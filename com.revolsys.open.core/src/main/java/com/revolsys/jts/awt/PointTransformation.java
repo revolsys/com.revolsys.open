@@ -39,7 +39,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Point;
 
 /**
- * Transforms a geometry {@link Coordinate} into a Java2D {@link Point},
+ * Transforms a geometry {@link Coordinates} into a Java2D {@link Point},
  * possibly with a mathematical transformation of the ordinate values.
  * Transformation from a model coordinate system to a view coordinate system 
  * can be efficiently performed by supplying an appropriate transformation.
@@ -48,9 +48,9 @@ import com.revolsys.jts.geom.Point;
  */
 public interface PointTransformation {
 	/**
-	 * Transforms a {@link Coordinate} into a Java2D {@link Point}.
+	 * Transforms a {@link Coordinates} into a Java2D {@link Point}.
 	 * 
-	 * @param src the source Coordinate 
+	 * @param src the source Coordinates 
 	 * @param dest the destination Point
 	 */
   public void transform(Coordinates src, Point2D dest);

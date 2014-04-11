@@ -57,10 +57,10 @@ public class CoordinateTest extends TestCase {
   }
 
   public void testCompareTo() {
-    final Coordinate lowest = new Coordinate(10.0, 100.0, 50.0);
-    final Coordinate highest = new Coordinate(20.0, 100.0, 50.0);
-    final Coordinate equalToHighest = new Coordinate(20.0, 100.0, 50.0);
-    final Coordinate higherStill = new Coordinate(20.0, 200.0, 50.0);
+    final Coordinates lowest = new Coordinate(10.0, 100.0, 50.0);
+    final Coordinates highest = new Coordinate(20.0, 100.0, 50.0);
+    final Coordinates equalToHighest = new Coordinate(20.0, 100.0, 50.0);
+    final Coordinates higherStill = new Coordinate(20.0, 200.0, 50.0);
 
     assertEquals(-1, lowest.compareTo(highest));
     assertEquals(1, highest.compareTo(lowest));
@@ -69,7 +69,7 @@ public class CoordinateTest extends TestCase {
   }
 
   public void testConstructor2D() {
-    final AbstractCoordinates c = new Coordinate(350.2, 4566.8,
+    final Coordinates c = new Coordinate(350.2, 4566.8,
       Coordinates.NULL_ORDINATE);
     assertEquals(c, 350.2, 4566.8, Coordinates.NULL_ORDINATE);
   }
@@ -86,26 +86,26 @@ public class CoordinateTest extends TestCase {
   }
 
   public void testDefaultConstructor() {
-    final AbstractCoordinates c = new Coordinate();
+    final Coordinates c = new Coordinate();
     assertEquals(c, 0.0, 0.0, Coordinates.NULL_ORDINATE);
   }
 
   public void testDistance() {
-    final AbstractCoordinates coord1 = new Coordinate(0.0, 0.0, 0.0);
+    final Coordinates coord1 = new Coordinate(0.0, 0.0, 0.0);
     final Coordinates coord2 = new Coordinate(100.0, 200.0, 50.0);
     final double distance = coord1.distance(coord2);
     assertEquals(distance, 223.60679774997897, 0.00001);
   }
 
   public void testDistance3D() {
-    final AbstractCoordinates coord1 = new Coordinate(0.0, 0.0, 0.0);
+    final Coordinates coord1 = new Coordinate(0.0, 0.0, 0.0);
     final Coordinates coord2 = new Coordinate(100.0, 200.0, 50.0);
     final double distance = coord1.distance3d(coord2);
     assertEquals(distance, 229.128784747792, 0.000001);
   }
 
   public void testEquals() {
-    final Coordinate c1 = new Coordinate(1.0, 2, 3);
+    final Coordinates c1 = new Coordinate(1.0, 2, 3);
     final String s = "Not a coordinate";
     assertTrue(!c1.equals(s));
 
@@ -117,7 +117,7 @@ public class CoordinateTest extends TestCase {
   }
 
   public void testEquals2D() {
-    final AbstractCoordinates c1 = new Coordinate(1.0, 2.0, 3.0);
+    final Coordinates c1 = new Coordinate(1.0, 2.0, 3.0);
     final Coordinates c2 = new Coordinate(1.0, 2.0, 3.0);
     assertTrue(c1.equals2d(c2));
 
@@ -126,13 +126,13 @@ public class CoordinateTest extends TestCase {
   }
 
   public void testEquals2DWithinTolerance() {
-    final AbstractCoordinates c = new Coordinate(100.0, 200.0, 50.0);
+    final Coordinates c = new Coordinate(100.0, 200.0, 50.0);
     final Coordinates aBitOff = new Coordinate(100.1, 200.1, 50.0);
     assertTrue(c.equals2d(aBitOff, 0.2));
   }
 
   public void testEquals3D() {
-    final AbstractCoordinates c1 = new Coordinate(1.0, 2.0, 3.0);
+    final Coordinates c1 = new Coordinate(1.0, 2.0, 3.0);
     final Coordinates c2 = new Coordinate(1.0, 2.0, 3.0);
     assertTrue(c1.equals3d(c2));
 
@@ -149,7 +149,7 @@ public class CoordinateTest extends TestCase {
 
   public void testSetCoordinate() {
     final Coordinates orig = new Coordinate(350.2, 4566.8, 5266.3);
-    final AbstractCoordinates c = new Coordinate(3);
+    final Coordinates c = new Coordinate((double)3);
     c.setCoordinate(orig);
     assertEquals(c.getX(), 350.2);
     assertEquals(c.getY(), 4566.8);
@@ -157,7 +157,7 @@ public class CoordinateTest extends TestCase {
   }
 
   public void testSetOrdinate() {
-    final Coordinates c = new Coordinate(3);
+    final Coordinates c = new Coordinate((double)3);
     c.setValue(Coordinates.X, 111);
     c.setValue(Coordinates.Y, 222);
     c.setValue(Coordinates.Z, 333);

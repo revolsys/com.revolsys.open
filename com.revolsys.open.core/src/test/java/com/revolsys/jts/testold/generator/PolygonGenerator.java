@@ -96,7 +96,8 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sy = coords[cindex - 1].getY();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new Coordinate(tx, sy + (j + 1) * cy, Coordinates.NULL_ORDINATE);
+          coords[cindex] = new Coordinate(tx, sy + (j + 1) * cy,
+            Coordinates.NULL_ORDINATE);
           gf.getPrecisionModel().makePrecise(coords[cindex++]);
         }
       } else { // even horz
@@ -108,7 +109,8 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sx = coords[cindex - 1].getX();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new Coordinate(sx + (j + 1) * cx, ty, Coordinates.NULL_ORDINATE);
+          coords[cindex] = new Coordinate(sx + (j + 1) * cx, ty,
+            Coordinates.NULL_ORDINATE);
           gf.getPrecisionModel().makePrecise(coords[cindex++]);
         }
       }

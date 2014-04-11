@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -67,13 +66,44 @@ import com.revolsys.jts.geom.Geometry;
  *
  * @version 1.7
  */
-public class CommonBitsRemover
-{
-  private Coordinates commonCoord;
-  private CommonCoordinateFilter ccFilter = new CommonCoordinateFilter();
+public class CommonBitsRemover {
+  class CommonCoordinateFilter implements CoordinateFilter {
+    private final CommonBits commonBitsX = new CommonBits();
 
-  public CommonBitsRemover()
-  {
+    private final CommonBits commonBitsY = new CommonBits();
+
+    @Override
+    public void filter(final Coordinates coord) {
+      commonBitsX.add(coord.getX());
+      commonBitsY.add(coord.getY());
+    }
+
+    public Coordinates getCommonCoordinate() {
+      return new Coordinate(commonBitsX.getCommon(), commonBitsY.getCommon(),
+        Coordinates.NULL_ORDINATE);
+    }
+  }
+
+  class Translater implements CoordinateFilter {
+    Coordinates trans = null;
+
+    public Translater(final Coordinates trans) {
+      this.trans = trans;
+    }
+
+    @Override
+    public void filter(final Coordinates coord) {
+      coord.setX(coord.getX() + trans.getX());
+      coord.setY(coord.getY() + trans.getY());
+    }
+
+  }
+
+  private Coordinates commonCoord;
+
+  private final CommonCoordinateFilter ccFilter = new CommonCoordinateFilter();
+
+  public CommonBitsRemover() {
   }
 
   /**
@@ -84,35 +114,9 @@ public class CommonBitsRemover
    *
    * @param geom a Geometry to test for common bits
    */
-  public void add(Geometry geom)
-  {
+  public void add(final Geometry geom) {
     geom.apply(ccFilter);
     commonCoord = ccFilter.getCommonCoordinate();
-  }
-
-  /**
-   * The common bits of the Coordinates in the supplied Geometries.
-   */
-  public Coordinates getCommonCoordinate() { return commonCoord; }
-
-  /**
-   * Removes the common coordinate bits from a Geometry.
-   * The coordinates of the Geometry are changed.
-   *
-   * @param geom the Geometry from which to remove the common coordinate bits
-   * @return the shifted Geometry
-   */
-  public Geometry removeCommonBits(Geometry geom)
-  {
-    if (commonCoord.getX() == 0.0 && commonCoord.getY() == 0.0)
-      return geom;
-    Coordinates invCoord = new Coordinate(commonCoord);
-    invCoord.setX(-invCoord.getX());
-    invCoord.setY(-invCoord.getY());
-    Translater trans = new Translater(invCoord);
-    geom.apply(trans);
-    geom.geometryChanged();
-    return geom;
   }
 
   /**
@@ -121,48 +125,37 @@ public class CommonBitsRemover
    *
    * @param geom the Geometry to which to add the common coordinate bits
    */
-  public void addCommonBits(Geometry geom)
-  {
-    Translater trans = new Translater(commonCoord);
+  public void addCommonBits(final Geometry geom) {
+    final Translater trans = new Translater(commonCoord);
     geom.apply(trans);
     geom.geometryChanged();
   }
 
-  class CommonCoordinateFilter
-      implements CoordinateFilter
-  {
-    private CommonBits commonBitsX = new CommonBits();
-    private CommonBits commonBitsY = new CommonBits();
-
-    public void filter(Coordinate coord)
-    {
-      commonBitsX.add(coord.getX());
-      commonBitsY.add(coord.getY());
-    }
-
-    public Coordinates getCommonCoordinate()
-    {
-      return new Coordinate(
-          commonBitsX.getCommon(),
-          commonBitsY.getCommon(), Coordinates.NULL_ORDINATE);
-    }
+  /**
+   * The common bits of the Coordinates in the supplied Geometries.
+   */
+  public Coordinates getCommonCoordinate() {
+    return commonCoord;
   }
 
-  class Translater
-      implements CoordinateFilter
-  {
-    Coordinates trans = null;
-
-    public Translater(Coordinates trans)
-    {
-      this.trans = trans;
+  /**
+   * Removes the common coordinate bits from a Geometry.
+   * The coordinates of the Geometry are changed.
+   *
+   * @param geom the Geometry from which to remove the common coordinate bits
+   * @return the shifted Geometry
+   */
+  public Geometry removeCommonBits(final Geometry geom) {
+    if (commonCoord.getX() == 0.0 && commonCoord.getY() == 0.0) {
+      return geom;
     }
-    public void filter(Coordinate coord)
-    {
-      coord.setX(coord.getX() + trans.getX());
-      coord.setY(coord.getY() + trans.getY());
-    }
-
+    final Coordinates invCoord = new Coordinate(commonCoord);
+    invCoord.setX(-invCoord.getX());
+    invCoord.setY(-invCoord.getY());
+    final Translater trans = new Translater(invCoord);
+    geom.apply(trans);
+    geom.geometryChanged();
+    return geom;
   }
 
 }

@@ -13,7 +13,6 @@ import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
@@ -176,7 +175,7 @@ public class PointDataObjectMap {
   public void sort(final DataObject object) {
     if (comparator != null) {
       final Geometry geometry = object.getGeometryValue();
-      final Coordinate coordinate = geometry.getCoordinate();
+      final Coordinates coordinate = geometry.getCoordinate();
       final List<DataObject> objects = objectMap.get(coordinate);
       if (objects != null) {
         Collections.sort(objects, comparator);

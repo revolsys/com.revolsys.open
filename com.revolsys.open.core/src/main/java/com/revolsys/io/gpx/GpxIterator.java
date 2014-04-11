@@ -27,11 +27,11 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -259,9 +259,9 @@ public class GpxIterator implements DataObjectIterator {
 
     Coordinates coord = null;
     if (Double.isNaN(elevation)) {
-      coord = new Coordinate(lon, lat, Coordinates.NULL_ORDINATE);
+      coord = new DoubleCoordinates(lon, lat);
     } else {
-      coord = new Coordinate(lon, lat, elevation);
+      coord = new DoubleCoordinates(lon, lat, elevation);
     }
 
     final Point point = geometryFactory.createPoint(coord);

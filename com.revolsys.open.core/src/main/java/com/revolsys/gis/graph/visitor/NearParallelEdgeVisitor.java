@@ -5,7 +5,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgeVisitor;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
@@ -34,12 +34,12 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
     }
     final CoordinatesList coords = line.getCoordinatesList();
     final CoordinatesList matchCoords = line.getCoordinatesList();
-    Coordinate previousCoordinate = coords.getCoordinate(0);
+    Coordinates previousCoordinate = coords.getCoordinate(0);
     for (int i = 1; i < coords.size(); i++) {
-      final Coordinate coordinate = coords.getCoordinate(i);
-      Coordinate previousMatchCoordinate = matchCoords.getCoordinate(0);
+      final Coordinates coordinate = coords.getCoordinate(i);
+      Coordinates previousMatchCoordinate = matchCoords.getCoordinate(0);
       for (int j = 1; j < coords.size(); j++) {
-        final Coordinate matchCoordinate = matchCoords.getCoordinate(i);
+        final Coordinates matchCoordinate = matchCoords.getCoordinate(i);
         final double distance = CGAlgorithms.distanceLineLine(
           previousCoordinate, coordinate, previousMatchCoordinate,
           matchCoordinate);

@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -55,17 +57,17 @@ public class MultiPoint extends GeometryCollection implements Puntal {
   }
 
   /**
-   *  Constructs a <code>MultiPoint</code>.
-   *
-   *@param  points          the <code>Point</code>s for this <code>MultiPoint</code>
-   *      , or <code>null</code> or an empty array to create the empty geometry.
-   *      Elements may be empty <code>Point</code>s, but not <code>null</code>s.
-   *@param  precisionModel  the specification of the grid of allowable points
-   *      for this <code>MultiPoint</code>
-   *@param  SRID            the ID of the Spatial Reference System used by this
-   *      <code>MultiPoint</code>
-   * @deprecated Use GeometryFactory instead
-   */
+  *  Constructs a <code>MultiPoint</code>.
+  *
+  *@param  points          the <code>Point</code>s for this <code>MultiPoint</code>
+  *      , or <code>null</code> or an empty array to create the empty geometry.
+  *      Elements may be empty <code>Point</code>s, but not <code>null</code>s.
+  *@param  precisionModel  the specification of the grid of allowable points
+  *      for this <code>MultiPoint</code>
+  *@param  SRID            the ID of the Spatial Reference System used by this
+  *      <code>MultiPoint</code>
+  * @deprecated Use GeometryFactory instead
+  */
   @Deprecated
   public MultiPoint(final Point[] points, final PrecisionModel precisionModel,
     final int SRID) {
@@ -141,6 +143,23 @@ public class MultiPoint extends GeometryCollection implements Puntal {
   @Override
   public boolean isValid() {
     return true;
+  }
+
+  @Override
+  public MultiPoint normalize() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final List<Point> geometries = new ArrayList<>();
+      for (final Geometry part : this.geometries) {
+        final Point normalizedPart = (Point)part.normalize();
+        geometries.add(normalizedPart);
+      }
+      Collections.sort(geometries);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final MultiPoint normalizedGeometry = geometryFactory.createMultiPoint(geometries);
+      return normalizedGeometry;
+    }
   }
 
   /**

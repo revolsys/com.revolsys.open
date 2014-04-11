@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -36,7 +35,6 @@ package com.revolsys.jts.algorithm;
 /**
  *@version 1.7
  */
-import com.revolsys.jts.geom.Coordinate;
 //import com.revolsys.jts.testold.util.Debug;
 import com.revolsys.jts.geom.Coordinates;
 
@@ -121,8 +119,8 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  protected int computeIntersect(final Coordinate p1, final Coordinate p2,
-    final Coordinate p3, final Coordinate p4) {
+  protected int computeIntersect(final Coordinates p1, final Coordinates p2,
+    final Coordinates p3, final Coordinates p4) {
     double a1;
     double b1;
     double c1;

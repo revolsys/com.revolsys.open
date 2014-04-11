@@ -20,7 +20,7 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 
 class AverageZFilter implements CoordinateFilter {
   @Override
-  public void filter(final Coordinate coord) {
+  public void filter(final Coordinates coord) {
     coord.setZ((coord.getX() + coord.getY()) / 2);
   }
 }
@@ -135,7 +135,7 @@ public class WKBTest extends TestCase {
   public void testBigPolygon() throws IOException, ParseException {
     final GeometricShapeFactory shapeFactory = new GeometricShapeFactory(
       this.geomFactory);
-    shapeFactory.setBase(new Coordinate(0, 0, Coordinates.NULL_ORDINATE));
+    shapeFactory.setBase(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
     shapeFactory.setSize(1000);
     shapeFactory.setNumPoints(1000);
     final Geometry geom = shapeFactory.createRectangle();

@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.Coordinates;
  */
 public class KdNode {
 
-  private Coordinate p = null;
+  private Coordinates p = null;
 
   private final Object data;
 
@@ -87,7 +87,7 @@ public class KdNode {
    * 
    * @return p location of this node
    */
-  public Coordinate getCoordinate() {
+  public Coordinates getCoordinate() {
     return p;
   }
 

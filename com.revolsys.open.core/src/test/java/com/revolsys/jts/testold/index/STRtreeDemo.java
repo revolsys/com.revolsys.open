@@ -156,11 +156,11 @@ public class STRtreeDemo {
       final Envelope e = (Envelope)i.next();
       final Geometry g = factory.createPolygon(
         factory.createLinearRing(new Coordinates[] {
-          new Coordinate(e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE),
-          new Coordinate(e.getMinX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
-          new Coordinate(e.getMaxX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
-          new Coordinate(e.getMaxX(), e.getMinY(), Coordinates.NULL_ORDINATE),
-          new Coordinate(e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE)
+          new Coordinate((double)e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE),
+          new Coordinate((double)e.getMinX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
+          new Coordinate((double)e.getMaxX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
+          new Coordinate((double)e.getMaxX(), e.getMinY(), Coordinates.NULL_ORDINATE),
+          new Coordinate((double)e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE)
         }), null);
       if (first) {
         first = false;
@@ -183,9 +183,9 @@ public class STRtreeDemo {
     final double right = left + width;
     return factory.createPolygon(
       factory.createLinearRing(new Coordinates[] {
-        new Coordinate(left, bottom, Coordinates.NULL_ORDINATE), new Coordinate(right, bottom, Coordinates.NULL_ORDINATE),
-        new Coordinate(right, top, Coordinates.NULL_ORDINATE), new Coordinate(left, top, Coordinates.NULL_ORDINATE),
-        new Coordinate(left, bottom, Coordinates.NULL_ORDINATE)
+        new Coordinate((double)left, bottom, Coordinates.NULL_ORDINATE), new Coordinate((double)right, bottom, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)right, top, Coordinates.NULL_ORDINATE), new Coordinate((double)left, top, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)left, bottom, Coordinates.NULL_ORDINATE)
       }), null);
   }
 

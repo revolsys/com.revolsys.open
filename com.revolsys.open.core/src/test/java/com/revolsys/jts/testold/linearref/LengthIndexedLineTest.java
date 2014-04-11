@@ -1,6 +1,5 @@
 package com.revolsys.jts.testold.linearref;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -28,8 +27,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   }
 
   @Override
-  protected AbstractCoordinates extractOffsetAt(final Geometry linearGeom,
-    final Coordinate testPt, final double offsetDistance) {
+  protected Coordinates extractOffsetAt(final Geometry linearGeom,
+    final Coordinates testPt, final double offsetDistance) {
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
     final double index = indexedLine.indexOf(testPt);
     return indexedLine.extractPoint(index, offsetDistance);
@@ -37,7 +36,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
 
   @Override
   protected boolean indexOfAfterCheck(final Geometry linearGeom,
-    final Coordinate testPt) {
+    final Coordinates testPt) {
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
 
     // check locations are consecutive
@@ -48,8 +47,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
     }
 
     // check extracted points are the same as the input
-    final AbstractCoordinates pt1 = indexedLine.extractPoint(loc1);
-    final AbstractCoordinates pt2 = indexedLine.extractPoint(loc2);
+    final Coordinates pt1 = indexedLine.extractPoint(loc1);
+    final Coordinates pt2 = indexedLine.extractPoint(loc2);
     if (!pt1.equals2d(testPt)) {
       return false;
     }
@@ -62,7 +61,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
 
   @Override
   protected boolean indexOfAfterCheck(final Geometry linearGeom,
-    final Coordinate testPt, final Coordinate checkPt) {
+    final Coordinates testPt, final Coordinates checkPt) {
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
 
     // check that computed location is after check location
@@ -91,10 +90,11 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZ() {
     final Geometry linearGeom = read("LINESTRING (0 0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new Coordinate(5, 5, Coordinates.NULL_ORDINATE));
-    final AbstractCoordinates projPt = indexedLine.extractPoint(projIndex);
+    final double projIndex = indexedLine.project(new Coordinate((double)5, 5,
+      Coordinates.NULL_ORDINATE));
+    final Coordinates projPt = indexedLine.extractPoint(projIndex);
     // System.out.println(projPt);
-    assertTrue(projPt.equals3d(new Coordinate(5, 5, 5)));
+    assertTrue(projPt.equals3d(new Coordinate((double)5, 5, 5)));
   }
 
   /**
@@ -104,7 +104,8 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZNaN() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new Coordinate(5, 5, Coordinates.NULL_ORDINATE));
+    final double projIndex = indexedLine.project(new Coordinate((double)5, 5,
+      Coordinates.NULL_ORDINATE));
     final Coordinates projPt = indexedLine.extractPoint(projIndex);
     assertTrue(Double.isNaN(projPt.getZ()));
   }
@@ -173,11 +174,13 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testExtractPointBeyondRange() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final Coordinate pt = indexedLine.extractPoint(100);
-    assertTrue(pt.equals(new Coordinate(10, 10, Coordinates.NULL_ORDINATE)));
+    final Coordinates pt = indexedLine.extractPoint(100);
+    assertTrue(pt.equals(new Coordinate((double)10, 10,
+      Coordinates.NULL_ORDINATE)));
 
-    final Coordinate pt2 = indexedLine.extractPoint(0);
-    assertTrue(pt2.equals(new Coordinate(0, 0, Coordinates.NULL_ORDINATE)));
+    final Coordinates pt2 = indexedLine.extractPoint(0);
+    assertTrue(pt2.equals(new Coordinate((double)0, 0,
+      Coordinates.NULL_ORDINATE)));
   }
 
   /**
@@ -202,15 +205,17 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testProjectExtractPoint() {
     final Geometry linearGeom = read("MULTILINESTRING ((0 2, 0 0), (-1 1, 1 1))");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double index = indexedLine.project(new Coordinate(1, 0, Coordinates.NULL_ORDINATE));
-    final Coordinate pt = indexedLine.extractPoint(index);
-    assertTrue(pt.equals(new Coordinate(0, 0, Coordinates.NULL_ORDINATE)));
+    final double index = indexedLine.project(new Coordinate((double)1, 0,
+      Coordinates.NULL_ORDINATE));
+    final Coordinates pt = indexedLine.extractPoint(index);
+    assertTrue(pt.equals(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE)));
   }
 
   public void testProjectPointWithDuplicateCoords() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 0, 10 0, 20 0)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new Coordinate(10, 1, Coordinates.NULL_ORDINATE));
+    final double projIndex = indexedLine.project(new Coordinate((double)10, 1,
+      Coordinates.NULL_ORDINATE));
     assertTrue(projIndex == 10.0);
   }
 

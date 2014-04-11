@@ -404,10 +404,10 @@ public class RobustDeterminant {
       * For instance, the following situation produces identical results in spite
       * of the inverse orientation of the line segment:
       * 
-      * Coordinate p0 = new Coordinate(219.3649559090992, 140.84159161824724);
-      * Coordinate p1 = new Coordinate(168.9018919682399, -5.713787599646864);
+      * Coordinates p0 = new Coordinate((double)219.3649559090992, 140.84159161824724);
+      * Coordinates p1 = new Coordinate((double)168.9018919682399, -5.713787599646864);
       * 
-      * Coordinate p = new Coordinate(186.80814046338352, 46.28973405831556); int
+      * Coordinates p = new Coordinate((double)186.80814046338352, 46.28973405831556); int
       * orient = orientationIndex(p0, p1, p); int orientInv =
       * orientationIndex(p1, p0, p);
       * 

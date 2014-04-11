@@ -83,7 +83,7 @@ public class BufferInputLineSimplifier
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public static Coordinate[] simplify(Coordinate[] inputLine, double distanceTol)
+  public static Coordinates[] simplify(Coordinates[] inputLine, double distanceTol)
   {
     BufferInputLineSimplifier simp = new BufferInputLineSimplifier(inputLine);
     return simp.simplify(distanceTol);
@@ -94,12 +94,12 @@ public class BufferInputLineSimplifier
   private static final int KEEP = 1;
   
   
-  private Coordinate[] inputLine;
+  private Coordinates[] inputLine;
   private double distanceTol;
   private byte[] isDeleted;
   private int angleOrientation = CGAlgorithms.COUNTERCLOCKWISE;
   
-  public BufferInputLineSimplifier(Coordinate[] inputLine) {
+  public BufferInputLineSimplifier(Coordinates[] inputLine) {
     this.inputLine = inputLine;
   }
 
@@ -113,7 +113,7 @@ public class BufferInputLineSimplifier
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public Coordinate[] simplify(double distanceTol)
+  public Coordinates[] simplify(double distanceTol)
   {
     this.distanceTol = Math.abs(distanceTol);
     if (distanceTol < 0)
@@ -184,7 +184,7 @@ public class BufferInputLineSimplifier
     return next;  
   }
   
-  private Coordinate[] collapseLine()
+  private Coordinates[] collapseLine()
   {
     CoordinateList coordList = new CoordinateList();
     for (int i = 0; i < inputLine.length; i++) {
@@ -198,7 +198,7 @@ public class BufferInputLineSimplifier
   private boolean isDeletable(int i0, int i1, int i2, double distanceTol)
   {
   	Coordinates p0 = inputLine[i0];
-  	AbstractCoordinates p1 = inputLine[i1];
+  	Coordinates p1 = inputLine[i1];
   	Coordinates p2 = inputLine[i2];
   	
   	if (! isConcave(p0, p1, p2)) return false;
@@ -210,7 +210,7 @@ public class BufferInputLineSimplifier
   	return isShallowSampled(p0, p1, i0, i2, distanceTol);
   }
 
-  private boolean isShallowConcavity(Coordinates p0, AbstractCoordinates p1, Coordinates p2, double distanceTol)
+  private boolean isShallowConcavity(Coordinates p0, Coordinates p1, Coordinates p2, double distanceTol)
   {
     int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
     boolean isAngleToSimplify = (orientation == angleOrientation);
@@ -235,7 +235,7 @@ public class BufferInputLineSimplifier
    * @param distanceTol distance tolerance
    * @return
    */
-  private boolean isShallowSampled(Coordinates p0, AbstractCoordinates p2, int i0, int i2, double distanceTol)
+  private boolean isShallowSampled(Coordinates p0, Coordinates p2, int i0, int i2, double distanceTol)
   {
     // check every n'th point to see if it is within tolerance
   	int inc = (i2 - i0) / NUM_PTS_TO_CHECK;
@@ -247,7 +247,7 @@ public class BufferInputLineSimplifier
   	return true;
   }
   
-  private boolean isShallow(Coordinates p0, AbstractCoordinates p1, Coordinates p2, double distanceTol)
+  private boolean isShallow(Coordinates p0, Coordinates p1, Coordinates p2, double distanceTol)
   {
     double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
     return dist < distanceTol;

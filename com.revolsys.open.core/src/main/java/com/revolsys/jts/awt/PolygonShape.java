@@ -61,7 +61,7 @@ public class PolygonShape implements Shape
      * Creates a new polygon {@link Shape}.
      * 
      * @param shellVertices the vertices of the shell 
-     * @param holeVerticesCollection a collection of Coordinate[] for each hole
+     * @param holeVerticesCollection a collection of Coordinates[] for each hole
      */
     public PolygonShape(Coordinates[] shellVertices,
         Collection holeVerticesCollection) 

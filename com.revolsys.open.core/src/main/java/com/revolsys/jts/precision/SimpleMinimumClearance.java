@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.precision;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
@@ -59,125 +58,122 @@ import com.revolsys.jts.geom.LineString;
  * @author Martin Davis
  *
  */
-public class SimpleMinimumClearance 
-{
-  public static double getDistance(Geometry g)
-  {
-    SimpleMinimumClearance rp = new SimpleMinimumClearance(g);
+public class SimpleMinimumClearance {
+  private class ComputeMCCoordinateSequenceFilter implements
+    CoordinateSequenceFilter {
+    private final Coordinates queryPt;
+
+    public ComputeMCCoordinateSequenceFilter(final Coordinates queryPt) {
+      this.queryPt = queryPt;
+    }
+
+    private void checkSegmentDistance(final Coordinates seg0,
+      final Coordinates seg1) {
+      if (queryPt.equals2d(seg0) || queryPt.equals2d(seg1)) {
+        return;
+      }
+      final double segDist = CGAlgorithms.distancePointLine(queryPt, seg1, seg0);
+      if (segDist > 0) {
+        updateClearance(segDist, queryPt, seg1, seg0);
+      }
+    }
+
+    private void checkVertexDistance(final Coordinates vertex) {
+      final double vertexDist = vertex.distance(queryPt);
+      if (vertexDist > 0) {
+        updateClearance(vertexDist, queryPt, vertex);
+      }
+    }
+
+    @Override
+    public void filter(final CoordinatesList seq, final int i) {
+      // compare to vertex
+      checkVertexDistance(seq.getCoordinate(i));
+
+      // compare to segment, if this is one
+      if (i > 0) {
+        checkSegmentDistance(seq.getCoordinate(i - 1), seq.getCoordinate(i));
+      }
+    }
+
+    @Override
+    public boolean isDone() {
+      return false;
+    }
+
+    @Override
+    public boolean isGeometryChanged() {
+      return false;
+    }
+
+  }
+
+  private class VertexCoordinateFilter implements CoordinateFilter {
+    public VertexCoordinateFilter() {
+
+    }
+
+    @Override
+    public void filter(final Coordinates coord) {
+      inputGeom.apply(new ComputeMCCoordinateSequenceFilter(coord));
+    }
+  }
+
+  public static double getDistance(final Geometry g) {
+    final SimpleMinimumClearance rp = new SimpleMinimumClearance(g);
     return rp.getDistance();
   }
-  
-  public static Geometry getLine(Geometry g)
-  {
-    SimpleMinimumClearance rp = new SimpleMinimumClearance(g);
+
+  public static Geometry getLine(final Geometry g) {
+    final SimpleMinimumClearance rp = new SimpleMinimumClearance(g);
     return rp.getLine();
   }
-  
-  private Geometry inputGeom;
+
+  private final Geometry inputGeom;
+
   private double minClearance;
+
   private Coordinates[] minClearancePts;
-  
-  public SimpleMinimumClearance(Geometry geom)
-  {
+
+  public SimpleMinimumClearance(final Geometry geom) {
     inputGeom = geom;
   }
-  
-  public double getDistance()
-  {
-    compute();
-    return minClearance;
-  }
-  
-  public LineString getLine()
-  {
-    compute();
-    return inputGeom.getGeometryFactory().createLineString(minClearancePts);
-  }
-  
-  private void compute()
-  {
-    if (minClearancePts != null) return;
+
+  private void compute() {
+    if (minClearancePts != null) {
+      return;
+    }
     minClearancePts = new Coordinates[2];
     minClearance = Double.MAX_VALUE;
     inputGeom.apply(new VertexCoordinateFilter());
   }
-  
-  private void updateClearance(double candidateValue, Coordinates p0, Coordinates p1)
-  {
+
+  public double getDistance() {
+    compute();
+    return minClearance;
+  }
+
+  public LineString getLine() {
+    compute();
+    return inputGeom.getGeometryFactory().createLineString(minClearancePts);
+  }
+
+  private void updateClearance(final double candidateValue,
+    final Coordinates p0, final Coordinates p1) {
     if (candidateValue < minClearance) {
       minClearance = candidateValue;
       minClearancePts[0] = new Coordinate(p0);
       minClearancePts[1] = new Coordinate(p1);
     }
   }
-  
-  private void updateClearance(double candidateValue, Coordinate p, 
-      Coordinate seg0, Coordinate seg1)
-  {
+
+  private void updateClearance(final double candidateValue,
+    final Coordinates p, final Coordinates seg0, final Coordinates seg1) {
     if (candidateValue < minClearance) {
       minClearance = candidateValue;
       minClearancePts[0] = new Coordinate(p);
-      LineSegment seg = new LineSegment(seg0, seg1);
+      final LineSegment seg = new LineSegment(seg0, seg1);
       minClearancePts[1] = new Coordinate(seg.closestPoint(p));
     }
-  }
-  
-  private class VertexCoordinateFilter 
-  implements CoordinateFilter
-  {
-    public VertexCoordinateFilter()
-    {
-      
-    }
-    
-    public void filter(Coordinate coord) {
-      inputGeom.apply(new ComputeMCCoordinateSequenceFilter(coord));
-    }
-  }
-  
-  private class ComputeMCCoordinateSequenceFilter 
-  implements CoordinateSequenceFilter 
-  {
-    private Coordinate queryPt;
-    
-    public ComputeMCCoordinateSequenceFilter(Coordinate queryPt)
-    {
-      this.queryPt = queryPt;
-    }
-    public void filter(CoordinatesList seq, int i) {
-      // compare to vertex
-      checkVertexDistance(seq.getCoordinate(i));
-      
-      // compare to segment, if this is one
-      if (i > 0) {
-        checkSegmentDistance(seq.getCoordinate(i - 1), seq.getCoordinate(i));
-      }
-    }
-    
-    private void checkVertexDistance(AbstractCoordinates vertex)
-    {
-      double vertexDist = vertex.distance(queryPt);
-      if (vertexDist > 0) {
-        updateClearance(vertexDist, queryPt, vertex);
-      }
-    }
-    
-    private void checkSegmentDistance(Coordinate seg0, Coordinate seg1)
-    {
-        if (queryPt.equals2d(seg0) || queryPt.equals2d(seg1))
-          return;
-        double segDist = CGAlgorithms.distancePointLine(queryPt, seg1, seg0);
-        if (segDist > 0) 
-          updateClearance(segDist, queryPt, seg1, seg0);
-    }
-    
-    public boolean isDone() {
-      return false;
-    }
-    
-    public boolean isGeometryChanged() {
-      return false;
-    }
-    
   }
 }

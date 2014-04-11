@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
@@ -242,8 +242,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Coordinate getCoordinate(final int i) {
-    final Coordinate coordinate = new Coordinate();
+  public Coordinates getCoordinate(final int i) {
+    final Coordinates coordinate = new DoubleCoordinates(getNumAxis());
     getCoordinate(i, coordinate);
     return coordinate;
   }
@@ -258,10 +258,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Coordinate getCoordinateCopy(final int i) {
-    final Coordinate coordinate = new Coordinate();
-    getCoordinate(i, coordinate);
-    return coordinate;
+  public Coordinates getCoordinateCopy(final int i) {
+    return getCoordinate(i);
   }
 
   @Override
@@ -342,6 +340,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return new CoordinatesListCoordinatesIterator(this);
   }
 
+  @Override
   public void makePrecise(final CoordinatesPrecisionModel precisionModel) {
     final InPlaceIterator iterator = new InPlaceIterator(this);
     for (final Coordinates point : iterator) {
@@ -450,8 +449,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Coordinate[] toCoordinateArray() {
-    final Coordinate[] coordinateArray = new Coordinate[size()];
+  public Coordinates[] toCoordinateArray() {
+    final Coordinates[] coordinateArray = new Coordinates[size()];
     for (int i = 0; i < coordinateArray.length; i++) {
       coordinateArray[i] = getCoordinateCopy(i);
     }

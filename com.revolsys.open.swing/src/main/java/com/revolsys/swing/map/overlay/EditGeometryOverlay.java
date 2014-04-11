@@ -33,10 +33,10 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.geometry.LineSegment;
-import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -318,8 +318,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           final LineString line = (LineString)geometry;
           final Point p0 = line.getPointN(0);
           final Point p1 = line.getPointN(1);
-          final LinearRing ring = geometryFactory.createLinearRing(p0, p1,
-            newPoint, p0);
+          final LinearRing ring = geometryFactory.createLinearRing(Arrays.asList(
+            p0, p1, newPoint, p0));
           geometry = geometryFactory.createPolygon(ring);
         } else if (geometry instanceof Polygon) {
           final Polygon polygon = (Polygon)geometry;

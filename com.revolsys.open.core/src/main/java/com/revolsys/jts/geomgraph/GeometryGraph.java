@@ -183,14 +183,14 @@ public class GeometryGraph extends PlanarGraph {
    */
   public void addEdge(final Edge e) {
     insertEdge(e);
-    final Coordinate[] coord = e.getCoordinates();
+    final Coordinates[] coord = e.getCoordinates();
     // insert the endpoint as a node, to mark that it is on the boundary
     insertPoint(argIndex, coord[0], Location.BOUNDARY);
     insertPoint(argIndex, coord[coord.length - 1], Location.BOUNDARY);
   }
 
   private void addLineString(final LineString line) {
-    final Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(line.getCoordinateArray());
+    final Coordinates[] coord = CoordinateArrays.removeRepeatedPoints(line.getCoordinateArray());
 
     if (coord.length < 2) {
       hasTooFewPoints = true;
@@ -218,7 +218,7 @@ public class GeometryGraph extends PlanarGraph {
    * Add a point computed externally.  The point is assumed to be a
    * Point Geometry part, which has a location of INTERIOR.
    */
-  public void addPoint(final Coordinate pt) {
+  public void addPoint(final Coordinates pt) {
     insertPoint(argIndex, pt, Location.INTERIOR);
   }
 
@@ -226,7 +226,7 @@ public class GeometryGraph extends PlanarGraph {
    * Add a Point to the graph.
    */
   private void addPoint(final Point p) {
-    final Coordinate coord = p.getCoordinate();
+    final Coordinates coord = p.getCoordinate();
     insertPoint(argIndex, coord, Location.INTERIOR);
   }
 
@@ -259,7 +259,7 @@ public class GeometryGraph extends PlanarGraph {
       return;
     }
 
-    final Coordinate[] coord = CoordinateArrays.removeRepeatedPoints(lr.getCoordinateArray());
+    final Coordinates[] coord = CoordinateArrays.removeRepeatedPoints(lr.getCoordinateArray());
 
     if (coord.length < 4) {
       hasTooFewPoints = true;
@@ -289,7 +289,7 @@ public class GeometryGraph extends PlanarGraph {
    * Otherwise, just add it as a regular node.
    */
   private void addSelfIntersectionNode(final int argIndex,
-    final Coordinate coord, final int loc) {
+    final Coordinates coord, final int loc) {
     // if this node is already a boundary node, don't change it
     if (isBoundaryNode(argIndex, coord)) {
       return;
@@ -431,7 +431,7 @@ public class GeometryGraph extends PlanarGraph {
    * This is used to add the boundary
    * points of dim-1 geometries (Curves/MultiCurves).
    */
-  private void insertBoundaryPoint(final int argIndex, final Coordinate coord) {
+  private void insertBoundaryPoint(final int argIndex, final Coordinates coord) {
     final NodeMap nodes = getNodeMap();
     final Node n = nodes.addNode(coord);
     // nodes always have labels
@@ -451,7 +451,7 @@ public class GeometryGraph extends PlanarGraph {
     lbl.setLocation(argIndex, newLoc);
   }
 
-  private void insertPoint(final int argIndex, final Coordinate coord,
+  private void insertPoint(final int argIndex, final Coordinates coord,
     final int onLocation) {
     final NodeMap nodes = getNodeMap();
     final Node n = nodes.addNode(coord);
@@ -465,13 +465,13 @@ public class GeometryGraph extends PlanarGraph {
 
   // MD - experimental for now
   /**
-   * Determines the {@link Location} of the given {@link Coordinate}
+   * Determines the {@link Location} of the given {@link Coordinates}
    * in this geometry.
    * 
    * @param p the point to test
    * @return the location of the point in the geometry
    */
-  public int locate(final Coordinate pt) {
+  public int locate(final Coordinates pt) {
     if (parentGeom instanceof Polygonal && parentGeom.getNumGeometries() > 50) {
       // lazily init point locator
       if (areaPtLocator == null) {

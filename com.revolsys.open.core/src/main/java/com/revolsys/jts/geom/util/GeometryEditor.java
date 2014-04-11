@@ -279,7 +279,7 @@ public class GeometryEditor
       }
 
       if (geometry instanceof Point) {
-        Coordinate[] newCoordinates = edit(geometry.getCoordinateArray(),
+        Coordinates[] newCoordinates = edit(geometry.getCoordinateArray(),
             geometry);
 
         return factory.createPoint((newCoordinates.length > 0)
@@ -290,7 +290,7 @@ public class GeometryEditor
     }
 
     /**
-     * Edits the array of {@link Coordinate}s from a {@link Geometry}.
+     * Edits the array of {@link Coordinates}s from a {@link Geometry}.
      * <p>
      * If it is desired to preserve the immutability of Geometrys,
      * if the coordinates are changed a new array should be created
@@ -300,7 +300,7 @@ public class GeometryEditor
      * @param geometry the geometry containing the coordinate list
      * @return an edited coordinate array (which may be the same as the input)
      */
-    public abstract Coordinate[] edit(Coordinates[] coordinates,
+    public abstract Coordinates[] edit(Coordinates[] coordinates,
                                       Geometry geometry);
   }
   

@@ -81,8 +81,8 @@ public abstract class GeometricShapeBuilder
 		double radius = getRadius();
 		
 		Coordinates centre = getCentre();
-		Coordinate p0 = new Coordinate(centre.getX() - radius, centre.getY() - radius, Coordinates.NULL_ORDINATE);
-		Coordinate p1 = new Coordinate(centre.getX() + radius, centre.getY() - radius, Coordinates.NULL_ORDINATE);
+		Coordinate p0 = new Coordinate((double)centre.getX() - radius, centre.getY() - radius, Coordinates.NULL_ORDINATE);
+		Coordinate p1 = new Coordinate((double)centre.getX() + radius, centre.getY() - radius, Coordinates.NULL_ORDINATE);
 		return new LineSegment(p0, p1);
 	}
 	
@@ -107,7 +107,7 @@ public abstract class GeometricShapeBuilder
 
   protected Coordinates createCoord(double x, double y)
   {
-  	Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+  	Coordinates pt = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
   	geomFactory.getPrecisionModel().makePrecise(pt);
     return pt;
   }

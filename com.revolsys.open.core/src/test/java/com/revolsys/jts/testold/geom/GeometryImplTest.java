@@ -38,7 +38,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -240,24 +239,15 @@ public class GeometryImplTest extends TestCase {
   // assertTrue(lineString.equals(geometryCollection));
   // }
   public void testEqualsExactForLinearRings() throws Exception {
-    final LinearRing x = this.geometryFactory.createLinearRing(new Coordinates[] {
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 100, Coordinates.NULL_ORDINATE),
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE)
-    });
-    final LinearRing somethingExactlyEqual = this.geometryFactory.createLinearRing(new Coordinates[] {
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 100, Coordinates.NULL_ORDINATE),
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE)
-    });
-    final LinearRing somethingNotEqualButSameClass = this.geometryFactory.createLinearRing(new Coordinates[] {
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 555, Coordinates.NULL_ORDINATE),
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE)
-    });
+    final LinearRing x = this.geometryFactory.createLinearRing(0.0, 0,
+      Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE, 100.0,
+      100, Coordinates.NULL_ORDINATE, 0.0, 0, Coordinates.NULL_ORDINATE);
+    final LinearRing somethingExactlyEqual = this.geometryFactory.createLinearRing(
+      0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
+      100.0, 100, Coordinates.NULL_ORDINATE, 0.0, 0, Coordinates.NULL_ORDINATE);
+    final LinearRing somethingNotEqualButSameClass = this.geometryFactory.createLinearRing(
+      0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
+      100.0, 555, Coordinates.NULL_ORDINATE, 0.0, 0, Coordinates.NULL_ORDINATE);
     final LinearRing sameClassButEmpty = this.geometryFactory.createLinearRing((CoordinatesList)null);
     final LinearRing anotherSameClassButEmpty = this.geometryFactory.createLinearRing((CoordinatesList)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
@@ -271,30 +261,25 @@ public class GeometryImplTest extends TestCase {
       sameClassButEmpty, anotherSameClassButEmpty, collectionFactory);
 
     // LineString somethingEqualButNotExactly =
-    // geometryFactory.createLineString(new Coordinate[] {
-    // new Coordinate(0, 0), new Coordinate(100, 0), new Coordinate(100, 100),
-    // new Coordinate(0, 0) });
+    // geometryFactory.createLineString(new Coordinates[] {
+    // new Coordinate((double)0, 0), new Coordinate((double)100, 0), new
+    // Coordinate((double)100, 100),
+    // new Coordinate((double)0, 0) });
     //
     // doTestEqualsExact(x, somethingExactlyEqual, somethingEqualButNotExactly,
     // somethingNotEqualButSameClass);
   }
 
   public void testEqualsExactForLineStrings() throws Exception {
-    final LineString x = this.geometryFactory.createLineString(new Coordinates[] {
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 100, Coordinates.NULL_ORDINATE)
-    });
-    final LineString somethingExactlyEqual = this.geometryFactory.createLineString(new Coordinates[] {
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 100, Coordinates.NULL_ORDINATE)
-    });
-    final LineString somethingNotEqualButSameClass = this.geometryFactory.createLineString(new Coordinates[] {
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(100.0, 555, Coordinates.NULL_ORDINATE)
-    });
+    final LineString x = this.geometryFactory.createLineString(0.0, 0,
+      Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE, 100.0,
+      100, Coordinates.NULL_ORDINATE);
+    final LineString somethingExactlyEqual = this.geometryFactory.createLineString(
+      0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
+      100.0, 100, Coordinates.NULL_ORDINATE);
+    final LineString somethingNotEqualButSameClass = this.geometryFactory.createLineString(
+      0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
+      100.0, 555, Coordinates.NULL_ORDINATE);
     final LineString sameClassButEmpty = this.geometryFactory.createLineString();
     final LineString anotherSameClassButEmpty = this.geometryFactory.createLineString();
     final CollectionFactory collectionFactory = new CollectionFactory() {
@@ -367,7 +352,7 @@ public class GeometryImplTest extends TestCase {
   // assertEquals(new Envelope(0, 50, 0, 50), g.getEnvelopeInternal());
   // g.apply(new CoordinateFilter() {
   // @Override
-  // public void filter(final Coordinate coord) {
+  // public void filter(final Coordinates coord) {
   // coord.setX(coord.getX() + 1);
   // coord.setY(coord.getY() + 1);
   // }

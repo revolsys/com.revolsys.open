@@ -5,9 +5,9 @@ import java.util.Comparator;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateArrays.BidirectionalComparator;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.io.WKTReader;
 
@@ -33,8 +33,8 @@ public class BidirectionalComparatorTest extends TestCase {
     throws Exception {
     final LineString g0 = (LineString)this.rdr.read(wkt0);
     final LineString g1 = (LineString)this.rdr.read(wkt1);
-    final Coordinate[] pts0 = g0.getCoordinateArray();
-    final Coordinate[] pts1 = g1.getCoordinateArray();
+    final Coordinates[] pts0 = g0.getCoordinateArray();
+    final Coordinates[] pts1 = g1.getCoordinateArray();
     final Comparator comp = new CoordinateArrays.BidirectionalComparator();
     return comp.compare(pts0, pts1);
   }

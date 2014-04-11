@@ -59,7 +59,7 @@ public class PointLocatorTest extends TestCase {
     super(name);
   }
 
-  private void runPtLocator(final int expected, final Coordinate pt,
+  private void runPtLocator(final int expected, final Coordinates pt,
     final String wkt) throws Exception {
     final Geometry geom = this.reader.read(wkt);
     final PointLocator pointLocator = new PointLocator();
@@ -68,26 +68,26 @@ public class PointLocatorTest extends TestCase {
   }
 
   public void testBox() throws Exception {
-    runPtLocator(Location.INTERIOR, new Coordinate(10, 10, Coordinates.NULL_ORDINATE),
+    runPtLocator(Location.INTERIOR, new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE),
       "POLYGON ((0 0, 0 20, 20 20, 20 0, 0 0))");
   }
 
   public void testComplexRing() throws Exception {
     runPtLocator(
       Location.INTERIOR,
-      new Coordinate(0, 0, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
       "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
   }
 
   public void testPointLocatorLinearRingLineString() throws Exception {
     runPtLocator(
       Location.BOUNDARY,
-      new Coordinate(0, 0, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
       "GEOMETRYCOLLECTION( LINESTRING(0 0, 10 10), LINEARRING(10 10, 10 20, 20 10, 10 10))");
   }
 
   public void testPointLocatorPointInsideLinearRing() throws Exception {
-    runPtLocator(Location.EXTERIOR, new Coordinate(11, 11, Coordinates.NULL_ORDINATE),
+    runPtLocator(Location.EXTERIOR, new Coordinate((double)11, 11, Coordinates.NULL_ORDINATE),
       "LINEARRING(10 10, 10 20, 20 10, 10 10)");
   }
 

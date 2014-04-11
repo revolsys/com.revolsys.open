@@ -49,7 +49,7 @@ public class Root
 {
 
   // the singleton root quad is centred at the origin.
-  private static final Coordinates origin = new Coordinate(0.0, 0.0, Coordinates.NULL_ORDINATE);
+  private static final Coordinates origin = new Coordinate((double)0.0, 0.0, Coordinates.NULL_ORDINATE);
 
   public Root()
   {

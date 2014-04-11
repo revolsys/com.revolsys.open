@@ -2,8 +2,6 @@ package com.revolsys.gis.graph.visitor;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
 public class NodeWithinDistanceOfCoordinateVisitor<T> implements
@@ -13,13 +11,6 @@ public class NodeWithinDistanceOfCoordinateVisitor<T> implements
   private final Visitor<Node<T>> matchVisitor;
 
   private final double maxDistance;
-
-  public NodeWithinDistanceOfCoordinateVisitor(final Coordinate coordinate,
-    final double maxDistance, final Visitor<Node<T>> matchVisitor) {
-    this.coordinates = new CoordinateCoordinates(coordinate);
-    this.maxDistance = maxDistance;
-    this.matchVisitor = matchVisitor;
-  }
 
   public NodeWithinDistanceOfCoordinateVisitor(final Coordinates coordinates,
     final double maxDistance, final Visitor<Node<T>> matchVisitor) {

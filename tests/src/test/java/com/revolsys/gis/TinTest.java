@@ -6,11 +6,11 @@ public class TinTest {
   // private final GeometryFactory factory =
   // GeometryFactory.getFactory(0,1,1,1);
   //
-  // private final Coordinate t0 = new Coordinate(0, 0, 0);
+  // private final  t0 = new ((double)0, 0, 0);
   //
-  // private final Coordinate t1 = new Coordinate(0, 7, 0);
+  // private final  t1 = new ((double)0, 7, 0);
   //
-  // private final Coordinate t2 = new Coordinate(10, 0, 0);
+  // private final  t2 = new ((double)10, 0, 0);
   //
   // private TriangulatedIrregularNetwork tin;
   //
@@ -44,8 +44,8 @@ public class TinTest {
   //
   // //
   // // public void test000BreaklineStartCornerEndCorner() throws Exception {
-  // // Coordinate l0 = new Coordinate(0, 7, 1);
-  // // Coordinate l1 = new Coordinate(10, 0, 2);
+  // //  l0 = new ((double)0, 7, 1);
+  // //  l1 = new ((double)10, 0, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(l0, l1, t2)
   // // };
@@ -53,8 +53,8 @@ public class TinTest {
   // // }
   // //
   // // public void test001BreaklineStartCornerEndEdgeNext() throws Exception {
-  // // Coordinate l0 = new Coordinate(0, 7, 1);
-  // // Coordinate l1 = new Coordinate(4, 4, 2);
+  // //  l0 = new ((double)0, 7, 1);
+  // //  l1 = new ((double)4, 4, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(l0, l1, t0), new Triangle(l1, t2, t0)
   // // };
@@ -63,8 +63,8 @@ public class TinTest {
   // //
   // // public void test002BreaklineStartCornerEndEdgePrevious() throws
   // Exception {
-  // // Coordinate l0 = new Coordinate(0, 7, 1);
-  // // Coordinate l1 = new Coordinate(0, 5, 2);
+  // //  l0 = new ((double)0, 7, 1);
+  // //  l1 = new ((double)0, 5, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(l0, l1, t2), new Triangle(l1, t0, t2)
   // // };
@@ -73,8 +73,8 @@ public class TinTest {
   // //
   // // public void test003BreaklineStartCornerEndEdgeOpposite() throws
   // Exception {
-  // // Coordinate l0 = new Coordinate(0, 7, 1);
-  // // Coordinate l1 = new Coordinate(3, 0, 2);
+  // //  l0 = new ((double)0, 7, 1);
+  // //  l1 = new ((double)3, 0, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(l0, l1, t2), new Triangle(l0, l1, t0)
   // // };
@@ -82,8 +82,8 @@ public class TinTest {
   // // }
   // //
   // // public void test004BreaklineStartCornerEndInside() throws Exception {
-  // // Coordinate l0 = new Coordinate(0, 7, 1);
-  // // Coordinate l1 = new Coordinate(3, 3, 2);
+  // //  l0 = new ((double)0, 7, 1);
+  // //  l1 = new ((double)3, 3, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(l0, t2, l1), new Triangle(l1, t2, t0),
   // // new Triangle(l0, l1, t0)
@@ -92,8 +92,8 @@ public class TinTest {
   // // }
   // //
   // // public void test005BreaklineStartEdgeEndSameEdge() throws Exception {
-  // // Coordinate l0 = new Coordinate(2, 0, 1);
-  // // Coordinate l1 = new Coordinate(4, 0, 2);
+  // //  l0 = new ((double)2, 0, 1);
+  // //  l1 = new ((double)4, 0, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, t1, l0), new Triangle(t1, l0, l1),
   // // new Triangle(t1, t2, l1)
@@ -102,8 +102,8 @@ public class TinTest {
   // // }
   // //
   // // public void test006BreaklineStartEdgeEndNextEdge() throws Exception {
-  // // Coordinate l0 = new Coordinate(1, 0, 1);
-  // // Coordinate l1 = new Coordinate(0, 2, 2);
+  // //  l0 = new ((double)1, 0, 1);
+  // //  l1 = new ((double)0, 2, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t2, l0, t1),
   // // new Triangle(l0, l1, t1),
@@ -114,8 +114,8 @@ public class TinTest {
   // //
   // // public void test007BreaklineStartEdgeEndPreviousEdge() throws Exception
   // {
-  // // Coordinate l0 = new Coordinate(0, 1, 1);
-  // // Coordinate l1 = new Coordinate(2, 0, 2);
+  // //  l0 = new ((double)0, 1, 1);
+  // //  l1 = new ((double)2, 0, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, l0, l1),
   // // new Triangle(t1, l0, l1),
@@ -125,8 +125,8 @@ public class TinTest {
   // // }
   // //
   // // public void test008BreaklineStartEdgeEndInside() throws Exception {
-  // // Coordinate l0 = new Coordinate(0, 2, 1);
-  // // Coordinate l1 = new Coordinate(2, 2, 2);
+  // //  l0 = new ((double)0, 2, 1);
+  // //  l1 = new ((double)2, 2, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, l0, l1),
   // // new Triangle(t0, l1, t2),
@@ -138,8 +138,8 @@ public class TinTest {
   // //
   // // public void test009BreaklineStartInsideEndInsideCounterClockwise()
   // // throws Exception {
-  // // Coordinate l0 = new Coordinate(1, 4, 1);
-  // // Coordinate l1 = new Coordinate(2, 1, 2);
+  // //  l0 = new ((double)1, 4, 1);
+  // //  l1 = new ((double)2, 1, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, l0, l1), new Triangle(t0, t1, l0),
   // // new Triangle(t1, t2, l0), new Triangle(l0, t2, l1),
@@ -150,8 +150,8 @@ public class TinTest {
   // //
   // // public void test010BreaklineStartInsideEndInsideClockwise() throws
   // // Exception {
-  // // Coordinate l0 = new Coordinate(1, 2, 1);
-  // // Coordinate l1 = new Coordinate(3, 1, 2);
+  // //  l0 = new ((double)1, 2, 1);
+  // //  l1 = new ((double)3, 1, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, t1, l0), new Triangle(t1, l0, t2),
   // // new Triangle(l0, t2, l1), new Triangle(t0, l1, t2),
@@ -163,8 +163,8 @@ public class TinTest {
   // // public void test011BreaklineStartInsideEndInsideColinear() throws
   // Exception
   // // {
-  // // Coordinate l0 = new Coordinate(1, 1, 1);
-  // // Coordinate l1 = new Coordinate(2, 2, 2);
+  // //  l0 = new ((double)1, 1, 1);
+  // //  l1 = new ((double)2, 2, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, t1, l0), new Triangle(t1, l1, l0),
   // // new Triangle(t1, t2, l1), new Triangle(l1, t2, l0),
@@ -175,8 +175,8 @@ public class TinTest {
   // //
   // // public void test012BreaklineStartInsideEndInsideMiddleClockwise()
   // // throws Exception {
-  // // Coordinate l0 = new Coordinate(1, 1, 1);
-  // // Coordinate l1 = new Coordinate(3, 2, 2);
+  // //  l0 = new ((double)1, 1, 1);
+  // //  l1 = new ((double)3, 2, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, t1, l0), new Triangle(t1, l1, l0),
   // // new Triangle(t1, t2, l1), new Triangle(l1, t2, l0),
@@ -187,8 +187,8 @@ public class TinTest {
   // //
   // // public void test013BreaklineStartInsideEndInsideMiddleCounterClockwise()
   // // throws Exception {
-  // // Coordinate l0 = new Coordinate(1, 1, 1);
-  // // Coordinate l1 = new Coordinate(2, 3, 2);
+  // //  l0 = new ((double)1, 1, 1);
+  // //  l1 = new ((double)2, 3, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, t1, l0), new Triangle(t1, l1, l0),
   // // new Triangle(t1, t2, l1), new Triangle(l1, t2, l0),
@@ -199,8 +199,8 @@ public class TinTest {
   // //
   // // public void test014BreaklineStartEdgeEndInsideColinear() throws
   // Exception {
-  // // Coordinate l0 = new Coordinate(0, 2, 1);
-  // // Coordinate l1 = new Coordinate(5, 1, 2);
+  // //  l0 = new ((double)0, 2, 1);
+  // //  l1 = new ((double)5, 1, 2);
   // // Triangle[] triangles = new Triangle[] {
   // // new Triangle(t0, l0, l1),
   // // new Triangle(t0, l1, t2),
@@ -210,7 +210,7 @@ public class TinTest {
   // // checkBreakline(l0, l1, triangles);
   // // }
   // //
-  // // private void checkBreakline(Coordinate l0, Coordinate l1,
+  // // private void checkBreakline( l0,  l1,
   // // Triangle[] expectedTriangles) throws Exception {
   // // log.info(getName());
   // // LineSegment3D lineSegment = new LineSegment3D(l0, l1);
@@ -225,7 +225,7 @@ public class TinTest {
   // protected void setUp()
   // throws Exception {
   //
-  // factory.createPolygon(factory.createLinearRing(new Coordinate[] {
+  // factory.createPolygon(factory.createLinearRing(new s[] {
   // t0, t1, t2, t0
   // }), null);
   // tin = new TriangulatedIrregularNetwork(factory,
@@ -250,7 +250,7 @@ public class TinTest {
   // private String toString(
   // final Triangle triangle) {
   // final Polygon polygon = factory.createPolygon(
-  // factory.createLinearRing(new Coordinate[] {
+  // factory.createLinearRing(new s[] {
   // triangle.p0, triangle.p1, triangle.p2, triangle.p0
   // }), null);
   //

@@ -202,6 +202,6 @@ public class CGAlgorithmsDD
     
     double y = DD.valueOf(q1.getY()).selfAdd(DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(fracQ)).doubleValue();
 
-    return new Coordinate(x,y, Coordinates.NULL_ORDINATE);
+    return new Coordinate((double)x,y, Coordinates.NULL_ORDINATE);
   }
 }

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -61,90 +60,29 @@ import com.revolsys.jts.geom.util.GeometryEditor;
  * 
  * @deprecated use GeometryPrecisionReducer
  */
-public class SimpleGeometryPrecisionReducer
-{
-	/**
-	 * Convenience method for doing precision reduction on a single geometry,
-	 * with collapses removed and keeping the geometry precision model the same.
-	 * 
-	 * @param g
-	 * @param precModel
-	 * @return the reduced geometry
-	 */
-	public static Geometry reduce(Geometry g, PrecisionModel precModel)
-	{
-		SimpleGeometryPrecisionReducer reducer = new SimpleGeometryPrecisionReducer(precModel);
-		return reducer.reduce(g);
-	}
-	
-  private PrecisionModel newPrecisionModel;
-  private boolean removeCollapsed = true;
-  private boolean changePrecisionModel = false;
+@Deprecated
+public class SimpleGeometryPrecisionReducer {
+  private class PrecisionReducerCoordinateOperation extends
+    GeometryEditor.CoordinateOperation {
+    @Override
+    public Coordinates[] edit(final Coordinates[] coordinates,
+      final Geometry geom) {
+      if (coordinates.length == 0) {
+        return null;
+      }
 
-  public SimpleGeometryPrecisionReducer(PrecisionModel pm)
-  {
-    newPrecisionModel = pm;
-  }
-
-  /**
-   * Sets whether the reduction will result in collapsed components
-   * being removed completely, or simply being collapsed to an (invalid)
-   * Geometry of the same type.
-   * The default is to remove collapsed components.
-   *
-   * @param removeCollapsed if <code>true</code> collapsed components will be removed
-   */
-  public void setRemoveCollapsedComponents(boolean removeCollapsed)
-  {
-    this.removeCollapsed = removeCollapsed;
-  }
-
-  /**
-   * Sets whether the {@link PrecisionModel} of the new reduced Geometry
-   * will be changed to be the {@link PrecisionModel} supplied to
-   * specify the precision reduction.
-   * <p>  
-   * The default is to <b>not</b> change the precision model
-   *
-   * @param changePrecisionModel if <code>true</code> the precision model of the created Geometry will be the
-   * the precisionModel supplied in the constructor.
-   */
-  public void setChangePrecisionModel(boolean changePrecisionModel)
-  {
-    this.changePrecisionModel = changePrecisionModel;
-  }
-
-  public Geometry reduce(Geometry geom)
-  {
-    GeometryEditor geomEdit;
-    if (changePrecisionModel) {
-      GeometryFactory newFactory = new GeometryFactory(newPrecisionModel, geom.getGeometryFactory().getSrid());
-      geomEdit = new GeometryEditor(newFactory);
-    }
-    else
-      // don't change geometry factory
-      geomEdit = new GeometryEditor();
-
-    return geomEdit.edit(geom, new PrecisionReducerCoordinateOperation());
-  }
-
-  private class PrecisionReducerCoordinateOperation
-      extends GeometryEditor.CoordinateOperation
-  {
-    public Coordinate[] edit(Coordinates[] coordinates, Geometry geom)
-    {
-      if (coordinates.length == 0) return null;
-
-      Coordinate[] reducedCoords = new Coordinate[coordinates.length];
+      final Coordinates[] reducedCoords = new Coordinates[coordinates.length];
       // copy coordinates and reduce
       for (int i = 0; i < coordinates.length; i++) {
-        Coordinate coord = new Coordinate(coordinates[i]);
+        final Coordinates coord = new Coordinate(coordinates[i]);
         newPrecisionModel.makePrecise(coord);
         reducedCoords[i] = coord;
       }
-      // remove repeated points, to simplify returned geometry as much as possible
-      CoordinateList noRepeatedCoordList = new CoordinateList(reducedCoords, false);
-      Coordinate[] noRepeatedCoords = noRepeatedCoordList.toCoordinateArray();
+      // remove repeated points, to simplify returned geometry as much as
+      // possible
+      final CoordinateList noRepeatedCoordList = new CoordinateList(
+        reducedCoords, false);
+      final Coordinates[] noRepeatedCoords = noRepeatedCoordList.toCoordinateArray();
 
       /**
        * Check to see if the removal of repeated points
@@ -157,19 +95,89 @@ public class SimpleGeometryPrecisionReducer
        * (This may create an invalid geometry - the client must handle this.)
        */
       int minLength = 0;
-      if (geom instanceof LineString) minLength = 2;
-      if (geom instanceof LinearRing) minLength = 4;
+      if (geom instanceof LineString) {
+        minLength = 2;
+      }
+      if (geom instanceof LinearRing) {
+        minLength = 4;
+      }
 
-      Coordinate[] collapsedCoords = reducedCoords;
-      if (removeCollapsed) collapsedCoords = null;
+      Coordinates[] collapsedCoords = reducedCoords;
+      if (removeCollapsed) {
+        collapsedCoords = null;
+      }
 
       // return null or orginal length coordinate array
       if (noRepeatedCoords.length < minLength) {
-          return collapsedCoords;
+        return collapsedCoords;
       }
 
       // ok to return shorter coordinate array
       return noRepeatedCoords;
     }
+  }
+
+  /**
+   * Convenience method for doing precision reduction on a single geometry,
+   * with collapses removed and keeping the geometry precision model the same.
+   * 
+   * @param g
+   * @param precModel
+   * @return the reduced geometry
+   */
+  public static Geometry reduce(final Geometry g, final PrecisionModel precModel) {
+    final SimpleGeometryPrecisionReducer reducer = new SimpleGeometryPrecisionReducer(
+      precModel);
+    return reducer.reduce(g);
+  }
+
+  private final PrecisionModel newPrecisionModel;
+
+  private boolean removeCollapsed = true;
+
+  private boolean changePrecisionModel = false;
+
+  public SimpleGeometryPrecisionReducer(final PrecisionModel pm) {
+    newPrecisionModel = pm;
+  }
+
+  public Geometry reduce(final Geometry geom) {
+    GeometryEditor geomEdit;
+    if (changePrecisionModel) {
+      final GeometryFactory newFactory = new GeometryFactory(newPrecisionModel,
+        geom.getGeometryFactory().getSrid());
+      geomEdit = new GeometryEditor(newFactory);
+    } else {
+      // don't change geometry factory
+      geomEdit = new GeometryEditor();
+    }
+
+    return geomEdit.edit(geom, new PrecisionReducerCoordinateOperation());
+  }
+
+  /**
+   * Sets whether the {@link PrecisionModel} of the new reduced Geometry
+   * will be changed to be the {@link PrecisionModel} supplied to
+   * specify the precision reduction.
+   * <p>  
+   * The default is to <b>not</b> change the precision model
+   *
+   * @param changePrecisionModel if <code>true</code> the precision model of the created Geometry will be the
+   * the precisionModel supplied in the constructor.
+   */
+  public void setChangePrecisionModel(final boolean changePrecisionModel) {
+    this.changePrecisionModel = changePrecisionModel;
+  }
+
+  /**
+   * Sets whether the reduction will result in collapsed components
+   * being removed completely, or simply being collapsed to an (invalid)
+   * Geometry of the same type.
+   * The default is to remove collapsed components.
+   *
+   * @param removeCollapsed if <code>true</code> collapsed components will be removed
+   */
+  public void setRemoveCollapsedComponents(final boolean removeCollapsed) {
+    this.removeCollapsed = removeCollapsed;
   }
 }

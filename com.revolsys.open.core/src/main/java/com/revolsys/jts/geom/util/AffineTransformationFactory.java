@@ -84,8 +84,8 @@ public class AffineTransformationFactory {
    * @return null if the control vectors do not determine a well-defined transformation
 	 */
 	public static AffineTransformation createFromControlVectors(Coordinates src0,
-			AbstractCoordinates src1, Coordinates dest0, AbstractCoordinates dest1) {
-		Coordinates rotPt = new Coordinate(dest1.getX() - dest0.getX(), dest1.getY() - dest0.getY(), Coordinates.NULL_ORDINATE);
+			Coordinates src1, Coordinates dest0, Coordinates dest1) {
+		Coordinates rotPt = new Coordinate((double)dest1.getX() - dest0.getX(), dest1.getY() - dest0.getY(), Coordinates.NULL_ORDINATE);
 
 		double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
@@ -137,8 +137,8 @@ public class AffineTransformationFactory {
 	 *           if the control vector arrays are too short, long or of different
 	 *           lengths
 	 */
-	public static AffineTransformation createFromControlVectors(AbstractCoordinates[] src,
-			AbstractCoordinates[] dest) {
+	public static AffineTransformation createFromControlVectors(Coordinates[] src,
+			Coordinates[] dest) {
 		if (src.length != dest.length)
 			throw new IllegalArgumentException(
 					"Src and Dest arrays are not the same length");
@@ -174,10 +174,10 @@ public class AffineTransformationFactory {
 	 * @return the computed transformation
 	 */
 	public static AffineTransformation createFromBaseLines(
-			Coordinates src0, AbstractCoordinates src1, 
-			Coordinates dest0, AbstractCoordinates dest1) 
+			Coordinates src0, Coordinates src1, 
+			Coordinates dest0, Coordinates dest1) 
 	{
-		Coordinates rotPt = new Coordinate(src0.getX() + dest1.getX() - dest0.getX(), src0.getY() + dest1.getY() - dest0.getY(), Coordinates.NULL_ORDINATE);
+		Coordinates rotPt = new Coordinate((double)src0.getX() + dest1.getX() - dest0.getX(), src0.getY() + dest1.getY() - dest0.getY(), Coordinates.NULL_ORDINATE);
 
 		double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 

@@ -36,7 +36,7 @@ public interface Coordinates extends Comparable<Object>, Cloneable,
   Coordinates cloneCoordinates();
 
   /**
-   *  Compares this {@link Coordinate} with the specified {@link Coordinate} for order.
+   *  Compares this {@link Coordinates} with the specified {@link Coordinates} for order.
    *  This method ignores the z value when making the comparison.
    *  Returns:
    *  <UL>

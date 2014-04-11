@@ -137,7 +137,7 @@ class SubgraphDepthLocater
                                    DirectedEdge dirEdge,
                                    List stabbedSegments)
   {
-    Coordinate[] pts = dirEdge.getEdge().getCoordinates();
+    Coordinates[] pts = dirEdge.getEdge().getCoordinates();
     for (int i = 0; i < pts.length - 1; i++) {
       seg.p0 = pts[i];
       seg.p1 = pts[i + 1];

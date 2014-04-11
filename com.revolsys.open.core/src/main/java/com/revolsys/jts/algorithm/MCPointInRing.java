@@ -90,7 +90,7 @@ public class MCPointInRing   implements PointInRing {
     //Envelope env = ring.getEnvelopeInternal();
     tree = new Bintree();
 
-    Coordinate[] pts = CoordinateArrays.removeRepeatedPoints(ring.getCoordinateArray());
+    Coordinates[] pts = CoordinateArrays.removeRepeatedPoints(ring.getCoordinateArray());
     List mcList = MonotoneChainBuilder.getChains(pts);
 
     for (int i = 0; i < mcList.size(); i++) {

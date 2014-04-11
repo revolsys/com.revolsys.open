@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LinearRing;
@@ -51,49 +50,65 @@ import com.revolsys.jts.index.strtree.STRtree;
  *
  * @version 1.7
  */
-public class IndexedNestedRingTester
-{
-  private GeometryGraph graph;  // used to find non-node vertices
-  private List rings = new ArrayList();
-  private Envelope totalEnv = new Envelope();
+public class IndexedNestedRingTester {
+  private final GeometryGraph graph; // used to find non-node vertices
+
+  private final List rings = new ArrayList();
+
+  private final Envelope totalEnv = new Envelope();
+
   private SpatialIndex index;
+
   private Coordinates nestedPt;
 
-  public IndexedNestedRingTester(GeometryGraph graph)
-  {
+  public IndexedNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;
   }
 
-  public Coordinates getNestedPoint() { return nestedPt; }
-
-  public void add(LinearRing ring)
-  {
+  public void add(final LinearRing ring) {
     rings.add(ring);
     totalEnv.expandToInclude(ring.getEnvelopeInternal());
   }
 
-  public boolean isNonNested()
-  {
+  private void buildIndex() {
+    index = new STRtree();
+
+    for (int i = 0; i < rings.size(); i++) {
+      final LinearRing ring = (LinearRing)rings.get(i);
+      final Envelope env = ring.getEnvelopeInternal();
+      index.insert(env, ring);
+    }
+  }
+
+  public Coordinates getNestedPoint() {
+    return nestedPt;
+  }
+
+  public boolean isNonNested() {
     buildIndex();
 
     for (int i = 0; i < rings.size(); i++) {
-      LinearRing innerRing = (LinearRing) rings.get(i);
-      Coordinate[] innerRingPts = innerRing.getCoordinateArray();
+      final LinearRing innerRing = (LinearRing)rings.get(i);
+      final Coordinates[] innerRingPts = innerRing.getCoordinateArray();
 
-      List results = index.query(innerRing.getEnvelopeInternal());
-//System.out.println(results.size());
+      final List results = index.query(innerRing.getEnvelopeInternal());
+      // System.out.println(results.size());
       for (int j = 0; j < results.size(); j++) {
-        LinearRing searchRing = (LinearRing) results.get(j);
-        Coordinates[] searchRingPts = searchRing.getCoordinateArray();
+        final LinearRing searchRing = (LinearRing)results.get(j);
+        final Coordinates[] searchRingPts = searchRing.getCoordinateArray();
 
-        if (innerRing == searchRing)
+        if (innerRing == searchRing) {
           continue;
+        }
 
-        if (! innerRing.getEnvelopeInternal().intersects(searchRing.getEnvelopeInternal()))
+        if (!innerRing.getEnvelopeInternal().intersects(
+          searchRing.getEnvelopeInternal())) {
           continue;
+        }
 
-        Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
-        
+        final Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts,
+          searchRing, graph);
+
         /**
          * If no non-node pts can be found, this means
          * that the searchRing touches ALL of the innerRing vertices.
@@ -104,10 +119,12 @@ public class IndexedNestedRingTester
          * Both of these cases are caught by other tests,
          * so it is safe to simply skip this situation here.
          */
-        if (innerRingPt == null)
+        if (innerRingPt == null) {
           continue;
+        }
 
-        boolean isInside = CGAlgorithms.isPointInRing(innerRingPt, searchRingPts);
+        final boolean isInside = CGAlgorithms.isPointInRing(innerRingPt,
+          searchRingPts);
         if (isInside) {
           nestedPt = innerRingPt;
           return false;
@@ -115,16 +132,5 @@ public class IndexedNestedRingTester
       }
     }
     return true;
-  }
-
-  private void buildIndex()
-  {
-    index = new STRtree();
-
-    for (int i = 0; i < rings.size(); i++) {
-      LinearRing ring = (LinearRing) rings.get(i);
-      Envelope env = ring.getEnvelopeInternal();
-      index.insert(env, ring);
-    }
   }
 }

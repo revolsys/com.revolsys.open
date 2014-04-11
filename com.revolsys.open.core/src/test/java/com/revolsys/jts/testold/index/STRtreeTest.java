@@ -141,13 +141,13 @@ public class STRtreeTest extends TestCase {
   public void testQuery() throws Throwable {
     final ArrayList geometries = new ArrayList();
     geometries.add(this.factory.createLineString(new Coordinates[] {
-      new Coordinate(0, 0, Coordinates.NULL_ORDINATE), new Coordinate(10, 10, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE)
     }));
     geometries.add(this.factory.createLineString(new Coordinates[] {
-      new Coordinate(20, 20, Coordinates.NULL_ORDINATE), new Coordinate(30, 30, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE), new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE)
     }));
     geometries.add(this.factory.createLineString(new Coordinates[] {
-      new Coordinate(20, 20, Coordinates.NULL_ORDINATE), new Coordinate(30, 30, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE), new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE)
     }));
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(4);
     for (final Iterator i = geometries.iterator(); i.hasNext();) {

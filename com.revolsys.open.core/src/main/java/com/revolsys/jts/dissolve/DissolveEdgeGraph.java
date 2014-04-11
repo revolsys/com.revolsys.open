@@ -2,8 +2,7 @@ package com.revolsys.jts.dissolve;
 
 import com.revolsys.jts.edgegraph.EdgeGraph;
 import com.revolsys.jts.edgegraph.HalfEdge;
-import com.revolsys.jts.geom.Coordinate;
-
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A graph containing {@link DissolveHalfEdge}s.
@@ -11,12 +10,9 @@ import com.revolsys.jts.geom.Coordinate;
  * @author Martin Davis
  *
  */
-class DissolveEdgeGraph extends EdgeGraph
-{
-  protected HalfEdge createEdge(Coordinate p0)
-  {
+class DissolveEdgeGraph extends EdgeGraph {
+  protected HalfEdge createEdge(final Coordinates p0) {
     return new DissolveHalfEdge(p0);
   }
-  
 
 }

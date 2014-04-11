@@ -96,9 +96,9 @@ public class CentroidLine
 
   /**
    * Adds the length defined by an array of coordinates.
-   * @param pts an array of {@link Coordinate}s
+   * @param pts an array of {@link Coordinates}s
    */
-  public void add(AbstractCoordinates[] pts)
+  public void add(Coordinates[] pts)
   {
     for (int i = 0; i < pts.length - 1; i++) {
       double segmentLen = pts[i].distance(pts[i + 1]);

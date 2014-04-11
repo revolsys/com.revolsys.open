@@ -99,7 +99,7 @@ public class SweeplineNestedRingTester
 
   private boolean isInside(LinearRing innerRing, LinearRing searchRing)
   {
-    Coordinate[] innerRingPts = innerRing.getCoordinateArray();
+    Coordinates[] innerRingPts = innerRing.getCoordinateArray();
     Coordinates[] searchRingPts = searchRing.getCoordinateArray();
 
     if (! innerRing.getEnvelopeInternal().intersects(searchRing.getEnvelopeInternal()))

@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -50,60 +48,80 @@ import com.revolsys.jts.geom.Coordinates;
  *
  * @version 1.7
  */
-public class EdgeIntersection
-    implements Comparable
-{
+public class EdgeIntersection implements Comparable {
 
-  public Coordinate coord;   // the point of intersection
-  public int segmentIndex;   // the index of the containing line segment in the parent edge
-  public double dist;        // the edge distance of this point along the containing line segment
+  public Coordinates coord; // the point of intersection
 
-  public EdgeIntersection(Coordinates coord, int segmentIndex, double dist) {
+  public int segmentIndex; // the index of the containing line segment in the
+                           // parent edge
+
+  public double dist; // the edge distance of this point along the containing
+                      // line segment
+
+  public EdgeIntersection(final Coordinates coord, final int segmentIndex,
+    final double dist) {
     this.coord = new Coordinate(coord);
     this.segmentIndex = segmentIndex;
     this.dist = dist;
   }
 
-  public Coordinates getCoordinate() { return coord; }
-
-  public int getSegmentIndex() { return segmentIndex; }
-
-  public double getDistance() { return dist; }
-
-  public int compareTo(Object obj)
-  {
-    EdgeIntersection other = (EdgeIntersection) obj;
-    return compare(other.segmentIndex, other.dist);
-  }
   /**
    * @return -1 this EdgeIntersection is located before the argument location
    * @return 0 this EdgeIntersection is at the argument location
    * @return 1 this EdgeIntersection is located after the argument location
    */
-  public int compare(int segmentIndex, double dist)
-  {
-    if (this.segmentIndex < segmentIndex) return -1;
-    if (this.segmentIndex > segmentIndex) return 1;
-    if (this.dist < dist) return -1;
-    if (this.dist > dist) return 1;
+  public int compare(final int segmentIndex, final double dist) {
+    if (this.segmentIndex < segmentIndex) {
+      return -1;
+    }
+    if (this.segmentIndex > segmentIndex) {
+      return 1;
+    }
+    if (this.dist < dist) {
+      return -1;
+    }
+    if (this.dist > dist) {
+      return 1;
+    }
     return 0;
   }
 
-  public boolean isEndPoint(int maxSegmentIndex)
-  {
-    if (segmentIndex == 0 && dist == 0.0) return true;
-    if (segmentIndex == maxSegmentIndex) return true;
+  @Override
+  public int compareTo(final Object obj) {
+    final EdgeIntersection other = (EdgeIntersection)obj;
+    return compare(other.segmentIndex, other.dist);
+  }
+
+  public Coordinates getCoordinate() {
+    return coord;
+  }
+
+  public double getDistance() {
+    return dist;
+  }
+
+  public int getSegmentIndex() {
+    return segmentIndex;
+  }
+
+  public boolean isEndPoint(final int maxSegmentIndex) {
+    if (segmentIndex == 0 && dist == 0.0) {
+      return true;
+    }
+    if (segmentIndex == maxSegmentIndex) {
+      return true;
+    }
     return false;
   }
 
-  public void print(PrintStream out)
-  {
+  public void print(final PrintStream out) {
     out.print(coord);
     out.print(" seg # = " + segmentIndex);
     out.println(" dist = " + dist);
   }
-  public String toString()
-  {
+
+  @Override
+  public String toString() {
     return coord + " seg # = " + segmentIndex + " dist = " + dist;
   }
 }

@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -34,14 +33,13 @@
  */
 package com.revolsys.jts.geom;
 
-
 /**
  *  <code>Geometry</code> classes support the concept of applying a
  *  coordinate filter to every coordinate in the <code>Geometry</code>. A
  *  coordinate filter can either record information about each coordinate or
- *  change the coordinate in some way. Coordinate filters implement the
+ *  change the coordinate in some way. Coordinates filters implement the
  *  interface <code>CoordinateFilter</code>. (<code>CoordinateFilter</code> is
- *  an example of the Gang-of-Four Visitor pattern). Coordinate filters can be
+ *  an example of the Gang-of-Four Visitor pattern). Coordinates filters can be
  *  used to implement such things as coordinate transformations, centroid and
  *  envelope computation, and many other functions.
  *
@@ -54,6 +52,5 @@ public interface CoordinateFilter {
    *
    *@param  coord  a <code>Coordinate</code> to which the filter is applied.
    */
-  void filter(Coordinate coord);
+  void filter(Coordinates coord);
 }
-

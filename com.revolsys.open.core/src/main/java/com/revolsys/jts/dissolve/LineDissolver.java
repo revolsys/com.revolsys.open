@@ -165,7 +165,7 @@ public class LineDissolver
   /**
    * Updates the tracked ringStartEdge
    * if the given edge has a lower origin
-   * (using the standard {@link Coordinate} ordering).
+   * (using the standard {@link Coordinates} ordering).
    * 
    * Identifying the lowest starting node meets two goals:
    * <ul>

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -40,6 +39,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
@@ -66,55 +66,83 @@ import com.revolsys.jts.noding.SegmentString;
  *
  * @version 1.7
  */
-public class MCIndexSnapRounder
-    implements Noder
-{
+public class MCIndexSnapRounder implements Noder {
   private final PrecisionModel pm;
-  private LineIntersector li;
+
+  private final LineIntersector li;
+
   private final double scaleFactor;
+
   private MCIndexNoder noder;
+
   private MCIndexPointSnapper pointSnapper;
+
   private Collection nodedSegStrings;
 
-  public MCIndexSnapRounder(PrecisionModel pm) {
+  public MCIndexSnapRounder(final PrecisionModel pm) {
     this.pm = pm;
     li = new RobustLineIntersector();
     li.setPrecisionModel(pm);
     scaleFactor = pm.getScale();
   }
 
-  public Collection getNodedSubstrings()
-  {
-    return  NodedSegmentString.getNodedSubstrings(nodedSegStrings);
+  private void checkCorrectness(final Collection inputSegmentStrings) {
+    final Collection resultSegStrings = NodedSegmentString.getNodedSubstrings(inputSegmentStrings);
+    final NodingValidator nv = new NodingValidator(resultSegStrings);
+    try {
+      nv.checkValid();
+    } catch (final Exception ex) {
+      ex.printStackTrace();
+    }
   }
 
-  public void computeNodes(Collection inputSegmentStrings)
-  {
+  /**
+   * Snaps segments to nodes created by segment intersections.
+   */
+  private void computeIntersectionSnaps(final Collection snapPts) {
+    for (final Iterator it = snapPts.iterator(); it.hasNext();) {
+      final Coordinates snapPt = (Coordinate)it.next();
+      final HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
+      pointSnapper.snap(hotPixel);
+    }
+  }
+
+  @Override
+  public void computeNodes(final Collection inputSegmentStrings) {
     this.nodedSegStrings = inputSegmentStrings;
     noder = new MCIndexNoder();
     pointSnapper = new MCIndexPointSnapper(noder.getIndex());
     snapRound(inputSegmentStrings, li);
 
     // testing purposes only - remove in final version
-    //checkCorrectness(inputSegmentStrings);
+    // checkCorrectness(inputSegmentStrings);
   }
 
-  private void checkCorrectness(Collection inputSegmentStrings)
-  {
-    Collection resultSegStrings = NodedSegmentString.getNodedSubstrings(inputSegmentStrings);
-    NodingValidator nv = new NodingValidator(resultSegStrings);
-    try {
-      nv.checkValid();
-    } catch (Exception ex) {
-      ex.printStackTrace();
+  /**
+   * Snaps segments to all vertices.
+   *
+   * @param edges the list of segment strings to snap together
+   */
+  public void computeVertexSnaps(final Collection edges) {
+    for (final Iterator i0 = edges.iterator(); i0.hasNext();) {
+      final NodedSegmentString edge0 = (NodedSegmentString)i0.next();
+      computeVertexSnaps(edge0);
     }
   }
 
-  private void snapRound(Collection segStrings, LineIntersector li)
-  {
-    List intersections = findInteriorIntersections(segStrings, li);
-    computeIntersectionSnaps(intersections);
-    computeVertexSnaps(segStrings);
+  /**
+   * Snaps segments to the vertices of a Segment String.  
+   */
+  private void computeVertexSnaps(final NodedSegmentString e) {
+    final Coordinates[] pts0 = e.getCoordinates();
+    for (int i = 0; i < pts0.length; i++) {
+      final HotPixel hotPixel = new HotPixel(pts0[i], scaleFactor, li);
+      final boolean isNodeAdded = pointSnapper.snap(hotPixel, e, i);
+      // if a node is created for a vertex, that vertex must be noded too
+      if (isNodeAdded) {
+        e.addIntersection(pts0[i], i);
+      }
+    }
   }
 
   /**
@@ -125,53 +153,24 @@ public class MCIndexSnapRounder
    *
    * @return a list of Coordinates for the intersections
    */
-  private List findInteriorIntersections(Collection segStrings, LineIntersector li)
-  {
-    InteriorIntersectionFinderAdder intFinderAdder = new InteriorIntersectionFinderAdder(li);
+  private List findInteriorIntersections(final Collection segStrings,
+    final LineIntersector li) {
+    final InteriorIntersectionFinderAdder intFinderAdder = new InteriorIntersectionFinderAdder(
+      li);
     noder.setSegmentIntersector(intFinderAdder);
     noder.computeNodes(segStrings);
     return intFinderAdder.getInteriorIntersections();
   }
 
-  /**
-   * Snaps segments to nodes created by segment intersections.
-   */
-  private void computeIntersectionSnaps(Collection snapPts)
-  {
-    for (Iterator it = snapPts.iterator(); it.hasNext(); ) {
-      Coordinate snapPt = (Coordinate) it.next();
-      HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
-      pointSnapper.snap(hotPixel);
-    }
+  @Override
+  public Collection getNodedSubstrings() {
+    return NodedSegmentString.getNodedSubstrings(nodedSegStrings);
   }
 
-  /**
-   * Snaps segments to all vertices.
-   *
-   * @param edges the list of segment strings to snap together
-   */
-  public void computeVertexSnaps(Collection edges)
-  {
-    for (Iterator i0 = edges.iterator(); i0.hasNext(); ) {
-      NodedSegmentString edge0 = (NodedSegmentString) i0.next();
-      computeVertexSnaps(edge0);
-    }
+  private void snapRound(final Collection segStrings, final LineIntersector li) {
+    final List intersections = findInteriorIntersections(segStrings, li);
+    computeIntersectionSnaps(intersections);
+    computeVertexSnaps(segStrings);
   }
-
-  /**
-   * Snaps segments to the vertices of a Segment String.  
-   */
-  private void computeVertexSnaps(NodedSegmentString e)
-  {
-    Coordinate[] pts0 = e.getCoordinates();
-    for (int i = 0; i < pts0.length ; i++) {
-      HotPixel hotPixel = new HotPixel(pts0[i], scaleFactor, li);
-      boolean isNodeAdded = pointSnapper.snap(hotPixel, e, i);
-      // if a node is created for a vertex, that vertex must be noded too
-      if (isNodeAdded) {
-        e.addIntersection(pts0[i], i);
-      }
-  }
-}
 
 }

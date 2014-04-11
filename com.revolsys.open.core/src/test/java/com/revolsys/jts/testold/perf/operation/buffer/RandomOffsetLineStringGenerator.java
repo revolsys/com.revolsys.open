@@ -39,9 +39,9 @@ public class RandomOffsetLineStringGenerator {
 
   private int exponent2 = 5;
 
-  private Coordinate[] pts;
+  private Coordinates[] pts;
 
-  private Coordinate endPoint;
+  private Coordinates endPoint;
 
   public RandomOffsetLineStringGenerator(final double maxSegLen,
     final int numPts) {
@@ -56,8 +56,8 @@ public class RandomOffsetLineStringGenerator {
     this.numPts = pow2(this.exponent2) + 1;
   }
 
-  private Coordinate computeRandomOffset(final Coordinate p0,
-    final Coordinate p1, final double segFrac) {
+  private Coordinates computeRandomOffset(final Coordinates p0,
+    final Coordinates p1, final double segFrac) {
     final double len = p0.distance(p1);
     final double len2 = len / 2;
     final double offsetLen = len * Math.random() - len2;
@@ -71,7 +71,7 @@ public class RandomOffsetLineStringGenerator {
       final int midIndex = i + inc2;
       final int endIndex = i + inc;
 
-      Coordinate segEndPoint;
+      Coordinates segEndPoint;
 
       double segFrac = 0.5 + randomFractionPerturbation();
 
@@ -97,7 +97,7 @@ public class RandomOffsetLineStringGenerator {
   }
 
   public Geometry generate(final GeometryFactory fact) {
-    this.pts = new Coordinate[this.numPts];
+    this.pts = new Coordinates[this.numPts];
 
     this.pts[0] = new Coordinate();
 

@@ -55,7 +55,7 @@ public class ConnectedElementPointFilter
 {
 
   /**
-   * Returns a list containing a Coordinate from each Polygon, LineString, and Point
+   * Returns a list containing a Coordinates from each Polygon, LineString, and Point
    * found inside the specified geometry. Thus, if the specified geometry is
    * not a GeometryCollection, an empty list will be returned.
    */

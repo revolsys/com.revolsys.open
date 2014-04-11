@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -34,6 +33,7 @@
 package com.revolsys.jts.operation.distance;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -48,8 +48,7 @@ import com.revolsys.jts.geom.Geometry;
  *
  * @version 1.7
  */
-public class GeometryLocation
-{
+public class GeometryLocation {
   /**
    * A special value of segmentIndex used for locations inside area geometries. 
    * These locations are not located on a segment, 
@@ -58,8 +57,20 @@ public class GeometryLocation
   public static final int INSIDE_AREA = -1;
 
   private Geometry component = null;
-  private int segIndex;
-  private Coordinate pt = null;
+
+  private final int segIndex;
+
+  private Coordinates pt = null;
+
+  /**
+   * Constructs a GeometryLocation specifying a point inside an area geometry.
+   * 
+   * @param component the component of the geometry containing the point
+   * @param pt the coordinate of the location
+   */
+  public GeometryLocation(final Geometry component, final Coordinates pt) {
+    this(component, INSIDE_AREA, pt);
+  }
 
   /**
    * Constructs a GeometryLocation specifying a point on a geometry, as well as the 
@@ -70,44 +81,41 @@ public class GeometryLocation
    * @param segIndex the segment index of the location, or INSIDE_AREA
    * @param pt the coordinate of the location
    */
-  public GeometryLocation(Geometry component, int segIndex, Coordinate pt)
-  {
+  public GeometryLocation(final Geometry component, final int segIndex,
+    final Coordinates pt) {
     this.component = component;
     this.segIndex = segIndex;
     this.pt = pt;
   }
 
   /**
-   * Constructs a GeometryLocation specifying a point inside an area geometry.
-   * 
-   * @param component the component of the geometry containing the point
-   * @param pt the coordinate of the location
-   */  
-  public GeometryLocation(Geometry component,Coordinate pt)
-  {
-    this(component, INSIDE_AREA, pt);
+   * Returns the {@link Coordinates} of this location.
+   */
+  public Coordinates getCoordinate() {
+    return pt;
   }
 
   /**
    * Returns the geometry component on (or in) which this location occurs.
    */
-  public Geometry getGeometryComponent() { return component; }
-  
+  public Geometry getGeometryComponent() {
+    return component;
+  }
+
   /**
    * Returns the segment index for this location. If the location is inside an
    * area, the index will have the value {@link #INSIDE_AREA};
    *
    * @return the segment index for the location, or INSIDE_AREA
    */
-  public int getSegmentIndex() { return segIndex; }
-  
-  /**
-   * Returns the {@link Coordinate} of this location.
-   */
-  public Coordinate getCoordinate() { return pt; }
-  
+  public int getSegmentIndex() {
+    return segIndex;
+  }
+
   /**
    * Tests whether this location represents a point inside an area geometry.
    */
-  public boolean isInsideArea() { return segIndex == INSIDE_AREA; }
+  public boolean isInsideArea() {
+    return segIndex == INSIDE_AREA;
+  }
 }

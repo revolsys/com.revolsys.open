@@ -51,7 +51,6 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
-import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -623,8 +622,6 @@ public class GeometryFactory implements Serializable,
           point = projectedPoint;
         } else if (object instanceof double[]) {
           point = new DoubleCoordinates((double[])object);
-        } else if (object instanceof Coordinates) {
-          point = new CoordinateCoordinates((Coordinate)object);
         } else if (object instanceof CoordinatesList) {
           final CoordinatesList coordinates = (CoordinatesList)object;
           point = coordinates.get(0);
@@ -891,7 +888,7 @@ public class GeometryFactory implements Serializable,
   }
 
   /**
-   * Creates a {@link LinearRing} using the given {@link Coordinate}s.
+   * Creates a {@link LinearRing} using the given {@link Coordinates}s.
    * A null or empty array creates an empty LinearRing. 
    * The points must form a closed and simple linestring. 
    * @param coordinates an array without null elements, or an empty array, or null
@@ -918,14 +915,17 @@ public class GeometryFactory implements Serializable,
     return new LinearRing(coordinatesList, this);
   }
 
+  public LinearRing createLinearRing(final double... coordinates) {
+    final int numAxis = getNumAxis();
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(numAxis,
+      coordinates);
+    return createLinearRing(points);
+  }
+
   public LinearRing createLinearRing(final LinearRing linearRing) {
     final CoordinatesList points = CoordinatesListUtil.get(linearRing);
     final CoordinatesList newPoints = createCoordinatesList(points);
     return createLinearRing(newPoints);
-  }
-
-  public LinearRing createLinearRing(final Object... points) {
-    return createLinearRing(Arrays.asList(points));
   }
 
   public LineString createLineString() {
@@ -999,7 +999,7 @@ public class GeometryFactory implements Serializable,
   }
 
   /**
-   * Creates a {@link MultiPoint} using the given {@link Coordinate}s.
+   * Creates a {@link MultiPoint} using the given {@link Coordinates}s.
    * A null or empty array will create an empty MultiPoint.
    *
    * @param coordinates an array (without null elements), or an empty array, or <code>null</code>

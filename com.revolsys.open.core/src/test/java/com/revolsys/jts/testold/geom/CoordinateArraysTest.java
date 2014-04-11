@@ -58,27 +58,27 @@ public class CoordinateArraysTest extends TestCase {
 
   public void testPtNotInList1() {
     assertTrue(CoordinateArrays.ptNotInList(
-      new Coordinate[] {
-        new Coordinate(1.0, 1, Coordinates.NULL_ORDINATE),
-        new Coordinate(2.0, 2, Coordinates.NULL_ORDINATE),
-        new Coordinate(3.0, 3, Coordinates.NULL_ORDINATE)
+      new Coordinates[] {
+        new Coordinate((double)1.0, 1, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)2.0, 2, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)3.0, 3, Coordinates.NULL_ORDINATE)
       },
-      new Coordinate[] {
-        new Coordinate(1.0, 1, Coordinates.NULL_ORDINATE),
-        new Coordinate(1.0, 2, Coordinates.NULL_ORDINATE),
-        new Coordinate(1.0, 3, Coordinates.NULL_ORDINATE)
-      }).equals2d(new Coordinate(2, 2, Coordinates.NULL_ORDINATE)));
+      new Coordinates[] {
+        new Coordinate((double)1.0, 1, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)1.0, 2, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)1.0, 3, Coordinates.NULL_ORDINATE)
+      }).equals2d(new Coordinate((double)2, 2, Coordinates.NULL_ORDINATE)));
   }
 
   public void testPtNotInList2() {
-    assertTrue(CoordinateArrays.ptNotInList(new Coordinate[] {
-      new Coordinate(1.0, 1, Coordinates.NULL_ORDINATE),
-      new Coordinate(2.0, 2, Coordinates.NULL_ORDINATE),
-      new Coordinate(3.0, 3, Coordinates.NULL_ORDINATE)
-    }, new Coordinate[] {
-      new Coordinate(1.0, 1, Coordinates.NULL_ORDINATE),
-      new Coordinate(2.0, 2, Coordinates.NULL_ORDINATE),
-      new Coordinate(3.0, 3, Coordinates.NULL_ORDINATE)
+    assertTrue(CoordinateArrays.ptNotInList(new Coordinates[] {
+      new Coordinate((double)1.0, 1, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)2.0, 2, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)3.0, 3, Coordinates.NULL_ORDINATE)
+    }, new Coordinates[] {
+      new Coordinate((double)1.0, 1, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)2.0, 2, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)3.0, 3, Coordinates.NULL_ORDINATE)
     }) == null);
   }
 }

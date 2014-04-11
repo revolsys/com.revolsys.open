@@ -4,7 +4,7 @@ package com.revolsys.gis.cs.epsg;
 public class EpsgCsTest {
   //
   // private void printDms(
-  // final Coordinate c1) {
+  // final Coordinates c1) {
   // printDms(c1.x);
   // System.out.print(", ");
   // printDms(c1.y);
@@ -25,12 +25,12 @@ public class EpsgCsTest {
   // }
   //
   // public void testUTransverseMeractor() {
-  // final ProjectedCoordinateSystem cs =
-  // (ProjectedCoordinateSystem)EpsgCoordinateSystems.getCoordinateSystem(26910);
+  // final ProjectedCoordinatesSystem cs =
+  // (ProjectedCoordinatesSystem)EpsgCoordinatesSystems.getCoordinatesSystem(26910);
   // final TransverseMercator proj = new TransverseMercator(cs);
-  // final DoubleCoordinates c1 = new DoubleCoordinates(-122, 49);
-  // final DoubleCoordinates c2 = new DoubleCoordinates(2);
-  // final DoubleCoordinates c3 = new DoubleCoordinates(-122, 49);
+  // final DoubleCoordinatess c1 = new DoubleCoordinatess(-122, 49);
+  // final DoubleCoordinatess c2 = new DoubleCoordinatess(2);
+  // final DoubleCoordinatess c3 = new DoubleCoordinatess(-122, 49);
   // for (int i = 0; i < 1; i++) {
   // proj.project(c3, c2);
   // proj.inverse(c2, c3);
@@ -42,23 +42,23 @@ public class EpsgCsTest {
   // int withProjectionCount = 0;
   // int withoutProjectionCount = 0;
   // final Map<Projection, Integer> counts = new HashMap<Projection, Integer>();
-  // for (final Integer crsId : EpsgCoordinateSystems.getCoordinateSystemsById()
+  // for (final Integer crsId : EpsgCoordinatesSystems.getCoordinatesSystemsById()
   // .keySet()) {
-  // final CoordinateSystem cs =
-  // EpsgCoordinateSystems.getCoordinateSystem(crsId);
-  // if (cs instanceof ProjectedCoordinateSystem) {
-  // final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)cs;
+  // final CoordinatesSystem cs =
+  // EpsgCoordinatesSystems.getCoordinatesSystem(crsId);
+  // if (cs instanceof ProjectedCoordinatesSystem) {
+  // final ProjectedCoordinatesSystem projCs = (ProjectedCoordinatesSystem)cs;
   // if (!projCs.isDeprecated()) {
   // if (projCs.getName().contains("British")) {
   // System.out.println(projCs.getAuthority());
   // }
-  // final GeographicCoordinateSystem geoCs =
-  // projCs.getGeographicCoordinateSystem();
-  // final CoordinatesOperation inverseOperation =
-  // ProjectionFactory.getCoordinatesOperation(
+  // final GeographicCoordinatesSystem geoCs =
+  // projCs.getGeographicCoordinatesSystem();
+  // final CoordinatessOperation inverseOperation =
+  // ProjectionFactory.getCoordinatessOperation(
   // projCs, geoCs);
-  // final CoordinatesOperation forwardOperation =
-  // ProjectionFactory.getCoordinatesOperation(
+  // final CoordinatessOperation forwardOperation =
+  // ProjectionFactory.getCoordinatessOperation(
   // geoCs, projCs);
   // if (inverseOperation == null) {
   // final Projection projection = projCs.getProjection();
@@ -74,13 +74,13 @@ public class EpsgCsTest {
   // withProjectionCount++;
   // final Area area = projCs.getArea();
   // if (area != null) {
-  // final Coordinate centre = area.getLatLonBounds().centre();
-  // final Coordinate c2 = new Coordinate();
-  // final Coordinate c3 = new Coordinate();
-  // forwardOperation.perform(new CoordinateCoordinates(centre),
-  // new CoordinateCoordinates(c2));
-  // inverseOperation.perform(new CoordinateCoordinates(c2),
-  // new CoordinateCoordinates(c3));
+  // final Coordinates centre = area.getLatLonBounds().centre();
+  // final Coordinates c2 = new Coordinates();
+  // final Coordinates c3 = new Coordinates();
+  // forwardOperation.perform(new CoordinatesCoordinatess(centre),
+  // new CoordinatesCoordinatess(c2));
+  // inverseOperation.perform(new CoordinatesCoordinatess(c2),
+  // new CoordinatesCoordinatess(c3));
   // }
   // }
   // }
@@ -96,34 +96,34 @@ public class EpsgCsTest {
   // return deg + min / 60.0 + sec / 3600.0;
   // }
   //
-  // public void xtestGetCoordinateSystem()
+  // public void xtestGetCoordinatesSystem()
   // throws Exception {
-  // final ProjectedCoordinateSystem bcAlbers =
-  // (ProjectedCoordinateSystem)EpsgCoordinateSystems.getCoordinateSystem(3005);
-  // final ProjectedCoordinateSystem utm =
-  // (ProjectedCoordinateSystem)EpsgCoordinateSystems.getCoordinateSystem(26910);
+  // final ProjectedCoordinatesSystem bcAlbers =
+  // (ProjectedCoordinatesSystem)EpsgCoordinatesSystems.getCoordinatesSystem(3005);
+  // final ProjectedCoordinatesSystem utm =
+  // (ProjectedCoordinatesSystem)EpsgCoordinatesSystems.getCoordinatesSystem(26910);
   //
-  // final GeographicCoordinateSystem gcs1 =
-  // bcAlbers.getGeographicCoordinateSystem();
-  // final GeographicCoordinateSystem gcs2 =
-  // utm.getGeographicCoordinateSystem();
+  // final GeographicCoordinatesSystem gcs1 =
+  // bcAlbers.getGeographicCoordinatesSystem();
+  // final GeographicCoordinatesSystem gcs2 =
+  // utm.getGeographicCoordinatesSystem();
   // System.out.println(gcs1.equals(gcs2));
   // }
   //
   // public void xtestTransverseMeractor() {
-  // final ProjectedCoordinateSystem cs =
-  // (ProjectedCoordinateSystem)EpsgCoordinateSystems.getCoordinateSystem(27700);
+  // final ProjectedCoordinatesSystem cs =
+  // (ProjectedCoordinatesSystem)EpsgCoordinatesSystems.getCoordinatesSystem(27700);
   // final TransverseMercator proj = new TransverseMercator(cs);
-  // final Coordinate c1 = new Coordinate(toDecimal(0, 30, 0), toDecimal(50, 30,
+  // final Coordinates c1 = new Coordinates((double)toDecimal(0, 30, 0), toDecimal(50, 30,
   // 0));
   // printDms(c1);
-  // final Coordinate c2 = new Coordinate();
-  // final Coordinate c3 = new Coordinate();
-  // final Coordinate c4 = new Coordinate(577274.99, 69740.50);
-  // final Coordinate c5 = new Coordinate();
-  // proj.project(new CoordinateCoordinates(c1), new CoordinateCoordinates(c2));
-  // proj.inverse(new CoordinateCoordinates(c2), new CoordinateCoordinates(c3));
-  // proj.inverse(new CoordinateCoordinates(c4), new CoordinateCoordinates(c5));
+  // final Coordinates c2 = new Coordinates();
+  // final Coordinates c3 = new Coordinates();
+  // final Coordinates c4 = new Coordinates((double)577274.99, 69740.50);
+  // final Coordinates c5 = new Coordinates();
+  // proj.project(new CoordinatesCoordinatess(c1), new CoordinatesCoordinatess(c2));
+  // proj.inverse(new CoordinatesCoordinatess(c2), new CoordinatesCoordinatess(c3));
+  // proj.inverse(new CoordinatesCoordinatess(c4), new CoordinatesCoordinatess(c5));
   // System.out.println(c1.distance(c3));
   // System.out.println(c1.distance(c5));
   // System.out.println(c2.distance(c4));

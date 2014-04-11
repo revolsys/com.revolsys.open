@@ -169,8 +169,8 @@ public class LineString extends Geometry implements Lineal {
       return false;
     }
     for (int i = 0; i < points.size(); i++) {
-      final Coordinate point = points.getCoordinate(i);
-      final Coordinate otherPoint = otherLineString.points.getCoordinate(i);
+      final Coordinates point = points.getCoordinate(i);
+      final Coordinates otherPoint = otherLineString.points.getCoordinate(i);
       if (!equal(point, otherPoint, tolerance)) {
         return false;
       }
@@ -199,7 +199,7 @@ public class LineString extends Geometry implements Lineal {
   }
 
   @Override
-  public Coordinate getCoordinate() {
+  public Coordinates getCoordinate() {
     if (isEmpty()) {
       return null;
     }
@@ -219,11 +219,11 @@ public class LineString extends Geometry implements Lineal {
   }
 
   @Override
-  public Coordinate[] getCoordinateArray() {
+  public Coordinates[] getCoordinateArray() {
     return points.toCoordinateArray();
   }
 
-  public Coordinate getCoordinateN(final int n) {
+  public Coordinates getCoordinateN(final int n) {
     return points.getCoordinate(n);
   }
 
@@ -355,17 +355,18 @@ public class LineString extends Geometry implements Lineal {
    * less than the reflected point.
    */
   @Override
-  public void normalize() {
+  public LineString normalize() {
     for (int i = 0; i < points.size() / 2; i++) {
       final int j = points.size() - 1 - i;
       // skip equal points on both ends
-      if (!points.getCoordinate(i).equals(points.getCoordinate(j))) {
+      if (!points.equal(i, points, j, 2)) {
         if (points.getCoordinate(i).compareTo(points.getCoordinate(j)) > 0) {
-          CoordinateArrays.reverse(getCoordinateArray());
+          return reverse();
         }
-        return;
+        return this;
       }
     }
+    return this;
   }
 
   public Iterable<Coordinates> points() {
@@ -379,11 +380,11 @@ public class LineString extends Geometry implements Lineal {
    * @return a {@link LineString} with coordinates in the reverse order
    */
   @Override
-  public Geometry reverse() {
-    final CoordinatesList seq = points.clone();
-    CoordinateSequences.reverse(seq);
-    final LineString revLine = getGeometryFactory().createLineString(seq);
-    return revLine;
+  public LineString reverse() {
+    final CoordinatesList reversePoints = this.points.reverse();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final LineString reverseLine = geometryFactory.createLineString(reversePoints);
+    return reverseLine;
   }
 
   @Override

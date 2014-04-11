@@ -57,11 +57,11 @@ public class PrecisionModelTest extends TestCase {
 
   private void preciseCoordinateTester(final PrecisionModel pm,
     final double x1, final double y1, final double x2, final double y2) {
-    final AbstractCoordinates p = new Coordinate(x1, y1, Coordinates.NULL_ORDINATE);
+    final Coordinates p = new Coordinate((double)x1, y1, Coordinates.NULL_ORDINATE);
 
     pm.makePrecise(p);
 
-    final Coordinates pPrecise = new Coordinate(x2, y2, Coordinates.NULL_ORDINATE);
+    final Coordinates pPrecise = new Coordinate((double)x2, y2, Coordinates.NULL_ORDINATE);
     assertTrue(p.equals2d(pPrecise));
   }
 

@@ -41,7 +41,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.util.Assert;
 /**
  * Represents an affine transformation on the 2D Cartesian plane. 
- * It can be used to transform a {@link Coordinate} or {@link Geometry}.
+ * It can be used to transform a {@link Coordinates} or {@link Geometry}.
  * An affine transformation is a mapping of the 2D plane into itself
  * via a series of transformations of the following basic types:
  * <ul>

@@ -19,13 +19,13 @@ public class InCirclePerf {
     test.run();
   }
 
-  Coordinates pa = new Coordinate(687958.05, 7460725.97, Coordinates.NULL_ORDINATE);
+  Coordinates pa = new Coordinate((double)687958.05, 7460725.97, Coordinates.NULL_ORDINATE);
 
-  Coordinates pb = new Coordinate(687957.43, 7460725.93, Coordinates.NULL_ORDINATE);
+  Coordinates pb = new Coordinate((double)687957.43, 7460725.93, Coordinates.NULL_ORDINATE);
 
-  Coordinates pc = new Coordinate(687957.58, 7460721, Coordinates.NULL_ORDINATE);
+  Coordinates pc = new Coordinate((double)687957.58, 7460721, Coordinates.NULL_ORDINATE);
 
-  Coordinates pp = new Coordinate(687958.13, 7460720.99, Coordinates.NULL_ORDINATE);
+  Coordinates pp = new Coordinate((double)687958.13, 7460720.99, Coordinates.NULL_ORDINATE);
 
   public InCirclePerf() {
   }

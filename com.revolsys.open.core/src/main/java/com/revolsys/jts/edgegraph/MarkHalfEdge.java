@@ -1,6 +1,6 @@
 package com.revolsys.jts.edgegraph;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A {@link HalfEdge} which supports
@@ -10,27 +10,34 @@ import com.revolsys.jts.geom.Coordinate;
  * @author Martin Davis
  *
  */
-public class MarkHalfEdge extends HalfEdge
-{
+public class MarkHalfEdge extends HalfEdge {
   /**
    * Tests whether the given edge is marked.
    * 
    * @param e the edge to test
    * @return true if the edge is marked
    */
-  public static boolean isMarked(HalfEdge e) 
-  {
-    return ((MarkHalfEdge) e).isMarked();
+  public static boolean isMarked(final HalfEdge e) {
+    return ((MarkHalfEdge)e).isMarked();
   }
-  
+
   /**
    * Marks the given edge.
    * 
    * @param e the edge to mark
    */
-  public static void mark(HalfEdge e)
-  {
-    ((MarkHalfEdge) e).mark();
+  public static void mark(final HalfEdge e) {
+    ((MarkHalfEdge)e).mark();
+  }
+
+  /**
+   * Marks the edges in a pair.
+   * 
+   * @param e an edge of the pair to mark
+   */
+  public static void markBoth(final HalfEdge e) {
+    ((MarkHalfEdge)e).mark();
+    ((MarkHalfEdge)e.sym()).mark();
   }
 
   /**
@@ -39,9 +46,8 @@ public class MarkHalfEdge extends HalfEdge
    * @param e the edge to set
    * @param isMarked the mark value
    */
-  public static void setMark(HalfEdge e, boolean isMarked)
-  {
-    ((MarkHalfEdge) e).setMark(isMarked);
+  public static void setMark(final HalfEdge e, final boolean isMarked) {
+    ((MarkHalfEdge)e).setMark(isMarked);
   }
 
   /**
@@ -50,22 +56,11 @@ public class MarkHalfEdge extends HalfEdge
    * @param e an edge of the pair to update
    * @param isMarked the mark value to set
    */
-  public static void setMarkBoth(HalfEdge e, boolean isMarked)
-  {
-    ((MarkHalfEdge) e).setMark(isMarked);
-    ((MarkHalfEdge) e.sym()).setMark(isMarked);
+  public static void setMarkBoth(final HalfEdge e, final boolean isMarked) {
+    ((MarkHalfEdge)e).setMark(isMarked);
+    ((MarkHalfEdge)e.sym()).setMark(isMarked);
   }
 
-  /**
-   * Marks the edges in a pair.
-   * 
-   * @param e an edge of the pair to mark
-   */
-  public static void markBoth(HalfEdge e) {
-    ((MarkHalfEdge) e).mark();
-    ((MarkHalfEdge) e.sym()).mark();
-  }
-  
   private boolean isMarked = false;
 
   /**
@@ -73,7 +68,7 @@ public class MarkHalfEdge extends HalfEdge
    * 
    * @param orig the coordinate of the edge origin
    */
-  public MarkHalfEdge(Coordinate orig) {
+  public MarkHalfEdge(final Coordinates orig) {
     super(orig);
   }
 
@@ -82,17 +77,15 @@ public class MarkHalfEdge extends HalfEdge
    * 
    * @return true if this edge is marked
    */
-  public boolean isMarked()
-  {
-    return isMarked ;
+  public boolean isMarked() {
+    return isMarked;
   }
-  
+
   /**
    * Marks this edge.
    * 
    */
-  public void mark()
-  {
+  public void mark() {
     isMarked = true;
   }
 
@@ -101,10 +94,8 @@ public class MarkHalfEdge extends HalfEdge
    * 
    * @param isMarked the mark value to set
    */
-  public void setMark(boolean isMarked)
-  {
+  public void setMark(final boolean isMarked) {
     this.isMarked = isMarked;
   }
-
 
 }

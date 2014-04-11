@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.visitor.AbstractEdgeListenerVisitor;
-import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.jts.geom.CoordinatesList;
 
 public class LineSegmentIntersectionVisitor extends

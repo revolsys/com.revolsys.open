@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -41,24 +39,22 @@ import java.util.Iterator;
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 
 /**
- * A list of {@link Coordinate}s, which may
+ * A list of {@link Coordinates}s, which may
  * be set to prevent repeated coordinates from occuring in the list.
  *
  *
  * @version 1.7
  */
-public class CoordinateList
-  extends ArrayList
-{
-  //With contributions from Markus Schaber [schabios@logi-track.com]
-  //[Jon Aquino 2004-03-25]
-  private final static Coordinate[] coordArrayType = new Coordinate[0];
+public class CoordinateList extends ArrayList {
+  // With contributions from Markus Schaber [schabios@logi-track.com]
+  // [Jon Aquino 2004-03-25]
+  private final static Coordinates[] coordArrayType = new Coordinates[0];
 
   /**
    * Constructs a new list without any coordinates
    */
-  public CoordinateList()
-  { super();
+  public CoordinateList() {
+    super();
   }
 
   /**
@@ -68,9 +64,8 @@ public class CoordinateList
    * 
    * @param coord the initial coordinates
    */
-  public CoordinateList(Coordinate[] coord)
-  {
-  	ensureCapacity(coord.length);
+  public CoordinateList(final Coordinates[] coord) {
+    ensureCapacity(coord.length);
     add(coord, true);
   }
 
@@ -81,31 +76,38 @@ public class CoordinateList
    * @param coord the array of coordinates to load into the list
    * @param allowRepeated if <code>false</code>, repeated points are removed
    */
-  public CoordinateList(Coordinate[] coord, boolean allowRepeated)
-  {
-  	ensureCapacity(coord.length);
+  public CoordinateList(final Coordinates[] coord, final boolean allowRepeated) {
+    ensureCapacity(coord.length);
     add(coord, allowRepeated);
   }
 
-  public Coordinates getCoordinate(int i) { return (Coordinates) get(i); }
-
-
-  /** 
-   * Adds a section of an array of coordinates to the list.
+  /**
+   * Adds a coordinate to the end of the list.
+   * 
    * @param coord The coordinates
    * @param allowRepeated if set to false, repeated coordinates are collapsed
-   * @param start the index to start from
-   * @param end the index to add up to but not including
+   */
+  public void add(final Coordinates coord, final boolean allowRepeated) {
+    // don't add duplicate coordinates
+    if (!allowRepeated) {
+      if (size() >= 1) {
+        final Coordinates last = (AbstractCoordinates)get(size() - 1);
+        if (last.equals2d(coord)) {
+          return;
+        }
+      }
+    }
+    super.add(coord);
+  }
+
+  /** 
+   * Adds an array of coordinates to the list.
+   * @param coord The coordinates
+   * @param allowRepeated if set to false, repeated coordinates are collapsed
    * @return true (as by general collection contract)
    */
-  public boolean add(Coordinate[] coord, boolean allowRepeated, int start, int end)
-  {
-    int inc = 1;
-    if (start > end) inc = -1;
-    
-    for (int i = start; i != end; i += inc) {
-      add(coord[i], allowRepeated);
-    }
+  public boolean add(final Coordinates[] coord, final boolean allowRepeated) {
+    add(coord, allowRepeated, true);
     return true;
   }
 
@@ -116,14 +118,13 @@ public class CoordinateList
    * @param direction if false, the array is added in reverse order
    * @return true (as by general collection contract)
    */
-  public boolean add(Coordinate[] coord, boolean allowRepeated, boolean direction)
-  {
+  public boolean add(final Coordinates[] coord, final boolean allowRepeated,
+    final boolean direction) {
     if (direction) {
       for (int i = 0; i < coord.length; i++) {
         add(coord[i], allowRepeated);
       }
-    }
-    else {
+    } else {
       for (int i = coord.length - 1; i >= 0; i--) {
         add(coord[i], allowRepeated);
       }
@@ -131,47 +132,25 @@ public class CoordinateList
     return true;
   }
 
-
   /** 
-   * Adds an array of coordinates to the list.
+   * Adds a section of an array of coordinates to the list.
    * @param coord The coordinates
    * @param allowRepeated if set to false, repeated coordinates are collapsed
+   * @param start the index to start from
+   * @param end the index to add up to but not including
    * @return true (as by general collection contract)
    */
-  public boolean add(Coordinate[] coord, boolean allowRepeated)
-  {
-    add(coord, allowRepeated, true);
-    return true;
-  }
-
-  /** 
-   * Adds a coordinate to the list.
-   * @param obj The coordinate to add
-   * @param allowRepeated if set to false, repeated coordinates are collapsed
-   * @return true (as by general collection contract)
-   */
-  public boolean add(Object obj, boolean allowRepeated)
-  {
-    add((Coordinate) obj, allowRepeated);
-    return true;
-  }
-
-  /**
-   * Adds a coordinate to the end of the list.
-   * 
-   * @param coord The coordinates
-   * @param allowRepeated if set to false, repeated coordinates are collapsed
-   */
-  public void add(Coordinate coord, boolean allowRepeated)
-  {
-    // don't add duplicate coordinates
-    if (! allowRepeated) {
-      if (size() >= 1) {
-        AbstractCoordinates last = (AbstractCoordinates) get(size() - 1);
-        if (last.equals2d(coord)) return;
-      }
+  public boolean add(final Coordinates[] coord, final boolean allowRepeated,
+    final int start, final int end) {
+    int inc = 1;
+    if (start > end) {
+      inc = -1;
     }
-    super.add(coord);
+
+    for (int i = start; i != end; i += inc) {
+      add(coord[i], allowRepeated);
+    }
+    return true;
   }
 
   /**
@@ -181,23 +160,38 @@ public class CoordinateList
    * @param coord the coordinate to insert
    * @param allowRepeated if set to false, repeated coordinates are collapsed
    */
-  public void add(int i, Coordinate coord, boolean allowRepeated)
-  {
+  public void add(final int i, final Coordinates coord,
+    final boolean allowRepeated) {
     // don't add duplicate coordinates
-    if (! allowRepeated) {
-      int size = size();
+    if (!allowRepeated) {
+      final int size = size();
       if (size > 0) {
         if (i > 0) {
-          AbstractCoordinates prev = (AbstractCoordinates) get(i - 1);
-          if (prev.equals2d(coord)) return;
+          final Coordinates prev = (AbstractCoordinates)get(i - 1);
+          if (prev.equals2d(coord)) {
+            return;
+          }
         }
         if (i < size) {
-          AbstractCoordinates next = (AbstractCoordinates) get(i);
-          if (next.equals2d(coord)) return;
+          final Coordinates next = (AbstractCoordinates)get(i);
+          if (next.equals2d(coord)) {
+            return;
+          }
         }
       }
     }
     super.add(i, coord);
+  }
+
+  /** 
+   * Adds a coordinate to the list.
+   * @param obj The coordinate to add
+   * @param allowRepeated if set to false, repeated coordinates are collapsed
+   * @return true (as by general collection contract)
+   */
+  public boolean add(final Object obj, final boolean allowRepeated) {
+    add((Coordinate)obj, allowRepeated);
+    return true;
   }
 
   /** Add an array of coordinates
@@ -205,32 +199,13 @@ public class CoordinateList
    * @param allowRepeated if set to false, repeated coordinates are collapsed
    * @return true (as by general collection contract)
    */
-  public boolean addAll(Collection coll, boolean allowRepeated)
-  {
+  public boolean addAll(final Collection coll, final boolean allowRepeated) {
     boolean isChanged = false;
-    for (Iterator i = coll.iterator(); i.hasNext(); ) {
-      add((Coordinate) i.next(), allowRepeated);
+    for (final Iterator i = coll.iterator(); i.hasNext();) {
+      add((Coordinate)i.next(), allowRepeated);
       isChanged = true;
     }
     return isChanged;
-  }
-
-  /**
-   * Ensure this coordList is a ring, by adding the start point if necessary
-   */
-  public void closeRing()
-  {
-    if (size() > 0)
-      add(new Coordinate((Coordinates) get(0)), false);
-  }
-
-  /** Returns the Coordinates in this collection.
-   *
-   * @return the coordinates
-   */
-  public Coordinate[] toCoordinateArray()
-  {
-    return (Coordinate[]) toArray(coordArrayType);
   }
 
   /**
@@ -238,11 +213,33 @@ public class CoordinateList
    *
    * @return a clone of this <tt>CoordinateList</tt> instance
    */
+  @Override
   public Object clone() {
-      CoordinateList clone = (CoordinateList) super.clone();
-      for (int i = 0; i < this.size(); i++) {
-          clone.add(i, ((Coordinates) this.get(i)).clone());
-      }
-      return clone;
+    final CoordinateList clone = (CoordinateList)super.clone();
+    for (int i = 0; i < this.size(); i++) {
+      clone.add(i, ((Coordinates)this.get(i)).clone());
+    }
+    return clone;
+  }
+
+  /**
+   * Ensure this coordList is a ring, by adding the start point if necessary
+   */
+  public void closeRing() {
+    if (size() > 0) {
+      add(new Coordinate((Coordinates)get(0)), false);
+    }
+  }
+
+  public Coordinates getCoordinate(final int i) {
+    return (Coordinates)get(i);
+  }
+
+  /** Returns the Coordinates in this collection.
+   *
+   * @return the coordinates
+   */
+  public Coordinates[] toCoordinateArray() {
+    return (Coordinates[])toArray(coordArrayType);
   }
 }

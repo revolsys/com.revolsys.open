@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -69,9 +68,9 @@ public class RobustLineIntersector extends LineIntersector {
    * @param q2 an endpoint of segment Q
    * @return the nearest endpoint to the other segment
    */
-  private static Coordinate nearestEndpoint(final Coordinate p1,
-    final Coordinate p2, final Coordinate q1, final Coordinate q2) {
-    Coordinate nearestPt = p1;
+  private static Coordinates nearestEndpoint(final Coordinates p1,
+    final Coordinates p2, final Coordinates q1, final Coordinates q2) {
+    Coordinates nearestPt = p1;
     double minDist = CGAlgorithms.distancePointLine(p1, q1, q2);
 
     double dist = CGAlgorithms.distancePointLine(p2, q1, q2);
@@ -96,7 +95,7 @@ public class RobustLineIntersector extends LineIntersector {
   }
 
   private void checkDD(final Coordinates p1, final Coordinates p2,
-    final Coordinates q1, final Coordinates q2, final AbstractCoordinates intPt) {
+    final Coordinates q1, final Coordinates q2, final Coordinates intPt) {
     final Coordinates intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1, q2);
     final boolean isIn = isInSegmentEnvelopes(intPtDD);
     System.out.println("DD in env = " + isIn + "  --------------------- "
@@ -106,8 +105,8 @@ public class RobustLineIntersector extends LineIntersector {
     }
   }
 
-  private int computeCollinearIntersection(final Coordinate p1,
-    final Coordinate p2, final Coordinate q1, final Coordinate q2) {
+  private int computeCollinearIntersection(final Coordinates p1,
+    final Coordinates p2, final Coordinates q1, final Coordinates q2) {
     final boolean p1q1p2 = Envelope.intersects(p1, p2, q1);
     final boolean p1q2p2 = Envelope.intersects(p1, p2, q2);
     final boolean q1p1q2 = Envelope.intersects(q1, q2, p1);
@@ -151,8 +150,8 @@ public class RobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  protected int computeIntersect(final Coordinate p1, final Coordinate p2,
-    final Coordinate q1, final Coordinate q2) {
+  protected int computeIntersect(final Coordinates p1, final Coordinates p2,
+    final Coordinates q1, final Coordinates q2) {
     isProper = false;
 
     // first try a fast test to see if the envelopes of the lines intersect
@@ -266,12 +265,12 @@ public class RobustLineIntersector extends LineIntersector {
    * removing common significant digits from the calculation to
    * maintain more bits of precision.
    */
-  private Coordinate intersection(final Coordinate p1, final Coordinate p2,
-    final Coordinate q1, final Coordinate q2) {
-    Coordinate intPt = intersectionWithNormalization(p1, p2, q1, q2);
+  private Coordinates intersection(final Coordinates p1, final Coordinates p2,
+    final Coordinates q1, final Coordinates q2) {
+    Coordinates intPt = intersectionWithNormalization(p1, p2, q1, q2);
 
     /*
-     * // TESTING ONLY Coordinate intPtDD = CGAlgorithmsDD.intersection(p1, p2,
+     * // TESTING ONLY Coordinates intPtDD = CGAlgorithmsDD.intersection(p1, p2,
      * q1, q2); double dist = intPt.distance(intPtDD); System.out.println(intPt
      * + " - " + intPtDD + " dist = " + dist); //intPt = intPtDD;
      */
@@ -308,16 +307,16 @@ public class RobustLineIntersector extends LineIntersector {
     return intPt;
   }
 
-  private Coordinate intersectionWithNormalization(final Coordinates p1,
+  private Coordinates intersectionWithNormalization(final Coordinates p1,
     final Coordinates p2, final Coordinates q1, final Coordinates q2) {
-    final Coordinate n1 = new Coordinate(p1);
-    final Coordinate n2 = new Coordinate(p2);
-    final Coordinate n3 = new Coordinate(q1);
-    final Coordinate n4 = new Coordinate(q2);
+    final Coordinates n1 = new Coordinate(p1);
+    final Coordinates n2 = new Coordinate(p2);
+    final Coordinates n3 = new Coordinate(q1);
+    final Coordinates n4 = new Coordinate(q2);
     final Coordinates normPt = new Coordinate();
     normalizeToEnvCentre(n1, n2, n3, n4, normPt);
 
-    final Coordinate intPt = safeHCoordinateIntersection(n1, n2, n3, n4);
+    final Coordinates intPt = safeHCoordinateIntersection(n1, n2, n3, n4);
 
     intPt.setX(intPt.getX() + normPt.getX());
     intPt.setY(intPt.getY() + normPt.getY());
@@ -377,7 +376,7 @@ public class RobustLineIntersector extends LineIntersector {
     /*
      * // equilavalent code using more modular but slower method Envelope env0 =
      * new Envelope(n00, n01); Envelope env1 = new Envelope(n10, n11); Envelope
-     * intEnv = env0.intersection(env1); Coordinate intMidPt = intEnv.centre();
+     * intEnv = env0.intersection(env1); Coordinates intMidPt = intEnv.centre();
      * normPt.x = intMidPt.x; normPt.y = intMidPt.y;
      */
 
@@ -429,9 +428,9 @@ public class RobustLineIntersector extends LineIntersector {
    * @param q2 a segment endpoint
    * @return the computed intersection point
    */
-  private Coordinate safeHCoordinateIntersection(final Coordinate p1,
-    final Coordinate p2, final Coordinate q1, final Coordinate q2) {
-    Coordinate intPt = null;
+  private Coordinates safeHCoordinateIntersection(final Coordinates p1,
+    final Coordinates p2, final Coordinates q1, final Coordinates q2) {
+    Coordinates intPt = null;
     try {
       intPt = HCoordinate.intersection(p1, p2, q1, q2);
     } catch (final NotRepresentableException e) {

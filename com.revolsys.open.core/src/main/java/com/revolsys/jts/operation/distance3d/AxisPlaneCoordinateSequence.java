@@ -119,7 +119,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public Coordinate getCoordinate(final int i) {
+  public Coordinates getCoordinate(final int i) {
     return getCoordinateCopy(i);
   }
 
@@ -131,8 +131,8 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public Coordinate getCoordinateCopy(final int i) {
-    return new Coordinate(getX(i), getY(i), getZ(i));
+  public Coordinates getCoordinateCopy(final int i) {
+    return new Coordinate((double)getX(i), getY(i), getZ(i));
   }
 
   @Override
@@ -191,7 +191,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public Coordinate[] toCoordinateArray() {
+  public Coordinates[] toCoordinateArray() {
     throw new UnsupportedOperationException();
   }
 

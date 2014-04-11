@@ -80,10 +80,10 @@ public class Vector3D {
 	}
 
 	/**
-	 * Creates a vector from a {@link Coordinate}.
+	 * Creates a vector from a {@link Coordinates}.
 	 * 
 	 * @param coord
-	 *            the Coordinate to copy
+	 *            the Coordinates to copy
 	 * @return a new vector
 	 */
 	public static Vector3D create(Coordinates coord) {
@@ -97,7 +97,7 @@ public class Vector3D {
 	}
 
 	/**
-	 * Computes the 3D dot-product of two {@link Coordinate}s.
+	 * Computes the 3D dot-product of two {@link Coordinates}s.
 	 * 
    * @param v1 the first vector
    * @param v2 the second vector
@@ -168,7 +168,7 @@ public class Vector3D {
 
 	public static Coordinates normalize(Coordinates v) {
 		double len = length(v);
-		return new Coordinate(v.getX() / len, v.getY() / len, v.getZ() / len);
+		return new Coordinate((double)v.getX() / len, v.getY() / len, v.getZ() / len);
 	}
 	  /**
 	   * Gets a string representation of this vector

@@ -37,6 +37,7 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
@@ -57,19 +58,19 @@ public class IsCCWTest extends TestCase {
     super(name);
   }
 
-  private Coordinate[] getCoordinates(final String wkt) throws ParseException {
+  private Coordinates[] getCoordinates(final String wkt) throws ParseException {
     final Geometry geom = this.reader.read(wkt);
     return geom.getCoordinateArray();
   }
 
   public void testCCW() throws Exception {
-    final Coordinate[] pts = getCoordinates("POLYGON ((60 180, 140 240, 140 240, 140 240, 200 180, 120 120, 60 180))");
+    final Coordinates[] pts = getCoordinates("POLYGON ((60 180, 140 240, 140 240, 140 240, 200 180, 120 120, 60 180))");
     assertEquals(CGAlgorithms.isCCW(pts), false);
 
-    final Coordinate[] pts2 = getCoordinates("POLYGON ((60 180, 140 120, 100 180, 140 240, 60 180))");
+    final Coordinates[] pts2 = getCoordinates("POLYGON ((60 180, 140 120, 100 180, 140 240, 60 180))");
     assertEquals(CGAlgorithms.isCCW(pts2), true);
     // same pts list with duplicate top point - check that isCCW still works
-    final Coordinate[] pts2x = getCoordinates("POLYGON ((60 180, 140 120, 100 180, 140 240, 140 240, 60 180))");
+    final Coordinates[] pts2x = getCoordinates("POLYGON ((60 180, 140 120, 100 180, 140 240, 140 240, 60 180))");
     assertEquals(CGAlgorithms.isCCW(pts2x), true);
   }
 }

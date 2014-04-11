@@ -47,9 +47,9 @@ import com.revolsys.jts.util.Assert;
  */
 public class Vector2D {
   /**
-   * Creates a vector from a {@link Coordinate}. 
+   * Creates a vector from a {@link Coordinates}. 
    * 
-   * @param coord the Coordinate to copy
+   * @param coord the Coordinates to copy
    * @return a new vector
    */
   public static Vector2D create(final Coordinates coord) {
@@ -59,7 +59,7 @@ public class Vector2D {
   /**
    * Creates a vector with the direction and magnitude
    * of the difference between the 
-   * <tt>to</tt> and <tt>from</tt> {@link Coordinate}s.
+   * <tt>to</tt> and <tt>from</tt> {@link Coordinates}s.
    * 
    * @param from the origin Coordinate
    * @param to the destination Coordinate
@@ -318,7 +318,7 @@ public class Vector2D {
   }
 
   public Coordinates toCoordinate() {
-    return new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+    return new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
   }
 
   /**
@@ -331,8 +331,8 @@ public class Vector2D {
     return "[" + x + ", " + y + "]";
   }
 
-  public Coordinate translate(final Coordinates coord) {
-    return new Coordinate(x + coord.getX(), y + coord.getY(),
+  public Coordinates translate(final Coordinates coord) {
+    return new Coordinate((double)x + coord.getX(), y + coord.getY(),
       Coordinates.NULL_ORDINATE);
   }
 

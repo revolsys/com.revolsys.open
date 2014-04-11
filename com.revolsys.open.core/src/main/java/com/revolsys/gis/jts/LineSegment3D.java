@@ -1,7 +1,6 @@
 package com.revolsys.gis.jts;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
@@ -33,14 +32,14 @@ public class LineSegment3D extends LineSegment {
     } else {
       z = MathUtil.midpoint(z1, z2);
     }
-    final Coordinates coordinate = new Coordinate(x, y, z);
+    final Coordinates coordinate = new DoubleCoordinates(x, y, z);
     return coordinate;
   }
 
   public LineSegment3D() {
   }
 
-  public LineSegment3D(final Coordinate p0, final Coordinate p1) {
+  public LineSegment3D(final Coordinates p0, final Coordinates p1) {
     super(p0, p1);
   }
 
@@ -54,7 +53,7 @@ public class LineSegment3D extends LineSegment {
    * @param coordinate The Coordinate.
    * @param line The line segment the coordinate is on.
    */
-  public void addElevation(final AbstractCoordinates coordinate) {
+  public void addElevation(final Coordinates coordinate) {
     final double z0 = p0.getZ();
     final double z1 = p1.getZ();
     if (!Double.isNaN(z0) && !Double.isNaN(z0)) {
@@ -69,7 +68,7 @@ public class LineSegment3D extends LineSegment {
    * @param coordinate The Coordinate.
    * @param line The line segment the coordinate is on.
    */
-  public void addElevation(final AbstractCoordinates coordinate,
+  public void addElevation(final Coordinates coordinate,
     final PrecisionModel model) {
     final double z0 = p0.getZ();
     final double z1 = p1.getZ();
@@ -83,8 +82,8 @@ public class LineSegment3D extends LineSegment {
     return new Envelope(p0, p1);
   }
 
-  public Coordinate intersection3D(final LineSegment line) {
-    final Coordinate intersection = super.intersection(line);
+  public Coordinates intersection3D(final LineSegment line) {
+    final Coordinates intersection = super.intersection(line);
     if (intersection != null) {
       addElevation(intersection);
     }
@@ -92,10 +91,18 @@ public class LineSegment3D extends LineSegment {
   }
 
   public Coordinates pointAlong3D(final double segmentLengthFraction) {
-    final AbstractCoordinates coord = new Coordinate();
-    coord.setX(p0.getX() + segmentLengthFraction * (p1.getX() - p0.getX()));
-    coord.setY(p0.getY() + segmentLengthFraction * (p1.getY() - p0.getY()));
-    addElevation(coord);
-    return coord;
+    final double x = p0.getX() + segmentLengthFraction
+      * (p1.getX() - p0.getX());
+    final double y = p0.getY() + segmentLengthFraction
+      * (p1.getY() - p0.getY());
+
+    final double z0 = p0.getZ();
+    final double z1 = p1.getZ();
+    if (!Double.isNaN(z0) && !Double.isNaN(z0)) {
+      final double z = z0 + (z1 - z0) * (segmentLengthFraction);
+      return new DoubleCoordinates(x, y, z);
+    } else {
+      return new DoubleCoordinates(x, y);
+    }
   }
 }

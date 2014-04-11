@@ -108,11 +108,11 @@ extends GeometricShapeBuilder
 	private LinearRing createSquareHole(double x, double y, double width)
 	{
 		Coordinates[] pts = new Coordinates[]{
-        new Coordinate(x, y, Coordinates.NULL_ORDINATE),
-        new Coordinate(x + width, y, Coordinates.NULL_ORDINATE),
-        new Coordinate(x + width, y + width, Coordinates.NULL_ORDINATE),
-        new Coordinate(x, y + width, Coordinates.NULL_ORDINATE),
-        new Coordinate(x, y, Coordinates.NULL_ORDINATE)
+        new Coordinate((double)x, y, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)x + width, y, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)x + width, y + width, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)x, y + width, Coordinates.NULL_ORDINATE),
+        new Coordinate((double)x, y, Coordinates.NULL_ORDINATE)
         }	;
 		return geomFactory.createLinearRing(pts); 
 	}

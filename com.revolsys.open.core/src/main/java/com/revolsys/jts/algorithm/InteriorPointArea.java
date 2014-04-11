@@ -186,8 +186,8 @@ public class InteriorPointArea {
     
     double bisectY = SafeBisectorFinder.getBisectorY((Polygon) geometry);
     return factory.createLineString(new Coordinates[] {
-            new Coordinate(envelope.getMinX(), bisectY, Coordinates.NULL_ORDINATE),
-            new Coordinate(envelope.getMaxX(), bisectY, Coordinates.NULL_ORDINATE)
+            new Coordinate((double)envelope.getMinX(), bisectY, Coordinates.NULL_ORDINATE),
+            new Coordinate((double)envelope.getMaxX(), bisectY, Coordinates.NULL_ORDINATE)
         });
   }
 
@@ -197,7 +197,7 @@ public class InteriorPointArea {
    * @return the centre of the envelope
    */
   public static Coordinates centre(Envelope envelope) {
-      return new Coordinate(avg(envelope.getMinX(),
+      return new Coordinate((double)avg(envelope.getMinX(),
               envelope.getMaxX()),
           avg(envelope.getMinY(), envelope.getMaxY()), Coordinates.NULL_ORDINATE);
   }

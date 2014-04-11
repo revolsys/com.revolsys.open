@@ -88,7 +88,7 @@ public class PolygonUnionPerfTest {
     final double yInc = height / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Coordinates base = new Coordinate(i * xInc, j * yInc, Coordinates.NULL_ORDINATE);
+        final Coordinates base = new Coordinate((double)i * xInc, j * yInc, Coordinates.NULL_ORDINATE);
         final Geometry poly = createPoly(base, size, nPts);
         geoms.add(poly);
         // System.out.println(poly);

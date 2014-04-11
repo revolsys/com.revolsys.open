@@ -68,19 +68,19 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final int xFac = factor[quadrant][0];
     final int yFac = factor[quadrant][1];
 
-    final Coordinates p0 = new Coordinate(base.getX() + xFac * size, base.getY() + yFac
-      * size, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate(base.getX() + yFac * size, base.getY() + -xFac
-      * size, Coordinates.NULL_ORDINATE);
+    final Coordinates p0 = new Coordinate(base.getX() + xFac * size,
+      base.getY() + yFac * size, Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate(base.getX() + yFac * size,
+      base.getY() + -xFac * size, Coordinates.NULL_ORDINATE);
 
     return this.fact.createLineString(new Coordinates[] {
       p0, base, p2
     });
   }
 
-  public List createTestGeometries(final Envelope env, final double inc,
-    final double size) {
-    final List testGeoms = new ArrayList();
+  public List<Geometry> createTestGeometries(final Envelope env,
+    final double inc, final double size) {
+    final List<Geometry> testGeoms = new ArrayList<Geometry>();
 
     for (double y = env.getMinY(); y <= env.getMaxY(); y += inc) {
       for (double x = env.getMinX(); x <= env.getMaxX(); x += inc) {
@@ -94,12 +94,13 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     return testGeoms;
   }
 
-  private List getTestGeometries() {
+  private List<Geometry> getTestGeometries() {
     final Envelope testEnv = new Envelope(
       this.rectEnv.getMinX() - this.bufSize, this.rectEnv.getMaxX()
         + this.bufSize, this.rectEnv.getMinY() - this.bufSize,
       this.rectEnv.getMaxY() + this.bufSize);
-    final List testGeoms = createTestGeometries(testEnv, 5, this.testGeomSize);
+    final List<Geometry> testGeoms = createTestGeometries(testEnv, 5,
+      this.testGeomSize);
     return testGeoms;
   }
 
@@ -124,7 +125,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   public void testDenseLines() {
     System.out.println(this.rect);
 
-    final List testGeoms = getTestGeometries();
+    final List<Geometry> testGeoms = getTestGeometries();
     for (final Iterator i = testGeoms.iterator(); i.hasNext();) {
       final Geometry testGeom = (Geometry)i.next();
 
@@ -139,17 +140,15 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   public void testLines() {
     System.out.println(this.rect);
 
-    final List testGeoms = getTestGeometries();
-    for (final Iterator i = testGeoms.iterator(); i.hasNext();) {
-      final Geometry testGeom = (Geometry)i.next();
+    final List<Geometry> testGeoms = getTestGeometries();
+    for (final Geometry testGeom : testGeoms) {
       runRectanglePredicates(this.rect, testGeom);
     }
   }
 
   public void testPolygons() {
-    final List testGeoms = getTestGeometries();
-    for (final Iterator i = testGeoms.iterator(); i.hasNext();) {
-      final Geometry testGeom = (Geometry)i.next();
+    final List<Geometry> testGeoms = getTestGeometries();
+    for (final Geometry testGeom : testGeoms) {
       runRectanglePredicates(this.rect, testGeom.buffer(this.bufferWidth));
     }
   }

@@ -33,13 +33,13 @@ public class EdgeGraphTest extends TestCase {
     return EdgeGraphBuilder.build(geoms);
   }
 
-  private void checkEdge(final EdgeGraph graph, final Coordinate p0,
+  private void checkEdge(final EdgeGraph graph, final Coordinates p0,
     final Coordinates p1) {
     final HalfEdge e = graph.findEdge(p0, p1);
     assertNotNull(e);
   }
 
-  private void checkEdgeRing(final EdgeGraph graph, final Coordinate p,
+  private void checkEdgeRing(final EdgeGraph graph, final Coordinates p,
     final Coordinates[] dest) {
     final HalfEdge e = graph.findEdge(p, dest[0]);
     HalfEdge onext = e;
@@ -53,10 +53,10 @@ public class EdgeGraphTest extends TestCase {
 
   public void testNode() throws Exception {
     final EdgeGraph graph = build("MULTILINESTRING((0 0, 1 0), (0 0, 0 1), (0 0, -1 0))");
-    checkEdgeRing(graph, new Coordinate(0, 0, Coordinates.NULL_ORDINATE), new Coordinates[] {
-      new Coordinate(1, 0, Coordinates.NULL_ORDINATE), new Coordinate(0, 1, Coordinates.NULL_ORDINATE), new Coordinate(-1, 0, Coordinates.NULL_ORDINATE)
+    checkEdgeRing(graph, new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), new Coordinates[] {
+      new Coordinate((double)1, 0, Coordinates.NULL_ORDINATE), new Coordinate((double)0, 1, Coordinates.NULL_ORDINATE), new Coordinate((double)-1, 0, Coordinates.NULL_ORDINATE)
     });
-    checkEdge(graph, new Coordinate(0, 0, Coordinates.NULL_ORDINATE), new Coordinate(1, 0, Coordinates.NULL_ORDINATE));
+    checkEdge(graph, new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), new Coordinate((double)1, 0, Coordinates.NULL_ORDINATE));
   }
 
 }

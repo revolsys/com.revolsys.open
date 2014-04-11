@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -46,7 +45,7 @@ import com.revolsys.jts.geom.Coordinates;
 /**
  * Represents a list of contiguous line segments,
  * and supports noding the segments.
- * The line segments are represented by an array of {@link Coordinate}s.
+ * The line segments are represented by an array of {@link Coordinates}s.
  * Intended to optimize the noding of contiguous segments by
  * reducing the number of allocated objects.
  * SegmentStrings can carry a context object, which is useful
@@ -84,7 +83,7 @@ public class NodedSegmentString implements NodableSegmentString {
 
   private final SegmentNodeList nodeList = new SegmentNodeList(this);
 
-  private final Coordinate[] pts;
+  private final Coordinates[] pts;
 
   private Object data;
 
@@ -94,7 +93,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param pts the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public NodedSegmentString(final Coordinate[] pts, final Object data) {
+  public NodedSegmentString(final Coordinates[] pts, final Object data) {
     this.pts = pts;
     this.data = data;
   }
@@ -106,7 +105,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segmentIndex the index of the segment containing the intersection
    */
   @Override
-  public void addIntersection(final AbstractCoordinates intPt, final int segmentIndex) {
+  public void addIntersection(final Coordinates intPt, final int segmentIndex) {
     addIntersectionNode(intPt, segmentIndex);
   }
 
@@ -118,7 +117,7 @@ public class NodedSegmentString implements NodableSegmentString {
    */
   public void addIntersection(final LineIntersector li, final int segmentIndex,
     final int geomIndex, final int intIndex) {
-    final AbstractCoordinates intPt = new Coordinate(li.getIntersection(intIndex));
+    final Coordinates intPt = new Coordinate(li.getIntersection(intIndex));
     addIntersection(intPt, segmentIndex);
   }
 
@@ -131,7 +130,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segmentIndex the index of the segment containing the intersection
    * @return the intersection node for the point
    */
-  public SegmentNode addIntersectionNode(final AbstractCoordinates intPt,
+  public SegmentNode addIntersectionNode(final Coordinates intPt,
     final int segmentIndex) {
     int normalizedSegmentIndex = segmentIndex;
     // Debug.println("edge intpt: " + intPt + " dist: " + dist);
@@ -167,12 +166,12 @@ public class NodedSegmentString implements NodableSegmentString {
   }
 
   @Override
-  public Coordinate getCoordinate(final int i) {
+  public Coordinates getCoordinate(final int i) {
     return pts[i];
   }
 
   @Override
-  public Coordinate[] getCoordinates() {
+  public Coordinates[] getCoordinates() {
     return pts;
   }
 
@@ -210,7 +209,7 @@ public class NodedSegmentString implements NodableSegmentString {
     return pts[0].equals(pts[pts.length - 1]);
   }
 
-  private int safeOctant(final AbstractCoordinates p0, final Coordinates p1) {
+  private int safeOctant(final Coordinates p0, final Coordinates p1) {
     if (p0.equals2d(p1)) {
       return 0;
     }

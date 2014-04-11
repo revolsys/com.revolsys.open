@@ -61,7 +61,7 @@ class MCIndexedGeometry {
     init(geom);
   }
 
-  private void addLine(final Coordinate[] pts) {
+  private void addLine(final Coordinates[] pts) {
     final SegmentString segStr = new BasicSegmentString(pts, null);
     final List segChains = MonotoneChainBuilder.getChains(
       segStr.getCoordinates(), segStr);
@@ -75,7 +75,7 @@ class MCIndexedGeometry {
     final List lines = LinearComponentExtracter.getLines(geom);
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
-      final Coordinate[] pts = line.getCoordinateArray();
+      final Coordinates[] pts = line.getCoordinateArray();
       addLine(pts);
     }
   }
@@ -86,7 +86,7 @@ class MCIndexedGeometry {
 }
 
 /**
- * Determines the location of {@link Coordinate}s relative to
+ * Determines the location of {@link Coordinates}s relative to
  * a {@link Polygonal} geometry, using indexing for efficiency.
  * This algorithm is suitable for use in cases where
  * many points will be tested against a given area.
@@ -147,7 +147,8 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
   public int locate(final Coordinates p) {
     final RayCrossingCounter rcc = new RayCrossingCounter(p);
     final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
-    final Envelope rayEnv = new Envelope(p.getX(), this.maxXExtent, p.getY(), p.getY());
+    final Envelope rayEnv = new Envelope(p.getX(), this.maxXExtent, p.getY(),
+      p.getY());
     final List mcs = this.index.query(rayEnv);
     countSegs(rcc, rayEnv, mcs, mcSegCounter);
 

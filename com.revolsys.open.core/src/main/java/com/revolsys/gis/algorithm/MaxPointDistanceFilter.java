@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 
 public class MaxPointDistanceFilter implements CoordinateFilter {
@@ -25,7 +25,7 @@ public class MaxPointDistanceFilter implements CoordinateFilter {
   }
 
   @Override
-  public void filter(final Coordinate pt) {
+  public void filter(final Coordinates pt) {
     minPtDist.initialize();
     euclideanDist.computeDistance(geom, pt, minPtDist);
     maxPtDist.setMaximum(minPtDist);

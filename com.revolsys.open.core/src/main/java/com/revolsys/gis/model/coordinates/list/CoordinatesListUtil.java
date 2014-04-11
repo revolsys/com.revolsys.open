@@ -20,15 +20,15 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
+import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.Location;
+import com.revolsys.gis.jts.RayCrossingCounter;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.gis.model.geometry.LineSegment;
-import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
-import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -743,8 +743,8 @@ public class CoordinatesListUtil {
    *          first point identical to last point)
    * @return the {@link Location} of p relative to the ring
    */
-  public static Location locatePointInRing(final Coordinates p,
-    final CoordinatesList ring) {
+  public static com.revolsys.gis.jts.Location locatePointInRing(
+    final Coordinates p, final CoordinatesList ring) {
     return RayCrossingCounter.locatePointInRing(p, ring);
   }
 

@@ -1,30 +1,27 @@
 package com.revolsys.gis.cs.projection;
 
-import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 
 public class CoordinateProjectionUtil {
   public static Coordinates perform(final CoordinatesOperation operation,
-    final Coordinate coordinate) {
+    final Coordinates coordinate) {
     if (operation == null) {
       return coordinate;
     } else {
-      final Coordinate newCoordinate = new Coordinate();
+      final Coordinates newCoordinate = new DoubleCoordinates(
+        coordinate.getNumAxis());
       perform(operation, coordinate, newCoordinate);
       return newCoordinate;
     }
   }
 
   public static void perform(final CoordinatesOperation operation,
-    final Coordinate from, final Coordinate to) {
+    final Coordinates from, final Coordinates to) {
     if (operation == null) {
       to.setCoordinate(from);
     } else {
-      final CoordinateCoordinates fromCoordinates = new CoordinateCoordinates(
-        from);
-      final CoordinateCoordinates toCoordinates = new CoordinateCoordinates(to);
-      operation.perform(fromCoordinates, toCoordinates);
+      operation.perform(from, to);
     }
   }
 }

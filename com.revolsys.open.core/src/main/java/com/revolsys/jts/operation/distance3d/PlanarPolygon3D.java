@@ -60,12 +60,12 @@ public class PlanarPolygon3D {
   private static Coordinates project(final Coordinates p, final int facingPlane) {
     switch (facingPlane) {
       case Plane3D.XY_PLANE:
-        return new Coordinate(p.getX(), p.getY(), Coordinates.NULL_ORDINATE);
+        return new Coordinate((double)p.getX(), p.getY(), Coordinates.NULL_ORDINATE);
       case Plane3D.XZ_PLANE:
-        return new Coordinate(p.getX(), p.getZ(), Coordinates.NULL_ORDINATE);
+        return new Coordinate((double)p.getX(), p.getZ(), Coordinates.NULL_ORDINATE);
         // Plane3D.YZ
       default:
-        return new Coordinate(p.getY(), p.getZ(), Coordinates.NULL_ORDINATE);
+        return new Coordinate((double)p.getY(), p.getZ(), Coordinates.NULL_ORDINATE);
     }
   }
 
@@ -105,9 +105,9 @@ public class PlanarPolygon3D {
    */
   private Vector3D averageNormal(final CoordinatesList seq) {
     final int n = seq.size();
-    final Coordinates sum = new Coordinate(0.0, 0.0, 0.0);
-    final Coordinates p1 = new Coordinate(0.0, 0.0, 0.0);
-    final Coordinates p2 = new Coordinate(0.0, 0.0, 0.0);
+    final Coordinates sum = new Coordinate((double)0.0, 0.0, 0.0);
+    final Coordinates p1 = new Coordinate((double)0.0, 0.0, 0.0);
+    final Coordinates p2 = new Coordinate((double)0.0, 0.0, 0.0);
     for (int i = 0; i < n - 1; i++) {
       seq.getCoordinate(i, p1);
       seq.getCoordinate(i + 1, p2);
@@ -129,10 +129,10 @@ public class PlanarPolygon3D {
    * the computed point also lies in the plane.
    * 
    * @param seq a coordinate sequence
-   * @return a Coordinate with averaged ordinates
+   * @return a Coordinates with averaged ordinates
    */
   private Coordinates averagePoint(final CoordinatesList seq) {
-    final Coordinates a = new Coordinate(0.0, 0.0, 0.0);
+    final Coordinates a = new Coordinate((double)0.0, 0.0, 0.0);
     final int n = seq.size();
     for (int i = 0; i < n; i++) {
       a.setX(a.getX() + seq.getOrdinate(i, CoordinatesList.X));

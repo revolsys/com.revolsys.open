@@ -36,9 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-//import com.revolsys.jts.testold.util.Debug;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
+//import com.revolsys.jts.testold.util.Debug;
 
 /**
  * Finds an interior intersection in a set of {@link SegmentString}s,
@@ -46,15 +45,18 @@ import com.revolsys.jts.geom.Coordinates;
  *
  * @version 1.7
  */
-public class InteriorIntersectionFinder
-    implements SegmentIntersector
-{
-	private boolean findAllIntersections = false;
-	private boolean isCheckEndSegmentsOnly = false;
-  private LineIntersector li;
-  private Coordinate interiorIntersection = null;
+public class InteriorIntersectionFinder implements SegmentIntersector {
+  private boolean findAllIntersections = false;
+
+  private boolean isCheckEndSegmentsOnly = false;
+
+  private final LineIntersector li;
+
+  private Coordinates interiorIntersection = null;
+
   private Coordinates[] intSegments = null;
-  private List intersections = new ArrayList();
+
+  private final List intersections = new ArrayList();
 
   /**
    * Creates an intersection finder which finds an interior intersection
@@ -62,22 +64,124 @@ public class InteriorIntersectionFinder
    *
    * @param li the LineIntersector to use
    */
-  public InteriorIntersectionFinder(LineIntersector li)
-  {
+  public InteriorIntersectionFinder(final LineIntersector li) {
     this.li = li;
     interiorIntersection = null;
   }
 
-  public void setFindAllIntersections(boolean findAllIntersections)
-  {
-    this.findAllIntersections = findAllIntersections;
+  /**
+   * Gets the computed location of the intersection.
+   * Due to round-off, the location may not be exact.
+   * 
+   * @return the coordinate for the intersection location
+   */
+  public Coordinates getInteriorIntersection() {
+    return interiorIntersection;
   }
-  
-  public List getIntersections()
-  {
+
+  public List getIntersections() {
     return intersections;
   }
-  
+
+  /**
+   * Gets the endpoints of the intersecting segments.
+   * 
+   * @return an array of the segment endpoints (p00, p01, p10, p11)
+   */
+  public Coordinates[] getIntersectionSegments() {
+    return intSegments;
+  }
+
+  /**
+   * Tests whether an intersection was found.
+   * 
+   * @return true if an intersection was found
+   */
+  public boolean hasIntersection() {
+    return interiorIntersection != null;
+  }
+
+  @Override
+  public boolean isDone() {
+    if (findAllIntersections) {
+      return false;
+    }
+    return interiorIntersection != null;
+  }
+
+  /**
+   * Tests whether a segment in a {@link SegmentString} is an end segment.
+   * (either the first or last).
+   * 
+   * @param segStr a segment string
+   * @param index the index of a segment in the segment string
+   * @return true if the segment is an end segment
+   */
+  private boolean isEndSegment(final SegmentString segStr, final int index) {
+    if (index == 0) {
+      return true;
+    }
+    if (index >= segStr.size() - 2) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * This method is called by clients
+   * of the {@link SegmentIntersector} class to process
+   * intersections for two segments of the {@link SegmentString}s being intersected.
+   * Note that some clients (such as <code>MonotoneChain</code>s) may optimize away
+   * this call for segment pairs which they have determined do not intersect
+   * (e.g. by an disjoint envelope test).
+   */
+  @Override
+  public void processIntersections(final SegmentString e0, final int segIndex0,
+    final SegmentString e1, final int segIndex1) {
+    // short-circuit if intersection already found
+    if (hasIntersection()) {
+      return;
+    }
+
+    // don't bother intersecting a segment with itself
+    if (e0 == e1 && segIndex0 == segIndex1) {
+      return;
+    }
+
+    /**
+     * If enabled, only test end segments (on either segString).
+     * 
+     */
+    if (isCheckEndSegmentsOnly) {
+      final boolean isEndSegPresent = isEndSegment(e0, segIndex0)
+        || isEndSegment(e1, segIndex1);
+      if (!isEndSegPresent) {
+        return;
+      }
+    }
+
+    final Coordinates p00 = e0.getCoordinates()[segIndex0];
+    final Coordinates p01 = e0.getCoordinates()[segIndex0 + 1];
+    final Coordinates p10 = e1.getCoordinates()[segIndex1];
+    final Coordinates p11 = e1.getCoordinates()[segIndex1 + 1];
+
+    li.computeIntersection(p00, p01, p10, p11);
+    // if (li.hasIntersection() && li.isProper()) Debug.println(li);
+
+    if (li.hasIntersection()) {
+      if (li.isInteriorIntersection()) {
+        intSegments = new Coordinates[4];
+        intSegments[0] = p00;
+        intSegments[1] = p01;
+        intSegments[2] = p10;
+        intSegments[3] = p11;
+
+        interiorIntersection = li.getIntersection(0);
+        intersections.add(interiorIntersection);
+      }
+    }
+  }
+
   /**
    * Sets whether only end segments should be tested for interior intersection.
    * This is a performance optimization that may be used if
@@ -87,112 +191,11 @@ public class InteriorIntersectionFinder
    * 
    * @param isCheckEndSegmentsOnly whether to test only end segments
    */
-  public void setCheckEndSegmentsOnly(boolean isCheckEndSegmentsOnly)
-  {
-  	this.isCheckEndSegmentsOnly = isCheckEndSegmentsOnly;
-  }
-  
-  /**
-   * Tests whether an intersection was found.
-   * 
-   * @return true if an intersection was found
-   */
-  public boolean hasIntersection() 
-  { 
-  	return interiorIntersection != null; 
-  }
-  
-  /**
-   * Gets the computed location of the intersection.
-   * Due to round-off, the location may not be exact.
-   * 
-   * @return the coordinate for the intersection location
-   */
-  public Coordinates getInteriorIntersection()  
-  {    
-  	return interiorIntersection;  
+  public void setCheckEndSegmentsOnly(final boolean isCheckEndSegmentsOnly) {
+    this.isCheckEndSegmentsOnly = isCheckEndSegmentsOnly;
   }
 
-  /**
-   * Gets the endpoints of the intersecting segments.
-   * 
-   * @return an array of the segment endpoints (p00, p01, p10, p11)
-   */
-  public Coordinates[] getIntersectionSegments()
-  {
-  	return intSegments;
-  }
-  
-  /**
-   * This method is called by clients
-   * of the {@link SegmentIntersector} class to process
-   * intersections for two segments of the {@link SegmentString}s being intersected.
-   * Note that some clients (such as <code>MonotoneChain</code>s) may optimize away
-   * this call for segment pairs which they have determined do not intersect
-   * (e.g. by an disjoint envelope test).
-   */
-  public void processIntersections(
-      SegmentString e0,  int segIndex0,
-      SegmentString e1,  int segIndex1
-      )
-  {
-  	// short-circuit if intersection already found
-  	if (hasIntersection())
-  		return;
-  	
-    // don't bother intersecting a segment with itself
-    if (e0 == e1 && segIndex0 == segIndex1) return;
-
-    /**
-     * If enabled, only test end segments (on either segString).
-     * 
-     */
-    if (isCheckEndSegmentsOnly) {
-    	boolean isEndSegPresent = isEndSegment(e0, segIndex0) || isEndSegment(e1, segIndex1);
-    	if (! isEndSegPresent)
-    		return;
-    }
-    
-    Coordinate p00 = e0.getCoordinates()[segIndex0];
-    Coordinate p01 = e0.getCoordinates()[segIndex0 + 1];
-    Coordinate p10 = e1.getCoordinates()[segIndex1];
-    Coordinate p11 = e1.getCoordinates()[segIndex1 + 1];
-    
-    li.computeIntersection(p00, p01, p10, p11);
-//if (li.hasIntersection() && li.isProper()) Debug.println(li);
-
-    if (li.hasIntersection()) {
-      if (li.isInteriorIntersection()) {
-      	intSegments = new Coordinates[4];
-      	intSegments[0] = p00;
-      	intSegments[1] = p01;
-      	intSegments[2] = p10;
-      	intSegments[3] = p11;
-      	
-      	interiorIntersection = li.getIntersection(0);
-      	intersections.add(interiorIntersection);
-      }
-    }
-  }
-  
-  /**
-   * Tests whether a segment in a {@link SegmentString} is an end segment.
-   * (either the first or last).
-   * 
-   * @param segStr a segment string
-   * @param index the index of a segment in the segment string
-   * @return true if the segment is an end segment
-   */
-  private boolean isEndSegment(SegmentString segStr, int index)
-  {
-  	if (index == 0) return true;
-  	if (index >= segStr.size() - 2) return true;
-  	return false;
-  }
-  
-  public boolean isDone()
-  { 
-  	if (findAllIntersections) return false;
-  	return interiorIntersection != null;
+  public void setFindAllIntersections(final boolean findAllIntersections) {
+    this.findAllIntersections = findAllIntersections;
   }
 }

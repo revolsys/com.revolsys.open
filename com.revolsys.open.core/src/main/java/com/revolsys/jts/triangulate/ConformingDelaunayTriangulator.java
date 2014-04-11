@@ -168,7 +168,7 @@ public class ConformingDelaunayTriangulator {
 
   private void computeConvexHull() {
     final GeometryFactory fact = GeometryFactory.getFactory();
-    final Coordinate[] coords = getPointArray();
+    final Coordinates[] coords = getPointArray();
     final ConvexHull hull = new ConvexHull(coords, fact);
     convexHull = hull.getConvexHull();
   }
@@ -245,7 +245,7 @@ public class ConformingDelaunayTriangulator {
       final Segment seg = (Segment)i.next();
       // System.out.println(seg);
 
-      final Coordinate encroachPt = findNonGabrielPoint(seg);
+      final Coordinates encroachPt = findNonGabrielPoint(seg);
       // no encroachment found - segment must already be in subdivision
       if (encroachPt == null) {
         continue;
@@ -303,7 +303,7 @@ public class ConformingDelaunayTriangulator {
 
   /**
    * Given a set of points stored in the kd-tree and a line segment defined by
-   * two points in this set, finds a {@link Coordinate} in the circumcircle of
+   * two points in this set, finds a {@link Coordinates} in the circumcircle of
    * the line segment, if one exists. This is called the Gabriel point - if none
    * exists then the segment is said to have the Gabriel condition. Uses the
    * heuristic of finding the non-Gabriel point closest to the midpoint of the
@@ -316,12 +316,13 @@ public class ConformingDelaunayTriangulator {
    * @return a point which is non-Gabriel
    * or null if no point is non-Gabriel
    */
-  private Coordinate findNonGabrielPoint(final Segment seg) {
-    final AbstractCoordinates p = seg.getStart();
+  private Coordinates findNonGabrielPoint(final Segment seg) {
+    final Coordinates p = seg.getStart();
     final Coordinates q = seg.getEnd();
     // Find the mid point on the line and compute the radius of enclosing circle
-    final AbstractCoordinates midPt = new Coordinate((p.getX() + q.getX()) / 2.0,
-      (p.getY() + q.getY()) / 2.0, Coordinates.NULL_ORDINATE);
+    final Coordinates midPt = new Coordinate(
+      (p.getX() + q.getX()) / 2.0, (p.getY() + q.getY()) / 2.0,
+      Coordinates.NULL_ORDINATE);
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle
@@ -332,11 +333,11 @@ public class ConformingDelaunayTriangulator {
 
     // For each point found, test if it falls strictly in the circle
     // find closest point
-    Coordinate closestNonGabriel = null;
+    Coordinates closestNonGabriel = null;
     double minDist = Double.MAX_VALUE;
     for (final Iterator i = result.iterator(); i.hasNext();) {
       final KdNode nextNode = (KdNode)i.next();
-      final Coordinate testPt = nextNode.getCoordinate();
+      final Coordinates testPt = nextNode.getCoordinate();
       // ignore segment endpoints
       if (testPt.equals2d(p) || testPt.equals2d(q)) {
         continue;
@@ -400,7 +401,7 @@ public class ConformingDelaunayTriangulator {
   // hull segment
   // */
   // private void addConvexHullToConstraints(Object convexHullSegmentData) {
-  // Coordinate[] coords = convexHull.getCoordinates();
+  // Coordinates[] coords = convexHull.getCoordinates();
   // for (int i = 1; i < coords.length; i++) {
   // Segment s = new Segment(coords[i - 1], coords[i], convexHullSegmentData);
   // addConstraintIfUnique(s);
@@ -440,8 +441,8 @@ public class ConformingDelaunayTriangulator {
     return kdt;
   }
 
-  private Coordinate[] getPointArray() {
-    final Coordinate[] pts = new Coordinate[initialVertices.size()
+  private Coordinates[] getPointArray() {
+    final Coordinates[] pts = new Coordinates[initialVertices.size()
       + segVertices.size()];
     int index = 0;
     for (final Iterator i = initialVertices.iterator(); i.hasNext();) {

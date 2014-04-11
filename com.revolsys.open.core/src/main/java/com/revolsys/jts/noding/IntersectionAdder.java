@@ -33,7 +33,6 @@
 package com.revolsys.jts.noding;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
 /**
@@ -43,11 +42,8 @@ import com.revolsys.jts.geom.Coordinates;
  *
  * @version 1.7
  */
-public class IntersectionAdder
-    implements SegmentIntersector
-{
-  public static boolean isAdjacentSegments(int i1, int i2)
-  {
+public class IntersectionAdder implements SegmentIntersector {
+  public static boolean isAdjacentSegments(final int i1, final int i2) {
     return Math.abs(i1 - i2) == 1;
   }
 
@@ -56,36 +52,65 @@ public class IntersectionAdder
    * found during ALL edges that have been intersected.
    */
   private boolean hasIntersection = false;
+
   private boolean hasProper = false;
+
   private boolean hasProperInterior = false;
+
   private boolean hasInterior = false;
 
   // the proper intersection point found
-  private Coordinates properIntersectionPoint = null;
+  private final Coordinates properIntersectionPoint = null;
 
-  private LineIntersector li;
+  private final LineIntersector li;
+
   private boolean isSelfIntersection;
-  //private boolean intersectionFound;
+
+  // private boolean intersectionFound;
   public int numIntersections = 0;
+
   public int numInteriorIntersections = 0;
+
   public int numProperIntersections = 0;
 
   // testing only
   public int numTests = 0;
 
-  public IntersectionAdder(LineIntersector li)
-  {
+  public IntersectionAdder(final LineIntersector li) {
     this.li = li;
   }
 
-  public LineIntersector getLineIntersector() { return li; }
+  public LineIntersector getLineIntersector() {
+    return li;
+  }
 
   /**
    * @return the proper intersection point, or <code>null</code> if none was found
    */
-  public Coordinates getProperIntersectionPoint()  {    return properIntersectionPoint;  }
+  public Coordinates getProperIntersectionPoint() {
+    return properIntersectionPoint;
+  }
 
-  public boolean hasIntersection() { return hasIntersection; }
+  /**
+   * An interior intersection is an intersection which is
+   * in the interior of some segment.
+   */
+  public boolean hasInteriorIntersection() {
+    return hasInterior;
+  }
+
+  public boolean hasIntersection() {
+    return hasIntersection;
+  }
+
+  /**
+   * A proper interior intersection is a proper intersection which is <b>not</b>
+   * contained in the set of boundary nodes set for this SegmentIntersector.
+   */
+  public boolean hasProperInteriorIntersection() {
+    return hasProperInterior;
+  }
+
   /**
    * A proper intersection is an intersection which is interior to at least two
    * line segments.  Note that a proper intersection is not necessarily
@@ -93,17 +118,19 @@ public class IntersectionAdder
    * an endpoint equal to the intersection, which according to SFS semantics
    * can result in the point being on the Boundary of the Geometry.
    */
-  public boolean hasProperIntersection() { return hasProper; }
+  public boolean hasProperIntersection() {
+    return hasProper;
+  }
+
   /**
-   * A proper interior intersection is a proper intersection which is <b>not</b>
-   * contained in the set of boundary nodes set for this SegmentIntersector.
+   * Always process all intersections
+   * 
+   * @return false always
    */
-  public boolean hasProperInteriorIntersection() { return hasProperInterior; }
-  /**
-   * An interior intersection is an intersection which is
-   * in the interior of some segment.
-   */
-  public boolean hasInteriorIntersection() { return hasInterior; }
+  @Override
+  public boolean isDone() {
+    return false;
+  }
 
   /**
    * A trivial intersection is an apparent self-intersection which in fact
@@ -111,16 +138,17 @@ public class IntersectionAdder
    * Note that closed edges require a special check for the point shared by the beginning
    * and end segments.
    */
-  private boolean isTrivialIntersection(SegmentString e0, int segIndex0, SegmentString e1, int segIndex1)
-  {
+  private boolean isTrivialIntersection(final SegmentString e0,
+    final int segIndex0, final SegmentString e1, final int segIndex1) {
     if (e0 == e1) {
       if (li.getIntersectionNum() == 1) {
-        if (isAdjacentSegments(segIndex0, segIndex1))
+        if (isAdjacentSegments(segIndex0, segIndex1)) {
           return true;
+        }
         if (e0.isClosed()) {
-          int maxSegIndex = e0.size() - 1;
-          if (    (segIndex0 == 0 && segIndex1 == maxSegIndex)
-              ||  (segIndex1 == 0 && segIndex0 == maxSegIndex) ) {
+          final int maxSegIndex = e0.size() - 1;
+          if ((segIndex0 == 0 && segIndex1 == maxSegIndex)
+            || (segIndex1 == 0 && segIndex0 == maxSegIndex)) {
             return true;
           }
         }
@@ -137,50 +165,45 @@ public class IntersectionAdder
    * this call for segment pairs which they have determined do not intersect
    * (e.g. by an disjoint envelope test).
    */
-  public void processIntersections(
-    SegmentString e0,  int segIndex0,
-    SegmentString e1,  int segIndex1
-     )
-  {
-    if (e0 == e1 && segIndex0 == segIndex1) return;
-numTests++;
-    Coordinate p00 = e0.getCoordinates()[segIndex0];
-    Coordinate p01 = e0.getCoordinates()[segIndex0 + 1];
-    Coordinate p10 = e1.getCoordinates()[segIndex1];
-    Coordinate p11 = e1.getCoordinates()[segIndex1 + 1];
+  @Override
+  public void processIntersections(final SegmentString e0, final int segIndex0,
+    final SegmentString e1, final int segIndex1) {
+    if (e0 == e1 && segIndex0 == segIndex1) {
+      return;
+    }
+    numTests++;
+    final Coordinates p00 = e0.getCoordinates()[segIndex0];
+    final Coordinates p01 = e0.getCoordinates()[segIndex0 + 1];
+    final Coordinates p10 = e1.getCoordinates()[segIndex1];
+    final Coordinates p11 = e1.getCoordinates()[segIndex1 + 1];
 
     li.computeIntersection(p00, p01, p10, p11);
-//if (li.hasIntersection() && li.isProper()) Debug.println(li);
+    // if (li.hasIntersection() && li.isProper()) Debug.println(li);
     if (li.hasIntersection()) {
-      //intersectionFound = true;
+      // intersectionFound = true;
       numIntersections++;
       if (li.isInteriorIntersection()) {
         numInteriorIntersections++;
         hasInterior = true;
-//System.out.println(li);
+        // System.out.println(li);
       }
-      // if the segments are adjacent they have at least one trivial intersection,
-      // the shared endpoint.  Don't bother adding it if it is the
+      // if the segments are adjacent they have at least one trivial
+      // intersection,
+      // the shared endpoint. Don't bother adding it if it is the
       // only intersection.
-      if (! isTrivialIntersection(e0, segIndex0, e1, segIndex1)) {
+      if (!isTrivialIntersection(e0, segIndex0, e1, segIndex1)) {
         hasIntersection = true;
-        ((NodedSegmentString) e0).addIntersections(li, segIndex0, 0);
-        ((NodedSegmentString) e1).addIntersections(li, segIndex1, 1);
+        ((NodedSegmentString)e0).addIntersections(li, segIndex0, 0);
+        ((NodedSegmentString)e1).addIntersections(li, segIndex1, 1);
         if (li.isProper()) {
           numProperIntersections++;
-//Debug.println(li.toString());  Debug.println(li.getIntersection(0));
-          //properIntersectionPoint = (Coordinate) li.getIntersection(0).clone();
+          // Debug.println(li.toString()); Debug.println(li.getIntersection(0));
+          // properIntersectionPoint = (Coordinate)
+          // li.getIntersection(0).clone();
           hasProper = true;
           hasProperInterior = true;
         }
       }
     }
   }
-  
-  /**
-   * Always process all intersections
-   * 
-   * @return false always
-   */
-  public boolean isDone() { return false; }
 }

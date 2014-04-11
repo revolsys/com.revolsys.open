@@ -124,111 +124,7 @@ import com.revolsys.jts.operation.distance.FacetSequenceTreeBuilder;
  * @author Martin Davis
  *
  */
-public class MinimumClearance 
-{
-  /**
-   * Computes the Minimum Clearance distance for 
-   * the given Geometry.
-   * 
-   * @param g the input geometry
-   * @return the Minimum Clearance distance
-   */
-  public static double getDistance(Geometry g)
-  {
-    MinimumClearance rp = new MinimumClearance(g);
-    return rp.getDistance();
-  }
-  
-  /**
-   * Gets a LineString containing two points
-   * which are at the Minimum Clearance distance
-   * for the given Geometry.
-   * 
-   * @param g the input geometry
-   * @return the value of the minimum clearance distance
-   * or <tt>LINESTRING EMPTY</tt> if no Minimum Clearance distance exists
-   */
-  public static Geometry getLine(Geometry g)
-  {
-    MinimumClearance rp = new MinimumClearance(g);
-    return rp.getLine();
-  }
-  
-  private Geometry inputGeom;
-  private double minClearance;
-  private Coordinates[] minClearancePts;
-  
-  /**
-   * Creates an object to compute the Minimum Clearance
-   * for the given Geometry
-   * 
-   * @param geom the input geometry
-   */
-  public MinimumClearance(Geometry geom)
-  {
-    inputGeom = geom;
-  }
-  
-  /**
-   * Gets the Minimum Clearance distance.
-   * <p>
-   * If no distance exists 
-   * (e.g. in the case of two identical points)
-   * <tt>Double.MAX_VALUE</tt> is returned.
-   * 
-   * @return the value of the minimum clearance distance
-   * or <tt>Double.MAX_VALUE</tt> if no Minimum Clearance distance exists
-   */
-  public double getDistance()
-  {
-    compute();
-    return minClearance;
-  }
-  
-  /**
-   * Gets a LineString containing two points
-   * which are at the Minimum Clearance distance.
-   * <p>
-   * If no distance could be found 
-   * (e.g. in the case of two identical points)
-   * <tt>LINESTRING EMPTY</tt> is returned.
-   * 
-   * @return the value of the minimum clearance distance
-   * or <tt>LINESTRING EMPTY</tt> if no Minimum Clearance distance exists
-   */
-  public LineString getLine()
-  {
-    compute();
-    // return empty line string if no min pts where found
-    if (minClearancePts == null || minClearancePts[0] == null)
-      return inputGeom.getGeometryFactory().createLineString((Coordinates[]) null);
-    return inputGeom.getGeometryFactory().createLineString(minClearancePts);
-  }
-  
-  private void compute()
-  {
-    // already computed
-    if (minClearancePts != null) return;
-    
-    // initialize to "No Distance Exists" state
-    minClearancePts = new Coordinates[2];
-    minClearance = Double.MAX_VALUE;
-    
-    // handle empty geometries
-    if (inputGeom.isEmpty()) {
-      return;
-    }
-    
-    STRtree geomTree = FacetSequenceTreeBuilder.build(inputGeom);
-    
-    Object[] nearest = geomTree.nearestNeighbour(new MinClearanceDistance());
-    MinClearanceDistance mcd = new MinClearanceDistance();
-    minClearance = mcd.distance(
-        (FacetSequence) nearest[0],
-        (FacetSequence) nearest[1]);
-    minClearancePts = mcd.getCoordinates();
-  }
-  
+public class MinimumClearance {
   /**
    * Implements the MinimumClearance distance function:
    * <ul>
@@ -248,91 +144,198 @@ public class MinimumClearance
    * @author Martin Davis
    *
    */
-  private static class MinClearanceDistance
-  implements ItemDistance
-  {
+  private static class MinClearanceDistance implements ItemDistance {
     private double minDist = Double.MAX_VALUE;
-    private Coordinates[] minPts = new Coordinates[2];
-    
-    public Coordinates[] getCoordinates()
-    {
-      return minPts;
-    }
-    
-    public double distance(ItemBoundable b1, ItemBoundable b2) {
-      FacetSequence fs1 = (FacetSequence) b1.getItem();
-      FacetSequence fs2 = (FacetSequence) b2.getItem();
-      minDist = Double.MAX_VALUE;
-      return distance(fs1, fs2);
-    }
-    
-    public double distance(FacetSequence fs1, FacetSequence fs2) {
-      
+
+    private final Coordinates[] minPts = new Coordinates[2];
+
+    public double distance(final FacetSequence fs1, final FacetSequence fs2) {
+
       // compute MinClearance distance metric
 
       vertexDistance(fs1, fs2);
-      if (fs1.size() == 1 && fs2.size() == 1) return minDist;
-      if (minDist <= 0.0) return minDist;
+      if (fs1.size() == 1 && fs2.size() == 1) {
+        return minDist;
+      }
+      if (minDist <= 0.0) {
+        return minDist;
+      }
       segmentDistance(fs1, fs2);
-      if (minDist <= 0.0) return minDist;
+      if (minDist <= 0.0) {
+        return minDist;
+      }
       segmentDistance(fs2, fs1);
       return minDist;
     }
-    
-    private double vertexDistance(FacetSequence fs1, FacetSequence fs2) {
+
+    @Override
+    public double distance(final ItemBoundable b1, final ItemBoundable b2) {
+      final FacetSequence fs1 = (FacetSequence)b1.getItem();
+      final FacetSequence fs2 = (FacetSequence)b2.getItem();
+      minDist = Double.MAX_VALUE;
+      return distance(fs1, fs2);
+    }
+
+    public Coordinates[] getCoordinates() {
+      return minPts;
+    }
+
+    private double segmentDistance(final FacetSequence fs1,
+      final FacetSequence fs2) {
       for (int i1 = 0; i1 < fs1.size(); i1++) {
-        for (int i2 = 0; i2 < fs2.size(); i2++) {
-          AbstractCoordinates p1 = fs1.getCoordinate(i1);
-          Coordinates p2 = fs2.getCoordinate(i2);
-          if (! p1.equals2d(p2)) {
-            double d = p1.distance(p2);
+        for (int i2 = 1; i2 < fs2.size(); i2++) {
+
+          final Coordinates p = fs1.getCoordinate(i1);
+
+          final Coordinates seg0 = fs2.getCoordinate(i2 - 1);
+          final Coordinates seg1 = fs2.getCoordinate(i2);
+
+          if (!(p.equals2d(seg0) || p.equals2d(seg1))) {
+            final double d = CGAlgorithms.distancePointLine(p, seg0, seg1);
             if (d < minDist) {
               minDist = d;
-              minPts[0] = p1;
-              minPts[1] = p2;
-              if (d == 0.0)
+              updatePts(p, seg0, seg1);
+              if (d == 0.0) {
                 return d;
+              }
             }
           }
         }
       }
       return minDist;
-     }
-      
-     private double segmentDistance(FacetSequence fs1, FacetSequence fs2) {
-        for (int i1 = 0; i1 < fs1.size(); i1++) {
-          for (int i2 = 1; i2 < fs2.size(); i2++) {
-            
-            Coordinate p = fs1.getCoordinate(i1);
-            
-            Coordinate seg0 = fs2.getCoordinate(i2-1);
-            Coordinate seg1 = fs2.getCoordinate(i2);
-            
-            if (! (p.equals2d(seg0) || p.equals2d(seg1))) {
-              double d = CGAlgorithms.distancePointLine(p, seg0, seg1);
-              if (d < minDist) {
-                minDist = d;
-                updatePts(p, seg0, seg1);
-                if (d == 0.0)
-                  return d;
+    }
+
+    private void updatePts(final Coordinates p, final Coordinates seg0,
+      final Coordinates seg1) {
+      minPts[0] = p;
+      final LineSegment seg = new LineSegment(seg0, seg1);
+      minPts[1] = new Coordinate(seg.closestPoint(p));
+    }
+
+    private double vertexDistance(final FacetSequence fs1,
+      final FacetSequence fs2) {
+      for (int i1 = 0; i1 < fs1.size(); i1++) {
+        for (int i2 = 0; i2 < fs2.size(); i2++) {
+          final Coordinates p1 = fs1.getCoordinate(i1);
+          final Coordinates p2 = fs2.getCoordinate(i2);
+          if (!p1.equals2d(p2)) {
+            final double d = p1.distance(p2);
+            if (d < minDist) {
+              minDist = d;
+              minPts[0] = p1;
+              minPts[1] = p2;
+              if (d == 0.0) {
+                return d;
               }
             }
           }
         }
-        return minDist;
-       }
-     
-     private void updatePts(Coordinate p, Coordinate seg0, Coordinate seg1)
-     {
-       minPts[0] = p;
-       LineSegment seg = new LineSegment(seg0, seg1);
-       minPts[1] = new Coordinate(seg.closestPoint(p));       
-     }
+      }
+      return minDist;
+    }
 
-       
-     }
-  
-    
   }
-  
 
+  /**
+   * Computes the Minimum Clearance distance for 
+   * the given Geometry.
+   * 
+   * @param g the input geometry
+   * @return the Minimum Clearance distance
+   */
+  public static double getDistance(final Geometry g) {
+    final MinimumClearance rp = new MinimumClearance(g);
+    return rp.getDistance();
+  }
+
+  /**
+   * Gets a LineString containing two points
+   * which are at the Minimum Clearance distance
+   * for the given Geometry.
+   * 
+   * @param g the input geometry
+   * @return the value of the minimum clearance distance
+   * or <tt>LINESTRING EMPTY</tt> if no Minimum Clearance distance exists
+   */
+  public static Geometry getLine(final Geometry g) {
+    final MinimumClearance rp = new MinimumClearance(g);
+    return rp.getLine();
+  }
+
+  private final Geometry inputGeom;
+
+  private double minClearance;
+
+  private Coordinates[] minClearancePts;
+
+  /**
+   * Creates an object to compute the Minimum Clearance
+   * for the given Geometry
+   * 
+   * @param geom the input geometry
+   */
+  public MinimumClearance(final Geometry geom) {
+    inputGeom = geom;
+  }
+
+  private void compute() {
+    // already computed
+    if (minClearancePts != null) {
+      return;
+    }
+
+    // initialize to "No Distance Exists" state
+    minClearancePts = new Coordinates[2];
+    minClearance = Double.MAX_VALUE;
+
+    // handle empty geometries
+    if (inputGeom.isEmpty()) {
+      return;
+    }
+
+    final STRtree geomTree = FacetSequenceTreeBuilder.build(inputGeom);
+
+    final Object[] nearest = geomTree.nearestNeighbour(new MinClearanceDistance());
+    final MinClearanceDistance mcd = new MinClearanceDistance();
+    minClearance = mcd.distance((FacetSequence)nearest[0],
+      (FacetSequence)nearest[1]);
+    minClearancePts = mcd.getCoordinates();
+  }
+
+  /**
+   * Gets the Minimum Clearance distance.
+   * <p>
+   * If no distance exists 
+   * (e.g. in the case of two identical points)
+   * <tt>Double.MAX_VALUE</tt> is returned.
+   * 
+   * @return the value of the minimum clearance distance
+   * or <tt>Double.MAX_VALUE</tt> if no Minimum Clearance distance exists
+   */
+  public double getDistance() {
+    compute();
+    return minClearance;
+  }
+
+  /**
+   * Gets a LineString containing two points
+   * which are at the Minimum Clearance distance.
+   * <p>
+   * If no distance could be found 
+   * (e.g. in the case of two identical points)
+   * <tt>LINESTRING EMPTY</tt> is returned.
+   * 
+   * @return the value of the minimum clearance distance
+   * or <tt>LINESTRING EMPTY</tt> if no Minimum Clearance distance exists
+   */
+  public LineString getLine() {
+    compute();
+    // return empty line string if no min pts where found
+    if (minClearancePts == null || minClearancePts[0] == null) {
+      return inputGeom.getGeometryFactory().createLineString(
+        (Coordinates[])null);
+    }
+    return inputGeom.getGeometryFactory().createLineString(minClearancePts);
+  }
+
+}

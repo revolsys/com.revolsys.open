@@ -136,7 +136,7 @@ public class RelateComputer {
 
     // complete the labelling for any nodes which only have a label for a single
     // geometry
-    // Debug.addWatch(nodes.find(new Coordinate(110, 200)));
+    // Debug.addWatch(nodes.find(new Coordinate((double)110, 200)));
     // Debug.printWatch();
     labelIsolatedNodes();
     // Debug.printWatch();

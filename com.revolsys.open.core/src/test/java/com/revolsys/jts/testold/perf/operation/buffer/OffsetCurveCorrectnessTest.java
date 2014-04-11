@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.testold.perf.operation.buffer;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -51,9 +50,9 @@ public class OffsetCurveCorrectnessTest {
 
   public static Geometry bufferOffsetCurve(final Geometry g,
     final double distance) {
-    final OffsetCurveBuilder ocb = new OffsetCurveBuilder(g.getGeometryFactory()
-      .getPrecisionModel(), new BufferParameters());
-    final Coordinate[] pts = g.getCoordinateArray();
+    final OffsetCurveBuilder ocb = new OffsetCurveBuilder(
+      g.getGeometryFactory().getPrecisionModel(), new BufferParameters());
+    final Coordinates[] pts = g.getCoordinateArray();
     Coordinates[] curvePts = null;
     if (g instanceof Polygonal) {
       curvePts = ocb.getRingCurve(pts, 1, distance);

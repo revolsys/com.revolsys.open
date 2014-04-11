@@ -216,7 +216,7 @@ class BufferBuilder
        * Discard edges which have zero length, 
        * since they carry no information and cause problems with topology building
        */
-      AbstractCoordinates[] pts = segStr.getCoordinates();
+      Coordinates[] pts = segStr.getCoordinates();
       if (pts.length == 2 && pts[0].equals2d(pts[1]))
         continue;
 

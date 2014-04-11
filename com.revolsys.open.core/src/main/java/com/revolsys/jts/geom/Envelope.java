@@ -39,7 +39,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 /**
  *  Defines a rectangular region of the 2D coordinate plane.
  *  It is often used to represent the bounding box of a {@link Geometry},
- *  e.g. the minimum and maximum x and y values of the {@link Coordinate}s.
+ *  e.g. the minimum and maximum x and y values of the {@link Coordinates}s.
  *  <p>
  *  Note that Envelopes support infinite or half-infinite regions, by using the values of
  *  <code>Double.POSITIVE_INFINITY</code> and <code>Double.NEGATIVE_INFINITY</code>.
@@ -193,7 +193,7 @@ public class Envelope implements Serializable {
     if (isNull()) {
       return null;
     }
-    return new Coordinate((getMinX() + getMaxX()) / 2.0,
+    return new Coordinate((double)(getMinX() + getMaxX()) / 2.0,
       (getMinY() + getMaxY()) / 2.0, Coordinates.NULL_ORDINATE);
   }
 
@@ -377,10 +377,10 @@ public class Envelope implements Serializable {
 
   /**
    *  Enlarges this <code>Envelope</code> so that it contains
-   *  the given {@link Coordinate}. 
+   *  the given {@link Coordinates}. 
    *  Has no effect if the point is already on or within the envelope.
    *
-   *@param  p  the Coordinate to expand to include
+   *@param  p  the Coordinates to expand to include
    */
   public void expandToInclude(final Coordinates p) {
     expandToInclude(p.getX(), p.getY());

@@ -83,7 +83,7 @@ public class OffsetPointGenerator
   /**
    * Gets the computed offset points.
    *
-   * @return List<Coordinate>
+   * @return List<Coordinates>
    */
   public List getPoints(double offsetDistance)
   {
@@ -126,12 +126,12 @@ public class OffsetPointGenerator
     double midY = (p1.getY() + p0.getY()) / 2;
 
     if (doLeft) {
-      Coordinate offsetLeft = new Coordinate(midX - uy, midY + ux, Coordinates.NULL_ORDINATE);
+      Coordinates offsetLeft = new Coordinate((double)midX - uy, midY + ux, Coordinates.NULL_ORDINATE);
       offsetPts.add(offsetLeft);
     }
     
     if (doRight) {
-      Coordinate offsetRight = new Coordinate(midX + uy, midY - ux, Coordinates.NULL_ORDINATE);
+      Coordinates offsetRight = new Coordinate((double)midX + uy, midY - ux, Coordinates.NULL_ORDINATE);
       offsetPts.add(offsetRight);
     }
   }

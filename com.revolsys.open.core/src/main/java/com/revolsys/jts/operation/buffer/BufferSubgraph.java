@@ -324,13 +324,13 @@ class BufferSubgraph
       DirectedEdge de = (DirectedEdge) it.next();
       double dx = de.getDx();
       double dy = de.getDy();
-      Coordinate p0 = de.getCoordinate();
+      Coordinates p0 = de.getCoordinate();
       double ang = Math.atan2(dy, dx);
-      Coordinate p1 = new Coordinate(
+      Coordinates p1 = new Coordinate((double)
           p0.x + .4 * Math.cos(ang),
           p0.y + .4 * Math.sin(ang));
 //      DebugFeature.add(SAVE_DIREDGES,
-//                       fact.createLineString(new Coordinate[] { p0, p1 } ),
+//                       fact.createLineString(new Coordinates[] { p0, p1 } ),
 //                       de.getDepth(Position.LEFT) + "/" + de.getDepth(Position.RIGHT)
 //                       );
     }

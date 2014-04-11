@@ -78,7 +78,7 @@ public class WKTWriter
 {
   /**
    * Generates the WKT for a <tt>POINT</tt>
-   * specified by a {@link Coordinate}.
+   * specified by a {@link Coordinates}.
    *
    * @param p0 the point coordinate
    *
@@ -117,7 +117,7 @@ public class WKTWriter
 
   /**
    * Generates the WKT for a <tt>LINESTRING</tt>
-   * specified by two {@link Coordinate}s.
+   * specified by two {@link Coordinates}s.
    *
    * @param p0 the first coordinate
    * @param p1 the second coordinate

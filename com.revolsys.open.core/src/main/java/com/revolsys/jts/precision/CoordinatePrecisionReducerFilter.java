@@ -39,7 +39,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.PrecisionModel;
 
 /**
- * Reduces the precision of the {@link Coordinate}s in a
+ * Reduces the precision of the {@link Coordinates}s in a
  * {@link CoordinatesList} to match the supplied {@link PrecisionModel}.
  * Uses {@link PrecisionModel#makePrecise(double)}.
  * The input is modified in-place, so

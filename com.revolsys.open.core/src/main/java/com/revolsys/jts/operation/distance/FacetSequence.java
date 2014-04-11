@@ -56,8 +56,8 @@ public class FacetSequence
   private int end;
   
   // temporary Coordinates to materialize points from the CoordinatesList
-  private AbstractCoordinates pt = new Coordinate();
-  private AbstractCoordinates seqPt = new Coordinate();
+  private Coordinates pt = new Coordinate();
+  private Coordinates seqPt = new Coordinate();
   
   /**
    * Creates a new section based on a CoordinatesList.
@@ -100,7 +100,7 @@ public class FacetSequence
     return end - start;
   }
   
-  public Coordinate getCoordinate(int index)
+  public Coordinates getCoordinate(int index)
   {
     return pts.getCoordinate(start + index);
   }
@@ -134,10 +134,10 @@ public class FacetSequence
   }
   
   // temporary Coordinates to materialize points from the CoordinatesList
-  private Coordinate p0 = new Coordinate();
-  private Coordinate p1 = new Coordinate();
-  private Coordinate q0 = new Coordinate();
-  private Coordinate q1 = new Coordinate();
+  private Coordinates p0 = new Coordinate();
+  private Coordinates p1 = new Coordinate();
+  private Coordinates q0 = new Coordinate();
+  private Coordinates q1 = new Coordinate();
 
   private double computeLineLineDistance(FacetSequence facetSeq)
   {
@@ -162,7 +162,7 @@ public class FacetSequence
     return minDistance;
   }
 
-  private double computePointLineDistance(AbstractCoordinates pt, FacetSequence facetSeq) 
+  private double computePointLineDistance(Coordinates pt, FacetSequence facetSeq) 
   {
     double minDistance = Double.MAX_VALUE;
 

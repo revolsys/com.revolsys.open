@@ -57,13 +57,13 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
      * @param encroachPt the encroaching point
      * @return the point at which to split the encroached segment
      */
-    public Coordinates findSplitPoint(Segment seg, Coordinate encroachPt) {
+    public Coordinates findSplitPoint(Segment seg, Coordinates encroachPt) {
         LineSegment lineSeg = seg.getLineSegment();
         double segLen = lineSeg.getLength();
         double midPtLen = segLen / 2;
         SplitSegment splitSeg = new SplitSegment(lineSeg);
 
-        AbstractCoordinates projPt = projectedSplitPoint(seg, encroachPt);
+        Coordinates projPt = projectedSplitPoint(seg, encroachPt);
         /**
          * Compute the largest diameter (length) that will produce a split segment which is not
          * still encroached upon by the encroaching point (The length is reduced slightly by a
@@ -88,9 +88,9 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
      * @param encroachPt
      * @return a split point on the segment
      */
-    public static AbstractCoordinates projectedSplitPoint(Segment seg, Coordinate encroachPt) {
+    public static Coordinates projectedSplitPoint(Segment seg, Coordinates encroachPt) {
         LineSegment lineSeg = seg.getLineSegment();
-        AbstractCoordinates projPt = lineSeg.project(encroachPt);
+        Coordinates projPt = lineSeg.project(encroachPt);
         return projPt;
     }
 }

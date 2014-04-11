@@ -2,6 +2,7 @@ package com.revolsys.jts.geom;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 
 public abstract class AbstractVertex extends AbstractCoordinates implements
   Vertex {
@@ -15,6 +16,11 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   @Override
   public AbstractVertex clone() {
     return (AbstractVertex)super.clone();
+  }
+
+  @Override
+  public DoubleCoordinates cloneCoordinates() {
+    return new DoubleCoordinates(this);
   }
 
   @Override

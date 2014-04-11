@@ -34,13 +34,13 @@ package com.revolsys.jts.noding;
 
 import java.util.Arrays;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents a list of contiguous line segments,
  * and supports noding the segments.
- * The line segments are represented by an array of {@link Coordinate}s.
+ * The line segments are represented by an array of {@link Coordinates}s.
  * Intended to optimize the noding of contiguous segments by
  * reducing the number of allocated objects.
  * SegmentStrings can carry a context object, which is useful
@@ -50,7 +50,7 @@ import com.revolsys.jts.geom.Coordinate;
  * @version 1.7
  */
 public class BasicSegmentString implements SegmentString {
-  private final Coordinate[] pts;
+  private final Coordinates[] pts;
 
   private Object data;
 
@@ -60,18 +60,18 @@ public class BasicSegmentString implements SegmentString {
    * @param pts the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public BasicSegmentString(final Coordinate[] pts, final Object data) {
+  public BasicSegmentString(final Coordinates[] pts, final Object data) {
     this.pts = pts;
     this.data = data;
   }
 
   @Override
-  public AbstractCoordinates getCoordinate(final int i) {
+  public Coordinates getCoordinate(final int i) {
     return pts[i];
   }
 
   @Override
-  public Coordinate[] getCoordinates() {
+  public Coordinates[] getCoordinates() {
     return pts;
   }
 

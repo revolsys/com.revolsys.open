@@ -35,8 +35,6 @@ package com.revolsys.jts.testold.geom;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -48,6 +46,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.test.geometry.CoordinateTest;
 
 /**
  * @version 1.7
@@ -110,57 +109,57 @@ public class NormalizeTest extends TestCase {
   }
 
   public void testNormalizeGeometryCollection() throws Exception {
-    final GeometryCollection actualValue = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (LINESTRING (200 300, 200 280, 220 280, 220 320, 180 320), POINT (140 220), POLYGON ((100 80, 100 160, 20 160, 20 80, 100 80), (40 140, 40 100, 80 100, 80 140, 40 140)), POINT (100 240))");
-    actualValue.normalize();
+    GeometryCollection actualValue = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (LINESTRING (200 300, 200 280, 220 280, 220 320, 180 320), POINT (140 220), POLYGON ((100 80, 100 160, 20 160, 20 80, 100 80), (40 140, 40 100, 80 100, 80 140, 40 140)), POINT (100 240))");
+    actualValue = actualValue.normalize();
     final GeometryCollection expectedValue = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (POINT (100 240), POINT (140 220), LINESTRING (180 320, 220 320, 220 280, 200 280, 200 300), POLYGON ((20 80, 20 160, 100 160, 100 80, 20 80), (40 100, 80 100, 80 140, 40 140, 40 100)))");
     assertEqualsExact(expectedValue, actualValue);
   }
 
   public void testNormalizeLineString1() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING (20 20, 160 40, 160 100, 100 120, 60 60)");
-    l.normalize();
+    LineString l = (LineString)this.reader.read("LINESTRING (20 20, 160 40, 160 100, 100 120, 60 60)");
+    l = l.normalize();
     final LineString expectedValue = (LineString)this.reader.read("LINESTRING (20 20, 160 40, 160 100, 100 120, 60 60)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeLineString2() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING (20 20, 160 40, 160 100, 100 120, 60 60)");
-    l.normalize();
+    LineString l = (LineString)this.reader.read("LINESTRING (20 20, 160 40, 160 100, 100 120, 60 60)");
+    l = l.normalize();
     final LineString expectedValue = (LineString)this.reader.read("LINESTRING (20 20, 160 40, 160 100, 100 120, 60 60)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeLineString3() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING (200 240, 140 160, 80 160, 160 80, 80 80)");
-    l.normalize();
+    LineString l = (LineString)this.reader.read("LINESTRING (200 240, 140 160, 80 160, 160 80, 80 80)");
+    l = l.normalize();
     final LineString expectedValue = (LineString)this.reader.read("LINESTRING (80 80, 160 80, 80 160, 140 160, 200 240)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeLineString4() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING (200 240, 140 160, 80 160, 160 80, 80 80)");
-    l.normalize();
+    LineString l = (LineString)this.reader.read("LINESTRING (200 240, 140 160, 80 160, 160 80, 80 80)");
+    l = l.normalize();
     final LineString expectedValue = (LineString)this.reader.read("LINESTRING (80 80, 160 80, 80 160, 140 160, 200 240)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeLineString5() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING (200 340, 140 240, 140 160, 60 240, 140 240, 200 340)");
-    l.normalize();
+    LineString l = (LineString)this.reader.read("LINESTRING (200 340, 140 240, 140 160, 60 240, 140 240, 200 340)");
+    l = l.normalize();
     final LineString expectedValue = (LineString)this.reader.read("LINESTRING (200 340, 140 240, 60 240, 140 160, 140 240, 200 340)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeMultiLineString() throws Exception {
-    final MultiLineString actualValue = (MultiLineString)this.reader.read("MULTILINESTRING ((200 260, 180 320, 260 340), (120 180, 140 100, 40 80), (200 180, 220 160, 200 180), (100 280, 120 260, 140 260, 140 240, 120 240, 120 260, 100 280))");
-    actualValue.normalize();
+    MultiLineString actualValue = (MultiLineString)this.reader.read("MULTILINESTRING ((200 260, 180 320, 260 340), (120 180, 140 100, 40 80), (200 180, 220 160, 200 180), (100 280, 120 260, 140 260, 140 240, 120 240, 120 260, 100 280))");
+    actualValue = actualValue.normalize();
     final MultiLineString expectedValue = (MultiLineString)this.reader.read("MULTILINESTRING ((40 80, 140 100, 120 180), (100 280, 120 260, 120 240, 140 240, 140 260, 120 260, 100 280), (200 180, 220 160, 200 180), (200 260, 180 320, 260 340))");
     assertEqualsExact(expectedValue, actualValue);
   }
 
   public void testNormalizeMultiPoint() throws Exception {
-    final MultiPoint m = (MultiPoint)this.reader.read("MULTIPOINT(30 20, 10 10, 20 20, 30 30, 20 10)");
-    m.normalize();
+    MultiPoint m = (MultiPoint)this.reader.read("MULTIPOINT(30 20, 10 10, 20 20, 30 30, 20 10)");
+    m = m.normalize();
     final MultiPoint expectedValue = (MultiPoint)this.reader.read("MULTIPOINT(10 10, 20 10, 20 20, 30 20, 30 30)");
     assertEqualsExact(expectedValue, m);
     final MultiPoint unexpectedValue = (MultiPoint)this.reader.read("MULTIPOINT(20 10, 20 20, 30 20, 30 30, 10 10)");
@@ -168,22 +167,21 @@ public class NormalizeTest extends TestCase {
   }
 
   public void testNormalizeMultiPolygon() throws Exception {
-    final MultiPolygon actualValue = (MultiPolygon)this.reader.read("MULTIPOLYGON (((40 360, 40 280, 140 280, 140 360, 40 360), (60 340, 60 300, 120 300, 120 340, 60 340)), ((140 200, 260 200, 260 100, 140 100, 140 200), (160 180, 240 180, 240 120, 160 120, 160 180)))");
-    actualValue.normalize();
+    MultiPolygon actualValue = (MultiPolygon)this.reader.read("MULTIPOLYGON (((40 360, 40 280, 140 280, 140 360, 40 360), (60 340, 60 300, 120 300, 120 340, 60 340)), ((140 200, 260 200, 260 100, 140 100, 140 200), (160 180, 240 180, 240 120, 160 120, 160 180)))");
+    actualValue = actualValue.normalize();
     final MultiPolygon expectedValue = (MultiPolygon)this.reader.read("MULTIPOLYGON (((40 280, 40 360, 140 360, 140 280, 40 280), (60 300, 120 300, 120 340, 60 340, 60 300)), ((140 100, 140 200, 260 200, 260 100, 140 100), (160 120, 240 120, 240 180, 160 180, 160 120)))");
     assertEqualsExact(expectedValue, actualValue);
   }
 
   public void testNormalizePoint() throws Exception {
-    final Point point = (Point)this.reader.read("POINT (30 30)");
-    point.normalize();
-    assertEquals(new Coordinate(30.0, 30, Coordinates.NULL_ORDINATE),
-      point.getCoordinate());
+    Point point = (Point)this.reader.read("POINT (30 30)");
+    point = point.normalize();
+    CoordinateTest.assertEquals(point.getCoordinate(), 30, 30);
   }
 
   public void testNormalizePolygon1() throws Exception {
-    final Polygon actualValue = (Polygon)this.reader.read("POLYGON ((120 320, 240 200, 120 80, 20 200, 120 320), (60 200, 80 220, 80 200, 60 200), (160 200, 180 200, 180 220, 160 200), (120 140, 140 140, 140 160, 120 140), (140 240, 140 220, 120 260, 140 240))");
-    actualValue.normalize();
+    Polygon actualValue = (Polygon)this.reader.read("POLYGON ((120 320, 240 200, 120 80, 20 200, 120 320), (60 200, 80 220, 80 200, 60 200), (160 200, 180 200, 180 220, 160 200), (120 140, 140 140, 140 160, 120 140), (140 240, 140 220, 120 260, 140 240))");
+    actualValue = actualValue.normalize();
     final Polygon expectedValue = (Polygon)this.reader.read("POLYGON ((20 200, 120 320, 240 200, 120 80, 20 200), (60 200, 80 200, 80 220, 60 200), (120 140, 140 140, 140 160, 120 140), (120 260, 140 220, 140 240, 120 260), (160 200, 180 200, 180 220, 160 200))");
     assertEqualsExact(expectedValue, actualValue);
   }

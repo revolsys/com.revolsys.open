@@ -1,8 +1,7 @@
 package com.revolsys.jts.dissolve;
 
 import com.revolsys.jts.edgegraph.MarkHalfEdge;
-import com.revolsys.jts.geom.Coordinate;
-
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A HalfEdge which carries information
@@ -11,11 +10,10 @@ import com.revolsys.jts.geom.Coordinate;
  * @author Martin Davis
  *
  */
-class DissolveHalfEdge extends MarkHalfEdge
-{
+class DissolveHalfEdge extends MarkHalfEdge {
   private boolean isStart = false;
-  
-  public DissolveHalfEdge(Coordinate orig) {
+
+  public DissolveHalfEdge(final Coordinates orig) {
     super(orig);
   }
 
@@ -25,16 +23,14 @@ class DissolveHalfEdge extends MarkHalfEdge
    * 
    * @return true if this edge is a start segment
    */
-  public boolean isStart()
-  {
+  public boolean isStart() {
     return isStart;
   }
-  
+
   /**
    * Sets this edge to be the start segment of an input LineString.
    */
-  public void setStart()
-  {
+  public void setStart() {
     isStart = true;
   }
 }

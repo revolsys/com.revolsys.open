@@ -158,7 +158,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
   }
 
   @Override
-  public Coordinates cloneCoordinates() {
+  public DoubleCoordinates cloneCoordinates() {
     return new DoubleCoordinates(x, y);
   }
 

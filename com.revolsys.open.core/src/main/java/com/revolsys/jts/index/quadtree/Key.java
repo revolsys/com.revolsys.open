@@ -72,7 +72,7 @@ public class Key {
 
   public Coordinates getCentre()
   {
-    return new Coordinate(
+    return new Coordinate((double)
       (env.getMinX() + env.getMaxX()) / 2,
       (env.getMinY() + env.getMaxY()) / 2, Coordinates.NULL_ORDINATE
       );

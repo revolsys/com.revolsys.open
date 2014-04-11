@@ -46,7 +46,7 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 public class TestDataBuilder {
   private GeometryFactory geomFact = GeometryFactory.getFactory();
 
-  private Coordinates origin = new Coordinate(0, 0, Coordinates.NULL_ORDINATE);
+  private Coordinates origin = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
 
   private double size = 100.0;
 
@@ -100,7 +100,7 @@ public class TestDataBuilder {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Coordinates base = new Coordinate(env.getMinX() + i * xInc,
+        final Coordinates base = new Coordinate((double)env.getMinX() + i * xInc,
           env.getMinY() + j * yInc, Coordinates.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);

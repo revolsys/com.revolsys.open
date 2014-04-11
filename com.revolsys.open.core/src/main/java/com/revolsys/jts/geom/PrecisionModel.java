@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -41,7 +40,7 @@ import java.util.Map;
 import com.revolsys.jts.io.WKTWriter;
 
 /**
- * Specifies the precision model of the {@link Coordinate}s in a {@link Geometry}.
+ * Specifies the precision model of the {@link Coordinates}s in a {@link Geometry}.
  * In other words, specifies the grid of allowable
  *  points for all <code>Geometry</code>s.
  * <p>
@@ -88,67 +87,56 @@ import com.revolsys.jts.io.WKTWriter;
  *
  *@version 1.7
  */
-public class PrecisionModel implements Serializable, Comparable
-{
-	/**
-	 * Determines which of two {@link PrecisionModel}s is the most precise
-	 * (allows the greatest number of significant digits).
-	 * 
-	 * @param pm1 a PrecisionModel
-	 * @param pm2 a PrecisionModel
-	 * @return the PrecisionModel which is most precise
-	 */
-	public static PrecisionModel mostPrecise(PrecisionModel pm1, PrecisionModel pm2)
-	{
-		if (pm1.compareTo(pm2) >= 0)
-			return pm1;
-		return pm2;
-	}
-	
-  private static final long serialVersionUID = 7777263578777803835L;
-
+public class PrecisionModel implements Serializable, Comparable {
   /**
    * The types of Precision Model which JTS supports.
    */
-  public static class Type
-      implements Serializable
-  {
+  public static class Type implements Serializable {
     private static final long serialVersionUID = -5528602631731589822L;
+
     private static Map nameToTypeMap = new HashMap();
-    public Type(String name) {
-        this.name = name;
-        nameToTypeMap.put(name, this);
+
+    private final String name;
+
+    public Type(final String name) {
+      this.name = name;
+      nameToTypeMap.put(name, this);
     }
-    private String name;
-    public String toString() { return name; }
-    
-    
+
     /*
      * Ssee http://www.javaworld.com/javaworld/javatips/jw-javatip122.html
      */
     private Object readResolve() {
-        return nameToTypeMap.get(name);
+      return nameToTypeMap.get(name);
+    }
+
+    @Override
+    public String toString() {
+      return name;
     }
   }
+
+  private static final long serialVersionUID = 7777263578777803835L;
 
   /**
    * Fixed Precision indicates that coordinates have a fixed number of decimal places.
    * The number of decimal places is determined by the log10 of the scale factor.
    */
   public static final Type FIXED = new Type("FIXED");
+
   /**
    * Floating precision corresponds to the standard Java
    * double-precision floating-point representation, which is
    * based on the IEEE-754 standard
    */
   public static final Type FLOATING = new Type("FLOATING");
+
   /**
    * Floating single precision corresponds to the standard Java
    * single-precision floating-point representation, which is
    * based on the IEEE-754 standard
    */
   public static final Type FLOATING_SINGLE = new Type("FLOATING SINGLE");
-
 
   /**
    *  The maximum precise value representable in a double. Since IEE754
@@ -158,9 +146,26 @@ public class PrecisionModel implements Serializable, Comparable
   public final static double maximumPreciseValue = 9007199254740992.0;
 
   /**
+   * Determines which of two {@link PrecisionModel}s is the most precise
+   * (allows the greatest number of significant digits).
+   * 
+   * @param pm1 a PrecisionModel
+   * @param pm2 a PrecisionModel
+   * @return the PrecisionModel which is most precise
+   */
+  public static PrecisionModel mostPrecise(final PrecisionModel pm1,
+    final PrecisionModel pm2) {
+    if (pm1.compareTo(pm2) >= 0) {
+      return pm1;
+    }
+    return pm2;
+  }
+
+  /**
    * The type of PrecisionModel this represents.
    */
-  private Type modelType;
+  private final Type modelType;
+
   /**
    * The scale factor which determines the number of decimal places in fixed precision.
    */
@@ -176,20 +181,18 @@ public class PrecisionModel implements Serializable, Comparable
   }
 
   /**
-   * Creates a <code>PrecisionModel</code> that specifies
-   * an explicit precision model type.
-   * If the model type is FIXED the scale factor will default to 1.
+   *  Creates a <code>PrecisionModel</code> that specifies Fixed precision.
+   *  Fixed-precision coordinates are represented as precise internal coordinates,
+   *  which are rounded to the grid defined by the scale factor.
    *
-   * @param modelType the type of the precision model
+   *@param  scale    amount by which to multiply a coordinate after subtracting
+   *      the offset, to obtain a precise coordinate
    */
-  public PrecisionModel(Type modelType)
-  {
-    this.modelType = modelType;
-    if (modelType == FIXED)
-    {
-      setScale(1.0);
-    }
+  public PrecisionModel(final double scale) {
+    modelType = FIXED;
+    setScale(scale);
   }
+
   /**
    *  Creates a <code>PrecisionModel</code> that specifies Fixed precision.
    *  Fixed-precision coordinates are represented as precise internal coordinates,
@@ -202,39 +205,82 @@ public class PrecisionModel implements Serializable, Comparable
    *
    * @deprecated offsets are no longer supported, since internal representation is rounded floating point
    */
-  public PrecisionModel(double scale, double offsetX, double offsetY) {
+  @Deprecated
+  public PrecisionModel(final double scale, final double offsetX,
+    final double offsetY) {
     modelType = FIXED;
     setScale(scale);
   }
-  /**
-   *  Creates a <code>PrecisionModel</code> that specifies Fixed precision.
-   *  Fixed-precision coordinates are represented as precise internal coordinates,
-   *  which are rounded to the grid defined by the scale factor.
-   *
-   *@param  scale    amount by which to multiply a coordinate after subtracting
-   *      the offset, to obtain a precise coordinate
-   */
-  public PrecisionModel(double scale) {
-    modelType = FIXED;
-    setScale(scale);
-  }
+
   /**
    *  Copy constructor to create a new <code>PrecisionModel</code>
    *  from an existing one.
    */
-  public PrecisionModel(PrecisionModel pm) {
+  public PrecisionModel(final PrecisionModel pm) {
     modelType = pm.modelType;
     scale = pm.scale;
   }
 
+  /**
+   * Creates a <code>PrecisionModel</code> that specifies
+   * an explicit precision model type.
+   * If the model type is FIXED the scale factor will default to 1.
+   *
+   * @param modelType the type of the precision model
+   */
+  public PrecisionModel(final Type modelType) {
+    this.modelType = modelType;
+    if (modelType == FIXED) {
+      setScale(1.0);
+    }
+  }
 
   /**
-   * Tests whether the precision model supports floating point
-   * @return <code>true</code> if the precision model supports floating point
+   *  Compares this {@link PrecisionModel} object with the specified object for order.
+   * A PrecisionModel is greater than another if it provides greater precision.
+   * The comparison is based on the value returned by the
+   * {@link #getMaximumSignificantDigits} method.
+   * This comparison is not strictly accurate when comparing floating precision models
+   * to fixed models; however, it is correct when both models are either floating or fixed.
+   *
+   *@param  o  the <code>PrecisionModel</code> with which this <code>PrecisionModel</code>
+   *      is being compared
+   *@return    a negative integer, zero, or a positive integer as this <code>PrecisionModel</code>
+   *      is less than, equal to, or greater than the specified <code>PrecisionModel</code>
    */
-  public boolean isFloating()
-  {
-    return modelType == FLOATING || modelType == FLOATING_SINGLE;
+  @Override
+  public int compareTo(final Object o) {
+    final PrecisionModel other = (PrecisionModel)o;
+
+    final int sigDigits = getMaximumSignificantDigits();
+    final int otherSigDigits = other.getMaximumSignificantDigits();
+    return (new Integer(sigDigits)).compareTo(new Integer(otherSigDigits));
+    // if (sigDigits > otherSigDigits)
+    // return 1;
+    // else if
+    // if (modelType == FLOATING && other.modelType == FLOATING) return 0;
+    // if (modelType == FLOATING && other.modelType != FLOATING) return 1;
+    // if (modelType != FLOATING && other.modelType == FLOATING) return -1;
+    // if (modelType == FIXED && other.modelType == FIXED) {
+    // if (scale > other.scale)
+    // return 1;
+    // else if (scale < other.scale)
+    // return -1;
+    // else
+    // return 0;
+    // }
+    // Assert.shouldNeverReachHere("Unknown Precision Model type encountered");
+    // return 0;
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (!(other instanceof PrecisionModel)) {
+      return false;
+    }
+    final PrecisionModel otherPrecisionModel = (PrecisionModel)other;
+    return modelType == otherPrecisionModel.modelType
+      && scale == otherPrecisionModel.scale;
   }
 
   /**
@@ -265,9 +311,34 @@ public class PrecisionModel implements Serializable, Comparable
     } else if (modelType == FLOATING_SINGLE) {
       maxSigDigits = 6;
     } else if (modelType == FIXED) {
-      maxSigDigits = 1 + (int) Math.ceil(Math.log(getScale()) / Math.log(10));
+      maxSigDigits = 1 + (int)Math.ceil(Math.log(getScale()) / Math.log(10));
     }
     return maxSigDigits;
+  }
+
+  /**
+   * Returns the x-offset used to obtain a precise coordinate.
+   *
+   * @return the amount by which to subtract the x-coordinate before
+   *         multiplying by the scale
+   * @deprecated Offsets are no longer used
+   */
+  @Deprecated
+  public double getOffsetX() {
+    // We actually don't use offsetX and offsetY anymore ... [Jon Aquino]
+    return 0;
+  }
+
+  /**
+   * Returns the y-offset used to obtain a precise coordinate.
+   *
+   * @return the amount by which to subtract the y-coordinate before
+   *         multiplying by the scale
+   * @deprecated Offsets are no longer used
+   */
+  @Deprecated
+  public double getOffsetY() {
+    return 0;
   }
 
   /**
@@ -289,102 +360,30 @@ public class PrecisionModel implements Serializable, Comparable
    * @return the type of this precision model
    * @see Type
    */
-  public Type getType()
-  {
+  public Type getType() {
     return modelType;
   }
+
   /**
-   *  Sets the multiplying factor used to obtain a precise coordinate.
-   * This method is private because PrecisionModel is an immutable (value) type.
+   * Tests whether the precision model supports floating point
+   * @return <code>true</code> if the precision model supports floating point
    */
-  private void setScale(double scale)
-  {
-    this.scale = Math.abs(scale);
+  public boolean isFloating() {
+    return modelType == FLOATING || modelType == FLOATING_SINGLE;
   }
 
   /**
-   * Returns the x-offset used to obtain a precise coordinate.
-   *
-   * @return the amount by which to subtract the x-coordinate before
-   *         multiplying by the scale
-   * @deprecated Offsets are no longer used
+   * Rounds a Coordinates to the PrecisionModel grid.
    */
-  public double getOffsetX() {
-    //We actually don't use offsetX and offsetY anymore ... [Jon Aquino]
-    return 0;
-  }
-
-
-
-  /**
-   * Returns the y-offset used to obtain a precise coordinate.
-   *
-   * @return the amount by which to subtract the y-coordinate before
-   *         multiplying by the scale
-   * @deprecated Offsets are no longer used
-   */
-  public double getOffsetY() {
-    return 0;
-  }
-
-  /**
-   *  Sets <code>internal</code> to the precise representation of <code>external</code>.
-   *
-   * @param external the original coordinate
-   * @param internal the coordinate whose values will be changed to the
-   *                 precise representation of <code>external</code>
-   * @deprecated use makePrecise instead
-   */
-  public void toInternal (Coordinates external, Coordinates internal) {
-    if (isFloating()) {
-      internal.setX(external.getX());
-      internal.setY(external.getY());
+  public void makePrecise(final Coordinates coord) {
+    // optimization for full precision
+    if (modelType == FLOATING) {
+      return;
     }
-    else {
-      internal.setX(makePrecise(external.getX()));
-      internal.setY(makePrecise(external.getY()));
-    }
-    internal.setZ(external.getZ());
-  }
 
-  /**
-   *  Returns the precise representation of <code>external</code>.
-   *
-   *@param  external  the original coordinate
-   *@return           the coordinate whose values will be changed to the precise
-   *      representation of <code>external</code>
-   * @deprecated use makePrecise instead
-   */
-  public Coordinates toInternal(Coordinates external) {
-    Coordinates internal = new Coordinate(external);
-    makePrecise(internal);
-    return internal;
-  }
-
-  /**
-   *  Returns the external representation of <code>internal</code>.
-   *
-   *@param  internal  the original coordinate
-   *@return           the coordinate whose values will be changed to the
-   *      external representation of <code>internal</code>
-   * @deprecated no longer needed, since internal representation is same as external representation
-   */
-  public Coordinates toExternal(Coordinates internal) {
-    Coordinates external = new Coordinate(internal);
-    return external;
-  }
-
-  /**
-   *  Sets <code>external</code> to the external representation of <code>internal</code>.
-   *
-   *@param  internal  the original coordinate
-   *@param  external  the coordinate whose values will be changed to the
-   *      external representation of <code>internal</code>
-   * @deprecated no longer needed, since internal representation is same as external representation
-   */
-  public void toExternal(Coordinates internal, Coordinates external) {
-      external.setX(internal.getX());
-      external.setY(internal.getY());
+    coord.setX(makePrecise(coord.getX()));
+    coord.setY(makePrecise(coord.getY()));
+    // MD says it's OK that we're not makePrecise'ing the z [Jon Aquino]
   }
 
   /**
@@ -398,93 +397,105 @@ public class PrecisionModel implements Serializable, Comparable
    * <b>Note:</b> Java's <code>Math#rint</code> uses the "Banker's Rounding" algorithm,
    * which is not suitable for precision operations elsewhere in JTS.
    */
-  public double makePrecise(double val) 
-  {
-  	// don't change NaN values
-  	if (Double.isNaN(val)) return val;
-  	
-  	if (modelType == FLOATING_SINGLE) {
-  		float floatSingleVal = (float) val;
-  		return (double) floatSingleVal;
-  	}
-  	if (modelType == FIXED) {
-            return Math.round(val * scale) / scale;
-//  		return Math.rint(val * scale) / scale;
-  	}
-  	// modelType == FLOATING - no rounding necessary
-  	return val;
-  }
-
-  /**
-   * Rounds a Coordinate to the PrecisionModel grid.
-   */
-  public void makePrecise(Coordinates coord)
-  {
-    // optimization for full precision
-    if (modelType == FLOATING) return;
-
-    coord.setX(makePrecise(coord.getX()));
-    coord.setY(makePrecise(coord.getY()));
-    //MD says it's OK that we're not makePrecise'ing the z [Jon Aquino]
-  }
-
-
-  public String toString() {
-  	String description = "UNKNOWN";
-  	if (modelType == FLOATING) {
-  		description = "Floating";
-  	} else if (modelType == FLOATING_SINGLE) {
-  		description = "Floating-Single";
-  	} else if (modelType == FIXED) {
-  		description = "Fixed (Scale=" + getScale() + ")";
-  	}
-  	return description;
-  }
-
-  public boolean equals(Object other) {
-    if (! (other instanceof PrecisionModel)) {
-      return false;
+  public double makePrecise(final double val) {
+    // don't change NaN values
+    if (Double.isNaN(val)) {
+      return val;
     }
-    PrecisionModel otherPrecisionModel = (PrecisionModel) other;
-    return modelType == otherPrecisionModel.modelType
-        && scale == otherPrecisionModel.scale;
-  }
-  /**
-   *  Compares this {@link PrecisionModel} object with the specified object for order.
-   * A PrecisionModel is greater than another if it provides greater precision.
-   * The comparison is based on the value returned by the
-   * {@link #getMaximumSignificantDigits} method.
-   * This comparison is not strictly accurate when comparing floating precision models
-   * to fixed models; however, it is correct when both models are either floating or fixed.
-   *
-   *@param  o  the <code>PrecisionModel</code> with which this <code>PrecisionModel</code>
-   *      is being compared
-   *@return    a negative integer, zero, or a positive integer as this <code>PrecisionModel</code>
-   *      is less than, equal to, or greater than the specified <code>PrecisionModel</code>
-   */
-  public int compareTo(Object o) {
-    PrecisionModel other = (PrecisionModel) o;
 
-    int sigDigits = getMaximumSignificantDigits();
-    int otherSigDigits = other.getMaximumSignificantDigits();
-    return (new Integer(sigDigits)).compareTo(new Integer(otherSigDigits));
-//    if (sigDigits > otherSigDigits)
-//      return 1;
-//    else if
-//    if (modelType == FLOATING && other.modelType == FLOATING) return 0;
-//    if (modelType == FLOATING && other.modelType != FLOATING) return 1;
-//    if (modelType != FLOATING && other.modelType == FLOATING) return -1;
-//    if (modelType == FIXED && other.modelType == FIXED) {
-//      if (scale > other.scale)
-//        return 1;
-//      else if (scale < other.scale)
-//        return -1;
-//      else
-//        return 0;
-//    }
-//    Assert.shouldNeverReachHere("Unknown Precision Model type encountered");
-//    return 0;
+    if (modelType == FLOATING_SINGLE) {
+      final float floatSingleVal = (float)val;
+      return floatSingleVal;
+    }
+    if (modelType == FIXED) {
+      return Math.round(val * scale) / scale;
+      // return Math.rint(val * scale) / scale;
+    }
+    // modelType == FLOATING - no rounding necessary
+    return val;
+  }
+
+  /**
+   *  Sets the multiplying factor used to obtain a precise coordinate.
+   * This method is private because PrecisionModel is an immutable (value) type.
+   */
+  private void setScale(final double scale) {
+    this.scale = Math.abs(scale);
+  }
+
+  /**
+   *  Returns the external representation of <code>internal</code>.
+   *
+   *@param  internal  the original coordinate
+   *@return           the coordinate whose values will be changed to the
+   *      external representation of <code>internal</code>
+   * @deprecated no longer needed, since internal representation is same as external representation
+   */
+  @Deprecated
+  public Coordinates toExternal(final Coordinates internal) {
+    final Coordinates external = new Coordinate(internal);
+    return external;
+  }
+
+  /**
+   *  Sets <code>external</code> to the external representation of <code>internal</code>.
+   *
+   *@param  internal  the original coordinate
+   *@param  external  the coordinate whose values will be changed to the
+   *      external representation of <code>internal</code>
+   * @deprecated no longer needed, since internal representation is same as external representation
+   */
+  @Deprecated
+  public void toExternal(final Coordinates internal, final Coordinates external) {
+    external.setX(internal.getX());
+    external.setY(internal.getY());
+  }
+
+  /**
+   *  Returns the precise representation of <code>external</code>.
+   *
+   *@param  external  the original coordinate
+   *@return           the coordinate whose values will be changed to the precise
+   *      representation of <code>external</code>
+   * @deprecated use makePrecise instead
+   */
+  @Deprecated
+  public Coordinates toInternal(final Coordinates external) {
+    final Coordinates internal = new Coordinate(external);
+    makePrecise(internal);
+    return internal;
+  }
+
+  /**
+   *  Sets <code>internal</code> to the precise representation of <code>external</code>.
+   *
+   * @param external the original coordinate
+   * @param internal the coordinate whose values will be changed to the
+   *                 precise representation of <code>external</code>
+   * @deprecated use makePrecise instead
+   */
+  @Deprecated
+  public void toInternal(final Coordinates external, final Coordinates internal) {
+    if (isFloating()) {
+      internal.setX(external.getX());
+      internal.setY(external.getY());
+    } else {
+      internal.setX(makePrecise(external.getX()));
+      internal.setY(makePrecise(external.getY()));
+    }
+    internal.setZ(external.getZ());
+  }
+
+  @Override
+  public String toString() {
+    String description = "UNKNOWN";
+    if (modelType == FLOATING) {
+      description = "Floating";
+    } else if (modelType == FLOATING_SINGLE) {
+      description = "Floating-Single";
+    } else if (modelType == FIXED) {
+      description = "Fixed (Scale=" + getScale() + ")";
+    }
+    return description;
   }
 }
-
-

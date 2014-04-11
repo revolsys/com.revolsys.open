@@ -37,7 +37,7 @@ import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
 
 /**
- * Allows comparing {@link Coordinate} arrays
+ * Allows comparing {@link Coordinates} arrays
  * in an orientation-independent way.
  *
  * @author Martin Davis
@@ -46,16 +46,16 @@ import com.revolsys.jts.geom.Coordinates;
 public class OrientedCoordinateArray
     implements Comparable
 {
-  private Coordinate[] pts;
+  private Coordinates[] pts;
   private boolean orientation;
 
   /**
    * Creates a new {@link OrientedCoordinateArray}
-   * for the given {@link Coordinate} array.
+   * for the given {@link Coordinates} array.
    *
    * @param pts the coordinates to orient
    */
-  public OrientedCoordinateArray(Coordinate[] pts)
+  public OrientedCoordinateArray(Coordinates[] pts)
   {
     this.pts = pts;
     orientation = orientation(pts);
@@ -68,7 +68,7 @@ public class OrientedCoordinateArray
    * @return <code>true</code> if the points are oriented forwards
    * or <code>false</code if the points are oriented in reverse
    */
-  private static boolean orientation(Coordinate[] pts)
+  private static boolean orientation(Coordinates[] pts)
   {
     return CoordinateArrays.increasingDirection(pts) == 1;
   }
@@ -103,7 +103,7 @@ public class OrientedCoordinateArray
 
   private static int compareOriented(Coordinates[] pts1,
                                      boolean orientation1,
-                                     Coordinate[] pts2,
+                                     Coordinates[] pts2,
                                      boolean orientation2)
   {
     int dir1 = orientation1 ? 1 : -1;

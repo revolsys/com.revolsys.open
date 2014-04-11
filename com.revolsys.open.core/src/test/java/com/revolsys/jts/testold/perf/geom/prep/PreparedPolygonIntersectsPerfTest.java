@@ -112,7 +112,7 @@ public class PreparedPolygonIntersectsPerfTest {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Coordinates base = new Coordinate(env.getMinX() + i * xInc,
+        final Coordinates base = new Coordinate((double)env.getMinX() + i * xInc,
           env.getMinY() + j * yInc, Coordinates.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);
@@ -161,8 +161,8 @@ public class PreparedPolygonIntersectsPerfTest {
   }
 
   public void test(final int nPts) {
-    // Geometry poly = createCircle(new Coordinate(0, 0), 100, nPts);
-    final Geometry sinePoly = createSineStar(new Coordinate(0, 0, Coordinates.NULL_ORDINATE), 100, nPts);
+    // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
+    final Geometry sinePoly = createSineStar(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), 100, nPts);
     // System.out.println(poly);
     // Geometry target = sinePoly.getBoundary();
     final Geometry target = sinePoly;

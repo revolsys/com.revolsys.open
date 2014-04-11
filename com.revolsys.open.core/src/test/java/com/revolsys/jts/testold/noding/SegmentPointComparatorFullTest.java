@@ -28,7 +28,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
     super(name);
   }
 
-  private void checkNodePosition(final LineSegment seg, final AbstractCoordinates p0,
+  private void checkNodePosition(final LineSegment seg, final Coordinates p0,
     final Coordinates p1, final int expectedPositionValue) {
     final int octant = Octant.octant(seg.p0, seg.p1);
     final int posValue = SegmentPointComparator.compare(octant, p0, p1);
@@ -38,8 +38,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
 
   private void checkPointsAtDistance(final LineSegment seg, final double dist0,
     final double dist1) {
-    final Coordinate p0 = computePoint(seg, dist0);
-    final Coordinate p1 = computePoint(seg, dist1);
+    final Coordinates p0 = computePoint(seg, dist0);
+    final Coordinates p1 = computePoint(seg, dist1);
     if (p0.equals(p1)) {
       checkNodePosition(seg, p0, p1, 0);
     } else {
@@ -49,8 +49,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
   }
 
   private void checkSegment(final double x, final double y) {
-    final Coordinate seg0 = new Coordinate(0, 0, Coordinates.NULL_ORDINATE);
-    final Coordinate seg1 = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+    final Coordinates seg0 = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
+    final Coordinates seg1 = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
     final LineSegment seg = new LineSegment(seg0, seg1);
 
     for (int i = 0; i < 4; i++) {
@@ -65,11 +65,11 @@ public class SegmentPointComparatorFullTest extends TestCase {
     }
   }
 
-  private Coordinate computePoint(final LineSegment seg, final double dist) {
+  private Coordinates computePoint(final LineSegment seg, final double dist) {
     final double dx = seg.p1.getX() - seg.p0.getX();
     final double dy = seg.p1.getY() - seg.p0.getY();
     final double len = seg.getLength();
-    final Coordinate pt = new Coordinate(dist * dx / len, dist * dy / len, Coordinates.NULL_ORDINATE);
+    final Coordinates pt = new Coordinate((double)dist * dx / len, dist * dy / len, Coordinates.NULL_ORDINATE);
     this.pm.makePrecise(pt);
     return pt;
   }

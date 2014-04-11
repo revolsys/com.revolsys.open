@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,8 +32,8 @@
  */
 package com.revolsys.jts.operation.linemerge;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.planargraph.DirectedEdge;
 import com.revolsys.jts.planargraph.Edge;
@@ -49,8 +48,7 @@ import com.revolsys.jts.planargraph.PlanarGraph;
  *
  * @version 1.7
  */
-public class LineMergeGraph extends PlanarGraph 
-{
+public class LineMergeGraph extends PlanarGraph {
   /**
    * Adds an Edge, DirectedEdges, and Nodes for the given LineString representation
    * of an edge. 
@@ -58,28 +56,32 @@ public class LineMergeGraph extends PlanarGraph
    * 
    * @param lineString the linestring to add to the graph
    */
-  public void addEdge(LineString lineString) {
-    if (lineString.isEmpty()) { return; }
-    
-    Coordinate[] coordinates = CoordinateArrays.removeRepeatedPoints(lineString.getCoordinateArray());
-    
+  public void addEdge(final LineString lineString) {
+    if (lineString.isEmpty()) {
+      return;
+    }
+
+    final Coordinates[] coordinates = CoordinateArrays.removeRepeatedPoints(lineString.getCoordinateArray());
+
     // don't add lines with all coordinates equal
-    if (coordinates.length <= 1) return;
-    
-    Coordinate startCoordinate = coordinates[0];
-    Coordinate endCoordinate = coordinates[coordinates.length - 1];
-    Node startNode = getNode(startCoordinate);
-    Node endNode = getNode(endCoordinate);
-    DirectedEdge directedEdge0 = new LineMergeDirectedEdge(startNode, endNode,
-        coordinates[1], true);
-    DirectedEdge directedEdge1 = new LineMergeDirectedEdge(endNode, startNode,
-        coordinates[coordinates.length - 2], false);
-    Edge edge = new LineMergeEdge(lineString);
+    if (coordinates.length <= 1) {
+      return;
+    }
+
+    final Coordinates startCoordinate = coordinates[0];
+    final Coordinates endCoordinate = coordinates[coordinates.length - 1];
+    final Node startNode = getNode(startCoordinate);
+    final Node endNode = getNode(endCoordinate);
+    final DirectedEdge directedEdge0 = new LineMergeDirectedEdge(startNode,
+      endNode, coordinates[1], true);
+    final DirectedEdge directedEdge1 = new LineMergeDirectedEdge(endNode,
+      startNode, coordinates[coordinates.length - 2], false);
+    final Edge edge = new LineMergeEdge(lineString);
     edge.setDirectedEdges(directedEdge0, directedEdge1);
     add(edge);
   }
 
-  private Node getNode(Coordinate coordinate) {
+  private Node getNode(final Coordinates coordinate) {
     Node node = findNode(coordinate);
     if (node == null) {
       node = new Node(coordinate);

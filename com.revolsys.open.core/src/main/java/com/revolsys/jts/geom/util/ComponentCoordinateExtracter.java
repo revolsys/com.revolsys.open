@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
 /**
- * Extracts a single representative {@link Coordinate} 
+ * Extracts a single representative {@link Coordinates} 
  * from each connected component of a {@link Geometry}.
  *
  * @version 1.9

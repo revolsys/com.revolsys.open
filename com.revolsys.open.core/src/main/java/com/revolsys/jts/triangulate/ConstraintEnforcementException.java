@@ -45,42 +45,43 @@ import com.revolsys.jts.io.WKTWriter;
  */
 public class ConstraintEnforcementException extends RuntimeException {
 
-    private static final long serialVersionUID = 386496846550080140L;
+  private static final long serialVersionUID = 386496846550080140L;
 
-    private static String msgWithCoord(String msg, Coordinates pt) {
-        if (pt != null)
-            return msg + " [ " + WKTWriter.toPoint(pt) + " ]";
-        return msg;
+  private static String msgWithCoord(final String msg, final Coordinates pt) {
+    if (pt != null) {
+      return msg + " [ " + WKTWriter.toPoint(pt) + " ]";
     }
+    return msg;
+  }
 
-    private Coordinates pt = null;
+  private Coordinates pt = null;
 
-    /**
-     * Creates a new instance with a given message.
-     * 
-     * @param msg a string
-     */
-    public ConstraintEnforcementException(String msg) {
-        super(msg);
-    }
+  /**
+   * Creates a new instance with a given message.
+   * 
+   * @param msg a string
+   */
+  public ConstraintEnforcementException(final String msg) {
+    super(msg);
+  }
 
-    /**
-     * Creates a new instance with a given message and approximate location.
-     * 
-     * @param msg a string
-     * @param pt the location of the error
-     */
-    public ConstraintEnforcementException(String msg, Coordinates pt) {
-        super(msgWithCoord(msg, pt));
-        this.pt = new Coordinate(pt);
-    }
+  /**
+   * Creates a new instance with a given message and approximate location.
+   * 
+   * @param msg a string
+   * @param pt the location of the error
+   */
+  public ConstraintEnforcementException(final String msg, final Coordinates pt) {
+    super(msgWithCoord(msg, pt));
+    this.pt = new Coordinate(pt);
+  }
 
-    /**
-     * Gets the approximate location of this error.
-     * 
-     * @return a location
-     */
-    public Coordinates getCoordinate() {
-        return pt;
-    }
+  /**
+   * Gets the approximate location of this error.
+   * 
+   * @return a location
+   */
+  public Coordinates getCoordinate() {
+    return pt;
+  }
 }

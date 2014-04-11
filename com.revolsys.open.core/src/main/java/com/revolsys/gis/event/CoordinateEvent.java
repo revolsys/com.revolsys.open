@@ -2,7 +2,6 @@ package com.revolsys.gis.event;
 
 import java.util.EventObject;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
 public class CoordinateEvent extends EventObject {
@@ -19,29 +18,27 @@ public class CoordinateEvent extends EventObject {
 
   private String action;
 
-  private Coordinates coordinate;
-
   private String notes;
 
   private String ruleName;
 
   private String typePath;
 
-  public CoordinateEvent(final Coordinate coordinate) {
+  public CoordinateEvent(final Coordinates coordinate) {
     super(coordinate);
   }
 
-  public CoordinateEvent(final Coordinate coordinate, final String ruleName,
+  public CoordinateEvent(final Coordinates coordinate, final String ruleName,
     final String action) {
     super(coordinate);
     this.ruleName = ruleName;
     this.action = action;
   }
 
-  public CoordinateEvent(final Coordinate coordinate, final String path,
+  public CoordinateEvent(final Coordinates coordinate, final String path,
     final String ruleName, final String action, final String notes) {
     super(coordinate);
-    this.typePath = typePath;
+    this.typePath = path;
     this.ruleName = ruleName;
     this.action = action;
     this.notes = notes;

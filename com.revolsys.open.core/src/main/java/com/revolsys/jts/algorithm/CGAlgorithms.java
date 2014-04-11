@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -110,8 +109,8 @@ public class CGAlgorithms {
    * @param D
    *          another point of the line (must be different to A)
    */
-  public static double distanceLineLine(final Coordinate A, final Coordinate B,
-    final Coordinate C, final Coordinate D) {
+  public static double distanceLineLine(final Coordinates A,
+    final Coordinates B, final Coordinates C, final Coordinates D) {
     // check for zero-length segments
     if (A.equals(B)) {
       return distancePointLine(A, C, D);
@@ -179,7 +178,7 @@ public class CGAlgorithms {
    *          another point of the line (must be different to A)
    * @return the distance from p to line segment AB
    */
-  public static double distancePointLine(final AbstractCoordinates p,
+  public static double distancePointLine(final Coordinates p,
     final Coordinates A, final Coordinates B) {
     // if start = end, then just compute distance to one of the endpoints
     if (A.getX() == B.getX() && A.getY() == B.getY()) {
@@ -226,7 +225,7 @@ public class CGAlgorithms {
    *          a sequence of contiguous line segments defined by their vertices
    * @return the minimum distance between the point and the line segments
    */
-  public static double distancePointLine(final AbstractCoordinates p,
+  public static double distancePointLine(final Coordinates p,
     final Coordinates[] line) {
     if (line.length == 0) {
       throw new IllegalArgumentException(
@@ -273,7 +272,7 @@ public class CGAlgorithms {
   }
 
   /**
-   * Computes whether a ring defined by an array of {@link Coordinate}s is
+   * Computes whether a ring defined by an array of {@link Coordinates}s is
    * oriented counter-clockwise.
    * <ul>
    * <li>The list of points is assumed to have the first and last points equal.
@@ -289,7 +288,7 @@ public class CGAlgorithms {
    * @throws IllegalArgumentException
    *           if there are too few points to determine orientation (< 4)
    */
-  public static boolean isCCW(final Coordinate[] ring) {
+  public static boolean isCCW(final Coordinates[] ring) {
     // # of points without closing endpoint
     final int nPts = ring.length - 1;
     // sanity check
@@ -324,8 +323,8 @@ public class CGAlgorithms {
       iNext = (iNext + 1) % nPts;
     } while (ring[iNext].equals2d(hiPt) && iNext != hiIndex);
 
-    final AbstractCoordinates prev = ring[iPrev];
-    final AbstractCoordinates next = ring[iNext];
+    final Coordinates prev = ring[iPrev];
+    final Coordinates next = ring[iNext];
 
     /**
      * This check catches cases where the ring contains an A-B-A configuration
@@ -479,10 +478,10 @@ public class CGAlgorithms {
      * For instance, the following situation produces identical results in spite
      * of the inverse orientation of the line segment:
      * 
-     * Coordinate p0 = new Coordinate(219.3649559090992, 140.84159161824724);
-     * Coordinate p1 = new Coordinate(168.9018919682399, -5.713787599646864);
+     * Coordinates p0 = new Coordinate((double)219.3649559090992, 140.84159161824724);
+     * Coordinates p1 = new Coordinate((double)168.9018919682399, -5.713787599646864);
      * 
-     * Coordinate p = new Coordinate(186.80814046338352, 46.28973405831556); int
+     * Coordinates p = new Coordinate((double)186.80814046338352, 46.28973405831556); int
      * orient = orientationIndex(p0, p1, p); int orientInv =
      * orientationIndex(p1, p0, p);
      * 

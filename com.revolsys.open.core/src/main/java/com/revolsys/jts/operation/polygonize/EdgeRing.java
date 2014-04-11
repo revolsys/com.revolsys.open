@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -32,7 +31,6 @@
  *     www.vividsolutions.com
  */
 
-
 package com.revolsys.jts.operation.polygonize;
 
 import java.util.ArrayList;
@@ -59,6 +57,19 @@ import com.revolsys.jts.planargraph.DirectedEdge;
  */
 class EdgeRing {
 
+  private static void addEdge(final Coordinates[] coords,
+    final boolean isForward, final CoordinateList coordList) {
+    if (isForward) {
+      for (int i = 0; i < coords.length; i++) {
+        coordList.add(coords[i], false);
+      }
+    } else {
+      for (int i = coords.length - 1; i >= 0; i--) {
+        coordList.add(coords[i], false);
+      }
+    }
+  }
+
   /**
    * Find the innermost enclosing shell EdgeRing containing the argument EdgeRing, if any.
    * The innermost enclosing ring is the <i>smallest</i> enclosing ring.
@@ -73,33 +84,39 @@ class EdgeRing {
    * @return containing EdgeRing, if there is one
    * or null if no containing EdgeRing is found
    */
-  public static EdgeRing findEdgeRingContaining(EdgeRing testEr, List shellList)
-  {
-    LinearRing testRing = testEr.getRing();
-    Envelope testEnv = testRing.getEnvelopeInternal();
+  public static EdgeRing findEdgeRingContaining(final EdgeRing testEr,
+    final List shellList) {
+    final LinearRing testRing = testEr.getRing();
+    final Envelope testEnv = testRing.getEnvelopeInternal();
     Coordinates testPt = testRing.getCoordinateN(0);
 
     EdgeRing minShell = null;
     Envelope minShellEnv = null;
-    for (Iterator it = shellList.iterator(); it.hasNext(); ) {
-      EdgeRing tryShell = (EdgeRing) it.next();
-      LinearRing tryShellRing = tryShell.getRing();
-      Envelope tryShellEnv = tryShellRing.getEnvelopeInternal();
+    for (final Iterator it = shellList.iterator(); it.hasNext();) {
+      final EdgeRing tryShell = (EdgeRing)it.next();
+      final LinearRing tryShellRing = tryShell.getRing();
+      final Envelope tryShellEnv = tryShellRing.getEnvelopeInternal();
       // the hole envelope cannot equal the shell envelope
       // (also guards against testing rings against themselves)
-      if (tryShellEnv.equals(testEnv)) continue;
+      if (tryShellEnv.equals(testEnv)) {
+        continue;
+      }
       // hole must be contained in shell
-      if (! tryShellEnv.contains(testEnv)) continue;
-      
-      testPt = CoordinateArrays.ptNotInList(testRing.getCoordinateArray(), tryShellRing.getCoordinateArray());
-      boolean isContained = false;
-      if (CGAlgorithms.isPointInRing(testPt, tryShellRing.getCoordinateArray()) )
-        isContained = true;
+      if (!tryShellEnv.contains(testEnv)) {
+        continue;
+      }
 
-      // check if this new containing ring is smaller than the current minimum ring
+      testPt = CoordinateArrays.ptNotInList(testRing.getCoordinateArray(),
+        tryShellRing.getCoordinateArray());
+      boolean isContained = false;
+      if (CGAlgorithms.isPointInRing(testPt, tryShellRing.getCoordinateArray())) {
+        isContained = true;
+      }
+
+      // check if this new containing ring is smaller than the current minimum
+      // ring
       if (isContained) {
-        if (minShell == null
-            || minShellEnv.contains(tryShellEnv)) {
+        if (minShell == null || minShellEnv.contains(tryShellEnv)) {
           minShell = tryShell;
           minShellEnv = minShell.getRing().getEnvelopeInternal();
         }
@@ -109,55 +126,58 @@ class EdgeRing {
   }
 
   /**
-   * Finds a point in a list of points which is not contained in another list of points
-   * @param testPts the {@link Coordinate}s to test
-   * @param pts an array of {@link Coordinate}s to test the input points against
-   * @return a {@link Coordinate} from <code>testPts</code> which is not in <code>pts</code>,
-   * or null if there is no coordinate not in the list
-   * 
-   * @deprecated Use CoordinateArrays.ptNotInList instead
-   */
-  public static Coordinates ptNotInList(Coordinate[] testPts, Coordinate[] pts)
-  {
-    for (int i = 0; i < testPts.length; i++) {
-      Coordinate testPt = testPts[i];
-      if (! isInList(testPt, pts))
-          return testPt;
-    }
-    return null;
-  }
-
-  /**
    * Tests whether a given point is in an array of points.
    * Uses a value-based test.
    *
-   * @param pt a {@link Coordinate} for the test point
-   * @param pts an array of {@link Coordinate}s to test
+   * @param pt a {@link Coordinates} for the test point
+   * @param pts an array of {@link Coordinates}s to test
    * @return <code>true</code> if the point is in the array
    * 
    * @deprecated
    */
-  public static boolean isInList(Coordinate pt, Coordinate[] pts)
-  {
+  @Deprecated
+  public static boolean isInList(final Coordinates pt, final Coordinates[] pts) {
     for (int i = 0; i < pts.length; i++) {
-        if (pt.equals(pts[i]))
-            return true;
+      if (pt.equals(pts[i])) {
+        return true;
+      }
     }
     return false;
   }
-  private GeometryFactory factory;
 
+  /**
+   * Finds a point in a list of points which is not contained in another list of points
+   * @param testPts the {@link Coordinates}s to test
+   * @param pts an array of {@link Coordinates}s to test the input points against
+   * @return a {@link Coordinates} from <code>testPts</code> which is not in <code>pts</code>,
+   * or null if there is no coordinate not in the list
+   * 
+   * @deprecated Use CoordinateArrays.ptNotInList instead
+   */
+  @Deprecated
+  public static Coordinates ptNotInList(final Coordinates[] testPts,
+    final Coordinates[] pts) {
+    for (int i = 0; i < testPts.length; i++) {
+      final Coordinates testPt = testPts[i];
+      if (!isInList(testPt, pts)) {
+        return testPt;
+      }
+    }
+    return null;
+  }
 
-  private List deList = new ArrayList();
+  private final GeometryFactory factory;
+
+  private final List deList = new ArrayList();
 
   // cache the following data for efficiency
   private LinearRing ring = null;
 
-  private Coordinate[] ringPts = null;
+  private Coordinates[] ringPts = null;
+
   private List holes;
 
-  public EdgeRing(GeometryFactory factory)
-  {
+  public EdgeRing(final GeometryFactory factory) {
     this.factory = factory;
   }
 
@@ -165,78 +185,35 @@ class EdgeRing {
    * Adds a {@link DirectedEdge} which is known to form part of this ring.
    * @param de the {@link DirectedEdge} to add.
    */
-  public void add(DirectedEdge de)
-  {
+  public void add(final DirectedEdge de) {
     deList.add(de);
-  }
-
-  /**
-   * Tests whether this ring is a hole.
-   * Due to the way the edges in the polyongization graph are linked,
-   * a ring is a hole if it is oriented counter-clockwise.
-   * @return <code>true</code> if this ring is a hole
-   */
-  public boolean isHole()
-  {
-    LinearRing ring = getRing();
-    return CGAlgorithms.isCCW(ring.getCoordinateArray());
   }
 
   /**
    * Adds a hole to the polygon formed by this ring.
    * @param hole the {@link LinearRing} forming the hole.
    */
-  public void addHole(LinearRing hole) {
-    if (holes == null)
+  public void addHole(final LinearRing hole) {
+    if (holes == null) {
       holes = new ArrayList();
-    holes.add(hole);
-  }
-
-  /**
-   * Computes the {@link Polygon} formed by this ring and any contained holes.
-   *
-   * @return the {@link Polygon} formed by this ring and its holes.
-   */
-  public Polygon getPolygon()
-  {
-    LinearRing[] holeLR = null;
-    if (holes != null) {
-      holeLR = new LinearRing[holes.size()];
-      for (int i = 0; i < holes.size(); i++) {
-        holeLR[i] = (LinearRing) holes.get(i);
-      }
     }
-    Polygon poly = factory.createPolygon(ring, holeLR);
-    return poly;
-  }
-
-  /**
-   * Tests if the {@link LinearRing} ring formed by this edge ring is topologically valid.
-   * 
-   * @return true if the ring is valid
-   */
-  public boolean isValid()
-  {
-    getCoordinates();
-    if (ringPts.length <= 3) return false;
-    getRing();
-    return ring.isValid();
+    holes.add(hole);
   }
 
   /**
    * Computes the list of coordinates which are contained in this ring.
    * The coordinatea are computed once only and cached.
    *
-   * @return an array of the {@link Coordinate}s in this ring
+   * @return an array of the {@link Coordinates}s in this ring
    */
-  private Coordinates[] getCoordinates()
-  {
+  private Coordinates[] getCoordinates() {
     if (ringPts == null) {
-      CoordinateList coordList = new CoordinateList();
-      for (Iterator i = deList.iterator(); i.hasNext(); ) {
-        DirectedEdge de = (DirectedEdge) i.next();
-        PolygonizeEdge edge = (PolygonizeEdge) de.getEdge();
-        addEdge(edge.getLine().getCoordinateArray(), de.getEdgeDirection(), coordList);
+      final CoordinateList coordList = new CoordinateList();
+      for (final Iterator i = deList.iterator(); i.hasNext();) {
+        final DirectedEdge de = (DirectedEdge)i.next();
+        final PolygonizeEdge edge = (PolygonizeEdge)de.getEdge();
+        addEdge(edge.getLine().getCoordinateArray(), de.getEdgeDirection(),
+          coordList);
       }
       ringPts = coordList.toCoordinateArray();
     }
@@ -250,10 +227,26 @@ class EdgeRing {
    * invalid.
    * @return a {@link LineString} containing the coordinates in this ring
    */
-  public LineString getLineString()
-  {
+  public LineString getLineString() {
     getCoordinates();
     return factory.createLineString(ringPts);
+  }
+
+  /**
+   * Computes the {@link Polygon} formed by this ring and any contained holes.
+   *
+   * @return the {@link Polygon} formed by this ring and its holes.
+   */
+  public Polygon getPolygon() {
+    LinearRing[] holeLR = null;
+    if (holes != null) {
+      holeLR = new LinearRing[holes.size()];
+      for (int i = 0; i < holes.size(); i++) {
+        holeLR[i] = (LinearRing)holes.get(i);
+      }
+    }
+    final Polygon poly = factory.createPolygon(ring, holeLR);
+    return poly;
   }
 
   /**
@@ -261,31 +254,44 @@ class EdgeRing {
    * creating it (such as a topology problem). Details of problems are written to
    * standard output.
    */
-  public LinearRing getRing()
-  {
-    if (ring != null) return ring;
+  public LinearRing getRing() {
+    if (ring != null) {
+      return ring;
+    }
     getCoordinates();
-    if (ringPts.length < 3) System.out.println(ringPts);
+    if (ringPts.length < 3) {
+      System.out.println(ringPts);
+    }
     try {
       ring = factory.createLinearRing(ringPts);
-    }
-    catch (Exception ex) {
+    } catch (final Exception ex) {
       System.out.println(ringPts);
     }
     return ring;
   }
 
-  private static void addEdge(Coordinate[] coords, boolean isForward, CoordinateList coordList)
-  {
-    if (isForward) {
-      for (int i = 0; i < coords.length; i++) {
-        coordList.add(coords[i], false);
-      }
+  /**
+   * Tests whether this ring is a hole.
+   * Due to the way the edges in the polyongization graph are linked,
+   * a ring is a hole if it is oriented counter-clockwise.
+   * @return <code>true</code> if this ring is a hole
+   */
+  public boolean isHole() {
+    final LinearRing ring = getRing();
+    return CGAlgorithms.isCCW(ring.getCoordinateArray());
+  }
+
+  /**
+   * Tests if the {@link LinearRing} ring formed by this edge ring is topologically valid.
+   * 
+   * @return true if the ring is valid
+   */
+  public boolean isValid() {
+    getCoordinates();
+    if (ringPts.length <= 3) {
+      return false;
     }
-    else {
-      for (int i = coords.length - 1; i >= 0; i--) {
-        coordList.add(coords[i], false);
-      }
-    }
+    getRing();
+    return ring.isValid();
   }
 }

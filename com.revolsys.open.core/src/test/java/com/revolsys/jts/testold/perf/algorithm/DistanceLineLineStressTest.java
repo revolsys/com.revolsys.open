@@ -50,18 +50,18 @@ public class DistanceLineLineStressTest extends TestCase {
     TestRunner.run(DistanceLineLineStressTest.class);
   }
 
-  private static Coordinate[] randomDisjointCollinearSegments() {
+  private static Coordinates[] randomDisjointCollinearSegments() {
     final double slope = randGen.nextDouble();
-    final Coordinate[] seg = new Coordinate[4];
+    final Coordinates[] seg = new Coordinates[4];
 
     final double gap = 1;
     final double x1 = 10;
     final double x2 = x1 + gap;
     final double x3 = x1 + gap + 10;
-    seg[0] = new Coordinate(0, 0, Coordinates.NULL_ORDINATE);
-    seg[1] = new Coordinate(x1, slope * x1, Coordinates.NULL_ORDINATE);
-    seg[2] = new Coordinate(x2, slope * x2, Coordinates.NULL_ORDINATE);
-    seg[3] = new Coordinate(x3, slope * x3, Coordinates.NULL_ORDINATE);
+    seg[0] = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
+    seg[1] = new Coordinate((double)x1, slope * x1, Coordinates.NULL_ORDINATE);
+    seg[2] = new Coordinate((double)x2, slope * x2, Coordinates.NULL_ORDINATE);
+    seg[3] = new Coordinate((double)x3, slope * x3, Coordinates.NULL_ORDINATE);
 
     return seg;
   }
@@ -75,7 +75,7 @@ public class DistanceLineLineStressTest extends TestCase {
     int failCount = 0;
     for (int i = 0; i < n; i++) {
       // System.out.println(i);
-      final Coordinate[] seg = randomDisjointCollinearSegments();
+      final Coordinates[] seg = randomDisjointCollinearSegments();
       if (0 == CGAlgorithms.distanceLineLine(seg[0], seg[1], seg[2], seg[3])) {
         /*
          * System.out.println("FAILED! - " + WKTWriter.toLineString(seg[0],

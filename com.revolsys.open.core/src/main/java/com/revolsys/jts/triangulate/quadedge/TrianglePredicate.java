@@ -65,8 +65,8 @@ public class TrianglePredicate {
    * @param c a vertex of the triangle
    * @param p the point to test
    */
-  private static void checkRobustInCircle(final Coordinate a,
-    final Coordinate b, final Coordinate c, final Coordinate p) {
+  private static void checkRobustInCircle(final Coordinates a,
+    final Coordinates b, final Coordinates c, final Coordinates p) {
     final boolean nonRobustInCircle = isInCircleNonRobust(a, b, c, p);
     final boolean isInCircleDD = TrianglePredicate.isInCircleDDSlow(a, b, c, p);
     final boolean isInCircleCC = TrianglePredicate.isInCircleCC(a, b, c, p);
@@ -113,8 +113,8 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleCC(final AbstractCoordinates a, final Coordinates b,
-    final Coordinates c, final AbstractCoordinates p) {
+  public static boolean isInCircleCC(final Coordinates a, final Coordinates b,
+    final Coordinates c, final Coordinates p) {
     final Coordinates cc = Triangle.circumcentre(a, b, c);
     final double ccRadius = a.distance(cc);
     final double pRadiusDiff = p.distance(cc) - ccRadius;

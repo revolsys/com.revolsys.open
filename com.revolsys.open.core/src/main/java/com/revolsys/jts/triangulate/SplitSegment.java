@@ -46,7 +46,7 @@ import com.revolsys.jts.geom.LineSegment;
  */
 public class SplitSegment {
     /**
-     * Computes the {@link Coordinate} that lies a given fraction along the line defined by the
+     * Computes the {@link Coordinates} that lies a given fraction along the line defined by the
      * reverse of the given segment. A fraction of <code>0.0</code> returns the end point of the
      * segment; a fraction of <code>1.0</code> returns the start point of the segment.
      * 
@@ -79,7 +79,7 @@ public class SplitSegment {
         return splitPt;
     }
 
-    public void splitAt(double length, AbstractCoordinates endPt) {
+    public void splitAt(double length, Coordinates endPt) {
         double actualLen = getConstrainedLength(length);
         double frac = actualLen / segLen;
         if (endPt.equals2d(seg.p0))
@@ -88,7 +88,7 @@ public class SplitSegment {
             splitPt = pointAlongReverse(seg, frac);
     }
 
-    public void splitAt(AbstractCoordinates pt) {
+    public void splitAt(Coordinates pt) {
         // check that given pt doesn't violate min length
         double minFrac = minimumLen / segLen;
         if (pt.distance(seg.p0) < minimumLen) {

@@ -50,7 +50,7 @@ import com.revolsys.jts.geom.Polygon;
  * having zero length or area), 
  * the centroid will be computed as for the equivalent lower-dimension geometry.
  * If the input geometry is empty, a
- * <code>null</code> Coordinate is returned.
+ * <code>null</code> Coordinates is returned.
  * 
  * <h2>Algorithm</h2>
  * <ul>
@@ -188,7 +188,7 @@ public class Centroid
     }
   }
 
-  private void addShell(Coordinate[] pts)
+  private void addShell(Coordinates[] pts)
   {
     if (pts.length > 0) 
       setBasePoint(pts[0]);
@@ -199,7 +199,7 @@ public class Centroid
     addLineSegments(pts);
   }
   
-  private void addHole(Coordinate[] pts)
+  private void addHole(Coordinates[] pts)
   {
     boolean isPositiveArea = CGAlgorithms.isCCW(pts);
     for (int i = 0; i < pts.length - 1; i++) {
@@ -243,9 +243,9 @@ public class Centroid
    * Adds the line segments defined by an array of coordinates
    * to the linear centroid accumulators.
    * 
-   * @param pts an array of {@link Coordinate}s
+   * @param pts an array of {@link Coordinates}s
    */
-  private void addLineSegments(AbstractCoordinates[] pts)
+  private void addLineSegments(Coordinates[] pts)
   {
     double lineLen = 0.0;
     for (int i = 0; i < pts.length - 1; i++) {
@@ -267,7 +267,7 @@ public class Centroid
 
   /**
    * Adds a point to the point centroid accumulator.
-   * @param pt a {@link Coordinate}
+   * @param pt a {@link Coordinates}
    */
   private void addPoint(Coordinates pt)
   {

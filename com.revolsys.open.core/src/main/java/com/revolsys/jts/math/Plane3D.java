@@ -75,7 +75,7 @@ public class Plane3D {
 		Vector3D pb = new Vector3D(p, basePt);
 		double pbdDotNormal = pb.dot(normal);
 		if (Double.isNaN(pbdDotNormal)) 
-			throw new IllegalArgumentException("3D Coordinate has NaN ordinate");
+			throw new IllegalArgumentException("3D Coordinates has NaN ordinate");
 		double d = pbdDotNormal / normal.length();
 		return d;
 	}

@@ -56,7 +56,7 @@ public class HCoordinate
    * to increase the precision of the calculation input points should be normalized
    * before passing them to this routine.
    */
-  public static Coordinate intersection(
+  public static Coordinates intersection(
       Coordinates p1, Coordinates p2,
       Coordinates q1, Coordinates q2)
       throws NotRepresentableException
@@ -82,19 +82,19 @@ public class HCoordinate
       throw new NotRepresentableException();
     }
     
-    return new Coordinate(xInt, yInt, Coordinates.NULL_ORDINATE);
+    return new Coordinate((double)xInt, yInt, Coordinates.NULL_ORDINATE);
   }
 
   /*
-  public static Coordinate OLDintersection(
-      Coordinate p1, Coordinate p2,
-      Coordinate q1, Coordinate q2)
+  public static Coordinates OLDintersection(
+      Coordinates p1, Coordinates p2,
+      Coordinates q1, Coordinates q2)
       throws NotRepresentableException
   {
     HCoordinate l1 = new HCoordinate(p1, p2);
     HCoordinate l2 = new HCoordinate(q1, q2);
     HCoordinate intHCoord = new HCoordinate(l1, l2);
-    Coordinate intPt = intHCoord.getCoordinate();
+    Coordinates intPt = intHCoord.getCoordinate();
     return intPt;
   }
   */
@@ -135,7 +135,7 @@ public class HCoordinate
   /**
    * Constructs a homogeneous coordinate which is the intersection of the lines
    * define by the homogenous coordinates represented by two
-   * {@link Coordinate}s.
+   * {@link Coordinates}s.
    * 
    * @param p1
    * @param p2

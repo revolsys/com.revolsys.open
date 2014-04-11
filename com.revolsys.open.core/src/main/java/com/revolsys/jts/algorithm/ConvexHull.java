@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -64,7 +63,7 @@ import com.revolsys.jts.util.UniqueCoordinateArrayFilter;
  */
 public class ConvexHull {
   /**
-   * Compares {@link Coordinate}s for their angle and distance
+   * Compares {@link Coordinates}s for their angle and distance
    * relative to an origin.
    *
    * @author Martin Davis
@@ -138,7 +137,7 @@ public class ConvexHull {
 
   }
 
-  private static Coordinate[] extractCoordinates(final Geometry geom) {
+  private static Coordinates[] extractCoordinates(final Geometry geom) {
     final UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();
     geom.apply(filter);
     return filter.getCoordinates();
@@ -146,12 +145,12 @@ public class ConvexHull {
 
   private final GeometryFactory geomFactory;
 
-  private final Coordinate[] inputPts;
+  private final Coordinates[] inputPts;
 
   /**
-   * Create a new convex hull construction for the input {@link Coordinate} array.
+   * Create a new convex hull construction for the input {@link Coordinates} array.
    */
-  public ConvexHull(final Coordinate[] pts, final GeometryFactory geomFactory) {
+  public ConvexHull(final Coordinates[] pts, final GeometryFactory geomFactory) {
     inputPts = UniqueCoordinateArrayFilter.filterCoordinates(pts);
     // inputPts = pts;
     this.geomFactory = geomFactory;
@@ -170,13 +169,13 @@ public class ConvexHull {
    *@return           the coordinates with unnecessary (collinear) vertices
    *      removed
    */
-  private Coordinate[] cleanRing(final Coordinate[] original) {
+  private Coordinates[] cleanRing(final Coordinates[] original) {
     Assert.equals(original[0], original[original.length - 1]);
     final ArrayList cleanedRing = new ArrayList();
     Coordinates previousDistinctCoordinate = null;
     for (int i = 0; i <= original.length - 2; i++) {
-      final Coordinate currentCoordinate = original[i];
-      final Coordinate nextCoordinate = original[i + 1];
+      final Coordinates currentCoordinate = original[i];
+      final Coordinates nextCoordinate = original[i + 1];
       if (currentCoordinate.equals(nextCoordinate)) {
         continue;
       }
@@ -189,12 +188,12 @@ public class ConvexHull {
       previousDistinctCoordinate = currentCoordinate;
     }
     cleanedRing.add(original[original.length - 1]);
-    final Coordinate[] cleanedRingCoordinates = new Coordinate[cleanedRing.size()];
-    return (Coordinate[])cleanedRing.toArray(cleanedRingCoordinates);
+    final Coordinates[] cleanedRingCoordinates = new Coordinates[cleanedRing.size()];
+    return (Coordinates[])cleanedRing.toArray(cleanedRingCoordinates);
   }
 
-  private Coordinate[] computeOctPts(final Coordinate[] inputPts) {
-    final Coordinate[] pts = new Coordinate[8];
+  private Coordinates[] computeOctPts(final Coordinates[] inputPts) {
+    final Coordinates[] pts = new Coordinates[8];
     for (int j = 0; j < pts.length; j++) {
       pts[j] = inputPts[0];
     }
@@ -202,25 +201,29 @@ public class ConvexHull {
       if (inputPts[i].getX() < pts[0].getX()) {
         pts[0] = inputPts[i];
       }
-      if (inputPts[i].getX() - inputPts[i].getY() < pts[1].getX() - pts[1].getY()) {
+      if (inputPts[i].getX() - inputPts[i].getY() < pts[1].getX()
+        - pts[1].getY()) {
         pts[1] = inputPts[i];
       }
       if (inputPts[i].getY() > pts[2].getY()) {
         pts[2] = inputPts[i];
       }
-      if (inputPts[i].getX() + inputPts[i].getY() > pts[3].getX() + pts[3].getY()) {
+      if (inputPts[i].getX() + inputPts[i].getY() > pts[3].getX()
+        + pts[3].getY()) {
         pts[3] = inputPts[i];
       }
       if (inputPts[i].getX() > pts[4].getX()) {
         pts[4] = inputPts[i];
       }
-      if (inputPts[i].getX() - inputPts[i].getY() > pts[5].getX() - pts[5].getY()) {
+      if (inputPts[i].getX() - inputPts[i].getY() > pts[5].getX()
+        - pts[5].getY()) {
         pts[5] = inputPts[i];
       }
       if (inputPts[i].getY() < pts[6].getY()) {
         pts[6] = inputPts[i];
       }
-      if (inputPts[i].getX() + inputPts[i].getY() < pts[7].getX() + pts[7].getY()) {
+      if (inputPts[i].getX() + inputPts[i].getY() < pts[7].getX()
+        + pts[7].getY()) {
         pts[7] = inputPts[i];
       }
     }
@@ -228,8 +231,8 @@ public class ConvexHull {
 
   }
 
-  private Coordinate[] computeOctRing(final Coordinate[] inputPts) {
-    final Coordinate[] octPts = computeOctPts(inputPts);
+  private Coordinates[] computeOctRing(final Coordinates[] inputPts) {
+    final Coordinates[] octPts = computeOctPts(inputPts);
     final CoordinateList coordList = new CoordinateList();
     coordList.add(octPts, false);
 
@@ -265,19 +268,19 @@ public class ConvexHull {
       return geomFactory.createLineString(inputPts);
     }
 
-    Coordinate[] reducedPts = inputPts;
+    Coordinates[] reducedPts = inputPts;
     // use heuristic to reduce points, if large
     if (inputPts.length > 50) {
       reducedPts = reduce(inputPts);
     }
     // sort points for Graham scan.
-    final Coordinate[] sortedPts = preSort(reducedPts);
+    final Coordinates[] sortedPts = preSort(reducedPts);
 
     // Use Graham scan to find convex hull.
     final Stack cHS = grahamScan(sortedPts);
 
     // Convert stack to an array.
-    final Coordinate[] cH = toCoordinateArray(cHS);
+    final Coordinates[] cH = toCoordinateArray(cHS);
 
     // Convert array to appropriate output geometry.
     return lineOrPolygon(cH);
@@ -289,8 +292,8 @@ public class ConvexHull {
    * @param c a list of points, with at least 3 entries
    * @return a Stack containing the ordered points of the convex hull ring
    */
-  private Stack grahamScan(final Coordinate[] c) {
-    Coordinate p;
+  private Stack grahamScan(final Coordinates[] c) {
+    Coordinates p;
     final Stack ps = new Stack();
     p = (Coordinate)ps.push(c[0]);
     p = (Coordinate)ps.push(c[1]);
@@ -344,22 +347,23 @@ public class ConvexHull {
    *      collinear; otherwise, a <code>Polygon</code> with unnecessary
    *      (collinear) vertices removed
    */
-  private Geometry lineOrPolygon(Coordinate[] coordinates) {
+  private Geometry lineOrPolygon(Coordinates[] coordinates) {
 
     coordinates = cleanRing(coordinates);
     if (coordinates.length == 3) {
       return geomFactory.createLineString(new Coordinates[] {
         coordinates[0], coordinates[1]
       });
-      // return new LineString(new Coordinate[]{coordinates[0], coordinates[1]},
+      // return new LineString(new Coordinates[]{coordinates[0],
+      // coordinates[1]},
       // geometry.getPrecisionModel(), geometry.getSRID());
     }
     final LinearRing linearRing = geomFactory.createLinearRing(coordinates);
     return geomFactory.createPolygon(linearRing, null);
   }
 
-  private Coordinate[] padArray3(final Coordinate[] pts) {
-    final Coordinate[] pad = new Coordinate[3];
+  private Coordinates[] padArray3(final Coordinates[] pts) {
+    final Coordinates[] pad = new Coordinates[3];
     for (int i = 0; i < pad.length; i++) {
       if (i < pts.length) {
         pad[i] = pts[i];
@@ -372,7 +376,7 @@ public class ConvexHull {
 
   /*
    * // MD - no longer used, but keep for reference purposes private
-   * Coordinate[] computeQuad(Coordinate[] inputPts) { BigQuad bigQuad =
+   * Coordinates[] computeQuad(Coordinates[] inputPts) { BigQuad bigQuad =
    * bigQuad(inputPts); // Build a linear ring defining a big poly. ArrayList
    * bigPoly = new ArrayList(); bigPoly.add(bigQuad.westmost); if (!
    * bigPoly.contains(bigQuad.northmost)) { bigPoly.add(bigQuad.northmost); } if
@@ -380,22 +384,22 @@ public class ConvexHull {
    * if (! bigPoly.contains(bigQuad.southmost)) {
    * bigPoly.add(bigQuad.southmost); } // points must all lie in a line if
    * (bigPoly.size() < 3) { return null; } // closing point
-   * bigPoly.add(bigQuad.westmost); Coordinate[] bigPolyArray =
+   * bigPoly.add(bigQuad.westmost); Coordinates[] bigPolyArray =
    * CoordinateArrays.toCoordinateArray(bigPoly); return bigPolyArray; } private
-   * BigQuad bigQuad(Coordinate[] pts) { BigQuad bigQuad = new BigQuad();
+   * BigQuad bigQuad(Coordinates[] pts) { BigQuad bigQuad = new BigQuad();
    * bigQuad.northmost = pts[0]; bigQuad.southmost = pts[0]; bigQuad.westmost =
    * pts[0]; bigQuad.eastmost = pts[0]; for (int i = 1; i < pts.length; i++) {
    * if (pts[i].x < bigQuad.westmost.x) { bigQuad.westmost = pts[i]; } if
    * (pts[i].x > bigQuad.eastmost.x) { bigQuad.eastmost = pts[i]; } if (pts[i].y
    * < bigQuad.southmost.y) { bigQuad.southmost = pts[i]; } if (pts[i].y >
    * bigQuad.northmost.y) { bigQuad.northmost = pts[i]; } } return bigQuad; }
-   * private static class BigQuad { public Coordinate northmost; public
-   * Coordinate southmost; public Coordinate westmost; public Coordinate
+   * private static class BigQuad { public Coordinates northmost; public
+   * Coordinates southmost; public Coordinates westmost; public Coordinate
    * eastmost; }
    */
 
-  private Coordinate[] preSort(final Coordinate[] pts) {
-    Coordinate t;
+  private Coordinates[] preSort(final Coordinates[] pts) {
+    Coordinates t;
 
     // find the lowest point in the set. If two or more points have
     // the same minimum y coordinate choose the one with the minimu x.
@@ -435,10 +439,10 @@ public class ConvexHull {
    * @param pts the points to reduce
    * @return the reduced list of points (at least 3)
    */
-  private Coordinate[] reduce(final Coordinate[] inputPts) {
-    // Coordinate[] polyPts = computeQuad(inputPts);
-    final Coordinate[] polyPts = computeOctRing(inputPts);
-    // Coordinate[] polyPts = null;
+  private Coordinates[] reduce(final Coordinates[] inputPts) {
+    // Coordinates[] polyPts = computeQuad(inputPts);
+    final Coordinates[] polyPts = computeOctRing(inputPts);
+    // Coordinates[] polyPts = null;
 
     // unable to compute interior polygon for some reason
     if (polyPts == null) {
@@ -464,7 +468,7 @@ public class ConvexHull {
         reducedSet.add(inputPts[i]);
       }
     }
-    final Coordinate[] reducedPts = CoordinateArrays.toCoordinateArray(reducedSet);
+    final Coordinates[] reducedPts = CoordinateArrays.toCoordinateArray(reducedSet);
 
     // ensure that computed array has at least 3 points (not necessarily unique)
     if (reducedPts.length < 3) {
@@ -477,10 +481,10 @@ public class ConvexHull {
    * An alternative to Stack.toArray, which is not present in earlier versions
    * of Java.
    */
-  protected Coordinate[] toCoordinateArray(final Stack stack) {
-    final Coordinate[] coordinates = new Coordinate[stack.size()];
+  protected Coordinates[] toCoordinateArray(final Stack stack) {
+    final Coordinates[] coordinates = new Coordinates[stack.size()];
     for (int i = 0; i < stack.size(); i++) {
-      final Coordinate coordinate = (Coordinate)stack.get(i);
+      final Coordinates coordinate = (Coordinate)stack.get(i);
       coordinates[i] = coordinate;
     }
     return coordinates;

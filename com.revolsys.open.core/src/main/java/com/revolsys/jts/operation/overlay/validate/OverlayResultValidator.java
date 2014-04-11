@@ -128,7 +128,7 @@ public class OverlayResultValidator
   private boolean checkValid(int overlayOp)
   {
     for (int i = 0; i < testCoords.size(); i++) {
-      Coordinate pt = (Coordinate) testCoords.get(i);
+      Coordinates pt = (Coordinate) testCoords.get(i);
       if (! checkValid(overlayOp, pt)) {
         invalidLocation = pt;
         return false;
@@ -137,7 +137,7 @@ public class OverlayResultValidator
     return true;
   }
 
-  private boolean checkValid(int overlayOp, Coordinate pt)
+  private boolean checkValid(int overlayOp, Coordinates pt)
   {
     location[0] = locFinder[0].getLocation(pt);
     location[1] = locFinder[1].getLocation(pt);

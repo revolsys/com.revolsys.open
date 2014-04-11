@@ -72,7 +72,7 @@ public class RepeatedPointTester {
     else  throw new UnsupportedOperationException(g.getClass().getName());
   }
 
-  public boolean hasRepeatedPoint(Coordinate[] coord)
+  public boolean hasRepeatedPoint(Coordinates[] coord)
   {
     for (int i = 1; i < coord.length; i++) {
       if (coord[i - 1].equals(coord[i]) ) {

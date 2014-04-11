@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.simplify;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -68,8 +67,93 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * 
  * @version 1.7
  */
-public class VWSimplifier
-{
+public class VWSimplifier {
+
+  class VWTransformer extends GeometryTransformer {
+    private boolean isEnsureValidTopology = true;
+
+    public VWTransformer(final boolean isEnsureValidTopology) {
+      this.isEnsureValidTopology = isEnsureValidTopology;
+    }
+
+    /**
+     * Creates a valid area geometry from one that possibly has bad topology
+     * (i.e. self-intersections). Since buffer can handle invalid topology, but
+     * always returns valid geometry, constructing a 0-width buffer "corrects"
+     * the topology. Note this only works for area geometries, since buffer
+     * always returns areas. This also may return empty geometries, if the input
+     * has no actual area.
+     * 
+     * @param rawAreaGeom
+     *          an area geometry possibly containing self-intersections
+     * @return a valid area geometry
+     */
+    private Geometry createValidArea(final Geometry rawAreaGeom) {
+      if (isEnsureValidTopology) {
+        return rawAreaGeom.buffer(0.0);
+      }
+      return rawAreaGeom;
+    }
+
+    @Override
+    protected CoordinatesList transformCoordinates(
+      final CoordinatesList coords, final Geometry parent) {
+      final Coordinates[] inputPts = coords.toCoordinateArray();
+      Coordinates[] newPts = null;
+      if (inputPts.length == 0) {
+        newPts = new Coordinates[0];
+      } else {
+        newPts = VWLineSimplifier.simplify(inputPts, distanceTolerance);
+      }
+      return factory.getCoordinateSequenceFactory().create(newPts);
+    }
+
+    /**
+     * Simplifies a LinearRing. If the simplification results in a degenerate
+     * ring, remove the component.
+     * 
+     * @return null if the simplification results in a degenerate ring
+     */
+    @Override
+    protected Geometry transformLinearRing(final LinearRing geom,
+      final Geometry parent) {
+      final boolean removeDegenerateRings = parent instanceof Polygon;
+      final Geometry simpResult = super.transformLinearRing(geom, parent);
+      if (removeDegenerateRings && !(simpResult instanceof LinearRing)) {
+        return null;
+      }
+      ;
+      return simpResult;
+    }
+
+    /**
+     * Simplifies a MultiPolygon, fixing it if required.
+     */
+    @Override
+    protected Geometry transformMultiPolygon(final MultiPolygon geom,
+      final Geometry parent) {
+      final Geometry rawGeom = super.transformMultiPolygon(geom, parent);
+      return createValidArea(rawGeom);
+    }
+
+    /**
+     * Simplifies a polygon, fixing it if required.
+     */
+    @Override
+    protected Geometry transformPolygon(final Polygon geom,
+      final Geometry parent) {
+      // empty geometries are simply removed
+      if (geom.isEmpty()) {
+        return null;
+      }
+      final Geometry rawGeom = super.transformPolygon(geom, parent);
+      // don't try and correct if the parent is going to do this
+      if (parent instanceof MultiPolygon) {
+        return rawGeom;
+      }
+      return createValidArea(rawGeom);
+    }
+  }
 
   /**
    * Simplifies a geometry using a given tolerance.
@@ -78,15 +162,17 @@ public class VWSimplifier
    * @param distanceTolerance the tolerance to use
    * @return a simplified version of the geometry
    */
-  public static Geometry simplify(Geometry geom, double distanceTolerance)
-  {
-    VWSimplifier simp = new VWSimplifier(geom);
+  public static Geometry simplify(final Geometry geom,
+    final double distanceTolerance) {
+    final VWSimplifier simp = new VWSimplifier(geom);
     simp.setDistanceTolerance(distanceTolerance);
     return simp.getResultGeometry();
   }
 
-  private Geometry inputGeom;
+  private final Geometry inputGeom;
+
   private double distanceTolerance;
+
   private boolean isEnsureValidTopology = true;
 
   /**
@@ -94,9 +180,22 @@ public class VWSimplifier
    * 
    * @param inputGeom the geometry to simplify
    */
-  public VWSimplifier(Geometry inputGeom)
-  {
+  public VWSimplifier(final Geometry inputGeom) {
     this.inputGeom = inputGeom;
+  }
+
+  /**
+   * Gets the simplified geometry.
+   * 
+   * @return the simplified geometry
+   */
+  public Geometry getResultGeometry() {
+    // empty input produces an empty result
+    if (inputGeom.isEmpty()) {
+      return (Geometry)inputGeom.clone();
+    }
+
+    return (new VWTransformer(isEnsureValidTopology)).transform(inputGeom);
   }
 
   /**
@@ -107,10 +206,10 @@ public class VWSimplifier
    * @param distanceTolerance
    *          the approximation tolerance to use
    */
-  public void setDistanceTolerance(double distanceTolerance)
-  {
-    if (distanceTolerance < 0.0)
+  public void setDistanceTolerance(final double distanceTolerance) {
+    if (distanceTolerance < 0.0) {
       throw new IllegalArgumentException("Tolerance must be non-negative");
+    }
     this.distanceTolerance = distanceTolerance;
   }
 
@@ -128,106 +227,8 @@ public class VWSimplifier
    * 
    * @param isEnsureValidTopology
    */
-  public void setEnsureValid(boolean isEnsureValidTopology)
-  {
+  public void setEnsureValid(final boolean isEnsureValidTopology) {
     this.isEnsureValidTopology = isEnsureValidTopology;
-  }
-
-  /**
-   * Gets the simplified geometry.
-   * 
-   * @return the simplified geometry
-   */
-  public Geometry getResultGeometry()
-  {
-    // empty input produces an empty result
-    if (inputGeom.isEmpty())
-      return (Geometry) inputGeom.clone();
-
-    return (new VWTransformer(isEnsureValidTopology)).transform(inputGeom);
-  }
-
-  class VWTransformer extends GeometryTransformer
-  {
-    private boolean isEnsureValidTopology = true;
-
-    public VWTransformer(boolean isEnsureValidTopology)
-    {
-      this.isEnsureValidTopology = isEnsureValidTopology;
-    }
-
-    protected CoordinatesList transformCoordinates(CoordinatesList coords, Geometry parent)
-    {
-      Coordinate[] inputPts = coords.toCoordinateArray();
-      Coordinates[] newPts = null;
-      if (inputPts.length == 0) {
-        newPts = new Coordinates[0];
-      }
-      else {
-        newPts = VWLineSimplifier.simplify(inputPts, distanceTolerance);
-      }
-      return factory.getCoordinateSequenceFactory().create(newPts);
-    }
-
-    /**
-     * Simplifies a polygon, fixing it if required.
-     */
-    protected Geometry transformPolygon(Polygon geom, Geometry parent)
-    {
-      // empty geometries are simply removed
-      if (geom.isEmpty())
-        return null;
-      Geometry rawGeom = super.transformPolygon(geom, parent);
-      // don't try and correct if the parent is going to do this
-      if (parent instanceof MultiPolygon) {
-        return rawGeom;
-      }
-      return createValidArea(rawGeom);
-    }
-
-    /**
-     * Simplifies a LinearRing. If the simplification results in a degenerate
-     * ring, remove the component.
-     * 
-     * @return null if the simplification results in a degenerate ring
-     */
-    protected Geometry transformLinearRing(LinearRing geom, Geometry parent)
-    {
-      boolean removeDegenerateRings = parent instanceof Polygon;
-      Geometry simpResult = super.transformLinearRing(geom, parent);
-      if (removeDegenerateRings && !(simpResult instanceof LinearRing))
-        return null;
-      ;
-      return simpResult;
-    }
-
-    /**
-     * Simplifies a MultiPolygon, fixing it if required.
-     */
-    protected Geometry transformMultiPolygon(MultiPolygon geom, Geometry parent)
-    {
-      Geometry rawGeom = super.transformMultiPolygon(geom, parent);
-      return createValidArea(rawGeom);
-    }
-
-    /**
-     * Creates a valid area geometry from one that possibly has bad topology
-     * (i.e. self-intersections). Since buffer can handle invalid topology, but
-     * always returns valid geometry, constructing a 0-width buffer "corrects"
-     * the topology. Note this only works for area geometries, since buffer
-     * always returns areas. This also may return empty geometries, if the input
-     * has no actual area.
-     * 
-     * @param rawAreaGeom
-     *          an area geometry possibly containing self-intersections
-     * @return a valid area geometry
-     */
-    private Geometry createValidArea(Geometry rawAreaGeom)
-    {
-      if (isEnsureValidTopology)
-        return rawAreaGeom.buffer(0.0);
-      return rawAreaGeom;
-    }
   }
 
 }

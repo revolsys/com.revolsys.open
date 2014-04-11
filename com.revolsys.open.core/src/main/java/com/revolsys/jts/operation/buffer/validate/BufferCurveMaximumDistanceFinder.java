@@ -54,95 +54,103 @@ import com.revolsys.jts.geom.Geometry;
  * @author mbdavis
  *
  */
-public class BufferCurveMaximumDistanceFinder 
-{
-	private Geometry inputGeom;
-  private PointPairDistance maxPtDist = new PointPairDistance();
+public class BufferCurveMaximumDistanceFinder {
+  public static class MaxMidpointDistanceFilter implements
+    CoordinateSequenceFilter {
+    private final PointPairDistance maxPtDist = new PointPairDistance();
 
-	public BufferCurveMaximumDistanceFinder(Geometry inputGeom)
-	{
-		this.inputGeom = inputGeom;
-	}
-	
-	public double findDistance(Geometry bufferCurve)
-	{
+    private final PointPairDistance minPtDist = new PointPairDistance();
+
+    private final Geometry geom;
+
+    public MaxMidpointDistanceFilter(final Geometry geom) {
+      this.geom = geom;
+    }
+
+    @Override
+    public void filter(final CoordinatesList seq, final int index) {
+      if (index == 0) {
+        return;
+      }
+
+      final Coordinates p0 = seq.getCoordinate(index - 1);
+      final Coordinates p1 = seq.getCoordinate(index);
+      final Coordinates midPt = new Coordinate((p0.getX() + p1.getX()) / 2,
+        (p0.getY() + p1.getY()) / 2, Coordinates.NULL_ORDINATE);
+
+      minPtDist.initialize();
+      DistanceToPointFinder.computeDistance(geom, midPt, minPtDist);
+      maxPtDist.setMaximum(minPtDist);
+    }
+
+    public PointPairDistance getMaxPointDistance() {
+      return maxPtDist;
+    }
+
+    @Override
+    public boolean isDone() {
+      return false;
+    }
+
+    @Override
+    public boolean isGeometryChanged() {
+      return false;
+    }
+  }
+
+  public static class MaxPointDistanceFilter implements CoordinateFilter {
+    private final PointPairDistance maxPtDist = new PointPairDistance();
+
+    private final PointPairDistance minPtDist = new PointPairDistance();
+
+    private final Geometry geom;
+
+    public MaxPointDistanceFilter(final Geometry geom) {
+      this.geom = geom;
+    }
+
+    @Override
+    public void filter(final Coordinates pt) {
+      minPtDist.initialize();
+      DistanceToPointFinder.computeDistance(geom, pt, minPtDist);
+      maxPtDist.setMaximum(minPtDist);
+    }
+
+    public PointPairDistance getMaxPointDistance() {
+      return maxPtDist;
+    }
+  }
+
+  private final Geometry inputGeom;
+
+  private final PointPairDistance maxPtDist = new PointPairDistance();
+
+  public BufferCurveMaximumDistanceFinder(final Geometry inputGeom) {
+    this.inputGeom = inputGeom;
+  }
+
+  private void computeMaxMidpointDistance(final Geometry curve) {
+    final MaxMidpointDistanceFilter distFilter = new MaxMidpointDistanceFilter(
+      inputGeom);
+    curve.apply(distFilter);
+    maxPtDist.setMaximum(distFilter.getMaxPointDistance());
+  }
+
+  private void computeMaxVertexDistance(final Geometry curve) {
+    final MaxPointDistanceFilter distFilter = new MaxPointDistanceFilter(
+      inputGeom);
+    curve.apply(distFilter);
+    maxPtDist.setMaximum(distFilter.getMaxPointDistance());
+  }
+
+  public double findDistance(final Geometry bufferCurve) {
     computeMaxVertexDistance(bufferCurve);
     computeMaxMidpointDistance(bufferCurve);
     return maxPtDist.getDistance();
-	}
-	
-	public PointPairDistance getDistancePoints()
-	{
-		return maxPtDist;
-	}
-	private void computeMaxVertexDistance(Geometry curve)
-	{
-    MaxPointDistanceFilter distFilter = new MaxPointDistanceFilter(inputGeom);
-    curve.apply(distFilter);
-    maxPtDist.setMaximum(distFilter.getMaxPointDistance());
-	}
-	
-	private void computeMaxMidpointDistance(Geometry curve)
-	{
-    MaxMidpointDistanceFilter distFilter = new MaxMidpointDistanceFilter(inputGeom);
-    curve.apply(distFilter);
-    maxPtDist.setMaximum(distFilter.getMaxPointDistance());
-	}
-	
-  public static class MaxPointDistanceFilter implements CoordinateFilter {
-		private PointPairDistance maxPtDist = new PointPairDistance();
-		private PointPairDistance minPtDist = new PointPairDistance();
-		private Geometry geom;
+  }
 
-		public MaxPointDistanceFilter(Geometry geom) {
-			this.geom = geom;
-		}
-
-		public void filter(Coordinate pt) {
-			minPtDist.initialize();
-			DistanceToPointFinder.computeDistance(geom, pt, minPtDist);
-			maxPtDist.setMaximum(minPtDist);
-		}
-
-		public PointPairDistance getMaxPointDistance() {
-			return maxPtDist;
-		}
-	}
-
-  public static class MaxMidpointDistanceFilter 
-  	implements CoordinateSequenceFilter 
-  	{
-		private PointPairDistance maxPtDist = new PointPairDistance();
-		private PointPairDistance minPtDist = new PointPairDistance();
-		private Geometry geom;
-
-		public MaxMidpointDistanceFilter(Geometry geom) {
-			this.geom = geom;
-		}
-
-		public void filter(CoordinatesList seq, int index) 
-		{
-			if (index == 0)
-				return;
-			
-			Coordinates p0 = seq.getCoordinate(index - 1);
-			Coordinates p1 = seq.getCoordinate(index);
-			Coordinate midPt = new Coordinate(
-					(p0.getX() + p1.getX())/2,
-					(p0.getY() + p1.getY())/2, Coordinates.NULL_ORDINATE);
-			
-			minPtDist.initialize();
-			DistanceToPointFinder.computeDistance(geom, midPt, minPtDist);
-			maxPtDist.setMaximum(minPtDist);
-		}
-
-		public boolean isGeometryChanged() { return false; }
-		
-		public boolean isDone() { return false; }
-		
-		public PointPairDistance getMaxPointDistance() {
-			return maxPtDist;
-		}
-	}
+  public PointPairDistance getDistancePoints() {
+    return maxPtDist;
+  }
 
 }

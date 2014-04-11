@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,8 +32,8 @@
  */
 package com.revolsys.jts.noding;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * An interface for classes which represent a sequence of contiguous line segments.
@@ -43,14 +42,19 @@ import com.revolsys.jts.geom.Coordinate;
  *
  * @version 1.7
  */
-public interface SegmentString
-{
+public interface SegmentString {
+  public Coordinates getCoordinate(int i);
+
+  public Coordinates[] getCoordinates();
+
   /**
    * Gets the user-defined data for this segment string.
    *
    * @return the user-defined data
    */
   public Object getData();
+
+  public boolean isClosed();
 
   /**
    * Sets the user-defined data for this segment string.
@@ -60,7 +64,4 @@ public interface SegmentString
   public void setData(Object data);
 
   public int size();
-  public AbstractCoordinates getCoordinate(int i);
-  public Coordinate[] getCoordinates();
-  public boolean isClosed();
 }

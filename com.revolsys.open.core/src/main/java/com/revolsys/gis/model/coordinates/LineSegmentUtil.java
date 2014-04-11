@@ -5,12 +5,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.gis.model.geometry.LineSegment;
-import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
-import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;

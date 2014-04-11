@@ -73,7 +73,7 @@ public class SimpleNestedRingTester
   {
     for (int i = 0; i < rings.size(); i++) {
       LinearRing innerRing = (LinearRing) rings.get(i);
-      Coordinate[] innerRingPts = innerRing.getCoordinateArray();
+      Coordinates[] innerRingPts = innerRing.getCoordinateArray();
 
       for (int j = 0; j < rings.size(); j++) {
         LinearRing searchRing = (LinearRing) rings.get(j);

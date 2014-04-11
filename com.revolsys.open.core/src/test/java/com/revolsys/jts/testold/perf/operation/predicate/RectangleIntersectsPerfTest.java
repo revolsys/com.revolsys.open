@@ -162,7 +162,7 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Coordinates origin = new Coordinate(0, 0, Coordinates.NULL_ORDINATE);
+    final Coordinates origin = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
     /**
      * Make the geometry "crinkly" by rounding off the points.

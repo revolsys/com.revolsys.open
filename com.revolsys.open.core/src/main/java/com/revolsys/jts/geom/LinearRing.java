@@ -66,8 +66,7 @@ public class LinearRing extends LineString {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRing(final CoordinatesList points,
-    final GeometryFactory factory) {
+  public LinearRing(final CoordinatesList points, final GeometryFactory factory) {
     super(points, factory);
     if (isClosed()) {
       final int vertexCount = getVertexCount();
@@ -115,11 +114,11 @@ public class LinearRing extends LineString {
   }
 
   @Override
-  public Geometry reverse() {
-    final CoordinatesList seq = (CoordinatesList)getCoordinatesList().clone();
-    CoordinateSequences.reverse(seq);
+  public LinearRing reverse() {
+    final CoordinatesList points = getCoordinatesList();
+    final CoordinatesList reversePoints = points.reverse();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final LinearRing rev = geometryFactory.createLinearRing(seq);
-    return rev;
+    final LinearRing reverseLine = geometryFactory.createLinearRing(reversePoints);
+    return reverseLine;
   }
 }

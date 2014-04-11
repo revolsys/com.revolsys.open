@@ -2,8 +2,6 @@ package com.revolsys.jts.testold.linearref;
 
 import junit.framework.TestCase;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;
@@ -31,8 +29,8 @@ public abstract class AbstractIndexedLineTest extends TestCase {
     assertTrue(isEqual);
   }
 
-  protected abstract AbstractCoordinates extractOffsetAt(Geometry input,
-    Coordinate testPt, double offsetDistance);
+  protected abstract Coordinates extractOffsetAt(Geometry input,
+    Coordinates testPt, double offsetDistance);
 
   /**
    * Checks that the point computed by <tt>indexOfAfter</tt>
@@ -44,10 +42,11 @@ public abstract class AbstractIndexedLineTest extends TestCase {
    * @param testPt
    * @return true if the result of indexOfAfter is the same as the input point
    */
-  protected abstract boolean indexOfAfterCheck(Geometry input, Coordinate testPt);
+  protected abstract boolean indexOfAfterCheck(Geometry input,
+    Coordinates testPt);
 
   protected abstract boolean indexOfAfterCheck(Geometry input,
-    Coordinate testPt, Coordinate afterPt);
+    Coordinates testPt, Coordinates afterPt);
 
   protected abstract Geometry indicesOfThenExtract(Geometry input,
     Geometry subLine);
@@ -66,7 +65,7 @@ public abstract class AbstractIndexedLineTest extends TestCase {
   {
     final Geometry input = read(inputStr);
     final Geometry testPoint = read(testPtWKT);
-    final Coordinate testPt = testPoint.getCoordinate();
+    final Coordinates testPt = testPoint.getCoordinate();
     final boolean resultOK = indexOfAfterCheck(input, testPt);
     assertTrue(resultOK);
   }
@@ -77,9 +76,9 @@ public abstract class AbstractIndexedLineTest extends TestCase {
   {
     final Geometry input = read(inputStr);
     final Geometry testPoint = read(testPtWKT);
-    final Coordinate testPt = testPoint.getCoordinate();
+    final Coordinates testPt = testPoint.getCoordinate();
     final Geometry afterPoint = read(afterPtWKT);
-    final Coordinate afterPt = afterPoint.getCoordinate();
+    final Coordinates afterPt = afterPoint.getCoordinate();
     final boolean resultOK = indexOfAfterCheck(input, testPt, afterPt);
     assertTrue(resultOK);
   }
@@ -101,9 +100,9 @@ public abstract class AbstractIndexedLineTest extends TestCase {
     final Geometry input = read(inputWKT);
     final Geometry testPoint = read(testPtWKT);
     final Geometry expectedPoint = read(expectedPtWKT);
-    final Coordinate testPt = testPoint.getCoordinate();
+    final Coordinates testPt = testPoint.getCoordinate();
     final Coordinates expectedPt = expectedPoint.getCoordinate();
-    final AbstractCoordinates offsetPt = extractOffsetAt(input, testPt, offsetDistance);
+    final Coordinates offsetPt = extractOffsetAt(input, testPt, offsetDistance);
 
     final boolean isOk = offsetPt.distance(expectedPt) < TOLERANCE_DIST;
     if (!isOk) {

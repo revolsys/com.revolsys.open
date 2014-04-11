@@ -24,7 +24,7 @@ public class MinimumBoundingCircleStressTest {
 
   }
 
-  void checkWithinCircle(final Coordinates[] pts, final AbstractCoordinates centre,
+  void checkWithinCircle(final Coordinates[] pts, final Coordinates centre,
     final double radius, final double tolerance) {
     for (final Coordinates p : pts) {
       final double ptRadius = centre.distance(p);
@@ -40,7 +40,7 @@ public class MinimumBoundingCircleStressTest {
     for (int i = 0; i < n; i++) {
       final double x = 100 * Math.random();
       final double y = 100 * Math.random();
-      pts[i] = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+      pts[i] = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
     }
     return pts;
   }
@@ -56,7 +56,7 @@ public class MinimumBoundingCircleStressTest {
     final Coordinates[] randPts = createRandomPoints(nPts);
     final Geometry mp = this.geomFact.createMultiPoint(randPts);
     final MinimumBoundingCircle mbc = new MinimumBoundingCircle(mp);
-    final AbstractCoordinates centre = mbc.getCentre();
+    final Coordinates centre = mbc.getCentre();
     final double radius = mbc.getRadius();
     System.out.println("Testing " + nPts + " random points.  Radius = "
       + radius);

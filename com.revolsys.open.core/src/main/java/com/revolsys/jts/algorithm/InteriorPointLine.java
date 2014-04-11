@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -54,22 +53,54 @@ import com.revolsys.jts.geom.LineString;
  */
 public class InteriorPointLine {
 
-  private Coordinates centroid;
+  private final Coordinates centroid;
+
   private double minDistance = Double.MAX_VALUE;
 
   private Coordinates interiorPoint = null;
 
-  public InteriorPointLine(Geometry g)
-  {
+  public InteriorPointLine(final Geometry g) {
     centroid = g.getCentroid().getCoordinate();
     addInterior(g);
-    if (interiorPoint == null)
+    if (interiorPoint == null) {
       addEndpoints(g);
+    }
   }
 
-  public Coordinates getInteriorPoint()
-  {
-    return interiorPoint;
+  private void add(final Coordinates point) {
+    final double dist = point.distance(centroid);
+    if (dist < minDistance) {
+      interiorPoint = new Coordinate(point);
+      minDistance = dist;
+    }
+  }
+
+  private void addEndpoints(final Coordinates[] pts) {
+    add(pts[0]);
+    add(pts[pts.length - 1]);
+  }
+
+  /**
+   * Tests the endpoint vertices
+   * defined by a linear Geometry for the best inside point.
+   * If a Geometry is not of dimension 1 it is not tested.
+   * @param geom the geometry to add
+   */
+  private void addEndpoints(final Geometry geom) {
+    if (geom instanceof LineString) {
+      addEndpoints(geom.getCoordinateArray());
+    } else if (geom instanceof GeometryCollection) {
+      final GeometryCollection gc = (GeometryCollection)geom;
+      for (int i = 0; i < gc.getNumGeometries(); i++) {
+        addEndpoints(gc.getGeometry(i));
+      }
+    }
+  }
+
+  private void addInterior(final Coordinates[] pts) {
+    for (int i = 1; i < pts.length - 1; i++) {
+      add(pts[i]);
+    }
   }
 
   /**
@@ -78,55 +109,19 @@ public class InteriorPointLine {
    * If a Geometry is not of dimension 1 it is not tested.
    * @param geom the geometry to add
    */
-  private void addInterior(Geometry geom)
-  {
+  private void addInterior(final Geometry geom) {
     if (geom instanceof LineString) {
       addInterior(geom.getCoordinateArray());
-    }
-    else if (geom instanceof GeometryCollection) {
-      GeometryCollection gc = (GeometryCollection) geom;
+    } else if (geom instanceof GeometryCollection) {
+      final GeometryCollection gc = (GeometryCollection)geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
         addInterior(gc.getGeometry(i));
       }
     }
   }
-  private void addInterior(AbstractCoordinates[] pts)
-  {
-    for (int i = 1; i < pts.length - 1; i++) {
-      add(pts[i]);
-    }
-  }
-  /**
-   * Tests the endpoint vertices
-   * defined by a linear Geometry for the best inside point.
-   * If a Geometry is not of dimension 1 it is not tested.
-   * @param geom the geometry to add
-   */
-  private void addEndpoints(Geometry geom)
-  {
-    if (geom instanceof LineString) {
-      addEndpoints(geom.getCoordinateArray());
-    }
-    else if (geom instanceof GeometryCollection) {
-      GeometryCollection gc = (GeometryCollection) geom;
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
-        addEndpoints(gc.getGeometry(i));
-      }
-    }
-  }
-  private void addEndpoints(AbstractCoordinates[] pts)
-  {
-    add(pts[0]);
-    add(pts[pts.length - 1]);
-  }
 
-  private void add(AbstractCoordinates point)
-  {
-    double dist = point.distance(centroid);
-    if (dist < minDistance) {
-      interiorPoint = new Coordinate(point);
-      minDistance = dist;
-    }
+  public Coordinates getInteriorPoint() {
+    return interiorPoint;
   }
 
 }

@@ -85,7 +85,7 @@ public class VoronoiDiagramBuilder
 	
 	/**
 	 * Sets the sites (point or vertices) which will be diagrammed
-	 * from a collection of {@link Coordinate}s.
+	 * from a collection of {@link Coordinates}s.
 	 * 
 	 * @param coords a collection of Coordinates.
 	 */

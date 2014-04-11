@@ -1,6 +1,5 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 public class CoordinatesListCoordinates extends AbstractCoordinates {
@@ -19,7 +18,7 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public Coordinates cloneCoordinates() {
+  public DoubleCoordinates cloneCoordinates() {
     return new DoubleCoordinates(this);
   }
 

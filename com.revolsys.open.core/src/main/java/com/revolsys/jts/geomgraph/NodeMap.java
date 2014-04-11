@@ -39,7 +39,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Location;
 
@@ -72,7 +71,7 @@ public class NodeMap implements Iterable<Node> {
    * Factory function - subclasses can override to create their own types of nodes
    */
   /*
-   * protected Node createNode(Coordinate coord) { return new Node(coord); }
+   * protected Node createNode(Coordinates coord) { return new Node(coord); }
    */
   /**
    * This method expects that a node has a coordinate value.
@@ -99,7 +98,7 @@ public class NodeMap implements Iterable<Node> {
   /**
    * @return the node if found; null otherwise
    */
-  public Node find(final Coordinate coord) {
+  public Node find(final Coordinates coord) {
     return nodeMap.get(coord);
   }
 

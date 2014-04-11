@@ -1,40 +1,40 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 
@@ -48,9 +48,8 @@ import com.revolsys.jts.geom.LineString;
  * Non-simple lines (i.e. which loop back to cross or touch
  * themselves) are supported.
  */
-public class LengthIndexedLine
-{
-  private Geometry linearGeom;
+public class LengthIndexedLine {
+  private final Geometry linearGeom;
 
   /**
    * Constructs an object which allows a linear {@link Geometry}
@@ -58,48 +57,29 @@ public class LengthIndexedLine
    *
    * @param linearGeom the linear geometry to reference along
    */
-  public LengthIndexedLine(Geometry linearGeom) {
+  public LengthIndexedLine(final Geometry linearGeom) {
     this.linearGeom = linearGeom;
   }
 
   /**
-   * Computes the {@link Coordinate} for the point
-   * on the line at the given index.
-   * If the index is out of range the first or last point on the
-   * line will be returned.
-   * The Z-ordinate of the computed point will be interpolated from
-   * the Z-ordinates of the line segment containing it, if they exist.
+   * Computes a valid index for this line
+   * by clamping the given index to the valid range of index values
    *
-   * @param index the index of the desired point
-   * @return the Coordinate at the given index
+   * @return a valid index value
    */
-  public Coordinate extractPoint(double index)
-  {
-    LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
-    return loc.getCoordinate(linearGeom);
-  }
+  public double clampIndex(final double index) {
+    final double posIndex = positiveIndex(index);
+    final double startIndex = getStartIndex();
+    if (posIndex < startIndex) {
+      return startIndex;
+    }
 
-  /**
-   * Computes the {@link Coordinate} for the point
-   * on the line at the given index, offset by the given distance.
-   * If the index is out of range the first or last point on the
-   * line will be returned.
-   * The computed point is offset to the left of the line if the offset distance is
-   * positive, to the right if negative.
-   * 
-   * The Z-ordinate of the computed point will be interpolated from
-   * the Z-ordinates of the line segment containing it, if they exist.
-   *
-   * @param index the index of the desired point
-   * @param offsetDistance the distance the point is offset from the segment
-   *    (positive is to the left, negative is to the right)
-   * @return the Coordinate at the given index
-   */
-  public AbstractCoordinates extractPoint(double index, double offsetDistance)
-  {
-    LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
-    LinearLocation locLow = loc.toLowest(linearGeom);
-    return locLow.getSegment(linearGeom).pointAlongOffset(locLow.getSegmentFraction(), offsetDistance);
+    final double endIndex = getEndIndex();
+    if (posIndex > endIndex) {
+      return endIndex;
+    }
+
+    return posIndex;
   }
 
   /**
@@ -112,28 +92,74 @@ public class LengthIndexedLine
    * @param endIndex the index of the end of the interval
    * @return the linear interval between the indices
    */
-  public Geometry extractLine(double startIndex, double endIndex)
-  {
-    LocationIndexedLine lil = new LocationIndexedLine(linearGeom);
-    double startIndex2 = clampIndex(startIndex);
-    double endIndex2 = clampIndex(endIndex);
-    // if extracted line is zero-length, resolve start lower as well to ensure they are equal
-    boolean resolveStartLower = startIndex2 == endIndex2;
-    LinearLocation startLoc = locationOf(startIndex2, resolveStartLower);
-//    LinearLocation endLoc = locationOf(endIndex2, true);
-//    LinearLocation startLoc = locationOf(startIndex2);
-    LinearLocation endLoc = locationOf(endIndex2);
+  public Geometry extractLine(final double startIndex, final double endIndex) {
+    final LocationIndexedLine lil = new LocationIndexedLine(linearGeom);
+    final double startIndex2 = clampIndex(startIndex);
+    final double endIndex2 = clampIndex(endIndex);
+    // if extracted line is zero-length, resolve start lower as well to ensure
+    // they are equal
+    final boolean resolveStartLower = startIndex2 == endIndex2;
+    final LinearLocation startLoc = locationOf(startIndex2, resolveStartLower);
+    // LinearLocation endLoc = locationOf(endIndex2, true);
+    // LinearLocation startLoc = locationOf(startIndex2);
+    final LinearLocation endLoc = locationOf(endIndex2);
     return ExtractLineByLocation.extract(linearGeom, startLoc, endLoc);
   }
 
-  private LinearLocation locationOf(double index)
-  {
-    return LengthLocationMap.getLocation(linearGeom, index);
+  /**
+   * Computes the {@link Coordinates} for the point
+   * on the line at the given index.
+   * If the index is out of range the first or last point on the
+   * line will be returned.
+   * The Z-ordinate of the computed point will be interpolated from
+   * the Z-ordinates of the line segment containing it, if they exist.
+   *
+   * @param index the index of the desired point
+   * @return the Coordinates at the given index
+   */
+  public Coordinates extractPoint(final double index) {
+    final LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
+    return loc.getCoordinate(linearGeom);
   }
 
-  private LinearLocation locationOf(double index, boolean resolveLower)
-  {
-    return LengthLocationMap.getLocation(linearGeom, index, resolveLower);
+  /**
+   * Computes the {@link Coordinates} for the point
+   * on the line at the given index, offset by the given distance.
+   * If the index is out of range the first or last point on the
+   * line will be returned.
+   * The computed point is offset to the left of the line if the offset distance is
+   * positive, to the right if negative.
+   * 
+   * The Z-ordinate of the computed point will be interpolated from
+   * the Z-ordinates of the line segment containing it, if they exist.
+   *
+   * @param index the index of the desired point
+   * @param offsetDistance the distance the point is offset from the segment
+   *    (positive is to the left, negative is to the right)
+   * @return the Coordinates at the given index
+   */
+  public Coordinates extractPoint(final double index,
+    final double offsetDistance) {
+    final LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
+    final LinearLocation locLow = loc.toLowest(linearGeom);
+    return locLow.getSegment(linearGeom).pointAlongOffset(
+      locLow.getSegmentFraction(), offsetDistance);
+  }
+
+  /**
+   * Returns the index of the end of the line
+   * @return the end index
+   */
+  public double getEndIndex() {
+    return linearGeom.getLength();
+  }
+
+  /**
+   * Returns the index of the start of the line
+   * @return the start index
+   */
+  public double getStartIndex() {
+    return 0.0;
   }
 
   /**
@@ -153,8 +179,7 @@ public class LengthIndexedLine
    *
    * @see #project(Coordinate)
    */
-  public double indexOf(Coordinate pt)
-  {
+  public double indexOf(final Coordinates pt) {
     return LengthIndexOfPoint.indexOf(linearGeom, pt);
   }
 
@@ -180,8 +205,7 @@ public class LengthIndexedLine
    *
    * @see #project(Coordinate)
    */
-  public double indexOfAfter(Coordinate pt, double minIndex)
-  {
+  public double indexOfAfter(final Coordinates pt, final double minIndex) {
     return LengthIndexOfPoint.indexOfAfter(linearGeom, pt, minIndex);
   }
 
@@ -194,16 +218,41 @@ public class LengthIndexedLine
    * @param subLine a subLine of the line
    * @return a pair of indices for the start and end of the subline.
    */
-  public double[] indicesOf(Geometry subLine)
-  {
-    LinearLocation[] locIndex = LocationIndexOfLine.indicesOf(linearGeom, subLine);
-    double[] index = new double[] {
+  public double[] indicesOf(final Geometry subLine) {
+    final LinearLocation[] locIndex = LocationIndexOfLine.indicesOf(linearGeom,
+      subLine);
+    final double[] index = new double[] {
       LengthLocationMap.getLength(linearGeom, locIndex[0]),
       LengthLocationMap.getLength(linearGeom, locIndex[1])
-      };
+    };
     return index;
   }
 
+  /**
+   * Tests whether an index is in the valid index range for the line.
+   *
+   * @param index the index to test
+   * @return <code>true</code> if the index is in the valid range
+   */
+  public boolean isValidIndex(final double index) {
+    return (index >= getStartIndex() && index <= getEndIndex());
+  }
+
+  private LinearLocation locationOf(final double index) {
+    return LengthLocationMap.getLocation(linearGeom, index);
+  }
+
+  private LinearLocation locationOf(final double index,
+    final boolean resolveLower) {
+    return LengthLocationMap.getLocation(linearGeom, index, resolveLower);
+  }
+
+  private double positiveIndex(final double index) {
+    if (index >= 0.0) {
+      return index;
+    }
+    return linearGeom.getLength() + index;
+  }
 
   /**
    * Computes the index for the closest point on the line to the given point.
@@ -214,62 +263,7 @@ public class LengthIndexedLine
    * @param pt a point on the line
    * @return the index of the point
    */
-  public double project(Coordinate pt)
-  {
+  public double project(final Coordinates pt) {
     return LengthIndexOfPoint.indexOf(linearGeom, pt);
-  }
-
-  /**
-   * Returns the index of the start of the line
-   * @return the start index
-   */
-  public double getStartIndex()
-  {
-    return 0.0;
-  }
-
-  /**
-   * Returns the index of the end of the line
-   * @return the end index
-   */
-  public double getEndIndex()
-  {
-    return linearGeom.getLength();
-  }
-
-  /**
-   * Tests whether an index is in the valid index range for the line.
-   *
-   * @param index the index to test
-   * @return <code>true</code> if the index is in the valid range
-   */
-  public boolean isValidIndex(double index)
-  {
-    return (index >= getStartIndex()
-            && index <= getEndIndex());
-  }
-
-  /**
-   * Computes a valid index for this line
-   * by clamping the given index to the valid range of index values
-   *
-   * @return a valid index value
-   */
-  public double clampIndex(double index)
-  {
-    double posIndex = positiveIndex(index);
-    double startIndex = getStartIndex();
-    if (posIndex < startIndex) return startIndex;
-
-    double endIndex = getEndIndex();
-    if (posIndex > endIndex) return endIndex;
-
-    return posIndex;
-  }
-  
-  private double positiveIndex(double index)
-  {
-    if (index >= 0.0) return index;
-    return linearGeom.getLength() + index;
   }
 }

@@ -75,38 +75,38 @@ public class MinimumDiameterTest extends TestCase {
   }
 
   public void testMinimumDiameter1() throws Exception {
-    doMinimumDiameterTest(true, "POINT (0 240)", new Coordinate(0, 240, Coordinates.NULL_ORDINATE),
-      new Coordinate(0, 240, Coordinates.NULL_ORDINATE));
+    doMinimumDiameterTest(true, "POINT (0 240)", new Coordinate((double)0, 240, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)0, 240, Coordinates.NULL_ORDINATE));
   }
 
   public void testMinimumDiameter2() throws Exception {
-    doMinimumDiameterTest(true, "LINESTRING (0 240, 220 240)", new Coordinate(
-      0, 240, Coordinates.NULL_ORDINATE), new Coordinate(0, 240, Coordinates.NULL_ORDINATE));
+    doMinimumDiameterTest(true, "LINESTRING (0 240, 220 240)", new Coordinate((double)
+      0, 240, Coordinates.NULL_ORDINATE), new Coordinate((double)0, 240, Coordinates.NULL_ORDINATE));
   }
 
   public void testMinimumDiameter3() throws Exception {
     doMinimumDiameterTest(true,
       "POLYGON ((0 240, 220 240, 220 0, 0 0, 0 240))",
-      new Coordinate(220, 240, Coordinates.NULL_ORDINATE), new Coordinate(0, 240, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)220, 240, Coordinates.NULL_ORDINATE), new Coordinate((double)0, 240, Coordinates.NULL_ORDINATE));
   }
 
   public void testMinimumDiameter4() throws Exception {
     doMinimumDiameterTest(true,
       "POLYGON ((0 240, 220 240, 220 0, 0 0, 0 240))",
-      new Coordinate(220, 240, Coordinates.NULL_ORDINATE), new Coordinate(0, 240, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)220, 240, Coordinates.NULL_ORDINATE), new Coordinate((double)0, 240, Coordinates.NULL_ORDINATE));
   }
 
   public void testMinimumDiameter5() throws Exception {
     doMinimumDiameterTest(true,
-      "POLYGON ((0 240, 160 140, 220 0, 0 0, 0 240))", new Coordinate(
-        185.86206896551724, 79.65517241379311, Coordinates.NULL_ORDINATE), new Coordinate(0, 0, Coordinates.NULL_ORDINATE));
+      "POLYGON ((0 240, 160 140, 220 0, 0 0, 0 240))", new Coordinate((double)
+        185.86206896551724, 79.65517241379311, Coordinates.NULL_ORDINATE), new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
   }
 
   public void testMinimumDiameter6() throws Exception {
     doMinimumDiameterTest(
       false,
       "LINESTRING ( 39 119, 162 197, 135 70, 95 35, 33 66, 111 82, 97 131, 48 160, -4 182, 57 195, 94 202, 90 174, 75 134, 47 114, 0 100, 59 81, 123 60, 136 43, 163 75, 145 114, 93 136, 92 159, 105 175 )",
-      new Coordinate(64.46262341325811, 196.41184767277855, Coordinates.NULL_ORDINATE), new Coordinate(95,
+      new Coordinate((double)64.46262341325811, 196.41184767277855, Coordinates.NULL_ORDINATE), new Coordinate((double)95,
         35, Coordinates.NULL_ORDINATE));
   }
 

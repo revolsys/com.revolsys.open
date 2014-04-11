@@ -8,7 +8,6 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.IntHashMap;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.geometry.Triangle;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;

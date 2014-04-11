@@ -38,7 +38,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LinearRing;
 
 /**
- * Tests whether a {@link Coordinate} lies inside
+ * Tests whether a {@link Coordinates} lies inside
  * a ring, using a linear-time algorithm.
  *
  * @version 1.7

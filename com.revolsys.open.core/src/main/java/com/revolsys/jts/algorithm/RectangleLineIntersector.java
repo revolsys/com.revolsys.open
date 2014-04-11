@@ -51,18 +51,20 @@ import com.revolsys.jts.geom.Envelope;
  * @author Martin Davis
  *
  */
-public class RectangleLineIntersector
-{
+public class RectangleLineIntersector {
   // for intersection testing, don't need to set precision model
-  private LineIntersector li = new RobustLineIntersector();
+  private final LineIntersector li = new RobustLineIntersector();
 
-  private Envelope rectEnv;
-  
-  private Coordinate diagUp0;
-  private Coordinate diagUp1;
-  private Coordinate diagDown0;
-  private Coordinate diagDown1;
-  
+  private final Envelope rectEnv;
+
+  private final Coordinates diagUp0;
+
+  private final Coordinates diagUp1;
+
+  private final Coordinates diagDown0;
+
+  private final Coordinates diagDown1;
+
   /**
    * Creates a new intersector for the given query rectangle,
    * specified as an {@link Envelope}.
@@ -70,21 +72,24 @@ public class RectangleLineIntersector
    * 
    * @param rectEnv the query rectangle, specified as an Envelope
    */
-  public RectangleLineIntersector(Envelope rectEnv)
-  {
+  public RectangleLineIntersector(final Envelope rectEnv) {
     this.rectEnv = rectEnv;
-    
+
     /**
      * Up and Down are the diagonal orientations
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    diagUp0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMinY(), Coordinates.NULL_ORDINATE);
-    diagUp1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY(), Coordinates.NULL_ORDINATE);
-    diagDown0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY(), Coordinates.NULL_ORDINATE);
-    diagDown1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMinY(), Coordinates.NULL_ORDINATE);
+    diagUp0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMinY(),
+      Coordinates.NULL_ORDINATE);
+    diagUp1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY(),
+      Coordinates.NULL_ORDINATE);
+    diagDown0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY(),
+      Coordinates.NULL_ORDINATE);
+    diagDown1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMinY(),
+      Coordinates.NULL_ORDINATE);
   }
-  
+
   /**
    * Tests whether the query rectangle intersects a 
    * given line segment.
@@ -93,25 +98,29 @@ public class RectangleLineIntersector
    * @param p1 the second endpoint of the segment
    * @return true if the rectangle intersects the segment
    */
-  public boolean intersects(Coordinate p0, Coordinate p1)
-  {
+  public boolean intersects(Coordinates p0, Coordinates p1) {
     // TODO: confirm that checking envelopes first is faster
 
     /**
      * If the segment envelope is disjoint from the
      * rectangle envelope, there is no intersection
      */
-    Envelope segEnv = new Envelope(p0, p1);
-    if (! rectEnv.intersects(segEnv))
+    final Envelope segEnv = new Envelope(p0, p1);
+    if (!rectEnv.intersects(segEnv)) {
       return false;
-    
+    }
+
     /**
      * If either segment endpoint lies in the rectangle,
      * there is an intersection.
      */
-    if (rectEnv.intersects(p0)) return true;
-    if (rectEnv.intersects(p1)) return true;
-    
+    if (rectEnv.intersects(p0)) {
+      return true;
+    }
+    if (rectEnv.intersects(p1)) {
+      return true;
+    }
+
     /**
      * Normalize segment.
      * This makes p0 less than p1,
@@ -119,7 +128,7 @@ public class RectangleLineIntersector
      * or vertically upwards.
      */
     if (p0.compareTo(p1) > 0) {
-      Coordinate tmp = p0;
+      final Coordinates tmp = p0;
       p0 = p1;
       p1 = tmp;
     }
@@ -130,9 +139,10 @@ public class RectangleLineIntersector
      * "Upwards" means relative to the left end of the segment.
      */
     boolean isSegUpwards = false;
-    if (p1.getY() > p0.getY())
+    if (p1.getY() > p0.getY()) {
       isSegUpwards = true;
-    
+    }
+
     /**
      * Since we now know that neither segment endpoint
      * lies in the rectangle, there are two possible 
@@ -154,14 +164,13 @@ public class RectangleLineIntersector
      */
     if (isSegUpwards) {
       li.computeIntersection(p0, p1, diagDown0, diagDown1);
+    } else {
+      li.computeIntersection(p0, p1, diagUp0, diagUp1);
     }
-    else {
-      li.computeIntersection(p0, p1, diagUp0, diagUp1);      
-    }
-    if (li.hasIntersection())
+    if (li.hasIntersection()) {
       return true;
+    }
     return false;
 
-      
   }
 }

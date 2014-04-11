@@ -33,6 +33,7 @@
 package com.revolsys.jts.geom;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -135,15 +136,32 @@ public class MultiPolygon extends GeometryCollection implements Polygonal {
     return "MultiPolygon";
   }
 
-  /*
-   * public boolean isSimple() { return true; }
-   */
-
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
   public <V extends Polygon> List<V> getPolygons() {
     return (List)super.getGeometries();
+  }
+
+  /*
+   * public boolean isSimple() { return true; }
+   */
+
+  @Override
+  public MultiPolygon normalize() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final List<Polygon> geometries = new ArrayList<>();
+      for (final Geometry part : this.geometries) {
+        final Polygon normalizedPart = (Polygon)part.normalize();
+        geometries.add(normalizedPart);
+      }
+      Collections.sort(geometries);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final MultiPolygon normalizedGeometry = geometryFactory.createMultiPolygon(geometries);
+      return normalizedGeometry;
+    }
   }
 
   /**

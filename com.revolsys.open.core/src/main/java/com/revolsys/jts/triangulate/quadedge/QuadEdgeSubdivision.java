@@ -147,7 +147,7 @@ public class QuadEdgeSubdivision {
       }
       if (coordList.size() > 0) {
         coordList.closeRing();
-        final Coordinate[] pts = coordList.toCoordinateArray();
+        final Coordinates[] pts = coordList.toCoordinateArray();
         if (pts.length != 4) {
           // checkTriangleSize(pts);
           return;
@@ -596,7 +596,7 @@ public class QuadEdgeSubdivision {
    * Gets the Voronoi cell around a site specified
    * by the origin of a QuadEdge.
    * <p>
-   * The userData of the polygon is set to be the {@link Coordinate}
+   * The userData of the polygon is set to be the {@link Coordinates}
    * of the site.  This allows attaching external 
    * data associated with the site to this cell polygon.
    * 
@@ -609,9 +609,9 @@ public class QuadEdgeSubdivision {
     final List cellPts = new ArrayList();
     final QuadEdge startQE = qe;
     do {
-      // Coordinate cc = circumcentre(qe);
+      // Coordinates cc = circumcentre(qe);
       // use previously computed circumcentre
-      final Coordinate cc = qe.rot().orig().getCoordinate();
+      final Coordinates cc = qe.rot().orig().getCoordinate();
       cellPts.add(cc);
 
       // move to next triangle CW around vertex
@@ -640,7 +640,7 @@ public class QuadEdgeSubdivision {
    * Gets a List of {@link Polygon}s for the Voronoi cells 
    * of this triangulation.
    * <p>
-   * The userData of each polygon is set to be the {@link Coordinate}
+   * The userData of each polygon is set to be the {@link Coordinates}
    * of the cell site.  This allows easily associating external 
    * data associated with the sites to the cells.
    * 
@@ -669,7 +669,7 @@ public class QuadEdgeSubdivision {
    * Gets the cells in the Voronoi diagram for this triangulation.
    * The cells are returned as a {@link GeometryCollection} of {@link Polygon}s
    * <p>
-   * The userData of each polygon is set to be the {@link Coordinate}
+   * The userData of each polygon is set to be the {@link Coordinates}
    * of the cell site.  This allows easily associating external 
    * data associated with the sites to the cells.
    * 
@@ -796,7 +796,7 @@ public class QuadEdgeSubdivision {
   }
 
   /**
-   * Tests whether a {@link Coordinate} lies on a {@link QuadEdge}, up to a
+   * Tests whether a {@link Coordinates} lies on a {@link QuadEdge}, up to a
    * tolerance determined by the subdivision tolerance.
    * 
    * @param e
@@ -805,7 +805,7 @@ public class QuadEdgeSubdivision {
    *          a point
    * @return true if the vertex lies on the edge
    */
-  public boolean isOnEdge(final QuadEdge e, final AbstractCoordinates p) {
+  public boolean isOnEdge(final QuadEdge e, final Coordinates p) {
     seg.setCoordinates(e.orig().getCoordinate(), e.dest().getCoordinate());
     final double dist = seg.distance(p);
     // heuristic (hack?)
@@ -829,9 +829,9 @@ public class QuadEdgeSubdivision {
 
   /**
    * Finds a quadedge of a triangle containing a location
-   * specified by a {@link Coordinate}, if one exists.
+   * specified by a {@link Coordinates}, if one exists.
    * 
-   * @param p the Coordinate to locate
+   * @param p the Coordinates to locate
    * @return a quadedge on the edge of a triangle which touches or contains the location
    * or null if no such triangle exists
    */

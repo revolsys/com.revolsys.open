@@ -84,13 +84,13 @@ import com.revolsys.jts.geom.LineSegment;
  */
 public class MonotoneChain {
 
-  private Coordinate[] pts;
+  private Coordinates[] pts;
   private int start, end;
   private Envelope env = null;
   private Object context = null;// user-defined information
   private int id;// useful for optimizing chain comparisons
 
-  public MonotoneChain(Coordinate[] pts, int start, int end, Object context)
+  public MonotoneChain(Coordinates[] pts, int start, int end, Object context)
   {
     this.pts    = pts;
     this.start  = start;

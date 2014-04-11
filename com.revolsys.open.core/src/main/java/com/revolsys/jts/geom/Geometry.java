@@ -262,8 +262,8 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
    *  {@link #geometryChanged} must be called to update the geometry state. 
    *  Note that you cannot use this method to
    *  modify this Geometry if its underlying CoordinatesList's #get method
-   *  returns a copy of the Coordinate, rather than the actual Coordinate stored
-   *  (if it even stores Coordinate objects at all).
+   *  returns a copy of the Coordinate, rather than the actual Coordinates stored
+   *  (if it even stores Coordinates objects at all).
    *
    *@param  filter  the filter to apply to this <code>Geometry</code>'s
    *      coordinates
@@ -867,7 +867,7 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
     return DistanceOp.distance(this, g);
   }
 
-  protected boolean equal(final Coordinate a, final Coordinate b,
+  protected boolean equal(final Coordinates a, final Coordinates b,
     final double tolerance) {
     if (tolerance == 0) {
       return a.equals(b);
@@ -1018,7 +1018,7 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
     if (g == null) {
       return false;
     }
-    return norm().equalsExact(g.norm());
+    return normalize().equalsExact(g.normalize());
   }
 
   /**
@@ -1150,13 +1150,13 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
    *  Returns a vertex of this <code>Geometry</code>
    *  (usually, but not necessarily, the first one).
    *  The returned coordinate should not be assumed
-   *  to be an actual Coordinate object used in
+   *  to be an actual Coordinates object used in
    *  the internal representation.
    *
-   *@return    a {@link Coordinate} which is a vertex of this <code>Geometry</code>.
+   *@return    a {@link Coordinates} which is a vertex of this <code>Geometry</code>.
    *@return null if this Geometry is empty
    */
-  public abstract Coordinate getCoordinate();
+  public abstract Coordinates getCoordinate();
 
   /**
    *  Returns an array containing the values of all the vertices for 
@@ -1176,7 +1176,7 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
    *@see #geometryChanged
    *@see CoordinatesList#setOrdinate
    */
-  public abstract Coordinate[] getCoordinateArray();
+  public abstract Coordinates[] getCoordinateArray();
 
   /**
    * 
@@ -1203,7 +1203,7 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
    * In the JTS spatial model, dimension values are in the set {0,1,2}.
    * <p>
    * Note that this is a different concept to the dimension of 
-   * the vertex {@link Coordinate}s.  
+   * the vertex {@link Coordinates}s.  
    * The geometry dimension can never be greater than the coordinate dimension.
    * For example, a 0-dimensional geometry (e.g. a Point) 
    * may have a coordinate dimension of 3 (X,Y,Z). 
@@ -1641,19 +1641,6 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
   }
 
   /**
-   * Creates a new Geometry which is a normalized
-   * copy of this Geometry. 
-   * 
-   * @return a normalized copy of this geometry.
-   * @see #normalize()
-   */
-  public Geometry norm() {
-    final Geometry copy = (Geometry)clone();
-    copy.normalize();
-    return copy;
-  }
-
-  /**
    *  Converts this <code>Geometry</code> to <b>normal form</b> (or <b>
    *  canonical form</b> ). Normal form is a unique representation for <code>Geometry</code>
    *  s. It can be used to test whether two <code>Geometry</code>s are equal
@@ -1663,12 +1650,11 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
    *  form use the standard lexicographical ordering for coordinates. "Sorted in
    *  order of coordinates" means the obvious extension of this ordering to
    *  sequences of coordinates.
-   *  <p>
-   *  NOTE that this method mutates the value of this geometry in-place.
-   *  If this is not safe and/or wanted, the geometry should be
-   *  cloned prior to normalization.
+    * 
+   * @return a normalized copy of this geometry.
+   * @see #normalize()
    */
-  public abstract void normalize();
+  public abstract Geometry normalize();
 
   /**
    * Tests whether this geometry overlaps the
@@ -1749,7 +1735,7 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
 
   /**
    * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Coordinate Reference System.
+   * An example use might be to add an object representing a Coordinates Reference System.
    * <p>
    * Note that user data objects are not present in geometries created by
    * construction methods.

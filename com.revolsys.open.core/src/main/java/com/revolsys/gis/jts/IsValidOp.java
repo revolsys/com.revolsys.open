@@ -11,7 +11,6 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.MCPointInRing;
 import com.revolsys.jts.algorithm.PointInRing;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -44,7 +43,7 @@ public class IsValidOp {
    *
    * @return the point found, or <code>null</code> if none found
    */
-  public static Coordinates findPtNotNode(final Coordinate[] testCoords,
+  public static Coordinates findPtNotNode(final Coordinates[] testCoords,
     final LinearRing searchRing, final GeometryGraph graph) {
     // find edge corresponding to searchRing.
     final Edge searchEdge = graph.findEdge(searchRing);
@@ -53,7 +52,7 @@ public class IsValidOp {
     // somewhat inefficient - is there a better way? (Use a node map, for
     // instance?)
     for (int i = 0; i < testCoords.length; i++) {
-      final Coordinate pt = testCoords[i];
+      final Coordinates pt = testCoords[i];
       if (!eiList.isIntersection(pt)) {
         return pt;
       }
@@ -277,7 +276,7 @@ public class IsValidOp {
    */
   private boolean checkNoSelfIntersectingRing(final EdgeIntersectionList eiList) {
     boolean valid = true;
-    final Set<Coordinate> nodeSet = new TreeSet<Coordinate>();
+    final Set<Coordinates> nodeSet = new TreeSet<Coordinates>();
     boolean isFirst = true;
     for (final Iterator i = eiList.iterator(); i.hasNext();) {
       final EdgeIntersection ei = (EdgeIntersection)i.next();
@@ -317,13 +316,13 @@ public class IsValidOp {
    * properly intersect.
    *
    * @return <code>null</code> if the shell is properly contained, or
-   *   a Coordinate which is not inside the hole if it is not
+   *   a Coordinates which is not inside the hole if it is not
    *
    */
   private Coordinates checkShellInsideHole(final LinearRing shell,
     final LinearRing hole, final GeometryGraph graph) {
-    final Coordinate[] shellPts = shell.getCoordinateArray();
-    final Coordinate[] holePts = hole.getCoordinateArray();
+    final Coordinates[] shellPts = shell.getCoordinateArray();
+    final Coordinates[] holePts = hole.getCoordinateArray();
     // TODO: improve performance of this - by sorting pointlists for instance?
     final Coordinates shellPt = findPtNotNode(shellPts, hole, graph);
     // if point is on shell but not hole, check that the shell is inside the
@@ -360,7 +359,7 @@ public class IsValidOp {
   private boolean checkShellNotNested(final LinearRing shell, final Polygon p,
     final GeometryGraph graph) {
     boolean valid = true;
-    final Coordinate[] shellPts = shell.getCoordinateArray();
+    final Coordinates[] shellPts = shell.getCoordinateArray();
     // test if shell is inside polygon shell
     final LinearRing polyShell = (LinearRing)p.getExteriorRing();
     final Coordinates[] polyPts = polyShell.getCoordinateArray();

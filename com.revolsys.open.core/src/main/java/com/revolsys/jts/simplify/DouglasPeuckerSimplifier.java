@@ -1,39 +1,38 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.simplify;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -60,8 +59,95 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * @version 1.7
  * @see TopologyPreservingSimplifier
  */
-public class DouglasPeuckerSimplifier
-{
+public class DouglasPeuckerSimplifier {
+
+  class DPTransformer extends GeometryTransformer {
+    private boolean isEnsureValidTopology = true;
+
+    public DPTransformer(final boolean isEnsureValidTopology) {
+      this.isEnsureValidTopology = isEnsureValidTopology;
+    }
+
+    /**
+     * Creates a valid area geometry from one that possibly has
+     * bad topology (i.e. self-intersections).
+     * Since buffer can handle invalid topology, but always returns
+     * valid geometry, constructing a 0-width buffer "corrects" the
+     * topology.
+     * Note this only works for area geometries, since buffer always returns
+     * areas.  This also may return empty geometries, if the input
+     * has no actual area.
+     *
+     * @param rawAreaGeom an area geometry possibly containing self-intersections
+     * @return a valid area geometry
+     */
+    private Geometry createValidArea(final Geometry rawAreaGeom) {
+      if (isEnsureValidTopology) {
+        return rawAreaGeom.buffer(0.0);
+      }
+      return rawAreaGeom;
+    }
+
+    @Override
+    protected CoordinatesList transformCoordinates(
+      final CoordinatesList coords, final Geometry parent) {
+      final Coordinates[] inputPts = coords.toCoordinateArray();
+      Coordinates[] newPts = null;
+      if (inputPts.length == 0) {
+        newPts = new Coordinates[0];
+      } else {
+        newPts = DouglasPeuckerLineSimplifier.simplify(inputPts,
+          distanceTolerance);
+      }
+      return factory.getCoordinateSequenceFactory().create(newPts);
+    }
+
+    /**
+     * Simplifies a LinearRing.  If the simplification results 
+     * in a degenerate ring, remove the component.
+     * 
+     * @return null if the simplification results in a degenerate ring
+     */
+    @Override
+    protected Geometry transformLinearRing(final LinearRing geom,
+      final Geometry parent) {
+      final boolean removeDegenerateRings = parent instanceof Polygon;
+      final Geometry simpResult = super.transformLinearRing(geom, parent);
+      if (removeDegenerateRings && !(simpResult instanceof LinearRing)) {
+        return null;
+      }
+      ;
+      return simpResult;
+    }
+
+    /**
+     * Simplifies a MultiPolygon, fixing it if required.
+     */
+    @Override
+    protected Geometry transformMultiPolygon(final MultiPolygon geom,
+      final Geometry parent) {
+      final Geometry rawGeom = super.transformMultiPolygon(geom, parent);
+      return createValidArea(rawGeom);
+    }
+
+    /**
+     * Simplifies a polygon, fixing it if required.
+     */
+    @Override
+    protected Geometry transformPolygon(final Polygon geom,
+      final Geometry parent) {
+      // empty geometries are simply removed
+      if (geom.isEmpty()) {
+        return null;
+      }
+      final Geometry rawGeom = super.transformPolygon(geom, parent);
+      // don't try and correct if the parent is going to do this
+      if (parent instanceof MultiPolygon) {
+        return rawGeom;
+      }
+      return createValidArea(rawGeom);
+    }
+  }
 
   /**
    * Simplifies a geometry using a given tolerance.
@@ -70,25 +156,40 @@ public class DouglasPeuckerSimplifier
    * @param distanceTolerance the tolerance to use
    * @return a simplified version of the geometry
    */
-  public static Geometry simplify(Geometry geom, double distanceTolerance)
-  {
-    DouglasPeuckerSimplifier tss = new DouglasPeuckerSimplifier(geom);
+  public static Geometry simplify(final Geometry geom,
+    final double distanceTolerance) {
+    final DouglasPeuckerSimplifier tss = new DouglasPeuckerSimplifier(geom);
     tss.setDistanceTolerance(distanceTolerance);
     return tss.getResultGeometry();
   }
 
-  private Geometry inputGeom;
+  private final Geometry inputGeom;
+
   private double distanceTolerance;
+
   private boolean isEnsureValidTopology = true;
-  
+
   /**
    * Creates a simplifier for a given geometry.
    * 
    * @param inputGeom the geometry to simplify
    */
-  public DouglasPeuckerSimplifier(Geometry inputGeom)
-  {
+  public DouglasPeuckerSimplifier(final Geometry inputGeom) {
     this.inputGeom = inputGeom;
+  }
+
+  /**
+   * Gets the simplified geometry.
+   * 
+   * @return the simplified geometry
+   */
+  public Geometry getResultGeometry() {
+    // empty input produces an empty result
+    if (inputGeom.isEmpty()) {
+      return (Geometry)inputGeom.clone();
+    }
+
+    return (new DPTransformer(isEnsureValidTopology)).transform(inputGeom);
   }
 
   /**
@@ -99,9 +200,10 @@ public class DouglasPeuckerSimplifier
    *
    * @param distanceTolerance the approximation tolerance to use
    */
-  public void setDistanceTolerance(double distanceTolerance) {
-    if (distanceTolerance < 0.0)
+  public void setDistanceTolerance(final double distanceTolerance) {
+    if (distanceTolerance < 0.0) {
       throw new IllegalArgumentException("Tolerance must be non-negative");
+    }
     this.distanceTolerance = distanceTolerance;
   }
 
@@ -119,106 +221,8 @@ public class DouglasPeuckerSimplifier
    * 
    * @param isEnsureValidTopology
    */
-  public void setEnsureValid(boolean isEnsureValidTopology)
-  {
-  	this.isEnsureValidTopology = isEnsureValidTopology;
+  public void setEnsureValid(final boolean isEnsureValidTopology) {
+    this.isEnsureValidTopology = isEnsureValidTopology;
   }
-  
-  /**
-   * Gets the simplified geometry.
-   * 
-   * @return the simplified geometry
-   */
-  public Geometry getResultGeometry()
-  {
-    // empty input produces an empty result
-    if (inputGeom.isEmpty()) return (Geometry) inputGeom.clone();
-    
-    return (new DPTransformer(isEnsureValidTopology)).transform(inputGeom);
-  }
-
-class DPTransformer
-    extends GeometryTransformer
-{
-  private boolean isEnsureValidTopology = true;
-
-	public DPTransformer(boolean isEnsureValidTopology)
-	{
-		this.isEnsureValidTopology = isEnsureValidTopology;
-	}
-	
-  protected CoordinatesList transformCoordinates(CoordinatesList coords, Geometry parent)
-  {
-    Coordinate[] inputPts = coords.toCoordinateArray();
-    Coordinates[] newPts = null;
-    if (inputPts.length == 0) {
-      newPts = new Coordinates[0];
-    }
-    else {
-      newPts = DouglasPeuckerLineSimplifier.simplify(inputPts, distanceTolerance);
-    }
-    return factory.getCoordinateSequenceFactory().create(newPts);
-  }
-
-  /**
-   * Simplifies a polygon, fixing it if required.
-   */
-  protected Geometry transformPolygon(Polygon geom, Geometry parent) {
-    // empty geometries are simply removed
-    if (geom.isEmpty())
-      return null;
-    Geometry rawGeom = super.transformPolygon(geom, parent);
-    // don't try and correct if the parent is going to do this
-    if (parent instanceof MultiPolygon) {
-      return rawGeom;
-    }
-    return createValidArea(rawGeom);
-  }
-
-  /**
-   * Simplifies a LinearRing.  If the simplification results 
-   * in a degenerate ring, remove the component.
-   * 
-   * @return null if the simplification results in a degenerate ring
-   */
-  protected Geometry transformLinearRing(LinearRing geom, Geometry parent) 
-  {
-  	boolean removeDegenerateRings = parent instanceof Polygon;
-  	Geometry simpResult = super.transformLinearRing(geom, parent);
-  	if (removeDegenerateRings && ! (simpResult instanceof LinearRing))
-  		return null;;
-  	return simpResult;
-  }
-  
-  /**
-   * Simplifies a MultiPolygon, fixing it if required.
-   */
-  protected Geometry transformMultiPolygon(MultiPolygon geom, Geometry parent) {
-    Geometry rawGeom = super.transformMultiPolygon(geom, parent);
-    return createValidArea(rawGeom);
-  }
-
-  /**
-   * Creates a valid area geometry from one that possibly has
-   * bad topology (i.e. self-intersections).
-   * Since buffer can handle invalid topology, but always returns
-   * valid geometry, constructing a 0-width buffer "corrects" the
-   * topology.
-   * Note this only works for area geometries, since buffer always returns
-   * areas.  This also may return empty geometries, if the input
-   * has no actual area.
-   *
-   * @param rawAreaGeom an area geometry possibly containing self-intersections
-   * @return a valid area geometry
-   */
-  private Geometry createValidArea(Geometry rawAreaGeom)
-  {
-  	if ( isEnsureValidTopology)
-  		return rawAreaGeom.buffer(0.0);
-  	return rawAreaGeom;
-  }
-}
 
 }
-
-

@@ -62,7 +62,7 @@ public class ConvexHullTest extends TestCase {
     }
 
     @Override
-    protected Coordinate[] toCoordinateArray(final Stack stack) {
+    protected Coordinates[] toCoordinateArray(final Stack stack) {
       return super.toCoordinateArray(stack);
     }
   }
@@ -143,7 +143,7 @@ public class ConvexHullTest extends TestCase {
   }
 
   public void testAllIdenticalPoints() throws Exception {
-    final Coordinate[] pts = new Coordinate[100];
+    final Coordinates[] pts = new Coordinates[100];
     for (int i = 0; i < 100; i++) {
       pts[i] = new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE);
     }
@@ -154,7 +154,7 @@ public class ConvexHullTest extends TestCase {
   }
 
   public void testManyIdenticalPoints() throws Exception {
-    final Coordinate[] pts = new Coordinate[100];
+    final Coordinates[] pts = new Coordinates[100];
     for (int i = 0; i < 99; i++) {
       pts[i] = new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE);
     }

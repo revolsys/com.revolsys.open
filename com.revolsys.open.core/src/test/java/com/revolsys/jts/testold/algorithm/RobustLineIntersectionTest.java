@@ -25,8 +25,8 @@ import com.revolsys.jts.io.WKTWriter;
  *
  */
 public class RobustLineIntersectionTest extends TestCase {
-  public static boolean equals(final AbstractCoordinates p0, final Coordinates p1,
-    final double distanceTolerance) {
+  public static boolean equals(final Coordinates p0,
+    final Coordinates p1, final double distanceTolerance) {
     return p0.distance(p1) <= distanceTolerance;
   }
 
@@ -40,9 +40,9 @@ public class RobustLineIntersectionTest extends TestCase {
     super(name);
   }
 
-  public void checkInputNotAltered(final Coordinate[] pt, final int scaleFactor) {
+  public void checkInputNotAltered(final Coordinates[] pt, final int scaleFactor) {
     // save input points
-    final Coordinate[] savePt = new Coordinate[4];
+    final Coordinates[] savePt = new Coordinates[4];
     for (int i = 0; i < 4; i++) {
       savePt[i] = new Coordinate(pt[i]);
     }
@@ -61,7 +61,7 @@ public class RobustLineIntersectionTest extends TestCase {
     final int scaleFactor) throws ParseException {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
-    final Coordinate[] pt = new Coordinate[] {
+    final Coordinates[] pt = new Coordinates[] {
       l1.getCoordinateN(0), l1.getCoordinateN(1), l2.getCoordinateN(0),
       l2.getCoordinateN(1)
     };
@@ -77,9 +77,9 @@ public class RobustLineIntersectionTest extends TestCase {
    * @param expectedIntPt the expected intersection points (maybe null if not tested)
    * @param distanceTolerance tolerance to use for equality test
    */
-  void checkIntersection(final Coordinate[] pt,
-    final int expectedIntersectionNum, final AbstractCoordinates[] expectedIntPt,
-    final double distanceTolerance) {
+  void checkIntersection(final Coordinates[] pt,
+    final int expectedIntersectionNum,
+    final Coordinates[] expectedIntPt, final double distanceTolerance) {
     final LineIntersector li = new RobustLineIntersector();
     li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
 
@@ -120,11 +120,11 @@ public class RobustLineIntersectionTest extends TestCase {
   }
 
   void checkIntersection(final String wkt1, final String wkt2,
-    final int expectedIntersectionNum, final AbstractCoordinates[] intPt,
+    final int expectedIntersectionNum, final Coordinates[] intPt,
     final double distanceTolerance) throws ParseException {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
-    final Coordinate[] pt = new Coordinate[] {
+    final Coordinates[] pt = new Coordinates[] {
       l1.getCoordinateN(0), l1.getCoordinateN(1), l2.getCoordinateN(0),
       l2.getCoordinateN(1)
     };
@@ -136,12 +136,12 @@ public class RobustLineIntersectionTest extends TestCase {
     final double distanceTolerance) throws ParseException {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
-    final Coordinate[] pt = new Coordinate[] {
+    final Coordinates[] pt = new Coordinates[] {
       l1.getCoordinateN(0), l1.getCoordinateN(1), l2.getCoordinateN(0),
       l2.getCoordinateN(1)
     };
     final Geometry g = this.reader.read(expectedWKT);
-    final AbstractCoordinates[] intPt = g.getCoordinateArray();
+    final Coordinates[] intPt = g.getCoordinateArray();
     checkIntersection(pt, expectedIntersectionNum, intPt, distanceTolerance);
   }
 
@@ -149,15 +149,15 @@ public class RobustLineIntersectionTest extends TestCase {
     throws ParseException {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
-    final Coordinate[] pt = new Coordinate[] {
+    final Coordinates[] pt = new Coordinates[] {
       l1.getCoordinateN(0), l1.getCoordinateN(1), l2.getCoordinateN(0),
       l2.getCoordinateN(1)
     };
     checkIntersection(pt, 0, null, 0);
   }
 
-  void checkIntPoints(final AbstractCoordinates expectedPt, final Coordinates actualPt,
-    final double distanceTolerance) {
+  void checkIntPoints(final Coordinates expectedPt,
+    final Coordinates actualPt, final double distanceTolerance) {
     final boolean isEqual = equals(expectedPt, actualPt, distanceTolerance);
     assertTrue(
       "Int Pts not equal - " + "expected " + WKTWriter.toPoint(expectedPt)
@@ -194,14 +194,19 @@ public class RobustLineIntersectionTest extends TestCase {
    * @throws ParseException
    */
   public void testCmp5CaseRaw() throws ParseException {
-    checkIntersection(new Coordinate[] {
-      new Coordinate(4348433.262114629, 5552595.478385733, Coordinates.NULL_ORDINATE),
-      new Coordinate(4348440.849387404, 5552599.272022122, Coordinates.NULL_ORDINATE),
+    checkIntersection(new Coordinates[] {
+      new Coordinate(4348433.262114629, 5552595.478385733,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(4348440.849387404, 5552599.272022122,
+        Coordinates.NULL_ORDINATE),
 
-      new Coordinate(4348433.26211463, 5552595.47838573, Coordinates.NULL_ORDINATE),
-      new Coordinate(4348440.8493874, 5552599.27202212, Coordinates.NULL_ORDINATE)
-    }, 1, new AbstractCoordinates[] {
-      new Coordinate(4348440.8493874, 5552599.27202212, Coordinates.NULL_ORDINATE),
+      new Coordinate(4348433.26211463, 5552595.47838573,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(4348440.8493874, 5552599.27202212,
+        Coordinates.NULL_ORDINATE)
+    }, 1, new Coordinates[] {
+      new Coordinate(4348440.8493874, 5552599.27202212,
+        Coordinates.NULL_ORDINATE),
     }, 0);
   }
 
@@ -214,8 +219,9 @@ public class RobustLineIntersectionTest extends TestCase {
     checkIntersection(
       "LINESTRING (4348433.262114629 5552595.478385733, 4348440.849387404 5552599.272022122 )",
       "LINESTRING (4348433.26211463  5552595.47838573,  4348440.8493874   5552599.27202212  )",
-      1, new AbstractCoordinates[] {
-        new Coordinate(4348440.8493874, 5552599.27202212, Coordinates.NULL_ORDINATE),
+      1, new Coordinates[] {
+        new Coordinate(4348440.8493874, 5552599.27202212,
+          Coordinates.NULL_ORDINATE),
       }, 0);
   }
 
@@ -229,8 +235,9 @@ public class RobustLineIntersectionTest extends TestCase {
     checkIntersection(
       "LINESTRING ( 2089426.5233462777 1180182.3877339689, 2085646.6891757075 1195618.7333999649 )",
       "LINESTRING ( 1889281.8148903656 1997547.0560044837, 2259977.3672235999 483675.17050843034 )",
-      1, new AbstractCoordinates[] {
-        new Coordinate(2087536.6062609926, 1187900.560566967, Coordinates.NULL_ORDINATE),
+      1, new Coordinates[] {
+        new Coordinate(2087536.6062609926, 1187900.560566967,
+          Coordinates.NULL_ORDINATE),
       }, 0);
   }
 

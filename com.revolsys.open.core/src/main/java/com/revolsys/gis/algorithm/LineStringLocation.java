@@ -39,10 +39,10 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
    * @param p0 the first point of the line segment
    * @param p1 the last point of the line segment
    * @param length the length to the desired point
-   * @return the {@link Coordinate} of the desired point
+   * @return the {@link Coordinates} of the desired point
    */
-  public static Coordinate pointAlongSegmentByFraction(final Coordinate p0,
-    final Coordinate p1, final double frac) {
+  public static Coordinates pointAlongSegmentByFraction(final Coordinates p0,
+    final Coordinates p1, final double frac) {
     if (frac <= 0.0) {
       return p0;
     }
@@ -102,9 +102,9 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     return 0;
   }
 
-  public Coordinate getCoordinate() {
-    final Coordinate p0 = line.getCoordinateN(segmentIndex);
-    final Coordinate p1 = line.getCoordinateN(segmentIndex + 1);
+  public Coordinates getCoordinate() {
+    final Coordinates p0 = line.getCoordinateN(segmentIndex);
+    final Coordinates p1 = line.getCoordinateN(segmentIndex + 1);
     return pointAlongSegmentByFraction(p0, p1, segmentFraction);
   }
 

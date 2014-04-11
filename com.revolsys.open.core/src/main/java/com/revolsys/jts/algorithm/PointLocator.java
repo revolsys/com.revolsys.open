@@ -34,7 +34,6 @@ package com.revolsys.jts.algorithm;
 
 import java.util.Iterator;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -122,7 +121,7 @@ public class PointLocator {
    * @param geom the Geometry to test
    * @return <code>true</code> if the point is in the interior or boundary of the Geometry
    */
-  public boolean intersects(final Coordinate p, final Geometry geom) {
+  public boolean intersects(final Coordinates p, final Geometry geom) {
     return locate(p, geom) != Location.EXTERIOR;
   }
 
@@ -166,7 +165,7 @@ public class PointLocator {
       return Location.EXTERIOR;
     }
 
-    final Coordinate[] pt = l.getCoordinateArray();
+    final Coordinates[] pt = l.getCoordinateArray();
     if (!l.isClosed()) {
       if (p.equals(pt[0]) || p.equals(pt[pt.length - 1])) {
         return Location.BOUNDARY;
@@ -181,7 +180,7 @@ public class PointLocator {
   private int locate(final Coordinates p, final Point pt) {
     // no point in doing envelope test, since equality test is just as fast
 
-    final AbstractCoordinates ptCoord = pt.getCoordinate();
+    final Coordinates ptCoord = pt.getCoordinate();
     if (ptCoord.equals2d(p)) {
       return Location.INTERIOR;
     }

@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.algorithm.distance;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -42,58 +41,56 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 
 /**
- * Computes the Euclidean distance (L2 metric) from a {@link Coordinate} to a {@link Geometry}.
+ * Computes the Euclidean distance (L2 metric) from a {@link Coordinates} to a {@link Geometry}.
  * Also computes two points on the geometry which are separated by the distance found.
  */
-public class DistanceToPoint 
-{
+public class DistanceToPoint {
 
-  public DistanceToPoint() {
-  }
-
-  public static void computeDistance(Geometry geom, Coordinate pt, PointPairDistance ptDist)
-  {
+  public static void computeDistance(final Geometry geom, final Coordinates pt,
+    final PointPairDistance ptDist) {
     if (geom instanceof LineString) {
-      computeDistance((LineString) geom, pt, ptDist);
-    }
-    else if (geom instanceof Polygon) {
-      computeDistance((Polygon) geom, pt, ptDist);
-    }
-    else if (geom instanceof GeometryCollection) {
-      GeometryCollection gc = (GeometryCollection) geom;
+      final LineString line = (LineString)geom;
+      computeDistance(line, pt, ptDist);
+    } else if (geom instanceof Polygon) {
+      final Polygon polygon = (Polygon)geom;
+      computeDistance(polygon, pt, ptDist);
+    } else if (geom instanceof GeometryCollection) {
+      final GeometryCollection gc = (GeometryCollection)geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
-        Geometry g = gc.getGeometry(i);
+        final Geometry g = gc.getGeometry(i);
         computeDistance(g, pt, ptDist);
       }
-    }
-    else { // assume geom is Point
+    } else { // assume geom is Point
       ptDist.setMinimum(geom.getCoordinate(), pt);
     }
   }
-  
-  public static void computeDistance(LineString line, Coordinate pt, PointPairDistance ptDist)
-  {
-    LineSegment tempSegment = new LineSegment();
-    Coordinates[] coords = line.getCoordinateArray();
+
+  public static void computeDistance(final LineSegment segment,
+    final Coordinates pt, final PointPairDistance ptDist) {
+    final Coordinates closestPt = segment.closestPoint(pt);
+    ptDist.setMinimum(closestPt, pt);
+  }
+
+  public static void computeDistance(final LineString line,
+    final Coordinates pt, final PointPairDistance ptDist) {
+    final LineSegment tempSegment = new LineSegment();
+    final Coordinates[] coords = line.getCoordinateArray();
     for (int i = 0; i < coords.length - 1; i++) {
       tempSegment.setCoordinates(coords[i], coords[i + 1]);
       // this is somewhat inefficient - could do better
-      AbstractCoordinates closestPt = tempSegment.closestPoint(pt);
+      final Coordinates closestPt = tempSegment.closestPoint(pt);
       ptDist.setMinimum(closestPt, pt);
     }
   }
 
-  public static void computeDistance(LineSegment segment, Coordinate pt, PointPairDistance ptDist)
-  {
-    AbstractCoordinates closestPt = segment.closestPoint(pt);
-    ptDist.setMinimum(closestPt, pt);
-  }
-
-  public static void computeDistance(Polygon poly, Coordinate pt, PointPairDistance ptDist)
-  {
+  public static void computeDistance(final Polygon poly, final Coordinates pt,
+    final PointPairDistance ptDist) {
     computeDistance(poly.getExteriorRing(), pt, ptDist);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
       computeDistance(poly.getInteriorRingN(i), pt, ptDist);
     }
+  }
+
+  public DistanceToPoint() {
   }
 }

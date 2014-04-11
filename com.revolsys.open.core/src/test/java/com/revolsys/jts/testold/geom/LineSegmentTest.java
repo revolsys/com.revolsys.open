@@ -77,7 +77,7 @@ public class LineSegmentTest extends TestCase {
     final LineSegment seg = new LineSegment(x0, y0, x1, y1);
     final Coordinates p = seg.pointAlongOffset(segFrac, offset);
 
-    assertTrue(equalsTolerance(new Coordinate(expectedX, expectedY,
+    assertTrue(equalsTolerance(new Coordinate((double)expectedX, expectedY,
       Coordinates.NULL_ORDINATE), p, 0.000001));
   }
 
@@ -97,7 +97,7 @@ public class LineSegmentTest extends TestCase {
 
   void checkOrientationIndex(final LineSegment seg, final double px,
     final double py, final int expectedOrient) {
-    final Coordinates p = new Coordinate(px, py, Coordinates.NULL_ORDINATE);
+    final Coordinates p = new Coordinate((double)px, py, Coordinates.NULL_ORDINATE);
     final int orient = seg.orientationIndex(p);
     assertTrue(orient == expectedOrient);
   }
@@ -147,11 +147,11 @@ public class LineSegmentTest extends TestCase {
   public void testProjectionFactor() {
     // zero-length line
     final LineSegment seg = new LineSegment(10, 0, 10, 0);
-    assertTrue(Double.isNaN(seg.projectionFactor(new Coordinate(11.0, 0,
+    assertTrue(Double.isNaN(seg.projectionFactor(new Coordinate((double)11.0, 0,
       Coordinates.NULL_ORDINATE))));
 
     final LineSegment seg2 = new LineSegment(10, 0, 20, 0);
-    assertTrue(seg2.projectionFactor(new Coordinate(11.0, 0,
+    assertTrue(seg2.projectionFactor(new Coordinate((double)11.0, 0,
       Coordinates.NULL_ORDINATE)) == 0.1);
 
   }

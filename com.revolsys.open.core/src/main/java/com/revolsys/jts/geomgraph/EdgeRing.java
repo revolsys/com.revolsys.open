@@ -212,7 +212,7 @@ public abstract class EdgeRing {
   }
   protected void addPoints(Edge edge, boolean isForward, boolean isFirstEdge)
   {
-    Coordinate[] edgePts = edge.getCoordinates();
+    Coordinates[] edgePts = edge.getCoordinates();
     if (isForward) {
       int startIndex = 1;
       if (isFirstEdge) startIndex = 0;

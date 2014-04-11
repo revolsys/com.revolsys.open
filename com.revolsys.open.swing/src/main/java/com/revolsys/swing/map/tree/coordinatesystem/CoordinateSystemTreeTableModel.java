@@ -148,11 +148,11 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
       }
     } else if (node == geographicCoordinateSystems) {
       if (column == 0) {
-        return "Geographic Coordinate Systems";
+        return "Geographic Coordinates Systems";
       }
     } else if (node == projections) {
       if (column == 0) {
-        return "Projected Coordinate Systems";
+        return "Projected Coordinates Systems";
       }
     } else if (node instanceof Projection) {
       final Projection projection = (Projection)node;

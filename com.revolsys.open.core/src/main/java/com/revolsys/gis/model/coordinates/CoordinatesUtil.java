@@ -6,7 +6,6 @@ import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -487,10 +486,6 @@ public class CoordinatesUtil {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
     final Point p2 = (Point)factory.createGeometry(c2);
     return factory.createPoint(subtract(getInstance(c1), getInstance(p2)));
-  }
-
-  public static Coordinates toCoordinate(final Coordinates point) {
-    return new Coordinate(point.getX(), point.getY(), point.getZ());
   }
 
   public static float[] toFloatArray(final CoordinatesList points,

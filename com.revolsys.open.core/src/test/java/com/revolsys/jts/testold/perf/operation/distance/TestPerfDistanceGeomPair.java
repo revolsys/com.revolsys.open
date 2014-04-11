@@ -47,13 +47,13 @@ public class TestPerfDistanceGeomPair {
 
   Geometry[] createCircles(final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
-    gsf.setCentre(new Coordinate(0, 0, Coordinates.NULL_ORDINATE));
+    gsf.setCentre(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
     gsf.setSize(100);
     gsf.setNumPoints(nPts);
 
     final Polygon gRect = gsf.createCircle();
 
-    gsf.setCentre(new Coordinate(0, this.separationDist, Coordinates.NULL_ORDINATE));
+    gsf.setCentre(new Coordinate((double)0, this.separationDist, Coordinates.NULL_ORDINATE));
 
     final Polygon gRect2 = gsf.createCircle();
 
@@ -65,13 +65,13 @@ public class TestPerfDistanceGeomPair {
 
   Geometry[] createSineStars(final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
-    gsf.setCentre(new Coordinate(0, 0, Coordinates.NULL_ORDINATE));
+    gsf.setCentre(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
     gsf.setSize(100);
     gsf.setNumPoints(nPts);
 
     final Geometry g = gsf.createSineStar().getBoundary();
 
-    gsf.setCentre(new Coordinate(0, this.separationDist, Coordinates.NULL_ORDINATE));
+    gsf.setCentre(new Coordinate((double)0, this.separationDist, Coordinates.NULL_ORDINATE));
 
     final Geometry g2 = gsf.createSineStar().getBoundary();
 

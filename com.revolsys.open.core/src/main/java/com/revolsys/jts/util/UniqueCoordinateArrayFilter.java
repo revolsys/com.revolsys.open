@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -39,6 +37,7 @@ import java.util.TreeSet;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  *  A {@link CoordinateFilter} that builds a set of <code>Coordinate</code>s.
@@ -47,43 +46,43 @@ import com.revolsys.jts.geom.CoordinateFilter;
  *
  *@version 1.7
  */
-public class UniqueCoordinateArrayFilter implements CoordinateFilter 
-{
+public class UniqueCoordinateArrayFilter implements CoordinateFilter {
   /**
-   * Convenience method which allows running the filter over an array of {@link Coordinate}s.
+   * Convenience method which allows running the filter over an array of {@link Coordinates}s.
    * 
    * @param coords an array of coordinates
    * @return an array of the unique coordinates
    */
-  public static Coordinate[] filterCoordinates(Coordinate[] coords)
-  {
-    UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();
+  public static Coordinates[] filterCoordinates(final Coordinates[] coords) {
+    final UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();
     for (int i = 0; i < coords.length; i++) {
       filter.filter(coords[i]);
     }
     return filter.getCoordinates();
   }
-  
+
   TreeSet treeSet = new TreeSet();
+
   ArrayList list = new ArrayList();
 
-  public UniqueCoordinateArrayFilter() { }
+  public UniqueCoordinateArrayFilter() {
+  }
+
+  @Override
+  public void filter(final Coordinates coord) {
+    if (!treeSet.contains(coord)) {
+      list.add(coord);
+      treeSet.add(coord);
+    }
+  }
 
   /**
    *  Returns the gathered <code>Coordinate</code>s.
    *
    *@return    the <code>Coordinate</code>s collected by this <code>CoordinateArrayFilter</code>
    */
-  public Coordinate[] getCoordinates() {
-    Coordinate[] coordinates = new Coordinate[list.size()];
-    return (Coordinate[]) list.toArray(coordinates);
-  }
-
-  public void filter(Coordinate coord) {
-    if (!treeSet.contains(coord)) {
-      list.add(coord);
-      treeSet.add(coord);
-    }
+  public Coordinates[] getCoordinates() {
+    final Coordinates[] coordinates = new Coordinates[list.size()];
+    return (Coordinates[])list.toArray(coordinates);
   }
 }
-

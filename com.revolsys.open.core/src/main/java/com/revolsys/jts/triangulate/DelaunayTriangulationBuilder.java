@@ -61,7 +61,7 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
  */
 public class DelaunayTriangulationBuilder {
   /**
-   * Computes the {@link Envelope} of a collection of {@link Coordinate}s.
+   * Computes the {@link Envelope} of a collection of {@link Coordinates}s.
    * 
    * @param coords a List of Coordinates
    * @return the envelope of the set of coordinates
@@ -76,7 +76,7 @@ public class DelaunayTriangulationBuilder {
   }
 
   /**
-   * Extracts the unique {@link Coordinate}s from the given {@link Geometry}.
+   * Extracts the unique {@link Coordinates}s from the given {@link Geometry}.
    * @param geom the geometry to extract from
    * @return a List of the unique Coordinates
    */
@@ -90,7 +90,7 @@ public class DelaunayTriangulationBuilder {
   }
 
   /**
-   * Converts all {@link Coordinate}s in a collection to {@link Vertex}es.
+   * Converts all {@link Coordinates}s in a collection to {@link Vertex}es.
    * @param coords the coordinates to convert
    * @return a List of Vertex objects
    */
@@ -104,7 +104,7 @@ public class DelaunayTriangulationBuilder {
   }
 
   public static CoordinateList unique(final Coordinates[] coords) {
-    final Coordinate[] coordsCopy = CoordinateArrays.copyDeep(coords);
+    final Coordinates[] coordsCopy = CoordinateArrays.copyDeep(coords);
     Arrays.sort(coordsCopy);
     final CoordinateList coordList = new CoordinateList(coordsCopy, false);
     return coordList;
@@ -171,7 +171,7 @@ public class DelaunayTriangulationBuilder {
 
   /**
    * Sets the sites (vertices) which will be triangulated
-   * from a collection of {@link Coordinate}s.
+   * from a collection of {@link Coordinates}s.
    * 
    * @param coords a collection of Coordinates.
    */

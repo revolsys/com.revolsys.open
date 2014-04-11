@@ -79,8 +79,8 @@ public class Vertex {
    * @param p1
    * @return the interpolated Z value
    */
-  public static double interpolateZ(final AbstractCoordinates p, final AbstractCoordinates p0,
-    final Coordinates p1) {
+  public static double interpolateZ(final Coordinates p,
+    final Coordinates p0, final Coordinates p1) {
     final double segLen = p0.distance(p1);
     final double ptLen = p.distance(p0);
     final double dz = p1.getZ() - p0.getZ();
@@ -119,7 +119,7 @@ public class Vertex {
     return z;
   }
 
-  private final Coordinate p;
+  private final Coordinates p;
 
   // private int edgeNumber = -1;
 
@@ -151,7 +151,7 @@ public class Vertex {
    * 
    * @param b
    * @param c
-   * @return the Coordinate which is the circumcircle of the 3 points.
+   * @return the Coordinates which is the circumcircle of the 3 points.
    */
   public Vertex circleCenter(final Vertex b, final Vertex c) {
     final Vertex a = new Vertex(this.getX(), this.getY());
@@ -268,7 +268,7 @@ public class Vertex {
     }
   }
 
-  public Coordinate getCoordinate() {
+  public Coordinates getCoordinate() {
     return p;
   }
 

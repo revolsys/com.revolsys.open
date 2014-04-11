@@ -278,7 +278,7 @@ public class Point extends Geometry implements Puntal, Vertex {
   }
 
   @Override
-  public Coordinate getCoordinate() {
+  public Coordinates getCoordinate() {
     if (isEmpty()) {
       return null;
     } else {
@@ -303,11 +303,11 @@ public class Point extends Geometry implements Puntal, Vertex {
   }
 
   @Override
-  public Coordinate[] getCoordinateArray() {
+  public Coordinates[] getCoordinateArray() {
     if (isEmpty()) {
-      return new Coordinate[0];
+      return new Coordinates[0];
     } else {
-      return new Coordinate[] {
+      return new Coordinates[] {
         getCoordinate()
       };
     }
@@ -444,7 +444,8 @@ public class Point extends Geometry implements Puntal, Vertex {
   }
 
   @Override
-  public void normalize() {
+  public Point normalize() {
+    return this;
   }
 
   @Override

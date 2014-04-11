@@ -35,7 +35,6 @@ package com.revolsys.jts.algorithm;
 /**
  * @version 1.7
  */
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.PrecisionModel;
@@ -112,8 +111,8 @@ public abstract class LineIntersector {
    * result of <b>rounding</b> points which lie on the line,
    * but not safe to use for <b>truncated</b> points.
    */
-  public static double computeEdgeDistance(final Coordinate p,
-    final Coordinate p0, final Coordinate p1) {
+  public static double computeEdgeDistance(final Coordinates p,
+    final Coordinates p0, final Coordinates p1) {
     final double dx = Math.abs(p1.getX() - p0.getX());
     final double dy = Math.abs(p1.getY() - p0.getY());
 
@@ -148,8 +147,8 @@ public abstract class LineIntersector {
    * This function is non-robust, since it may compute the square of large numbers.
    * Currently not sure how to improve this.
    */
-  public static double nonRobustComputeEdgeDistance(final Coordinate p,
-    final Coordinate p1, final Coordinates p2) {
+  public static double nonRobustComputeEdgeDistance(final Coordinates p,
+    final Coordinates p1, final Coordinates p2) {
     final double dx = p.getX() - p1.getX();
     final double dy = p.getY() - p1.getY();
     final double dist = Math.sqrt(dx * dx + dy * dy); // dummy value
@@ -160,9 +159,9 @@ public abstract class LineIntersector {
 
   protected int result;
 
-  protected Coordinate[][] inputLines = new Coordinate[2][2];
+  protected Coordinates[][] inputLines = new Coordinates[2][2];
 
-  protected Coordinate[] intPt = new Coordinate[2];
+  protected Coordinates[] intPt = new Coordinates[2];
 
   /**
    * The indexes of the endpoints of the intersection lines, in order along
@@ -172,9 +171,9 @@ public abstract class LineIntersector {
 
   protected boolean isProper;
 
-  protected Coordinate pa;
+  protected Coordinates pa;
 
-  protected AbstractCoordinates pb;
+  protected Coordinates pb;
 
   /**
    * If makePrecise is true, computed intersection coordinates will be made precise
@@ -193,23 +192,8 @@ public abstract class LineIntersector {
     result = 0;
   }
 
-  protected abstract int computeIntersect(Coordinate p1, Coordinate p2,
-    Coordinate q1, Coordinate q2);
-
-  /**
-   * Computes the intersection of the lines p1-p2 and p3-p4.
-   * This function computes both the boolean value of the hasIntersection test
-   * and the (approximate) value of the intersection point itself (if there is one).
-   */
-  public void computeIntersection(final Coordinate p1, final Coordinate p2,
-    final Coordinate p3, final Coordinate p4) {
-    inputLines[0][0] = p1;
-    inputLines[0][1] = p2;
-    inputLines[1][0] = p3;
-    inputLines[1][1] = p4;
-    result = computeIntersect(p1, p2, p3, p4);
-    // numIntersects++;
-  }
+  protected abstract int computeIntersect(Coordinates p1, Coordinates p2,
+    Coordinates q1, Coordinates q2);
 
   /**
    * Compute the intersection of a point p and the line p1-p2.
@@ -219,6 +203,21 @@ public abstract class LineIntersector {
    */
   public abstract void computeIntersection(Coordinates p, Coordinates p1,
     Coordinates p2);
+
+  /**
+   * Computes the intersection of the lines p1-p2 and p3-p4.
+   * This function computes both the boolean value of the hasIntersection test
+   * and the (approximate) value of the intersection point itself (if there is one).
+   */
+  public void computeIntersection(final Coordinates p1, final Coordinates p2,
+    final Coordinates p3, final Coordinates p4) {
+    inputLines[0][0] = p1;
+    inputLines[0][1] = p2;
+    inputLines[1][0] = p3;
+    inputLines[1][1] = p4;
+    result = computeIntersect(p1, p2, p3, p4);
+    // numIntersects++;
+  }
 
   protected void computeIntLineIndex() {
     if (intLineIndex == null) {
@@ -292,7 +291,7 @@ public abstract class LineIntersector {
    *
    * @return the intIndex'th intersection point
    */
-  public Coordinate getIntersection(final int intIndex) {
+  public Coordinates getIntersection(final int intIndex) {
     return intPt[intIndex];
   }
 

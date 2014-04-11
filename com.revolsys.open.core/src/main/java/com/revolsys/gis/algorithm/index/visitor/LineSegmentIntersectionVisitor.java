@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.index.visitor;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.index.ItemVisitor;
 

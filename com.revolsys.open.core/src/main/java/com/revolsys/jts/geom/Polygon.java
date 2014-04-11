@@ -32,7 +32,9 @@
  */
 package com.revolsys.jts.geom;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.AbstractIterator;
@@ -323,24 +325,24 @@ public class Polygon extends Geometry implements Polygonal {
   }
 
   @Override
-  public Coordinate getCoordinate() {
+  public Coordinates getCoordinate() {
     return shell.getCoordinate();
   }
 
   @Override
-  public Coordinate[] getCoordinateArray() {
+  public Coordinates[] getCoordinateArray() {
     if (isEmpty()) {
-      return new Coordinate[] {};
+      return new Coordinates[] {};
     }
-    final Coordinate[] coordinates = new Coordinate[getNumPoints()];
+    final Coordinates[] coordinates = new Coordinates[getNumPoints()];
     int k = -1;
-    final Coordinate[] shellCoordinates = shell.getCoordinateArray();
+    final Coordinates[] shellCoordinates = shell.getCoordinateArray();
     for (int x = 0; x < shellCoordinates.length; x++) {
       k++;
       coordinates[k] = shellCoordinates[x];
     }
     for (int i = 0; i < holes.length; i++) {
-      final Coordinate[] childCoordinates = holes[i].getCoordinateArray();
+      final Coordinates[] childCoordinates = holes[i].getCoordinateArray();
       for (int j = 0; j < childCoordinates.length; j++) {
         k++;
         coordinates[k] = childCoordinates[j];
@@ -455,38 +457,51 @@ public class Polygon extends Geometry implements Polygonal {
   }
 
   @Override
-  public void normalize() {
-    normalize(shell, true);
-    for (int i = 0; i < holes.length; i++) {
-      normalize(holes[i], false);
+  public Polygon normalize() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final LinearRing exteriorRing = normalize(shell, true);
+      final List<LinearRing> rings = new ArrayList<>();
+      for (final LinearRing hole : holes) {
+        final LinearRing normalizedHole = normalize(hole, false);
+        rings.add(normalizedHole);
+      }
+      Collections.sort(rings);
+      rings.add(0, exteriorRing);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.createPolygon(rings);
     }
-    Arrays.sort(holes);
   }
 
-  private void normalize(final LinearRing ring, final boolean clockwise) {
+  private LinearRing normalize(final LinearRing ring, final boolean clockwise) {
     if (ring.isEmpty()) {
-      return;
-    }
-    final Coordinate[] uniqueCoordinates = new Coordinate[ring.getCoordinateArray().length - 1];
-    System.arraycopy(ring.getCoordinateArray(), 0, uniqueCoordinates, 0,
-      uniqueCoordinates.length);
-    final Coordinate minCoordinate = CoordinateArrays.minCoordinate(ring.getCoordinateArray());
-    CoordinateArrays.scroll(uniqueCoordinates, minCoordinate);
-    System.arraycopy(uniqueCoordinates, 0, ring.getCoordinateArray(), 0,
-      uniqueCoordinates.length);
-    ring.getCoordinateArray()[uniqueCoordinates.length] = uniqueCoordinates[0];
-    if (CGAlgorithms.isCCW(ring.getCoordinateArray()) == clockwise) {
-      CoordinateArrays.reverse(ring.getCoordinateArray());
+      return ring;
+    } else {
+      final Coordinates[] ringCoordinates = ring.getCoordinateArray();
+      final Coordinates[] uniqueCoordinates = new Coordinates[ringCoordinates.length - 1];
+      System.arraycopy(ringCoordinates, 0, uniqueCoordinates, 0,
+        uniqueCoordinates.length);
+      final Coordinates minCoordinate = CoordinateArrays.minCoordinate(ringCoordinates);
+      CoordinateArrays.scroll(uniqueCoordinates, minCoordinate);
+      System.arraycopy(uniqueCoordinates, 0, ringCoordinates, 0,
+        uniqueCoordinates.length);
+      ringCoordinates[uniqueCoordinates.length] = uniqueCoordinates[0];
+      if (CGAlgorithms.isCCW(ringCoordinates) == clockwise) {
+        CoordinateArrays.reverse(ringCoordinates);
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.createLinearRing(ringCoordinates);
     }
   }
 
   @Override
   public Geometry reverse() {
     final Polygon poly = (Polygon)super.clone();
-    poly.shell = (LinearRing)((LinearRing)shell.clone()).reverse();
+    poly.shell = ((LinearRing)shell.clone()).reverse();
     poly.holes = new LinearRing[holes.length];
     for (int i = 0; i < holes.length; i++) {
-      poly.holes[i] = (LinearRing)((LinearRing)holes[i].clone()).reverse();
+      poly.holes[i] = ((LinearRing)holes[i].clone()).reverse();
     }
     return poly;// return the clone
   }

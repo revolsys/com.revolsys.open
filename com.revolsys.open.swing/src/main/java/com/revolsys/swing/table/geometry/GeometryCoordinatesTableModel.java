@@ -10,10 +10,10 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.revolsys.gis.model.geometry.GeometryCollection;
-import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
+import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;

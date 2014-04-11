@@ -308,7 +308,7 @@ public class OverlayOp extends GeometryGraphOperation {
   private void computeLabelling() {
     for (final Iterator nodeit = graph.getNodes().iterator(); nodeit.hasNext();) {
       final Node node = (Node)nodeit.next();
-      // if (node.getCoordinate().equals(new Coordinate(222, 100)) )
+      // if (node.getCoordinate().equals(new Coordinate((double)222, 100)) )
       // Debug.addWatch(node.getEdges());
       node.getEdges().computeLabelling(arg);
     }

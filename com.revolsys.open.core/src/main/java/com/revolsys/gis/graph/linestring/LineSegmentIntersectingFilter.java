@@ -1,7 +1,7 @@
 package com.revolsys.gis.graph.linestring;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.jts.geom.CoordinatesList;
 
 public class LineSegmentIntersectingFilter implements Filter<LineSegment> {

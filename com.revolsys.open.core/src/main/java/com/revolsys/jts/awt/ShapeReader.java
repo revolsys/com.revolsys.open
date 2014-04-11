@@ -121,7 +121,7 @@ public class ShapeReader
       
       List holes = new ArrayList();
       // add holes as long as rings are CCW
-      while (seqIndex < pathPtSeq.size() && isHole((Coordinate[]) pathPtSeq.get(seqIndex))) {
+      while (seqIndex < pathPtSeq.size() && isHole((Coordinates[]) pathPtSeq.get(seqIndex))) {
         Coordinates[] holePts = (Coordinates[]) pathPtSeq.get(seqIndex);
         LinearRing hole = geometryFactory.createLinearRing(holePts);
         holes.add(hole);
@@ -133,24 +133,24 @@ public class ShapeReader
     return geometryFactory.buildGeometry(polys);
   }
   
-  private boolean isHole(Coordinate[] pts)
+  private boolean isHole(Coordinates[] pts)
   {
     return CGAlgorithms.isCCW(pts);
   }
   
   /**
    * Extracts the points of the paths in a flat {@link PathIterator} into
-   * a list of Coordinate arrays.
+   * a list of Coordinates arrays.
    * 
    * @param pathIt a path iterator
-   * @return a List of Coordinate arrays
+   * @return a List of Coordinates arrays
    * @throws IllegalArgumentException if a non-linear segment type is encountered
    */
   public static List toCoordinates(PathIterator pathIt)
   {
     List coordArrays = new ArrayList();
     while (! pathIt.isDone()) {
-      Coordinate[] pts = nextCoordinateArray(pathIt);
+      Coordinates[] pts = nextCoordinateArray(pathIt);
       if (pts == null)
         break;
       coordArrays.add(pts);
@@ -158,7 +158,7 @@ public class ShapeReader
     return coordArrays;
   }
   
-  private static Coordinate[] nextCoordinateArray(PathIterator pathIt)
+  private static Coordinates[] nextCoordinateArray(PathIterator pathIt)
   {
     double[] pathPt = new double[6];
     CoordinateList coordList = null;
@@ -173,12 +173,12 @@ public class ShapeReader
         }
         else {
           coordList = new CoordinateList();
-          coordList.add(new Coordinate(pathPt[0], pathPt[1], Coordinates.NULL_ORDINATE));
+          coordList.add(new Coordinate((double)pathPt[0], pathPt[1], Coordinates.NULL_ORDINATE));
           pathIt.next();
         }
         break;
       case PathIterator.SEG_LINETO:
-        coordList.add(new Coordinate(pathPt[0], pathPt[1], Coordinates.NULL_ORDINATE));
+        coordList.add(new Coordinate((double)pathPt[0], pathPt[1], Coordinates.NULL_ORDINATE));
         pathIt.next();
         break;
       case PathIterator.SEG_CLOSE:  

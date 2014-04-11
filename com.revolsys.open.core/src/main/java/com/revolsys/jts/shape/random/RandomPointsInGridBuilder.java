@@ -166,7 +166,7 @@ extends GeometricShapeBuilder
   	
     double x0 = centreX + rndX;
     double y0 = centreY + rndY;
-    return new Coordinate(x0, y0, Coordinates.NULL_ORDINATE);    
+    return new Coordinate((double)x0, y0, Coordinates.NULL_ORDINATE);    
   }
 
 }

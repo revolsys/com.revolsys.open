@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -63,43 +62,66 @@ import com.revolsys.jts.geom.Point;
  * @version 1.7
  */
 
-public class BoundaryOp
-{
-  private Geometry geom;
-  private GeometryFactory geomFact;
-  private BoundaryNodeRule bnRule;
+public class BoundaryOp {
+  private final Geometry geom;
 
-  public BoundaryOp(Geometry geom)
-  {
+  private final GeometryFactory geomFact;
+
+  private final BoundaryNodeRule bnRule;
+
+  private Map endpointMap;
+
+  public BoundaryOp(final Geometry geom) {
     this(geom, BoundaryNodeRule.MOD2_BOUNDARY_RULE);
   }
 
-  public BoundaryOp(Geometry geom, BoundaryNodeRule bnRule)
-  {
+  public BoundaryOp(final Geometry geom, final BoundaryNodeRule bnRule) {
     this.geom = geom;
     geomFact = geom.getGeometryFactory();
     this.bnRule = bnRule;
   }
 
-  public Geometry getBoundary()
-  {
-    if (geom instanceof LineString) return boundaryLineString((LineString) geom);
-    if (geom instanceof MultiLineString) return boundaryMultiLineString((MultiLineString) geom);
-    return geom.getBoundary();
+  private void addEndpoint(final Coordinates pt) {
+    Counter counter = (Counter)endpointMap.get(pt);
+    if (counter == null) {
+      counter = new Counter();
+      endpointMap.put(pt, counter);
+    }
+    counter.count++;
   }
 
-  private MultiPoint getEmptyMultiPoint()
-  {
-    return geomFact.createMultiPoint((CoordinatesList) null);
-  }
-
-  private Geometry boundaryMultiLineString(MultiLineString mLine)
-  {
+  private Geometry boundaryLineString(final LineString line) {
     if (geom.isEmpty()) {
       return getEmptyMultiPoint();
     }
 
-    Coordinates[] bdyPts = computeBoundaryCoordinates(mLine);
+    if (line.isClosed()) {
+      // check whether endpoints of valence 2 are on the boundary or not
+      final boolean closedEndpointOnBoundary = bnRule.isInBoundary(2);
+      if (closedEndpointOnBoundary) {
+        return line.getStartPoint();
+      } else {
+        return geomFact.createMultiPoint((Coordinates[])null);
+      }
+    }
+    return geomFact.createMultiPoint(new Point[] {
+      line.getStartPoint(), line.getEndPoint()
+    });
+  }
+
+  /*
+   * // MD - superseded private Coordinates[]
+   * computeBoundaryFromGeometryGraph(MultiLineString mLine) { GeometryGraph g =
+   * new GeometryGraph(0, mLine, bnRule); Coordinates[] bdyPts =
+   * g.getBoundaryPoints(); return bdyPts; }
+   */
+
+  private Geometry boundaryMultiLineString(final MultiLineString mLine) {
+    if (geom.isEmpty()) {
+      return getEmptyMultiPoint();
+    }
+
+    final Coordinates[] bdyPts = computeBoundaryCoordinates(mLine);
 
     // return Point or MultiPoint
     if (bdyPts.length == 1) {
@@ -109,34 +131,22 @@ public class BoundaryOp
     return geomFact.createMultiPoint(bdyPts);
   }
 
-/*
-// MD - superseded
-  private Coordinate[] computeBoundaryFromGeometryGraph(MultiLineString mLine)
-  {
-    GeometryGraph g = new GeometryGraph(0, mLine, bnRule);
-    Coordinate[] bdyPts = g.getBoundaryPoints();
-    return bdyPts;
-  }
-*/
-
-  private Map endpointMap;
-
-  private Coordinates[] computeBoundaryCoordinates(MultiLineString mLine)
-  {
-    List bdyPts = new ArrayList();
+  private Coordinates[] computeBoundaryCoordinates(final MultiLineString mLine) {
+    final List bdyPts = new ArrayList();
     endpointMap = new TreeMap();
     for (int i = 0; i < mLine.getNumGeometries(); i++) {
-      LineString line = (LineString) mLine.getGeometry(i);
-      if (line.getNumPoints() == 0)
+      final LineString line = (LineString)mLine.getGeometry(i);
+      if (line.getNumPoints() == 0) {
         continue;
+      }
       addEndpoint(line.getCoordinateN(0));
       addEndpoint(line.getCoordinateN(line.getNumPoints() - 1));
     }
 
-    for (Iterator it = endpointMap.entrySet().iterator(); it.hasNext(); ) {
-      Map.Entry entry = (Map.Entry) it.next();
-      Counter counter = (Counter) entry.getValue();
-      int valence = counter.count;
+    for (final Iterator it = endpointMap.entrySet().iterator(); it.hasNext();) {
+      final Map.Entry entry = (Map.Entry)it.next();
+      final Counter counter = (Counter)entry.getValue();
+      final int valence = counter.count;
       if (bnRule.isInBoundary(valence)) {
         bdyPts.add(entry.getKey());
       }
@@ -145,36 +155,18 @@ public class BoundaryOp
     return CoordinateArrays.toCoordinateArray(bdyPts);
   }
 
-  private void addEndpoint(Coordinate pt)
-  {
-    Counter counter = (Counter) endpointMap.get(pt);
-    if (counter == null) {
-      counter = new Counter();
-      endpointMap.put(pt, counter);
+  public Geometry getBoundary() {
+    if (geom instanceof LineString) {
+      return boundaryLineString((LineString)geom);
     }
-    counter.count++;
+    if (geom instanceof MultiLineString) {
+      return boundaryMultiLineString((MultiLineString)geom);
+    }
+    return geom.getBoundary();
   }
 
-  private Geometry boundaryLineString(LineString line)
-  {
-    if (geom.isEmpty()) {
-      return getEmptyMultiPoint();
-    }
-
-    if (line.isClosed()) {
-      // check whether endpoints of valence 2 are on the boundary or not
-      boolean closedEndpointOnBoundary = bnRule.isInBoundary(2);
-      if (closedEndpointOnBoundary) {
-        return line.getStartPoint();
-      }
-      else {
-        return geomFact.createMultiPoint((Coordinates[]) null);
-      }
-    }
-    return geomFact.createMultiPoint(new Point[]{
-                                     line.getStartPoint(),
-                                     line.getEndPoint()
-    });
+  private MultiPoint getEmptyMultiPoint() {
+    return geomFact.createMultiPoint((CoordinatesList)null);
   }
 }
 
@@ -184,8 +176,7 @@ public class BoundaryOp
  * @author Martin Davis
  * @version 1.7
  */
-class Counter
-{
+class Counter {
   /**
    * The value of the count
    */

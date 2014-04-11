@@ -59,7 +59,7 @@ public abstract class IntervalRTreeNode
 
 	public String toString()
 	{
-		return WKTWriter.toLineString(new Coordinate(min, 0, Coordinates.NULL_ORDINATE), new Coordinate(max, 0, Coordinates.NULL_ORDINATE));
+		return WKTWriter.toLineString(new Coordinate((double)min, 0, Coordinates.NULL_ORDINATE), new Coordinate((double)max, 0, Coordinates.NULL_ORDINATE));
 	}
   
   public static class NodeComparator implements Comparator

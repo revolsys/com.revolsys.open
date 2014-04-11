@@ -20,16 +20,16 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   @Override
-  public Coordinates clone() {
+  public AbstractCoordinates clone() {
     try {
-      return (Coordinates)super.clone();
+      return (AbstractCoordinates)super.clone();
     } catch (final CloneNotSupportedException e) {
       throw new UnsupportedOperationException();
     }
   }
 
   @Override
-  public Coordinates cloneCoordinates() {
+  public AbstractCoordinates cloneCoordinates() {
     return clone();
   }
 

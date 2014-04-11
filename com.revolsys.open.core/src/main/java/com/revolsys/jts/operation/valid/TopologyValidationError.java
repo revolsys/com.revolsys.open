@@ -104,7 +104,7 @@ public class TopologyValidationError {
 
   /**
    * Indicates that the <code>X</code> or <code>Y</code> ordinate of
-   * a Coordinate is not a valid numeric value (e.g. {@link Double#NaN} )
+   * a Coordinates is not a valid numeric value (e.g. {@link Double#NaN} )
    */
   public static final int INVALID_COORDINATE      = 10;
 
@@ -162,7 +162,7 @@ public class TopologyValidationError {
   /**
    * Returns the location of this error (on the {@link Geometry} containing the error).
    *
-   * @return a {@link Coordinate} on the input geometry
+   * @return a {@link Coordinates} on the input geometry
    */
   public Coordinates getCoordinate() { return pt; }
 

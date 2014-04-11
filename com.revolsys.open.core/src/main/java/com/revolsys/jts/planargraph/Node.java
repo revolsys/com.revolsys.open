@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -32,7 +31,6 @@
  *     www.vividsolutions.com
  */
 
-
 package com.revolsys.jts.planargraph;
 
 import java.util.Collection;
@@ -40,7 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A node in a {@link PlanarGraph}is a location where 0 or more {@link Edge}s
@@ -51,23 +49,20 @@ import com.revolsys.jts.geom.Coordinate;
  *
  * @version 1.7
  */
-public class Node
-    extends GraphComponent
-{
+public class Node extends GraphComponent {
   /**
    * Returns all Edges that connect the two nodes (which are assumed to be different).
    */
-  public static Collection getEdgesBetween(Node node0, Node node1)
-  {
-    List edges0 = DirectedEdge.toEdges(node0.getOutEdges().getEdges());
-    Set commonEdges = new HashSet(edges0);
-    List edges1 = DirectedEdge.toEdges(node1.getOutEdges().getEdges());
+  public static Collection getEdgesBetween(final Node node0, final Node node1) {
+    final List edges0 = DirectedEdge.toEdges(node0.getOutEdges().getEdges());
+    final Set commonEdges = new HashSet(edges0);
+    final List edges1 = DirectedEdge.toEdges(node1.getOutEdges().getEdges());
     commonEdges.retainAll(edges1);
     return commonEdges;
   }
 
   /** The location of this Node */
-  protected Coordinate pt;
+  protected Coordinates pt;
 
   /** The collection of DirectedEdges that leave this Node */
   protected DirectedEdgeStar deStar;
@@ -75,57 +70,62 @@ public class Node
   /**
    * Constructs a Node with the given location.
    */
-  public Node(Coordinate pt)
-  {
+  public Node(final Coordinates pt) {
     this(pt, new DirectedEdgeStar());
   }
 
   /**
    * Constructs a Node with the given location and collection of outgoing DirectedEdges.
    */
-  public Node(Coordinate pt, DirectedEdgeStar deStar)
-  {
+  public Node(final Coordinates pt, final DirectedEdgeStar deStar) {
     this.pt = pt;
     this.deStar = deStar;
   }
 
   /**
-   * Returns the location of this Node.
-   */
-  public Coordinate getCoordinate() { return pt; }
-
-  /**
    * Adds an outgoing DirectedEdge to this Node.
    */
-  public void addOutEdge(DirectedEdge de)
-  {
+  public void addOutEdge(final DirectedEdge de) {
     deStar.add(de);
+  }
+
+  /**
+   * Returns the location of this Node.
+   */
+  public Coordinates getCoordinate() {
+    return pt;
+  }
+
+  /**
+   * Returns the number of edges around this Node.
+   */
+  public int getDegree() {
+    return deStar.getDegree();
+  }
+
+  /**
+   * Returns the zero-based index of the given Edge, after sorting in ascending order
+   * by angle with the positive x-axis.
+   */
+  public int getIndex(final Edge edge) {
+    return deStar.getIndex(edge);
   }
 
   /**
    * Returns the collection of DirectedEdges that leave this Node.
    */
-  public DirectedEdgeStar getOutEdges() { return deStar; }
-  /**
-   * Returns the number of edges around this Node.
-   */
-  public int getDegree() { return deStar.getDegree(); }
-  /**
-   * Returns the zero-based index of the given Edge, after sorting in ascending order
-   * by angle with the positive x-axis.
-   */
-  public int getIndex(Edge edge)
-  {
-    return deStar.getIndex(edge);
+  public DirectedEdgeStar getOutEdges() {
+    return deStar;
   }
 
   /**
-   * Removes a {@link DirectedEdge} incident on this node.
-   * Does not change the state of the directed edge.
+   * Tests whether this node has been removed from its containing graph
+   *
+   * @return <code>true</code> if this node is removed
    */
-  public void remove(DirectedEdge de)
-  {
-    deStar.remove(de);
+  @Override
+  public boolean isRemoved() {
+    return pt == null;
   }
 
   /**
@@ -135,15 +135,12 @@ public class Node
     pt = null;
   }
 
-
   /**
-   * Tests whether this node has been removed from its containing graph
-   *
-   * @return <code>true</code> if this node is removed
+   * Removes a {@link DirectedEdge} incident on this node.
+   * Does not change the state of the directed edge.
    */
-  public boolean isRemoved()
-  {
-    return pt == null;
+  public void remove(final DirectedEdge de) {
+    deStar.remove(de);
   }
 
 }

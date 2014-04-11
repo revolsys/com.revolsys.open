@@ -68,7 +68,7 @@ public class LineStringGenerator extends GeometryGenerator {
       final double fx = Math.sin(angle) * radius; // may be neg.
       final double fy = Math.cos(angle) * radius; // may be neg.
 
-      coords[i] = new Coordinate(cx + fx, cy + fy, Coordinates.NULL_ORDINATE);
+      coords[i] = new Coordinate((double)cx + fx, cy + fy, Coordinates.NULL_ORDINATE);
       gf.getPrecisionModel().makePrecise(coords[i]);
     }
   }
@@ -77,14 +77,14 @@ public class LineStringGenerator extends GeometryGenerator {
     final double dy, final Coordinates[] coords, final GeometryFactory gf) {
     final double fy = y + Math.random() * dy;
     double rx = dx; // remainder of x distance
-    coords[0] = new Coordinate(x, fy, Coordinates.NULL_ORDINATE);
+    coords[0] = new Coordinate((double)x, fy, Coordinates.NULL_ORDINATE);
     gf.getPrecisionModel().makePrecise(coords[0]);
     for (int i = 1; i < coords.length - 1; i++) {
       rx -= Math.random() * rx;
-      coords[i] = new Coordinate(x + dx - rx, fy, Coordinates.NULL_ORDINATE);
+      coords[i] = new Coordinate((double)x + dx - rx, fy, Coordinates.NULL_ORDINATE);
       gf.getPrecisionModel().makePrecise(coords[i]);
     }
-    coords[coords.length - 1] = new Coordinate(x + dx, fy, Coordinates.NULL_ORDINATE);
+    coords[coords.length - 1] = new Coordinate((double)x + dx, fy, Coordinates.NULL_ORDINATE);
     gf.getPrecisionModel().makePrecise(coords[coords.length - 1]);
   }
 
@@ -92,14 +92,14 @@ public class LineStringGenerator extends GeometryGenerator {
     final double dy, final Coordinates[] coords, final GeometryFactory gf) {
     final double fx = x + Math.random() * dx;
     double ry = dy; // remainder of y distance
-    coords[0] = new Coordinate(fx, y, Coordinates.NULL_ORDINATE);
+    coords[0] = new Coordinate((double)fx, y, Coordinates.NULL_ORDINATE);
     gf.getPrecisionModel().makePrecise(coords[0]);
     for (int i = 1; i < coords.length - 1; i++) {
       ry -= Math.random() * ry;
-      coords[i] = new Coordinate(fx, y + dy - ry, Coordinates.NULL_ORDINATE);
+      coords[i] = new Coordinate((double)fx, y + dy - ry, Coordinates.NULL_ORDINATE);
       gf.getPrecisionModel().makePrecise(coords[i]);
     }
-    coords[coords.length - 1] = new Coordinate(fx, y + dy, Coordinates.NULL_ORDINATE);
+    coords[coords.length - 1] = new Coordinate((double)fx, y + dy, Coordinates.NULL_ORDINATE);
     gf.getPrecisionModel().makePrecise(coords[coords.length - 1]);
   }
 

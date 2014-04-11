@@ -1,35 +1,35 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.operation.predicate;
 
@@ -65,94 +65,56 @@ public class RectangleContains {
    * @param b a Geometry of any type
    * @return true if the geometries intersect
    */
-  public static boolean contains(Polygon rectangle, Geometry b)
-  {
-    RectangleContains rc = new RectangleContains(rectangle);
+  public static boolean contains(final Polygon rectangle, final Geometry b) {
+    final RectangleContains rc = new RectangleContains(rectangle);
     return rc.contains(b);
   }
 
-  private Envelope rectEnv;
+  private final Envelope rectEnv;
 
   /**
    * Create a new contains computer for two geometries.
    *
    * @param rectangle a rectangular geometry
    */
-  public RectangleContains(Polygon rectangle) {
+  public RectangleContains(final Polygon rectangle) {
     rectEnv = rectangle.getEnvelopeInternal();
   }
 
-  public boolean contains(Geometry geom)
-  {
+  public boolean contains(final Geometry geom) {
     // the test geometry must be wholly contained in the rectangle envelope
-    if (! rectEnv.contains(geom.getEnvelopeInternal()))
+    if (!rectEnv.contains(geom.getEnvelopeInternal())) {
       return false;
-    
+    }
+
     /**
      * Check that geom is not contained entirely in the rectangle boundary.
      * According to the somewhat odd spec of the SFS, if this
      * is the case the geometry is NOT contained.
      */
-    if (isContainedInBoundary(geom))
+    if (isContainedInBoundary(geom)) {
       return false;
-    return true;
-  }
-
-  private boolean isContainedInBoundary(Geometry geom)
-  {
-    // polygons can never be wholely contained in the boundary
-    if (geom instanceof Polygon) return false;
-    if (geom instanceof Point) return isPointContainedInBoundary((Point) geom);
-    if (geom instanceof LineString) return isLineStringContainedInBoundary((LineString) geom);
-
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
-      Geometry comp = geom.getGeometry(i);
-      if (! isContainedInBoundary(comp))
-        return false;
     }
     return true;
   }
 
-  private boolean isPointContainedInBoundary(Point point)
-  {
-    return isPointContainedInBoundary(point.getCoordinate());
-  }
+  private boolean isContainedInBoundary(final Geometry geom) {
+    // polygons can never be wholely contained in the boundary
+    if (geom instanceof Polygon) {
+      return false;
+    }
+    if (geom instanceof Point) {
+      return isPointContainedInBoundary((Point)geom);
+    }
+    if (geom instanceof LineString) {
+      return isLineStringContainedInBoundary((LineString)geom);
+    }
 
-  /**
-   * Tests if a point is contained in the boundary of the target rectangle.
-   * 
-   * @param pt the point to test
-   * @return true if the point is contained in the boundary
-   */
-  private boolean isPointContainedInBoundary(Coordinates pt)
-  {
-    /**
-     * contains = false iff the point is properly contained in the rectangle.
-     * 
-     * This code assumes that the point lies in the rectangle envelope
-     */ 
-    return pt.getX() == rectEnv.getMinX() 
-    		|| pt.getX() == rectEnv.getMaxX()
-    		|| pt.getY() == rectEnv.getMinY()
-    		|| pt.getY() == rectEnv.getMaxY();
-  }
-
-  /**
-   * Tests if a linestring is completely contained in the boundary of the target rectangle.
-   * @param line the linestring to test
-   * @return true if the linestring is contained in the boundary
-   */
-  private boolean isLineStringContainedInBoundary(LineString line)
-  {
-    CoordinatesList seq = line.getCoordinatesList();
-    Coordinate p0 = new Coordinate();
-    Coordinate p1 = new Coordinate();
-    for (int i = 0; i < seq.size() - 1; i++) {
-      seq.getCoordinate(i, p0);
-      seq.getCoordinate(i + 1, p1);
-
-      if (! isLineSegmentContainedInBoundary(p0, p1))
+    for (int i = 0; i < geom.getNumGeometries(); i++) {
+      final Geometry comp = geom.getGeometry(i);
+      if (!isContainedInBoundary(comp)) {
         return false;
+      }
     }
     return true;
   }
@@ -163,21 +125,21 @@ public class RectangleContains {
    * @param p1 an endpoint of the segment
    * @return true if the line segment is contained in the boundary
    */
-  private boolean isLineSegmentContainedInBoundary(Coordinate p0, Coordinate p1)
-  {
-    if (p0.equals(p1))
+  private boolean isLineSegmentContainedInBoundary(final Coordinates p0,
+    final Coordinates p1) {
+    if (p0.equals(p1)) {
       return isPointContainedInBoundary(p0);
+    }
 
     // we already know that the segment is contained in the rectangle envelope
     if (p0.getX() == p1.getX()) {
-      if (p0.getX() == rectEnv.getMinX() ||
-          p0.getX() == rectEnv.getMaxX() )
+      if (p0.getX() == rectEnv.getMinX() || p0.getX() == rectEnv.getMaxX()) {
         return true;
-    }
-    else if (p0.getY() == p1.getY()) {
-      if (p0.getY() == rectEnv.getMinY() ||
-          p0.getY() == rectEnv.getMaxY() )
+      }
+    } else if (p0.getY() == p1.getY()) {
+      if (p0.getY() == rectEnv.getMinY() || p0.getY() == rectEnv.getMaxY()) {
         return true;
+      }
     }
     /**
      * Either
@@ -188,6 +150,46 @@ public class RectangleContains {
      * In either case, the segment is not wholely in the boundary
      */
     return false;
+  }
+
+  /**
+   * Tests if a linestring is completely contained in the boundary of the target rectangle.
+   * @param line the linestring to test
+   * @return true if the linestring is contained in the boundary
+   */
+  private boolean isLineStringContainedInBoundary(final LineString line) {
+    final CoordinatesList seq = line.getCoordinatesList();
+    final Coordinates p0 = new Coordinate();
+    final Coordinates p1 = new Coordinate();
+    for (int i = 0; i < seq.size() - 1; i++) {
+      seq.getCoordinate(i, p0);
+      seq.getCoordinate(i + 1, p1);
+
+      if (!isLineSegmentContainedInBoundary(p0, p1)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Tests if a point is contained in the boundary of the target rectangle.
+   * 
+   * @param pt the point to test
+   * @return true if the point is contained in the boundary
+   */
+  private boolean isPointContainedInBoundary(final Coordinates pt) {
+    /**
+     * contains = false iff the point is properly contained in the rectangle.
+     * 
+     * This code assumes that the point lies in the rectangle envelope
+     */
+    return pt.getX() == rectEnv.getMinX() || pt.getX() == rectEnv.getMaxX()
+      || pt.getY() == rectEnv.getMinY() || pt.getY() == rectEnv.getMaxY();
+  }
+
+  private boolean isPointContainedInBoundary(final Point point) {
+    return isPointContainedInBoundary(point.getCoordinate());
   }
 
 }

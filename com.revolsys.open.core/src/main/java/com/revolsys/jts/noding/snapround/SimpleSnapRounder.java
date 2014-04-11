@@ -123,7 +123,7 @@ public class SimpleSnapRounder
 
   /**
    * Computes all interior intersections in the collection of {@link SegmentString}s,
-   * and returns their {@link Coordinate}s.
+   * and returns their {@link Coordinates}s.
    *
    * Does NOT node the segStrings.
    *
@@ -154,7 +154,7 @@ public class SimpleSnapRounder
   private void computeSnaps(NodedSegmentString ss, Collection snapPts)
   {
     for (Iterator it = snapPts.iterator(); it.hasNext(); ) {
-      Coordinate snapPt = (Coordinate) it.next();
+      Coordinates snapPt = (Coordinate) it.next();
       HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
       for (int i = 0; i < ss.size() - 1; i++) {
       	hotPixel.addSnappedNode(ss, i);
@@ -185,7 +185,7 @@ public class SimpleSnapRounder
    */
   private void computeVertexSnaps(NodedSegmentString e0, NodedSegmentString e1)
   {
-    Coordinate[] pts0 = e0.getCoordinates();
+    Coordinates[] pts0 = e0.getCoordinates();
     Coordinates[] pts1 = e1.getCoordinates();
     for (int i0 = 0; i0 < pts0.length - 1; i0++) {
       HotPixel hotPixel = new HotPixel(pts0[i0], scaleFactor, li);

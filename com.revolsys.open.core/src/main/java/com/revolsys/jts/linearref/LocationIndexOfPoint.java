@@ -1,67 +1,67 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.linearref;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.util.Assert;
 
 /**
  * Computes the {@link LinearLocation} of the point
- * on a linear {@link Geometry} nearest a given {@link Coordinate}.
+ * on a linear {@link Geometry} nearest a given {@link Coordinates}.
  * The nearest point is not necessarily unique; this class
  * always computes the nearest point closest to
  * the start of the geometry.
  */
-class LocationIndexOfPoint
-{
-  public static LinearLocation indexOf(Geometry linearGeom, Coordinate inputPt)
-  {
-    LocationIndexOfPoint locater = new LocationIndexOfPoint(linearGeom);
+class LocationIndexOfPoint {
+  public static LinearLocation indexOf(final Geometry linearGeom,
+    final Coordinates inputPt) {
+    final LocationIndexOfPoint locater = new LocationIndexOfPoint(linearGeom);
     return locater.indexOf(inputPt);
   }
 
-  public static LinearLocation indexOfAfter(Geometry linearGeom, Coordinate inputPt, LinearLocation minIndex)
-  {
-    LocationIndexOfPoint locater = new LocationIndexOfPoint(linearGeom);
+  public static LinearLocation indexOfAfter(final Geometry linearGeom,
+    final Coordinates inputPt, final LinearLocation minIndex) {
+    final LocationIndexOfPoint locater = new LocationIndexOfPoint(linearGeom);
     return locater.indexOfAfter(inputPt, minIndex);
   }
 
-  private Geometry linearGeom;
+  private final Geometry linearGeom;
 
-  public LocationIndexOfPoint(Geometry linearGeom) {
+  public LocationIndexOfPoint(final Geometry linearGeom) {
     this.linearGeom = linearGeom;
   }
 
@@ -71,14 +71,13 @@ class LocationIndexOfPoint
    * @param inputPt the coordinate to locate
    * @return the location of the nearest point
    */
-  public LinearLocation indexOf(Coordinate inputPt)
-  {
+  public LinearLocation indexOf(final Coordinates inputPt) {
     return indexOfFromStart(inputPt, null);
   }
 
   /**
    * Find the nearest {@link LinearLocation} along the linear {@link Geometry}
-   * to a given {@link Coordinate}
+   * to a given {@link Coordinates}
    * after the specified minimum {@link LinearLocation}.
    * If possible the location returned will be strictly greater than the
    * <code>minLocation</code>.
@@ -91,50 +90,50 @@ class LocationIndexOfPoint
    * @param minIndex the minimum location for the point location
    * @return the location of the nearest point
    */
-  public LinearLocation indexOfAfter(Coordinate inputPt, LinearLocation minIndex)
-  {
-    if (minIndex == null) return indexOf(inputPt);
+  public LinearLocation indexOfAfter(final Coordinates inputPt,
+    final LinearLocation minIndex) {
+    if (minIndex == null) {
+      return indexOf(inputPt);
+    }
 
     // sanity check for minLocation at or past end of line
-    LinearLocation endLoc = LinearLocation.getEndLocation(linearGeom);
-    if (endLoc.compareTo(minIndex) <= 0)
+    final LinearLocation endLoc = LinearLocation.getEndLocation(linearGeom);
+    if (endLoc.compareTo(minIndex) <= 0) {
       return endLoc;
+    }
 
-    LinearLocation closestAfter = indexOfFromStart(inputPt, minIndex);
+    final LinearLocation closestAfter = indexOfFromStart(inputPt, minIndex);
     /**
      * Return the minDistanceLocation found.
      * This will not be null, since it was initialized to minLocation
      */
     Assert.isTrue(closestAfter.compareTo(minIndex) >= 0,
-                  "computed location is before specified minimum location");
+      "computed location is before specified minimum location");
     return closestAfter;
   }
 
-  private LinearLocation indexOfFromStart(Coordinate inputPt, LinearLocation minIndex)
-  {
+  private LinearLocation indexOfFromStart(final Coordinates inputPt,
+    final LinearLocation minIndex) {
     double minDistance = Double.MAX_VALUE;
     int minComponentIndex = 0;
     int minSegmentIndex = 0;
     double minFrac = -1.0;
 
-    LineSegment seg = new LineSegment();
-    for (LinearIterator it = new LinearIterator(linearGeom);
-         it.hasNext(); it.next()) {
-      if (! it.isEndOfLine()) {
+    final LineSegment seg = new LineSegment();
+    for (final LinearIterator it = new LinearIterator(linearGeom); it.hasNext(); it.next()) {
+      if (!it.isEndOfLine()) {
         seg.p0 = it.getSegmentStart();
         seg.p1 = it.getSegmentEnd();
-        double segDistance = seg.distance(inputPt);
-        double segFrac = seg.segmentFraction(inputPt);
+        final double segDistance = seg.distance(inputPt);
+        final double segFrac = seg.segmentFraction(inputPt);
 
-        int candidateComponentIndex = it.getComponentIndex();
-        int candidateSegmentIndex = it.getVertexIndex();
+        final int candidateComponentIndex = it.getComponentIndex();
+        final int candidateSegmentIndex = it.getVertexIndex();
         if (segDistance < minDistance) {
           // ensure after minLocation, if any
-          if (minIndex == null ||
-              minIndex.compareLocationValues(
-              candidateComponentIndex, candidateSegmentIndex, segFrac)
-              < 0
-              ) {
+          if (minIndex == null
+            || minIndex.compareLocationValues(candidateComponentIndex,
+              candidateSegmentIndex, segFrac) < 0) {
             // otherwise, save this as new minimum
             minComponentIndex = candidateComponentIndex;
             minSegmentIndex = candidateSegmentIndex;
@@ -149,7 +148,8 @@ class LocationIndexOfPoint
       return new LinearLocation(minIndex);
     }
     // otherwise, return computed location
-    LinearLocation loc = new LinearLocation(minComponentIndex, minSegmentIndex, minFrac);
+    final LinearLocation loc = new LinearLocation(minComponentIndex,
+      minSegmentIndex, minFrac);
     return loc;
   }
 
@@ -164,17 +164,9 @@ class LocationIndexOfPoint
    * @return the fraction along the line segment the point occurs
    */
   /*
-   // MD - no longer needed
-  private static double segmentFraction(
-      LineSegment seg,
-      Coordinate inputPt)
-  {
-    double segFrac = seg.projectionFactor(inputPt);
-    if (segFrac < 0.0)
-      segFrac = 0.0;
-    else if (segFrac > 1.0)
-      segFrac = 1.0;
-    return segFrac;
-  }
-  */
+   * // MD - no longer needed private static double segmentFraction( LineSegment
+   * seg, Coordinates inputPt) { double segFrac = seg.projectionFactor(inputPt);
+   * if (segFrac < 0.0) segFrac = 0.0; else if (segFrac > 1.0) segFrac = 1.0;
+   * return segFrac; }
+   */
 }

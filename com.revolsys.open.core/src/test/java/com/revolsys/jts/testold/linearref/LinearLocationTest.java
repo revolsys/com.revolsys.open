@@ -32,21 +32,21 @@ public class LinearLocationTest extends TestCase {
     final Geometry line = this.reader.read("MULTILINESTRING ((0 0, 10 0, 20 0), (20 0, 30 0))");
     final LocationIndexedLine indexedLine = new LocationIndexedLine(line);
 
-    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate(0, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc0_5 = indexedLine.indexOf(new Coordinate(5, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc1 = indexedLine.indexOf(new Coordinate(10, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc2 = indexedLine.indexOf(new Coordinate(20, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc0_5 = indexedLine.indexOf(new Coordinate((double)5, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc1 = indexedLine.indexOf(new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc2 = indexedLine.indexOf(new Coordinate((double)20, 0, Coordinates.NULL_ORDINATE));
     final LinearLocation loc2B = new LinearLocation(1, 0, 0.0);
 
-    final LinearLocation loc2_5 = indexedLine.indexOf(new Coordinate(25, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc3 = indexedLine.indexOf(new Coordinate(30, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc2_5 = indexedLine.indexOf(new Coordinate((double)25, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc3 = indexedLine.indexOf(new Coordinate((double)30, 0, Coordinates.NULL_ORDINATE));
 
-    final LineSegment seg0 = new LineSegment(new Coordinate(0, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(10, 0, Coordinates.NULL_ORDINATE));
-    final LineSegment seg1 = new LineSegment(new Coordinate(10, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(20, 0, Coordinates.NULL_ORDINATE));
-    final LineSegment seg2 = new LineSegment(new Coordinate(20, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate(30, 0, Coordinates.NULL_ORDINATE));
+    final LineSegment seg0 = new LineSegment(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE));
+    final LineSegment seg1 = new LineSegment(new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)20, 0, Coordinates.NULL_ORDINATE));
+    final LineSegment seg2 = new LineSegment(new Coordinate((double)20, 0, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)30, 0, Coordinates.NULL_ORDINATE));
 
     assertTrue(loc0.getSegment(line).equals(seg0));
     assertTrue(loc0_5.getSegment(line).equals(seg0));
@@ -61,7 +61,7 @@ public class LinearLocationTest extends TestCase {
   public void testRepeatedCoordsLineString() throws Exception {
     final Geometry line = this.reader.read("LINESTRING (10 0, 10 0, 20 0)");
     final LocationIndexedLine indexedLine = new LocationIndexedLine(line);
-    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate(11, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate((double)11, 0, Coordinates.NULL_ORDINATE));
     assertTrue(loc0.compareTo(new LinearLocation(1, 0.1)) == 0);
   }
 
@@ -69,12 +69,12 @@ public class LinearLocationTest extends TestCase {
     final Geometry line = this.reader.read("LINESTRING (0 0, 10 0, 20 0, 30 0)");
     final LocationIndexedLine indexedLine = new LocationIndexedLine(line);
 
-    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate(0, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc0_5 = indexedLine.indexOf(new Coordinate(5, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc1 = indexedLine.indexOf(new Coordinate(10, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc2 = indexedLine.indexOf(new Coordinate(20, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc2_5 = indexedLine.indexOf(new Coordinate(25, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc3 = indexedLine.indexOf(new Coordinate(30, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc0_5 = indexedLine.indexOf(new Coordinate((double)5, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc1 = indexedLine.indexOf(new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc2 = indexedLine.indexOf(new Coordinate((double)20, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc2_5 = indexedLine.indexOf(new Coordinate((double)25, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc3 = indexedLine.indexOf(new Coordinate((double)30, 0, Coordinates.NULL_ORDINATE));
 
     assertTrue(loc0.isOnSameSegment(loc0));
     assertTrue(loc0.isOnSameSegment(loc0_5));
@@ -106,14 +106,14 @@ public class LinearLocationTest extends TestCase {
     final Geometry line = this.reader.read("MULTILINESTRING ((0 0, 10 0, 20 0), (20 0, 30 0))");
     final LocationIndexedLine indexedLine = new LocationIndexedLine(line);
 
-    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate(0, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc0_5 = indexedLine.indexOf(new Coordinate(5, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc1 = indexedLine.indexOf(new Coordinate(10, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc2 = indexedLine.indexOf(new Coordinate(20, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc0_5 = indexedLine.indexOf(new Coordinate((double)5, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc1 = indexedLine.indexOf(new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc2 = indexedLine.indexOf(new Coordinate((double)20, 0, Coordinates.NULL_ORDINATE));
     final LinearLocation loc2B = new LinearLocation(1, 0, 0.0);
 
-    final LinearLocation loc2_5 = indexedLine.indexOf(new Coordinate(25, 0, Coordinates.NULL_ORDINATE));
-    final LinearLocation loc3 = indexedLine.indexOf(new Coordinate(30, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc2_5 = indexedLine.indexOf(new Coordinate((double)25, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc3 = indexedLine.indexOf(new Coordinate((double)30, 0, Coordinates.NULL_ORDINATE));
 
     assertTrue(loc0.isOnSameSegment(loc0));
     assertTrue(loc0.isOnSameSegment(loc0_5));
@@ -145,7 +145,7 @@ public class LinearLocationTest extends TestCase {
   public void testZeroLengthLineString() throws Exception {
     final Geometry line = this.reader.read("LINESTRING (10 0, 10 0)");
     final LocationIndexedLine indexedLine = new LocationIndexedLine(line);
-    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate(11, 0, Coordinates.NULL_ORDINATE));
+    final LinearLocation loc0 = indexedLine.indexOf(new Coordinate((double)11, 0, Coordinates.NULL_ORDINATE));
     assertTrue(loc0.compareTo(new LinearLocation(1, 0.0)) == 0);
   }
 

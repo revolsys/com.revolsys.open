@@ -74,7 +74,7 @@ public class OctagonalEnvelope
   }
 
   /**
-   * Creates a new null bounding octagon bounding a {@link Coordinate}
+   * Creates a new null bounding octagon bounding a {@link Coordinates}
    */
   public OctagonalEnvelope(Coordinates p)
   {
@@ -82,7 +82,7 @@ public class OctagonalEnvelope
   }
 
   /**
-   * Creates a new null bounding octagon bounding a pair of {@link Coordinate}s
+   * Creates a new null bounding octagon bounding a pair of {@link Coordinates}s
    */
   public OctagonalEnvelope(Coordinates p0, Coordinates p1)
   {
@@ -302,17 +302,17 @@ public class OctagonalEnvelope
       return geomFactory.createPoint((CoordinatesList)null);
     }
 
-    Coordinate px00 = new Coordinate(minX, minA - minX, Coordinates.NULL_ORDINATE);
-    Coordinate px01 = new Coordinate(minX, minX - minB, Coordinates.NULL_ORDINATE);
+    Coordinates px00 = new Coordinate((double)minX, minA - minX, Coordinates.NULL_ORDINATE);
+    Coordinates px01 = new Coordinate((double)minX, minX - minB, Coordinates.NULL_ORDINATE);
 
-    Coordinate px10 = new Coordinate(maxX, maxX - maxB, Coordinates.NULL_ORDINATE);
-    Coordinate px11 = new Coordinate(maxX, maxA - maxX, Coordinates.NULL_ORDINATE);
+    Coordinates px10 = new Coordinate((double)maxX, maxX - maxB, Coordinates.NULL_ORDINATE);
+    Coordinates px11 = new Coordinate((double)maxX, maxA - maxX, Coordinates.NULL_ORDINATE);
 
-    Coordinate py00 = new Coordinate(minA - minY, minY, Coordinates.NULL_ORDINATE);
-    Coordinate py01 = new Coordinate(minY + maxB, minY, Coordinates.NULL_ORDINATE);
+    Coordinates py00 = new Coordinate((double)minA - minY, minY, Coordinates.NULL_ORDINATE);
+    Coordinates py01 = new Coordinate((double)minY + maxB, minY, Coordinates.NULL_ORDINATE);
 
-    Coordinate py10 = new Coordinate(maxY + minB, maxY, Coordinates.NULL_ORDINATE);
-    Coordinate py11 = new Coordinate(maxA - maxY, maxY, Coordinates.NULL_ORDINATE);
+    Coordinates py10 = new Coordinate((double)maxY + minB, maxY, Coordinates.NULL_ORDINATE);
+    Coordinates py11 = new Coordinate((double)maxA - maxY, maxY, Coordinates.NULL_ORDINATE);
 
     PrecisionModel pm = geomFactory.getPrecisionModel();
     pm.makePrecise(px00);

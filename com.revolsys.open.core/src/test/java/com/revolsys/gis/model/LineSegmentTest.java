@@ -2,9 +2,9 @@ package com.revolsys.gis.model;
 
 import org.junit.Test;
 
+import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;

@@ -32,7 +32,6 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
@@ -46,7 +45,7 @@ public class PointPairDistance {
 
   private boolean isNull = true;
 
-  private final AbstractCoordinates[] pt = {
+  private final Coordinates[] pt = {
     new Coordinate(), new Coordinate()
   };
 
@@ -69,7 +68,7 @@ public class PointPairDistance {
     isNull = true;
   }
 
-  public void initialize(final AbstractCoordinates p0, final Coordinates p1) {
+  public void initialize(final Coordinates p0, final Coordinates p1) {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);
     distance = p0.distance(p1);
@@ -91,7 +90,7 @@ public class PointPairDistance {
     isNull = false;
   }
 
-  public void setMaximum(final AbstractCoordinates p0, final Coordinates p1) {
+  public void setMaximum(final Coordinates p0, final Coordinates p1) {
     if (isNull) {
       initialize(p0, p1);
       return;
@@ -106,7 +105,7 @@ public class PointPairDistance {
     setMaximum(ptDist.pt[0], ptDist.pt[1]);
   }
 
-  public void setMinimum(final AbstractCoordinates p0, final Coordinates p1) {
+  public void setMinimum(final Coordinates p0, final Coordinates p1) {
     if (isNull) {
       initialize(p0, p1);
       return;

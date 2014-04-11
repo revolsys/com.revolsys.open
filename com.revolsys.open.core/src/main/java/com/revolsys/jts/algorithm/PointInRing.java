@@ -37,7 +37,7 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
 /**
- * An interface for classes which test whether a {@link Coordinate} lies inside
+ * An interface for classes which test whether a {@link Coordinates} lies inside
  * a ring.
  *
  * @version 1.7

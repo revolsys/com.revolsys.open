@@ -1,18 +1,15 @@
 package com.revolsys.gis.jts;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.jts.locator.SortedPackedIntervalRTree;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.geometry.LineSegment;
-import com.revolsys.gis.model.geometry.algorithm.locate.Location;
-import com.revolsys.gis.model.geometry.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.gis.model.geometry.index.SortedPackedIntervalRTree;
 import com.revolsys.jts.algorithm.PointInArea;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
+public class IndexedPointInAreaLocator {
 
   private static class IntervalIndexedGeometry {
     private final SortedPackedIntervalRTree<LineSegment> index = new SortedPackedIntervalRTree<LineSegment>();
@@ -51,8 +48,8 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
   private static final String KEY = IndexedPointInAreaLocator.class.getName();
 
-  public static PointOnGeometryLocator get(final Geometry geometry) {
-    PointOnGeometryLocator locator = JtsGeometryUtil.getGeometryProperty(
+  public static IndexedPointInAreaLocator get(final Geometry geometry) {
+    IndexedPointInAreaLocator locator = JtsGeometryUtil.getGeometryProperty(
       geometry, KEY);
     if (locator == null) {
       locator = new IndexedPointInAreaLocator(geometry);
@@ -87,14 +84,12 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return index;
   }
 
-  @Override
   public Location locate(final Coordinates coordinates) {
     final double x = coordinates.getX();
     final double y = coordinates.getY();
     return locate(x, y);
   }
 
-  @Override
   public Location locate(final double x, final double y) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final double resolutionXy = geometryFactory.getResolutionXy();

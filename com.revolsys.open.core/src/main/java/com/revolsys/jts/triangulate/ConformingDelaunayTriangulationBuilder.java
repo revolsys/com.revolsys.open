@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -72,9 +73,12 @@ public class ConformingDelaunayTriangulationBuilder {
 
   private static void createConstraintSegments(final LineString line,
     final List constraintSegs) {
-    final Coordinate[] coords = line.getCoordinateArray();
-    for (int i = 1; i < coords.length; i++) {
-      constraintSegs.add(new Segment(coords[i - 1], coords[i]));
+    Coordinates previousPoint = line.getVertex(0);
+    final Coordinates[] coords = line.getCoordinateArray();
+    for (final com.revolsys.jts.geom.Vertex vertex : line.vertices()) {
+      final Coordinates point = vertex.cloneCoordinates();
+      constraintSegs.add(new Segment(previousPoint, point));
+      previousPoint = point;
     }
   }
 
@@ -119,7 +123,7 @@ public class ConformingDelaunayTriangulationBuilder {
   private List createSiteVertices(final Collection coords) {
     final List verts = new ArrayList();
     for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinate coord = (Coordinate)i.next();
+      final Coordinates coord = (Coordinate)i.next();
       if (constraintVertexMap.containsKey(coord)) {
         continue;
       }
@@ -129,10 +133,9 @@ public class ConformingDelaunayTriangulationBuilder {
   }
 
   private void createVertices(final Geometry geom) {
-    final Coordinate[] coords = geom.getCoordinateArray();
-    for (int i = 0; i < coords.length; i++) {
-      final Vertex v = new ConstraintVertex(coords[i]);
-      constraintVertexMap.put(coords[i], v);
+    for (final Coordinates coordinate : geom.vertices()) {
+      final Vertex v = new ConstraintVertex(coordinate);
+      constraintVertexMap.put(v.getCoordinate(), v);
     }
   }
 

@@ -1,6 +1,6 @@
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.util.Assert;
@@ -14,13 +14,13 @@ import com.revolsys.jts.util.Assert;
 public class LocationOfPoint {
 
   public static LineStringLocation locate(final LineString line,
-    final Coordinate inputPt) {
+    final Coordinates inputPt) {
     final LocationOfPoint locater = new LocationOfPoint(line);
     return locater.locate(inputPt);
   }
 
   public static double segmentFraction(final LineSegment seg,
-    final Coordinate inputPt) {
+    final Coordinates inputPt) {
     double segFrac = seg.projectionFactor(inputPt);
     if (segFrac < 0.0) {
       segFrac = 0.0;
@@ -57,9 +57,9 @@ public class LocationOfPoint {
    * @param inputPt the coordinate to locate
    * @return the location of the nearest point
    */
-  public LineStringLocation locate(final Coordinate inputPt) {
+  public LineStringLocation locate(final Coordinates inputPt) {
     // return locateAfter(inputPt, null);
-    final Coordinate[] pts = line.getCoordinateArray();
+    final Coordinates[] pts = line.getCoordinateArray();
 
     double minDistance = Double.MAX_VALUE;
     int minIndex = 0;
@@ -96,13 +96,13 @@ public class LocationOfPoint {
    * @param minLocation the minimum location for the point location
    * @return the location of the nearest point
    */
-  public LineStringLocation locateAfter(final Coordinate inputPt,
+  public LineStringLocation locateAfter(final Coordinates inputPt,
     final LineStringLocation minLocation) {
     if (minLocation == null) {
       return locate(inputPt);
     }
 
-    final Coordinate[] pts = line.getCoordinateArray();
+    final Coordinates[] pts = line.getCoordinateArray();
 
     // sanity check for minLocation at or past end of line
     if (minLocation.getSegmentIndex() >= line.getNumPoints()) {

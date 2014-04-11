@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -49,15 +48,23 @@ import com.revolsys.jts.geom.Point;
  */
 public class InteriorPointPoint {
 
-  private Coordinates centroid;
+  private final Coordinates centroid;
+
   private double minDistance = Double.MAX_VALUE;
 
   private Coordinates interiorPoint = null;
 
-  public InteriorPointPoint(Geometry g)
-  {
+  public InteriorPointPoint(final Geometry g) {
     centroid = g.getCentroid().getCoordinate();
     add(g);
+  }
+
+  private void add(final Coordinates point) {
+    final double dist = point.distance(centroid);
+    if (dist < minDistance) {
+      interiorPoint = new Coordinate(point);
+      minDistance = dist;
+    }
   }
 
   /**
@@ -65,29 +72,18 @@ public class InteriorPointPoint {
    * If a Geometry is not of dimension 0 it is not tested.
    * @param geom the geometry to add
    */
-  private void add(Geometry geom)
-  {
+  private void add(final Geometry geom) {
     if (geom instanceof Point) {
       add(geom.getCoordinate());
-    }
-    else if (geom instanceof GeometryCollection) {
-      GeometryCollection gc = (GeometryCollection) geom;
+    } else if (geom instanceof GeometryCollection) {
+      final GeometryCollection gc = (GeometryCollection)geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
         add(gc.getGeometry(i));
       }
     }
   }
-  private void add(AbstractCoordinates point)
-  {
-    double dist = point.distance(centroid);
-    if (dist < minDistance) {
-      interiorPoint = new Coordinate(point);
-      minDistance = dist;
-    }
-  }
 
-  public Coordinates getInteriorPoint()
-  {
+  public Coordinates getInteriorPoint() {
     return interiorPoint;
   }
 }

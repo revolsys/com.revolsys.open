@@ -97,9 +97,9 @@ public class CentroidArea
    * Adds the area defined by an array of
    * coordinates.  The array must be a ring;
    * i.e. end with the same coordinate as it starts with.
-   * @param ring an array of {@link Coordinate}s
+   * @param ring an array of {@link Coordinates}s
    */
-  public void add(Coordinate[] ring)
+  public void add(Coordinates[] ring)
   {
     setBasePoint(ring[0]);
     addShell(ring);
@@ -134,7 +134,7 @@ public class CentroidArea
     }
   }
 
-  private void addShell(Coordinate[] pts)
+  private void addShell(Coordinates[] pts)
   {
     boolean isPositiveArea = ! CGAlgorithms.isCCW(pts);
     for (int i = 0; i < pts.length - 1; i++) {
@@ -142,7 +142,7 @@ public class CentroidArea
     }
     addLinearSegments(pts);
   }
-  private void addHole(Coordinate[] pts)
+  private void addHole(Coordinates[] pts)
   {
     boolean isPositiveArea = CGAlgorithms.isCCW(pts);
     for (int i = 0; i < pts.length - 1; i++) {
@@ -188,9 +188,9 @@ public class CentroidArea
    * This is done in case the polygon(s) have zero-area, 
    * in which case the linear centroid is computed instead.
    * 
-   * @param pts an array of {@link Coordinate}s
+   * @param pts an array of {@link Coordinates}s
    */
-  private void addLinearSegments(AbstractCoordinates[] pts)
+  private void addLinearSegments(Coordinates[] pts)
   {
     for (int i = 0; i < pts.length - 1; i++) {
       double segmentLen = pts[i].distance(pts[i + 1]);

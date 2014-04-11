@@ -56,50 +56,50 @@ public class AngleTest extends TestCase {
 
   public void testAngle() throws Exception {
     assertEquals(
-      Angle.angle(new Coordinate(10.0, 0, Coordinates.NULL_ORDINATE)), 0.0,
+      Angle.angle(new Coordinate((double)10.0, 0, Coordinates.NULL_ORDINATE)), 0.0,
       TOLERANCE);
     assertEquals(
-      Angle.angle(new Coordinate(10.0, 10, Coordinates.NULL_ORDINATE)),
+      Angle.angle(new Coordinate((double)10.0, 10, Coordinates.NULL_ORDINATE)),
       Math.PI / 4, TOLERANCE);
     assertEquals(
-      Angle.angle(new Coordinate(0.0, 10, Coordinates.NULL_ORDINATE)),
+      Angle.angle(new Coordinate((double)0.0, 10, Coordinates.NULL_ORDINATE)),
       Math.PI / 2, TOLERANCE);
     assertEquals(
-      Angle.angle(new Coordinate(-10.0, 10, Coordinates.NULL_ORDINATE)),
+      Angle.angle(new Coordinate((double)-10.0, 10, Coordinates.NULL_ORDINATE)),
       0.75 * Math.PI, TOLERANCE);
     assertEquals(
-      Angle.angle(new Coordinate(-10.0, 0, Coordinates.NULL_ORDINATE)),
+      Angle.angle(new Coordinate((double)-10.0, 0, Coordinates.NULL_ORDINATE)),
       Math.PI, TOLERANCE);
     assertEquals(
-      Angle.angle(new Coordinate(-10.0, -0.1, Coordinates.NULL_ORDINATE)),
+      Angle.angle(new Coordinate((double)-10.0, -0.1, Coordinates.NULL_ORDINATE)),
       -3.131592986903128, TOLERANCE);
     assertEquals(
-      Angle.angle(new Coordinate(-10.0, -10, Coordinates.NULL_ORDINATE)), -0.75
+      Angle.angle(new Coordinate((double)-10.0, -10, Coordinates.NULL_ORDINATE)), -0.75
         * Math.PI, TOLERANCE);
   }
 
   public void testIsAcute() throws Exception {
-    assertEquals(Angle.isAcute(new Coordinate(10.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(0.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(5.0, 10.0,
+    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)0.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)5.0, 10.0,
       Coordinates.NULL_ORDINATE)), true);
-    assertEquals(Angle.isAcute(new Coordinate(10.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(0.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(5.0, -10,
+    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)0.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)5.0, -10,
       Coordinates.NULL_ORDINATE)), true);
     // angle of 0
-    assertEquals(Angle.isAcute(new Coordinate(10.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(0.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(10.0, 0,
+    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)0.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)10.0, 0,
       Coordinates.NULL_ORDINATE)), true);
 
-    assertEquals(Angle.isAcute(new Coordinate(10.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(0.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(-5.0, 10,
+    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)0.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)-5.0, 10,
       Coordinates.NULL_ORDINATE)), false);
-    assertEquals(Angle.isAcute(new Coordinate(10.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(0.0, 0,
-      Coordinates.NULL_ORDINATE), new Coordinate(-5.0, -10,
+    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)0.0, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)-5.0, -10,
       Coordinates.NULL_ORDINATE)), false);
 
   }

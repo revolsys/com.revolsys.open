@@ -48,14 +48,13 @@ import com.revolsys.jts.geom.Coordinates;
  *
  * @version 1.7
  */
-public class EdgeIntersectionList
-{
+public class EdgeIntersectionList {
   // a Map <EdgeIntersection, EdgeIntersection>
-  private Map nodeMap = new TreeMap();
-  Edge edge;  // the parent edge
+  private final Map nodeMap = new TreeMap();
 
-  public EdgeIntersectionList(Edge edge)
-  {
+  Edge edge; // the parent edge
+
+  public EdgeIntersectionList(final Edge edge) {
     this.edge = edge;
   }
 
@@ -64,10 +63,11 @@ public class EdgeIntersectionList
    * The input segmentIndex and dist are expected to be normalized.
    * @return the EdgeIntersection found or added
    */
-  public EdgeIntersection add(Coordinates intPt, int segmentIndex, double dist)
-  {
-    EdgeIntersection eiNew = new EdgeIntersection(intPt, segmentIndex, dist);
-    EdgeIntersection ei = (EdgeIntersection) nodeMap.get(eiNew);
+  public EdgeIntersection add(final Coordinates intPt, final int segmentIndex,
+    final double dist) {
+    final EdgeIntersection eiNew = new EdgeIntersection(intPt, segmentIndex,
+      dist);
+    final EdgeIntersection ei = (EdgeIntersection)nodeMap.get(eiNew);
     if (ei != null) {
       return ei;
     }
@@ -76,34 +76,10 @@ public class EdgeIntersectionList
   }
 
   /**
-   * Returns an iterator of {@link EdgeIntersection}s
-   *
-   * @return an Iterator of EdgeIntersections
-   */
-  public Iterator iterator() { return nodeMap.values().iterator(); }
-
-  /**
-   * Tests if the given point is an edge intersection
-   *
-   * @param pt the point to test
-   * @return true if the point is an intersection
-   */
-  public boolean isIntersection(Coordinate pt)
-  {
-    for (Iterator it = iterator(); it.hasNext(); ) {
-      EdgeIntersection ei = (EdgeIntersection) it.next();
-      if (ei.coord.equals(pt))
-       return true;
-    }
-    return false;
-  }
-
-  /**
    * Adds entries for the first and last points of the edge to the list
    */
-  public void addEndpoints()
-  {
-    int maxSegIndex = edge.pts.length - 1;
+  public void addEndpoints() {
+    final int maxSegIndex = edge.pts.length - 1;
     add(edge.pts[0], 0, 0.0);
     add(edge.pts[maxSegIndex], maxSegIndex, 0.0);
   }
@@ -116,57 +92,84 @@ public class EdgeIntersectionList
    *
    * @param edgeList a list of EdgeIntersections
    */
-  public void addSplitEdges(List edgeList)
-  {
+  public void addSplitEdges(final List edgeList) {
     // ensure that the list has entries for the first and last point of the edge
     addEndpoints();
 
-    Iterator it = iterator();
+    final Iterator it = iterator();
     // there should always be at least two entries in the list
-    EdgeIntersection eiPrev = (EdgeIntersection) it.next();
+    EdgeIntersection eiPrev = (EdgeIntersection)it.next();
     while (it.hasNext()) {
-      EdgeIntersection ei = (EdgeIntersection) it.next();
-      Edge newEdge = createSplitEdge(eiPrev, ei);
+      final EdgeIntersection ei = (EdgeIntersection)it.next();
+      final Edge newEdge = createSplitEdge(eiPrev, ei);
       edgeList.add(newEdge);
 
       eiPrev = ei;
     }
   }
+
   /**
    * Create a new "split edge" with the section of points between
    * (and including) the two intersections.
    * The label for the new edge is the same as the label for the parent edge.
    */
-  Edge createSplitEdge(EdgeIntersection ei0, EdgeIntersection ei1)
-  {
-//Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
+  Edge createSplitEdge(final EdgeIntersection ei0, final EdgeIntersection ei1) {
+    // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
 
-    Coordinates lastSegStartPt = edge.pts[ei1.segmentIndex];
+    final Coordinates lastSegStartPt = edge.pts[ei1.segmentIndex];
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
-    // (This check is needed because the distance metric is not totally reliable!)
+    // (This check is needed because the distance metric is not totally
+    // reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    boolean useIntPt1 = ei1.dist > 0.0 || ! ei1.coord.equals2d(lastSegStartPt);
-    if (! useIntPt1) {
+    final boolean useIntPt1 = ei1.dist > 0.0
+      || !ei1.coord.equals2d(lastSegStartPt);
+    if (!useIntPt1) {
       npts--;
     }
 
-    Coordinate[] pts = new Coordinate[npts];
+    final Coordinates[] pts = new Coordinates[npts];
     int ipt = 0;
     pts[ipt++] = new Coordinate(ei0.coord);
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
       pts[ipt++] = edge.pts[i];
     }
-    if (useIntPt1) pts[ipt] = ei1.coord;
+    if (useIntPt1) {
+      pts[ipt] = ei1.coord;
+    }
     return new Edge(pts, new Label(edge.label));
   }
 
-  public void print(PrintStream out)
-  {
+  /**
+   * Tests if the given point is an edge intersection
+   *
+   * @param pt the point to test
+   * @return true if the point is an intersection
+   */
+  public boolean isIntersection(final Coordinates pt) {
+    for (final Iterator it = iterator(); it.hasNext();) {
+      final EdgeIntersection ei = (EdgeIntersection)it.next();
+      if (ei.coord.equals(pt)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns an iterator of {@link EdgeIntersection}s
+   *
+   * @return an Iterator of EdgeIntersections
+   */
+  public Iterator iterator() {
+    return nodeMap.values().iterator();
+  }
+
+  public void print(final PrintStream out) {
     out.println("Intersections:");
-    for (Iterator it = iterator(); it.hasNext(); ) {
-      EdgeIntersection ei = (EdgeIntersection) it.next();
+    for (final Iterator it = iterator(); it.hasNext();) {
+      final EdgeIntersection ei = (EdgeIntersection)it.next();
       ei.print(out);
     }
   }

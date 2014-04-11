@@ -59,7 +59,7 @@ public class PointInAreaPerfTester {
         // compute test point
         final double x = areaEnv.getMinX() + i * xStep;
         final double y = areaEnv.getMinY() + j * yStep;
-        final Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+        final Coordinates pt = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
         this.geomFactory.getPrecisionModel().makePrecise(pt);
 
         final int loc = this.pia1.locate(pt);

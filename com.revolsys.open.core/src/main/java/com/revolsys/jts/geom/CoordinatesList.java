@@ -41,7 +41,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
  * The internal representation of a list of coordinates inside a Geometry.
  * <p>
  * This allows Geometries to store their
- * points using something other than the JTS {@link Coordinate} class. 
+ * points using something other than the JTS {@link Coordinates} class. 
  * For example, a storage-efficient implementation
  * might store coordinate sequences as an array of x's
  * and an array of y's. 
@@ -119,25 +119,25 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   /**
    * Returns (possibly a copy of) the i'th coordinate in this sequence.
-   * Whether or not the Coordinate returned is the actual underlying
-   * Coordinate or merely a copy depends on the implementation.
+   * Whether or not the Coordinates returned is the actual underlying
+   * Coordinates or merely a copy depends on the implementation.
    * <p>
    * Note that in the future the semantics of this method may change
-   * to guarantee that the Coordinate returned is always a copy.
+   * to guarantee that the Coordinates returned is always a copy.
    * Callers should not to assume that they can modify a CoordinatesList by
    * modifying the object returned by this method.
    *
    * @param i the index of the coordinate to retrieve
    * @return the i'th coordinate in the sequence
    */
-  Coordinate getCoordinate(int i);
+  Coordinates getCoordinate(int i);
 
   /**
    * Copies the i'th coordinate in the sequence to the supplied
-   * {@link Coordinate}.  Only the first two dimensions are copied.
+   * {@link Coordinates}.  Only the first two dimensions are copied.
    *
    * @param index the index of the coordinate to copy
-   * @param coord a {@link Coordinate} to receive the value
+   * @param coord a {@link Coordinates} to receive the value
    */
   void getCoordinate(int index, Coordinates coord);
 
@@ -145,7 +145,7 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    * Returns a copy of the i'th coordinate in this sequence.
    * This method optimizes the situation where the caller is
    * going to make a copy anyway - if the implementation
-   * has already created a new Coordinate object, no further copy is needed.
+   * has already created a new Coordinates object, no further copy is needed.
    *
    * @param i the index of the coordinate to retrieve
    * @return a copy of the i'th coordinate in the sequence
@@ -257,5 +257,5 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    *
    * @return a array of coordinates containing the point values in this sequence
    */
-  Coordinate[] toCoordinateArray();
+  Coordinates[] toCoordinateArray();
 }

@@ -26,7 +26,7 @@ public class DelaunayPerfTest {
     for (int i = 0; i < nPts; i++) {
       final double x = SIDE_LEN * Math.random();
       final double y = SIDE_LEN * Math.random();
-      pts.add(new Coordinate(x, y, Coordinates.NULL_ORDINATE));
+      pts.add(new Coordinate((double)x, y, Coordinates.NULL_ORDINATE));
     }
     return pts;
   }
@@ -40,7 +40,7 @@ public class DelaunayPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double x = i * SIDE_LEN + SIDE_LEN * Math.random();
         final double y = j * SIDE_LEN + SIDE_LEN * Math.random();
-        pts.add(new Coordinate(x, y, Coordinates.NULL_ORDINATE));
+        pts.add(new Coordinate((double)x, y, Coordinates.NULL_ORDINATE));
       }
     }
     return pts;

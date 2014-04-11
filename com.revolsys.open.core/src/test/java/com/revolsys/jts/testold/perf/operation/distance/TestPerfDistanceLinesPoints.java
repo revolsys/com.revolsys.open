@@ -70,7 +70,7 @@ public class TestPerfDistanceLinesPoints {
     final double inc = extent / nSegs;
     for (int i = 0; i < nSegs; i++) {
       final double ord = i * inc;
-      final Coordinates p = new Coordinate(ord, ord, Coordinates.NULL_ORDINATE);
+      final Coordinates p = new Coordinate((double)ord, ord, Coordinates.NULL_ORDINATE);
       final Geometry pt = geomFact.createPoint(p);
       circles[i] = (Polygon)pt.buffer(inc / 2);
     }
@@ -80,19 +80,19 @@ public class TestPerfDistanceLinesPoints {
 
   Geometry createDiagonalLine(final double extent, final int nSegs) {
     final Coordinates[] pts = new Coordinates[nSegs + 1];
-    pts[0] = new Coordinate(0, 0, Coordinates.NULL_ORDINATE);
+    pts[0] = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
     final double inc = extent / nSegs;
     for (int i = 1; i <= nSegs; i++) {
       final double ord = i * inc;
-      pts[i] = new Coordinate(ord, ord, Coordinates.NULL_ORDINATE);
+      pts[i] = new Coordinate((double)ord, ord, Coordinates.NULL_ORDINATE);
     }
     return geomFact.createLineString(pts);
   }
 
   Geometry createLine(final double extent, final int nSegs) {
     final Coordinates[] pts = new Coordinates[] {
-      new Coordinate(0, 0, Coordinates.NULL_ORDINATE), new Coordinate(0, extent, Coordinates.NULL_ORDINATE),
-      new Coordinate(extent, extent, Coordinates.NULL_ORDINATE), new Coordinate(extent, 0, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), new Coordinate((double)0, extent, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)extent, extent, Coordinates.NULL_ORDINATE), new Coordinate((double)extent, 0, Coordinates.NULL_ORDINATE)
 
     };
     final Geometry outline = geomFact.createLineString(pts);
@@ -108,7 +108,7 @@ public class TestPerfDistanceLinesPoints {
     final double yinc = extent.getHeight() / nPtsSide;
     for (int i = 0; i < nPtsSide; i++) {
       for (int j = 0; j < nPtsSide; j++) {
-        pts[index++] = geomFact.createPoint(new Coordinate(extent.getMinX() + i
+        pts[index++] = geomFact.createPoint(new Coordinate((double)extent.getMinX() + i
           * xinc, extent.getMinY() + j * yinc, Coordinates.NULL_ORDINATE));
       }
     }

@@ -1,6 +1,6 @@
 package com.revolsys.jts.geom;
 
-import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
+import com.revolsys.gis.jts.GeometryEditUtil;
 
 /**
  * @author Paul Austin <paul.austin@revolsys.com>

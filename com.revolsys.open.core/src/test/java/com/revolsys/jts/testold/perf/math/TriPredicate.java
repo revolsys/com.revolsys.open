@@ -56,8 +56,8 @@ public class TriPredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleCC(final AbstractCoordinates a, final Coordinates b,
-    final Coordinates c, final AbstractCoordinates p) {
+  public static boolean isInCircleCC(final Coordinates a, final Coordinates b,
+    final Coordinates c, final Coordinates p) {
     final Coordinates cc = Triangle.circumcentre(a, b, c);
     final double ccRadius = a.distance(cc);
     final double pRadiusDiff = p.distance(cc) - ccRadius;

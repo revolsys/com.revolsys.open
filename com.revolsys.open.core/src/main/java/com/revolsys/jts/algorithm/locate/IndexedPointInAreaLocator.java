@@ -49,7 +49,7 @@ import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.intervalrtree.SortedPackedIntervalRTree;
 
 /**
- * Determines the {@link Location} of {@link Coordinate}s relative to
+ * Determines the {@link Location} of {@link Coordinates}s relative to
  * a {@link Polygonal} geometry, using indexing for efficiency.
  * This algorithm is suitable for use in cases where
  * many points will be tested against a given area.
@@ -59,104 +59,90 @@ import com.revolsys.jts.index.intervalrtree.SortedPackedIntervalRTree;
  * @author Martin Davis
  *
  */
-public class IndexedPointInAreaLocator 
-  implements PointOnGeometryLocator
-{
+public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
+  private static class IntervalIndexedGeometry {
+    private final SortedPackedIntervalRTree index = new SortedPackedIntervalRTree();
+
+    public IntervalIndexedGeometry(final Geometry geom) {
+      init(geom);
+    }
+
+    private void addLine(final Coordinates[] pts) {
+      for (int i = 1; i < pts.length; i++) {
+        final LineSegment seg = new LineSegment(pts[i - 1], pts[i]);
+        final double min = Math.min(seg.p0.getY(), seg.p1.getY());
+        final double max = Math.max(seg.p0.getY(), seg.p1.getY());
+        index.insert(min, max, seg);
+      }
+    }
+
+    private void init(final Geometry geom) {
+      final List lines = LinearComponentExtracter.getLines(geom);
+      for (final Iterator i = lines.iterator(); i.hasNext();) {
+        final LineString line = (LineString)i.next();
+        final Coordinates[] pts = line.getCoordinateArray();
+        addLine(pts);
+      }
+    }
+
+    public List query(final double min, final double max) {
+      final ArrayListVisitor visitor = new ArrayListVisitor();
+      index.query(min, max, visitor);
+      return visitor.getItems();
+    }
+
+    public void query(final double min, final double max,
+      final ItemVisitor visitor) {
+      index.query(min, max, visitor);
+    }
+  }
+
+  private static class SegmentVisitor implements ItemVisitor {
+    private final RayCrossingCounter counter;
+
+    public SegmentVisitor(final RayCrossingCounter counter) {
+      this.counter = counter;
+    }
+
+    @Override
+    public void visitItem(final Object item) {
+      final LineSegment seg = (LineSegment)item;
+      counter.countSegment(seg.getCoordinate(0), seg.getCoordinate(1));
+    }
+  }
+
   private final IntervalIndexedGeometry index;
-  
+
   /**
    * Creates a new locator for a given {@link Geometry}
    * @param g the Geometry to locate in
    */
-  public IndexedPointInAreaLocator(Geometry g)
-  {
-    if (! (g instanceof Polygonal))
+  public IndexedPointInAreaLocator(final Geometry g) {
+    if (!(g instanceof Polygonal)) {
       throw new IllegalArgumentException("Argument must be Polygonal");
+    }
     index = new IntervalIndexedGeometry(g);
   }
-    
+
   /**
    * Determines the {@link Location} of a point in an areal {@link Geometry}.
    * 
    * @param p the point to test
    * @return the location of the point in the geometry  
    */
-  public int locate(Coordinates p)
-  {
-    RayCrossingCounter rcc = new RayCrossingCounter(p);
-    
-    SegmentVisitor visitor = new SegmentVisitor(rcc);
-    index.query(p.getY(), p.getY(), visitor);
-  
-    /*
-     // MD - slightly slower alternative
-    List segs = index.query(p.y, p.y);
-    countSegs(rcc, segs);
-    */
-    
-    return rcc.getLocation();
-  }
-  
-  private static class SegmentVisitor
-    implements ItemVisitor
-  {
-    private RayCrossingCounter counter;
-    
-    public SegmentVisitor(RayCrossingCounter counter)
-    {
-      this.counter = counter;
-    }
-    
-    public void visitItem(Object item)
-    {
-      LineSegment seg = (LineSegment) item;
-      counter.countSegment(seg.getCoordinate(0), seg.getCoordinate(1));
-    }
-  }
-  
-  private static class IntervalIndexedGeometry
-  {
-    private final SortedPackedIntervalRTree index= new SortedPackedIntervalRTree();
+  @Override
+  public int locate(final Coordinates p) {
+    final RayCrossingCounter rcc = new RayCrossingCounter(p);
 
-    public IntervalIndexedGeometry(Geometry geom)
-    {
-      init(geom);
-    }
-    
-    private void init(Geometry geom)
-    {
-      List lines = LinearComponentExtracter.getLines(geom);
-      for (Iterator i = lines.iterator(); i.hasNext(); ) {
-        LineString line = (LineString) i.next();
-        Coordinate[] pts = line.getCoordinateArray();
-        addLine(pts);
-      }
-    }
-    
-    private void addLine(Coordinate[] pts)
-    {
-      for (int i = 1; i < pts.length; i++) {
-        LineSegment seg = new LineSegment(pts[i-1], pts[i]);
-        double min = Math.min(seg.p0.getY(), seg.p1.getY());
-        double max = Math.max(seg.p0.getY(), seg.p1.getY());
-        index.insert(min, max, seg);
-      }
-    }
-    
-    public List query(double min, double max)
-    {
-      ArrayListVisitor visitor = new ArrayListVisitor();
-      index.query(min, max, visitor);
-      return visitor.getItems();
-    }
-    
-    public void query(double min, double max, ItemVisitor visitor)
-    {
-      index.query(min, max, visitor);
-    }
+    final SegmentVisitor visitor = new SegmentVisitor(rcc);
+    index.query(p.getY(), p.getY(), visitor);
+
+    /*
+     * // MD - slightly slower alternative List segs = index.query(p.y, p.y);
+     * countSegs(rcc, segs);
+     */
+
+    return rcc.getLocation();
   }
 
 }
-
-
-

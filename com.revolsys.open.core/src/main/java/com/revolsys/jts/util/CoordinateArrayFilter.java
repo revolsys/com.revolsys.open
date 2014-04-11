@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -34,7 +33,6 @@
  */
 package com.revolsys.jts.util;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -47,6 +45,7 @@ import com.revolsys.jts.geom.Geometry;
  */
 public class CoordinateArrayFilter implements CoordinateFilter {
   Coordinates[] pts = null;
+
   int n = 0;
 
   /**
@@ -55,8 +54,13 @@ public class CoordinateArrayFilter implements CoordinateFilter {
    *@param  size  the number of points that the <code>CoordinateArrayFilter</code>
    *      will collect
    */
-  public CoordinateArrayFilter(int size) {
+  public CoordinateArrayFilter(final int size) {
     pts = new Coordinates[size];
+  }
+
+  @Override
+  public void filter(final Coordinates coord) {
+    pts[n++] = coord;
   }
 
   /**
@@ -67,9 +71,4 @@ public class CoordinateArrayFilter implements CoordinateFilter {
   public Coordinates[] getCoordinates() {
     return pts;
   }
-
-  public void filter(Coordinate coord) {
-    pts[n++] = coord;
-  }
 }
-

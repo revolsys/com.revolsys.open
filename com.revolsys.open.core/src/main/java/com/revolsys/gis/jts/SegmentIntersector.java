@@ -8,7 +8,6 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.Node;
@@ -81,10 +80,10 @@ public class SegmentIntersector extends
       return;
     }
     numTests++;
-    final Coordinate p00 = e0.getCoordinates()[segIndex0];
-    final Coordinate p01 = e0.getCoordinates()[segIndex0 + 1];
-    final Coordinate p10 = e1.getCoordinates()[segIndex1];
-    final Coordinate p11 = e1.getCoordinates()[segIndex1 + 1];
+    final Coordinates p00 = e0.getCoordinates()[segIndex0];
+    final Coordinates p01 = e0.getCoordinates()[segIndex0 + 1];
+    final Coordinates p10 = e1.getCoordinates()[segIndex1];
+    final Coordinates p11 = e1.getCoordinates()[segIndex1 + 1];
 
     li.computeIntersection(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);

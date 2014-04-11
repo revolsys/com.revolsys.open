@@ -35,7 +35,6 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -69,7 +68,7 @@ public class TriangleTest extends TestCase {
   public void checkAcute(final String wkt, final boolean expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final AbstractCoordinates[] pt = g.getCoordinateArray();
+    final Coordinates[] pt = g.getCoordinateArray();
 
     final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     final boolean isAcute = t.isAcute();
@@ -80,7 +79,7 @@ public class TriangleTest extends TestCase {
   public void checkArea(final String wkt, final double expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final AbstractCoordinates[] pt = g.getCoordinateArray();
+    final Coordinates[] pt = g.getCoordinateArray();
 
     final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     final double signedArea = t.signedArea();
@@ -95,19 +94,19 @@ public class TriangleTest extends TestCase {
   public void checkArea3D(final String wkt, final double expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final AbstractCoordinates[] pt = g.getCoordinateArray();
+    final Coordinates[] pt = g.getCoordinateArray();
     final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     final double area3D = t.area3D();
     // System.out.println("area3D = " + area3D);
     assertEquals(expectedValue, area3D, TOLERANCE);
   }
 
-  public void checkCentroid(final String wkt, final Coordinate expectedValue)
+  public void checkCentroid(final String wkt, final Coordinates expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final AbstractCoordinates[] pt = g.getCoordinateArray();
+    final Coordinates[] pt = g.getCoordinateArray();
 
-    Coordinate centroid = Triangle.centroid(pt[0], pt[1], pt[2]);
+    Coordinates centroid = Triangle.centroid(pt[0], pt[1], pt[2]);
     System.out.println("(Static) centroid = " + centroid);
     assertEquals(expectedValue.toString(), centroid.toString());
 
@@ -119,12 +118,12 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue.toString(), centroid.toString());
   }
 
-  public void checkCircumCentre(final String wkt, final Coordinate expectedValue)
+  public void checkCircumCentre(final String wkt, final Coordinates expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final AbstractCoordinates[] pt = g.getCoordinateArray();
+    final Coordinates[] pt = g.getCoordinateArray();
 
-    Coordinate circumcentre = Triangle.circumcentre(pt[0], pt[1], pt[2]);
+    Coordinates circumcentre = Triangle.circumcentre(pt[0], pt[1], pt[2]);
     System.out.println("(Static) circumcentre = " + circumcentre);
     assertEquals(expectedValue.toString(), circumcentre.toString());
 
@@ -139,7 +138,7 @@ public class TriangleTest extends TestCase {
   public void checkInterpolateZ(final String wkt, final Coordinates p,
     final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final AbstractCoordinates[] pt = g.getCoordinateArray();
+    final Coordinates[] pt = g.getCoordinateArray();
 
     final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     final double z = t.interpolateZ(p);
@@ -150,7 +149,7 @@ public class TriangleTest extends TestCase {
   public void checkLongestSideLength(final String wkt,
     final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final AbstractCoordinates[] pt = g.getCoordinateArray();
+    final Coordinates[] pt = g.getCoordinateArray();
 
     double length = Triangle.longestSideLength(pt[0], pt[1], pt[2]);
     System.out.println("(Static) longestSideLength = " + length);

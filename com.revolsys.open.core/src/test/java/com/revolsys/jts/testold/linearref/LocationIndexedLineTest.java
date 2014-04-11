@@ -1,7 +1,6 @@
 package com.revolsys.jts.testold.linearref;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.linearref.LinearLocation;
 import com.revolsys.jts.linearref.LocationIndexedLine;
@@ -20,8 +19,8 @@ public class LocationIndexedLineTest extends AbstractIndexedLineTest {
   }
 
   @Override
-  protected AbstractCoordinates extractOffsetAt(final Geometry linearGeom,
-    final Coordinate testPt, final double offsetDistance) {
+  protected Coordinates extractOffsetAt(final Geometry linearGeom,
+    final Coordinates testPt, final double offsetDistance) {
     final LocationIndexedLine indexedLine = new LocationIndexedLine(linearGeom);
     final LinearLocation index = indexedLine.indexOf(testPt);
     return indexedLine.extractPoint(index, offsetDistance);
@@ -29,7 +28,7 @@ public class LocationIndexedLineTest extends AbstractIndexedLineTest {
 
   @Override
   protected boolean indexOfAfterCheck(final Geometry linearGeom,
-    final Coordinate testPt) {
+    final Coordinates testPt) {
     final LocationIndexedLine indexedLine = new LocationIndexedLine(linearGeom);
 
     // check locations are consecutive
@@ -40,21 +39,20 @@ public class LocationIndexedLineTest extends AbstractIndexedLineTest {
     }
 
     // check extracted points are the same as the input
-    final AbstractCoordinates pt1 = indexedLine.extractPoint(loc1);
-    final AbstractCoordinates pt2 = indexedLine.extractPoint(loc2);
+    final Coordinates pt1 = indexedLine.extractPoint(loc1);
+    final Coordinates pt2 = indexedLine.extractPoint(loc2);
     if (!pt1.equals2d(testPt)) {
       return false;
     }
     if (!pt2.equals2d(testPt)) {
       return false;
     }
-
     return true;
   }
 
   @Override
   protected boolean indexOfAfterCheck(final Geometry linearGeom,
-    final Coordinate testPt, final Coordinate afterPt) {
+    final Coordinates testPt, final Coordinates afterPt) {
     final LocationIndexedLine indexedLine = new LocationIndexedLine(linearGeom);
 
     // check that computed location is after check location

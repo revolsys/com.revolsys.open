@@ -1,8 +1,8 @@
 package com.revolsys.swing.map.overlay;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
-import com.revolsys.gis.model.geometry.util.IndexedLineSegment;
+import com.revolsys.gis.jts.GeometryEditUtil;
+import com.revolsys.gis.jts.IndexedLineSegment;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;

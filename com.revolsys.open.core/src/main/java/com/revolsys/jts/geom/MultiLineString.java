@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -134,6 +136,23 @@ public class MultiLineString extends GeometryCollection implements Lineal {
       }
     }
     return true;
+  }
+
+  @Override
+  public MultiLineString normalize() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final List<LineString> geometries = new ArrayList<>();
+      for (final Geometry part : this.geometries) {
+        final LineString normalizedPart = (LineString)part.normalize();
+        geometries.add(normalizedPart);
+      }
+      Collections.sort(geometries);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final MultiLineString normalizedGeometry = geometryFactory.createMultiLineString(geometries);
+      return normalizedGeometry;
+    }
   }
 
   /**

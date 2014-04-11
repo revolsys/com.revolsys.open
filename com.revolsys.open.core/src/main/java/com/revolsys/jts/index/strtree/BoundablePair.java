@@ -126,8 +126,8 @@ class BoundablePair
   	double miny = Math.min(env1.getMinY(), env2.getMinY());
   	double maxx = Math.max(env1.getMaxX(), env2.getMaxX());
   	double maxy = Math.max(env1.getMaxY(), env2.getMaxY());
-    Coordinate min = new Coordinate(minx, miny);
-    Coordinate max = new Coordinate(maxx, maxy);
+    Coordinates min = new Coordinate((double)minx, miny);
+    Coordinates max = new Coordinate((double)maxx, maxy);
     return min.distance(max);
   }
   */

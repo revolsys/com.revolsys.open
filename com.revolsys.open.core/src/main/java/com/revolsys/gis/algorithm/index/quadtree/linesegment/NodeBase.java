@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 

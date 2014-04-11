@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -40,7 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents a directed graph which is embeddable in a planar surface.
@@ -56,17 +55,87 @@ import com.revolsys.jts.geom.Coordinate;
  *
  * @version 1.7
  */
-public abstract class PlanarGraph
-{
+public abstract class PlanarGraph {
   protected Set edges = new HashSet();
+
   protected Set dirEdges = new HashSet();
+
   protected NodeMap nodeMap = new NodeMap();
 
   /**
    * Constructs a empty graph.
    */
-  public PlanarGraph()
-  {
+  public PlanarGraph() {
+  }
+
+  /**
+   * Adds the Edge to this PlanarGraph; only subclasses can add DirectedEdges,
+   * to ensure the edges added are of the right class.
+   */
+  protected void add(final DirectedEdge dirEdge) {
+    dirEdges.add(dirEdge);
+  }
+
+  /**
+   * Adds the Edge and its DirectedEdges with this PlanarGraph.
+   * Assumes that the Edge has already been created with its associated DirectEdges.
+   * Only subclasses can add Edges, to ensure the edges added are of the right class.
+   */
+  protected void add(final Edge edge) {
+    edges.add(edge);
+    add(edge.getDirEdge(0));
+    add(edge.getDirEdge(1));
+  }
+
+  /**
+   * Adds a node to the map, replacing any that is already at that location.
+   * Only subclasses can add Nodes, to ensure Nodes are of the right type.
+   * 
+   * @param node the node to add
+   */
+  protected void add(final Node node) {
+    nodeMap.add(node);
+  }
+
+  /**
+   * Tests whether this graph contains the given {@link DirectedEdge}
+   *
+   * @param de the directed edge to query
+   * @return <code>true</code> if the graph contains the directed edge
+   */
+  public boolean contains(final DirectedEdge de) {
+    return dirEdges.contains(de);
+  }
+
+  /**
+   * Tests whether this graph contains the given {@link Edge}
+   *
+   * @param e the edge to query
+   * @return <code>true</code> if the graph contains the edge
+   */
+  public boolean contains(final Edge e) {
+    return edges.contains(e);
+  }
+
+  /**
+   * Returns an Iterator over the DirectedEdges in this PlanarGraph, in the order in which they
+   * were added.
+   *
+   * @see #add(Edge)
+   * @see #add(DirectedEdge)
+   */
+  public Iterator dirEdgeIterator() {
+    return dirEdges.iterator();
+  }
+
+  /**
+   * Returns an Iterator over the Edges in this PlanarGraph, in the order in which they
+   * were added.
+   *
+   * @see #add(Edge)
+   */
+  public Iterator edgeIterator() {
+    return edges.iterator();
   }
 
   /**
@@ -77,95 +146,62 @@ public abstract class PlanarGraph
    * @return the node found
    * or <code>null</code> if this graph contains no node at the location
    */
-  public Node findNode(Coordinate pt)
-  {
-    return (Node) nodeMap.find(pt);
+  public Node findNode(final Coordinates pt) {
+    return (Node)nodeMap.find(pt);
   }
 
   /**
-   * Adds a node to the map, replacing any that is already at that location.
-   * Only subclasses can add Nodes, to ensure Nodes are of the right type.
-   * 
-   * @param node the node to add
+   * Returns all Nodes with the given number of Edges around it.
    */
-  protected void add(Node node)
-  {
-    nodeMap.add(node);
+  public List findNodesOfDegree(final int degree) {
+    final List nodesFound = new ArrayList();
+    for (final Iterator i = nodeIterator(); i.hasNext();) {
+      final Node node = (Node)i.next();
+      if (node.getDegree() == degree) {
+        nodesFound.add(node);
+      }
+    }
+    return nodesFound;
   }
-
-  /**
-   * Adds the Edge and its DirectedEdges with this PlanarGraph.
-   * Assumes that the Edge has already been created with its associated DirectEdges.
-   * Only subclasses can add Edges, to ensure the edges added are of the right class.
-   */
-  protected void add(Edge edge)
-  {
-    edges.add(edge);
-    add(edge.getDirEdge(0));
-    add(edge.getDirEdge(1));
-  }
-
-  /**
-   * Adds the Edge to this PlanarGraph; only subclasses can add DirectedEdges,
-   * to ensure the edges added are of the right class.
-   */
-  protected void add(DirectedEdge dirEdge)
-  {
-    dirEdges.add(dirEdge);
-  }
-  /**
-   * Returns an Iterator over the Nodes in this PlanarGraph.
-   */
-  public Iterator nodeIterator()  {    return nodeMap.iterator();  }
-  /**
-   * Returns the Nodes in this PlanarGraph.
-   */
-
-  /**
-   * Tests whether this graph contains the given {@link Edge}
-   *
-   * @param e the edge to query
-   * @return <code>true</code> if the graph contains the edge
-   */
-  public boolean contains(Edge e)
-  {
-    return edges.contains(e);
-  }
-
-  /**
-   * Tests whether this graph contains the given {@link DirectedEdge}
-   *
-   * @param de the directed edge to query
-   * @return <code>true</code> if the graph contains the directed edge
-   */
-  public boolean contains(DirectedEdge de)
-  {
-    return dirEdges.contains(de);
-  }
-
-  public Collection getNodes()  {    return nodeMap.values();  }
-
-  /**
-   * Returns an Iterator over the DirectedEdges in this PlanarGraph, in the order in which they
-   * were added.
-   *
-   * @see #add(Edge)
-   * @see #add(DirectedEdge)
-   */
-  public Iterator dirEdgeIterator()  {    return dirEdges.iterator();  }
-  /**
-   * Returns an Iterator over the Edges in this PlanarGraph, in the order in which they
-   * were added.
-   *
-   * @see #add(Edge)
-   */
-  public Iterator edgeIterator()  {    return edges.iterator();  }
 
   /**
    * Returns the Edges that have been added to this PlanarGraph
    * @see #add(Edge)
    */
-  public Collection getEdges()  {    return edges;  }
+  public Collection getEdges() {
+    return edges;
+  }
+
+  public Collection getNodes() {
+    return nodeMap.values();
+  }
+
+  /**
+   * Returns an Iterator over the Nodes in this PlanarGraph.
+   */
+  public Iterator nodeIterator() {
+    return nodeMap.iterator();
+  }
+
+  /**
+   * Returns the Nodes in this PlanarGraph.
+   */
+
+  /**
+   * Removes a {@link DirectedEdge} from its from-{@link Node} and from this graph.
+   * This method does not remove the {@link Node}s associated with the DirectedEdge,
+   * even if the removal of the DirectedEdge reduces the degree of a Node to zero.
+   */
+  public void remove(final DirectedEdge de) {
+    final DirectedEdge sym = de.getSym();
+    if (sym != null) {
+      sym.setSym(null);
+    }
+
+    de.getFromNode().remove(de);
+    de.remove();
+    dirEdges.remove(de);
+  }
 
   /**
    * Removes an {@link Edge} and its associated {@link DirectedEdge}s
@@ -174,8 +210,7 @@ public abstract class PlanarGraph
    * with the {@link Edge}, even if the removal of the {@link Edge}
    * reduces the degree of a {@link Node} to zero.
    */
-  public void remove(Edge edge)
-  {
+  public void remove(final Edge edge) {
     remove(edge.getDirEdge(0));
     remove(edge.getDirEdge(1));
     edges.remove(edge);
@@ -183,37 +218,23 @@ public abstract class PlanarGraph
   }
 
   /**
-   * Removes a {@link DirectedEdge} from its from-{@link Node} and from this graph.
-   * This method does not remove the {@link Node}s associated with the DirectedEdge,
-   * even if the removal of the DirectedEdge reduces the degree of a Node to zero.
-   */
-  public void remove(DirectedEdge de)
-  {
-    DirectedEdge sym = de.getSym();
-    if (sym != null) sym.setSym(null);
-    
-    de.getFromNode().remove(de);
-    de.remove();
-    dirEdges.remove(de);
-  }
-
-  /**
    * Removes a node from the graph, along with any associated DirectedEdges and
    * Edges.
    */
-  public void remove(Node node)
-  {
+  public void remove(final Node node) {
     // unhook all directed edges
-    List outEdges = node.getOutEdges().getEdges();
-    for (Iterator i = outEdges.iterator(); i.hasNext(); ) {
-      DirectedEdge de = (DirectedEdge) i.next();
-      DirectedEdge sym = de.getSym();
+    final List outEdges = node.getOutEdges().getEdges();
+    for (final Iterator i = outEdges.iterator(); i.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)i.next();
+      final DirectedEdge sym = de.getSym();
       // remove the diredge that points to this node
-      if (sym != null) remove(sym);
+      if (sym != null) {
+        remove(sym);
+      }
       // remove this diredge from the graph collection
       dirEdges.remove(de);
 
-      Edge edge = de.getEdge();
+      final Edge edge = de.getEdge();
       if (edge != null) {
         edges.remove(edge);
       }
@@ -222,20 +243,6 @@ public abstract class PlanarGraph
     // remove the node from the graph
     nodeMap.remove(node.getCoordinate());
     node.remove();
-  }
-
-  /**
-   * Returns all Nodes with the given number of Edges around it.
-   */
-  public List findNodesOfDegree(int degree)
-  {
-    List nodesFound = new ArrayList();
-    for (Iterator i = nodeIterator(); i.hasNext(); ) {
-      Node node = (Node) i.next();
-      if (node.getDegree() == degree)
-        nodesFound.add(node);
-    }
-    return nodesFound;
   }
 
 }

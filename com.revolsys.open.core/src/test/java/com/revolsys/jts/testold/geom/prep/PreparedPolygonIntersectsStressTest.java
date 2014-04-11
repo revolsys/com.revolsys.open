@@ -118,15 +118,15 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Coordinates basePt = new Coordinate(env.getMinX() + xOffset,
+    final Coordinates basePt = new Coordinate((double)env.getMinX() + xOffset,
       env.getMinY() + yOffset, Coordinates.NULL_ORDINATE);
     final LineString line = createTestLine(basePt, size, nPts);
     return line;
   }
 
   public void run(final int nPts) {
-    // Geometry poly = createCircle(new Coordinate(0, 0), 100, nPts);
-    final Geometry poly = createSineStar(new Coordinate(0, 0, Coordinates.NULL_ORDINATE), 100, nPts);
+    // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
+    final Geometry poly = createSineStar(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), 100, nPts);
     System.out.println(poly);
 
     System.out.println();

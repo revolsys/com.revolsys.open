@@ -35,7 +35,7 @@ public class AreaPrecisionPerfTest {
 
       Coordinates vertex;
       for (int i = 0; i <= nrVertices; i++) {
-        vertex = new Coordinate(originX
+        vertex = new Coordinate((double)originX
           + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)), originY
           + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)), Coordinates.NULL_ORDINATE);
         coordinates[i] = vertex;

@@ -287,8 +287,8 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor
   private RectangleLineIntersector rectIntersector;
 
   private boolean hasIntersection = false;
-  private Coordinate p0 = new Coordinate();
-  private Coordinate p1 = new Coordinate();
+  private Coordinates p0 = new Coordinate();
+  private Coordinates p1 = new Coordinate();
 
   /**
    * Creates a visitor for checking rectangle intersection

@@ -265,7 +265,7 @@ public class QuadEdge {
    * Gets the primary edge of this quadedge and its <tt>sym</tt>.
    * The primary edge is the one for which the origin
    * and destination coordinates are ordered
-   * according to the standard {@link Coordinate} ordering
+   * according to the standard {@link Coordinates} ordering
    * 
    * @return the primary quadedge
    */

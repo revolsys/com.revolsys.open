@@ -76,34 +76,149 @@ import com.revolsys.jts.geom.Geometry;
  *   HD(A, B) ~= 47.8
  * </pre>
  */
-public class DiscreteHausdorffDistance
-{
-  public static double distance(Geometry g0, Geometry g1)
-  {
-    DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(g0, g1);
+public class DiscreteHausdorffDistance {
+  public static class MaxDensifiedByFractionDistanceFilter implements
+    CoordinateSequenceFilter {
+    private final PointPairDistance maxPtDist = new PointPairDistance();
+
+    private final PointPairDistance minPtDist = new PointPairDistance();
+
+    private final Geometry geom;
+
+    private int numSubSegs = 0;
+
+    public MaxDensifiedByFractionDistanceFilter(final Geometry geom,
+      final double fraction) {
+      this.geom = geom;
+      numSubSegs = (int)Math.rint(1.0 / fraction);
+    }
+
+    @Override
+    public void filter(final CoordinatesList seq, final int index) {
+      /**
+       * This logic also handles skipping Point geometries
+       */
+      if (index == 0) {
+        return;
+      }
+
+      final Coordinates p0 = seq.getCoordinate(index - 1);
+      final Coordinates p1 = seq.getCoordinate(index);
+
+      final double delx = (p1.getX() - p0.getX()) / numSubSegs;
+      final double dely = (p1.getY() - p0.getY()) / numSubSegs;
+
+      for (int i = 0; i < numSubSegs; i++) {
+        final double x = p0.getX() + i * delx;
+        final double y = p0.getY() + i * dely;
+        final Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+        minPtDist.initialize();
+        DistanceToPoint.computeDistance(geom, pt, minPtDist);
+        maxPtDist.setMaximum(minPtDist);
+      }
+
+    }
+
+    public PointPairDistance getMaxPointDistance() {
+      return maxPtDist;
+    }
+
+    @Override
+    public boolean isDone() {
+      return false;
+    }
+
+    @Override
+    public boolean isGeometryChanged() {
+      return false;
+    }
+  }
+
+  public static class MaxPointDistanceFilter implements CoordinateFilter {
+    private final PointPairDistance maxPtDist = new PointPairDistance();
+
+    private final PointPairDistance minPtDist = new PointPairDistance();
+
+    private final DistanceToPoint euclideanDist = new DistanceToPoint();
+
+    private final Geometry geom;
+
+    public MaxPointDistanceFilter(final Geometry geom) {
+      this.geom = geom;
+    }
+
+    @Override
+    public void filter(final Coordinates pt) {
+      minPtDist.initialize();
+      DistanceToPoint.computeDistance(geom, pt, minPtDist);
+      maxPtDist.setMaximum(minPtDist);
+    }
+
+    public PointPairDistance getMaxPointDistance() {
+      return maxPtDist;
+    }
+  }
+
+  public static double distance(final Geometry g0, final Geometry g1) {
+    final DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(g0, g1);
     return dist.distance();
   }
 
-  public static double distance(Geometry g0, Geometry g1, double densifyFrac)
-  {
-    DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(g0, g1);
+  public static double distance(final Geometry g0, final Geometry g1,
+    final double densifyFrac) {
+    final DiscreteHausdorffDistance dist = new DiscreteHausdorffDistance(g0, g1);
     dist.setDensifyFraction(densifyFrac);
     return dist.distance();
   }
 
-  private Geometry g0;
-  private Geometry g1;
-  private PointPairDistance ptDist = new PointPairDistance();
-  
+  private final Geometry g0;
+
+  private final Geometry g1;
+
+  private final PointPairDistance ptDist = new PointPairDistance();
+
   /**
    * Value of 0.0 indicates that no densification should take place
    */
   private double densifyFrac = 0.0;
 
-  public DiscreteHausdorffDistance(Geometry g0, Geometry g1)
-  {
+  public DiscreteHausdorffDistance(final Geometry g0, final Geometry g1) {
     this.g0 = g0;
     this.g1 = g1;
+  }
+
+  private void compute(final Geometry g0, final Geometry g1) {
+    computeOrientedDistance(g0, g1, ptDist);
+    computeOrientedDistance(g1, g0, ptDist);
+  }
+
+  private void computeOrientedDistance(final Geometry discreteGeom,
+    final Geometry geom, final PointPairDistance ptDist) {
+    final MaxPointDistanceFilter distFilter = new MaxPointDistanceFilter(geom);
+    discreteGeom.apply(distFilter);
+    ptDist.setMaximum(distFilter.getMaxPointDistance());
+
+    if (densifyFrac > 0) {
+      final MaxDensifiedByFractionDistanceFilter fracFilter = new MaxDensifiedByFractionDistanceFilter(
+        geom, densifyFrac);
+      discreteGeom.apply(fracFilter);
+      ptDist.setMaximum(fracFilter.getMaxPointDistance());
+
+    }
+  }
+
+  public double distance() {
+    compute(g0, g1);
+    return ptDist.getDistance();
+  }
+
+  public Coordinates[] getCoordinates() {
+    return ptDist.getCoordinates();
+  }
+
+  public double orientedDistance() {
+    computeOrientedDistance(g0, g1, ptDist);
+    return ptDist.getDistance();
   }
 
   /**
@@ -114,118 +229,12 @@ public class DiscreteHausdorffDistance
    * 
    * @param densifyPercent
    */
-  public void setDensifyFraction(double densifyFrac)
-  {
-    if (densifyFrac > 1.0 
-        || densifyFrac <= 0.0)
+  public void setDensifyFraction(final double densifyFrac) {
+    if (densifyFrac > 1.0 || densifyFrac <= 0.0) {
       throw new IllegalArgumentException("Fraction is not in range (0.0 - 1.0]");
-        
+    }
+
     this.densifyFrac = densifyFrac;
   }
-  
-  public double distance() 
-  { 
-    compute(g0, g1);
-    return ptDist.getDistance(); 
-  }
-
-  public double orientedDistance() 
-  { 
-    computeOrientedDistance(g0, g1, ptDist);
-    return ptDist.getDistance(); 
-  }
-
-  public Coordinates[] getCoordinates() { return ptDist.getCoordinates(); }
-
-  private void compute(Geometry g0, Geometry g1)
-  {
-    computeOrientedDistance(g0, g1, ptDist);
-    computeOrientedDistance(g1, g0, ptDist);
-  }
-
-  private void computeOrientedDistance(Geometry discreteGeom, Geometry geom, PointPairDistance ptDist)
-  {
-    MaxPointDistanceFilter distFilter = new MaxPointDistanceFilter(geom);
-    discreteGeom.apply(distFilter);
-    ptDist.setMaximum(distFilter.getMaxPointDistance());
-    
-    if (densifyFrac > 0) {
-      MaxDensifiedByFractionDistanceFilter fracFilter = new MaxDensifiedByFractionDistanceFilter(geom, densifyFrac);
-      discreteGeom.apply(fracFilter);
-      ptDist.setMaximum(fracFilter.getMaxPointDistance());
-      
-    }
-  }
-
-  public static class MaxPointDistanceFilter
-      implements CoordinateFilter
-  {
-    private PointPairDistance maxPtDist = new PointPairDistance();
-    private PointPairDistance minPtDist = new PointPairDistance();
-    private DistanceToPoint euclideanDist = new DistanceToPoint();
-    private Geometry geom;
-
-    public MaxPointDistanceFilter(Geometry geom)
-    {
-      this.geom = geom;
-    }
-
-    public void filter(Coordinate pt)
-    {
-      minPtDist.initialize();
-      DistanceToPoint.computeDistance(geom, pt, minPtDist);
-      maxPtDist.setMaximum(minPtDist);
-    }
-
-    public PointPairDistance getMaxPointDistance() { return maxPtDist; }
-  }
-  
-  public static class MaxDensifiedByFractionDistanceFilter 
-  implements CoordinateSequenceFilter 
-  {
-  private PointPairDistance maxPtDist = new PointPairDistance();
-  private PointPairDistance minPtDist = new PointPairDistance();
-  private Geometry geom;
-  private int numSubSegs = 0;
-
-  public MaxDensifiedByFractionDistanceFilter(Geometry geom, double fraction) {
-    this.geom = geom;
-    numSubSegs = (int) Math.rint(1.0/fraction);
-  }
-
-  public void filter(CoordinatesList seq, int index) 
-  {
-    /**
-     * This logic also handles skipping Point geometries
-     */
-    if (index == 0)
-      return;
-    
-    Coordinates p0 = seq.getCoordinate(index - 1);
-    Coordinates p1 = seq.getCoordinate(index);
-    
-    double delx = (p1.getX() - p0.getX())/numSubSegs;
-    double dely = (p1.getY() - p0.getY())/numSubSegs;
-
-    for (int i = 0; i < numSubSegs; i++) {
-      double x = p0.getX() + i*delx;
-      double y = p0.getY() + i*dely;
-      Coordinate pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
-      minPtDist.initialize();
-      DistanceToPoint.computeDistance(geom, pt, minPtDist);
-      maxPtDist.setMaximum(minPtDist);  
-    }
-    
-    
-  }
-
-  public boolean isGeometryChanged() { return false; }
-  
-  public boolean isDone() { return false; }
-  
-  public PointPairDistance getMaxPointDistance() {
-    return maxPtDist;
-  }
-}
 
 }

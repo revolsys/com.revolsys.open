@@ -58,16 +58,16 @@ public class NonRobustLineIntersectorTest extends TestCase {
   public void testGetIntersectionNum() {
     // MD: NonRobustLineIntersector may have different semantics for
     // getIntersectionNumber
-    // li.computeIntersection(new Coordinate(220, 0), new Coordinate(110, 0),
-    // new Coordinate(0, 0), new Coordinate(110, 0));
+    // li.computeIntersection(new Coordinate((double)220, 0), new Coordinate((double)110, 0),
+    // new Coordinate((double)0, 0), new Coordinate((double)110, 0));
     // assertEquals(1, li.getIntersectionNum());
   }
 
   public void testNegativeZero() {
     // MD suggests we ignore this issue for now.
-    // li.computeIntersection(new Coordinate(220, 260), new Coordinate(220, 0),
-    // new Coordinate(220, 0), new Coordinate(100, 0));
-    // assertEquals((new Coordinate(220, 0)).toString(),
+    // li.computeIntersection(new Coordinate((double)220, 260), new Coordinate((double)220, 0),
+    // new Coordinate((double)220, 0), new Coordinate((double)100, 0));
+    // assertEquals((new Coordinate((double)220, 0)).toString(),
     // li.getIntersection(0).toString());
   }
 

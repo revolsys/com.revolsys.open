@@ -1,6 +1,5 @@
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -97,7 +96,7 @@ public class MaximalNearestSubline {
     }
   }
 
-  private void findNearestOnA(final Coordinate bPt) {
+  private void findNearestOnA(final Coordinates bPt) {
     final LineStringLocation nearestLocationOnA = aPtLocator.locate(bPt);
     expandInterval(nearestLocationOnA);
   }
@@ -132,7 +131,7 @@ public class MaximalNearestSubline {
     for (int ia = 0; ia < aCoords.size(); ia++) {
       if (isOutsideInterval(ia)) {
         final LineStringLocation bLoc = bPtLocator.locate(aCoords.getCoordinate(ia));
-        final Coordinate bPt = bLoc.getCoordinate();
+        final Coordinates bPt = bLoc.getCoordinate();
         findNearestOnA(bPt);
       }
     }

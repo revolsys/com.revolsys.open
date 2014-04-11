@@ -33,13 +33,12 @@
 
 package com.revolsys.jts.planargraph;
 
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A map of {@link Node}s, indexed by the coordinate of the node.
@@ -50,8 +49,8 @@ public class NodeMap
 
 {
 
-  private Map nodeMap = new TreeMap();
-  
+  private final Map nodeMap = new TreeMap();
+
   /**
    * Constructs a NodeMap without any Nodes.
    */
@@ -62,39 +61,38 @@ public class NodeMap
    * Adds a node to the map, replacing any that is already at that location.
    * @return the added node
    */
-  public Node add(Node n)
-  {
+  public Node add(final Node n) {
     nodeMap.put(n.getCoordinate(), n);
     return n;
   }
 
   /**
-   * Removes the Node at the given location, and returns it (or null if no Node was there).
-   */
-  public Node remove(Coordinate pt)
-  {
-    return (Node) nodeMap.remove(pt);
-  }
-
-  /**
    * Returns the Node at the given location, or null if no Node was there.
    */
-  public Node find(Coordinate coord)  {    return (Node) nodeMap.get(coord);  }
+  public Node find(final Coordinates coord) {
+    return (Node)nodeMap.get(coord);
+  }
 
   /**
    * Returns an Iterator over the Nodes in this NodeMap, sorted in ascending order
    * by angle with the positive x-axis.
    */
-  public Iterator iterator()
-  {
+  public Iterator iterator() {
     return nodeMap.values().iterator();
   }
+
+  /**
+   * Removes the Node at the given location, and returns it (or null if no Node was there).
+   */
+  public Node remove(final Coordinates pt) {
+    return (Node)nodeMap.remove(pt);
+  }
+
   /**
    * Returns the Nodes in this NodeMap, sorted in ascending order
    * by angle with the positive x-axis.
    */
-  public Collection values()
-  {
+  public Collection values() {
     return nodeMap.values();
   }
 

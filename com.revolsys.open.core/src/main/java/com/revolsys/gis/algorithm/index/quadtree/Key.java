@@ -57,8 +57,12 @@ public class Key {
   }
 
   public Coordinates getCentre() {
-    return new Coordinate((env.getMinX() + env.getMaxX()) / 2,
-      (env.getMinY() + env.getMaxY()) / 2, Coordinates.NULL_ORDINATE);
+    final double minX = env.getMinX();
+    final double maxX = env.getMaxX();
+    final double minY = env.getMinY();
+    final double maxY = env.getMaxY();
+    return new Coordinate((minX + maxX) / 2, (minY + maxY) / 2,
+      Coordinates.NULL_ORDINATE);
   }
 
   public Envelope getEnvelope() {

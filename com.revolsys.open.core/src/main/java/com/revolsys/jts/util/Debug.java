@@ -189,7 +189,7 @@ public class Debug {
     return new String(ch);
   }
   
-  public static boolean equals(AbstractCoordinates c1, Coordinates c2, double tolerance)
+  public static boolean equals(Coordinates c1, Coordinates c2, double tolerance)
   {
   	return c1.distance(c2) <= tolerance;
   }
@@ -222,7 +222,7 @@ public class Debug {
     if (o1.equals(o2)) doBreak();
   }
   
-  public static void breakIfEqual(AbstractCoordinates p0, Coordinates p1, double tolerance)
+  public static void breakIfEqual(Coordinates p0, Coordinates p1, double tolerance)
   {
     if (p0.distance(p1) <= tolerance) doBreak();
   }
@@ -233,7 +233,7 @@ public class Debug {
     return; 
   }
   
-  public static boolean hasSegment(Geometry geom, AbstractCoordinates p0, AbstractCoordinates p1)
+  public static boolean hasSegment(Geometry geom, Coordinates p0, Coordinates p1)
   {
     SegmentFindingFilter filter = new SegmentFindingFilter(p0, p1);
     geom.apply(filter);
@@ -243,10 +243,10 @@ public class Debug {
   private static class SegmentFindingFilter
   implements CoordinateSequenceFilter
   {
-    private AbstractCoordinates p0, p1;
+    private Coordinates p0, p1;
     private boolean hasSegment = false;
     
-    public SegmentFindingFilter(AbstractCoordinates p0, AbstractCoordinates p1)
+    public SegmentFindingFilter(Coordinates p0, Coordinates p1)
     {
       this.p0 = p0;
       this.p1 = p1;

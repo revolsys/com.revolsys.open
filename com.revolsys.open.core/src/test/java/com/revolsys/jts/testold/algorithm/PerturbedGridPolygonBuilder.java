@@ -34,8 +34,8 @@ public class PerturbedGridPolygonBuilder {
     int index = 0;
 
     for (int i = 0; i < this.numLines; i++) {
-      final Coordinates p0 = new Coordinate(getRandOrdinate(), 0, Coordinates.NULL_ORDINATE);
-      final Coordinates p1 = new Coordinate(getRandOrdinate(), this.gridWidth, Coordinates.NULL_ORDINATE);
+      final Coordinates p0 = new Coordinate((double)getRandOrdinate(), 0, Coordinates.NULL_ORDINATE);
+      final Coordinates p1 = new Coordinate((double)getRandOrdinate(), this.gridWidth, Coordinates.NULL_ORDINATE);
       final LineString line = this.geomFactory.createLineString(new Coordinates[] {
         p0, p1
       });
@@ -43,8 +43,8 @@ public class PerturbedGridPolygonBuilder {
     }
 
     for (int i = 0; i < this.numLines; i++) {
-      final Coordinates p0 = new Coordinate(0, getRandOrdinate(), Coordinates.NULL_ORDINATE);
-      final Coordinates p1 = new Coordinate(this.gridWidth, getRandOrdinate(), Coordinates.NULL_ORDINATE);
+      final Coordinates p0 = new Coordinate((double)0, getRandOrdinate(), Coordinates.NULL_ORDINATE);
+      final Coordinates p1 = new Coordinate((double)this.gridWidth, getRandOrdinate(), Coordinates.NULL_ORDINATE);
       final LineString line = this.geomFactory.createLineString(new Coordinates[] {
         p0, p1
       });

@@ -77,8 +77,8 @@ public class OrientationIndexTest extends TestCase {
     final double p0y, final double p1x, final double p1y, final double p2x,
     final double p2y) {
     final Coordinates[] pts = {
-      new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE), new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE),
-      new Coordinate(p2x, p2y, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)p0x, p0y, Coordinates.NULL_ORDINATE), new Coordinate((double)p1x, p1y, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)p2x, p2y, Coordinates.NULL_ORDINATE)
     };
     return isAllOrientationsEqual(pts);
   }
@@ -98,9 +98,9 @@ public class OrientationIndexTest extends TestCase {
   public void testCCW2() throws Exception {
     // experimental case - can't make it fail
     final Coordinates[] pts2 = {
-      new Coordinate(1.0000000000004998, -7.989685402102996, Coordinates.NULL_ORDINATE),
-      new Coordinate(10.0, -7.004368924503866, Coordinates.NULL_ORDINATE),
-      new Coordinate(1.0000000000005, -7.989685402102996, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)1.0000000000004998, -7.989685402102996, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)10.0, -7.004368924503866, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)1.0000000000005, -7.989685402102996, Coordinates.NULL_ORDINATE),
     };
     assertTrue(isAllOrientationsEqual(pts2));
   }

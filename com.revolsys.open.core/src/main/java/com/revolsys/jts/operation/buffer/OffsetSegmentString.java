@@ -49,13 +49,13 @@ import com.revolsys.jts.geom.PrecisionModel;
  * @author Martin Davis
  *
  */
-class OffsetSegmentString 
-{
-  private static final Coordinate[] COORDINATE_ARRAY_TYPE = new Coordinate[0];
+class OffsetSegmentString {
+  private static final Coordinates[] COORDINATE_ARRAY_TYPE = new Coordinates[0];
 
-  private ArrayList ptList;
+  private final ArrayList ptList;
+
   private PrecisionModel precisionModel = null;
-  
+
   /**
    * The distance below which two adjacent points on the curve 
    * are considered to be coincident.
@@ -63,46 +63,60 @@ class OffsetSegmentString
    */
   private double minimimVertexDistance = 0.0;
 
-  public OffsetSegmentString()
-  {
-  	ptList = new ArrayList();
+  public OffsetSegmentString() {
+    ptList = new ArrayList();
   }
-  
-  public void setPrecisionModel(PrecisionModel precisionModel)
-  {
-  	this.precisionModel = precisionModel;
-  }
-  
-  public void setMinimumVertexDistance(double minimimVertexDistance)
-  {
-  	this.minimimVertexDistance = minimimVertexDistance;
-  }
-  
-  public void addPt(Coordinates pt)
-  {
-    Coordinate bufPt = new Coordinate(pt);
+
+  public void addPt(final Coordinates pt) {
+    final Coordinates bufPt = new Coordinate(pt);
     precisionModel.makePrecise(bufPt);
     // don't add duplicate (or near-duplicate) points
-    if (isRedundant(bufPt))
-        return;
+    if (isRedundant(bufPt)) {
+      return;
+    }
     ptList.add(bufPt);
-//System.out.println(bufPt);
+    // System.out.println(bufPt);
   }
-  
-  public void addPts(Coordinates[] pt, boolean isForward)
-  {
+
+  public void addPts(final Coordinates[] pt, final boolean isForward) {
     if (isForward) {
       for (int i = 0; i < pt.length; i++) {
         addPt(pt[i]);
       }
-    }
-    else {
+    } else {
       for (int i = pt.length - 1; i >= 0; i--) {
         addPt(pt[i]);
-      }     
+      }
     }
   }
-  
+
+  public void closeRing() {
+    if (ptList.size() < 1) {
+      return;
+    }
+    final Coordinates startPt = new Coordinate((Coordinates)ptList.get(0));
+    final Coordinates lastPt = (Coordinate)ptList.get(ptList.size() - 1);
+    Coordinates last2Pt = null;
+    if (ptList.size() >= 2) {
+      last2Pt = (Coordinates)ptList.get(ptList.size() - 2);
+    }
+    if (startPt.equals(lastPt)) {
+      return;
+    }
+    ptList.add(startPt);
+  }
+
+  public Coordinates[] getCoordinates() {
+    /*
+     * // check that points are a ring - add the startpoint again if they are
+     * not if (ptList.size() > 1) { Coordinates start = (Coordinate)
+     * ptList.get(0); Coordinates end = (Coordinate) ptList.get(ptList.size() -
+     * 1); if (! start.equals(end) ) addPt(start); }
+     */
+    final Coordinates[] coord = (Coordinates[])ptList.toArray(COORDINATE_ARRAY_TYPE);
+    return coord;
+  }
+
   /**
    * Tests whether the given point is redundant
    * relative to the previous
@@ -111,52 +125,34 @@ class OffsetSegmentString
    * @param pt
    * @return true if the point is redundant
    */
-  private boolean isRedundant(AbstractCoordinates pt)
-  {
-    if (ptList.size() < 1)
-    	return false;
-    Coordinates lastPt = (Coordinates) ptList.get(ptList.size() - 1);
-    double ptDist = pt.distance(lastPt);
-    if (ptDist < minimimVertexDistance)
-    	return true;
+  private boolean isRedundant(final Coordinates pt) {
+    if (ptList.size() < 1) {
+      return false;
+    }
+    final Coordinates lastPt = (Coordinates)ptList.get(ptList.size() - 1);
+    final double ptDist = pt.distance(lastPt);
+    if (ptDist < minimimVertexDistance) {
+      return true;
+    }
     return false;
   }
-  
-  public void closeRing()
-  {
-    if (ptList.size() < 1) return;
-    Coordinate startPt = new Coordinate((Coordinates) ptList.get(0));
-    Coordinate lastPt = (Coordinate) ptList.get(ptList.size() - 1);
-    Coordinates last2Pt = null;
-    if (ptList.size() >= 2)
-      last2Pt = (Coordinates) ptList.get(ptList.size() - 2);
-    if (startPt.equals(lastPt)) return;
-    ptList.add(startPt);
+
+  public void reverse() {
+
   }
 
-  public void reverse()
-  {
-    
-  }
-  
-  public Coordinate[] getCoordinates()
-  {
-    /*
-     // check that points are a ring - add the startpoint again if they are not
-   if (ptList.size() > 1) {
-      Coordinate start  = (Coordinate) ptList.get(0);
-      Coordinate end    = (Coordinate) ptList.get(ptList.size() - 1);
-      if (! start.equals(end) ) addPt(start);
-    }
-    */
-    Coordinate[] coord = (Coordinate[]) ptList.toArray(COORDINATE_ARRAY_TYPE);
-    return coord;
+  public void setMinimumVertexDistance(final double minimimVertexDistance) {
+    this.minimimVertexDistance = minimimVertexDistance;
   }
 
-  public String toString()
-  {
-  	GeometryFactory fact = GeometryFactory.getFactory();
-  	LineString line = fact.createLineString(getCoordinates());
-  	return line.toString();
+  public void setPrecisionModel(final PrecisionModel precisionModel) {
+    this.precisionModel = precisionModel;
+  }
+
+  @Override
+  public String toString() {
+    final GeometryFactory fact = GeometryFactory.getFactory();
+    final LineString line = fact.createLineString(getCoordinates());
+    return line.toString();
   }
 }

@@ -79,7 +79,7 @@ public abstract class StressTestHarness {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Coordinates basePt = new Coordinate(env.getMinX() + xOffset,
+    final Coordinates basePt = new Coordinate((double)env.getMinX() + xOffset,
       env.getMinY() + yOffset, Coordinates.NULL_ORDINATE);
     Geometry test = createTestCircle(basePt, size, nPts);
     if (test instanceof Polygon && Math.random() > 0.5) {
@@ -113,8 +113,8 @@ public abstract class StressTestHarness {
 
   public void run(final int nIter) {
     System.out.println("Running " + nIter + " tests");
-    // Geometry poly = createCircle(new Coordinate(0, 0), 100, nPts);
-    final Geometry poly = createSineStar(new Coordinate(0, 0, Coordinates.NULL_ORDINATE), 100,
+    // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
+    final Geometry poly = createSineStar(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), 100,
       this.numTargetPts);
     System.out.println(poly);
 

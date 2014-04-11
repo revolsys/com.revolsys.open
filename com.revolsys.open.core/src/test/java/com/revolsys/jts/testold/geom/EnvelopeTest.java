@@ -35,7 +35,6 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -46,6 +45,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.test.geometry.CoordinateTest;
 
 /**
  * @version 1.7
@@ -92,8 +92,7 @@ public class EnvelopeTest extends TestCase {
       .getEnvelope()
       .isEmpty());
 
-    final Geometry g = this.geometryFactory.createPoint(
-      new Coordinate(5.0, 6, Coordinates.NULL_ORDINATE)).getEnvelope();
+    final Geometry g = this.geometryFactory.createPoint(5.0, 6).getEnvelope();
     assertTrue(!g.isEmpty());
     assertTrue(g instanceof Point);
 
@@ -108,17 +107,13 @@ public class EnvelopeTest extends TestCase {
 
     final Polygon poly = (Polygon)g2;
     poly.normalize();
-    assertEquals(5, poly.getExteriorRing().getNumPoints());
-    assertEquals(new Coordinate(10.0, 10, Coordinates.NULL_ORDINATE),
-      poly.getExteriorRing().getCoordinateN(0));
-    assertEquals(new Coordinate(10.0, 40, Coordinates.NULL_ORDINATE),
-      poly.getExteriorRing().getCoordinateN(1));
-    assertEquals(new Coordinate(30.0, 40, Coordinates.NULL_ORDINATE),
-      poly.getExteriorRing().getCoordinateN(2));
-    assertEquals(new Coordinate(30.0, 10, Coordinates.NULL_ORDINATE),
-      poly.getExteriorRing().getCoordinateN(3));
-    assertEquals(new Coordinate(10.0, 10, Coordinates.NULL_ORDINATE),
-      poly.getExteriorRing().getCoordinateN(4));
+    final LineString exteriorRing = poly.getExteriorRing();
+    assertEquals(5, exteriorRing.getNumPoints());
+    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(0), 10.0, 10);
+    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(1), 10.0, 40);
+    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(2), 30.0, 40);
+    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(3), 30.0, 10);
+    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(4), 10.0, 10);
   }
 
   public void testContainsEmpty() {

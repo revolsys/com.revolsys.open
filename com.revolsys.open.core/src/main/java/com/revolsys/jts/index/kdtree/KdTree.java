@@ -36,7 +36,7 @@ package com.revolsys.jts.index.kdtree;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 
 /**
@@ -51,87 +51,78 @@ import com.revolsys.jts.geom.Envelope;
  * @author David Skea
  * @author Martin Davis
  */
-public class KdTree 
-{
-	private KdNode root = null;
-	private KdNode last = null;
-	private long numberOfNodes;
-	private double tolerance;
+public class KdTree {
+  private KdNode root = null;
 
-	/**
-	 * Creates a new instance of a KdTree 
-	 * with a snapping tolerance of 0.0.
-	 * (I.e. distinct points will <i>not</i> be snapped)
-	 */
-	public KdTree() {
-		this(0.0);
-	}
+  private final KdNode last = null;
 
-	/**
-	 * Creates a new instance of a KdTree, specifying a snapping distance tolerance.
-	 * Points which lie closer than the tolerance to a point already 
-	 * in the tree will be treated as identical to the existing point.
-	 * 
-	 * @param tolerance
-	 *          the tolerance distance for considering two points equal
-	 */
-	public KdTree(double tolerance) {
-		this.tolerance = tolerance;
-	}
+  private long numberOfNodes;
+
+  private final double tolerance;
 
   /**
-   * Tests whether the index contains any items.
-   * 
-   * @return true if the index does not contain any items
+   * Creates a new instance of a KdTree 
+   * with a snapping tolerance of 0.0.
+   * (I.e. distinct points will <i>not</i> be snapped)
    */
-  public boolean isEmpty()
-  {
-    if (root == null) return true;
-    return false;
+  public KdTree() {
+    this(0.0);
   }
-  
-	/**
-	 * Inserts a new point in the kd-tree, with no data.
-	 * 
-	 * @param p
-	 *          the point to insert
-	 * @return the kdnode containing the point
-	 */
-	public KdNode insert(AbstractCoordinates p) {
-		return insert(p, null);
-	}
 
-	/**
-	 * Inserts a new point into the kd-tree.
-	 * 
-	 * @param p
-	 *          the point to insert
-	 * @param data
-	 *          a data item for the point
-	 * @return returns a new KdNode if a new point is inserted, else an existing
-	 *         node is returned with its counter incremented. This can be checked
-	 *         by testing returnedNode.getCount() > 1.
-	 */
-	public KdNode insert(AbstractCoordinates p, Object data) {
-		if (root == null) {
-			root = new KdNode(p, data);
-			return root;
-		}
+  /**
+   * Creates a new instance of a KdTree, specifying a snapping distance tolerance.
+   * Points which lie closer than the tolerance to a point already 
+   * in the tree will be treated as identical to the existing point.
+   * 
+   * @param tolerance
+   *          the tolerance distance for considering two points equal
+   */
+  public KdTree(final double tolerance) {
+    this.tolerance = tolerance;
+  }
 
-		KdNode currentNode = root;
-		KdNode leafNode = root;
-		boolean isOddLevel = true;
-		boolean isLessThan = true;
+  /**
+   * Inserts a new point in the kd-tree, with no data.
+   * 
+   * @param p
+   *          the point to insert
+   * @return the kdnode containing the point
+   */
+  public KdNode insert(final Coordinates p) {
+    return insert(p, null);
+  }
 
-		/**
-		 * Traverse the tree,
-		 * first cutting the plane left-right (by X ordinate)
-		 * then top-bottom (by Y ordinate)
-		 */
-		while (currentNode != last) {
+  /**
+   * Inserts a new point into the kd-tree.
+   * 
+   * @param p
+   *          the point to insert
+   * @param data
+   *          a data item for the point
+   * @return returns a new KdNode if a new point is inserted, else an existing
+   *         node is returned with its counter incremented. This can be checked
+   *         by testing returnedNode.getCount() > 1.
+   */
+  public KdNode insert(final Coordinates p, final Object data) {
+    if (root == null) {
+      root = new KdNode(p, data);
+      return root;
+    }
+
+    KdNode currentNode = root;
+    KdNode leafNode = root;
+    boolean isOddLevel = true;
+    boolean isLessThan = true;
+
+    /**
+     * Traverse the tree,
+     * first cutting the plane left-right (by X ordinate)
+     * then top-bottom (by Y ordinate)
+     */
+    while (currentNode != last) {
       // test if point is already a node
       if (currentNode != null) {
-        boolean isInTolerance = p.distance(currentNode.getCoordinate()) <= tolerance;
+        final boolean isInTolerance = p.distance(currentNode.getCoordinate()) <= tolerance;
 
         // check if point is already in tree (up to tolerance) and if so simply
         // return existing node
@@ -142,87 +133,100 @@ public class KdTree
       }
 
       if (isOddLevel) {
-				isLessThan = p.getX() < currentNode.getX();
-			} else {
-				isLessThan = p.getY() < currentNode.getY();
-			}
-			leafNode = currentNode;
-			if (isLessThan) {
-				currentNode = currentNode.getLeft();
-			} else {
-				currentNode = currentNode.getRight();
-			}
-			
-			isOddLevel = !isOddLevel;
-		}
+        isLessThan = p.getX() < currentNode.getX();
+      } else {
+        isLessThan = p.getY() < currentNode.getY();
+      }
+      leafNode = currentNode;
+      if (isLessThan) {
+        currentNode = currentNode.getLeft();
+      } else {
+        currentNode = currentNode.getRight();
+      }
 
-		// no node found, add new leaf node to tree
-		numberOfNodes = numberOfNodes + 1;
-		KdNode node = new KdNode(p, data);
-		node.setLeft(last);
-		node.setRight(last);
-		if (isLessThan) {
-			leafNode.setLeft(node);
-		} else {
-			leafNode.setRight(node);
-		}
-		return node;
-	}
+      isOddLevel = !isOddLevel;
+    }
 
-	private void queryNode(KdNode currentNode, KdNode bottomNode,
-			Envelope queryEnv, boolean odd, List result) {
-		if (currentNode == bottomNode)
-			return;
+    // no node found, add new leaf node to tree
+    numberOfNodes = numberOfNodes + 1;
+    final KdNode node = new KdNode(p, data);
+    node.setLeft(last);
+    node.setRight(last);
+    if (isLessThan) {
+      leafNode.setLeft(node);
+    } else {
+      leafNode.setRight(node);
+    }
+    return node;
+  }
 
-		double min;
-		double max;
-		double discriminant;
-		if (odd) {
-			min = queryEnv.getMinX();
-			max = queryEnv.getMaxX();
-			discriminant = currentNode.getX();
-		} else {
-			min = queryEnv.getMinY();
-			max = queryEnv.getMaxY();
-			discriminant = currentNode.getY();
-		}
-		boolean searchLeft = min < discriminant;
-		boolean searchRight = discriminant <= max;
+  /**
+   * Tests whether the index contains any items.
+   * 
+   * @return true if the index does not contain any items
+   */
+  public boolean isEmpty() {
+    if (root == null) {
+      return true;
+    }
+    return false;
+  }
 
-		if (searchLeft) {
-			queryNode(currentNode.getLeft(), bottomNode, queryEnv, !odd, result);
-		}
-		if (queryEnv.contains(currentNode.getCoordinate())) {
-			result.add((Object) currentNode);
-		}
-		if (searchRight) {
-			queryNode(currentNode.getRight(), bottomNode, queryEnv, !odd, result);
-		}
+  /**
+   * Performs a range search of the points in the index.
+   * 
+   * @param queryEnv
+   *          the range rectangle to query
+   * @return a list of the KdNodes found
+   */
+  public List query(final Envelope queryEnv) {
+    final List result = new ArrayList();
+    queryNode(root, last, queryEnv, true, result);
+    return result;
+  }
 
-	}
+  /**
+   * Performs a range search of the points in the index.
+   * 
+   * @param queryEnv
+   *          the range rectangle to query
+   * @param result
+   *          a list to accumulate the result nodes into
+   */
+  public void query(final Envelope queryEnv, final List result) {
+    queryNode(root, last, queryEnv, true, result);
+  }
 
-	/**
-	 * Performs a range search of the points in the index.
-	 * 
-	 * @param queryEnv
-	 *          the range rectangle to query
-	 * @return a list of the KdNodes found
-	 */
-	public List query(Envelope queryEnv) {
-		List result = new ArrayList();
-		queryNode(root, last, queryEnv, true, result);
-		return result;
-	}
+  private void queryNode(final KdNode currentNode, final KdNode bottomNode,
+    final Envelope queryEnv, final boolean odd, final List result) {
+    if (currentNode == bottomNode) {
+      return;
+    }
 
-	/**
-	 * Performs a range search of the points in the index.
-	 * 
-	 * @param queryEnv
-	 *          the range rectangle to query
-	 * @param result
-	 *          a list to accumulate the result nodes into
-	 */
-	public void query(Envelope queryEnv, List result) {
-		queryNode(root, last, queryEnv, true, result);
-	}
+    double min;
+    double max;
+    double discriminant;
+    if (odd) {
+      min = queryEnv.getMinX();
+      max = queryEnv.getMaxX();
+      discriminant = currentNode.getX();
+    } else {
+      min = queryEnv.getMinY();
+      max = queryEnv.getMaxY();
+      discriminant = currentNode.getY();
+    }
+    final boolean searchLeft = min < discriminant;
+    final boolean searchRight = discriminant <= max;
+
+    if (searchLeft) {
+      queryNode(currentNode.getLeft(), bottomNode, queryEnv, !odd, result);
+    }
+    if (queryEnv.contains(currentNode.getCoordinate())) {
+      result.add(currentNode);
+    }
+    if (searchRight) {
+      queryNode(currentNode.getRight(), bottomNode, queryEnv, !odd, result);
+    }
+
+  }
 }

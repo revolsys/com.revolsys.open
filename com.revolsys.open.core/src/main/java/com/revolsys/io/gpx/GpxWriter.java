@@ -23,7 +23,6 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -170,7 +169,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
   private void writeWaypoint(final DataObject wayPoint) throws IOException {
     out.startTag(GpxConstants.WAYPOINT_ELEMENT);
     final Point point = wayPoint.getGeometryValue();
-    final Coordinate coordinate = point.getCoordinate();
+    final Coordinates coordinate = point.getCoordinate();
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(point.getSrid());
     final CoordinatesOperation inverseCoordinatesOperation = ProjectionFactory.getToGeographicsCoordinatesOperation(coordinateSystem);
     final Coordinates geoCoordinate = CoordinateProjectionUtil.perform(

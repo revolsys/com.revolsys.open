@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.algorithm.distance;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.io.WKTWriter;
@@ -45,18 +44,34 @@ import com.revolsys.jts.io.WKTWriter;
  */
 public class PointPairDistance {
 
-  private AbstractCoordinates[] pt = { new Coordinate(), new Coordinate() };
+  private final Coordinates[] pt = {
+    new Coordinate(), new Coordinate()
+  };
+
   private double distance = Double.NaN;
+
   private boolean isNull = true;
 
-  public PointPairDistance()
-  {
+  public PointPairDistance() {
   }
 
-  public void initialize() { isNull = true; }
+  public Coordinates getCoordinate(final int i) {
+    return pt[i];
+  }
 
-  public void initialize(AbstractCoordinates p0, Coordinates p1)
-  {
+  public Coordinates[] getCoordinates() {
+    return pt;
+  }
+
+  public double getDistance() {
+    return distance;
+  }
+
+  public void initialize() {
+    isNull = true;
+  }
+
+  public void initialize(final Coordinates p0, final Coordinates p1) {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);
     distance = p0.distance(p1);
@@ -69,54 +84,46 @@ public class PointPairDistance {
    * @param p1
    * @param distance the distance between p0 and p1
    */
-  private void initialize(Coordinates p0, Coordinates p1, double distance)
-  {
+  private void initialize(final Coordinates p0, final Coordinates p1,
+    final double distance) {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);
     this.distance = distance;
     isNull = false;
   }
 
-  public double getDistance() { return distance; }
+  public void setMaximum(final Coordinates p0, final Coordinates p1) {
+    if (isNull) {
+      initialize(p0, p1);
+      return;
+    }
+    final double dist = p0.distance(p1);
+    if (dist > distance) {
+      initialize(p0, p1, dist);
+    }
+  }
 
-  public Coordinates[] getCoordinates() { return pt; }
-
-  public Coordinates getCoordinate(int i) { return pt[i]; }
-
-  public void setMaximum(PointPairDistance ptDist)
-  {
+  public void setMaximum(final PointPairDistance ptDist) {
     setMaximum(ptDist.pt[0], ptDist.pt[1]);
   }
 
-  public void setMaximum(AbstractCoordinates p0, Coordinates p1)
-  {
+  public void setMinimum(final Coordinates p0, final Coordinates p1) {
     if (isNull) {
       initialize(p0, p1);
       return;
     }
-    double dist = p0.distance(p1);
-    if (dist > distance)
+    final double dist = p0.distance(p1);
+    if (dist < distance) {
       initialize(p0, p1, dist);
+    }
   }
 
-  public void setMinimum(PointPairDistance ptDist)
-  {
+  public void setMinimum(final PointPairDistance ptDist) {
     setMinimum(ptDist.pt[0], ptDist.pt[1]);
   }
 
-  public void setMinimum(AbstractCoordinates p0, Coordinates p1)
-  {
-    if (isNull) {
-      initialize(p0, p1);
-      return;
-    }
-    double dist = p0.distance(p1);
-    if (dist < distance)
-      initialize(p0, p1, dist);
-  }
-  
-  public String toString()
-  {
-  	return WKTWriter.toLineString(pt[0], pt[1]);
+  @Override
+  public String toString() {
+    return WKTWriter.toLineString(pt[0], pt[1]);
   }
 }

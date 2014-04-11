@@ -32,7 +32,9 @@
  */
 package com.revolsys.jts.geom;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -227,7 +229,7 @@ public class GeometryCollection extends Geometry {
   }
 
   @Override
-  public Coordinate getCoordinate() {
+  public Coordinates getCoordinate() {
     if (isEmpty()) {
       return null;
     }
@@ -244,11 +246,11 @@ public class GeometryCollection extends Geometry {
    * @return the collected coordinates
    *    */
   @Override
-  public Coordinate[] getCoordinateArray() {
-    final Coordinate[] coordinates = new Coordinate[getNumPoints()];
+  public Coordinates[] getCoordinateArray() {
+    final Coordinates[] coordinates = new Coordinates[getNumPoints()];
     int k = -1;
     for (int i = 0; i < geometries.length; i++) {
-      final Coordinate[] childCoordinates = geometries[i].getCoordinateArray();
+      final Coordinates[] childCoordinates = geometries[i].getCoordinateArray();
       for (int j = 0; j < childCoordinates.length; j++) {
         k++;
         coordinates[k] = childCoordinates[j];
@@ -272,9 +274,10 @@ public class GeometryCollection extends Geometry {
     return (List<V>)Arrays.asList(geometries);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Geometry getGeometry(final int n) {
-    return geometries[n];
+  public <V extends Geometry> V getGeometry(final int n) {
+    return (V)geometries[n];
   }
 
   @Override
@@ -316,11 +319,16 @@ public class GeometryCollection extends Geometry {
   }
 
   @Override
-  public void normalize() {
-    for (int i = 0; i < geometries.length; i++) {
-      geometries[i].normalize();
+  public GeometryCollection normalize() {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final Geometry part : this.geometries) {
+      final Geometry normalizedPart = part.normalize();
+      geometries.add(normalizedPart);
     }
-    Arrays.sort(geometries);
+    Collections.sort(geometries);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryCollection normalizedGeometry = geometryFactory.createGeometryCollection(geometries);
+    return normalizedGeometry;
   }
 
   /**

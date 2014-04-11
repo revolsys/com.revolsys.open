@@ -23,10 +23,11 @@ public class LineDissolverTest extends TestCase {
     final LineDissolver d = new LineDissolver();
     d.add(geoms);
     final Geometry result = d.getResult();
-    final boolean equal = result.norm().equalsExact(expected.norm());
+    final Geometry normalizedResult = result.normalize();
+    final boolean equal = normalizedResult.equalsExact(expected.normalize());
     if (!equal) {
       System.out.println("Expected = " + expected + " actual = "
-        + result.norm());
+        + normalizedResult);
     }
     assertTrue(equal);
   }

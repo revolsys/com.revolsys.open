@@ -3,7 +3,6 @@ package com.revolsys.gis.model.coordinates.list;
 import java.io.Serializable;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceFactory;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -13,7 +12,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
 
   private static final long serialVersionUID = 948765434610427191L;
 
-  public static CoordinatesList create(final List<Coordinate> coordinates) {
+  public static CoordinatesList create(final List<Coordinates> coordinates) {
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(
       coordinates.size(), 3);
     for (int i = 0; i < coordinates.size(); i++) {
@@ -25,12 +24,16 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
 
   @Override
   public CoordinatesList create(final Coordinates[] coordinates) {
-    final CoordinatesList coordinatesList = create(coordinates.length, 3);
-    for (int i = 0; i < coordinates.length; i++) {
-      final Coordinates coordinate = coordinates[i];
-      coordinatesList.setCoordinate(i, coordinate);
+    if (coordinates == null) {
+      return create(0, 3);
+    } else {
+      final CoordinatesList coordinatesList = create(coordinates.length, 3);
+      for (int i = 0; i < coordinates.length; i++) {
+        final Coordinates coordinate = coordinates[i];
+        coordinatesList.setCoordinate(i, coordinate);
+      }
+      return coordinatesList;
     }
-    return coordinatesList;
   }
 
   @Override
@@ -40,7 +43,7 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
     final CoordinatesList coordinatesList = create(size, numAxis);
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < numAxis; j++) {
-        final double coordinate = coordinateSequence.getOrdinate(i, i);
+        final double coordinate = coordinateSequence.getOrdinate(i, j);
         coordinatesList.setValue(i, j, coordinate);
       }
     }

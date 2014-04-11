@@ -32,8 +32,6 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -53,12 +51,12 @@ public class EuclideanDistanceToPoint {
   public EuclideanDistanceToPoint() {
   }
 
-  public void computeDistance(final Geometry geom, final Coordinate pt,
+  public void computeDistance(final Geometry geom, final Coordinates pt,
     final PointPairDistance ptDist) {
     if (geom instanceof LineString) {
-      computeDistance((LineString)geom, pt, ptDist);
+      computeDistance(geom, pt, ptDist);
     } else if (geom instanceof Polygon) {
-      computeDistance((Polygon)geom, pt, ptDist);
+      computeDistance(geom, pt, ptDist);
     } else if (geom instanceof GeometryCollection) {
       final GeometryCollection gc = (GeometryCollection)geom;
       for (int i = 0; i < gc.getNumGeometries(); i++) {
@@ -70,24 +68,24 @@ public class EuclideanDistanceToPoint {
     }
   }
 
-  public void computeDistance(final LineSegment segment, final Coordinate pt,
+  public void computeDistance(final LineSegment segment, final Coordinates pt,
     final PointPairDistance ptDist) {
-    final AbstractCoordinates closestPt = segment.closestPoint(pt);
+    final Coordinates closestPt = segment.closestPoint(pt);
     ptDist.setMinimum(closestPt, pt);
   }
 
-  public void computeDistance(final LineString line, final Coordinate pt,
+  public void computeDistance(final LineString line, final Coordinates pt,
     final PointPairDistance ptDist) {
     final Coordinates[] coords = line.getCoordinateArray();
     for (int i = 0; i < coords.length - 1; i++) {
       tempSegment.setCoordinates(coords[i], coords[i + 1]);
       // this is somewhat inefficient - could do better
-      final AbstractCoordinates closestPt = tempSegment.closestPoint(pt);
+      final Coordinates closestPt = tempSegment.closestPoint(pt);
       ptDist.setMinimum(closestPt, pt);
     }
   }
 
-  public void computeDistance(final Polygon poly, final Coordinate pt,
+  public void computeDistance(final Polygon poly, final Coordinates pt,
     final PointPairDistance ptDist) {
     computeDistance(poly.getExteriorRing(), pt, ptDist);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {

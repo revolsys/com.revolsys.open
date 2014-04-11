@@ -136,7 +136,7 @@ public class PlanarGraph {
   /**
    * @return the node if found; null otherwise
    */
-  public Node find(final Coordinate coord) {
+  public Node find(final Coordinates coord) {
     return nodes.find(coord);
   }
 
@@ -146,10 +146,10 @@ public class PlanarGraph {
    * @return the edge, if found
    *    <code>null</code> if the edge was not found
    */
-  public Edge findEdge(final Coordinate p0, final Coordinate p1) {
+  public Edge findEdge(final Coordinates p0, final Coordinates p1) {
     for (int i = 0; i < edges.size(); i++) {
       final Edge e = (Edge)edges.get(i);
-      final Coordinate[] eCoord = e.getCoordinates();
+      final Coordinates[] eCoord = e.getCoordinates();
       if (p0.equals(eCoord[0]) && p1.equals(eCoord[1])) {
         return e;
       }
@@ -181,11 +181,11 @@ public class PlanarGraph {
    * @return the edge, if found
    *    <code>null</code> if the edge was not found
    */
-  public Edge findEdgeInSameDirection(final Coordinate p0, final Coordinates p1) {
+  public Edge findEdgeInSameDirection(final Coordinates p0, final Coordinates p1) {
     for (int i = 0; i < edges.size(); i++) {
       final Edge e = (Edge)edges.get(i);
 
-      final Coordinate[] eCoord = e.getCoordinates();
+      final Coordinates[] eCoord = e.getCoordinates();
       if (matchInSameDirection(p0, p1, eCoord[0], eCoord[1])) {
         return e;
       }
@@ -222,7 +222,7 @@ public class PlanarGraph {
     edges.add(e);
   }
 
-  public boolean isBoundaryNode(final int geomIndex, final Coordinate coord) {
+  public boolean isBoundaryNode(final int geomIndex, final Coordinates coord) {
     final Node node = nodes.find(coord);
     if (node == null) {
       return false;
@@ -263,8 +263,8 @@ public class PlanarGraph {
    * E.g. the segments are parallel and in the same quadrant
    * (as opposed to parallel and opposite!).
    */
-  private boolean matchInSameDirection(final Coordinate p0,
-    final Coordinates p1, final Coordinate ep0, final Coordinates ep1) {
+  private boolean matchInSameDirection(final Coordinates p0,
+    final Coordinates p1, final Coordinates ep0, final Coordinates ep1) {
     if (!p0.equals(ep0)) {
       return false;
     }

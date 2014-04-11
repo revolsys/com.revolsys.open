@@ -114,7 +114,7 @@ extends GeometricShapeBuilder
   
   protected Coordinates createCoord(double x, double y)
   {
-  	Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+  	Coordinates pt = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
   	geomFactory.getPrecisionModel().makePrecise(pt);
     return pt;
   }

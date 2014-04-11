@@ -69,7 +69,7 @@ class TaggedLineString
 
   public int getMinimumSize()  {    return minimumSize;  }
   public LineString getParent() { return parentLine; }
-  public Coordinate[] getParentCoordinates() { return parentLine.getCoordinateArray(); }
+  public Coordinates[] getParentCoordinates() { return parentLine.getCoordinateArray(); }
   public Coordinates[] getResultCoordinates() { return extractCoordinates(resultSegs); }
 
   public int getResultSize()
@@ -82,7 +82,7 @@ class TaggedLineString
 
   private void init()
   {
-    Coordinate[] pts = parentLine.getCoordinateArray();
+    Coordinates[] pts = parentLine.getCoordinateArray();
     segs = new TaggedLineSegment[pts.length - 1];
     for (int i = 0; i < pts.length - 1; i++) {
       TaggedLineSegment seg
