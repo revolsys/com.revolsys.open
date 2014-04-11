@@ -4,7 +4,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.grid.RectangularMapGrid;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -29,9 +29,9 @@ public class MapGridGeometrySheetFilter implements Filter<DataObject> {
       if (geometry != null) {
         final Geometry geographicsGeometry = GeometryProjectionUtil.perform(
           geometry, 4326);
-        final Coordinate centroid = geographicsGeometry.getCentroid()
+        final Coordinates centroid = geographicsGeometry.getCentroid()
           .getCoordinate();
-        final String geometrySheet = grid.getMapTileName(centroid.x, centroid.y);
+        final String geometrySheet = grid.getMapTileName(centroid.getX(), centroid.getY());
         if (geometrySheet != null) {
           if (sheet.equals(geometrySheet) == !inverse) {
             return true;

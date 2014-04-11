@@ -42,6 +42,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
 import com.revolsys.jts.geomgraph.Edge;
@@ -71,7 +72,7 @@ class RightmostEdgeFinder {
   }
   
   public DirectedEdge getEdge()  {    return orientedDe;  }
-  public Coordinate getCoordinate()  {    return minCoord;  }
+  public Coordinates getCoordinate()  {    return minCoord;  }
 
   public void findEdge(List dirEdgeList)
   {
@@ -126,18 +127,18 @@ class RightmostEdgeFinder {
        * If these segments are both above or below the rightmost point, we need to
        * determine their relative orientation to decide which is rightmost.
        */
-      Coordinate[] pts = minDe.getEdge().getCoordinates();
+      Coordinates[] pts = minDe.getEdge().getCoordinates();
       Assert.isTrue(minIndex > 0 && minIndex < pts.length, "rightmost point expected to be interior vertex of edge");
-      Coordinate pPrev = pts[minIndex - 1];
-      Coordinate pNext = pts[minIndex + 1];
+      Coordinates pPrev = pts[minIndex - 1];
+      Coordinates pNext = pts[minIndex + 1];
       int orientation = CGAlgorithms.computeOrientation(minCoord, pNext, pPrev);
       boolean usePrev = false;
         // both segments are below min point
-      if (pPrev.y < minCoord.y && pNext.y < minCoord.y
+      if (pPrev.getY() < minCoord.getY() && pNext.getY() < minCoord.getY()
          && orientation == CGAlgorithms.COUNTERCLOCKWISE) {
           usePrev = true;
       }
-      else if (pPrev.y > minCoord.y && pNext.y > minCoord.y
+      else if (pPrev.getY() > minCoord.getY() && pNext.getY() > minCoord.getY()
                 && orientation == CGAlgorithms.CLOCKWISE) {
           usePrev = true;
       }
@@ -153,7 +154,7 @@ class RightmostEdgeFinder {
     for (int i = 0; i < coord.length - 1; i++) {
       // only check vertices which are the start or end point of a non-horizontal segment
      // <FIX> MD 19 Sep 03 - NO!  we can test all vertices, since the rightmost must have a non-horiz segment adjacent to it
-        if (minCoord == null || coord[i].x > minCoord.x ) {
+        if (minCoord == null || coord[i].getX() > minCoord.getX() ) {
           minDe = de;
           minIndex = i;
           minCoord = coord[i];
@@ -180,13 +181,13 @@ class RightmostEdgeFinder {
   private int getRightmostSideOfSegment(DirectedEdge de, int i)
   {
     Edge e = de.getEdge();
-    Coordinate coord[] = e.getCoordinates();
+    Coordinates coord[] = e.getCoordinates();
 
     if (i < 0 || i + 1 >= coord.length) return -1;
-    if (coord[i].y == coord[i + 1].y) return -1;    // indicates edge is parallel to x-axis
+    if (coord[i].getY() == coord[i + 1].getY()) return -1;    // indicates edge is parallel to x-axis
 
     int pos = Position.LEFT;
-    if (coord[i].y < coord[i + 1].y) pos = Position.RIGHT;
+    if (coord[i].getY() < coord[i + 1].getY()) pos = Position.RIGHT;
     return pos;
   }
 }

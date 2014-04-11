@@ -47,7 +47,7 @@ import com.revolsys.jts.geom.Polygon;
  * from each connected element in a Geometry
  * (e.g. a polygon, linestring or point)
  * and returns them in a list. The elements of the list are 
- * {@link com.revolsys.jts.operation.distance.GeometryLocation}s.
+ * {@link com.revolsys.jts.testold.operation.distance.GeometryLocation}s.
  *
  * @version 1.7
  */
@@ -59,7 +59,7 @@ public class ConnectedElementLocationFilter
    * Returns a list containing a point from each Polygon, LineString, and Point
    * found inside the specified geometry. Thus, if the specified geometry is
    * not a GeometryCollection, an empty list will be returned. The elements of the list 
-   * are {@link com.revolsys.jts.operation.distance.GeometryLocation}s.
+   * are {@link com.revolsys.jts.testold.operation.distance.GeometryLocation}s.
    */  
   public static List getLocations(Geometry geom)
   {

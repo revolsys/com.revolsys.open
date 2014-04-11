@@ -34,6 +34,7 @@
 package com.revolsys.jts.shape.random;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
@@ -121,7 +122,7 @@ extends GeometricShapeBuilder
     double cellDX = cellFrac * gridDX;
     double cellDY = cellFrac * gridDY;
     	
-    Coordinate[] pts = new Coordinate[nCells * nCells];
+    Coordinates[] pts = new Coordinates[nCells * nCells];
     int index = 0;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
@@ -133,7 +134,7 @@ extends GeometricShapeBuilder
     return geomFactory.createMultiPoint(pts);
   }
   
-  private Coordinate randomPointInCell(double orgX, double orgY, double xLen, double yLen)
+  private Coordinates randomPointInCell(double orgX, double orgY, double xLen, double yLen)
   {
   	if (isConstrainedToCircle) {
   		return randomPointInCircle(
@@ -144,14 +145,14 @@ extends GeometricShapeBuilder
   	return randomPointInGridCell(orgX, orgY, xLen, yLen);
   }
   
-  private Coordinate randomPointInGridCell(double orgX, double orgY, double xLen, double yLen)
+  private Coordinates randomPointInGridCell(double orgX, double orgY, double xLen, double yLen)
   {
     double x = orgX + xLen * Math.random();
     double y = orgY + yLen * Math.random();
     return createCoord(x, y);
   }
 
-  private static Coordinate randomPointInCircle(double orgX, double orgY, double width, double height)
+  private static Coordinates randomPointInCircle(double orgX, double orgY, double width, double height)
   {
   	double centreX = orgX + width/2;
   	double centreY = orgY + height/2;
@@ -165,7 +166,7 @@ extends GeometricShapeBuilder
   	
     double x0 = centreX + rndX;
     double y0 = centreY + rndY;
-    return new Coordinate(x0, y0);    
+    return new Coordinate(x0, y0, Coordinates.NULL_ORDINATE);    
   }
 
 }

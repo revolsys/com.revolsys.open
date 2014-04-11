@@ -7,7 +7,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
@@ -18,13 +17,14 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectFileLayer extends DataObjectListLayer {
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(

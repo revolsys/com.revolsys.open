@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 public class ChainedCoordinatesOperation implements CoordinatesOperation {
   private final List<CoordinatesOperation> operations;

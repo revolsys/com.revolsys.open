@@ -34,6 +34,7 @@
 package com.revolsys.jts.operation.predicate;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -123,17 +124,17 @@ public class RectangleContains {
    * @param pt the point to test
    * @return true if the point is contained in the boundary
    */
-  private boolean isPointContainedInBoundary(Coordinate pt)
+  private boolean isPointContainedInBoundary(Coordinates pt)
   {
     /**
      * contains = false iff the point is properly contained in the rectangle.
      * 
      * This code assumes that the point lies in the rectangle envelope
      */ 
-    return pt.x == rectEnv.getMinX() 
-    		|| pt.x == rectEnv.getMaxX()
-    		|| pt.y == rectEnv.getMinY()
-    		|| pt.y == rectEnv.getMaxY();
+    return pt.getX() == rectEnv.getMinX() 
+    		|| pt.getX() == rectEnv.getMaxX()
+    		|| pt.getY() == rectEnv.getMinY()
+    		|| pt.getY() == rectEnv.getMaxY();
   }
 
   /**
@@ -168,14 +169,14 @@ public class RectangleContains {
       return isPointContainedInBoundary(p0);
 
     // we already know that the segment is contained in the rectangle envelope
-    if (p0.x == p1.x) {
-      if (p0.x == rectEnv.getMinX() ||
-          p0.x == rectEnv.getMaxX() )
+    if (p0.getX() == p1.getX()) {
+      if (p0.getX() == rectEnv.getMinX() ||
+          p0.getX() == rectEnv.getMaxX() )
         return true;
     }
-    else if (p0.y == p1.y) {
-      if (p0.y == rectEnv.getMinY() ||
-          p0.y == rectEnv.getMaxY() )
+    else if (p0.getY() == p1.getY()) {
+      if (p0.getY() == rectEnv.getMinY() ||
+          p0.getY() == rectEnv.getMaxY() )
         return true;
     }
     /**

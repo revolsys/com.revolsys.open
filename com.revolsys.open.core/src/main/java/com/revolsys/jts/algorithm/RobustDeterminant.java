@@ -34,7 +34,7 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * @version 1.7
@@ -393,7 +393,7 @@ public class RobustDeterminant {
     * @return -1 if q is clockwise (right) from p1-p2
     * @return 0 if q is collinear with p1-p2
     */
-   public static int orientationIndex(Coordinate p1, Coordinate p2, Coordinate q)
+   public static int orientationIndex(Coordinates p1, Coordinates p2, Coordinates q)
    {
      /**
       * MD - 9 Aug 2010 It seems that the basic algorithm is slightly orientation
@@ -414,10 +414,10 @@ public class RobustDeterminant {
       * 
       */
      
-     double dx1 = p2.x - p1.x;
-     double dy1 = p2.y - p1.y;
-     double dx2 = q.x - p2.x;
-     double dy2 = q.y - p2.y;
+     double dx1 = p2.getX() - p1.getX();
+     double dy1 = p2.getY() - p1.getY();
+     double dx2 = q.getX() - p2.getX();
+     double dy2 = q.getY() - p2.getY();
      return signOfDet2x2(dx1, dy1, dx2, dy2);
    }
 

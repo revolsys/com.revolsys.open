@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 /**
  * Methods for computing and working with octants of the Cartesian plane
  * Octants are numbered as follows:
@@ -96,10 +96,10 @@ public class Octant {
   /**
    * Returns the octant of a directed line segment from p0 to p1.
    */
-  public static int octant(Coordinate p0, Coordinate p1)
+  public static int octant(Coordinates p0, Coordinates p1)
   {
-    double dx = p1.x - p0.x;
-    double dy = p1.y - p0.y;
+    double dx = p1.getX() - p0.getX();
+    double dy = p1.getY() - p0.getY();
     if (dx == 0.0 && dy == 0.0)
       throw new IllegalArgumentException("Cannot compute the octant for two identical points " + p0);
     return octant(dx, dy);

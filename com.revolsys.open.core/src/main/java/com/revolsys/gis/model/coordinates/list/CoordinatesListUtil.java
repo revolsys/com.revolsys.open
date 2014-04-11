@@ -20,7 +20,6 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -31,6 +30,7 @@ import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -476,7 +476,7 @@ public class CoordinatesListUtil {
     final GeometryFactory geometryFactory, final CoordinatesList points) {
     BoundingBox boundingBox = new BoundingBox(geometryFactory);
     for (final Coordinates point : points) {
-      boundingBox = boundingBox.expandToInclude(point);
+      boundingBox = boundingBox.expand(point);
     }
     return boundingBox;
   }

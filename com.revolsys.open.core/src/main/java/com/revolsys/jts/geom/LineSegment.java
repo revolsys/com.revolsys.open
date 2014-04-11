@@ -36,6 +36,7 @@ package com.revolsys.jts.geom;
 
 import java.io.Serializable;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.LineIntersector;
@@ -68,7 +69,7 @@ public class LineSegment
   }
 
   public LineSegment(double x0, double y0, double x1, double y1) {
-    this(new Coordinate(x0, y0), new Coordinate(x1, y1));
+    this(new Coordinate(x0, y0, Coordinates.NULL_ORDINATE), new Coordinate(x1, y1, Coordinates.NULL_ORDINATE));
   }
 
   public LineSegment(LineSegment ls) {
@@ -79,7 +80,7 @@ public class LineSegment
     this(new Coordinate(), new Coordinate());
   }
 
-  public Coordinate getCoordinate(int i)
+  public AbstractCoordinates getCoordinate(int i)
   {
     if (i == 0) return p0;
     return p1;
@@ -90,12 +91,12 @@ public class LineSegment
     setCoordinates(ls.p0, ls.p1);
   }
 
-  public void setCoordinates(Coordinate p0, Coordinate p1)
+  public void setCoordinates(Coordinates p0, Coordinates p1)
   {
-    this.p0.x = p0.x;
-    this.p0.y = p0.y;
-    this.p1.x = p1.x;
-    this.p1.y = p1.y;
+    this.p0.setX(p0.getX());
+    this.p0.setY(p0.getY());
+    this.p1.setX(p1.getX());
+    this.p1.setY(p1.getY());
   }
 
   /**
@@ -112,14 +113,14 @@ public class LineSegment
    *
    * @return <code>true</code> if the segment is horizontal
    */
-  public boolean isHorizontal() { return p0.y == p1.y; }
+  public boolean isHorizontal() { return p0.getY() == p1.getY(); }
 
   /**
    * Tests whether the segment is vertical.
    *
    * @return <code>true</code> if the segment is vertical
    */
-  public boolean isVertical() { return p0.x == p1.x; }
+  public boolean isVertical() { return p0.getX() == p1.getX(); }
 
   /**
    * Determines the orientation of a LineSegment relative to this segment.
@@ -166,7 +167,7 @@ public class LineSegment
    * 
    * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
    */
-  public int orientationIndex(Coordinate p)
+  public int orientationIndex(Coordinates p)
   {
     return CGAlgorithms.orientationIndex(p0, p1, p);
   }
@@ -202,7 +203,7 @@ public class LineSegment
    */
   public double angle()
   {
-    return Math.atan2(p1.y - p0.y, p1.x - p0.x);
+    return Math.atan2(p1.getY() - p0.getY(), p1.getX() - p0.getX());
   }
 
   /**
@@ -210,7 +211,7 @@ public class LineSegment
    *
    * @return the midpoint of the segment
    */
-  public Coordinate midPoint()
+  public Coordinates midPoint()
   {
     return midPoint(p0, p1);
   }
@@ -220,10 +221,10 @@ public class LineSegment
    *
    * @return the midpoint of the segment
    */
-  public static Coordinate midPoint(Coordinate p0, Coordinate p1)
+  public static Coordinates midPoint(Coordinates p0, Coordinates p1)
   {
-    return new Coordinate( (p0.x + p1.x) / 2,
-                           (p0.y + p1.y) / 2);
+    return new Coordinate( (p0.getX() + p1.getX()) / 2,
+                           (p0.getY() + p1.getY()) / 2, Coordinates.NULL_ORDINATE);
   }
 
   /**
@@ -241,7 +242,7 @@ public class LineSegment
    *
    * @return the distance from this segment to the given point
    */
-  public double distance(Coordinate p)
+  public double distance(AbstractCoordinates p)
   {
     return CGAlgorithms.distancePointLine(p, p0, p1);
   }
@@ -252,7 +253,7 @@ public class LineSegment
    *
    * @return the perpendicular distance between the defined line and the given point
    */
-  public double distancePerpendicular(Coordinate p)
+  public double distancePerpendicular(Coordinates p)
   {
     return CGAlgorithms.distancePointLinePerpendicular(p, p0, p1);
   }
@@ -271,8 +272,8 @@ public class LineSegment
   public Coordinate pointAlong(double segmentLengthFraction)
   {
     Coordinate coord = new Coordinate();
-    coord.x = p0.x + segmentLengthFraction * (p1.x - p0.x);
-    coord.y = p0.y + segmentLengthFraction * (p1.y - p0.y);
+    coord.setX(p0.getX() + segmentLengthFraction * (p1.getX() - p0.getX()));
+    coord.setY(p0.getY() + segmentLengthFraction * (p1.getY() - p0.getY()));
     return coord;
   }
 
@@ -295,11 +296,11 @@ public class LineSegment
   public Coordinate pointAlongOffset(double segmentLengthFraction, double offsetDistance)
   {
   	// the point on the segment line
-    double segx = p0.x + segmentLengthFraction * (p1.x - p0.x);
-    double segy = p0.y + segmentLengthFraction * (p1.y - p0.y);
+    double segx = p0.getX() + segmentLengthFraction * (p1.getX() - p0.getX());
+    double segy = p0.getY() + segmentLengthFraction * (p1.getY() - p0.getY());
     
-    double dx = p1.x - p0.x;
-    double dy = p1.y - p0.y;
+    double dx = p1.getX() - p0.getX();
+    double dy = p1.getY() - p0.getY();
     double len = Math.sqrt(dx * dx + dy * dy);
     double ux = 0.0;
     double uy = 0.0;
@@ -316,7 +317,7 @@ public class LineSegment
     double offsetx = segx - uy;
     double offsety = segy + ux;
 
-    Coordinate coord = new Coordinate(offsetx, offsety);
+    Coordinate coord = new Coordinate(offsetx, offsety, Coordinates.NULL_ORDINATE);
     return coord;
   }
 
@@ -348,14 +349,14 @@ public class LineSegment
                 r>1 P is on the forward extension of AB
                 0<r<1 P is interior to AB
         */
-    double dx = p1.x - p0.x;
-    double dy = p1.y - p0.y;
+    double dx = p1.getX() - p0.getX();
+    double dy = p1.getY() - p0.getY();
     double len = dx * dx + dy * dy;
     
     // handle zero-length segments
     if (len <= 0.0) return Double.NaN;
     
-    double r = ( (p.x - p0.x) * dx + (p.y - p0.y) * dy )
+    double r = ( (p.getX() - p0.getX()) * dx + (p.getY() - p0.getY()) * dy )
               / len;
     return r;
   }
@@ -398,8 +399,8 @@ public class LineSegment
 
     double r = projectionFactor(p);
     Coordinate coord = new Coordinate();
-    coord.x = p0.x + r * (p1.x - p0.x);
-    coord.y = p0.y + r * (p1.y - p0.y);
+    coord.setX(p0.getX() + r * (p1.getX() - p0.getX()));
+    coord.setY(p0.getY() + r * (p1.getY() - p0.getY()));
     return coord;
   }
   /**
@@ -543,10 +544,10 @@ public class LineSegment
    * 
    * @see RobustLineIntersector
    */
-  public Coordinate lineIntersection(LineSegment line)
+  public Coordinates lineIntersection(LineSegment line)
   {
     try {
-      Coordinate intPt = HCoordinate.intersection(p0, p1, line.p0, line.p1);
+      Coordinates intPt = HCoordinate.intersection(p0, p1, line.p0, line.p1);
       return intPt;
     }
     catch (NotRepresentableException ex) {
@@ -563,7 +564,7 @@ public class LineSegment
    */
   public LineString toGeometry(GeometryFactory geomFactory)
   {
-    return geomFactory.createLineString(new Coordinate[] { p0, p1 });
+    return geomFactory.createLineString(new Coordinates[] { p0, p1 });
   }
   
   /**
@@ -588,12 +589,12 @@ public class LineSegment
    * @return a hashcode for this object
    */
   public int hashCode() {
-    long bits0 = java.lang.Double.doubleToLongBits(p0.x);
-    bits0 ^= java.lang.Double.doubleToLongBits(p0.y) * 31;
+    long bits0 = java.lang.Double.doubleToLongBits(p0.getX());
+    bits0 ^= java.lang.Double.doubleToLongBits(p0.getY()) * 31;
     int hash0 = (((int) bits0) ^ ((int) (bits0  >> 32)));
     
-    long bits1 = java.lang.Double.doubleToLongBits(p1.x);
-    bits1 ^= java.lang.Double.doubleToLongBits(p1.y) * 31;
+    long bits1 = java.lang.Double.doubleToLongBits(p1.getX());
+    bits1 ^= java.lang.Double.doubleToLongBits(p1.getY()) * 31;
     int hash1 = (((int) bits1) ^ ((int) (bits1  >> 32)));
 
     // XOR is supposed to be a good way to combine hashcodes
@@ -635,8 +636,8 @@ public class LineSegment
   public String toString()
   {
     return "LINESTRING( " +
-        p0.x + " " + p0.y
+        p0.getX() + " " + p0.getY()
         + ", " +
-        p1.x + " " + p1.y + ")";
+        p1.getX() + " " + p1.getY() + ")";
   }
 }

@@ -3,8 +3,8 @@ package com.revolsys.gis.algorithm.linematch;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;

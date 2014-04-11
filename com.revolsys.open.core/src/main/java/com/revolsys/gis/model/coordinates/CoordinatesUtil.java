@@ -7,6 +7,7 @@ import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -158,6 +159,13 @@ public class CoordinatesUtil {
     }
   }
 
+  /**
+   * Computes the 2-dimensional Euclidean distance to another location.
+   * The Z-ordinate is ignored.
+   * 
+   * @param c a point
+   * @return the 2-dimensional Euclidean distance between the locations
+   */
   public static double distance(final Coordinates point1,
     final Coordinates point2) {
     final double x1 = point1.getX();
@@ -165,6 +173,20 @@ public class CoordinatesUtil {
     final double x2 = point2.getX();
     final double y2 = point2.getY();
     return MathUtil.distance(x1, y1, x2, y2);
+  }
+
+  /**
+   * Computes the 3-dimensional Euclidean distance to another location.
+   * 
+   * @param c a coordinate
+   * @return the 3-dimensional Euclidean distance between the locations
+   */
+  public static double distance3d(final Coordinates point1,
+    final Coordinates point2) {
+    final double dx = point1.getX() - point2.getX();
+    final double dy = point1.getY() - point2.getY();
+    final double dz = point1.getZ() - point2.getZ();
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   public static Coordinates divide(final Coordinates c1, final double d) {
@@ -214,11 +236,12 @@ public class CoordinatesUtil {
     return false;
   }
 
-  public static Coordinates get(final Coordinate coordinate) {
-    if (Double.isNaN(coordinate.z)) {
-      return new DoubleCoordinates(coordinate.x, coordinate.y);
+  public static Coordinates get(final Coordinates coordinate) {
+    if (Double.isNaN(coordinate.getZ())) {
+      return new DoubleCoordinates(coordinate.getX(), coordinate.getY());
     } else {
-      return new DoubleCoordinates(coordinate.x, coordinate.y, coordinate.z);
+      return new DoubleCoordinates(coordinate.getX(), coordinate.getY(),
+        coordinate.getZ());
     }
   }
 
@@ -466,7 +489,7 @@ public class CoordinatesUtil {
     return factory.createPoint(subtract(getInstance(c1), getInstance(p2)));
   }
 
-  public static Coordinate toCoordinate(final Coordinates point) {
+  public static Coordinates toCoordinate(final Coordinates point) {
     return new Coordinate(point.getX(), point.getY(), point.getZ());
   }
 

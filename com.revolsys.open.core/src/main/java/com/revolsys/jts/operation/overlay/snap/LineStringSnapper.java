@@ -33,8 +33,10 @@
 
 package com.revolsys.jts.operation.overlay.snap;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 
@@ -87,10 +89,10 @@ public class LineStringSnapper
   {
     this.allowSnappingToSourceVertices = allowSnappingToSourceVertices;
   }
-  private static boolean isClosed(Coordinate[] pts)
+  private static boolean isClosed(AbstractCoordinates[] pts)
   {
     if (pts.length <= 1) return false;
-    return pts[0].equals2D(pts[pts.length - 1]);
+    return pts[0].equals2d(pts[pts.length - 1]);
   }
   /**
    * Snaps the vertices and segments of the source LineString 
@@ -99,14 +101,14 @@ public class LineStringSnapper
    * @param snapPts the vertices to snap to
    * @return a list of the snapped points
    */
-  public Coordinate[] snapTo(Coordinate[] snapPts)
+  public Coordinates[] snapTo(AbstractCoordinates[] snapPts)
   {
     CoordinateList coordList = new CoordinateList(srcPts);
 
     snapVertices(coordList, snapPts);
     snapSegments(coordList, snapPts);
 
-    Coordinate[] newPts = coordList.toCoordinateArray();
+    Coordinates[] newPts = coordList.toCoordinateArray();
     return newPts;
   }
 
@@ -116,14 +118,14 @@ public class LineStringSnapper
    * @param srcCoords the points to snap
    * @param snapPts the points to snap to
    */
-  private void snapVertices(CoordinateList srcCoords, Coordinate[] snapPts)
+  private void snapVertices(CoordinateList srcCoords, Coordinates[] snapPts)
   {
     // try snapping vertices
     // if src is a ring then don't snap final vertex
     int end = isClosed ? srcCoords.size() - 1 : srcCoords.size();
     for (int i = 0; i < end; i++) {
-      Coordinate srcPt = (Coordinate) srcCoords.get(i);
-      Coordinate snapVert = findSnapForVertex(srcPt, snapPts);
+      AbstractCoordinates srcPt = (AbstractCoordinates) srcCoords.get(i);
+      Coordinates snapVert = findSnapForVertex(srcPt, snapPts);
       if (snapVert != null) {
         // update src with snap pt
         srcCoords.set(i, new Coordinate(snapVert));
@@ -134,11 +136,11 @@ public class LineStringSnapper
     }
   }
 
-  private Coordinate findSnapForVertex(Coordinate pt, Coordinate[] snapPts)
+  private Coordinates findSnapForVertex(AbstractCoordinates pt, Coordinates[] snapPts)
   {
     for (int i = 0; i < snapPts.length; i++) {
       // if point is already equal to a src pt, don't snap
-      if (pt.equals2D(snapPts[i]))
+      if (pt.equals2d(snapPts[i]))
         return null;
       if (pt.distance(snapPts[i]) < snapTolerance)
         return snapPts[i];
@@ -160,7 +162,7 @@ public class LineStringSnapper
    * @param srcCoords the coordinates of the source linestring to be snapped
    * @param snapPts the target snap vertices
    */
-  private void snapSegments(CoordinateList srcCoords, Coordinate[] snapPts)
+  private void snapSegments(CoordinateList srcCoords, AbstractCoordinates[] snapPts)
   {
     // guard against empty input
     if (snapPts.length == 0) return;
@@ -169,11 +171,11 @@ public class LineStringSnapper
 
     // check for duplicate snap pts when they are sourced from a linear ring.  
     // TODO: Need to do this better - need to check *all* snap points for dups (using a Set?)
-    if (snapPts[0].equals2D(snapPts[snapPts.length - 1]))
+    if (snapPts[0].equals2d(snapPts[snapPts.length - 1]))
         distinctPtCount = snapPts.length - 1;
 
     for (int i = 0; i < distinctPtCount; i++) {
-      Coordinate snapPt = snapPts[i];
+      AbstractCoordinates snapPt = snapPts[i];
       int index = findSegmentIndexToSnap(snapPt, srcCoords);
       /**
        * If a segment to snap to was found, "crack" it at the snap pt.
@@ -207,7 +209,7 @@ public class LineStringSnapper
    * @return the index of the snapped segment
    * or -1 if no segment snaps to the snap point
    */
-  private int findSegmentIndexToSnap(Coordinate snapPt, CoordinateList srcCoords)
+  private int findSegmentIndexToSnap(AbstractCoordinates snapPt, CoordinateList srcCoords)
   {
     double minDist = Double.MAX_VALUE;
     int snapIndex = -1;
@@ -220,7 +222,7 @@ public class LineStringSnapper
        * 
        * If the snap pt is already in the src list, don't snap at all.
        */
-      if (seg.p0.equals2D(snapPt) || seg.p1.equals2D(snapPt)) {
+      if (seg.p0.equals2d(snapPt) || seg.p1.equals2d(snapPt)) {
         if (allowSnappingToSourceVertices)
           continue;
         else

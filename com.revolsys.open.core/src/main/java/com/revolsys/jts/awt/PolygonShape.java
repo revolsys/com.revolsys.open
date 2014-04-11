@@ -42,7 +42,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A {@link Shape} which represents a polygon which may contain holes.
@@ -63,13 +63,13 @@ public class PolygonShape implements Shape
      * @param shellVertices the vertices of the shell 
      * @param holeVerticesCollection a collection of Coordinate[] for each hole
      */
-    public PolygonShape(Coordinate[] shellVertices,
+    public PolygonShape(Coordinates[] shellVertices,
         Collection holeVerticesCollection) 
     {
         polygonPath = toPath(shellVertices);
 
         for (Iterator i = holeVerticesCollection.iterator(); i.hasNext();) {
-            Coordinate[] holeVertices = (Coordinate[]) i.next();
+            Coordinates[] holeVertices = (Coordinates[]) i.next();
             polygonPath.append(toPath(holeVertices), false);
         }
     }
@@ -109,13 +109,13 @@ public class PolygonShape implements Shape
      * @param coordinates a coordinate sequence
      * @return the path for the coordinate sequence
      */
-    private GeneralPath toPath(Coordinate[] coordinates) {
+    private GeneralPath toPath(Coordinates[] coordinates) {
       GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD, coordinates.length);
 
       if (coordinates.length > 0) {
-        path.moveTo((float) coordinates[0].x, (float) coordinates[0].y);
+        path.moveTo((float) coordinates[0].getX(), (float) coordinates[0].getY());
         for (int i = 0; i < coordinates.length; i++) {
-          path.lineTo((float) coordinates[i].x, (float) coordinates[i].y);
+          path.lineTo((float) coordinates[i].getX(), (float) coordinates[i].getY());
         }
       }
       return path;

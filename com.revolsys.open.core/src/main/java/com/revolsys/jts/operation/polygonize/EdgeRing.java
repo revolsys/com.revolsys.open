@@ -43,6 +43,7 @@ import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -76,7 +77,7 @@ class EdgeRing {
   {
     LinearRing testRing = testEr.getRing();
     Envelope testEnv = testRing.getEnvelopeInternal();
-    Coordinate testPt = testRing.getCoordinateN(0);
+    Coordinates testPt = testRing.getCoordinateN(0);
 
     EdgeRing minShell = null;
     Envelope minShellEnv = null;
@@ -116,7 +117,7 @@ class EdgeRing {
    * 
    * @deprecated Use CoordinateArrays.ptNotInList instead
    */
-  public static Coordinate ptNotInList(Coordinate[] testPts, Coordinate[] pts)
+  public static Coordinates ptNotInList(Coordinate[] testPts, Coordinate[] pts)
   {
     for (int i = 0; i < testPts.length; i++) {
       Coordinate testPt = testPts[i];
@@ -228,7 +229,7 @@ class EdgeRing {
    *
    * @return an array of the {@link Coordinate}s in this ring
    */
-  private Coordinate[] getCoordinates()
+  private Coordinates[] getCoordinates()
   {
     if (ringPts == null) {
       CoordinateList coordList = new CoordinateList();

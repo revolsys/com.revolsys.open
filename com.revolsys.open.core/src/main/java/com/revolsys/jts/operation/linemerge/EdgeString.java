@@ -37,9 +37,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
@@ -52,7 +52,7 @@ import com.revolsys.jts.geom.LineString;
 public class EdgeString {
   private GeometryFactory factory;
   private List directedEdges = new ArrayList();
-  private Coordinate[] coordinates = null;
+  private Coordinates[] coordinates = null;
   /**
    * Constructs an EdgeString with the given factory used to convert this EdgeString
    * to a LineString
@@ -68,7 +68,7 @@ public class EdgeString {
     directedEdges.add(directedEdge);
   }
 
-  private Coordinate[] getCoordinates() {
+  private Coordinates[] getCoordinates() {
     if (coordinates == null) {
       int forwardDirectedEdges = 0;
       int reverseDirectedEdges = 0;

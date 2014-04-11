@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,18 +32,16 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import com.revolsys.jts.geom.Coordinate;
-
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * @version 1.7
  */
 public class NodeFactory {
-/**
- * The basic node constructor does not allow for incident edges
- */
-  public Node createNode(Coordinate coord)
-  {
+  /**
+   * The basic node constructor does not allow for incident edges
+   */
+  public Node createNode(final Coordinates coord) {
     return new Node(coord, null);
   }
 }

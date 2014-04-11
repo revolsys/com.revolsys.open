@@ -35,6 +35,7 @@ package com.revolsys.jts.simplify;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 
 /**
@@ -45,7 +46,7 @@ import com.revolsys.jts.geom.LineSegment;
  */
 class DouglasPeuckerLineSimplifier
 {
-  public static Coordinate[] simplify(Coordinate[] pts, double distanceTolerance)
+  public static Coordinates[] simplify(Coordinate[] pts, double distanceTolerance)
   {
     DouglasPeuckerLineSimplifier simp = new DouglasPeuckerLineSimplifier(pts);
     simp.setDistanceTolerance(distanceTolerance);
@@ -71,7 +72,7 @@ class DouglasPeuckerLineSimplifier
     this.distanceTolerance = distanceTolerance;
   }
 
-  public Coordinate[] simplify()
+  public Coordinates[] simplify()
   {
     usePt = new boolean[pts.length];
     for (int i = 0; i < pts.length; i++) {

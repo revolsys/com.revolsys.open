@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geomgraph.DirectedEdge;
@@ -74,7 +74,7 @@ class BufferSubgraph
   private RightmostEdgeFinder finder;
   private List dirEdgeList  = new ArrayList();
   private List nodes        = new ArrayList();
-  private Coordinate rightMostCoord = null;
+  private Coordinates rightMostCoord = null;
   private Envelope env = null;
 
   public BufferSubgraph()
@@ -97,7 +97,7 @@ class BufferSubgraph
       Envelope edgeEnv = new Envelope();
       for (Iterator it = dirEdgeList.iterator(); it.hasNext(); ) {
         DirectedEdge dirEdge = (DirectedEdge) it.next();
-        Coordinate[] pts = dirEdge.getEdge().getCoordinates();
+        Coordinates[] pts = dirEdge.getEdge().getCoordinates();
         for (int i = 0; i < pts.length - 1; i++) {
           edgeEnv.expandToInclude(pts[i]);
         }
@@ -110,7 +110,7 @@ class BufferSubgraph
   /**
    * Gets the rightmost coordinate in the edges of the subgraph
    */
-  public Coordinate getRightmostCoordinate()
+  public Coordinates getRightmostCoordinate()
   {
     return rightMostCoord;
   }
@@ -304,10 +304,10 @@ class BufferSubgraph
    */
   public int compareTo(Object o) {
     BufferSubgraph graph = (BufferSubgraph) o;
-    if (this.rightMostCoord.x < graph.rightMostCoord.x) {
+    if (this.rightMostCoord.getX() < graph.rightMostCoord.getX()) {
       return -1;
     }
-    if (this.rightMostCoord.x > graph.rightMostCoord.x) {
+    if (this.rightMostCoord.getX() > graph.rightMostCoord.getX()) {
       return 1;
     }
     return 0;

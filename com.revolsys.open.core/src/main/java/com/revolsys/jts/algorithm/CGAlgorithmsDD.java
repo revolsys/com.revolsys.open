@@ -33,6 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.math.DD;
 
 /**
@@ -55,7 +56,7 @@ public class CGAlgorithmsDD
    * @return -1 if q is clockwise (right) from p1-p2
    * @return 0 if q is collinear with p1-p2
    */
-  public static int orientationIndex(Coordinate p1, Coordinate p2, Coordinate q)
+  public static int orientationIndex(Coordinates p1, Coordinates p2, Coordinates q)
   {
     // fast filter for orientation index
     // avoids use of slow extended-precision arithmetic in many cases
@@ -63,10 +64,10 @@ public class CGAlgorithmsDD
     if (index <= 1) return index;
     
     // normalize coordinates
-    DD dx1 = DD.valueOf(p2.x).selfAdd(-p1.x);
-    DD dy1 = DD.valueOf(p2.y).selfAdd(-p1.y);
-    DD dx2 = DD.valueOf(q.x).selfAdd(-p2.x);
-    DD dy2 = DD.valueOf(q.y).selfAdd(-p2.y);
+    DD dx1 = DD.valueOf(p2.getX()).selfAdd(-p1.getX());
+    DD dy1 = DD.valueOf(p2.getY()).selfAdd(-p1.getY());
+    DD dx2 = DD.valueOf(q.getX()).selfAdd(-p2.getX());
+    DD dy2 = DD.valueOf(q.getY()).selfAdd(-p2.getY());
 
     // sign of determinant - unrolled for performance
     return dx1.selfMultiply(dy2).selfSubtract(dy1.selfMultiply(dx2)).signum();
@@ -112,12 +113,12 @@ public class CGAlgorithmsDD
    * @return the orientation index if it can be computed safely
    * @return i > 1 if the orientation index cannot be computed safely
    */
-  private static int orientationIndexFilter(Coordinate pa, Coordinate pb, Coordinate pc)
+  private static int orientationIndexFilter(Coordinates pa, Coordinates pb, Coordinates pc)
   {
     double detsum;
 
-    double detleft = (pa.x - pc.x) * (pb.y - pc.y);
-    double detright = (pa.y - pc.y) * (pb.x - pc.x);
+    double detleft = (pa.getX() - pc.getX()) * (pb.getY() - pc.getY());
+    double detright = (pa.getY() - pc.getY()) * (pb.getX() - pc.getX());
     double det = detleft - detright;
 
     if (detleft > 0.0) {
@@ -166,14 +167,14 @@ public class CGAlgorithmsDD
    * @param q2
    * @return
    */
-  public static Coordinate intersection(
-      Coordinate p1, Coordinate p2,
-      Coordinate q1, Coordinate q2)
+  public static Coordinates intersection(
+      Coordinates p1, Coordinates p2,
+      Coordinates q1, Coordinates q2)
   {
-    DD denom1 = DD.valueOf(q2.y).selfSubtract(q1.y)
-    .selfMultiply(DD.valueOf(p2.x).selfSubtract(p1.x));
-    DD denom2 = DD.valueOf(q2.x).selfSubtract(q1.x)
-    .selfMultiply(DD.valueOf(p2.y).selfSubtract(p1.y));
+    DD denom1 = DD.valueOf(q2.getY()).selfSubtract(q1.getY())
+    .selfMultiply(DD.valueOf(p2.getX()).selfSubtract(p1.getX()));
+    DD denom2 = DD.valueOf(q2.getX()).selfSubtract(q1.getX())
+    .selfMultiply(DD.valueOf(p2.getY()).selfSubtract(p1.getY()));
     DD denom = denom1.subtract(denom2);
     
     /**
@@ -183,24 +184,24 @@ public class CGAlgorithmsDD
      * - intersection point lies within line segment q if fracQ is between 0 and 1
      */
     
-    DD numx1 = DD.valueOf(q2.x).selfSubtract(q1.x)
-    .selfMultiply(DD.valueOf(p1.y).selfSubtract(q1.y));
-    DD numx2 = DD.valueOf(q2.y).selfSubtract(q1.y)
-    .selfMultiply(DD.valueOf(p1.x).selfSubtract(q1.x));
+    DD numx1 = DD.valueOf(q2.getX()).selfSubtract(q1.getX())
+    .selfMultiply(DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
+    DD numx2 = DD.valueOf(q2.getY()).selfSubtract(q1.getY())
+    .selfMultiply(DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
     DD numx = numx1.subtract(numx2);
     double fracP = numx.selfDivide(denom).doubleValue();
     
-    double x = DD.valueOf(p1.x).selfAdd(DD.valueOf(p2.x).selfSubtract(p1.x).selfMultiply(fracP)).doubleValue();
+    double x = DD.valueOf(p1.getX()).selfAdd(DD.valueOf(p2.getX()).selfSubtract(p1.getX()).selfMultiply(fracP)).doubleValue();
     
-    DD numy1 = DD.valueOf(p2.x).selfSubtract(p1.x)
-    .selfMultiply(DD.valueOf(p1.y).selfSubtract(q1.y));
-    DD numy2 = DD.valueOf(p2.y).selfSubtract(p1.y)
-    .selfMultiply(DD.valueOf(p1.x).selfSubtract(q1.x));
+    DD numy1 = DD.valueOf(p2.getX()).selfSubtract(p1.getX())
+    .selfMultiply(DD.valueOf(p1.getY()).selfSubtract(q1.getY()));
+    DD numy2 = DD.valueOf(p2.getY()).selfSubtract(p1.getY())
+    .selfMultiply(DD.valueOf(p1.getX()).selfSubtract(q1.getX()));
     DD numy = numy1.subtract(numy2);
     double fracQ = numy.selfDivide(denom).doubleValue();
     
-    double y = DD.valueOf(q1.y).selfAdd(DD.valueOf(q2.y).selfSubtract(q1.y).selfMultiply(fracQ)).doubleValue();
+    double y = DD.valueOf(q1.getY()).selfAdd(DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(fracQ)).doubleValue();
 
-    return new Coordinate(x,y);
+    return new Coordinate(x,y, Coordinates.NULL_ORDINATE);
   }
 }

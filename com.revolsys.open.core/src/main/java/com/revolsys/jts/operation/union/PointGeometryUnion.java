@@ -39,6 +39,7 @@ import java.util.TreeSet;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
@@ -93,7 +94,7 @@ public class PointGeometryUnion
 		
 		// make a puntal geometry of appropriate size
 		Geometry ptComp = null;
-		Coordinate[] coords = CoordinateArrays.toCoordinateArray(exteriorCoords);
+		Coordinates[] coords = CoordinateArrays.toCoordinateArray(exteriorCoords);
 		if (coords.length == 1) {
 			ptComp = geomFact.createPoint(coords[0]);
 		}

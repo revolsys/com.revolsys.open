@@ -38,6 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -66,8 +67,8 @@ extends GeometricShapeBuilder
 	{
 		int level = recursionLevelForSize(numPts);
 		LineSegment baseLine = getSquareBaseLine();
-		Coordinate origin = baseLine.getCoordinate(0);
-		LinearRing[] holes = getHoles(level, origin.x, origin.y, getDiameter());
+		Coordinates origin = baseLine.getCoordinate(0);
+		LinearRing[] holes = getHoles(level, origin.getX(), origin.getY(), getDiameter());
 		LinearRing shell = (LinearRing) ((Polygon) geomFactory.toGeometry(getSquareExtent())).getExteriorRing();
 		return geomFactory.createPolygon(
 				shell, holes);
@@ -106,12 +107,12 @@ extends GeometricShapeBuilder
 
 	private LinearRing createSquareHole(double x, double y, double width)
 	{
-		Coordinate[] pts = new Coordinate[]{
-        new Coordinate(x, y),
-        new Coordinate(x + width, y),
-        new Coordinate(x + width, y + width),
-        new Coordinate(x, y + width),
-        new Coordinate(x, y)
+		Coordinates[] pts = new Coordinates[]{
+        new Coordinate(x, y, Coordinates.NULL_ORDINATE),
+        new Coordinate(x + width, y, Coordinates.NULL_ORDINATE),
+        new Coordinate(x + width, y + width, Coordinates.NULL_ORDINATE),
+        new Coordinate(x, y + width, Coordinates.NULL_ORDINATE),
+        new Coordinate(x, y, Coordinates.NULL_ORDINATE)
         }	;
 		return geomFactory.createLinearRing(pts); 
 	}

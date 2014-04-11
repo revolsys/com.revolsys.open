@@ -12,6 +12,7 @@ import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.MathUtil;

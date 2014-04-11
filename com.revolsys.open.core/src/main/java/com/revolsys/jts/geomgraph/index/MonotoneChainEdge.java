@@ -35,7 +35,7 @@
  */
 package com.revolsys.jts.geomgraph.index;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geomgraph.Edge;
 
@@ -59,7 +59,7 @@ import com.revolsys.jts.geomgraph.Edge;
 public class MonotoneChainEdge {
 
   Edge e;
-  Coordinate[] pts; // cache a reference to the coord array, for efficiency
+  Coordinates[] pts; // cache a reference to the coord array, for efficiency
   // the lists of start/end indexes of the monotone chains.
   // Includes the end point of the edge as a sentinel
   int[] startIndex;
@@ -74,19 +74,19 @@ public class MonotoneChainEdge {
     startIndex = mcb.getChainStartIndices(pts);
   }
 
-  public Coordinate[] getCoordinates() { return pts; }
+  public Coordinates[] getCoordinates() { return pts; }
   public int[] getStartIndexes() { return startIndex; }
 
   public double getMinX(int chainIndex)
   {
-    double x1 = pts[startIndex[chainIndex]].x;
-    double x2 = pts[startIndex[chainIndex + 1]].x;
+    double x1 = pts[startIndex[chainIndex]].getX();
+    double x2 = pts[startIndex[chainIndex + 1]].getX();
     return x1 < x2 ? x1 : x2;
   }
   public double getMaxX(int chainIndex)
   {
-    double x1 = pts[startIndex[chainIndex]].x;
-    double x2 = pts[startIndex[chainIndex + 1]].x;
+    double x1 = pts[startIndex[chainIndex]].getX();
+    double x2 = pts[startIndex[chainIndex + 1]].getX();
     return x1 > x2 ? x1 : x2;
   }
 
@@ -118,10 +118,10 @@ public class MonotoneChainEdge {
     int start1, int end1,
     SegmentIntersector ei)
   {
-    Coordinate p00 = pts[start0];
-    Coordinate p01 = pts[end0];
-    Coordinate p10 = mce.pts[start1];
-    Coordinate p11 = mce.pts[end1];
+    Coordinates p00 = pts[start0];
+    Coordinates p01 = pts[end0];
+    Coordinates p10 = mce.pts[start1];
+    Coordinates p11 = mce.pts[end1];
 //Debug.println("computeIntersectsForChain:" + p00 + p01 + p10 + p11);
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {

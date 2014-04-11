@@ -36,6 +36,7 @@ package com.revolsys.jts.operation.overlay.validate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -106,7 +107,7 @@ public class FuzzyPointLocator
   	return g.getGeometryFactory().createMultiLineString(lines);
   }
   
-  private boolean isWithinToleranceOfBoundary(Coordinate pt)
+  private boolean isWithinToleranceOfBoundary(AbstractCoordinates pt)
   {
   	for (int i = 0; i < linework.getNumGeometries(); i++) {
   		LineString line = (LineString) linework.getGeometry(i);

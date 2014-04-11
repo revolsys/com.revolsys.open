@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -264,7 +264,7 @@ public class UnaryUnionOp {
    * @return the union of the input geometry
    */
   private Geometry unionNoOpt(final Geometry g0) {
-    final Geometry empty = geomFact.createPoint((Coordinate)null);
+    final Geometry empty = geomFact.createPoint((Coordinates)null);
     return SnapIfNeededOverlayOp.overlayOp(g0, empty, OverlayOp.UNION);
   }
 

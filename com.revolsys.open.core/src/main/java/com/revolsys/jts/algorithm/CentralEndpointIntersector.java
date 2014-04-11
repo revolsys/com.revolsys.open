@@ -32,7 +32,9 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 
 /**
@@ -59,44 +61,44 @@ import com.revolsys.jts.geom.Coordinate;
  */
 public class CentralEndpointIntersector 
 {
-	public static Coordinate getIntersection(Coordinate p00, Coordinate p01,
-			Coordinate p10, Coordinate p11)
+	public static Coordinates getIntersection(AbstractCoordinates p00, AbstractCoordinates p01,
+			AbstractCoordinates p10, AbstractCoordinates p11)
 	{
 		CentralEndpointIntersector intor = new CentralEndpointIntersector(p00, p01, p10, p11);
 		return intor.getIntersection();
 	}
 	
-	private Coordinate[] pts;
-	private Coordinate intPt = null;
+	private AbstractCoordinates[] pts;
+	private Coordinates intPt = null;
 
-	public CentralEndpointIntersector(Coordinate p00, Coordinate p01,
-			Coordinate p10, Coordinate p11) 
+	public CentralEndpointIntersector(AbstractCoordinates p00, AbstractCoordinates p01,
+			AbstractCoordinates p10, AbstractCoordinates p11) 
 	{
-		pts = new Coordinate[] { p00, p01, p10, p11 };
+		pts = new AbstractCoordinates[] { p00, p01, p10, p11 };
 		compute();
 	}
 
 	private void Ocompute() 
 	{
-		Coordinate centroid = average(pts);
+		AbstractCoordinates centroid = average(pts);
 		intPt = new Coordinate(findNearestPoint(centroid, pts));
 	}
 
-	public Coordinate getIntersection() {
+	public Coordinates getIntersection() {
 		return intPt;
 	}
 
-	private static Coordinate average(Coordinate[] pts)
+	private static AbstractCoordinates average(Coordinates[] pts)
 	{
-		Coordinate avg = new Coordinate();
+		AbstractCoordinates avg = new Coordinate();
 		int n = pts.length;
 		for (int i = 0; i < pts.length; i++) {
-			avg.x += pts[i].x;
-			avg.y += pts[i].y;
+			avg.setX(avg.getX() + pts[i].getX());
+			avg.setY(avg.getY() + pts[i].getY());
 		}
 		if (n > 0) {
-			avg.x /= n;
-			avg.y /= n;
+			avg.setX(avg.getX() / n);
+			avg.setY(avg.getY() / n);
 		}
 		return avg;
 	}
@@ -111,10 +113,10 @@ public class CentralEndpointIntersector
    * @param q2 a potential result point
    * @return the point closest to the input point p
    */
-  private Coordinate findNearestPoint(Coordinate p, Coordinate[] pts)
+  private Coordinates findNearestPoint(AbstractCoordinates p, Coordinates[] pts)
   {
   	double minDist = Double.MAX_VALUE;
-  	Coordinate result = null;
+  	Coordinates result = null;
   	for (int i = 0; i < pts.length; i++) {
   		double dist = p.distance(pts[i]);
   		// always initialize the result
@@ -139,7 +141,7 @@ public class CentralEndpointIntersector
 		tryDist(pts[3], pts[0], pts[1]);
 	}
 
-	private void tryDist(Coordinate p, Coordinate p0, Coordinate p1) 
+	private void tryDist(AbstractCoordinates p, Coordinates p0, Coordinates p1) 
 	{
 		double dist = CGAlgorithms.distancePointLine(p, p0, p1);
 		if (dist < minDist) {

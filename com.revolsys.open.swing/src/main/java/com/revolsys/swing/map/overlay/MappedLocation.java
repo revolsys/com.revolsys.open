@@ -5,17 +5,17 @@ import java.util.Map;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
 
 public class MappedLocation extends AbstractPropertyChangeObject implements
   MapSerializer {

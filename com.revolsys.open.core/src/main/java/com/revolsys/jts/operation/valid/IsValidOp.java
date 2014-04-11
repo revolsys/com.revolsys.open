@@ -44,6 +44,7 @@ import com.revolsys.jts.algorithm.MCPointInRing;
 import com.revolsys.jts.algorithm.PointInRing;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -86,12 +87,12 @@ public class IsValidOp
    * @param coord the coordinate to validate
    * @return <code>true</code> if the coordinate is valid
    */
-  public static boolean isValid(Coordinate coord)
+  public static boolean isValid(Coordinates coord)
   {
-    if (Double.isNaN(coord.x)) return false;
-    if (Double.isInfinite(coord.x)) return false;
-    if (Double.isNaN(coord.y)) return false;
-    if (Double.isInfinite(coord.y)) return false;
+    if (Double.isNaN(coord.getX())) return false;
+    if (Double.isInfinite(coord.getX())) return false;
+    if (Double.isNaN(coord.getY())) return false;
+    if (Double.isInfinite(coord.getY())) return false;
     return true;
   }
   /**
@@ -100,7 +101,7 @@ public class IsValidOp
    *
    * @return the point found, or <code>null</code> if none found
    */
-  public static Coordinate findPtNotNode(
+  public static Coordinates findPtNotNode(
                           Coordinate[] testCoords,
                           LinearRing searchRing,
                           GeometryGraph graph)
@@ -321,7 +322,7 @@ public class IsValidOp
     }
   }
 
-  private void checkInvalidCoordinates(Coordinate[] coords)
+  private void checkInvalidCoordinates(Coordinates[] coords)
   {
     for (int i = 0; i < coords.length; i++) {
       if (! isValid(coords[i])) {
@@ -356,7 +357,7 @@ public class IsValidOp
   private void checkClosedRing(LinearRing ring)
   {
     if (! ring.isClosed() ) {
-    	Coordinate pt = null;
+    	Coordinates pt = null;
     	if (ring.getNumPoints() >= 1)
     		pt = ring.getCoordinateN(0);
       validErr = new TopologyValidationError(
@@ -467,7 +468,7 @@ public class IsValidOp
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
 
       LinearRing hole = (LinearRing) p.getInteriorRingN(i);
-      Coordinate holePt = findPtNotNode(hole.getCoordinateArray(), shell, graph);
+      Coordinates holePt = findPtNotNode(hole.getCoordinateArray(), shell, graph);
       /**
        * If no non-node hole vertex can be found, the hole must
        * split the polygon into disconnected interiors.
@@ -555,8 +556,8 @@ public class IsValidOp
     Coordinate[] shellPts = shell.getCoordinateArray();
     // test if shell is inside polygon shell
     LinearRing polyShell =  (LinearRing) p.getExteriorRing();
-    Coordinate[] polyPts = polyShell.getCoordinateArray();
-    Coordinate shellPt = findPtNotNode(shellPts, polyShell, graph);
+    Coordinates[] polyPts = polyShell.getCoordinateArray();
+    Coordinates shellPt = findPtNotNode(shellPts, polyShell, graph);
     // if no point could be found, we can assume that the shell is outside the polygon
     if (shellPt == null)
       return;
@@ -577,7 +578,7 @@ public class IsValidOp
      * returns a null coordinate.
      * Otherwise, the shell is not properly contained in a hole, which is an error.
      */
-    Coordinate badNestedPt = null;
+    Coordinates badNestedPt = null;
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
       LinearRing hole = (LinearRing) p.getInteriorRingN(i);
       badNestedPt = checkShellInsideHole(shell, hole, graph);
@@ -598,12 +599,12 @@ public class IsValidOp
    *   a Coordinate which is not inside the hole if it is not
    *
    */
-  private Coordinate checkShellInsideHole(LinearRing shell, LinearRing hole, GeometryGraph graph)
+  private Coordinates checkShellInsideHole(LinearRing shell, LinearRing hole, GeometryGraph graph)
   {
     Coordinate[] shellPts = shell.getCoordinateArray();
     Coordinate[] holePts = hole.getCoordinateArray();
     // TODO: improve performance of this - by sorting pointlists for instance?
-    Coordinate shellPt = findPtNotNode(shellPts, hole, graph);
+    Coordinates shellPt = findPtNotNode(shellPts, hole, graph);
     // if point is on shell but not hole, check that the shell is inside the hole
     if (shellPt != null) {
       boolean insideHole = CGAlgorithms.isPointInRing(shellPt, holePts);
@@ -611,7 +612,7 @@ public class IsValidOp
         return shellPt;
       }
     }
-    Coordinate holePt = findPtNotNode(holePts, shell, graph);
+    Coordinates holePt = findPtNotNode(holePts, shell, graph);
     // if point is on hole but not shell, check that the hole is outside the shell
     if (holePt != null) {
       boolean insideShell = CGAlgorithms.isPointInRing(holePt, shellPts);

@@ -21,8 +21,8 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.UriTemplate;
 import com.revolsys.util.UrlUtil;
 

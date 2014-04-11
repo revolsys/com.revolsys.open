@@ -1,9 +1,9 @@
 package com.revolsys.gis.model.coordinates.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.geometry.LineSegment;
+import com.revolsys.jts.geom.Coordinates;
 
 public class PointOnLineSegment implements Filter<Coordinates> {
 

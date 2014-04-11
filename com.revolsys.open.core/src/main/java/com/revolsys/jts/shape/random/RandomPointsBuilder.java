@@ -36,6 +36,7 @@ package com.revolsys.jts.shape.random;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -93,10 +94,10 @@ extends GeometricShapeBuilder
   
   public Geometry getGeometry()
   {
-  	Coordinate[] pts = new Coordinate[numPts];
+  	Coordinates[] pts = new Coordinates[numPts];
   	int i = 0;
   	while (i < numPts) {
-  		Coordinate p = createRandomCoord(getExtent());
+  		Coordinates p = createRandomCoord(getExtent());
   		if (extentLocator != null && ! isInExtent(p))
   			continue;
   		pts[i++] = p;
@@ -104,21 +105,21 @@ extends GeometricShapeBuilder
   	return geomFactory.createMultiPoint(pts);
   }
   
-  protected boolean isInExtent(Coordinate p)
+  protected boolean isInExtent(Coordinates p)
   {
   	if (extentLocator != null) 
   		return extentLocator.locate(p) != Location.EXTERIOR;
   	return getExtent().contains(p);
   }
   
-  protected Coordinate createCoord(double x, double y)
+  protected Coordinates createCoord(double x, double y)
   {
-  	Coordinate pt = new Coordinate(x, y);
+  	Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
   	geomFactory.getPrecisionModel().makePrecise(pt);
     return pt;
   }
   
-  protected Coordinate createRandomCoord(Envelope env)
+  protected Coordinates createRandomCoord(Envelope env)
   {
     double x = env.getMinX() + env.getWidth() * Math.random();
     double y = env.getMinY() + env.getHeight() * Math.random();

@@ -34,6 +34,7 @@ package com.revolsys.jts.densify;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
@@ -79,7 +80,7 @@ public class Densifier {
 	 * @param distanceTolerance
 	 * @return the densified coordinate sequence
 	 */
-	private static Coordinate[] densifyPoints(Coordinate[] pts,
+	private static Coordinates[] densifyPoints(Coordinate[] pts,
 			double distanceTolerance, PrecisionModel precModel) {
 		LineSegment seg = new LineSegment();
 		CoordinateList coordList = new CoordinateList();
@@ -144,11 +145,11 @@ public class Densifier {
 		protected CoordinatesList transformCoordinates(
 				CoordinatesList coords, Geometry parent) {
 			Coordinate[] inputPts = coords.toCoordinateArray();
-			Coordinate[] newPts = Densifier
+			Coordinates[] newPts = Densifier
 					.densifyPoints(inputPts, distanceTolerance, parent.getPrecisionModel());
 			// prevent creation of invalid linestrings
 			if (parent instanceof LineString && newPts.length == 1) {
-				newPts = new Coordinate[0];
+				newPts = new Coordinates[0];
 			}
 			return factory.getCoordinateSequenceFactory().create(newPts);
 		}

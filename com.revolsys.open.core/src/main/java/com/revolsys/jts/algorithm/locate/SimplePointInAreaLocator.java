@@ -35,7 +35,7 @@ package com.revolsys.jts.algorithm.locate;
 import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
@@ -68,7 +68,7 @@ public class SimplePointInAreaLocator
    * @param geom the areal geometry to test
    * @return the Location of the point in the geometry  
    */
-  public static int locate(Coordinate p, Geometry geom)
+  public static int locate(Coordinates p, Geometry geom)
   {
     if (geom.isEmpty()) return Location.EXTERIOR;
 
@@ -77,7 +77,7 @@ public class SimplePointInAreaLocator
     return Location.EXTERIOR;
   }
 
-  private static boolean containsPoint(Coordinate p, Geometry geom)
+  private static boolean containsPoint(Coordinates p, Geometry geom)
   {
     if (geom instanceof Polygon) {
       return containsPointInPolygon(p, (Polygon) geom);
@@ -94,7 +94,7 @@ public class SimplePointInAreaLocator
     return false;
   }
 
-  public static boolean containsPointInPolygon(Coordinate p, Polygon poly)
+  public static boolean containsPointInPolygon(Coordinates p, Polygon poly)
   {
     if (poly.isEmpty()) return false;
     LinearRing shell = (LinearRing) poly.getExteriorRing();
@@ -115,7 +115,7 @@ public class SimplePointInAreaLocator
    * @param ring a linear ring
    * @return true if the point lies inside the ring
    */
-  private static boolean isPointInRing(Coordinate p, LinearRing ring)
+  private static boolean isPointInRing(Coordinates p, LinearRing ring)
   {
   	// short-circuit if point is not in ring envelope
   	if (! ring.getEnvelopeInternal().intersects(p))
@@ -129,7 +129,7 @@ public class SimplePointInAreaLocator
 		this.geom = geom;
 	}
 
-	public int locate(Coordinate p) {
+	public int locate(Coordinates p) {
 		return SimplePointInAreaLocator.locate(p, geom);
 	}
 

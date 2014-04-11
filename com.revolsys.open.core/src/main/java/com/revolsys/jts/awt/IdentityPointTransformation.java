@@ -34,7 +34,7 @@ package com.revolsys.jts.awt;
 
 import java.awt.geom.Point2D;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Copies point ordinates with no transformation.
@@ -45,8 +45,8 @@ import com.revolsys.jts.geom.Coordinate;
 public class IdentityPointTransformation
 implements PointTransformation
 {
-	public void transform(Coordinate model, Point2D view)
+	public void transform(Coordinates model, Point2D view)
 	{
-		view.setLocation(model.x, model.y);
+		view.setLocation(model.getX(), model.getY());
 	}
 }

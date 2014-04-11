@@ -33,8 +33,10 @@
 
 package com.revolsys.jts.operation.distance;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -54,8 +56,8 @@ public class FacetSequence
   private int end;
   
   // temporary Coordinates to materialize points from the CoordinatesList
-  private Coordinate pt = new Coordinate();
-  private Coordinate seqPt = new Coordinate();
+  private AbstractCoordinates pt = new Coordinate();
+  private AbstractCoordinates seqPt = new Coordinate();
   
   /**
    * Creates a new section based on a CoordinatesList.
@@ -160,7 +162,7 @@ public class FacetSequence
     return minDistance;
   }
 
-  private double computePointLineDistance(Coordinate pt, FacetSequence facetSeq) 
+  private double computePointLineDistance(AbstractCoordinates pt, FacetSequence facetSeq) 
   {
     double minDistance = Double.MAX_VALUE;
 
@@ -180,12 +182,12 @@ public class FacetSequence
   {
     StringBuffer buf = new StringBuffer();
     buf.append("LINESTRING ( ");
-    Coordinate p = new Coordinate();
+    Coordinates p = new Coordinate();
     for (int i = start; i < end; i++) {
       if (i > start)
         buf.append(", ");
       pts.getCoordinate(i, p);
-      buf.append(p.x + " " + p.y);
+      buf.append(p.getX() + " " + p.getY());
     }
     buf.append(" )");
     return buf.toString();

@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.Node;
 
@@ -37,7 +37,7 @@ public class SegmentIntersector extends
   private boolean hasProperInterior = false;
 
   // the proper intersection point found
-  private Coordinate properIntersectionPoint = null;
+  private Coordinates properIntersectionPoint = null;
 
   private final LineIntersector li;
 
@@ -111,9 +111,9 @@ public class SegmentIntersector extends
           e1.addIntersections(li, segIndex1, 1);
         }
         if (li.isProper()) {
-          final Coordinate intersection = li.getIntersection(0);
+          final Coordinates intersection = li.getIntersection(0);
           addProperIntersection(intersection);
-          properIntersectionPoint = (Coordinate)intersection.clone();
+          properIntersectionPoint = (Coordinates)intersection.clone();
           hasProper = true;
           if (!isBoundaryPoint(li, bdyNodes)) {
             hasProperInterior = true;
@@ -125,7 +125,7 @@ public class SegmentIntersector extends
     }
   }
 
-  private void addProperIntersection(final Coordinate coordinate) {
+  private void addProperIntersection(final Coordinates coordinate) {
     properIntersections.add(new DoubleCoordinates(
       CoordinatesUtil.get(coordinate), 2));
   }
@@ -134,7 +134,7 @@ public class SegmentIntersector extends
    * @return the proper intersection point, or <code>null</code> if none was found
    */
   @Override
-  public Coordinate getProperIntersectionPoint() {
+  public Coordinates getProperIntersectionPoint() {
     return properIntersectionPoint;
   }
 
@@ -172,7 +172,7 @@ public class SegmentIntersector extends
     final Collection bdyNodes) {
     for (final Iterator i = bdyNodes.iterator(); i.hasNext();) {
       final Node node = (Node)i.next();
-      final Coordinate pt = node.getCoordinate();
+      final Coordinates pt = node.getCoordinate();
       if (li.isIntersection(pt)) {
         return true;
       }

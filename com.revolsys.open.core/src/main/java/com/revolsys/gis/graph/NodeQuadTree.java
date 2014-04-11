@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.AbstractIdObjectPointQuadTree;
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.visitor.CreateListVisitor;
 

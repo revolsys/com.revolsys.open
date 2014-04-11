@@ -32,7 +32,9 @@
  */
 package com.revolsys.jts.algorithm.distance;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineSegment;
@@ -72,18 +74,18 @@ public class DistanceToPoint
   public static void computeDistance(LineString line, Coordinate pt, PointPairDistance ptDist)
   {
     LineSegment tempSegment = new LineSegment();
-    Coordinate[] coords = line.getCoordinateArray();
+    Coordinates[] coords = line.getCoordinateArray();
     for (int i = 0; i < coords.length - 1; i++) {
       tempSegment.setCoordinates(coords[i], coords[i + 1]);
       // this is somewhat inefficient - could do better
-      Coordinate closestPt = tempSegment.closestPoint(pt);
+      AbstractCoordinates closestPt = tempSegment.closestPoint(pt);
       ptDist.setMinimum(closestPt, pt);
     }
   }
 
   public static void computeDistance(LineSegment segment, Coordinate pt, PointPairDistance ptDist)
   {
-    Coordinate closestPt = segment.closestPoint(pt);
+    AbstractCoordinates closestPt = segment.closestPoint(pt);
     ptDist.setMinimum(closestPt, pt);
   }
 

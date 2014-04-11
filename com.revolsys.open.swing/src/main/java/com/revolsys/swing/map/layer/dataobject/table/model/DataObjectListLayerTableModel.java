@@ -13,12 +13,12 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.layer.dataobject.DataObjectListLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.util.Property;
-import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   implements PropertyChangeListener {

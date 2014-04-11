@@ -16,6 +16,10 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
@@ -24,10 +28,6 @@ import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
 import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.dataobject.style.panel.GeometryStylePreview;
 import com.revolsys.swing.map.util.GeometryShapeUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 
 public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 

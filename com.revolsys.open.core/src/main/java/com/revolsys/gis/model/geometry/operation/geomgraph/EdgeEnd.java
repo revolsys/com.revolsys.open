@@ -2,9 +2,9 @@ package com.revolsys.gis.model.geometry.operation.geomgraph;
 
 import java.io.PrintStream;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.util.Assert;
 
 /**

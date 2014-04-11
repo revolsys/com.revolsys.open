@@ -39,6 +39,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -251,7 +252,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor
       return;
 
     // test each corner of rectangle for inclusion
-    Coordinate rectPt = new Coordinate();
+    Coordinates rectPt = new Coordinate();
     for (int i = 0; i < 4; i++) {
       rectSeq.getCoordinate(i, rectPt);
       if (!elementEnv.contains(rectPt))

@@ -1,8 +1,8 @@
 package com.revolsys.gis.model.geometry.operation.distance;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents the location of a point on a Geometry.

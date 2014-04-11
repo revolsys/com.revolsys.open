@@ -1,6 +1,3 @@
-
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -35,7 +32,6 @@
  */
 package com.revolsys.jts.geomgraph;
 
-
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,38 +40,45 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Location;
 
 /**
  * A map of nodes, indexed by the coordinate of the node
  * @version 1.7
  */
-public class NodeMap
+public class NodeMap implements Iterable<Node> {
+  // Map nodeMap = new HashMap();
+  Map<Coordinates, Node> nodeMap = new TreeMap<>();
 
-{
-  //Map nodeMap = new HashMap();
-  Map nodeMap = new TreeMap();
   NodeFactory nodeFact;
 
-  public NodeMap(NodeFactory nodeFact) {
+  public NodeMap(final NodeFactory nodeFact) {
     this.nodeFact = nodeFact;
+  }
+
+  /**
+   * Adds a node for the start point of this EdgeEnd
+   * (if one does not already exist in this map).
+   * Adds the EdgeEnd to the (possibly new) node.
+   */
+  public void add(final EdgeEnd e) {
+    final Coordinates p = e.getCoordinate();
+    final Node n = addNode(p);
+    n.add(e);
   }
 
   /**
    * Factory function - subclasses can override to create their own types of nodes
    */
-   /*
-  protected Node createNode(Coordinate coord)
-  {
-    return new Node(coord);
-  }
-  */
+  /*
+   * protected Node createNode(Coordinate coord) { return new Node(coord); }
+   */
   /**
    * This method expects that a node has a coordinate value.
    */
-  public Node addNode(Coordinate coord)
-  {
-    Node node = (Node) nodeMap.get(coord);
+  public Node addNode(final Coordinates coord) {
+    Node node = nodeMap.get(coord);
     if (node == null) {
       node = nodeFact.createNode(coord);
       nodeMap.put(coord, node);
@@ -83,9 +86,8 @@ public class NodeMap
     return node;
   }
 
-  public Node addNode(Node n)
-  {
-    Node node = (Node) nodeMap.get(n.getCoordinate());
+  public Node addNode(final Node n) {
+    final Node node = nodeMap.get(n.getCoordinate());
     if (node == null) {
       nodeMap.put(n.getCoordinate(), n);
       return n;
@@ -95,47 +97,34 @@ public class NodeMap
   }
 
   /**
-   * Adds a node for the start point of this EdgeEnd
-   * (if one does not already exist in this map).
-   * Adds the EdgeEnd to the (possibly new) node.
-   */
-  public void add(EdgeEnd e)
-  {
-    Coordinate p = e.getCoordinate();
-    Node n = addNode(p);
-    n.add(e);
-  }
-  /**
    * @return the node if found; null otherwise
    */
-  public Node find(Coordinate coord)  {    return (Node) nodeMap.get(coord);  }
+  public Node find(final Coordinate coord) {
+    return nodeMap.get(coord);
+  }
 
-  public Iterator iterator()
-  {
+  public Collection<Node> getBoundaryNodes(final int geomIndex) {
+    final Collection<Node> boundaryNodes = new ArrayList<>();
+    for (final Node node : this) {
+      if (node.getLabel().getLocation(geomIndex) == Location.BOUNDARY) {
+        boundaryNodes.add(node);
+      }
+    }
+    return boundaryNodes;
+  }
+
+  @Override
+  public Iterator<Node> iterator() {
     return nodeMap.values().iterator();
   }
-  public Collection values()
-  {
+
+  public void print(final PrintStream out) {
+    for (final Node node : this) {
+      node.print(out);
+    }
+  }
+
+  public Collection<Node> values() {
     return nodeMap.values();
-  }
-
-  public Collection getBoundaryNodes(int geomIndex)
-  {
-    Collection bdyNodes = new ArrayList();
-    for (Iterator i = iterator(); i.hasNext(); ) {
-      Node node = (Node) i.next();
-      if (node.getLabel().getLocation(geomIndex) == Location.BOUNDARY)
-        bdyNodes.add(node);
-    }
-    return bdyNodes;
-  }
-
-  public void print(PrintStream out)
-  {
-    for (Iterator it = iterator(); it.hasNext(); )
-    {
-      Node n = (Node) it.next();
-      n.print(out);
-    }
   }
 }

@@ -33,6 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Non-robust versions of various fundamental Computational Geometric algorithms,
@@ -57,7 +58,7 @@ public class NonRobustCGAlgorithms
    * @return <code>true</code> if the ring is oriented counter-clockwise.
    * @throws IllegalArgumentException if the ring is degenerate (does not contain 3 different points)
    */
-  public static boolean isPointInRing(Coordinate p, Coordinate[] ring)
+  public static boolean isPointInRing(Coordinates p, Coordinates[] ring)
   {
     int		i, i1;		// point index; i1 = i-1 mod n
     double	xInt;		// x intersection of e with ray
@@ -68,12 +69,12 @@ public class NonRobustCGAlgorithms
 	/* For each line edge l = (i-1, i), see if it crosses ray from test point in positive x direction. */
 	for (i = 1; i < nPts; i++ ) {
 		i1 = i - 1;
-		Coordinate p1 = ring[i];
-		Coordinate p2 = ring[i1];
-		x1 = p1.x - p.x;
-		y1 = p1.y - p.y;
-		x2 = p2.x - p.x;
-		y2 = p2.y - p.y;
+		Coordinates p1 = ring[i];
+		Coordinates p2 = ring[i1];
+		x1 = p1.getX() - p.getX();
+		y1 = p1.getY() - p.getY();
+		x2 = p2.getX() - p.getX();
+		y2 = p2.getY() - p.getY();
 
 		if( ( ( y1 > 0 ) && ( y2 <= 0 ) ) ||
 		    ( ( y2 > 0 ) && ( y1 <= 0 ) ) ) {
@@ -116,7 +117,7 @@ public class NonRobustCGAlgorithms
     int hii = 0;
     for (int i = 1; i <= nPts; i++) {
       Coordinate p = ring[i];
-      if (p.y > hip.y) {
+      if (p.getY() > hip.getY()) {
         hip = p;
         hii = i;
       }
@@ -144,10 +145,10 @@ public class NonRobustCGAlgorithms
     // This will not affect the area calculation, and will avoid
     // finite-accuracy errors (i.e very small vectors with very large coordinates)
     // This also simplifies the discriminant calculation.
-    double prev2x = prev.x - hip.x;
-    double prev2y = prev.y - hip.y;
-    double next2x = next.x - hip.x;
-    double next2y = next.y - hip.y;
+    double prev2x = prev.getX() - hip.getX();
+    double prev2y = prev.getY() - hip.getY();
+    double next2x = next.getX() - hip.getX();
+    double next2y = next.getY() - hip.getY();
     // compute cross-product of vectors hip->next and hip->prev
     // (e.g. area of parallelogram they enclose)
     double disc = next2x * prev2y - next2y * prev2x;
@@ -160,7 +161,7 @@ public class NonRobustCGAlgorithms
     */
     if (disc == 0.0) {
             // poly is CCW if prev x is right of next x
-            return (prev.x > next.x);
+            return (prev.getX() > next.getX());
     }
     else {
             // if area is positive, points are ordered CCW
@@ -177,7 +178,7 @@ public class NonRobustCGAlgorithms
    * @return -1 if q is clockwise from p1-p2
    * @return 0 if q is collinear with p1-p2
    */
-  public static int computeOrientation(Coordinate p1, Coordinate p2, Coordinate q) {
+  public static int computeOrientation(Coordinates p1, Coordinates p2, Coordinates q) {
     return orientationIndex(p1, p2, q);
   }
   
@@ -196,12 +197,12 @@ public class NonRobustCGAlgorithms
    * @return -1 if q is clockwise (right) from p1-p2
    * @return 0 if q is collinear with p1-p2
    */
-  public static int orientationIndex(Coordinate p1, Coordinate p2, Coordinate q)
+  public static int orientationIndex(Coordinates p1, Coordinates p2, Coordinates q)
   {
-        double dx1 = p2.x - p1.x;
-        double dy1 = p2.y - p1.y;
-        double dx2 = q.x - p2.x;
-        double dy2 = q.y - p2.y;
+        double dx1 = p2.getX() - p1.getX();
+        double dy1 = p2.getY() - p1.getY();
+        double dx2 = q.getX() - p2.getX();
+        double dy2 = q.getY() - p2.getY();
         double det = dx1*dy2 - dx2*dy1;
         if (det > 0.0) return 1;
         if (det < 0.0) return -1;
@@ -247,11 +248,11 @@ public class NonRobustCGAlgorithms
      * zero, AB & CD are parallel If the numerator in eqn 1 is also zero, AB &
      * CD are collinear.
      */
-    double r_top = (A.y - C.y) * (D.x - C.x) - (A.x - C.x) * (D.y - C.y);
-    double r_bot = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x);
+    double r_top = (A.getY() - C.getY()) * (D.getX() - C.getX()) - (A.getX() - C.getX()) * (D.getY() - C.getY());
+    double r_bot = (B.getX() - A.getX()) * (D.getY() - C.getY()) - (B.getY() - A.getY()) * (D.getX() - C.getX());
 
-    double s_top = (A.y - C.y) * (B.x - A.x) - (A.x - C.x) * (B.y - A.y);
-    double s_bot = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x);
+    double s_top = (A.getY() - C.getY()) * (B.getX() - A.getX()) - (A.getX() - C.getX()) * (B.getY() - A.getY());
+    double s_bot = (B.getX() - A.getX()) * (D.getY() - C.getY()) - (B.getY() - A.getY()) * (D.getX() - C.getX());
 
     if ((r_bot == 0) || (s_bot == 0)) {
       return Math

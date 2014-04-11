@@ -1,7 +1,6 @@
 package com.revolsys.jts.geom;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.model.coordinates.Coordinates;
 
 public interface Vertex extends Coordinates {
 

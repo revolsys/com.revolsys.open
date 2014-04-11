@@ -7,8 +7,8 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.util.ExceptionUtil;
 

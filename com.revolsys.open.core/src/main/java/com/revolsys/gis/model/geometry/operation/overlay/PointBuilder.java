@@ -36,12 +36,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Label;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Constructs {@link Point}s from the nodes of an overlay graph.

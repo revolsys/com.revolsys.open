@@ -8,12 +8,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
@@ -30,13 +30,13 @@ import com.revolsys.jts.geomgraph.index.SimpleMCSweepLineIntersector;
 
 public class IsSimpleOp {
   private static class EndpointInfo {
-    Coordinate pt;
+    Coordinates pt;
 
     boolean isClosed;
 
     int degree;
 
-    public EndpointInfo(final Coordinate pt) {
+    public EndpointInfo(final Coordinates pt) {
       this.pt = pt;
       isClosed = false;
       degree = 0;
@@ -47,7 +47,7 @@ public class IsSimpleOp {
       this.isClosed |= isClosed;
     }
 
-    public Coordinate getCoordinate() {
+    public Coordinates getCoordinate() {
       return pt;
     }
   }
@@ -92,7 +92,7 @@ public class IsSimpleOp {
     eiInfo.addEndpoint(isClosed);
   }
 
-  private void addNonSimplePoint(final Coordinate coordinate) {
+  private void addNonSimplePoint(final Coordinates coordinate) {
     nonSimplePoints.add(new DoubleCoordinates(CoordinatesUtil.get(coordinate),
       2));
   }
@@ -144,7 +144,7 @@ public class IsSimpleOp {
       for (final Iterator eiIt = e.getEdgeIntersectionList().iterator(); eiIt.hasNext();) {
         final EdgeIntersection ei = (EdgeIntersection)eiIt.next();
         if (!ei.isEndPoint(maxSegmentIndex)) {
-          final Coordinate coordinate = ei.getCoordinate();
+          final Coordinates coordinate = ei.getCoordinate();
           addNonSimplePoint(coordinate);
           hasIntersection = true;
         }

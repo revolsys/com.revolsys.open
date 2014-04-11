@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A graph comprised of {@link HalfEdge}s.
@@ -122,7 +123,7 @@ public class EdgeGraph
    * @param dest the destination location.
    * @return an edge with the given orig and dest, or null if none exists
    */
-  public HalfEdge findEdge(Coordinate orig, Coordinate dest) {
+  public HalfEdge findEdge(Coordinate orig, Coordinates dest) {
     HalfEdge e = (HalfEdge) vertexMap.get(orig);
     if (e == null) return null;
     return e.find(dest);

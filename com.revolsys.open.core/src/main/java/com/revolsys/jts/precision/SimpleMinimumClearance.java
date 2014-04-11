@@ -32,10 +32,12 @@
  */
 package com.revolsys.jts.precision;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
@@ -73,7 +75,7 @@ public class SimpleMinimumClearance
   
   private Geometry inputGeom;
   private double minClearance;
-  private Coordinate[] minClearancePts;
+  private Coordinates[] minClearancePts;
   
   public SimpleMinimumClearance(Geometry geom)
   {
@@ -95,12 +97,12 @@ public class SimpleMinimumClearance
   private void compute()
   {
     if (minClearancePts != null) return;
-    minClearancePts = new Coordinate[2];
+    minClearancePts = new Coordinates[2];
     minClearance = Double.MAX_VALUE;
     inputGeom.apply(new VertexCoordinateFilter());
   }
   
-  private void updateClearance(double candidateValue, Coordinate p0, Coordinate p1)
+  private void updateClearance(double candidateValue, Coordinates p0, Coordinates p1)
   {
     if (candidateValue < minClearance) {
       minClearance = candidateValue;
@@ -152,7 +154,7 @@ public class SimpleMinimumClearance
       }
     }
     
-    private void checkVertexDistance(Coordinate vertex)
+    private void checkVertexDistance(AbstractCoordinates vertex)
     {
       double vertexDist = vertex.distance(queryPt);
       if (vertexDist > 0) {
@@ -162,7 +164,7 @@ public class SimpleMinimumClearance
     
     private void checkSegmentDistance(Coordinate seg0, Coordinate seg1)
     {
-        if (queryPt.equals2D(seg0) || queryPt.equals2D(seg1))
+        if (queryPt.equals2d(seg0) || queryPt.equals2d(seg1))
           return;
         double segDist = CGAlgorithms.distancePointLine(queryPt, seg1, seg0);
         if (segDist > 0) 

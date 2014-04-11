@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -35,6 +34,8 @@ package com.revolsys.jts.geom;
 
 import java.io.Serializable;
 
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+
 /**
  *  Defines a rectangular region of the 2D coordinate plane.
  *  It is often used to represent the bounding box of a {@link Geometry},
@@ -58,14 +59,14 @@ public class Envelope implements Serializable {
    * @param q the point to test for intersection
    * @return <code>true</code> if q intersects the envelope p1-p2
    */
-  public static boolean intersects(final Coordinate p1, final Coordinate p2,
-    final Coordinate q) {
+  public static boolean intersects(final Coordinates p1, final Coordinates p2,
+    final Coordinates q) {
     // OptimizeIt shows that Math#min and Math#max here are a bottleneck.
     // Replace with direct comparisons. [Jon Aquino]
-    if (((q.x >= (p1.x < p2.x ? p1.x : p2.x)) && (q.x <= (p1.x > p2.x ? p1.x
-      : p2.x)))
-      && ((q.y >= (p1.y < p2.y ? p1.y : p2.y)) && (q.y <= (p1.y > p2.y ? p1.y
-        : p2.y)))) {
+    if (((q.getX() >= (p1.getX() < p2.getX() ? p1.getX() : p2.getX())) && (q.getX() <= (p1.getX() > p2.getX() ? p1.getX()
+      : p2.getX())))
+      && ((q.getY() >= (p1.getY() < p2.getY() ? p1.getY() : p2.getY())) && (q.getY() <= (p1.getY() > p2.getY() ? p1.getY()
+        : p2.getY())))) {
       return true;
     }
     return false;
@@ -82,12 +83,12 @@ public class Envelope implements Serializable {
    * @param q2 another extremal point of the envelope Q
    * @return <code>true</code> if Q intersects P
    */
-  public static boolean intersects(final Coordinate p1, final Coordinate p2,
-    final Coordinate q1, final Coordinate q2) {
-    double minq = Math.min(q1.x, q2.x);
-    double maxq = Math.max(q1.x, q2.x);
-    double minp = Math.min(p1.x, p2.x);
-    double maxp = Math.max(p1.x, p2.x);
+  public static boolean intersects(final Coordinates p1, final Coordinates p2,
+    final Coordinates q1, final Coordinates q2) {
+    double minq = Math.min(q1.getX(), q2.getX());
+    double maxq = Math.max(q1.getX(), q2.getX());
+    double minp = Math.min(p1.getX(), p2.getX());
+    double maxp = Math.max(p1.getX(), p2.getX());
 
     if (minp > maxq) {
       return false;
@@ -96,10 +97,10 @@ public class Envelope implements Serializable {
       return false;
     }
 
-    minq = Math.min(q1.y, q2.y);
-    maxq = Math.max(q1.y, q2.y);
-    minp = Math.min(p1.y, p2.y);
-    maxp = Math.max(p1.y, p2.y);
+    minq = Math.min(q1.getY(), q2.getY());
+    maxq = Math.max(q1.getY(), q2.getY());
+    minp = Math.min(p1.getY(), p2.getY());
+    maxp = Math.max(p1.getY(), p2.getY());
 
     if (minp > maxq) {
       return false;
@@ -142,8 +143,8 @@ public class Envelope implements Serializable {
    *
    *@param  p  the Coordinate
    */
-  public Envelope(final Coordinate p) {
-    init(p.x, p.x, p.y, p.y);
+  public Envelope(final Coordinates p) {
+    init(p.getX(), p.getX(), p.getY(), p.getY());
   }
 
   /**
@@ -152,8 +153,8 @@ public class Envelope implements Serializable {
    *@param  p1  the first Coordinate
    *@param  p2  the second Coordinate
    */
-  public Envelope(final Coordinate p1, final Coordinate p2) {
-    init(p1.x, p2.x, p1.y, p2.y);
+  public Envelope(final Coordinates p1, final Coordinates p2) {
+    init(p1.getX(), p2.getX(), p1.getY(), p2.getY());
   }
 
   public Envelope(final double x, final double y) {
@@ -188,12 +189,12 @@ public class Envelope implements Serializable {
    * @return the centre coordinate of this envelope
    * <code>null</code> if the envelope is null
    */
-  public Coordinate centre() {
+  public Coordinates centre() {
     if (isNull()) {
       return null;
     }
     return new Coordinate((getMinX() + getMaxX()) / 2.0,
-      (getMinY() + getMaxY()) / 2.0);
+      (getMinY() + getMaxY()) / 2.0, Coordinates.NULL_ORDINATE);
   }
 
   /**
@@ -209,7 +210,7 @@ public class Envelope implements Serializable {
    *      
    *@see #covers(Coordinate)
    */
-  public boolean contains(final Coordinate p) {
+  public boolean contains(final Coordinates p) {
     return covers(p);
   }
 
@@ -256,8 +257,8 @@ public class Envelope implements Serializable {
    *@return    <code>true</code> if the point lies in the interior or
    *      on the boundary of this <code>Envelope</code>.
    */
-  public boolean covers(final Coordinate p) {
-    return covers(p.x, p.y);
+  public boolean covers(final Coordinates p) {
+    return covers(p.getX(), p.getY());
   }
 
   /**
@@ -381,8 +382,8 @@ public class Envelope implements Serializable {
    *
    *@param  p  the Coordinate to expand to include
    */
-  public void expandToInclude(final Coordinate p) {
-    expandToInclude(p.x, p.y);
+  public void expandToInclude(final Coordinates p) {
+    expandToInclude(p.getX(), p.getY());
   }
 
   /**
@@ -526,10 +527,10 @@ public class Envelope implements Serializable {
   public int hashCode() {
     // Algorithm from Effective Java by Joshua Bloch [Jon Aquino]
     int result = 17;
-    result = 37 * result + Coordinate.hashCode(minx);
-    result = 37 * result + Coordinate.hashCode(maxx);
-    result = 37 * result + Coordinate.hashCode(miny);
-    result = 37 * result + Coordinate.hashCode(maxy);
+    result = 37 * result + CoordinatesUtil.hashCode(minx);
+    result = 37 * result + CoordinatesUtil.hashCode(maxx);
+    result = 37 * result + CoordinatesUtil.hashCode(miny);
+    result = 37 * result + CoordinatesUtil.hashCode(maxy);
     return result;
   }
 
@@ -545,8 +546,8 @@ public class Envelope implements Serializable {
    *
    *@param  p  the coordinate
    */
-  public void init(final Coordinate p) {
-    init(p.x, p.x, p.y, p.y);
+  public void init(final Coordinates p) {
+    init(p.getX(), p.getX(), p.getY(), p.getY());
   }
 
   /**
@@ -555,8 +556,8 @@ public class Envelope implements Serializable {
    *@param  p1  the first Coordinate
    *@param  p2  the second Coordinate
    */
-  public void init(final Coordinate p1, final Coordinate p2) {
-    init(p1.x, p2.x, p1.y, p2.y);
+  public void init(final Coordinates p1, final Coordinates p2) {
+    init(p1.getX(), p2.getX(), p1.getY(), p2.getY());
   }
 
   /**
@@ -623,8 +624,8 @@ public class Envelope implements Serializable {
    *@param  p  the <code>Coordinate</code> to be tested
    *@return        <code>true</code> if the point overlaps this <code>Envelope</code>
    */
-  public boolean intersects(final Coordinate p) {
-    return intersects(p.x, p.y);
+  public boolean intersects(final Coordinates p) {
+    return intersects(p.getX(), p.getY());
   }
 
   /**
@@ -706,7 +707,7 @@ public class Envelope implements Serializable {
    * @deprecated Use #intersects instead.
    */
   @Deprecated
-  public boolean overlaps(final Coordinate p) {
+  public boolean overlaps(final Coordinates p) {
     return intersects(p);
   }
 

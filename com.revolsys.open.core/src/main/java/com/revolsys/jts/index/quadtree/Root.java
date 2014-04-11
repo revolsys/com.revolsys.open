@@ -34,6 +34,7 @@
 package com.revolsys.jts.index.quadtree;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.util.Assert;
 
@@ -48,7 +49,7 @@ public class Root
 {
 
   // the singleton root quad is centred at the origin.
-  private static final Coordinate origin = new Coordinate(0.0, 0.0);
+  private static final Coordinates origin = new Coordinate(0.0, 0.0, Coordinates.NULL_ORDINATE);
 
   public Root()
   {
@@ -59,7 +60,7 @@ public class Root
    */
   public void insert(Envelope itemEnv, Object item)
   {
-    int index = getSubnodeIndex(itemEnv, origin.x, origin.y);
+    int index = getSubnodeIndex(itemEnv, origin.getX(), origin.getY());
     // if index is -1, itemEnv must cross the X or Y axis.
     if (index == -1) {
       add(item);

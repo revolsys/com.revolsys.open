@@ -36,9 +36,7 @@ import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.FileUtil;
@@ -47,6 +45,9 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.io.xml.DomUtil;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
@@ -54,7 +55,6 @@ import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
-import com.revolsys.jts.geom.Point;
 
 public class GeoReferencedImage extends AbstractPropertyChangeObject implements
   PropertyChangeListener, MapSerializer {

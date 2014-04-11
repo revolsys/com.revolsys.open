@@ -37,8 +37,10 @@ package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geomgraph.index.MonotoneChainEdge;
@@ -90,7 +92,7 @@ public class Edge
   {
     return pts[i];
   }
-  public Coordinate getCoordinate()
+  public AbstractCoordinates getCoordinate()
   {
     if (pts.length > 0) return pts[0];
     return null;
@@ -178,19 +180,19 @@ public class Edge
    */
   public void addIntersection(LineIntersector li, int segmentIndex, int geomIndex, int intIndex)
   {
-      Coordinate intPt = new Coordinate(li.getIntersection(intIndex));
+      AbstractCoordinates intPt = new Coordinate(li.getIntersection(intIndex));
       int normalizedSegmentIndex = segmentIndex;
       double dist = li.getEdgeDistance(geomIndex, intIndex);
 //Debug.println("edge intpt: " + intPt + " dist: " + dist);
       // normalize the intersection point location
       int nextSegIndex = normalizedSegmentIndex + 1;
       if (nextSegIndex < pts.length) {
-        Coordinate nextPt = pts[nextSegIndex];
+        Coordinates nextPt = pts[nextSegIndex];
 //Debug.println("next pt: " + nextPt);
 
         // Normalize segment index if intPt falls on vertex
         // The check for point equality is 2D only - Z values are ignored
-        if (intPt.equals2D(nextPt)) {
+        if (intPt.equals2d(nextPt)) {
 //Debug.println("normalized distance");
             normalizedSegmentIndex = nextSegIndex;
             dist = 0.0;
@@ -231,10 +233,10 @@ public class Edge
     boolean isEqualReverse = true;
     int iRev = pts.length;
     for (int i = 0; i < pts.length; i++) {
-      if (! pts[i].equals2D(e.pts[i])) {
+      if (! pts[i].equals2d(e.pts[i])) {
          isEqualForward = false;
       }
-      if (! pts[i].equals2D(e.pts[--iRev])) {
+      if (! pts[i].equals2d(e.pts[--iRev])) {
          isEqualReverse = false;
       }
       if (! isEqualForward && ! isEqualReverse) return false;
@@ -250,7 +252,7 @@ public class Edge
     if (pts.length != e.pts.length) return false;
 
     for (int i = 0; i < pts.length; i++) {
-      if (! pts[i].equals2D(e.pts[i])) {
+      if (! pts[i].equals2d(e.pts[i])) {
          return false;
       }
     }
@@ -264,7 +266,7 @@ public class Edge
     buf.append("LINESTRING (");
     for (int i = 0; i < pts.length; i++) {
       if (i > 0) buf.append(",");
-      buf.append(pts[i].x + " " + pts[i].y);
+      buf.append(pts[i].getX() + " " + pts[i].getY());
     }
     buf.append(")  " + label + " " + depthDelta);
     return buf.toString();
@@ -275,7 +277,7 @@ public class Edge
     out.print("LINESTRING (");
     for (int i = 0; i < pts.length; i++) {
       if (i > 0) out.print(",");
-      out.print(pts[i].x + " " + pts[i].y);
+      out.print(pts[i].getX() + " " + pts[i].getY());
     }
     out.print(")  " + label + " " + depthDelta);
   }

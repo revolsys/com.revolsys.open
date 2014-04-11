@@ -7,7 +7,7 @@ import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;

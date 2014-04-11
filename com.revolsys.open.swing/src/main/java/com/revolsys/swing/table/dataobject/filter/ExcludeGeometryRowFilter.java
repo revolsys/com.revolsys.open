@@ -4,8 +4,8 @@ import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.swing.table.dataobject.model.AbstractDataObjectTableModel;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.swing.table.dataobject.model.AbstractDataObjectTableModel;
 
 public class ExcludeGeometryRowFilter extends RowFilter<TableModel, Integer> {
 

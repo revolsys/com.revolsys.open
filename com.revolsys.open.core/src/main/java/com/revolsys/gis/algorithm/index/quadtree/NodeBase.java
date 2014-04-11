@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 
 public abstract class NodeBase<T> {

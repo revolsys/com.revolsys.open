@@ -32,10 +32,10 @@
  */
 package com.revolsys.gis.model.geometry.algorithm;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.Polygonal;
 import com.revolsys.gis.model.geometry.algorithm.locate.Location;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**

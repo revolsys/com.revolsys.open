@@ -13,9 +13,10 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -39,7 +40,6 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.Property;
-import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectLayerTablePanel extends TablePanel implements
   PropertyChangeListener {

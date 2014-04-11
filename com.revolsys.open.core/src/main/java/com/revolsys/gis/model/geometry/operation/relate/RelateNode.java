@@ -7,9 +7,9 @@ package com.revolsys.gis.model.geometry.operation.relate;
  * @version 1.7
  */
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeEndStar;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.IntersectionMatrix;
 
 /**

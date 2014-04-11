@@ -11,7 +11,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeRing;
  * to represent polygons under the OGC SFS spatial data model.
  *
  * @version 1.7
- * @see com.revolsys.jts.operation.overlay.MaximalEdgeRing
+ * @see com.revolsys.jts.testold.operation.overlay.MaximalEdgeRing
  */
 public class MinimalEdgeRing extends EdgeRing {
 

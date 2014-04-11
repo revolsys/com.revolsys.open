@@ -42,6 +42,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -114,14 +115,14 @@ public class ShapeReader
     while (seqIndex < pathPtSeq.size()) {
       // assume next seq is shell 
       // TODO: test this
-      Coordinate[] pts = (Coordinate[]) pathPtSeq.get(seqIndex);
+      Coordinates[] pts = (Coordinates[]) pathPtSeq.get(seqIndex);
       LinearRing shell = geometryFactory.createLinearRing(pts);
       seqIndex++;
       
       List holes = new ArrayList();
       // add holes as long as rings are CCW
       while (seqIndex < pathPtSeq.size() && isHole((Coordinate[]) pathPtSeq.get(seqIndex))) {
-        Coordinate[] holePts = (Coordinate[]) pathPtSeq.get(seqIndex);
+        Coordinates[] holePts = (Coordinates[]) pathPtSeq.get(seqIndex);
         LinearRing hole = geometryFactory.createLinearRing(holePts);
         holes.add(hole);
         seqIndex++;
@@ -172,12 +173,12 @@ public class ShapeReader
         }
         else {
           coordList = new CoordinateList();
-          coordList.add(new Coordinate(pathPt[0], pathPt[1]));
+          coordList.add(new Coordinate(pathPt[0], pathPt[1], Coordinates.NULL_ORDINATE));
           pathIt.next();
         }
         break;
       case PathIterator.SEG_LINETO:
-        coordList.add(new Coordinate(pathPt[0], pathPt[1]));
+        coordList.add(new Coordinate(pathPt[0], pathPt[1], Coordinates.NULL_ORDINATE));
         pathIt.next();
         break;
       case PathIterator.SEG_CLOSE:  

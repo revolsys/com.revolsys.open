@@ -34,7 +34,6 @@ package com.revolsys.gis.model.geometry.operation.distance;
 
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.LineSegment;
@@ -44,6 +43,7 @@ import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
 import com.revolsys.gis.model.geometry.util.GeometryUtil;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Location;
 

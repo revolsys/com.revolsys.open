@@ -35,7 +35,9 @@ package com.revolsys.jts.triangulate.quadedge;
 
 import java.util.Arrays;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.math.DD;
@@ -69,7 +71,7 @@ public class TrianglePredicate {
     final boolean isInCircleDD = TrianglePredicate.isInCircleDDSlow(a, b, c, p);
     final boolean isInCircleCC = TrianglePredicate.isInCircleCC(a, b, c, p);
 
-    final Coordinate circumCentre = Triangle.circumcentre(a, b, c);
+    final Coordinates circumCentre = Triangle.circumcentre(a, b, c);
     System.out.println("p radius diff a = "
       + Math.abs(p.distance(circumCentre) - a.distance(circumCentre))
       / a.distance(circumCentre));
@@ -111,23 +113,23 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleCC(final Coordinate a, final Coordinate b,
-    final Coordinate c, final Coordinate p) {
-    final Coordinate cc = Triangle.circumcentre(a, b, c);
+  public static boolean isInCircleCC(final AbstractCoordinates a, final Coordinates b,
+    final Coordinates c, final AbstractCoordinates p) {
+    final Coordinates cc = Triangle.circumcentre(a, b, c);
     final double ccRadius = a.distance(cc);
     final double pRadiusDiff = p.distance(cc) - ccRadius;
     return pRadiusDiff <= 0;
   }
 
-  public static boolean isInCircleDDFast(final Coordinate a,
-    final Coordinate b, final Coordinate c, final Coordinate p) {
-    final DD aTerm = (DD.sqr(a.x).selfAdd(DD.sqr(a.y))).selfMultiply(triAreaDDFast(
+  public static boolean isInCircleDDFast(final Coordinates a,
+    final Coordinates b, final Coordinates c, final Coordinates p) {
+    final DD aTerm = (DD.sqr(a.getX()).selfAdd(DD.sqr(a.getY()))).selfMultiply(triAreaDDFast(
       b, c, p));
-    final DD bTerm = (DD.sqr(b.x).selfAdd(DD.sqr(b.y))).selfMultiply(triAreaDDFast(
+    final DD bTerm = (DD.sqr(b.getX()).selfAdd(DD.sqr(b.getY()))).selfMultiply(triAreaDDFast(
       a, c, p));
-    final DD cTerm = (DD.sqr(c.x).selfAdd(DD.sqr(c.y))).selfMultiply(triAreaDDFast(
+    final DD cTerm = (DD.sqr(c.getX()).selfAdd(DD.sqr(c.getY()))).selfMultiply(triAreaDDFast(
       a, b, p));
-    final DD pTerm = (DD.sqr(p.x).selfAdd(DD.sqr(p.y))).selfMultiply(triAreaDDFast(
+    final DD pTerm = (DD.sqr(p.getX()).selfAdd(DD.sqr(p.getY()))).selfMultiply(triAreaDDFast(
       a, b, c));
 
     final DD sum = aTerm.selfSubtract(bTerm).selfAdd(cTerm).selfSubtract(pTerm);
@@ -136,14 +138,14 @@ public class TrianglePredicate {
     return isInCircle;
   }
 
-  public static boolean isInCircleDDNormalized(final Coordinate a,
-    final Coordinate b, final Coordinate c, final Coordinate p) {
-    final DD adx = DD.valueOf(a.x).selfSubtract(p.x);
-    final DD ady = DD.valueOf(a.y).selfSubtract(p.y);
-    final DD bdx = DD.valueOf(b.x).selfSubtract(p.x);
-    final DD bdy = DD.valueOf(b.y).selfSubtract(p.y);
-    final DD cdx = DD.valueOf(c.x).selfSubtract(p.x);
-    final DD cdy = DD.valueOf(c.y).selfSubtract(p.y);
+  public static boolean isInCircleDDNormalized(final Coordinates a,
+    final Coordinates b, final Coordinates c, final Coordinates p) {
+    final DD adx = DD.valueOf(a.getX()).selfSubtract(p.getX());
+    final DD ady = DD.valueOf(a.getY()).selfSubtract(p.getY());
+    final DD bdx = DD.valueOf(b.getX()).selfSubtract(p.getX());
+    final DD bdy = DD.valueOf(b.getY()).selfSubtract(p.getY());
+    final DD cdx = DD.valueOf(c.getX()).selfSubtract(p.getX());
+    final DD cdy = DD.valueOf(c.getY()).selfSubtract(p.getY());
 
     final DD abdet = adx.multiply(bdy).selfSubtract(bdx.multiply(ady));
     final DD bcdet = bdx.multiply(cdy).selfSubtract(cdx.multiply(bdy));
@@ -172,16 +174,16 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleDDSlow(final Coordinate a,
-    final Coordinate b, final Coordinate c, final Coordinate p) {
-    final DD px = DD.valueOf(p.x);
-    final DD py = DD.valueOf(p.y);
-    final DD ax = DD.valueOf(a.x);
-    final DD ay = DD.valueOf(a.y);
-    final DD bx = DD.valueOf(b.x);
-    final DD by = DD.valueOf(b.y);
-    final DD cx = DD.valueOf(c.x);
-    final DD cy = DD.valueOf(c.y);
+  public static boolean isInCircleDDSlow(final Coordinates a,
+    final Coordinates b, final Coordinates c, final Coordinates p) {
+    final DD px = DD.valueOf(p.getX());
+    final DD py = DD.valueOf(p.getY());
+    final DD ax = DD.valueOf(a.getX());
+    final DD ay = DD.valueOf(a.getY());
+    final DD bx = DD.valueOf(b.getX());
+    final DD by = DD.valueOf(b.getY());
+    final DD cx = DD.valueOf(c.getX());
+    final DD cy = DD.valueOf(c.getY());
 
     final DD aTerm = (ax.multiply(ax).add(ay.multiply(ay))).multiply(triAreaDDSlow(
       bx, by, cx, cy, px, py));
@@ -210,11 +212,11 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleNonRobust(final Coordinate a,
-    final Coordinate b, final Coordinate c, final Coordinate p) {
-    final boolean isInCircle = (a.x * a.x + a.y * a.y) * triArea(b, c, p)
-      - (b.x * b.x + b.y * b.y) * triArea(a, c, p) + (c.x * c.x + c.y * c.y)
-      * triArea(a, b, p) - (p.x * p.x + p.y * p.y) * triArea(a, b, c) > 0;
+  public static boolean isInCircleNonRobust(final Coordinates a,
+    final Coordinates b, final Coordinates c, final Coordinates p) {
+    final boolean isInCircle = (a.getX() * a.getX() + a.getY() * a.getY()) * triArea(b, c, p)
+      - (b.getX() * b.getX() + b.getY() * b.getY()) * triArea(a, c, p) + (c.getX() * c.getX() + c.getY() * c.getY())
+      * triArea(a, b, p) - (p.getX() * p.getX() + p.getY() * p.getY()) * triArea(a, b, c) > 0;
     return isInCircle;
   }
 
@@ -235,14 +237,14 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleNormalized(final Coordinate a,
-    final Coordinate b, final Coordinate c, final Coordinate p) {
-    final double adx = a.x - p.x;
-    final double ady = a.y - p.y;
-    final double bdx = b.x - p.x;
-    final double bdy = b.y - p.y;
-    final double cdx = c.x - p.x;
-    final double cdy = c.y - p.y;
+  public static boolean isInCircleNormalized(final Coordinates a,
+    final Coordinates b, final Coordinates c, final Coordinates p) {
+    final double adx = a.getX() - p.getX();
+    final double ady = a.getY() - p.getY();
+    final double bdx = b.getX() - p.getX();
+    final double bdy = b.getY() - p.getY();
+    final double cdx = c.getX() - p.getX();
+    final double cdy = c.getY() - p.getY();
 
     final double abdet = adx * bdy - bdx * ady;
     final double bcdet = bdx * cdy - cdx * bdy;
@@ -266,8 +268,8 @@ public class TrianglePredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleRobust(final Coordinate a,
-    final Coordinate b, final Coordinate c, final Coordinate p) {
+  public static boolean isInCircleRobust(final Coordinates a,
+    final Coordinates b, final Coordinates c, final Coordinates p) {
     // checkRobustInCircle(a, b, c, p);
     // return isInCircleNonRobust(a, b, c, p);
     return isInCircleNormalized(a, b, c, p);
@@ -281,21 +283,21 @@ public class TrianglePredicate {
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
    */
-  private static double triArea(final Coordinate a, final Coordinate b,
-    final Coordinate c) {
-    return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  private static double triArea(final Coordinates a, final Coordinates b,
+    final Coordinates c) {
+    return (b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX());
   }
 
-  public static DD triAreaDDFast(final Coordinate a, final Coordinate b,
-    final Coordinate c) {
+  public static DD triAreaDDFast(final Coordinates a, final Coordinates b,
+    final Coordinates c) {
 
-    final DD t1 = DD.valueOf(b.x)
-      .selfSubtract(a.x)
-      .selfMultiply(DD.valueOf(c.y).selfSubtract(a.y));
+    final DD t1 = DD.valueOf(b.getX())
+      .selfSubtract(a.getX())
+      .selfMultiply(DD.valueOf(c.getY()).selfSubtract(a.getY()));
 
-    final DD t2 = DD.valueOf(b.y)
-      .selfSubtract(a.y)
-      .selfMultiply(DD.valueOf(c.x).selfSubtract(a.x));
+    final DD t2 = DD.valueOf(b.getY())
+      .selfSubtract(a.getY())
+      .selfMultiply(DD.valueOf(c.getX()).selfSubtract(a.getX()));
 
     return t1.selfSubtract(t2);
   }

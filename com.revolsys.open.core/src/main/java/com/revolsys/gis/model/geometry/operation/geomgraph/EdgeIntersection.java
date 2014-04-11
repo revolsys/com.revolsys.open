@@ -2,8 +2,8 @@ package com.revolsys.gis.model.geometry.operation.geomgraph;
 
 import java.io.PrintStream;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents a point on an edge which intersects with another edge.

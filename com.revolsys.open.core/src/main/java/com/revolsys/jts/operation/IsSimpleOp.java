@@ -45,6 +45,7 @@ import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -105,7 +106,7 @@ public class IsSimpleOp
 {
   private Geometry inputGeom;
   private boolean isClosedEndpointsInInterior = true;
-  private Coordinate nonSimpleLocation = null;
+  private Coordinates nonSimpleLocation = null;
 
   /**
    * Creates a simplicity checker using the default SFS Mod-2 Boundary Node Rule
@@ -169,7 +170,7 @@ public class IsSimpleOp
    * @return a coordinate for the location of the non-boundary self-intersection
    * or null if the geometry is simple
    */
-  public Coordinate getNonSimpleLocation()
+  public Coordinates getNonSimpleLocation()
   {
     return nonSimpleLocation;
   }
@@ -299,18 +300,18 @@ public class IsSimpleOp
   }
 
   private static class EndpointInfo {
-    Coordinate pt;
+    Coordinates pt;
     boolean isClosed;
     int degree;
 
-    public EndpointInfo(Coordinate pt)
+    public EndpointInfo(Coordinates pt)
     {
       this.pt = pt;
       isClosed = false;
       degree = 0;
     }
 
-    public Coordinate getCoordinate() { return pt; }
+    public Coordinates getCoordinate() { return pt; }
 
     public void addEndpoint(boolean isClosed)
     {

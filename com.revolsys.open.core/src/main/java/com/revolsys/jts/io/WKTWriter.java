@@ -39,6 +39,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -83,9 +84,9 @@ public class WKTWriter
    *
    * @return the WKT
    */
-  public static String toPoint(Coordinate p0)
+  public static String toPoint(Coordinates p0)
   {
-    return "POINT ( " + p0.x + " " + p0.y  + " )";
+    return "POINT ( " + p0.getX() + " " + p0.getY()  + " )";
   }
 
   /**
@@ -123,9 +124,9 @@ public class WKTWriter
    *
    * @return the WKT
    */
-  public static String toLineString(Coordinate p0, Coordinate p1)
+  public static String toLineString(Coordinates p0, Coordinates p1)
   {
-    return "LINESTRING ( " + p0.x + " " + p0.y + ", " + p1.x + " " + p1.y + " )";
+    return "LINESTRING ( " + p0.getX() + " " + p0.getY() + ", " + p1.getX() + " " + p1.getY() + " )";
   }
 
   private static final int INDENT = 2;
@@ -359,7 +360,7 @@ public class WKTWriter
    *@param  precisionModel  the <code>PrecisionModel</code> to use to convert
    *      from a precise coordinate to an external coordinate
    */
-  private void appendPointTaggedText(Coordinate coordinate, int level, Writer writer,
+  private void appendPointTaggedText(Coordinates coordinate, int level, Writer writer,
       PrecisionModel precisionModel)
     throws IOException
   {
@@ -476,7 +477,7 @@ public class WKTWriter
    *@param  precisionModel  the <code>PrecisionModel</code> to use to convert
    *      from a precise coordinate to an external coordinate
    */
-  private void appendPointText(Coordinate coordinate, int level, Writer writer,
+  private void appendPointText(Coordinates coordinate, int level, Writer writer,
       PrecisionModel precisionModel)
     throws IOException
   {
@@ -517,13 +518,13 @@ public class WKTWriter
    *@param  coordinate      the <code>Coordinate</code> to process
    *@param  writer          the output writer to append to
    */
-  private void appendCoordinate(Coordinate coordinate, Writer writer)
+  private void appendCoordinate(Coordinates coordinate, Writer writer)
     throws IOException
   {
-    writer.write(writeNumber(coordinate.x) + " " + writeNumber(coordinate.y));
-    if (outputDimension >= 3 && ! Double.isNaN(coordinate.z)) {
+    writer.write(writeNumber(coordinate.getX()) + " " + writeNumber(coordinate.getY()));
+    if (outputDimension >= 3 && ! Double.isNaN(coordinate.getZ())) {
       writer.write(" ");
-      writer.write(writeNumber(coordinate.z));
+      writer.write(writeNumber(coordinate.getZ()));
     }
   }
 

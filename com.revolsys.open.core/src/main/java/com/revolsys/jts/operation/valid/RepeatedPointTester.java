@@ -35,6 +35,7 @@
 package com.revolsys.jts.operation.valid;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -52,12 +53,12 @@ import com.revolsys.jts.geom.Polygon;
 public class RepeatedPointTester {
 
   // save the repeated coord found (if any)
-  private Coordinate repeatedCoord;
+  private Coordinates repeatedCoord;
 
   public RepeatedPointTester() {
   }
 
-  public Coordinate getCoordinate() { return repeatedCoord; }
+  public Coordinates getCoordinate() { return repeatedCoord; }
 
   public boolean hasRepeatedPoint(Geometry g)
   {

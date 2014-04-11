@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
@@ -15,7 +15,7 @@ import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Polygonal;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -118,7 +118,7 @@ public class GeometrySnapper {
     this.srcGeom = srcGeom;
   }
 
-  private double computeMinimumSegmentLength(final Coordinate[] pts) {
+  private double computeMinimumSegmentLength(final AbstractCoordinates[] pts) {
     double minSegLen = Double.MAX_VALUE;
     for (int i = 0; i < pts.length - 1; i++) {
       final double segLen = pts[i].distance(pts[i + 1]);
@@ -135,7 +135,7 @@ public class GeometrySnapper {
    * @param ringPts
    * @return
    */
-  private double computeSnapTolerance(final Coordinate[] ringPts) {
+  private double computeSnapTolerance(final AbstractCoordinates[] ringPts) {
     final double minSegLen = computeMinimumSegmentLength(ringPts);
     // use a small percentage of this to be safe
     final double snapTol = minSegLen / 10;

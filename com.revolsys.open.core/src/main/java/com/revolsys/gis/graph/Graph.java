@@ -46,7 +46,6 @@ import com.revolsys.gis.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -56,6 +55,7 @@ import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparat
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;

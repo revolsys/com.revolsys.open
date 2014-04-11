@@ -105,7 +105,7 @@ public class MultiPoint extends GeometryCollection implements Puntal {
    *      at 0
    *@return    the <code>n</code>th <code>Coordinate</code>
    */
-  protected Coordinate getCoordinate(final int n) {
+  protected Coordinates getCoordinate(final int n) {
     return ((Point)this.geometries[n]).getCoordinate();
   }
 

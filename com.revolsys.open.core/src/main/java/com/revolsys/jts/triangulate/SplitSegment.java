@@ -33,7 +33,9 @@
 
 package com.revolsys.jts.triangulate;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 
 /**
@@ -52,16 +54,16 @@ public class SplitSegment {
      * @param segmentLengthFraction the fraction of the segment length along the line
      * @return the point at that distance
      */
-    private static Coordinate pointAlongReverse(LineSegment seg, double segmentLengthFraction) {
-        Coordinate coord = new Coordinate();
-        coord.x = seg.p1.x - segmentLengthFraction * (seg.p1.x - seg.p0.x);
-        coord.y = seg.p1.y - segmentLengthFraction * (seg.p1.y - seg.p0.y);
+    private static Coordinates pointAlongReverse(LineSegment seg, double segmentLengthFraction) {
+        Coordinates coord = new Coordinate();
+        coord.setX(seg.p1.getX() - segmentLengthFraction * (seg.p1.getX() - seg.p0.getX()));
+        coord.setY(seg.p1.getY() - segmentLengthFraction * (seg.p1.getY() - seg.p0.getY()));
         return coord;
     }
 
     private LineSegment seg;
     private double      segLen;
-    private Coordinate  splitPt;
+    private Coordinates  splitPt;
     private double      minimumLen = 0.0;
 
     public SplitSegment(LineSegment seg) {
@@ -73,20 +75,20 @@ public class SplitSegment {
         minimumLen = minLen;
     }
 
-    public Coordinate getSplitPoint() {
+    public Coordinates getSplitPoint() {
         return splitPt;
     }
 
-    public void splitAt(double length, Coordinate endPt) {
+    public void splitAt(double length, AbstractCoordinates endPt) {
         double actualLen = getConstrainedLength(length);
         double frac = actualLen / segLen;
-        if (endPt.equals2D(seg.p0))
+        if (endPt.equals2d(seg.p0))
             splitPt = seg.pointAlong(frac);
         else
             splitPt = pointAlongReverse(seg, frac);
     }
 
-    public void splitAt(Coordinate pt) {
+    public void splitAt(AbstractCoordinates pt) {
         // check that given pt doesn't violate min length
         double minFrac = minimumLen / segLen;
         if (pt.distance(seg.p0) < minimumLen) {

@@ -2,6 +2,8 @@ package com.revolsys.gis.model.coordinates;
 
 import java.io.Serializable;
 
+import com.revolsys.jts.geom.Coordinates;
+
 public class SimpleCoordinatesPrecisionModel implements
   CoordinatesPrecisionModel, Serializable {
   /**

@@ -1,8 +1,8 @@
 package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.util.Assert;
 
 /**

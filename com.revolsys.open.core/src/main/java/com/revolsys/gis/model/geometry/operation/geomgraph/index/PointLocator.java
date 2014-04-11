@@ -32,7 +32,6 @@
  */
 package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
@@ -47,6 +46,7 @@ import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Location;
 
 /**

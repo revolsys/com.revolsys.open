@@ -3,13 +3,14 @@ package com.revolsys.gis.model.geometry.impl;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.gis.model.geometry.Point;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
+import com.revolsys.jts.util.NumberUtil;
 
 public class PointImpl extends GeometryImpl implements Point {
 
@@ -85,6 +86,20 @@ public class PointImpl extends GeometryImpl implements Point {
     return distance((Coordinates)point);
   }
 
+  /**
+   * Computes the 3-dimensional Euclidean distance to another location.
+   * 
+   * @param c a coordinate
+   * @return the 3-dimensional Euclidean distance between the locations
+   */
+  @Override
+  public double distance3d(final Coordinates c) {
+    final double dx = getX() - c.getX();
+    final double dy = getY() - c.getY();
+    final double dz = getZ() - c.getZ();
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
   @Override
   public boolean equals(final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
@@ -114,6 +129,25 @@ public class PointImpl extends GeometryImpl implements Point {
       }
     }
     return false;
+  }
+
+  /**
+   * Tests if another coordinate has the same values for the X and Y ordinates.
+   * The Z ordinate is ignored.
+   *
+   *@param other a <code>Coordinate</code> with which to do the 2D comparison.
+   *@return true if <code>other</code> is a <code>Coordinate</code>
+   *      with the same values for X and Y.
+   */
+  @Override
+  public boolean equals2d(final Coordinates c, final double tolerance) {
+    if (!NumberUtil.equalsWithTolerance(this.getX(), c.getX(), tolerance)) {
+      return false;
+    }
+    if (!NumberUtil.equalsWithTolerance(this.getY(), c.getY(), tolerance)) {
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -203,6 +237,11 @@ public class PointImpl extends GeometryImpl implements Point {
   @Override
   public boolean isEmpty() {
     return coordinates.length == 0;
+  }
+
+  @Override
+  public void setCoordinate(final Coordinates other) {
+    throw new IllegalArgumentException("Geometries cannot be modified");
   }
 
   @Override

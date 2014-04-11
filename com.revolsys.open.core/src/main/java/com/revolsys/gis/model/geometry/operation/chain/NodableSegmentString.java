@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.geometry.operation.chain;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * An interface for classes which support adding nodes to

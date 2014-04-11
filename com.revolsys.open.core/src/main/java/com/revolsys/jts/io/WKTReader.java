@@ -39,6 +39,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -231,10 +232,10 @@ public class WKTReader
    *@throws  IOException     if an I/O error occurs
    *@throws  ParseException  if an unexpected token was encountered
    */
-  private Coordinate[] getCoordinates() throws IOException, ParseException {
+  private Coordinates[] getCoordinates() throws IOException, ParseException {
 		String nextToken = getNextEmptyOrOpener();
 		if (nextToken.equals(EMPTY)) {
-			return new Coordinate[] {};
+			return new Coordinates[] {};
 		}
 		ArrayList coordinates = new ArrayList();
 		coordinates.add(getPreciseCoordinate());
@@ -244,10 +245,10 @@ public class WKTReader
 			nextToken = getNextCloserOrComma();
 		}
 		Coordinate[] array = new Coordinate[coordinates.size()];
-		return (Coordinate[]) coordinates.toArray(array);
+		return (Coordinates[]) coordinates.toArray(array);
 	}
 
-	private Coordinate[] getCoordinatesNoLeftParen() throws IOException, ParseException {
+	private Coordinates[] getCoordinatesNoLeftParen() throws IOException, ParseException {
 		String nextToken = null;
 		ArrayList coordinates = new ArrayList();
 		coordinates.add(getPreciseCoordinate());
@@ -257,17 +258,17 @@ public class WKTReader
 			nextToken = getNextCloserOrComma();
 		}
 		Coordinate[] array = new Coordinate[coordinates.size()];
-		return (Coordinate[]) coordinates.toArray(array);
+		return (Coordinates[]) coordinates.toArray(array);
 	}
 
   private Coordinate getPreciseCoordinate()
       throws IOException, ParseException
   {
     Coordinate coord = new Coordinate();
-    coord.x = getNextNumber();
-    coord.y = getNextNumber();
+    coord.setX(getNextNumber());
+    coord.setY(getNextNumber());
     if (isNumberNext()) {
-        coord.z = getNextNumber();
+        coord.setZ(getNextNumber());
     }
     precisionModel.makePrecise(coord);
     return coord;
@@ -520,7 +521,7 @@ public class WKTReader
   private Point readPointText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.createPoint((Coordinate)null);
+      return geometryFactory.createPoint((Coordinates)null);
     }
     Point point = geometryFactory.createPoint(getPreciseCoordinate());
     getNextCloser();
@@ -615,7 +616,7 @@ public class WKTReader
    *@return              <code>Point</code>s created using this <code>WKTReader</code>
    *      s <code>GeometryFactory</code>
    */
-  private Point[] toPoints(Coordinate[] coordinates) {
+  private Point[] toPoints(Coordinates[] coordinates) {
     ArrayList points = new ArrayList();
     for (int i = 0; i < coordinates.length; i++) {
       points.add(geometryFactory.createPoint(coordinates[i]));
@@ -639,7 +640,7 @@ public class WKTReader
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
         return geometryFactory.createPolygon(geometryFactory.createLinearRing(
-            new Coordinate[]{}), new LinearRing[]{});
+            new Coordinates[]{}), new LinearRing[]{});
     }
     ArrayList holes = new ArrayList();
     LinearRing shell = readLinearRingText();

@@ -1,8 +1,8 @@
 package com.revolsys.gis.model.geometry.visitor;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.Triangle;
+import com.revolsys.jts.geom.Coordinates;
 
 public class TriangleContainsPointFilter implements Filter<Triangle> {
   private final Coordinates point;

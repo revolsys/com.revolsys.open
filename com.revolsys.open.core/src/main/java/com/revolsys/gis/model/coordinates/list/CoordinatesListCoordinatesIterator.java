@@ -3,8 +3,8 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**

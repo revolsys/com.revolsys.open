@@ -3,6 +3,7 @@ package com.revolsys.gis.model.coordinates;
 import java.io.Serializable;
 import java.util.List;
 
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.util.MathUtil;
 
 public class DoubleCoordinates extends AbstractCoordinates implements

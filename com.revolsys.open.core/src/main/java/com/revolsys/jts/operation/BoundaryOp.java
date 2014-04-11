@@ -41,6 +41,7 @@ import java.util.TreeMap;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -98,7 +99,7 @@ public class BoundaryOp
       return getEmptyMultiPoint();
     }
 
-    Coordinate[] bdyPts = computeBoundaryCoordinates(mLine);
+    Coordinates[] bdyPts = computeBoundaryCoordinates(mLine);
 
     // return Point or MultiPoint
     if (bdyPts.length == 1) {
@@ -120,7 +121,7 @@ public class BoundaryOp
 
   private Map endpointMap;
 
-  private Coordinate[] computeBoundaryCoordinates(MultiLineString mLine)
+  private Coordinates[] computeBoundaryCoordinates(MultiLineString mLine)
   {
     List bdyPts = new ArrayList();
     endpointMap = new TreeMap();
@@ -167,7 +168,7 @@ public class BoundaryOp
         return line.getStartPoint();
       }
       else {
-        return geomFact.createMultiPoint((Coordinate[]) null);
+        return geomFact.createMultiPoint((Coordinates[]) null);
       }
     }
     return geomFact.createMultiPoint(new Point[]{

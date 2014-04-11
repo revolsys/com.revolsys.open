@@ -10,11 +10,11 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
-import com.revolsys.jts.geom.Geometry;
 
 public class GeometryCoordinatesPanel extends ValueField implements
   TableModelListener {

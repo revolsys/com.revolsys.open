@@ -33,7 +33,9 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -50,7 +52,7 @@ import com.revolsys.jts.geom.Polygon;
  */
 public class CentroidLine
 {
-  private Coordinate centSum = new Coordinate();
+  private Coordinates centSum = new Coordinate();
   private double totalLength = 0.0;
 
   public CentroidLine()
@@ -84,11 +86,11 @@ public class CentroidLine
     }
   }
 
-  public Coordinate getCentroid()
+  public Coordinates getCentroid()
   {
-    Coordinate cent = new Coordinate();
-    cent.x = centSum.x / totalLength;
-    cent.y = centSum.y / totalLength;
+    Coordinates cent = new Coordinate();
+    cent.setX(centSum.getX() / totalLength);
+    cent.setY(centSum.getY() / totalLength);
     return cent;
   }
 
@@ -96,16 +98,16 @@ public class CentroidLine
    * Adds the length defined by an array of coordinates.
    * @param pts an array of {@link Coordinate}s
    */
-  public void add(Coordinate[] pts)
+  public void add(AbstractCoordinates[] pts)
   {
     for (int i = 0; i < pts.length - 1; i++) {
       double segmentLen = pts[i].distance(pts[i + 1]);
       totalLength += segmentLen;
 
-      double midx = (pts[i].x + pts[i + 1].x) / 2;
-      centSum.x += segmentLen * midx;
-      double midy = (pts[i].y + pts[i + 1].y) / 2;
-      centSum.y += segmentLen * midy;
+      double midx = (pts[i].getX() + pts[i + 1].getX()) / 2;
+      centSum.setX(centSum.getX() + segmentLen * midx);
+      double midy = (pts[i].getY() + pts[i + 1].getY()) / 2;
+      centSum.setY(centSum.getY() + segmentLen * midy);
     }
   }
 

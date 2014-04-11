@@ -2,7 +2,6 @@ package com.revolsys.gis.model.geometry.operation.valid;
 
 import java.util.Iterator;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.MultiPolygon;
 import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
@@ -12,6 +11,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.SegmentIntersec
 import com.revolsys.gis.model.geometry.operation.relate.EdgeEndBundle;
 import com.revolsys.gis.model.geometry.operation.relate.RelateNode;
 import com.revolsys.gis.model.geometry.operation.relate.RelateNodeGraph;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Checks that a {@link GeometryGraph} representing an area (a {@link Polygon}

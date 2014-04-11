@@ -5,12 +5,12 @@ import java.util.List;
 
 import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.swing.map.overlay.MappedLocation;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.swing.map.overlay.MappedLocation;
 
 public abstract class WarpFilter extends WholeImageFilter {
   private static final long serialVersionUID = 1L;

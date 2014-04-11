@@ -19,10 +19,13 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -36,9 +39,6 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.undo.ListAddUndo;
 import com.revolsys.swing.undo.SetObjectProperty;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 
 public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   private static final Cursor CURSOR_MOVE_IMAGE = SilkIconLoader.getCursor(

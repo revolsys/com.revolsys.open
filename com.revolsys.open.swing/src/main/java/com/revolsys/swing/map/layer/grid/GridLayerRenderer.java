@@ -14,14 +14,14 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 
 public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 

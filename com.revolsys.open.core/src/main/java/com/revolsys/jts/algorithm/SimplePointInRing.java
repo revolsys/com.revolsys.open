@@ -34,6 +34,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LinearRing;
 
 /**
@@ -46,14 +47,14 @@ public class SimplePointInRing
   implements PointInRing
 {
 
-  private Coordinate[] pts;
+  private Coordinates[] pts;
 
   public SimplePointInRing(LinearRing ring)
   {
     pts = ring.getCoordinateArray();
   }
 
-  public boolean isInside(Coordinate pt)
+  public boolean isInside(Coordinates pt)
   {
     return CGAlgorithms.isPointInRing(pt, pts);
   }

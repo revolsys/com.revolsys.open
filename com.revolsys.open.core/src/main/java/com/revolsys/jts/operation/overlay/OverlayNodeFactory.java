@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,7 +36,7 @@ package com.revolsys.jts.operation.overlay;
 /**
  * @version 1.7
  */
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
 import com.revolsys.jts.geomgraph.Node;
 import com.revolsys.jts.geomgraph.NodeFactory;
@@ -49,11 +48,8 @@ import com.revolsys.jts.geomgraph.PlanarGraph;
  *
  * @version 1.7
  */
-public class OverlayNodeFactory
-  extends NodeFactory
-{
-  public Node createNode(Coordinate coord)
-  {
+public class OverlayNodeFactory extends NodeFactory {
+  public Node createNode(final Coordinates coord) {
     return new Node(coord, new DirectedEdgeStar());
   }
 }

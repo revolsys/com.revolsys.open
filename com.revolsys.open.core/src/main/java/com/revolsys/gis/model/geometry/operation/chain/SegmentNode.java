@@ -34,8 +34,8 @@ package com.revolsys.gis.model.geometry.operation.chain;
 
 import java.io.PrintStream;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents an intersection point between two {@link SegmentString}s.

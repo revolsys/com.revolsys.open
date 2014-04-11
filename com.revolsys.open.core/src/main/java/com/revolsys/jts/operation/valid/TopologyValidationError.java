@@ -35,6 +35,7 @@
 package com.revolsys.jts.operation.valid;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -132,7 +133,7 @@ public class TopologyValidationError {
   };
 
   private int errorType;
-  private Coordinate pt;
+  private Coordinates pt;
 
   /**
    * Creates a validation error with the given type and location
@@ -140,11 +141,11 @@ public class TopologyValidationError {
    * @param errorType the type of the error
    * @param pt the location of the error
    */
-  public TopologyValidationError(int errorType, Coordinate pt)
+  public TopologyValidationError(int errorType, Coordinates pt)
   {
     this.errorType = errorType;
     if (pt != null)
-      this.pt = (Coordinate) pt.clone();
+      this.pt = (Coordinates) pt.clone();
   }
 
   /**
@@ -163,7 +164,7 @@ public class TopologyValidationError {
    *
    * @return a {@link Coordinate} on the input geometry
    */
-  public Coordinate getCoordinate() { return pt; }
+  public Coordinates getCoordinate() { return pt; }
 
   /**
    * Gets the type of this error.

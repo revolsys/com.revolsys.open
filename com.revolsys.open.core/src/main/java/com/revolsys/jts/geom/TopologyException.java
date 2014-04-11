@@ -35,6 +35,7 @@
  */
 package com.revolsys.jts.geom;
 
+
 /**
  * Indicates an invalid or inconsistent topological situation encountered during processing
  *
@@ -43,26 +44,26 @@ package com.revolsys.jts.geom;
 public class TopologyException
   extends RuntimeException
 {
-  private static String msgWithCoord(String msg, Coordinate pt)
+  private static String msgWithCoord(String msg, Coordinates pt)
   {
     if (pt != null)
       return msg + " [ " + pt + " ]";
     return msg;
   }
 
-  private Coordinate pt = null;
+  private Coordinates pt = null;
 
   public TopologyException(String msg)
   {
     super(msg);
   }
 
-  public TopologyException(String msg, Coordinate pt)
+  public TopologyException(String msg, Coordinates pt)
   {
     super(msgWithCoord(msg, pt));
     this.pt = new Coordinate(pt);
   }
 
-  public Coordinate getCoordinate() { return pt; }
+  public Coordinates getCoordinate() { return pt; }
 
 }

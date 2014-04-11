@@ -36,6 +36,7 @@ package com.revolsys.jts.geom.util;
 import java.util.ArrayList;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -299,7 +300,7 @@ public class GeometryEditor
      * @param geometry the geometry containing the coordinate list
      * @return an edited coordinate array (which may be the same as the input)
      */
-    public abstract Coordinate[] edit(Coordinate[] coordinates,
+    public abstract Coordinate[] edit(Coordinates[] coordinates,
                                       Geometry geometry);
   }
   

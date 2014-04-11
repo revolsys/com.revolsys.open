@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.gis.model.geometry.util.TopologyException;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.util.Assert;
 

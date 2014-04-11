@@ -37,6 +37,7 @@ package com.revolsys.jts.index.chain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geomgraph.Quadrant;
 
@@ -83,7 +84,7 @@ public class MonotoneChainBuilder {
    * The last entry in the array points to the end point of the point array,
    * for use as a sentinel.
    */
-  public static int[] getChainStartIndices(Coordinate[] pts)
+  public static int[] getChainStartIndices(AbstractCoordinates[] pts)
   {
     // find the startpoint (and endpoints) of all monotone chains in this edge
     int start = 0;
@@ -108,12 +109,12 @@ public class MonotoneChainBuilder {
    * @return the index of the last point in the monotone chain 
    * starting at <code>start</code>.
    */
-  private static int findChainEnd(Coordinate[] pts, int start)
+  private static int findChainEnd(AbstractCoordinates[] pts, int start)
   {
   	int safeStart = start;
   	// skip any zero-length segments at the start of the sequence
   	// (since they cannot be used to establish a quadrant)
-  	while (safeStart < pts.length - 1 && pts[safeStart].equals2D(pts[safeStart + 1])) {
+  	while (safeStart < pts.length - 1 && pts[safeStart].equals2d(pts[safeStart + 1])) {
   		safeStart++;
   	}
   	// check if there are NO non-zero-length segments
@@ -125,7 +126,7 @@ public class MonotoneChainBuilder {
     int last = start + 1;
     while (last < pts.length) {
     	// skip zero-length segments, but include them in the chain
-    	if (! pts[last - 1].equals2D(pts[last])) {
+    	if (! pts[last - 1].equals2d(pts[last])) {
         // compute quadrant for next possible segment in chain
     		int quad = Quadrant.quadrant(pts[last - 1], pts[last]);
       	if (quad != chainQuad) break;

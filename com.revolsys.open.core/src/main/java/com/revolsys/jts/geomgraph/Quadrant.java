@@ -38,7 +38,7 @@ package com.revolsys.jts.geomgraph;
 /**
  * @version 1.7
  */
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Utility functions for working with quadrants, which are numbered as follows:
@@ -86,19 +86,19 @@ public class Quadrant
    * 
    * @throws IllegalArgumentException if the points are equal
    */
-  public static int quadrant(Coordinate p0, Coordinate p1)
+  public static int quadrant(Coordinates p0, Coordinates p1)
   {
-    if (p1.x == p0.x && p1.y == p0.y)
+    if (p1.getX() == p0.getX() && p1.getY() == p0.getY())
       throw new IllegalArgumentException("Cannot compute the quadrant for two identical points " + p0);
     
-    if (p1.x >= p0.x) {
-      if (p1.y >= p0.y)
+    if (p1.getX() >= p0.getX()) {
+      if (p1.getY() >= p0.getY())
         return NE;
       else
         return SE;
     }
     else {
-    	if (p1.y >= p0.y)
+    	if (p1.getY() >= p0.getY())
     		return NW;
     	else
     		return SW;

@@ -56,7 +56,7 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
   /**
   * The {@link SpatialIndex} used should be something that supports
   * envelope (range) queries efficiently (such as a 
-  * {@link com.revolsys.jts.index.quadtree.Quadtree}
+  * {@link com.revolsys.jts.testold.index.quadtree.Quadtree}
   * or {@link STRtree}.
   */
   private STRtree index = new STRtree();

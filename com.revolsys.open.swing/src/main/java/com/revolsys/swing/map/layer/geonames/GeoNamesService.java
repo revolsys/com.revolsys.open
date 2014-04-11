@@ -12,15 +12,16 @@ import javax.measure.unit.SI;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonParser;
-import com.revolsys.util.UrlUtil;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.UrlUtil;
 
 public class GeoNamesService {
   public static final DataObjectMetaData NAME_METADATA;
@@ -161,10 +162,10 @@ public class GeoNamesService {
       final double lat = ((Number)name.get("lat")).doubleValue();
       final double lon = ((Number)name.get("lng")).doubleValue();
 
-      final Coordinate coordinate = new Coordinate(lon, lat);
+      final Coordinates coordinate = new Coordinate(lon, lat, Coordinates.NULL_ORDINATE);
       final Number elevation = (Number)name.get("elevation");
       if (elevation != null) {
-        coordinate.z = elevation.doubleValue();
+        coordinate.setZ(elevation.doubleValue());
       }
       dataObject.setGeometryValue(GeometryFactory.getFactory().createPoint(
         coordinate));

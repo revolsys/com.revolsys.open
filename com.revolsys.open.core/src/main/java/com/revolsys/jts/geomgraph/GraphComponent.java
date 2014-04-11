@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -35,7 +33,7 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.util.Assert;
 
@@ -48,42 +46,51 @@ import com.revolsys.jts.util.Assert;
 abstract public class GraphComponent {
 
   protected Label label;
+
   /**
    * isInResult indicates if this component has already been included in the result
    */
   private boolean isInResult = false;
+
   private boolean isCovered = false;
+
   private boolean isCoveredSet = false;
+
   private boolean isVisited = false;
 
   public GraphComponent() {
   }
 
-  public GraphComponent(Label label) {
+  public GraphComponent(final Label label) {
     this.label = label;
   }
 
-  public Label getLabel() { return label; }
-  public void setLabel(Label label) { this.label = label; }
-  public void setInResult(boolean isInResult) { this.isInResult = isInResult; }
-  public boolean isInResult() { return isInResult; }
-  public void setCovered(boolean isCovered)
-  {
-    this.isCovered = isCovered;
-    this.isCoveredSet = true;
-  }
-  public boolean isCovered()    { return isCovered; }
-  public boolean isCoveredSet() { return isCoveredSet; }
-  public boolean isVisited() { return isVisited; }
-  public void setVisited(boolean isVisited) { this.isVisited = isVisited; }
-  /**
-   * @return a coordinate in this component (or null, if there are none)
-   */
-  abstract public Coordinate getCoordinate();
   /**
    * compute the contribution to an IM for this component
    */
   abstract protected void computeIM(IntersectionMatrix im);
+
+  /**
+   * @return a coordinate in this component (or null, if there are none)
+   */
+  abstract public Coordinates getCoordinate();
+
+  public Label getLabel() {
+    return label;
+  }
+
+  public boolean isCovered() {
+    return isCovered;
+  }
+
+  public boolean isCoveredSet() {
+    return isCoveredSet;
+  }
+
+  public boolean isInResult() {
+    return isInResult;
+  }
+
   /**
    * An isolated component is one that does not intersect or touch any other
    * component.  This is the case if the label has valid locations for
@@ -92,12 +99,33 @@ abstract public class GraphComponent {
    * @return true if this component is isolated
    */
   abstract public boolean isIsolated();
+
+  public boolean isVisited() {
+    return isVisited;
+  }
+
+  public void setCovered(final boolean isCovered) {
+    this.isCovered = isCovered;
+    this.isCoveredSet = true;
+  }
+
+  public void setInResult(final boolean isInResult) {
+    this.isInResult = isInResult;
+  }
+
+  public void setLabel(final Label label) {
+    this.label = label;
+  }
+
+  public void setVisited(final boolean isVisited) {
+    this.isVisited = isVisited;
+  }
+
   /**
    * Update the IM with the contribution for this component.
    * A component only contributes if it has a labelling for both parent geometries
    */
-  public void updateIM(IntersectionMatrix im)
-  {
+  public void updateIM(final IntersectionMatrix im) {
     Assert.isTrue(label.getGeometryCount() >= 2, "found partial label");
     computeIM(im);
   }

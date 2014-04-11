@@ -32,7 +32,6 @@
  */
 package com.revolsys.gis.model.geometry.algorithm.locate;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
@@ -41,6 +40,7 @@ import com.revolsys.gis.model.geometry.Polygon;
 import com.revolsys.gis.model.geometry.Polygonal;
 import com.revolsys.gis.model.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.gis.model.geometry.impl.BoundingBox;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Computes the location of points relative to a {@link Polygonal}

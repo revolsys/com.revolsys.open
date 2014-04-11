@@ -34,6 +34,7 @@ package com.revolsys.jts.operation.buffer;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geomgraph.Position;
@@ -134,7 +135,7 @@ public class OffsetCurveBuilder
     return segGen.getCoordinates();
   }
 
-  public Coordinate[] getOffsetCurve(Coordinate[] inputPts, double distance)
+  public Coordinates[] getOffsetCurve(Coordinate[] inputPts, double distance)
   {
     this.distance = distance;
     
@@ -150,14 +151,14 @@ public class OffsetCurveBuilder
     else {
       computeOffsetCurve(inputPts, isRightSide, segGen);
     }
-    Coordinate[] curvePts = segGen.getCoordinates();
+    Coordinates[] curvePts = segGen.getCoordinates();
     // for right side line is traversed in reverse direction, so have to reverse generated line
     if (isRightSide) 
       CoordinateArrays.reverse(curvePts);
     return curvePts;
   }
 
-  private static Coordinate[] copyCoordinates(Coordinate[] pts)
+  private static Coordinate[] copyCoordinates(Coordinates[] pts)
   {
     Coordinate[] copy = new Coordinate[pts.length];
     for (int i = 0; i < copy.length; i++) {
@@ -192,7 +193,7 @@ public class OffsetCurveBuilder
     return bufDistance / SIMPLIFY_FACTOR;
   }
   
-  private void computePointCurve(Coordinate pt, OffsetSegmentGenerator segGen) {
+  private void computePointCurve(Coordinates pt, OffsetSegmentGenerator segGen) {
     switch (bufParams.getEndCapStyle()) {
       case BufferParameters.CAP_ROUND:
         segGen.createCircle(pt);

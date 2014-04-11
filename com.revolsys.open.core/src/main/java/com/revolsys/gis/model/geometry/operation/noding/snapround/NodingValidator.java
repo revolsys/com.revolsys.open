@@ -3,10 +3,10 @@ package com.revolsys.gis.model.geometry.operation.noding.snapround;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**

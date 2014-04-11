@@ -35,6 +35,7 @@ package com.revolsys.jts.noding;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Detects and records an intersection between two {@link SegmentString}s,
@@ -57,8 +58,8 @@ public class SegmentIntersectionDetector
   private boolean hasProperIntersection = false;
   private boolean hasNonProperIntersection = false;
   
-  private Coordinate intPt = null;
-  private Coordinate[] intSegments = null;
+  private Coordinates intPt = null;
+  private Coordinates[] intSegments = null;
 
   /**
    * Creates an intersection finder using a {@link RobustLineIntersector}.
@@ -134,7 +135,7 @@ public class SegmentIntersectionDetector
    * 
    * @return the coordinate for the intersection location
    */
-  public Coordinate getIntersection()  
+  public Coordinates getIntersection()  
   {    
   	return intPt;  
   }
@@ -145,7 +146,7 @@ public class SegmentIntersectionDetector
    * 
    * @return an array of the segment endpoints (p00, p01, p10, p11)
    */
-  public Coordinate[] getIntersectionSegments()
+  public Coordinates[] getIntersectionSegments()
   {
   	return intSegments;
   }
@@ -200,7 +201,7 @@ public class SegmentIntersectionDetector
 				intPt = li.getIntersection(0);
 
 				// record intersecting segments
-				intSegments = new Coordinate[4];
+				intSegments = new Coordinates[4];
 				intSegments[0] = p00;
 				intSegments[1] = p01;
 				intSegments[2] = p10;

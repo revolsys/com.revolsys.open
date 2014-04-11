@@ -42,6 +42,7 @@ import java.util.TreeSet;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -88,12 +89,12 @@ public class ConvexHull {
      * @return -1, 0 or 1 depending on whether p is less than,
      * equal to or greater than q
      */
-    private static int polarCompare(final Coordinate o, final Coordinate p,
-      final Coordinate q) {
-      final double dxp = p.x - o.x;
-      final double dyp = p.y - o.y;
-      final double dxq = q.x - o.x;
-      final double dyq = q.y - o.y;
+    private static int polarCompare(final Coordinates o, final Coordinates p,
+      final Coordinates q) {
+      final double dxp = p.getX() - o.getX();
+      final double dyp = p.getY() - o.getY();
+      final double dxq = q.getX() - o.getX();
+      final double dyq = q.getY() - o.getY();
 
       /*
        * // MD - non-robust int result = 0; double alph = Math.atan2(dxp, dyp);
@@ -122,16 +123,16 @@ public class ConvexHull {
       return 0;
     }
 
-    private final Coordinate origin;
+    private final Coordinates origin;
 
-    public RadialComparator(final Coordinate origin) {
+    public RadialComparator(final Coordinates origin) {
       this.origin = origin;
     }
 
     @Override
     public int compare(final Object o1, final Object o2) {
-      final Coordinate p1 = (Coordinate)o1;
-      final Coordinate p2 = (Coordinate)o2;
+      final Coordinates p1 = (Coordinates)o1;
+      final Coordinates p2 = (Coordinates)o2;
       return polarCompare(origin, p1, p2);
     }
 
@@ -172,7 +173,7 @@ public class ConvexHull {
   private Coordinate[] cleanRing(final Coordinate[] original) {
     Assert.equals(original[0], original[original.length - 1]);
     final ArrayList cleanedRing = new ArrayList();
-    Coordinate previousDistinctCoordinate = null;
+    Coordinates previousDistinctCoordinate = null;
     for (int i = 0; i <= original.length - 2; i++) {
       final Coordinate currentCoordinate = original[i];
       final Coordinate nextCoordinate = original[i + 1];
@@ -198,28 +199,28 @@ public class ConvexHull {
       pts[j] = inputPts[0];
     }
     for (int i = 1; i < inputPts.length; i++) {
-      if (inputPts[i].x < pts[0].x) {
+      if (inputPts[i].getX() < pts[0].getX()) {
         pts[0] = inputPts[i];
       }
-      if (inputPts[i].x - inputPts[i].y < pts[1].x - pts[1].y) {
+      if (inputPts[i].getX() - inputPts[i].getY() < pts[1].getX() - pts[1].getY()) {
         pts[1] = inputPts[i];
       }
-      if (inputPts[i].y > pts[2].y) {
+      if (inputPts[i].getY() > pts[2].getY()) {
         pts[2] = inputPts[i];
       }
-      if (inputPts[i].x + inputPts[i].y > pts[3].x + pts[3].y) {
+      if (inputPts[i].getX() + inputPts[i].getY() > pts[3].getX() + pts[3].getY()) {
         pts[3] = inputPts[i];
       }
-      if (inputPts[i].x > pts[4].x) {
+      if (inputPts[i].getX() > pts[4].getX()) {
         pts[4] = inputPts[i];
       }
-      if (inputPts[i].x - inputPts[i].y > pts[5].x - pts[5].y) {
+      if (inputPts[i].getX() - inputPts[i].getY() > pts[5].getX() - pts[5].getY()) {
         pts[5] = inputPts[i];
       }
-      if (inputPts[i].y < pts[6].y) {
+      if (inputPts[i].getY() < pts[6].getY()) {
         pts[6] = inputPts[i];
       }
-      if (inputPts[i].x + inputPts[i].y < pts[7].x + pts[7].y) {
+      if (inputPts[i].getX() + inputPts[i].getY() < pts[7].getX() + pts[7].getY()) {
         pts[7] = inputPts[i];
       }
     }
@@ -298,7 +299,7 @@ public class ConvexHull {
       p = (Coordinate)ps.pop();
       // check for empty stack to guard against robustness problems
       while (!ps.empty()
-        && CGAlgorithms.computeOrientation((Coordinate)ps.peek(), p, c[i]) > 0) {
+        && CGAlgorithms.computeOrientation((Coordinates)ps.peek(), p, c[i]) > 0) {
         p = (Coordinate)ps.pop();
       }
       p = (Coordinate)ps.push(p);
@@ -312,24 +313,24 @@ public class ConvexHull {
    *@return    whether the three coordinates are collinear and c2 lies between
    *      c1 and c3 inclusive
    */
-  private boolean isBetween(final Coordinate c1, final Coordinate c2,
-    final Coordinate c3) {
+  private boolean isBetween(final Coordinates c1, final Coordinates c2,
+    final Coordinates c3) {
     if (CGAlgorithms.computeOrientation(c1, c2, c3) != 0) {
       return false;
     }
-    if (c1.x != c3.x) {
-      if (c1.x <= c2.x && c2.x <= c3.x) {
+    if (c1.getX() != c3.getX()) {
+      if (c1.getX() <= c2.getX() && c2.getX() <= c3.getX()) {
         return true;
       }
-      if (c3.x <= c2.x && c2.x <= c1.x) {
+      if (c3.getX() <= c2.getX() && c2.getX() <= c1.getX()) {
         return true;
       }
     }
-    if (c1.y != c3.y) {
-      if (c1.y <= c2.y && c2.y <= c3.y) {
+    if (c1.getY() != c3.getY()) {
+      if (c1.getY() <= c2.getY() && c2.getY() <= c3.getY()) {
         return true;
       }
-      if (c3.y <= c2.y && c2.y <= c1.y) {
+      if (c3.getY() <= c2.getY() && c2.getY() <= c1.getY()) {
         return true;
       }
     }
@@ -347,7 +348,7 @@ public class ConvexHull {
 
     coordinates = cleanRing(coordinates);
     if (coordinates.length == 3) {
-      return geomFactory.createLineString(new Coordinate[] {
+      return geomFactory.createLineString(new Coordinates[] {
         coordinates[0], coordinates[1]
       });
       // return new LineString(new Coordinate[]{coordinates[0], coordinates[1]},
@@ -400,8 +401,8 @@ public class ConvexHull {
     // the same minimum y coordinate choose the one with the minimu x.
     // This focal point is put in array location pts[0].
     for (int i = 1; i < pts.length; i++) {
-      if ((pts[i].y < pts[0].y)
-        || ((pts[i].y == pts[0].y) && (pts[i].x < pts[0].x))) {
+      if ((pts[i].getY() < pts[0].getY())
+        || ((pts[i].getY() == pts[0].getY()) && (pts[i].getX() < pts[0].getX()))) {
         t = pts[0];
         pts[0] = pts[i];
         pts[i] = t;

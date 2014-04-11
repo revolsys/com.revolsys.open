@@ -3,7 +3,7 @@ package com.revolsys.gis.cs.projection;
 import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 public class UnitConverstionOperation implements CoordinatesOperation {
   private final UnitConverter converter;

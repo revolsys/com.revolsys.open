@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
@@ -69,7 +70,7 @@ class TaggedLineString
   public int getMinimumSize()  {    return minimumSize;  }
   public LineString getParent() { return parentLine; }
   public Coordinate[] getParentCoordinates() { return parentLine.getCoordinateArray(); }
-  public Coordinate[] getResultCoordinates() { return extractCoordinates(resultSegs); }
+  public Coordinates[] getResultCoordinates() { return extractCoordinates(resultSegs); }
 
   public int getResultSize()
   {
@@ -106,9 +107,9 @@ class TaggedLineString
     return parentLine.getGeometryFactory().createLinearRing(extractCoordinates(resultSegs));
   }
 
-  private static Coordinate[] extractCoordinates(List segs)
+  private static Coordinates[] extractCoordinates(List segs)
   {
-    Coordinate[] pts = new Coordinate[segs.size() + 1];
+    Coordinates[] pts = new Coordinates[segs.size() + 1];
     LineSegment seg = null;
     for (int i = 0; i < segs.size(); i++) {
       seg = (LineSegment) segs.get(i);

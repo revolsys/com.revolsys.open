@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.geom;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.operation.BoundaryOp;
@@ -70,8 +69,7 @@ public class LineString extends Geometry implements Lineal {
    *      to create the empty geometry. 
    * @throws IllegalArgumentException if too few points are provided
    */
-  public LineString(final CoordinatesList points,
-    final GeometryFactory factory) {
+  public LineString(final CoordinatesList points, final GeometryFactory factory) {
     super(factory);
     init(points);
   }
@@ -118,7 +116,7 @@ public class LineString extends Geometry implements Lineal {
   @Override
   public Object clone() {
     final LineString ls = (LineString)super.clone();
-    ls.points = (CoordinatesList)points.clone();
+    ls.points = points.clone();
     return ls;
   }
 
@@ -271,7 +269,7 @@ public class LineString extends Geometry implements Lineal {
 
   public Point getPointN(final int n) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Coordinate coordinate = points.getCoordinate(n);
+    final Coordinates coordinate = points.getCoordinate(n);
     return geometryFactory.createPoint(coordinate);
   }
 
@@ -310,7 +308,7 @@ public class LineString extends Geometry implements Lineal {
   private void init(CoordinatesList points) {
     if (points == null) {
       points = getGeometryFactory().getCoordinateSequenceFactory().create(
-        new Coordinate[] {});
+        new Coordinates[] {});
     }
     if (points.size() == 1) {
       throw new IllegalArgumentException(
@@ -332,22 +330,6 @@ public class LineString extends Geometry implements Lineal {
         if (y1 == yn) {
           return true;
         }
-      }
-    }
-    return false;
-  }
-
-  /**
-   *  Returns true if the given point is a vertex of this <code>LineString</code>.
-   *
-   *@param  pt  the <code>Coordinate</code> to check
-   *@return     <code>true</code> if <code>pt</code> is one of this <code>LineString</code>
-   *      's vertices
-   */
-  public boolean isCoordinate(final Coordinate pt) {
-    for (int i = 0; i < points.size(); i++) {
-      if (points.getCoordinate(i).equals(pt)) {
-        return true;
       }
     }
     return false;
@@ -398,7 +380,7 @@ public class LineString extends Geometry implements Lineal {
    */
   @Override
   public Geometry reverse() {
-    final CoordinatesList seq = (CoordinatesList)points.clone();
+    final CoordinatesList seq = points.clone();
     CoordinateSequences.reverse(seq);
     final LineString revLine = getGeometryFactory().createLineString(seq);
     return revLine;

@@ -36,7 +36,9 @@ package com.revolsys.jts.operation.overlay.snap;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -176,7 +178,7 @@ public class GeometrySnapper
    */
   public Geometry snapTo(Geometry snapGeom, double snapTolerance)
   {
-    Coordinate[] snapPts = extractTargetCoordinates(snapGeom);
+    AbstractCoordinates[] snapPts = extractTargetCoordinates(snapGeom);
 
     SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPts);
     return snapTrans.transform(srcGeom);
@@ -196,7 +198,7 @@ public class GeometrySnapper
    */
   public Geometry snapToSelf(double snapTolerance, boolean cleanResult)
   {
-    Coordinate[] snapPts = extractTargetCoordinates(srcGeom);
+    AbstractCoordinates[] snapPts = extractTargetCoordinates(srcGeom);
 
     SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPts, true);
     Geometry snappedGeom = snapTrans.transform(srcGeom);
@@ -208,7 +210,7 @@ public class GeometrySnapper
     return result;
   }
 
-  private Coordinate[] extractTargetCoordinates(Geometry g)
+  private AbstractCoordinates[] extractTargetCoordinates(Geometry g)
   {
     // TODO: should do this more efficiently.  Use CoordSeq filter to get points, KDTree for uniqueness & queries
     Set ptSet = new TreeSet();
@@ -216,7 +218,7 @@ public class GeometrySnapper
     for (int i = 0; i < pts.length; i++) {
       ptSet.add(pts[i]);
     }
-    return (Coordinate[]) ptSet.toArray(new Coordinate[0]);
+    return (AbstractCoordinates[]) ptSet.toArray(new Coordinate[0]);
   }
   
   /**
@@ -225,7 +227,7 @@ public class GeometrySnapper
    * @param ringPts
    * @return
    */
-  private double computeSnapTolerance(Coordinate[] ringPts)
+  private double computeSnapTolerance(AbstractCoordinates[] ringPts)
   {
     double minSegLen = computeMinimumSegmentLength(ringPts);
     // use a small percentage of this to be safe
@@ -233,7 +235,7 @@ public class GeometrySnapper
     return snapTol;
   }
 
-  private double computeMinimumSegmentLength(Coordinate[] pts)
+  private double computeMinimumSegmentLength(AbstractCoordinates[] pts)
   {
     double minSegLen = Double.MAX_VALUE;
     for (int i = 0; i < pts.length - 1; i++) {
@@ -250,16 +252,16 @@ class SnapTransformer
     extends GeometryTransformer
 {
   private double snapTolerance;
-  private Coordinate[] snapPts;
+  private AbstractCoordinates[] snapPts;
   private boolean isSelfSnap = false;
 
-  SnapTransformer(double snapTolerance, Coordinate[] snapPts)
+  SnapTransformer(double snapTolerance, AbstractCoordinates[] snapPts)
   {
     this.snapTolerance = snapTolerance;
     this.snapPts = snapPts;
   }
 
-  SnapTransformer(double snapTolerance, Coordinate[] snapPts, boolean isSelfSnap)
+  SnapTransformer(double snapTolerance, AbstractCoordinates[] snapPts, boolean isSelfSnap)
   {
     this.snapTolerance = snapTolerance;
     this.snapPts = snapPts;
@@ -269,11 +271,11 @@ class SnapTransformer
   protected CoordinatesList transformCoordinates(CoordinatesList coords, Geometry parent)
   {
     Coordinate[] srcPts = coords.toCoordinateArray();
-    Coordinate[] newPts = snapLine(srcPts, snapPts);
+    Coordinates[] newPts = snapLine(srcPts, snapPts);
     return factory.getCoordinateSequenceFactory().create(newPts);
   }
 
-  private Coordinate[] snapLine(Coordinate[] srcPts, Coordinate[] snapPts)
+  private Coordinates[] snapLine(Coordinate[] srcPts, AbstractCoordinates[] snapPts)
   {
     LineStringSnapper snapper = new LineStringSnapper(srcPts, snapTolerance);
     snapper.setAllowSnappingToSourceVertices(isSelfSnap);

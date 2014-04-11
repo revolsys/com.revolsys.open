@@ -1,6 +1,4 @@
 
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -42,7 +40,7 @@ package com.revolsys.jts.operation.relate;
  * @version 1.7
  */
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geomgraph.EdgeEndStar;
 import com.revolsys.jts.geomgraph.Node;
@@ -52,12 +50,9 @@ import com.revolsys.jts.geomgraph.Node;
  *
  * @version 1.7
  */
-public class RelateNode
-  extends Node
-{
+public class RelateNode extends Node {
 
-  public RelateNode(Coordinate coord, EdgeEndStar edges)
-  {
+  public RelateNode(final Coordinates coord, final EdgeEndStar edges) {
     super(coord, edges);
   }
 
@@ -65,16 +60,16 @@ public class RelateNode
    * Update the IM with the contribution for this component.
    * A component only contributes if it has a labelling for both parent geometries
    */
-  protected void computeIM(IntersectionMatrix im)
-  {
+  @Override
+  protected void computeIM(final IntersectionMatrix im) {
     im.setAtLeastIfValid(label.getLocation(0), label.getLocation(1), 0);
   }
+
   /**
    * Update the IM with the contribution for the EdgeEnds incident on this node.
    */
-  void updateIMFromEdges(IntersectionMatrix im)
-  {
-    ((EdgeEndBundleStar) edges).updateIM(im);
+  void updateIMFromEdges(final IntersectionMatrix im) {
+    ((EdgeEndBundleStar)edges).updateIM(im);
   }
 
 }

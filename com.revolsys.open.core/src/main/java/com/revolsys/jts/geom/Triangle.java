@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.geom;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.HCoordinate;
@@ -61,7 +62,7 @@ public class Triangle
    *          a vertex of the triangle
    * @return true if the triangle is acute
    */
-  public static boolean isAcute(Coordinate a, Coordinate b, Coordinate c)
+  public static boolean isAcute(Coordinates a, Coordinates b, Coordinates c)
   {
     if (!Angle.isAcute(a, b, c))
       return false;
@@ -82,13 +83,13 @@ public class Triangle
    *          another point
    * @return the perpendicular bisector, as an HCoordinate
    */
-  public static HCoordinate perpendicularBisector(Coordinate a, Coordinate b)
+  public static HCoordinate perpendicularBisector(Coordinates a, Coordinates b)
   {
     // returns the perpendicular bisector of the line segment ab
-    double dx = b.x - a.x;
-    double dy = b.y - a.y;
-    HCoordinate l1 = new HCoordinate(a.x + dx / 2.0, a.y + dy / 2.0, 1.0);
-    HCoordinate l2 = new HCoordinate(a.x - dy + dx / 2.0, a.y + dx + dy / 2.0,
+    double dx = b.getX() - a.getX();
+    double dy = b.getY() - a.getY();
+    HCoordinate l1 = new HCoordinate(a.getX() + dx / 2.0, a.getY() + dy / 2.0, 1.0);
+    HCoordinate l2 = new HCoordinate(a.getX() - dy + dx / 2.0, a.getY() + dx + dy / 2.0,
         1.0);
     return new HCoordinate(l1, l2);
   }
@@ -149,14 +150,14 @@ public class Triangle
    *          a vertx of the triangle
    * @return the circumcentre of the triangle
    */
-  public static Coordinate circumcentre(Coordinate a, Coordinate b, Coordinate c)
+  public static Coordinate circumcentre(Coordinates a, Coordinates b, Coordinates c)
   {
-    double cx = c.x;
-    double cy = c.y;
-    double ax = a.x - cx;
-    double ay = a.y - cy;
-    double bx = b.x - cx;
-    double by = b.y - cy;
+    double cx = c.getX();
+    double cy = c.getY();
+    double ax = a.getX() - cx;
+    double ay = a.getY() - cy;
+    double bx = b.getX() - cx;
+    double by = b.getY() - cy;
 
     double denom = 2 * det(ax, ay, bx, by);
     double numx = det(ay, ax * ax + ay * ay, by, bx * bx + by * by);
@@ -165,7 +166,7 @@ public class Triangle
     double ccx = cx - numx / denom;
     double ccy = cy + numy / denom;
 
-    return new Coordinate(ccx, ccy);
+    return new Coordinate(ccx, ccy, Coordinates.NULL_ORDINATE);
   }
 
   /**
@@ -204,7 +205,7 @@ public class Triangle
    *          a vertx of the triangle
    * @return the point which is the incentre of the triangle
    */
-  public static Coordinate inCentre(Coordinate a, Coordinate b, Coordinate c)
+  public static AbstractCoordinates inCentre(AbstractCoordinates a, AbstractCoordinates b, Coordinates c)
   {
     // the lengths of the sides, labelled by their opposite vertex
     double len0 = b.distance(c);
@@ -212,9 +213,9 @@ public class Triangle
     double len2 = a.distance(b);
     double circum = len0 + len1 + len2;
 
-    double inCentreX = (len0 * a.x + len1 * b.x + len2 * c.x) / circum;
-    double inCentreY = (len0 * a.y + len1 * b.y + len2 * c.y) / circum;
-    return new Coordinate(inCentreX, inCentreY);
+    double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2 * c.getX()) / circum;
+    double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2 * c.getY()) / circum;
+    return new Coordinate(inCentreX, inCentreY, Coordinates.NULL_ORDINATE);
   }
 
   /**
@@ -234,11 +235,11 @@ public class Triangle
    *          a vertex of the triangle
    * @return the centroid of the triangle
    */
-  public static Coordinate centroid(Coordinate a, Coordinate b, Coordinate c)
+  public static Coordinate centroid(Coordinates a, Coordinates b, Coordinates c)
   {
-    double x = (a.x + b.x + c.x) / 3;
-    double y = (a.y + b.y + c.y) / 3;
-    return new Coordinate(x, y);
+    double x = (a.getX() + b.getX() + c.getX()) / 3;
+    double y = (a.getY() + b.getY() + c.getY()) / 3;
+    return new Coordinate(x, y, Coordinates.NULL_ORDINATE);
   }
 
   /**
@@ -252,8 +253,8 @@ public class Triangle
    *          a vertex of the triangle
    * @return the length of the longest side of the triangle
    */
-  public static double longestSideLength(Coordinate a, Coordinate b,
-      Coordinate c)
+  public static double longestSideLength(AbstractCoordinates a, AbstractCoordinates b,
+      AbstractCoordinates c)
   {
     double lenAB = a.distance(b);
     double lenBC = b.distance(c);
@@ -278,8 +279,8 @@ public class Triangle
    *          a vertex of the triangle
    * @return the angle bisector cut point
    */
-  public static Coordinate angleBisector(Coordinate a, Coordinate b,
-      Coordinate c)
+  public static Coordinates angleBisector(Coordinates a, AbstractCoordinates b,
+      Coordinates c)
   {
     /**
      * Uses the fact that the lengths of the parts of the split segment are
@@ -288,10 +289,10 @@ public class Triangle
     double len0 = b.distance(a);
     double len2 = b.distance(c);
     double frac = len0 / (len0 + len2);
-    double dx = c.x - a.x;
-    double dy = c.y - a.y;
+    double dx = c.getX() - a.getX();
+    double dy = c.getY() - a.getY();
 
-    Coordinate splitPt = new Coordinate(a.x + frac * dx, a.y + frac * dy);
+    Coordinates splitPt = new Coordinate(a.getX() + frac * dx, a.getY() + frac * dy, Coordinates.NULL_ORDINATE);
     return splitPt;
   }
 
@@ -308,10 +309,10 @@ public class Triangle
    * 
    * @see #signedArea(Coordinate, Coordinate, Coordinate)
    */
-  public static double area(Coordinate a, Coordinate b, Coordinate c)
+  public static double area(Coordinates a, Coordinates b, Coordinates c)
   {
     return Math
-        .abs(((c.x - a.x) * (b.y - a.y) - (b.x - a.x) * (c.y - a.y)) / 2);
+        .abs(((c.getX() - a.getX()) * (b.getY() - a.getY()) - (b.getX() - a.getX()) * (c.getY() - a.getY())) / 2);
   }
 
   /**
@@ -333,14 +334,14 @@ public class Triangle
    * 
    * @see CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)
    */
-  public static double signedArea(Coordinate a, Coordinate b, Coordinate c)
+  public static double signedArea(Coordinates a, Coordinates b, Coordinates c)
   {
     /**
      * Uses the formula 1/2 * | u x v | where u,v are the side vectors of the
      * triangle x is the vector cross-product For 2D vectors, this formual
      * simplifies to the expression below
      */
-    return ((c.x - a.x) * (b.y - a.y) - (b.x - a.x) * (c.y - a.y)) / 2;
+    return ((c.getX() - a.getX()) * (b.getY() - a.getY()) - (b.getX() - a.getX()) * (c.getY() - a.getY())) / 2;
   }
 
   /**
@@ -355,20 +356,20 @@ public class Triangle
    *          a vertex of the triangle
    * @return the 3D area of the triangle
    */
-  public static double area3D(Coordinate a, Coordinate b, Coordinate c)
+  public static double area3D(Coordinates a, Coordinates b, Coordinates c)
   {
     /**
      * Uses the formula 1/2 * | u x v | where u,v are the side vectors of the
      * triangle x is the vector cross-product
      */
     // side vectors u and v
-    double ux = b.x - a.x;
-    double uy = b.y - a.y;
-    double uz = b.z - a.z;
+    double ux = b.getX() - a.getX();
+    double uy = b.getY() - a.getY();
+    double uz = b.getZ() - a.getZ();
 
-    double vx = c.x - a.x;
-    double vy = c.y - a.y;
-    double vz = c.z - a.z;
+    double vx = c.getX() - a.getX();
+    double vy = c.getY() - a.getY();
+    double vz = c.getZ() - a.getZ();
 
     // cross-product = u x v
     double crossx = uy * vz - uz * vy;
@@ -401,28 +402,28 @@ public class Triangle
    *          a vertex of a triangle, with a Z ordinate
    * @return the computed Z-value (elevation) of the point
    */
-  public static double interpolateZ(Coordinate p, Coordinate v0, Coordinate v1,
-      Coordinate v2)
+  public static double interpolateZ(Coordinates p, Coordinates v0, Coordinates v1,
+      Coordinates v2)
   {
-    double x0 = v0.x;
-    double y0 = v0.y;
-    double a = v1.x - x0;
-    double b = v2.x - x0;
-    double c = v1.y - y0;
-    double d = v2.y - y0;
+    double x0 = v0.getX();
+    double y0 = v0.getY();
+    double a = v1.getX() - x0;
+    double b = v2.getX() - x0;
+    double c = v1.getY() - y0;
+    double d = v2.getY() - y0;
     double det = a * d - b * c;
-    double dx = p.x - x0;
-    double dy = p.y - y0;
+    double dx = p.getX() - x0;
+    double dy = p.getY() - y0;
     double t = (d * dx - b * dy) / det;
     double u = (-c * dx + a * dy) / det;
-    double z = v0.z + t * (v1.z - v0.z) + u * (v2.z - v0.z);
+    double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u * (v2.getZ() - v0.getZ());
     return z;
   }
 
   /**
    * The coordinates of the vertices of the triangle
    */
-  public Coordinate p0, p1, p2;
+  public AbstractCoordinates p0, p1, p2;
 
   /**
    * Creates a new triangle with the given vertices.
@@ -434,7 +435,7 @@ public class Triangle
    * @param p2
    *          a vertex
    */
-  public Triangle(Coordinate p0, Coordinate p1, Coordinate p2)
+  public Triangle(AbstractCoordinates p0, AbstractCoordinates p1, AbstractCoordinates p2)
   {
     this.p0 = p0;
     this.p1 = p1;
@@ -450,7 +451,7 @@ public class Triangle
    * 
    * @return the point which is the inCentre of this triangle
    */
-  public Coordinate inCentre()
+  public AbstractCoordinates inCentre()
   {
     return inCentre(p0, p1, p2);
   }
@@ -570,7 +571,7 @@ public class Triangle
    *          the point to compute the Z-value of
    * @return the computed Z-value (elevation) of the point
    */
-  public double interpolateZ(Coordinate p)
+  public double interpolateZ(Coordinates p)
   {
     if (p == null)
       throw new IllegalArgumentException("Supplied point is null.");

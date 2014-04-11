@@ -3,7 +3,7 @@ package com.revolsys.gis.model.geometry.operation.geomgraph;
 import java.io.PrintStream;
 import java.util.Iterator;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.Location;
 

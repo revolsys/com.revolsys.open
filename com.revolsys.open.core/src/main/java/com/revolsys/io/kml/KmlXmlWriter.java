@@ -13,7 +13,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -331,10 +331,10 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     }
     startTag(POINT);
     startTag(COORDINATES);
-    final Coordinate centre = envelope.centre();
-    write(Double.toString(centre.x));
+    final Coordinates centre = envelope.centre();
+    write(Double.toString(centre.getX()));
     write(',');
-    write(Double.toString(centre.y));
+    write(Double.toString(centre.getY()));
 
     endTag();
     endTag();

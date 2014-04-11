@@ -36,7 +36,7 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -210,11 +210,11 @@ public class ShapeWriter
 		return poly;
 	}
 
-	private void appendRing(PolygonShape poly, Coordinate[] coords) 
+	private void appendRing(PolygonShape poly, Coordinates[] coords) 
 	{
     double prevx = Double.NaN;
     double prevy = Double.NaN;
-    Coordinate prev = null;
+    Coordinates prev = null;
     
     int n = coords.length - 1;
     /**
@@ -226,8 +226,8 @@ public class ShapeWriter
 		  
 		  if (decimationDistance > 0.0) {
 		    boolean isDecimated = prev != null 
-		      && Math.abs(coords[i].x - prev.x) < decimationDistance
-		      && Math.abs(coords[i].y - prev.y) < decimationDistance;
+		      && Math.abs(coords[i].getX() - prev.getX()) < decimationDistance
+		      && Math.abs(coords[i].getY() - prev.getY()) < decimationDistance;
 		    if (i < n && isDecimated) 
 		      continue;
 		    prev = coords[i];
@@ -275,7 +275,7 @@ public class ShapeWriter
 	{
 		GeneralPath shape = new GeneralPath();
 		
-    Coordinate prev = lineString.getCoordinateN(0);
+    Coordinates prev = lineString.getCoordinateN(0);
     transformPoint(prev, transPoint);
 		shape.moveTo((float) transPoint.getX(), (float) transPoint.getY());
 
@@ -285,11 +285,11 @@ public class ShapeWriter
     int n = lineString.getNumPoints() - 1;
     //int count = 0;
     for (int i = 1; i <= n; i++) {
-      Coordinate currentCoord = lineString.getCoordinateN(i);
+      Coordinates currentCoord = lineString.getCoordinateN(i);
       if (decimationDistance > 0.0) {
         boolean isDecimated = prev != null
-            && Math.abs(currentCoord.x - prev.x) < decimationDistance
-            && Math.abs(currentCoord.y - prev.y) < decimationDistance;
+            && Math.abs(currentCoord.getX() - prev.getX()) < decimationDistance
+            && Math.abs(currentCoord.getY() - prev.getY()) < decimationDistance;
         if (i < n && isDecimated) {
           continue;
         }
@@ -319,11 +319,11 @@ public class ShapeWriter
 		return pointFactory.createPoint(viewPoint);
 	}
 
-  private Point2D transformPoint(Coordinate model) {
+  private Point2D transformPoint(Coordinates model) {
 		return transformPoint(model, new Point2D.Double());
 	}
   
-  private Point2D transformPoint(Coordinate model, Point2D view) {
+  private Point2D transformPoint(Coordinates model, Point2D view) {
 		pointTransformer.transform(model, view);
 		return view;
 	}

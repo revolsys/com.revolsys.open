@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 public interface GeometryFactoryI extends CoordinatesPrecisionModel {

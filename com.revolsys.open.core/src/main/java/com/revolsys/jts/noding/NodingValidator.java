@@ -39,6 +39,7 @@ import java.util.Iterator;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.util.Debug;
 
 /**
@@ -85,7 +86,7 @@ public class NodingValidator {
     }
   }
 
-  private void checkCollapse(Coordinate p0, Coordinate p1, Coordinate p2)
+  private void checkCollapse(Coordinate p0, Coordinates p1, Coordinate p2)
   {
     if (p0.equals(p2))
       throw new RuntimeException("found non-noded collapse at "
@@ -109,8 +110,8 @@ public class NodingValidator {
 
   private void checkInteriorIntersections(SegmentString ss0, SegmentString ss1)
   {
-    Coordinate[] pts0 = ss0.getCoordinates();
-    Coordinate[] pts1 = ss1.getCoordinates();
+    Coordinates[] pts0 = ss0.getCoordinates();
+    Coordinates[] pts1 = ss1.getCoordinates();
     for (int i0 = 0; i0 < pts0.length - 1; i0++) {
       for (int i1 = 0; i1 < pts1.length - 1; i1++) {
         checkInteriorIntersections(ss0, i0, ss1, i1);

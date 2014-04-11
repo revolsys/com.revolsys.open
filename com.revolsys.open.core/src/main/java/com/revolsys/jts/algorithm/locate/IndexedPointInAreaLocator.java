@@ -37,6 +37,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -80,12 +81,12 @@ public class IndexedPointInAreaLocator
    * @param p the point to test
    * @return the location of the point in the geometry  
    */
-  public int locate(Coordinate p)
+  public int locate(Coordinates p)
   {
     RayCrossingCounter rcc = new RayCrossingCounter(p);
     
     SegmentVisitor visitor = new SegmentVisitor(rcc);
-    index.query(p.y, p.y, visitor);
+    index.query(p.getY(), p.getY(), visitor);
   
     /*
      // MD - slightly slower alternative
@@ -136,8 +137,8 @@ public class IndexedPointInAreaLocator
     {
       for (int i = 1; i < pts.length; i++) {
         LineSegment seg = new LineSegment(pts[i-1], pts[i]);
-        double min = Math.min(seg.p0.y, seg.p1.y);
-        double max = Math.max(seg.p0.y, seg.p1.y);
+        double min = Math.min(seg.p0.getY(), seg.p1.getY());
+        double max = Math.max(seg.p0.getY(), seg.p1.getY());
         index.insert(min, max, seg);
       }
     }

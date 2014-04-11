@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryCollection;
@@ -23,6 +22,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeIntersectionList;
 import com.revolsys.gis.model.geometry.operation.geomgraph.GeometryGraph;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.util.Assert;
 

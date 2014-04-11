@@ -34,6 +34,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -119,7 +120,7 @@ public class MinimumDiameter
    *
    * @return a coordinate forming one end of the minimum diameter
    */
-  public Coordinate getWidthCoordinate()
+  public Coordinates getWidthCoordinate()
   {
     computeMinimumDiameter();
     return minWidthPt;
@@ -133,7 +134,7 @@ public class MinimumDiameter
   public LineString getSupportingSegment()
   {
     computeMinimumDiameter();
-    return inputGeom.getGeometryFactory().createLineString(new Coordinate[] { minBaseSeg.p0, minBaseSeg.p1 } );
+    return inputGeom.getGeometryFactory().createLineString(new Coordinates[] { minBaseSeg.p0, minBaseSeg.p1 } );
   }
 
   /**
@@ -147,10 +148,10 @@ public class MinimumDiameter
 
     // return empty linestring if no minimum width calculated
     if (minWidthPt == null)
-      return inputGeom.getGeometryFactory().createLineString((Coordinate[])null);
+      return inputGeom.getGeometryFactory().createLineString((Coordinates[])null);
 
-    Coordinate basePt = minBaseSeg.project(minWidthPt);
-    return inputGeom.getGeometryFactory().createLineString(new Coordinate[] { basePt, minWidthPt } );
+    Coordinates basePt = minBaseSeg.project(minWidthPt);
+    return inputGeom.getGeometryFactory().createLineString(new Coordinates[] { basePt, minWidthPt } );
   }
 
   private void computeMinimumDiameter()
@@ -243,7 +244,7 @@ public class MinimumDiameter
     return maxIndex;
   }
 
-  private static int nextIndex(Coordinate[] pts, int index)
+  private static int nextIndex(Coordinates[] pts, int index)
   {
     index++;
     if (index >= pts.length) index = 0;
@@ -268,15 +269,15 @@ public class MinimumDiameter
   
     // check if minimum rectangle is degenerate (a point or line segment)
     if (minWidth == 0.0) {
-      if (minBaseSeg.p0.equals2D(minBaseSeg.p1)) {
+      if (minBaseSeg.p0.equals2d(minBaseSeg.p1)) {
         return inputGeom.getGeometryFactory().createPoint(minBaseSeg.p0);
       }
       return minBaseSeg.toGeometry(inputGeom.getGeometryFactory());
     }
     
     // deltas for the base segment of the minimum diameter
-    double dx = minBaseSeg.p1.x - minBaseSeg.p0.x;
-    double dy = minBaseSeg.p1.y - minBaseSeg.p0.y;
+    double dx = minBaseSeg.p1.getX() - minBaseSeg.p0.getX();
+    double dy = minBaseSeg.p1.getY() - minBaseSeg.p0.getY();
     
     /*
     double c0 = computeC(dx, dy, minBaseSeg.p0);
@@ -307,20 +308,20 @@ public class MinimumDiameter
     LineSegment minParaLine = computeSegmentForLine(-dy, dx, minPara);
     
     // compute vertices of rectangle (where the para/perp max & min lines intersect)
-    Coordinate p0 = maxParaLine.lineIntersection(maxPerpLine);
-    Coordinate p1 = minParaLine.lineIntersection(maxPerpLine);
-    Coordinate p2 = minParaLine.lineIntersection(minPerpLine);
-    Coordinate p3 = maxParaLine.lineIntersection(minPerpLine);
+    Coordinates p0 = maxParaLine.lineIntersection(maxPerpLine);
+    Coordinates p1 = minParaLine.lineIntersection(maxPerpLine);
+    Coordinates p2 = minParaLine.lineIntersection(minPerpLine);
+    Coordinates p3 = maxParaLine.lineIntersection(minPerpLine);
     
     LinearRing shell = inputGeom.getGeometryFactory().createLinearRing(
-        new Coordinate[] { p0, p1, p2, p3, p0 });
+        new Coordinates[] { p0, p1, p2, p3, p0 });
     return inputGeom.getGeometryFactory().createPolygon(shell, null);
 
   }
   
-  private static double computeC(double a, double b, Coordinate p)
+  private static double computeC(double a, double b, Coordinates p)
   {
-    return a * p.y - b * p.x;
+    return a * p.getY() - b * p.getX();
   }
   
   private static LineSegment computeSegmentForLine(double a, double b, double c)
@@ -333,12 +334,12 @@ public class MinimumDiameter
     * If slope is steep, use y values as the inputs
     */
     if (Math.abs(b) > Math.abs(a)) {
-      p0 = new Coordinate(0.0, c/b);
-      p1 = new Coordinate(1.0, c/b - a/b);
+      p0 = new Coordinate(0.0, c/b, Coordinates.NULL_ORDINATE);
+      p1 = new Coordinate(1.0, c/b - a/b, Coordinates.NULL_ORDINATE);
     }
     else {
-      p0 = new Coordinate(c/a, 0.0);
-      p1 = new Coordinate(c/a - b/a, 1.0);
+      p0 = new Coordinate(c/a, 0.0, Coordinates.NULL_ORDINATE);
+      p1 = new Coordinate(c/a - b/a, 1.0, Coordinates.NULL_ORDINATE);
     }
     return new LineSegment(p0, p1);
   }

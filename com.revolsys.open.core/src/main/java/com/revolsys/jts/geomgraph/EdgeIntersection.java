@@ -38,6 +38,7 @@ package com.revolsys.jts.geomgraph;
 import java.io.PrintStream;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents a point on an
@@ -57,13 +58,13 @@ public class EdgeIntersection
   public int segmentIndex;   // the index of the containing line segment in the parent edge
   public double dist;        // the edge distance of this point along the containing line segment
 
-  public EdgeIntersection(Coordinate coord, int segmentIndex, double dist) {
+  public EdgeIntersection(Coordinates coord, int segmentIndex, double dist) {
     this.coord = new Coordinate(coord);
     this.segmentIndex = segmentIndex;
     this.dist = dist;
   }
 
-  public Coordinate getCoordinate() { return coord; }
+  public Coordinates getCoordinate() { return coord; }
 
   public int getSegmentIndex() { return segmentIndex; }
 

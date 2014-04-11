@@ -35,7 +35,7 @@
  */
 package com.revolsys.jts.geomgraph.index;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Edge;
 
 
@@ -45,7 +45,7 @@ import com.revolsys.jts.geomgraph.Edge;
 public class SweepLineSegment {
 
   Edge edge;
-  Coordinate[] pts;
+  Coordinates[] pts;
   int ptIndex;
 
   public SweepLineSegment(Edge edge,  int ptIndex) {
@@ -56,14 +56,14 @@ public class SweepLineSegment {
 
   public double getMinX()
   {
-    double x1 = pts[ptIndex].x;
-    double x2 = pts[ptIndex + 1].x;
+    double x1 = pts[ptIndex].getX();
+    double x2 = pts[ptIndex + 1].getX();
     return x1 < x2 ? x1 : x2;
   }
   public double getMaxX()
   {
-    double x1 = pts[ptIndex].x;
-    double x2 = pts[ptIndex + 1].x;
+    double x1 = pts[ptIndex].getX();
+    double x2 = pts[ptIndex + 1].getX();
     return x1 > x2 ? x1 : x2;
   }
   public void computeIntersections(SweepLineSegment ss, SegmentIntersector si)

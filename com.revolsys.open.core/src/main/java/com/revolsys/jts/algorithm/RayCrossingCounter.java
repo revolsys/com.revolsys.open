@@ -33,6 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygonal;
@@ -73,13 +74,13 @@ public class RayCrossingCounter
 	 * @param ring an array of Coordinates forming a ring 
 	 * @return the location of the point in the ring
 	 */
-	public static int locatePointInRing(Coordinate p, Coordinate[] ring) 
+	public static int locatePointInRing(Coordinates p, Coordinates[] ring) 
 	{
 		RayCrossingCounter counter = new RayCrossingCounter(p);
 	
     for (int i = 1; i < ring.length; i++) {
-      Coordinate p1 = ring[i];
-      Coordinate p2 = ring[i-1];
+      Coordinates p1 = ring[i];
+      Coordinates p2 = ring[i-1];
       counter.countSegment(p1, p2);
       if (counter.isOnSegment())
       	return counter.getLocation();
@@ -96,11 +97,11 @@ public class RayCrossingCounter
    *            a coordinate sequence forming a ring
    * @return the location of the point in the ring
    */
-  public static int locatePointInRing(Coordinate p, CoordinatesList ring) {
+  public static int locatePointInRing(Coordinates p, CoordinatesList ring) {
     RayCrossingCounter counter = new RayCrossingCounter(p);
 
-    Coordinate p1 = new Coordinate();
-    Coordinate p2 = new Coordinate();
+    Coordinates p1 = new Coordinate();
+    Coordinates p2 = new Coordinate();
     for (int i = 1; i < ring.size(); i++) {
       ring.getCoordinate(i, p1);
       ring.getCoordinate(i - 1, p2);
@@ -111,12 +112,12 @@ public class RayCrossingCounter
     return counter.getLocation();
   }
 
-	private Coordinate p;
+	private Coordinates p;
 	private int crossingCount = 0;
 	// true if the test point lies on an input segment
 	private boolean isPointOnSegment = false;
 	
-	public RayCrossingCounter(Coordinate p)
+	public RayCrossingCounter(Coordinates p)
 	{
 		this.p = p;
 	}
@@ -127,18 +128,18 @@ public class RayCrossingCounter
 	 * @param p1 an endpoint of the segment
 	 * @param p2 another endpoint of the segment
 	 */
-	public void countSegment(Coordinate p1, Coordinate p2) {
+	public void countSegment(Coordinates p1, Coordinates p2) {
 		/**
 		 * For each segment, check if it crosses 
 		 * a horizontal ray running from the test point in the positive x direction.
 		 */
 		
 		// check if the segment is strictly to the left of the test point
-		if (p1.x < p.x && p2.x < p.x)
+		if (p1.getX() < p.getX() && p2.getX() < p.getX())
 			return;
 		
 		// check if the point is equal to the current ring vertex
-		if (p.x == p2.x && p.y == p2.y) {
+		if (p.getX() == p2.getX() && p.getY() == p2.getY()) {
 			isPointOnSegment = true;
 			return;
 		}
@@ -146,14 +147,14 @@ public class RayCrossingCounter
 		 * For horizontal segments, check if the point is on the segment.
 		 * Otherwise, horizontal segments are not counted.
 		 */
-		if (p1.y == p.y && p2.y == p.y) {
-			double minx = p1.x;
-			double maxx = p2.x;
+		if (p1.getY() == p.getY() && p2.getY() == p.getY()) {
+			double minx = p1.getX();
+			double maxx = p2.getX();
 			if (minx > maxx) {
-				minx = p2.x;
-				maxx = p1.x;
+				minx = p2.getX();
+				maxx = p1.getX();
 			}
-			if (p.x >= minx && p.x <= maxx) {
+			if (p.getX() >= minx && p.getX() <= maxx) {
 				isPointOnSegment = true;
 			}
 			return;
@@ -169,13 +170,13 @@ public class RayCrossingCounter
 		 * final endpoint
 		 * </ul>
 		 */
-		if (((p1.y > p.y) && (p2.y <= p.y)) 
-				|| ((p2.y > p.y) && (p1.y <= p.y))) {
+		if (((p1.getY() > p.getY()) && (p2.getY() <= p.getY())) 
+				|| ((p2.getY() > p.getY()) && (p1.getY() <= p.getY()))) {
 			// translate the segment so that the test point lies on the origin
-			double x1 = p1.x - p.x;
-			double y1 = p1.y - p.y;
-			double x2 = p2.x - p.x;
-			double y2 = p2.y - p.y;
+			double x1 = p1.getX() - p.getX();
+			double y1 = p1.getY() - p.getY();
+			double x2 = p2.getX() - p.getX();
+			double y2 = p2.getY() - p.getY();
 
 			/**
 			 * The translated segment straddles the x-axis. Compute the sign of the

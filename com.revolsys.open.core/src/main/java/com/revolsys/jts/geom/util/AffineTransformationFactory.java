@@ -33,8 +33,10 @@
 
 package com.revolsys.jts.geom.util;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Supports creating {@link AffineTransformation}s defined by various kinds of
@@ -58,9 +60,9 @@ public class AffineTransformationFactory {
 	 * @param dest2
 	 * @return the computed transformation
 	 */
-	public static AffineTransformation createFromControlVectors(Coordinate src0,
-			Coordinate src1, Coordinate src2, Coordinate dest0, Coordinate dest1,
-			Coordinate dest2) {
+	public static AffineTransformation createFromControlVectors(Coordinates src0,
+			Coordinates src1, Coordinates src2, Coordinates dest0, Coordinates dest1,
+			Coordinates dest2) {
 		AffineTransformationBuilder builder = new AffineTransformationBuilder(src0,
 				src1, src2, dest0, dest1, dest2);
 		return builder.getTransformation();
@@ -81,9 +83,9 @@ public class AffineTransformationFactory {
 	 * @return the computed transformation
    * @return null if the control vectors do not determine a well-defined transformation
 	 */
-	public static AffineTransformation createFromControlVectors(Coordinate src0,
-			Coordinate src1, Coordinate dest0, Coordinate dest1) {
-		Coordinate rotPt = new Coordinate(dest1.x - dest0.x, dest1.y - dest0.y);
+	public static AffineTransformation createFromControlVectors(Coordinates src0,
+			AbstractCoordinates src1, Coordinates dest0, AbstractCoordinates dest1) {
+		Coordinates rotPt = new Coordinate(dest1.getX() - dest0.getX(), dest1.getY() - dest0.getY(), Coordinates.NULL_ORDINATE);
 
 		double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
@@ -96,10 +98,10 @@ public class AffineTransformationFactory {
 		double scale = destDist / srcDist;
 
 		AffineTransformation trans = AffineTransformation.translationInstance(
-				-src0.x, -src0.y);
+				-src0.getX(), -src0.getY());
 		trans.rotate(ang);
 		trans.scale(scale, scale);
-		trans.translate(dest0.x, dest0.y);
+		trans.translate(dest0.getX(), dest0.getY());
 		return trans;
 	}
 
@@ -115,10 +117,10 @@ public class AffineTransformationFactory {
 	 *          the end point of the control vector
 	 * @return the computed transformation
 	 */
-	public static AffineTransformation createFromControlVectors(Coordinate src0,
-			Coordinate dest0) {
-		double dx = dest0.x - src0.x;
-		double dy = dest0.y - src0.y;
+	public static AffineTransformation createFromControlVectors(Coordinates src0,
+			Coordinates dest0) {
+		double dx = dest0.getX() - src0.getX();
+		double dy = dest0.getY() - src0.getY();
 		return AffineTransformation.translationInstance(dx, dy);
 	}
 
@@ -135,8 +137,8 @@ public class AffineTransformationFactory {
 	 *           if the control vector arrays are too short, long or of different
 	 *           lengths
 	 */
-	public static AffineTransformation createFromControlVectors(Coordinate[] src,
-			Coordinate[] dest) {
+	public static AffineTransformation createFromControlVectors(AbstractCoordinates[] src,
+			AbstractCoordinates[] dest) {
 		if (src.length != dest.length)
 			throw new IllegalArgumentException(
 					"Src and Dest arrays are not the same length");
@@ -172,10 +174,10 @@ public class AffineTransformationFactory {
 	 * @return the computed transformation
 	 */
 	public static AffineTransformation createFromBaseLines(
-			Coordinate src0, Coordinate src1, 
-			Coordinate dest0, Coordinate dest1) 
+			Coordinates src0, AbstractCoordinates src1, 
+			Coordinates dest0, AbstractCoordinates dest1) 
 	{
-		Coordinate rotPt = new Coordinate(src0.x + dest1.x - dest0.x, src0.y + dest1.y - dest0.y);
+		Coordinates rotPt = new Coordinate(src0.getX() + dest1.getX() - dest0.getX(), src0.getY() + dest1.getY() - dest0.getY(), Coordinates.NULL_ORDINATE);
 
 		double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
@@ -189,10 +191,10 @@ public class AffineTransformationFactory {
 		double scale = destDist / srcDist;
 
 		AffineTransformation trans = AffineTransformation.translationInstance(
-				-src0.x, -src0.y);
+				-src0.getX(), -src0.getY());
 		trans.rotate(ang);
 		trans.scale(scale, scale);
-		trans.translate(dest0.x, dest0.y);
+		trans.translate(dest0.getX(), dest0.getY());
 		return trans;
 	}
 

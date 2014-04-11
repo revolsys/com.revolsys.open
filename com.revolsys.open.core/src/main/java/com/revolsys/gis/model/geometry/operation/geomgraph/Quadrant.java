@@ -3,7 +3,7 @@ package com.revolsys.gis.model.geometry.operation.geomgraph;
 /**
  * @version 1.7
  */
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Utility functions for working with quadrants, which are numbered as follows:

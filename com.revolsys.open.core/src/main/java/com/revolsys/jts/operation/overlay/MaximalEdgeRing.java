@@ -59,7 +59,7 @@ import com.revolsys.jts.geomgraph.Node;
  * {@link #buildMinimalRings() } method.
  *
  * @version 1.7
- * @see com.revolsys.jts.operation.overlay.MinimalEdgeRing
+ * @see com.revolsys.jts.testold.operation.overlay.MinimalEdgeRing
  */
 public class MaximalEdgeRing
   extends EdgeRing

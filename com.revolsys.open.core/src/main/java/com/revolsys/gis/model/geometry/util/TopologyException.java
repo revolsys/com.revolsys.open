@@ -1,7 +1,7 @@
 package com.revolsys.gis.model.geometry.util;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Indicates an invalid or inconsistent topological situation encountered during

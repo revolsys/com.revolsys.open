@@ -34,6 +34,7 @@ package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.jts.algorithm.CGAlgorithms3D;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -101,7 +102,7 @@ public class Distance3DOp {
 	 *            another {@link Geometry}
 	 * @return the nearest points in the geometries
 	 */
-	public static Coordinate[] nearestPoints(Geometry g0, Geometry g1) {
+	public static Coordinates[] nearestPoints(Geometry g0, Geometry g1) {
 		Distance3DOp distOp = new Distance3DOp(g0, g1);
 		return distOp.nearestPoints();
 	}
@@ -169,9 +170,9 @@ public class Distance3DOp {
 	 * 
 	 * @return a pair of {@link Coordinate}s of the nearest points
 	 */
-	public Coordinate[] nearestPoints() {
+	public Coordinates[] nearestPoints() {
 		computeMinDistance();
-		Coordinate[] nearestPts = new Coordinate[] {
+		Coordinates[] nearestPts = new Coordinates[] {
 				minDistanceLocation[0].getCoordinate(),
 				minDistanceLocation[1].getCoordinate() };
 		return nearestPts;
@@ -426,12 +427,12 @@ public class Distance3DOp {
 			return null;
 
 		// start point of line
-		Coordinate p0 = new Coordinate();
+		Coordinates p0 = new Coordinate();
 		seq.getCoordinate(0, p0);
 		double d0 = poly.getPlane().orientedDistance(p0);
 		
 		// for each segment in the line
-		Coordinate p1 = new Coordinate();
+		Coordinates p1 = new Coordinate();
 		for (int i = 0; i < seq.size() - 1; i++) {
 			seq.getCoordinate(i, p0);
 			seq.getCoordinate(i + 1, p1);
@@ -565,15 +566,15 @@ public class Distance3DOp {
 	 *            proportional distance from computed point to end point
 	 * @return the computed point
 	 */
-	private static Coordinate segmentPoint(Coordinate p0, Coordinate p1, double d0,
+	private static Coordinate segmentPoint(Coordinates p0, Coordinates p1, double d0,
 			double d1) {
 		if (d0 <= 0) return new Coordinate(p0);
 		if (d1 <= 0) return new Coordinate(p1);
 		
 		double f = Math.abs(d0) / (Math.abs(d0) + Math.abs(d1));
-		double intx = p0.x + f * (p1.x - p0.x);
-		double inty = p0.y + f * (p1.y - p0.y);
-		double intz = p0.z + f * (p1.z - p0.z);
+		double intx = p0.getX() + f * (p1.getX() - p0.getX());
+		double inty = p0.getY() + f * (p1.getY() - p0.getY());
+		double intz = p0.getZ() + f * (p1.getZ() - p0.getZ());
 		return new Coordinate(intx, inty, intz);
 	}
 

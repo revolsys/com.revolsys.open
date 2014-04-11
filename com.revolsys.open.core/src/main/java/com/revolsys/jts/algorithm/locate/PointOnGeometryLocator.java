@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.algorithm.locate;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Location;
 
@@ -50,5 +50,5 @@ public interface PointOnGeometryLocator
    * @param p the point to test
    * @return the location of the point in the geometry  
    */
-	int locate(Coordinate p);
+	int locate(Coordinates p);
 }

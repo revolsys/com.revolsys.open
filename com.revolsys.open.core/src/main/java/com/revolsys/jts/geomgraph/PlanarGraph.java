@@ -43,6 +43,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Location;
 
 /**
@@ -64,76 +65,50 @@ import com.revolsys.jts.geom.Location;
  *
  * @version 1.7
  */
-public class PlanarGraph
-{
+public class PlanarGraph {
   /**
    * For nodes in the Collection, link the DirectedEdges at the node that are in the result.
    * This allows clients to link only a subset of nodes in the graph, for
    * efficiency (because they know that only a subset is of interest).
    */
-  public static void linkResultDirectedEdges(Collection nodes)
-  {
-    for (Iterator nodeit = nodes.iterator(); nodeit.hasNext(); ) {
-      Node node = (Node) nodeit.next();
-      ((DirectedEdgeStar) node.getEdges()).linkResultDirectedEdges();
+  public static void linkResultDirectedEdges(final Collection nodes) {
+    for (final Iterator nodeit = nodes.iterator(); nodeit.hasNext();) {
+      final Node node = (Node)nodeit.next();
+      ((DirectedEdgeStar)node.getEdges()).linkResultDirectedEdges();
     }
   }
 
-  protected List edges        = new ArrayList();
-  protected NodeMap nodes;
-  protected List edgeEndList  = new ArrayList();
+  protected List edges = new ArrayList();
 
-  public PlanarGraph(NodeFactory nodeFact) {
-    nodes = new NodeMap(nodeFact);
-  }
+  private final NodeMap nodes;
+
+  protected List edgeEndList = new ArrayList();
 
   public PlanarGraph() {
-    nodes = new NodeMap(new NodeFactory());
+    this(new NodeFactory());
   }
 
-  public Iterator getEdgeIterator() { return edges.iterator(); }
-  public Collection getEdgeEnds() { return edgeEndList; }
+  public PlanarGraph(final NodeFactory nodeFact) {
+    this.nodes = new NodeMap(nodeFact);
+  }
 
-  public boolean isBoundaryNode(int geomIndex, Coordinate coord)
-  {
-    Node node = nodes.find(coord);
-    if (node == null) return false;
-    Label label = node.getLabel();
-    if (label != null && label.getLocation(geomIndex) == Location.BOUNDARY) return true;
-    return false;
-  }
-  protected void insertEdge(Edge e)
-  {
-    edges.add(e);
-  }
-  public void add(EdgeEnd e)
-  {
+  public void add(final EdgeEnd e) {
     nodes.add(e);
     edgeEndList.add(e);
   }
-
-  public Iterator getNodeIterator() { return nodes.iterator(); }
-  public Collection getNodes() { return nodes.values(); }
-  public Node addNode(Node node) { return nodes.addNode(node); }
-  public Node addNode(Coordinate coord) { return nodes.addNode(coord); }
-  /**
-   * @return the node if found; null otherwise
-   */
-  public Node find(Coordinate coord) { return nodes.find(coord); }
 
   /**
    * Add a set of edges to the graph.  For each edge two DirectedEdges
    * will be created.  DirectedEdges are NOT linked by this method.
    */
-  public void addEdges(List edgesToAdd)
-  {
+  public void addEdges(final List edgesToAdd) {
     // create all the nodes for the edges
-    for (Iterator it = edgesToAdd.iterator(); it.hasNext(); ) {
-      Edge e = (Edge) it.next();
+    for (final Iterator it = edgesToAdd.iterator(); it.hasNext();) {
+      final Edge e = (Edge)it.next();
       edges.add(e);
 
-      DirectedEdge de1 = new DirectedEdge(e, true);
-      DirectedEdge de2 = new DirectedEdge(e, false);
+      final DirectedEdge de1 = new DirectedEdge(e, true);
+      final DirectedEdge de2 = new DirectedEdge(e, false);
       de1.setSym(de2);
       de2.setSym(de1);
 
@@ -142,45 +117,27 @@ public class PlanarGraph
     }
   }
 
-  /**
-   * Link the DirectedEdges at the nodes of the graph.
-   * This allows clients to link only a subset of nodes in the graph, for
-   * efficiency (because they know that only a subset is of interest).
-   */
-  public void linkResultDirectedEdges()
-  {
-    for (Iterator nodeit = nodes.iterator(); nodeit.hasNext(); ) {
-      Node node = (Node) nodeit.next();
-      ((DirectedEdgeStar) node.getEdges()).linkResultDirectedEdges();
-    }
+  public Node addNode(final Coordinates coord) {
+    return nodes.addNode(coord);
   }
-  /**
-   * Link the DirectedEdges at the nodes of the graph.
-   * This allows clients to link only a subset of nodes in the graph, for
-   * efficiency (because they know that only a subset is of interest).
-   */
-  public void linkAllDirectedEdges()
-  {
-    for (Iterator nodeit = nodes.iterator(); nodeit.hasNext(); ) {
-      Node node = (Node) nodeit.next();
-      ((DirectedEdgeStar) node.getEdges()).linkAllDirectedEdges();
-    }
+
+  public Node addNode(final Node node) {
+    return nodes.addNode(node);
   }
+
+  void debugPrint(final Object o) {
+    System.out.print(o);
+  }
+
+  void debugPrintln(final Object o) {
+    System.out.println(o);
+  }
+
   /**
-   * Returns the EdgeEnd which has edge e as its base edge
-   * (MD 18 Feb 2002 - this should return a pair of edges)
-   *
-   * @return the edge, if found
-   *    <code>null</code> if the edge was not found
+   * @return the node if found; null otherwise
    */
-  public EdgeEnd findEdgeEnd(Edge e)
-  {
-    for (Iterator i = getEdgeEnds().iterator(); i.hasNext(); ) {
-      EdgeEnd ee = (EdgeEnd) i.next();
-      if (ee.getEdge() == e)
-        return ee;
-    }
-    return null;
+  public Node find(final Coordinate coord) {
+    return nodes.find(coord);
   }
 
   /**
@@ -189,16 +146,34 @@ public class PlanarGraph
    * @return the edge, if found
    *    <code>null</code> if the edge was not found
    */
-  public Edge findEdge(Coordinate p0, Coordinate p1)
-  {
+  public Edge findEdge(final Coordinate p0, final Coordinate p1) {
     for (int i = 0; i < edges.size(); i++) {
-      Edge e = (Edge) edges.get(i);
-      Coordinate[] eCoord = e.getCoordinates();
-      if (p0.equals(eCoord[0]) && p1.equals(eCoord[1]) )
+      final Edge e = (Edge)edges.get(i);
+      final Coordinate[] eCoord = e.getCoordinates();
+      if (p0.equals(eCoord[0]) && p1.equals(eCoord[1])) {
         return e;
+      }
     }
     return null;
   }
+
+  /**
+   * Returns the EdgeEnd which has edge e as its base edge
+   * (MD 18 Feb 2002 - this should return a pair of edges)
+   *
+   * @return the edge, if found
+   *    <code>null</code> if the edge was not found
+   */
+  public EdgeEnd findEdgeEnd(final Edge e) {
+    for (final Iterator i = getEdgeEnds().iterator(); i.hasNext();) {
+      final EdgeEnd ee = (EdgeEnd)i.next();
+      if (ee.getEdge() == e) {
+        return ee;
+      }
+    }
+    return null;
+  }
+
   /**
    * Returns the edge which starts at p0 and whose first segment is
    * parallel to p1
@@ -206,19 +181,81 @@ public class PlanarGraph
    * @return the edge, if found
    *    <code>null</code> if the edge was not found
    */
-  public Edge findEdgeInSameDirection(Coordinate p0, Coordinate p1)
-  {
+  public Edge findEdgeInSameDirection(final Coordinate p0, final Coordinates p1) {
     for (int i = 0; i < edges.size(); i++) {
-      Edge e = (Edge) edges.get(i);
+      final Edge e = (Edge)edges.get(i);
 
-      Coordinate[] eCoord = e.getCoordinates();
-      if (matchInSameDirection(p0, p1, eCoord[0], eCoord[1]) )
+      final Coordinate[] eCoord = e.getCoordinates();
+      if (matchInSameDirection(p0, p1, eCoord[0], eCoord[1])) {
         return e;
+      }
 
-      if (matchInSameDirection(p0, p1, eCoord[eCoord.length - 1], eCoord[eCoord.length - 2]) )
+      if (matchInSameDirection(p0, p1, eCoord[eCoord.length - 1],
+        eCoord[eCoord.length - 2])) {
         return e;
+      }
     }
     return null;
+  }
+
+  public Collection getEdgeEnds() {
+    return edgeEndList;
+  }
+
+  public Iterator getEdgeIterator() {
+    return edges.iterator();
+  }
+
+  public Iterator getNodeIterator() {
+    return nodes.iterator();
+  }
+
+  protected NodeMap getNodeMap() {
+    return nodes;
+  }
+
+  public Collection getNodes() {
+    return nodes.values();
+  }
+
+  protected void insertEdge(final Edge e) {
+    edges.add(e);
+  }
+
+  public boolean isBoundaryNode(final int geomIndex, final Coordinate coord) {
+    final Node node = nodes.find(coord);
+    if (node == null) {
+      return false;
+    }
+    final Label label = node.getLabel();
+    if (label != null && label.getLocation(geomIndex) == Location.BOUNDARY) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Link the DirectedEdges at the nodes of the graph.
+   * This allows clients to link only a subset of nodes in the graph, for
+   * efficiency (because they know that only a subset is of interest).
+   */
+  public void linkAllDirectedEdges() {
+    for (final Iterator nodeit = nodes.iterator(); nodeit.hasNext();) {
+      final Node node = (Node)nodeit.next();
+      ((DirectedEdgeStar)node.getEdges()).linkAllDirectedEdges();
+    }
+  }
+
+  /**
+   * Link the DirectedEdges at the nodes of the graph.
+   * This allows clients to link only a subset of nodes in the graph, for
+   * efficiency (because they know that only a subset is of interest).
+   */
+  public void linkResultDirectedEdges() {
+    for (final Iterator nodeit = nodes.iterator(); nodeit.hasNext();) {
+      final Node node = (Node)nodeit.next();
+      ((DirectedEdgeStar)node.getEdges()).linkResultDirectedEdges();
+    }
   }
 
   /**
@@ -226,34 +263,27 @@ public class PlanarGraph
    * E.g. the segments are parallel and in the same quadrant
    * (as opposed to parallel and opposite!).
    */
-  private boolean matchInSameDirection(Coordinate p0, Coordinate p1, Coordinate ep0, Coordinate ep1)
-  {
-    if (! p0.equals(ep0))
+  private boolean matchInSameDirection(final Coordinate p0,
+    final Coordinates p1, final Coordinate ep0, final Coordinates ep1) {
+    if (!p0.equals(ep0)) {
       return false;
+    }
 
     if (CGAlgorithms.computeOrientation(p0, p1, ep1) == CGAlgorithms.COLLINEAR
-         && Quadrant.quadrant(p0, p1) == Quadrant.quadrant(ep0, ep1) )
+      && Quadrant.quadrant(p0, p1) == Quadrant.quadrant(ep0, ep1)) {
       return true;
+    }
     return false;
   }
 
-  public void printEdges(PrintStream out)
-  {
+  public void printEdges(final PrintStream out) {
     out.println("Edges:");
     for (int i = 0; i < edges.size(); i++) {
       out.println("edge " + i + ":");
-      Edge e = (Edge) edges.get(i);
+      final Edge e = (Edge)edges.get(i);
       e.print(out);
       e.eiList.print(out);
     }
-  }
-  void debugPrint(Object o)
-  {
-    System.out.print(o);
-  }
-  void debugPrintln(Object o)
-  {
-    System.out.println(o);
   }
 
 }

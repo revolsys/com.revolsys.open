@@ -34,6 +34,7 @@
 package com.revolsys.jts.geom.util;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -122,7 +123,7 @@ public class SineStarFactory
     double centreX = env.getMinX() + radius;
     double centreY = env.getMinY() + radius;
 
-    Coordinate[] pts = new Coordinate[nPts + 1];
+    Coordinates[] pts = new Coordinates[nPts + 1];
     int iPt = 0;
     for (int i = 0; i < nPts; i++) {
       // the fraction of the way thru the current arm - in [0,1]

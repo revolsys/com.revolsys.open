@@ -2,9 +2,10 @@ package com.revolsys.gis.cs.projection;
 
 import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 public class CoordinateProjectionUtil {
-  public static Coordinate perform(final CoordinatesOperation operation,
+  public static Coordinates perform(final CoordinatesOperation operation,
     final Coordinate coordinate) {
     if (operation == null) {
       return coordinate;

@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.io.WKTWriter;
 
@@ -112,7 +112,7 @@ public class FastNodingValidator
   {
   	if (isValid) return "no intersections found";
   	
-		Coordinate[] intSegs = segInt.getIntersectionSegments();
+		Coordinates[] intSegs = segInt.getIntersectionSegments();
     return "found non-noded intersection between "
         + WKTWriter.toLineString(intSegs[0], intSegs[1])
         + " and "

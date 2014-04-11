@@ -13,7 +13,7 @@ import java.util.Map;
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -26,6 +26,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -508,8 +509,8 @@ public final class LineStringUtil {
     final int numCoordinates2 = coordinates2.size();
     final Coordinate firstCoord1 = coordinates1.getCoordinate(0);
     final Coordinate firstCoord2 = coordinates2.getCoordinate(0);
-    final Coordinate lastCoord1 = coordinates1.getCoordinate(numCoordinates1 - 1);
-    final Coordinate lastCoord2 = coordinates2.getCoordinate(numCoordinates2 - 2);
+    final Coordinates lastCoord1 = coordinates1.getCoordinate(numCoordinates1 - 1);
+    final Coordinates lastCoord2 = coordinates2.getCoordinate(numCoordinates2 - 2);
 
     Coordinate previousCoord1 = firstCoord1;
     for (int i1 = 1; i1 < numCoordinates1; i1++) {
@@ -524,13 +525,13 @@ public final class LineStringUtil {
         final int numIntersections = intersector.getIntersectionNum();
         if (intersector.hasIntersection()) {
           if (intersector.isProper()) {
-            final Coordinate intersection = intersector.getIntersection(0);
+            final Coordinates intersection = intersector.getIntersection(0);
             return CoordinatesUtil.get(intersection);
           } else if (numIntersections == 1) {
-            final Coordinate intersection = intersector.getIntersection(0);
+            final AbstractCoordinates intersection = intersector.getIntersection(0);
             if (i1 == 1 || i2 == 1 || i1 == numCoordinates1 - 1
               || i2 == numCoordinates2 - 1) {
-              if (!((intersection.equals2D(firstCoord1) || intersection.equals2D(lastCoord1)) && (intersection.equals2D(firstCoord2) || intersection.equals2D(lastCoord2)))) {
+              if (!((intersection.equals2d(firstCoord1) || intersection.equals2d(lastCoord1)) && (intersection.equals2d(firstCoord2) || intersection.equals2d(lastCoord2)))) {
                 return CoordinatesUtil.get(intersection);
               }
             } else {

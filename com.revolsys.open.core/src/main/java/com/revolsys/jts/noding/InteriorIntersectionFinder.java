@@ -36,8 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-//import com.revolsys.jts.util.Debug;
+//import com.revolsys.jts.testold.util.Debug;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Finds an interior intersection in a set of {@link SegmentString}s,
@@ -52,7 +53,7 @@ public class InteriorIntersectionFinder
 	private boolean isCheckEndSegmentsOnly = false;
   private LineIntersector li;
   private Coordinate interiorIntersection = null;
-  private Coordinate[] intSegments = null;
+  private Coordinates[] intSegments = null;
   private List intersections = new ArrayList();
 
   /**
@@ -107,7 +108,7 @@ public class InteriorIntersectionFinder
    * 
    * @return the coordinate for the intersection location
    */
-  public Coordinate getInteriorIntersection()  
+  public Coordinates getInteriorIntersection()  
   {    
   	return interiorIntersection;  
   }
@@ -117,7 +118,7 @@ public class InteriorIntersectionFinder
    * 
    * @return an array of the segment endpoints (p00, p01, p10, p11)
    */
-  public Coordinate[] getIntersectionSegments()
+  public Coordinates[] getIntersectionSegments()
   {
   	return intSegments;
   }
@@ -162,7 +163,7 @@ public class InteriorIntersectionFinder
 
     if (li.hasIntersection()) {
       if (li.isInteriorIntersection()) {
-      	intSegments = new Coordinate[4];
+      	intSegments = new Coordinates[4];
       	intSegments[0] = p00;
       	intSegments[1] = p01;
       	intSegments[2] = p10;

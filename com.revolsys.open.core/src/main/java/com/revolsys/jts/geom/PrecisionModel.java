@@ -335,16 +335,16 @@ public class PrecisionModel implements Serializable, Comparable
    *                 precise representation of <code>external</code>
    * @deprecated use makePrecise instead
    */
-  public void toInternal (Coordinate external, Coordinate internal) {
+  public void toInternal (Coordinates external, Coordinates internal) {
     if (isFloating()) {
-      internal.x = external.x;
-      internal.y = external.y;
+      internal.setX(external.getX());
+      internal.setY(external.getY());
     }
     else {
-      internal.x = makePrecise(external.x);
-      internal.y = makePrecise(external.y);
+      internal.setX(makePrecise(external.getX()));
+      internal.setY(makePrecise(external.getY()));
     }
-    internal.z = external.z;
+    internal.setZ(external.getZ());
   }
 
   /**
@@ -355,8 +355,8 @@ public class PrecisionModel implements Serializable, Comparable
    *      representation of <code>external</code>
    * @deprecated use makePrecise instead
    */
-  public Coordinate toInternal(Coordinate external) {
-    Coordinate internal = new Coordinate(external);
+  public Coordinates toInternal(Coordinates external) {
+    Coordinates internal = new Coordinate(external);
     makePrecise(internal);
     return internal;
   }
@@ -369,8 +369,8 @@ public class PrecisionModel implements Serializable, Comparable
    *      external representation of <code>internal</code>
    * @deprecated no longer needed, since internal representation is same as external representation
    */
-  public Coordinate toExternal(Coordinate internal) {
-    Coordinate external = new Coordinate(internal);
+  public Coordinates toExternal(Coordinates internal) {
+    Coordinates external = new Coordinate(internal);
     return external;
   }
 
@@ -382,9 +382,9 @@ public class PrecisionModel implements Serializable, Comparable
    *      external representation of <code>internal</code>
    * @deprecated no longer needed, since internal representation is same as external representation
    */
-  public void toExternal(Coordinate internal, Coordinate external) {
-      external.x = internal.x;
-      external.y = internal.y;
+  public void toExternal(Coordinates internal, Coordinates external) {
+      external.setX(internal.getX());
+      external.setY(internal.getY());
   }
 
   /**
@@ -418,13 +418,13 @@ public class PrecisionModel implements Serializable, Comparable
   /**
    * Rounds a Coordinate to the PrecisionModel grid.
    */
-  public void makePrecise(Coordinate coord)
+  public void makePrecise(Coordinates coord)
   {
     // optimization for full precision
     if (modelType == FLOATING) return;
 
-    coord.x = makePrecise(coord.x);
-    coord.y = makePrecise(coord.y);
+    coord.setX(makePrecise(coord.getX()));
+    coord.setY(makePrecise(coord.getY()));
     //MD says it's OK that we're not makePrecise'ing the z [Jon Aquino]
   }
 

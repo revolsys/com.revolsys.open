@@ -34,9 +34,11 @@ package com.revolsys.jts.operation.distance;
 
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -100,7 +102,7 @@ public class DistanceOp
    * @param g1 another {@link Geometry}
    * @return the nearest points in the geometries
    */
-  public static Coordinate[] nearestPoints(Geometry g0, Geometry g1)
+  public static Coordinates[] nearestPoints(Geometry g0, Geometry g1)
   {
     DistanceOp distOp = new DistanceOp(g0, g1);
     return distOp.nearestPoints();
@@ -115,7 +117,7 @@ public class DistanceOp
    * @return the closest points in the geometries
    * @deprecated renamed to nearestPoints
    */
-  public static Coordinate[] closestPoints(Geometry g0, Geometry g1)
+  public static Coordinates[] closestPoints(Geometry g0, Geometry g1)
   {
     DistanceOp distOp = new DistanceOp(g0, g1);
     return distOp.nearestPoints();
@@ -179,11 +181,11 @@ public class DistanceOp
    *
    * @return a pair of {@link Coordinate}s of the nearest points
    */
-  public Coordinate[] nearestPoints()
+  public AbstractCoordinates[] nearestPoints()
   {
     computeMinDistance();
-    Coordinate[] nearestPts
-        = new Coordinate[] {
+    AbstractCoordinates[] nearestPts
+        = new AbstractCoordinates[] {
           minDistanceLocation[0].getCoordinate(),
           minDistanceLocation[1].getCoordinate() };
     return nearestPts;
@@ -194,7 +196,7 @@ public class DistanceOp
    * @return a pair of {@link Coordinate}s of the nearest points
    * @deprecated renamed to nearestPoints
    */
-  public Coordinate[] closestPoints()
+  public Coordinates[] closestPoints()
   {
     return nearestPoints();
   }

@@ -36,7 +36,7 @@ package com.revolsys.jts.index.kdtree;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Envelope;
 
 /**
@@ -97,7 +97,7 @@ public class KdTree
 	 *          the point to insert
 	 * @return the kdnode containing the point
 	 */
-	public KdNode insert(Coordinate p) {
+	public KdNode insert(AbstractCoordinates p) {
 		return insert(p, null);
 	}
 
@@ -112,7 +112,7 @@ public class KdTree
 	 *         node is returned with its counter incremented. This can be checked
 	 *         by testing returnedNode.getCount() > 1.
 	 */
-	public KdNode insert(Coordinate p, Object data) {
+	public KdNode insert(AbstractCoordinates p, Object data) {
 		if (root == null) {
 			root = new KdNode(p, data);
 			return root;
@@ -142,9 +142,9 @@ public class KdTree
       }
 
       if (isOddLevel) {
-				isLessThan = p.x < currentNode.getX();
+				isLessThan = p.getX() < currentNode.getX();
 			} else {
-				isLessThan = p.y < currentNode.getY();
+				isLessThan = p.getY() < currentNode.getY();
 			}
 			leafNode = currentNode;
 			if (isLessThan) {

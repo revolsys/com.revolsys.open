@@ -34,6 +34,7 @@
 package com.revolsys.jts.shape;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -60,7 +61,7 @@ public abstract class GeometricShapeBuilder
 		return extent;
 	}
 	
-	public Coordinate getCentre()
+	public Coordinates getCentre()
 	{
 		return extent.centre();
 	}
@@ -79,9 +80,9 @@ public abstract class GeometricShapeBuilder
 	{
 		double radius = getRadius();
 		
-		Coordinate centre = getCentre();
-		Coordinate p0 = new Coordinate(centre.x - radius, centre.y - radius);
-		Coordinate p1 = new Coordinate(centre.x + radius, centre.y - radius);
+		Coordinates centre = getCentre();
+		Coordinate p0 = new Coordinate(centre.getX() - radius, centre.getY() - radius, Coordinates.NULL_ORDINATE);
+		Coordinate p1 = new Coordinate(centre.getX() + radius, centre.getY() - radius, Coordinates.NULL_ORDINATE);
 		return new LineSegment(p0, p1);
 	}
 	
@@ -89,9 +90,9 @@ public abstract class GeometricShapeBuilder
 	{
 		double radius = getRadius();
 		
-		Coordinate centre = getCentre();
-		return new Envelope(centre.x - radius, centre.x + radius,
-				centre.y - radius, centre.y + radius);
+		Coordinates centre = getCentre();
+		return new Envelope(centre.getX() - radius, centre.getX() + radius,
+				centre.getY() - radius, centre.getY() + radius);
 	}
 	
 
@@ -104,9 +105,9 @@ public abstract class GeometricShapeBuilder
 
   public abstract Geometry getGeometry();
 
-  protected Coordinate createCoord(double x, double y)
+  protected Coordinates createCoord(double x, double y)
   {
-  	Coordinate pt = new Coordinate(x, y);
+  	Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
   	geomFactory.getPrecisionModel().makePrecise(pt);
     return pt;
   }

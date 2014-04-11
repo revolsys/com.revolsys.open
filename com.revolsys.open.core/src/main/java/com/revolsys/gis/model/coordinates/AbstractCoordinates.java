@@ -1,6 +1,8 @@
 package com.revolsys.gis.model.coordinates;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.util.NumberUtil;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCoordinates implements Coordinates {
@@ -54,9 +56,27 @@ public abstract class AbstractCoordinates implements Coordinates {
     }
   }
 
+  /**
+   * Computes the 2-dimensional Euclidean distance to another location.
+   * The Z-ordinate is ignored.
+   * 
+   * @param c a point
+   * @return the 2-dimensional Euclidean distance between the locations
+   */
   @Override
-  public double distance(final Coordinates coordinates) {
-    return CoordinatesUtil.distance(this, coordinates);
+  public double distance(final Coordinates point) {
+    return CoordinatesUtil.distance(this, point);
+  }
+
+  /**
+   * Computes the 3-dimensional Euclidean distance to another location.
+   * 
+   * @param c a coordinate
+   * @return the 3-dimensional Euclidean distance between the locations
+   */
+  @Override
+  public double distance3d(final Coordinates point) {
+    return CoordinatesUtil.distance3d(this, point);
   }
 
   @Override
@@ -70,6 +90,15 @@ public abstract class AbstractCoordinates implements Coordinates {
     return true;
   }
 
+  /**
+   *  Returns <code>true</code> if <code>other</code> has the same values for
+   *  the x and y ordinates.
+   *  Since Coordinates are 2.5D, this routine ignores the z value when making the comparison.
+   *
+   *@param  other  a <code>Coordinate</code> with which to do the comparison.
+   *@return        <code>true</code> if <code>other</code> is a <code>Coordinate</code>
+   *      with the same values for the x and y ordinates.
+   */
   @Override
   public boolean equals(final Object other) {
     if (other instanceof Coordinates) {
@@ -83,6 +112,25 @@ public abstract class AbstractCoordinates implements Coordinates {
   @Override
   public boolean equals2d(final Coordinates point) {
     return CoordinatesUtil.equals2d(this, point);
+  }
+
+  /**
+   * Tests if another coordinate has the same values for the X and Y ordinates.
+   * The Z ordinate is ignored.
+   *
+   *@param other a <code>Coordinate</code> with which to do the 2D comparison.
+   *@return true if <code>other</code> is a <code>Coordinate</code>
+   *      with the same values for X and Y.
+   */
+  @Override
+  public boolean equals2d(final Coordinates c, final double tolerance) {
+    if (!NumberUtil.equalsWithTolerance(this.getX(), c.getX(), tolerance)) {
+      return false;
+    }
+    if (!NumberUtil.equalsWithTolerance(this.getY(), c.getY(), tolerance)) {
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -124,22 +172,35 @@ public abstract class AbstractCoordinates implements Coordinates {
 
   @Override
   public double getX() {
-    return getValue(0);
+    return getValue(X);
   }
 
   @Override
   public double getY() {
-    return getValue(1);
+    return getValue(Y);
   }
 
   @Override
   public double getZ() {
-    return getValue(2);
+    return getValue(Z);
   }
 
   @Override
   public int hashCode() {
     return CoordinatesUtil.hashCode(this);
+  }
+
+  /**
+   *  Sets this <code>Coordinate</code>s (x,y,z) values to that of <code>other</code>.
+   *
+   *@param  other  the <code>Coordinate</code> to copy
+   */
+  @Override
+  public void setCoordinate(final Coordinates other) {
+    for (int i = 0; i < getNumAxis(); i++) {
+      final double value = other.getValue(i);
+      setValue(i, value);
+    }
   }
 
   @Override
@@ -154,17 +215,17 @@ public abstract class AbstractCoordinates implements Coordinates {
 
   @Override
   public void setX(final double x) {
-    setValue(0, x);
+    setValue(X, x);
   }
 
   @Override
   public void setY(final double y) {
-    setValue(1, y);
+    setValue(Y, y);
   }
 
   @Override
   public void setZ(final double z) {
-    setValue(2, z);
+    setValue(Z, z);
   }
 
   @Override

@@ -8,7 +8,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 

@@ -38,8 +38,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -121,7 +123,7 @@ public class ConformingDelaunayTriangulator {
   private Envelope computeAreaEnv;
 
   // records the last split point computed, for error reporting
-  private Coordinate splitPt = null;
+  private Coordinates splitPt = null;
 
   private final double tolerance; // defines if two sites are the same.
 
@@ -171,7 +173,7 @@ public class ConformingDelaunayTriangulator {
     convexHull = hull.getConvexHull();
   }
 
-  private ConstraintVertex createVertex(final Coordinate p) {
+  private ConstraintVertex createVertex(final Coordinates p) {
     ConstraintVertex v = null;
     if (vertexFactory != null) {
       v = vertexFactory.createVertex(p, null);
@@ -188,7 +190,7 @@ public class ConformingDelaunayTriangulator {
    * @param seg the constraint segment it lies on
    * @return the new constraint vertex
    */
-  private ConstraintVertex createVertex(final Coordinate p, final Segment seg) {
+  private ConstraintVertex createVertex(final Coordinates p, final Segment seg) {
     ConstraintVertex v = null;
     if (vertexFactory != null) {
       v = vertexFactory.createVertex(p, seg);
@@ -272,7 +274,7 @@ public class ConformingDelaunayTriangulator {
        * </ul>
        */
       final ConstraintVertex insertedVertex = insertSite(splitVertex);
-      if (!insertedVertex.getCoordinate().equals2D(splitPt)) {
+      if (!insertedVertex.getCoordinate().equals2d(splitPt)) {
         Debug.println("Split pt snapped to: " + insertedVertex);
         // throw new ConstraintEnforcementException("Split point snapped to
         // existing point
@@ -315,11 +317,11 @@ public class ConformingDelaunayTriangulator {
    * or null if no point is non-Gabriel
    */
   private Coordinate findNonGabrielPoint(final Segment seg) {
-    final Coordinate p = seg.getStart();
-    final Coordinate q = seg.getEnd();
+    final AbstractCoordinates p = seg.getStart();
+    final Coordinates q = seg.getEnd();
     // Find the mid point on the line and compute the radius of enclosing circle
-    final Coordinate midPt = new Coordinate((p.x + q.x) / 2.0,
-      (p.y + q.y) / 2.0);
+    final AbstractCoordinates midPt = new Coordinate((p.getX() + q.getX()) / 2.0,
+      (p.getY() + q.getY()) / 2.0, Coordinates.NULL_ORDINATE);
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle
@@ -336,7 +338,7 @@ public class ConformingDelaunayTriangulator {
       final KdNode nextNode = (KdNode)i.next();
       final Coordinate testPt = nextNode.getCoordinate();
       // ignore segment endpoints
-      if (testPt.equals2D(p) || testPt.equals2D(q)) {
+      if (testPt.equals2d(p) || testPt.equals2d(q)) {
         continue;
       }
 
@@ -508,7 +510,7 @@ public class ConformingDelaunayTriangulator {
    * 
    * @param p the location of the site to insert
    */
-  public void insertSite(final Coordinate p) {
+  public void insertSite(final Coordinates p) {
     insertSite(createVertex(p));
   }
 

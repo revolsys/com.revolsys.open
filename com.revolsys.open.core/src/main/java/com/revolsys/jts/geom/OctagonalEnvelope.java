@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.geom;
 
+
 /**
  * A Bounding Container which is in the shape of an octagon.
  * The OctagonalEnvelope of a geometric object
@@ -75,7 +76,7 @@ public class OctagonalEnvelope
   /**
    * Creates a new null bounding octagon bounding a {@link Coordinate}
    */
-  public OctagonalEnvelope(Coordinate p)
+  public OctagonalEnvelope(Coordinates p)
   {
     expandToInclude(p);
   }
@@ -83,7 +84,7 @@ public class OctagonalEnvelope
   /**
    * Creates a new null bounding octagon bounding a pair of {@link Coordinate}s
    */
-  public OctagonalEnvelope(Coordinate p0, Coordinate p1)
+  public OctagonalEnvelope(Coordinates p0, Coordinates p1)
   {
     expandToInclude(p0);
     expandToInclude(p1);
@@ -174,9 +175,9 @@ public class OctagonalEnvelope
     return this;
   }
 
-  public OctagonalEnvelope expandToInclude(Coordinate p)
+  public OctagonalEnvelope expandToInclude(Coordinates p)
   {
-    expandToInclude(p.x, p.y);
+    expandToInclude(p.getX(), p.getY());
     return this;
   }
 
@@ -265,15 +266,15 @@ public class OctagonalEnvelope
     return true;
   }
 
-  public boolean intersects(Coordinate p)
+  public boolean intersects(Coordinates p)
   {
-    if (minX > p.x) return false;
-    if (maxX < p.x) return false;
-    if (minY > p.y) return false;
-    if (maxY < p.y) return false;
+    if (minX > p.getX()) return false;
+    if (maxX < p.getX()) return false;
+    if (minY > p.getY()) return false;
+    if (maxY < p.getY()) return false;
     
-    double A = computeA(p.x, p.y);
-    double B = computeB(p.x, p.y);
+    double A = computeA(p.getX(), p.getY());
+    double B = computeB(p.getX(), p.getY());
     if (minA > A) return false;
     if (maxA < A) return false;
     if (minB > B) return false;
@@ -301,17 +302,17 @@ public class OctagonalEnvelope
       return geomFactory.createPoint((CoordinatesList)null);
     }
 
-    Coordinate px00 = new Coordinate(minX, minA - minX);
-    Coordinate px01 = new Coordinate(minX, minX - minB);
+    Coordinate px00 = new Coordinate(minX, minA - minX, Coordinates.NULL_ORDINATE);
+    Coordinate px01 = new Coordinate(minX, minX - minB, Coordinates.NULL_ORDINATE);
 
-    Coordinate px10 = new Coordinate(maxX, maxX - maxB);
-    Coordinate px11 = new Coordinate(maxX, maxA - maxX);
+    Coordinate px10 = new Coordinate(maxX, maxX - maxB, Coordinates.NULL_ORDINATE);
+    Coordinate px11 = new Coordinate(maxX, maxA - maxX, Coordinates.NULL_ORDINATE);
 
-    Coordinate py00 = new Coordinate(minA - minY, minY);
-    Coordinate py01 = new Coordinate(minY + maxB, minY);
+    Coordinate py00 = new Coordinate(minA - minY, minY, Coordinates.NULL_ORDINATE);
+    Coordinate py01 = new Coordinate(minY + maxB, minY, Coordinates.NULL_ORDINATE);
 
-    Coordinate py10 = new Coordinate(maxY + minB, maxY);
-    Coordinate py11 = new Coordinate(maxA - maxY, maxY);
+    Coordinate py10 = new Coordinate(maxY + minB, maxY, Coordinates.NULL_ORDINATE);
+    Coordinate py11 = new Coordinate(maxA - maxY, maxY, Coordinates.NULL_ORDINATE);
 
     PrecisionModel pm = geomFactory.getPrecisionModel();
     pm.makePrecise(px00);
@@ -337,12 +338,12 @@ public class OctagonalEnvelope
       return geomFactory.createPoint(px00);
     }
     if (coordList.size() == 2) {
-      Coordinate[] pts = coordList.toCoordinateArray();
+      Coordinates[] pts = coordList.toCoordinateArray();
       return geomFactory.createLineString(pts);
     }
     // must be a polygon, so add closing point
     coordList.add(px00, false);
-    Coordinate[] pts = coordList.toCoordinateArray();
+    Coordinates[] pts = coordList.toCoordinateArray();
     return geomFactory.createPolygon(geomFactory.createLinearRing(pts), null);
   }
 

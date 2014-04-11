@@ -52,7 +52,6 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -102,7 +101,7 @@ public class GeometryFactory implements Serializable,
     return GeometryFactory.getFactory(srid, numAxis, scaleXY, scaleZ);
   }
 
-  public static Point createPointFromInternalCoord(final Coordinate coord,
+  public static Point createPointFromInternalCoord(final Coordinates coord,
     final Geometry exemplar) {
     exemplar.getPrecisionModel().makePrecise(coord);
     return exemplar.getGeometryFactory().createPoint(coord);
@@ -624,7 +623,7 @@ public class GeometryFactory implements Serializable,
           point = projectedPoint;
         } else if (object instanceof double[]) {
           point = new DoubleCoordinates((double[])object);
-        } else if (object instanceof Coordinate) {
+        } else if (object instanceof Coordinates) {
           point = new CoordinateCoordinates((Coordinate)object);
         } else if (object instanceof CoordinatesList) {
           final CoordinatesList coordinates = (CoordinatesList)object;
@@ -677,7 +676,7 @@ public class GeometryFactory implements Serializable,
   }
 
   public Geometry createEmptyGeometry() {
-    return createPoint((Coordinate)null);
+    return createPoint((Coordinates)null);
   }
 
   protected GeometryCollection createEmptyGeometryCollection() {
@@ -899,7 +898,7 @@ public class GeometryFactory implements Serializable,
    * @return the created LinearRing
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    */
-  public LinearRing createLinearRing(final Coordinate[] coordinates) {
+  public LinearRing createLinearRing(final Coordinates[] coordinates) {
     return createLinearRing(coordinates != null ? getCoordinateSequenceFactory().create(
       coordinates)
       : null);
@@ -940,21 +939,13 @@ public class GeometryFactory implements Serializable,
     return createLineString(coordinatesList);
   }
 
-  /**
-   * Creates a LineString using the given Coordinates.
-   * A null or empty array creates an empty LineString. 
-   * 
-   * @param coordinates an array without null elements, or an empty array, or null
-   */
-  public LineString createLineString(final Coordinate[] coordinates) {
-    return createLineString(coordinates != null ? getCoordinateSequenceFactory().create(
-      coordinates)
-      : null);
-  }
-
   public LineString createLineString(final Coordinates... points) {
-    final List<Coordinates> p = Arrays.asList(points);
-    return createLineString(p);
+    if (points == null) {
+      return createLineString();
+    } else {
+      final List<Coordinates> p = Arrays.asList(points);
+      return createLineString(p);
+    }
   }
 
   /**
@@ -969,14 +960,17 @@ public class GeometryFactory implements Serializable,
     return line;
   }
 
+  public LineString createLineString(final double... coordinates) {
+    final int numAxis = getNumAxis();
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(numAxis,
+      coordinates);
+    return createLineString(points);
+  }
+
   public LineString createLineString(final LineString lineString) {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     final CoordinatesList newPoints = createCoordinatesList(points);
     return createLineString(newPoints);
-  }
-
-  public LineString createLineString(final Object... points) {
-    return createLineString(Arrays.asList(points));
   }
 
   public MultiLineString createMultiLineString(final Collection<?> lines) {
@@ -1011,7 +1005,7 @@ public class GeometryFactory implements Serializable,
    * @param coordinates an array (without null elements), or an empty array, or <code>null</code>
    * @return a MultiPoint object
    */
-  public MultiPoint createMultiPoint(final Coordinate[] coordinates) {
+  public MultiPoint createMultiPoint(final Coordinates[] coordinates) {
     return createMultiPoint(coordinates != null ? getCoordinateSequenceFactory().create(
       coordinates)
       : null);
@@ -1082,21 +1076,6 @@ public class GeometryFactory implements Serializable,
     return new Point(this);
   }
 
-  /**
-   * Creates a Point using the given Coordinate.
-   * A null Coordinate creates an empty Geometry.
-   * 
-   * @param coordinate a Coordinate, or null
-   * @return the created Point
-   */
-  public Point createPoint(final Coordinate point) {
-    if (point == null) {
-      return createPoint();
-    } else {
-      return createPoint(point.x, point.y, point.z);
-    }
-  }
-
   public Point createPoint(final Coordinates point) {
     if (point == null) {
       return createPoint();
@@ -1149,8 +1128,8 @@ public class GeometryFactory implements Serializable,
       return createPoint((Coordinates)object);
     } else if (object instanceof double[]) {
       return createPoint((double[])object);
-    } else if (object instanceof Coordinate) {
-      return createPoint((Coordinate)object);
+    } else if (object instanceof Coordinates) {
+      return createPoint((Coordinates)object);
     } else if (object instanceof CoordinatesList) {
       return createPoint((CoordinatesList)object);
     } else {
@@ -1191,7 +1170,7 @@ public class GeometryFactory implements Serializable,
    *            the empty geometry is to be created.
    * @throws IllegalArgumentException if the boundary ring is invalid
    */
-  public Polygon createPolygon(final Coordinate[] coordinates) {
+  public Polygon createPolygon(final Coordinates[] coordinates) {
     return createPolygon(createLinearRing(coordinates));
   }
 
@@ -1518,26 +1497,35 @@ public class GeometryFactory implements Serializable,
     // point?
     if (envelope.getMinX() == envelope.getMaxX()
       && envelope.getMinY() == envelope.getMaxY()) {
-      return createPoint(new Coordinate(envelope.getMinX(), envelope.getMinY()));
+      return createPoint(new Coordinate(envelope.getMinX(), envelope.getMinY(),
+        Coordinates.NULL_ORDINATE));
     }
 
     // vertical or horizontal line?
     if (envelope.getMinX() == envelope.getMaxX()
       || envelope.getMinY() == envelope.getMaxY()) {
-      return createLineString(new Coordinate[] {
-        new Coordinate(envelope.getMinX(), envelope.getMinY()),
-        new Coordinate(envelope.getMaxX(), envelope.getMaxY())
+      return createLineString(new Coordinates[] {
+        new Coordinate(envelope.getMinX(), envelope.getMinY(),
+          Coordinates.NULL_ORDINATE),
+        new Coordinate(envelope.getMaxX(), envelope.getMaxY(),
+          Coordinates.NULL_ORDINATE)
       });
     }
 
     // create a CW ring for the polygon
-    return createPolygon(createLinearRing(new Coordinate[] {
-      new Coordinate(envelope.getMinX(), envelope.getMinY()),
-      new Coordinate(envelope.getMinX(), envelope.getMaxY()),
-      new Coordinate(envelope.getMaxX(), envelope.getMaxY()),
-      new Coordinate(envelope.getMaxX(), envelope.getMinY()),
-      new Coordinate(envelope.getMinX(), envelope.getMinY())
-    }), null);
+    return createPolygon(
+      createLinearRing(new Coordinates[] {
+        new Coordinate(envelope.getMinX(), envelope.getMinY(),
+          Coordinates.NULL_ORDINATE),
+        new Coordinate(envelope.getMinX(), envelope.getMaxY(),
+          Coordinates.NULL_ORDINATE),
+        new Coordinate(envelope.getMaxX(), envelope.getMaxY(),
+          Coordinates.NULL_ORDINATE),
+        new Coordinate(envelope.getMaxX(), envelope.getMinY(),
+          Coordinates.NULL_ORDINATE),
+        new Coordinate(envelope.getMinX(), envelope.getMinY(),
+          Coordinates.NULL_ORDINATE)
+      }), null);
   }
 
   @Override

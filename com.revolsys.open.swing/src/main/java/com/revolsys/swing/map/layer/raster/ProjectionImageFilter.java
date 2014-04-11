@@ -6,11 +6,11 @@ import java.awt.image.BufferedImage;
 import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ProjectionImageFilter extends WholeImageFilter {
 

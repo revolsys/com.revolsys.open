@@ -38,6 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -58,7 +59,7 @@ public class LinearGeometryBuilder
   private boolean ignoreInvalidLines = false;
   private boolean fixInvalidLines = false;
 
-  private Coordinate lastPt = null;
+  private Coordinates lastPt = null;
 
   public LinearGeometryBuilder(GeometryFactory geomFact) {
     this.geomFact = geomFact;
@@ -109,7 +110,7 @@ public class LinearGeometryBuilder
     lastPt = pt;
   }
 
-  public Coordinate getLastCoordinate() { return lastPt; }
+  public Coordinates getLastCoordinate() { return lastPt; }
 
   /**
    * Terminate the current LineString.
@@ -123,8 +124,8 @@ public class LinearGeometryBuilder
       coordList = null;
       return;
     }
-    Coordinate[] rawPts = coordList.toCoordinateArray();
-    Coordinate[] pts = rawPts;
+    Coordinates[] rawPts = coordList.toCoordinateArray();
+    Coordinates[] pts = rawPts;
     if (fixInvalidLines)
       pts = validCoordinateSequence(rawPts);
 
@@ -143,10 +144,10 @@ public class LinearGeometryBuilder
     if (line != null) lines.add(line);
   }
 
-  private Coordinate[] validCoordinateSequence(Coordinate[] pts)
+  private Coordinates[] validCoordinateSequence(Coordinates[] pts)
   {
     if (pts.length >= 2) return pts;
-    Coordinate[] validPts = new Coordinate[] { pts[0], pts[0]};
+    Coordinates[] validPts = new Coordinates[] { pts[0], pts[0]};
     return validPts;
   }
 

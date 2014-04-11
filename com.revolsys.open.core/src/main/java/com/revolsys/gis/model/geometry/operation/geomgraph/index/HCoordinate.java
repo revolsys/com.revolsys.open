@@ -32,9 +32,9 @@
  */
 package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.NotRepresentableException;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents a homogeneous coordinate in a 2-D coordinate space. In JTS

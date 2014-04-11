@@ -34,6 +34,7 @@
 package com.revolsys.jts.triangulate.quadedge;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.io.WKTWriter;
 
@@ -230,8 +231,8 @@ public class QuadEdge {
    * @return true if the quadedges are based on the same line segment
    */
   public boolean equalsOriented(final QuadEdge qe) {
-    if (orig().getCoordinate().equals2D(qe.orig().getCoordinate())
-      && dest().getCoordinate().equals2D(qe.dest().getCoordinate())) {
+    if (orig().getCoordinate().equals2d(qe.orig().getCoordinate())
+      && dest().getCoordinate().equals2d(qe.dest().getCoordinate())) {
       return true;
     }
     return false;
@@ -432,8 +433,8 @@ public class QuadEdge {
    */
   @Override
   public String toString() {
-    final Coordinate p0 = vertex.getCoordinate();
-    final Coordinate p1 = dest().getCoordinate();
+    final Coordinates p0 = vertex.getCoordinate();
+    final Coordinates p1 = dest().getCoordinate();
     return WKTWriter.toLineString(p0, p1);
   }
 }

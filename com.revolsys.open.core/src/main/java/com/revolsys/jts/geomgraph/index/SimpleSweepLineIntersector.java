@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Edge;
 
 /**
@@ -100,7 +100,7 @@ public class SimpleSweepLineIntersector
 
   private void add(Edge edge, Object edgeSet)
   {
-    Coordinate[] pts = edge.getCoordinates();
+    Coordinates[] pts = edge.getCoordinates();
     for (int i = 0; i < pts.length - 1; i++) {
       SweepLineSegment ss = new SweepLineSegment(edge, i);
       SweepLineEvent insertEvent = new SweepLineEvent(edgeSet, ss.getMinX(), null);

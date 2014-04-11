@@ -10,17 +10,17 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.GeometryCollection;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
-import com.revolsys.swing.map.form.DataObjectLayerForm;
-import com.revolsys.swing.table.TablePanel;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.swing.map.form.DataObjectLayerForm;
+import com.revolsys.swing.table.TablePanel;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {
   private static final long serialVersionUID = 1L;

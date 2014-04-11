@@ -36,6 +36,7 @@ package com.revolsys.jts.util;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -45,7 +46,7 @@ import com.revolsys.jts.geom.Geometry;
  *@version 1.7
  */
 public class CoordinateArrayFilter implements CoordinateFilter {
-  Coordinate[] pts = null;
+  Coordinates[] pts = null;
   int n = 0;
 
   /**
@@ -55,7 +56,7 @@ public class CoordinateArrayFilter implements CoordinateFilter {
    *      will collect
    */
   public CoordinateArrayFilter(int size) {
-    pts = new Coordinate[size];
+    pts = new Coordinates[size];
   }
 
   /**
@@ -63,7 +64,7 @@ public class CoordinateArrayFilter implements CoordinateFilter {
    *
    *@return    the <code>Coordinate</code>s collected by this <code>CoordinateArrayFilter</code>
    */
-  public Coordinate[] getCoordinates() {
+  public Coordinates[] getCoordinates() {
     return pts;
   }
 

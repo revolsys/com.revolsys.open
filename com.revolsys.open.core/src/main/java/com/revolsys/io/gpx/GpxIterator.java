@@ -26,13 +26,13 @@ import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -257,9 +257,9 @@ public class GpxIterator implements DataObjectIterator {
       }
     }
 
-    Coordinate coord = null;
+    Coordinates coord = null;
     if (Double.isNaN(elevation)) {
-      coord = new Coordinate(lon, lat);
+      coord = new Coordinate(lon, lat, Coordinates.NULL_ORDINATE);
     } else {
       coord = new Coordinate(lon, lat, elevation);
     }

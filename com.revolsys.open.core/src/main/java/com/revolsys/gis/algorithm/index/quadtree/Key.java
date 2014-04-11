@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.quadtree.DoubleBits;
 
@@ -22,7 +23,7 @@ public class Key {
   }
 
   // the fields which make up the key
-  private final Coordinate pt = new Coordinate();
+  private final Coordinates pt = new Coordinate();
 
   private int level = 0;
 
@@ -50,14 +51,14 @@ public class Key {
 
   private void computeKey(final int level, final Envelope itemEnv) {
     final double quadSize = DoubleBits.powerOf2(level);
-    pt.x = Math.floor(itemEnv.getMinX() / quadSize) * quadSize;
-    pt.y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
-    env.init(pt.x, pt.x + quadSize, pt.y, pt.y + quadSize);
+    pt.setX(Math.floor(itemEnv.getMinX() / quadSize) * quadSize);
+    pt.setY(Math.floor(itemEnv.getMinY() / quadSize) * quadSize);
+    env.init(pt.getX(), pt.getX() + quadSize, pt.getY(), pt.getY() + quadSize);
   }
 
-  public Coordinate getCentre() {
+  public Coordinates getCentre() {
     return new Coordinate((env.getMinX() + env.getMaxX()) / 2,
-      (env.getMinY() + env.getMaxY()) / 2);
+      (env.getMinY() + env.getMaxY()) / 2, Coordinates.NULL_ORDINATE);
   }
 
   public Envelope getEnvelope() {
@@ -68,7 +69,7 @@ public class Key {
     return level;
   }
 
-  public Coordinate getPoint() {
+  public Coordinates getPoint() {
     return pt;
   }
 }

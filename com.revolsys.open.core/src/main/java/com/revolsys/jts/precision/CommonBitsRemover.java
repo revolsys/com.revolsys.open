@@ -35,6 +35,7 @@ package com.revolsys.jts.precision;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -68,7 +69,7 @@ import com.revolsys.jts.geom.Geometry;
  */
 public class CommonBitsRemover
 {
-  private Coordinate commonCoord;
+  private Coordinates commonCoord;
   private CommonCoordinateFilter ccFilter = new CommonCoordinateFilter();
 
   public CommonBitsRemover()
@@ -92,7 +93,7 @@ public class CommonBitsRemover
   /**
    * The common bits of the Coordinates in the supplied Geometries.
    */
-  public Coordinate getCommonCoordinate() { return commonCoord; }
+  public Coordinates getCommonCoordinate() { return commonCoord; }
 
   /**
    * Removes the common coordinate bits from a Geometry.
@@ -103,11 +104,11 @@ public class CommonBitsRemover
    */
   public Geometry removeCommonBits(Geometry geom)
   {
-    if (commonCoord.x == 0.0 && commonCoord.y == 0.0)
+    if (commonCoord.getX() == 0.0 && commonCoord.getY() == 0.0)
       return geom;
-    Coordinate invCoord = new Coordinate(commonCoord);
-    invCoord.x = -invCoord.x;
-    invCoord.y = -invCoord.y;
+    Coordinates invCoord = new Coordinate(commonCoord);
+    invCoord.setX(-invCoord.getX());
+    invCoord.setY(-invCoord.getY());
     Translater trans = new Translater(invCoord);
     geom.apply(trans);
     geom.geometryChanged();
@@ -135,31 +136,31 @@ public class CommonBitsRemover
 
     public void filter(Coordinate coord)
     {
-      commonBitsX.add(coord.x);
-      commonBitsY.add(coord.y);
+      commonBitsX.add(coord.getX());
+      commonBitsY.add(coord.getY());
     }
 
-    public Coordinate getCommonCoordinate()
+    public Coordinates getCommonCoordinate()
     {
       return new Coordinate(
           commonBitsX.getCommon(),
-          commonBitsY.getCommon());
+          commonBitsY.getCommon(), Coordinates.NULL_ORDINATE);
     }
   }
 
   class Translater
       implements CoordinateFilter
   {
-    Coordinate trans = null;
+    Coordinates trans = null;
 
-    public Translater(Coordinate trans)
+    public Translater(Coordinates trans)
     {
       this.trans = trans;
     }
     public void filter(Coordinate coord)
     {
-      coord.x += trans.x;
-      coord.y += trans.y;
+      coord.setX(coord.getX() + trans.getX());
+      coord.setY(coord.getY() + trans.getY());
     }
 
   }

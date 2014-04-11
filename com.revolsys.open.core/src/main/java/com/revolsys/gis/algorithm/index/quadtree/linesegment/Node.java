@@ -1,28 +1,28 @@
 package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.quadtree.DoubleBits;
 
 public class Node extends NodeBase {
-  public static Envelope computeKey(final Coordinate point, final int level,
+  public static Envelope computeKey(final Coordinates point, final int level,
     final Envelope itemEnv) {
     final double quadSize = DoubleBits.powerOf2(level);
-    point.x = Math.floor(itemEnv.getMinX() / quadSize) * quadSize;
-    point.y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
-    return new Envelope(point.x, point.x + quadSize, point.y, point.y
+    point.setX(Math.floor(itemEnv.getMinX() / quadSize) * quadSize);
+    point.setY(Math.floor(itemEnv.getMinY() / quadSize) * quadSize);
+    return new Envelope(point.getX(), point.getX() + quadSize, point.getY(), point.getY()
       + quadSize);
   }
 
-  public static Envelope computeKey(final int level, final Coordinate point,
+  public static Envelope computeKey(final int level, final Coordinates point,
     final Envelope itemEnv) {
     final double quadSize = DoubleBits.powerOf2(level);
     final double x = Math.floor(itemEnv.getMinX() / quadSize) * quadSize;
     final double y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
-    point.x = x;
-    point.y = y;
+    point.setX(x);
+    point.setY(y);
     return new Envelope(x, x + quadSize, y, y + quadSize);
   }
 
@@ -48,7 +48,7 @@ public class Node extends NodeBase {
   }
 
   public static Node createNode(final Envelope itemEnv) {
-    final Coordinate point = new Coordinate();
+    final Coordinates point = new Coordinate();
     int level = computeQuadLevel(itemEnv);
     Envelope nodeEnvelope = computeKey(level, point, itemEnv);
     // MD - would be nice to have a non-iterative form of this algorithm

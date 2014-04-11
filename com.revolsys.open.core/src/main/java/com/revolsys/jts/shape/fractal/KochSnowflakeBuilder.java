@@ -35,6 +35,7 @@ package com.revolsys.jts.shape.fractal;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -62,7 +63,7 @@ extends GeometricShapeBuilder
 	{
 		int level = recursionLevelForSize(numPts);
 		LineSegment baseLine = getSquareBaseLine();
-		Coordinate[] pts = getBoundary(level, baseLine.getCoordinate(0), baseLine.getLength());
+		Coordinates[] pts = getBoundary(level, baseLine.getCoordinate(0), baseLine.getLength());
 		return geomFactory.createPolygon(
 				geomFactory.createLinearRing(pts), null);
 	}
@@ -75,17 +76,17 @@ extends GeometricShapeBuilder
 	private static final double THIRD_HEIGHT = HEIGHT_FACTOR/3.0;
 	private static final double TWO_THIRDS = 2.0/3.0;
 	
-	private Coordinate[] getBoundary(int level, Coordinate origin, double width) 
+	private Coordinates[] getBoundary(int level, Coordinates origin, double width) 
 	{
-		double y = origin.y;
+		double y = origin.getY();
 		// for all levels beyond 0 need to vertically shift shape by height of one "arm" to centre it
 		if (level > 0) {
 			y += THIRD_HEIGHT * width;
 		}
 		
-		Coordinate p0 = new Coordinate(origin.x, y);
-		Coordinate p1 = new Coordinate(origin.x + width/2, y + width * HEIGHT_FACTOR);
-		Coordinate p2 = new Coordinate(origin.x + width, y);
+		Coordinate p0 = new Coordinate(origin.getX(), y, Coordinates.NULL_ORDINATE);
+		Coordinate p1 = new Coordinate(origin.getX() + width/2, y + width * HEIGHT_FACTOR, Coordinates.NULL_ORDINATE);
+		Coordinate p2 = new Coordinate(origin.getX() + width, y, Coordinates.NULL_ORDINATE);
 		addSide(level, p0, p1);
 		addSide(level, p1, p2);
 		addSide(level, p2, p0);
@@ -93,12 +94,12 @@ extends GeometricShapeBuilder
 		return coordList.toCoordinateArray();
 	}
 
-	public void addSide(int level, Coordinate p0, Coordinate p1) {
+	public void addSide(int level, Coordinates p0, Coordinate p1) {
 		if (level == 0)
 			addSegment(p0, p1);
 		else {
 			Vector2D base = Vector2D.create(p0, p1);
-			Coordinate midPt = base.multiply(0.5).translate(p0);
+			Coordinates midPt = base.multiply(0.5).translate(p0);
 			
 			Vector2D heightVec = base.multiply(THIRD_HEIGHT);
 			Vector2D offsetVec = heightVec.rotateByQuarterCircle(1);
@@ -116,7 +117,7 @@ extends GeometricShapeBuilder
 		}
 	}
 		
-	private void addSegment(Coordinate p0, Coordinate p1)
+	private void addSegment(Coordinates p0, Coordinate p1)
 	{
 		coordList.add(p1);
 	}

@@ -35,6 +35,7 @@ package com.revolsys.jts.operation.buffer.validate;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 
@@ -124,11 +125,11 @@ public class BufferCurveMaximumDistanceFinder
 			if (index == 0)
 				return;
 			
-			Coordinate p0 = seq.getCoordinate(index - 1);
-			Coordinate p1 = seq.getCoordinate(index);
+			Coordinates p0 = seq.getCoordinate(index - 1);
+			Coordinates p1 = seq.getCoordinate(index);
 			Coordinate midPt = new Coordinate(
-					(p0.x + p1.x)/2,
-					(p0.y + p1.y)/2);
+					(p0.getX() + p1.getX())/2,
+					(p0.getY() + p1.getY())/2, Coordinates.NULL_ORDINATE);
 			
 			minPtDist.initialize();
 			DistanceToPointFinder.computeDistance(geom, midPt, minPtDist);

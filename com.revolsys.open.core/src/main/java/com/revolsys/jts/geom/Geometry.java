@@ -762,7 +762,7 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
     return relate(g).isCovers();
   }
 
-  private Point createPointFromInternalCoord(final Coordinate coord,
+  private Point createPointFromInternalCoord(final Coordinates coord,
     final Geometry exemplar) {
     exemplar.getPrecisionModel().makePrecise(coord);
     return exemplar.getGeometryFactory().createPoint(coord);
@@ -1130,9 +1130,9 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
    */
   public Point getCentroid() {
     if (isEmpty()) {
-      return geometryFactory.createPoint((Coordinate)null);
+      return geometryFactory.createPoint();
     }
-    final Coordinate centPt = Centroid.getCentroid(this);
+    final Coordinates centPt = Centroid.getCentroid(this);
     return createPointFromInternalCoord(centPt, this);
   }
 
@@ -1304,9 +1304,9 @@ public abstract class Geometry implements Cloneable, Comparable<Object>,
    */
   public Point getInteriorPoint() {
     if (isEmpty()) {
-      return geometryFactory.createPoint((Coordinate)null);
+      return geometryFactory.createPoint();
     }
-    Coordinate interiorPt = null;
+    Coordinates interiorPt = null;
     final int dim = getDimension();
     if (dim == 0) {
       final InteriorPointPoint intPt = new InteriorPointPoint(this);

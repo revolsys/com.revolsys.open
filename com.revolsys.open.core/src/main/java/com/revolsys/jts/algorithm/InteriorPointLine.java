@@ -33,7 +33,9 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -52,10 +54,10 @@ import com.revolsys.jts.geom.LineString;
  */
 public class InteriorPointLine {
 
-  private Coordinate centroid;
+  private Coordinates centroid;
   private double minDistance = Double.MAX_VALUE;
 
-  private Coordinate interiorPoint = null;
+  private Coordinates interiorPoint = null;
 
   public InteriorPointLine(Geometry g)
   {
@@ -65,7 +67,7 @@ public class InteriorPointLine {
       addEndpoints(g);
   }
 
-  public Coordinate getInteriorPoint()
+  public Coordinates getInteriorPoint()
   {
     return interiorPoint;
   }
@@ -88,7 +90,7 @@ public class InteriorPointLine {
       }
     }
   }
-  private void addInterior(Coordinate[] pts)
+  private void addInterior(AbstractCoordinates[] pts)
   {
     for (int i = 1; i < pts.length - 1; i++) {
       add(pts[i]);
@@ -112,13 +114,13 @@ public class InteriorPointLine {
       }
     }
   }
-  private void addEndpoints(Coordinate[] pts)
+  private void addEndpoints(AbstractCoordinates[] pts)
   {
     add(pts[0]);
     add(pts[pts.length - 1]);
   }
 
-  private void add(Coordinate point)
+  private void add(AbstractCoordinates point)
   {
     double dist = point.distance(centroid);
     if (dist < minDistance) {

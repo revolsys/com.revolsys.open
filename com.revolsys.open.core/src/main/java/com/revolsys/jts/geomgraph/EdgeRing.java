@@ -41,6 +41,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -83,7 +84,7 @@ public abstract class EdgeRing {
     return isHole;
   }
 
-  public Coordinate getCoordinate(int i) { return (Coordinate) pts.get(i);  }
+  public Coordinates getCoordinate(int i) { return (Coordinates) pts.get(i);  }
   public LinearRing getLinearRing() { return ring; }
   public Label getLabel() { return label; }
   public boolean isShell() { return shell == null; }
@@ -112,9 +113,9 @@ public abstract class EdgeRing {
   public void computeRing()
   {
     if (ring != null) return;   // don't compute more than once
-    Coordinate[] coord = new Coordinate[pts.size()];
+    Coordinates[] coord = new Coordinates[pts.size()];
     for (int i = 0; i < pts.size(); i++) {
-      coord[i] = (Coordinate) pts.get(i);
+      coord[i] = (Coordinates) pts.get(i);
     }
     ring = geometryFactory.createLinearRing(coord);
     isHole = CGAlgorithms.isCCW(ring.getCoordinateArray());
@@ -232,7 +233,7 @@ public abstract class EdgeRing {
    * This method will cause the ring to be computed.
    * It will also check any holes, if they have been assigned.
    */
-  public boolean containsPoint(Coordinate p)
+  public boolean containsPoint(Coordinates p)
   {
     LinearRing shell = getLinearRing();
     Envelope env = shell.getEnvelopeInternal();

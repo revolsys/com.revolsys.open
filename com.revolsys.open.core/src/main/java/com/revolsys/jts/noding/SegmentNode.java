@@ -34,7 +34,9 @@ package com.revolsys.jts.noding;
 
 import java.io.PrintStream;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents an intersection point between two {@link SegmentString}s.
@@ -50,12 +52,12 @@ public class SegmentNode
   private final int segmentOctant;
   private final boolean isInterior;
 
-  public SegmentNode(NodedSegmentString segString, Coordinate coord, int segmentIndex, int segmentOctant) {
+  public SegmentNode(NodedSegmentString segString, AbstractCoordinates coord, int segmentIndex, int segmentOctant) {
     this.segString = segString;
     this.coord = new Coordinate(coord);
     this.segmentIndex = segmentIndex;
     this.segmentOctant = segmentOctant;
-    isInterior = ! coord.equals2D(segString.getCoordinate(segmentIndex));
+    isInterior = ! coord.equals2d(segString.getCoordinate(segmentIndex));
   }
 
   /**
@@ -63,7 +65,7 @@ public class SegmentNode
    * 
    * @return the coordinate of the node
    */
-  public Coordinate getCoordinate() 
+  public Coordinates getCoordinate() 
   {
     return coord;
   }
@@ -89,7 +91,7 @@ public class SegmentNode
     if (segmentIndex < other.segmentIndex) return -1;
     if (segmentIndex > other.segmentIndex) return 1;
 
-    if (coord.equals2D(other.coord)) return 0;
+    if (coord.equals2d(other.coord)) return 0;
 
     return SegmentPointComparator.compare(segmentOctant, coord, other.coord);
     //return segment.compareNodePosition(this, other);

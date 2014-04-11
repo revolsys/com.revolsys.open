@@ -35,6 +35,7 @@ package com.revolsys.jts.geom.util;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.util.Assert;
@@ -339,12 +340,12 @@ public class AffineTransformation
    * @param dest2 the mapped point for source point 2
    * 
    */
-  public AffineTransformation(Coordinate src0,
-      Coordinate src1,
-      Coordinate src2,
-      Coordinate dest0,
-      Coordinate dest1,
-      Coordinate dest2)
+  public AffineTransformation(Coordinates src0,
+      Coordinates src1,
+      Coordinates src2,
+      Coordinates dest0,
+      Coordinates dest1,
+      Coordinates dest2)
   {
   }
   
@@ -984,12 +985,12 @@ public class AffineTransformation
    * @param dest the coordinate to accept the results 
    * @return the <tt>dest</tt> coordinate
    */
-  public Coordinate transform(Coordinate src, Coordinate dest)
+  public Coordinates transform(Coordinates src, Coordinates dest)
   {
-    double xp = m00 * src.x + m01 * src.y + m02;
-    double yp = m10 * src.x + m11 * src.y + m12;
-    dest.x = xp;
-    dest.y = yp;
+    double xp = m00 * src.getX() + m01 * src.getY() + m02;
+    double yp = m10 * src.getX() + m11 * src.getY() + m12;
+    dest.setX(xp);
+    dest.setY(yp);
     return dest;
   }
   

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceFactory;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
@@ -16,17 +17,17 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(
       coordinates.size(), 3);
     for (int i = 0; i < coordinates.size(); i++) {
-      final Coordinate coordinate = coordinates.get(i);
+      final Coordinates coordinate = coordinates.get(i);
       coordinatesList.setCoordinate(i, coordinate);
     }
     return coordinatesList;
   }
 
   @Override
-  public CoordinatesList create(final Coordinate[] coordinates) {
+  public CoordinatesList create(final Coordinates[] coordinates) {
     final CoordinatesList coordinatesList = create(coordinates.length, 3);
     for (int i = 0; i < coordinates.length; i++) {
-      final Coordinate coordinate = coordinates[i];
+      final Coordinates coordinate = coordinates[i];
       coordinatesList.setCoordinate(i, coordinate);
     }
     return coordinatesList;

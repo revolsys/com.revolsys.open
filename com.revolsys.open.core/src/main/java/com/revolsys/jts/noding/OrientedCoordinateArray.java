@@ -34,6 +34,7 @@ package com.revolsys.jts.noding;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Allows comparing {@link Coordinate} arrays
@@ -100,7 +101,7 @@ public class OrientedCoordinateArray
     return comp;
   }
 
-  private static int compareOriented(Coordinate[] pts1,
+  private static int compareOriented(Coordinates[] pts1,
                                      boolean orientation1,
                                      Coordinate[] pts2,
                                      boolean orientation2)

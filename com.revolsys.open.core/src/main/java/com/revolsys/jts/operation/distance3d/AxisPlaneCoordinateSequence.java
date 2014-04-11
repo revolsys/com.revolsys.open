@@ -35,6 +35,7 @@ package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 
@@ -123,10 +124,10 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public void getCoordinate(final int index, final Coordinate coord) {
-    coord.x = getOrdinate(index, X);
-    coord.y = getOrdinate(index, Y);
-    coord.z = getOrdinate(index, Z);
+  public void getCoordinate(final int index, final Coordinates coord) {
+    coord.setX(getOrdinate(index, X));
+    coord.setY(getOrdinate(index, Y));
+    coord.setZ(getOrdinate(index, Z));
   }
 
   @Override

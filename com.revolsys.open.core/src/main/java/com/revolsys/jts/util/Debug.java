@@ -42,8 +42,9 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -106,16 +107,16 @@ public class Debug {
 
   public static boolean isDebugging() { return debugOn; }
 
-  public static LineString toLine(Coordinate p0, Coordinate p1) {
-    return fact.createLineString(new Coordinate[] { p0, p1 });
+  public static LineString toLine(Coordinates p0, Coordinates p1) {
+    return fact.createLineString(new Coordinates[] { p0, p1 });
   }
 
-  public static LineString toLine(Coordinate p0, Coordinate p1, Coordinate p2) {
-    return fact.createLineString(new Coordinate[] { p0, p1, p2});
+  public static LineString toLine(Coordinates p0, Coordinates p1, Coordinates p2) {
+    return fact.createLineString(new Coordinates[] { p0, p1, p2});
   }
 
-  public static LineString toLine(Coordinate p0, Coordinate p1, Coordinate p2, Coordinate p3) {
-    return fact.createLineString(new Coordinate[] { p0, p1, p2, p3});
+  public static LineString toLine(Coordinates p0, Coordinates p1, Coordinates p2, Coordinates p3) {
+    return fact.createLineString(new Coordinates[] { p0, p1, p2, p3});
   }
 
   public static void print(String str) {
@@ -188,7 +189,7 @@ public class Debug {
     return new String(ch);
   }
   
-  public static boolean equals(Coordinate c1, Coordinate c2, double tolerance)
+  public static boolean equals(AbstractCoordinates c1, Coordinates c2, double tolerance)
   {
   	return c1.distance(c2) <= tolerance;
   }
@@ -221,7 +222,7 @@ public class Debug {
     if (o1.equals(o2)) doBreak();
   }
   
-  public static void breakIfEqual(Coordinate p0, Coordinate p1, double tolerance)
+  public static void breakIfEqual(AbstractCoordinates p0, Coordinates p1, double tolerance)
   {
     if (p0.distance(p1) <= tolerance) doBreak();
   }
@@ -232,7 +233,7 @@ public class Debug {
     return; 
   }
   
-  public static boolean hasSegment(Geometry geom, Coordinate p0, Coordinate p1)
+  public static boolean hasSegment(Geometry geom, AbstractCoordinates p0, AbstractCoordinates p1)
   {
     SegmentFindingFilter filter = new SegmentFindingFilter(p0, p1);
     geom.apply(filter);
@@ -242,10 +243,10 @@ public class Debug {
   private static class SegmentFindingFilter
   implements CoordinateSequenceFilter
   {
-    private Coordinate p0, p1;
+    private AbstractCoordinates p0, p1;
     private boolean hasSegment = false;
     
-    public SegmentFindingFilter(Coordinate p0, Coordinate p1)
+    public SegmentFindingFilter(AbstractCoordinates p0, AbstractCoordinates p1)
     {
       this.p0 = p0;
       this.p1 = p1;
@@ -256,8 +257,8 @@ public class Debug {
     public void filter(CoordinatesList seq, int i)
     {
       if (i == 0) return;
-      hasSegment = p0.equals2D(seq.getCoordinate(i-1)) 
-          && p1.equals2D(seq.getCoordinate(i));
+      hasSegment = p0.equals2d(seq.getCoordinate(i-1)) 
+          && p1.equals2d(seq.getCoordinate(i));
     }
     
     public boolean isDone()

@@ -38,8 +38,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents a list of contiguous line segments,
@@ -104,7 +106,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segmentIndex the index of the segment containing the intersection
    */
   @Override
-  public void addIntersection(final Coordinate intPt, final int segmentIndex) {
+  public void addIntersection(final AbstractCoordinates intPt, final int segmentIndex) {
     addIntersectionNode(intPt, segmentIndex);
   }
 
@@ -116,7 +118,7 @@ public class NodedSegmentString implements NodableSegmentString {
    */
   public void addIntersection(final LineIntersector li, final int segmentIndex,
     final int geomIndex, final int intIndex) {
-    final Coordinate intPt = new Coordinate(li.getIntersection(intIndex));
+    final AbstractCoordinates intPt = new Coordinate(li.getIntersection(intIndex));
     addIntersection(intPt, segmentIndex);
   }
 
@@ -129,19 +131,19 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segmentIndex the index of the segment containing the intersection
    * @return the intersection node for the point
    */
-  public SegmentNode addIntersectionNode(final Coordinate intPt,
+  public SegmentNode addIntersectionNode(final AbstractCoordinates intPt,
     final int segmentIndex) {
     int normalizedSegmentIndex = segmentIndex;
     // Debug.println("edge intpt: " + intPt + " dist: " + dist);
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < pts.length) {
-      final Coordinate nextPt = pts[nextSegIndex];
+      final Coordinates nextPt = pts[nextSegIndex];
       // Debug.println("next pt: " + nextPt);
 
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (intPt.equals2D(nextPt)) {
+      if (intPt.equals2d(nextPt)) {
         // Debug.println("normalized distance");
         normalizedSegmentIndex = nextSegIndex;
       }
@@ -208,8 +210,8 @@ public class NodedSegmentString implements NodableSegmentString {
     return pts[0].equals(pts[pts.length - 1]);
   }
 
-  private int safeOctant(final Coordinate p0, final Coordinate p1) {
-    if (p0.equals2D(p1)) {
+  private int safeOctant(final AbstractCoordinates p0, final Coordinates p1) {
+    if (p0.equals2d(p1)) {
       return 0;
     }
     return Octant.octant(p0, p1);

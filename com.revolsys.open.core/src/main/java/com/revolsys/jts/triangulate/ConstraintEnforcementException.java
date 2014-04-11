@@ -34,6 +34,7 @@
 package com.revolsys.jts.triangulate;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.io.WKTWriter;
 
 /**
@@ -46,13 +47,13 @@ public class ConstraintEnforcementException extends RuntimeException {
 
     private static final long serialVersionUID = 386496846550080140L;
 
-    private static String msgWithCoord(String msg, Coordinate pt) {
+    private static String msgWithCoord(String msg, Coordinates pt) {
         if (pt != null)
             return msg + " [ " + WKTWriter.toPoint(pt) + " ]";
         return msg;
     }
 
-    private Coordinate pt = null;
+    private Coordinates pt = null;
 
     /**
      * Creates a new instance with a given message.
@@ -69,7 +70,7 @@ public class ConstraintEnforcementException extends RuntimeException {
      * @param msg a string
      * @param pt the location of the error
      */
-    public ConstraintEnforcementException(String msg, Coordinate pt) {
+    public ConstraintEnforcementException(String msg, Coordinates pt) {
         super(msgWithCoord(msg, pt));
         this.pt = new Coordinate(pt);
     }
@@ -79,7 +80,7 @@ public class ConstraintEnforcementException extends RuntimeException {
      * 
      * @return a location
      */
-    public Coordinate getCoordinate() {
+    public Coordinates getCoordinate() {
         return pt;
     }
 }

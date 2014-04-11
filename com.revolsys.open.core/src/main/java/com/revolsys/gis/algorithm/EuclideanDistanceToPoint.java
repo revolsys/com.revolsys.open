@@ -32,7 +32,9 @@
 
 package com.revolsys.gis.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineSegment;
@@ -70,17 +72,17 @@ public class EuclideanDistanceToPoint {
 
   public void computeDistance(final LineSegment segment, final Coordinate pt,
     final PointPairDistance ptDist) {
-    final Coordinate closestPt = segment.closestPoint(pt);
+    final AbstractCoordinates closestPt = segment.closestPoint(pt);
     ptDist.setMinimum(closestPt, pt);
   }
 
   public void computeDistance(final LineString line, final Coordinate pt,
     final PointPairDistance ptDist) {
-    final Coordinate[] coords = line.getCoordinateArray();
+    final Coordinates[] coords = line.getCoordinateArray();
     for (int i = 0; i < coords.length - 1; i++) {
       tempSegment.setCoordinates(coords[i], coords[i + 1]);
       // this is somewhat inefficient - could do better
-      final Coordinate closestPt = tempSegment.closestPoint(pt);
+      final AbstractCoordinates closestPt = tempSegment.closestPoint(pt);
       ptDist.setMinimum(closestPt, pt);
     }
   }

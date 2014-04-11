@@ -2,7 +2,7 @@ package com.revolsys.gis.graph.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 public class NodeCoordinatesFilter<T> implements Filter<Node<T>> {
   private Filter<Coordinates> filter;

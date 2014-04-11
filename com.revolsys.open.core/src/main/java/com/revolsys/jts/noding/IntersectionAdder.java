@@ -34,6 +34,7 @@ package com.revolsys.jts.noding;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Computes the possible intersections between two line segments in {@link NodedSegmentString}s
@@ -60,7 +61,7 @@ public class IntersectionAdder
   private boolean hasInterior = false;
 
   // the proper intersection point found
-  private Coordinate properIntersectionPoint = null;
+  private Coordinates properIntersectionPoint = null;
 
   private LineIntersector li;
   private boolean isSelfIntersection;
@@ -82,7 +83,7 @@ public class IntersectionAdder
   /**
    * @return the proper intersection point, or <code>null</code> if none was found
    */
-  public Coordinate getProperIntersectionPoint()  {    return properIntersectionPoint;  }
+  public Coordinates getProperIntersectionPoint()  {    return properIntersectionPoint;  }
 
   public boolean hasIntersection() { return hasIntersection; }
   /**

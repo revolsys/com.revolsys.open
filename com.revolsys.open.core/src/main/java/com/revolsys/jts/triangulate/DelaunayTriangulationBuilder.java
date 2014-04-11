@@ -41,6 +41,7 @@ import java.util.List;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -68,7 +69,7 @@ public class DelaunayTriangulationBuilder {
   public static Envelope envelope(final Collection coords) {
     final Envelope env = new Envelope();
     for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinate coord = (Coordinate)i.next();
+      final Coordinates coord = (Coordinates)i.next();
       env.expandToInclude(coord);
     }
     return env;
@@ -84,7 +85,7 @@ public class DelaunayTriangulationBuilder {
       return new CoordinateList();
     }
 
-    final Coordinate[] coords = geom.getCoordinateArray();
+    final Coordinates[] coords = geom.getCoordinateArray();
     return unique(coords);
   }
 
@@ -96,13 +97,13 @@ public class DelaunayTriangulationBuilder {
   public static List toVertices(final Collection coords) {
     final List verts = new ArrayList();
     for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinate coord = (Coordinate)i.next();
+      final Coordinates coord = (Coordinates)i.next();
       verts.add(new Vertex(coord));
     }
     return verts;
   }
 
-  public static CoordinateList unique(final Coordinate[] coords) {
+  public static CoordinateList unique(final Coordinates[] coords) {
     final Coordinate[] coordsCopy = CoordinateArrays.copyDeep(coords);
     Arrays.sort(coordsCopy);
     final CoordinateList coordList = new CoordinateList(coordsCopy, false);

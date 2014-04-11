@@ -33,7 +33,9 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -77,23 +79,23 @@ public class Centroid
    * @param geom the geometry to use
    * @return the centroid point, or null if the geometry is empty
    */
-  public static Coordinate getCentroid(Geometry geom)
+  public static Coordinates getCentroid(Geometry geom)
   {
     Centroid cent = new Centroid(geom);
     return cent.getCentroid();
   }
   
-  private Coordinate areaBasePt = null;// the point all triangles are based at
-  private Coordinate triangleCent3 = new Coordinate();// temporary variable to hold centroid of triangle
+  private Coordinates areaBasePt = null;// the point all triangles are based at
+  private Coordinates triangleCent3 = new Coordinate();// temporary variable to hold centroid of triangle
   private double  areasum2 = 0;        /* Partial area sum */
-  private Coordinate cg3 = new Coordinate(); // partial centroid sum
+  private Coordinates cg3 = new Coordinate(); // partial centroid sum
   
   // data for linear centroid computation, if needed
-  private Coordinate lineCentSum = new Coordinate();
+  private Coordinates lineCentSum = new Coordinate();
   private double totalLength = 0.0;
 
   private int ptCount = 0;
-  private Coordinate ptCentSum = new Coordinate();
+  private Coordinates ptCentSum = new Coordinate();
 
   /**
    * Creates a new instance for computing the centroid of a geometry
@@ -136,7 +138,7 @@ public class Centroid
    * 
    * @return the computed centroid, or null if the input is empty
    */
-  public Coordinate getCentroid()
+  public Coordinates getCentroid()
   {
     /**
      * The centroid is computed from the highest dimension components present in the input.
@@ -144,27 +146,27 @@ public class Centroid
      * Degenerate geometry are computed using their effective dimension
      * (e.g. areas may degenerate to lines or points)
      */
-    Coordinate cent = new Coordinate();
+    Coordinates cent = new Coordinate();
     if (Math.abs(areasum2) > 0.0) {
       /**
        * Input contains areal geometry
        */
-    	cent.x = cg3.x / 3 / areasum2;
-    	cent.y = cg3.y / 3 / areasum2;
+    	cent.setX(cg3.getX() / 3 / areasum2);
+    	cent.setY(cg3.getY() / 3 / areasum2);
     }
     else if (totalLength > 0.0) {
       /**
        * Input contains lineal geometry
        */
-      cent.x = lineCentSum.x / totalLength;
-      cent.y = lineCentSum.y / totalLength;   	
+      cent.setX(lineCentSum.getX() / totalLength);
+      cent.setY(lineCentSum.getY() / totalLength);   	
     }
     else if (ptCount > 0){
       /**
        * Input contains puntal geometry only
        */
-      cent.x = ptCentSum.x / ptCount;
-      cent.y = ptCentSum.y / ptCount;
+      cent.setX(ptCentSum.getX() / ptCount);
+      cent.setY(ptCentSum.getY() / ptCount);
     }
     else {
       return null;
@@ -172,7 +174,7 @@ public class Centroid
     return cent;
   }
 
-  private void setBasePoint(Coordinate basePt)
+  private void setBasePoint(Coordinates basePt)
   {
     if (this.areaBasePt == null)
       this.areaBasePt = basePt;
@@ -205,13 +207,13 @@ public class Centroid
     }
     addLineSegments(pts);
   }
-  private void addTriangle(Coordinate p0, Coordinate p1, Coordinate p2, boolean isPositiveArea)
+  private void addTriangle(Coordinates p0, Coordinates p1, Coordinates p2, boolean isPositiveArea)
   {
     double sign = (isPositiveArea) ? 1.0 : -1.0;
     centroid3( p0, p1, p2, triangleCent3 );
     double area2 =  area2( p0, p1, p2 );
-    cg3.x += sign * area2 * triangleCent3.x;
-    cg3.y += sign * area2 * triangleCent3.y;
+    cg3.setX(cg3.getX() + sign * area2 * triangleCent3.getX());
+    cg3.setY(cg3.getY() + sign * area2 * triangleCent3.getY());
     areasum2 += sign * area2;
   }
   /**
@@ -219,10 +221,10 @@ public class Centroid
    * The factor of 3 is
    * left in to permit division to be avoided until later.
    */
-  private static void centroid3( Coordinate p1, Coordinate p2, Coordinate p3, Coordinate c )
+  private static void centroid3( Coordinates p1, Coordinates p2, Coordinates p3, Coordinates c )
   {
-    c.x = p1.x + p2.x + p3.x;
-    c.y = p1.y + p2.y + p3.y;
+    c.setX(p1.getX() + p2.getX() + p3.getX());
+    c.setY(p1.getY() + p2.getY() + p3.getY());
     return;
   }
 
@@ -230,11 +232,11 @@ public class Centroid
    * Returns twice the signed area of the triangle p1-p2-p3.
    * The area is positive if the triangle is oriented CCW, and negative if CW.
    */
-  private static double area2( Coordinate p1, Coordinate p2, Coordinate p3 )
+  private static double area2( Coordinates p1, Coordinates p2, Coordinates p3 )
   {
     return
-    (p2.x - p1.x) * (p3.y - p1.y) -
-        (p3.x - p1.x) * (p2.y - p1.y);
+    (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) -
+        (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
   }
 
   /**
@@ -243,7 +245,7 @@ public class Centroid
    * 
    * @param pts an array of {@link Coordinate}s
    */
-  private void addLineSegments(Coordinate[] pts)
+  private void addLineSegments(AbstractCoordinates[] pts)
   {
     double lineLen = 0.0;
     for (int i = 0; i < pts.length - 1; i++) {
@@ -253,10 +255,10 @@ public class Centroid
       
       lineLen += segmentLen;
 
-      double midx = (pts[i].x + pts[i + 1].x) / 2;
-      lineCentSum.x += segmentLen * midx;
-      double midy = (pts[i].y + pts[i + 1].y) / 2;
-      lineCentSum.y += segmentLen * midy;
+      double midx = (pts[i].getX() + pts[i + 1].getX()) / 2;
+      lineCentSum.setX(lineCentSum.getX() + segmentLen * midx);
+      double midy = (pts[i].getY() + pts[i + 1].getY()) / 2;
+      lineCentSum.setY(lineCentSum.getY() + segmentLen * midy);
     }
     totalLength += lineLen;
     if (lineLen == 0.0 && pts.length > 0)
@@ -267,11 +269,11 @@ public class Centroid
    * Adds a point to the point centroid accumulator.
    * @param pt a {@link Coordinate}
    */
-  private void addPoint(Coordinate pt)
+  private void addPoint(Coordinates pt)
   {
     ptCount += 1;
-    ptCentSum.x += pt.x;
-    ptCentSum.y += pt.y;
+    ptCentSum.setX(ptCentSum.getX() + pt.getX());
+    ptCentSum.setY(ptCentSum.getY() + pt.getY());
   }
 
 

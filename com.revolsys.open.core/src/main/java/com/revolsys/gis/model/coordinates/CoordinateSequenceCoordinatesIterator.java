@@ -3,6 +3,7 @@ package com.revolsys.gis.model.coordinates;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates

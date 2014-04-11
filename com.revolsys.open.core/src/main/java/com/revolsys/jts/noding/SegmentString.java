@@ -33,6 +33,7 @@
  */
 package com.revolsys.jts.noding;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 
 /**
@@ -59,7 +60,7 @@ public interface SegmentString
   public void setData(Object data);
 
   public int size();
-  public Coordinate getCoordinate(int i);
+  public AbstractCoordinates getCoordinate(int i);
   public Coordinate[] getCoordinates();
   public boolean isClosed();
 }

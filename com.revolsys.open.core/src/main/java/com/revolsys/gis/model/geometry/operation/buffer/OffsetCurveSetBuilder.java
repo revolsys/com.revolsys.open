@@ -3,7 +3,6 @@ package com.revolsys.gis.model.geometry.operation.buffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
@@ -23,6 +22,7 @@ import com.revolsys.gis.model.geometry.operation.chain.NodedSegmentString;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Label;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Position;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Location;
 

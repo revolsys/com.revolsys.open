@@ -44,9 +44,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -215,8 +216,8 @@ class BufferBuilder
        * Discard edges which have zero length, 
        * since they carry no information and cause problems with topology building
        */
-      Coordinate[] pts = segStr.getCoordinates();
-      if (pts.length == 2 && pts[0].equals2D(pts[1]))
+      AbstractCoordinates[] pts = segStr.getCoordinates();
+      if (pts.length == 2 && pts[0].equals2d(pts[1]))
         continue;
 
       Label oldLabel = (Label) segStr.getData();
@@ -299,7 +300,7 @@ class BufferBuilder
     List processedGraphs = new ArrayList();
     for (Iterator i = subgraphList.iterator(); i.hasNext(); ) {
       BufferSubgraph subgraph = (BufferSubgraph) i.next();
-      Coordinate p = subgraph.getRightmostCoordinate();
+      Coordinates p = subgraph.getRightmostCoordinate();
 //      int outsideDepth = 0;
 //      if (polyBuilder.containsPoint(p))
 //        outsideDepth = 1;

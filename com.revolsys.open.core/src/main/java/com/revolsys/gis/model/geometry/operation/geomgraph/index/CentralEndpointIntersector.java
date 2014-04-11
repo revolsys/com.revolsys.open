@@ -32,8 +32,8 @@
  */
 package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Computes an approximate intersection of two line segments

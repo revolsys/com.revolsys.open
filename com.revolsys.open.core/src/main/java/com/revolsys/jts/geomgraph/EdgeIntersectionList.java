@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A list of edge intersections along an {@link Edge}.
@@ -63,7 +64,7 @@ public class EdgeIntersectionList
    * The input segmentIndex and dist are expected to be normalized.
    * @return the EdgeIntersection found or added
    */
-  public EdgeIntersection add(Coordinate intPt, int segmentIndex, double dist)
+  public EdgeIntersection add(Coordinates intPt, int segmentIndex, double dist)
   {
     EdgeIntersection eiNew = new EdgeIntersection(intPt, segmentIndex, dist);
     EdgeIntersection ei = (EdgeIntersection) nodeMap.get(eiNew);
@@ -141,12 +142,12 @@ public class EdgeIntersectionList
 //Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
 
-    Coordinate lastSegStartPt = edge.pts[ei1.segmentIndex];
+    Coordinates lastSegStartPt = edge.pts[ei1.segmentIndex];
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    boolean useIntPt1 = ei1.dist > 0.0 || ! ei1.coord.equals2D(lastSegStartPt);
+    boolean useIntPt1 = ei1.dist > 0.0 || ! ei1.coord.equals2d(lastSegStartPt);
     if (! useIntPt1) {
       npts--;
     }

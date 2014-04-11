@@ -40,6 +40,7 @@ import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.Node;
 
@@ -66,7 +67,7 @@ public class SegmentIntersector
   private boolean hasProper = false;
   private boolean hasProperInterior = false;
   // the proper intersection point found
-  private Coordinate properIntersectionPoint = null;
+  private Coordinates properIntersectionPoint = null;
 
   private LineIntersector li;
   private boolean includeProper;
@@ -102,7 +103,7 @@ public class SegmentIntersector
   /**
    * @return the proper intersection point, or <code>null</code> if none was found
    */
-  public Coordinate getProperIntersectionPoint()  {    return properIntersectionPoint;  }
+  public Coordinates getProperIntersectionPoint()  {    return properIntersectionPoint;  }
 
   public boolean hasIntersection() { return hasIntersection; }
   /**
@@ -186,7 +187,7 @@ numTests++;
           e1.addIntersections(li, segIndex1, 1);
         }
         if (li.isProper()) {
-          properIntersectionPoint = (Coordinate) li.getIntersection(0).clone();
+          properIntersectionPoint = (Coordinates) li.getIntersection(0).clone();
           hasProper = true;
           if (! isBoundaryPoint(li, bdyNodes))
             hasProperInterior = true;
@@ -209,7 +210,7 @@ numTests++;
   {
     for (Iterator i = bdyNodes.iterator(); i.hasNext(); ) {
       Node node = (Node) i.next();
-      Coordinate pt = node.getCoordinate();
+      Coordinates pt = node.getCoordinate();
       if (li.isIntersection(pt)) return true;
     }
     return false;

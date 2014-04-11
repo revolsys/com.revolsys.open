@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.geometry;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 public interface Point extends Coordinates, Geometry {
   double distance(Point point);

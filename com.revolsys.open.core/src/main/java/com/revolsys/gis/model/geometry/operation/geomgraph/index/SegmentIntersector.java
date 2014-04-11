@@ -3,9 +3,9 @@ package com.revolsys.gis.model.geometry.operation.geomgraph.index;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Edge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Computes the intersection of line segments, and adds the intersection to the

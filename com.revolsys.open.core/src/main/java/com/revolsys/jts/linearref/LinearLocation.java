@@ -33,7 +33,9 @@
 
 package com.revolsys.jts.linearref;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -82,10 +84,10 @@ public class LinearLocation
     if (frac <= 0.0) return p0;
     if (frac >= 1.0) return p1;
 
-    double x = (p1.x - p0.x) * frac + p0.x;
-    double y = (p1.y - p0.y) * frac + p0.y;
+    double x = (p1.getX() - p0.getX()) * frac + p0.getX();
+    double y = (p1.getY() - p0.getY()) * frac + p0.getY();
     // interpolate Z value. If either input Z is NaN, result z will be NaN as well.
-    double z = (p1.z - p0.z) * frac + p0.z;
+    double z = (p1.getZ() - p0.getZ()) * frac + p0.getZ();
     return new Coordinate(x, y, z);
   }
 
@@ -221,8 +223,8 @@ public class LinearLocation
     if (segmentIndex >= lineComp.getNumPoints() - 1)
       segIndex = lineComp.getNumPoints() - 2;
 
-    Coordinate p0 = lineComp.getCoordinateN(segIndex);
-    Coordinate p1 = lineComp.getCoordinateN(segIndex + 1);
+    AbstractCoordinates p0 = lineComp.getCoordinateN(segIndex);
+    Coordinates p1 = lineComp.getCoordinateN(segIndex + 1);
     return p0.distance(p1);
   }
 

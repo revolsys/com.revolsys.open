@@ -1,6 +1,6 @@
 package com.revolsys.gis.cs.projection;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 public class CopyOperation implements CoordinatesOperation {
 

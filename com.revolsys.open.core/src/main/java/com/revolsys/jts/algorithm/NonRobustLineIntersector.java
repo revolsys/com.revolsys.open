@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,220 +32,49 @@
  *     www.vividsolutions.com
  */
 package com.revolsys.jts.algorithm;
+
 /**
  *@version 1.7
  */
 import com.revolsys.jts.geom.Coordinate;
-//import com.revolsys.jts.util.Debug;
+//import com.revolsys.jts.testold.util.Debug;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A non-robust version of {@link LineIntersector}.
  *
  * @version 1.7
  */
-public class NonRobustLineIntersector
-    extends LineIntersector
-{
+public class NonRobustLineIntersector extends LineIntersector {
   /**
    * @return true if both numbers are positive or if both numbers are negative.
    * Returns false if both numbers are zero.
    */
-  public static boolean isSameSignAndNonZero(double a, double b) {
+  public static boolean isSameSignAndNonZero(final double a, final double b) {
     if (a == 0 || b == 0) {
       return false;
     }
     return (a < 0 && b < 0) || (a > 0 && b > 0);
   }
 
-
   public NonRobustLineIntersector() {
   }
 
-  public void computeIntersection(
-      Coordinate p,
-      Coordinate p1,
-      Coordinate p2) {
-    double a1;
-    double b1;
-    double c1;
-    /*
-     *  Coefficients of line eqns.
-     */
-    double r;
-    /*
-     *  'Sign' values
-     */
-    isProper = false;
-
-    /*
-     *  Compute a1, b1, c1, where line joining points 1 and 2
-     *  is "a1 x  +  b1 y  +  c1  =  0".
-     */
-    a1 = p2.y - p1.y;
-    b1 = p1.x - p2.x;
-    c1 = p2.x * p1.y - p1.x * p2.y;
-
-    /*
-     *  Compute r3 and r4.
-     */
-    r = a1 * p.x + b1 * p.y + c1;
-
-    // if r != 0 the point does not lie on the line
-    if (r != 0) {
-      result = NO_INTERSECTION;
-      return;
-    }
-
-    // Point lies on line - check to see whether it lies in line segment.
-
-    double dist = rParameter(p1, p2, p);
-    if (dist < 0.0 || dist > 1.0) {
-      result = NO_INTERSECTION;
-      return;
-    }
-
-    isProper = true;
-    if (p.equals(p1) || p.equals(p2)) {
-      isProper = false;
-    }
-    result = POINT_INTERSECTION;
-  }
-
-  protected int computeIntersect(
-      Coordinate p1,
-      Coordinate p2,
-      Coordinate p3,
-      Coordinate p4) {
-    double a1;
-    double b1;
-    double c1;
-    /*
-     *  Coefficients of line eqns.
-     */
-    double a2;
-    /*
-     *  Coefficients of line eqns.
-     */
-    double b2;
-    /*
-     *  Coefficients of line eqns.
-     */
-    double c2;
-    double r1;
-    double r2;
-    double r3;
-    double r4;
-    /*
-     *  'Sign' values
-     */
-    //double denom, offset, num;     /* Intermediate values */
-
-    isProper = false;
-
-    /*
-     *  Compute a1, b1, c1, where line joining points 1 and 2
-     *  is "a1 x  +  b1 y  +  c1  =  0".
-     */
-    a1 = p2.y - p1.y;
-    b1 = p1.x - p2.x;
-    c1 = p2.x * p1.y - p1.x * p2.y;
-
-    /*
-     *  Compute r3 and r4.
-     */
-    r3 = a1 * p3.x + b1 * p3.y + c1;
-    r4 = a1 * p4.x + b1 * p4.y + c1;
-
-    /*
-     *  Check signs of r3 and r4.  If both point 3 and point 4 lie on
-     *  same side of line 1, the line segments do not intersect.
-     */
-    if (r3 != 0 &&
-        r4 != 0 &&
-        isSameSignAndNonZero(r3, r4)) {
-      return NO_INTERSECTION;
-    }
-
-    /*
-     *  Compute a2, b2, c2
-     */
-    a2 = p4.y - p3.y;
-    b2 = p3.x - p4.x;
-    c2 = p4.x * p3.y - p3.x * p4.y;
-
-    /*
-     *  Compute r1 and r2
-     */
-    r1 = a2 * p1.x + b2 * p1.y + c2;
-    r2 = a2 * p2.x + b2 * p2.y + c2;
-
-    /*
-     *  Check signs of r1 and r2.  If both point 1 and point 2 lie
-     *  on same side of second line segment, the line segments do
-     *  not intersect.
-     */
-    if (r1 != 0 &&
-        r2 != 0 &&
-        isSameSignAndNonZero(r1, r2)) {
-      return NO_INTERSECTION;
-    }
-
-    /**
-     *  Line segments intersect: compute intersection point.
-     */
-    double denom = a1 * b2 - a2 * b1;
-    if (denom == 0) {
-      return computeCollinearIntersection(p1, p2, p3, p4);
-    }
-    double numX = b1 * c2 - b2 * c1;
-    pa.x = numX / denom;
-    /*
-     *  TESTING ONLY
-     *  double valX = (( num < 0 ? num - offset : num + offset ) / denom);
-     *  double valXInt = (int) (( num < 0 ? num - offset : num + offset ) / denom);
-     *  if (valXInt != pa.x)     // TESTING ONLY
-     *  System.out.println(val + " - int: " + valInt + ", floor: " + pa.x);
-     */
-    double numY = a2 * c1 - a1 * c2;
-    pa.y = numY / denom;
-
-    // check if this is a proper intersection BEFORE truncating values,
-    // to avoid spurious equality comparisons with endpoints
-    isProper = true;
-    if (pa.equals(p1) || pa.equals(p2) || pa.equals(p3) || pa.equals(p4)) {
-      isProper = false;
-    }
-
-    // truncate computed point to precision grid
-    // TESTING - don't force coord to be precise
-    if (precisionModel != null) {
-      precisionModel.makePrecise(pa);
-    }
-    return POINT_INTERSECTION;
-  }
-
-
   /*
-   *  p1-p2  and p3-p4 are assumed to be collinear (although
-   *  not necessarily intersecting). Returns:
-   *  DONT_INTERSECT	: the two segments do not intersect
-   *  COLLINEAR		: the segments intersect, in the
-   *  line segment pa-pb.  pa-pb is in
-   *  the same direction as p1-p2
-   *  DO_INTERSECT		: the inputLines intersect in a single point
-   *  only, pa
+   * p1-p2 and p3-p4 are assumed to be collinear (although not necessarily
+   * intersecting). Returns: DONT_INTERSECT : the two segments do not intersect
+   * COLLINEAR : the segments intersect, in the line segment pa-pb. pa-pb is in
+   * the same direction as p1-p2 DO_INTERSECT : the inputLines intersect in a
+   * single point only, pa
    */
-  private int computeCollinearIntersection(
-      Coordinate p1,
-      Coordinate p2,
-      Coordinate p3,
-      Coordinate p4) {
+  private int computeCollinearIntersection(final Coordinates p1,
+    final Coordinates p2, final Coordinates p3, final Coordinates p4) {
     double r1;
     double r2;
     double r3;
     double r4;
-    Coordinate q3;
-    Coordinate q4;
+    Coordinates q3;
+    Coordinates q4;
     double t3;
     double t4;
     r1 = 0;
@@ -259,8 +87,7 @@ public class NonRobustLineIntersector
       t3 = r3;
       q4 = p4;
       t4 = r4;
-    }
-    else {
+    } else {
       q3 = p4;
       t3 = r4;
       q4 = p3;
@@ -293,23 +120,177 @@ public class NonRobustLineIntersector
     return COLLINEAR_INTERSECTION;
   }
 
+  @Override
+  protected int computeIntersect(final Coordinate p1, final Coordinate p2,
+    final Coordinate p3, final Coordinate p4) {
+    double a1;
+    double b1;
+    double c1;
+    /*
+     * Coefficients of line eqns.
+     */
+    double a2;
+    /*
+     * Coefficients of line eqns.
+     */
+    double b2;
+    /*
+     * Coefficients of line eqns.
+     */
+    double c2;
+    double r1;
+    double r2;
+    double r3;
+    double r4;
+    /*
+     * 'Sign' values
+     */
+    // double denom, offset, num; /* Intermediate values */
+
+    isProper = false;
+
+    /*
+     * Compute a1, b1, c1, where line joining points 1 and 2 is
+     * "a1 x  +  b1 y  +  c1  =  0".
+     */
+    a1 = p2.getY() - p1.getY();
+    b1 = p1.getX() - p2.getX();
+    c1 = p2.getX() * p1.getY() - p1.getX() * p2.getY();
+
+    /*
+     * Compute r3 and r4.
+     */
+    r3 = a1 * p3.getX() + b1 * p3.getY() + c1;
+    r4 = a1 * p4.getX() + b1 * p4.getY() + c1;
+
+    /*
+     * Check signs of r3 and r4. If both point 3 and point 4 lie on same side of
+     * line 1, the line segments do not intersect.
+     */
+    if (r3 != 0 && r4 != 0 && isSameSignAndNonZero(r3, r4)) {
+      return NO_INTERSECTION;
+    }
+
+    /*
+     * Compute a2, b2, c2
+     */
+    a2 = p4.getY() - p3.getY();
+    b2 = p3.getX() - p4.getX();
+    c2 = p4.getX() * p3.getY() - p3.getX() * p4.getY();
+
+    /*
+     * Compute r1 and r2
+     */
+    r1 = a2 * p1.getX() + b2 * p1.getY() + c2;
+    r2 = a2 * p2.getX() + b2 * p2.getY() + c2;
+
+    /*
+     * Check signs of r1 and r2. If both point 1 and point 2 lie on same side of
+     * second line segment, the line segments do not intersect.
+     */
+    if (r1 != 0 && r2 != 0 && isSameSignAndNonZero(r1, r2)) {
+      return NO_INTERSECTION;
+    }
+
+    /**
+     *  Line segments intersect: compute intersection point.
+     */
+    final double denom = a1 * b2 - a2 * b1;
+    if (denom == 0) {
+      return computeCollinearIntersection(p1, p2, p3, p4);
+    }
+    final double numX = b1 * c2 - b2 * c1;
+    pa.setX(numX / denom);
+    /*
+     * TESTING ONLY double valX = (( num < 0 ? num - offset : num + offset ) /
+     * denom); double valXInt = (int) (( num < 0 ? num - offset : num + offset )
+     * / denom); if (valXInt != pa.x) // TESTING ONLY System.out.println(val +
+     * " - int: " + valInt + ", floor: " + pa.x);
+     */
+    final double numY = a2 * c1 - a1 * c2;
+    pa.setY(numY / denom);
+
+    // check if this is a proper intersection BEFORE truncating values,
+    // to avoid spurious equality comparisons with endpoints
+    isProper = true;
+    if (pa.equals(p1) || pa.equals(p2) || pa.equals(p3) || pa.equals(p4)) {
+      isProper = false;
+    }
+
+    // truncate computed point to precision grid
+    // TESTING - don't force coord to be precise
+    if (precisionModel != null) {
+      precisionModel.makePrecise(pa);
+    }
+    return POINT_INTERSECTION;
+  }
+
+  @Override
+  public void computeIntersection(final Coordinates p, final Coordinates p1,
+    final Coordinates p2) {
+    double a1;
+    double b1;
+    double c1;
+    /*
+     * Coefficients of line eqns.
+     */
+    double r;
+    /*
+     * 'Sign' values
+     */
+    isProper = false;
+
+    /*
+     * Compute a1, b1, c1, where line joining points 1 and 2 is
+     * "a1 x  +  b1 y  +  c1  =  0".
+     */
+    a1 = p2.getY() - p1.getY();
+    b1 = p1.getX() - p2.getX();
+    c1 = p2.getX() * p1.getY() - p1.getX() * p2.getY();
+
+    /*
+     * Compute r3 and r4.
+     */
+    r = a1 * p.getX() + b1 * p.getY() + c1;
+
+    // if r != 0 the point does not lie on the line
+    if (r != 0) {
+      result = NO_INTERSECTION;
+      return;
+    }
+
+    // Point lies on line - check to see whether it lies in line segment.
+
+    final double dist = rParameter(p1, p2, p);
+    if (dist < 0.0 || dist > 1.0) {
+      result = NO_INTERSECTION;
+      return;
+    }
+
+    isProper = true;
+    if (p.equals(p1) || p.equals(p2)) {
+      isProper = false;
+    }
+    result = POINT_INTERSECTION;
+  }
+
   /**
    *  RParameter computes the parameter for the point p
    *  in the parameterized equation
    *  of the line from p1 to p2.
    *  This is equal to the 'distance' of p along p1-p2
    */
-  private double rParameter(Coordinate p1, Coordinate p2, Coordinate p) {
+  private double rParameter(final Coordinates p1, final Coordinates p2,
+    final Coordinates p) {
     double r;
     // compute maximum delta, for numerical stability
     // also handle case of p1-p2 being vertical or horizontal
-    double dx = Math.abs(p2.x - p1.x);
-    double dy = Math.abs(p2.y - p1.y);
+    final double dx = Math.abs(p2.getX() - p1.getX());
+    final double dy = Math.abs(p2.getY() - p1.getY());
     if (dx > dy) {
-      r = (p.x - p1.x) / (p2.x - p1.x);
-    }
-    else {
-      r = (p.y - p1.y) / (p2.y - p1.y);
+      r = (p.getX() - p1.getX()) / (p2.getX() - p1.getX());
+    } else {
+      r = (p.getY() - p1.getY()) / (p2.getY() - p1.getY());
     }
     return r;
   }

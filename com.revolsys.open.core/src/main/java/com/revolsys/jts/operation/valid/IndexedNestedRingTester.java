@@ -37,6 +37,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geomgraph.GeometryGraph;
@@ -56,14 +57,14 @@ public class IndexedNestedRingTester
   private List rings = new ArrayList();
   private Envelope totalEnv = new Envelope();
   private SpatialIndex index;
-  private Coordinate nestedPt;
+  private Coordinates nestedPt;
 
   public IndexedNestedRingTester(GeometryGraph graph)
   {
     this.graph = graph;
   }
 
-  public Coordinate getNestedPoint() { return nestedPt; }
+  public Coordinates getNestedPoint() { return nestedPt; }
 
   public void add(LinearRing ring)
   {
@@ -83,7 +84,7 @@ public class IndexedNestedRingTester
 //System.out.println(results.size());
       for (int j = 0; j < results.size(); j++) {
         LinearRing searchRing = (LinearRing) results.get(j);
-        Coordinate[] searchRingPts = searchRing.getCoordinateArray();
+        Coordinates[] searchRingPts = searchRing.getCoordinateArray();
 
         if (innerRing == searchRing)
           continue;
@@ -91,7 +92,7 @@ public class IndexedNestedRingTester
         if (! innerRing.getEnvelopeInternal().intersects(searchRing.getEnvelopeInternal()))
           continue;
 
-        Coordinate innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
+        Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
         
         /**
          * If no non-node pts can be found, this means

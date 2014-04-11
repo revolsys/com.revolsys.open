@@ -33,7 +33,9 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.Polygon;
@@ -56,13 +58,13 @@ import com.revolsys.jts.geom.Polygon;
  */
 public class CentroidArea
 {
-  private Coordinate basePt = null;// the point all triangles are based at
-  private Coordinate triangleCent3 = new Coordinate();// temporary variable to hold centroid of triangle
+  private Coordinates basePt = null;// the point all triangles are based at
+  private Coordinates triangleCent3 = new Coordinate();// temporary variable to hold centroid of triangle
   private double  areasum2 = 0;        /* Partial area sum */
-  private Coordinate cg3 = new Coordinate(); // partial centroid sum
+  private Coordinates cg3 = new Coordinate(); // partial centroid sum
   
   // data for linear centroid computation, if needed
-  private Coordinate centSum = new Coordinate();
+  private Coordinates centSum = new Coordinate();
   private double totalLength = 0.0;
 
   public CentroidArea()
@@ -103,22 +105,22 @@ public class CentroidArea
     addShell(ring);
   }
 
-  public Coordinate getCentroid()
+  public Coordinates getCentroid()
   {
-    Coordinate cent = new Coordinate();
+    Coordinates cent = new Coordinate();
     if (Math.abs(areasum2) > 0.0) {
-    	cent.x = cg3.x / 3 / areasum2;
-    	cent.y = cg3.y / 3 / areasum2;
+    	cent.setX(cg3.getX() / 3 / areasum2);
+    	cent.setY(cg3.getY() / 3 / areasum2);
     }
     else {
     	// if polygon was degenerate, compute linear centroid instead
-      cent.x = centSum.x / totalLength;
-      cent.y = centSum.y / totalLength;   	
+      cent.setX(centSum.getX() / totalLength);
+      cent.setY(centSum.getY() / totalLength);   	
     }
     return cent;
   }
 
-  private void setBasePoint(Coordinate basePt)
+  private void setBasePoint(Coordinates basePt)
   {
     if (this.basePt == null)
       this.basePt = basePt;
@@ -148,13 +150,13 @@ public class CentroidArea
     }
     addLinearSegments(pts);
   }
-  private void addTriangle(Coordinate p0, Coordinate p1, Coordinate p2, boolean isPositiveArea)
+  private void addTriangle(Coordinates p0, Coordinates p1, Coordinates p2, boolean isPositiveArea)
   {
     double sign = (isPositiveArea) ? 1.0 : -1.0;
     centroid3( p0, p1, p2, triangleCent3 );
     double area2 =  area2( p0, p1, p2 );
-    cg3.x += sign * area2 * triangleCent3.x;
-    cg3.y += sign * area2 * triangleCent3.y;
+    cg3.setX(cg3.getX() + sign * area2 * triangleCent3.getX());
+    cg3.setY(cg3.getY() + sign * area2 * triangleCent3.getY());
     areasum2 += sign * area2;
   }
   /**
@@ -162,10 +164,10 @@ public class CentroidArea
    * The factor of 3 is
    * left in to permit division to be avoided until later.
    */
-  private static void centroid3( Coordinate p1, Coordinate p2, Coordinate p3, Coordinate c )
+  private static void centroid3( Coordinates p1, Coordinates p2, Coordinates p3, Coordinates c )
   {
-    c.x = p1.x + p2.x + p3.x;
-    c.y = p1.y + p2.y + p3.y;
+    c.setX(p1.getX() + p2.getX() + p3.getX());
+    c.setY(p1.getY() + p2.getY() + p3.getY());
     return;
   }
 
@@ -173,11 +175,11 @@ public class CentroidArea
    * Returns twice the signed area of the triangle p1-p2-p3,
    * positive if a,b,c are oriented ccw, and negative if cw.
    */
-  private static double area2( Coordinate p1, Coordinate p2, Coordinate p3 )
+  private static double area2( Coordinates p1, Coordinates p2, Coordinates p3 )
   {
     return
-    (p2.x - p1.x) * (p3.y - p1.y) -
-        (p3.x - p1.x) * (p2.y - p1.y);
+    (p2.getX() - p1.getX()) * (p3.getY() - p1.getY()) -
+        (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
   }
 
   /**
@@ -188,16 +190,16 @@ public class CentroidArea
    * 
    * @param pts an array of {@link Coordinate}s
    */
-  private void addLinearSegments(Coordinate[] pts)
+  private void addLinearSegments(AbstractCoordinates[] pts)
   {
     for (int i = 0; i < pts.length - 1; i++) {
       double segmentLen = pts[i].distance(pts[i + 1]);
       totalLength += segmentLen;
 
-      double midx = (pts[i].x + pts[i + 1].x) / 2;
-      centSum.x += segmentLen * midx;
-      double midy = (pts[i].y + pts[i + 1].y) / 2;
-      centSum.y += segmentLen * midy;
+      double midx = (pts[i].getX() + pts[i + 1].getX()) / 2;
+      centSum.setX(centSum.getX() + segmentLen * midx);
+      double midy = (pts[i].getY() + pts[i + 1].getY()) / 2;
+      centSum.setY(centSum.getY() + segmentLen * midy);
     }
   }
 

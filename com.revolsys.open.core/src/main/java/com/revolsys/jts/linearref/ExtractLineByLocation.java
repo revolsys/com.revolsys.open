@@ -35,6 +35,7 @@ package com.revolsys.jts.linearref;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -129,14 +130,14 @@ class ExtractLineByLocation
     if (newCoordinates.size() <= 0)
       newCoordinates.add(start.getCoordinate(line));
 
-    Coordinate[] newCoordinateArray = newCoordinates.toCoordinateArray();
+    Coordinates[] newCoordinateArray = newCoordinates.toCoordinateArray();
     /**
      * Ensure there is enough coordinates to build a valid line.
      * Make a 2-point line with duplicate coordinates, if necessary.
      * There will always be at least one coordinate in the coordList.
      */
     if (newCoordinateArray.length <= 1) {
-      newCoordinateArray = new Coordinate[] { newCoordinateArray[0], newCoordinateArray[0]};
+      newCoordinateArray = new Coordinates[] { newCoordinateArray[0], newCoordinateArray[0]};
     }
     return line.getGeometryFactory().createLineString(newCoordinateArray);
   }

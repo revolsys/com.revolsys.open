@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.util.MathUtil;
@@ -249,11 +249,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public void getCoordinate(final int index, final Coordinate coord) {
-    coord.x = getX(index);
-    coord.y = getY(index);
+  public void getCoordinate(final int index, final Coordinates coord) {
+    coord.setX(getX(index));
+    coord.setY(getY(index));
     if (getNumAxis() > 2) {
-      coord.z = getZ(index);
+      coord.setZ(getZ(index));
     }
   }
 
@@ -342,7 +342,6 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return new CoordinatesListCoordinatesIterator(this);
   }
 
-  @Override
   public void makePrecise(final CoordinatesPrecisionModel precisionModel) {
     final InPlaceIterator iterator = new InPlaceIterator(this);
     for (final Coordinates point : iterator) {
@@ -356,11 +355,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public void setCoordinate(final int i, final Coordinate coordinate) {
-    setValue(i, 0, coordinate.x);
-    setValue(i, 1, coordinate.y);
+  public void setCoordinate(final int i, final Coordinates coordinate) {
+    setValue(i, 0, coordinate.getX());
+    setValue(i, 1, coordinate.getY());
     if (getNumAxis() > 2) {
-      setValue(i, 2, coordinate.z);
+      setValue(i, 2, coordinate.getZ());
     }
   }
 

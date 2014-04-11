@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineString;
 
 /**
@@ -48,9 +49,9 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     if (frac >= 1.0) {
       return p1;
     }
-    final double x = (p1.x - p0.x) * frac + p0.x;
-    final double y = (p1.y - p0.y) * frac + p0.y;
-    return new Coordinate(x, y);
+    final double x = (p1.getX() - p0.getX()) * frac + p0.getX();
+    final double y = (p1.getY() - p0.getY()) * frac + p0.getY();
+    return new Coordinate(x, y, Coordinates.NULL_ORDINATE);
   }
 
   private final LineString line;

@@ -17,7 +17,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.PointLocator;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineIntersector;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.SegmentIntersector;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.util.Assert;
@@ -52,7 +52,7 @@ public class RelateComputer {
   private final ArrayList isolatedEdges = new ArrayList();
 
   // the intersection point found (if any)
-  private Coordinate invalidPoint;
+  private Coordinates invalidPoint;
 
   public RelateComputer(final GeometryGraph[] arg) {
     this.arg = arg;

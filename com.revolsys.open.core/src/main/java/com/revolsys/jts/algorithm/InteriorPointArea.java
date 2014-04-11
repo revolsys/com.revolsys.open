@@ -34,6 +34,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -75,7 +76,7 @@ public class InteriorPointArea {
   }
 
   private GeometryFactory factory;
-  private Coordinate interiorPoint = null;
+  private Coordinates interiorPoint = null;
   private double maxWidth = 0.0;
 
   /**
@@ -95,7 +96,7 @@ public class InteriorPointArea {
    * 
    * @return the coordinate of an interior point
    */
-  public Coordinate getInteriorPoint()
+  public Coordinates getInteriorPoint()
   {
     return interiorPoint;
   }
@@ -128,7 +129,7 @@ public class InteriorPointArea {
     if (geometry.isEmpty())
       return;
     
-    Coordinate intPt;
+    Coordinates intPt;
     double width = 0;
     
     LineString bisector = horizontalBisector(geometry);
@@ -184,9 +185,9 @@ public class InteriorPointArea {
     //double avgY = avg(envelope.getMinY(), envelope.getMaxY());
     
     double bisectY = SafeBisectorFinder.getBisectorY((Polygon) geometry);
-    return factory.createLineString(new Coordinate[] {
-            new Coordinate(envelope.getMinX(), bisectY),
-            new Coordinate(envelope.getMaxX(), bisectY)
+    return factory.createLineString(new Coordinates[] {
+            new Coordinate(envelope.getMinX(), bisectY, Coordinates.NULL_ORDINATE),
+            new Coordinate(envelope.getMaxX(), bisectY, Coordinates.NULL_ORDINATE)
         });
   }
 
@@ -195,10 +196,10 @@ public class InteriorPointArea {
    * @param envelope the envelope to analyze
    * @return the centre of the envelope
    */
-  public static Coordinate centre(Envelope envelope) {
+  public static Coordinates centre(Envelope envelope) {
       return new Coordinate(avg(envelope.getMinX(),
               envelope.getMaxX()),
-          avg(envelope.getMinY(), envelope.getMaxY()));
+          avg(envelope.getMinY(), envelope.getMaxY()), Coordinates.NULL_ORDINATE);
   }
 
   /**

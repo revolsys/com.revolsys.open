@@ -38,7 +38,7 @@ import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geomgraph.GeometryGraph;
@@ -75,7 +75,7 @@ public class ConsistentAreaTester {
   private RelateNodeGraph nodeGraph = new RelateNodeGraph();
 
   // the intersection point found (if any)
-  private Coordinate invalidPoint;
+  private Coordinates invalidPoint;
 
   /**
    * Creates a new tester for consistent areas.
@@ -90,7 +90,7 @@ public class ConsistentAreaTester {
     /**
    * @return the intersection point, or <code>null</code> if none was found
    */
-  public Coordinate getInvalidPoint() { return invalidPoint; }
+  public Coordinates getInvalidPoint() { return invalidPoint; }
 
   /**
    * Check all nodes to see if their labels are consistent with area topology.
@@ -125,7 +125,7 @@ public class ConsistentAreaTester {
     for (Iterator nodeIt = nodeGraph.getNodeIterator(); nodeIt.hasNext(); ) {
       RelateNode node = (RelateNode) nodeIt.next();
       if (! node.getEdges().isAreaLabelsConsistent(geomGraph)) {
-        invalidPoint = (Coordinate) node.getCoordinate().clone();
+        invalidPoint = (Coordinates) node.getCoordinate().clone();
         return false;
       }
     }

@@ -34,6 +34,7 @@ package com.revolsys.jts.precision;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
@@ -52,7 +53,7 @@ public class PrecisionReducerCoordinateOperation extends
 		this.removeCollapsed = removeCollapsed;
 	}
 	
-	public Coordinate[] edit(Coordinate[] coordinates, Geometry geom) {
+	public Coordinate[] edit(Coordinates[] coordinates, Geometry geom) {
 		if (coordinates.length == 0)
 			return null;
 

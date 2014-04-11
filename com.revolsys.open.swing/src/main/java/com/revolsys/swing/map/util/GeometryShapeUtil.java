@@ -6,12 +6,12 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.swing.map.Viewport2D;
 
 public final class GeometryShapeUtil {
   public static void addCoordinateSequence(final Viewport2D viewport,

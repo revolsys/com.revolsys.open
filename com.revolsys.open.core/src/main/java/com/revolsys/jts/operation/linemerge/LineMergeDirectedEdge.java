@@ -33,13 +33,13 @@
  */
 package com.revolsys.jts.operation.linemerge;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.planargraph.DirectedEdge;
 import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.util.Assert;
 
 /**
- * A {@link com.revolsys.jts.planargraph.DirectedEdge} of a 
+ * A {@link com.revolsys.jts.testold.planargraph.DirectedEdge} of a 
  * {@link LineMergeGraph}. 
  *
  * @version 1.7
@@ -56,7 +56,7 @@ public class LineMergeDirectedEdge extends DirectedEdge {
    *                  whether this DirectedEdge's direction is the same as or
    *                  opposite to that of the parent Edge (if any)
    */  
-  public LineMergeDirectedEdge(Node from, Node to, Coordinate directionPt,
+  public LineMergeDirectedEdge(Node from, Node to, Coordinates directionPt,
     boolean edgeDirection) {
     super(from, to, directionPt, edgeDirection);
   }

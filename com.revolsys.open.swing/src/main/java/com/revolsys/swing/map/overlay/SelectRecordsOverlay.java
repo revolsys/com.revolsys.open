@@ -18,7 +18,9 @@ import org.jdesktop.swingx.color.ColorUtil;
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -28,8 +30,6 @@ import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
 
 public class SelectRecordsOverlay extends AbstractOverlay {
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2,

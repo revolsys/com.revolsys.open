@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.geometry.Geometry;
 import com.revolsys.gis.model.geometry.GeometryFactoryI;
@@ -27,6 +26,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineInter
 import com.revolsys.gis.model.geometry.operation.noding.snapround.IntersectionAdder;
 import com.revolsys.gis.model.geometry.operation.overlay.OverlayNodeFactory;
 import com.revolsys.gis.model.geometry.operation.overlay.PolygonBuilder;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 

@@ -3,7 +3,7 @@ package com.revolsys.gis.graph.comparator;
 import java.util.Comparator;
 
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 public class NodeDegreeComparator<T> implements Comparator<Node<T>> {
 

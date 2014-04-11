@@ -41,6 +41,7 @@ package com.revolsys.jts.operation.buffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
@@ -257,7 +258,7 @@ public class OffsetCurveSetBuilder {
    */
   private boolean isErodedCompletely(LinearRing ring, double bufferDistance)
   {
-    Coordinate[] ringCoord = ring.getCoordinateArray();
+    AbstractCoordinates[] ringCoord = ring.getCoordinateArray();
     double minDiam = 0.0;
     // degenerate ring has no area
     if (ringCoord.length < 4)
@@ -314,11 +315,11 @@ public class OffsetCurveSetBuilder {
    * @return
    */
   private boolean isTriangleErodedCompletely(
-      Coordinate[] triangleCoord,
+      AbstractCoordinates[] triangleCoord,
       double bufferDistance)
   {
     Triangle tri = new Triangle(triangleCoord[0], triangleCoord[1], triangleCoord[2]);
-    Coordinate inCentre = tri.inCentre();
+    AbstractCoordinates inCentre = tri.inCentre();
     double distToCentre = CGAlgorithms.distancePointLine(inCentre, tri.p0, tri.p1);
     return distToCentre < Math.abs(bufferDistance);
   }

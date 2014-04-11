@@ -41,8 +41,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -94,12 +96,12 @@ public class QuadEdgeSubdivision {
 
     @Override
     public void visit(final QuadEdge[] triEdges) {
-      final Coordinate a = triEdges[0].orig().getCoordinate();
-      final Coordinate b = triEdges[1].orig().getCoordinate();
-      final Coordinate c = triEdges[2].orig().getCoordinate();
+      final Coordinates a = triEdges[0].orig().getCoordinate();
+      final Coordinates b = triEdges[1].orig().getCoordinate();
+      final Coordinates c = triEdges[2].orig().getCoordinate();
 
       // TODO: choose the most accurate circumcentre based on the edges
-      final Coordinate cc = Triangle.circumcentre(a, b, c);
+      final Coordinates cc = Triangle.circumcentre(a, b, c);
       final Vertex ccVertex = new Vertex(cc);
       // save the circumcentre as the origin for the dual edges originating in
       // this triangle
@@ -117,7 +119,7 @@ public class QuadEdgeSubdivision {
     public TriangleCoordinatesVisitor() {
     }
 
-    private void checkTriangleSize(final Coordinate[] pts) {
+    private void checkTriangleSize(final Coordinates[] pts) {
       String loc = "";
       if (pts.length >= 2) {
         loc = WKTWriter.toLineString(pts[0], pts[1]);
@@ -128,7 +130,7 @@ public class QuadEdgeSubdivision {
       }
       // Assert.isTrue(pts.length == 4,
       // "Too few points for visited triangle at " + loc);
-      // com.revolsys.jts.util.Debug.println("too few points for triangle at " +
+      // com.revolsys.jts.testold.util.Debug.println("too few points for triangle at " +
       // loc);
     }
 
@@ -384,7 +386,7 @@ public class QuadEdgeSubdivision {
     int i = 0;
     for (final Iterator it = quadEdges.iterator(); it.hasNext();) {
       final QuadEdge qe = (QuadEdge)it.next();
-      edges[i++] = geomFact.createLineString(new Coordinate[] {
+      edges[i++] = geomFact.createLineString(new Coordinates[] {
         qe.orig().getCoordinate(), qe.dest().getCoordinate()
       });
     }
@@ -487,7 +489,7 @@ public class QuadEdgeSubdivision {
     final Polygon[] tris = new Polygon[triPtsList.size()];
     int i = 0;
     for (final Iterator it = triPtsList.iterator(); it.hasNext();) {
-      final Coordinate[] triPt = (Coordinate[])it.next();
+      final Coordinates[] triPt = (Coordinates[])it.next();
       tris[i++] = geomFact.createPolygon(geomFact.createLinearRing(triPt), null);
     }
     return geomFact.createGeometryCollection(tris);
@@ -625,7 +627,7 @@ public class QuadEdgeSubdivision {
       coordList.add(coordList.get(coordList.size() - 1), true);
     }
 
-    final Coordinate[] pts = coordList.toCoordinateArray();
+    final Coordinates[] pts = coordList.toCoordinateArray();
     final Polygon cellPoly = geomFact.createPolygon(
       geomFact.createLinearRing(pts), null);
 
@@ -803,7 +805,7 @@ public class QuadEdgeSubdivision {
    *          a point
    * @return true if the vertex lies on the edge
    */
-  public boolean isOnEdge(final QuadEdge e, final Coordinate p) {
+  public boolean isOnEdge(final QuadEdge e, final AbstractCoordinates p) {
     seg.setCoordinates(e.orig().getCoordinate(), e.dest().getCoordinate());
     final double dist = seg.distance(p);
     // heuristic (hack?)
@@ -833,7 +835,7 @@ public class QuadEdgeSubdivision {
    * @return a quadedge on the edge of a triangle which touches or contains the location
    * or null if no such triangle exists
    */
-  public QuadEdge locate(final Coordinate p) {
+  public QuadEdge locate(final Coordinates p) {
     return locator.locate(new Vertex(p));
   }
 
@@ -846,7 +848,7 @@ public class QuadEdgeSubdivision {
    * @return the edge joining the coordinates, if present
    * or null if no such edge exists
    */
-  public QuadEdge locate(final Coordinate p0, final Coordinate p1) {
+  public QuadEdge locate(final Coordinates p0, final Coordinates p1) {
     // find an edge containing one of the points
     final QuadEdge e = locator.locate(new Vertex(p0));
     if (e == null) {
@@ -855,13 +857,13 @@ public class QuadEdgeSubdivision {
 
     // normalize so that p0 is origin of base edge
     QuadEdge base = e;
-    if (e.dest().getCoordinate().equals2D(p0)) {
+    if (e.dest().getCoordinate().equals2d(p0)) {
       base = e.sym();
     }
     // check all edges around origin of base edge
     QuadEdge locEdge = base;
     do {
-      if (locEdge.dest().getCoordinate().equals2D(p1)) {
+      if (locEdge.dest().getCoordinate().equals2d(p1)) {
         return locEdge;
       }
       locEdge = locEdge.oNext();

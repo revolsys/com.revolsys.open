@@ -1,6 +1,5 @@
 package com.revolsys.jts.geom;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.util.GeometryEditUtil;
 
 /**

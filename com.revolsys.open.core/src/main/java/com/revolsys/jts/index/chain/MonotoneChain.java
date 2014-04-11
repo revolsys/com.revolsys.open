@@ -35,6 +35,7 @@
 package com.revolsys.jts.index.chain;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 
@@ -105,8 +106,8 @@ public class MonotoneChain {
   public Envelope getEnvelope()
   {
     if (env == null) {
-      Coordinate p0 = pts[start];
-      Coordinate p1 = pts[end];
+      Coordinates p0 = pts[start];
+      Coordinates p1 = pts[end];
       env = new Envelope(p0, p1);
     }
     return env;
@@ -130,9 +131,9 @@ public class MonotoneChain {
    * Return the subsequence of coordinates forming this chain.
    * Allocates a new array to hold the Coordinates
    */
-  public Coordinate[] getCoordinates()
+  public Coordinates[] getCoordinates()
   {
-    Coordinate coord[] = new Coordinate[end - start + 1];
+    Coordinates coord[] = new Coordinates[end - start + 1];
     int index = 0;
     for (int i = start; i <= end; i++) {
       coord[index++] = pts[i];
@@ -165,8 +166,8 @@ public class MonotoneChain {
     int start0, int end0,
     MonotoneChainSelectAction mcs )
   {
-    Coordinate p0 = pts[start0];
-    Coordinate p1 = pts[end0];
+    Coordinates p0 = pts[start0];
+    Coordinates p1 = pts[end0];
     mcs.tempEnv1.init(p0, p1);
 
 //Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
@@ -218,10 +219,10 @@ public class MonotoneChain {
     int start1, int end1,
     MonotoneChainOverlapAction mco)
   {
-    Coordinate p00 = pts[start0];
-    Coordinate p01 = pts[end0];
-    Coordinate p10 = mc.pts[start1];
-    Coordinate p11 = mc.pts[end1];
+    Coordinates p00 = pts[start0];
+    Coordinates p01 = pts[end0];
+    Coordinates p10 = mc.pts[start1];
+    Coordinates p11 = mc.pts[end1];
 //Debug.println("computeIntersectsForChain:" + p00 + p01 + p10 + p11);
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {

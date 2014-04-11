@@ -59,6 +59,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.field.CheckBox;
@@ -79,7 +80,6 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
-import com.revolsys.jts.geom.Geometry;
 
 public class SwingUtil {
   public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);

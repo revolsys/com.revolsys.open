@@ -3,7 +3,7 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 public class PointArrayCoordinatesList extends AbstractCoordinatesList {
   private static final long serialVersionUID = 5567278244212676984L;

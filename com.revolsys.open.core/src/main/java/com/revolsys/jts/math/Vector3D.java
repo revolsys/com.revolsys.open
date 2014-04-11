@@ -34,6 +34,7 @@
 package com.revolsys.jts.math;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents a vector in 3-dimensional Cartesian space.
@@ -52,14 +53,14 @@ public class Vector3D {
 	 * @param D
 	 * @return the dot product
 	 */
-	public static double dot(Coordinate A, Coordinate B, Coordinate C, Coordinate D)
+	public static double dot(Coordinates A, Coordinates B, Coordinates C, Coordinates D)
 	{
-		double ABx = B.x - A.x;
-		double ABy = B.y - A.y;
-		double ABz = B.z - A.z;
-		double CDx = D.x - C.x;
-		double CDy = D.y - C.y;
-		double CDz = D.z - C.z;
+		double ABx = B.getX() - A.getX();
+		double ABy = B.getY() - A.getY();
+		double ABz = B.getZ() - A.getZ();
+		double CDx = D.getX() - C.getX();
+		double CDy = D.getY() - C.getY();
+		double CDz = D.getZ() - C.getZ();
 		return ABx*CDx + ABy*CDy + ABz*CDz;
 	}
 
@@ -85,14 +86,14 @@ public class Vector3D {
 	 *            the Coordinate to copy
 	 * @return a new vector
 	 */
-	public static Vector3D create(Coordinate coord) {
+	public static Vector3D create(Coordinates coord) {
 		return new Vector3D(coord);
 	}
 
-	public Vector3D(Coordinate v) {
-		x = v.x;
-		y = v.y;
-		z = v.z;
+	public Vector3D(Coordinates v) {
+		x = v.getX();
+		y = v.getY();
+		z = v.getZ();
 	}
 
 	/**
@@ -102,18 +103,18 @@ public class Vector3D {
    * @param v2 the second vector
 	 * @return the dot product of the vectors
 	 */
-	public static double dot(Coordinate v1, Coordinate v2) {
-		return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+	public static double dot(Coordinates v1, Coordinates v2) {
+		return v1.getX() * v2.getX() + v1.getY() * v2.getY() + v1.getZ() * v2.getZ();
 	}
 
 	private double x;
 	private double y;
 	private double z;
 
-	public Vector3D(Coordinate from, Coordinate to) {
-		x = to.x - from.x;
-		y = to.y - from.y;
-		z = to.z - from.z;
+	public Vector3D(Coordinates from, Coordinates to) {
+		x = to.getX() - from.getX();
+		y = to.getY() - from.getY();
+		z = to.getZ() - from.getZ();
 	}
 
 	public Vector3D(double x, double y, double z) {
@@ -150,8 +151,8 @@ public class Vector3D {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 
-	public static double length(Coordinate v) {
-		return Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	public static double length(Coordinates v) {
+		return Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY() + v.getZ() * v.getZ());
 	}
 
 	public Vector3D normalize() {
@@ -165,9 +166,9 @@ public class Vector3D {
 		return create(x / d, y / d, z / d);
 	}
 
-	public static Coordinate normalize(Coordinate v) {
+	public static Coordinates normalize(Coordinates v) {
 		double len = length(v);
-		return new Coordinate(v.x / len, v.y / len, v.z / len);
+		return new Coordinate(v.getX() / len, v.getY() / len, v.getZ() / len);
 	}
 	  /**
 	   * Gets a string representation of this vector

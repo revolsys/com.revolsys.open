@@ -32,7 +32,8 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 
@@ -92,9 +93,9 @@ public class VertexHausdorffDistance {
    */
   private void computeMaxPointDistance(final LineSegment seg0,
     final LineSegment seg1, final PointPairDistance ptDist) {
-    final Coordinate closestPt0 = seg0.closestPoint(seg1.p0);
+    final AbstractCoordinates closestPt0 = seg0.closestPoint(seg1.p0);
     ptDist.setMaximum(closestPt0, seg1.p0);
-    final Coordinate closestPt1 = seg0.closestPoint(seg1.p1);
+    final AbstractCoordinates closestPt1 = seg0.closestPoint(seg1.p1);
     ptDist.setMaximum(closestPt1, seg1.p1);
   }
 
@@ -102,7 +103,7 @@ public class VertexHausdorffDistance {
     return ptDist.getDistance();
   }
 
-  public Coordinate[] getCoordinates() {
+  public Coordinates[] getCoordinates() {
     return ptDist.getCoordinates();
   }
 

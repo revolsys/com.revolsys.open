@@ -34,6 +34,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.Point;
@@ -49,7 +50,7 @@ import com.revolsys.jts.geom.Point;
 public class CentroidPoint
 {
   private int ptCount = 0;
-  private Coordinate centSum = new Coordinate();
+  private Coordinates centSum = new Coordinate();
 
   public CentroidPoint()
   {
@@ -77,18 +78,18 @@ public class CentroidPoint
    * Adds the length defined by an array of coordinates.
    * @param pts an array of {@link Coordinate}s
    */
-  public void add(Coordinate pt)
+  public void add(Coordinates pt)
   {
     ptCount += 1;
-    centSum.x += pt.x;
-    centSum.y += pt.y;
+    centSum.setX(centSum.getX() + pt.getX());
+    centSum.setY(centSum.getY() + pt.getY());
   }
 
-  public Coordinate getCentroid()
+  public Coordinates getCentroid()
   {
-    Coordinate cent = new Coordinate();
-    cent.x = centSum.x / ptCount;
-    cent.y = centSum.y / ptCount;
+    Coordinates cent = new Coordinate();
+    cent.setX(centSum.getX() / ptCount);
+    cent.setY(centSum.getY() / ptCount);
     return cent;
   }
 

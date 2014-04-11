@@ -37,6 +37,7 @@ import java.util.Collection;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.util.CollectionUtil;
 
 /**
@@ -103,14 +104,14 @@ public class ScaledNoder
       );
   }
 
-  private Coordinate[] scale(Coordinate[] pts)
+  private Coordinate[] scale(Coordinates[] pts)
   {
     Coordinate[] roundPts = new Coordinate[pts.length];
     for (int i = 0; i < pts.length; i++) {
       roundPts[i] = new Coordinate(
-          Math.round((pts[i].x - offsetX) * scaleFactor),
-          Math.round((pts[i].y - offsetY) * scaleFactor),
-          pts[i].z
+          Math.round((pts[i].getX() - offsetX) * scaleFactor),
+          Math.round((pts[i].getY() - offsetY) * scaleFactor),
+          pts[i].getZ()
         );
     }
     Coordinate[] roundPtsNoDup = CoordinateArrays.removeRepeatedPoints(roundPts);
@@ -135,8 +136,8 @@ public class ScaledNoder
 
   private void rescale(Coordinate[] pts)
   {
-    Coordinate p0 = null;
-    Coordinate p1 = null;
+    Coordinates p0 = null;
+    Coordinates p1 = null;
     
     if (pts.length == 2) {
       p0 = new Coordinate(pts[0]);
@@ -144,11 +145,11 @@ public class ScaledNoder
     }
 
     for (int i = 0; i < pts.length; i++) {
-      pts[i].x = pts[i].x / scaleFactor + offsetX;
-      pts[i].y = pts[i].y / scaleFactor + offsetY;
+      pts[i].setX(pts[i].getX() / scaleFactor + offsetX);
+      pts[i].setY(pts[i].getY() / scaleFactor + offsetY);
     }
     
-    if (pts.length == 2 && pts[0].equals2D(pts[1])) {
+    if (pts.length == 2 && pts[0].equals2d(pts[1])) {
       System.out.println(pts);
     }
   }

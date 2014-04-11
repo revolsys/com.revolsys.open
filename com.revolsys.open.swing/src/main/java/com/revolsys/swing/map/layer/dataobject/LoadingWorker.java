@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 

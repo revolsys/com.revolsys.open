@@ -36,6 +36,7 @@ package com.revolsys.jts.algorithm.distance;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 
@@ -134,7 +135,7 @@ public class DiscreteHausdorffDistance
     return ptDist.getDistance(); 
   }
 
-  public Coordinate[] getCoordinates() { return ptDist.getCoordinates(); }
+  public Coordinates[] getCoordinates() { return ptDist.getCoordinates(); }
 
   private void compute(Geometry g0, Geometry g1)
   {
@@ -200,16 +201,16 @@ public class DiscreteHausdorffDistance
     if (index == 0)
       return;
     
-    Coordinate p0 = seq.getCoordinate(index - 1);
-    Coordinate p1 = seq.getCoordinate(index);
+    Coordinates p0 = seq.getCoordinate(index - 1);
+    Coordinates p1 = seq.getCoordinate(index);
     
-    double delx = (p1.x - p0.x)/numSubSegs;
-    double dely = (p1.y - p0.y)/numSubSegs;
+    double delx = (p1.getX() - p0.getX())/numSubSegs;
+    double dely = (p1.getY() - p0.getY())/numSubSegs;
 
     for (int i = 0; i < numSubSegs; i++) {
-      double x = p0.x + i*delx;
-      double y = p0.y + i*dely;
-      Coordinate pt = new Coordinate(x, y);
+      double x = p0.getX() + i*delx;
+      double y = p0.getY() + i*dely;
+      Coordinate pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
       minPtDist.initialize();
       DistanceToPoint.computeDistance(geom, pt, minPtDist);
       maxPtDist.setMaximum(minPtDist);  

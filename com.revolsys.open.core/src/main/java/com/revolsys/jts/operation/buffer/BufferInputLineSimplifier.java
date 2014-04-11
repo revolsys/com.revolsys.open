@@ -32,9 +32,11 @@
  */
 package com.revolsys.jts.operation.buffer;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Simplifies a buffer input line to 
@@ -195,9 +197,9 @@ public class BufferInputLineSimplifier
   
   private boolean isDeletable(int i0, int i1, int i2, double distanceTol)
   {
-  	Coordinate p0 = inputLine[i0];
-  	Coordinate p1 = inputLine[i1];
-  	Coordinate p2 = inputLine[i2];
+  	Coordinates p0 = inputLine[i0];
+  	AbstractCoordinates p1 = inputLine[i1];
+  	Coordinates p2 = inputLine[i2];
   	
   	if (! isConcave(p0, p1, p2)) return false;
   	if (! isShallow(p0, p1, p2, distanceTol)) return false;
@@ -208,7 +210,7 @@ public class BufferInputLineSimplifier
   	return isShallowSampled(p0, p1, i0, i2, distanceTol);
   }
 
-  private boolean isShallowConcavity(Coordinate p0, Coordinate p1, Coordinate p2, double distanceTol)
+  private boolean isShallowConcavity(Coordinates p0, AbstractCoordinates p1, Coordinates p2, double distanceTol)
   {
     int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
     boolean isAngleToSimplify = (orientation == angleOrientation);
@@ -233,7 +235,7 @@ public class BufferInputLineSimplifier
    * @param distanceTol distance tolerance
    * @return
    */
-  private boolean isShallowSampled(Coordinate p0, Coordinate p2, int i0, int i2, double distanceTol)
+  private boolean isShallowSampled(Coordinates p0, AbstractCoordinates p2, int i0, int i2, double distanceTol)
   {
     // check every n'th point to see if it is within tolerance
   	int inc = (i2 - i0) / NUM_PTS_TO_CHECK;
@@ -245,14 +247,14 @@ public class BufferInputLineSimplifier
   	return true;
   }
   
-  private boolean isShallow(Coordinate p0, Coordinate p1, Coordinate p2, double distanceTol)
+  private boolean isShallow(Coordinates p0, AbstractCoordinates p1, Coordinates p2, double distanceTol)
   {
     double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
     return dist < distanceTol;
   }
   
   
-  private boolean isConcave(Coordinate p0, Coordinate p1, Coordinate p2)
+  private boolean isConcave(Coordinates p0, Coordinates p1, Coordinates p2)
   {
     int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
     boolean isConcave = (orientation == angleOrientation);

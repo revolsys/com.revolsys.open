@@ -36,7 +36,7 @@ package com.revolsys.jts.geom.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -163,7 +163,7 @@ public class GeometryTransformer
    * @param coords the coordinate array to copy
    * @return a coordinate sequence for the array
    */
-  protected final CoordinatesList createCoordinateSequence(Coordinate[] coords)
+  protected final CoordinatesList createCoordinateSequence(Coordinates[] coords)
   {
     return factory.getCoordinateSequenceFactory().create(coords);
   }

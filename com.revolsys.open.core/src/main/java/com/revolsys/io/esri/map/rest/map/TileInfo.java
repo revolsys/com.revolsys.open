@@ -3,9 +3,9 @@ package com.revolsys.io.esri.map.rest.map;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.esri.map.rest.AbstractMapWrapper;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.util.CollectionUtil;
 

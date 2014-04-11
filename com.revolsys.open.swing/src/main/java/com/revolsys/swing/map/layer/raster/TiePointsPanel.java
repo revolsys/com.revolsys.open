@@ -6,6 +6,7 @@ import java.util.List;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
@@ -22,7 +23,6 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
-import com.revolsys.jts.geom.Geometry;
 
 public class TiePointsPanel extends TablePanel {
   private static final long serialVersionUID = 1L;

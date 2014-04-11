@@ -35,12 +35,12 @@ package com.revolsys.gis.model.geometry.operation.noding.snapround;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.chain.MonotoneChain;
 import com.revolsys.gis.model.geometry.operation.chain.NodedSegmentString;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentIntersector;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Finds proper and interior intersections in a set of SegmentStrings,

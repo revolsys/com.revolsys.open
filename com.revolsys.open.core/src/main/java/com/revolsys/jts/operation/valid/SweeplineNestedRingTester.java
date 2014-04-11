@@ -38,6 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geomgraph.GeometryGraph;
@@ -60,14 +61,14 @@ public class SweeplineNestedRingTester
   private List rings = new ArrayList();
   //private Envelope totalEnv = new Envelope();
   private SweepLineIndex sweepLine;
-  private Coordinate nestedPt = null;
+  private Coordinates nestedPt = null;
 
   public SweeplineNestedRingTester(GeometryGraph graph)
   {
     this.graph = graph;
   }
 
-  public Coordinate getNestedPoint() { return nestedPt; }
+  public Coordinates getNestedPoint() { return nestedPt; }
 
   public void add(LinearRing ring)
   {
@@ -99,12 +100,12 @@ public class SweeplineNestedRingTester
   private boolean isInside(LinearRing innerRing, LinearRing searchRing)
   {
     Coordinate[] innerRingPts = innerRing.getCoordinateArray();
-    Coordinate[] searchRingPts = searchRing.getCoordinateArray();
+    Coordinates[] searchRingPts = searchRing.getCoordinateArray();
 
     if (! innerRing.getEnvelopeInternal().intersects(searchRing.getEnvelopeInternal()))
       return false;
 
-    Coordinate innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
+    Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
     Assert.isTrue(innerRingPt != null, "Unable to find a ring point not a node of the search ring");
 
     boolean isInside = CGAlgorithms.isPointInRing(innerRingPt, searchRingPts);

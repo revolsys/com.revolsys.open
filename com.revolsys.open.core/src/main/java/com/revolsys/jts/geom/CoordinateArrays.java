@@ -37,6 +37,7 @@ package com.revolsys.jts.geom;
 import java.util.Collection;
 import java.util.Comparator;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.math.MathUtil;
 
 /**
@@ -56,10 +57,10 @@ public class CoordinateArrays {
    * @param pts an array of Coordinates
    * @return true if the coordinate form a ring.
    */
-  public static boolean isRing(Coordinate[] pts)
+  public static boolean isRing(AbstractCoordinates[] pts)
   {
     if (pts.length < 4) return false;
-    if (! pts[0].equals2D(pts[pts.length -1])) return false;
+    if (! pts[0].equals2d(pts[pts.length -1])) return false;
     return true;
   }
     
@@ -70,7 +71,7 @@ public class CoordinateArrays {
    * @return a {@link Coordinate} from <code>testPts</code> which is not in <code>pts</code>, '
    * or <code>null</code>
    */
-  public static Coordinate ptNotInList(Coordinate[] testPts, Coordinate[] pts)
+  public static AbstractCoordinates ptNotInList(Coordinate[] testPts, Coordinate[] pts)
   {
     for (int i = 0; i < testPts.length; i++) {
       Coordinate testPt = testPts[i];
@@ -89,7 +90,7 @@ public class CoordinateArrays {
    * @param pts2
    * @return an integer indicating the order
    */
-  public static int compare(Coordinate[] pts1, Coordinate[] pts2) {
+  public static int compare(Coordinates[] pts1, Coordinate[] pts2) {
     int i = 0;
     while (i < pts1.length && i < pts2.length) {
       int compare = pts1[i].compareTo(pts2[i]);
@@ -113,7 +114,7 @@ public class CoordinateArrays {
       implements Comparator
   {
     public int compare(Object o1, Object o2) {
-      Coordinate[] pts1 = (Coordinate[]) o1;
+      Coordinates[] pts1 = (Coordinates[]) o1;
       Coordinate[] pts2 = (Coordinate[]) o2;
 
       return CoordinateArrays.compare(pts1, pts2);
@@ -155,10 +156,10 @@ public class CoordinateArrays {
    * @param pts2
    * @return <code>true</code> if the two arrays are equal in opposite directions.
    */
-  private static boolean isEqualReversed(Coordinate[] pts1, Coordinate[] pts2)
+  private static boolean isEqualReversed(Coordinates[] pts1, Coordinate[] pts2)
   {
     for (int i = 0; i < pts1.length; i++) {
-      Coordinate p1 = pts1[i];
+      Coordinates p1 = pts1[i];
       Coordinate p2 = pts2[pts1.length - i - 1];
       if (p1.compareTo(p2) != 0)
         return false;
@@ -179,7 +180,7 @@ public class CoordinateArrays {
       implements Comparator
   {
     public int compare(Object o1, Object o2) {
-      Coordinate[] pts1 = (Coordinate[]) o1;
+      Coordinates[] pts1 = (Coordinates[]) o1;
       Coordinate[] pts2 = (Coordinate[]) o2;
 
       if (pts1.length < pts2.length) return -1;
@@ -227,7 +228,7 @@ public class CoordinateArrays {
    * @param coordinates an array of Coordinates
    * @return a deep copy of the input
    */
-  public static Coordinate[] copyDeep(Coordinate[] coordinates) {
+  public static Coordinate[] copyDeep(Coordinates[] coordinates) {
     Coordinate[] copy = new Coordinate[coordinates.length];
     for (int i = 0; i < coordinates.length; i++) {
       copy[i] = new Coordinate(coordinates[i]);
@@ -247,7 +248,7 @@ public class CoordinateArrays {
    * @param destStart the destination index to start copying to
    * @param length the number of items to copy
    */
-  public static void copyDeep(Coordinate[] src, int srcStart, Coordinate[] dest, int destStart, int length) {
+  public static void copyDeep(Coordinates[] src, int srcStart, Coordinates[] dest, int destStart, int length) {
     for (int i = 0; i < length; i++) {
       dest[destStart + i] = new Coordinate(src[srcStart + i]);
     }
@@ -279,8 +280,8 @@ public class CoordinateArrays {
    * Returns either the given coordinate array if its length is greater than the
    * given amount, or an empty coordinate array.
    */
-  public static Coordinate[] atLeastNCoordinatesOrNothing(int n, Coordinate[] c) {
-      return c.length >= n ? c : new Coordinate[] {  };
+  public static Coordinates[] atLeastNCoordinatesOrNothing(int n, Coordinates[] c) {
+      return c.length >= n ? c : new Coordinates[] {  };
   }
 
   /**
@@ -302,13 +303,13 @@ public class CoordinateArrays {
    * @param coord the coordinate array to collapse
    * @return an array containing only non-null elements
    */
-  public static Coordinate[] removeNull(Coordinate[] coord)
+  public static Coordinates[] removeNull(Coordinates[] coord)
   {
     int nonNull = 0;
     for (int i = 0; i < coord.length; i++) {
       if (coord[i] != null) nonNull++;
     }
-    Coordinate[] newCoord = new Coordinate[nonNull];
+    Coordinates[] newCoord = new Coordinates[nonNull];
     // empty case
     if (nonNull == 0) return newCoord;
     
@@ -322,12 +323,12 @@ public class CoordinateArrays {
   /**
    * Reverses the coordinates in an array in-place.
    */
-  public static void reverse(Coordinate[] coord)
+  public static void reverse(Coordinates[] coord)
   {
     int last = coord.length - 1;
     int mid = last / 2;
     for (int i = 0; i <= mid; i++) {
-      Coordinate tmp = coord[i];
+      Coordinates tmp = coord[i];
       coord[i] = coord[last - i];
       coord[last - i] = tmp;
     }
@@ -438,7 +439,7 @@ public class CoordinateArrays {
    * @param end the index of the end of the subsequence to extract
    * @return a subsequence of the input array
    */
-  public static Coordinate[] extract(Coordinate[] pts, int start, int end)
+  public static Coordinates[] extract(Coordinates[] pts, int start, int end)
   {
     start = MathUtil.clamp(start, 0, pts.length);
     end = MathUtil.clamp(end, -1, pts.length);
@@ -448,7 +449,7 @@ public class CoordinateArrays {
     if (start >= pts.length) npts = 0;
     if (end < start) npts = 0;
     
-    Coordinate[] extractPts = new Coordinate[npts];
+    Coordinates[] extractPts = new Coordinates[npts];
     if (npts == 0) return extractPts;
     
     int iPts = 0;

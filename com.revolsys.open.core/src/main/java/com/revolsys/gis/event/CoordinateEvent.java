@@ -3,6 +3,7 @@ package com.revolsys.gis.event;
 import java.util.EventObject;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 public class CoordinateEvent extends EventObject {
   /**
@@ -18,7 +19,7 @@ public class CoordinateEvent extends EventObject {
 
   private String action;
 
-  private Coordinate coordinate;
+  private Coordinates coordinate;
 
   private String notes;
 
@@ -50,8 +51,8 @@ public class CoordinateEvent extends EventObject {
     return action;
   }
 
-  public Coordinate getCoordinate() {
-    return (Coordinate)getSource();
+  public Coordinates getCoordinate() {
+    return (Coordinates)getSource();
   }
 
   public String getNotes() {

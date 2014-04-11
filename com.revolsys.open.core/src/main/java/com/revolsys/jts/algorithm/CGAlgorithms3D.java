@@ -33,7 +33,9 @@
 
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.math.Vector3D;
 
 /**
@@ -45,22 +47,22 @@ import com.revolsys.jts.math.Vector3D;
  */
 public class CGAlgorithms3D 
 {
-	public static double distance(Coordinate p0, Coordinate p1)
+	public static double distance(AbstractCoordinates p0, Coordinates p1)
 	{
 		// default to 2D distance if either Z is not set
-		if (Double.isNaN(p0.z) || Double.isNaN(p1.z))
+		if (Double.isNaN(p0.getZ()) || Double.isNaN(p1.getZ()))
 			return p0.distance(p1);
 		
-	    double dx = p0.x - p1.x;
-	    double dy = p0.y - p1.y;
-	    double dz = p0.z - p1.z;
+	    double dx = p0.getX() - p1.getX();
+	    double dy = p0.getY() - p1.getY();
+	    double dz = p0.getZ() - p1.getZ();
 	    return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
 
-	public static double distancePointSegment(Coordinate p,
-			Coordinate A, Coordinate B) {
+	public static double distancePointSegment(AbstractCoordinates p,
+			AbstractCoordinates A, Coordinates B) {
 	    // if start = end, then just compute distance to one of the endpoints
-	    if (A.equals3D(B))
+	    if (A.equals3d(B))
 	      return distance(p, A);
 
 	    // otherwise use comp.graphics.algorithms Frequently Asked Questions method
@@ -77,10 +79,10 @@ public class CGAlgorithms3D
 	     *   0<r<1 P is interior to AB
 	     */
 
-	    double len2 = (B.x - A.x) * (B.x - A.x) + (B.y - A.y) * (B.y - A.y) + (B.z - A.z) * (B.z - A.z);
+	    double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX()) + (B.getY() - A.getY()) * (B.getY() - A.getY()) + (B.getZ() - A.getZ()) * (B.getZ() - A.getZ());
 	    if (Double.isNaN(len2))
 	    	throw new IllegalArgumentException("Ordinates must not be NaN");
-	    double r = ((p.x - A.x) * (B.x - A.x) + (p.y - A.y) * (B.y - A.y) + (p.z - A.z) * (B.z - A.z))
+	    double r = ((p.getX() - A.getX()) * (B.getX() - A.getX()) + (p.getY() - A.getY()) * (B.getY() - A.getY()) + (p.getZ() - A.getZ()) * (B.getZ() - A.getZ()))
 	        / len2;
 
 	    if (r <= 0.0)
@@ -89,13 +91,13 @@ public class CGAlgorithms3D
 	      return distance(p, B);
 
 	    // compute closest point q on line segment
-	    double qx = A.x + r * (B.x - A.x);
-	    double qy = A.y + r * (B.y - A.y);
-	    double qz = A.z + r * (B.z - A.z);
+	    double qx = A.getX() + r * (B.getX() - A.getX());
+	    double qy = A.getY() + r * (B.getY() - A.getY());
+	    double qz = A.getZ() + r * (B.getZ() - A.getZ());
 	    // result is distance from p to q
-	    double dx = p.x - qx;
-	    double dy = p.y - qy;
-	    double dz = p.z - qz;
+	    double dx = p.getX() - qx;
+	    double dy = p.getY() - qy;
+	    double dz = p.getZ() - qz;
 	    return Math.sqrt(dx*dx + dy*dy + dz*dz);
 	}
 	
@@ -110,16 +112,16 @@ public class CGAlgorithms3D
 	 * @return the distance between the segments
 	 */
 	public static double distanceSegmentSegment(
-			Coordinate A, Coordinate B, Coordinate C, Coordinate D) 
+			AbstractCoordinates A, AbstractCoordinates B, AbstractCoordinates C, AbstractCoordinates D) 
 	{
 		/**
 		 * This calculation is susceptible to roundoff errors when 
 		 * passed large ordinate values.
 		 * It may be possible to improve this by using {@link DD} arithmetic.
 		 */
-	    if (A.equals3D(B))
+	    if (A.equals3d(B))
 		      return distancePointSegment(A, C, D);
-	    if (C.equals3D(B))
+	    if (C.equals3d(B))
 		      return distancePointSegment(C, A, B);
 	    
 	    /**
@@ -166,13 +168,13 @@ public class CGAlgorithms3D
 		 * The closest points are in interiors of segments,
 		 * so compute them directly
 		 */
-		double x1 = A.x + s * (B.x - A.x);
-		double y1 = A.y + s * (B.y - A.y);
-		double z1 = A.z + s * (B.z - A.z);
+		double x1 = A.getX() + s * (B.getX() - A.getX());
+		double y1 = A.getY() + s * (B.getY() - A.getY());
+		double z1 = A.getZ() + s * (B.getZ() - A.getZ());
 
-		double x2 = C.x + t * (D.x - C.x);
-		double y2 = C.y + t * (D.y - C.y);
-		double z2 = C.z + t * (D.z - C.z);
+		double x2 = C.getX() + t * (D.getX() - C.getX());
+		double y2 = C.getY() + t * (D.getY() - C.getY());
+		double z2 = C.getZ() + t * (D.getZ() - C.getZ());
 		
 		// length (p1-p2)
 		return distance(new Coordinate(x1, y1, z1), new Coordinate(x2, y2, z2));

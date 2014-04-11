@@ -1,7 +1,9 @@
 package com.revolsys.jts.edgegraph;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Quadrant;
 import com.revolsys.jts.util.Assert;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
@@ -102,7 +104,7 @@ public class HalfEdge {
    * 
    * @return the destination coordinate
    */
-  public Coordinate dest() { return sym.orig; }
+  public AbstractCoordinates dest() { return sym.orig; }
 
   /**
    * Gets the symmetric pair edge of this edge.
@@ -163,11 +165,11 @@ public class HalfEdge {
    * @return the edge with the required dest vertex, if it exists,
    * or null
    */
-  public HalfEdge find(Coordinate dest) {
+  public HalfEdge find(Coordinates dest) {
     HalfEdge oNext = this;
     do {
       if (oNext == null) return null;
-      if (oNext.dest().equals2D(dest)) 
+      if (oNext.dest().equals2d(dest)) 
         return oNext;
       oNext = oNext.oNext();
     } while (oNext != this);
@@ -181,8 +183,8 @@ public class HalfEdge {
    * @param p1 the destination vertex to test
    * @return true if the vertices are equal to the ones of this edge
    */
-  public boolean equals(Coordinate p0, Coordinate p1) {
-    return orig.equals2D(p0) && sym.orig.equals(p1);
+  public boolean equals(Coordinates p0, Coordinate p1) {
+    return orig.equals2d(p0) && sym.orig.equals(p1);
   }
   
   /**
@@ -292,14 +294,14 @@ public class HalfEdge {
    * 
    * @return the X component of the edge length
    */
-  public double deltaX() { return sym.orig.x - orig.x; }
+  public double deltaX() { return sym.orig.getX() - orig.getX(); }
   
   /**
    * The Y component of the distance between the orig and dest vertices.
    * 
    * @return the Y component of the edge length
    */
-  public double deltaY() { return sym.orig.y - orig.y; }
+  public double deltaY() { return sym.orig.getY() - orig.getY(); }
   
   /**
    * Computes a string representation of a HalfEdge.
@@ -308,9 +310,9 @@ public class HalfEdge {
    */
   public String toString()
   {
-    return "HE("+orig.x + " " + orig.y
+    return "HE("+orig.getX() + " " + orig.getY()
         + ", "
-        + sym.orig.x + " " + sym.orig.y
+        + sym.orig.getX() + " " + sym.orig.getY()
         + ")";
   }
 

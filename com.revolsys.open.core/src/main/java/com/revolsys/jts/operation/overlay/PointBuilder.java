@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Label;
@@ -48,11 +48,14 @@ import com.revolsys.jts.geomgraph.Node;
  * @version 1.7
  */
 public class PointBuilder {
-  private OverlayOp op;
-  private GeometryFactory geometryFactory;
-  private List resultPointList = new ArrayList();
+  private final OverlayOp op;
 
-  public PointBuilder(OverlayOp op, GeometryFactory geometryFactory, PointLocator ptLocator) {
+  private final GeometryFactory geometryFactory;
+
+  private final List resultPointList = new ArrayList();
+
+  public PointBuilder(final OverlayOp op,
+    final GeometryFactory geometryFactory, final PointLocator ptLocator) {
     this.op = op;
     this.geometryFactory = geometryFactory;
     // ptLocator is never used in this class
@@ -64,8 +67,7 @@ public class PointBuilder {
    *
    * @return a list of the Points objects in the result
    */
-  public List build(int opCode)
-  {
+  public List build(final int opCode) {
     extractNonCoveredResultNodes(opCode);
     /**
      * It can happen that connected result nodes are still covered by
@@ -83,33 +85,36 @@ public class PointBuilder {
    *
    * @param opCode the overlay operation
    */
-  private void extractNonCoveredResultNodes(int opCode)
-  {
+  private void extractNonCoveredResultNodes(final int opCode) {
     // testing only
-    //if (true) return resultNodeList;
+    // if (true) return resultNodeList;
 
-    for (Iterator nodeit = op.getGraph().getNodes().iterator(); nodeit.hasNext(); ) {
-      Node n = (Node) nodeit.next();
+    for (final Iterator nodeit = op.getGraph().getNodes().iterator(); nodeit.hasNext();) {
+      final Node n = (Node)nodeit.next();
 
       // filter out nodes which are known to be in the result
-      if (n.isInResult())
+      if (n.isInResult()) {
         continue;
-      // if an incident edge is in the result, then the node coordinate is included already
-      if (n.isIncidentEdgeInResult())
+      }
+      // if an incident edge is in the result, then the node coordinate is
+      // included already
+      if (n.isIncidentEdgeInResult()) {
         continue;
+      }
       if (n.getEdges().getDegree() == 0 || opCode == OverlayOp.INTERSECTION) {
 
         /**
          * For nodes on edges, only INTERSECTION can result in edge nodes being included even
          * if none of their incident edges are included
          */
-          Label label = n.getLabel();
-          if (OverlayOp.isResultOfOp(label, opCode)) {
-            filterCoveredNodeToPoint(n);
-          }
+        final Label label = n.getLabel();
+        if (OverlayOp.isResultOfOp(label, opCode)) {
+          filterCoveredNodeToPoint(n);
+        }
       }
     }
-    //System.out.println("connectedResultNodes collected = " + connectedResultNodes.size());
+    // System.out.println("connectedResultNodes collected = " +
+    // connectedResultNodes.size());
   }
 
   /**
@@ -121,11 +126,10 @@ public class PointBuilder {
    *
    * @param n the node to test
    */
-  private void filterCoveredNodeToPoint(Node n)
-  {
-    Coordinate coord = n.getCoordinate();
-    if (! op.isCoveredByLA(coord)) {
-      Point pt = geometryFactory.createPoint(coord);
+  private void filterCoveredNodeToPoint(final Node n) {
+    final Coordinates coord = n.getCoordinate();
+    if (!op.isCoveredByLA(coord)) {
+      final Point pt = geometryFactory.createPoint(coord);
       resultPointList.add(pt);
     }
   }

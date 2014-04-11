@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.index;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 
 public interface PointSpatialIndex<T> extends Iterable<T> {

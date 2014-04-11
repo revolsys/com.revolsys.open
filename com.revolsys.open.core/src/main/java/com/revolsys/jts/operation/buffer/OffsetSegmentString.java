@@ -34,7 +34,9 @@ package com.revolsys.jts.operation.buffer;
 
 import java.util.ArrayList;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.PrecisionModel;
@@ -76,7 +78,7 @@ class OffsetSegmentString
   	this.minimimVertexDistance = minimimVertexDistance;
   }
   
-  public void addPt(Coordinate pt)
+  public void addPt(Coordinates pt)
   {
     Coordinate bufPt = new Coordinate(pt);
     precisionModel.makePrecise(bufPt);
@@ -87,7 +89,7 @@ class OffsetSegmentString
 //System.out.println(bufPt);
   }
   
-  public void addPts(Coordinate[] pt, boolean isForward)
+  public void addPts(Coordinates[] pt, boolean isForward)
   {
     if (isForward) {
       for (int i = 0; i < pt.length; i++) {
@@ -109,11 +111,11 @@ class OffsetSegmentString
    * @param pt
    * @return true if the point is redundant
    */
-  private boolean isRedundant(Coordinate pt)
+  private boolean isRedundant(AbstractCoordinates pt)
   {
     if (ptList.size() < 1)
     	return false;
-    Coordinate lastPt = (Coordinate) ptList.get(ptList.size() - 1);
+    Coordinates lastPt = (Coordinates) ptList.get(ptList.size() - 1);
     double ptDist = pt.distance(lastPt);
     if (ptDist < minimimVertexDistance)
     	return true;
@@ -123,11 +125,11 @@ class OffsetSegmentString
   public void closeRing()
   {
     if (ptList.size() < 1) return;
-    Coordinate startPt = new Coordinate((Coordinate) ptList.get(0));
+    Coordinate startPt = new Coordinate((Coordinates) ptList.get(0));
     Coordinate lastPt = (Coordinate) ptList.get(ptList.size() - 1);
-    Coordinate last2Pt = null;
+    Coordinates last2Pt = null;
     if (ptList.size() >= 2)
-      last2Pt = (Coordinate) ptList.get(ptList.size() - 2);
+      last2Pt = (Coordinates) ptList.get(ptList.size() - 2);
     if (startPt.equals(lastPt)) return;
     ptList.add(startPt);
   }

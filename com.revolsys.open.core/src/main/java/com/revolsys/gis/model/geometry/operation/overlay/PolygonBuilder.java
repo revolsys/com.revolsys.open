@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LinearRing;
 import com.revolsys.gis.model.geometry.Polygon;
@@ -48,6 +47,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.DirectedEdge;
 import com.revolsys.gis.model.geometry.operation.geomgraph.EdgeRing;
 import com.revolsys.gis.model.geometry.operation.geomgraph.PlanarGraph;
 import com.revolsys.gis.model.geometry.util.TopologyException;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.util.Assert;
 
 /**

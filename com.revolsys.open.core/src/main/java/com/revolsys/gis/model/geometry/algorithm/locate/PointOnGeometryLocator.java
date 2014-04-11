@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.geometry.algorithm.locate;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 public interface PointOnGeometryLocator {
   Location locate(Coordinates coordinates);

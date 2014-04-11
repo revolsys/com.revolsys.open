@@ -33,8 +33,10 @@
 
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Triangle;
@@ -80,8 +82,8 @@ public class MinimumBoundingCircle
 	 */
 	
 	private Geometry input;
-	private Coordinate[] extremalPts = null;
-	private Coordinate centre = null;
+	private AbstractCoordinates[] extremalPts = null;
+	private AbstractCoordinates centre = null;
 	private double radius = 0.0;
 	
 	/**
@@ -128,7 +130,7 @@ public class MinimumBoundingCircle
 	 * 
 	 * @return the points defining the Minimum Bounding Circle
 	 */
-	public Coordinate[] getExtremalPoints() 
+	public Coordinates[] getExtremalPoints() 
 	{
 		compute();
 		return extremalPts;
@@ -140,7 +142,7 @@ public class MinimumBoundingCircle
 	 * @return the centre point of the Minimum Bounding Circle
 	 * @return null if the input is empty
 	 */
-	public Coordinate getCentre() 
+	public AbstractCoordinates getCentre() 
 	{
 		compute();
 		return centre;
@@ -168,8 +170,8 @@ public class MinimumBoundingCircle
 			break;
 		case 2:
 			centre = new Coordinate(
-					(extremalPts[0].x + extremalPts[1].x) / 2.0,
-					(extremalPts[0].y + extremalPts[1].y) / 2.0
+					(extremalPts[0].getX() + extremalPts[1].getX()) / 2.0,
+					(extremalPts[0].getY() + extremalPts[1].getY()) / 2.0, Coordinates.NULL_ORDINATE
 					);
 			break;
 		case 3:
@@ -192,12 +194,12 @@ public class MinimumBoundingCircle
 	{
 		// handle degenerate or trivial cases
 		if (input.isEmpty()) {
-			extremalPts = new Coordinate[0];
+			extremalPts = new AbstractCoordinates[0];
 			return;
 		}
 		if (input.getNumPoints() == 1) {
-			Coordinate[] pts = input.getCoordinateArray();
-			extremalPts = new Coordinate[] { new Coordinate(pts[0]) };
+			Coordinates[] pts = input.getCoordinateArray();
+			extremalPts = new AbstractCoordinates[] { new Coordinate(pts[0]) };
 			return;
 		}
 		
@@ -207,12 +209,12 @@ public class MinimumBoundingCircle
 		 */
 		Geometry convexHull = input.convexHull();
 		
-		Coordinate[] hullPts = convexHull.getCoordinateArray();
+		AbstractCoordinates[] hullPts = convexHull.getCoordinateArray();
 		
 		// strip duplicate final point, if any
-		Coordinate[] pts = hullPts;
-		if (hullPts[0].equals2D(hullPts[hullPts.length - 1])) {
-			pts = new Coordinate[hullPts.length - 1];
+		Coordinates[] pts = hullPts;
+		if (hullPts[0].equals2d(hullPts[hullPts.length - 1])) {
+			pts = new Coordinates[hullPts.length - 1];
 			CoordinateArrays.copyDeep(hullPts, 0, pts, 0, hullPts.length - 1);
 		}
 		
@@ -225,10 +227,10 @@ public class MinimumBoundingCircle
 		}
 		
 		// find a point P with minimum Y ordinate
-		Coordinate P = lowestPoint(pts);
+		Coordinates P = lowestPoint(pts);
 		
 		// find a point Q such that the angle that PQ makes with the x-axis is minimal
-		Coordinate Q = pointWitMinAngleWithX(pts, P);
+		Coordinates Q = pointWitMinAngleWithX(pts, P);
 		
 		/**
 		 * Iterate over the remaining points to find 
@@ -238,11 +240,11 @@ public class MinimumBoundingCircle
 		 * with a correct result.
 		 */ 
 		for (int i = 0; i < pts.length; i++) {
-			Coordinate R = pointWithMinAngleWithSegment(pts, P, Q);
+			Coordinates R = pointWithMinAngleWithSegment(pts, P, Q);
 			
 			// if PRQ is obtuse, then MBC is determined by P and Q
 			if (Angle.isObtuse(P, R, Q)) {
-				extremalPts = new Coordinate[] { new Coordinate(P), new Coordinate(Q) };
+				extremalPts = new AbstractCoordinates[] { new Coordinate(P), new Coordinate(Q) };
 				return;
 			}
 			// if RPQ is obtuse, update baseline and iterate
@@ -256,36 +258,36 @@ public class MinimumBoundingCircle
 				continue;
 			}
 			// otherwise all angles are acute, and the MBC is determined by the triangle PQR
-			extremalPts = new Coordinate[] { new Coordinate(P), new Coordinate(Q), new Coordinate(R) };
+			extremalPts = new AbstractCoordinates[] { new Coordinate(P), new Coordinate(Q), new Coordinate(R) };
 			return;
 		}
 		Assert.shouldNeverReachHere("Logic failure in Minimum Bounding Circle algorithm!"); 
 	}
 	
-	private static Coordinate lowestPoint(Coordinate[] pts)
+	private static Coordinates lowestPoint(Coordinates[] pts)
 	{
-		Coordinate min = pts[0];
+		Coordinates min = pts[0];
 		for (int i = 1; i < pts.length; i++) {
-			if (pts[i].y < min.y)
+			if (pts[i].getY() < min.getY())
 				min = pts[i];
 		}
 		return min;
 	}
 	
-	private static Coordinate pointWitMinAngleWithX(Coordinate[] pts, Coordinate P)
+	private static Coordinates pointWitMinAngleWithX(Coordinates[] pts, Coordinates P)
 	{
 		double minSin = Double.MAX_VALUE;
-		Coordinate minAngPt = null;
+		Coordinates minAngPt = null;
 		for (int i = 0; i < pts.length; i++) {
 			
-			Coordinate p = pts[i];
+			Coordinates p = pts[i];
 			if (p == P) continue;
 			
 			/**
 			 * The sin of the angle is a simpler proxy for the angle itself
 			 */
-			double dx = p.x - P.x;
-			double dy = p.y - P.y;
+			double dx = p.getX() - P.getX();
+			double dy = p.getY() - P.getY();
 			if (dy < 0) dy = -dy;
 			double len = Math.sqrt(dx * dx + dy * dy);
 			double sin = dy / len;
@@ -298,13 +300,13 @@ public class MinimumBoundingCircle
 		return minAngPt;
 	}
 	
-	private static Coordinate pointWithMinAngleWithSegment(Coordinate[] pts, Coordinate P, Coordinate Q)
+	private static Coordinates pointWithMinAngleWithSegment(Coordinates[] pts, Coordinates P, Coordinates Q)
 	{
 		double minAng = Double.MAX_VALUE;
-		Coordinate minAngPt = null;
+		Coordinates minAngPt = null;
 		for (int i = 0; i < pts.length; i++) {
 			
-			Coordinate p = pts[i];
+			Coordinates p = pts[i];
 			if (p == P) continue;
 			if (p == Q) continue;
 			

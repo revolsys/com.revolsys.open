@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.operation.buffer.validate;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.MultiPolygon;
@@ -94,7 +94,7 @@ public class BufferResultValidator
   private Geometry result;
   private boolean isValid = true;
   private String errorMsg = null;
-  private Coordinate errorLocation = null;
+  private Coordinates errorLocation = null;
   private Geometry errorIndicator = null;
   
   public BufferResultValidator(Geometry input, double distance, Geometry result)
@@ -123,7 +123,7 @@ public class BufferResultValidator
   	return errorMsg;
   }
   
-  public Coordinate getErrorLocation()
+  public Coordinates getErrorLocation()
   {
   	return errorLocation;
   }

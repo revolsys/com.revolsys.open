@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectListLayerTableModel;
-import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectListLayer extends AbstractDataObjectLayer {
 

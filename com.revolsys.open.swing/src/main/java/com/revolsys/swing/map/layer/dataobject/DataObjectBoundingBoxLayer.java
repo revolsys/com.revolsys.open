@@ -12,13 +12,13 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.swing.parallel.Invoke;
 
 public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
   private static final Logger LOG = Logger.getLogger(DataObjectBoundingBoxLayer.class);

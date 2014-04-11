@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.util.ComponentCoordinateExtracter;
@@ -77,7 +77,7 @@ abstract class PreparedPolygonPredicate
 	{
     List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
     for (Iterator i = coords.iterator(); i.hasNext(); ) {
-      Coordinate p = (Coordinate) i.next();
+      Coordinates p = (Coordinates) i.next();
       int loc = targetPointLocator.locate(p);
       if (loc == Location.EXTERIOR)
         return false;
@@ -97,7 +97,7 @@ abstract class PreparedPolygonPredicate
 	{
     List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
     for (Iterator i = coords.iterator(); i.hasNext(); ) {
-      Coordinate p = (Coordinate) i.next();
+      Coordinates p = (Coordinates) i.next();
       int loc = targetPointLocator.locate(p);
       if (loc != Location.INTERIOR)
         return false;
@@ -117,7 +117,7 @@ abstract class PreparedPolygonPredicate
 	{
     List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
     for (Iterator i = coords.iterator(); i.hasNext(); ) {
-      Coordinate p = (Coordinate) i.next();
+      Coordinates p = (Coordinates) i.next();
       int loc = targetPointLocator.locate(p);
       if (loc != Location.EXTERIOR)
         return true;
@@ -137,7 +137,7 @@ abstract class PreparedPolygonPredicate
 	{
     List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
     for (Iterator i = coords.iterator(); i.hasNext(); ) {
-      Coordinate p = (Coordinate) i.next();
+      Coordinates p = (Coordinates) i.next();
       int loc = targetPointLocator.locate(p);
       if (loc == Location.INTERIOR)
         return true;
@@ -158,7 +158,7 @@ abstract class PreparedPolygonPredicate
 	{
 		PointOnGeometryLocator piaLoc = new SimplePointInAreaLocator(testGeom);
     for (Iterator i = targetRepPts.iterator(); i.hasNext(); ) {
-      Coordinate p = (Coordinate) i.next();
+      Coordinates p = (Coordinates) i.next();
       int loc = piaLoc.locate(p);
       if (loc != Location.EXTERIOR)
         return true;

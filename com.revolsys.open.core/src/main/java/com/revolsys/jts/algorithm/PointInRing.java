@@ -34,6 +34,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * An interface for classes which test whether a {@link Coordinate} lies inside
@@ -45,5 +46,5 @@ import com.revolsys.jts.geom.Coordinate;
  */
 public interface PointInRing {
 
-  boolean isInside(Coordinate pt);
+  boolean isInside(Coordinates pt);
 }

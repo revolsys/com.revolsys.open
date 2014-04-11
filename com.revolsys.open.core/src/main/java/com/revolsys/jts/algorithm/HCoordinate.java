@@ -33,6 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Represents a homogeneous coordinate in a 2-D coordinate space.
@@ -56,18 +57,18 @@ public class HCoordinate
    * before passing them to this routine.
    */
   public static Coordinate intersection(
-      Coordinate p1, Coordinate p2,
-      Coordinate q1, Coordinate q2)
+      Coordinates p1, Coordinates p2,
+      Coordinates q1, Coordinates q2)
       throws NotRepresentableException
   {
   	// unrolled computation
-    double px = p1.y - p2.y;
-    double py = p2.x - p1.x;
-    double pw = p1.x * p2.y - p2.x * p1.y;
+    double px = p1.getY() - p2.getY();
+    double py = p2.getX() - p1.getX();
+    double pw = p1.getX() * p2.getY() - p2.getX() * p1.getY();
     
-    double qx = q1.y - q2.y;
-    double qy = q2.x - q1.x;
-    double qw = q1.x * q2.y - q2.x * q1.y;
+    double qx = q1.getY() - q2.getY();
+    double qy = q2.getX() - q1.getX();
+    double qw = q1.getX() * q2.getY() - q2.getX() * q1.getY();
     
     double x = py * qw - qy * pw;
     double y = qx * pw - px * qw;
@@ -81,7 +82,7 @@ public class HCoordinate
       throw new NotRepresentableException();
     }
     
-    return new Coordinate(xInt, yInt);
+    return new Coordinate(xInt, yInt, Coordinates.NULL_ORDINATE);
   }
 
   /*
@@ -118,9 +119,9 @@ public class HCoordinate
     w = 1.0;
   }
 
-  public HCoordinate(Coordinate p) {
-    x = p.x;
-    y = p.y;
+  public HCoordinate(Coordinates p) {
+    x = p.getX();
+    y = p.getY();
     w = 1.0;
   }
 
@@ -139,24 +140,24 @@ public class HCoordinate
    * @param p1
    * @param p2
    */
-  public HCoordinate(Coordinate p1, Coordinate p2) 
+  public HCoordinate(Coordinates p1, Coordinates p2) 
   {
   	// optimization when it is known that w = 1
-    x = p1.y - p2.y;
-    y = p2.x - p1.x;
-    w = p1.x * p2.y - p2.x * p1.y;
+    x = p1.getY() - p2.getY();
+    y = p2.getX() - p1.getX();
+    w = p1.getX() * p2.getY() - p2.getX() * p1.getY();
   }
   
-  public HCoordinate(Coordinate p1, Coordinate p2, Coordinate q1, Coordinate q2) 
+  public HCoordinate(Coordinates p1, Coordinates p2, Coordinates q1, Coordinates q2) 
   {
   	// unrolled computation
-    double px = p1.y - p2.y;
-    double py = p2.x - p1.x;
-    double pw = p1.x * p2.y - p2.x * p1.y;
+    double px = p1.getY() - p2.getY();
+    double py = p2.getX() - p1.getX();
+    double pw = p1.getX() * p2.getY() - p2.getX() * p1.getY();
     
-    double qx = q1.y - q2.y;
-    double qy = q2.x - q1.x;
-    double qw = q1.x * q2.y - q2.x * q1.y;
+    double qx = q1.getY() - q2.getY();
+    double qy = q2.getX() - q1.getX();
+    double qw = q1.getX() * q2.getY() - q2.getX() * q1.getY();
     
     x = py * qw - qy * pw;
     y = qx * pw - px * qw;
@@ -179,10 +180,10 @@ public class HCoordinate
     return a;
   }
 
-  public Coordinate getCoordinate() throws NotRepresentableException {
-    Coordinate p = new Coordinate();
-    p.x = getX();
-    p.y = getY();
+  public Coordinates getCoordinate() throws NotRepresentableException {
+    Coordinates p = new Coordinate();
+    p.setX(getX());
+    p.setY(getY());
     return p;
   }
 }

@@ -33,8 +33,10 @@
 
 package com.revolsys.jts.noding.snapround;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.util.Assert;
@@ -58,8 +60,8 @@ public class HotPixel
   private LineIntersector li;
 
   private Coordinate pt;
-  private Coordinate originalPt;
-  private Coordinate ptScaled;
+  private AbstractCoordinates originalPt;
+  private Coordinates ptScaled;
 
   private Coordinate p0Scaled;
   private Coordinate p1Scaled;
@@ -98,7 +100,7 @@ public class HotPixel
     if (scaleFactor <= 0) 
       throw new IllegalArgumentException("Scale factor must be non-zero");
     if (scaleFactor != 1.0) {
-      this.pt = new Coordinate(scale(pt.x), scale(pt.y));
+      this.pt = new Coordinate(scale(pt.getX()), scale(pt.getY()), Coordinates.NULL_ORDINATE);
       p0Scaled = new Coordinate();
       p1Scaled = new Coordinate();
     }
@@ -110,7 +112,7 @@ public class HotPixel
    * 
    * @return the coordinate of the pixel
    */
-  public Coordinate getCoordinate() { return originalPt; }
+  public AbstractCoordinates getCoordinate() { return originalPt; }
 
   private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
   
@@ -125,27 +127,27 @@ public class HotPixel
   {
     if (safeEnv == null) {
       double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / scaleFactor;
-      safeEnv = new Envelope(originalPt.x - safeTolerance,
-                             originalPt.x + safeTolerance,
-                             originalPt.y - safeTolerance,
-                             originalPt.y + safeTolerance
+      safeEnv = new Envelope(originalPt.getX() - safeTolerance,
+                             originalPt.getX() + safeTolerance,
+                             originalPt.getY() - safeTolerance,
+                             originalPt.getY() + safeTolerance
                              );
     }
     return safeEnv;
   }
 
-  private void initCorners(Coordinate pt)
+  private void initCorners(Coordinates pt)
   {
     double tolerance = 0.5;
-    minx = pt.x - tolerance;
-    maxx = pt.x + tolerance;
-    miny = pt.y - tolerance;
-    maxy = pt.y + tolerance;
+    minx = pt.getX() - tolerance;
+    maxx = pt.getX() + tolerance;
+    miny = pt.getY() - tolerance;
+    maxy = pt.getY() + tolerance;
 
-    corner[0] = new Coordinate(maxx, maxy);
-    corner[1] = new Coordinate(minx, maxy);
-    corner[2] = new Coordinate(minx, miny);
-    corner[3] = new Coordinate(maxx, miny);
+    corner[0] = new Coordinate(maxx, maxy, Coordinates.NULL_ORDINATE);
+    corner[1] = new Coordinate(minx, maxy, Coordinates.NULL_ORDINATE);
+    corner[2] = new Coordinate(minx, miny, Coordinates.NULL_ORDINATE);
+    corner[3] = new Coordinate(maxx, miny, Coordinates.NULL_ORDINATE);
   }
 
   private double scale(double val)
@@ -171,18 +173,18 @@ public class HotPixel
     return intersectsScaled(p0Scaled, p1Scaled);
   }
 
-  private void copyScaled(Coordinate p, Coordinate pScaled)
+  private void copyScaled(Coordinates p, Coordinates pScaled)
   {
-    pScaled.x = scale(p.x);
-    pScaled.y = scale(p.y);
+    pScaled.setX(scale(p.getX()));
+    pScaled.setY(scale(p.getY()));
   }
 
   private boolean intersectsScaled(Coordinate p0, Coordinate p1)
   {
-    double segMinx = Math.min(p0.x, p1.x);
-    double segMaxx = Math.max(p0.x, p1.x);
-    double segMiny = Math.min(p0.y, p1.y);
-    double segMaxy = Math.max(p0.y, p1.y);
+    double segMinx = Math.min(p0.getX(), p1.getX());
+    double segMaxx = Math.max(p0.getX(), p1.getX());
+    double segMiny = Math.min(p0.getY(), p1.getY());
+    double segMaxy = Math.max(p0.getY(), p1.getY());
 
     boolean isOutsidePixelEnv =  maxx < segMinx
                          || minx > segMaxx

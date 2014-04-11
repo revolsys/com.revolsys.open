@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.operation.overlay.OverlayOp;
@@ -77,7 +78,7 @@ public class OverlayResultValidator
   private Geometry[] geom;
   private FuzzyPointLocator[] locFinder;
   private int[] location = new int[3] ;
-  private Coordinate invalidLocation = null;
+  private Coordinates invalidLocation = null;
   private double boundaryDistanceTolerance = TOLERANCE;
 
   private List testCoords = new ArrayList();
@@ -116,7 +117,7 @@ public class OverlayResultValidator
     return isValid;
   }
 
-  public Coordinate getInvalidLocation() { return invalidLocation; }
+  public Coordinates getInvalidLocation() { return invalidLocation; }
 
   private void addTestPts(Geometry g)
   {

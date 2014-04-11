@@ -16,12 +16,12 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.util.Reorderable;
-import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectListTableModel extends DataObjectRowTableModel implements
   Reorderable {

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListCoordinatesIterator;
@@ -17,6 +16,7 @@ import com.revolsys.gis.model.geometry.GeometryFactoryI;
 import com.revolsys.gis.model.geometry.LineString;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
@@ -272,11 +272,11 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   }
 
   @Override
-  public void getCoordinate(final int index, final Coordinate coord) {
-    coord.x = getX(index);
-    coord.y = getY(index);
+  public void getCoordinate(final int index, final Coordinates coord) {
+    coord.setX(getX(index));
+    coord.setY(getY(index));
     if (getNumAxis() > 2) {
-      coord.z = getZ(index);
+      coord.setZ(getZ(index));
     }
   }
 
@@ -424,11 +424,11 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   }
 
   @Override
-  public void setCoordinate(final int i, final Coordinate coordinate) {
-    setValue(i, 0, coordinate.x);
-    setValue(i, 1, coordinate.y);
+  public void setCoordinate(final int i, final Coordinates coordinate) {
+    setValue(i, 0, coordinate.getX());
+    setValue(i, 1, coordinate.getY());
     if (getNumAxis() > 2) {
-      setValue(i, 2, coordinate.z);
+      setValue(i, 2, coordinate.getZ());
     }
   }
 

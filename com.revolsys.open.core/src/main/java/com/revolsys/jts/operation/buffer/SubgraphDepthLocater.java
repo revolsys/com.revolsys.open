@@ -41,6 +41,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geomgraph.DirectedEdge;
@@ -65,7 +66,7 @@ class SubgraphDepthLocater
     this.subgraphs = subgraphs;
   }
 
-  public int getDepth(Coordinate p)
+  public int getDepth(Coordinates p)
   {
     List stabbedSegments = findStabbedSegments(p);
     // if no segments on stabbing line subgraph must be outside all others.
@@ -83,7 +84,7 @@ class SubgraphDepthLocater
    * @param stabbingRayLeftPt the left-hand origin of the stabbing line
    * @return a List of {@link DepthSegments} intersecting the stabbing line
    */
-  private List findStabbedSegments(Coordinate stabbingRayLeftPt)
+  private List findStabbedSegments(Coordinates stabbingRayLeftPt)
   {
     List stabbedSegments = new ArrayList();
     for (Iterator i = subgraphs.iterator(); i.hasNext(); ) {
@@ -91,8 +92,8 @@ class SubgraphDepthLocater
 
       // optimization - don't bother checking subgraphs which the ray does not intersect
       Envelope env = bsg.getEnvelope();
-      if (stabbingRayLeftPt.y < env.getMinY()
-          || stabbingRayLeftPt.y > env.getMaxY())
+      if (stabbingRayLeftPt.getY() < env.getMinY()
+          || stabbingRayLeftPt.getY() > env.getMaxY())
         continue;
 
       findStabbedSegments(stabbingRayLeftPt, bsg.getDirectedEdges(), stabbedSegments);
@@ -108,7 +109,7 @@ class SubgraphDepthLocater
    * @param stabbingRayLeftPt the left-hand origin of the stabbing line
    * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
    */
-  private void findStabbedSegments(Coordinate stabbingRayLeftPt,
+  private void findStabbedSegments(Coordinates stabbingRayLeftPt,
                                    List dirEdges,
                                    List stabbedSegments)
   {
@@ -132,7 +133,7 @@ class SubgraphDepthLocater
    * @param stabbingRayLeftPt the left-hand origin of the stabbing line
    * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
    */
-  private void findStabbedSegments(Coordinate stabbingRayLeftPt,
+  private void findStabbedSegments(Coordinates stabbingRayLeftPt,
                                    DirectedEdge dirEdge,
                                    List stabbedSegments)
   {
@@ -141,12 +142,12 @@ class SubgraphDepthLocater
       seg.p0 = pts[i];
       seg.p1 = pts[i + 1];
       // ensure segment always points upwards
-      if (seg.p0.y > seg.p1.y)
+      if (seg.p0.getY() > seg.p1.getY())
         seg.reverse();
 
       // skip segment if it is left of the stabbing line
-      double maxx = Math.max(seg.p0.x, seg.p1.x);
-      if (maxx < stabbingRayLeftPt.x)
+      double maxx = Math.max(seg.p0.getX(), seg.p1.getX());
+      if (maxx < stabbingRayLeftPt.getX())
         continue;
 
       // skip horizontal segments (there will be a non-horizontal one carrying the same depth info
@@ -154,7 +155,7 @@ class SubgraphDepthLocater
         continue;
 
       // skip if segment is above or below stabbing line
-      if (stabbingRayLeftPt.y < seg.p0.y || stabbingRayLeftPt.y > seg.p1.y)
+      if (stabbingRayLeftPt.getY() < seg.p0.getY() || stabbingRayLeftPt.getY() > seg.p1.getY())
         continue;
 
       // skip if stabbing ray is right of the segment

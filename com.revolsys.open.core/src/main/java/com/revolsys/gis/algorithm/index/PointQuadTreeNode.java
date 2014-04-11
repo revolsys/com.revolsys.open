@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.util.MathUtil;
 

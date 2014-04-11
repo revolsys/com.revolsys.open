@@ -1,9 +1,9 @@
 package com.revolsys.gis.model.geometry.operation.relate;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.geomgraph.Node;
 import com.revolsys.gis.model.geometry.operation.geomgraph.NodeFactory;
 import com.revolsys.gis.model.geometry.operation.geomgraph.NodeMap;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Used by the {@link NodeMap} in a {@link RelateNodeGraph} to create {@link RelateNode}s.

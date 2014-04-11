@@ -19,10 +19,10 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
-import com.revolsys.jts.geom.Geometry;
 
 public abstract class DataObjectRowTableModel extends
   AbstractDataObjectTableModel implements SortableTableModel,

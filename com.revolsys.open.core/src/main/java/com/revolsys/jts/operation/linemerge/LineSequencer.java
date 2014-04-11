@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -479,8 +480,8 @@ public class LineSequencer
 
   private static LineString reverse(LineString line)
   {
-    Coordinate[] pts = line.getCoordinateArray();
-    Coordinate[] revPts = new Coordinate[pts.length];
+    Coordinates[] pts = line.getCoordinateArray();
+    Coordinates[] revPts = new Coordinates[pts.length];
     int len = pts.length;
     for (int i = 0; i < len; i++) {
       revPts[len - 1 - i] = new Coordinate(pts[i]);

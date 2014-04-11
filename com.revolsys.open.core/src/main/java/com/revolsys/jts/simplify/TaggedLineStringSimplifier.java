@@ -36,6 +36,7 @@ package com.revolsys.jts.simplify;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
@@ -143,7 +144,7 @@ public class TaggedLineStringSimplifier
     double maxDist = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
-      Coordinate midPt = pts[k];
+      AbstractCoordinates midPt = pts[k];
       double distance = seg.distance(midPt);
       if (distance > maxDist) {
         maxDist = distance;

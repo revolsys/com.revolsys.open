@@ -34,6 +34,7 @@
 package com.revolsys.jts.index.kdtree;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A node of a {@link KdTree}, which represents one or more points in the same location.
@@ -42,124 +43,128 @@ import com.revolsys.jts.geom.Coordinate;
  */
 public class KdNode {
 
-    private Coordinate p = null;
-    private Object     data;
-    private KdNode     left;
-    private KdNode     right;
-    private int        count;
+  private Coordinate p = null;
 
-    /**
-     * Creates a new KdNode.
-     * 
-     * @param _x coordinate of point
-     * @param _y coordinate of point
-     * @param data a data objects to associate with this node
-     */
-    public KdNode(double _x, double _y, Object data) {
-        p = new Coordinate(_x, _y);
-        left = null;
-        right = null;
-        count = 1;
-        this.data = data;
-    }
+  private final Object data;
 
-    /**
-     * Creates a new KdNode.
-     * 
-     * @param p point location of new node
-     * @param data a data objects to associate with this node
-     */
-    public KdNode(Coordinate p, Object data) {
-        this.p = new Coordinate(p);
-        left = null;
-        right = null;
-        count = 1;
-        this.data = data;
-    }
+  private KdNode left;
 
-    /**
-     * Returns the X coordinate of the node
-     * 
-     * @retrun X coordiante of the node
-     */
-    public double getX() {
-        return p.x;
-    }
+  private KdNode right;
 
-    /**
-     * Returns the Y coordinate of the node
-     * 
-     * @return Y coordiante of the node
-     */
-    public double getY() {
-        return p.y;
-    }
+  private int count;
 
-    /**
-     * Returns the location of this node
-     * 
-     * @return p location of this node
-     */
-    public Coordinate getCoordinate() {
-        return p;
-    }
+  /**
+   * Creates a new KdNode.
+   * 
+   * @param p point location of new node
+   * @param data a data objects to associate with this node
+   */
+  public KdNode(final Coordinates p, final Object data) {
+    this.p = new Coordinate(p);
+    left = null;
+    right = null;
+    count = 1;
+    this.data = data;
+  }
 
-    /**
-     * Gets the user data object associated with this node.
-     * @return
-     */
-    public Object getData() {
-        return data;
-    }
+  /**
+   * Creates a new KdNode.
+   * 
+   * @param _x coordinate of point
+   * @param _y coordinate of point
+   * @param data a data objects to associate with this node
+   */
+  public KdNode(final double _x, final double _y, final Object data) {
+    p = new Coordinate(_x, _y, Coordinates.NULL_ORDINATE);
+    left = null;
+    right = null;
+    count = 1;
+    this.data = data;
+  }
 
-    /**
-     * Returns the left node of the tree
-     * 
-     * @return left node
-     */
-    public KdNode getLeft() {
-        return left;
-    }
+  /**
+   * Returns the location of this node
+   * 
+   * @return p location of this node
+   */
+  public Coordinate getCoordinate() {
+    return p;
+  }
 
-    /**
-     * Returns the right node of the tree
-     * 
-     * @return right node
-     */
-    public KdNode getRight() {
-        return right;
-    }
+  /**
+   * Returns the number of inserted points that are coincident at this location.
+   * 
+   * @return number of inserted points that this node represents
+   */
+  public int getCount() {
+    return count;
+  }
 
-    // Increments counts of points at this location
-    void increment() {
-        count = count + 1;
-    }
+  /**
+   * Gets the user data object associated with this node.
+   * @return
+   */
+  public Object getData() {
+    return data;
+  }
 
-    /**
-     * Returns the number of inserted points that are coincident at this location.
-     * 
-     * @return number of inserted points that this node represents
-     */
-    public int getCount() {
-        return count;
-    }
+  /**
+   * Returns the left node of the tree
+   * 
+   * @return left node
+   */
+  public KdNode getLeft() {
+    return left;
+  }
 
-    /**
-     * Tests whether more than one point with this value have been inserted (up to the tolerance)
-     * 
-     * @return true if more than one point have been inserted with this value
-     */
-    public boolean isRepeated() {
-        return count > 1;
-    }
+  /**
+   * Returns the right node of the tree
+   * 
+   * @return right node
+   */
+  public KdNode getRight() {
+    return right;
+  }
 
-    // Sets left node value
-    void setLeft(KdNode _left) {
-        left = _left;
-    }
+  /**
+   * Returns the X coordinate of the node
+   * 
+   * @retrun X coordiante of the node
+   */
+  public double getX() {
+    return p.getX();
+  }
 
-    // Sets right node value
-    void setRight(KdNode _right) {
-        right = _right;
-    }
+  /**
+   * Returns the Y coordinate of the node
+   * 
+   * @return Y coordiante of the node
+   */
+  public double getY() {
+    return p.getY();
+  }
+
+  // Increments counts of points at this location
+  void increment() {
+    count = count + 1;
+  }
+
+  /**
+   * Tests whether more than one point with this value have been inserted (up to the tolerance)
+   * 
+   * @return true if more than one point have been inserted with this value
+   */
+  public boolean isRepeated() {
+    return count > 1;
+  }
+
+  // Sets left node value
+  void setLeft(final KdNode _left) {
+    left = _left;
+  }
+
+  // Sets right node value
+  void setRight(final KdNode _right) {
+    right = _right;
+  }
 }

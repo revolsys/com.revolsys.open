@@ -34,6 +34,7 @@
 package com.revolsys.jts.index.quadtree;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 
 /**
@@ -55,7 +56,7 @@ public class Key {
   }
 
   // the fields which make up the key
-  private Coordinate pt = new Coordinate();
+  private Coordinates pt = new Coordinate();
   private int level = 0;
   // auxiliary data which is derived from the key for use in computation
   private Envelope env = null;
@@ -65,15 +66,15 @@ public class Key {
     computeKey(itemEnv);
   }
 
-  public Coordinate getPoint() { return pt; }
+  public Coordinates getPoint() { return pt; }
   public int getLevel() { return level; }
   public Envelope getEnvelope() { return env; }
 
-  public Coordinate getCentre()
+  public Coordinates getCentre()
   {
     return new Coordinate(
       (env.getMinX() + env.getMaxX()) / 2,
-      (env.getMinY() + env.getMaxY()) / 2
+      (env.getMinY() + env.getMaxY()) / 2, Coordinates.NULL_ORDINATE
       );
   }
   /**
@@ -95,8 +96,8 @@ public class Key {
   private void computeKey(int level, Envelope itemEnv)
   {
     double quadSize = DoubleBits.powerOf2(level);
-    pt.x = Math.floor(itemEnv.getMinX() / quadSize) * quadSize;
-    pt.y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
-    env.init(pt.x, pt.x + quadSize, pt.y, pt.y + quadSize);
+    pt.setX(Math.floor(itemEnv.getMinX() / quadSize) * quadSize);
+    pt.setY(Math.floor(itemEnv.getMinY() / quadSize) * quadSize);
+    env.init(pt.getX(), pt.getX() + quadSize, pt.getY(), pt.getY() + quadSize);
   }
 }

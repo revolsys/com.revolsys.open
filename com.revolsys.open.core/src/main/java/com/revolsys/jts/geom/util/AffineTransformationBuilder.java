@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.geom.util;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.math.Matrix;
 
 /**
@@ -63,12 +63,12 @@ import com.revolsys.jts.math.Matrix;
  */
 public class AffineTransformationBuilder
 {
-  private Coordinate src0;
-  private Coordinate src1;
-  private Coordinate src2;
-  private Coordinate dest0;
-  private Coordinate dest1;
-  private Coordinate dest2;
+  private Coordinates src0;
+  private Coordinates src1;
+  private Coordinates src2;
+  private Coordinates dest0;
+  private Coordinates dest1;
+  private Coordinates dest2;
   
   // the matrix entries for the transformation
   private double m00, m01, m02, m10, m11, m12;
@@ -86,12 +86,12 @@ public class AffineTransformationBuilder
    * @param dest1 the image of control point 1 under the required transformation
    * @param dest2 the image of control point 2 under the required transformation
    */
-  public AffineTransformationBuilder(Coordinate src0,
-      Coordinate src1,
-      Coordinate src2,
-      Coordinate dest0,
-      Coordinate dest1,
-      Coordinate dest2)
+  public AffineTransformationBuilder(Coordinates src0,
+      Coordinates src1,
+      Coordinates src2,
+      Coordinates dest0,
+      Coordinates dest1,
+      Coordinates dest2)
   {
     this.src0 = src0;
     this.src1 = src1;
@@ -128,14 +128,14 @@ public class AffineTransformationBuilder
    */
   private boolean compute()
   {
-    double[] bx = new double[] { dest0.x, dest1.x, dest2.x };
+    double[] bx = new double[] { dest0.getX(), dest1.getX(), dest2.getX() };
     double[] row0 = solve(bx);
     if (row0 == null) return false;
     m00 = row0[0];
     m01 = row0[1];
     m02 = row0[2];
     
-    double[] by = new double[] { dest0.y, dest1.y, dest2.y };
+    double[] by = new double[] { dest0.getY(), dest1.getY(), dest2.getY() };
     double[] row1 = solve(by);
     if (row1 == null) return false;
     m10 = row1[0];
@@ -155,9 +155,9 @@ public class AffineTransformationBuilder
   private double[] solve(double[] b)
   {
     double[][] a = new double[][] {
-        { src0.x, src0.y, 1 },
-        { src1.x, src1.y, 1},
-        { src2.x, src2.y, 1}
+        { src0.getX(), src0.getY(), 1 },
+        { src1.getX(), src1.getY(), 1},
+        { src2.getX(), src2.getY(), 1}
     };
     return Matrix.solve(a, b);
   }

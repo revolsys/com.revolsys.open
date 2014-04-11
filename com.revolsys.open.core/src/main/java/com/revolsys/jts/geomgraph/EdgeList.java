@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.noding.OrientedCoordinateArray;
 
 /**
@@ -120,10 +120,10 @@ public class EdgeList
       Edge e = (Edge) edges.get(j);
       if (j > 0) out.print(",");
       out.print("(");
-      Coordinate[] pts = e.getCoordinates();
+      Coordinates[] pts = e.getCoordinates();
       for (int i = 0; i < pts.length; i++) {
         if (i > 0) out.print(",");
-        out.print(pts[i].x + " " + pts[i].y);
+        out.print(pts[i].getX() + " " + pts[i].getY());
       }
       out.println(")");
     }

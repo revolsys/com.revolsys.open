@@ -3,7 +3,7 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.util.MathUtil;
 

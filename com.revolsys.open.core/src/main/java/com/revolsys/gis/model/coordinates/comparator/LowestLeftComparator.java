@@ -2,7 +2,7 @@ package com.revolsys.gis.model.coordinates.comparator;
 
 import java.util.Comparator;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Compare the coordinates, lowest Y first if equal then X comparison.

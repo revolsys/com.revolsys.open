@@ -32,8 +32,10 @@ import org.springframework.util.StringUtils;
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
@@ -69,8 +71,6 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.PrecisionModel;
 
 public class MapPanel extends JPanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;

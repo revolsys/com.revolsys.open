@@ -17,12 +17,11 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -337,6 +336,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int[] elemInfo = new int[] {
       1, 1, numPoints
     };
+
     return new JGeometry(numAxis * 1000 + JGeometry.GTYPE_MULTIPOINT, srid,
       elemInfo, points);
   }

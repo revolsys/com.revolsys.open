@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.geom;
 
+
 /**
  * A factory to create concrete instances of {@link CoordinatesList}s.
  * Used to configure {@link GeometryFactory}s
@@ -50,7 +51,7 @@ public interface CoordinateSequenceFactory
    *
    * @param coordinates the coordinates
    */
-  CoordinatesList create(Coordinate[] coordinates);
+  CoordinatesList create(Coordinates[] coordinates);
 
   /**
    * Creates a {@link CoordinatesList} which is a copy

@@ -18,13 +18,13 @@ import com.revolsys.gis.cs.projection.CoordinateProjectionUtil;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -173,12 +173,12 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     final Coordinate coordinate = point.getCoordinate();
     final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(point.getSrid());
     final CoordinatesOperation inverseCoordinatesOperation = ProjectionFactory.getToGeographicsCoordinatesOperation(coordinateSystem);
-    final Coordinate geoCoordinate = CoordinateProjectionUtil.perform(
+    final Coordinates geoCoordinate = CoordinateProjectionUtil.perform(
       inverseCoordinatesOperation, coordinate);
-    out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.x);
-    out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.y);
+    out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.getX());
+    out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.getY());
     if (point.getCoordinateSequence().getDimension() > 2) {
-      final double elevation = geoCoordinate.z;
+      final double elevation = geoCoordinate.getZ();
       if (!Double.isNaN(elevation)) {
         out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
       }

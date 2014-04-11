@@ -16,6 +16,7 @@ import javax.swing.table.TableModel;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.map.layer.dataobject.table.predicate.ErrorPredicate;
@@ -25,7 +26,6 @@ import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 import com.revolsys.swing.table.dataobject.renderer.DataObjectRowTableCellRenderer;
-import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectRowTable extends BaseJxTable implements MouseListener {
   private static final long serialVersionUID = 1L;

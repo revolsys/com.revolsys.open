@@ -1,5 +1,7 @@
 package com.revolsys.gis.model.coordinates;
 
+import com.revolsys.jts.geom.Coordinates;
+
 @SuppressWarnings("serial")
 public class CoordinatesWithOrientation extends DoubleCoordinates {
 

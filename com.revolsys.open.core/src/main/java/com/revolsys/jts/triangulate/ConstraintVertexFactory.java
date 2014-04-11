@@ -34,7 +34,7 @@
 package com.revolsys.jts.triangulate;
 
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * An interface for factories which create a {@link ConstraintVertex}
@@ -42,5 +42,5 @@ import com.revolsys.jts.geom.Coordinate;
  * @author Martin Davis
  */
 public interface ConstraintVertexFactory {
-    ConstraintVertex createVertex(Coordinate p, Segment constraintSeg);
+    ConstraintVertex createVertex(Coordinates p, Segment constraintSeg);
 }

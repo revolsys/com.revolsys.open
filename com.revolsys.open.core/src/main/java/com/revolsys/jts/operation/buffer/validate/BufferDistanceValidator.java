@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.MultiPolygon;
@@ -83,7 +83,7 @@ public class BufferDistanceValidator
   
   private boolean isValid = true;
   private String errMsg = null;
-  private Coordinate errorLocation = null;
+  private Coordinates errorLocation = null;
   private Geometry errorIndicator = null;
   
   public BufferDistanceValidator(Geometry input, double bufDistance, Geometry result)
@@ -125,7 +125,7 @@ public class BufferDistanceValidator
   	return errMsg;
   }
   
-  public Coordinate getErrorLocation()
+  public Coordinates getErrorLocation()
   {
     return errorLocation;
   }
@@ -198,7 +198,7 @@ public class BufferDistanceValidator
     
   	if (minDistanceFound < minDist) {
   		isValid = false;
-  		Coordinate[] pts = distOp.nearestPoints();
+  		Coordinates[] pts = distOp.nearestPoints();
   		errorLocation = distOp.nearestPoints()[1];
   		errorIndicator = g1.getGeometryFactory().createLineString(pts);
   		errMsg = "Distance between buffer curve and input is too small "
@@ -229,7 +229,7 @@ public class BufferDistanceValidator
     
     if (maxDistanceFound > maxDist) {
       isValid = false;
-      Coordinate[] pts = haus.getCoordinates();
+      Coordinates[] pts = haus.getCoordinates();
       errorLocation = pts[1];
       errorIndicator = input.getGeometryFactory().createLineString(pts);
       errMsg = "Distance between buffer curve and input is too large "

@@ -38,7 +38,7 @@ package com.revolsys.jts.geomgraph.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Quadrant;
 /**
  * MonotoneChains are a way of partitioning the segments of an edge to
@@ -76,7 +76,7 @@ public class MonotoneChainIndexer {
   public MonotoneChainIndexer() {
   }
 
-  public int[] getChainStartIndices(Coordinate[] pts)
+  public int[] getChainStartIndices(Coordinates[] pts)
   {
     // find the startpoint (and endpoints) of all monotone chains in this edge
     int start = 0;
@@ -95,7 +95,7 @@ public class MonotoneChainIndexer {
   /**
    * @return the index of the last point in the monotone chain
    */
-  private int findChainEnd(Coordinate[] pts, int start)
+  private int findChainEnd(Coordinates[] pts, int start)
   {
     // determine quadrant for chain
     int chainQuad = Quadrant.quadrant(pts[start], pts[start + 1]);

@@ -2,6 +2,7 @@ package com.revolsys.jts.simplify;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Triangle;
 
 /**
@@ -14,7 +15,7 @@ import com.revolsys.jts.geom.Triangle;
  */
 class VWLineSimplifier
 {
-  public static Coordinate[] simplify(Coordinate[] pts, double distanceTolerance)
+  public static Coordinates[] simplify(Coordinate[] pts, double distanceTolerance)
   {
     VWLineSimplifier simp = new VWLineSimplifier(pts, distanceTolerance);
     return simp.simplify();
@@ -29,17 +30,17 @@ class VWLineSimplifier
     this.tolerance = distanceTolerance * distanceTolerance;
   }
 
-  public Coordinate[] simplify()
+  public Coordinates[] simplify()
   {
     VWLineSimplifier.VWVertex vwLine = VWVertex.buildLine(pts);
     double minArea = tolerance;
     do {
       minArea = simplifyVertex(vwLine);
     } while (minArea < tolerance);
-    Coordinate[] simp = vwLine.getCoordinates();
+    Coordinates[] simp = vwLine.getCoordinates();
     // ensure computed value is a valid line
     if (simp.length < 2) {
-      return new Coordinate[] { simp[0], new Coordinate(simp[0]) };
+      return new Coordinates[] { simp[0], new Coordinate(simp[0]) };
     }
     return simp;
   }
@@ -148,7 +149,7 @@ class VWLineSimplifier
       isLive = false;
       return result;
     }
-    public Coordinate[] getCoordinates()
+    public Coordinates[] getCoordinates()
     {
       CoordinateList coords = new CoordinateList();
       VWLineSimplifier.VWVertex curr = this;

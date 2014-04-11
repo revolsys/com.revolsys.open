@@ -32,8 +32,10 @@
  */
 package com.revolsys.jts.precision;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -154,7 +156,7 @@ public class MinimumClearance
   
   private Geometry inputGeom;
   private double minClearance;
-  private Coordinate[] minClearancePts;
+  private Coordinates[] minClearancePts;
   
   /**
    * Creates an object to compute the Minimum Clearance
@@ -199,7 +201,7 @@ public class MinimumClearance
     compute();
     // return empty line string if no min pts where found
     if (minClearancePts == null || minClearancePts[0] == null)
-      return inputGeom.getGeometryFactory().createLineString((Coordinate[]) null);
+      return inputGeom.getGeometryFactory().createLineString((Coordinates[]) null);
     return inputGeom.getGeometryFactory().createLineString(minClearancePts);
   }
   
@@ -209,7 +211,7 @@ public class MinimumClearance
     if (minClearancePts != null) return;
     
     // initialize to "No Distance Exists" state
-    minClearancePts = new Coordinate[2];
+    minClearancePts = new Coordinates[2];
     minClearance = Double.MAX_VALUE;
     
     // handle empty geometries
@@ -250,9 +252,9 @@ public class MinimumClearance
   implements ItemDistance
   {
     private double minDist = Double.MAX_VALUE;
-    private Coordinate[] minPts = new Coordinate[2];
+    private Coordinates[] minPts = new Coordinates[2];
     
-    public Coordinate[] getCoordinates()
+    public Coordinates[] getCoordinates()
     {
       return minPts;
     }
@@ -280,9 +282,9 @@ public class MinimumClearance
     private double vertexDistance(FacetSequence fs1, FacetSequence fs2) {
       for (int i1 = 0; i1 < fs1.size(); i1++) {
         for (int i2 = 0; i2 < fs2.size(); i2++) {
-          Coordinate p1 = fs1.getCoordinate(i1);
-          Coordinate p2 = fs2.getCoordinate(i2);
-          if (! p1.equals2D(p2)) {
+          AbstractCoordinates p1 = fs1.getCoordinate(i1);
+          Coordinates p2 = fs2.getCoordinate(i2);
+          if (! p1.equals2d(p2)) {
             double d = p1.distance(p2);
             if (d < minDist) {
               minDist = d;
@@ -306,7 +308,7 @@ public class MinimumClearance
             Coordinate seg0 = fs2.getCoordinate(i2-1);
             Coordinate seg1 = fs2.getCoordinate(i2);
             
-            if (! (p.equals2D(seg0) || p.equals2D(seg1))) {
+            if (! (p.equals2d(seg0) || p.equals2d(seg1))) {
               double d = CGAlgorithms.distancePointLine(p, seg0, seg1);
               if (d < minDist) {
                 minDist = d;

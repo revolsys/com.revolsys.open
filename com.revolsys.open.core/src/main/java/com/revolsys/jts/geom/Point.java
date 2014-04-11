@@ -34,10 +34,10 @@ package com.revolsys.jts.geom;
 
 import java.util.Collections;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.util.NumberUtil;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -183,6 +183,20 @@ public class Point extends Geometry implements Puntal, Vertex {
     return CoordinatesUtil.distance(this, point);
   }
 
+  /**
+   * Computes the 3-dimensional Euclidean distance to another location.
+   * 
+   * @param c a coordinate
+   * @return the 3-dimensional Euclidean distance between the locations
+   */
+  @Override
+  public double distance3d(final Coordinates c) {
+    final double dx = getX() - c.getX();
+    final double dy = getY() - c.getY();
+    final double dz = getZ() - c.getZ();
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
   @Override
   public boolean equals(final double... coordinates) {
     return CoordinatesUtil.equals(this, coordinates);
@@ -204,6 +218,25 @@ public class Point extends Geometry implements Puntal, Vertex {
   @Override
   public boolean equals2d(final Coordinates point) {
     return CoordinatesUtil.equals2d(this, point);
+  }
+
+  /**
+   * Tests if another coordinate has the same values for the X and Y ordinates.
+   * The Z ordinate is ignored.
+   *
+   *@param other a <code>Coordinate</code> with which to do the 2D comparison.
+   *@return true if <code>other</code> is a <code>Coordinate</code>
+   *      with the same values for X and Y.
+   */
+  @Override
+  public boolean equals2d(final Coordinates c, final double tolerance) {
+    if (!NumberUtil.equalsWithTolerance(this.getX(), c.getX(), tolerance)) {
+      return false;
+    }
+    if (!NumberUtil.equalsWithTolerance(this.getY(), c.getY(), tolerance)) {
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -417,6 +450,11 @@ public class Point extends Geometry implements Puntal, Vertex {
   @Override
   public Geometry reverse() {
     return clone();
+  }
+
+  @Override
+  public void setCoordinate(final Coordinates other) {
+    throw new IllegalArgumentException("Geometries cannot be modified");
   }
 
   @Override

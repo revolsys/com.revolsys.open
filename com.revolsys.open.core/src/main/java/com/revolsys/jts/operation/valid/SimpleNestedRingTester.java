@@ -38,6 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geomgraph.GeometryGraph;
 import com.revolsys.jts.util.Assert;
@@ -54,7 +55,7 @@ public class SimpleNestedRingTester
 
   private GeometryGraph graph;  // used to find non-node vertices
   private List rings = new ArrayList();
-  private Coordinate nestedPt;
+  private Coordinates nestedPt;
 
   public SimpleNestedRingTester(GeometryGraph graph)
   {
@@ -66,7 +67,7 @@ public class SimpleNestedRingTester
     rings.add(ring);
   }
 
-  public Coordinate getNestedPoint() { return nestedPt; }
+  public Coordinates getNestedPoint() { return nestedPt; }
 
   public boolean isNonNested()
   {
@@ -76,7 +77,7 @@ public class SimpleNestedRingTester
 
       for (int j = 0; j < rings.size(); j++) {
         LinearRing searchRing = (LinearRing) rings.get(j);
-        Coordinate[] searchRingPts = searchRing.getCoordinateArray();
+        Coordinates[] searchRingPts = searchRing.getCoordinateArray();
 
         if (innerRing == searchRing)
           continue;
@@ -84,7 +85,7 @@ public class SimpleNestedRingTester
         if (! innerRing.getEnvelopeInternal().intersects(searchRing.getEnvelopeInternal()))
           continue;
 
-        Coordinate innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
+        Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
         Assert.isTrue(innerRingPt != null, "Unable to find a ring point not a node of the search ring");
         //Coordinate innerRingPt = innerRingPts[0];
 

@@ -18,13 +18,12 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.GeometryOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.LineSegment;
 import com.revolsys.io.wkt.WktParser;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -328,11 +327,11 @@ public class BoundingBox extends Envelope implements Cloneable {
    * @param coordinate The coordinate.
    */
   public BoundingBox(final GeometryFactory geometryFactory,
-    final Coordinate coordinate) {
-    super(coordinate);
+    final Coordinates point) {
+    super(point);
     this.geometryFactory = geometryFactory;
-    this.minZ = coordinate.z;
-    this.maxZ = coordinate.z;
+    this.minZ = point.getZ();
+    this.maxZ = point.getZ();
   }
 
   /**
@@ -343,24 +342,11 @@ public class BoundingBox extends Envelope implements Cloneable {
    * @param coordinate2 The second coordinate.
    */
   public BoundingBox(final GeometryFactory geometryFactory,
-    final Coordinate coordinate1, final Coordinate coordinate2) {
+    final Coordinates coordinate1, final Coordinates coordinate2) {
     super(coordinate1, coordinate2);
     this.geometryFactory = geometryFactory;
-    this.minZ = Math.min(coordinate1.z, coordinate2.z);
-    this.maxZ = Math.max(coordinate1.z, coordinate2.z);
-  }
-
-  public BoundingBox(final GeometryFactory geometryFactory,
-    final Coordinates point) {
-    this(geometryFactory, CoordinatesUtil.getX(point),
-      CoordinatesUtil.getY(point));
-  }
-
-  public BoundingBox(final GeometryFactory geometryFactory,
-    final Coordinates point1, final Coordinates point2) {
-    this(geometryFactory, CoordinatesUtil.getX(point1),
-      CoordinatesUtil.getY(point1), CoordinatesUtil.getX(point2),
-      CoordinatesUtil.getY(point2));
+    this.minZ = Math.min(coordinate1.getZ(), coordinate2.getZ());
+    this.maxZ = Math.max(coordinate1.getZ(), coordinate2.getZ());
   }
 
   /**
@@ -441,6 +427,7 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
+  @Override
   public boolean contains(final Coordinates coordinate) {
     if (coordinate == null) {
       return false;
@@ -566,6 +553,35 @@ public class BoundingBox extends Envelope implements Cloneable {
     boundingBox.expandToInclude(newX, newY);
   }
 
+  public BoundingBox expand(final Coordinates coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (isEmpty()) {
+      return new BoundingBox(geometryFactory, coordinates);
+    } else {
+      final double x = coordinates.getX();
+      final double y = coordinates.getY();
+
+      double minX = getMinX();
+      double maxX = getMaxX();
+      double minY = getMinY();
+      double maxY = getMaxY();
+
+      if (x < minX) {
+        minX = x;
+      }
+      if (x > maxX) {
+        maxX = x;
+      }
+      if (y < minY) {
+        minY = y;
+      }
+      if (y > maxY) {
+        maxY = y;
+      }
+      return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
+    }
+  }
+
   /**
    * Return a new bounding box expanded by delta.
    * 
@@ -634,35 +650,6 @@ public class BoundingBox extends Envelope implements Cloneable {
     }
   }
 
-  public BoundingBox expandToInclude(final Coordinates coordinates) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (isEmpty()) {
-      return new BoundingBox(geometryFactory, coordinates);
-    } else {
-      final double x = coordinates.getX();
-      final double y = coordinates.getY();
-
-      double minX = getMinX();
-      double maxX = getMaxX();
-      double minY = getMinY();
-      double maxY = getMaxY();
-
-      if (x < minX) {
-        minX = x;
-      }
-      if (x > maxX) {
-        maxX = x;
-      }
-      if (y < minY) {
-        minY = y;
-      }
-      if (y > maxY) {
-        maxY = y;
-      }
-      return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
-    }
-  }
-
   public BoundingBox expandToInclude(final DataObject object) {
     if (object != null) {
       final Geometry geometry = object.getGeometryValue();
@@ -689,7 +676,7 @@ public class BoundingBox extends Envelope implements Cloneable {
     } else {
       final Point copy = geometryFactory.copy(point);
       final Coordinates coordinates = CoordinatesUtil.getInstance(copy);
-      return expandToInclude(coordinates);
+      return expand(coordinates);
     }
   }
 
@@ -944,6 +931,7 @@ public class BoundingBox extends Envelope implements Cloneable {
     return intersects((Envelope)convertedBoundingBox);
   }
 
+  @Override
   public boolean intersects(final Coordinates point) {
     if (point == null) {
       return false;

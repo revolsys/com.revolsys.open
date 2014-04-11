@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A sorted collection of {@link DirectedEdge}s which leave a {@link Node}
@@ -94,7 +94,7 @@ public class DirectedEdgeStar
   /**
    * Returns the coordinate for the node at wich this star is based
    */
-  public Coordinate getCoordinate()
+  public Coordinates getCoordinate()
   {
     Iterator it = iterator();
     if (! it.hasNext()) return null;

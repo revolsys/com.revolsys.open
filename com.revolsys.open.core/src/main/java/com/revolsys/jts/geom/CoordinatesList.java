@@ -35,7 +35,6 @@ package com.revolsys.jts.geom;
 import java.io.Serializable;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 
 /**
@@ -140,7 +139,7 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    * @param index the index of the coordinate to copy
    * @param coord a {@link Coordinate} to receive the value
    */
-  void getCoordinate(int index, Coordinate coord);
+  void getCoordinate(int index, Coordinates coord);
 
   /**
    * Returns a copy of the i'th coordinate in this sequence.
@@ -151,7 +150,7 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    * @param i the index of the coordinate to retrieve
    * @return a copy of the i'th coordinate in the sequence
    */
-  Coordinate getCoordinateCopy(int i);
+  Coordinates getCoordinateCopy(int i);
 
   double[] getCoordinates();
 
@@ -206,7 +205,7 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   CoordinatesList reverse();
 
-  void setCoordinate(int i, Coordinate coordinate);
+  void setCoordinate(int i, Coordinates coordinate);
 
   void setM(int index, double m);
 

@@ -34,6 +34,7 @@ package com.revolsys.jts.noding;
 
 import java.util.Arrays;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 
 /**
@@ -65,7 +66,7 @@ public class BasicSegmentString implements SegmentString {
   }
 
   @Override
-  public Coordinate getCoordinate(final int i) {
+  public AbstractCoordinates getCoordinate(final int i) {
     return pts[i];
   }
 

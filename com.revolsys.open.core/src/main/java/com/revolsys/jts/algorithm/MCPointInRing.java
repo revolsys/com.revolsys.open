@@ -39,6 +39,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
@@ -61,9 +62,9 @@ public class MCPointInRing   implements PointInRing {
 
   class MCSelecter extends MonotoneChainSelectAction
   {
-    Coordinate p;
+    Coordinates p;
 
-    public MCSelecter(Coordinate p)
+    public MCSelecter(Coordinates p)
     {
       this.p = p;
     }
@@ -103,15 +104,15 @@ public class MCPointInRing   implements PointInRing {
 
   private Interval interval = new Interval();
 
-  public boolean isInside(Coordinate pt)
+  public boolean isInside(Coordinates pt)
   {
     crossings = 0;
 
     // test all segments intersected by ray from pt in positive x direction
-    Envelope rayEnv = new Envelope(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, pt.y, pt.y);
+    Envelope rayEnv = new Envelope(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, pt.getY(), pt.getY());
 
-    interval.min = pt.y;
-    interval.max = pt.y;
+    interval.min = pt.getY();
+    interval.max = pt.getY();
     List segs = tree.query(interval);
 //System.out.println("query size = " + segs.size());
 
@@ -136,7 +137,7 @@ public class MCPointInRing   implements PointInRing {
     mc.select(rayEnv, mcSelecter);
   }
 
-  private void testLineSegment(Coordinate p, LineSegment seg) {
+  private void testLineSegment(Coordinates p, LineSegment seg) {
     double xInt;  // x intersection of segment with ray
     double x1;    // translated coordinates
     double y1;
@@ -146,12 +147,12 @@ public class MCPointInRing   implements PointInRing {
     /*
      *  Test if segment crosses ray from test point in positive x direction.
      */
-    Coordinate p1 = seg.p0;
-    Coordinate p2 = seg.p1;
-    x1 = p1.x - p.x;
-    y1 = p1.y - p.y;
-    x2 = p2.x - p.x;
-    y2 = p2.y - p.y;
+    Coordinates p1 = seg.p0;
+    Coordinates p2 = seg.p1;
+    x1 = p1.getX() - p.getX();
+    y1 = p1.getY() - p.getY();
+    x2 = p2.getX() - p.getX();
+    y2 = p2.getY() - p.getY();
 
     if (((y1 > 0) && (y2 <= 0)) ||
         ((y2 > 0) && (y1 <= 0))) {

@@ -35,6 +35,7 @@ package com.revolsys.jts.triangulate;
 
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * A simple split point finder which returns the midpoint of the split segment. This is a default
@@ -53,10 +54,10 @@ public class MidpointSplitPointFinder implements ConstraintSplitPointFinder {
     /**
      * Gets the midpoint of the split segment
      */
-    public Coordinate findSplitPoint(Segment seg, Coordinate encroachPt) {
-        Coordinate p0 = seg.getStart();
-        Coordinate p1 = seg.getEnd();
-        return new Coordinate((p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
+    public Coordinates findSplitPoint(Segment seg, Coordinate encroachPt) {
+        Coordinates p0 = seg.getStart();
+        Coordinates p1 = seg.getEnd();
+        return new Coordinate((p0.getX() + p1.getX()) / 2, (p0.getY() + p1.getY()) / 2, Coordinates.NULL_ORDINATE);
     }
 
 }

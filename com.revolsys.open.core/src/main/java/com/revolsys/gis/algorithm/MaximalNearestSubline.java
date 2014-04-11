@@ -2,6 +2,7 @@ package com.revolsys.gis.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 
@@ -48,17 +49,17 @@ public class MaximalNearestSubline {
     if (!end.isVertex()) {
       newCoordinates.add(end.getCoordinate(), false);
     }
-    if (Double.isNaN(((Coordinate)newCoordinates.get(0)).x)) {
+    if (Double.isNaN(((Coordinates)newCoordinates.get(0)).getX())) {
       newCoordinates.remove(0);
     }
-    Coordinate[] newCoordinateArray = newCoordinates.toCoordinateArray();
+    Coordinates[] newCoordinateArray = newCoordinates.toCoordinateArray();
     /**
      * Ensure there is enough coordinates to build a valid line. Make a 2-point
      * line with duplicate coordinates, if necessary There will always be at
      * least one coordinate in the coordList.
      */
     if (newCoordinateArray.length <= 1) {
-      newCoordinateArray = new Coordinate[] {
+      newCoordinateArray = new Coordinates[] {
         newCoordinateArray[0], newCoordinateArray[0]
       };
     }

@@ -32,7 +32,9 @@
  */
 package com.revolsys.jts.operation.buffer.validate;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Contains a pair of points and the distance between them.
@@ -41,7 +43,7 @@ import com.revolsys.jts.geom.Coordinate;
  */
 public class PointPairDistance {
 
-  private Coordinate[] pt = { new Coordinate(), new Coordinate() };
+  private AbstractCoordinates[] pt = { new Coordinate(), new Coordinate() };
   private double distance = Double.NaN;
   private boolean isNull = true;
 
@@ -51,7 +53,7 @@ public class PointPairDistance {
 
   public void initialize() { isNull = true; }
 
-  public void initialize(Coordinate p0, Coordinate p1)
+  public void initialize(AbstractCoordinates p0, Coordinates p1)
   {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);
@@ -65,7 +67,7 @@ public class PointPairDistance {
    * @param p1
    * @param distance the distance between p0 and p1
    */
-  private void initialize(Coordinate p0, Coordinate p1, double distance)
+  private void initialize(Coordinates p0, Coordinates p1, double distance)
   {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);
@@ -75,16 +77,16 @@ public class PointPairDistance {
 
   public double getDistance() { return distance; }
 
-  public Coordinate[] getCoordinates() { return pt; }
+  public Coordinates[] getCoordinates() { return pt; }
 
-  public Coordinate getCoordinate(int i) { return pt[i]; }
+  public Coordinates getCoordinate(int i) { return pt[i]; }
 
   public void setMaximum(PointPairDistance ptDist)
   {
     setMaximum(ptDist.pt[0], ptDist.pt[1]);
   }
 
-  public void setMaximum(Coordinate p0, Coordinate p1)
+  public void setMaximum(AbstractCoordinates p0, Coordinates p1)
   {
     if (isNull) {
       initialize(p0, p1);
@@ -100,7 +102,7 @@ public class PointPairDistance {
     setMinimum(ptDist.pt[0], ptDist.pt[1]);
   }
 
-  public void setMinimum(Coordinate p0, Coordinate p1)
+  public void setMinimum(AbstractCoordinates p0, Coordinates p1)
   {
     if (isNull) {
       initialize(p0, p1);

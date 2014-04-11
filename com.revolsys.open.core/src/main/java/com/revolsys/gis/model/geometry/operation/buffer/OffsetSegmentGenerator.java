@@ -32,7 +32,6 @@
  */
 package com.revolsys.gis.model.geometry.operation.buffer;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -43,6 +42,7 @@ import com.revolsys.gis.model.geometry.operation.geomgraph.index.RobustLineInter
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.NotRepresentableException;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geomgraph.Position;
 import com.revolsys.jts.operation.buffer.BufferParameters;

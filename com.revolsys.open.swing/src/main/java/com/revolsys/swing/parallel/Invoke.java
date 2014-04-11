@@ -25,7 +25,6 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Property;
 
 public class Invoke {
   private static PropertyChangeListener PROPERTY_CHANGE_LISTENER = new PropertyChangeListener() {

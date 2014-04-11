@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
@@ -98,7 +99,7 @@ public class OffsetPointGenerator
 
   private void extractPoints(LineString line, double offsetDistance, List offsetPts)
   {
-    Coordinate[] pts = line.getCoordinateArray();
+    Coordinates[] pts = line.getCoordinateArray();
     for (int i = 0; i < pts.length - 1; i++) {
     	computeOffsetPoints(pts[i], pts[i + 1], offsetDistance, offsetPts);
     }
@@ -112,25 +113,25 @@ public class OffsetPointGenerator
    * @param p0 the first point of the segment to offset from
    * @param p1 the second point of the segment to offset from
    */
-  private void computeOffsetPoints(Coordinate p0, Coordinate p1, double offsetDistance, List offsetPts)
+  private void computeOffsetPoints(Coordinates p0, Coordinates p1, double offsetDistance, List offsetPts)
   {
-    double dx = p1.x - p0.x;
-    double dy = p1.y - p0.y;
+    double dx = p1.getX() - p0.getX();
+    double dy = p1.getY() - p0.getY();
     double len = Math.sqrt(dx * dx + dy * dy);
     // u is the vector that is the length of the offset, in the direction of the segment
     double ux = offsetDistance * dx / len;
     double uy = offsetDistance * dy / len;
 
-    double midX = (p1.x + p0.x) / 2;
-    double midY = (p1.y + p0.y) / 2;
+    double midX = (p1.getX() + p0.getX()) / 2;
+    double midY = (p1.getY() + p0.getY()) / 2;
 
     if (doLeft) {
-      Coordinate offsetLeft = new Coordinate(midX - uy, midY + ux);
+      Coordinate offsetLeft = new Coordinate(midX - uy, midY + ux, Coordinates.NULL_ORDINATE);
       offsetPts.add(offsetLeft);
     }
     
     if (doRight) {
-      Coordinate offsetRight = new Coordinate(midX + uy, midY - ux);
+      Coordinate offsetRight = new Coordinate(midX + uy, midY - ux, Coordinates.NULL_ORDINATE);
       offsetPts.add(offsetRight);
     }
   }

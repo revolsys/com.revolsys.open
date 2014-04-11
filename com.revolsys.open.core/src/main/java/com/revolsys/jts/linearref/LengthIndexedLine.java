@@ -33,6 +33,7 @@
 
 package com.revolsys.jts.linearref;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -94,7 +95,7 @@ public class LengthIndexedLine
    *    (positive is to the left, negative is to the right)
    * @return the Coordinate at the given index
    */
-  public Coordinate extractPoint(double index, double offsetDistance)
+  public AbstractCoordinates extractPoint(double index, double offsetDistance)
   {
     LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
     LinearLocation locLow = loc.toLowest(linearGeom);

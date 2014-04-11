@@ -38,7 +38,7 @@ package com.revolsys.jts.geomgraph.index;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Edge;
 
 /**
@@ -92,8 +92,8 @@ public class SimpleEdgeSetIntersector
    */
   private void computeIntersects(Edge e0, Edge e1, SegmentIntersector si)
   {
-   Coordinate[] pts0 = e0.getCoordinates();
-    Coordinate[] pts1 = e1.getCoordinates();
+   Coordinates[] pts0 = e0.getCoordinates();
+    Coordinates[] pts1 = e1.getCoordinates();
     for (int i0 = 0; i0 < pts0.length - 1; i0++) {
       for (int i1 = 0; i1 < pts1.length - 1; i1++) {
         si.addIntersections(e0, i0, e1, i1);

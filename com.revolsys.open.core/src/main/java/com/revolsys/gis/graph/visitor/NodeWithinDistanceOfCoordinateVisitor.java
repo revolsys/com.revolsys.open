@@ -3,8 +3,8 @@ package com.revolsys.gis.graph.visitor;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.CoordinateCoordinates;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 public class NodeWithinDistanceOfCoordinateVisitor<T> implements
   Visitor<Node<T>> {

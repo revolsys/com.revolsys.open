@@ -8,18 +8,18 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.layer.dataobject.DataObjectBoundingBoxLayer;
 import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.geonames.GeoNamesService;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
-import com.revolsys.jts.geom.Point;
 
 public class WikipediaBoundingBoxLayerWorker extends
   AbstractSwingWorker<DataObjectQuadTree, Void> {

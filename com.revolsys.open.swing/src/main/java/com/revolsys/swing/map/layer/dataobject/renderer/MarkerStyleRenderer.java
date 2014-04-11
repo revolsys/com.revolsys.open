@@ -11,14 +11,18 @@ import javax.swing.Icon;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -28,10 +32,6 @@ import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.panel.MarkerStylePanel;
 import com.revolsys.util.MathUtil;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 
 public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 

@@ -9,9 +9,9 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.dataobject.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
-import com.revolsys.jts.geom.Geometry;
 
 public class MergedValuePredicate implements HighlightPredicate {
 

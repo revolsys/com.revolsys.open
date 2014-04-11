@@ -32,13 +32,13 @@
  */
 package com.revolsys.gis.model.geometry.operation.noding.snapround;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.geometry.operation.chain.MonotoneChain;
 import com.revolsys.gis.model.geometry.operation.chain.NodedSegmentString;
 import com.revolsys.gis.model.geometry.operation.chain.Noder;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentIntersector;
 import com.revolsys.gis.model.geometry.operation.chain.SegmentString;
 import com.revolsys.gis.model.geometry.operation.geomgraph.index.LineIntersector;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Computes the intersections between two line segments in {@link SegmentString}

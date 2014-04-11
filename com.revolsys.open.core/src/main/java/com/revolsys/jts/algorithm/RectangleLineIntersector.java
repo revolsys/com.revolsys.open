@@ -33,6 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 
 /**
@@ -78,10 +79,10 @@ public class RectangleLineIntersector
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    diagUp0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMinY());
-    diagUp1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY());
-    diagDown0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY());
-    diagDown1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMinY());
+    diagUp0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMinY(), Coordinates.NULL_ORDINATE);
+    diagUp1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY(), Coordinates.NULL_ORDINATE);
+    diagDown0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY(), Coordinates.NULL_ORDINATE);
+    diagDown1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMinY(), Coordinates.NULL_ORDINATE);
   }
   
   /**
@@ -129,7 +130,7 @@ public class RectangleLineIntersector
      * "Upwards" means relative to the left end of the segment.
      */
     boolean isSegUpwards = false;
-    if (p1.y > p0.y)
+    if (p1.getY() > p0.getY())
       isSegUpwards = true;
     
     /**

@@ -32,7 +32,9 @@
 
 package com.revolsys.gis.algorithm;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Contains a pair of points and the distance between them. Provides methods to
@@ -44,18 +46,18 @@ public class PointPairDistance {
 
   private boolean isNull = true;
 
-  private final Coordinate[] pt = {
+  private final AbstractCoordinates[] pt = {
     new Coordinate(), new Coordinate()
   };
 
   public PointPairDistance() {
   }
 
-  public Coordinate getCoordinate(final int i) {
+  public Coordinates getCoordinate(final int i) {
     return pt[i];
   }
 
-  public Coordinate[] getCoordinates() {
+  public Coordinates[] getCoordinates() {
     return pt;
   }
 
@@ -67,7 +69,7 @@ public class PointPairDistance {
     isNull = true;
   }
 
-  public void initialize(final Coordinate p0, final Coordinate p1) {
+  public void initialize(final AbstractCoordinates p0, final Coordinates p1) {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);
     distance = p0.distance(p1);
@@ -81,7 +83,7 @@ public class PointPairDistance {
    * @param p1
    * @param distance the distance between p0 and p1
    */
-  private void initialize(final Coordinate p0, final Coordinate p1,
+  private void initialize(final Coordinates p0, final Coordinates p1,
     final double distance) {
     pt[0].setCoordinate(p0);
     pt[1].setCoordinate(p1);
@@ -89,7 +91,7 @@ public class PointPairDistance {
     isNull = false;
   }
 
-  public void setMaximum(final Coordinate p0, final Coordinate p1) {
+  public void setMaximum(final AbstractCoordinates p0, final Coordinates p1) {
     if (isNull) {
       initialize(p0, p1);
       return;
@@ -104,7 +106,7 @@ public class PointPairDistance {
     setMaximum(ptDist.pt[0], ptDist.pt[1]);
   }
 
-  public void setMinimum(final Coordinate p0, final Coordinate p1) {
+  public void setMinimum(final AbstractCoordinates p0, final Coordinates p1) {
     if (isNull) {
       initialize(p0, p1);
       return;

@@ -18,9 +18,9 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
-import com.revolsys.jts.geom.Geometry;
 
 public abstract class AbstractDataObjectTableModel extends AbstractTableModel
   implements PropertyChangeSupportProxy {

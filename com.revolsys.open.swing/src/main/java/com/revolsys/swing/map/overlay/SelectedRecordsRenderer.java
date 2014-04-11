@@ -11,19 +11,19 @@ import org.jdesktop.swingx.color.ColorUtil;
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.jts.IsSimpleOp;
 import com.revolsys.gis.jts.IsValidOp;
-import com.revolsys.gis.model.coordinates.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
-import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.operation.valid.TopologyValidationError;
+import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 
 public class SelectedRecordsRenderer {
 

@@ -33,9 +33,11 @@
 
 package com.revolsys.jts.triangulate.quadedge;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Models a site (node) in a {@link QuadEdgeSubdivision}. 
@@ -77,12 +79,12 @@ public class Vertex {
    * @param p1
    * @return the interpolated Z value
    */
-  public static double interpolateZ(final Coordinate p, final Coordinate p0,
-    final Coordinate p1) {
+  public static double interpolateZ(final AbstractCoordinates p, final AbstractCoordinates p0,
+    final Coordinates p1) {
     final double segLen = p0.distance(p1);
     final double ptLen = p.distance(p0);
-    final double dz = p1.z - p0.z;
-    final double pz = p0.z + dz * (ptLen / segLen);
+    final double dz = p1.getZ() - p0.getZ();
+    final double pz = p0.getZ() + dz * (ptLen / segLen);
     return pz;
   }
 
@@ -99,20 +101,21 @@ public class Vertex {
    * @param v2 a vertex of a triangle containing the p
    * @return the interpolated Z-value (height) of the point  
    */
-  public static double interpolateZ(final Coordinate p, final Coordinate v0,
-    final Coordinate v1, final Coordinate v2) {
-    final double x0 = v0.x;
-    final double y0 = v0.y;
-    final double a = v1.x - x0;
-    final double b = v2.x - x0;
-    final double c = v1.y - y0;
-    final double d = v2.y - y0;
+  public static double interpolateZ(final Coordinates p, final Coordinates v0,
+    final Coordinates v1, final Coordinates v2) {
+    final double x0 = v0.getX();
+    final double y0 = v0.getY();
+    final double a = v1.getX() - x0;
+    final double b = v2.getX() - x0;
+    final double c = v1.getY() - y0;
+    final double d = v2.getY() - y0;
     final double det = a * d - b * c;
-    final double dx = p.x - x0;
-    final double dy = p.y - y0;
+    final double dx = p.getX() - x0;
+    final double dy = p.getY() - y0;
     final double t = (d * dx - b * dy) / det;
     final double u = (-c * dx + a * dy) / det;
-    final double z = v0.z + t * (v1.z - v0.z) + u * (v2.z - v0.z);
+    final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u
+      * (v2.getZ() - v0.getZ());
     return z;
   }
 
@@ -120,12 +123,12 @@ public class Vertex {
 
   // private int edgeNumber = -1;
 
-  public Vertex(final Coordinate _p) {
+  public Vertex(final Coordinates _p) {
     p = new Coordinate(_p);
   }
 
   public Vertex(final double _x, final double _y) {
-    p = new Coordinate(_x, _y);
+    p = new Coordinate(_x, _y, Coordinates.NULL_ORDINATE);
   }
 
   public Vertex(final double _x, final double _y, final double _z) {
@@ -221,7 +224,7 @@ public class Vertex {
 
   /* returns k X v (cross product). this is a vector perpendicular to v */
   Vertex cross() {
-    return (new Vertex(p.y, -p.x));
+    return (new Vertex(p.getY(), -p.getX()));
   }
 
   /**
@@ -231,7 +234,7 @@ public class Vertex {
    * @return returns the magnitude of u X v
    */
   double crossProduct(final Vertex v) {
-    return (p.x * v.getY() - p.y * v.getX());
+    return (p.getX() * v.getY() - p.getY() * v.getX());
   }
 
   private double distance(final Vertex v1, final Vertex v2) {
@@ -246,11 +249,11 @@ public class Vertex {
    * @return returns the dot product u.v
    */
   double dot(final Vertex v) {
-    return (p.x * v.getX() + p.y * v.getY());
+    return (p.getX() * v.getX() + p.getY() * v.getY());
   }
 
   public boolean equals(final Vertex _x) {
-    if (p.x == _x.getX() && p.y == _x.getY()) {
+    if (p.getX() == _x.getX() && p.getY() == _x.getY()) {
       return true;
     } else {
       return false;
@@ -270,15 +273,15 @@ public class Vertex {
   }
 
   public double getX() {
-    return p.x;
+    return p.getX();
   }
 
   public double getY() {
-    return p.y;
+    return p.getY();
   }
 
   public double getZ() {
-    return p.z;
+    return p.getZ();
   }
 
   /** ************************************************************* */
@@ -328,7 +331,8 @@ public class Vertex {
 
     // is equal to the signed area of the triangle
 
-    return (b.p.x - p.x) * (c.p.y - p.y) - (b.p.y - p.y) * (c.p.x - p.x) > 0;
+    return (b.p.getX() - p.getX()) * (c.p.getY() - p.getY())
+      - (b.p.getY() - p.getY()) * (c.p.getX() - p.getX()) > 0;
 
     // original rolled code
     // boolean isCCW = triArea(this, b, c) > 0;
@@ -357,7 +361,7 @@ public class Vertex {
 
   /* magnitude of vector */
   double magn() {
-    return (Math.sqrt(p.x * p.x + p.y * p.y));
+    return (Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()));
   }
 
   /**
@@ -367,9 +371,9 @@ public class Vertex {
    * @return the point mid-way between this and that.
    */
   public Vertex midPoint(final Vertex a) {
-    final double xm = (p.x + a.getX()) / 2.0;
-    final double ym = (p.y + a.getY()) / 2.0;
-    final double zm = (p.z + a.getZ()) / 2.0;
+    final double xm = (p.getX() + a.getX()) / 2.0;
+    final double ym = (p.getY() + a.getY()) / 2.0;
+    final double zm = (p.getZ() + a.getZ()) / 2.0;
     return new Vertex(xm, ym, zm);
   }
 
@@ -377,18 +381,18 @@ public class Vertex {
     return isCCW(e.dest(), e.orig());
   }
 
-  public void setZ(final double _z) {
-    p.z = _z;
+  public void setZ(final double z) {
+    p.setZ(z);
   }
 
   /* and subtraction */
   Vertex sub(final Vertex v) {
-    return (new Vertex(p.x - v.getX(), p.y - v.getY()));
+    return (new Vertex(p.getX() - v.getX(), p.getY() - v.getY()));
   }
 
   /* Vector addition */
   Vertex sum(final Vertex v) {
-    return (new Vertex(p.x + v.getX(), p.y + v.getY()));
+    return (new Vertex(p.getX() + v.getX(), p.getY() + v.getY()));
   }
 
   /**
@@ -398,12 +402,12 @@ public class Vertex {
    * @return returns the scaled vector
    */
   Vertex times(final double c) {
-    return (new Vertex(c * p.x, c * p.y));
+    return (new Vertex(c * p.getX(), c * p.getY()));
   }
 
   @Override
   public String toString() {
-    return "POINT (" + p.x + " " + p.y + ")";
+    return "POINT (" + p.getX() + " " + p.getY() + ")";
   }
 
 }

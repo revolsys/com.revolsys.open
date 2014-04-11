@@ -3,7 +3,6 @@ package com.revolsys.gis.model.geometry.operation.overlay;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.geometry.Geometry;
@@ -16,6 +15,7 @@ import com.revolsys.gis.model.geometry.MultiPoint;
 import com.revolsys.gis.model.geometry.MultiPolygon;
 import com.revolsys.gis.model.geometry.Point;
 import com.revolsys.gis.model.geometry.Polygon;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.util.GeometryEditor;
 

@@ -16,12 +16,12 @@ import javax.swing.border.BevelBorder;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
-import com.revolsys.jts.geom.Point;
 
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
   PropertyChangeListener {

@@ -35,6 +35,7 @@ package com.revolsys.jts.index.intervalrtree;
 import java.util.Comparator;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.io.WKTWriter;
 
@@ -58,7 +59,7 @@ public abstract class IntervalRTreeNode
 
 	public String toString()
 	{
-		return WKTWriter.toLineString(new Coordinate(min, 0), new Coordinate(max, 0));
+		return WKTWriter.toLineString(new Coordinate(min, 0, Coordinates.NULL_ORDINATE), new Coordinate(max, 0, Coordinates.NULL_ORDINATE));
 	}
   
   public static class NodeComparator implements Comparator

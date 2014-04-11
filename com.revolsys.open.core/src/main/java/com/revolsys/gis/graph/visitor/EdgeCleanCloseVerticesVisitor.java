@@ -11,6 +11,7 @@ import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinatesIterator;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -112,7 +113,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
           }
           if (fixed) {
             coordinateListeners.coordinateEvent(
-              new Coordinate(x2, y2),
+              new Coordinate(x2, y2, Coordinates.NULL_ORDINATE),
               typePath,
               "Short Segment",
               "Fixed",
@@ -120,7 +121,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
                 + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           } else {
             coordinateListeners.coordinateEvent(
-              new Coordinate(x2, y2),
+              new Coordinate(x2, y2, Coordinates.NULL_ORDINATE),
               typePath,
               "Short Segment",
               "Review",

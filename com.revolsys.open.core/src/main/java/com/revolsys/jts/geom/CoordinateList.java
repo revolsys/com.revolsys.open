@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+
 /**
  * A list of {@link Coordinate}s, which may
  * be set to prevent repeated coordinates from occuring in the list.
@@ -85,7 +87,7 @@ public class CoordinateList
     add(coord, allowRepeated);
   }
 
-  public Coordinate getCoordinate(int i) { return (Coordinate) get(i); }
+  public Coordinates getCoordinate(int i) { return (Coordinates) get(i); }
 
 
   /** 
@@ -165,8 +167,8 @@ public class CoordinateList
     // don't add duplicate coordinates
     if (! allowRepeated) {
       if (size() >= 1) {
-        Coordinate last = (Coordinate) get(size() - 1);
-        if (last.equals2D(coord)) return;
+        AbstractCoordinates last = (AbstractCoordinates) get(size() - 1);
+        if (last.equals2d(coord)) return;
       }
     }
     super.add(coord);
@@ -186,12 +188,12 @@ public class CoordinateList
       int size = size();
       if (size > 0) {
         if (i > 0) {
-          Coordinate prev = (Coordinate) get(i - 1);
-          if (prev.equals2D(coord)) return;
+          AbstractCoordinates prev = (AbstractCoordinates) get(i - 1);
+          if (prev.equals2d(coord)) return;
         }
         if (i < size) {
-          Coordinate next = (Coordinate) get(i);
-          if (next.equals2D(coord)) return;
+          AbstractCoordinates next = (AbstractCoordinates) get(i);
+          if (next.equals2d(coord)) return;
         }
       }
     }
@@ -219,7 +221,7 @@ public class CoordinateList
   public void closeRing()
   {
     if (size() > 0)
-      add(new Coordinate((Coordinate) get(0)), false);
+      add(new Coordinate((Coordinates) get(0)), false);
   }
 
   /** Returns the Coordinates in this collection.
@@ -239,7 +241,7 @@ public class CoordinateList
   public Object clone() {
       CoordinateList clone = (CoordinateList) super.clone();
       for (int i = 0; i < this.size(); i++) {
-          clone.add(i, ((Coordinate) this.get(i)).clone());
+          clone.add(i, ((Coordinates) this.get(i)).clone());
       }
       return clone;
   }

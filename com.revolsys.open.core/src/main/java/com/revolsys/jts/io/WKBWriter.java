@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -177,8 +178,7 @@ import com.revolsys.jts.util.Assert;
  * </pre></blockquote> 
  * @see WKBReader
  */
-public class WKBWriter
-{
+public class WKBWriter {
   /**
    * Converts a byte array to a hexadecimal string.
    * 
@@ -187,8 +187,8 @@ public class WKBWriter
    * 
    * @deprecated
    */
-  public static String bytesToHex(byte[] bytes)
-  {
+  @Deprecated
+  public static String bytesToHex(final byte[] bytes) {
     return toHex(bytes);
   }
 
@@ -198,33 +198,39 @@ public class WKBWriter
    * @param bytes a byte array
    * @return a string of hexadecimal digits
    */
-  public static String toHex(byte[] bytes)
-  {
-    StringBuffer buf = new StringBuffer();
+  public static String toHex(final byte[] bytes) {
+    final StringBuffer buf = new StringBuffer();
     for (int i = 0; i < bytes.length; i++) {
-      byte b = bytes[i];
+      final byte b = bytes[i];
       buf.append(toHexDigit((b >> 4) & 0x0F));
       buf.append(toHexDigit(b & 0x0F));
     }
     return buf.toString();
   }
 
-  private static char toHexDigit(int n)
-  {
-    if (n < 0 || n > 15)
+  private static char toHexDigit(final int n) {
+    if (n < 0 || n > 15) {
       throw new IllegalArgumentException("Nibble value out of range: " + n);
-    if (n <= 9)
-      return (char) ('0' + n);
-    return (char) ('A' + (n - 10));
+    }
+    if (n <= 9) {
+      return (char)('0' + n);
+    }
+    return (char)('A' + (n - 10));
   }
 
   private int outputDimension = 2;
-  private int byteOrder;
+
+  private final int byteOrder;
+
   private boolean includeSRID = false;
-  private ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
-  private OutStream byteArrayOutStream = new OutputStreamOutStream(byteArrayOS);
+
+  private final ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+
+  private final OutStream byteArrayOutStream = new OutputStreamOutStream(
+    byteArrayOS);
+
   // holds output data values
-  private byte[] buf = new byte[8];
+  private final byte[] buf = new byte[8];
 
   /**
    * Creates a writer that writes {@link Geometry}s with
@@ -239,11 +245,11 @@ public class WKBWriter
    * the given dimension (2 or 3) for output coordinates
    * and {@link ByteOrderValues#BIG_ENDIAN} byte order.
    * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Coordinate#NULL_ORDINATE}.
+   * coordinates will be padded with {@link Coordinate#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    */
-  public WKBWriter(int outputDimension) {
+  public WKBWriter(final int outputDimension) {
     this(outputDimension, ByteOrderValues.BIG_ENDIAN);
   }
 
@@ -254,63 +260,63 @@ public class WKBWriter
    * takes a flag to control whether srid information will be
    * written.
    * If the input geometry has a smaller coordinate dimension,
-   * coordinates will be padded with {@link Coordinate#NULL_ORDINATE}.
+   * coordinates will be padded with {@link Coordinate#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param includeSRID indicates whether SRID should be written
    */
-  public WKBWriter(int outputDimension, boolean includeSRID) {
+  public WKBWriter(final int outputDimension, final boolean includeSRID) {
     this(outputDimension, ByteOrderValues.BIG_ENDIAN, includeSRID);
   }
-  
+
   /**
    * Creates a writer that writes {@link Geometry}s with
    * the given dimension (2 or 3) for output coordinates
    * and byte order
    * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Coordinate#NULL_ORDINATE}.
+   * coordinates will be padded with {@link Coordinate#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param byteOrder the byte ordering to use
    */
-  public WKBWriter(int outputDimension, int byteOrder) {
-      this(outputDimension, byteOrder, false);
+  public WKBWriter(final int outputDimension, final int byteOrder) {
+    this(outputDimension, byteOrder, false);
   }
-  
+
   /**
    * Creates a writer that writes {@link Geometry}s with
    * the given dimension (2 or 3) for output coordinates
    * and byte order. This constructor also takes a flag to 
    * control whether srid information will be written.
    * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Coordinate#NULL_ORDINATE}.
+   * coordinates will be padded with {@link Coordinate#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param byteOrder the byte ordering to use
    * @param includeSRID indicates whether SRID should be written
    */
-  public WKBWriter(int outputDimension, int byteOrder, boolean includeSRID) {
-      this.outputDimension = outputDimension;
-      this.byteOrder = byteOrder;
-      this.includeSRID = includeSRID;
-      
-      if (outputDimension < 2 || outputDimension > 3)
-        throw new IllegalArgumentException("Output dimension must be 2 or 3");
+  public WKBWriter(final int outputDimension, final int byteOrder,
+    final boolean includeSRID) {
+    this.outputDimension = outputDimension;
+    this.byteOrder = byteOrder;
+    this.includeSRID = includeSRID;
+
+    if (outputDimension < 2 || outputDimension > 3) {
+      throw new IllegalArgumentException("Output dimension must be 2 or 3");
+    }
   }
-  
+
   /**
    * Writes a {@link Geometry} into a byte array.
    *
    * @param geom the geometry to write
    * @return the byte array containing the WKB
    */
-  public byte[] write(Geometry geom)
-  {
+  public byte[] write(final Geometry geom) {
     try {
       byteArrayOS.reset();
       write(geom, byteArrayOutStream);
-    }
-    catch (IOException ex) {
+    } catch (final IOException ex) {
       throw new RuntimeException("Unexpected IO exception: " + ex.getMessage());
     }
     return byteArrayOS.toByteArray();
@@ -323,64 +329,71 @@ public class WKBWriter
    * @param os the out stream to write to
    * @throws IOException if an I/O error occurs
    */
-  public void write(Geometry geom, OutStream os) throws IOException
-  {
-    if (geom instanceof Point)
-      writePoint((Point) geom, os);
-    // LinearRings will be written as LineStrings
-    else if (geom instanceof LineString)
-      writeLineString((LineString) geom, os);
-    else if (geom instanceof Polygon)
-      writePolygon((Polygon) geom, os);
-    else if (geom instanceof MultiPoint)
-      writeGeometryCollection(WKBConstants.wkbMultiPoint, 
-          (MultiPoint) geom, os);
-    else if (geom instanceof MultiLineString)
+  public void write(final Geometry geom, final OutStream os) throws IOException {
+    if (geom instanceof Point) {
+      writePoint((Point)geom, os);
+    } else if (geom instanceof LineString) {
+      writeLineString((LineString)geom, os);
+    } else if (geom instanceof Polygon) {
+      writePolygon((Polygon)geom, os);
+    } else if (geom instanceof MultiPoint) {
+      writeGeometryCollection(WKBConstants.wkbMultiPoint, (MultiPoint)geom, os);
+    } else if (geom instanceof MultiLineString) {
       writeGeometryCollection(WKBConstants.wkbMultiLineString,
-          (MultiLineString) geom, os);
-    else if (geom instanceof MultiPolygon)
-      writeGeometryCollection(WKBConstants.wkbMultiPolygon,
-          (MultiPolygon) geom, os);
-    else if (geom instanceof GeometryCollection)
+        (MultiLineString)geom, os);
+    } else if (geom instanceof MultiPolygon) {
+      writeGeometryCollection(WKBConstants.wkbMultiPolygon, (MultiPolygon)geom,
+        os);
+    } else if (geom instanceof GeometryCollection) {
       writeGeometryCollection(WKBConstants.wkbGeometryCollection,
-          (GeometryCollection) geom, os);
-    else {
+        (GeometryCollection)geom, os);
+    } else {
       Assert.shouldNeverReachHere("Unknown Geometry type");
     }
   }
 
-  private void writePoint(Point pt, OutStream os) throws IOException
-  {
-    if (pt.getCoordinateSequence().size() == 0)
-      throw new IllegalArgumentException("Empty Points cannot be represented in WKB");
-    writeByteOrder(os);
-    writeGeometryType(WKBConstants.wkbPoint, pt, os);
-    writeCoordinateSequence(pt.getCoordinateSequence(), false, os);
+  private void writeByteOrder(final OutStream os) throws IOException {
+    if (byteOrder == ByteOrderValues.LITTLE_ENDIAN) {
+      buf[0] = WKBConstants.wkbNDR;
+    } else {
+      buf[0] = WKBConstants.wkbXDR;
+    }
+    os.write(buf, 1);
   }
 
-  private void writeLineString(LineString line, OutStream os)
-      throws IOException
-  {
-    writeByteOrder(os);
-    writeGeometryType(WKBConstants.wkbLineString, line, os);
-    writeCoordinateSequence(line.getCoordinatesList(), true, os);
-  }
+  private void writeCoordinate(final CoordinatesList seq, final int index,
+    final OutStream os) throws IOException {
+    ByteOrderValues.putDouble(seq.getX(index), buf, byteOrder);
+    os.write(buf, 8);
+    ByteOrderValues.putDouble(seq.getY(index), buf, byteOrder);
+    os.write(buf, 8);
 
-  private void writePolygon(Polygon poly, OutStream os) throws IOException
-  {
-    writeByteOrder(os);
-    writeGeometryType(WKBConstants.wkbPolygon, poly, os);
-    writeInt(poly.getNumInteriorRing() + 1, os);
-    writeCoordinateSequence(poly.getExteriorRing().getCoordinatesList(), true, os);
-    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      writeCoordinateSequence(poly.getInteriorRingN(i).getCoordinatesList(), true,
-          os);
+    // only write 3rd dim if caller has requested it for this writer
+    if (outputDimension >= 3) {
+      // if 3rd dim is requested, only write it if the CoordinatesList provides
+      // it
+      double ordVal = Coordinates.NULL_ORDINATE;
+      if (seq.getDimension() >= 3) {
+        ordVal = seq.getOrdinate(index, 2);
+      }
+      ByteOrderValues.putDouble(ordVal, buf, byteOrder);
+      os.write(buf, 8);
     }
   }
 
-  private void writeGeometryCollection(int geometryType, GeometryCollection gc,
-      OutStream os) throws IOException
-  {
+  private void writeCoordinateSequence(final CoordinatesList seq,
+    final boolean writeSize, final OutStream os) throws IOException {
+    if (writeSize) {
+      writeInt(seq.size(), os);
+    }
+
+    for (int i = 0; i < seq.size(); i++) {
+      writeCoordinate(seq, i, os);
+    }
+  }
+
+  private void writeGeometryCollection(final int geometryType,
+    final GeometryCollection gc, final OutStream os) throws IOException {
     writeByteOrder(os);
     writeGeometryType(geometryType, gc, os);
     writeInt(gc.getNumGeometries(), os);
@@ -389,60 +402,51 @@ public class WKBWriter
     }
   }
 
-  private void writeByteOrder(OutStream os) throws IOException
-  {
-    if (byteOrder == ByteOrderValues.LITTLE_ENDIAN)
-      buf[0] = WKBConstants.wkbNDR;
-    else
-      buf[0] = WKBConstants.wkbXDR;
-    os.write(buf, 1);
-  }
-
-  private void writeGeometryType(int geometryType, Geometry g, OutStream os)
-      throws IOException
-  {
-    int flag3D = (outputDimension == 3) ? 0x80000000 : 0;
+  private void writeGeometryType(final int geometryType, final Geometry g,
+    final OutStream os) throws IOException {
+    final int flag3D = (outputDimension == 3) ? 0x80000000 : 0;
     int typeInt = geometryType | flag3D;
     typeInt |= includeSRID ? 0x20000000 : 0;
     writeInt(typeInt, os);
     if (includeSRID) {
-        writeInt(g.getSrid(), os);
+      writeInt(g.getSrid(), os);
     }
   }
 
-  private void writeInt(int intValue, OutStream os) throws IOException
-  {
+  private void writeInt(final int intValue, final OutStream os)
+    throws IOException {
     ByteOrderValues.putInt(intValue, buf, byteOrder);
     os.write(buf, 4);
   }
 
-  private void writeCoordinateSequence(CoordinatesList seq, boolean writeSize, OutStream os)
-      throws IOException
-  {
-    if (writeSize)
-      writeInt(seq.size(), os);
-
-    for (int i = 0; i < seq.size(); i++) {
-      writeCoordinate(seq, i, os);
-    }
+  private void writeLineString(final LineString line, final OutStream os)
+    throws IOException {
+    writeByteOrder(os);
+    writeGeometryType(WKBConstants.wkbLineString, line, os);
+    writeCoordinateSequence(line.getCoordinatesList(), true, os);
   }
 
-  private void writeCoordinate(CoordinatesList seq, int index, OutStream os)
-  throws IOException
-  {
-    ByteOrderValues.putDouble(seq.getX(index), buf, byteOrder);
-    os.write(buf, 8);
-    ByteOrderValues.putDouble(seq.getY(index), buf, byteOrder);
-    os.write(buf, 8);
-    
-    // only write 3rd dim if caller has requested it for this writer
-    if (outputDimension >= 3) {
-      // if 3rd dim is requested, only write it if the CoordinatesList provides it
-    	double ordVal = Coordinate.NULL_ORDINATE;
-    	if (seq.getDimension() >= 3)
-    		ordVal = seq.getOrdinate(index, 2);
-      ByteOrderValues.putDouble(ordVal, buf, byteOrder);
-      os.write(buf, 8);
+  private void writePoint(final Point pt, final OutStream os)
+    throws IOException {
+    if (pt.getCoordinateSequence().size() == 0) {
+      throw new IllegalArgumentException(
+        "Empty Points cannot be represented in WKB");
+    }
+    writeByteOrder(os);
+    writeGeometryType(WKBConstants.wkbPoint, pt, os);
+    writeCoordinateSequence(pt.getCoordinateSequence(), false, os);
+  }
+
+  private void writePolygon(final Polygon poly, final OutStream os)
+    throws IOException {
+    writeByteOrder(os);
+    writeGeometryType(WKBConstants.wkbPolygon, poly, os);
+    writeInt(poly.getNumInteriorRing() + 1, os);
+    writeCoordinateSequence(poly.getExteriorRing().getCoordinatesList(), true,
+      os);
+    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
+      writeCoordinateSequence(poly.getInteriorRingN(i).getCoordinatesList(),
+        true, os);
     }
   }
 }

@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 
 /**
  * Utility functions for working with angles.
@@ -80,9 +80,9 @@ public class Angle
    *
    * @return the normalized angle (in radians) that p0-p1 makes with the positive x-axis.
    */
-  public static double angle(Coordinate p0, Coordinate p1) {
-      double dx = p1.x - p0.x;
-      double dy = p1.y - p0.y;
+  public static double angle(Coordinates p0, Coordinates p1) {
+      double dx = p1.getX() - p0.getX();
+      double dy = p1.getY() - p0.getY();
       return Math.atan2(dy, dx);
   }
 
@@ -93,8 +93,8 @@ public class Angle
    *
    * @return the normalized angle (in radians) that p makes with the positive x-axis.
    */
-  public static double angle(Coordinate p) {
-      return Math.atan2(p.y, p.x);
+  public static double angle(Coordinates p) {
+      return Math.atan2(p.getY(), p.getX());
   }
 
 
@@ -108,13 +108,13 @@ public class Angle
    * @param p1 the base of the angle
    * @param p2 the other endpoint of the angle
    */
-  public static boolean isAcute(Coordinate p0, Coordinate p1, Coordinate p2)
+  public static boolean isAcute(Coordinates p0, Coordinates p1, Coordinates p2)
   {
     // relies on fact that A dot B is positive iff A ang B is acute
-    double dx0 = p0.x - p1.x;
-    double dy0 = p0.y - p1.y;
-    double dx1 = p2.x - p1.x;
-    double dy1 = p2.y - p1.y;
+    double dx0 = p0.getX() - p1.getX();
+    double dy0 = p0.getY() - p1.getY();
+    double dx1 = p2.getX() - p1.getX();
+    double dy1 = p2.getY() - p1.getY();
     double dotprod = dx0 * dx1 + dy0 * dy1;
     return dotprod > 0;
   }
@@ -129,13 +129,13 @@ public class Angle
    * @param p1 the base of the angle
    * @param p2 the other endpoint of the angle
    */
-  public static boolean isObtuse(Coordinate p0, Coordinate p1, Coordinate p2)
+  public static boolean isObtuse(Coordinates p0, Coordinates p1, Coordinates p2)
   {
     // relies on fact that A dot B is negative iff A ang B is obtuse
-    double dx0 = p0.x - p1.x;
-    double dy0 = p0.y - p1.y;
-    double dx1 = p2.x - p1.x;
-    double dy1 = p2.y - p1.y;
+    double dx0 = p0.getX() - p1.getX();
+    double dy0 = p0.getY() - p1.getY();
+    double dx1 = p2.getX() - p1.getX();
+    double dy1 = p2.getY() - p1.getY();
     double dotprod = dx0 * dx1 + dy0 * dy1;
     return dotprod < 0;
   }
@@ -149,8 +149,8 @@ public class Angle
    * @param tip2 the tip of the other vector
    * @return the angle between tail-tip1 and tail-tip2
    */
-  public static double angleBetween(Coordinate tip1, Coordinate tail,
-			Coordinate tip2) {
+  public static double angleBetween(Coordinates tip1, Coordinates tail,
+			Coordinates tip2) {
 		double a1 = angle(tail, tip1);
 		double a2 = angle(tail, tip2);
 
@@ -171,8 +171,8 @@ public class Angle
    * @param tip2 the tip of v2
    * @return the angle between v1 and v2, relative to v1
    */
-  public static double angleBetweenOriented(Coordinate tip1, Coordinate tail,
-			Coordinate tip2) 
+  public static double angleBetweenOriented(Coordinates tip1, Coordinates tail,
+			Coordinates tip2) 
   {
 		double a1 = angle(tail, tip1);
 		double a2 = angle(tail, tip2);
@@ -199,7 +199,7 @@ public class Angle
 	 *          the next point of the ring
 	 * @return the interior angle based at <code>p1</code>
 	 */
-  public static double interiorAngle(Coordinate p0, Coordinate p1, Coordinate p2)
+  public static double interiorAngle(Coordinates p0, Coordinates p1, Coordinates p2)
   {
     double anglePrev = Angle.angle(p1, p0);
     double angleNext = Angle.angle(p1, p2);

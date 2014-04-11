@@ -40,7 +40,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -66,13 +68,13 @@ public class SegmentNodeList
    *
    * @return the SegmentIntersection found or added
    */
-  public SegmentNode add(Coordinate intPt, int segmentIndex)
+  public SegmentNode add(AbstractCoordinates intPt, int segmentIndex)
   {
     SegmentNode eiNew = new SegmentNode(edge, intPt, segmentIndex, edge.getSegmentOctant(segmentIndex));
     SegmentNode ei = (SegmentNode) nodeMap.get(eiNew);
     if (ei != null) {
       // debugging sanity check
-      Assert.isTrue(ei.coord.equals2D(intPt), "Found equal nodes with different coordinates");
+      Assert.isTrue(ei.coord.equals2d(intPt), "Found equal nodes with different coordinates");
 //      if (! ei.coord.equals2D(intPt))
 //        Debug.println("Found equal nodes with different coordinates");
 
@@ -126,10 +128,10 @@ public class SegmentNodeList
   private void findCollapsesFromExistingVertices(List collapsedVertexIndexes)
   {
     for (int i = 0; i < edge.size() - 2; i++) {
-      Coordinate p0 = edge.getCoordinate(i);
-      Coordinate p1 = edge.getCoordinate(i + 1);
-      Coordinate p2 = edge.getCoordinate(i + 2);
-      if (p0.equals2D(p2)) {
+      AbstractCoordinates p0 = edge.getCoordinate(i);
+      Coordinates p1 = edge.getCoordinate(i + 1);
+      Coordinates p2 = edge.getCoordinate(i + 2);
+      if (p0.equals2d(p2)) {
         // add base of collapse as node
         collapsedVertexIndexes.add(new Integer(i + 1));
       }
@@ -162,7 +164,7 @@ public class SegmentNodeList
   private boolean findCollapseIndex(SegmentNode ei0, SegmentNode ei1, int[] collapsedVertexIndex)
   {
     // only looking for equal nodes
-    if (! ei0.coord.equals2D(ei1.coord)) return false;
+    if (! ei0.coord.equals2d(ei1.coord)) return false;
 
     int numVerticesBetween = ei1.segmentIndex - ei0.segmentIndex;
     if (! ei1.isInterior()) {
@@ -214,18 +216,18 @@ public class SegmentNodeList
    */
   private void checkSplitEdgesCorrectness(List splitEdges)
   {
-    Coordinate[] edgePts = edge.getCoordinates();
+    Coordinates[] edgePts = edge.getCoordinates();
 
     // check that first and last points of split edges are same as endpoints of edge
     SegmentString split0 = (SegmentString) splitEdges.get(0);
-    Coordinate pt0 = split0.getCoordinate(0);
-    if (! pt0.equals2D(edgePts[0]))
+    AbstractCoordinates pt0 = split0.getCoordinate(0);
+    if (! pt0.equals2d(edgePts[0]))
       throw new RuntimeException("bad split edge start point at " + pt0);
 
     SegmentString splitn = (SegmentString) splitEdges.get(splitEdges.size() - 1);
-    Coordinate[] splitnPts = splitn.getCoordinates();
-    Coordinate ptn = splitnPts[splitnPts.length - 1];
-    if (! ptn.equals2D(edgePts[edgePts.length - 1]))
+    AbstractCoordinates[] splitnPts = splitn.getCoordinates();
+    AbstractCoordinates ptn = splitnPts[splitnPts.length - 1];
+    if (! ptn.equals2d(edgePts[edgePts.length - 1]))
       throw new RuntimeException("bad split edge end point at " + ptn);
 
   }
@@ -240,12 +242,12 @@ public class SegmentNodeList
 //Debug.println("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
 
-    Coordinate lastSegStartPt = edge.getCoordinate(ei1.segmentIndex);
+    Coordinates lastSegStartPt = edge.getCoordinate(ei1.segmentIndex);
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    boolean useIntPt1 = ei1.isInterior() || ! ei1.coord.equals2D(lastSegStartPt);
+    boolean useIntPt1 = ei1.isInterior() || ! ei1.coord.equals2d(lastSegStartPt);
     if (! useIntPt1) {
       npts--;
     }
