@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -46,64 +45,155 @@ import com.revolsys.jts.geom.util.GeometryEditor;
  *
  * @version 1.12
  */
-public class GeometryPrecisionReducer
-{
-	/**
-	 * Convenience method for doing precision reduction 
+public class GeometryPrecisionReducer {
+  /**
+   * Convenience method for doing precision reduction 
    * on a single geometry,
-	 * with collapses removed 
+   * with collapses removed 
    * and keeping the geometry precision model the same,
    * and preserving polygonal topology.
-	 * 
-	 * @param g the geometry to reduce
-	 * @param precModel the precision model to use
-	 * @return the reduced geometry
-	 */
-	public static Geometry reduce(Geometry g, PrecisionModel precModel)
-	{
-		GeometryPrecisionReducer reducer = new GeometryPrecisionReducer(precModel);
-		return reducer.reduce(g);
-	}
-	
-	/**
-	 * Convenience method for doing pointwise precision reduction 
+   * 
+   * @param g the geometry to reduce
+   * @param precModel the precision model to use
+   * @return the reduced geometry
+   */
+  public static Geometry reduce(final Geometry g, final PrecisionModel precModel) {
+    final GeometryPrecisionReducer reducer = new GeometryPrecisionReducer(
+      precModel);
+    return reducer.reduce(g);
+  }
+
+  /**
+   * Convenience method for doing pointwise precision reduction 
    * on a single geometry,
-	 * with collapses removed 
+   * with collapses removed 
    * and keeping the geometry precision model the same,
    * but NOT preserving valid polygonal topology.
-	 * 
-	 * @param g the geometry to reduce
-	 * @param precModel the precision model to use
-	 * @return the reduced geometry
-	 */
-	public static Geometry reducePointwise(Geometry g, PrecisionModel precModel)
-	{
-		GeometryPrecisionReducer reducer = new GeometryPrecisionReducer(precModel);
-		reducer.setPointwise(true);
-		return reducer.reduce(g);
-	}
-	
-  private PrecisionModel targetPM;
+   * 
+   * @param g the geometry to reduce
+   * @param precModel the precision model to use
+   * @return the reduced geometry
+   */
+  public static Geometry reducePointwise(final Geometry g,
+    final PrecisionModel precModel) {
+    final GeometryPrecisionReducer reducer = new GeometryPrecisionReducer(
+      precModel);
+    reducer.setPointwise(true);
+    return reducer.reduce(g);
+  }
+
+  private final PrecisionModel targetPM;
+
   private boolean removeCollapsed = true;
+
   private boolean changePrecisionModel = false;
+
   private boolean isPointwise = false;
 
-  public GeometryPrecisionReducer(PrecisionModel pm)
-  {
+  public GeometryPrecisionReducer(final PrecisionModel pm) {
     targetPM = pm;
   }
 
   /**
-   * Sets whether the reduction will result in collapsed components
-   * being removed completely, or simply being collapsed to an (invalid)
-   * Geometry of the same type.
-   * The default is to remove collapsed components.
-   *
-   * @param removeCollapsed if <code>true</code> collapsed components will be removed
+   * Duplicates a geometry to one that uses a different PrecisionModel,
+   * without changing any coordinate values.
+   * 
+   * @param geom the geometry to duplicate
+   * @param newPM the precision model to use
+   * @return the geometry value with a new precision model
    */
-  public void setRemoveCollapsedComponents(boolean removeCollapsed)
-  {
-    this.removeCollapsed = removeCollapsed;
+  private Geometry changePM(final Geometry geom, final PrecisionModel newPM) {
+    final GeometryEditor geomEditor = createEditor(geom.getGeometryFactory(),
+      newPM);
+    // this operation changes the PM for the entire geometry tree
+    return geomEditor.edit(geom, new GeometryEditor.NoOpGeometryOperation());
+  }
+
+  private GeometryEditor createEditor(final GeometryFactory geomFactory,
+    final PrecisionModel newPM) {
+    // no need to change if precision model is the same
+    if (geomFactory.getPrecisionModel() == newPM) {
+      return new GeometryEditor();
+    }
+    // otherwise create a geometry editor which changes PrecisionModel
+    final GeometryFactory newFactory = createFactory(geomFactory, newPM);
+    final GeometryEditor geomEdit = new GeometryEditor(newFactory);
+    return geomEdit;
+  }
+
+  private GeometryFactory createFactory(final GeometryFactory inputFactory,
+    final PrecisionModel pm) {
+    final GeometryFactory newFactory = GeometryFactory.getFactory(
+      inputFactory.getSrid(), inputFactory.getNumAxis(), pm.getScale(),
+      inputFactory.getScaleZ());
+    return newFactory;
+  }
+
+  private Geometry fixPolygonalTopology(final Geometry geom) {
+    /**
+     * If precision model was *not* changed, need to flip
+     * geometry to targetPM, buffer in that model, then flip back
+     */
+    Geometry geomToBuffer = geom;
+    if (!changePrecisionModel) {
+      geomToBuffer = changePM(geom, targetPM);
+    }
+
+    final Geometry bufGeom = geomToBuffer.buffer(0);
+
+    Geometry finalGeom = bufGeom;
+    if (!changePrecisionModel) {
+      // a slick way to copy the geometry with the original precision factory
+      finalGeom = geom.getGeometryFactory().createGeometry(bufGeom);
+    }
+    return finalGeom;
+  }
+
+  public Geometry reduce(final Geometry geom) {
+    final Geometry reducePW = reducePointwise(geom);
+    if (isPointwise) {
+      return reducePW;
+    }
+
+    // TODO: handle GeometryCollections containing polys
+    if (!(reducePW instanceof Polygonal)) {
+      return reducePW;
+    }
+
+    // Geometry is polygonal - test if topology needs to be fixed
+    if (reducePW.isValid()) {
+      return reducePW;
+    }
+
+    // hack to fix topology.
+    // TODO: implement snap-rounding and use that.
+    return fixPolygonalTopology(reducePW);
+  }
+
+  private Geometry reducePointwise(final Geometry geom) {
+    GeometryEditor geomEdit;
+    if (changePrecisionModel) {
+      final GeometryFactory newFactory = createFactory(
+        geom.getGeometryFactory(), targetPM);
+      geomEdit = new GeometryEditor(newFactory);
+    } else {
+      // don't change geometry factory
+      geomEdit = new GeometryEditor();
+    }
+
+    /**
+     * For polygonal geometries, collapses are always removed, in order
+     * to produce correct topology
+     */
+    boolean finalRemoveCollapsed = removeCollapsed;
+    if (geom.getDimension() >= 2) {
+      finalRemoveCollapsed = true;
+    }
+
+    final Geometry reduceGeom = geomEdit.edit(geom,
+      new PrecisionReducerCoordinateOperation(targetPM, finalRemoveCollapsed));
+
+    return reduceGeom;
   }
 
   /**
@@ -116,8 +206,7 @@ public class GeometryPrecisionReducer
    * @param changePrecisionModel if <code>true</code> the precision model of the created Geometry will be the
    * the precisionModel supplied in the constructor.
    */
-  public void setChangePrecisionModel(boolean changePrecisionModel)
-  {
+  public void setChangePrecisionModel(final boolean changePrecisionModel) {
     this.changePrecisionModel = changePrecisionModel;
   }
 
@@ -131,108 +220,20 @@ public class GeometryPrecisionReducer
    * 
    * @param isPointwise if reduction should be done pointwise only
    */
-  public void setPointwise(boolean isPointwise)
-  {
+  public void setPointwise(final boolean isPointwise) {
     this.isPointwise = isPointwise;
   }
 
-  public Geometry reduce(Geometry geom)
-  {
-    Geometry reducePW = reducePointwise(geom);
-    if (isPointwise)
-    	return reducePW;
-    
-    //TODO: handle GeometryCollections containing polys
-    if (! (reducePW instanceof Polygonal))
-    	return reducePW;
-    
-    // Geometry is polygonal - test if topology needs to be fixed
-    if (reducePW.isValid()) return reducePW;
-    
-    // hack to fix topology.  
-    // TODO: implement snap-rounding and use that.
-    return fixPolygonalTopology(reducePW);
-  }
-
-  private Geometry reducePointwise(Geometry geom)
-  {
-    GeometryEditor geomEdit;
-    if (changePrecisionModel) {
-    	GeometryFactory newFactory = createFactory(geom.getGeometryFactory(), targetPM);
-      geomEdit = new GeometryEditor(newFactory);
-    }
-    else
-      // don't change geometry factory
-      geomEdit = new GeometryEditor();
-
-    /**
-     * For polygonal geometries, collapses are always removed, in order
-     * to produce correct topology
-     */
-    boolean finalRemoveCollapsed = removeCollapsed;
-    if (geom.getDimension() >= 2)
-    	finalRemoveCollapsed = true;
-    
-    Geometry reduceGeom = geomEdit.edit(geom, 
-    		new PrecisionReducerCoordinateOperation(targetPM, finalRemoveCollapsed));
-    
-    return reduceGeom;
-  }
-  
-  private Geometry fixPolygonalTopology(Geometry geom)
-  {
-  	/**
-  	 * If precision model was *not* changed, need to flip
-  	 * geometry to targetPM, buffer in that model, then flip back
-  	 */
-  	Geometry geomToBuffer = geom;
-  	if (! changePrecisionModel) {
-  		geomToBuffer = changePM(geom, targetPM);
-  	}
-  	
-  	Geometry bufGeom = geomToBuffer.buffer(0);
-  	
-  	Geometry finalGeom = bufGeom;
-  	if (! changePrecisionModel) {
-  	  // a slick way to copy the geometry with the original precision factory
-  		finalGeom = geom.getGeometryFactory().createGeometry(bufGeom);
-  	}
-  	return finalGeom;
-  }
-  
   /**
-   * Duplicates a geometry to one that uses a different PrecisionModel,
-   * without changing any coordinate values.
-   * 
-   * @param geom the geometry to duplicate
-   * @param newPM the precision model to use
-   * @return the geometry value with a new precision model
+   * Sets whether the reduction will result in collapsed components
+   * being removed completely, or simply being collapsed to an (invalid)
+   * Geometry of the same type.
+   * The default is to remove collapsed components.
+   *
+   * @param removeCollapsed if <code>true</code> collapsed components will be removed
    */
-  private Geometry changePM(Geometry geom, PrecisionModel newPM)
-  {
-  	GeometryEditor geomEditor = createEditor(geom.getGeometryFactory(), newPM);
-  	// this operation changes the PM for the entire geometry tree
-  	return geomEditor.edit(geom, new GeometryEditor.NoOpGeometryOperation());
+  public void setRemoveCollapsedComponents(final boolean removeCollapsed) {
+    this.removeCollapsed = removeCollapsed;
   }
-  
-  private GeometryEditor createEditor(GeometryFactory geomFactory, PrecisionModel newPM)
-  {
-    // no need to change if precision model is the same
-  	if (geomFactory.getPrecisionModel() == newPM)
-  		return new GeometryEditor();
-  	// otherwise create a geometry editor which changes PrecisionModel
-  	GeometryFactory newFactory = createFactory(geomFactory, newPM);
-  	GeometryEditor geomEdit = new GeometryEditor(newFactory);
-    return geomEdit;
-  }
-  
-  private GeometryFactory createFactory(GeometryFactory inputFactory, PrecisionModel pm)
-  {
-    GeometryFactory newFactory 
-  	= new GeometryFactory(pm, 
-  			inputFactory.getSrid(),
-  			inputFactory.getCoordinateSequenceFactory());
-    return newFactory;
-  }
-  
+
 }

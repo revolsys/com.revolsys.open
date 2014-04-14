@@ -193,7 +193,7 @@ public class Envelope implements Serializable {
     if (isNull()) {
       return null;
     }
-    return new Coordinate((double)(getMinX() + getMaxX()) / 2.0,
+    return new Coordinate((getMinX() + getMaxX()) / 2.0,
       (getMinY() + getMaxY()) / 2.0, Coordinates.NULL_ORDINATE);
   }
 
@@ -208,7 +208,7 @@ public class Envelope implements Serializable {
    *@return    <code>true</code> if the point lies in the interior or
    *      on the boundary of this <code>Envelope</code>.
    *      
-   *@see #covers(Coordinate)
+   *@see #covers(Coordinates)
    */
   public boolean contains(final Coordinates p) {
     return covers(p);

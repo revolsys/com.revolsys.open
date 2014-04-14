@@ -32,15 +32,14 @@
  */
 package com.revolsys.jts.geom.prep;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.util.ComponentCoordinateExtracter;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * A base class for {@link PreparedGeometry} subclasses.
@@ -55,59 +54,57 @@ import com.revolsys.jts.geom.util.ComponentCoordinateExtracter;
 class BasicPreparedGeometry implements PreparedGeometry {
   private final Geometry baseGeom;
 
-  private final List representativePts; // List<Coordinates>
-
-  public BasicPreparedGeometry(final Geometry geom) {
-    baseGeom = geom;
-    representativePts = ComponentCoordinateExtracter.getCoordinates(geom);
+  public BasicPreparedGeometry(final Geometry geometry) {
+    this.baseGeom = geometry;
   }
 
   /**
    * Default implementation.
    */
   @Override
-  public boolean contains(final Geometry g) {
-    return baseGeom.contains(g);
+  public boolean contains(final Geometry geometry) {
+    return baseGeom.contains(geometry);
   }
 
   /**
    * Default implementation.
    */
   @Override
-  public boolean containsProperly(final Geometry g) {
+  public boolean containsProperly(final Geometry geometry) {
     // since raw relate is used, provide some optimizations
 
     // short-circuit test
-    if (!baseGeom.getEnvelopeInternal().contains(g.getEnvelopeInternal())) {
+    if (!baseGeom.getEnvelopeInternal()
+      .contains(geometry.getEnvelopeInternal())) {
       return false;
     }
 
     // otherwise, compute using relate mask
-    return baseGeom.relate(g, "T**FF*FF*");
+    return baseGeom.relate(geometry, "T**FF*FF*");
   }
 
   /**
    * Default implementation.
    */
   @Override
-  public boolean coveredBy(final Geometry g) {
-    return baseGeom.coveredBy(g);
+  public boolean coveredBy(final Geometry geometry) {
+    return baseGeom.coveredBy(geometry);
   }
 
   /**
    * Default implementation.
    */
   @Override
-  public boolean covers(final Geometry g) {
-    return baseGeom.covers(g);
+  public boolean covers(final Geometry geometry) {
+    return baseGeom.covers(geometry);
   }
 
   /**
    * Default implementation.
    */
   @Override
-  public boolean crosses(final Geometry g) {
-    return baseGeom.crosses(g);
+  public boolean crosses(final Geometry geometry) {
+    return baseGeom.crosses(geometry);
   }
 
   /**
@@ -115,20 +112,20 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * Supports {@link GeometryCollection}s as input.
    */
   @Override
-  public boolean disjoint(final Geometry g) {
-    return !intersects(g);
+  public boolean disjoint(final Geometry geometry) {
+    return !intersects(geometry);
   }
 
   /**
    * Determines whether the envelope of 
-   * this geometry covers the Geometry g.
+   * this geometry covers the Geometry  geometry.
    * 
    *  
    * @param g a Geometry
    * @return true if g is contained in this envelope
    */
-  protected boolean envelopeCovers(final Geometry g) {
-    if (!baseGeom.getEnvelopeInternal().covers(g.getEnvelopeInternal())) {
+  protected boolean envelopeCovers(final Geometry geometry) {
+    if (!baseGeom.getEnvelopeInternal().covers(geometry.getEnvelopeInternal())) {
       return false;
     }
     return true;
@@ -141,8 +138,9 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * @param g a Geometry
    * @return true if the envelopes intersect
    */
-  protected boolean envelopesIntersect(final Geometry g) {
-    if (!baseGeom.getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+  protected boolean envelopesIntersect(final Geometry geometry) {
+    if (!baseGeom.getEnvelopeInternal().intersects(
+      geometry.getEnvelopeInternal())) {
       return false;
     }
     return true;
@@ -162,17 +160,20 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * 
    * @return a List of Coordinate
    */
-  public List getRepresentativePoints() {
-    // TODO wrap in unmodifiable?
-    return representativePts;
+  public List<Coordinates> getRepresentativePoints() {
+    final List<Coordinates> points = new ArrayList<Coordinates>();
+    for (final Vertex vertex : baseGeom.vertices()) {
+      points.add(vertex.cloneCoordinates());
+    }
+    return points;
   }
 
   /**
    * Default implementation.
    */
   @Override
-  public boolean intersects(final Geometry g) {
-    return baseGeom.intersects(g);
+  public boolean intersects(final Geometry geometry) {
+    return baseGeom.intersects(geometry);
   }
 
   /**
@@ -186,9 +187,8 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   public boolean isAnyTargetComponentInTest(final Geometry testGeom) {
     final PointLocator locator = new PointLocator();
-    for (final Iterator i = representativePts.iterator(); i.hasNext();) {
-      final Coordinates p = (Coordinate)i.next();
-      if (locator.intersects(p, testGeom)) {
+    for (final Vertex vertex : baseGeom.vertices()) {
+      if (locator.intersects(vertex, testGeom)) {
         return true;
       }
     }
@@ -199,8 +199,8 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * Default implementation.
    */
   @Override
-  public boolean overlaps(final Geometry g) {
-    return baseGeom.overlaps(g);
+  public boolean overlaps(final Geometry geometry) {
+    return baseGeom.overlaps(geometry);
   }
 
   @Override
@@ -212,15 +212,15 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * Default implementation.
    */
   @Override
-  public boolean touches(final Geometry g) {
-    return baseGeom.touches(g);
+  public boolean touches(final Geometry geometry) {
+    return baseGeom.touches(geometry);
   }
 
   /**
    * Default implementation.
    */
   @Override
-  public boolean within(final Geometry g) {
-    return baseGeom.within(g);
+  public boolean within(final Geometry geometry) {
+    return baseGeom.within(geometry);
   }
 }

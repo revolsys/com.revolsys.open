@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -177,7 +176,7 @@ public class LengthIndexedLine {
    * @param pt a point on the line
    * @return the minimum index of the point
    *
-   * @see #project(Coordinate)
+   * @see #project(Coordinates)
    */
   public double indexOf(final Coordinates pt) {
     return LengthIndexOfPoint.indexOf(linearGeom, pt);
@@ -203,7 +202,7 @@ public class LengthIndexedLine {
    * @param minIndex the value the returned index must be greater than
    * @return the index of the point greater than the given minimum index
    *
-   * @see #project(Coordinate)
+   * @see #project(Coordinates)
    */
   public double indexOfAfter(final Coordinates pt, final double minIndex) {
     return LengthIndexOfPoint.indexOfAfter(linearGeom, pt, minIndex);

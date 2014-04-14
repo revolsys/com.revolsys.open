@@ -23,8 +23,7 @@ public class GeometryUtils {
   }
 
   public static Geometry normalize(final Geometry g) {
-    final Geometry g2 = (Geometry)g.clone();
-    g2.normalize();
+    final Geometry g2 = g.normalize();
     return g2;
   }
 

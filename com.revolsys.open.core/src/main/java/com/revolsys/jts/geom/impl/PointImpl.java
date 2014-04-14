@@ -149,7 +149,9 @@ public class PointImpl extends GeometryImpl implements Point {
   @Override
   public PointImpl clone() {
     final PointImpl point = (PointImpl)super.clone();
-    point.coordinates = coordinates.clone();
+    if (coordinates != null) {
+      point.coordinates = coordinates.clone();
+    }
     return point;
   }
 

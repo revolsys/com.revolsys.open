@@ -26,12 +26,12 @@ public class SimpleCoordinatesPrecisionModel implements
       // .divide(scaleDecimal)
       // .doubleValue();
 
-      double multiple = value * scale;
-      if (multiple < 0) {
-        multiple -= 0.00001;
-      } else {
-        multiple += 0.00001;
-      }
+      final double multiple = value * scale;
+      // if (multiple < 0) {
+      // multiple -= 0.00001;
+      // } else {
+      // multiple += 0.00001;
+      // }
       final long scaledValue = Math.round(multiple);
       final double preciseValue = scaledValue / scale;
       return preciseValue;

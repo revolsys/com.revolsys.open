@@ -22,6 +22,8 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 
 public final class HtmlUtil {
@@ -210,7 +212,9 @@ public final class HtmlUtil {
   public static void elementWithId(final XmlWriter writer, final QName tag,
     final String id, final Object content) {
     writer.startTag(tag);
-    writer.attribute(ATTR_ID, id.replaceAll("[^A-Za-z0-9\\-:.]", "_"));
+    if (StringUtils.hasText(id)) {
+      writer.attribute(ATTR_ID, id.replaceAll("[^A-Za-z0-9\\-:.]", "_"));
+    }
     writer.text(content);
     writer.endTag(tag);
   }

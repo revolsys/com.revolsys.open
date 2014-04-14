@@ -34,9 +34,6 @@ package com.revolsys.jts.geom;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 
 /**
  * A list of {@link Coordinates}s, which may
@@ -45,7 +42,7 @@ import com.revolsys.gis.model.coordinates.AbstractCoordinates;
  *
  * @version 1.7
  */
-public class CoordinateList extends ArrayList {
+public class CoordinateList extends ArrayList<Coordinates> {
   // With contributions from Markus Schaber [schabios@logi-track.com]
   // [Jon Aquino 2004-03-25]
   private final static Coordinates[] coordArrayType = new Coordinates[0];
@@ -91,7 +88,7 @@ public class CoordinateList extends ArrayList {
     // don't add duplicate coordinates
     if (!allowRepeated) {
       if (size() >= 1) {
-        final Coordinates last = (AbstractCoordinates)get(size() - 1);
+        final Coordinates last = get(size() - 1);
         if (last.equals2d(coord)) {
           return;
         }
@@ -167,13 +164,13 @@ public class CoordinateList extends ArrayList {
       final int size = size();
       if (size > 0) {
         if (i > 0) {
-          final Coordinates prev = (AbstractCoordinates)get(i - 1);
+          final Coordinates prev = get(i - 1);
           if (prev.equals2d(coord)) {
             return;
           }
         }
         if (i < size) {
-          final Coordinates next = (AbstractCoordinates)get(i);
+          final Coordinates next = get(i);
           if (next.equals2d(coord)) {
             return;
           }
@@ -190,19 +187,20 @@ public class CoordinateList extends ArrayList {
    * @return true (as by general collection contract)
    */
   public boolean add(final Object obj, final boolean allowRepeated) {
-    add((Coordinate)obj, allowRepeated);
+    add((Coordinates)obj, allowRepeated);
     return true;
   }
 
   /** Add an array of coordinates
-   * @param coll The coordinates
+   * @param points The coordinates
    * @param allowRepeated if set to false, repeated coordinates are collapsed
    * @return true (as by general collection contract)
    */
-  public boolean addAll(final Collection coll, final boolean allowRepeated) {
+  public boolean addAll(final Collection<? extends Coordinates> points,
+    final boolean allowRepeated) {
     boolean isChanged = false;
-    for (final Iterator i = coll.iterator(); i.hasNext();) {
-      add((Coordinate)i.next(), allowRepeated);
+    for (final Coordinates point : points) {
+      add(point, allowRepeated);
       isChanged = true;
     }
     return isChanged;
@@ -217,7 +215,7 @@ public class CoordinateList extends ArrayList {
   public Object clone() {
     final CoordinateList clone = (CoordinateList)super.clone();
     for (int i = 0; i < this.size(); i++) {
-      clone.add(i, ((Coordinates)this.get(i)).clone());
+      clone.add(i, this.get(i).cloneCoordinates());
     }
     return clone;
   }
@@ -227,12 +225,12 @@ public class CoordinateList extends ArrayList {
    */
   public void closeRing() {
     if (size() > 0) {
-      add(new Coordinate((Coordinates)get(0)), false);
+      add(new Coordinate(get(0)), false);
     }
   }
 
   public Coordinates getCoordinate(final int i) {
-    return (Coordinates)get(i);
+    return get(i);
   }
 
   /** Returns the Coordinates in this collection.
@@ -240,6 +238,6 @@ public class CoordinateList extends ArrayList {
    * @return the coordinates
    */
   public Coordinates[] toCoordinateArray() {
-    return (Coordinates[])toArray(coordArrayType);
+    return toArray(coordArrayType);
   }
 }

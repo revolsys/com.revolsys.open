@@ -49,8 +49,6 @@ public class SimpleGeometryPrecisionReducerTest extends TestCase {
     TestRunner.run(SimpleGeometryPrecisionReducerTest.class);
   }
 
-  private final PrecisionModel pmFloat = new PrecisionModel();
-
   private final PrecisionModel pmFixed1 = new PrecisionModel(1);
 
   private final SimpleGeometryPrecisionReducer reducer = new SimpleGeometryPrecisionReducer(
@@ -59,7 +57,7 @@ public class SimpleGeometryPrecisionReducerTest extends TestCase {
   private final SimpleGeometryPrecisionReducer reducerKeepCollapse = new SimpleGeometryPrecisionReducer(
     this.pmFixed1);
 
-  private final GeometryFactory gfFloat = new GeometryFactory(this.pmFloat, 0);
+  private final GeometryFactory gfFloat = GeometryFactory.getFactory();
 
   WKTReader reader = new WKTReader(this.gfFloat);
 

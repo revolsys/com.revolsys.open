@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.operation.overlay.snap;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
@@ -76,7 +75,8 @@ public class LineStringSnapper {
    * @param srcPts the points to snap 
    * @param snapTolerance the snap tolerance to use
    */
-  public LineStringSnapper(final Coordinates[] srcPts, final double snapTolerance) {
+  public LineStringSnapper(final Coordinates[] srcPts,
+    final double snapTolerance) {
     this.srcPts = srcPts;
     isClosed = isClosed(srcPts);
     this.snapTolerance = snapTolerance;
@@ -117,8 +117,8 @@ public class LineStringSnapper {
     double minDist = Double.MAX_VALUE;
     int snapIndex = -1;
     for (int i = 0; i < srcCoords.size() - 1; i++) {
-      seg.p0 = (Coordinate)srcCoords.get(i);
-      seg.p1 = (Coordinate)srcCoords.get(i + 1);
+      seg.p0 = srcCoords.get(i);
+      seg.p1 = srcCoords.get(i + 1);
 
       /**
        * Check if the snap pt is equal to one of the segment endpoints.
@@ -235,7 +235,7 @@ public class LineStringSnapper {
     // if src is a ring then don't snap final vertex
     final int end = isClosed ? srcCoords.size() - 1 : srcCoords.size();
     for (int i = 0; i < end; i++) {
-      final Coordinates srcPt = (AbstractCoordinates)srcCoords.get(i);
+      final Coordinates srcPt = srcCoords.get(i);
       final Coordinates snapVert = findSnapForVertex(srcPt, snapPts);
       if (snapVert != null) {
         // update src with snap pt

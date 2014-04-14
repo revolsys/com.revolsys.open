@@ -32,14 +32,11 @@
  */
 package com.revolsys.jts.geom.prep;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.util.ComponentCoordinateExtracter;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.noding.SegmentStringUtil;
 
 /**
@@ -131,16 +128,15 @@ class PreparedLineStringIntersects {
    * @param geom a Puntal geometry to test
    * @return true if any point of the argument intersects the prepared geometry
    */
-  protected boolean isAnyTestPointInTarget(final Geometry testGeom) {
+  protected boolean isAnyTestPointInTarget(final Geometry geometry) {
     /**
      * This could be optimized by using the segment index on the lineal target.
      * However, it seems like the L/P case would be pretty rare in practice.
      */
     final PointLocator locator = new PointLocator();
-    final List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
-    for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinates p = (Coordinate)i.next();
-      if (locator.intersects(p, prepLine.getGeometry())) {
+    final Geometry realGeometry = prepLine.getGeometry();
+    for (final Vertex vertex : geometry.vertices()) {
+      if (locator.intersects(vertex, realGeometry)) {
         return true;
       }
     }

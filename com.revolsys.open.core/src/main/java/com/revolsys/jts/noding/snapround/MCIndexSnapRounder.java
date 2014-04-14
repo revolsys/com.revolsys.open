@@ -33,12 +33,10 @@
 package com.revolsys.jts.noding.snapround;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
@@ -99,9 +97,8 @@ public class MCIndexSnapRounder implements Noder {
   /**
    * Snaps segments to nodes created by segment intersections.
    */
-  private void computeIntersectionSnaps(final Collection snapPts) {
-    for (final Iterator it = snapPts.iterator(); it.hasNext();) {
-      final Coordinates snapPt = (Coordinate)it.next();
+  private void computeIntersectionSnaps(final Collection<Coordinates> snapPts) {
+    for (final Coordinates snapPt : snapPts) {
       final HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
       pointSnapper.snap(hotPixel);
     }
@@ -123,9 +120,8 @@ public class MCIndexSnapRounder implements Noder {
    *
    * @param edges the list of segment strings to snap together
    */
-  public void computeVertexSnaps(final Collection edges) {
-    for (final Iterator i0 = edges.iterator(); i0.hasNext();) {
-      final NodedSegmentString edge0 = (NodedSegmentString)i0.next();
+  public void computeVertexSnaps(final Collection<NodedSegmentString> edges) {
+    for (final NodedSegmentString edge0 : edges) {
       computeVertexSnaps(edge0);
     }
   }

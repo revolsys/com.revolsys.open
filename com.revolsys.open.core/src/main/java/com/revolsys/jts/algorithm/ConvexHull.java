@@ -35,10 +35,11 @@ package com.revolsys.jts.algorithm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
@@ -46,7 +47,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.util.Assert;
@@ -69,7 +69,7 @@ public class ConvexHull {
    * @author Martin Davis
    * @version 1.7
    */
-  private static class RadialComparator implements Comparator {
+  private static class RadialComparator implements Comparator<Coordinates> {
     /**
      * Given two points p and q compare them with respect to their radial
      * ordering about point o.  First checks radial ordering.
@@ -129,9 +129,7 @@ public class ConvexHull {
     }
 
     @Override
-    public int compare(final Object o1, final Object o2) {
-      final Coordinates p1 = (Coordinates)o1;
-      final Coordinates p2 = (Coordinates)o2;
+    public int compare(final Coordinates p1, final Coordinates p2) {
       return polarCompare(origin, p1, p2);
     }
 
@@ -171,7 +169,7 @@ public class ConvexHull {
    */
   private Coordinates[] cleanRing(final Coordinates[] original) {
     Assert.equals(original[0], original[original.length - 1]);
-    final ArrayList cleanedRing = new ArrayList();
+    final List<Coordinates> cleanedRing = new ArrayList<Coordinates>();
     Coordinates previousDistinctCoordinate = null;
     for (int i = 0; i <= original.length - 2; i++) {
       final Coordinates currentCoordinate = original[i];
@@ -189,7 +187,7 @@ public class ConvexHull {
     }
     cleanedRing.add(original[original.length - 1]);
     final Coordinates[] cleanedRingCoordinates = new Coordinates[cleanedRing.size()];
-    return (Coordinates[])cleanedRing.toArray(cleanedRingCoordinates);
+    return cleanedRing.toArray(cleanedRingCoordinates);
   }
 
   private Coordinates[] computeOctPts(final Coordinates[] inputPts) {
@@ -277,7 +275,7 @@ public class ConvexHull {
     final Coordinates[] sortedPts = preSort(reducedPts);
 
     // Use Graham scan to find convex hull.
-    final Stack cHS = grahamScan(sortedPts);
+    final Stack<Coordinates> cHS = grahamScan(sortedPts);
 
     // Convert stack to an array.
     final Coordinates[] cH = toCoordinateArray(cHS);
@@ -292,23 +290,23 @@ public class ConvexHull {
    * @param c a list of points, with at least 3 entries
    * @return a Stack containing the ordered points of the convex hull ring
    */
-  private Stack grahamScan(final Coordinates[] c) {
+  private Stack<Coordinates> grahamScan(final Coordinates[] c) {
     Coordinates p;
-    final Stack ps = new Stack();
-    p = (Coordinate)ps.push(c[0]);
-    p = (Coordinate)ps.push(c[1]);
-    p = (Coordinate)ps.push(c[2]);
+    final Stack<Coordinates> ps = new Stack<Coordinates>();
+    p = ps.push(c[0]);
+    p = ps.push(c[1]);
+    p = ps.push(c[2]);
     for (int i = 3; i < c.length; i++) {
-      p = (Coordinate)ps.pop();
+      p = ps.pop();
       // check for empty stack to guard against robustness problems
       while (!ps.empty()
-        && CGAlgorithms.computeOrientation((Coordinates)ps.peek(), p, c[i]) > 0) {
-        p = (Coordinate)ps.pop();
+        && CGAlgorithms.computeOrientation(ps.peek(), p, c[i]) > 0) {
+        p = ps.pop();
       }
-      p = (Coordinate)ps.push(p);
-      p = (Coordinate)ps.push(c[i]);
+      p = ps.push(p);
+      p = ps.push(c[i]);
     }
-    p = (Coordinate)ps.push(c[0]);
+    p = ps.push(c[0]);
     return ps;
   }
 
@@ -358,8 +356,7 @@ public class ConvexHull {
       // coordinates[1]},
       // geometry.getPrecisionModel(), geometry.getSRID());
     }
-    final LinearRing linearRing = geomFactory.createLinearRing(coordinates);
-    return geomFactory.createPolygon(linearRing, null);
+    return geomFactory.createPolygon(coordinates);
   }
 
   private Coordinates[] padArray3(final Coordinates[] pts) {
@@ -453,7 +450,7 @@ public class ConvexHull {
     // System.out.println(ring);
 
     // add points defining polygon
-    final TreeSet reducedSet = new TreeSet();
+    final Set<Coordinates> reducedSet = new TreeSet<Coordinates>();
     for (int i = 0; i < polyPts.length; i++) {
       reducedSet.add(polyPts[i]);
     }
@@ -481,10 +478,10 @@ public class ConvexHull {
    * An alternative to Stack.toArray, which is not present in earlier versions
    * of Java.
    */
-  protected Coordinates[] toCoordinateArray(final Stack stack) {
+  protected Coordinates[] toCoordinateArray(final Stack<Coordinates> stack) {
     final Coordinates[] coordinates = new Coordinates[stack.size()];
     for (int i = 0; i < stack.size(); i++) {
-      final Coordinates coordinate = (Coordinate)stack.get(i);
+      final Coordinates coordinate = stack.get(i);
       coordinates[i] = coordinate;
     }
     return coordinates;

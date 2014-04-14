@@ -128,8 +128,11 @@ public class FastNodingValidator
   public void checkValid()
   {
   	execute();
-  	if (! isValid)
-  		throw new TopologyException(getErrorMessage(), segInt.getInteriorIntersection());
+  	if (! isValid) {
+      String errorMessage = getErrorMessage();
+      Coordinates interiorIntersection = segInt.getInteriorIntersection();
+      throw new TopologyException(errorMessage, interiorIntersection);
+    }
   }
 
   private void execute()

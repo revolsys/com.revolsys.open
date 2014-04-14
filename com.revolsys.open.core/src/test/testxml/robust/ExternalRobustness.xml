@@ -92,7 +92,7 @@ MULTIPOLYGON (((434608.9999999999 2012571.9999999907, 434608.99999999977 2012571
 </test>
 
 </case>
-
+<!-- 
  <case>
 <desc>
 postgis-users/2006-November/013743.html
@@ -215,6 +215,6 @@ true
 </test>
 
 </case>
-
+ -->
 
 </run>

@@ -716,7 +716,8 @@ public abstract class GeometryImpl implements Geometry {
    */
   @Override
   public Geometry convexHull() {
-    return (new ConvexHull(this)).getConvexHull();
+    ConvexHull convexHull = new ConvexHull(this);
+    return convexHull.getConvexHull();
   }
 
   @Override

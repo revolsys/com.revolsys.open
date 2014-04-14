@@ -67,8 +67,8 @@ public class BoundaryTest extends TestCase {
     final Geometry expected = this.rdr.read(wktExpected);
 
     final BoundaryOp op = new BoundaryOp(g, bnRule);
-    final Geometry boundary = op.getBoundary();
-    boundary.normalize();
+    Geometry boundary = op.getBoundary();
+    boundary = boundary.normalize();
     // System.out.println("Computed Boundary = " + boundary);
     assertTrue(boundary.equalsExact(expected));
   }

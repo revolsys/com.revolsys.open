@@ -46,9 +46,11 @@ public final class StaxUtils {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
   public static void closeSilent(final XMLStreamReader in) {
-    try {
-      in.close();
-    } catch (final XMLStreamException e) {
+    if (in != null) {
+      try {
+        in.close();
+      } catch (final XMLStreamException e) {
+      }
     }
   }
 

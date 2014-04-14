@@ -197,9 +197,6 @@ public class IntersectionAdder implements SegmentIntersector {
         ((NodedSegmentString)e1).addIntersections(li, segIndex1, 1);
         if (li.isProper()) {
           numProperIntersections++;
-          // Debug.println(li.toString()); Debug.println(li.getIntersection(0));
-          // properIntersectionPoint = (Coordinate)
-          // li.getIntersection(0).clone();
           hasProper = true;
           hasProperInterior = true;
         }

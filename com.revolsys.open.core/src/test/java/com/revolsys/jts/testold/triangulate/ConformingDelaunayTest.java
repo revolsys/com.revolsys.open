@@ -78,9 +78,9 @@ public class ConformingDelaunayTest extends TestCase {
     }
     System.out.println(result);
 
-    final Geometry expectedEdges = this.reader.read(expectedWKT);
-    result.normalize();
-    expectedEdges.normalize();
+    Geometry expectedEdges = this.reader.read(expectedWKT);
+    result = result.normalize();
+    expectedEdges = expectedEdges.normalize();
     assertTrue(expectedEdges.equalsExact(result, COMPARISON_TOLERANCE));
   }
 

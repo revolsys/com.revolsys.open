@@ -82,11 +82,11 @@ public class LineStringImplTest extends TestCase {
 
   public void testEquals10() throws Exception {
     final WKTReader reader = new WKTReader(GeometryFactory.getFactory(0, 1.0));
-    final Geometry l1 = reader.read("POLYGON((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    final Geometry l2 = reader.read("POLYGON((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
-    l1.normalize();
-    l2.normalize();
-    // TODO assertTrue(l1.equalsExact(l2));
+    Geometry l1 = reader.read("POLYGON((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
+    Geometry l2 = reader.read("POLYGON((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
+    l1 = l1.normalize();
+    l2 = l2.normalize();
+    assertTrue(l1.equalsExact(l2));
   }
 
   public void testEquals2() throws Exception {
@@ -143,8 +143,8 @@ public class LineStringImplTest extends TestCase {
 
   public void testFiveZeros() {
     final GeometryFactory factory = GeometryFactory.getFactory(0, 2);
-    final LineString line = factory.lineString(0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0, 0.0);
+    final LineString line = factory.lineString(0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0, 0.0);
     final boolean closed = line.isClosed();
     assertTrue(closed);
   }

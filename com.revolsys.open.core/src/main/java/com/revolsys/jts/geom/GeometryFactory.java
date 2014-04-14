@@ -36,7 +36,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -53,8 +52,9 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
@@ -296,13 +296,14 @@ public class GeometryFactory implements Serializable,
     }
   }
 
-  private static Set<Class<?>> getGeometryClassSet(
+  private static Set<DataType> getGeometryDataTypes(
     final Collection<? extends Geometry> geometries) {
-    final Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
+    final Set<DataType> dataTypes = new LinkedHashSet<DataType>();
     for (final Geometry geometry : geometries) {
-      classes.add(geometry.getClass());
+      final DataType dataType = geometry.getDataType();
+      dataTypes.add(dataType);
     }
-    return classes;
+    return dataTypes;
   }
 
   private static int getId(final CoordinateSystem coordinateSystem) {
@@ -319,6 +320,9 @@ public class GeometryFactory implements Serializable,
    *@param  geometries  the list of <code>Geometry's</code> to convert
    *@return            the <code>List</code> in array format
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static Geometry[] toGeometryArray(final Collection geometries) {
     if (geometries == null) {
       return null;
@@ -333,6 +337,9 @@ public class GeometryFactory implements Serializable,
    *@param  linearRings  the <code>List</code> of LinearRings to convert
    *@return              the <code>List</code> in array format
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static LinearRing[] toLinearRingArray(final Collection linearRings) {
     final LinearRing[] linearRingArray = new LinearRing[linearRings.size()];
     return (LinearRing[])linearRings.toArray(linearRingArray);
@@ -344,6 +351,9 @@ public class GeometryFactory implements Serializable,
    *@param  lineStrings  the <code>List</code> of LineStrings to convert
    *@return              the <code>List</code> in array format
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static LineString[] toLineStringArray(final Collection lineStrings) {
     final LineString[] lineStringArray = new LineString[lineStrings.size()];
     return (LineString[])lineStrings.toArray(lineStringArray);
@@ -355,6 +365,9 @@ public class GeometryFactory implements Serializable,
    *@param  multiLineStrings  the <code>List</code> of MultiLineStrings to convert
    *@return                   the <code>List</code> in array format
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static MultiLineString[] toMultiLineStringArray(
     final Collection multiLineStrings) {
     final MultiLineString[] multiLineStringArray = new MultiLineString[multiLineStrings.size()];
@@ -367,6 +380,9 @@ public class GeometryFactory implements Serializable,
    *@param  multiPoints  the <code>List</code> of MultiPoints to convert
    *@return              the <code>List</code> in array format
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static MultiPoint[] toMultiPointArray(final Collection multiPoints) {
     final MultiPoint[] multiPointArray = new MultiPoint[multiPoints.size()];
     return (MultiPoint[])multiPoints.toArray(multiPointArray);
@@ -378,6 +394,9 @@ public class GeometryFactory implements Serializable,
    *@param  multiPolygons  the <code>List</code> of MultiPolygons to convert
    *@return                the <code>List</code> in array format
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static MultiPolygon[] toMultiPolygonArray(
     final Collection multiPolygons) {
     final MultiPolygon[] multiPolygonArray = new MultiPolygon[multiPolygons.size()];
@@ -390,6 +409,9 @@ public class GeometryFactory implements Serializable,
    *@param  points  the <code>List</code> of Points to convert
    *@return         the <code>List</code> in array format
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static Point[] toPointArray(final Collection points) {
     final Point[] pointArray = new Point[points.size()];
     return (Point[])points.toArray(pointArray);
@@ -401,6 +423,9 @@ public class GeometryFactory implements Serializable,
    *@param  polygons  the <code>List</code> of Polygons to convert
    *@return           the <code>List</code> in array format
    */
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static Polygon[] toPolygonArray(final Collection polygons) {
     final Polygon[] polygonArray = new Polygon[polygons.size()];
     return (Polygon[])polygons.toArray(polygonArray);
@@ -422,7 +447,7 @@ public class GeometryFactory implements Serializable,
 
   private int numAxis = 2;
 
-  private CoordinateSequenceFactory coordinateSequenceFactory;
+  private final CoordinateSequenceFactory coordinateSequenceFactory;
 
   private final int srid;
 
@@ -454,18 +479,6 @@ public class GeometryFactory implements Serializable,
 
   /**
    * Constructs a GeometryFactory that generates Geometries having the given
-   * {@link PrecisionModel} and the default CoordinatesList
-   * implementation.
-   *
-   * @param precisionModel the PrecisionModel to use
-   */
-  @Deprecated
-  public GeometryFactory(final PrecisionModel precisionModel) {
-    this(precisionModel, 0, getDefaultCoordinateSequenceFactory());
-  }
-
-  /**
-   * Constructs a GeometryFactory that generates Geometries having the given
    * {@link PrecisionModel} and spatial-reference ID, and the default CoordinatesList
    * implementation.
    *
@@ -473,19 +486,8 @@ public class GeometryFactory implements Serializable,
    * @param srid the srid to use
    */
   @Deprecated
-  public GeometryFactory(final PrecisionModel precisionModel, final int SRID) {
-    this(precisionModel, SRID, getDefaultCoordinateSequenceFactory());
-  }
-
-  /**
-   * Constructs a GeometryFactory that generates Geometries having the given
-   * PrecisionModel, spatial-reference ID, and CoordinatesList implementation.
-   */
-  @Deprecated
-  public GeometryFactory(final PrecisionModel precisionModel, final int srid,
-    final CoordinateSequenceFactory coordinateSequenceFactory) {
+  public GeometryFactory(final PrecisionModel precisionModel, final int srid) {
     this(srid, 3, precisionModel.getScale(), precisionModel.getScale());
-    this.coordinateSequenceFactory = coordinateSequenceFactory;
   }
 
   public void addGeometries(final List<Geometry> geometryList,
@@ -527,6 +529,9 @@ public class GeometryFactory implements Serializable,
    *      type-specific" class that can contain the elements of <code>geomList</code>
    *      .
    */
+  @SuppressWarnings({
+    "rawtypes"
+  })
   public Geometry buildGeometry(final Collection geomList) {
 
     /**
@@ -761,17 +766,19 @@ public class GeometryFactory implements Serializable,
     } else if (geometries.size() == 1) {
       return (V)CollectionUtil.get(geometries, 0);
     } else {
-      final Set<Class<?>> classes = getGeometryClassSet(geometries);
-      if (classes.equals(Collections.singleton(Point.class))) {
-        return (V)createMultiPoint(geometries);
-      } else if (classes.equals(Collections.singleton(LineString.class))) {
-        return (V)createMultiLineString(geometries);
-      } else if (classes.equals(Collections.singleton(Polygon.class))) {
-        return (V)createMultiPolygon(geometries);
-      } else {
-        final Geometry[] geometryArray = com.revolsys.jts.geom.GeometryFactory.toGeometryArray(geometries);
-        return (V)createGeometryCollection(geometryArray);
+      final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
+      if (dataTypes.size() == 1) {
+        final DataType dataType = CollectionUtil.get(dataTypes, 0);
+        if (dataType.equals(DataTypes.POINT)) {
+          return (V)createMultiPoint(geometryList);
+        } else if (dataType.equals(DataTypes.LINE_STRING)) {
+          return (V)createMultiLineString(geometryList);
+        } else if (dataType.equals(DataTypes.POLYGON)) {
+          return (V)createMultiPolygon(geometryList);
+        }
       }
+      final Geometry[] geometryArray = GeometryFactory.toGeometryArray(geometries);
+      return (V)createGeometryCollection(geometryArray);
     }
   }
 
@@ -879,17 +886,19 @@ public class GeometryFactory implements Serializable,
     if (geometryList == null || geometryList.size() == 0) {
       return (V)createEmptyGeometryCollection();
     } else {
-      final Set<Class<?>> classes = getGeometryClassSet(geometryList);
-      if (classes.equals(Collections.singleton(Point.class))) {
-        return (V)createMultiPoint(geometryList);
-      } else if (classes.equals(Collections.singleton(LineString.class))) {
-        return (V)createMultiLineString(geometryList);
-      } else if (classes.equals(Collections.singleton(Polygon.class))) {
-        return (V)createMultiPolygon(geometryList);
-      } else {
-        final Geometry[] geometryArray = GeometryFactory.toGeometryArray(geometryList);
-        return (V)createGeometryCollection(geometryArray);
+      final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
+      if (dataTypes.size() == 1) {
+        final DataType dataType = CollectionUtil.get(dataTypes, 0);
+        if (dataType.equals(DataTypes.POINT)) {
+          return (V)createMultiPoint(geometryList);
+        } else if (dataType.equals(DataTypes.LINE_STRING)) {
+          return (V)createMultiLineString(geometryList);
+        } else if (dataType.equals(DataTypes.POLYGON)) {
+          return (V)createMultiPolygon(geometryList);
+        }
       }
+      final Geometry[] geometryArray = GeometryFactory.toGeometryArray(geometryList);
+      return (V)createGeometryCollection(geometryArray);
     }
   }
 
@@ -949,45 +958,6 @@ public class GeometryFactory implements Serializable,
     final CoordinatesList points = CoordinatesListUtil.get(linearRing);
     final CoordinatesList newPoints = createCoordinatesList(points);
     return createLinearRing(newPoints);
-  }
-
-  public LineString lineString(final Collection<?> points) {
-    final CoordinatesList coordinatesList = createCoordinatesList(points);
-    return lineString(coordinatesList);
-  }
-
-  public LineString lineString(final Coordinates... points) {
-    if (points == null) {
-      return lineString();
-    } else {
-      final List<Coordinates> p = Arrays.asList(points);
-      return lineString(p);
-    }
-  }
-
-  /**
-   * Creates a LineString using the given CoordinatesList.
-   * A null or empty CoordinatesList creates an empty LineString. 
-   * 
-   * @param coordinates a CoordinatesList (possibly empty), or null
-   */
-  public LineString lineString(final CoordinatesList points) {
-    final CoordinatesList newPoints = createCoordinatesList(points);
-    final LineString line = new LineStringImpl(newPoints, this);
-    return line;
-  }
-
-  public LineString lineString(final double... coordinates) {
-    final int numAxis = getNumAxis();
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(numAxis,
-      coordinates);
-    return lineString(points);
-  }
-
-  public LineString lineString(final LineString lineString) {
-    final CoordinatesList points = CoordinatesListUtil.get(lineString);
-    final CoordinatesList newPoints = createCoordinatesList(points);
-    return lineString(newPoints);
   }
 
   public MultiLineString createMultiLineString(final Collection<?> lines) {
@@ -1206,7 +1176,7 @@ public class GeometryFactory implements Serializable,
 
   public Coordinates getCoordinates(final Point point) {
     final Point convertedPoint = project(point);
-    return CoordinatesUtil.getInstance(convertedPoint);
+    return convertedPoint;
   }
 
   public CoordinateSequenceFactory getCoordinateSequenceFactory() {
@@ -1405,6 +1375,45 @@ public class GeometryFactory implements Serializable,
     return lineString(points);
   }
 
+  public LineString lineString(final Collection<?> points) {
+    final CoordinatesList coordinatesList = createCoordinatesList(points);
+    return lineString(coordinatesList);
+  }
+
+  public LineString lineString(final Coordinates... points) {
+    if (points == null) {
+      return lineString();
+    } else {
+      final List<Coordinates> p = Arrays.asList(points);
+      return lineString(p);
+    }
+  }
+
+  /**
+   * Creates a LineString using the given CoordinatesList.
+   * A null or empty CoordinatesList creates an empty LineString. 
+   * 
+   * @param coordinates a CoordinatesList (possibly empty), or null
+   */
+  public LineString lineString(final CoordinatesList points) {
+    final CoordinatesList newPoints = createCoordinatesList(points);
+    final LineString line = new LineStringImpl(newPoints, this);
+    return line;
+  }
+
+  public LineString lineString(final double... coordinates) {
+    final int numAxis = getNumAxis();
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(numAxis,
+      coordinates);
+    return lineString(points);
+  }
+
+  public LineString lineString(final LineString lineString) {
+    final CoordinatesList points = CoordinatesListUtil.get(lineString);
+    final CoordinatesList newPoints = createCoordinatesList(points);
+    return lineString(newPoints);
+  }
+
   @Override
   public void makePrecise(final Coordinates point) {
     coordinatesPrecisionModel.makePrecise(point);
@@ -1591,33 +1600,32 @@ public class GeometryFactory implements Serializable,
 
   @Override
   public String toString() {
-    if (coordinateSystem == null) {
-      return "Unknown coordinate system";
+    final StringBuffer string = new StringBuffer();
+    final int srid = getSrid();
+    if (coordinateSystem != null) {
+      string.append(coordinateSystem.getName());
+      string.append(", ");
+    }
+    string.append("srid=");
+    string.append(srid);
+    string.append(", numAxis=");
+    string.append(numAxis);
+    final double scaleXY = coordinatesPrecisionModel.getScaleXY();
+    string.append(", scaleXy=");
+    if (scaleXY <= 0) {
+      string.append("floating");
     } else {
-      final StringBuffer string = new StringBuffer(coordinateSystem.getName());
-      final int srid = coordinateSystem.getId();
-      string.append(", srid=");
-      string.append(srid);
-      string.append(", numAxis=");
-      string.append(numAxis);
-      final double scaleXY = coordinatesPrecisionModel.getScaleXY();
-      string.append(", scaleXy=");
-      if (scaleXY <= 0) {
+      string.append(scaleXY);
+    }
+    if (hasZ()) {
+      final double scaleZ = coordinatesPrecisionModel.getScaleZ();
+      string.append(", scaleZ=");
+      if (scaleZ <= 0) {
         string.append("floating");
       } else {
-        string.append(scaleXY);
+        string.append(scaleZ);
       }
-      if (hasZ()) {
-        final double scaleZ = coordinatesPrecisionModel.getScaleZ();
-        string.append(", scaleZ=");
-        if (scaleZ <= 0) {
-          string.append("floating");
-        } else {
-          string.append(scaleZ);
-        }
-      }
-      return string.toString();
     }
+    return string.toString();
   }
-
 }

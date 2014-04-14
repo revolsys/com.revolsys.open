@@ -33,8 +33,8 @@
 package com.revolsys.jts.operation.buffer;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -52,7 +52,7 @@ import com.revolsys.jts.geom.PrecisionModel;
 class OffsetSegmentString {
   private static final Coordinates[] COORDINATE_ARRAY_TYPE = new Coordinates[0];
 
-  private final ArrayList ptList;
+  private final List<Coordinates> ptList = new ArrayList<>();
 
   private PrecisionModel precisionModel = null;
 
@@ -62,10 +62,6 @@ class OffsetSegmentString {
    * This is chosen to be a small fraction of the offset distance.
    */
   private double minimimVertexDistance = 0.0;
-
-  public OffsetSegmentString() {
-    ptList = new ArrayList();
-  }
 
   public void addPt(final Coordinates pt) {
     final Coordinates bufPt = new Coordinate(pt);
@@ -94,11 +90,11 @@ class OffsetSegmentString {
     if (ptList.size() < 1) {
       return;
     }
-    final Coordinates startPt = new Coordinate((Coordinates)ptList.get(0));
-    final Coordinates lastPt = (Coordinate)ptList.get(ptList.size() - 1);
+    final Coordinates startPt = new Coordinate(ptList.get(0));
+    final Coordinates lastPt = ptList.get(ptList.size() - 1);
     Coordinates last2Pt = null;
     if (ptList.size() >= 2) {
-      last2Pt = (Coordinates)ptList.get(ptList.size() - 2);
+      last2Pt = ptList.get(ptList.size() - 2);
     }
     if (startPt.equals(lastPt)) {
       return;
@@ -109,11 +105,11 @@ class OffsetSegmentString {
   public Coordinates[] getCoordinates() {
     /*
      * // check that points are a ring - add the startpoint again if they are
-     * not if (ptList.size() > 1) { Coordinates start = (Coordinate)
-     * ptList.get(0); Coordinates end = (Coordinate) ptList.get(ptList.size() -
+     * not if (ptList.size() > 1) { Coordinates start = (Coordinates)
+     * ptList.get(0); Coordinates end = (Coordinates) ptList.get(ptList.size() -
      * 1); if (! start.equals(end) ) addPt(start); }
      */
-    final Coordinates[] coord = (Coordinates[])ptList.toArray(COORDINATE_ARRAY_TYPE);
+    final Coordinates[] coord = ptList.toArray(COORDINATE_ARRAY_TYPE);
     return coord;
   }
 
@@ -129,7 +125,7 @@ class OffsetSegmentString {
     if (ptList.size() < 1) {
       return false;
     }
-    final Coordinates lastPt = (Coordinates)ptList.get(ptList.size() - 1);
+    final Coordinates lastPt = ptList.get(ptList.size() - 1);
     final double ptDist = pt.distance(lastPt);
     if (ptDist < minimimVertexDistance) {
       return true;

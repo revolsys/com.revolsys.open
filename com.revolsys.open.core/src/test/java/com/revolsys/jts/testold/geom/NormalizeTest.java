@@ -89,28 +89,28 @@ public class NormalizeTest extends TestCase {
   }
 
   public void testNormalizeEmptyLineString() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING EMPTY");
-    l.normalize();
+    LineString l = (LineString)this.reader.read("LINESTRING EMPTY");
+    l = l.normalize();
     final LineString expectedValue = (LineString)this.reader.read("LINESTRING EMPTY");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeEmptyPoint() throws Exception {
-    final Point point = (Point)this.reader.read("POINT EMPTY");
-    point.normalize();
+    Point point = (Point)this.reader.read("POINT EMPTY");
+    point = point.normalize();
     assertEquals(null, point.getCoordinate());
   }
 
   public void testNormalizeEmptyPolygon() throws Exception {
-    final Polygon actualValue = (Polygon)this.reader.read("POLYGON EMPTY");
-    actualValue.normalize();
+    Polygon actualValue = (Polygon)this.reader.read("POLYGON EMPTY");
+    actualValue = actualValue.normalize();
     final Polygon expectedValue = (Polygon)this.reader.read("POLYGON EMPTY");
     assertEqualsExact(expectedValue, actualValue);
   }
 
   public void testNormalizeGeometryCollection() throws Exception {
     GeometryCollection actualValue = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (LINESTRING (200 300, 200 280, 220 280, 220 320, 180 320), POINT (140 220), POLYGON ((100 80, 100 160, 20 160, 20 80, 100 80), (40 140, 40 100, 80 100, 80 140, 40 140)), POINT (100 240))");
-    actualValue = actualValue.normalize();
+    actualValue = actualValue = actualValue.normalize();
     final GeometryCollection expectedValue = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (POINT (100 240), POINT (140 220), LINESTRING (180 320, 220 320, 220 280, 200 280, 200 300), POLYGON ((20 80, 20 160, 100 160, 100 80, 20 80), (40 100, 80 100, 80 140, 40 140, 40 100)))");
     assertEqualsExact(expectedValue, actualValue);
   }

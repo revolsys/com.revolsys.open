@@ -109,7 +109,7 @@ public class SimpleRayCrossingStressTest extends TestCase {
 
   public void testGrid() {
     // Use fixed PM to try and get at least some points hitting the boundary
-    final GeometryFactory geomFactory = new GeometryFactory(this.pmFixed_1);
+    final GeometryFactory geomFactory = GeometryFactory.getFactory(0, 1.0);
     // GeometryFactoryI geomFactory = new GeometryFactoryI();
 
     final PerturbedGridPolygonBuilder gridBuilder = new PerturbedGridPolygonBuilder(

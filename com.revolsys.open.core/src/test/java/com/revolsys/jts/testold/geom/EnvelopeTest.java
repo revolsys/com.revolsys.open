@@ -105,8 +105,8 @@ public class EnvelopeTest extends TestCase {
     assertTrue(!g2.isEmpty());
     assertTrue(g2 instanceof Polygon);
 
-    final Polygon poly = (Polygon)g2;
-    poly.normalize();
+    Polygon poly = (Polygon)g2;
+    poly = poly.normalize();
     final LineString exteriorRing = poly.getExteriorRing();
     assertEquals(5, exteriorRing.getNumPoints());
     CoordinateTest.assertEquals(exteriorRing.getCoordinateN(0), 10.0, 10);

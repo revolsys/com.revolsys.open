@@ -244,12 +244,14 @@ public class BufferValidator {
 
   public BufferValidator setFactory(final PrecisionModel precisionModel,
     final int srid) {
-    this.wktReader = new WKTReader(new GeometryFactory(precisionModel, srid));
+    this.wktReader = new WKTReader(GeometryFactory.getFactory(0,
+      precisionModel.getScale()));
     return this;
   }
 
   public BufferValidator setPrecisionModel(final PrecisionModel precisionModel) {
-    this.wktReader = new WKTReader(new GeometryFactory(precisionModel));
+    this.wktReader = new WKTReader(GeometryFactory.getFactory(0,
+      precisionModel.getScale()));
     return this;
   }
 

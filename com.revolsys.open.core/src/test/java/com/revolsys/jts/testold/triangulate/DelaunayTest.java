@@ -75,9 +75,9 @@ public class DelaunayTest extends TestCase {
     }
     System.out.println(result);
 
-    final Geometry expected = this.reader.read(expectedWKT);
-    result.normalize();
-    expected.normalize();
+    Geometry expected = this.reader.read(expectedWKT);
+    result = result.normalize();
+    expected = expected.normalize();
     assertTrue(expected.equalsExact(result, COMPARISON_TOLERANCE));
   }
 

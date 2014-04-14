@@ -35,12 +35,10 @@ package com.revolsys.jts.triangulate;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 
@@ -59,19 +57,18 @@ import com.revolsys.jts.geom.Geometry;
  *
  */
 public class VertexTaggedGeometryDataMapper {
-  private final Map coordDataMap = new TreeMap();
+  private final Map<Coordinates, Object> coordDataMap = new TreeMap<>();
 
   public VertexTaggedGeometryDataMapper() {
 
   }
 
-  public List getCoordinates() {
-    return new ArrayList(coordDataMap.keySet());
+  public List<Coordinates> getCoordinates() {
+    return new ArrayList<>(coordDataMap.keySet());
   }
 
-  public void loadSourceGeometries(final Collection geoms) {
-    for (final Iterator i = geoms.iterator(); i.hasNext();) {
-      final Geometry geom = (Geometry)i.next();
+  public void loadSourceGeometries(final Collection<Geometry> geoms) {
+    for (final Geometry geom : geoms) {
       loadVertices(geom.getCoordinateArray(), geom.getUserData());
     }
   }
@@ -84,8 +81,8 @@ public class VertexTaggedGeometryDataMapper {
   }
 
   private void loadVertices(final Coordinates[] pts, final Object data) {
-    for (int i = 0; i < pts.length; i++) {
-      coordDataMap.put(pts[i], data);
+    for (final Coordinates point : pts) {
+      coordDataMap.put(point, data);
     }
   }
 
@@ -101,7 +98,7 @@ public class VertexTaggedGeometryDataMapper {
   public void transferData(final Geometry targetGeom) {
     for (int i = 0; i < targetGeom.getNumGeometries(); i++) {
       final Geometry geom = targetGeom.getGeometry(i);
-      final Coordinates vertexKey = (Coordinate)geom.getUserData();
+      final Coordinates vertexKey = (Coordinates)geom.getUserData();
       if (vertexKey == null) {
         continue;
       }

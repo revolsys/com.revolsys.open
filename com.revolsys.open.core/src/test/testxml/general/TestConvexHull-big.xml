@@ -1,5 +1,5 @@
 <run>
-  <precisionModel scale="1.0" offsetx="0.0" offsety="0.0"/>
+  <precisionModel type="FLOATING"/>
 
 <case>
   <desc>Big convex hull</desc>

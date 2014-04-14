@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -120,10 +119,10 @@ public class ConformingDelaunayTriangulationBuilder {
     subdiv = cdt.getSubdivision();
   }
 
-  private List createSiteVertices(final Collection coords) {
-    final List verts = new ArrayList();
-    for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinates coord = (Coordinate)i.next();
+  private List<ConstraintVertex> createSiteVertices(
+    final Collection<Coordinates> coords) {
+    final List<ConstraintVertex> verts = new ArrayList<>();
+    for (final Coordinates coord : coords) {
       if (constraintVertexMap.containsKey(coord)) {
         continue;
       }

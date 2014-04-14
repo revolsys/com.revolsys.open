@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -44,7 +43,7 @@ import com.revolsys.jts.io.WKTWriter;
  * In other words, specifies the grid of allowable
  *  points for all <code>Geometry</code>s.
  * <p>
- * The {@link #makePrecise(Coordinate)} method allows rounding a coordinate to
+ * The {@link #makePrecise(Coordinates)} method allows rounding a coordinate to
  * a "precise" value; that is, one whose
  *  precision is known exactly.
  *<p>

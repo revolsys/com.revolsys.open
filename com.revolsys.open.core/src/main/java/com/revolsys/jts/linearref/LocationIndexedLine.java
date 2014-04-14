@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -154,7 +153,7 @@ public class LocationIndexedLine {
    *
    * @param pt a point on the line
    * @return the index of the point
-   * @see #project(Coordinate)
+   * @see #project(Coordinates)
    */
   public LinearLocation indexOf(final Coordinates pt) {
     return LocationIndexOfPoint.indexOf(linearGeom, pt);
@@ -180,7 +179,7 @@ public class LocationIndexedLine {
    * @param minIndex the value the returned index must be greater than
    * @return the index of the point greater than the given minimum index
    *
-   * @see #project(Coordinate)
+   * @see #project(Coordinates)
    */
   public LinearLocation indexOfAfter(final Coordinates pt,
     final LinearLocation minIndex) {

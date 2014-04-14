@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
 /**
@@ -15,9 +14,9 @@ import com.revolsys.jts.geom.Coordinates;
  * <p>
  * This class may be subclassed to use a 
  * different subclass of HalfEdge,
- * by overriding {@link #createEdge(Coordinate)}.
+ * by overriding {@link #createEdge(Coordinates)}.
  * If additional logic is required to initialize
- * edges then {@link EdgeGraph#addEdge(Coordinate, Coordinate)}
+ * edges then {@link EdgeGraph#addEdge(Coordinates, Coordinates)}
  * can be overridden as well.
  * 
  * @author Martin Davis

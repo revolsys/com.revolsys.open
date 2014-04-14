@@ -37,6 +37,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -192,7 +193,7 @@ public class WKTReader {
     if (nextToken.equals(EMPTY)) {
       return new Coordinates[] {};
     }
-    final ArrayList coordinates = new ArrayList();
+    final List<Coordinates> coordinates = new ArrayList<Coordinates>();
     coordinates.add(getPreciseCoordinate());
     nextToken = getNextCloserOrComma();
     while (nextToken.equals(COMMA)) {
@@ -200,7 +201,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final Coordinates[] array = new Coordinates[coordinates.size()];
-    return (Coordinates[])coordinates.toArray(array);
+    return coordinates.toArray(array);
   }
 
   private Coordinates[] getCoordinatesNoLeftParen() throws IOException,
@@ -609,7 +610,7 @@ public class WKTReader {
       }
     }
 
-    final ArrayList points = new ArrayList();
+    final List<Point> points = new ArrayList<Point>();
     Point point = readPointText();
     points.add(point);
     nextToken = getNextCloserOrComma();
@@ -618,8 +619,7 @@ public class WKTReader {
       points.add(point);
       nextToken = getNextCloserOrComma();
     }
-    final Point[] array = new Point[points.size()];
-    return geometryFactory.createMultiPoint((Point[])points.toArray(array));
+    return geometryFactory.createMultiPoint(points);
   }
 
   /**
@@ -691,7 +691,7 @@ public class WKTReader {
         geometryFactory.createLinearRing(new Coordinates[] {}),
         new LinearRing[] {});
     }
-    final ArrayList holes = new ArrayList();
+    final List<LinearRing> holes = new ArrayList<LinearRing>();
     final LinearRing shell = readLinearRingText();
     nextToken = getNextCloserOrComma();
     while (nextToken.equals(COMMA)) {
@@ -700,8 +700,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final LinearRing[] array = new LinearRing[holes.size()];
-    return geometryFactory.createPolygon(shell,
-      (LinearRing[])holes.toArray(array));
+    return geometryFactory.createPolygon(shell, holes.toArray(array));
   }
 
   /**
