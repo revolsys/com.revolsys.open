@@ -43,7 +43,7 @@ public class CoordinatesUtil {
   public static Point add(final Point c1, final Point c2) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
     final Point p2 = (Point)factory.createGeometry(c2);
-    return factory.createPoint(add(getInstance(c1), getInstance(p2)));
+    return factory.point(add(getInstance(c1), getInstance(p2)));
   }
 
   public static double angle(final Coordinates p1, final Coordinates p2,
@@ -487,7 +487,7 @@ public class CoordinatesUtil {
   public static Point subtract(final Point c1, final Point c2) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
     final Point p2 = (Point)factory.createGeometry(c2);
-    return factory.createPoint(subtract(getInstance(c1), getInstance(p2)));
+    return factory.point(subtract(getInstance(c1), getInstance(p2)));
   }
 
   public static float[] toFloatArray(final CoordinatesList points,

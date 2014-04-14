@@ -268,7 +268,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         jGeometry = toJGeometry(point, dimension);
       } else if (object instanceof Coordinates) {
         final Coordinates coordinates = (Coordinates)object;
-        final Point point = this.geometryFactory.createPoint(coordinates);
+        final Point point = this.geometryFactory.point(coordinates);
         jGeometry = toJGeometry(point, dimension);
       } else if (object instanceof MultiPoint) {
         final MultiPoint multiPoint = (MultiPoint)geometry;
@@ -414,7 +414,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final double[] coordinates = coordinatesArray.getDoubleArray();
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(numAxis,
       coordinates);
-    return this.geometryFactory.createLineString(coordinatesList);
+    return this.geometryFactory.lineString(coordinatesList);
   }
 
   private MultiLineString toMultiLineString(final ResultSet resultSet,
@@ -537,7 +537,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       final double z = resultSet.getDouble(columnIndex + 3);
       coordinatesList = new DoubleCoordinatesList(numAxis, x, y, z);
     }
-    return this.geometryFactory.createPoint(coordinatesList);
+    return this.geometryFactory.point(coordinatesList);
   }
 
   private Polygon toPolygon(final ResultSet resultSet, final int columnIndex,

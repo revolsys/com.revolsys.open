@@ -76,7 +76,7 @@ public class TileInfo extends AbstractMapWrapper {
   public Point getOriginPoint() {
     final com.revolsys.jts.geom.GeometryFactory spatialReference = getSpatialReference();
     final Coordinates origin = getOrigin();
-    return spatialReference.createPoint(origin);
+    return spatialReference.point(origin);
   }
 
   public double getOriginX() {

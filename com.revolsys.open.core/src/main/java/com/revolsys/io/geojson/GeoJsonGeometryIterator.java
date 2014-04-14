@@ -307,7 +307,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
-    final LineString lineString = factory.createLineString(points);
+    final LineString lineString = factory.lineString(points);
     return lineString;
   }
 
@@ -375,7 +375,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
-    final Point point = factory.createPoint(coordinates);
+    final Point point = factory.point(coordinates);
     return point;
   }
 

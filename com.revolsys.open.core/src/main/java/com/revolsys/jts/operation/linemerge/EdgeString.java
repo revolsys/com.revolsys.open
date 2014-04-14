@@ -98,6 +98,6 @@ public class EdgeString {
    * Converts this EdgeString into a LineString.
    */
   public LineString toLineString() {
-    return factory.createLineString(getCoordinates());
+    return factory.lineString(getCoordinates());
   }
 }

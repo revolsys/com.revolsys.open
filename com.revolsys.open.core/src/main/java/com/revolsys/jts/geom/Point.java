@@ -59,6 +59,9 @@ public interface Point extends Geometry, Puntal, Vertex {
   @Override
   Point convert(GeometryFactory geometryFactory);
 
+  @Override
+  Point copy(GeometryFactory geometryFactory);
+
   double distance(final Point point);
 
   double getCoordinate(final int axisIndex);

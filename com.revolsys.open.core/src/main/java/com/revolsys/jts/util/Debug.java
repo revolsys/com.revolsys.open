@@ -108,15 +108,15 @@ public class Debug {
   public static boolean isDebugging() { return debugOn; }
 
   public static LineString toLine(Coordinates p0, Coordinates p1) {
-    return fact.createLineString(new Coordinates[] { p0, p1 });
+    return fact.lineString(new Coordinates[] { p0, p1 });
   }
 
   public static LineString toLine(Coordinates p0, Coordinates p1, Coordinates p2) {
-    return fact.createLineString(new Coordinates[] { p0, p1, p2});
+    return fact.lineString(new Coordinates[] { p0, p1, p2});
   }
 
   public static LineString toLine(Coordinates p0, Coordinates p1, Coordinates p2, Coordinates p3) {
-    return fact.createLineString(new Coordinates[] { p0, p1, p2, p3});
+    return fact.lineString(new Coordinates[] { p0, p1, p2, p3});
   }
 
   public static void print(String str) {

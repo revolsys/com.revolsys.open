@@ -160,7 +160,7 @@ public class GeometryGraph extends Graph<LineSegment> {
               // Point intersection, make sure it's not at the start
               final Node<LineSegment> node = findNode(intersection);
               if (node == null) {
-                pointIntersections.add(geometryFactory.createPoint(intersection));
+                pointIntersections.add(geometryFactory.point(intersection));
               } else {
                 final int degree = node.getDegree();
                 if (isStartPoint(node)) {
@@ -168,19 +168,19 @@ public class GeometryGraph extends Graph<LineSegment> {
                     // Intersection not at the start/end of the other line,
                     // taking
                     // into account loops
-                    pointIntersections.add(geometryFactory.createPoint(intersection));
+                    pointIntersections.add(geometryFactory.point(intersection));
                   }
                 } else if (degree > 1) {
                   // Intersection not at the start/end of the other line
-                  pointIntersections.add(geometryFactory.createPoint(intersection));
+                  pointIntersections.add(geometryFactory.point(intersection));
                 }
               }
             } else {
               // Intersection not at the start/end of the line
-              pointIntersections.add(geometryFactory.createPoint(intersection));
+              pointIntersections.add(geometryFactory.point(intersection));
             }
           } else if (numIntersections == 2) {
-            lineIntersections.add(geometryFactory.createLineString(segmentIntersection));
+            lineIntersections.add(geometryFactory.lineString(segmentIntersection));
           }
           for (final Coordinates point : line1) {
             if (line2.distance(point) < maxDistance) {
@@ -194,16 +194,16 @@ public class GeometryGraph extends Graph<LineSegment> {
                       // Intersection not at the start/end of the other line,
                       // taking
                       // into account loops
-                      pointIntersections.add(geometryFactory.createPoint(point));
+                      pointIntersections.add(geometryFactory.point(point));
                     }
                   } else if (degree > 1) {
                     // Intersection not at the start/end of the other line
-                    pointIntersections.add(geometryFactory.createPoint(point));
+                    pointIntersections.add(geometryFactory.point(point));
                   }
                 }
               } else {
                 // Intersection not at the start/end of the line
-                pointIntersections.add(geometryFactory.createPoint(point));
+                pointIntersections.add(geometryFactory.point(point));
               }
             }
           }
@@ -273,7 +273,7 @@ public class GeometryGraph extends Graph<LineSegment> {
           }
         } else {
           if (points.size() > 1) {
-            final LineString line = geometryFactory.createLineString(points);
+            final LineString line = geometryFactory.lineString(points);
             geometries.add(line);
           }
           points = new DoubleListCoordinatesList(numAxis);
@@ -282,7 +282,7 @@ public class GeometryGraph extends Graph<LineSegment> {
         if (points.size() > 1) {
           final int toDegree = toNode.getDegree();
           if (toDegree != 2) {
-            final LineString line = geometryFactory.createLineString(points);
+            final LineString line = geometryFactory.lineString(points);
             geometries.add(line);
             points = new DoubleListCoordinatesList(numAxis);
             points.add(toNode);
@@ -292,7 +292,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       }
     }
     if (points.size() > 1) {
-      final LineString line = geometryFactory.createLineString(points);
+      final LineString line = geometryFactory.lineString(points);
       geometries.add(line);
     }
     return geometryFactory.createGeometry(geometries);

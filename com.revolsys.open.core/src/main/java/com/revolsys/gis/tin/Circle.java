@@ -53,7 +53,7 @@ public class Circle extends DoubleCoordinates {
 
   public Geometry toGeometry() {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory();
-    final Point point = factory.createPoint(this);
+    final Point point = factory.point(this);
     return point.buffer(radius);
   }
 

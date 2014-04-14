@@ -719,6 +719,11 @@ public abstract class GeometryImpl implements Geometry {
     return (new ConvexHull(this)).getConvexHull();
   }
 
+  @Override
+  public Geometry copy(final GeometryFactory geometryFactory) {
+    return geometryFactory.copy(this);
+  }
+
   /**
    * Tests whether this geometry is covered by the
    * argument geometry.
@@ -804,7 +809,7 @@ public abstract class GeometryImpl implements Geometry {
   private Point createPointFromInternalCoord(final Coordinates coord,
     final Geometry exemplar) {
     exemplar.getPrecisionModel().makePrecise(coord);
-    return exemplar.getGeometryFactory().createPoint(coord);
+    return exemplar.getGeometryFactory().point(coord);
   }
 
   /**
@@ -1187,7 +1192,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public Point getCentroid() {
     if (isEmpty()) {
-      return geometryFactory.createPoint();
+      return geometryFactory.point();
     }
     final Coordinates centPt = Centroid.getCentroid(this);
     return createPointFromInternalCoord(centPt, this);
@@ -1377,7 +1382,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public Point getInteriorPoint() {
     if (isEmpty()) {
-      return geometryFactory.createPoint();
+      return geometryFactory.point();
     }
     Coordinates interiorPt = null;
     final int dim = getDimension();
@@ -1406,6 +1411,20 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public double getLength() {
     return 0.0;
+  }
+
+  protected GeometryFactory getNonZeroGeometryFactory(
+    GeometryFactory geometryFactory) {
+    final int geometrySrid = getSrid();
+    final int srid = geometryFactory.getSrid();
+    if (srid == 0 && geometrySrid != 0) {
+      final int numAxis = geometryFactory.getNumAxis();
+      final double scaleXY = geometryFactory.getScaleXY();
+      final double scaleZ = geometryFactory.getScaleZ();
+      geometryFactory = GeometryFactory.getFactory(geometrySrid, numAxis,
+        scaleXY, scaleZ);
+    }
+    return geometryFactory;
   }
 
   @Override
@@ -2069,19 +2088,6 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean within(final Geometry g) {
     return g.contains(this);
-  }
-
-  protected GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
-    final int geometrySrid = getSrid();
-      final int srid = geometryFactory.getSrid();
-    if (srid == 0 && geometrySrid != 0) {
-       int numAxis = geometryFactory.getNumAxis();
-      double scaleXY = geometryFactory.getScaleXY();
-      double scaleZ = geometryFactory.getScaleZ();
-      geometryFactory = GeometryFactory.getFactory(
-        geometrySrid, numAxis, scaleXY, scaleZ);
-    }
-    return geometryFactory;
   }
 
 }

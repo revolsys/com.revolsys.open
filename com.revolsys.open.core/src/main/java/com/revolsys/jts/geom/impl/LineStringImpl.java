@@ -295,7 +295,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   public Point getPointN(final int n) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Coordinates coordinate = points.getCoordinate(n);
-    return geometryFactory.createPoint(coordinate);
+    return geometryFactory.point(coordinate);
   }
 
   @Override
@@ -414,7 +414,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   public LineString reverse() {
     final CoordinatesList reversePoints = this.points.reverse();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final LineString reverseLine = geometryFactory.createLineString(reversePoints);
+    final LineString reverseLine = geometryFactory.lineString(reversePoints);
     return reverseLine;
   }
 

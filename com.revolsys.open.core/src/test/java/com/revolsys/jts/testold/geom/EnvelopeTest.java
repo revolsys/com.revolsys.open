@@ -88,11 +88,11 @@ public class EnvelopeTest extends TestCase {
   }
 
   public void testAsGeometry() throws Exception {
-    assertTrue(this.geometryFactory.createPoint((Coordinates)null)
+    assertTrue(this.geometryFactory.point((Coordinates)null)
       .getEnvelope()
       .isEmpty());
 
-    final Geometry g = this.geometryFactory.createPoint(5.0, 6).getEnvelope();
+    final Geometry g = this.geometryFactory.point(5.0, 6).getEnvelope();
     assertTrue(!g.isEmpty());
     assertTrue(g instanceof Point);
 

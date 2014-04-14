@@ -84,10 +84,10 @@ public class RobustLineIntersectorTest extends TestCase {
     final Coordinates p1 = new Coordinate((double)-123456789, -40, Coordinates.NULL_ORDINATE);
     final Coordinates p2 = new Coordinate((double)381039468754763d, 123456789, Coordinates.NULL_ORDINATE);
     final Coordinates q = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
-    final LineString l = GeometryFactory.getFactory().createLineString(new Coordinates[] {
+    final LineString l = GeometryFactory.getFactory().lineString(new Coordinates[] {
       p1, p2
     });
-    final Point p = GeometryFactory.getFactory().createPoint(q);
+    final Point p = GeometryFactory.getFactory().point(q);
     assertEquals(false, l.intersects(p));
     assertEquals(false, CGAlgorithms.isOnLine(q, new Coordinates[] {
       p1, p2

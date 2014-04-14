@@ -265,11 +265,11 @@ public class WktParser {
       numAxis = geometryFactory.getNumAxis();
     }
     if (isEmpty(text)) {
-      return geometryFactory.createLineString();
+      return geometryFactory.lineString();
     } else {
       final CoordinatesList points = parseCoordinates(geometryFactory, text,
         numAxis);
-      return geometryFactory.createLineString(points);
+      return geometryFactory.lineString(points);
     }
   }
 
@@ -409,14 +409,14 @@ public class WktParser {
       }
     }
     if (isEmpty(text)) {
-      return geometryFactory.createPoint();
+      return geometryFactory.point();
     } else {
       final CoordinatesList points = parseCoordinates(geometryFactory, text,
         numAxis);
       if (points.size() > 1) {
         throw new IllegalArgumentException("Points may only have 1 vertex");
       }
-      return geometryFactory.createPoint(points);
+      return geometryFactory.point(points);
     }
   }
 

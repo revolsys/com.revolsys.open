@@ -448,6 +448,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   Geometry convexHull();
 
   /**
+   * Create a copy of the geometry io the requried geometry factory. Projecting to the required
+   * coordinate system and applying the precision model.
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param geometryFactory The geometry factory to convert the geometry to.
+   * @return The converted geometry
+   */
+  Geometry copy(GeometryFactory geometryFactory);
+
+  /**
    * Tests whether this geometry is covered by the
    * argument geometry.
    * <p>

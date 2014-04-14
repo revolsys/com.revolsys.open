@@ -286,7 +286,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
               final CoordinatesList coordinates = getCoordinates(shape,
                 allCoordinates, partIndex, ringIndex, numAxis);
-              final Point point = geometryFactory.createPoint(coordinates);
+              final Point point = geometryFactory.point(coordinates);
               if (!point.isEmpty()) {
                 points.add(point);
               }
@@ -305,7 +305,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
               final CoordinatesList coordinates = getCoordinates(shape,
                 allCoordinates, partIndex, ringIndex, numAxis);
-              final LineString line = geometryFactory.createLineString(coordinates);
+              final LineString line = geometryFactory.lineString(coordinates);
               if (!line.isEmpty()) {
                 lines.add(line);
               }

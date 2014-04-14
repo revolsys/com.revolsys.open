@@ -87,7 +87,7 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   @Override
   public Point toPoint() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.createPoint(this);
+    return geometryFactory.point(this);
   }
 
 }

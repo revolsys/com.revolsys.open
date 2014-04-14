@@ -121,7 +121,7 @@ class ExtractLineByLocation {
         newCoordinateArray[0], newCoordinateArray[0]
       };
     }
-    return line.getGeometryFactory().createLineString(newCoordinateArray);
+    return line.getGeometryFactory().lineString(newCoordinateArray);
   }
 
   /**

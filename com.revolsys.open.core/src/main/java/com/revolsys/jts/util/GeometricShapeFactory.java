@@ -213,7 +213,7 @@ public class GeometricShapeFactory {
       final double y = yRadius * Math.sin(ang) + centreY;
       pts[iPt++] = coord(x, y);
     }
-    final LineString line = geomFact.createLineString(pts);
+    final LineString line = geomFact.lineString(pts);
     return (LineString)rotate(line);
   }
 

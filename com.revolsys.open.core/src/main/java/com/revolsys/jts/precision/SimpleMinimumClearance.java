@@ -155,7 +155,7 @@ public class SimpleMinimumClearance {
 
   public LineString getLine() {
     compute();
-    return inputGeom.getGeometryFactory().createLineString(minClearancePts);
+    return inputGeom.getGeometryFactory().lineString(minClearancePts);
   }
 
   private void updateClearance(final double candidateValue,

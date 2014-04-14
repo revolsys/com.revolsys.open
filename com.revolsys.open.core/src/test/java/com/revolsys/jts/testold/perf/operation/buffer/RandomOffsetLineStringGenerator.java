@@ -111,7 +111,7 @@ public class RandomOffsetLineStringGenerator {
       createRandomOffsets(interval);
       interval /= 2;
     }
-    return fact.createLineString(this.pts);
+    return fact.lineString(this.pts);
   }
 
   private double randomFractionPerturbation() {

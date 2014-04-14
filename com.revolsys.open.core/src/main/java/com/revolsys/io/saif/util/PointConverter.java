@@ -55,7 +55,7 @@ public class PointConverter implements OsnConverter {
           iterator.throwParseError("Expecting Coord2D or Coord3D");
         }
         iterator.nextEndObject();
-        geometry = geometryFactory.createPoint(coordinate);
+        geometry = geometryFactory.point(coordinate);
       } else {
         readAttribute(iterator, attributeName, values);
       }

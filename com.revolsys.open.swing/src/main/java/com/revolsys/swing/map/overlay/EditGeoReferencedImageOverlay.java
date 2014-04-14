@@ -584,7 +584,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         final Coordinates point = getImageBoundingBox().getCornerPoint(i);
         final double distance = point.distance(CoordinatesUtil.getInstance(mousePoint));
         if (distance < maxDistance && distance < closestDistance) {
-          closestPoint = geometryFactory.createPoint(point);
+          closestPoint = geometryFactory.point(point);
           closestDistance = distance;
           closestIndex = i;
         }
@@ -887,7 +887,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
               targetPoint = moveTiePointLocation;
             }
             if (sourcePoint != null && targetPoint != null) {
-              final LineString line = getGeometryFactory().createLineString(
+              final LineString line = getGeometryFactory().lineString(
                 sourcePoint, targetPoint);
               renderTiePointLine(graphics, viewport, line);
             }
@@ -904,13 +904,13 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           final Point bottomLeft = warpFilter.sourcePixelToTargetPoint(0.0, 0.0);
           final Point bottomRight = warpFilter.sourcePixelToTargetPoint(width,
             0.0);
-          final LineString line = getGeometryFactory().createLineString(
+          final LineString line = getGeometryFactory().lineString(
             topLeft, topRight, bottomRight, bottomLeft, topLeft);
           GeometryStyleRenderer.renderLineString(viewport, graphics, line,
             STYLE_IMAGE_LINE);
         }
         if (addTiePointFirstPoint != null) {
-          final LineString line = getGeometryFactory().createLineString(
+          final LineString line = getGeometryFactory().lineString(
             addTiePointFirstPoint, addTiePointMove);
           renderTiePointLine(graphics, viewport, line);
         }

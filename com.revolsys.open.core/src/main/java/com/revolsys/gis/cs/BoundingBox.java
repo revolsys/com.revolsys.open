@@ -693,11 +693,11 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public Point getBottomLeftPoint() {
-    return getGeometryFactory().createPoint(getMinX(), getMinY());
+    return getGeometryFactory().point(getMinX(), getMinY());
   }
 
   public Point getBottomRightPoint() {
-    return getGeometryFactory().createPoint(getMaxX(), getMinY());
+    return getGeometryFactory().point(getMaxX(), getMinY());
   }
 
   public Coordinates getCentre() {
@@ -705,7 +705,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public Point getCentrePoint() {
-    return geometryFactory.createPoint(getCentre());
+    return geometryFactory.point(getCentre());
   }
 
   public double getCentreX() {
@@ -865,11 +865,11 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public Point getTopLeftPoint() {
-    return getGeometryFactory().createPoint(getMinX(), getMaxY());
+    return getGeometryFactory().point(getMinX(), getMaxY());
   }
 
   public Point getTopRightPoint() {
-    return getGeometryFactory().createPoint(getMaxX(), getMaxY());
+    return getGeometryFactory().point(getMaxX(), getMaxY());
   }
 
   @SuppressWarnings("unchecked")
@@ -1016,10 +1016,10 @@ public class BoundingBox extends Envelope implements Cloneable {
     final double width = getWidth();
     final double height = getHeight();
     if (width == 0 && height == 0) {
-      return geometryFactory.createPoint(new DoubleCoordinatesList(2, minX,
+      return geometryFactory.point(new DoubleCoordinatesList(2, minX,
         minY));
     } else if (width == 0 || height == 0) {
-      return geometryFactory.createLineString(new DoubleCoordinatesList(2,
+      return geometryFactory.lineString(new DoubleCoordinatesList(2,
         minX, minY, maxX, maxY));
     } else {
       return geometryFactory.createPolygon(new DoubleCoordinatesList(2, minX,

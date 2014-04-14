@@ -126,7 +126,7 @@ public class GeometryNoder
       // skip collapsed lines
       if (ss.size() < 2)
       	continue;
-      lines.add(geomFact.createLineString(ss.getCoordinates()));
+      lines.add(geomFact.lineString(ss.getCoordinates()));
     }
     return lines;
   }

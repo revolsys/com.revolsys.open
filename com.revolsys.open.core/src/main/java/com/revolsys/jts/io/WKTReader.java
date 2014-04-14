@@ -545,7 +545,7 @@ public class WKTReader {
    *@throws  ParseException  if an unexpected token was encountered
    */
   private LineString readLineStringText() throws IOException, ParseException {
-    return geometryFactory.createLineString(getCoordinates());
+    return geometryFactory.lineString(getCoordinates());
   }
 
   /*
@@ -665,9 +665,9 @@ public class WKTReader {
   private Point readPointText() throws IOException, ParseException {
     final String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.createPoint((Coordinates)null);
+      return geometryFactory.point((Coordinates)null);
     }
-    final Point point = geometryFactory.createPoint(getPreciseCoordinate());
+    final Point point = geometryFactory.point(getPreciseCoordinate());
     getNextCloser();
     return point;
   }
@@ -735,7 +735,7 @@ public class WKTReader {
   private Point[] toPoints(final Coordinates[] coordinates) {
     final ArrayList points = new ArrayList();
     for (int i = 0; i < coordinates.length; i++) {
-      points.add(geometryFactory.createPoint(coordinates[i]));
+      points.add(geometryFactory.point(coordinates[i]));
     }
     return (Point[])points.toArray(new Point[] {});
   }

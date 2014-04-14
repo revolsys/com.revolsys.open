@@ -186,7 +186,7 @@ public class PackedCoordinateUtil {
     final Double mScale) {
     final CoordinatesList points = getCoordinatesList(numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
-    return geometryFactory.createLineString(points);
+    return geometryFactory.lineString(points);
   }
 
   private static MultiLineString getMultiLineString(final InputStream pointsIn,
@@ -385,7 +385,7 @@ public class PackedCoordinateUtil {
     final Double mScale) {
     final CoordinatesList points = getCoordinatesList(numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
-    return geometryFactory.createPoint(points);
+    return geometryFactory.point(points);
   }
 
   private static Polygon getPolygon(final InputStream pointsIn,

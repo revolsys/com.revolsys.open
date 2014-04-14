@@ -63,7 +63,7 @@ public final class LineStringUtil {
     final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
       startPoint, startIndex, length, endPoint);
     if (newPoints.size() > 1) {
-      final LineString newLine = geometryFactory.createLineString(newPoints);
+      final LineString newLine = geometryFactory.lineString(newPoints);
       if (newLine.getLength() > 0) {
         lines.add(newLine);
       }
@@ -138,7 +138,7 @@ public final class LineStringUtil {
       if (newPoints == null) {
         return line;
       } else {
-        return factory.createLineString(newPoints);
+        return factory.lineString(newPoints);
       }
     } else {
       return line;
@@ -614,7 +614,7 @@ public final class LineStringUtil {
   public static Point getPoint(final LineString line, final int index) {
     final Coordinates coordinates = getCoordinates(line, index);
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    return geometryFactory.createPoint(coordinates);
+    return geometryFactory.point(coordinates);
   }
 
   public static Coordinates getToCoordinates(final LineString line) {
@@ -625,7 +625,7 @@ public final class LineStringUtil {
   public static Point getToPoint(final LineString line) {
     final Coordinates coordinates = getToCoordinates(line);
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    return geometryFactory.createPoint(coordinates);
+    return geometryFactory.point(coordinates);
   }
 
   public static boolean hasEndPoint(final LineString line, final Point point) {
@@ -685,7 +685,7 @@ public final class LineStringUtil {
       }
     }
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
-    final LineString newLine = factory.createLineString(newPoints);
+    final LineString newLine = factory.lineString(newPoints);
     return newLine;
   }
 
@@ -749,7 +749,7 @@ public final class LineStringUtil {
       newCoordinates.setPoint(i, lineSegment.get(1));
       i++;
     }
-    final LineString newLine = factory.createLineString(newCoordinates);
+    final LineString newLine = factory.lineString(newCoordinates);
     return newLine;
   }
 
@@ -822,18 +822,18 @@ public final class LineStringUtil {
       final CoordinatesList intersectionPoints = intersections.get(0);
       if (intersectionPoints.size() == 1) {
         final Coordinates point = intersectionPoints.get(0);
-        return factory.createPoint(point);
+        return factory.point(point);
       } else {
-        return factory.createLineString(intersectionPoints);
+        return factory.lineString(intersectionPoints);
       }
     } else {
       final Collection<Geometry> geometries = new ArrayList<Geometry>();
       for (final CoordinatesList intersection : intersections) {
         if (intersection.size() == 1) {
           final Coordinates point = intersection.get(0);
-          geometries.add(factory.createPoint(point));
+          geometries.add(factory.point(point));
         } else {
-          geometries.add(factory.createLineString(intersection));
+          geometries.add(factory.lineString(intersection));
         }
       }
       final Geometry geometry = factory.buildGeometry(geometries);
@@ -1006,7 +1006,7 @@ public final class LineStringUtil {
     final CoordinatesList coordinates = CoordinatesListUtil.merge(point,
       coordinates1, coordinates2);
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
-    final LineString line = factory.createLineString(coordinates);
+    final LineString line = factory.lineString(coordinates);
     JtsGeometryUtil.copyUserData(line1, line);
     return line;
   }
@@ -1028,7 +1028,7 @@ public final class LineStringUtil {
     final CoordinatesList coordinates = CoordinatesListUtil.merge(coordinates1,
       coordinates2);
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
-    final LineString line = factory.createLineString(coordinates);
+    final LineString line = factory.lineString(coordinates);
     JtsGeometryUtil.copyUserData(line1, line);
 
     return line;
@@ -1053,7 +1053,7 @@ public final class LineStringUtil {
             final Coordinates midPoint = LineSegmentUtil.project(
               geometryFactory, p1, p2, (midPointLength - currentLength)
                 / segmentLength);
-            return geometryFactory.createPoint(midPoint);
+            return geometryFactory.point(midPoint);
 
           }
           currentLength += segmentLength;
@@ -1069,7 +1069,7 @@ public final class LineStringUtil {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
     final CoordinatesList reverseCoordinates = coordinates.reverse();
-    final LineString newLine = factory.createLineString(reverseCoordinates);
+    final LineString newLine = factory.lineString(reverseCoordinates);
     JtsGeometryUtil.copyUserData(line, newLine);
     return newLine;
   }
@@ -1249,14 +1249,14 @@ public final class LineStringUtil {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
 
     if (coords1Size > 1) {
-      final LineString line1 = geometryFactory.createLineString(points1);
+      final LineString line1 = geometryFactory.lineString(points1);
       if (line1.getLength() > 0) {
         lines.add(line1);
       }
     }
 
     if (coords2Size > 1) {
-      final LineString line2 = geometryFactory.createLineString(points2);
+      final LineString line2 = geometryFactory.lineString(points2);
       if (line2.getLength() > 0) {
         lines.add(line2);
       }
@@ -1275,7 +1275,7 @@ public final class LineStringUtil {
     if (newPoints.size() < 2) {
       return null;
     } else {
-      final LineString newLine = factory.createLineString(newPoints);
+      final LineString newLine = factory.lineString(newPoints);
       JtsGeometryUtil.copyUserData(line, newLine);
       return newLine;
     }

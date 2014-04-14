@@ -82,7 +82,7 @@ public class WKTWriterTest extends TestCase {
 
   public void testWrite3D() {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory();
-    final Point point = geometryFactory.createPoint(new Coordinate((double)1, 1, 1));
+    final Point point = geometryFactory.point(new Coordinate((double)1, 1, 1));
     final String wkt = this.writer3D.write(point);
     assertEquals("POINT (1 1 1)", wkt);
   }
@@ -92,18 +92,18 @@ public class WKTWriterTest extends TestCase {
     final Coordinates[] coordinates = {
       new Coordinate((double)1, 1, Coordinates.NULL_ORDINATE), new Coordinate((double)2, 2, 2)
     };
-    final LineString line = geometryFactory.createLineString(coordinates);
+    final LineString line = geometryFactory.lineString(coordinates);
     final String wkt = this.writer3D.write(line);
     assertEquals("LINESTRING (1 1, 2 2 2)", wkt);
   }
 
   public void testWriteGeometryCollection() {
-    final Point point1 = this.geometryFactory.createPoint(new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE));
-    final Point point2 = this.geometryFactory.createPoint(new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE));
+    final Point point1 = this.geometryFactory.point(new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE));
+    final Point point2 = this.geometryFactory.point(new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE));
     final Coordinates[] coordinates = {
       new Coordinate((double)15, 15, 0), new Coordinate((double)20, 20, 0)
     };
-    final LineString lineString1 = this.geometryFactory.createLineString(coordinates);
+    final LineString lineString1 = this.geometryFactory.lineString(coordinates);
     final Geometry[] geometries = {
       point1, point2, lineString1
     };
@@ -117,7 +117,7 @@ public class WKTWriterTest extends TestCase {
     final PrecisionModel precisionModel = new PrecisionModel(1E9);
     final GeometryFactory geometryFactory = new GeometryFactory(precisionModel,
       0);
-    final Point point1 = geometryFactory.createPoint(new Coordinate((double)
+    final Point point1 = geometryFactory.point(new Coordinate((double)
       123456789012345678d, 10E9, Coordinates.NULL_ORDINATE));
     assertEquals("POINT (123456789012345680 10000000000)", point1.toWkt());
   }
@@ -126,7 +126,7 @@ public class WKTWriterTest extends TestCase {
     final PrecisionModel precisionModel = new PrecisionModel(1E9);
     final GeometryFactory geometryFactory = new GeometryFactory(precisionModel,
       0);
-    final Point point1 = geometryFactory.createPoint(new Coordinate((double)1234d, 10E9, Coordinates.NULL_ORDINATE));
+    final Point point1 = geometryFactory.point(new Coordinate((double)1234d, 10E9, Coordinates.NULL_ORDINATE));
     assertEquals("POINT (1234 10000000000)", point1.toWkt());
   }
 
@@ -134,7 +134,7 @@ public class WKTWriterTest extends TestCase {
     final PrecisionModel precisionModel = new PrecisionModel(1E9);
     final GeometryFactory geometryFactory = new GeometryFactory(precisionModel,
       0);
-    final Point point1 = geometryFactory.createPoint(new Coordinate((double)
+    final Point point1 = geometryFactory.point(new Coordinate((double)
       123456789012345678000000E9d, 10E9, Coordinates.NULL_ORDINATE));
     assertEquals("POINT (123456789012345690000000000000000 10000000000)",
       point1.toWkt());
@@ -145,7 +145,7 @@ public class WKTWriterTest extends TestCase {
       new Coordinate((double)10, 10, 0), new Coordinate((double)20, 20, 0),
       new Coordinate((double)30, 40, 0)
     };
-    final LineString lineString = this.geometryFactory.createLineString(coordinates);
+    final LineString lineString = this.geometryFactory.lineString(coordinates);
     assertEquals("LINESTRING (10 10, 20 20, 30 40)",
       this.writer.write(lineString).toString());
   }
@@ -154,11 +154,11 @@ public class WKTWriterTest extends TestCase {
     final Coordinates[] coordinates1 = {
       new Coordinate((double)10, 10, 0), new Coordinate((double)20, 20, 0)
     };
-    final LineString lineString1 = this.geometryFactory.createLineString(coordinates1);
+    final LineString lineString1 = this.geometryFactory.lineString(coordinates1);
     final Coordinates[] coordinates2 = {
       new Coordinate((double)15, 15, 0), new Coordinate((double)30, 15, 0)
     };
-    final LineString lineString2 = this.geometryFactory.createLineString(coordinates2);
+    final LineString lineString2 = this.geometryFactory.lineString(coordinates2);
     final LineString[] lineStrings = {
       lineString1, lineString2
     };
@@ -169,8 +169,8 @@ public class WKTWriterTest extends TestCase {
 
   public void testWriteMultiPoint() {
     final Point[] points = {
-      this.geometryFactory.createPoint(new Coordinate((double)10, 10, 0)),
-      this.geometryFactory.createPoint(new Coordinate((double)20, 20, 0))
+      this.geometryFactory.point(new Coordinate((double)10, 10, 0)),
+      this.geometryFactory.point(new Coordinate((double)20, 20, 0))
     };
     final MultiPoint multiPoint = this.geometryFactory.createMultiPoint(points);
     assertEquals("MULTIPOINT ((10 10), (20 20))", this.writer.write(multiPoint)
@@ -205,7 +205,7 @@ public class WKTWriterTest extends TestCase {
   }
 
   public void testWritePoint() {
-    final Point point = this.geometryFactory.createPoint(new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE));
+    final Point point = this.geometryFactory.point(new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE));
     assertEquals("POINT (10 10)", this.writer.write(point).toString());
   }
 

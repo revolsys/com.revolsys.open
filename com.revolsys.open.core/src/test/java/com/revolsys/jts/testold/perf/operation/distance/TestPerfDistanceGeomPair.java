@@ -37,7 +37,7 @@ public class TestPerfDistanceGeomPair {
     final IndexedFacetDistance fastDist = new IndexedFacetDistance(geom[0]);
     for (final Coordinates p : pts) {
       // slow N^2 distance
-      dist = geom[0].distance(geom[1].getGeometryFactory().createPoint(p));
+      dist = geom[0].distance(geom[1].getGeometryFactory().point(p));
 
       // dist2 = fastDist.getDistance(geom[1].getFactory().createPoint(p));
 

@@ -185,7 +185,7 @@ public class InteriorPointArea {
     //double avgY = avg(envelope.getMinY(), envelope.getMaxY());
     
     double bisectY = SafeBisectorFinder.getBisectorY((Polygon) geometry);
-    return factory.createLineString(new Coordinates[] {
+    return factory.lineString(new Coordinates[] {
             new Coordinate((double)envelope.getMinX(), bisectY, Coordinates.NULL_ORDINATE),
             new Coordinate((double)envelope.getMaxX(), bisectY, Coordinates.NULL_ORDINATE)
         });

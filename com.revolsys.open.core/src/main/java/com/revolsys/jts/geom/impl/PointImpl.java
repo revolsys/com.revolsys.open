@@ -192,10 +192,20 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
-  public Point convert(GeometryFactory geometryFactory) {
+  public Point convert(final GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (sourceGeometryFactory == geometryFactory) {
       return this;
+    } else {
+      return copy(geometryFactory);
+    }
+  }
+
+  @Override
+  public Point copy(GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (isEmpty()) {
+      return geometryFactory.point();
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       double[] targetCoordinates;
@@ -210,7 +220,7 @@ public class PointImpl extends GeometryImpl implements Point {
           targetCoordinates);
       }
 
-      return geometryFactory.createPoint(targetCoordinates);
+      return geometryFactory.point(targetCoordinates);
     }
   }
 

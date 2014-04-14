@@ -149,14 +149,14 @@ public class SelectedRecordsRenderer {
         final IsSimpleOp simpleOp = new IsSimpleOp(geometry);
         if (!simpleOp.isSimple()) {
           for (final Coordinates coordinates : simpleOp.getNonSimplePoints()) {
-            final Point point = viewportGeometryFactory.createPoint(coordinates);
+            final Point point = viewportGeometryFactory.point(coordinates);
             MarkerStyleRenderer.renderMarker(viewport, graphics, point,
               erroStyle);
           }
         }
       } else {
         for (final TopologyValidationError error : validOp.getErrors()) {
-          final Point point = viewportGeometryFactory.createPoint(error.getCoordinate());
+          final Point point = viewportGeometryFactory.point(error.getCoordinate());
           MarkerStyleRenderer.renderMarker(viewport, graphics, point, erroStyle);
         }
       }

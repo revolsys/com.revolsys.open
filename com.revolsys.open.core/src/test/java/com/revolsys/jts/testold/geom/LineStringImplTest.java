@@ -143,7 +143,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testFiveZeros() {
     final GeometryFactory factory = GeometryFactory.getFactory(0, 2);
-    final LineString line = factory.createLineString(0.0, 0.0, 0.0, 0.0, 0.0,
+    final LineString line = factory.lineString(0.0, 0.0, 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0, 0.0, 0.0);
     final boolean closed = line.isClosed();
     assertTrue(closed);

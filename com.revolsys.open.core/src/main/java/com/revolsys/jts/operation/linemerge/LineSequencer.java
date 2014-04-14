@@ -193,7 +193,7 @@ public class LineSequencer {
     for (int i = 0; i < len; i++) {
       revPts[len - 1 - i] = new Coordinate(pts[i]);
     }
-    return line.getGeometryFactory().createLineString(revPts);
+    return line.getGeometryFactory().lineString(revPts);
   }
 
   public static Geometry sequence(final Geometry geom) {

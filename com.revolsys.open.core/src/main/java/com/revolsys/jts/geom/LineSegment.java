@@ -648,7 +648,7 @@ public class LineSegment implements Comparable, Serializable {
    * @return a LineString with the same geometry as this segment
    */
   public LineString toGeometry(final GeometryFactory geomFactory) {
-    return geomFactory.createLineString(new Coordinates[] {
+    return geomFactory.lineString(new Coordinates[] {
       p0, p1
     });
   }

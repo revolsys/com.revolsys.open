@@ -81,7 +81,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
         geometry = toPgPoint(point);
       } else if (object instanceof Coordinates) {
         final Coordinates coordinates = (Coordinates)object;
-        final com.revolsys.jts.geom.Point point = geometryFactory.createPoint(coordinates);
+        final com.revolsys.jts.geom.Point point = geometryFactory.point(coordinates);
         geometry = toPgPoint(point);
       } else if (object instanceof com.revolsys.jts.geom.MultiPoint) {
         final com.revolsys.jts.geom.MultiPoint point = (com.revolsys.jts.geom.MultiPoint)object;
@@ -161,7 +161,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     Geometry geometry = null;
     if (object instanceof Coordinates) {
       final Coordinates coordinates = (Coordinates)object;
-      final com.revolsys.jts.geom.Point point = geometryFactory.createPoint(coordinates);
+      final com.revolsys.jts.geom.Point point = geometryFactory.point(coordinates);
       geometry = toPgPoint(point);
     } else if (object instanceof com.revolsys.jts.geom.Point) {
       final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)object;
@@ -204,7 +204,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
         }
       }
     }
-    return factory.createLineString(coordinates);
+    return factory.lineString(coordinates);
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiLineString(
@@ -268,7 +268,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
         coordinate = new DoubleCoordinates(point.x, point.y);
       break;
     }
-    return factory.createPoint(coordinate);
+    return factory.point(coordinate);
   }
 
   private com.revolsys.jts.geom.Polygon toJtsPolygon(

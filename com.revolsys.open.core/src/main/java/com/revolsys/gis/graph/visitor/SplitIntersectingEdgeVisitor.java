@@ -83,7 +83,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
         }
         if (started) {
           if (hasMatches != matched) {
-            final LineString newLine = factory.createLineString(coordinates);
+            final LineString newLine = factory.lineString(coordinates);
             JtsGeometryUtil.copyUserData(line, newLine);
             JtsGeometryUtil.setGeometryProperty(newLine, MTACHED, matched);
             lines.add(newLine);
@@ -102,7 +102,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
       }
     }
     if (coordinates.size() > 1) {
-      final LineString newLine = factory.createLineString(coordinates);
+      final LineString newLine = factory.lineString(coordinates);
       JtsGeometryUtil.copyUserData(line, newLine);
       lines.add(newLine);
     }

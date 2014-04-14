@@ -244,7 +244,7 @@ public class Graph<T> {
 
   public Edge<T> createEdge(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final T object, final CoordinatesList points) {
-    final LineString newLine = geometryFactory.createLineString(points);
+    final LineString newLine = geometryFactory.lineString(points);
     final T newObject = clone(object, newLine);
     final Edge<T> newEdge = addEdge(newObject, newLine);
     return newEdge;

@@ -113,7 +113,7 @@ public class GeometryFactory implements Serializable,
   public static Point createPointFromInternalCoord(final Coordinates coord,
     final Geometry exemplar) {
     exemplar.getPrecisionModel().makePrecise(coord);
-    return exemplar.getGeometryFactory().createPoint(coord);
+    return exemplar.getGeometryFactory().point(coord);
   }
 
   private static CoordinateSequenceFactory getDefaultCoordinateSequenceFactory() {
@@ -428,17 +428,6 @@ public class GeometryFactory implements Serializable,
 
   private final WktParser parser = new WktParser(this);
 
-  /**
-   * Constructs a GeometryFactory that generates Geometries having the given
-   * CoordinatesList implementation, a double-precision floating PrecisionModel and a
-   * spatial-reference ID of 0.
-   */
-  @Deprecated
-  public GeometryFactory(
-    final CoordinateSequenceFactory coordinateSequenceFactory) {
-    this(new PrecisionModel(), 0, coordinateSequenceFactory);
-  }
-
   protected GeometryFactory(final CoordinateSystem coordinateSystem,
     final int numAxis, final double scaleXY, final double scaleZ) {
     this.precisionModel = PrecisionModelUtil.getPrecisionModel(scaleXY);
@@ -685,7 +674,7 @@ public class GeometryFactory implements Serializable,
   }
 
   public Geometry createEmptyGeometry() {
-    return createPoint((Coordinates)null);
+    return point((Coordinates)null);
   }
 
   public GeometryCollection createEmptyGeometryCollection() {
@@ -856,13 +845,13 @@ public class GeometryFactory implements Serializable,
         return createGeometryCollection(geometries);
       } else if (geometry instanceof Point) {
         final Point point = (Point)geometry;
-        return createPoint(point);
+        return point.copy(this);
       } else if (geometry instanceof LinearRing) {
         final LinearRing linearRing = (LinearRing)geometry;
         return createLinearRing(linearRing);
       } else if (geometry instanceof LineString) {
         final LineString lineString = (LineString)geometry;
-        return createLineString(lineString);
+        return lineString(lineString);
       } else if (geometry instanceof Polygon) {
         final Polygon polygon = (Polygon)geometry;
         return createPolygon(polygon);
@@ -962,23 +951,17 @@ public class GeometryFactory implements Serializable,
     return createLinearRing(newPoints);
   }
 
-  public LineString createLineString() {
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
-      getNumAxis());
-    return createLineString(points);
-  }
-
-  public LineString createLineString(final Collection<?> points) {
+  public LineString lineString(final Collection<?> points) {
     final CoordinatesList coordinatesList = createCoordinatesList(points);
-    return createLineString(coordinatesList);
+    return lineString(coordinatesList);
   }
 
-  public LineString createLineString(final Coordinates... points) {
+  public LineString lineString(final Coordinates... points) {
     if (points == null) {
-      return createLineString();
+      return lineString();
     } else {
       final List<Coordinates> p = Arrays.asList(points);
-      return createLineString(p);
+      return lineString(p);
     }
   }
 
@@ -988,23 +971,23 @@ public class GeometryFactory implements Serializable,
    * 
    * @param coordinates a CoordinatesList (possibly empty), or null
    */
-  public LineString createLineString(final CoordinatesList points) {
+  public LineString lineString(final CoordinatesList points) {
     final CoordinatesList newPoints = createCoordinatesList(points);
     final LineString line = new LineStringImpl(newPoints, this);
     return line;
   }
 
-  public LineString createLineString(final double... coordinates) {
+  public LineString lineString(final double... coordinates) {
     final int numAxis = getNumAxis();
     final DoubleCoordinatesList points = new DoubleCoordinatesList(numAxis,
       coordinates);
-    return createLineString(points);
+    return lineString(points);
   }
 
-  public LineString createLineString(final LineString lineString) {
+  public LineString lineString(final LineString lineString) {
     final CoordinatesList points = CoordinatesListUtil.get(lineString);
     final CoordinatesList newPoints = createCoordinatesList(points);
-    return createLineString(newPoints);
+    return lineString(newPoints);
   }
 
   public MultiLineString createMultiLineString(final Collection<?> lines) {
@@ -1064,7 +1047,7 @@ public class GeometryFactory implements Serializable,
       final Point[] points = new Point[coordinatesList.size()];
       for (int i = 0; i < points.length; i++) {
         final Coordinates coordinates = coordinatesList.get(i);
-        final Point point = createPoint(coordinates);
+        final Point point = point(coordinates);
         points[i] = point;
       }
       return createMultiPoint(points);
@@ -1110,84 +1093,10 @@ public class GeometryFactory implements Serializable,
     return new MultiPolygonImpl(polygons, this);
   }
 
-  public Point createPoint() {
-    return new PointImpl(this);
-  }
-
-  public Point createPoint(final Coordinates point) {
-    if (point == null) {
-      return createPoint();
-    } else {
-      return createPoint(point.getCoordinates());
-    }
-  }
-
-  /**
-   * Creates a Point using the given CoordinatesList; a null or empty
-   * CoordinatesList will create an empty Point.
-   * 
-   * @param points a CoordinatesList (possibly empty), or null
-   * @return the created Point
-   */
-  public Point createPoint(final CoordinatesList points) {
-    if (points == null) {
-      return createPoint();
-    } else {
-      final int size = points.size();
-      if (size == 0) {
-        return createPoint();
-      } else if (size == 1) {
-        final int numAxis = Math.min(points.getDimension(), getNumAxis());
-        final double[] coordinates = new double[numAxis];
-        for (int i = 0; i < numAxis; i++) {
-          final double coordinate = points.getOrdinate(0, i);
-          coordinates[i] = coordinate;
-        }
-        return createPoint(coordinates);
-      } else {
-        throw new IllegalArgumentException("Point can only have 1 vertex not "
-          + size);
-      }
-    }
-  }
-
-  public Point createPoint(final double... coordinates) {
-    if (coordinates == null || coordinates.length < 2) {
-      return createPoint();
-    } else {
-      return new PointImpl(this, coordinates);
-    }
-  }
-
-  public Point createPoint(final Object object) {
-    if (object == null) {
-      return createPoint();
-    } else if (object instanceof Coordinates) {
-      return createPoint((Coordinates)object);
-    } else if (object instanceof double[]) {
-      return createPoint((double[])object);
-    } else if (object instanceof Coordinates) {
-      return createPoint((Coordinates)object);
-    } else if (object instanceof CoordinatesList) {
-      return createPoint((CoordinatesList)object);
-    } else {
-      throw new IllegalArgumentException("Cannot create a point from "
-        + object.getClass());
-    }
-  }
-
-  public Point createPoint(final Point point) {
-    if (point.isEmpty()) {
-      return createPoint();
-    } else {
-      return createPoint((Coordinates)point);
-    }
-  }
-
   public List<Point> createPointList(final CoordinatesList sourcePoints) {
     final List<Point> points = new ArrayList<Point>(sourcePoints.size());
     for (final Coordinates coordinates : sourcePoints) {
-      final Point point = createPoint(coordinates);
+      final Point point = point(coordinates);
       points.add(point);
     }
     return points;
@@ -1379,10 +1288,10 @@ public class GeometryFactory implements Serializable,
         lineString = (LineString)value;
       } else if (value instanceof CoordinatesList) {
         final CoordinatesList coordinates = (CoordinatesList)value;
-        lineString = createLineString(coordinates);
+        lineString = lineString(coordinates);
       } else if (value instanceof double[]) {
         final double[] points = (double[])value;
-        lineString = createLineString(points);
+        lineString = lineString(points);
       } else {
         lineString = null;
       }
@@ -1400,7 +1309,7 @@ public class GeometryFactory implements Serializable,
   public Point[] getPointArray(final Collection<?> pointsList) {
     final List<Point> points = new ArrayList<Point>();
     for (final Object object : pointsList) {
-      final Point point = createPoint(object);
+      final Point point = point(object);
       if (point != null && !point.isEmpty()) {
         points.add(point);
       }
@@ -1490,6 +1399,12 @@ public class GeometryFactory implements Serializable,
     return coordinatesPrecisionModel.isFloating();
   }
 
+  public LineString lineString() {
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
+      getNumAxis());
+    return lineString(points);
+  }
+
   @Override
   public void makePrecise(final Coordinates point) {
     coordinatesPrecisionModel.makePrecise(point);
@@ -1516,6 +1431,73 @@ public class GeometryFactory implements Serializable,
   @Override
   public double makeZPrecise(final double value) {
     return coordinatesPrecisionModel.makeZPrecise(value);
+  }
+
+  public Point point() {
+    return new PointImpl(this);
+  }
+
+  public Point point(final Coordinates point) {
+    if (point == null) {
+      return point();
+    } else {
+      return point(point.getCoordinates());
+    }
+  }
+
+  /**
+   * Creates a Point using the given CoordinatesList; a null or empty
+   * CoordinatesList will create an empty Point.
+   * 
+   * @param points a CoordinatesList (possibly empty), or null
+   * @return the created Point
+   */
+  public Point point(final CoordinatesList points) {
+    if (points == null) {
+      return point();
+    } else {
+      final int size = points.size();
+      if (size == 0) {
+        return point();
+      } else if (size == 1) {
+        final int numAxis = Math.min(points.getDimension(), getNumAxis());
+        final double[] coordinates = new double[numAxis];
+        for (int i = 0; i < numAxis; i++) {
+          final double coordinate = points.getOrdinate(0, i);
+          coordinates[i] = coordinate;
+        }
+        return point(coordinates);
+      } else {
+        throw new IllegalArgumentException("Point can only have 1 vertex not "
+          + size);
+      }
+    }
+  }
+
+  public Point point(final double... coordinates) {
+    if (coordinates == null || coordinates.length < 2) {
+      return point();
+    } else {
+      return new PointImpl(this, coordinates);
+    }
+  }
+
+  public Point point(final Object object) {
+    if (object == null) {
+      return point();
+    } else if (object instanceof Point) {
+      final Point point = (Point)object;
+      return point.copy(this);
+    } else if (object instanceof double[]) {
+      return point((double[])object);
+    } else if (object instanceof Coordinates) {
+      return point((Coordinates)object);
+    } else if (object instanceof CoordinatesList) {
+      return point((CoordinatesList)object);
+    } else {
+      throw new IllegalArgumentException("Cannot create a point from "
+        + object.getClass());
+    }
   }
 
   /**
@@ -1550,20 +1532,20 @@ public class GeometryFactory implements Serializable,
   public Geometry toGeometry(final Envelope envelope) {
     // null envelope - return empty point geometry
     if (envelope.isNull()) {
-      return createPoint((CoordinatesList)null);
+      return point((CoordinatesList)null);
     }
 
     // point?
     if (envelope.getMinX() == envelope.getMaxX()
       && envelope.getMinY() == envelope.getMaxY()) {
-      return createPoint(new Coordinate(envelope.getMinX(), envelope.getMinY(),
+      return point(new Coordinate(envelope.getMinX(), envelope.getMinY(),
         Coordinates.NULL_ORDINATE));
     }
 
     // vertical or horizontal line?
     if (envelope.getMinX() == envelope.getMaxX()
       || envelope.getMinY() == envelope.getMaxY()) {
-      return createLineString(new Coordinates[] {
+      return lineString(new Coordinates[] {
         new Coordinate(envelope.getMinX(), envelope.getMinY(),
           Coordinates.NULL_ORDINATE),
         new Coordinate(envelope.getMaxX(), envelope.getMaxY(),

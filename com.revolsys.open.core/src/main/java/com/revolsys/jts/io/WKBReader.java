@@ -315,7 +315,7 @@ public class WKBReader {
   private LineString readLineString() throws IOException {
     final int size = dis.readInt();
     final CoordinatesList pts = readCoordinateSequenceLineString(size);
-    return factory.createLineString(pts);
+    return factory.lineString(pts);
   }
 
   private MultiLineString readMultiLineString() throws IOException,
@@ -361,7 +361,7 @@ public class WKBReader {
 
   private Point readPoint() throws IOException {
     final CoordinatesList pts = readCoordinateSequence(1);
-    return factory.createPoint(pts);
+    return factory.point(pts);
   }
 
   private Polygon readPolygon() throws IOException {

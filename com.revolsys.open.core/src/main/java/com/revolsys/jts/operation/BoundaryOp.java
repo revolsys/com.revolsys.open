@@ -125,7 +125,7 @@ public class BoundaryOp {
 
     // return Point or MultiPoint
     if (bdyPts.length == 1) {
-      return geomFact.createPoint(bdyPts[0]);
+      return geomFact.point(bdyPts[0]);
     }
     // this handles 0 points case as well
     return geomFact.createMultiPoint(bdyPts);

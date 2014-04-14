@@ -17,7 +17,7 @@ public class WKBWriterTest extends TestCase {
 
   public void testSRID() throws Exception {
     final GeometryFactory gf = GeometryFactory.getFactory();
-    final Point p1 = gf.createPoint(new Coordinate((double)1, 2, Coordinates.NULL_ORDINATE));
+    final Point p1 = gf.point(new Coordinate((double)1, 2, Coordinates.NULL_ORDINATE));
     // p1.setSRID(1234);
 
     // first write out without srid set

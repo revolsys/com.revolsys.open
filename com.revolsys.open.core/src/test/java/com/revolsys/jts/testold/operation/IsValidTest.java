@@ -69,7 +69,7 @@ public class IsValidTest extends TestCase {
     final Coordinates[] pts = {
       new Coordinate((double)0.0, 0.0, Coordinates.NULL_ORDINATE), badCoord
     };
-    final Geometry line = this.geometryFactory.createLineString(pts);
+    final Geometry line = this.geometryFactory.lineString(pts);
     final IsValidOp isValidOp = new IsValidOp(line);
     final boolean valid = isValidOp.isValid();
     final TopologyValidationError err = isValidOp.getValidationError();

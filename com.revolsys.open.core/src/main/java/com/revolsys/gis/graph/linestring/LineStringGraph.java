@@ -128,7 +128,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         previousNode = nextNode;
       }
     } while (previousNode != null && !previousNode.equals2d(fromPoint));
-    return geometryFactory.createLineString(newPoints);
+    return geometryFactory.lineString(newPoints);
   }
 
   public List<LineString> getLines() {
@@ -152,7 +152,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           }
         } else {
           if (points.size() > 1) {
-            final LineString line = geometryFactory.createLineString(points);
+            final LineString line = geometryFactory.lineString(points);
             lines.add(line);
           }
           points = new DoubleListCoordinatesList(numAxis);
@@ -161,7 +161,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         if (points.size() > 1) {
           final int toDegree = toNode.getDegree();
           if (toDegree != 2) {
-            final LineString line = geometryFactory.createLineString(points);
+            final LineString line = geometryFactory.lineString(points);
             lines.add(line);
             points = new DoubleListCoordinatesList(numAxis);
             points.add(toNode);
@@ -171,7 +171,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       }
     }
     if (points.size() > 1) {
-      final LineString line = geometryFactory.createLineString(points);
+      final LineString line = geometryFactory.lineString(points);
       lines.add(line);
     }
     return lines;

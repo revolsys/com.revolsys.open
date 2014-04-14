@@ -80,7 +80,7 @@ public class RectangleLineIntersectorPerfTest {
   }
 
   private Coordinates[] createTestPoints(final int nPts) {
-    final Point pt = this.geomFact.createPoint(new Coordinate(this.baseX,
+    final Point pt = this.geomFact.point(new Coordinate(this.baseX,
       this.baseY, Coordinates.NULL_ORDINATE));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return circle.getCoordinateArray();

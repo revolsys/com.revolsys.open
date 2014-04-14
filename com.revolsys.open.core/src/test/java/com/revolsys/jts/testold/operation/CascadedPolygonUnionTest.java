@@ -38,7 +38,7 @@ public class CascadedPolygonUnionTest extends TestCase {
     for (int i = 0; i < num; i++) {
       for (int j = 0; j < num; j++) {
         final Coordinates pt = new Coordinate((double)i, j, Coordinates.NULL_ORDINATE);
-        final Geometry ptGeom = this.geomFact.createPoint(pt);
+        final Geometry ptGeom = this.geomFact.point(pt);
         final Geometry disc = ptGeom.buffer(radius);
         geoms.add(disc);
       }

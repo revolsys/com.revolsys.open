@@ -388,7 +388,7 @@ public final class ShapefileGeometryUtil {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final CoordinatesList points = readXYCoordinates(in, 1, 2);
-    return geometryFactory.createPoint(points);
+    return geometryFactory.point(points);
   }
 
   public Point readPointM(
@@ -400,7 +400,7 @@ public final class ShapefileGeometryUtil {
     final double m = in.readLEDouble();
     final DoubleCoordinatesList points = new DoubleCoordinatesList(4, x, y, z,
       m);
-    return geometryFactory.createPoint(points);
+    return geometryFactory.point(points);
   }
 
   public void readPoints(final EndianInput in, final int[] partIndex,
@@ -418,7 +418,7 @@ public final class ShapefileGeometryUtil {
     final double y = in.readLEDouble();
     final double z = in.readLEDouble();
     final DoubleCoordinatesList points = new DoubleCoordinatesList(3, x, y, z);
-    return geometryFactory.createPoint(points);
+    return geometryFactory.point(points);
   }
 
   public Point readPointZM(
@@ -430,7 +430,7 @@ public final class ShapefileGeometryUtil {
     final double m = in.readLEDouble();
     final DoubleCoordinatesList points = new DoubleCoordinatesList(4, x, y, z,
       m);
-    return geometryFactory.createPoint(points);
+    return geometryFactory.point(points);
   }
 
   public Geometry readPolygon(
@@ -504,7 +504,7 @@ public final class ShapefileGeometryUtil {
       in.readLEInt();
       final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
 
-      return geometryFactory.createLineString(points);
+      return geometryFactory.lineString(points);
     } else {
       final int[] partIndex = new int[numParts + 1];
       partIndex[numParts] = numPoints;
@@ -536,7 +536,7 @@ public final class ShapefileGeometryUtil {
       final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       readCoordinates(in, points, 3);
-      return geometryFactory.createLineString(points);
+      return geometryFactory.lineString(points);
     } else {
       final int[] partIndex = new int[numParts + 1];
       partIndex[numParts] = numPoints;
@@ -572,7 +572,7 @@ public final class ShapefileGeometryUtil {
       final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       readCoordinates(in, points, 2);
-      return geometryFactory.createLineString(points);
+      return geometryFactory.lineString(points);
     } else {
       final int[] partIndex = new int[numParts + 1];
       partIndex[numParts] = numPoints;
@@ -610,7 +610,7 @@ public final class ShapefileGeometryUtil {
       readCoordinates(in, points, 2);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       readCoordinates(in, points, 3);
-      return geometryFactory.createLineString(points);
+      return geometryFactory.lineString(points);
     } else {
       final int[] partIndex = new int[numParts + 1];
       partIndex[numParts] = numPoints;

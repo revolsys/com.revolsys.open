@@ -176,7 +176,7 @@ public class LineBuilder {
     for (Iterator it = lineEdgesList.iterator(); it.hasNext(); ) {
       Edge e = (Edge) it.next();
       Label label = e.getLabel();
-        LineString line = geometryFactory.createLineString(e.getCoordinates());
+        LineString line = geometryFactory.lineString(e.getCoordinates());
         resultLineList.add(line);
         e.setInResult(true);
     }

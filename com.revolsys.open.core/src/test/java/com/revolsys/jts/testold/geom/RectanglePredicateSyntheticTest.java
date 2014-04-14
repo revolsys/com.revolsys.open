@@ -73,7 +73,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final Coordinates p2 = new Coordinate(base.getX() + yFac * size,
       base.getY() + -xFac * size, Coordinates.NULL_ORDINATE);
 
-    return this.fact.createLineString(new Coordinates[] {
+    return this.fact.lineString(new Coordinates[] {
       p0, base, p2
     });
   }

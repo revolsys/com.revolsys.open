@@ -119,7 +119,7 @@ public class GeometryImplTest extends TestCase {
     if (x instanceof Point) {
       emptyDifferentClass = this.geometryFactory.createGeometryCollection();
     } else {
-      emptyDifferentClass = this.geometryFactory.createPoint((Coordinates)null);
+      emptyDifferentClass = this.geometryFactory.point((Coordinates)null);
     }
 
     final Geometry somethingEqualButNotExactly = this.geometryFactory.createGeometryCollection(new Geometry[] {
@@ -271,17 +271,17 @@ public class GeometryImplTest extends TestCase {
   }
 
   public void testEqualsExactForLineStrings() throws Exception {
-    final LineString x = this.geometryFactory.createLineString(0.0, 0,
+    final LineString x = this.geometryFactory.lineString(0.0, 0,
       Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE, 100.0,
       100, Coordinates.NULL_ORDINATE);
-    final LineString somethingExactlyEqual = this.geometryFactory.createLineString(
+    final LineString somethingExactlyEqual = this.geometryFactory.lineString(
       0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
       100.0, 100, Coordinates.NULL_ORDINATE);
-    final LineString somethingNotEqualButSameClass = this.geometryFactory.createLineString(
+    final LineString somethingNotEqualButSameClass = this.geometryFactory.lineString(
       0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
       100.0, 555, Coordinates.NULL_ORDINATE);
-    final LineString sameClassButEmpty = this.geometryFactory.createLineString();
-    final LineString anotherSameClassButEmpty = this.geometryFactory.createLineString();
+    final LineString sameClassButEmpty = this.geometryFactory.lineString();
+    final LineString anotherSameClassButEmpty = this.geometryFactory.lineString();
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
@@ -304,13 +304,13 @@ public class GeometryImplTest extends TestCase {
   }
 
   public void testEqualsExactForPoints() throws Exception {
-    final Point x = this.geometryFactory.createPoint(100.0, 100.0);
-    final Point somethingExactlyEqual = this.geometryFactory.createPoint(100.0,
+    final Point x = this.geometryFactory.point(100.0, 100.0);
+    final Point somethingExactlyEqual = this.geometryFactory.point(100.0,
       100);
-    final Point somethingNotEqualButSameClass = this.geometryFactory.createPoint(
+    final Point somethingNotEqualButSameClass = this.geometryFactory.point(
       999.0, 100);
-    final Point sameClassButEmpty = this.geometryFactory.createPoint((Coordinates)null);
-    final Point anotherSameClassButEmpty = this.geometryFactory.createPoint((Coordinates)null);
+    final Point sameClassButEmpty = this.geometryFactory.point((Coordinates)null);
+    final Point anotherSameClassButEmpty = this.geometryFactory.point((Coordinates)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {

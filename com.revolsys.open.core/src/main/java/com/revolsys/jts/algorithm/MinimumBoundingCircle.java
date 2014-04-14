@@ -307,7 +307,7 @@ public class MinimumBoundingCircle {
     if (centre == null) {
       return input.getGeometryFactory().createPolygon(null, null);
     }
-    final Point centrePoint = input.getGeometryFactory().createPoint(centre);
+    final Point centrePoint = input.getGeometryFactory().point(centre);
     if (radius == 0.0) {
       return centrePoint;
     }

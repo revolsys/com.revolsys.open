@@ -5,6 +5,8 @@ import junit.framework.Assert;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.Reader;
@@ -29,6 +31,20 @@ public class TestUtil {
         final String wkt = object.getValue("wkt");
         final Geometry geometry = geometryFactory.createGeometry(wkt);
         valid &= equalsExpectedWkt(i, object, geometry);
+
+        final CoordinateSystem coordinateSystem = geometry.getCoordinateSystem();
+        GeometryFactory otherGeometryFactory;
+        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+          final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
+          otherGeometryFactory = GeometryFactory.getFactory(
+            projectedCoordinateSystem, numAxis, scaleXy, scaleZ);
+        } else {
+          otherGeometryFactory = GeometryFactory.getFactory(3005, numAxis,
+            scaleXy, scaleZ);
+        }
+        final Geometry convertedGeometry = geometry.convert(otherGeometryFactory);
+        final Geometry convertedBackGeometry = convertedGeometry.convert(geometryFactory);
+        valid &= equalsExpectedGeometry(i, geometry, convertedBackGeometry);
         i++;
       }
     }
@@ -37,11 +53,8 @@ public class TestUtil {
     }
   }
 
-  public static boolean equalsExpectedWkt(final int i, final DataObject object,
-    final Geometry actualGeometry) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
-    final String wkt = object.getValue("expectedWkt");
-    final Geometry expectedGeometry = geometryFactory.createGeometry(wkt, true);
+  public static boolean equalsExpectedGeometry(final int i,
+    final Geometry actualGeometry, final Geometry expectedGeometry) {
     final int actualSrid = actualGeometry.getSrid();
     final int expectedSrid = expectedGeometry.getSrid();
     if (actualSrid != expectedSrid) {
@@ -55,6 +68,14 @@ public class TestUtil {
         + actualGeometry);
       return false;
     }
+  }
+
+  public static boolean equalsExpectedWkt(final int i, final DataObject object,
+    final Geometry actualGeometry) {
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+    final String wkt = object.getValue("expectedWkt");
+    final Geometry expectedGeometry = geometryFactory.createGeometry(wkt, true);
+    return equalsExpectedGeometry(i, actualGeometry, expectedGeometry);
   }
 
 }

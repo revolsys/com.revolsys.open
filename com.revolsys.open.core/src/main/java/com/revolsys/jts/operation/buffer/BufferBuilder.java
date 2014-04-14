@@ -326,7 +326,7 @@ class BufferBuilder
   	List lines = new ArrayList();
   	while (it.hasNext()) {
   		SegmentString ss = (SegmentString) it.next();
-  		LineString line = fact.createLineString(ss.getCoordinates());
+  		LineString line = fact.lineString(ss.getCoordinates());
   		lines.add(line);
   	}
   	return fact.buildGeometry(lines);

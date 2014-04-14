@@ -100,7 +100,7 @@ class TaggedLineString
 
   public LineString asLineString()
   {
-    return parentLine.getGeometryFactory().createLineString(extractCoordinates(resultSegs));
+    return parentLine.getGeometryFactory().lineString(extractCoordinates(resultSegs));
   }
 
   public LinearRing asLinearRing() {

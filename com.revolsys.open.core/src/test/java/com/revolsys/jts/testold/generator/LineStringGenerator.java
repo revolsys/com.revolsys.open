@@ -188,7 +188,7 @@ public class LineStringGenerator extends GeometryGenerator {
           throw new IllegalStateException("Invalid Alg. Specified");
       }
 
-      final LineString ls = this.geometryFactory.createLineString(coords);
+      final LineString ls = this.geometryFactory.lineString(coords);
       final IsValidOp valid = new IsValidOp(ls);
       if (valid.isValid()) {
         return ls;

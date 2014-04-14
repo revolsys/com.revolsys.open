@@ -195,7 +195,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
       final Double x = CollectionUtil.getDouble(object, pointXAttributeName);
       final Double y = CollectionUtil.getDouble(object, pointYAttributeName);
       if (x != null && y != null) {
-        final Geometry geometry = geometryFactory.createPoint(x, y);
+        final Geometry geometry = geometryFactory.point(x, y);
         object.setGeometryValue(geometry);
       }
     }

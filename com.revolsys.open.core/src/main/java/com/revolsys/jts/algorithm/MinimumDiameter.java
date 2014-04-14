@@ -236,12 +236,12 @@ public class MinimumDiameter {
 
     // return empty linestring if no minimum width calculated
     if (minWidthPt == null) {
-      return inputGeom.getGeometryFactory().createLineString(
+      return inputGeom.getGeometryFactory().lineString(
         (Coordinates[])null);
     }
 
     final Coordinates basePt = minBaseSeg.project(minWidthPt);
-    return inputGeom.getGeometryFactory().createLineString(new Coordinates[] {
+    return inputGeom.getGeometryFactory().lineString(new Coordinates[] {
       basePt, minWidthPt
     });
   }
@@ -274,7 +274,7 @@ public class MinimumDiameter {
     // check if minimum rectangle is degenerate (a point or line segment)
     if (minWidth == 0.0) {
       if (minBaseSeg.p0.equals2d(minBaseSeg.p1)) {
-        return inputGeom.getGeometryFactory().createPoint(minBaseSeg.p0);
+        return inputGeom.getGeometryFactory().point(minBaseSeg.p0);
       }
       return minBaseSeg.toGeometry(inputGeom.getGeometryFactory());
     }
@@ -342,7 +342,7 @@ public class MinimumDiameter {
    */
   public LineString getSupportingSegment() {
     computeMinimumDiameter();
-    return inputGeom.getGeometryFactory().createLineString(new Coordinates[] {
+    return inputGeom.getGeometryFactory().lineString(new Coordinates[] {
       minBaseSeg.p0, minBaseSeg.p1
     });
   }

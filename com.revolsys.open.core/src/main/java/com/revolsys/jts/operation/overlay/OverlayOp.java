@@ -116,10 +116,10 @@ public class OverlayOp extends GeometryGraphOperation {
         result = geomFact.createGeometryCollection(new Geometry[0]);
       break;
       case 0:
-        result = geomFact.createPoint((Coordinates)null);
+        result = geomFact.point((Coordinates)null);
       break;
       case 1:
-        result = geomFact.createLineString((Coordinates[])null);
+        result = geomFact.lineString((Coordinates[])null);
       break;
       case 2:
         result = geomFact.createPolygon(null, null);

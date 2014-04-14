@@ -189,7 +189,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   private void createLine(final List<LineString> lines,
     final List<Coordinates> coordinates) {
     if (!coordinates.isEmpty()) {
-      final LineString line = geometryFactory.createLineString(coordinates);
+      final LineString line = geometryFactory.lineString(coordinates);
       lines.add(line);
     }
   }

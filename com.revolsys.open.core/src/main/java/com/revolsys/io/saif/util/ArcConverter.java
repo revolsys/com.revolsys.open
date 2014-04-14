@@ -64,7 +64,7 @@ public class ArcConverter implements OsnConverter {
           iterator.nextEndObject();
           iterator.nextEndObject();
         }
-        geometry = geometryFactory.createLineString(coordinates);
+        geometry = geometryFactory.lineString(coordinates);
       } else {
         readAttribute(iterator, attributeName, values);
       }

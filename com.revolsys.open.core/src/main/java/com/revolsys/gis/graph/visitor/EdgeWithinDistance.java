@@ -20,7 +20,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Coordinates point, final double maxDistance) {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory();
-    final Geometry geometry = geometryFactory.createPoint(point);
+    final Geometry geometry = geometryFactory.point(point);
     return edgesWithinDistance(graph, geometry, maxDistance);
 
   }
@@ -39,7 +39,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
     final Node<T> node, final double maxDistance) {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final Coordinates coordinate = node;
-    final Geometry geometry = geometryFactory.createPoint(coordinate);
+    final Geometry geometry = geometryFactory.point(coordinate);
     return edgesWithinDistance(graph, geometry, maxDistance);
 
   }

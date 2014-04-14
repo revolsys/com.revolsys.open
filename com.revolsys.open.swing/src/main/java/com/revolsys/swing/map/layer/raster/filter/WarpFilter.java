@@ -182,7 +182,7 @@ public abstract class WarpFilter extends WholeImageFilter {
     final double targetPixelY) {
     final Coordinates targetPoint = toModelPoint(this.boundingBox,
       targetPixelX, targetPixelY, this.imageWidth, this.imageHeight);
-    return getGeometryFactory().createPoint(targetPoint);
+    return getGeometryFactory().point(targetPoint);
   }
 
   public Coordinates targetPixelToSourcePixel(final Coordinates point) {

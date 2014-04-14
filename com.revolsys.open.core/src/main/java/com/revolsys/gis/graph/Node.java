@@ -232,7 +232,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
    */
   public double getDistance(final Geometry geometry) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(geometry);
-    final Point point = factory.createPoint(this);
+    final Point point = factory.point(this);
     return point.distance(geometry);
   }
 
@@ -377,7 +377,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
   public Point getPoint() {
     final Graph<T> graph = getGraph();
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = graph.getGeometryFactory();
-    return geometryFactory.createPoint(this);
+    return geometryFactory.point(this);
   }
 
   @Override

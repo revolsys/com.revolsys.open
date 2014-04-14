@@ -332,10 +332,10 @@ public class MinimumClearance {
     compute();
     // return empty line string if no min pts where found
     if (minClearancePts == null || minClearancePts[0] == null) {
-      return inputGeom.getGeometryFactory().createLineString(
+      return inputGeom.getGeometryFactory().lineString(
         (Coordinates[])null);
     }
-    return inputGeom.getGeometryFactory().createLineString(minClearancePts);
+    return inputGeom.getGeometryFactory().lineString(minClearancePts);
   }
 
 }

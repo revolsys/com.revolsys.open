@@ -129,7 +129,7 @@ public class PointBuilder {
   private void filterCoveredNodeToPoint(final Node n) {
     final Coordinates coord = n.getCoordinate();
     if (!op.isCoveredByLA(coord)) {
-      final Point pt = geometryFactory.createPoint(coord);
+      final Point pt = geometryFactory.point(coord);
       resultPointList.add(pt);
     }
   }

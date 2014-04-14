@@ -99,7 +99,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
     if (value instanceof Coordinates) {
       final Coordinates coordinates = (Coordinates)value;
-      value = this.geometryFactory.createPoint(coordinates);
+      value = this.geometryFactory.point(coordinates);
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;

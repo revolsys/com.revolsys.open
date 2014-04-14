@@ -200,7 +200,7 @@ public class BufferDistanceValidator
   		isValid = false;
   		Coordinates[] pts = distOp.nearestPoints();
   		errorLocation = distOp.nearestPoints()[1];
-  		errorIndicator = g1.getGeometryFactory().createLineString(pts);
+  		errorIndicator = g1.getGeometryFactory().lineString(pts);
   		errMsg = "Distance between buffer curve and input is too small "
   			+ "(" + minDistanceFound
   			+ " at " + WKTWriter.toLineString(pts[0], pts[1]) +" )";
@@ -231,7 +231,7 @@ public class BufferDistanceValidator
       isValid = false;
       Coordinates[] pts = haus.getCoordinates();
       errorLocation = pts[1];
-      errorIndicator = input.getGeometryFactory().createLineString(pts);
+      errorIndicator = input.getGeometryFactory().lineString(pts);
       errMsg = "Distance between buffer curve and input is too large "
         + "(" + maxDistanceFound
         + " at " + WKTWriter.toLineString(pts[0], pts[1]) +")";

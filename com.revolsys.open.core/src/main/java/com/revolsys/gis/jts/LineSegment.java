@@ -339,7 +339,7 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   public LineString getLine() {
-    return geometryFactory.createLineString(this);
+    return geometryFactory.lineString(this);
   }
 
   @Override
@@ -349,7 +349,7 @@ public class LineSegment extends AbstractCoordinatesList implements
 
   public Point getPoint(final int i) {
     final Coordinates coordinates = get(i);
-    return geometryFactory.createPoint(coordinates);
+    return geometryFactory.point(coordinates);
   }
 
   @Override

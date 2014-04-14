@@ -130,7 +130,7 @@ public final class JtsGeometryUtil {
     final List<LineString> lines, final List<Coordinates> coordinates) {
     if (coordinates.size() > 1) {
       boolean add = true;
-      final LineString line = factory.createLineString(DoubleCoordinatesListFactory.create(coordinates));
+      final LineString line = factory.lineString(DoubleCoordinatesListFactory.create(coordinates));
       if (line.getLength() < 1) {
         // Node<T> firstNode = findNode(coordinates.get(0));
         // if (firstNode != null && firstNode.getDegree() == 1) {
@@ -228,7 +228,7 @@ public final class JtsGeometryUtil {
     final List<Coordinates> coordinates) {
     final Coordinates[] coords = new Coordinates[coordinates.size()];
     coordinates.toArray(coords);
-    return factory.createLineString(coords);
+    return factory.lineString(coords);
 
   }
 
@@ -285,7 +285,7 @@ public final class JtsGeometryUtil {
       lastLineSegment = lineSegment;
     }
     final CoordinatesList newCoords = DoubleCoordinatesListFactory.create(newCoordinates);
-    return factory.createLineString(newCoords);
+    return factory.lineString(newCoords);
   }
 
   public static Polygon createPolygon(final GeometryFactory factory,
@@ -427,10 +427,10 @@ public final class JtsGeometryUtil {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(geometry);
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      return factory.createPoint(get2DCoordinates(point.getCoordinateSequence()));
+      return factory.point(get2DCoordinates(point.getCoordinateSequence()));
     } else if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
-      return factory.createLineString(get2DCoordinates(line.getCoordinatesList()));
+      return factory.lineString(get2DCoordinates(line.getCoordinatesList()));
     } else if (geometry instanceof Polygon) {
 
       final Polygon polygon = (Polygon)geometry;
@@ -622,7 +622,7 @@ public final class JtsGeometryUtil {
   public static Point getFromPoint(final LineString line) {
     final Coordinates coordinates = LineStringUtil.getFromCoordinates(line);
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    return geometryFactory.createPoint(coordinates);
+    return geometryFactory.point(coordinates);
   }
 
   public static Geometry getGeometries(
@@ -975,7 +975,7 @@ public final class JtsGeometryUtil {
       }
     }
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
-    final LineString newLine = factory.createLineString(newCoords);
+    final LineString newLine = factory.lineString(newCoords);
     return newLine;
   }
 
@@ -1011,9 +1011,9 @@ public final class JtsGeometryUtil {
     final LineString line2) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory();
     final CoordinatesList coordinates1 = line1.getCoordinatesList();
-    final LineString line1Floating = factory.createLineString(coordinates1);
+    final LineString line1Floating = factory.lineString(coordinates1);
     final CoordinatesList coordinates2 = line2.getCoordinatesList();
-    final LineString line2Floating = factory.createLineString(coordinates2);
+    final LineString line2Floating = factory.lineString(coordinates2);
     return JtsGeometryUtil.intersection2DZ(line1Floating, line2Floating);
   }
 
@@ -1155,7 +1155,7 @@ public final class JtsGeometryUtil {
   public static boolean isLessThanDistance(final Coordinates coordinate,
     final LineString line, final double maxDistance) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
-    final Point point = factory.createPoint(coordinate);
+    final Point point = factory.point(coordinate);
     final double distance = line.distance(point);
     return distance < maxDistance;
   }
@@ -1180,7 +1180,7 @@ public final class JtsGeometryUtil {
   public static boolean isWithinDistance(final Coordinates coordinate,
     final LineString line, final double maxDistance) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
-    final Point point = factory.createPoint(coordinate);
+    final Point point = factory.point(coordinate);
     final double distance = line.distance(point);
     return distance <= maxDistance;
   }
@@ -1228,7 +1228,7 @@ public final class JtsGeometryUtil {
     final double newY = y + deltaY;
 
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(point);
-    final Point newPoint = factory.createPoint(newX, newY);
+    final Point newPoint = factory.point(newX, newY);
     return newPoint;
   }
 
@@ -1316,7 +1316,7 @@ public final class JtsGeometryUtil {
       } else {
         final Coordinates newCoordinates = geometryFactory.createCoordinates(CoordinatesUtil.getInstance(newLocation));
         newCoordinates.setZ(z);
-        return geometryFactory.createPoint(newCoordinates);
+        return geometryFactory.point(newCoordinates);
       }
     } else {
       return convertedNewPoint;

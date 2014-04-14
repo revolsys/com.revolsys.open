@@ -349,7 +349,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     for (int i = 0; i < numCoords; i++) {
       readCoordinate(in, coords, i);
     }
-    return factory.createLineString(coords);
+    return factory.lineString(coords);
   }
 
   private void readCoordinate(final InputStream in,
@@ -417,7 +417,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   private Point readPoint(final InputStream in) throws IOException {
     final CoordinatesList coords = new DoubleCoordinatesList(1, 3);
     readCoordinate(in, coords, 0);
-    return factory.createPoint(coords);
+    return factory.point(coords);
   }
 
   private LineString readSimpleLine(final int numCoords) throws IOException {
@@ -425,7 +425,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     for (int i = 0; i < numCoords; i++) {
       readCoordinate(in, coords, i);
     }
-    return factory.createLineString(coords);
+    return factory.lineString(coords);
   }
 
   private String readString(final int length) throws IOException {

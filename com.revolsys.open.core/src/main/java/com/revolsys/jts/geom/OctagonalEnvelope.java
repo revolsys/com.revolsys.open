@@ -299,7 +299,7 @@ public class OctagonalEnvelope
   public Geometry toGeometry(GeometryFactory geomFactory)
   {
     if (isNull()) {
-      return geomFactory.createPoint((CoordinatesList)null);
+      return geomFactory.point((CoordinatesList)null);
     }
 
     Coordinates px00 = new Coordinate((double)minX, minA - minX, Coordinates.NULL_ORDINATE);
@@ -335,11 +335,11 @@ public class OctagonalEnvelope
     coordList.add(py00, false);
 
     if (coordList.size() == 1) {
-      return geomFactory.createPoint(px00);
+      return geomFactory.point(px00);
     }
     if (coordList.size() == 2) {
       Coordinates[] pts = coordList.toCoordinateArray();
-      return geomFactory.createLineString(pts);
+      return geomFactory.lineString(pts);
     }
     // must be a polygon, so add closing point
     coordList.add(px00, false);

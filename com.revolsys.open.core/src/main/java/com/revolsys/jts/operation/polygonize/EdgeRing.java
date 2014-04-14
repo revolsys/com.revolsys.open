@@ -229,7 +229,7 @@ class EdgeRing {
    */
   public LineString getLineString() {
     getCoordinates();
-    return factory.createLineString(ringPts);
+    return factory.lineString(ringPts);
   }
 
   /**

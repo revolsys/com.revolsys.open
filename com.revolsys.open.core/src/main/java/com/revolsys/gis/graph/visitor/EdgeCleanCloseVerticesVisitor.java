@@ -145,7 +145,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
             k++;
           }
         }
-        final LineString newLine = geometryFactory.createLineString(newCoordinates);
+        final LineString newLine = geometryFactory.lineString(newCoordinates);
         final Edge<T> newEdge = graph.replaceEdge(edge, newLine);
         edgeListeners.edgeEvent(newEdge, "Edge close indicies",
           EdgeEvent.EDGE_CHANGED, null);

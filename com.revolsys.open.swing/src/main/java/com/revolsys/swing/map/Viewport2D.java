@@ -605,10 +605,10 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   public Point toModelPoint(final double... viewCoordinates) {
     if (this.geometryFactory == null) {
-      return GeometryFactory.getFactory().createPoint();
+      return GeometryFactory.getFactory().point();
     } else {
       final double[] coordinates = toModelCoordinates(viewCoordinates);
-      return this.geometryFactory.createPoint(coordinates);
+      return this.geometryFactory.point(coordinates);
     }
   }
 
@@ -617,9 +617,9 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
       || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
-      return geometryFactory.createPoint();
+      return geometryFactory.point();
     } else {
-      final Point point = this.geometryFactory.createPoint(coordinates);
+      final Point point = this.geometryFactory.point(coordinates);
       return geometryFactory.copy(point);
     }
   }

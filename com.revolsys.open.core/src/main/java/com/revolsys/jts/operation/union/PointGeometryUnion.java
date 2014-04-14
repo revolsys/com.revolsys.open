@@ -96,7 +96,7 @@ public class PointGeometryUnion {
     Geometry ptComp = null;
     final Coordinates[] coords = CoordinateArrays.toCoordinateArray(exteriorCoords);
     if (coords.length == 1) {
-      ptComp = geomFact.createPoint(coords[0]);
+      ptComp = geomFact.point(coords[0]);
     } else {
       ptComp = geomFact.createMultiPoint(coords);
     }

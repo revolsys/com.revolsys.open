@@ -59,7 +59,7 @@ public class OffsetCurveCorrectnessTest {
     } else {
       curvePts = ocb.getLineCurve(pts, distance);
     }
-    final Geometry curve = g.getGeometryFactory().createLineString(curvePts);
+    final Geometry curve = g.getGeometryFactory().lineString(curvePts);
     return curve;
   }
 

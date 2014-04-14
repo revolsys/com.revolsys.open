@@ -71,7 +71,7 @@ public class TestPerfDistanceLinesPoints {
     for (int i = 0; i < nSegs; i++) {
       final double ord = i * inc;
       final Coordinates p = new Coordinate((double)ord, ord, Coordinates.NULL_ORDINATE);
-      final Geometry pt = geomFact.createPoint(p);
+      final Geometry pt = geomFact.point(p);
       circles[i] = (Polygon)pt.buffer(inc / 2);
     }
     return geomFact.createMultiPolygon(circles);
@@ -86,7 +86,7 @@ public class TestPerfDistanceLinesPoints {
       final double ord = i * inc;
       pts[i] = new Coordinate((double)ord, ord, Coordinates.NULL_ORDINATE);
     }
-    return geomFact.createLineString(pts);
+    return geomFact.lineString(pts);
   }
 
   Geometry createLine(final double extent, final int nSegs) {
@@ -95,7 +95,7 @@ public class TestPerfDistanceLinesPoints {
       new Coordinate((double)extent, extent, Coordinates.NULL_ORDINATE), new Coordinate((double)extent, 0, Coordinates.NULL_ORDINATE)
 
     };
-    final Geometry outline = geomFact.createLineString(pts);
+    final Geometry outline = geomFact.lineString(pts);
     final double inc = extent / nSegs;
     return Densifier.densify(outline, inc);
 
@@ -108,7 +108,7 @@ public class TestPerfDistanceLinesPoints {
     final double yinc = extent.getHeight() / nPtsSide;
     for (int i = 0; i < nPtsSide; i++) {
       for (int j = 0; j < nPtsSide; j++) {
-        pts[index++] = geomFact.createPoint(new Coordinate((double)extent.getMinX() + i
+        pts[index++] = geomFact.point(new Coordinate((double)extent.getMinX() + i
           * xinc, extent.getMinY() + j * yinc, Coordinates.NULL_ORDINATE));
       }
     }

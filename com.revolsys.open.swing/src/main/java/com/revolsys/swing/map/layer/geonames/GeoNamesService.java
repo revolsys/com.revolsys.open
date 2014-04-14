@@ -167,7 +167,7 @@ public class GeoNamesService {
       if (elevation != null) {
         coordinate.setZ(elevation.doubleValue());
       }
-      dataObject.setGeometryValue(GeometryFactory.getFactory().createPoint(
+      dataObject.setGeometryValue(GeometryFactory.getFactory().point(
         coordinate));
       results.add(dataObject);
     }

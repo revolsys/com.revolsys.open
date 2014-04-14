@@ -49,7 +49,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(
         boundingBox, sourcePixel);
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
-      return geometryFactory.createPoint(sourcePoint);
+      return geometryFactory.point(sourcePoint);
     }
   }
 
@@ -61,7 +61,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final Coordinates sourcePixel = getSourcePixel();
       final Point sourcePoint = filter.sourcePixelToTargetPoint(sourcePixel);
       final Point targetPoint = getTargetPoint();
-      return geometryFactory.createLineString(sourcePoint, targetPoint);
+      return geometryFactory.lineString(sourcePoint, targetPoint);
     }
   }
 
@@ -74,7 +74,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(
         boundingBox, sourcePixel);
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
-      return geometryFactory.createLineString(sourcePoint, getTargetPoint());
+      return geometryFactory.lineString(sourcePoint, getTargetPoint());
     }
   }
 

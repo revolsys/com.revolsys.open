@@ -91,7 +91,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   public LineString perform(final LineString line) {
     if (line != null) {
       final CoordinatesList newCoordinates = perform(CoordinatesListUtil.get(line));
-      final LineString newLine = geometryFactory.createLineString(newCoordinates);
+      final LineString newLine = geometryFactory.lineString(newCoordinates);
       addUserData(line, newLine);
       return newLine;
     } else {
@@ -153,7 +153,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   public Point perform(final Point point) {
     if (point != null) {
       final CoordinatesList newCoordinate = perform(CoordinatesListUtil.get(point));
-      final Point newPoint = geometryFactory.createPoint(newCoordinate);
+      final Point newPoint = geometryFactory.point(newCoordinate);
       addUserData(point, newPoint);
       return newPoint;
     } else {

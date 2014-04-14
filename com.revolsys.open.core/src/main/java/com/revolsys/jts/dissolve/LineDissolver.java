@@ -260,7 +260,7 @@ public class LineDissolver
   }
 
   private void addLine(CoordinateList line) {
-    lines.add(factory.createLineString(line.toCoordinateArray()));
+    lines.add(factory.lineString(line.toCoordinateArray()));
   }
 
   /**

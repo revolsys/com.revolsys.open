@@ -1071,7 +1071,7 @@ public class CoordinatesListUtil {
         if (splitVertices.contains(index)) {
           final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
             startPoint, startIndex, index - startIndex + 1, null);
-          final LineString newLine = geometryFactory.createLineString(newPoints);
+          final LineString newLine = geometryFactory.lineString(newPoints);
           lines.add(newLine);
           startPoint = null;
           startIndex = index;
@@ -1098,7 +1098,7 @@ public class CoordinatesListUtil {
               newPoints = CoordinatesListUtil.subList(points, startPoint,
                 startIndex, index - startIndex + 1, point);
             }
-            final LineString newLine = geometryFactory.createLineString(newPoints);
+            final LineString newLine = geometryFactory.lineString(newPoints);
             lines.add(newLine);
             startPoint = point;
             startIndex = index + 1;
@@ -1107,7 +1107,7 @@ public class CoordinatesListUtil {
       }
       final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
         startPoint, startIndex);
-      final LineString newLine = geometryFactory.createLineString(newPoints);
+      final LineString newLine = geometryFactory.lineString(newPoints);
       lines.add(newLine);
 
       return lines;

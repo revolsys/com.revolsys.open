@@ -46,7 +46,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements
   @Override
   public boolean visit(final Node<T> node) {
     final Coordinates coordinate = node;
-    final Point point = geometryFactory.createPoint(coordinate);
+    final Point point = geometryFactory.point(coordinate);
     final double distance = geometry.distance(point);
     if (distance < maxDistance) {
       matchVisitor.visit(node);

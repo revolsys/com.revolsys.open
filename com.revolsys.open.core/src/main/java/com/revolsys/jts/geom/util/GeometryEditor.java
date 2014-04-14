@@ -274,7 +274,7 @@ public class GeometryEditor
       }
 
       if (geometry instanceof LineString) {
-        return factory.createLineString(edit(geometry.getCoordinateArray(),
+        return factory.lineString(edit(geometry.getCoordinateArray(),
             geometry));
       }
 
@@ -282,7 +282,7 @@ public class GeometryEditor
         Coordinates[] newCoordinates = edit(geometry.getCoordinateArray(),
             geometry);
 
-        return factory.createPoint((newCoordinates.length > 0)
+        return factory.point((newCoordinates.length > 0)
                                    ? newCoordinates[0] : null);
       }
 
@@ -320,13 +320,13 @@ public class GeometryEditor
       }
 
       if (geometry instanceof LineString) {
-        return factory.createLineString(edit(
+        return factory.lineString(edit(
             ((LineString)geometry).getCoordinatesList(),
             geometry));
       }
 
       if (geometry instanceof Point) {
-        return factory.createPoint(edit(
+        return factory.point(edit(
             ((Point)geometry).getCoordinateSequence(),
             geometry));
       }

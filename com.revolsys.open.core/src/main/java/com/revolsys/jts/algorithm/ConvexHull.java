@@ -262,10 +262,10 @@ public class ConvexHull {
       return geomFactory.createGeometryCollection();
     }
     if (inputPts.length == 1) {
-      return geomFactory.createPoint(inputPts[0]);
+      return geomFactory.point(inputPts[0]);
     }
     if (inputPts.length == 2) {
-      return geomFactory.createLineString(inputPts);
+      return geomFactory.lineString(inputPts);
     }
 
     Coordinates[] reducedPts = inputPts;
@@ -351,7 +351,7 @@ public class ConvexHull {
 
     coordinates = cleanRing(coordinates);
     if (coordinates.length == 3) {
-      return geomFactory.createLineString(new Coordinates[] {
+      return geomFactory.lineString(new Coordinates[] {
         coordinates[0], coordinates[1]
       });
       // return new LineString(new Coordinates[]{coordinates[0],

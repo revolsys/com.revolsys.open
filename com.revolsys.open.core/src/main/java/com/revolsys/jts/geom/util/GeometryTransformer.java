@@ -196,7 +196,7 @@ public class GeometryTransformer
   }
 
   protected Geometry transformPoint(Point geom, Geometry parent) {
-    return factory.createPoint(
+    return factory.point(
         transformCoordinates(geom.getCoordinateSequence(), geom));
   }
 
@@ -231,7 +231,7 @@ public class GeometryTransformer
     int seqSize = seq.size();
     // ensure a valid LinearRing
     if (seqSize > 0 && seqSize < 4 && ! preserveType)
-      return factory.createLineString(seq);
+      return factory.lineString(seq);
     return factory.createLinearRing(seq);
   }
 
@@ -244,7 +244,7 @@ public class GeometryTransformer
    */
   protected Geometry transformLineString(LineString geom, Geometry parent) {
     // should check for 1-point sequences and downgrade them to points
-    return factory.createLineString(
+    return factory.lineString(
         transformCoordinates(geom.getCoordinatesList(), geom));
   }
 

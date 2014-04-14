@@ -97,10 +97,10 @@ public class GeometryFactoryTest {
     final CoordinatesList ring3Points = GEOMETRY_FACTORY.createCoordinatesList(
       120, 120, 120, 180, 180, 180, 180, 120, 120, 120);
 
-    final Point point = GEOMETRY_FACTORY.createPoint(pointPoints);
+    final Point point = GEOMETRY_FACTORY.point(pointPoints);
     assertCopyGeometry(point, pointPoints);
 
-    final LineString line = GEOMETRY_FACTORY.createLineString(ringPoints);
+    final LineString line = GEOMETRY_FACTORY.lineString(ringPoints);
     assertCopyGeometry(line, ringPoints);
 
     final LinearRing linearRing = GEOMETRY_FACTORY.createLinearRing(ringPoints);

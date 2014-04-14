@@ -384,7 +384,7 @@ public class QuadEdgeSubdivision {
     int i = 0;
     for (final Iterator it = quadEdges.iterator(); it.hasNext();) {
       final QuadEdge qe = (QuadEdge)it.next();
-      edges[i++] = geomFact.createLineString(new Coordinates[] {
+      edges[i++] = geomFact.lineString(new Coordinates[] {
         qe.orig().getCoordinate(), qe.dest().getCoordinate()
       });
     }

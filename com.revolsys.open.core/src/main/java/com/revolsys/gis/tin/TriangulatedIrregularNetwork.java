@@ -477,7 +477,7 @@ public class TriangulatedIrregularNetwork {
       }
     }
     if (modified) {
-      return geometryFactory.createLineString(newPoints);
+      return geometryFactory.lineString(newPoints);
     } else {
       return line;
     }

@@ -287,7 +287,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
     Geometry geometry = this.addGeometry;
     if (geometry.isEmpty()) {
-      geometry = geometryFactory.createPoint(newPoint);
+      geometry = newPoint.convert(geometryFactory);
     } else {
       final DataType geometryDataType = this.addGeometryDataType;
       final int[] geometryPartIndex = this.addGeometryPartIndex;
@@ -303,7 +303,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          geometry = geometryFactory.createLineString(point, newPoint);
+          geometry = geometryFactory.lineString(point, newPoint);
         } else if (geometry instanceof LineString) {
           final LineString line = (LineString)geometry;
           geometry = GeometryEditUtil.appendVertex(line, newPoint,
@@ -313,7 +313,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          geometry = geometryFactory.createLineString(point, newPoint);
+          geometry = geometryFactory.lineString(point, newPoint);
         } else if (geometry instanceof LineString) {
           final LineString line = (LineString)geometry;
           final Point p0 = line.getPointN(0);
@@ -367,9 +367,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
     final Coordinates newC1 = line.pointAlongOffset((length - cursorRadius)
       / length, 0);
-    Point point = viewportGeometryFactory.createPoint(newC1);
+    Point point = viewportGeometryFactory.point(newC1);
     point = geometryFactory.copy(point);
-    return geometryFactory.createLineString(c0, point);
+    return geometryFactory.lineString(c0, point);
   }
 
   protected void fireActionPerformed(final ActionListener listener,
@@ -408,7 +408,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       return toPoint;
     } else {
       final Coordinates pointOnLine = segment.project(coordinates);
-      return geometryFactory.createPoint(pointOnLine);
+      return geometryFactory.point(pointOnLine);
     }
   }
 
@@ -736,10 +736,10 @@ public class EditGeometryOverlay extends AbstractOverlay implements
                 xorGeometry = createXorLine(geometryFactory, previousPoint,
                   point);
               } else {
-                final Point p1 = geometryFactory.createPoint(previousPoint);
-                final Point p3 = geometryFactory.createPoint(firstPoint);
+                final Point p1 = geometryFactory.point(previousPoint);
+                final Point p3 = geometryFactory.point(firstPoint);
                 final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
-                xorGeometry = viewportGeometryFactory.createLineString(p1,
+                xorGeometry = viewportGeometryFactory.lineString(p1,
                   point, p3);
               }
             }

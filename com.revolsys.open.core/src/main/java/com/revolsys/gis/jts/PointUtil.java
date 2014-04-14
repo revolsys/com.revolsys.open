@@ -18,7 +18,7 @@ public class PointUtil {
     final double x = envelope.getMinX() + envelope.getWidth() * Math.random();
     final double y = envelope.getMinY() + envelope.getHeight() * Math.random();
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(2, x, y);
-    return factory.createPoint(coordinatesList);
+    return factory.point(coordinatesList);
   }
 
   public static Point getPointWithin(final Geometry geometry) {
@@ -47,7 +47,7 @@ public class PointUtil {
       final Coordinates coordinates = CoordinatesUtil.getInstance(centroid);
       final CoordinatesList coordinatesList = new DoubleCoordinatesList(2,
         coordinates.getX(), coordinates.getY());
-      return factory.createPoint(coordinatesList);
+      return factory.point(coordinatesList);
     } else {
       final Envelope envelope = polygon.getEnvelopeInternal();
       Point point = createRandomPoint(factory, envelope);

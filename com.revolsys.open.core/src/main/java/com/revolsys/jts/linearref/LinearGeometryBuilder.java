@@ -108,7 +108,7 @@ public class LinearGeometryBuilder {
     coordList = null;
     LineString line = null;
     try {
-      line = geomFact.createLineString(pts);
+      line = geomFact.lineString(pts);
     } catch (final IllegalArgumentException ex) {
       // exception is due to too few points in line.
       // only propagate if not ignoring short lines

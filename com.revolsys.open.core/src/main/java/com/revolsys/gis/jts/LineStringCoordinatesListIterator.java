@@ -37,7 +37,7 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
 
   @Override
   public LineString next() {
-    final LineString lineString = factory.createLineString(points.subList(
+    final LineString lineString = factory.lineString(points.subList(
       index, 2));
     index++;
     return lineString;

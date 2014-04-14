@@ -264,7 +264,7 @@ public class GpxIterator implements DataObjectIterator {
       coord = new DoubleCoordinates(lon, lat, elevation);
     }
 
-    final Point point = geometryFactory.createPoint(coord);
+    final Point point = geometryFactory.point(coord);
     dataObject.setValue("location", point);
     return dataObject;
   }
@@ -304,9 +304,9 @@ public class GpxIterator implements DataObjectIterator {
     }
     final LineString line;
     if (points.size() > 1) {
-      line = geometryFactory.createLineString(points);
+      line = geometryFactory.lineString(points);
     } else {
-      line = geometryFactory.createLineString((CoordinatesList)null);
+      line = geometryFactory.lineString((CoordinatesList)null);
     }
 
     dataObject.setGeometryValue(line);

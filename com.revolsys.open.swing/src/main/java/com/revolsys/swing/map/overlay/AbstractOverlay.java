@@ -276,7 +276,7 @@ public class AbstractOverlay extends JComponent implements
         final com.revolsys.jts.geom.GeometryFactory geometryFactory = layer.getGeometryFactory();
         pointOnLine = ProjectionFactory.convert(pointOnLine,
           viewportGeometryFactory, geometryFactory);
-        final Point closePoint = geometryFactory.createPoint(pointOnLine);
+        final Point closePoint = geometryFactory.point(pointOnLine);
         return new CloseLocation(layer, object, geometry, null, closestSegment,
           closePoint);
       }

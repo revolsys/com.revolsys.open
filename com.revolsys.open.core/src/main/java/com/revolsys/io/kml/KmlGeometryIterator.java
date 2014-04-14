@@ -146,7 +146,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
         StaxUtils.skipSubTree(in);
       }
     }
-    final LineString lineString = geometryFactory.createLineString(cooordinatesList);
+    final LineString lineString = geometryFactory.lineString(cooordinatesList);
     StaxUtils.skipToEndElementByLocalName(in, LINE_STRING);
     return lineString;
   }
@@ -193,7 +193,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
         StaxUtils.skipSubTree(in);
       }
     }
-    final Point point = geometryFactory.createPoint(cooordinatesList);
+    final Point point = geometryFactory.point(cooordinatesList);
     StaxUtils.skipToEndElementByLocalName(in, POINT);
     return point;
   }
