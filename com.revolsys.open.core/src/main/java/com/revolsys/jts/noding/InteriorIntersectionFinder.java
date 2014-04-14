@@ -37,7 +37,6 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinates;
-//import com.revolsys.jts.testold.util.Debug;
 
 /**
  * Finds an interior intersection in a set of {@link SegmentString}s,

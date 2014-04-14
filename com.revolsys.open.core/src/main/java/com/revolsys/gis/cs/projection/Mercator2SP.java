@@ -5,9 +5,8 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.jts.algorithm.Angle;
-import com.revolsys.jts.geom.Coordinates;
 
-public class Mercator2SP implements CoordinatesProjection {
+public class Mercator2SP extends AbstractCoordinatesProjection {
 
   private final double a;
 
@@ -43,13 +42,15 @@ public class Mercator2SP implements CoordinatesProjection {
   }
 
   @Override
-  public void inverse(final Coordinates from, final Coordinates to) {
-    final double x = (from.getX() - x0) / multiple;
-    final double y = (from.getY() - y0) / multiple;
+  public void inverse(final double x, final double y,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
+    final double dX = (x - x0) / multiple;
+    final double dY = (y - y0) / multiple;
 
-    final double lambda = x / a + lambda0;
+    final double lambda = dX / a + lambda0;
 
-    final double t = Math.pow(Math.E, -y / a);
+    final double t = Math.pow(Math.E, -dY / a);
     double phi = Angle.PI_OVER_2 - 2 * Math.atan(t);
     double delta = 10e010;
     do {
@@ -60,18 +61,14 @@ public class Mercator2SP implements CoordinatesProjection {
       phi = phi1;
     } while (delta > 1.0e-011);
 
-    to.setValue(0, lambda);
-    to.setValue(1, phi);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = lambda;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = phi;
   }
 
   @Override
-  public void project(final Coordinates from, final Coordinates to) {
-    final double lambda = from.getX();
-    final double phi = from.getY();
+  public void project(final double lambda, final double phi,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
 
     final double x = (a * (lambda - lambda0)) * multiple;
 
@@ -80,13 +77,8 @@ public class Mercator2SP implements CoordinatesProjection {
       * Math.pow((1 - eSinPhi) / (1 + eSinPhi), eOver2)))
       * multiple;
 
-    to.setValue(0, x0 + x);
-    to.setValue(1, y0 + y);
-
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = x0 + x;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = y0 + y;
   }
 
 }

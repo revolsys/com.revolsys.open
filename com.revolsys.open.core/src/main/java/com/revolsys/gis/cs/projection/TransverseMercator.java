@@ -4,7 +4,6 @@ import com.revolsys.gis.cs.Datum;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Spheroid;
-import com.revolsys.jts.geom.Coordinates;
 
 /**
  * An implementation of the Transverse Mercator projection. See section 1.3.5 of
@@ -13,7 +12,7 @@ import com.revolsys.jts.geom.Coordinates;
  * 
  * @author Paul Austin
  */
-public class TransverseMercator implements CoordinatesProjection {
+public class TransverseMercator extends AbstractCoordinatesProjection {
 
   /** The length in metres of the semi-major axis of the ellipsoid. */
   private final double a;
@@ -116,9 +115,9 @@ public class TransverseMercator implements CoordinatesProjection {
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void inverse(final Coordinates from, final Coordinates to) {
-    final double x = from.getX();
-    final double y = from.getY();
+  public void inverse(final double x, final double y,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
     final double m = m0 + (y - y0) / k0;
     final double sqrt1MinusESq = Math.sqrt(1 - eSq);
     final double e1 = (1 - sqrt1MinusESq) / (1 + sqrt1MinusESq);
@@ -163,12 +162,8 @@ public class TransverseMercator implements CoordinatesProjection {
         * ePrimeSq + 24 * t1Sq)
         * d5 / 120) / cosPhi1;
 
-    to.setValue(0, lambda);
-    to.setValue(1, phi);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = lambda;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = phi;
   }
 
   /**
@@ -220,9 +215,9 @@ public class TransverseMercator implements CoordinatesProjection {
    * @param to The ordinates to write the converted ordinates to.
    */
   @Override
-  public void project(final Coordinates from, final Coordinates to) {
-    final double lambda = from.getValue(0);
-    final double phi = from.getValue(1);
+  public void project(final double lambda, final double phi,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
     final double cosPhi = Math.cos(phi);
     final double sinPhi = Math.sin(phi);
     final double tanPhi = Math.tan(phi);
@@ -252,12 +247,8 @@ public class TransverseMercator implements CoordinatesProjection {
         * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24 + (61 - 58 * t
           + tSq + 600 * c - 330 * ePrimeSq)
           * a1Pow6 / 720));
-    to.setValue(0, x);
-    to.setValue(1, y);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = x;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = y;
   }
 
   /**

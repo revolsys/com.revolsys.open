@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateFilter;
@@ -328,6 +330,11 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   }
 
   @Override
+  public DataType getDataType() {
+    return DataTypes.POLYGON;
+  }
+
+  @Override
   public int getDimension() {
     return 2;
   }
@@ -335,11 +342,6 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   @Override
   public LinearRing getExteriorRing() {
     return shell;
-  }
-
-  @Override
-  public String getGeometryType() {
-    return "Polygon";
   }
 
   @Override

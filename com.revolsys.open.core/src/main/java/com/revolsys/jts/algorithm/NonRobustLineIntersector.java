@@ -35,7 +35,6 @@ package com.revolsys.jts.algorithm;
 /**
  *@version 1.7
  */
-//import com.revolsys.jts.testold.util.Debug;
 import com.revolsys.jts.geom.Coordinates;
 
 /**

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -149,15 +148,15 @@ public class CoordinateTest extends TestCase {
 
   public void testSetCoordinate() {
     final Coordinates orig = new Coordinate(350.2, 4566.8, 5266.3);
-    final Coordinates c = new Coordinate((double)3);
+    final Coordinates c = new Coordinate(3);
     c.setCoordinate(orig);
-    assertEquals(c.getX(), 350.2);
-    assertEquals(c.getY(), 4566.8);
-    assertEquals(c.getZ(), 5266.3);
+    assertEquals(350.2, c.getX());
+    assertEquals(4566.8, c.getY());
+    assertEquals(5266.3, c.getZ());
   }
 
   public void testSetOrdinate() {
-    final Coordinates c = new Coordinate((double)3);
+    final Coordinates c = new Coordinate(3);
     c.setValue(Coordinates.X, 111);
     c.setValue(Coordinates.Y, 222);
     c.setValue(Coordinates.Z, 333);

@@ -1,7 +1,5 @@
 package com.revolsys.gis.cs.projection;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
@@ -11,6 +9,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
@@ -25,7 +24,8 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   private final CoordinatesOperation operation;
 
   public CoordinatesOperationGeometryOperation(
-    final CoordinatesOperation operation, final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+    final CoordinatesOperation operation,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.operation = operation;
     this.geometryFactory = geometryFactory;
   }
@@ -58,6 +58,23 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     }
     newCoordinates.makePrecise(precisionModel);
     return newCoordinates;
+  }
+
+  public GeometryCollection perform(final GeometryCollection geometryCollection) {
+    if (geometryCollection != null) {
+      final Geometry[] newGeometries = new Geometry[geometryCollection.getNumGeometries()];
+      for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
+        final Geometry geometry = geometryCollection.getGeometry(i);
+        final Geometry newGeometry = perform(geometry);
+        addUserData(geometry, newGeometry);
+        newGeometries[i] = newGeometry;
+      }
+      final GeometryCollection newGeometryCollection = geometryFactory.createGeometryCollection(newGeometries);
+      addUserData(geometryCollection, newGeometryCollection);
+      return newGeometryCollection;
+    } else {
+      return null;
+    }
   }
 
   public LinearRing perform(final LinearRing ring) {
@@ -146,11 +163,11 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
 
   public Polygon perform(final Polygon polygon) {
 
-    final LinearRing shell = (LinearRing)polygon.getExteriorRing();
+    final LinearRing shell = polygon.getExteriorRing();
     final LinearRing newShell = perform(shell);
     final LinearRing[] newHoles = new LinearRing[polygon.getNumInteriorRing()];
     for (int i = 0; i < newHoles.length; i++) {
-      final LinearRing hole = (LinearRing)polygon.getInteriorRingN(i);
+      final LinearRing hole = polygon.getInteriorRingN(i);
       newHoles[i] = perform(hole);
     }
     final Polygon newPolygon = geometryFactory.createPolygon(newShell, newHoles);
@@ -162,22 +179,29 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T perform(final T geometry) {
-    try {
-      final Method method = getClass().getMethod("perform", geometry.getClass());
-      return (T)method.invoke(this, geometry);
-    } catch (final NoSuchMethodException e) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return (T)perform(point);
+    } else if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      return (T)perform(line);
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      return (T)perform(polygon);
+    } else if (geometry instanceof MultiPoint) {
+      final MultiPoint point = (MultiPoint)geometry;
+      return (T)perform(point);
+    } else if (geometry instanceof MultiLineString) {
+      final MultiLineString line = (MultiLineString)geometry;
+      return (T)perform(line);
+    } else if (geometry instanceof MultiPolygon) {
+      final MultiPolygon polygon = (MultiPolygon)geometry;
+      return (T)perform(polygon);
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
+      return (T)perform(geometryCollection);
+    } else {
       return geometry;
-    } catch (final IllegalAccessException e) {
-      throw new RuntimeException("Unable to invoke method", e);
-    } catch (final InvocationTargetException e) {
-      final Throwable cause = e.getCause();
-      if (cause instanceof RuntimeException) {
-        throw (RuntimeException)cause;
-      } else if (cause instanceof Error) {
-        throw (Error)cause;
-      } else {
-        throw new RuntimeException(cause);
-      }
     }
   }
 

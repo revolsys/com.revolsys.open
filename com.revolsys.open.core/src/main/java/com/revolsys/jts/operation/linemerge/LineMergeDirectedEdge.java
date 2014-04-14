@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -39,7 +38,7 @@ import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.util.Assert;
 
 /**
- * A {@link com.revolsys.jts.testold.planargraph.DirectedEdge} of a 
+ * A {@link com.revolsys.jts.planargraph.DirectedEdge} of a 
  * {@link LineMergeGraph}. 
  *
  * @version 1.7
@@ -55,9 +54,9 @@ public class LineMergeDirectedEdge extends DirectedEdge {
    * @param edgeDirection
    *                  whether this DirectedEdge's direction is the same as or
    *                  opposite to that of the parent Edge (if any)
-   */  
-  public LineMergeDirectedEdge(Node from, Node to, Coordinates directionPt,
-    boolean edgeDirection) {
+   */
+  public LineMergeDirectedEdge(final Node from, final Node to,
+    final Coordinates directionPt, final boolean edgeDirection) {
     super(from, to, directionPt, edgeDirection);
   }
 
@@ -71,10 +70,10 @@ public class LineMergeDirectedEdge extends DirectedEdge {
       return null;
     }
     if (getToNode().getOutEdges().getEdges().get(0) == getSym()) {
-      return (LineMergeDirectedEdge) getToNode().getOutEdges().getEdges().get(1);
+      return (LineMergeDirectedEdge)getToNode().getOutEdges().getEdges().get(1);
     }
     Assert.isTrue(getToNode().getOutEdges().getEdges().get(1) == getSym());
 
-    return (LineMergeDirectedEdge) getToNode().getOutEdges().getEdges().get(0);
+    return (LineMergeDirectedEdge)getToNode().getOutEdges().getEdges().get(0);
   }
 }

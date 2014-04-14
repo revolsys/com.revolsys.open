@@ -40,6 +40,7 @@ import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.data.model.types.DataTypeProxy;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.buffer.BufferOp;
@@ -163,7 +164,8 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *
  *@version 1.7
  */
-public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
+public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
+  DataTypeProxy {
 
   List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
@@ -401,6 +403,17 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable {
    * @see Geometry#covers
    */
   boolean contains(final Geometry geometry);
+
+  /**
+   * Convert the geometry to the requried geometry factory. Projecting to the required
+   * coordinate system and applying the precision model. If the geometry factory is
+   * the same as this geometries factory then the geometry will be returned.
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param geometryFactory The geometry factory to convert the geometry to.
+   * @return The converted geometry
+   */
+  Geometry convert(GeometryFactory geometryFactory);
 
   /**
    *  Computes the smallest convex <code>Polygon</code> that contains all the

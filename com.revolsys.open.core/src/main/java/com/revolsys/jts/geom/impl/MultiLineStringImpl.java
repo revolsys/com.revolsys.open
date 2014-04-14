@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -98,13 +100,13 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
   }
 
   @Override
-  public int getDimension() {
-    return 1;
+  public DataType getDataType() {
+    return DataTypes.MULTI_LINE_STRING;
   }
 
   @Override
-  public String getGeometryType() {
-    return "MultiLineString";
+  public int getDimension() {
+    return 1;
   }
 
   @Override

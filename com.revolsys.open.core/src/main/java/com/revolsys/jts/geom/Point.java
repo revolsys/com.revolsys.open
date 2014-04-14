@@ -34,7 +34,6 @@ package com.revolsys.jts.geom;
 
 import com.revolsys.jts.geom.vertex.Vertex;
 
-
 /**
  * Represents a single point.
  *
@@ -56,6 +55,9 @@ public interface Point extends Geometry, Puntal, Vertex {
    */
   @Override
   Point clone();
+
+  @Override
+  Point convert(GeometryFactory geometryFactory);
 
   double distance(final Point point);
 

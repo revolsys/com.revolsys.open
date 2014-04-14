@@ -5,9 +5,8 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.jts.algorithm.Angle;
-import com.revolsys.jts.geom.Coordinates;
 
-public class LambertConicConformal implements CoordinatesProjection {
+public class LambertConicConformal extends AbstractCoordinatesProjection {
   private final double a;
 
   private final double e;
@@ -62,18 +61,21 @@ public class LambertConicConformal implements CoordinatesProjection {
   }
 
   @Override
-  public void inverse(final Coordinates from, final Coordinates to) {
-    double x = from.getX() - x0;
-    double y = from.getY() - y0;
+  public void inverse(final double x, final double y,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
+
+    double dX = x - x0;
+    double dY = y - y0;
 
     double rho0 = this.rho0;
     if (n < 0) {
       rho0 = -rho0;
-      x = -x;
-      y = -y;
+      dX = -dX;
+      dY = -dY;
     }
-    final double theta = Math.atan(x / (rho0 - y));
-    double rho = Math.sqrt(x * x + Math.pow(rho0 - y, 2));
+    final double theta = Math.atan(dX / (rho0 - dY));
+    double rho = Math.sqrt(dX * dX + Math.pow(rho0 - dY, 2));
     if (n < 0) {
       rho = -rho;
     }
@@ -91,12 +93,8 @@ public class LambertConicConformal implements CoordinatesProjection {
     } while (!Double.isNaN(phi) && delta > 1.0e-011);
     final double lambda = theta / n + lambda0;
 
-    to.setValue(0, lambda);
-    to.setValue(1, phi);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = lambda;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = phi;
   }
 
   private double m(final double phi) {
@@ -105,9 +103,9 @@ public class LambertConicConformal implements CoordinatesProjection {
   }
 
   @Override
-  public void project(final Coordinates from, final Coordinates to) {
-    final double lambda = from.getX();
-    final double phi = from.getY();
+  public void project(final double lambda, final double phi,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
 
     final double t = t(phi);
     final double rho = a * f * Math.pow(t, n);
@@ -116,12 +114,8 @@ public class LambertConicConformal implements CoordinatesProjection {
     final double x = x0 + rho * Math.sin(theta);
     final double y = y0 + rho0 - rho * Math.cos(theta);
 
-    to.setValue(0, x);
-    to.setValue(1, y);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = x;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = y;
   }
 
   private double t(final double phi) {

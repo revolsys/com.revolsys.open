@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
@@ -268,6 +270,11 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   }
 
   @Override
+  public DataType getDataType() {
+    return DataTypes.GEOMETRY_COLLECTION;
+  }
+
+  @Override
   public int getDimension() {
     int dimension = Dimension.FALSE;
     for (int i = 0; i < geometries.length; i++) {
@@ -286,11 +293,6 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
     return (V)geometries[n];
-  }
-
-  @Override
-  public String getGeometryType() {
-    return "GeometryCollection";
   }
 
   @Override

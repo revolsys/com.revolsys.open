@@ -159,6 +159,7 @@ public final class DataTypes {
     final String className = clazz.getName();
     final DataType type = CLASS_TYPE_MAP.get(className);
     if (type == null) {
+
       if (List.class.isAssignableFrom(clazz)) {
         return LIST;
       } else if (Set.class.isAssignableFrom(clazz)) {
@@ -174,6 +175,9 @@ public final class DataTypes {
   public static DataType getType(final Object object) {
     if (object == null) {
       return null;
+    } else if (object instanceof DataTypeProxy) {
+      final DataTypeProxy proxy = (DataTypeProxy)object;
+      return proxy.getDataType();
     } else {
       final Class<?> clazz = object.getClass();
       return getType(clazz);

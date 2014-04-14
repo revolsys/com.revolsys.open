@@ -40,8 +40,6 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PrecisionModel;
-import com.revolsys.jts.io.WKTReader;
 
 /**
  * Test for com.revolsys.jts.testold.geom.impl.PointImpl.
@@ -58,66 +56,71 @@ public class PointImplTest extends TestCase {
     return new TestSuite(PointImplTest.class);
   }
 
-  PrecisionModel precisionModel = new PrecisionModel(1000);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1000.0);
 
-  GeometryFactory geometryFactory = new GeometryFactory(this.precisionModel, 0);
+  private final GeometryFactory albers2d = GeometryFactory.getFactory(3005,
+    1000.0);
 
-  WKTReader reader = new WKTReader(this.geometryFactory);
+  private final GeometryFactory albers3d = GeometryFactory.getFactory(3005,
+    1000.0, 1.0);
+
+  private final GeometryFactory worldMercator = GeometryFactory.worldMercator();
 
   public PointImplTest(final String name) {
     super(name);
   }
 
   public void testEquals1() throws Exception {
-    final Point p1 = (Point)this.reader.read("POINT(1.234 5.678)");
-    final Point p2 = (Point)this.reader.read("POINT(1.234 5.678)");
+    final Point p1 = geometryFactory.createGeometry("POINT(1.234 5.678)");
+    final Point p2 = geometryFactory.createGeometry("POINT(1.234 5.678)");
     assertTrue(p1.equals(p2));
   }
 
   public void testEquals2() throws Exception {
-    final Point p1 = (Point)this.reader.read("POINT(1.23 5.67)");
-    final Point p2 = (Point)this.reader.read("POINT(1.23 5.67)");
+    final Point p1 = geometryFactory.createGeometry("POINT(1.23 5.67)");
+    final Point p2 = geometryFactory.createGeometry("POINT(1.23 5.67)");
     assertTrue(p1.equals(p2));
   }
 
   public void testEquals3() throws Exception {
-    final Point p1 = (Point)this.reader.read("POINT(1.235 5.678)");
-    final Point p2 = (Point)this.reader.read("POINT(1.234 5.678)");
+    final Point p1 = geometryFactory.createGeometry("POINT(1.235 5.678)");
+    final Point p2 = geometryFactory.createGeometry("POINT(1.234 5.678)");
     assertTrue(!p1.equals(p2));
   }
 
   public void testEquals4() throws Exception {
-    final Point p1 = (Point)this.reader.read("POINT(1.2334 5.678)");
-    final Point p2 = (Point)this.reader.read("POINT(1.2333 5.678)");
+    final Point p1 = geometryFactory.createGeometry("POINT(1.2334 5.678)");
+    final Point p2 = geometryFactory.createGeometry("POINT(1.2333 5.678)");
     assertTrue(p1.equals(p2));
   }
 
   public void testEquals5() throws Exception {
-    final Point p1 = (Point)this.reader.read("POINT(1.2334 5.678)");
-    final Point p2 = (Point)this.reader.read("POINT(1.2335 5.678)");
+    final Point p1 = geometryFactory.createGeometry("POINT(1.2334 5.678)");
+    final Point p2 = geometryFactory.createGeometry("POINT(1.2335 5.678)");
     assertTrue(!p1.equals(p2));
   }
 
   public void testEquals6() throws Exception {
-    final Point p1 = (Point)this.reader.read("POINT(1.2324 5.678)");
-    final Point p2 = (Point)this.reader.read("POINT(1.2325 5.678)");
+    final Point p1 = geometryFactory.createGeometry("POINT(1.2324 5.678)");
+    final Point p2 = geometryFactory.createGeometry("POINT(1.2325 5.678)");
     assertTrue(!p1.equals(p2));
   }
 
   public void testIsSimple() throws Exception {
-    final Point p1 = (Point)this.reader.read("POINT(1.2324 5.678)");
+    final Point p1 = geometryFactory.createGeometry("POINT(1.2324 5.678)");
     assertTrue(p1.isSimple());
-    final Point p2 = (Point)this.reader.read("POINT EMPTY");
+    final Point p2 = geometryFactory.createGeometry("POINT EMPTY");
     assertTrue(p2.isSimple());
   }
 
   public void testNegRounding1() throws Exception {
-    final Point pLo = (Point)this.reader.read("POINT(-1.233 5.678)");
-    final Point pHi = (Point)this.reader.read("POINT(-1.232 5.678)");
+    final Point pLo = geometryFactory.createGeometry("POINT(-1.233 5.678)");
+    final Point pHi = geometryFactory.createGeometry("POINT(-1.232 5.678)");
 
-    final Point p1 = (Point)this.reader.read("POINT(-1.2326 5.678)");
-    final Point p2 = (Point)this.reader.read("POINT(-1.2325 5.678)");
-    final Point p3 = (Point)this.reader.read("POINT(-1.2324 5.678)");
+    final Point p1 = geometryFactory.createGeometry("POINT(-1.2326 5.678)");
+    final Point p2 = geometryFactory.createGeometry("POINT(-1.2325 5.678)");
+    final Point p3 = geometryFactory.createGeometry("POINT(-1.2324 5.678)");
 
     assertTrue(!p1.equals(p2));
     assertTrue(p3.equals(p2));
@@ -127,4 +130,17 @@ public class PointImplTest extends TestCase {
     assertTrue(p3.equals(pHi));
   }
 
+  public void testProjection() {
+    final Point albersPoint = albers3d.createGeometry("SRID=3005;POINT Z(1000000 1500000 10)");
+    final Point webMercatorPoint = albersPoint.convert(worldMercator);
+    final Point albersPoint2 = webMercatorPoint.convert(albers3d);
+    if (!albersPoint.equalsExact(albersPoint2)) {
+      failNotEquals("Not Equal Exact", albersPoint, albersPoint2);
+    }
+    final Point albersPoint3 = webMercatorPoint.convert(albers2d);
+    final Point albersPoint4 = albersPoint3.convert(albers3d);
+    System.out.println(webMercatorPoint);
+    System.out.println(albersPoint);
+
+  }
 }

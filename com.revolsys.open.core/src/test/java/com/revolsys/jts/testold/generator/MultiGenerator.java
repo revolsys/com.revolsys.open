@@ -191,7 +191,7 @@ public class MultiGenerator extends GeometryGenerator {
   }
 
   /**
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#setGeometryFactory(com.revolsys.jts.testold.geom.GeometryFactory)
+   * @see com.revolsys.jts.testold.generator.GeometryGenerator#setGeometryFactory(com.revolsys.jts.geom.GeometryFactory)
    */
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

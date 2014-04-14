@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -59,51 +58,49 @@ import com.revolsys.jts.geomgraph.Node;
  * {@link #buildMinimalRings() } method.
  *
  * @version 1.7
- * @see com.revolsys.jts.testold.operation.overlay.MinimalEdgeRing
+ * @see com.revolsys.jts.operation.overlay.MinimalEdgeRing
  */
-public class MaximalEdgeRing
-  extends EdgeRing
-{
+public class MaximalEdgeRing extends EdgeRing {
 
-  public MaximalEdgeRing(DirectedEdge start, GeometryFactory geometryFactory) {
+  public MaximalEdgeRing(final DirectedEdge start,
+    final GeometryFactory geometryFactory) {
     super(start, geometryFactory);
   }
 
-  public DirectedEdge getNext(DirectedEdge de)
-  {
-    return de.getNext();
+  public List buildMinimalRings() {
+    final List minEdgeRings = new ArrayList();
+    DirectedEdge de = startDe;
+    do {
+      if (de.getMinEdgeRing() == null) {
+        final EdgeRing minEr = new MinimalEdgeRing(de, geometryFactory);
+        minEdgeRings.add(minEr);
+      }
+      de = de.getNext();
+    } while (de != startDe);
+    return minEdgeRings;
   }
-  public void setEdgeRing(DirectedEdge de, EdgeRing er)
-  {
-    de.setEdgeRing(er);
+
+  @Override
+  public DirectedEdge getNext(final DirectedEdge de) {
+    return de.getNext();
   }
 
   /**
    * For all nodes in this EdgeRing,
    * link the DirectedEdges at the node to form minimalEdgeRings
    */
-  public void linkDirectedEdgesForMinimalEdgeRings()
-  {
+  public void linkDirectedEdgesForMinimalEdgeRings() {
     DirectedEdge de = startDe;
     do {
-      Node node = de.getNode();
-      ((DirectedEdgeStar) node.getEdges()).linkMinimalDirectedEdges(this);
+      final Node node = de.getNode();
+      ((DirectedEdgeStar)node.getEdges()).linkMinimalDirectedEdges(this);
       de = de.getNext();
     } while (de != startDe);
   }
 
-  public List buildMinimalRings()
-  {
-    List minEdgeRings = new ArrayList();
-    DirectedEdge de = startDe;
-    do {
-      if (de.getMinEdgeRing() == null) {
-        EdgeRing minEr = new MinimalEdgeRing(de, geometryFactory);
-        minEdgeRings.add(minEr);
-      }
-      de = de.getNext();
-    } while (de != startDe);
-    return minEdgeRings;
+  @Override
+  public void setEdgeRing(final DirectedEdge de, final EdgeRing er) {
+    de.setEdgeRing(er);
   }
 
 }

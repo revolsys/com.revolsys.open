@@ -17,6 +17,8 @@ public interface CoordinatesPrecisionModel {
 
   void makePrecise(Coordinates coordinates);
 
+  void makePrecise(int numAxis, double... coordinates);
+
   double makeXyPrecise(final double value);
 
   double makeZPrecise(final double value);

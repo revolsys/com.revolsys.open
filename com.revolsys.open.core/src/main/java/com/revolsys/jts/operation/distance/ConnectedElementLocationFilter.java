@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -47,40 +46,36 @@ import com.revolsys.jts.geom.Polygon;
  * from each connected element in a Geometry
  * (e.g. a polygon, linestring or point)
  * and returns them in a list. The elements of the list are 
- * {@link com.revolsys.jts.testold.operation.distance.GeometryLocation}s.
+ * {@link com.revolsys.jts.operation.distance.GeometryLocation}s.
  *
  * @version 1.7
  */
-public class ConnectedElementLocationFilter
-  implements GeometryFilter
-{
+public class ConnectedElementLocationFilter implements GeometryFilter {
 
   /**
    * Returns a list containing a point from each Polygon, LineString, and Point
    * found inside the specified geometry. Thus, if the specified geometry is
    * not a GeometryCollection, an empty list will be returned. The elements of the list 
-   * are {@link com.revolsys.jts.testold.operation.distance.GeometryLocation}s.
-   */  
-  public static List getLocations(Geometry geom)
-  {
-    List locations = new ArrayList();
+   * are {@link com.revolsys.jts.operation.distance.GeometryLocation}s.
+   */
+  public static List getLocations(final Geometry geom) {
+    final List locations = new ArrayList();
     geom.apply(new ConnectedElementLocationFilter(locations));
     return locations;
   }
 
-  private List locations;
+  private final List locations;
 
-  ConnectedElementLocationFilter(List locations)
-  {
+  ConnectedElementLocationFilter(final List locations) {
     this.locations = locations;
   }
 
-  public void filter(Geometry geom)
-  {
-    if (geom instanceof Point
-      || geom instanceof LineString
-      || geom instanceof Polygon )
+  @Override
+  public void filter(final Geometry geom) {
+    if (geom instanceof Point || geom instanceof LineString
+      || geom instanceof Polygon) {
       locations.add(new GeometryLocation(geom, 0, geom.getCoordinate()));
+    }
   }
 
 }

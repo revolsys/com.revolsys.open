@@ -50,7 +50,9 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
+import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -423,6 +425,8 @@ public class GeometryFactory implements Serializable,
   private CoordinateSequenceFactory coordinateSequenceFactory;
 
   private final int srid;
+
+  private final WktParser parser = new WktParser(this);
 
   /**
    * Constructs a GeometryFactory that generates Geometries having the given
@@ -815,13 +819,37 @@ public class GeometryFactory implements Serializable,
           geometrySrid, numAxis, getScaleXY(), getScaleZ());
         return geometryFactory.createGeometry(geometry);
       } else if (srid != 0 && geometrySrid != 0 && geometrySrid != srid) {
-        if (geometry instanceof GeometryCollection) {
+        if (geometry instanceof MultiPoint) {
+          final List<Geometry> geometries = new ArrayList<Geometry>();
+          addGeometries(geometries, geometry);
+          return createMultiPoint(geometries);
+        } else if (geometry instanceof MultiLineString) {
+          final List<Geometry> geometries = new ArrayList<Geometry>();
+          addGeometries(geometries, geometry);
+          return createMultiLineString(geometries);
+        } else if (geometry instanceof MultiPolygon) {
+          final List<Geometry> geometries = new ArrayList<Geometry>();
+          addGeometries(geometries, geometry);
+          return createMultiPolygon(geometries);
+        } else if (geometry instanceof GeometryCollection) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
           return createGeometryCollection(geometries);
         } else {
           return GeometryProjectionUtil.performCopy(geometry, this);
         }
+      } else if (geometry instanceof MultiPoint) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return createMultiPoint(geometries);
+      } else if (geometry instanceof MultiLineString) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return createMultiLineString(geometries);
+      } else if (geometry instanceof MultiPolygon) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return createMultiPolygon(geometries);
       } else if (geometry instanceof GeometryCollection) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
         addGeometries(geometries, geometry);
@@ -846,14 +874,12 @@ public class GeometryFactory implements Serializable,
 
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T createGeometry(final String wkt) {
-    final WktParser parser = new WktParser(this);
     return (T)parser.parseGeometry(wkt);
   }
 
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T createGeometry(final String wkt,
     final boolean useNumAxisFromGeometryFactory) {
-    final WktParser parser = new WktParser(this);
     return (T)parser.parseGeometry(wkt, useNumAxisFromGeometryFactory);
   }
 
@@ -1001,6 +1027,10 @@ public class GeometryFactory implements Serializable,
     return createMultiLineString(Arrays.asList(lines));
   }
 
+  public MultiPoint createMultiPoint() {
+    return new MultiPointImpl(this);
+  }
+
   public MultiPoint createMultiPoint(final Collection<?> points) {
     final Point[] pointArray = getPointArray(points);
     return createMultiPoint(pointArray);
@@ -1053,7 +1083,7 @@ public class GeometryFactory implements Serializable,
    * @return a MultiPoint object
    */
   public MultiPoint createMultiPoint(final Point[] point) {
-    return new MultiPointImpl(point, this);
+    return new MultiPointImpl(this, point);
   }
 
   public MultiPolygon createMultiPolygon(final Collection<?> polygons) {
@@ -1274,6 +1304,22 @@ public class GeometryFactory implements Serializable,
     return coordinateSequenceFactory;
   }
 
+  /**
+   * <p>Get the {@link CoordinatesOperation} to convert between this factory's and the other factory's
+   * {@link CoordinateSystem}.</p>
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param geometryFactory The geometry factory to convert to.
+   * @return The coordinates operation or null if no conversion is available.
+   */
+  public CoordinatesOperation getCoordinatesOperation(
+    final GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    final CoordinateSystem otherCoordinateSystem = geometryFactory.getCoordinateSystem();
+    return ProjectionFactory.getCoordinatesOperation(coordinateSystem,
+      otherCoordinateSystem);
+  }
+
   public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
     return coordinatesPrecisionModel;
   }
@@ -1455,6 +1501,11 @@ public class GeometryFactory implements Serializable,
 
   public double makePrecise(final double value) {
     return getPrecisionModel().makePrecise(value);
+  }
+
+  @Override
+  public void makePrecise(final int numAxis, final double... coordinates) {
+    coordinatesPrecisionModel.makePrecise(numAxis, coordinates);
   }
 
   @Override

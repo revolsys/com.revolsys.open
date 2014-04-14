@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom.impl;
 
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.CoordinateFilter;
@@ -252,6 +254,11 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   }
 
   @Override
+  public DataType getDataType() {
+    return DataTypes.LINE_STRING;
+  }
+
+  @Override
   public int getDimension() {
     return 1;
   }
@@ -262,11 +269,6 @@ public class LineStringImpl extends GeometryImpl implements LineString {
       return null;
     }
     return getPointN(getNumPoints() - 1);
-  }
-
-  @Override
-  public String getGeometryType() {
-    return "LineString";
   }
 
   /**

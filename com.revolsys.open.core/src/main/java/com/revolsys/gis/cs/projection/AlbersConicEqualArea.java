@@ -5,7 +5,6 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.jts.algorithm.Angle;
-import com.revolsys.jts.geom.Coordinates;
 
 /**
  * <h1>Albers Equal Area</h1>
@@ -69,7 +68,7 @@ import com.revolsys.jts.geom.Coordinates;
  * 
  * @author paustin
  */
-public class AlbersConicEqualArea implements CoordinatesProjection {
+public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
   /** Constant c = sq(m(phi1) + n * q(phi1) */
   private final double c;
 
@@ -164,11 +163,13 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * lambda =
    */
   @Override
-  public void inverse(final Coordinates from, final Coordinates to) {
-    final double x = from.getX() - x0;
-    final double y = from.getY() - y0;
-    final double theta = Math.atan(x / (rho0 - y));
-    final double rho = Math.sqrt(x * x + Math.pow((rho0 - y), 2.0));
+  public void inverse(final double x, final double y,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
+    final double dX = x - x0;
+    final double dY = y - y0;
+    final double theta = Math.atan(dX / (rho0 - dY));
+    final double rho = Math.sqrt(dX * dX + Math.pow((rho0 - dY), 2.0));
     final double q = (c - (rho * rho * n * n) / (semiMajorAxis * semiMajorAxis))
       / n;
     final double lambda = lambda0 + theta / n;
@@ -198,12 +199,8 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
     } else {
       phi = li;
     }
-    to.setValue(0, lambda);
-    to.setValue(1, phi);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = lambda;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = phi;
   }
 
   /**
@@ -234,9 +231,9 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
    * </pre>
    */
   @Override
-  public void project(final Coordinates from, final Coordinates to) {
-    final double lambda = from.getX();
-    final double phi = from.getY();
+  public void project(final double lambda, final double phi,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
     final double q = q(phi);
     final double lminusl0 = lambda - lambda0;
     final double theta = n * lminusl0;
@@ -246,12 +243,8 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
     final double x = x0 + rho * Math.sin(theta);
     final double y = y0 + rho0 - rho * Math.cos(theta);
 
-    to.setValue(0, x);
-    to.setValue(1, y);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = x;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = y;
   }
 
   /**
@@ -275,15 +268,5 @@ public class AlbersConicEqualArea implements CoordinatesProjection {
       * (sinPhi / (1.0 - ee * sinPhi * sinPhi) - (1.0 / (2.0 * e))
         * Math.log((1.0 - eSinPhi) / (1.0 + eSinPhi)));
     return q;
-  }
-
-  /**
-   * q = (C - sq(rho) * sq(n) / sq(a)) /n
-   * 
-   * @param phi
-   * @return
-   */
-  private double qInverse(final double rho) {
-    return (c - rho * rho * n * n / (semiMajorAxis * semiMajorAxis)) / n;
   }
 }

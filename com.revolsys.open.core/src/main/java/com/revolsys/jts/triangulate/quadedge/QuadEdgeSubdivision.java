@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -130,7 +128,7 @@ public class QuadEdgeSubdivision {
       }
       // Assert.isTrue(pts.length == 4,
       // "Too few points for visited triangle at " + loc);
-      // com.revolsys.jts.testold.util.Debug.println("too few points for triangle at " +
+      // com.revolsys.jts.util.Debug.println("too few points for triangle at " +
       // loc);
     }
 

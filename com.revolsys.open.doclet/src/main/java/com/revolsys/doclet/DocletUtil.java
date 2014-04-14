@@ -36,7 +36,7 @@ public class DocletUtil {
 
   static {
     addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
-    addPackageUrl("com.revolsys.jts.testold.",
+    addPackageUrl("com.revolsys.jts.",
       "http://tsusiatsoftware.net/jts/javadoc/");
   }
 
@@ -364,6 +364,17 @@ public class DocletUtil {
     }
   }
 
+  public static void tagWithAnchor(final XmlWriter writer, final QName tag,
+    final String name, final String title) {
+    writer.startTag(tag);
+    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
+    writer.startTag(HtmlUtil.A);
+    writer.attribute(HtmlUtil.ATTR_NAME, name);
+    writer.text(title);
+    writer.endTag(HtmlUtil.A);
+    writer.endTag(tag);
+  }
+
   public static void title(final XmlWriter writer, final String title) {
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "title");
@@ -437,16 +448,5 @@ public class DocletUtil {
       }
     }
     writer.text(type.dimension());
-  }
-
-  public static void tagWithAnchor(final XmlWriter writer, final QName tag,
-    final String name, final String title) {
-    writer.startTag(tag);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
-    writer.startTag(HtmlUtil.A);
-    writer.attribute(HtmlUtil.ATTR_NAME, name);
-    writer.text(title);
-    writer.endTag(HtmlUtil.A);
-    writer.endTag(tag);
   }
 }

@@ -99,11 +99,6 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
     return Dimension.FALSE;
   }
 
-  @Override
-  public String getGeometryType() {
-    return "LinearRing";
-  }
-
   /**
    * Tests whether this ring is closed.
    * Empty rings are closed by definition.

@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
@@ -57,13 +59,18 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
 
   private static final long serialVersionUID = -8048474874175355449L;
 
+  public MultiPointImpl(final GeometryFactory geometryFactory) {
+    super(null, geometryFactory);
+  }
+
   /**
    *@param  points          the <code>Point</code>s for this <code>MultiPoint</code>
    *      , or <code>null</code> or an empty array to create the empty geometry.
    *      Elements may be empty <code>Point</code>s, but not <code>null</code>s.
    */
-  public MultiPointImpl(final Point[] points, final GeometryFactory factory) {
-    super(points, factory);
+  public MultiPointImpl(final GeometryFactory geometryFactory,
+    final Point[] points) {
+    super(points, geometryFactory);
   }
 
   @Override
@@ -110,13 +117,13 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
   }
 
   @Override
-  public int getDimension() {
-    return 0;
+  public DataType getDataType() {
+    return DataTypes.MULTI_POINT;
   }
 
   @Override
-  public String getGeometryType() {
-    return "MultiPoint";
+  public int getDimension() {
+    return 0;
   }
 
   @Override

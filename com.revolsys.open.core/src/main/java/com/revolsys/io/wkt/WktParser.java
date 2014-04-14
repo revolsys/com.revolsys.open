@@ -79,13 +79,13 @@ public class WktParser {
     }
   }
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
   public WktParser() {
     this(GeometryFactory.getFactory());
   }
 
-  public WktParser(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public WktParser(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
@@ -127,8 +127,8 @@ public class WktParser {
   }
 
   private CoordinatesList parseCoordinates(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final StringBuffer text, final int numAxis) {
+    final GeometryFactory geometryFactory, final StringBuffer text,
+    final int numAxis) {
     final int geometryFactoryNumAxis = geometryFactory.getNumAxis();
     char c = text.charAt(0);
     if (c == '(') {
@@ -197,7 +197,7 @@ public class WktParser {
   public <T extends Geometry> T parseGeometry(final String value,
     final boolean useNumAxisFromGeometryFactory) {
     if (StringUtils.hasLength(value)) {
-      com.revolsys.jts.geom.GeometryFactory geometryFactory = this.geometryFactory;
+      GeometryFactory geometryFactory = this.geometryFactory;
       final int numAxis = geometryFactory.getNumAxis();
       final double scaleXY = geometryFactory.getScaleXY();
       final double scaleZ = geometryFactory.getScaleZ();
@@ -250,8 +250,7 @@ public class WktParser {
     }
   }
 
-  private LineString parseLineString(
-    com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  private LineString parseLineString(GeometryFactory geometryFactory,
     final boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
@@ -274,8 +273,7 @@ public class WktParser {
     }
   }
 
-  private MultiLineString parseMultiLineString(
-    com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  private MultiLineString parseMultiLineString(GeometryFactory geometryFactory,
     final boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
@@ -296,8 +294,7 @@ public class WktParser {
     return geometryFactory.createMultiLineString(lines);
   }
 
-  private MultiPoint parseMultiPoint(
-    com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  private MultiPoint parseMultiPoint(GeometryFactory geometryFactory,
     final boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
@@ -310,17 +307,16 @@ public class WktParser {
       }
     }
 
-    final List<CoordinatesList> pointsList;
     if (isEmpty(text)) {
-      pointsList = new ArrayList<CoordinatesList>();
+      return geometryFactory.createMultiPoint();
     } else {
-      pointsList = parseParts(geometryFactory, text, numAxis);
+      final List<CoordinatesList> pointsList = parseParts(geometryFactory,
+        text, numAxis);
+      return geometryFactory.createMultiPoint(pointsList);
     }
-    return geometryFactory.createMultiPoint(pointsList);
   }
 
-  private MultiPolygon parseMultiPolygon(
-    com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  private MultiPolygon parseMultiPolygon(GeometryFactory geometryFactory,
     final boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
@@ -343,8 +339,8 @@ public class WktParser {
   }
 
   private List<CoordinatesList> parseParts(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final StringBuffer text, final int numAxis) {
+    final GeometryFactory geometryFactory, final StringBuffer text,
+    final int numAxis) {
     final List<CoordinatesList> parts = new ArrayList<CoordinatesList>();
     final char firstChar = text.charAt(0);
     switch (firstChar) {
@@ -372,8 +368,8 @@ public class WktParser {
   }
 
   private List<List<CoordinatesList>> parsePartsList(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final StringBuffer text, final int numAxis) {
+    final GeometryFactory geometryFactory, final StringBuffer text,
+    final int numAxis) {
     final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
     final char firstChar = text.charAt(0);
     switch (firstChar) {
@@ -400,8 +396,7 @@ public class WktParser {
     return partsList;
   }
 
-  private Point parsePoint(
-    com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  private Point parsePoint(GeometryFactory geometryFactory,
     final boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     final int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {
@@ -425,8 +420,7 @@ public class WktParser {
     }
   }
 
-  private Polygon parsePolygon(
-    com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  private Polygon parsePolygon(GeometryFactory geometryFactory,
     final boolean useNumAxisFromGeometryFactory, final StringBuffer text) {
     int numAxis = getNumAxis(text);
     if (!useNumAxisFromGeometryFactory) {

@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -113,13 +115,13 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
   }
 
   @Override
-  public int getDimension() {
-    return 2;
+  public DataType getDataType() {
+    return DataTypes.MULTI_POLYGON;
   }
 
   @Override
-  public String getGeometryType() {
-    return "MultiPolygon";
+  public int getDimension() {
+    return 2;
   }
 
   @Override

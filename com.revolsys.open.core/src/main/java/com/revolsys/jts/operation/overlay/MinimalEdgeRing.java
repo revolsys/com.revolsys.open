@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -45,22 +44,22 @@ import com.revolsys.jts.geomgraph.EdgeRing;
  * to represent polygons under the OGC SFS spatial data model.
  *
  * @version 1.7
- * @see com.revolsys.jts.testold.operation.overlay.MaximalEdgeRing
+ * @see com.revolsys.jts.operation.overlay.MaximalEdgeRing
  */
-public class MinimalEdgeRing
-  extends EdgeRing
-{
+public class MinimalEdgeRing extends EdgeRing {
 
-  public MinimalEdgeRing(DirectedEdge start, GeometryFactory geometryFactory) {
+  public MinimalEdgeRing(final DirectedEdge start,
+    final GeometryFactory geometryFactory) {
     super(start, geometryFactory);
   }
 
-  public DirectedEdge getNext(DirectedEdge de)
-  {
+  @Override
+  public DirectedEdge getNext(final DirectedEdge de) {
     return de.getNextMin();
   }
-  public void setEdgeRing(DirectedEdge de, EdgeRing er)
-  {
+
+  @Override
+  public void setEdgeRing(final DirectedEdge de, final EdgeRing er) {
     de.setMinEdgeRing(er);
   }
 

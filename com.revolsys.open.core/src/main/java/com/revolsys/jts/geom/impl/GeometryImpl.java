@@ -40,6 +40,8 @@ import java.util.List;
 
 import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.wkt.WktWriter;
@@ -673,6 +675,15 @@ public abstract class GeometryImpl implements Geometry {
     return relate(g).isContains();
   }
 
+  @Override
+  public Geometry convert(final GeometryFactory geometryFactory) {
+    if (getGeometryFactory() == geometryFactory) {
+      return this;
+    } else {
+      return geometryFactory.createGeometry(this);
+    }
+  }
+
   /**
    *  Computes the smallest convex <code>Polygon</code> that contains all the
    *  points in the <code>Geometry</code>. This obviously applies only to <code>Geometry</code>
@@ -1243,6 +1254,11 @@ public abstract class GeometryImpl implements Geometry {
     return geometryFactory.getCoordinateSystem();
   }
 
+  @Override
+  public DataType getDataType() {
+    return DataTypes.GEOMETRY;
+  }
+
   /**
    * Returns the dimension of this geometry.
    * The dimension of a geometry is is the topological 
@@ -1344,7 +1360,9 @@ public abstract class GeometryImpl implements Geometry {
    *@return the name of this <code>Geometry</code>s actual class
    */
   @Override
-  public abstract String getGeometryType();
+  public String getGeometryType() {
+    return getDataType().toString();
+  }
 
   /**
    * Computes an interior point of this <code>Geometry</code>.
@@ -2051,6 +2069,19 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean within(final Geometry g) {
     return g.contains(this);
+  }
+
+  protected GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
+    final int geometrySrid = getSrid();
+      final int srid = geometryFactory.getSrid();
+    if (srid == 0 && geometrySrid != 0) {
+       int numAxis = geometryFactory.getNumAxis();
+      double scaleXY = geometryFactory.getScaleXY();
+      double scaleZ = geometryFactory.getScaleZ();
+      geometryFactory = GeometryFactory.getFactory(
+        geometrySrid, numAxis, scaleXY, scaleZ);
+    }
+    return geometryFactory;
   }
 
 }

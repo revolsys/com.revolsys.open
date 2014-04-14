@@ -28,6 +28,17 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
   }
 
   @Override
+  public void perform(int sourceNumAxis, double[] sourceCoordinates,
+    final int targetNumAxis, final double[] targetCoordinates) {
+    for (final CoordinatesOperation operation : operations) {
+      operation.perform(sourceNumAxis, sourceCoordinates, targetNumAxis,
+        targetCoordinates);
+      sourceNumAxis = targetNumAxis;
+      sourceCoordinates = targetCoordinates;
+    }
+  }
+
+  @Override
   public String toString() {
     return operations.toString();
   }

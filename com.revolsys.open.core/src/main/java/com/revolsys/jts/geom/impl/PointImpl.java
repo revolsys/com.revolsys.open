@@ -34,6 +34,9 @@ package com.revolsys.jts.geom.impl;
 
 import java.util.Collections;
 
+import com.revolsys.gis.cs.projection.CoordinatesOperation;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -185,6 +188,29 @@ public class PointImpl extends GeometryImpl implements Point {
       final double x = getX();
       final double y = getY();
       return new Envelope(x, y);
+    }
+  }
+
+  @Override
+  public Point convert(GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (sourceGeometryFactory == geometryFactory) {
+      return this;
+    } else {
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
+      double[] targetCoordinates;
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory.getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        targetCoordinates = coordinates;
+      } else {
+        final byte sourceNumAxis = getNumAxis();
+        final int targetNumAxis = geometryFactory.getNumAxis();
+        targetCoordinates = new double[targetNumAxis];
+        coordinatesOperation.perform(sourceNumAxis, coordinates, targetNumAxis,
+          targetCoordinates);
+      }
+
+      return geometryFactory.createPoint(targetCoordinates);
     }
   }
 
@@ -341,6 +367,11 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
+  public DataType getDataType() {
+    return DataTypes.POINT;
+  }
+
+  @Override
   public int getDimension() {
     return 0;
   }
@@ -349,11 +380,6 @@ public class PointImpl extends GeometryImpl implements Point {
   @Override
   public <V extends Geometry> V getGeometry() {
     return (V)this;
-  }
-
-  @Override
-  public String getGeometryType() {
-    return "Point";
   }
 
   @Override

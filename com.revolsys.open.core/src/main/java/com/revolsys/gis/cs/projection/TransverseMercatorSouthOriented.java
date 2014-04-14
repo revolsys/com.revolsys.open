@@ -4,9 +4,9 @@ import com.revolsys.gis.cs.Datum;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Spheroid;
-import com.revolsys.jts.geom.Coordinates;
 
-public class TransverseMercatorSouthOriented implements CoordinatesProjection {
+public class TransverseMercatorSouthOriented extends
+  AbstractCoordinatesProjection {
 
   private final double a;
 
@@ -88,9 +88,9 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
   }
 
   @Override
-  public void inverse(final Coordinates from, final Coordinates to) {
-    final double x = from.getX();
-    final double y = from.getY();
+  public void inverse(final double x, final double y,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
 
     final double phi1 = footPointLatitude(y - y0);
     final double cosPhi1 = Math.cos(phi1);
@@ -123,19 +123,15 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
         * d5 / 120) / cosPhi1;
 
     final double lon = Math.toDegrees(lambda);
-    to.setValue(0, lon);
     final double lat = Math.toDegrees(phi);
-    to.setValue(1, lat);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = lon;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = lat;
   }
 
   @Override
-  public void project(final Coordinates from, final Coordinates to) {
-    final double lon = from.getX();
-    final double lat = from.getY();
+  public void project(final double lon, final double lat,
+    final double[] targetCoordinates, final int targetOffset,
+    final int targetNumAxis) {
     // ep2 = the second eccentricity squared.
     // N = the radius of curvature of the spheroid in the prime vertical plane
     final double n = spheroid.primeVerticalRadiusOfCurvature(lat);
@@ -178,12 +174,8 @@ public class TransverseMercatorSouthOriented implements CoordinatesProjection {
     v3 = 1385.0 - 311.0 * t2 + 543.0 * t4 - t6;
     final double y = s0(lat) / n + u0 + u1 * v1 + u2 * v2 + u3 * v3;
 
-    to.setValue(0, x0 - n * x * k0);
-    to.setValue(1, y0 - n * y * k0);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
-      final double ordinate = from.getValue(i);
-      to.setValue(i, ordinate);
-    }
+    targetCoordinates[targetOffset * targetNumAxis] = x0 - n * x * k0;
+    targetCoordinates[targetOffset * targetNumAxis + 1] = y0 - n * y * k0;
   }
 
   private double s0(final double lat) {
