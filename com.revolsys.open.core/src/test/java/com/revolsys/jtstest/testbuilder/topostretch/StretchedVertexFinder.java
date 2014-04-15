@@ -28,8 +28,8 @@ class StretchedVertexFinder {
 
   private static double distanceToSeg(final Coordinates p,
     final Coordinates p0, final Coordinates p1) {
-    distSeg.p0 = p0;
-    distSeg.p1 = p1;
+    distSeg.setP0(p0);
+    distSeg.setP1(p1);
     double segDist = distSeg.distance(p);
 
     // robust calculation of zero distance
@@ -66,8 +66,8 @@ class StretchedVertexFinder {
     }
 
     // compute actual distance
-    distSeg.p0 = p0;
-    distSeg.p1 = p1;
+    distSeg.setP0(p0);
+    distSeg.setP1(p1);
     final double segDist = distSeg.distance(p);
     if (segDist > distTol) {
       return false;

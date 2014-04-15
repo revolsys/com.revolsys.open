@@ -16,15 +16,15 @@ import com.revolsys.swing.map.Viewport2D;
 public final class GeometryShapeUtil {
   public static void addCoordinateSequence(final Viewport2D viewport,
     final GeneralPath path, final CoordinatesList sequence) {
-    double x = sequence.getOrdinate(0, 0);
-    double y = sequence.getOrdinate(0, 1);
+    double x = sequence.getValue(0, 0);
+    double y = sequence.getValue(0, 1);
     double[] screenCoords = viewport.toViewCoordinates(x, y);
     float screenX = (float)screenCoords[0];
     float screenY = (float)screenCoords[1];
     path.moveTo(screenX, screenY);
     for (int i = 0; i < sequence.size(); i++) {
-      x = sequence.getOrdinate(i, 0);
-      y = sequence.getOrdinate(i, 1);
+      x = sequence.getValue(i, 0);
+      y = sequence.getValue(i, 1);
       screenCoords = viewport.toViewCoordinates(x, y);
       screenX = (float)screenCoords[0];
       screenY = (float)screenCoords[1];

@@ -151,8 +151,8 @@ public class MinimumDiameter {
     // compute the max distance for all segments in the ring, and pick the
     // minimum
     for (int i = 0; i < pts.length - 1; i++) {
-      seg.p0 = pts[i];
-      seg.p1 = pts[i + 1];
+      seg.setP0(pts[i]);
+      seg.setP1(pts[i + 1]);
       currMaxIndex = findMaxPerpDistance(pts, seg, currMaxIndex);
     }
   }
@@ -188,13 +188,13 @@ public class MinimumDiameter {
     } else if (convexHullPts.length == 1) {
       minWidth = 0.0;
       minWidthPt = convexHullPts[0];
-      minBaseSeg.p0 = convexHullPts[0];
-      minBaseSeg.p1 = convexHullPts[0];
+      minBaseSeg.setP0(convexHullPts[0]);
+      minBaseSeg.setP1(convexHullPts[0]);
     } else if (convexHullPts.length == 2 || convexHullPts.length == 3) {
       minWidth = 0.0;
       minWidthPt = convexHullPts[0];
-      minBaseSeg.p0 = convexHullPts[0];
-      minBaseSeg.p1 = convexHullPts[1];
+      minBaseSeg.setP0(convexHullPts[0]);
+      minBaseSeg.setP1(convexHullPts[1]);
     } else {
       computeConvexRingMinDiameter(convexHullPts);
     }
@@ -273,15 +273,15 @@ public class MinimumDiameter {
 
     // check if minimum rectangle is degenerate (a point or line segment)
     if (minWidth == 0.0) {
-      if (minBaseSeg.p0.equals2d(minBaseSeg.p1)) {
-        return inputGeom.getGeometryFactory().point(minBaseSeg.p0);
+      if (minBaseSeg.getP0().equals2d(minBaseSeg.getP1())) {
+        return inputGeom.getGeometryFactory().point(minBaseSeg.getP0());
       }
       return minBaseSeg.toGeometry(inputGeom.getGeometryFactory());
     }
 
     // deltas for the base segment of the minimum diameter
-    final double dx = minBaseSeg.p1.getX() - minBaseSeg.p0.getX();
-    final double dy = minBaseSeg.p1.getY() - minBaseSeg.p0.getY();
+    final double dx = minBaseSeg.getP1().getX() - minBaseSeg.getP0().getX();
+    final double dy = minBaseSeg.getP1().getY() - minBaseSeg.getP0().getY();
 
     /*
      * double c0 = computeC(dx, dy, minBaseSeg.p0); double c1 = computeC(dx, dy,
@@ -343,7 +343,7 @@ public class MinimumDiameter {
   public LineString getSupportingSegment() {
     computeMinimumDiameter();
     return inputGeom.getGeometryFactory().lineString(new Coordinates[] {
-      minBaseSeg.p0, minBaseSeg.p1
+      minBaseSeg.getP0(), minBaseSeg.getP1()
     });
   }
 

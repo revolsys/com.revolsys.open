@@ -55,7 +55,7 @@ public class GeometryEditUtil {
       return new ListCoordinatesList(points);
     } else {
       final int size = points.size();
-      final byte numAxis = points.getNumAxis();
+      final int numAxis = points.getNumAxis();
       final CoordinatesList newPoints = new DoubleCoordinatesList(size + 1,
         numAxis);
       points.copy(0, newPoints, 0, numAxis, size);
@@ -112,7 +112,7 @@ public class GeometryEditUtil {
     final Coordinates newPoint) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final CoordinatesList newPoints = appendVertex(points, newPoint);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.lineString(newPoints);
   }
 
@@ -120,7 +120,7 @@ public class GeometryEditUtil {
     final Coordinates newPoint) {
     final CoordinatesList points = CoordinatesListUtil.get(multiPoint);
     final CoordinatesList newPoints = appendVertex(points, newPoint);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
     return geometryFactory.createMultiPoint(newPoints);
   }
 
@@ -132,7 +132,7 @@ public class GeometryEditUtil {
       newPoint);
 
     rings.set(ringIndex, newPoints);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
     return geometryFactory.createPolygon(rings);
   }
 
@@ -158,7 +158,7 @@ public class GeometryEditUtil {
     final int[] vertexId) {
     if (geometry != null && vertexId.length > 0) {
       final int pointIndex = vertexId[vertexId.length - 1];
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
       if (geometry instanceof Point) {
         return geometry;
       } else if (geometry instanceof LineString) {
@@ -205,7 +205,7 @@ public class GeometryEditUtil {
 
   public static LineString deleteVertex(final LineString line,
     final int pointIndex) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final CoordinatesList newPoints = deleteVertex(points, pointIndex);
     if (newPoints != points) {
@@ -224,7 +224,7 @@ public class GeometryEditUtil {
     final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
     final CoordinatesList points = rings.get(ringIndex).clone();
     CoordinatesList newPoints;
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
     if (pointIndex == 0 || pointIndex == points.size() - 1) {
       newPoints = points.subList(1, points.size() - 1);
       final Coordinates firstPoint = newPoints.get(0);
@@ -677,7 +677,8 @@ public class GeometryEditUtil {
 
   public static <T extends Geometry> T insertVertex(final Geometry geometry,
     final Point newPoint, final int[] vertexId) {
-    return insertVertex(geometry, CoordinatesUtil.getInstance(newPoint), vertexId);
+    return insertVertex(geometry, CoordinatesUtil.getInstance(newPoint),
+      vertexId);
   }
 
   public static LineString insertVertex(final LineString line,
@@ -685,7 +686,7 @@ public class GeometryEditUtil {
     final CoordinatesList coordinatesList = CoordinatesListUtil.get(line);
     final ListCoordinatesList points = insertVertex(coordinatesList,
       pointIndex, newPoint);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.lineString(points);
   }
 
@@ -694,7 +695,7 @@ public class GeometryEditUtil {
     final CoordinatesList coordinatesList = CoordinatesListUtil.get(multiPoint);
     final ListCoordinatesList points = insertVertex(coordinatesList,
       pointIndex, newPoint);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
     return geometryFactory.createMultiPoint(points);
   }
 
@@ -707,7 +708,7 @@ public class GeometryEditUtil {
     points.add(pointIndex, newPoint);
 
     rings.set(ringIndex, points);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
     return geometryFactory.createPolygon(rings);
   }
 
@@ -730,61 +731,12 @@ public class GeometryEditUtil {
     return false;
   }
 
-  protected static CoordinatesList moveGeometry(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final CoordinatesList points, final double deltaX, final double deltaY) {
-    final CoordinatesList newPoints = geometryFactory.createCoordinatesList(points);
-    for (int i = 0; i < newPoints.size(); i++) {
-      final double x = points.getX(i);
-      newPoints.setX(i, x + deltaX);
-
-      final double y = points.getY(i);
-      newPoints.setY(i, y + deltaY);
-    }
-    return newPoints;
-  }
-
-  protected static LineString moveGeometry(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final LineString line, final double deltaX, final double deltaY) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    final CoordinatesList newPoints = moveGeometry(geometryFactory, points,
-      deltaX, deltaY);
-    final LineString newLine = geometryFactory.lineString(newPoints);
-    return newLine;
-  }
-
-  protected static Point moveGeometry(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final Point point, final double deltaX, final double deltaY) {
-    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
-    coordinates.setX(coordinates.getX() + deltaX);
-    coordinates.setY(coordinates.getY() + deltaY);
-    final Point newPoint = geometryFactory.point(coordinates);
-    return newPoint;
-  }
-
-  protected static Polygon moveGeometry(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final Polygon polygon, final double deltaX, final double deltaY) {
-    final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-    for (int i = 0; i < rings.size(); i++) {
-      final CoordinatesList ring = rings.get(i);
-      final CoordinatesList newRing = moveGeometry(geometryFactory, ring,
-        deltaX, deltaY);
-      rings.set(i, newRing);
-    }
-
-    final Polygon newPolygon = geometryFactory.createPolygon(rings);
-    return newPolygon;
-  }
-
   @SuppressWarnings("unchecked")
   public static <T extends Geometry> T moveGeometry(final Geometry geometry,
     final double deltaX, final double deltaY) {
 
     if (geometry != null && !geometry.isEmpty()) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
       if (deltaX != 0 && deltaY != 0) {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
@@ -811,6 +763,53 @@ public class GeometryEditUtil {
     return (T)geometry;
   }
 
+  protected static CoordinatesList moveGeometry(
+    final GeometryFactory geometryFactory, final CoordinatesList points,
+    final double deltaX, final double deltaY) {
+    final CoordinatesList newPoints = geometryFactory.createCoordinatesList(points);
+    for (int i = 0; i < newPoints.size(); i++) {
+      final double x = points.getX(i);
+      newPoints.setX(i, x + deltaX);
+
+      final double y = points.getY(i);
+      newPoints.setY(i, y + deltaY);
+    }
+    return newPoints;
+  }
+
+  protected static LineString moveGeometry(
+    final GeometryFactory geometryFactory, final LineString line,
+    final double deltaX, final double deltaY) {
+    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final CoordinatesList newPoints = moveGeometry(geometryFactory, points,
+      deltaX, deltaY);
+    final LineString newLine = geometryFactory.lineString(newPoints);
+    return newLine;
+  }
+
+  protected static Point moveGeometry(final GeometryFactory geometryFactory,
+    final Point point, final double deltaX, final double deltaY) {
+    final double[] coordinates = point.getCoordinates();
+    coordinates[0] += deltaX;
+    coordinates[1] += deltaY;
+    final Point newPoint = geometryFactory.point(coordinates);
+    return newPoint;
+  }
+
+  protected static Polygon moveGeometry(final GeometryFactory geometryFactory,
+    final Polygon polygon, final double deltaX, final double deltaY) {
+    final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+    for (int i = 0; i < rings.size(); i++) {
+      final CoordinatesList ring = rings.get(i);
+      final CoordinatesList newRing = moveGeometry(geometryFactory, ring,
+        deltaX, deltaY);
+      rings.set(i, newRing);
+    }
+
+    final Polygon newPolygon = geometryFactory.createPolygon(rings);
+    return newPolygon;
+  }
+
   protected static CoordinatesList moveVertex(
     final CoordinatesList coordinatesList, final int pointIndex,
     final Coordinates newPoint) {
@@ -823,7 +822,7 @@ public class GeometryEditUtil {
   public static <T extends Geometry> T moveVertex(final Geometry geometry,
     final Coordinates newPoint, final int[] vertexId) {
     if (geometry != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
       if (geometry instanceof Point) {
         return (T)geometryFactory.point(newPoint);
       } else if (geometry instanceof LineString) {
@@ -870,7 +869,7 @@ public class GeometryEditUtil {
     final CoordinatesList coordinatesList = CoordinatesListUtil.get(line);
     final CoordinatesList points = moveVertex(coordinatesList, pointIndex,
       newPoint);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.lineString(points);
   }
 
@@ -879,7 +878,7 @@ public class GeometryEditUtil {
     final CoordinatesList coordinatesList = CoordinatesListUtil.get(multiPoint);
     final CoordinatesList points = moveVertex(coordinatesList, pointIndex,
       newPoint);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
     return geometryFactory.createMultiPoint(points);
   }
 
@@ -894,7 +893,7 @@ public class GeometryEditUtil {
       setVertex(points, 0, newPoint);
     }
     rings.set(ringIndex, points);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
     return geometryFactory.createPolygon(rings);
   }
 

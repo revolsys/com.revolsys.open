@@ -135,9 +135,9 @@ public class Densifier {
     final LineSegment seg = new LineSegment();
     final CoordinateList coordList = new CoordinateList();
     for (int i = 0; i < pts.length - 1; i++) {
-      seg.p0 = pts[i];
-      seg.p1 = pts[i + 1];
-      coordList.add(seg.p0, false);
+      seg.setP0(pts[i]);
+      seg.setP1(pts[i + 1]);
+      coordList.add(seg.getP0(), false);
       final double len = seg.getLength();
       final int densifiedSegCount = (int)(len / distanceTolerance) + 1;
       if (densifiedSegCount > 1) {

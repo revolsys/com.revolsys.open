@@ -38,6 +38,7 @@ import java.lang.ref.Reference;
 import java.text.NumberFormat;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -87,6 +88,15 @@ public class WktWriter {
     write(writer, geometry);
     writer.flush();
     return out.toString();
+  }
+
+  private static void write(final PrintWriter out, final Coordinates point,
+    final int numAxis) {
+    writeOrdinate(out, point, 0);
+    for (int j = 1; j < numAxis; j++) {
+      out.print(' ');
+      writeOrdinate(out, point, j);
+    }
   }
 
   public static void write(final PrintWriter out,
@@ -248,14 +258,12 @@ public class WktWriter {
       out.print(" EMPTY");
     } else {
       Point point = (Point)multiPoint.getGeometry(0);
-      CoordinatesList coordinates = point.getCoordinateSequence();
       out.print("((");
-      write(out, coordinates, 0, numAxis);
+      write(out, point, numAxis);
       for (int i = 1; i < multiPoint.getNumGeometries(); i++) {
         out.print("),(");
         point = (Point)multiPoint.getGeometry(i);
-        coordinates = point.getCoordinateSequence();
-        write(out, coordinates, 0, numAxis);
+        write(out, point, numAxis);
       }
       out.print("))");
     }
@@ -298,8 +306,7 @@ public class WktWriter {
       out.print(" EMPTY");
     } else {
       out.print("(");
-      final CoordinatesList coordinates = point.getCoordinateSequence();
-      write(out, coordinates, 0, numAxis);
+      write(out, point, numAxis);
       out.print(')');
     }
   }
@@ -334,12 +341,25 @@ public class WktWriter {
   }
 
   private static void writeOrdinate(final PrintWriter out,
-    final CoordinatesList coordinates, final int index,
-    final int ordinateIndex) {
-    if (ordinateIndex > coordinates.getDimension()) {
+    final Coordinates coordinates, final int ordinateIndex) {
+    if (ordinateIndex > coordinates.getNumAxis()) {
       out.print(0);
     } else {
-      final double ordinate = coordinates.getOrdinate(index, ordinateIndex);
+      final double ordinate = coordinates.getValue(ordinateIndex);
+      if (Double.isNaN(ordinate)) {
+        out.print(0);
+      } else {
+        out.print(MathUtil.toString(ordinate));
+      }
+    }
+  }
+
+  private static void writeOrdinate(final PrintWriter out,
+    final CoordinatesList coordinates, final int index, final int ordinateIndex) {
+    if (ordinateIndex > coordinates.getNumAxis()) {
+      out.print(0);
+    } else {
+      final double ordinate = coordinates.getValue(index, ordinateIndex);
       if (Double.isNaN(ordinate)) {
         out.print(0);
       } else {

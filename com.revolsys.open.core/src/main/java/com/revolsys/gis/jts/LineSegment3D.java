@@ -54,10 +54,10 @@ public class LineSegment3D extends LineSegment {
    * @param line The line segment the coordinate is on.
    */
   public void addElevation(final Coordinates coordinate) {
-    final double z0 = p0.getZ();
-    final double z1 = p1.getZ();
+    final double z0 = getP0().getZ();
+    final double z1 = getP1().getZ();
     if (!Double.isNaN(z0) && !Double.isNaN(z0)) {
-      final double fraction = coordinate.distance(p0) / getLength();
+      final double fraction = coordinate.distance(getP0()) / getLength();
       coordinate.setZ(z0 + (z1 - z0) * (fraction));
     }
   }
@@ -70,16 +70,16 @@ public class LineSegment3D extends LineSegment {
    */
   public void addElevation(final Coordinates coordinate,
     final PrecisionModel model) {
-    final double z0 = p0.getZ();
-    final double z1 = p1.getZ();
+    final double z0 = getP0().getZ();
+    final double z1 = getP1().getZ();
     if (!Double.isNaN(z0) && !Double.isNaN(z0)) {
-      final double fraction = coordinate.distance(p0) / getLength();
+      final double fraction = coordinate.distance(getP0()) / getLength();
       coordinate.setZ(model.makePrecise(z0 + (z1 - z0) * (fraction)));
     }
   }
 
   public Envelope getEnvelope() {
-    return new Envelope(p0, p1);
+    return new Envelope(getP0(), getP1());
   }
 
   public Coordinates intersection3D(final LineSegment line) {
@@ -91,13 +91,13 @@ public class LineSegment3D extends LineSegment {
   }
 
   public Coordinates pointAlong3D(final double segmentLengthFraction) {
-    final double x = p0.getX() + segmentLengthFraction
-      * (p1.getX() - p0.getX());
-    final double y = p0.getY() + segmentLengthFraction
-      * (p1.getY() - p0.getY());
+    final double x = getP0().getX() + segmentLengthFraction
+      * (getP1().getX() - getP0().getX());
+    final double y = getP0().getY() + segmentLengthFraction
+      * (getP1().getY() - getP0().getY());
 
-    final double z0 = p0.getZ();
-    final double z1 = p1.getZ();
+    final double z0 = getP0().getZ();
+    final double z1 = getP1().getZ();
     if (!Double.isNaN(z0) && !Double.isNaN(z0)) {
       final double z = z0 + (z1 - z0) * (segmentLengthFraction);
       return new DoubleCoordinates(x, y, z);

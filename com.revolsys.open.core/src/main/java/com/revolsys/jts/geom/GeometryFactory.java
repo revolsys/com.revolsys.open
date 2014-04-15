@@ -1469,11 +1469,11 @@ public class GeometryFactory implements Serializable,
       if (size == 0) {
         return point();
       } else if (size == 1) {
-        final int numAxis = Math.min(points.getDimension(), getNumAxis());
+        final int numAxis = Math.min(points.getNumAxis(), getNumAxis());
         final double[] coordinates = new double[numAxis];
-        for (int i = 0; i < numAxis; i++) {
-          final double coordinate = points.getOrdinate(0, i);
-          coordinates[i] = coordinate;
+        for (int axisIndex = 0; axisIndex < numAxis; axisIndex++) {
+          final double coordinate = points.getValue(0, axisIndex);
+          coordinates[axisIndex] = coordinate;
         }
         return point(coordinates);
       } else {

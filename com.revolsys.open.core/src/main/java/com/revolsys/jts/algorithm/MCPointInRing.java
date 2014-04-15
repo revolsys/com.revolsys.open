@@ -147,8 +147,8 @@ public class MCPointInRing   implements PointInRing {
     /*
      *  Test if segment crosses ray from test point in positive x direction.
      */
-    Coordinates p1 = seg.p0;
-    Coordinates p2 = seg.p1;
+    Coordinates p1 = seg.getP0();
+    Coordinates p2 = seg.getP1();
     x1 = p1.getX() - p.getX();
     y1 = p1.getY() - p.getY();
     x2 = p2.getX() - p.getX();

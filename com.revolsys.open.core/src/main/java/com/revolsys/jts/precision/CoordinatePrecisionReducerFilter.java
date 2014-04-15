@@ -69,8 +69,8 @@ public class CoordinatePrecisionReducerFilter
 	 */
 	public void filter(CoordinatesList seq, int i)
 	{
-		seq.setOrdinate(i, 0, precModel.makePrecise(seq.getOrdinate(i, 0)));
-		seq.setOrdinate(i, 1, precModel.makePrecise(seq.getOrdinate(i, 1)));
+		seq.setValue(i, 0, precModel.makePrecise(seq.getValue(i, 0)));
+		seq.setValue(i, 1, precModel.makePrecise(seq.getValue(i, 1)));
 	}
   
 	/**

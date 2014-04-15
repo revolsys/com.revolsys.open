@@ -124,8 +124,8 @@ public class MonotoneChain {
    */
   public void getLineSegment(int index, LineSegment ls)
   {
-    ls.p0 = pts[index];
-    ls.p1 = pts[index + 1];
+    ls.setP0(pts[index]);
+    ls.setP1(pts[index + 1]);
   }
   /**
    * Return the subsequence of coordinates forming this chain.

@@ -197,7 +197,7 @@ public class GeometryTransformer
 
   protected Geometry transformPoint(Point geom, Geometry parent) {
     return factory.point(
-        transformCoordinates(geom.getCoordinateSequence(), geom));
+        transformCoordinates(geom.getCoordinatesList(), geom));
   }
 
   protected Geometry transformMultiPoint(MultiPoint geom, Geometry parent) {

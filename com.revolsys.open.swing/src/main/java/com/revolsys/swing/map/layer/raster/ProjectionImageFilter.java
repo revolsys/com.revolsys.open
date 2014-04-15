@@ -8,8 +8,6 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class ProjectionImageFilter extends WholeImageFilter {
@@ -79,17 +77,17 @@ public class ProjectionImageFilter extends WholeImageFilter {
     if (operation == null) {
       return inPixels;
     }
-    final Coordinates source = new DoubleCoordinates(2);
-    final Coordinates dest = new DoubleCoordinates(2);
+    final double[] source = new double[2];
+    final double[] dest = new double[2];
     for (int i = 0; i < newImageWidth; i++) {
       final double newImageX = newMinX + i * this.destPixelSize;
-      dest.setX(newImageX);
+      dest[0] = newImageX;
       for (int j = 0; j < newImageHeight; j++) {
         final double newImageY = newMaxY - j * this.destPixelSize;
-        dest.setY(newImageY);
-        operation.perform(dest, source);
-        final double imageX = source.getX();
-        final double imageY = source.getY();
+        dest[1] = newImageY;
+        operation.perform(2, dest, 2, source);
+        final double imageX = source[0];
+        final double imageY = source[1];
         final int imageI = (int)((imageX - minX) / pixelWidth);
         final int imageJ = imageHeight - (int)((imageY - minY) / pixelHeight);
         if (imageI > -1 && imageI < imageWidth) {

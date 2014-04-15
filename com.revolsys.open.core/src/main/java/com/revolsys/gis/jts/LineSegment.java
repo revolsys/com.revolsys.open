@@ -223,7 +223,7 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   private Coordinates getCoordinates1() {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     final Coordinates coordinates = new DoubleCoordinates(numAxis);
     for (int i = 0; i < numAxis; i++) {
       final double value = getValue(0, i);
@@ -233,7 +233,7 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   private Coordinates getCoordinates2() {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     final Coordinates coordinates = new DoubleCoordinates(numAxis);
     for (int i = 0; i < numAxis; i++) {
       final double value = getValue(1, i);
@@ -343,7 +343,7 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return (byte)(points.length / 2);
   }
 
@@ -354,7 +354,7 @@ public class LineSegment extends AbstractCoordinatesList implements
 
   @Override
   public double getValue(final int index, final int axisIndex) {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (axisIndex >= 0 && axisIndex < numAxis) {
       if (index >= 0 && index < 2) {
         final int valueIndex = index * numAxis + axisIndex;
@@ -518,7 +518,7 @@ public class LineSegment extends AbstractCoordinatesList implements
 
   @Override
   public void setValue(final int index, final int axisIndex, final double value) {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (axisIndex >= 0 && axisIndex < numAxis) {
       if (index >= 0 && index < 2) {
         final int valueIndex = index * numAxis + axisIndex;

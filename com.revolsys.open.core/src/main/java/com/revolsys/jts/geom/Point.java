@@ -66,7 +66,7 @@ public interface Point extends Geometry, Puntal, Vertex {
 
   double getCoordinate(final int axisIndex);
 
-  CoordinatesList getCoordinateSequence();
+  CoordinatesList getCoordinatesList();
 
   @Override
   Point normalize();

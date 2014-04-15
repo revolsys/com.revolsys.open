@@ -161,8 +161,8 @@ class OffsetSegmentGenerator {
    * @param offset1 the second offset segment
    */
   private void addBevelJoin(final LineSegment offset0, final LineSegment offset1) {
-    segList.addPt(offset0.p1);
-    segList.addPt(offset1.p0);
+    segList.addPt(offset0.getP1());
+    segList.addPt(offset1.getP0());
   }
 
   private void addCollinear(final boolean addStartPoint) {
@@ -190,11 +190,11 @@ class OffsetSegmentGenerator {
       if (bufParams.getJoinStyle() == BufferParameters.JOIN_BEVEL
         || bufParams.getJoinStyle() == BufferParameters.JOIN_MITRE) {
         if (addStartPoint) {
-          segList.addPt(offset0.p1);
+          segList.addPt(offset0.getP1());
         }
-        segList.addPt(offset1.p0);
+        segList.addPt(offset1.getP0());
       } else {
-        addFillet(s1, offset0.p1, offset1.p0, CGAlgorithms.CLOCKWISE, distance);
+        addFillet(s1, offset0.getP1(), offset1.getP0(), CGAlgorithms.CLOCKWISE, distance);
       }
     }
   }
@@ -271,7 +271,7 @@ class OffsetSegmentGenerator {
   }
 
   public void addFirstSegment() {
-    segList.addPt(offset1.p0);
+    segList.addPt(offset1.getP0());
   }
 
   /**
@@ -284,7 +284,7 @@ class OffsetSegmentGenerator {
     /**
      * add intersection point of offset segments (if any)
      */
-    li.computeIntersection(offset0.p0, offset0.p1, offset1.p0, offset1.p1);
+    li.computeIntersection(offset0.getP0(), offset0.getP1(), offset1.getP0(), offset1.getP1());
     if (li.hasIntersection()) {
       segList.addPt(li.getIntersection(0));
     } else {
@@ -318,27 +318,27 @@ class OffsetSegmentGenerator {
       */
       hasNarrowConcaveAngle = true;
       // System.out.println("NARROW ANGLE - distance = " + distance);
-      if (offset0.p1.distance(offset1.p0) < distance
+      if (offset0.getP1().distance(offset1.getP0()) < distance
         * INSIDE_TURN_VERTEX_SNAP_DISTANCE_FACTOR) {
-        segList.addPt(offset0.p1);
+        segList.addPt(offset0.getP1());
       } else {
         // add endpoint of this segment offset
-        segList.addPt(offset0.p1);
+        segList.addPt(offset0.getP1());
 
         /**
          * Add "closing segment" of required length.
          */
         if (closingSegLengthFactor > 0) {
           final Coordinates mid0 = new Coordinate((closingSegLengthFactor
-            * offset0.p1.getX() + s1.getX())
+            * offset0.getP1().getX() + s1.getX())
             / (closingSegLengthFactor + 1), (closingSegLengthFactor
-            * offset0.p1.getY() + s1.getY())
+            * offset0.getP1().getY() + s1.getY())
             / (closingSegLengthFactor + 1), Coordinates.NULL_ORDINATE);
           segList.addPt(mid0);
           final Coordinates mid1 = new Coordinate((closingSegLengthFactor
-            * offset1.p0.getX() + s1.getX())
+            * offset1.getP0().getX() + s1.getX())
             / (closingSegLengthFactor + 1), (closingSegLengthFactor
-            * offset1.p0.getY() + s1.getY())
+            * offset1.getP0().getY() + s1.getY())
             / (closingSegLengthFactor + 1), Coordinates.NULL_ORDINATE);
           segList.addPt(mid1);
         } else {
@@ -352,7 +352,7 @@ class OffsetSegmentGenerator {
 
         // */
         // add start point of next segment offset
-        segList.addPt(offset1.p0);
+        segList.addPt(offset1.getP0());
       }
     }
   }
@@ -361,7 +361,7 @@ class OffsetSegmentGenerator {
    * Add last offset point
    */
   public void addLastSegment() {
-    segList.addPt(offset1.p1);
+    segList.addPt(offset1.getP1());
   }
 
   /**
@@ -376,13 +376,13 @@ class OffsetSegmentGenerator {
    */
   private void addLimitedMitreJoin(final LineSegment offset0,
     final LineSegment offset1, final double distance, final double mitreLimit) {
-    final Coordinates basePt = seg0.p1;
+    final Coordinates basePt = seg0.getP1();
 
-    final double ang0 = Angle.angle(basePt, seg0.p0);
-    final double ang1 = Angle.angle(basePt, seg1.p1);
+    final double ang0 = Angle.angle(basePt, seg0.getP0());
+    final double ang1 = Angle.angle(basePt, seg1.getP1());
 
     // oriented angle between segments
-    final double angDiff = Angle.angleBetweenOriented(seg0.p0, basePt, seg1.p1);
+    final double angDiff = Angle.angleBetweenOriented(seg0.getP0(), basePt, seg1.getP1());
     // half of the interior angle
     final double angDiffHalf = angDiff / 2;
 
@@ -444,15 +444,15 @@ class OffsetSegmentGenerator {
     switch (bufParams.getEndCapStyle()) {
       case BufferParameters.CAP_ROUND:
         // add offset seg points with a fillet between them
-        segList.addPt(offsetL.p1);
+        segList.addPt(offsetL.getP1());
         addFillet(p1, angle + Math.PI / 2, angle - Math.PI / 2,
           CGAlgorithms.CLOCKWISE, distance);
-        segList.addPt(offsetR.p1);
+        segList.addPt(offsetR.getP1());
       break;
       case BufferParameters.CAP_FLAT:
         // only offset segment points are added
-        segList.addPt(offsetL.p1);
-        segList.addPt(offsetR.p1);
+        segList.addPt(offsetL.getP1());
+        segList.addPt(offsetR.getP1());
       break;
       case BufferParameters.CAP_SQUARE:
         // add a square defined by extensions of the offset segment endpoints
@@ -460,11 +460,11 @@ class OffsetSegmentGenerator {
         squareCapSideOffset.setX(Math.abs(distance) * Math.cos(angle));
         squareCapSideOffset.setY(Math.abs(distance) * Math.sin(angle));
 
-        final Coordinates squareCapLOffset = new Coordinate(offsetL.p1.getX()
-          + squareCapSideOffset.getX(), offsetL.p1.getY()
+        final Coordinates squareCapLOffset = new Coordinate(offsetL.getP1().getX()
+          + squareCapSideOffset.getX(), offsetL.getP1().getY()
           + squareCapSideOffset.getY(), Coordinates.NULL_ORDINATE);
-        final Coordinates squareCapROffset = new Coordinate(offsetR.p1.getX()
-          + squareCapSideOffset.getX(), offsetR.p1.getY()
+        final Coordinates squareCapROffset = new Coordinate(offsetR.getP1().getX()
+          + squareCapSideOffset.getX(), offsetR.getP1().getY()
           + squareCapSideOffset.getY(), Coordinates.NULL_ORDINATE);
         segList.addPt(squareCapLOffset);
         segList.addPt(squareCapROffset);
@@ -492,8 +492,8 @@ class OffsetSegmentGenerator {
      * whether the offset segment endpoints are almost coincident
      */
     try {
-      intPt = HCoordinate.intersection(offset0.p0, offset0.p1, offset1.p0,
-        offset1.p1);
+      intPt = HCoordinate.intersection(offset0.getP0(), offset0.getP1(), offset1.getP0(),
+        offset1.getP1());
 
       final double mitreRatio = distance <= 0.0 ? 1.0 : intPt.distance(p)
         / Math.abs(distance);
@@ -556,9 +556,9 @@ class OffsetSegmentGenerator {
      * where the two segments are almost parallel 
      * (which is hard to compute a robust intersection for).
      */
-    if (offset0.p1.distance(offset1.p0) < distance
+    if (offset0.getP1().distance(offset1.getP0()) < distance
       * OFFSET_SEGMENT_SEPARATION_FACTOR) {
-      segList.addPt(offset0.p1);
+      segList.addPt(offset0.getP1());
       return;
     }
 
@@ -569,11 +569,11 @@ class OffsetSegmentGenerator {
     } else {
       // add a circular fillet connecting the endpoints of the offset segments
       if (addStartPoint) {
-        segList.addPt(offset0.p1);
+        segList.addPt(offset0.getP1());
       }
       // TESTING - comment out to produce beveled joins
-      addFillet(s1, offset0.p1, offset1.p0, orientation, distance);
-      segList.addPt(offset1.p0);
+      addFillet(s1, offset0.getP1(), offset1.getP0(), orientation, distance);
+      segList.addPt(offset1.getP0());
     }
   }
 
@@ -597,17 +597,17 @@ class OffsetSegmentGenerator {
   private void computeOffsetSegment(final LineSegment seg, final int side,
     final double distance, final LineSegment offset) {
     final int sideSign = side == Position.LEFT ? 1 : -1;
-    final double dx = seg.p1.getX() - seg.p0.getX();
-    final double dy = seg.p1.getY() - seg.p0.getY();
+    final double dx = seg.getP1().getX() - seg.getP0().getX();
+    final double dy = seg.getP1().getY() - seg.getP0().getY();
     final double len = Math.sqrt(dx * dx + dy * dy);
     // u is the vector that is the length of the offset, in the direction of the
     // segment
     final double ux = sideSign * distance * dx / len;
     final double uy = sideSign * distance * dy / len;
-    offset.p0.setX(seg.p0.getX() - uy);
-    offset.p0.setY(seg.p0.getY() + ux);
-    offset.p1.setX(seg.p1.getX() - uy);
-    offset.p1.setY(seg.p1.getY() + ux);
+    offset.getP0().setX(seg.getP0().getX() - uy);
+    offset.getP0().setY(seg.getP0().getY() + ux);
+    offset.getP1().setX(seg.getP1().getX() - uy);
+    offset.getP1().setY(seg.getP1().getY() + ux);
   }
 
   /**

@@ -24,9 +24,28 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     super(dataType, "xs:" + dataType.getName());
   }
 
+  private void coordinates(final XmlWriter out, final Coordinates point) {
+    out.startTag(GmlConstants.COORDINATES);
+    final int numAxis = point.getNumAxis();
+    final double x = point.getX();
+    out.text(x);
+    final double y = point.getY();
+    out.text(",");
+    out.text(y);
+    if (numAxis > 2) {
+      final double z = point.getZ();
+      if (Double.isNaN(z)) {
+        out.text(0);
+      } else {
+        out.text(z);
+      }
+    }
+    out.endTag(GmlConstants.COORDINATES);
+  }
+
   private void coordinates(final XmlWriter out, final CoordinatesList points) {
     out.startTag(GmlConstants.COORDINATES);
-    final byte numAxis = points.getNumAxis();
+    final int numAxis = points.getNumAxis();
     boolean first = true;
     for (int i = 0; i < points.size(); i++) {
       if (first) {
@@ -135,8 +154,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     final boolean writeSrsName) {
     out.startTag(POINT);
     srsName(out, point, writeSrsName);
-    final CoordinatesList points = CoordinatesListUtil.get(point);
-    coordinates(out, points);
+    coordinates(out, point);
     out.endTag(POINT);
   }
 
@@ -162,7 +180,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   private void pos(final XmlWriter out, final Coordinates coordinates) {
     out.startTag(GmlConstants.POS);
-    final byte numAxis = coordinates.getNumAxis();
+    final int numAxis = coordinates.getNumAxis();
     out.attribute(GmlConstants.DIMENSION, numAxis);
     final double x = coordinates.getX();
     out.text(x);
@@ -183,7 +201,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   private void posList(final XmlWriter out, final CoordinatesList points) {
     out.startTag(GmlConstants.POS_LIST);
-    final byte numAxis = points.getNumAxis();
+    final int numAxis = points.getNumAxis();
     out.attribute(GmlConstants.DIMENSION, numAxis);
     boolean first = true;
     for (int i = 0; i < points.size(); i++) {

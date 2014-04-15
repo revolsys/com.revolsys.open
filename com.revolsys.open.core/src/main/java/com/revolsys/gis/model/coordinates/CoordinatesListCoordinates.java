@@ -27,7 +27,7 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return coordinates.getNumAxis();
   }
 
@@ -61,7 +61,7 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
 
   @Override
   public String toString() {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (numAxis > 0) {
       final double x = coordinates.getX(index);
       final StringBuffer s = new StringBuffer(String.valueOf(x));

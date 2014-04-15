@@ -42,13 +42,13 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
         return false;
       }
 
-      if (coord.getX() != seq.getOrdinate(i, CoordinatesList.X)) {
+      if (coord.getX() != seq.getValue(i, CoordinatesList.X)) {
         return false;
       }
-      if (coord.getY() != seq.getOrdinate(i, CoordinatesList.Y)) {
+      if (coord.getY() != seq.getValue(i, CoordinatesList.Y)) {
         return false;
       }
-      if (coord.getZ() != seq.getOrdinate(i, CoordinatesList.Z)) {
+      if (coord.getZ() != seq.getValue(i, CoordinatesList.Z)) {
         return false;
       }
     }
@@ -84,13 +84,13 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
       }
 
       // Ordinate indexed getters
-      if (coords[i].getX() != seq.getOrdinate(i, CoordinatesList.X)) {
+      if (coords[i].getX() != seq.getValue(i, CoordinatesList.X)) {
         return false;
       }
-      if (coords[i].getY() != seq.getOrdinate(i, CoordinatesList.Y)) {
+      if (coords[i].getY() != seq.getValue(i, CoordinatesList.Y)) {
         return false;
       }
-      if (coords[i].getZ() != seq.getOrdinate(i, CoordinatesList.Z)) {
+      if (coords[i].getZ() != seq.getValue(i, CoordinatesList.Z)) {
         return false;
       }
 
@@ -115,8 +115,8 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
 
     final CoordinatesList seq = getCSFactory().create(SIZE, 2);
     for (int i = 0; i < seq.size(); i++) {
-      seq.setOrdinate(i, 0, coords[i].getX());
-      seq.setOrdinate(i, 1, coords[i].getY());
+      seq.setValue(i, 0, coords[i].getX());
+      seq.setValue(i, 1, coords[i].getY());
     }
 
     for (int i = 0; i < seq.size(); i++) {
@@ -144,9 +144,9 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
 
     final CoordinatesList seq = getCSFactory().create(SIZE, 3);
     for (int i = 0; i < seq.size(); i++) {
-      seq.setOrdinate(i, 0, coords[i].getX());
-      seq.setOrdinate(i, 1, coords[i].getY());
-      seq.setOrdinate(i, 2, coords[i].getZ());
+      seq.setValue(i, 0, coords[i].getX());
+      seq.setValue(i, 1, coords[i].getY());
+      seq.setValue(i, 2, coords[i].getZ());
     }
 
     assertTrue(isEqual(seq, coords));

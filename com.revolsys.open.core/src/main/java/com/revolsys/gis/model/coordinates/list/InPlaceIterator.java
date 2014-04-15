@@ -32,7 +32,7 @@ public class InPlaceIterator extends AbstractCoordinates implements
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return coordinates.getNumAxis();
   }
 
@@ -99,7 +99,7 @@ public class InPlaceIterator extends AbstractCoordinates implements
 
   @Override
   public String toString() {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (numAxis > 0) {
       final StringBuffer s = new StringBuffer(String.valueOf(getValue(0)));
       for (int i = 1; i < numAxis; i++) {

@@ -95,8 +95,8 @@ class DouglasPeuckerLineSimplifier {
     if ((i + 1) == j) {
       return;
     }
-    seg.p0 = pts[i];
-    seg.p1 = pts[j];
+    seg.setP0(pts[i]);
+    seg.setP1(pts[j]);
     double maxDistance = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {

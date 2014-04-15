@@ -70,8 +70,8 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     private void addLine(final Coordinates[] pts) {
       for (int i = 1; i < pts.length; i++) {
         final LineSegment seg = new LineSegment(pts[i - 1], pts[i]);
-        final double min = Math.min(seg.p0.getY(), seg.p1.getY());
-        final double max = Math.max(seg.p0.getY(), seg.p1.getY());
+        final double min = Math.min(seg.getP0().getY(), seg.getP1().getY());
+        final double max = Math.max(seg.getP0().getY(), seg.getP1().getY());
         index.insert(min, max, seg);
       }
     }

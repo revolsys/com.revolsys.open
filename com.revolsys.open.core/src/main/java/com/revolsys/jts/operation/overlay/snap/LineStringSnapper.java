@@ -117,15 +117,15 @@ public class LineStringSnapper {
     double minDist = Double.MAX_VALUE;
     int snapIndex = -1;
     for (int i = 0; i < srcCoords.size() - 1; i++) {
-      seg.p0 = srcCoords.get(i);
-      seg.p1 = srcCoords.get(i + 1);
+      seg.setP0(srcCoords.get(i));
+      seg.setP1(srcCoords.get(i + 1));
 
       /**
        * Check if the snap pt is equal to one of the segment endpoints.
        * 
        * If the snap pt is already in the src list, don't snap at all.
        */
-      if (seg.p0.equals2d(snapPt) || seg.p1.equals2d(snapPt)) {
+      if (seg.getP0().equals2d(snapPt) || seg.getP1().equals2d(snapPt)) {
         if (allowSnappingToSourceVertices) {
           continue;
         } else {

@@ -120,7 +120,7 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
 
   public Point perform(final Point point) {
     if (point != null) {
-      final CoordinatesList newCoordinate = perform(CoordinatesListUtil.get(point));
+      final CoordinatesList newCoordinate = perform(point.getCoordinatesList());
       final Point newPoint = geometryFactory.point(newCoordinate);
       addUserData(point, newPoint);
       return newPoint;

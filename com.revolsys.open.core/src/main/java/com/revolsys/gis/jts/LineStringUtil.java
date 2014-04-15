@@ -273,17 +273,17 @@ public final class LineStringUtil {
       double minDistance = Double.MAX_VALUE;
       final CoordinatesList coordinates1 = line1.getCoordinatesList();
       final CoordinatesList coordinates2 = line2.getCoordinatesList();
-      double previousX1 = coordinates1.getOrdinate(0, 0);
-      double previousY1 = coordinates1.getOrdinate(0, 1);
+      double previousX1 = coordinates1.getValue(0, 0);
+      double previousY1 = coordinates1.getValue(0, 1);
       for (int i = 1; i < coordinates1.size(); i++) {
-        final double x1 = coordinates1.getOrdinate(i, 0);
-        final double y1 = coordinates1.getOrdinate(i, 1);
+        final double x1 = coordinates1.getValue(i, 0);
+        final double y1 = coordinates1.getValue(i, 1);
 
-        double previousX2 = coordinates2.getOrdinate(0, 0);
-        double previousY2 = coordinates2.getOrdinate(0, 1);
+        double previousX2 = coordinates2.getValue(0, 0);
+        double previousY2 = coordinates2.getValue(0, 1);
         for (int j = 1; j < coordinates2.size(); j++) {
-          final double x2 = coordinates2.getOrdinate(j, 0);
-          final double y2 = coordinates2.getOrdinate(j, 1);
+          final double x2 = coordinates2.getValue(j, 0);
+          final double y2 = coordinates2.getValue(j, 1);
           final double distance = distance(previousX1, previousY1, x1, y1,
             previousX2, previousY2, x2, y2);
           if (distance <= terminateDistance) {
@@ -738,7 +738,7 @@ public final class LineStringUtil {
         }
       }
     }
-    final int dimension = line.getCoordinatesList().getDimension();
+    final int dimension = line.getCoordinatesList().getNumAxis();
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(
       segments.size() + 1, dimension);
     final LineSegment firstSegment = segments.get(0);
@@ -1233,7 +1233,7 @@ public final class LineStringUtil {
     if (!containsPoint) {
       points1.setPoint(coords1Size - 1, point);
       points2.setPoint(0, point);
-      if (points1.getDimension() > 2) {
+      if (points1.getNumAxis() > 2) {
         final Coordinates previous = points1.get(segmentIndex);
         final Coordinates next = points.get(segmentIndex + 1);
         final double z = getElevation(point, previous, next);

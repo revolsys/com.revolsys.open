@@ -27,14 +27,14 @@ public class CoordinateSequenceCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public byte getNumAxis() {
-    return (byte)coordinates.getDimension();
+  public int getNumAxis() {
+    return (byte)coordinates.getNumAxis();
   }
 
   @Override
   public double getValue(final int index) {
     if (index >= 0 && index < getNumAxis()) {
-      return coordinates.getOrdinate(this.index, index);
+      return coordinates.getValue(this.index, index);
     } else {
       return 0;
     }
@@ -47,7 +47,7 @@ public class CoordinateSequenceCoordinates extends AbstractCoordinates {
   @Override
   public void setValue(final int index, final double value) {
     if (index >= 0 && index < getNumAxis()) {
-      coordinates.setOrdinate(this.index, index, value);
+      coordinates.setValue(this.index, index, value);
     }
   }
 

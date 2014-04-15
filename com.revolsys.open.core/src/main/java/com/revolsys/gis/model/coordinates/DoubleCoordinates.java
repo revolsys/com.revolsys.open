@@ -13,7 +13,7 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   private final double[] coordinates;
 
   public DoubleCoordinates(final Coordinates coordinates) {
-    final byte numAxis = coordinates.getNumAxis();
+    final int numAxis = coordinates.getNumAxis();
     this.coordinates = new double[numAxis];
     for (int i = 0; i < numAxis; i++) {
       final double value = coordinates.getValue(i);
@@ -62,7 +62,7 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return (byte)coordinates.length;
   }
 
@@ -84,7 +84,7 @@ public class DoubleCoordinates extends AbstractCoordinates implements
 
   @Override
   public String toString() {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (numAxis > 0) {
       final StringBuffer s = new StringBuffer(String.valueOf(coordinates[0]));
       for (int i = 1; i < numAxis; i++) {

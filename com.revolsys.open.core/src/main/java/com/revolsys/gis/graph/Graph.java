@@ -61,6 +61,7 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.util.MathUtil;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class Graph<T> {
@@ -242,7 +243,8 @@ public class Graph<T> {
     return false;
   }
 
-  public Edge<T> createEdge(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Edge<T> createEdge(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final T object, final CoordinatesList points) {
     final LineString newLine = geometryFactory.lineString(points);
     final T newObject = clone(object, newLine);
@@ -836,16 +838,19 @@ public class Graph<T> {
     final Graph<DataObject> graph = node1.getGraph();
     final Coordinates midPoint = LineSegmentUtil.midPoint(
       new SimpleCoordinatesPrecisionModel(1000, 1), node2, node1);
-    final Coordinates newPoint = new DoubleCoordinates(3);
-    newPoint.setX(midPoint.getX());
-    newPoint.setY(midPoint.getY());
+    final double x = midPoint.getX();
+    final double y = midPoint.getY();
     final double z1 = point1.getZ();
     final double z2 = point2.getZ();
-    if (z1 == 0 || Double.isNaN(z1)) {
-      newPoint.setZ(z2);
-    } else if (z2 == 0 || Double.isNaN(z2)) {
-      newPoint.setZ(z1);
+    double z;
+    if (z1 == 0 || MathUtil.isNanOrInfinite(z1)) {
+      z = z2;
+    } else if (z2 == 0 || MathUtil.isNanOrInfinite(z1)) {
+      z = z1;
+    } else {
+      z = Double.NaN;
     }
+    final Coordinates newPoint = new DoubleCoordinates(x, y, z);
     final Node<DataObject> newNode = graph.getNode(midPoint);
     if (!Node.hasEdgesBetween(typePath, node1, newNode)
       && !Node.hasEdgesBetween(typePath, node2, newNode)) {

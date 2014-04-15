@@ -198,7 +198,7 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return 2;
   }
 
@@ -278,7 +278,7 @@ public abstract class AbstractCoordinates implements Coordinates {
       s.append(srid);
       s.append(';');
     }
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     final double[] coordinates = getCoordinates();
     if (numAxis > 0) {
       s.append("POINT(");

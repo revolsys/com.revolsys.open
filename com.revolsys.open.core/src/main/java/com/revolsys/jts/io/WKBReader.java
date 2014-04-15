@@ -189,14 +189,14 @@ public class WKBReader {
   private CoordinatesList readCoordinateSequence(final int size)
     throws IOException {
     final CoordinatesList seq = csFactory.create(size, inputDimension);
-    int targetDim = seq.getDimension();
+    int targetDim = seq.getNumAxis();
     if (targetDim > inputDimension) {
       targetDim = inputDimension;
     }
     for (int i = 0; i < size; i++) {
       readCoordinate();
       for (int j = 0; j < targetDim; j++) {
-        seq.setOrdinate(i, j, ordValues[j]);
+        seq.setValue(i, j, ordValues[j]);
       }
     }
     return seq;

@@ -113,8 +113,8 @@ public class FuzzyPointLocator {
       final LineString line = (LineString)linework.getGeometry(i);
       final CoordinatesList seq = line.getCoordinatesList();
       for (int j = 0; j < seq.size() - 1; j++) {
-        seq.getCoordinate(j, seg.p0);
-        seq.getCoordinate(j + 1, seg.p1);
+        seq.getCoordinate(j, seg.getP0());
+        seq.getCoordinate(j + 1, seg.getP1());
         final double dist = seg.distance(pt);
         if (dist <= boundaryDistanceTolerance) {
           return true;

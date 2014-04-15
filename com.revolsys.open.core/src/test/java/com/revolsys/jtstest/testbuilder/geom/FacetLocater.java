@@ -94,7 +94,7 @@ public class FacetLocater {
       if (geom instanceof LineString) {
         seq = ((LineString)geom).getCoordinatesList();
       } else if (geom instanceof Point) {
-        seq = ((Point)geom).getCoordinateSequence();
+        seq = ((Point)geom).getCoordinatesList();
       } else {
         throw new IllegalStateException("Unknown geometry type: "
           + geom.getClass().getName());
@@ -122,12 +122,12 @@ public class FacetLocater {
     final CoordinatesList seq, final List locations) {
     final LineSegment seg = new LineSegment();
     for (int i = 0; i < seq.size() - 1; i++) {
-      seg.p0 = seq.getCoordinate(i);
-      seg.p1 = seq.getCoordinate(i + 1);
+      seg.setP0(seq.getCoordinate(i));
+      seg.setP1(seq.getCoordinate(i + 1));
       final double dist = seg.distance(queryPt);
       if (dist <= tolerance) {
         locations.add(new GeometryLocation(parentGeom, compGeom,
-          toIntArray(path), i, false, seg.p0));
+          toIntArray(path), i, false, seg.getP0()));
       }
     }
   }

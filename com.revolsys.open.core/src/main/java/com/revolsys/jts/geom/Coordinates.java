@@ -109,7 +109,7 @@ public interface Coordinates extends Comparable<Object>, Cloneable,
 
   double getM();
 
-  byte getNumAxis();
+  int getNumAxis();
 
   long getTime();
 

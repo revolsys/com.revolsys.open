@@ -146,16 +146,18 @@ public class CommonBitsRemover {
    * @return the shifted Geometry
    */
   public Geometry removeCommonBits(final Geometry geom) {
-    if (commonCoord.getX() == 0.0 && commonCoord.getY() == 0.0) {
+    final double x = commonCoord.getX();
+    final double y = commonCoord.getY();
+    if (x == 0.0 && y == 0.0) {
+      return geom;
+    } else {
+      final Coordinates invCoord = new Coordinate(-x, -y,
+        Coordinates.NULL_ORDINATE);
+      final Translater trans = new Translater(invCoord);
+      geom.apply(trans);
+      geom.geometryChanged();
       return geom;
     }
-    final Coordinates invCoord = new Coordinate(commonCoord);
-    invCoord.setX(-invCoord.getX());
-    invCoord.setY(-invCoord.getY());
-    final Translater trans = new Translater(invCoord);
-    geom.apply(trans);
-    geom.geometryChanged();
-    return geom;
   }
 
 }

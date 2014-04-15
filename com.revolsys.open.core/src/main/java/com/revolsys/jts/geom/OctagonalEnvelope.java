@@ -356,7 +356,7 @@ public class OctagonalEnvelope
          expandToInclude( ((LineString) geom).getCoordinatesList());
        }
        else if (geom instanceof Point) {
-         expandToInclude( ((Point) geom).getCoordinateSequence());
+         expandToInclude( (Coordinates) geom);
        }
      }
   }

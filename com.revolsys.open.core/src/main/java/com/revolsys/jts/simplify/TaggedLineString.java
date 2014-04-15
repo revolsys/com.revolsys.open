@@ -113,10 +113,10 @@ class TaggedLineString
     LineSegment seg = null;
     for (int i = 0; i < segs.size(); i++) {
       seg = (LineSegment) segs.get(i);
-      pts[i] = seg.p0;
+      pts[i] = seg.getP0();
     }
     // add last point
-    pts[pts.length - 1] = seg.p1;
+    pts[pts.length - 1] = seg.getP1();
     return pts;
   }
 

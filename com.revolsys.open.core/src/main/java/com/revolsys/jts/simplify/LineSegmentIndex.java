@@ -65,17 +65,17 @@ class LineSegmentIndex
 
   public void add(LineSegment seg)
   {
-    index.insert(new Envelope(seg.p0, seg.p1), seg);
+    index.insert(new Envelope(seg.getP0(), seg.getP1()), seg);
   }
 
   public void remove(LineSegment seg)
   {
-    index.remove(new Envelope(seg.p0, seg.p1), seg);
+    index.remove(new Envelope(seg.getP0(), seg.getP1()), seg);
   }
 
   public List query(LineSegment querySeg)
   {
-    Envelope env = new Envelope(querySeg.p0, querySeg.p1);
+    Envelope env = new Envelope(querySeg.getP0(), querySeg.getP1());
 
     LineSegmentVisitor visitor = new LineSegmentVisitor(querySeg);
     index.query(env, visitor);
@@ -108,7 +108,7 @@ class LineSegmentVisitor
   public void visitItem(Object item)
   {
     LineSegment seg = (LineSegment) item;
-    if (Envelope.intersects(seg.p0, seg.p1, querySeg.p0, querySeg.p1))
+    if (Envelope.intersects(seg.getP0(), seg.getP1(), querySeg.getP0(), querySeg.getP1()))
       items.add(item);
   }
 

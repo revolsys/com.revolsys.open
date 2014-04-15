@@ -54,7 +54,7 @@ public class CoordinateSequencesTest extends TestCase {
     // initialize with a data signature where coords look like [1, 10, 100, ...]
     for (int i = 0; i < size; i++) {
       for (int d = 0; d < dim; d++) {
-        cs.setOrdinate(i, d, i * Math.pow(10, d));
+        cs.setValue(i, d, i * Math.pow(10, d));
       }
     }
     return cs;

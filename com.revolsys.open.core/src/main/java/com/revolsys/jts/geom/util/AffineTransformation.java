@@ -1017,10 +1017,10 @@ public class AffineTransformation
    */
   public void transform(CoordinatesList seq, int i)
   {
-    double xp = m00 * seq.getOrdinate(i, 0) + m01 * seq.getOrdinate(i, 1) + m02;
-    double yp = m10 * seq.getOrdinate(i, 0) + m11 * seq.getOrdinate(i, 1) + m12;
-    seq.setOrdinate(i, 0, xp);
-    seq.setOrdinate(i, 1, yp);  
+    double xp = m00 * seq.getValue(i, 0) + m01 * seq.getValue(i, 1) + m02;
+    double yp = m10 * seq.getValue(i, 0) + m11 * seq.getValue(i, 1) + m12;
+    seq.setValue(i, 0, xp);
+    seq.setValue(i, 1, yp);  
   }
   
   /**

@@ -20,7 +20,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
    */
   private static final long serialVersionUID = 9211011581013036939L;
 
-  public void append(final StringBuffer s, final int i, final byte numAxis) {
+  public void append(final StringBuffer s, final int i, final int numAxis) {
     s.append(getX(i));
     s.append(' ');
     s.append(getY(i));
@@ -265,7 +265,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   @Override
   public double[] getCoordinates() {
     final int size = size();
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     final double[] coordinates = new double[size * numAxis];
     int k = 0;
     for (int i = 0; i < size; i++) {
@@ -280,7 +280,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   @Deprecated
-  public int getDimension() {
+  public int getNumAxis() {
     return getNumAxis();
   }
 
@@ -300,7 +300,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   @Deprecated
-  public double getOrdinate(final int index, final int axisIndex) {
+  public double getValue(final int index, final int axisIndex) {
     return getValue(index, axisIndex);
   }
 
@@ -369,7 +369,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   @Deprecated
-  public void setOrdinate(final int index, final int axisIndex,
+  public void setValue(final int index, final int axisIndex,
     final double value) {
     setValue(index, axisIndex, value);
   }
@@ -459,7 +459,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public String toString() {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (numAxis > 0 && size() > 0) {
       final StringBuffer s = new StringBuffer("LINESTRING(");
       append(s, 0, numAxis);

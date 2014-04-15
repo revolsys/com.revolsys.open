@@ -969,7 +969,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   double getLength();
 
-  byte getNumAxis();
+  int getNumAxis();
 
   /**
    * Returns the number of {@link Geometry}s in a {@link GeometryCollection}

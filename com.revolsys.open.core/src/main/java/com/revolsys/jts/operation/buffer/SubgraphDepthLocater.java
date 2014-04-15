@@ -139,14 +139,14 @@ class SubgraphDepthLocater
   {
     Coordinates[] pts = dirEdge.getEdge().getCoordinates();
     for (int i = 0; i < pts.length - 1; i++) {
-      seg.p0 = pts[i];
-      seg.p1 = pts[i + 1];
+      seg.setP0(pts[i]);
+      seg.setP1(pts[i + 1]);
       // ensure segment always points upwards
-      if (seg.p0.getY() > seg.p1.getY())
+      if (seg.getP0().getY() > seg.getP1().getY())
         seg.reverse();
 
       // skip segment if it is left of the stabbing line
-      double maxx = Math.max(seg.p0.getX(), seg.p1.getX());
+      double maxx = Math.max(seg.getP0().getX(), seg.getP1().getX());
       if (maxx < stabbingRayLeftPt.getX())
         continue;
 
@@ -155,18 +155,18 @@ class SubgraphDepthLocater
         continue;
 
       // skip if segment is above or below stabbing line
-      if (stabbingRayLeftPt.getY() < seg.p0.getY() || stabbingRayLeftPt.getY() > seg.p1.getY())
+      if (stabbingRayLeftPt.getY() < seg.getP0().getY() || stabbingRayLeftPt.getY() > seg.getP1().getY())
         continue;
 
       // skip if stabbing ray is right of the segment
-      if (CGAlgorithms.computeOrientation(seg.p0, seg.p1, stabbingRayLeftPt)
+      if (CGAlgorithms.computeOrientation(seg.getP0(), seg.getP1(), stabbingRayLeftPt)
           == CGAlgorithms.RIGHT)
         continue;
 
       // stabbing line cuts this segment, so record it
       int depth = dirEdge.getDepth(Position.LEFT);
       // if segment direction was flipped, use RHS depth instead
-      if (! seg.p0.equals(pts[i]))
+      if (! seg.getP0().equals(pts[i]))
         depth = dirEdge.getDepth(Position.RIGHT);
       DepthSegment ds = new DepthSegment(seg, depth);
       stabbedSegments.add(ds);
@@ -243,10 +243,10 @@ class SubgraphDepthLocater
      */
     private int compareX(LineSegment seg0, LineSegment seg1)
     {
-      int compare0 = seg0.p0.compareTo(seg1.p0);
+      int compare0 = seg0.getP0().compareTo(seg1.getP0());
       if (compare0 != 0)
         return compare0;
-      return seg0.p1.compareTo(seg1.p1);
+      return seg0.getP1().compareTo(seg1.getP1());
 
     }
 

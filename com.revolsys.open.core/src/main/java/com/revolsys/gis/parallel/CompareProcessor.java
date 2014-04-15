@@ -20,7 +20,6 @@ import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.jts.filter.LineIntersectsFilter;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -202,10 +201,10 @@ public class CompareProcessor extends AbstractMergeProcess {
       equalFilter);
     if (otherObject != null) {
       final Point sourcePoint = sourceObject.getGeometryValue();
-      final double sourceZ = CoordinatesListUtil.get(sourcePoint).getZ(0);
+      final double sourceZ = sourcePoint.getZ();
 
       final Point otherPoint = otherObject.getGeometryValue();
-      final double otherZ = CoordinatesListUtil.get(otherPoint).getZ(0);
+      final double otherZ = otherPoint.getZ();
 
       if (sourceZ == otherZ || Double.isNaN(sourceZ) && Double.isNaN(otherZ)) {
         equalStatistics.add(sourceObject);

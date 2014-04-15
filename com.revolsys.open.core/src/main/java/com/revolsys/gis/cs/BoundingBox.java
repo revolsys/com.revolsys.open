@@ -403,8 +403,7 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   public BoundingBox(final Point p1, final Point p2) {
-    this(GeometryFactory.getFactory(p1), CoordinatesUtil.getInstance(p1),
-      CoordinatesUtil.getInstance(p2));
+    this(GeometryFactory.getFactory(p1), p1, p1);
   }
 
   public BoundingBox clipToCoordinateSystem() {
@@ -480,8 +479,8 @@ public class BoundingBox extends Envelope implements Cloneable {
         final double minY = getMinY();
         final double maxY = getMaxY();
         final BoundingBox boundingBox = new BoundingBox(geometryFactory);
-        final Coordinates from = new DoubleCoordinates(2);
-        final Coordinates to = new DoubleCoordinates(2);
+        final double[] from = new double[2];
+        final double[] to = new double[2];
         expand(boundingBox, operation, from, to, minX, minY);
         expand(boundingBox, operation, from, to, minX, maxY);
         expand(boundingBox, operation, from, to, minX, minY);
@@ -541,15 +540,15 @@ public class BoundingBox extends Envelope implements Cloneable {
   }
 
   private void expand(final BoundingBox boundingBox,
-    final CoordinatesOperation operation, final Coordinates from,
-    final Coordinates to, final double x, final double y) {
+    final CoordinatesOperation operation, final double[] from,
+    final double[] to, final double x, final double y) {
 
-    from.setX(x);
-    from.setY(y);
-    operation.perform(from, to);
+    from[0] = x;
+    from[1] = y;
+    operation.perform(2, from, 2, to);
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final double newX = geometryFactory.makeXyPrecise(to.getX());
-    final double newY = geometryFactory.makeXyPrecise(to.getY());
+    final double newX = geometryFactory.makeXyPrecise(to[0]);
+    final double newY = geometryFactory.makeXyPrecise(to[1]);
     boundingBox.expandToInclude(newX, newY);
   }
 
@@ -1016,11 +1015,10 @@ public class BoundingBox extends Envelope implements Cloneable {
     final double width = getWidth();
     final double height = getHeight();
     if (width == 0 && height == 0) {
-      return geometryFactory.point(new DoubleCoordinatesList(2, minX,
-        minY));
+      return geometryFactory.point(new DoubleCoordinatesList(2, minX, minY));
     } else if (width == 0 || height == 0) {
-      return geometryFactory.lineString(new DoubleCoordinatesList(2,
-        minX, minY, maxX, maxY));
+      return geometryFactory.lineString(new DoubleCoordinatesList(2, minX,
+        minY, maxX, maxY));
     } else {
       return geometryFactory.createPolygon(new DoubleCoordinatesList(2, minX,
         minY, minX, maxY, maxX, maxY, maxX, minY, minX, minY));

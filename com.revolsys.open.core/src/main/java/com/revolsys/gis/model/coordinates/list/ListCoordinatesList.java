@@ -51,6 +51,10 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
     coordinates.add(new DoubleCoordinates(point, numAxis));
   }
 
+  public void add(final int index, final Coordinates point) {
+    coordinates.add(index, point);
+  }
+
   public void add(final Point point) {
     add(CoordinatesUtil.getInstance(point));
   }
@@ -67,13 +71,13 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return numAxis;
   }
 
   @Override
   public double getValue(final int index, final int axisIndex) {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (axisIndex < numAxis && index < size()) {
       return coordinates.get(index).getValue(axisIndex);
     } else {
@@ -87,7 +91,7 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
 
   @Override
   public void setValue(final int index, final int axisIndex, final double value) {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (axisIndex < numAxis) {
       if (index <= size()) {
         for (int i = coordinates.size(); i < (index + 1); i++) {
@@ -101,9 +105,5 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   @Override
   public int size() {
     return coordinates.size();
-  }
-
-  public void add(int index, Coordinates point) {
-    coordinates.add(index, point);
   }
 }

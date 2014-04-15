@@ -191,8 +191,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private double[] toCoordinateArray(final CoordinatesList sequence,
     final int dimension) {
-    int geometryDimension = sequence.getDimension();
-    if (Double.isNaN(sequence.getOrdinate(0, 2))) {
+    int geometryDimension = sequence.getNumAxis();
+    if (Double.isNaN(sequence.getValue(0, 2))) {
       geometryDimension = 2;
     }
 
@@ -204,7 +204,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         if (j >= geometryDimension) {
           ordinates[ordinateIndex++] = 0;
         } else {
-          final double ordinate = sequence.getOrdinate(i, j);
+          final double ordinate = sequence.getValue(i, j);
           if (Double.isNaN(ordinate)) {
             ordinates[ordinateIndex++] = 0;
           } else {
@@ -386,13 +386,12 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private JGeometry toJGeometry(final Point point, final int dimension) {
-    final CoordinatesList coordinatesList = CoordinatesListUtil.get(point);
+  private JGeometry toJGeometry(final Point point, final int numAxis) {
     final int srid = this.geometryFactory.getSrid();
-    final double x = coordinatesList.getX(0);
-    final double y = coordinatesList.getY(0);
-    if (dimension == 3) {
-      double z = coordinatesList.getZ(0);
+    final double x = point.getX();
+    final double y = point.getY();
+    if (numAxis == 3) {
+      double z = point.getZ();
       if (Double.isNaN(z)) {
         z = 0;
       }

@@ -64,10 +64,10 @@ public class CoordinateSequences {
   public static void swap(CoordinatesList seq, int i, int j)
   {
     if (i == j) return;
-    for (int dim = 0; dim < seq.getDimension(); dim++) {
-      double tmp = seq.getOrdinate(i, dim);
-      seq.setOrdinate(i, dim, seq.getOrdinate(j, dim));
-      seq.setOrdinate(j, dim, tmp);
+    for (int dim = 0; dim < seq.getNumAxis(); dim++) {
+      double tmp = seq.getValue(i, dim);
+      seq.setValue(i, dim, seq.getValue(j, dim));
+      seq.setValue(j, dim, tmp);
     }
   }
   
@@ -101,9 +101,9 @@ public class CoordinateSequences {
    */
   public static void copyCoord(CoordinatesList src, int srcPos, CoordinatesList dest, int destPos)
   {
-    int minDim = Math.min(src.getDimension(), dest.getDimension());
+    int minDim = Math.min(src.getNumAxis(), dest.getNumAxis());
 		for (int dim = 0; dim < minDim; dim++) {
-			dest.setOrdinate(destPos, dim, src.getOrdinate(srcPos, dim));
+			dest.setValue(destPos, dim, src.getValue(srcPos, dim));
 		}
   }
   
@@ -125,8 +125,8 @@ public class CoordinateSequences {
   	if (n <= 3) 
   		return false;
   	// test if closed
-  	return seq.getOrdinate(0, CoordinatesList.X) == seq.getOrdinate(n-1, CoordinatesList.X)
-  		&& seq.getOrdinate(0, CoordinatesList.Y) == seq.getOrdinate(n-1, CoordinatesList.Y);
+  	return seq.getValue(0, CoordinatesList.X) == seq.getValue(n-1, CoordinatesList.X)
+  		&& seq.getValue(0, CoordinatesList.Y) == seq.getValue(n-1, CoordinatesList.Y);
   }
   
   /**
@@ -150,8 +150,8 @@ public class CoordinateSequences {
   	if (n <= 3) 
   		return createClosedRing(fact, seq, 4);
   	
-  	boolean isClosed = seq.getOrdinate(0, CoordinatesList.X) == seq.getOrdinate(n-1, CoordinatesList.X)
-		&& seq.getOrdinate(0, CoordinatesList.Y) == seq.getOrdinate(n-1, CoordinatesList.Y);
+  	boolean isClosed = seq.getValue(0, CoordinatesList.X) == seq.getValue(n-1, CoordinatesList.X)
+		&& seq.getValue(0, CoordinatesList.Y) == seq.getValue(n-1, CoordinatesList.Y);
   	if (isClosed) return seq;
   	// make a new closed ring
   	return createClosedRing(fact, seq, n+1);
@@ -159,7 +159,7 @@ public class CoordinateSequences {
   
   private static CoordinatesList createClosedRing(CoordinateSequenceFactory fact, CoordinatesList seq, int size)
   {
-    CoordinatesList newseq = fact.create(size, seq.getDimension());
+    CoordinatesList newseq = fact.create(size, seq.getNumAxis());
     int n = seq.size();
     copy(seq, 0, newseq, 0, n);
     // fill remaining coordinates with start point
@@ -170,7 +170,7 @@ public class CoordinateSequences {
   
   public static CoordinatesList extend(CoordinateSequenceFactory fact, CoordinatesList seq, int size)
   {
-    CoordinatesList newseq = fact.create(size, seq.getDimension());
+    CoordinatesList newseq = fact.create(size, seq.getNumAxis());
     int n = seq.size();
     copy(seq, 0, newseq, 0, n);
     // fill remaining coordinates with end point, if it exists
@@ -197,12 +197,12 @@ public class CoordinateSequences {
     int cs1Size = cs1.size();
     int cs2Size = cs2.size();
     if (cs1Size != cs2Size) return false;
-    int dim = Math.min(cs1.getDimension(), cs2.getDimension());
+    int dim = Math.min(cs1.getNumAxis(), cs2.getNumAxis());
     for (int i = 0; i < cs1Size; i++) {
       for (int d = 0; d < dim; d++) {
-        double v1 = cs1.getOrdinate(i, d);
-        double v2 = cs2.getOrdinate(i, d);
-        if (cs1.getOrdinate(i, d) == cs2.getOrdinate(i, d))
+        double v1 = cs1.getValue(i, d);
+        double v2 = cs2.getValue(i, d);
+        if (cs1.getValue(i, d) == cs2.getValue(i, d))
           continue;
         // special check for NaNs
         if (Double.isNaN(v1) && Double.isNaN(v2))
@@ -228,14 +228,14 @@ public class CoordinateSequences {
     int size = cs.size();
     if (size == 0) 
       return "()";
-    int dim = cs.getDimension();
+    int dim = cs.getNumAxis();
     StringBuffer buf = new StringBuffer();
     buf.append('(');
     for (int i = 0; i < size; i++) {
       if (i > 0) buf.append(" ");
       for (int d = 0; d < dim; d++) {
         if (d > 0) buf.append(",");
-        buf.append(StringUtil.toString(cs.getOrdinate(i, d)));
+        buf.append(StringUtil.toString(cs.getValue(i, d)));
       }
     }
     buf.append(')');

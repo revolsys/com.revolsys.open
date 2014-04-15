@@ -260,9 +260,9 @@ public class QuadEdgeTriangle {
   }
 
   public void getEdgeSegment(final int i, final LineSegment seg) {
-    seg.p0 = edge[i].orig().getCoordinate();
+    seg.setP0(edge[i].orig().getCoordinate());
     final int nexti = (i + 1) % 3;
-    seg.p1 = edge[nexti].orig().getCoordinate();
+    seg.setP1(edge[nexti].orig().getCoordinate());
   }
 
   public Polygon getGeometry(final GeometryFactory fact) {

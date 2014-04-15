@@ -152,8 +152,22 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
 
   public Point perform(final Point point) {
     if (point != null) {
-      final CoordinatesList newCoordinate = perform(CoordinatesListUtil.get(point));
-      final Point newPoint = geometryFactory.point(newCoordinate);
+      final Point newPoint;
+      if (point.isEmpty()) {
+        newPoint = geometryFactory.point();
+      } else {
+        final int numAxis = point.getNumAxis();
+        final double[] sourceCoordinates = new double[numAxis];
+        final double[] targetCoordinates = new double[numAxis];
+        for (int i = 0; i < numAxis; i++) {
+          final double value = point.getValue(i);
+          sourceCoordinates[i] = value;
+          targetCoordinates[i] = value;
+        }
+        operation.perform(numAxis, sourceCoordinates, numAxis,
+          targetCoordinates);
+        newPoint = geometryFactory.point(targetCoordinates);
+      }
       addUserData(point, newPoint);
       return newPoint;
     } else {

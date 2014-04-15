@@ -33,6 +33,7 @@
 
 package com.revolsys.jts.operation.distance3d;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -60,12 +61,12 @@ public class PlanarPolygon3D {
   private static Coordinates project(final Coordinates p, final int facingPlane) {
     switch (facingPlane) {
       case Plane3D.XY_PLANE:
-        return new Coordinate((double)p.getX(), p.getY(), Coordinates.NULL_ORDINATE);
+        return new Coordinate(p.getX(), p.getY(), Coordinates.NULL_ORDINATE);
       case Plane3D.XZ_PLANE:
-        return new Coordinate((double)p.getX(), p.getZ(), Coordinates.NULL_ORDINATE);
+        return new Coordinate(p.getX(), p.getZ(), Coordinates.NULL_ORDINATE);
         // Plane3D.YZ
       default:
-        return new Coordinate((double)p.getY(), p.getZ(), Coordinates.NULL_ORDINATE);
+        return new Coordinate(p.getY(), p.getZ(), Coordinates.NULL_ORDINATE);
     }
   }
 
@@ -105,20 +106,21 @@ public class PlanarPolygon3D {
    */
   private Vector3D averageNormal(final CoordinatesList seq) {
     final int n = seq.size();
-    final Coordinates sum = new Coordinate((double)0.0, 0.0, 0.0);
-    final Coordinates p1 = new Coordinate((double)0.0, 0.0, 0.0);
-    final Coordinates p2 = new Coordinate((double)0.0, 0.0, 0.0);
+    final double[] sum = new double[3];
+    final Coordinates p1 = new Coordinate(0.0, 0.0, 0.0);
+    final Coordinates p2 = new Coordinate(0.0, 0.0, 0.0);
     for (int i = 0; i < n - 1; i++) {
       seq.getCoordinate(i, p1);
       seq.getCoordinate(i + 1, p2);
-      sum.setX(sum.getX() + (p1.getY() - p2.getY()) * (p1.getZ() + p2.getZ()));
-      sum.setY(sum.getY() + (p1.getZ() - p2.getZ()) * (p1.getX() + p2.getX()));
-      sum.setZ(sum.getZ() + (p1.getX() - p2.getX()) * (p1.getY() + p2.getY()));
+      sum[0] += (p1.getY() - p2.getY()) * (p1.getZ() + p2.getZ());
+      sum[1] += (p1.getZ() - p2.getZ()) * (p1.getX() + p2.getX());
+      sum[2] += (p1.getX() - p2.getX()) * (p1.getY() + p2.getY());
     }
-    sum.setX(sum.getX() / n);
-    sum.setY(sum.getY() / n);
-    sum.setZ(sum.getZ() / n);
-    final Vector3D norm = Vector3D.create(sum).normalize();
+    sum[0] /= n;
+    sum[1] /= n;
+    sum[2] /= n;
+    final Vector3D norm = Vector3D.create(new DoubleCoordinates(sum))
+      .normalize();
     return norm;
   }
 
@@ -132,17 +134,17 @@ public class PlanarPolygon3D {
    * @return a Coordinates with averaged ordinates
    */
   private Coordinates averagePoint(final CoordinatesList seq) {
-    final Coordinates a = new Coordinate((double)0.0, 0.0, 0.0);
+    final double[] a = new double[3];
     final int n = seq.size();
     for (int i = 0; i < n; i++) {
-      a.setX(a.getX() + seq.getOrdinate(i, CoordinatesList.X));
-      a.setY(a.getY() + seq.getOrdinate(i, CoordinatesList.Y));
-      a.setZ(a.getZ() + seq.getOrdinate(i, CoordinatesList.Z));
+      a[0] += seq.getValue(i, CoordinatesList.X);
+      a[1] += seq.getValue(i, CoordinatesList.Y);
+      a[2] += seq.getValue(i, CoordinatesList.Z);
     }
-    a.setX(a.getX() / n);
-    a.setY(a.getY() / n);
-    a.setZ(a.getZ() / n);
-    return a;
+    a[0] /= n;
+    a[1] /= n;
+    a[2] /= n;
+    return new DoubleCoordinates(a);
   }
 
   /**

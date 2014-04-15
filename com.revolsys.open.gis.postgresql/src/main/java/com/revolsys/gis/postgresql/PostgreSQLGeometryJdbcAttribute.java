@@ -21,12 +21,12 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 
 public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
@@ -415,20 +415,19 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Point toPgPoint(final com.revolsys.jts.geom.Point point) {
-    final CoordinatesList coordinates = CoordinatesListUtil.get(point);
-    final int numAxis = coordinates.getNumAxis();
+    final int numAxis = point.getNumAxis();
 
     Point pgPoint;
-    final double x = coordinates.getX(0);
-    final double y = coordinates.getY(0);
+    final double x = point.getX();
+    final double y = point.getY();
     if (numAxis > 2) {
-      double z = coordinates.getZ(0);
+      double z = point.getZ();
       if (Double.isNaN(z)) {
         z = 0;
       }
       pgPoint = new Point(x, y, z);
       if (numAxis > 3) {
-        double m = coordinates.getM(0);
+        double m = point.getM();
         if (Double.isNaN(m)) {
           m = 0;
         }

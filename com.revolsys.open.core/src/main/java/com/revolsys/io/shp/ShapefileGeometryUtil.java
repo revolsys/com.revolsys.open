@@ -737,7 +737,7 @@ public final class ShapefileGeometryUtil {
     double maxM = -Double.MAX_VALUE;
     for (final CoordinatesList ring : pointsList) {
       for (int i = 0; i < ring.size(); i++) {
-        double m = ring.getOrdinate(i, 2);
+        double m = ring.getValue(i, 2);
         if (Double.isNaN(m)) {
           m = 0;
         }
@@ -803,15 +803,14 @@ public final class ShapefileGeometryUtil {
     throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      final CoordinatesList points = CoordinatesListUtil.get(point);
       if (writeLength) {
         final int recordLength = 10;
         // (BYTES_IN_INT + 2 * BYTES_IN_DOUBLE) / BYTES_IN_SHORT;
         out.writeInt(recordLength);
       }
       out.writeLEInt(ShapefileConstants.POINT_SHAPE);
-      out.writeLEDouble(points.getX(0));
-      out.writeLEDouble(points.getY(0));
+      out.writeLEDouble(point.getX());
+      out.writeLEDouble(point.getY());
     } else {
       throw new IllegalArgumentException("Expecting " + Point.class
         + " geometry got " + geometry.getClass());
@@ -822,16 +821,15 @@ public final class ShapefileGeometryUtil {
     throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      final CoordinatesList points = CoordinatesListUtil.get(point);
       if (writeLength) {
         final int recordLength = 14;
         // (BYTES_IN_INT + 3 * BYTES_IN_DOUBLE) / BYTES_IN_SHORT;
         out.writeInt(recordLength);
       }
       out.writeLEInt(ShapefileConstants.POINT_M_SHAPE);
-      out.writeLEDouble(points.getX(0));
-      out.writeLEDouble(points.getY(0));
-      out.writeLEDouble(points.getM(0));
+      out.writeLEDouble(point.getX());
+      out.writeLEDouble(point.getY());
+      out.writeLEDouble(point.getM());
     } else {
       throw new IllegalArgumentException("Expecting " + Point.class
         + " geometry got " + geometry.getClass());
@@ -847,11 +845,10 @@ public final class ShapefileGeometryUtil {
         // (BYTES_IN_INT + 3 * BYTES_IN_DOUBLE) / BYTES_IN_SHORT;
         out.writeInt(recordLength);
       }
-      final CoordinatesList points = CoordinatesListUtil.get(point);
       out.writeLEInt(ShapefileConstants.POINT_Z_SHAPE);
-      out.writeLEDouble(points.getX(0));
-      out.writeLEDouble(points.getY(0));
-      out.writeLEDouble(points.getZ(0));
+      out.writeLEDouble(point.getX());
+      out.writeLEDouble(point.getY());
+      out.writeLEDouble(point.getZ());
     } else {
       throw new IllegalArgumentException("Expecting " + Point.class
         + " geometry got " + geometry.getClass());
@@ -862,17 +859,16 @@ public final class ShapefileGeometryUtil {
     throws IOException {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      final CoordinatesList points = CoordinatesListUtil.get(point);
       if (writeLength) {
         final int recordLength = 18;
         // (BYTES_IN_INT + 4 * BYTES_IN_DOUBLE) / BYTES_IN_SHORT;
         out.writeInt(recordLength);
       }
       out.writeLEInt(ShapefileConstants.POINT_ZM_SHAPE);
-      out.writeLEDouble(points.getX(0));
-      out.writeLEDouble(points.getY(0));
-      out.writeLEDouble(points.getZ(0));
-      out.writeLEDouble(points.getM(0));
+      out.writeLEDouble(point.getX());
+      out.writeLEDouble(point.getY());
+      out.writeLEDouble(point.getZ());
+      out.writeLEDouble(point.getM());
     } else {
       throw new IllegalArgumentException("Expecting " + Point.class
         + " geometry got " + geometry.getClass());
@@ -1114,7 +1110,7 @@ public final class ShapefileGeometryUtil {
     double maxZ = -Double.MAX_VALUE;
     for (final CoordinatesList ring : pointsList) {
       for (int i = 0; i < ring.size(); i++) {
-        double z = ring.getOrdinate(i, 2);
+        double z = ring.getValue(i, 2);
         if (Double.isNaN(z)) {
           z = 0;
         }

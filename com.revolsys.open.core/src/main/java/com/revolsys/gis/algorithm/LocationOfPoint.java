@@ -70,8 +70,8 @@ public class LocationOfPoint {
     startIndex = 0;
 
     for (int i = startIndex; i < pts.length - 1; i++) {
-      seg.p0 = pts[i];
-      seg.p1 = pts[i + 1];
+      seg.setP0(pts[i]);
+      seg.setP1(pts[i + 1]);
       final double segDistance = seg.distance(inputPt);
       final double segFrac = segmentFraction(seg, inputPt);
 
@@ -117,8 +117,8 @@ public class LocationOfPoint {
     startIndex = minLocation.getSegmentIndex();
 
     for (int i = startIndex; i < pts.length - 1; i++) {
-      seg.p0 = pts[i];
-      seg.p1 = pts[i + 1];
+      seg.setP0(pts[i]);
+      seg.setP1(pts[i + 1]);
 
       final double segDistance = seg.distance(inputPt);
       final double segFrac = segmentFraction(seg, inputPt);

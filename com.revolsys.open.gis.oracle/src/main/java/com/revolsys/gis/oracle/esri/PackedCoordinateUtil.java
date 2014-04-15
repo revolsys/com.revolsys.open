@@ -607,7 +607,7 @@ public class PackedCoordinateUtil {
   private static long writeOrdinate(final PackedIntegerOutputStream out,
     final CoordinatesList coordinates, final long previousValue,
     final double scale, final int coordinateIndex, final int ordinateIndex) {
-    final double value = coordinates.getOrdinate(coordinateIndex, ordinateIndex);
+    final double value = coordinates.getValue(coordinateIndex, ordinateIndex);
     return writeOrdinate(out, previousValue, scale, value);
   }
 

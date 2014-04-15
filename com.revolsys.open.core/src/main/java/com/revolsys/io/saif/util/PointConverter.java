@@ -6,10 +6,8 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 
@@ -18,11 +16,13 @@ public class PointConverter implements OsnConverter {
 
   private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
-  public PointConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public PointConverter(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public PointConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public PointConverter(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final String geometryClass) {
     this.geometryFactory = geometryFactory;
     this.geometryClass = geometryClass;
@@ -78,12 +78,10 @@ public class PointConverter implements OsnConverter {
     throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
-      final CoordinatesList points = CoordinatesListUtil.get(point);
-
-      final int numAxis = points.getNumAxis();
-      final double x = points.getX(0);
-      final double y = points.getY(0);
-      final double z = points.getZ(0);
+      final int numAxis = point.getNumAxis();
+      final double x = point.getX();
+      final double y = point.getY();
+      final double z = point.getZ();
       serializer.startObject(geometryClass);
       serializer.attributeName("coords");
       if (numAxis == 2) {

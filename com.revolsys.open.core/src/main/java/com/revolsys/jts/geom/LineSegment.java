@@ -34,6 +34,7 @@ package com.revolsys.jts.geom;
 
 import java.io.Serializable;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.LineIntersector;
@@ -66,7 +67,9 @@ public class LineSegment implements Comparable, Serializable {
       (p0.getY() + p1.getY()) / 2, Coordinates.NULL_ORDINATE);
   }
 
-  public Coordinates p0, p1;
+  private Coordinates p0;
+
+  private Coordinates p1;
 
   public LineSegment() {
     this(new Coordinate(), new Coordinate());
@@ -84,7 +87,7 @@ public class LineSegment implements Comparable, Serializable {
   }
 
   public LineSegment(final LineSegment ls) {
-    this(ls.p0, ls.p1);
+    this(ls.getP0(), ls.getP1());
   }
 
   /**
@@ -95,7 +98,8 @@ public class LineSegment implements Comparable, Serializable {
    * @return the angle this segment makes with the X-axis (in radians)
    */
   public double angle() {
-    return Math.atan2(p1.getY() - p0.getY(), p1.getX() - p0.getX());
+    return Math.atan2(getP1().getY() - getP0().getY(), getP1().getX()
+      - getP0().getX());
   }
 
   /**
@@ -108,12 +112,12 @@ public class LineSegment implements Comparable, Serializable {
     if (factor > 0 && factor < 1) {
       return project(p);
     }
-    final double dist0 = p0.distance(p);
-    final double dist1 = p1.distance(p);
+    final double dist0 = getP0().distance(p);
+    final double dist1 = getP1().distance(p);
     if (dist0 < dist1) {
-      return p0;
+      return getP0();
     }
-    return p1;
+    return getP1();
   }
 
   /**
@@ -139,32 +143,32 @@ public class LineSegment implements Comparable, Serializable {
     double minDistance = Double.MAX_VALUE;
     double dist;
 
-    final Coordinates close00 = closestPoint(line.p0);
-    minDistance = close00.distance(line.p0);
+    final Coordinates close00 = closestPoint(line.getP0());
+    minDistance = close00.distance(line.getP0());
     closestPt[0] = close00;
-    closestPt[1] = line.p0;
+    closestPt[1] = line.getP0();
 
-    final Coordinates close01 = closestPoint(line.p1);
-    dist = close01.distance(line.p1);
+    final Coordinates close01 = closestPoint(line.getP1());
+    dist = close01.distance(line.getP1());
     if (dist < minDistance) {
       minDistance = dist;
       closestPt[0] = close01;
-      closestPt[1] = line.p1;
+      closestPt[1] = line.getP1();
     }
 
-    final Coordinates close10 = line.closestPoint(p0);
-    dist = close10.distance(p0);
+    final Coordinates close10 = line.closestPoint(getP0());
+    dist = close10.distance(getP0());
     if (dist < minDistance) {
       minDistance = dist;
-      closestPt[0] = p0;
+      closestPt[0] = getP0();
       closestPt[1] = close10;
     }
 
-    final Coordinates close11 = line.closestPoint(p1);
-    dist = close11.distance(p1);
+    final Coordinates close11 = line.closestPoint(getP1());
+    dist = close11.distance(getP1());
     if (dist < minDistance) {
       minDistance = dist;
-      closestPt[0] = p1;
+      closestPt[0] = getP1();
       closestPt[1] = close11;
     }
 
@@ -183,11 +187,11 @@ public class LineSegment implements Comparable, Serializable {
   @Override
   public int compareTo(final Object o) {
     final LineSegment other = (LineSegment)o;
-    final int comp0 = p0.compareTo(other.p0);
+    final int comp0 = getP0().compareTo(other.getP0());
     if (comp0 != 0) {
       return comp0;
     }
-    return p1.compareTo(other.p1);
+    return getP1().compareTo(other.getP1());
   }
 
   /**
@@ -196,7 +200,7 @@ public class LineSegment implements Comparable, Serializable {
    * @return the distance from this segment to the given point
    */
   public double distance(final Coordinates p) {
-    return CGAlgorithms.distancePointLine(p, p0, p1);
+    return CGAlgorithms.distancePointLine(p, getP0(), getP1());
   }
 
   /**
@@ -205,7 +209,8 @@ public class LineSegment implements Comparable, Serializable {
    * @return the distance to the other segment
    */
   public double distance(final LineSegment ls) {
-    return CGAlgorithms.distanceLineLine(p0, p1, ls.p0, ls.p1);
+    return CGAlgorithms.distanceLineLine(getP0(), getP1(), ls.getP0(),
+      ls.getP1());
   }
 
   /**
@@ -215,7 +220,7 @@ public class LineSegment implements Comparable, Serializable {
    * @return the perpendicular distance between the defined line and the given point
    */
   public double distancePerpendicular(final Coordinates p) {
-    return CGAlgorithms.distancePointLinePerpendicular(p, p0, p1);
+    return CGAlgorithms.distancePointLinePerpendicular(p, getP0(), getP1());
   }
 
   /**
@@ -232,7 +237,7 @@ public class LineSegment implements Comparable, Serializable {
       return false;
     }
     final LineSegment other = (LineSegment)o;
-    return p0.equals(other.p0) && p1.equals(other.p1);
+    return getP0().equals(other.getP0()) && getP1().equals(other.getP1());
   }
 
   /**
@@ -245,15 +250,15 @@ public class LineSegment implements Comparable, Serializable {
    *      with the same values for the x and y ordinates.
    */
   public boolean equalsTopo(final LineSegment other) {
-    return p0.equals(other.p0) && p1.equals(other.p1) || p0.equals(other.p1)
-      && p1.equals(other.p0);
+    return getP0().equals(other.getP0()) && getP1().equals(other.getP1())
+      || getP0().equals(other.getP1()) && getP1().equals(other.getP0());
   }
 
   public Coordinates getCoordinate(final int i) {
     if (i == 0) {
-      return p0;
+      return getP0();
     }
-    return p1;
+    return getP1();
   }
 
   /**
@@ -261,7 +266,15 @@ public class LineSegment implements Comparable, Serializable {
    * @return the length of the line segment
    */
   public double getLength() {
-    return p0.distance(p1);
+    return getP0().distance(getP1());
+  }
+
+  public Coordinates getP0() {
+    return p0;
+  }
+
+  public Coordinates getP1() {
+    return p1;
   }
 
   /**
@@ -271,12 +284,12 @@ public class LineSegment implements Comparable, Serializable {
    */
   @Override
   public int hashCode() {
-    long bits0 = java.lang.Double.doubleToLongBits(p0.getX());
-    bits0 ^= java.lang.Double.doubleToLongBits(p0.getY()) * 31;
+    long bits0 = java.lang.Double.doubleToLongBits(getP0().getX());
+    bits0 ^= java.lang.Double.doubleToLongBits(getP0().getY()) * 31;
     final int hash0 = (((int)bits0) ^ ((int)(bits0 >> 32)));
 
-    long bits1 = java.lang.Double.doubleToLongBits(p1.getX());
-    bits1 ^= java.lang.Double.doubleToLongBits(p1.getY()) * 31;
+    long bits1 = java.lang.Double.doubleToLongBits(getP1().getX());
+    bits1 ^= java.lang.Double.doubleToLongBits(getP1().getY()) * 31;
     final int hash1 = (((int)bits1) ^ ((int)(bits1 >> 32)));
 
     // XOR is supposed to be a good way to combine hashcodes
@@ -299,7 +312,7 @@ public class LineSegment implements Comparable, Serializable {
    */
   public Coordinates intersection(final LineSegment line) {
     final LineIntersector li = new RobustLineIntersector();
-    li.computeIntersection(p0, p1, line.p0, line.p1);
+    li.computeIntersection(getP0(), getP1(), line.getP0(), line.getP1());
     if (li.hasIntersection()) {
       return li.getIntersection(0);
     }
@@ -312,7 +325,7 @@ public class LineSegment implements Comparable, Serializable {
    * @return <code>true</code> if the segment is horizontal
    */
   public boolean isHorizontal() {
-    return p0.getY() == p1.getY();
+    return getP0().getY() == getP1().getY();
   }
 
   /**
@@ -321,7 +334,7 @@ public class LineSegment implements Comparable, Serializable {
    * @return <code>true</code> if the segment is vertical
    */
   public boolean isVertical() {
-    return p0.getX() == p1.getX();
+    return getP0().getX() == getP1().getX();
   }
 
   /**
@@ -343,8 +356,8 @@ public class LineSegment implements Comparable, Serializable {
    */
   public Coordinates lineIntersection(final LineSegment line) {
     try {
-      final Coordinates intPt = HCoordinate.intersection(p0, p1, line.p0,
-        line.p1);
+      final Coordinates intPt = HCoordinate.intersection(getP0(), getP1(),
+        line.getP0(), line.getP1());
       return intPt;
     } catch (final NotRepresentableException ex) {
       // eat this exception, and return null;
@@ -358,7 +371,7 @@ public class LineSegment implements Comparable, Serializable {
    * @return the midpoint of the segment
    */
   public Coordinates midPoint() {
-    return midPoint(p0, p1);
+    return midPoint(getP0(), getP1());
   }
 
   /**
@@ -370,8 +383,8 @@ public class LineSegment implements Comparable, Serializable {
    */
 
   public LineSegment normalize() {
-    if (p1.compareTo(p0) < 0) {
-      return new LineSegment(p1, p0);
+    if (getP1().compareTo(getP0()) < 0) {
+      return new LineSegment(getP1(), getP0());
     } else {
       return this;
     }
@@ -390,7 +403,7 @@ public class LineSegment implements Comparable, Serializable {
    * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
    */
   public int orientationIndex(final Coordinates p) {
-    return CGAlgorithms.orientationIndex(p0, p1, p);
+    return CGAlgorithms.orientationIndex(getP0(), getP1(), p);
   }
 
   /**
@@ -413,8 +426,10 @@ public class LineSegment implements Comparable, Serializable {
    * @return 0 if <code>seg</code> has indeterminate orientation relative to this segment
    */
   public int orientationIndex(final LineSegment seg) {
-    final int orient0 = CGAlgorithms.orientationIndex(p0, p1, seg.p0);
-    final int orient1 = CGAlgorithms.orientationIndex(p0, p1, seg.p1);
+    final int orient0 = CGAlgorithms.orientationIndex(getP0(), getP1(),
+      seg.getP0());
+    final int orient1 = CGAlgorithms.orientationIndex(getP0(), getP1(),
+      seg.getP1());
     // this handles the case where the points are L or collinear
     if (orient0 >= 0 && orient1 >= 0) {
       return Math.max(orient0, orient1);
@@ -439,9 +454,12 @@ public class LineSegment implements Comparable, Serializable {
    * @return the point at that distance
    */
   public Coordinates pointAlong(final double segmentLengthFraction) {
-    final Coordinates coord = new Coordinate();
-    coord.setX(p0.getX() + segmentLengthFraction * (p1.getX() - p0.getX()));
-    coord.setY(p0.getY() + segmentLengthFraction * (p1.getY() - p0.getY()));
+    final double x = getP0().getX() + segmentLengthFraction
+      * (getP1().getX() - getP0().getX());
+    final double y = getP0().getY() + segmentLengthFraction
+      * (getP1().getY() - getP0().getY());
+    final Coordinates coord = new DoubleCoordinates(x, y,
+      Coordinates.NULL_ORDINATE);
     return coord;
   }
 
@@ -464,13 +482,13 @@ public class LineSegment implements Comparable, Serializable {
   public Coordinates pointAlongOffset(final double segmentLengthFraction,
     final double offsetDistance) {
     // the point on the segment line
-    final double segx = p0.getX() + segmentLengthFraction
-      * (p1.getX() - p0.getX());
-    final double segy = p0.getY() + segmentLengthFraction
-      * (p1.getY() - p0.getY());
+    final double segx = getP0().getX() + segmentLengthFraction
+      * (getP1().getX() - getP0().getX());
+    final double segy = getP0().getY() + segmentLengthFraction
+      * (getP1().getY() - getP0().getY());
 
-    final double dx = p1.getX() - p0.getX();
-    final double dy = p1.getY() - p0.getY();
+    final double dx = getP1().getX() - getP0().getX();
+    final double dy = getP1().getY() - getP0().getY();
     final double len = Math.sqrt(dx * dx + dy * dy);
     double ux = 0.0;
     double uy = 0.0;
@@ -505,14 +523,15 @@ public class LineSegment implements Comparable, Serializable {
    * the projection factor will lie outside the range [0.0, 1.0].
    */
   public Coordinates project(final Coordinates p) {
-    if (p.equals(p0) || p.equals(p1)) {
+    if (p.equals(getP0()) || p.equals(getP1())) {
       return new Coordinate(p);
     }
 
     final double r = projectionFactor(p);
-    final Coordinates coord = new Coordinate();
-    coord.setX(p0.getX() + r * (p1.getX() - p0.getX()));
-    coord.setY(p0.getY() + r * (p1.getY() - p0.getY()));
+    final double x = getP0().getX() + r * (getP1().getX() - getP0().getX());
+    final double y = getP0().getY() + r * (getP1().getY() - getP0().getY());
+    final Coordinates coord = new DoubleCoordinates(x, y,
+      Coordinates.NULL_ORDINATE);
     return coord;
   }
 
@@ -529,8 +548,8 @@ public class LineSegment implements Comparable, Serializable {
    * @return the projected line segment, or <code>null</code> if there is no overlap
    */
   public LineSegment project(final LineSegment seg) {
-    final double pf0 = projectionFactor(seg.p0);
-    final double pf1 = projectionFactor(seg.p1);
+    final double pf0 = projectionFactor(seg.getP0());
+    final double pf1 = projectionFactor(seg.getP1());
     // check if segment projects at all
     if (pf0 >= 1.0 && pf1 >= 1.0) {
       return null;
@@ -539,20 +558,20 @@ public class LineSegment implements Comparable, Serializable {
       return null;
     }
 
-    Coordinates newp0 = project(seg.p0);
+    Coordinates newp0 = project(seg.getP0());
     if (pf0 < 0.0) {
-      newp0 = p0;
+      newp0 = getP0();
     }
     if (pf0 > 1.0) {
-      newp0 = p1;
+      newp0 = getP1();
     }
 
-    Coordinates newp1 = project(seg.p1);
+    Coordinates newp1 = project(seg.getP1());
     if (pf1 < 0.0) {
-      newp1 = p0;
+      newp1 = getP0();
     }
     if (pf1 > 1.0) {
-      newp1 = p1;
+      newp1 = getP1();
     }
 
     return new LineSegment(newp0, newp1);
@@ -572,10 +591,10 @@ public class LineSegment implements Comparable, Serializable {
    * @return the projection factor for the point
    */
   public double projectionFactor(final Coordinates p) {
-    if (p.equals(p0)) {
+    if (p.equals(getP0())) {
       return 0.0;
     }
-    if (p.equals(p1)) {
+    if (p.equals(getP1())) {
       return 1.0;
     }
     // Otherwise, use comp.graphics.algorithms Frequently Asked Questions method
@@ -584,8 +603,8 @@ public class LineSegment implements Comparable, Serializable {
      * r=1 P = B r<0 P is on the backward extension of AB r>1 P is on the
      * forward extension of AB 0<r<1 P is interior to AB
      */
-    final double dx = p1.getX() - p0.getX();
-    final double dy = p1.getY() - p0.getY();
+    final double dx = getP1().getX() - getP0().getX();
+    final double dy = getP1().getY() - getP0().getY();
     final double len = dx * dx + dy * dy;
 
     // handle zero-length segments
@@ -593,7 +612,8 @@ public class LineSegment implements Comparable, Serializable {
       return Double.NaN;
     }
 
-    final double r = ((p.getX() - p0.getX()) * dx + (p.getY() - p0.getY()) * dy)
+    final double r = ((p.getX() - getP0().getX()) * dx + (p.getY() - getP0().getY())
+      * dy)
       / len;
     return r;
   }
@@ -602,9 +622,9 @@ public class LineSegment implements Comparable, Serializable {
    * Reverses the direction of the line segment.
    */
   public void reverse() {
-    final Coordinates temp = p0;
-    p0 = p1;
-    p1 = temp;
+    final Coordinates temp = getP0();
+    setP0(getP1());
+    setP1(temp);
   }
 
   /**
@@ -631,14 +651,22 @@ public class LineSegment implements Comparable, Serializable {
   }
 
   public void setCoordinates(final Coordinates p0, final Coordinates p1) {
-    this.p0.setX(p0.getX());
-    this.p0.setY(p0.getY());
-    this.p1.setX(p1.getX());
-    this.p1.setY(p1.getY());
+    this.getP0().setX(p0.getX());
+    this.getP0().setY(p0.getY());
+    this.getP1().setX(p1.getX());
+    this.getP1().setY(p1.getY());
   }
 
   public void setCoordinates(final LineSegment ls) {
-    setCoordinates(ls.p0, ls.p1);
+    setCoordinates(ls.getP0(), ls.getP1());
+  }
+
+  public void setP0(final Coordinates p0) {
+    this.p0 = p0;
+  }
+
+  public void setP1(final Coordinates p1) {
+    this.p1 = p1;
   }
 
   /**
@@ -649,13 +677,13 @@ public class LineSegment implements Comparable, Serializable {
    */
   public LineString toGeometry(final GeometryFactory geomFactory) {
     return geomFactory.lineString(new Coordinates[] {
-      p0, p1
+      getP0(), getP1()
     });
   }
 
   @Override
   public String toString() {
-    return "LINESTRING( " + p0.getX() + " " + p0.getY() + ", " + p1.getX()
-      + " " + p1.getY() + ")";
+    return "LINESTRING( " + getP0().getX() + " " + getP0().getY() + ", "
+      + getP1().getX() + " " + getP1().getY() + ")";
   }
 }

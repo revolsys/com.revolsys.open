@@ -125,64 +125,49 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
 
   @Override
   public void getCoordinate(final int index, final Coordinates coord) {
-    coord.setX(getOrdinate(index, X));
-    coord.setY(getOrdinate(index, Y));
-    coord.setZ(getOrdinate(index, Z));
+    coord.setX(getValue(index, X));
+    coord.setY(getValue(index, Y));
+    coord.setZ(getValue(index, Z));
   }
 
   @Override
   public Coordinates getCoordinateCopy(final int i) {
-    return new Coordinate((double)getX(i), getY(i), getZ(i));
+    return new Coordinate(getX(i), getY(i), getZ(i));
   }
 
   @Override
-  public int getDimension() {
+  public int getNumAxis() {
     return 2;
   }
 
   @Override
-  public byte getNumAxis() {
-    return (byte)getDimension();
-  }
-
-  @Override
-  public double getOrdinate(final int index, final int ordinateIndex) {
+  public double getValue(final int index, final int ordinateIndex) {
     // Z ord is always 0
     if (ordinateIndex > 1) {
       return 0;
     }
-    return seq.getOrdinate(index, indexMap[ordinateIndex]);
-  }
-
-  @Override
-  public double getValue(final int index, final int axisIndex) {
-    return getOrdinate(axisIndex, axisIndex);
+    return seq.getValue(index, indexMap[ordinateIndex]);
   }
 
   @Override
   public double getX(final int index) {
-    return getOrdinate(index, X);
+    return getValue(index, X);
   }
 
   @Override
   public double getY(final int index) {
-    return getOrdinate(index, Y);
+    return getValue(index, Y);
   }
 
   @Override
   public double getZ(final int index) {
-    return getOrdinate(index, Z);
+    return getValue(index, Z);
   }
 
   @Override
-  public void setOrdinate(final int index, final int ordinateIndex,
+  public void setValue(final int index, final int ordinateIndex,
     final double value) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setValue(final int index, final int axisIndex, final double value) {
-    setOrdinate(index, axisIndex, value);
   }
 
   @Override

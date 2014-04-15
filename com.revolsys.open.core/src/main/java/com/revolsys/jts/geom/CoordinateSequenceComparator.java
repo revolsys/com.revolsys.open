@@ -109,8 +109,8 @@ public class CoordinateSequenceComparator
     int size1 = s1.size();
     int size2 = s2.size();
 
-    int dim1 = s1.getDimension();
-    int dim2 = s2.getDimension();
+    int dim1 = s1.getNumAxis();
+    int dim2 = s2.getNumAxis();
 
     int minDim = dim1;
     if (dim2 < minDim)
@@ -153,8 +153,8 @@ public class CoordinateSequenceComparator
   protected int compareCoordinate(CoordinatesList s1, CoordinatesList s2, int i, int dimension)
   {
     for (int d = 0; d < dimension; d++) {
-      double ord1 = s1.getOrdinate(i, d);
-      double ord2 = s2.getOrdinate(i, d);
+      double ord1 = s1.getValue(i, d);
+      double ord2 = s2.getValue(i, d);
       int comp = compare(ord1, ord2);
       if (comp != 0) return comp;
     }

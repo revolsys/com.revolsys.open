@@ -75,7 +75,7 @@ public class Coordinate extends AbstractCoordinates {
    *@param  c  the <code>Coordinate</code> to copy.
    */
   public Coordinate(final Coordinates point) {
-    final byte numAxis = point.getNumAxis();
+    final int numAxis = point.getNumAxis();
     this.coordinates = new double[numAxis];
     for (int i = 0; i < numAxis; i++) {
       final double value = point.getValue(i);
@@ -116,7 +116,7 @@ public class Coordinate extends AbstractCoordinates {
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return (byte)coordinates.length;
   }
 
@@ -164,7 +164,7 @@ public class Coordinate extends AbstractCoordinates {
   public String toString() {
     final StringBuffer s = new StringBuffer("POINT(");
     s.append(coordinates[0]);
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     for (int i = 1; i < numAxis; i++) {
       final Double ordinate = coordinates[i];
       s.append(' ');

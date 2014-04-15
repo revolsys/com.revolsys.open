@@ -8,6 +8,7 @@ import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
 /**
@@ -218,10 +219,10 @@ public class RobustLineIntersector extends LineIntersector {
 
     final Coordinates intPt = safeHCoordinatesIntersection(n1, n2, n3, n4);
 
-    intPt.setX(intPt.getX() + normPt.getX());
-    intPt.setY(intPt.getY() + normPt.getY());
+    final double x = intPt.getX() + normPt.getX();
+    final double y = intPt.getY() + normPt.getY();
 
-    return intPt;
+    return new Coordinate(x, y);
   }
 
   /**

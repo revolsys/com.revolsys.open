@@ -92,10 +92,10 @@ public class VertexHausdorffDistance {
    */
   private void computeMaxPointDistance(final LineSegment seg0,
     final LineSegment seg1, final PointPairDistance ptDist) {
-    final Coordinates closestPt0 = seg0.closestPoint(seg1.p0);
-    ptDist.setMaximum(closestPt0, seg1.p0);
-    final Coordinates closestPt1 = seg0.closestPoint(seg1.p1);
-    ptDist.setMaximum(closestPt1, seg1.p1);
+    final Coordinates closestPt0 = seg0.closestPoint(seg1.getP0());
+    ptDist.setMaximum(closestPt0, seg1.getP0());
+    final Coordinates closestPt1 = seg0.closestPoint(seg1.getP1());
+    ptDist.setMaximum(closestPt1, seg1.getP1());
   }
 
   public double distance() {

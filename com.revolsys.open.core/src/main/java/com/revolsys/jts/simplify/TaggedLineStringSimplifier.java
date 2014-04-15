@@ -91,8 +91,8 @@ public class TaggedLineStringSimplifier {
   private int findFurthestPoint(final Coordinates[] pts, final int i,
     final int j, final double[] maxDistance) {
     final LineSegment seg = new LineSegment();
-    seg.p0 = pts[i];
-    seg.p1 = pts[j];
+    seg.setP0(pts[i]);
+    seg.setP1(pts[j]);
     double maxDist = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
@@ -168,7 +168,7 @@ public class TaggedLineStringSimplifier {
 
   private boolean hasInteriorIntersection(final LineSegment seg0,
     final LineSegment seg1) {
-    li.computeIntersection(seg0.p0, seg0.p1, seg1.p0, seg1.p1);
+    li.computeIntersection(seg0.getP0(), seg0.getP1(), seg1.getP0(), seg1.getP1());
     return li.isInteriorIntersection();
   }
 
@@ -243,8 +243,8 @@ public class TaggedLineStringSimplifier {
     }
     // test if flattened section would cause intersection
     final LineSegment candidateSeg = new LineSegment();
-    candidateSeg.p0 = linePts[i];
-    candidateSeg.p1 = linePts[j];
+    candidateSeg.setP0(linePts[i]);
+    candidateSeg.setP1(linePts[j]);
     sectionIndex[0] = i;
     sectionIndex[1] = j;
     if (hasBadIntersection(line, sectionIndex, candidateSeg)) {

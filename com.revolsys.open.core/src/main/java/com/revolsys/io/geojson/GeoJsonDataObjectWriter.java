@@ -9,6 +9,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonWriter;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -60,6 +61,24 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     }
   }
 
+  private void coordinate(final Coordinates coordinates) {
+    final double x = coordinates.getX();
+    final double y = coordinates.getY();
+
+    out.print('[');
+    out.value(x);
+
+    out.print(',');
+    out.value(y);
+
+    final double z = coordinates.getZ();
+    if (!Double.isNaN(z)) {
+      out.print(',');
+      out.value(z);
+    }
+    out.print(']');
+  }
+
   private void coordinate(final CoordinatesList coordinates, final int i) {
     double x = coordinates.getX(i);
     double y = coordinates.getY(i);
@@ -104,8 +123,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   public void coordinates(final Point point) {
-    final CoordinatesList coordinates = CoordinatesListUtil.get(point);
-    coordinate(coordinates, 0);
+    coordinate(point);
   }
 
   public void coordinates(final Polygon polygon) {

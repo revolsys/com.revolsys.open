@@ -80,7 +80,7 @@ public class FacetSequenceTreeBuilder {
           addFacetSequences(seq, sections);
         }
         else if (geom instanceof Point) {
-          seq = ((Point) geom).getCoordinateSequence();
+          seq = ((Point) geom).getCoordinatesList();
           addFacetSequences(seq, sections);
         }
       }

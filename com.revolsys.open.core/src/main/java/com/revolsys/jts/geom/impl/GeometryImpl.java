@@ -1429,7 +1429,7 @@ public abstract class GeometryImpl implements Geometry {
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return (byte)geometryFactory.getNumAxis();
   }
 

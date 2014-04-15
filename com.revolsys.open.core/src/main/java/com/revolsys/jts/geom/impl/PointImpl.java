@@ -124,7 +124,7 @@ public class PointImpl extends GeometryImpl implements Point {
     if (isEmpty()) {
       return;
     }
-    filter.filter(getCoordinateSequence(), 0);
+    filter.filter(getCoordinatesList(), 0);
     if (filter.isGeometryChanged()) {
       geometryChanged();
     }
@@ -215,7 +215,7 @@ public class PointImpl extends GeometryImpl implements Point {
       if (coordinatesOperation == null) {
         targetCoordinates = coordinates;
       } else {
-        final byte sourceNumAxis = getNumAxis();
+        final int sourceNumAxis = getNumAxis();
         final int targetNumAxis = geometryFactory.getNumAxis();
         targetCoordinates = new double[targetNumAxis];
         coordinatesOperation.perform(sourceNumAxis, coordinates, targetNumAxis,
@@ -347,7 +347,7 @@ public class PointImpl extends GeometryImpl implements Point {
     if (isEmpty()) {
       return Double.NaN;
     } else {
-      final byte numAxis = getNumAxis();
+      final int numAxis = getNumAxis();
       if (axisIndex >= 0 && axisIndex < numAxis) {
         return coordinates[axisIndex];
       } else {
@@ -373,8 +373,8 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
-  public CoordinatesList getCoordinateSequence() {
-    final byte numAxis = getNumAxis();
+  public CoordinatesList getCoordinatesList() {
+    final int numAxis = getNumAxis();
     return new DoubleCoordinatesList(numAxis, coordinates);
   }
 

@@ -25,7 +25,6 @@ import com.revolsys.gis.jts.Location;
 import com.revolsys.gis.jts.RayCrossingCounter;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
@@ -119,8 +118,8 @@ public class CoordinatesListUtil {
   public static int append(final CoordinatesList src,
     final CoordinatesList dest, final int startIndex) {
     int coordIndex = startIndex;
-    final int srcDimension = src.getDimension();
-    final int destDimension = dest.getDimension();
+    final int srcDimension = src.getNumAxis();
+    final int destDimension = dest.getNumAxis();
     final int dimension = Math.min(srcDimension, destDimension);
     final int srcSize = src.size();
     final int destSize = dest.size();
@@ -154,8 +153,8 @@ public class CoordinatesListUtil {
   public static int appendReversed(final CoordinatesList src,
     final CoordinatesList dest, final int startIndex) {
     int coordIndex = startIndex;
-    final int srcDimension = src.getDimension();
-    final int destDimension = dest.getDimension();
+    final int srcDimension = src.getNumAxis();
+    final int destDimension = dest.getNumAxis();
     final int dimension = Math.min(srcDimension, destDimension);
     final int srcSize = src.size();
     final int destSize = dest.size();
@@ -268,8 +267,8 @@ public class CoordinatesListUtil {
 
   public static boolean equals2dCoordinates(final CoordinatesList coordinates,
     final int index1, final int index2) {
-    return coordinates.getX(index1) == coordinates.getOrdinate(index2, 0)
-      && coordinates.getY(index1) == coordinates.getOrdinate(index2, 1);
+    return coordinates.getX(index1) == coordinates.getValue(index2, 0)
+      && coordinates.getY(index1) == coordinates.getValue(index2, 1);
   }
 
   public static boolean equalWithinTolerance(final CoordinatesList points1,
@@ -373,7 +372,7 @@ public class CoordinatesListUtil {
     if (geometry == null) {
       return null;
     } else if (geometry instanceof Point) {
-      return get((Point)geometry);
+      return ((Point)geometry).getCoordinatesList();
     } else if (geometry instanceof LineString) {
       return get((LineString)geometry);
     } else if (geometry instanceof Polygon) {
@@ -407,7 +406,7 @@ public class CoordinatesListUtil {
     if (size == 0) {
       return new DoubleCoordinatesList(0, 3);
     } else {
-      final byte numAxis = points.get(0).getNumAxis();
+      final int numAxis = points.get(0).getNumAxis();
       final DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(
         size, numAxis);
       int i = 0;
@@ -427,18 +426,13 @@ public class CoordinatesListUtil {
       numAxis);
     for (int i = 0; i < numPoints; i++) {
       final Point point = (Point)multiPoint.getGeometry(i);
-      final Coordinates coordinates = CoordinatesUtil.getInstance(point);
-      points.setPoint(i, coordinates);
+      points.setPoint(i, point);
     }
     return points;
   }
 
   public static CoordinatesList get(final Point... points) {
     return get(Arrays.asList(points));
-  }
-
-  public static CoordinatesList get(final Point point) {
-    return point.getCoordinateSequence();
   }
 
   private static CoordinatesList get(final Polygon polygon) {
@@ -455,7 +449,7 @@ public class CoordinatesListUtil {
       for (int i = 0; i < geometry.getNumGeometries(); i++) {
         final Geometry subGeometry = geometry.getGeometry(i);
         if (subGeometry instanceof Point) {
-          pointsList.add(get((Point)subGeometry));
+          pointsList.add(((Point)subGeometry).getCoordinatesList());
         } else if (subGeometry instanceof LineString) {
           pointsList.add(get((LineString)subGeometry));
         } else if (subGeometry instanceof Polygon) {
@@ -648,7 +642,7 @@ public class CoordinatesListUtil {
     boolean isCCW = false;
     if (disc == 0) {
       // poly is CCW if prev x is right of next x
-      isCCW = (ring.getOrdinate(iPrev, 0) > ring.getOrdinate(iPrev, 1));
+      isCCW = (ring.getValue(iPrev, 0) > ring.getValue(iPrev, 1));
     } else {
       // if area is positive, points are ordered CCW
       isCCW = (disc > 0);
@@ -750,8 +744,8 @@ public class CoordinatesListUtil {
 
   public static CoordinatesList merge(final Coordinates point,
     final CoordinatesList coordinates1, final CoordinatesList coordinates2) {
-    final int dimension = Math.max(coordinates1.getDimension(),
-      coordinates2.getDimension());
+    final int dimension = Math.max(coordinates1.getNumAxis(),
+      coordinates2.getNumAxis());
     final int maxSize = coordinates1.size() + coordinates2.size();
     final CoordinatesList coordinates = new DoubleCoordinatesList(maxSize,
       dimension);
@@ -787,8 +781,8 @@ public class CoordinatesListUtil {
 
   public static CoordinatesList merge(final CoordinatesList coordinates1,
     final CoordinatesList coordinates2) {
-    final int dimension = Math.max(coordinates1.getDimension(),
-      coordinates2.getDimension());
+    final int dimension = Math.max(coordinates1.getNumAxis(),
+      coordinates2.getNumAxis());
     final int maxSize = coordinates1.size() + coordinates2.size();
     final CoordinatesList coordinates = new DoubleCoordinatesList(maxSize,
       dimension);
@@ -943,7 +937,7 @@ public class CoordinatesListUtil {
 
   public static CoordinatesList removeRepeatedPoints(
     final CoordinatesList points) {
-    final byte numAxis = points.getNumAxis();
+    final int numAxis = points.getNumAxis();
     final List<Double> coordinates = new ArrayList<Double>();
     double x = points.getX(0);
     double y = points.getY(0);

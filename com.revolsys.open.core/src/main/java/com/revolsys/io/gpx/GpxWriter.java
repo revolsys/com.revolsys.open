@@ -147,14 +147,14 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     writeAttributes(object);
     out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
     final DoubleCoordinates geoCoordinates = new DoubleCoordinates(
-      coordinatesList.getDimension());
+      coordinatesList.getNumAxis());
 
     for (final Coordinates coordinates : new InPlaceIterator(coordinatesList)) {
       inverseCoordinatesOperation.perform(coordinates, geoCoordinates);
       out.startTag(GpxConstants.TRACK_POINT_ELEMENT);
       out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinates.getX());
       out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinates.getY());
-      if (coordinatesList.getDimension() > 2) {
+      if (coordinatesList.getNumAxis() > 2) {
         final double elevation = geoCoordinates.getValue(2);
         if (!Double.isNaN(elevation)) {
           out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
@@ -176,7 +176,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
       inverseCoordinatesOperation, coordinate);
     out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.getX());
     out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.getY());
-    if (point.getCoordinateSequence().getDimension() > 2) {
+    if (point.getNumAxis() > 2) {
       final double elevation = geoCoordinate.getZ();
       if (!Double.isNaN(elevation)) {
         out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));

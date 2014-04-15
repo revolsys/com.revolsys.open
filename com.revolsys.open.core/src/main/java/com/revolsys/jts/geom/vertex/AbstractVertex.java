@@ -44,7 +44,7 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return (byte)geometryFactory.getNumAxis();
   }

@@ -20,7 +20,7 @@ public class ReverseCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return coordinateList.getNumAxis();
   }
 

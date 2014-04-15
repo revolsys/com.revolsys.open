@@ -38,7 +38,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -111,10 +111,9 @@ public class MultiPointImplTest extends TestCase {
     final Geometry g = m.getGeometry(1);
     assertTrue(g instanceof Point);
     final Point p = (Point)g;
-    final Coordinates externalCoordinate = new Coordinate();
     final Coordinates internal = p.getCoordinate();
-    externalCoordinate.setX(internal.getX());
-    externalCoordinate.setY(internal.getY());
+    final Coordinates externalCoordinate = new DoubleCoordinates(
+      internal.getX(), internal.getY());
     assertEquals(3.333, externalCoordinate.getX(), 1E-10);
     assertEquals(4.444, externalCoordinate.getY(), 1E-10);
   }

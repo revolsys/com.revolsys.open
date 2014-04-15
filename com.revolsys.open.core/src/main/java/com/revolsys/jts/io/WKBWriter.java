@@ -373,8 +373,28 @@ public class WKBWriter {
       // if 3rd dim is requested, only write it if the CoordinatesList provides
       // it
       double ordVal = Coordinates.NULL_ORDINATE;
-      if (seq.getDimension() >= 3) {
-        ordVal = seq.getOrdinate(index, 2);
+      if (seq.getNumAxis() >= 3) {
+        ordVal = seq.getValue(index, 2);
+      }
+      ByteOrderValues.putDouble(ordVal, buf, byteOrder);
+      os.write(buf, 8);
+    }
+  }
+
+  private void writeCoordinates(final Coordinates seq, final boolean writeSize,
+    final OutStream os) throws IOException {
+    ByteOrderValues.putDouble(seq.getX(), buf, byteOrder);
+    os.write(buf, 8);
+    ByteOrderValues.putDouble(seq.getY(), buf, byteOrder);
+    os.write(buf, 8);
+
+    // only write 3rd dim if caller has requested it for this writer
+    if (outputDimension >= 3) {
+      // if 3rd dim is requested, only write it if the CoordinatesList provides
+      // it
+      double ordVal = Coordinates.NULL_ORDINATE;
+      if (seq.getNumAxis() >= 3) {
+        ordVal = seq.getValue(2);
       }
       ByteOrderValues.putDouble(ordVal, buf, byteOrder);
       os.write(buf, 8);
@@ -426,15 +446,15 @@ public class WKBWriter {
     writeCoordinateSequence(line.getCoordinatesList(), true, os);
   }
 
-  private void writePoint(final Point pt, final OutStream os)
+  private void writePoint(final Point point, final OutStream os)
     throws IOException {
-    if (pt.getCoordinateSequence().size() == 0) {
+    if (point.isEmpty()) {
       throw new IllegalArgumentException(
         "Empty Points cannot be represented in WKB");
     }
     writeByteOrder(os);
-    writeGeometryType(WKBConstants.wkbPoint, pt, os);
-    writeCoordinateSequence(pt.getCoordinateSequence(), false, os);
+    writeGeometryType(WKBConstants.wkbPoint, point, os);
+    writeCoordinates(point, false, os);
   }
 
   private void writePolygon(final Polygon poly, final OutStream os)

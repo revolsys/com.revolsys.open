@@ -95,13 +95,13 @@ public class DoubleListCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return numAxis;
   }
 
   @Override
   public double getValue(final int index, final int axisIndex) {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (axisIndex < numAxis && index < size()) {
       return coordinates.get(index * numAxis + axisIndex);
     } else {
@@ -117,7 +117,7 @@ public class DoubleListCoordinatesList extends AbstractCoordinatesList {
 
   @Override
   public void setValue(final int index, final int axisIndex, final double value) {
-    final byte numAxis = getNumAxis();
+    final int numAxis = getNumAxis();
     if (axisIndex < numAxis) {
       if (index <= size()) {
         for (int i = coordinates.size(); i < (index + 1) * numAxis; i++) {

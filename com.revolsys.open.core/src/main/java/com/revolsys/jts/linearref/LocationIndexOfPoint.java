@@ -122,8 +122,8 @@ class LocationIndexOfPoint {
     final LineSegment seg = new LineSegment();
     for (final LinearIterator it = new LinearIterator(linearGeom); it.hasNext(); it.next()) {
       if (!it.isEndOfLine()) {
-        seg.p0 = it.getSegmentStart();
-        seg.p1 = it.getSegmentEnd();
+        seg.setP0(it.getSegmentStart());
+        seg.setP1(it.getSegmentEnd());
         final double segDistance = seg.distance(inputPt);
         final double segFrac = seg.segmentFraction(inputPt);
 

@@ -502,8 +502,8 @@ public class WKTWriter
       throws IOException
   {
     writer.write(writeNumber(seq.getX(i)) + " " + writeNumber(seq.getY(i)));
-    if (outputDimension >= 3 && seq.getDimension() >= 3) {
-      double z = seq.getOrdinate(i, 3);
+    if (outputDimension >= 3 && seq.getNumAxis() >= 3) {
+      double z = seq.getValue(i, 3);
       if (! Double.isNaN(z)) {
         writer.write(" ");
         writer.write(writeNumber(z));

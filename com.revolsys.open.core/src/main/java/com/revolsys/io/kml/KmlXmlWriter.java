@@ -94,13 +94,32 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void write(final CoordinatesList coordinateSequence) {
     startTag(Kml22Constants.COORDINATES);
-    final boolean hasZ = coordinateSequence.getDimension() > 2;
+    final boolean hasZ = coordinateSequence.getNumAxis() > 2;
     for (int i = 0; i < coordinateSequence.size(); i++) {
       write(String.valueOf(coordinateSequence.getX(i)));
       write(',');
       write(String.valueOf(coordinateSequence.getY(i)));
       if (hasZ) {
-        final double z = coordinateSequence.getOrdinate(i, 2);
+        final double z = coordinateSequence.getValue(i, 2);
+        if (!Double.isNaN(z)) {
+          write(',');
+          write(String.valueOf(z));
+        }
+      }
+      write(' ');
+    }
+    endTag();
+  }
+
+  public void writeCoordinates(final Coordinates point) {
+    startTag(Kml22Constants.COORDINATES);
+    if (point != null) {
+      final boolean hasZ = point.getNumAxis() > 2;
+      write(String.valueOf(point.getX()));
+      write(',');
+      write(String.valueOf(point.getY()));
+      if (hasZ) {
+        final double z = point.getZ();
         if (!Double.isNaN(z)) {
           write(',');
           write(String.valueOf(z));
@@ -359,7 +378,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writePoint(final Point point) {
     startTag(Kml22Constants.POINT);
-    write(point.getCoordinateSequence());
+    writeCoordinates(point);
     endTag();
   }
 

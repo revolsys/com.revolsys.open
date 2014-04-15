@@ -327,7 +327,7 @@ public class GeometryEditor
 
       if (geometry instanceof Point) {
         return factory.point(edit(
-            ((Point)geometry).getCoordinateSequence(),
+            ((Point)geometry).getCoordinatesList(),
             geometry));
       }
 

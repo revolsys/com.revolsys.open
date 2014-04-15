@@ -39,6 +39,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -336,13 +337,15 @@ public class WKTReader {
   }
 
   private Coordinates getPreciseCoordinate() throws IOException, ParseException {
-    final Coordinates coord = new Coordinate();
-    coord.setX(getNextNumber());
-    coord.setY(getNextNumber());
+    final double x = precisionModel.makePrecise(getNextNumber());
+    final double y = precisionModel.makePrecise(getNextNumber());
+    final Coordinates coord;
     if (isNumberNext()) {
-      coord.setZ(getNextNumber());
+      final double z = getNextNumber();
+      coord = new DoubleCoordinates(x, y, z);
+    } else {
+      coord = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
     }
-    precisionModel.makePrecise(coord);
     return coord;
   }
 

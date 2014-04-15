@@ -64,8 +64,8 @@ public class GeometryPointLocater {
         return;
       }
 
-      seg.p0 = p0;
-      seg.p1 = p1;
+      seg.setP0(p0);
+      seg.setP1(p1);
       final double segDist = seg.distance(testPt);
       if (segDist < tolerance) {
         nearestPt = seg.closestPoint(testPt);

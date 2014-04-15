@@ -76,7 +76,7 @@ public class SIRtreePointInRing implements PointInRing {
         continue;
       } // Optimization suggested by MD. [Jon Aquino]
       final LineSegment seg = new LineSegment(pts[i - 1], pts[i]);
-      this.sirTree.insert(seg.p0.getY(), seg.p1.getY(), seg);
+      this.sirTree.insert(seg.getP0().getY(), seg.getP1().getY(), seg);
     }
   }
 
@@ -113,8 +113,8 @@ public class SIRtreePointInRing implements PointInRing {
     /*
      * Test if segment crosses ray from test point in positive x direction.
      */
-    final Coordinates p1 = seg.p0;
-    final Coordinates p2 = seg.p1;
+    final Coordinates p1 = seg.getP0();
+    final Coordinates p2 = seg.getP1();
     x1 = p1.getX() - p.getX();
     y1 = p1.getY() - p.getY();
     x2 = p2.getX() - p.getX();

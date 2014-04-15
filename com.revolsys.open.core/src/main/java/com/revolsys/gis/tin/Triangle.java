@@ -178,7 +178,7 @@ public class Triangle extends AbstractCoordinatesList {
   }
 
   @Override
-  public byte getNumAxis() {
+  public int getNumAxis() {
     return 3;
   }
 

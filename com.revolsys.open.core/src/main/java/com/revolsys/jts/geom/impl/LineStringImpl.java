@@ -35,6 +35,7 @@ package com.revolsys.jts.geom.impl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
@@ -91,7 +92,15 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   public LineStringImpl(final CoordinatesList points,
     final GeometryFactory factory) {
     super(factory);
-    init(points);
+    if (points == null) {
+      this.points = new DoubleCoordinatesList(factory.getNumAxis());
+    } else if (points.size() == 1) {
+      throw new IllegalArgumentException(
+        "Invalid number of points in LineString (found " + points.size()
+          + " - must be 0 or >= 2)");
+    } else {
+      this.points = points;
+    }
   }
 
   @Override
@@ -232,7 +241,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
       while (vertexIndex < 0) {
         vertexIndex += numPoints;
       }
-      return points.getOrdinate(vertexIndex, axisIndex);
+      return points.getValue(vertexIndex, axisIndex);
     } else {
       return Double.NaN;
     }
@@ -331,19 +340,6 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   @Override
   public int getVertexCount() {
     return points.size();
-  }
-
-  private void init(CoordinatesList points) {
-    if (points == null) {
-      points = getGeometryFactory().getCoordinateSequenceFactory().create(
-        new Coordinates[] {});
-    }
-    if (points.size() == 1) {
-      throw new IllegalArgumentException(
-        "Invalid number of points in LineString (found " + points.size()
-          + " - must be 0 or >= 2)");
-    }
-    this.points = points;
   }
 
   @Override

@@ -154,19 +154,13 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   double[] getCoordinates();
 
-  /**
-   * Returns the dimension (number of ordinates in each coordinate)
-   * for this sequence.
-   *
-   * @return the dimension of the sequence.
-   */
-  int getDimension();
-
   List<Coordinates> getList();
 
   double getM(int index);
 
-  byte getNumAxis();
+  int getNumAxis();
+
+  long getTime(int index);
 
   /**
    * Returns the ordinate of a coordinate in this sequence.
@@ -177,10 +171,6 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    * @param index  the coordinate index in the sequence
    * @param ordinateIndex the ordinate index in the coordinate (in range [0, dimension-1])
    */
-  double getOrdinate(int index, int ordinateIndex);
-
-  long getTime(int index);
-
   double getValue(int index, int axisIndex);
 
   /**
@@ -209,6 +199,10 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   void setM(int index, double m);
 
+  void setPoint(int i, Coordinates point);
+
+  void setTime(int index, long time);
+
   /**
    * Sets the value for a given ordinate of a coordinate in this sequence.
    *
@@ -216,12 +210,6 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    * @param ordinateIndex the ordinate index in the coordinate (in range [0, dimension-1])
    * @param value  the new ordinate value
    */
-  void setOrdinate(int index, int ordinateIndex, double value);
-
-  void setPoint(int i, Coordinates point);
-
-  void setTime(int index, long time);
-
   void setValue(int index, int axisIndex, double value);
 
   void setX(int index, double x);
