@@ -488,7 +488,7 @@ public class QuadEdgeSubdivision {
     int i = 0;
     for (final Iterator it = triPtsList.iterator(); it.hasNext();) {
       final Coordinates[] triPt = (Coordinates[])it.next();
-      tris[i++] = geomFact.createPolygon(geomFact.createLinearRing(triPt), null);
+      tris[i++] = geomFact.createPolygon(geomFact.linearRing(triPt), null);
     }
     return geomFact.createGeometryCollection(tris);
   }
@@ -604,7 +604,7 @@ public class QuadEdgeSubdivision {
    */
   public Polygon getVoronoiCellPolygon(QuadEdge qe,
     final GeometryFactory geomFact) {
-    final List cellPts = new ArrayList();
+    final List<Coordinates> cellPts = new ArrayList<>();
     final QuadEdge startQE = qe;
     do {
       // Coordinates cc = circumcentre(qe);
@@ -625,9 +625,7 @@ public class QuadEdgeSubdivision {
       coordList.add(coordList.get(coordList.size() - 1), true);
     }
 
-    final Coordinates[] pts = coordList.toCoordinateArray();
-    final Polygon cellPoly = geomFact.createPolygon(
-      geomFact.createLinearRing(pts), null);
+    final Polygon cellPoly = geomFact.createPolygon(coordList);
 
     final Vertex v = startQE.orig();
     cellPoly.setUserData(v.getCoordinate());

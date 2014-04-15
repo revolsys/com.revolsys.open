@@ -73,7 +73,7 @@ public class IteratedBufferStressTest {
   Geometry doBuffer(final Geometry g, final double dist) {
     System.out.println("Buffering with dist = " + dist);
     final Geometry buf = g.buffer(dist);
-    System.out.println("Buffer result has " + buf.getNumPoints() + " vertices");
+    System.out.println("Buffer result has " + buf.getVertexCount() + " vertices");
 
     System.out.println(buf);
     return buf;

@@ -239,17 +239,14 @@ public class GeometryImplTest extends TestCase {
   // assertTrue(lineString.equals(geometryCollection));
   // }
   public void testEqualsExactForLinearRings() throws Exception {
-    final LinearRing x = this.geometryFactory.createLinearRing(0.0, 0,
-      Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE, 100.0,
-      100, Coordinates.NULL_ORDINATE, 0.0, 0, Coordinates.NULL_ORDINATE);
-    final LinearRing somethingExactlyEqual = this.geometryFactory.createLinearRing(
-      0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
-      100.0, 100, Coordinates.NULL_ORDINATE, 0.0, 0, Coordinates.NULL_ORDINATE);
-    final LinearRing somethingNotEqualButSameClass = this.geometryFactory.createLinearRing(
-      0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
-      100.0, 555, Coordinates.NULL_ORDINATE, 0.0, 0, Coordinates.NULL_ORDINATE);
-    final LinearRing sameClassButEmpty = this.geometryFactory.createLinearRing((CoordinatesList)null);
-    final LinearRing anotherSameClassButEmpty = this.geometryFactory.createLinearRing((CoordinatesList)null);
+    final LinearRing x = this.geometryFactory.linearRing(2, 0.0, 0, 100.0, 0,
+      100.0, 100, 0.0, 0);
+    final LinearRing somethingExactlyEqual = this.geometryFactory.linearRing(2,
+      0.0, 0, 100.0, 0, 100.0, 100, 0.0, 0);
+    final LinearRing somethingNotEqualButSameClass = this.geometryFactory.linearRing(
+      2, 0.0, 0, 100.0, 0, 100.0, 555, 0.0, 0);
+    final LinearRing sameClassButEmpty = this.geometryFactory.linearRing((CoordinatesList)null);
+    final LinearRing anotherSameClassButEmpty = this.geometryFactory.linearRing((CoordinatesList)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
@@ -271,15 +268,12 @@ public class GeometryImplTest extends TestCase {
   }
 
   public void testEqualsExactForLineStrings() throws Exception {
-    final LineString x = this.geometryFactory.lineString(0.0, 0,
-      Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE, 100.0,
-      100, Coordinates.NULL_ORDINATE);
-    final LineString somethingExactlyEqual = this.geometryFactory.lineString(
-      0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
-      100.0, 100, Coordinates.NULL_ORDINATE);
+    final LineString x = this.geometryFactory.lineString(2, 0.0, 0, 100.0, 0,
+      100.0, 100);
+    final LineString somethingExactlyEqual = this.geometryFactory.lineString(2,
+      0.0, 0, 100.0, 0, 100.0, 100);
     final LineString somethingNotEqualButSameClass = this.geometryFactory.lineString(
-      0.0, 0, Coordinates.NULL_ORDINATE, 100.0, 0, Coordinates.NULL_ORDINATE,
-      100.0, 555, Coordinates.NULL_ORDINATE);
+      2, 0.0, 0, 100.0, 0, 100.0, 555);
     final LineString sameClassButEmpty = this.geometryFactory.lineString();
     final LineString anotherSameClassButEmpty = this.geometryFactory.lineString();
     final CollectionFactory collectionFactory = new CollectionFactory() {
@@ -305,8 +299,7 @@ public class GeometryImplTest extends TestCase {
 
   public void testEqualsExactForPoints() throws Exception {
     final Point x = this.geometryFactory.point(100.0, 100.0);
-    final Point somethingExactlyEqual = this.geometryFactory.point(100.0,
-      100);
+    final Point somethingExactlyEqual = this.geometryFactory.point(100.0, 100);
     final Point somethingNotEqualButSameClass = this.geometryFactory.point(
       999.0, 100);
     final Point sameClassButEmpty = this.geometryFactory.point((Coordinates)null);

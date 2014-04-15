@@ -36,7 +36,7 @@ import com.revolsys.util.MathUtil;
 public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
-    .createEmptyGeometry();
+    .geometry();
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_marker");
 
@@ -101,7 +101,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
             orientation = Math.toDegrees(-point.angle2d(p2));
           }
         } else if ("center".equals(placement)) {
-          if (geometry instanceof LineString && geometry.getNumPoints() > 1) {
+          if (geometry instanceof LineString && geometry.getVertexCount() > 1) {
             final Geometry projectedGeometry = viewportGeometryFactory.copy(geometry);
             points = CoordinatesListUtil.get(projectedGeometry);
             final double totalLength = projectedGeometry.getLength();

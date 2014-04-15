@@ -183,14 +183,14 @@ public class WKTWriterTest extends TestCase {
       new Coordinate((double)20, 20, 0), new Coordinate((double)20, 15, 0),
       new Coordinate((double)10, 10, 0)
     };
-    final LinearRing linearRing1 = this.geometryFactory.createLinearRing(coordinates1);
+    final LinearRing linearRing1 = this.geometryFactory.linearRing(coordinates1);
     final Polygon polygon1 = this.geometryFactory.createPolygon(linearRing1,
       new LinearRing[] {});
     final Coordinates[] coordinates2 = {
       new Coordinate((double)60, 60, 0), new Coordinate((double)70, 70, 0),
       new Coordinate((double)80, 60, 0), new Coordinate((double)60, 60, 0)
     };
-    final LinearRing linearRing2 = this.geometryFactory.createLinearRing(coordinates2);
+    final LinearRing linearRing2 = this.geometryFactory.linearRing(coordinates2);
     final Polygon polygon2 = this.geometryFactory.createPolygon(linearRing2,
       new LinearRing[] {});
     final Polygon[] polygons = {
@@ -215,7 +215,7 @@ public class WKTWriterTest extends TestCase {
       new Coordinate((double)20, 20, 0), new Coordinate((double)20, 15, 0),
       new Coordinate((double)10, 10, 0)
     };
-    final LinearRing linearRing = this.geometryFactory.createLinearRing(coordinates);
+    final LinearRing linearRing = this.geometryFactory.linearRing(coordinates);
     final Polygon polygon = this.geometryFactory.createPolygon(linearRing,
       new LinearRing[] {});
     assertEquals("POLYGON ((10 10, 10 20, 20 20, 20 15, 10 10))",

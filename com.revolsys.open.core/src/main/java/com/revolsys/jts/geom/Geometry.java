@@ -980,15 +980,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   int getNumGeometries();
 
   /**
-   *  Returns the count of this <code>Geometry</code>s vertices. The <code>Geometry</code>
-   *  s contained by composite <code>Geometry</code>s must be
-   *  Geometry's; that is, they must implement <code>getNumPoints</code>
-   *
-   *@return    the number of vertices in this <code>Geometry</code>
-   */
-  int getNumPoints();
-
-  /**
    * @author Paul Austin <paul.austin@revolsys.com>
    */
   List<CoordinatesList> getPointLists();
@@ -1032,6 +1023,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @return The vertex or null if it does not exist.
    */
   Vertex getVertex(final int... vertexId);
+
+  /**
+   *  Returns the count of this <code>Geometry</code>s vertices. The <code>Geometry</code>
+   *  s contained by composite <code>Geometry</code>s must be
+   *  Geometry's; that is, they must implement <code>getNumPoints</code>
+   *
+   *@return    the number of vertices in this <code>Geometry</code>
+   */
+  int getVertexCount();
 
   /**
    * Gets a hash code for the Geometry.

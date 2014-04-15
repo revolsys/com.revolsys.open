@@ -372,8 +372,8 @@ public class BoundingBox extends Envelope implements Cloneable {
    */
   public BoundingBox(final GeometryFactory geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
-    super(geometryFactory.makePrecise(x1), geometryFactory.makePrecise(x2),
-      geometryFactory.makePrecise(y1), geometryFactory.makePrecise(y2));
+    super(geometryFactory.makeXyPrecise(x1), geometryFactory.makeXyPrecise(x2),
+      geometryFactory.makeXyPrecise(y1), geometryFactory.makeXyPrecise(y2));
     this.geometryFactory = geometryFactory;
     this.minZ = Double.NaN;
     this.maxZ = Double.NaN;

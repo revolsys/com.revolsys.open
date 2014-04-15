@@ -48,7 +48,7 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
   public LinearRing perform(final LinearRing ring) {
     if (ring != null) {
       final CoordinatesList newCoordinates = perform(CoordinatesListUtil.get(ring));
-      final LinearRing newRing = geometryFactory.createLinearRing(newCoordinates);
+      final LinearRing newRing = geometryFactory.linearRing(newCoordinates);
       addUserData(ring, newRing);
       return newRing;
     } else {

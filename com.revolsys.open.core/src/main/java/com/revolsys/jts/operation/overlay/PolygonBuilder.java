@@ -257,7 +257,7 @@ public class PolygonBuilder {
   {
     LinearRing testRing = testEr.getLinearRing();
     Envelope testEnv = testRing.getEnvelopeInternal();
-    Coordinates testPt = testRing.getCoordinateN(0);
+    Coordinates testPt = testRing.getCoordinate(0);
 
     EdgeRing minShell = null;
     Envelope minEnv = null;

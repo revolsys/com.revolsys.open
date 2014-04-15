@@ -269,7 +269,7 @@ public class GeometryEditor
   {
     public final Geometry edit(Geometry geometry, GeometryFactory factory) {
       if (geometry instanceof LinearRing) {
-        return factory.createLinearRing(edit(geometry.getCoordinateArray(),
+        return factory.linearRing(edit(geometry.getCoordinateArray(),
             geometry));
       }
 
@@ -314,7 +314,7 @@ public class GeometryEditor
   {
     public final Geometry edit(Geometry geometry, GeometryFactory factory) {
       if (geometry instanceof LinearRing) {
-        return factory.createLinearRing(edit(
+        return factory.linearRing(edit(
             ((LinearRing)geometry).getCoordinatesList(),
             geometry));
       }

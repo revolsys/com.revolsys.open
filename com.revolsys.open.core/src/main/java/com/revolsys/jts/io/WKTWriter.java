@@ -586,7 +586,7 @@ public class WKTWriter
     else {
       if (doIndent) indent(level, writer);
       writer.write("(");
-      for (int i = 0; i < lineString.getNumPoints(); i++) {
+      for (int i = 0; i < lineString.getVertexCount(); i++) {
         if (i > 0) {
           writer.write(", ");
           if (coordsPerLine > 0
@@ -594,7 +594,7 @@ public class WKTWriter
             indent(level + 1, writer);
           }
         }
-        appendCoordinate(lineString.getCoordinateN(i), writer);
+        appendCoordinate(lineString.getCoordinate(i), writer);
       }
       writer.write(")");
     }

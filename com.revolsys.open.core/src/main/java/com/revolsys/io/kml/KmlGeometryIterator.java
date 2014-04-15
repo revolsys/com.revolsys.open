@@ -131,7 +131,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     StaxUtils.skipToEndElementByLocalName(in, LINEAR_RING);
-    final LinearRing ring = geometryFactory.createLinearRing(cooordinatesList);
+    final LinearRing ring = geometryFactory.linearRing(cooordinatesList);
     return ring;
   }
 

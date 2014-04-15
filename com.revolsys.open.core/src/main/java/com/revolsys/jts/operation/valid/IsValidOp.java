@@ -138,8 +138,8 @@ public class IsValidOp {
   private void checkClosedRing(final LinearRing ring) {
     if (!ring.isClosed()) {
       Coordinates pt = null;
-      if (ring.getNumPoints() >= 1) {
-        pt = ring.getCoordinateN(0);
+      if (ring.getVertexCount() >= 1) {
+        pt = ring.getCoordinate(0);
       }
       validErr = new TopologyValidationError(
         TopologyValidationError.RING_NOT_CLOSED, pt);

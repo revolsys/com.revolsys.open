@@ -54,12 +54,12 @@ public class LineHandlingFunctions {
   private static LineString extractChain(final LineString line,
     final int index, final int maxChainSize) {
     int size = maxChainSize + 1;
-    if (index + size > line.getNumPoints()) {
-      size = line.getNumPoints() - index;
+    if (index + size > line.getVertexCount()) {
+      size = line.getVertexCount() - index;
     }
     final Coordinates[] pts = new Coordinates[size];
     for (int i = 0; i < size; i++) {
-      pts[i] = line.getCoordinateN(index + i);
+      pts[i] = line.getCoordinate(index + i);
     }
     return line.getGeometryFactory().lineString(pts);
   }
@@ -69,7 +69,7 @@ public class LineHandlingFunctions {
     final List chains = new ArrayList();
     for (final Iterator it = lines.iterator(); it.hasNext();) {
       final LineString line = (LineString)it.next();
-      for (int i = 0; i < line.getNumPoints() - 1; i += maxChainSize) {
+      for (int i = 0; i < line.getVertexCount() - 1; i += maxChainSize) {
         final LineString chain = extractChain(line, i, maxChainSize);
         chains.add(chain);
       }
@@ -87,10 +87,10 @@ public class LineHandlingFunctions {
     final List segments = new ArrayList();
     for (final Iterator it = lines.iterator(); it.hasNext();) {
       final LineString line = (LineString)it.next();
-      for (int i = 1; i < line.getNumPoints(); i++) {
+      for (int i = 1; i < line.getVertexCount(); i++) {
         final LineString seg = g.getGeometryFactory().lineString(
           new Coordinates[] {
-            line.getCoordinateN(i - 1), line.getCoordinateN(i)
+            line.getCoordinate(i - 1), line.getCoordinate(i)
           });
         segments.add(seg);
       }

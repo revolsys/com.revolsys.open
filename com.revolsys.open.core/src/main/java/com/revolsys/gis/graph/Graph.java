@@ -817,10 +817,10 @@ public class Graph<T> {
             LineString newLine;
             if (CoordinatesUtil.get(line).equals(fromNode)) {
               newLine = LineStringUtil.subLineString(line, newPoint, 1,
-                line.getNumPoints() - 1, null);
+                line.getVertexCount() - 1, null);
             } else {
               newLine = LineStringUtil.subLineString(line, null, 0,
-                line.getNumPoints() - 1, newPoint);
+                line.getVertexCount() - 1, newPoint);
             }
             final Graph<DataObject> graph = edge.getGraph();
             graph.replaceEdge(edge, newLine);
@@ -1284,15 +1284,15 @@ public class Graph<T> {
               return Collections.singletonList(edge);
             }
           }
-        } else if (coordinateIndex == line.getNumPoints() - 1) {
+        } else if (coordinateIndex == line.getVertexCount() - 1) {
           if (coordinateDistance == 0) {
             return Collections.singletonList(edge);
           } else if (segmentDistance == 0) {
             lines = LineStringUtil.split(line, segmentIndex, point);
           } else {
-            final Coordinates cn = points.get(line.getNumPoints() - 1);
+            final Coordinates cn = points.get(line.getVertexCount() - 1);
             Coordinates cn1;
-            int i = line.getNumPoints() - 2;
+            int i = line.getVertexCount() - 2;
             do {
               cn1 = points.get(i);
               i++;
@@ -1301,7 +1301,7 @@ public class Graph<T> {
               lines = LineStringUtil.split(line, segmentIndex, point);
             } else if (edge.getToNode().getDegree() == 1) {
               final LineString newLine = LineStringUtil.insert(line,
-                line.getNumPoints(), point);
+                line.getVertexCount(), point);
               lines = Collections.singletonList(newLine);
             } else {
               return Collections.singletonList(edge);

@@ -2205,7 +2205,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final LineString line1;
       final LineString line2;
 
-      final int numPoints = line.getNumPoints();
+      final int numPoints = line.getVertexCount();
       if (vertexIndex == null) {
         final int pointIndex = mouseLocation.getSegmentIndex()[0];
         line1 = LineStringUtil.subLineString(line, null, 0, pointIndex + 1,

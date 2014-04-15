@@ -341,7 +341,7 @@ public class TestBuilderModel {
     if (g == null) {
       return "";
     }
-    if (g.getNumPoints() > MAX_DISPLAY_POINTS) {
+    if (g.getVertexCount() > MAX_DISPLAY_POINTS) {
       return GeometryEditModel.toStringVeryLarge(g);
     }
     return writer.writeFormatted(g);

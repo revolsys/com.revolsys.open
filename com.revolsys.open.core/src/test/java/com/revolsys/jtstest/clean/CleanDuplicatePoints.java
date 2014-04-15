@@ -107,7 +107,7 @@ public class CleanDuplicatePoints {
 
   private LinearRing clean(final LinearRing g) {
     final Coordinates[] coords = removeDuplicatePoints(g.getCoordinateArray());
-    return fact.createLinearRing(coords);
+    return fact.linearRing(coords);
   }
 
   private LineString clean(final LineString g) {
@@ -136,13 +136,13 @@ public class CleanDuplicatePoints {
   private Polygon clean(final Polygon poly) {
     final Coordinates[] shellCoords = removeDuplicatePoints(poly.getExteriorRing()
       .getCoordinateArray());
-    final LinearRing shell = fact.createLinearRing(shellCoords);
+    final LinearRing shell = fact.linearRing(shellCoords);
     final List holes = new ArrayList();
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
       final Coordinates[] holeCoords = removeDuplicatePoints(poly.getInteriorRingN(
         i)
         .getCoordinateArray());
-      holes.add(fact.createLinearRing(holeCoords));
+      holes.add(fact.linearRing(holeCoords));
     }
     return fact.createPolygon(shell, GeometryFactory.toLinearRingArray(holes));
   }

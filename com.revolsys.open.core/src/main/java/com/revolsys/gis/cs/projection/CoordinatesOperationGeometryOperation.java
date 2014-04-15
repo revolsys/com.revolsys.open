@@ -43,21 +43,25 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   }
 
   public CoordinatesList perform(final CoordinatesList coordinates) {
-    final int size = coordinates.size();
-    final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
-      geometryFactory.getNumAxis());
-    final CoordinatesListCoordinates sourceCoordinates = new CoordinatesListCoordinates(
-      coordinates);
-    final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(
-      newCoordinates);
-    final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
-    for (int i = 0; i < size; i++) {
-      sourceCoordinates.setIndex(i);
-      targetCoordinates.setIndex(i);
-      operation.perform(sourceCoordinates, targetCoordinates);
+    if (coordinates == null) {
+      return null;
+    } else {
+      final int size = coordinates.size();
+      final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
+        geometryFactory.getNumAxis());
+      final CoordinatesListCoordinates sourceCoordinates = new CoordinatesListCoordinates(
+        coordinates);
+      final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(
+        newCoordinates);
+      final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
+      for (int i = 0; i < size; i++) {
+        sourceCoordinates.setIndex(i);
+        targetCoordinates.setIndex(i);
+        operation.perform(sourceCoordinates, targetCoordinates);
+      }
+      newCoordinates.makePrecise(precisionModel);
+      return newCoordinates;
     }
-    newCoordinates.makePrecise(precisionModel);
-    return newCoordinates;
   }
 
   public GeometryCollection perform(final GeometryCollection geometryCollection) {
@@ -80,7 +84,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   public LinearRing perform(final LinearRing ring) {
     if (ring != null) {
       final CoordinatesList newCoordinates = perform(CoordinatesListUtil.get(ring));
-      final LinearRing newRing = geometryFactory.createLinearRing(newCoordinates);
+      final LinearRing newRing = geometryFactory.linearRing(newCoordinates);
       addUserData(ring, newRing);
       return newRing;
     } else {

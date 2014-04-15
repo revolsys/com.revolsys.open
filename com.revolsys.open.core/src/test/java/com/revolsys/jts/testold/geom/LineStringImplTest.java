@@ -126,16 +126,15 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals8() throws Exception {
-    final WKTReader reader = new WKTReader(new GeometryFactory(
-      new PrecisionModel(1000), 0));
+    final WKTReader reader = new WKTReader(
+      GeometryFactory.getFactory(0, 1000.0));
     final MultiLineString l1 = (MultiLineString)reader.read("MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final MultiLineString l2 = (MultiLineString)reader.read("MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals9() throws Exception {
-    final WKTReader reader = new WKTReader(new GeometryFactory(
-      new PrecisionModel(1), 0));
+    final WKTReader reader = new WKTReader(GeometryFactory.getFactory(0, 1.0));
     final MultiLineString l1 = (MultiLineString)reader.read("MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final MultiLineString l2 = (MultiLineString)reader.read("MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
@@ -143,7 +142,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testFiveZeros() {
     final GeometryFactory factory = GeometryFactory.getFactory(0, 2);
-    final LineString line = factory.lineString(0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    final LineString line = factory.lineString(2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0, 0.0);
     final boolean closed = line.isClosed();
     assertTrue(closed);
@@ -166,7 +165,7 @@ public class LineStringImplTest extends TestCase {
     assertTrue(l.isEmpty());
     assertTrue(!l.isClosed());
 
-    final LinearRing r = this.geometryFactory.createLinearRing((CoordinatesList)null);
+    final LinearRing r = this.geometryFactory.linearRing((CoordinatesList)null);
     assertTrue(r.isEmpty());
     assertTrue(r.isClosed());
 
@@ -190,7 +189,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testLinearRingConstructor() throws Exception {
     try {
-      final LinearRing ring = GeometryFactory.getFactory().createLinearRing(
+      final LinearRing ring = GeometryFactory.getFactory().linearRing(
         new Coordinates[] {
           new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
           new Coordinate(10.0, 10, Coordinates.NULL_ORDINATE),
@@ -204,7 +203,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testUnclosedLinearRing() {
     try {
-      this.geometryFactory.createLinearRing(new Coordinates[] {
+      this.geometryFactory.linearRing(new Coordinates[] {
         new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
         new Coordinate(1.0, 0, Coordinates.NULL_ORDINATE),
         new Coordinate(1.0, 1, Coordinates.NULL_ORDINATE),

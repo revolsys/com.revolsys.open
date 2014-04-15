@@ -62,23 +62,21 @@ public interface LineString extends Geometry, Lineal {
   @Override
   LineString clone();
 
-  double getCoordinate(int vertexIndex, final int axisIndex);
+  Coordinates getCoordinate(final int vertexIndex);
 
-  Coordinates getCoordinateN(final int n);
+  double getCoordinate(int vertexIndex, final int axisIndex);
 
   CoordinatesList getCoordinatesList();
 
   Point getEndPoint();
 
-  CoordinatesList getPointList();
+  Point getPoint(final int vertexIndex);
 
-  Point getPointN(final int n);
+  CoordinatesList getPointList();
 
   Point getStartPoint();
 
   AbstractVertex getVertex(int vertexIndex);
-
-  int getVertexCount();
 
   boolean isClosed();
 

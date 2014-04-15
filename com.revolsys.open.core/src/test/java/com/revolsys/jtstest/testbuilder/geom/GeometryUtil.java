@@ -17,7 +17,7 @@ public class GeometryUtil {
     g.getGeometryType().toUpperCase() 
     +  " - " + structure
     + (structure.length() > 0 ? ", " : "")
-    + g.getNumPoints() + " pts";
+    + g.getVertexCount() + " pts";
   }
 
 }

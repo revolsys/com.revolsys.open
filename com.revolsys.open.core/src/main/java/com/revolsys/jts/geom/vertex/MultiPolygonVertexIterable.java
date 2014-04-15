@@ -32,7 +32,7 @@ public class MultiPolygonVertexIterable extends AbstractIterator<Vertex> {
 
   @Override
   protected Vertex getNext() throws NoSuchElementException {
-    while (vertexIndex >= ring.getNumPoints()) {
+    while (vertexIndex >= ring.getVertexCount()) {
       vertexIndex = 0;
       ringIndex++;
       if (ringIndex < 1 + polygon.getNumInteriorRing()) {

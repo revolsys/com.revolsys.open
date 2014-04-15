@@ -25,7 +25,7 @@ public class MultiLineStringVertexIterable extends AbstractIterator<Vertex> {
 
   @Override
   protected Vertex getNext() throws NoSuchElementException {
-    while (vertexIndex >= line.getNumPoints()) {
+    while (vertexIndex >= line.getVertexCount()) {
       this.vertexIndex = 0;
       this.partIndex++;
       if (partIndex < multiLineString.getLineStrings().size()) {

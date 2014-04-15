@@ -155,7 +155,7 @@ public class STRtreeDemo {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
       final Envelope e = (Envelope)i.next();
       final Geometry g = factory.createPolygon(
-        factory.createLinearRing(new Coordinates[] {
+        factory.linearRing(new Coordinates[] {
           new Coordinate((double)e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE),
           new Coordinate((double)e.getMinX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
           new Coordinate((double)e.getMaxX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
@@ -182,7 +182,7 @@ public class STRtreeDemo {
     final double top = bottom + height;
     final double right = left + width;
     return factory.createPolygon(
-      factory.createLinearRing(new Coordinates[] {
+      factory.linearRing(new Coordinates[] {
         new Coordinate((double)left, bottom, Coordinates.NULL_ORDINATE), new Coordinate((double)right, bottom, Coordinates.NULL_ORDINATE),
         new Coordinate((double)right, top, Coordinates.NULL_ORDINATE), new Coordinate((double)left, top, Coordinates.NULL_ORDINATE),
         new Coordinate((double)left, bottom, Coordinates.NULL_ORDINATE)

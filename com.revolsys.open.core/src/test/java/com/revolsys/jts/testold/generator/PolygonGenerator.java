@@ -69,7 +69,7 @@ public class PolygonGenerator extends GeometryGenerator {
     coords[npoints] = new Coordinate(coords[0]);
     gf.getPrecisionModel().makePrecise(coords[npoints]);
 
-    return gf.createLinearRing(coords);
+    return gf.linearRing(coords);
   }
 
   private static LinearRing createBox(final double x, final double dx,
@@ -118,7 +118,7 @@ public class PolygonGenerator extends GeometryGenerator {
     coords[npoints] = new Coordinate(x, y, Coordinates.NULL_ORDINATE); // end
     gf.getPrecisionModel().makePrecise(coords[npoints]);
 
-    return gf.createLinearRing(coords);
+    return gf.linearRing(coords);
   }
 
   private static Polygon createBox(final double x, final double dx,
@@ -241,7 +241,7 @@ public class PolygonGenerator extends GeometryGenerator {
     coords[3] = new Coordinate(cx, cy, Coordinates.NULL_ORDINATE);
     gf.getPrecisionModel().makePrecise(coords[3]);
 
-    return gf.createLinearRing(coords);
+    return gf.linearRing(coords);
   }
 
   /**

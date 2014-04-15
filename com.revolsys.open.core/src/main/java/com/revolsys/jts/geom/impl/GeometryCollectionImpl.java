@@ -70,7 +70,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   /**
    *  Internal representation of this <code>GeometryCollection</code>.
    */
-  protected Geometry[] geometries;
+  private Geometry[] geometries;
 
   /**
    * @param geometries
@@ -79,33 +79,34 @@ public class GeometryCollectionImpl extends GeometryImpl implements
    *            geometry. Elements may be empty <code>Geometry</code>s,
    *            but not <code>null</code>s.
    */
-  public GeometryCollectionImpl(Geometry[] geometries,
-    final GeometryFactory factory) {
-    super(factory);
-    if (geometries == null) {
-      geometries = new Geometry[] {};
-    }
-    if (hasNullElements(geometries)) {
+  public GeometryCollectionImpl(final GeometryFactory geometryFactory,
+    final Geometry[] geometries) {
+    super(geometryFactory);
+    if (geometries == null || geometries.length == 0) {
+      this.geometries = null;
+    } else if (hasNullElements(geometries)) {
       throw new IllegalArgumentException(
         "geometries must not contain null elements");
+    } else {
+      this.geometries = geometries;
     }
-    this.geometries = geometries;
+  }
+
+  public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
   }
 
   @Override
   public void apply(final CoordinateFilter filter) {
-    for (int i = 0; i < geometries.length; i++) {
-      geometries[i].apply(filter);
+    for (final Geometry geometry : geometries()) {
+      geometry.apply(filter);
     }
   }
 
   @Override
   public void apply(final CoordinateSequenceFilter filter) {
-    if (geometries.length == 0) {
-      return;
-    }
-    for (int i = 0; i < geometries.length; i++) {
-      geometries[i].apply(filter);
+    for (final Geometry geometry : geometries()) {
+      geometry.apply(filter);
       if (filter.isDone()) {
         break;
       }
@@ -118,16 +119,16 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   @Override
   public void apply(final GeometryComponentFilter filter) {
     filter.filter(this);
-    for (int i = 0; i < geometries.length; i++) {
-      geometries[i].apply(filter);
+    for (final Geometry geometry : geometries()) {
+      geometry.apply(filter);
     }
   }
 
   @Override
   public void apply(final GeometryFilter filter) {
     filter.filter(this);
-    for (int i = 0; i < geometries.length; i++) {
-      geometries[i].apply(filter);
+    for (final Geometry geometry : geometries()) {
+      geometry.apply(filter);
     }
   }
 
@@ -148,10 +149,9 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   }
 
   @Override
-  public int compareToSameClass(final Geometry o) {
-    final Set<Geometry> theseElements = new TreeSet<>(Arrays.asList(geometries));
-    final Set<Geometry> otherElements = new TreeSet<>(
-      ((GeometryCollection)o).getGeometries());
+  public int compareToSameClass(final Geometry geometry) {
+    final Set<Geometry> theseElements = new TreeSet<>(getGeometries());
+    final Set<Geometry> otherElements = new TreeSet<>(geometry.getGeometries());
     return compare(theseElements, otherElements);
   }
 
@@ -185,8 +185,8 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   @Override
   protected Envelope computeEnvelopeInternal() {
     final Envelope envelope = new Envelope();
-    for (int i = 0; i < geometries.length; i++) {
-      envelope.expandToInclude(geometries[i].getEnvelopeInternal());
+    for (final Geometry geometry : geometries()) {
+      envelope.expandToInclude(geometry.getEnvelopeInternal());
     }
     return envelope;
   }
@@ -197,15 +197,22 @@ public class GeometryCollectionImpl extends GeometryImpl implements
       return false;
     }
     final GeometryCollection otherCollection = (GeometryCollection)other;
-    if (geometries.length != otherCollection.getNumGeometries()) {
+    if (getNumGeometries() != otherCollection.getNumGeometries()) {
       return false;
     }
-    for (int i = 0; i < geometries.length; i++) {
-      if (!geometries[i].equalsExact(otherCollection.getGeometry(i), tolerance)) {
+    int i = 0;
+    for (final Geometry geometry : geometries()) {
+      if (!geometry.equalsExact(otherCollection.getGeometry(i), tolerance)) {
         return false;
       }
+      i++;
     }
     return true;
+  }
+
+  @Override
+  public Iterable<Geometry> geometries() {
+    return getGeometries();
   }
 
   /**
@@ -216,8 +223,8 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   @Override
   public double getArea() {
     double area = 0.0;
-    for (int i = 0; i < geometries.length; i++) {
-      area += geometries[i].getArea();
+    for (final Geometry geometry : geometries()) {
+      area += geometry.getArea();
     }
     return area;
   }
@@ -232,8 +239,8 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   @Override
   public int getBoundaryDimension() {
     int dimension = Dimension.FALSE;
-    for (int i = 0; i < geometries.length; i++) {
-      dimension = Math.max(dimension, geometries[i].getBoundaryDimension());
+    for (final Geometry geometry : geometries()) {
+      dimension = Math.max(dimension, geometry.getBoundaryDimension());
     }
     return dimension;
   }
@@ -242,8 +249,9 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   public Coordinates getCoordinate() {
     if (isEmpty()) {
       return null;
+    } else {
+      return getGeometry(0).getCoordinate();
     }
-    return geometries[0].getCoordinate();
   }
 
   /**
@@ -257,10 +265,10 @@ public class GeometryCollectionImpl extends GeometryImpl implements
    *    */
   @Override
   public Coordinates[] getCoordinateArray() {
-    final Coordinates[] coordinates = new Coordinates[getNumPoints()];
+    final Coordinates[] coordinates = new Coordinates[getVertexCount()];
     int k = -1;
-    for (int i = 0; i < geometries.length; i++) {
-      final Coordinates[] childCoordinates = geometries[i].getCoordinateArray();
+    for (final Geometry geometry : geometries()) {
+      final Coordinates[] childCoordinates = geometry.getCoordinateArray();
       for (int j = 0; j < childCoordinates.length; j++) {
         k++;
         coordinates[k] = childCoordinates[j];
@@ -277,8 +285,8 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   @Override
   public int getDimension() {
     int dimension = Dimension.FALSE;
-    for (int i = 0; i < geometries.length; i++) {
-      dimension = Math.max(dimension, geometries[i].getDimension());
+    for (final Geometry geometry : geometries()) {
+      dimension = Math.max(dimension, geometry.getDimension());
     }
     return dimension;
   }
@@ -286,52 +294,68 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    return (List<V>)Arrays.asList(geometries);
+    if (geometries == null) {
+      return Collections.emptyList();
+    } else {
+      return (List<V>)Arrays.asList(geometries);
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    return (V)geometries[n];
+    if (geometries == null) {
+      return null;
+    } else {
+      return (V)geometries[n];
+    }
   }
 
   @Override
   public double getLength() {
     double sum = 0.0;
-    for (int i = 0; i < geometries.length; i++) {
-      sum += (geometries[i]).getLength();
+    for (final Geometry geometry : geometries()) {
+      sum += geometry.getLength();
     }
     return sum;
   }
 
   @Override
   public int getNumGeometries() {
-    return geometries.length;
+    if (geometries == null) {
+      return 0;
+    } else {
+      return geometries.length;
+    }
   }
 
   @Override
-  public int getNumPoints() {
+  public int getVertexCount() {
     int numPoints = 0;
-    for (int i = 0; i < geometries.length; i++) {
-      numPoints += geometries[i].getNumPoints();
+    for (final Geometry geometry : geometries()) {
+      numPoints += geometry.getVertexCount();
     }
     return numPoints;
   }
 
   @Override
   public boolean isEmpty() {
-    for (int i = 0; i < geometries.length; i++) {
-      if (!geometries[i].isEmpty()) {
-        return false;
+    if (getNumGeometries() == 0) {
+      return true;
+    } else {
+      for (final Geometry geometry : geometries()) {
+        if (!geometry.isEmpty()) {
+          return false;
+        }
       }
+      return true;
     }
-    return true;
   }
 
   @Override
   public GeometryCollection normalize() {
     final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry part : this.geometries) {
+    for (final Geometry part : geometries()) {
       final Geometry normalizedPart = part.normalize();
       geometries.add(normalizedPart);
     }
@@ -350,12 +374,15 @@ public class GeometryCollectionImpl extends GeometryImpl implements
    */
   @Override
   public GeometryCollection reverse() {
-    final int n = geometries.length;
-    final Geometry[] revGeoms = new Geometry[n];
-    for (int i = 0; i < geometries.length; i++) {
-      revGeoms[i] = geometries[i].reverse();
+    final List<Geometry> revGeoms = new ArrayList<>();
+    for (final Geometry geometry : geometries()) {
+      if (!geometry.isEmpty()) {
+        final Geometry reverse = geometry.reverse();
+        revGeoms.add(reverse);
+      }
     }
-    return getGeometryFactory().createGeometryCollection(revGeoms);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.createGeometryCollection(revGeoms);
   }
 
   /**

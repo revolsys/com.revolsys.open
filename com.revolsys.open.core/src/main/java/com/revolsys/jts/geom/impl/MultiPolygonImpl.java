@@ -75,7 +75,7 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
    */
   public MultiPolygonImpl(final Polygon[] polygons,
     final GeometryFactory factory) {
-    super(polygons, factory);
+    super(factory, polygons);
   }
 
   @Override
@@ -142,7 +142,7 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
       return this;
     } else {
       final List<Polygon> geometries = new ArrayList<>();
-      for (final Geometry part : this.geometries) {
+      for (final Geometry part : geometries()) {
         final Polygon normalizedPart = (Polygon)part.normalize();
         geometries.add(normalizedPart);
       }
@@ -162,12 +162,14 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
    */
   @Override
   public MultiPolygon reverse() {
-    final int n = geometries.length;
-    final Polygon[] revGeoms = new Polygon[n];
-    for (int i = 0; i < geometries.length; i++) {
-      revGeoms[i] = (Polygon)geometries[i].reverse();
+    final List<Polygon> polygons = new ArrayList<>();
+    for (final Geometry geometry : geometries()) {
+      final Polygon polygon = (Polygon)geometry;
+      final Polygon reverse = polygon.reverse();
+      polygons.add(reverse);
     }
-    return getGeometryFactory().createMultiPolygon(revGeoms);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.createMultiPolygon(polygons);
   }
 
   /**

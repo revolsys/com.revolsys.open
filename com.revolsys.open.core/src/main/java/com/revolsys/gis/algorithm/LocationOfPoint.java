@@ -105,7 +105,7 @@ public class LocationOfPoint {
     final Coordinates[] pts = line.getCoordinateArray();
 
     // sanity check for minLocation at or past end of line
-    if (minLocation.getSegmentIndex() >= line.getNumPoints()) {
+    if (minLocation.getSegmentIndex() >= line.getVertexCount()) {
       return new LineStringLocation(line, pts.length - 1, 1.0);
     }
 

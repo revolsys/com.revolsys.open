@@ -145,8 +145,8 @@ public class LinearIterator {
    * @return a {@link Coordinates} or <code>null</code>
    */
   public Coordinates getSegmentEnd() {
-    if (vertexIndex < getLine().getNumPoints() - 1) {
-      return currentLine.getCoordinateN(vertexIndex + 1);
+    if (vertexIndex < getLine().getVertexCount() - 1) {
+      return currentLine.getCoordinate(vertexIndex + 1);
     }
     return null;
   }
@@ -157,7 +157,7 @@ public class LinearIterator {
    * @return a {@link Coordinates}
    */
   public Coordinates getSegmentStart() {
-    return currentLine.getCoordinateN(vertexIndex);
+    return currentLine.getCoordinate(vertexIndex);
   }
 
   /**
@@ -181,7 +181,7 @@ public class LinearIterator {
       return false;
     }
     if (componentIndex == numLines - 1
-      && vertexIndex >= currentLine.getNumPoints()) {
+      && vertexIndex >= currentLine.getVertexCount()) {
       return false;
     }
     return true;
@@ -199,7 +199,7 @@ public class LinearIterator {
     }
     // LineString currentLine = (LineString)
     // linear.getGeometryN(componentIndex);
-    if (vertexIndex < currentLine.getNumPoints() - 1) {
+    if (vertexIndex < currentLine.getVertexCount() - 1) {
       return false;
     }
     return true;
@@ -222,7 +222,7 @@ public class LinearIterator {
     }
 
     vertexIndex++;
-    if (vertexIndex >= currentLine.getNumPoints()) {
+    if (vertexIndex >= currentLine.getVertexCount()) {
       componentIndex++;
       loadCurrentLine();
       vertexIndex = 0;

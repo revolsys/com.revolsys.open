@@ -40,7 +40,7 @@ public class DegreesToRadiansOperation implements CoordinatesOperation {
         } else {
           value = Double.NaN;
         }
-        targetCoordinates[vertexIndex * sourceNumAxis + axisIndex] = value;
+        targetCoordinates[vertexIndex * targetNumAxis + axisIndex] = value;
       }
     }
   }

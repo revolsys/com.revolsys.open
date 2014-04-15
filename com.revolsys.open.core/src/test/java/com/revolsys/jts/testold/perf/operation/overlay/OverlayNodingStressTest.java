@@ -179,7 +179,7 @@ class RotatedRectangleFactory {
     // close polygon
     pts[4] = new Coordinate(pts[0]);
     final Polygon poly = this.fact.createPolygon(
-      this.fact.createLinearRing(pts), null);
+      this.fact.linearRing(pts), null);
     return poly;
   }
 

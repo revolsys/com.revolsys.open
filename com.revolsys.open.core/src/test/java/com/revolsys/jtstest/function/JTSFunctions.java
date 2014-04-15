@@ -43,7 +43,7 @@ public class JTSFunctions {
     final CoordinateList coordList = new CoordinateList();
     coordList.add(jTop, false);
     coordList.add(jArc.reverse().getCoordinateArray(), false, 1,
-      jArc.getNumPoints() - 1);
+      jArc.getVertexCount() - 1);
     coordList.add(jBottom, false);
 
     return gf.lineString(coordList.toCoordinateArray());
@@ -77,10 +77,10 @@ public class JTSFunctions {
     final CoordinateList coordList = new CoordinateList();
     coordList.add(top, false);
     coordList.add(arcTop.getCoordinateArray(), false, 1,
-      arcTop.getNumPoints() - 1);
+      arcTop.getVertexCount() - 1);
     coordList.add(new Coordinate(centreX, HEIGHT / 2));
     coordList.add(arcBottom.getCoordinateArray(), false, 1,
-      arcBottom.getNumPoints() - 1);
+      arcBottom.getVertexCount() - 1);
     coordList.add(bottom, false);
 
     return gf.lineString(coordList.toCoordinateArray());

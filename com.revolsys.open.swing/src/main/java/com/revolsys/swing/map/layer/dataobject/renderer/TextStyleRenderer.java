@@ -139,7 +139,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           }
 
         } else if ("center".equals(placementType)) {
-          if (geometry instanceof LineString && geometry.getNumPoints() > 1) {
+          if (geometry instanceof LineString && geometry.getVertexCount() > 1) {
             final double totalLength = geometry.getLength();
             final double centreLength = totalLength / 2;
             double currentLength = 0;

@@ -277,7 +277,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
       switch (type) {
 
         case SeShape.TYPE_NIL:
-          return geometryFactory.createEmptyGeometry();
+          return geometryFactory.geometry();
         case SeShape.TYPE_POINT:
         case SeShape.TYPE_MULTI_POINT:
           final List<Point> points = new ArrayList<Point>();

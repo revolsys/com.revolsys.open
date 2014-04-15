@@ -105,7 +105,7 @@ public class GeometryLocationsWriter {
       if (comp instanceof GeometryCollection) {
         buf.append("[" + comp.getNumGeometries() + "]");
       } else {
-        buf.append("(" + comp.getNumPoints() + ")");
+        buf.append("(" + comp.getVertexCount() + ")");
       }
       if (comp.getUserData() != null) {
         buf.append("  Data: ");

@@ -8,7 +8,6 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.util.MathUtil;
 
 public class DoubleCoordinatesList extends AbstractCoordinatesList {
-
   /**
    * 
    */
@@ -104,7 +103,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   @Override
   public int size() {
-    if (numAxis < 2) {
+    if (numAxis < 2 || coordinates == null) {
       return 0;
     } else {
       return coordinates.length / numAxis;

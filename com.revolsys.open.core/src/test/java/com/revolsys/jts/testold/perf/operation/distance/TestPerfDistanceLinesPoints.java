@@ -148,7 +148,7 @@ public class TestPerfDistanceLinesPoints {
   public void test(final Geometry[] pts, final Geometry target) {
     if (this.verbose) {
       System.out.println("Query points = " + pts.length
-        + "     Target points = " + target.getNumPoints());
+        + "     Target points = " + target.getVertexCount());
       // if (! verbose) System.out.print(num + ", ");
     }
 

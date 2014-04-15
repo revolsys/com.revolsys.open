@@ -327,7 +327,7 @@ public class MinimumDiameter {
     final Coordinates p2 = minParaLine.lineIntersection(minPerpLine);
     final Coordinates p3 = maxParaLine.lineIntersection(minPerpLine);
 
-    final LinearRing shell = inputGeom.getGeometryFactory().createLinearRing(
+    final LinearRing shell = inputGeom.getGeometryFactory().linearRing(
       new Coordinates[] {
         p0, p1, p2, p3, p0
       });

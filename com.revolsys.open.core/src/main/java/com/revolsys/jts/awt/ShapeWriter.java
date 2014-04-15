@@ -275,17 +275,17 @@ public class ShapeWriter
 	{
 		GeneralPath shape = new GeneralPath();
 		
-    Coordinates prev = lineString.getCoordinateN(0);
+    Coordinates prev = lineString.getCoordinate(0);
     transformPoint(prev, transPoint);
 		shape.moveTo((float) transPoint.getX(), (float) transPoint.getY());
 
     double prevx = (double) transPoint.getX();
     double prevy = (double) transPoint.getY();
     
-    int n = lineString.getNumPoints() - 1;
+    int n = lineString.getVertexCount() - 1;
     //int count = 0;
     for (int i = 1; i <= n; i++) {
-      Coordinates currentCoord = lineString.getCoordinateN(i);
+      Coordinates currentCoord = lineString.getCoordinate(i);
       if (decimationDistance > 0.0) {
         boolean isDecimated = prev != null
             && Math.abs(currentCoord.getX() - prev.getX()) < decimationDistance

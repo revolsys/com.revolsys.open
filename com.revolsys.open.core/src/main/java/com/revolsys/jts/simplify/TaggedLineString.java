@@ -104,7 +104,7 @@ class TaggedLineString
   }
 
   public LinearRing asLinearRing() {
-    return parentLine.getGeometryFactory().createLinearRing(extractCoordinates(resultSegs));
+    return parentLine.getGeometryFactory().linearRing(extractCoordinates(resultSegs));
   }
 
   private static Coordinates[] extractCoordinates(List segs)

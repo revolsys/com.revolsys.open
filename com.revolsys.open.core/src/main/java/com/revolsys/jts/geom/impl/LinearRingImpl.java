@@ -57,6 +57,10 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
 
   private static final long serialVersionUID = -4261142084085851829L;
 
+  public LinearRingImpl(final GeometryFactory factory) {
+    super(factory);
+  }
+
   /**
    * Constructs a <code>LinearRing</code> with the vertices
    * specifed by the given {@link CoordinatesList}.
@@ -67,9 +71,35 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingImpl(final CoordinatesList points,
-    final GeometryFactory factory) {
-    super(points, factory);
+  public LinearRingImpl(final GeometryFactory factory,
+    final CoordinatesList points) {
+    super(factory, points);
+    if (isClosed()) {
+      final int vertexCount = getVertexCount();
+      if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
+        throw new IllegalArgumentException(
+          "Invalid number of points in LinearRing (found " + vertexCount
+            + " - must be 0 or >= 4)");
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Points of LinearRing do not form a closed linestring");
+    }
+  }
+
+  /**
+   * Constructs a <code>LinearRing</code> with the vertices
+   * specifed by the given {@link CoordinatesList}.
+   *
+   *@param  points  a sequence points forming a closed and simple linestring, or
+   *      <code>null</code> to create the empty geometry.
+   *      
+   * @throws IllegalArgumentException if the ring is not closed, or has too few points
+   *
+   */
+  public LinearRingImpl(final GeometryFactory factory, final int numAxis,
+    final double... points) {
+    super(factory, numAxis, points);
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
@@ -86,6 +116,27 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
   @Override
   public LinearRingImpl clone() {
     return (LinearRingImpl)super.clone();
+  }
+
+  @Override
+  public LinearRing convert(final GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (sourceGeometryFactory == geometryFactory) {
+      return this;
+    } else {
+      return copy(geometryFactory);
+    }
+  }
+
+  @Override
+  public LinearRing copy(final GeometryFactory geometryFactory) {
+    if (isEmpty()) {
+      return geometryFactory.linearRing();
+    } else {
+      final double[] coordinates = convertCoordinates(geometryFactory);
+      final int numAxis = getNumAxis();
+      return geometryFactory.linearRing(numAxis, coordinates);
+    }
   }
 
   /**
@@ -120,7 +171,7 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
     final CoordinatesList points = getCoordinatesList();
     final CoordinatesList reversePoints = points.reverse();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final LinearRing reverseLine = geometryFactory.createLinearRing(reversePoints);
+    final LinearRing reverseLine = geometryFactory.linearRing(reversePoints);
     return reverseLine;
   }
 }

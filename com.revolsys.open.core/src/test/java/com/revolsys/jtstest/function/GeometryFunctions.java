@@ -60,7 +60,7 @@ public class GeometryFunctions {
       return g;
     }
     // TODO: ensure ring is valid
-    final LinearRing ring = g.getGeometryFactory().createLinearRing(
+    final LinearRing ring = g.getGeometryFactory().linearRing(
       g.getCoordinateArray());
     return g.getGeometryFactory().createPolygon(ring, null);
   }

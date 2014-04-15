@@ -201,7 +201,7 @@ public class MinimumBoundingCircle {
       extremalPts = new AbstractCoordinates[0];
       return;
     }
-    if (input.getNumPoints() == 1) {
+    if (input.getVertexCount() == 1) {
       final Coordinates[] pts = input.getCoordinateArray();
       extremalPts = new Coordinates[] {
         new Coordinate(pts[0])

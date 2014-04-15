@@ -555,7 +555,7 @@ public class Distance3DOp {
     final int dim0 = geom[0].getDimension();
     final int dim1 = geom[1].getDimension();
     if (dim0 >= 2 && dim1 >= 2) {
-      if (geom[0].getNumPoints() > geom[1].getNumPoints()) {
+      if (geom[0].getVertexCount() > geom[1].getVertexCount()) {
         return 0;
       }
       return 1;

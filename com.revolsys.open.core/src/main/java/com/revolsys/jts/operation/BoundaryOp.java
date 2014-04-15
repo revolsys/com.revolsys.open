@@ -136,11 +136,11 @@ public class BoundaryOp {
     endpointMap = new TreeMap();
     for (int i = 0; i < mLine.getNumGeometries(); i++) {
       final LineString line = (LineString)mLine.getGeometry(i);
-      if (line.getNumPoints() == 0) {
+      if (line.getVertexCount() == 0) {
         continue;
       }
-      addEndpoint(line.getCoordinateN(0));
-      addEndpoint(line.getCoordinateN(line.getNumPoints() - 1));
+      addEndpoint(line.getCoordinate(0));
+      addEndpoint(line.getCoordinate(line.getVertexCount() - 1));
     }
 
     for (final Iterator it = endpointMap.entrySet().iterator(); it.hasNext();) {

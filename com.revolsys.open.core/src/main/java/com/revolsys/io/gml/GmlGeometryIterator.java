@@ -154,7 +154,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     } else {
       StaxUtils.skipToEndElement(in, LINEAR_RING);
     }
-    return factory.createLinearRing(points);
+    return factory.linearRing(points);
   }
 
   private LineString readLineString(

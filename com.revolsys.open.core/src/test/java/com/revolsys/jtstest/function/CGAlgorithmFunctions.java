@@ -9,7 +9,7 @@ import com.revolsys.jts.geom.Geometry;
 public class CGAlgorithmFunctions {
   public static int orientationIndex(final Geometry segment,
     final Geometry ptGeom) {
-    if (segment.getNumPoints() != 2 || ptGeom.getNumPoints() != 1) {
+    if (segment.getVertexCount() != 2 || ptGeom.getVertexCount() != 1) {
       throw new IllegalArgumentException(
         "A must have two points and B must have one");
     }
@@ -22,7 +22,7 @@ public class CGAlgorithmFunctions {
 
   public static int orientationIndexDD(final Geometry segment,
     final Geometry ptGeom) {
-    if (segment.getNumPoints() != 2 || ptGeom.getNumPoints() != 1) {
+    if (segment.getVertexCount() != 2 || ptGeom.getVertexCount() != 1) {
       throw new IllegalArgumentException(
         "A must have two points and B must have one");
     }

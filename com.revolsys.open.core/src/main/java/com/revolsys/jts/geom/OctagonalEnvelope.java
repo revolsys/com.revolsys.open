@@ -344,7 +344,7 @@ public class OctagonalEnvelope
     // must be a polygon, so add closing point
     coordList.add(px00, false);
     Coordinates[] pts = coordList.toCoordinateArray();
-    return geomFactory.createPolygon(geomFactory.createLinearRing(pts), null);
+    return geomFactory.createPolygon(geomFactory.linearRing(pts), null);
   }
 
   private class BoundingOctagonComponentFilter

@@ -362,14 +362,17 @@ public class LineSegmentUtil {
             Coordinates intersection = geometryFactory.createCoordinates(x, y);
             intersection = getElevation(geometryFactory, line1Start, line1End,
               intersection);
-            return geometryFactory.createCoordinatesList(intersection);
+            final DoubleCoordinatesList points = new DoubleCoordinatesList(
+              geometryFactory.getNumAxis(), intersection);
+            geometryFactory.makePrecise(points);
+            return points;
           }
         }
       } else {
         return geometryFactory.createCoordinatesList(intersections);
       }
     }
-    return geometryFactory.createCoordinatesList(0);
+    return new DoubleCoordinatesList(2);
   }
 
   public static boolean intersects(final Coordinates line1p1,

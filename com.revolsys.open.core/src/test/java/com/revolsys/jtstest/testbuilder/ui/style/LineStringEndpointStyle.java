@@ -34,10 +34,10 @@ public abstract class LineStringEndpointStyle extends LineStringStyle {
     }
 
     paint(
-      start ? lineString.getCoordinateN(0)
-        : lineString.getCoordinateN(lineString.getNumPoints() - 1),
-      start ? lineString.getCoordinateN(1)
-        : lineString.getCoordinateN(lineString.getNumPoints() - 2), viewport,
+      start ? lineString.getCoordinate(0)
+        : lineString.getCoordinate(lineString.getVertexCount() - 1),
+      start ? lineString.getCoordinate(1)
+        : lineString.getCoordinate(lineString.getVertexCount() - 2), viewport,
       graphics);
   }
 

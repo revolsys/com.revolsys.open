@@ -80,7 +80,7 @@ public class GeometryCombiner {
   }
 
   public Geometry addPolygonRing(final Geometry orig, final Coordinates[] pts) {
-    final LinearRing ring = geomFactory.createLinearRing(pts);
+    final LinearRing ring = geomFactory.linearRing(pts);
 
     if (orig == null) {
       return geomFactory.createPolygon(ring, null);

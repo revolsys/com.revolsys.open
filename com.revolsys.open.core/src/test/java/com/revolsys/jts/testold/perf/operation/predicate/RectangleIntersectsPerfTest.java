@@ -144,7 +144,7 @@ public class RectangleIntersectsPerfTest {
   }
 
   void test(final Geometry[] rect, final Geometry g) {
-    System.out.println("Target # pts: " + g.getNumPoints()
+    System.out.println("Target # pts: " + g.getVertexCount()
       + "  -- # Rectangles: " + rect.length);
 
     final int maxCount = MAX_ITER;

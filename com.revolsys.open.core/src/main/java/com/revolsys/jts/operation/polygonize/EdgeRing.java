@@ -88,7 +88,7 @@ class EdgeRing {
     final List shellList) {
     final LinearRing testRing = testEr.getRing();
     final Envelope testEnv = testRing.getEnvelopeInternal();
-    Coordinates testPt = testRing.getCoordinateN(0);
+    Coordinates testPt = testRing.getCoordinate(0);
 
     EdgeRing minShell = null;
     Envelope minShellEnv = null;
@@ -263,7 +263,7 @@ class EdgeRing {
       System.out.println(ringPts);
     }
     try {
-      ring = factory.createLinearRing(ringPts);
+      ring = factory.linearRing(ringPts);
     } catch (final Exception ex) {
       System.out.println(ringPts);
     }

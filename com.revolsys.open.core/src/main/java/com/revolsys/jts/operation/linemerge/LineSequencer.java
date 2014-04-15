@@ -159,8 +159,8 @@ public class LineSequencer {
     final List currNodes = new ArrayList();
     for (int i = 0; i < mls.getNumGeometries(); i++) {
       final LineString line = (LineString)mls.getGeometry(i);
-      final Coordinates startNode = line.getCoordinateN(0);
-      final Coordinates endNode = line.getCoordinateN(line.getNumPoints() - 1);
+      final Coordinates startNode = line.getCoordinate(0);
+      final Coordinates endNode = line.getCoordinate(line.getVertexCount() - 1);
 
       /**
        * If this linestring is connected to a previous subgraph, geom is not sequenced

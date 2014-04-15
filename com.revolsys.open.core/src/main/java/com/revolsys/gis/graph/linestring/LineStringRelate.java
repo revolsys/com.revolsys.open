@@ -59,8 +59,8 @@ public class LineStringRelate {
     final int i = 0;
     fromPoint1 = getMovedCoordinate(movedNodes, line1, i);
     fromPoint2 = getMovedCoordinate(movedNodes, line2, i);
-    toPoint1 = getMovedCoordinate(movedNodes, line1, line1.getNumPoints() - 1);
-    toPoint2 = getMovedCoordinate(movedNodes, line2, line2.getNumPoints() - 1);
+    toPoint1 = getMovedCoordinate(movedNodes, line1, line1.getVertexCount() - 1);
+    toPoint2 = getMovedCoordinate(movedNodes, line2, line2.getVertexCount() - 1);
   }
 
   public Graph<LineSegment> getGraph1() {

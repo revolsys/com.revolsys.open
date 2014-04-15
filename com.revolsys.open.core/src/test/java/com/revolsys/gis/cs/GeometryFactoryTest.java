@@ -5,6 +5,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -19,7 +20,7 @@ import com.revolsys.jts.geom.Polygon;
 
 public class GeometryFactoryTest {
   private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
-    3857, 2, 1, 1);
+    3857, 1.0);
 
   public static void assertCoordinatesListEqual(final Geometry geometry,
     final CoordinatesList... pointsList) {
@@ -86,16 +87,14 @@ public class GeometryFactoryTest {
   }
 
   private static void testCreateGeometry() {
-    final CoordinatesList pointPoints = GEOMETRY_FACTORY.createCoordinatesList(
-      0, 0);
-    final CoordinatesList point2Points = GEOMETRY_FACTORY.createCoordinatesList(
-      20, 20);
-    final CoordinatesList ringPoints = GEOMETRY_FACTORY.createCoordinatesList(
-      0, 0, 0, 100, 100, 100, 100, 0, 0, 0);
-    final CoordinatesList ring2Points = GEOMETRY_FACTORY.createCoordinatesList(
-      20, 20, 20, 80, 80, 80, 80, 20, 20, 20);
-    final CoordinatesList ring3Points = GEOMETRY_FACTORY.createCoordinatesList(
-      120, 120, 120, 180, 180, 180, 180, 120, 120, 120);
+    final CoordinatesList pointPoints = new DoubleCoordinatesList(2, 0, 0);
+    final CoordinatesList point2Points = new DoubleCoordinatesList(2, 20, 20);
+    final CoordinatesList ringPoints = new DoubleCoordinatesList(2, 0, 0, 0,
+      100, 100, 100, 100, 0, 0, 0);
+    final CoordinatesList ring2Points = new DoubleCoordinatesList(2, 20, 20,
+      20, 80, 80, 80, 80, 20, 20, 20);
+    final CoordinatesList ring3Points = new DoubleCoordinatesList(2, 120, 120,
+      120, 180, 180, 180, 180, 120, 120, 120);
 
     final Point point = GEOMETRY_FACTORY.point(pointPoints);
     assertCopyGeometry(point, pointPoints);
@@ -103,7 +102,7 @@ public class GeometryFactoryTest {
     final LineString line = GEOMETRY_FACTORY.lineString(ringPoints);
     assertCopyGeometry(line, ringPoints);
 
-    final LinearRing linearRing = GEOMETRY_FACTORY.createLinearRing(ringPoints);
+    final LinearRing linearRing = GEOMETRY_FACTORY.linearRing(ringPoints);
     assertCopyGeometry(linearRing, ringPoints);
 
     final Polygon polygon = GEOMETRY_FACTORY.createPolygon(ringPoints);

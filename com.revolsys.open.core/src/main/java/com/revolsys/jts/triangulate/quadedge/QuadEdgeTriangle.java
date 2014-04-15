@@ -149,7 +149,7 @@ public class QuadEdgeTriangle {
       e[2].orig().getCoordinate(), e[0].orig().getCoordinate()
     };
     final GeometryFactory fact = GeometryFactory.getFactory();
-    final LinearRing ring = fact.createLinearRing(ringPts);
+    final LinearRing ring = fact.linearRing(ringPts);
     final Polygon tri = fact.createPolygon(ring, null);
     return tri;
   }
@@ -160,7 +160,7 @@ public class QuadEdgeTriangle {
       v[0].getCoordinate()
     };
     final GeometryFactory fact = GeometryFactory.getFactory();
-    final LinearRing ring = fact.createLinearRing(ringPts);
+    final LinearRing ring = fact.linearRing(ringPts);
     final Polygon tri = fact.createPolygon(ring, null);
     return tri;
   }
@@ -266,7 +266,7 @@ public class QuadEdgeTriangle {
   }
 
   public Polygon getGeometry(final GeometryFactory fact) {
-    final LinearRing ring = fact.createLinearRing(getCoordinates());
+    final LinearRing ring = fact.linearRing(getCoordinates());
     final Polygon tri = fact.createPolygon(ring, null);
     return tri;
   }

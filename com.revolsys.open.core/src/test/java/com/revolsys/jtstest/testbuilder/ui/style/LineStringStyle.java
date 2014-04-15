@@ -24,7 +24,7 @@ public abstract class LineStringStyle
 
     if (geom instanceof LineString) {
       LineString lineString = (LineString) geom;
-      if (lineString.getNumPoints() < 2) {
+      if (lineString.getVertexCount() < 2) {
         return;
       }
       paintLineString(lineString, LINE, viewport, g);

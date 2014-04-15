@@ -62,8 +62,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Coordinates[] pt = new Coordinates[] {
-      l1.getCoordinateN(0), l1.getCoordinateN(1), l2.getCoordinateN(0),
-      l2.getCoordinateN(1)
+      l1.getCoordinate(0), l1.getCoordinate(1), l2.getCoordinate(0),
+      l2.getCoordinate(1)
     };
     checkInputNotAltered(pt, scaleFactor);
   }
@@ -125,8 +125,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Coordinates[] pt = new Coordinates[] {
-      l1.getCoordinateN(0), l1.getCoordinateN(1), l2.getCoordinateN(0),
-      l2.getCoordinateN(1)
+      l1.getCoordinate(0), l1.getCoordinate(1), l2.getCoordinate(0),
+      l2.getCoordinate(1)
     };
     checkIntersection(pt, expectedIntersectionNum, intPt, distanceTolerance);
   }
@@ -137,8 +137,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Coordinates[] pt = new Coordinates[] {
-      l1.getCoordinateN(0), l1.getCoordinateN(1), l2.getCoordinateN(0),
-      l2.getCoordinateN(1)
+      l1.getCoordinate(0), l1.getCoordinate(1), l2.getCoordinate(0),
+      l2.getCoordinate(1)
     };
     final Geometry g = this.reader.read(expectedWKT);
     final Coordinates[] intPt = g.getCoordinateArray();
@@ -150,8 +150,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Coordinates[] pt = new Coordinates[] {
-      l1.getCoordinateN(0), l1.getCoordinateN(1), l2.getCoordinateN(0),
-      l2.getCoordinateN(1)
+      l1.getCoordinate(0), l1.getCoordinate(1), l2.getCoordinate(0),
+      l2.getCoordinate(1)
     };
     checkIntersection(pt, 0, null, 0);
   }

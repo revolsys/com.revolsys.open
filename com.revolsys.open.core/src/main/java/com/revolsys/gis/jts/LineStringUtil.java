@@ -437,7 +437,7 @@ public final class LineStringUtil {
             return c0;
           }
         }
-      } else if (coordinateIndex == line.getNumPoints() - 1) {
+      } else if (coordinateIndex == line.getVertexCount() - 1) {
         final Coordinates cn = coordinates.get(coordinates.size() - 1);
         if (coordinateDistance == 0) {
           return cn;
@@ -445,7 +445,7 @@ public final class LineStringUtil {
           return point;
         } else {
           Coordinates cn1;
-          int i = line.getNumPoints() - 2;
+          int i = line.getVertexCount() - 2;
           do {
             cn1 = coordinates.get(i);
             i++;
@@ -618,7 +618,7 @@ public final class LineStringUtil {
   }
 
   public static Coordinates getToCoordinates(final LineString line) {
-    final int index = line.getNumPoints() - 1;
+    final int index = line.getVertexCount() - 1;
     return getCoordinates(line, index);
   }
 
@@ -995,7 +995,7 @@ public final class LineStringUtil {
     if (isWithinDistance(point, line, 0, maxDistance)) {
       return true;
     } else {
-      return isWithinDistance(point, line, line.getNumPoints() - 1, maxDistance);
+      return isWithinDistance(point, line, line.getVertexCount() - 1, maxDistance);
     }
   }
 
@@ -1038,7 +1038,7 @@ public final class LineStringUtil {
     if (line.isEmpty()) {
       return null;
     } else {
-      final int numPoints = line.getNumPoints();
+      final int numPoints = line.getVertexCount();
       if (numPoints > 1) {
         final double totalLength = line.getLength();
         final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -1060,7 +1060,7 @@ public final class LineStringUtil {
         }
         return null;
       } else {
-        return line.getPointN(0);
+        return line.getPoint(0);
       }
     }
   }
@@ -1182,7 +1182,7 @@ public final class LineStringUtil {
             return Collections.singletonList(line);
           }
         }
-      } else if (coordinateIndex == line.getNumPoints() - 1) {
+      } else if (coordinateIndex == line.getVertexCount() - 1) {
         if (coordinateDistance == 0) {
           return Collections.singletonList(line);
         } else if (segmentDistance == 0) {

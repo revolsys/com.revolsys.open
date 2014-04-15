@@ -36,6 +36,7 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -98,14 +99,11 @@ public class GeometryFactoryTest extends TestCase {
   // }
 
   public void testMultiPointCS() {
-    final GeometryFactory gf = GeometryFactory.getFactory(3005, 4, 1, 1);
-    final CoordinatesList mpSeq = gf.createCoordinatesList(1);
-    mpSeq.setValue(0, 0, 50);
-    mpSeq.setValue(0, 1, -2);
-    mpSeq.setValue(0, 2, 10);
-    mpSeq.setValue(0, 3, 20);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(3005, 4,
+      1, 1);
+    final CoordinatesList mpSeq = new DoubleCoordinatesList(2, 50, -2, 10, 20);
 
-    final MultiPoint mp = gf.createMultiPoint(mpSeq);
+    final MultiPoint mp = geometryFactory.createMultiPoint(mpSeq);
     final CoordinatesList pSeq = ((Point)mp.getGeometry(0)).getCoordinatesList();
     assertEquals(4, pSeq.getNumAxis());
     for (int i = 0; i < 4; i++) {

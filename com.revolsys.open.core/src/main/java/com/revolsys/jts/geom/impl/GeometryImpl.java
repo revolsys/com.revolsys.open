@@ -1452,7 +1452,7 @@ public abstract class GeometryImpl implements Geometry {
    *@return    the number of vertices in this <code>Geometry</code>
    */
   @Override
-  public abstract int getNumPoints();
+  public abstract int getVertexCount();
 
   /**
    * @author Paul Austin <paul.austin@revolsys.com>

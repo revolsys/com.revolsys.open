@@ -103,8 +103,8 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
   }
 
   public Coordinates getCoordinate() {
-    final Coordinates p0 = line.getCoordinateN(segmentIndex);
-    final Coordinates p1 = line.getCoordinateN(segmentIndex + 1);
+    final Coordinates p0 = line.getCoordinate(segmentIndex);
+    final Coordinates p1 = line.getCoordinate(segmentIndex + 1);
     return pointAlongSegmentByFraction(p0, p1, segmentFraction);
   }
 
@@ -125,7 +125,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
   }
 
   public boolean isLast() {
-    return segmentIndex == line.getNumPoints() - 1 && segmentFraction == 1.0;
+    return segmentIndex == line.getVertexCount() - 1 && segmentFraction == 1.0;
   }
 
   public boolean isVertex() {
@@ -146,8 +146,8 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     if (segmentIndex < 0) {
       segmentIndex = 0;
       segmentFraction = 0.0;
-    } else if (segmentIndex >= line.getNumPoints()) {
-      segmentIndex = line.getNumPoints() - 1;
+    } else if (segmentIndex >= line.getVertexCount()) {
+      segmentIndex = line.getVertexCount() - 1;
       segmentFraction = 1.0;
     }
   }

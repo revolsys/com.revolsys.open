@@ -116,14 +116,14 @@ public class ShapeReader
       // assume next seq is shell 
       // TODO: test this
       Coordinates[] pts = (Coordinates[]) pathPtSeq.get(seqIndex);
-      LinearRing shell = geometryFactory.createLinearRing(pts);
+      LinearRing shell = geometryFactory.linearRing(pts);
       seqIndex++;
       
       List holes = new ArrayList();
       // add holes as long as rings are CCW
       while (seqIndex < pathPtSeq.size() && isHole((Coordinates[]) pathPtSeq.get(seqIndex))) {
         Coordinates[] holePts = (Coordinates[]) pathPtSeq.get(seqIndex);
-        LinearRing hole = geometryFactory.createLinearRing(holePts);
+        LinearRing hole = geometryFactory.linearRing(holePts);
         holes.add(hole);
         seqIndex++;
       }

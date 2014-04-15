@@ -129,10 +129,13 @@ public class GeometryProjectionUtil {
    * @param geometryFactory
    * @return
    */
+  @SuppressWarnings("unchecked")
   public static <T extends Geometry> T performCopy(final T geometry,
     final GeometryFactory geometryFactory) {
     if (geometry == null) {
       return null;
+    } else if (geometry.isEmpty()) {
+      return (T)geometry.clone();
     } else {
       final int geometrySrid = geometry.getSrid();
       if (geometrySrid == 0) {

@@ -55,8 +55,15 @@ public interface LinearRing extends LineString {
   int MINIMUM_VALID_SIZE = 4;
 
   @Override
-  public LinearRing clone();
+  LinearRing clone();
 
   @Override
-  public LinearRing reverse();
+  LinearRing convert(GeometryFactory geometryFactory);
+
+  @Override
+  LinearRing copy(GeometryFactory geometryFactory);
+
+  @Override
+  LinearRing reverse();
+
 }

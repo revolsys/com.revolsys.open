@@ -108,12 +108,12 @@ public class EnvelopeTest extends TestCase {
     Polygon poly = (Polygon)g2;
     poly = poly.normalize();
     final LineString exteriorRing = poly.getExteriorRing();
-    assertEquals(5, exteriorRing.getNumPoints());
-    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(0), 10.0, 10);
-    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(1), 10.0, 40);
-    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(2), 30.0, 40);
-    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(3), 30.0, 10);
-    CoordinateTest.assertEquals(exteriorRing.getCoordinateN(4), 10.0, 10);
+    assertEquals(5, exteriorRing.getVertexCount());
+    CoordinateTest.assertEquals(exteriorRing.getCoordinate(0), 10.0, 10);
+    CoordinateTest.assertEquals(exteriorRing.getCoordinate(1), 10.0, 40);
+    CoordinateTest.assertEquals(exteriorRing.getCoordinate(2), 30.0, 40);
+    CoordinateTest.assertEquals(exteriorRing.getCoordinate(3), 30.0, 10);
+    CoordinateTest.assertEquals(exteriorRing.getCoordinate(4), 10.0, 10);
   }
 
   public void testContainsEmpty() {

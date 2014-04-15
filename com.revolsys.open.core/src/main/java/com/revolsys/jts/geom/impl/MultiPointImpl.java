@@ -60,7 +60,7 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
   private static final long serialVersionUID = -8048474874175355449L;
 
   public MultiPointImpl(final GeometryFactory geometryFactory) {
-    super(null, geometryFactory);
+    super(geometryFactory, null);
   }
 
   /**
@@ -70,7 +70,7 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
    */
   public MultiPointImpl(final GeometryFactory geometryFactory,
     final Point[] points) {
-    super(points, geometryFactory);
+    super(geometryFactory, points);
   }
 
   @Override
@@ -107,7 +107,7 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
    *@return    the <code>n</code>th <code>Coordinate</code>
    */
   protected Coordinates getCoordinate(final int n) {
-    return ((Point)this.geometries[n]).getCoordinate();
+    return getPoint(n);
   }
 
   @Override
@@ -153,7 +153,7 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
       return this;
     } else {
       final List<Point> geometries = new ArrayList<>();
-      for (final Geometry part : this.geometries) {
+      for (final Geometry part : geometries()) {
         final Point normalizedPart = (Point)part.normalize();
         geometries.add(normalizedPart);
       }

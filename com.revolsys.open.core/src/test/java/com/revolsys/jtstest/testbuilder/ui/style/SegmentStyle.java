@@ -37,8 +37,8 @@ public abstract class SegmentStyle extends LineStringStyle {
   protected void paintLineString(final LineString lineString,
     final int lineType, final Viewport viewport, final Graphics2D graphics)
     throws Exception {
-    for (int i = 0; i < lineString.getNumPoints() - 1; i++) {
-      paint(i, lineString.getCoordinateN(i), lineString.getCoordinateN(i + 1),
+    for (int i = 0; i < lineString.getVertexCount() - 1; i++) {
+      paint(i, lineString.getCoordinate(i), lineString.getCoordinate(i + 1),
         lineType, viewport, graphics);
     }
   }

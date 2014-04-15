@@ -309,7 +309,7 @@ public class WKBReader {
   private LinearRing readLinearRing() throws IOException {
     final int size = dis.readInt();
     final CoordinatesList pts = readCoordinateSequenceRing(size);
-    return factory.createLinearRing(pts);
+    return factory.linearRing(pts);
   }
 
   private LineString readLineString() throws IOException {

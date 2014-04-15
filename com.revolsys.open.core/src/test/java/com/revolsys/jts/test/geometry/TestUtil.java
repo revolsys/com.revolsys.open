@@ -31,7 +31,6 @@ public class TestUtil {
         final String wkt = object.getValue("wkt");
         final Geometry geometry = geometryFactory.createGeometry(wkt);
         valid &= equalsExpectedWkt(i, object, geometry);
-
         final CoordinateSystem coordinateSystem = geometry.getCoordinateSystem();
         GeometryFactory otherGeometryFactory;
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {

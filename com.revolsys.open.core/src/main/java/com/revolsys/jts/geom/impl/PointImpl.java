@@ -179,7 +179,7 @@ public class PointImpl extends GeometryImpl implements Point {
   public int compareToSameClass(final Geometry other,
     final CoordinateSequenceComparator comp) {
     final Point point = (Point)other;
-    return comp.compare(this.coordinates, point.getCoordinates());
+    return comp.compare(getCoordinates(), point.getCoordinates());
   }
 
   @Override
@@ -322,7 +322,7 @@ public class PointImpl extends GeometryImpl implements Point {
    */
   @Override
   public Geometry getBoundary() {
-    return getGeometryFactory().createEmptyGeometryCollection();
+    return getGeometryFactory().geometryCollection();
   }
 
   @Override
@@ -400,11 +400,6 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
-  public int getNumPoints() {
-    return isEmpty() ? 0 : 1;
-  }
-
-  @Override
   public int getPartIndex() {
     return -1;
   }
@@ -436,6 +431,11 @@ public class PointImpl extends GeometryImpl implements Point {
       }
       return null;
     }
+  }
+
+  @Override
+  public int getVertexCount() {
+    return isEmpty() ? 0 : 1;
   }
 
   @Override

@@ -762,7 +762,7 @@ public final class ShapefileGeometryUtil {
   private void writeMultipoint(final EndianOutput out, final Geometry geometry,
     final int shapeType, final int wordsPerPoint) throws IOException {
     if (geometry instanceof MultiPoint || geometry instanceof Point) {
-      final int numPoints = geometry.getNumPoints();
+      final int numPoints = geometry.getVertexCount();
       if (writeLength) {
         final int recordLength = 20 + wordsPerPoint * numPoints;
         // (BYTES_IN_INT + 4 * BYTES_IN_DOUBLE + BYTES_IN_INT +
@@ -971,7 +971,7 @@ public final class ShapefileGeometryUtil {
   private void writePolyline(final EndianOutput out, final Geometry geometry,
     final int shapeType, final int wordsPerPoint) throws IOException {
     if (geometry instanceof LineString || geometry instanceof MultiLineString) {
-      final int numCoordinates = geometry.getNumPoints();
+      final int numCoordinates = geometry.getVertexCount();
       final int numGeometries = geometry.getNumGeometries();
       final Envelope envelope = geometry.getEnvelopeInternal();
 
@@ -1008,7 +1008,7 @@ public final class ShapefileGeometryUtil {
     for (int i = 0; i < geometry.getNumGeometries(); i++) {
       final LineString line = (LineString)geometry.getGeometry(i);
       out.writeLEInt(partIndex);
-      partIndex += line.getNumPoints();
+      partIndex += line.getVertexCount();
     }
   }
 

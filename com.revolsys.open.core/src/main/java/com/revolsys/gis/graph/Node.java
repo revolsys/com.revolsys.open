@@ -464,10 +464,10 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
             LineString newLine;
             if (edge.isForwards(this)) {
               newLine = LineStringUtil.subLineString(line, newNode, 1,
-                line.getNumPoints() - 1, null);
+                line.getVertexCount() - 1, null);
             } else {
               newLine = LineStringUtil.subLineString(line, null, 0,
-                line.getNumPoints() - 1, newNode);
+                line.getVertexCount() - 1, newNode);
             }
             graph.replaceEdge(edge, newLine);
             if (!edge.isRemoved()) {

@@ -196,7 +196,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         final GeometryFactory geometryFactory = metaData.getGeometryFactory();
         this.setGeometryFactory(geometryFactory);
         clearUndoHistory();
-        this.addGeometry = geometryFactory.createEmptyGeometry();
+        this.addGeometry = geometryFactory.geometry();
         setAddGeometryDataType(geometryAttribute.getType());
         setMapCursor(CURSOR_NODE_ADD);
 
@@ -316,9 +316,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           geometry = geometryFactory.lineString(point, newPoint);
         } else if (geometry instanceof LineString) {
           final LineString line = (LineString)geometry;
-          final Point p0 = line.getPointN(0);
-          final Point p1 = line.getPointN(1);
-          final LinearRing ring = geometryFactory.createLinearRing(Arrays.asList(
+          final Point p0 = line.getPoint(0);
+          final Point p1 = line.getPoint(1);
+          final LinearRing ring = geometryFactory.linearRing(Arrays.asList(
             p0, p1, newPoint, p0));
           geometry = geometryFactory.createPolygon(ring);
         } else if (geometry instanceof Polygon) {

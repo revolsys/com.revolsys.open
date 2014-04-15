@@ -189,9 +189,9 @@ public class LinearLocation implements Comparable {
       setToEnd(linear);
       return;
     }
-    if (segmentIndex >= linear.getNumPoints()) {
+    if (segmentIndex >= linear.getVertexCount()) {
       final LineString line = (LineString)linear.getGeometry(componentIndex);
-      segmentIndex = line.getNumPoints() - 1;
+      segmentIndex = line.getVertexCount() - 1;
       segmentFraction = 1.0;
     }
   }
@@ -297,11 +297,11 @@ public class LinearLocation implements Comparable {
    */
   public Coordinates getCoordinate(final Geometry linearGeom) {
     final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    final Coordinates p0 = lineComp.getCoordinateN(segmentIndex);
-    if (segmentIndex >= lineComp.getNumPoints() - 1) {
+    final Coordinates p0 = lineComp.getCoordinate(segmentIndex);
+    if (segmentIndex >= lineComp.getVertexCount() - 1) {
       return p0;
     }
-    final Coordinates p1 = lineComp.getCoordinateN(segmentIndex + 1);
+    final Coordinates p1 = lineComp.getCoordinate(segmentIndex + 1);
     return pointAlongSegmentByFraction(p0, p1, segmentFraction);
   }
 
@@ -314,13 +314,13 @@ public class LinearLocation implements Comparable {
    */
   public LineSegment getSegment(final Geometry linearGeom) {
     final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    final Coordinates p0 = lineComp.getCoordinateN(segmentIndex);
+    final Coordinates p0 = lineComp.getCoordinate(segmentIndex);
     // check for endpoint - return last segment of the line if so
-    if (segmentIndex >= lineComp.getNumPoints() - 1) {
-      final Coordinates prev = lineComp.getCoordinateN(lineComp.getNumPoints() - 2);
+    if (segmentIndex >= lineComp.getVertexCount() - 1) {
+      final Coordinates prev = lineComp.getCoordinate(lineComp.getVertexCount() - 2);
       return new LineSegment(prev, p0);
     }
-    final Coordinates p1 = lineComp.getCoordinateN(segmentIndex + 1);
+    final Coordinates p1 = lineComp.getCoordinate(segmentIndex + 1);
     return new LineSegment(p0, p1);
   }
 
@@ -354,12 +354,12 @@ public class LinearLocation implements Comparable {
 
     // ensure segment index is valid
     int segIndex = segmentIndex;
-    if (segmentIndex >= lineComp.getNumPoints() - 1) {
-      segIndex = lineComp.getNumPoints() - 2;
+    if (segmentIndex >= lineComp.getVertexCount() - 1) {
+      segIndex = lineComp.getVertexCount() - 2;
     }
 
-    final Coordinates p0 = lineComp.getCoordinateN(segIndex);
-    final Coordinates p1 = lineComp.getCoordinateN(segIndex + 1);
+    final Coordinates p0 = lineComp.getCoordinate(segIndex);
+    final Coordinates p1 = lineComp.getCoordinate(segIndex + 1);
     return p0.distance(p1);
   }
 
@@ -373,7 +373,7 @@ public class LinearLocation implements Comparable {
   public boolean isEndpoint(final Geometry linearGeom) {
     final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
     // check for endpoint
-    final int nseg = lineComp.getNumPoints() - 1;
+    final int nseg = lineComp.getVertexCount() - 1;
     return segmentIndex >= nseg
       || (segmentIndex == nseg && segmentFraction >= 1.0);
   }
@@ -414,10 +414,10 @@ public class LinearLocation implements Comparable {
     }
 
     final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    if (segmentIndex < 0 || segmentIndex > lineComp.getNumPoints()) {
+    if (segmentIndex < 0 || segmentIndex > lineComp.getVertexCount()) {
       return false;
     }
-    if (segmentIndex == lineComp.getNumPoints() && segmentFraction != 0.0) {
+    if (segmentIndex == lineComp.getVertexCount() && segmentFraction != 0.0) {
       return false;
     }
 
@@ -475,7 +475,7 @@ public class LinearLocation implements Comparable {
   public void setToEnd(final Geometry linear) {
     componentIndex = linear.getNumGeometries() - 1;
     final LineString lastLine = (LineString)linear.getGeometry(componentIndex);
-    segmentIndex = lastLine.getNumPoints() - 1;
+    segmentIndex = lastLine.getVertexCount() - 1;
     segmentFraction = 1.0;
   }
 
@@ -518,7 +518,7 @@ public class LinearLocation implements Comparable {
   public LinearLocation toLowest(final Geometry linearGeom) {
     // TODO: compute lowest component index
     final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    final int nseg = lineComp.getNumPoints() - 1;
+    final int nseg = lineComp.getVertexCount() - 1;
     // if not an endpoint can be returned directly
     if (segmentIndex < nseg) {
       return this;

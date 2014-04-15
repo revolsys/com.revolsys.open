@@ -34,6 +34,7 @@ package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.revolsys.gis.data.model.types.DataType;
@@ -68,7 +69,7 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
    */
   public MultiLineStringImpl(final LineString[] lineStrings,
     final GeometryFactory factory) {
-    super(lineStrings, factory);
+    super(factory, lineStrings);
   }
 
   @Override
@@ -122,8 +123,8 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
     if (isEmpty()) {
       return false;
     }
-    for (int i = 0; i < geometries.length; i++) {
-      if (!((LineString)geometries[i]).isClosed()) {
+    for (final Geometry geometry : geometries()) {
+      if (!((LineString)geometry).isClosed()) {
         return false;
       }
     }
@@ -136,7 +137,7 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
       return this;
     } else {
       final List<LineString> geometries = new ArrayList<>();
-      for (final Geometry part : this.geometries) {
+      for (final Geometry part : geometries()) {
         final LineString normalizedPart = (LineString)part.normalize();
         geometries.add(normalizedPart);
       }
@@ -158,12 +159,14 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
    */
   @Override
   public MultiLineString reverse() {
-    final int nLines = geometries.length;
-    final LineString[] revLines = new LineString[nLines];
-    for (int i = 0; i < geometries.length; i++) {
-      revLines[nLines - 1 - i] = (LineString)geometries[i].reverse();
+    final LinkedList<LineString> revLines = new LinkedList<LineString>();
+    for (final Geometry geometry : geometries()) {
+      final LineString line = (LineString)geometry;
+      final LineString reverse = line.reverse();
+      revLines.addFirst(reverse);
     }
-    return getGeometryFactory().createMultiLineString(revLines);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.createMultiLineString(revLines);
   }
 
   /**

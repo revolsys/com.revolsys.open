@@ -488,7 +488,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
           length);
         final CoordinatesList coordinatesList = new DoubleCoordinatesList(
           numAxis, ordinates);
-        final LinearRing ring = this.geometryFactory.createLinearRing(coordinatesList);
+        final LinearRing ring = this.geometryFactory.linearRing(coordinatesList);
 
         switch ((int)type) {
           case 1003:
@@ -565,7 +565,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
           length);
         final CoordinatesList coordinatesList = new DoubleCoordinatesList(
           numAxis, ordinates);
-        final LinearRing ring = this.geometryFactory.createLinearRing(coordinatesList);
+        final LinearRing ring = this.geometryFactory.linearRing(coordinatesList);
 
         switch ((int)type) {
           case 1003:

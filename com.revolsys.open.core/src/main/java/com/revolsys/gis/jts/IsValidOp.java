@@ -122,8 +122,8 @@ public class IsValidOp {
       return true;
     } else {
       Coordinates pt = null;
-      if (ring.getNumPoints() >= 1) {
-        pt = ring.getCoordinateN(0);
+      if (ring.getVertexCount() >= 1) {
+        pt = ring.getCoordinate(0);
       }
       addError(TopologyValidationError.RING_NOT_CLOSED, pt);
       return false;

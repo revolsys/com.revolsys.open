@@ -64,9 +64,9 @@ public class SnapRoundingTest extends TestCase {
   private boolean isSnapped(final Coordinates v, final List lines) {
     for (int i = 0; i < lines.size(); i++) {
       final LineString line = (LineString)lines.get(i);
-      for (int j = 0; j < line.getNumPoints() - 1; j++) {
-        final Coordinates p0 = line.getCoordinateN(j);
-        final Coordinates p1 = line.getCoordinateN(j + 1);
+      for (int j = 0; j < line.getVertexCount() - 1; j++) {
+        final Coordinates p0 = line.getCoordinate(j);
+        final Coordinates p1 = line.getCoordinate(j + 1);
         if (!isSnapped(v, p0, p1)) {
           return false;
         }
@@ -78,8 +78,8 @@ public class SnapRoundingTest extends TestCase {
   boolean isSnapped(final List lines, final double tol) {
     for (int i = 0; i < lines.size(); i++) {
       final LineString line = (LineString)lines.get(i);
-      for (int j = 0; j < line.getNumPoints(); j++) {
-        final Coordinates v = line.getCoordinateN(j);
+      for (int j = 0; j < line.getVertexCount(); j++) {
+        final Coordinates v = line.getCoordinate(j);
         if (!isSnapped(v, lines)) {
           return false;
         }

@@ -122,7 +122,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     final LineSegment baseLine = getSquareBaseLine();
     final Coordinates[] pts = getBoundary(level, baseLine.getCoordinate(0),
       baseLine.getLength());
-    return geomFactory.createPolygon(geomFactory.createLinearRing(pts), null);
+    return geomFactory.createPolygon(geomFactory.linearRing(pts), null);
   }
 
 }

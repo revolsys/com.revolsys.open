@@ -78,14 +78,14 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.point((Coordinates)null)
       .getBoundary()
       .getClass() == GeometryCollection.class);
-    assertTrue(this.geometryFactory.createLinearRing(new Coordinates[] {})
+    assertTrue(this.geometryFactory.linearRing(new Coordinates[] {})
       .getBoundary()
       .getClass() == MultiPoint.class);
     assertTrue(this.geometryFactory.lineString(new Coordinates[] {})
       .getBoundary()
       .getClass() == MultiPoint.class);
     assertTrue(this.geometryFactory.createPolygon(
-      this.geometryFactory.createLinearRing(new Coordinates[] {}),
+      this.geometryFactory.linearRing(new Coordinates[] {}),
       new LinearRing[] {})
       .getBoundary()
       .getClass() == MultiLineString.class);
@@ -133,12 +133,12 @@ public class MiscellaneousTest extends TestCase {
 
   public void testCreateEmptyGeometry() throws Exception {
     assertTrue(this.geometryFactory.point((Coordinates)null).isEmpty());
-    assertTrue(this.geometryFactory.createLinearRing(new Coordinates[] {})
+    assertTrue(this.geometryFactory.linearRing(new Coordinates[] {})
       .isEmpty());
     assertTrue(this.geometryFactory.lineString(new Coordinates[] {})
       .isEmpty());
     assertTrue(this.geometryFactory.createPolygon(
-      this.geometryFactory.createLinearRing(new Coordinates[] {}),
+      this.geometryFactory.linearRing(new Coordinates[] {}),
       new LinearRing[] {}).isEmpty());
     assertTrue(this.geometryFactory.createMultiPolygon(new Polygon[] {})
       .isEmpty());
@@ -147,7 +147,7 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.createMultiPoint(new Point[] {}).isEmpty());
 
     assertTrue(this.geometryFactory.point((Coordinates)null).isSimple());
-    assertTrue(this.geometryFactory.createLinearRing(new Coordinates[] {})
+    assertTrue(this.geometryFactory.linearRing(new Coordinates[] {})
       .isSimple());
     /**
      * @todo Enable when #isSimple implemented
@@ -165,14 +165,14 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.point((Coordinates)null)
       .getBoundary()
       .isEmpty());
-    assertTrue(this.geometryFactory.createLinearRing(new Coordinates[] {})
+    assertTrue(this.geometryFactory.linearRing(new Coordinates[] {})
       .getBoundary()
       .isEmpty());
     assertTrue(this.geometryFactory.lineString(new Coordinates[] {})
       .getBoundary()
       .isEmpty());
     assertTrue(this.geometryFactory.createPolygon(
-      this.geometryFactory.createLinearRing(new Coordinates[] {}),
+      this.geometryFactory.linearRing(new Coordinates[] {}),
       new LinearRing[] {})
       .getBoundary()
       .isEmpty());
@@ -186,7 +186,7 @@ public class MiscellaneousTest extends TestCase {
       .getBoundary()
       .isEmpty());
 
-    assertTrue(this.geometryFactory.createLinearRing((CoordinatesList)null)
+    assertTrue(this.geometryFactory.linearRing((CoordinatesList)null)
       .isEmpty());
     assertTrue(this.geometryFactory.lineString((Coordinates[])null)
       .isEmpty());
@@ -198,7 +198,7 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(-1, this.geometryFactory.point((Coordinates)null)
       .getBoundaryDimension());
     assertEquals(-1,
-      this.geometryFactory.createLinearRing((CoordinatesList)null)
+      this.geometryFactory.linearRing((CoordinatesList)null)
         .getBoundaryDimension());
     assertEquals(0, this.geometryFactory.lineString((Coordinates[])null)
       .getBoundaryDimension());
@@ -212,23 +212,23 @@ public class MiscellaneousTest extends TestCase {
       .getBoundaryDimension());
 
     assertEquals(0, this.geometryFactory.point((Coordinates)null)
-      .getNumPoints());
+      .getVertexCount());
     assertEquals(0,
-      this.geometryFactory.createLinearRing((CoordinatesList)null)
-        .getNumPoints());
+      this.geometryFactory.linearRing((CoordinatesList)null)
+        .getVertexCount());
     assertEquals(0, this.geometryFactory.lineString((Coordinates[])null)
-      .getNumPoints());
+      .getVertexCount());
     assertEquals(0, this.geometryFactory.createPolygon(null, null)
-      .getNumPoints());
-    assertEquals(0, this.geometryFactory.createMultiPolygon().getNumPoints());
-    assertEquals(0, this.geometryFactory.createMultiLineString().getNumPoints());
+      .getVertexCount());
+    assertEquals(0, this.geometryFactory.createMultiPolygon().getVertexCount());
+    assertEquals(0, this.geometryFactory.createMultiLineString().getVertexCount());
     assertEquals(0, this.geometryFactory.createMultiPoint((Point[])null)
-      .getNumPoints());
+      .getVertexCount());
 
     assertEquals(0, this.geometryFactory.point((Coordinates)null)
       .getCoordinateArray().length);
     assertEquals(0,
-      this.geometryFactory.createLinearRing((CoordinatesList)null)
+      this.geometryFactory.linearRing((CoordinatesList)null)
         .getCoordinateArray().length);
     assertEquals(0, this.geometryFactory.lineString((Coordinates[])null)
       .getCoordinateArray().length);
@@ -250,7 +250,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyLinearRing() throws Exception {
-    final LineString l = this.geometryFactory.createLinearRing((CoordinatesList)null);
+    final LineString l = this.geometryFactory.linearRing((CoordinatesList)null);
     assertEquals(1, l.getDimension());
     assertEquals(new Envelope(), l.getEnvelopeInternal());
     assertTrue(l.isSimple());
@@ -356,7 +356,7 @@ public class MiscellaneousTest extends TestCase {
       new Coordinate((double)20, 20, 0), new Coordinate((double)20, 15, 0),
       new Coordinate((double)10, 10, 0)
     };
-    final LinearRing linearRing = this.geometryFactory.createLinearRing(coordinates);
+    final LinearRing linearRing = this.geometryFactory.linearRing(coordinates);
     assertTrue(linearRing.isSimple());
   }
 
@@ -498,7 +498,7 @@ public class MiscellaneousTest extends TestCase {
     final Polygon p = (Polygon)this.reader.read("POLYGON ( (0 0, 100 0, 100 100, 0 100, 0 0), "
       + "          (20 20, 20 80, 80 80, 80 20, 20 20)) ");
     final Coordinates[] coordinates = p.getCoordinateArray();
-    assertEquals(10, p.getNumPoints());
+    assertEquals(10, p.getVertexCount());
     assertEquals(10, coordinates.length);
     assertEquals(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
       coordinates[0]);

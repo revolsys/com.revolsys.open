@@ -357,7 +357,7 @@ class LineStringNode extends GeometryNode {
   }
 
   public LineStringNode(final LineString line, final String tag) {
-    super(line, line.getNumPoints(), tag);
+    super(line, line.getVertexCount(), tag);
     this.line = line;
   }
 
@@ -408,7 +408,7 @@ class PolygonNode extends GeometryNode {
   Polygon poly;
 
   PolygonNode(final Polygon poly) {
-    super(poly, poly.getNumPoints(), null);
+    super(poly, poly.getVertexCount(), null);
     this.poly = poly;
   }
 

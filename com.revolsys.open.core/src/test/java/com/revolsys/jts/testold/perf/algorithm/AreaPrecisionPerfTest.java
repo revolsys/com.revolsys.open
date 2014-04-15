@@ -43,7 +43,7 @@ public class AreaPrecisionPerfTest {
       // close ring
       coordinates[nrVertices] = coordinates[0];
 
-      final Geometry g1 = GeometryFactory.getFactory().createLinearRing(coordinates);
+      final Geometry g1 = GeometryFactory.getFactory().linearRing(coordinates);
       final LinearRing[] holes = new LinearRing[] {};
       final Polygon polygon = GeometryFactory.getFactory().createPolygon(
         (LinearRing)g1, holes);

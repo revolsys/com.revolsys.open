@@ -67,7 +67,7 @@ public class PolygonHandler implements ShapeHandler {
       LinearRing minShell = null;
       Envelope minEnv = null;
       final Envelope testHoleEnv = testHole.getEnvelopeInternal();
-      final Coordinates testHolePt = testHole.getCoordinateN(0);
+      final Coordinates testHolePt = testHole.getCoordinate(0);
       LinearRing tryShell;
       final int nShells = shells.size();
       for (int j = 0; j < nShells; j++) {
@@ -125,7 +125,7 @@ public class PolygonHandler implements ShapeHandler {
       nrings = nrings + 1 + p.getNumInteriorRing();
     }
 
-    final int npoints = multi.getNumPoints();
+    final int npoints = multi.getVertexCount();
 
     if (myShapeType == 15) {
       return 22 + (2 * nrings) + 8 * npoints + 4 * npoints + 8 + 4 * npoints
@@ -273,7 +273,7 @@ public class PolygonHandler implements ShapeHandler {
         points[i] = coords[offset];
         offset++;
       }
-      final LinearRing ring = geometryFactory.createLinearRing(points);
+      final LinearRing ring = geometryFactory.linearRing(points);
       if (cga.isCCW(points)) {
         holes.add(ring);
       } else {

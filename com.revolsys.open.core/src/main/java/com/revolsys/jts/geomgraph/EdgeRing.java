@@ -117,7 +117,7 @@ public abstract class EdgeRing {
     for (int i = 0; i < pts.size(); i++) {
       coord[i] = (Coordinates) pts.get(i);
     }
-    ring = geometryFactory.createLinearRing(coord);
+    ring = geometryFactory.linearRing(coord);
     isHole = CGAlgorithms.isCCW(ring.getCoordinateArray());
 //Debug.println( (isHole ? "hole - " : "shell - ") + WKTWriter.toLineString(new CoordinateArraySequence(ring.getCoordinates())));
   }

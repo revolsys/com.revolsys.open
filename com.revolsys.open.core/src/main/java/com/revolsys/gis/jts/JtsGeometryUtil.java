@@ -88,11 +88,11 @@ public final class JtsGeometryUtil {
 
   private static void addElevation(final LineString original,
     final LineString update) {
-    final Coordinates c0 = update.getCoordinateN(0);
+    final Coordinates c0 = update.getCoordinate(0);
     if (Double.isNaN(c0.getZ())) {
       addElevation(c0, original);
     }
-    final Coordinates cN = update.getCoordinateN(update.getNumPoints() - 1);
+    final Coordinates cN = update.getCoordinate(update.getVertexCount() - 1);
     if (Double.isNaN(cN.getZ())) {
       addElevation(cN, original);
     }
@@ -216,7 +216,7 @@ public final class JtsGeometryUtil {
     final List<Coordinates> coordinates) {
     final Coordinates[] coords = new Coordinates[coordinates.size()];
     coordinates.toArray(coords);
-    return factory.createLinearRing(coords);
+    return factory.linearRing(coords);
 
   }
 
@@ -293,7 +293,7 @@ public final class JtsGeometryUtil {
   public static Polygon createPolygon(final MultiLineString multiLine) {
     final GeometryFactory factory = GeometryFactory.getFactory(multiLine);
     final Coordinates[] coordinates = getMergeLine(multiLine).getCoordinateArray();
-    final LinearRing linearRing = factory.createLinearRing(coordinates);
+    final LinearRing linearRing = factory.linearRing(coordinates);
     final Polygon polygon = factory.createPolygon(linearRing, null);
     return polygon;
 
@@ -346,13 +346,13 @@ public final class JtsGeometryUtil {
 
   public static boolean equalsExact3D(final LineString line1,
     final LineString line2) {
-    if (line1.getNumPoints() != line2.getNumPoints()) {
+    if (line1.getVertexCount() != line2.getVertexCount()) {
       return false;
     }
-    for (int i = 0; i < line1.getNumPoints(); i++) {
-      line1.getCoordinateN(i);
-      final Coordinates coordinate1 = line1.getCoordinateN(i);
-      final Coordinates coordinate2 = line2.getCoordinateN(i);
+    for (int i = 0; i < line1.getVertexCount(); i++) {
+      line1.getCoordinate(i);
+      final Coordinates coordinate1 = line1.getCoordinate(i);
+      final Coordinates coordinate2 = line2.getCoordinate(i);
       if (!coordinate1.equals3d(coordinate2)) {
         return false;
       }
@@ -772,7 +772,7 @@ public final class JtsGeometryUtil {
       clockwiseSegment.getP0()
     };
     final GeometryFactory factory = GeometryFactory.getFactory();
-    final LinearRing exteriorRing = factory.createLinearRing(coords);
+    final LinearRing exteriorRing = factory.linearRing(coords);
     return factory.createPolygon(exteriorRing, null);
   }
 
@@ -1233,7 +1233,7 @@ public final class JtsGeometryUtil {
     final LineString exteriorRing = polygon.getExteriorRing();
     final CoordinatesList oldCoordinates = CoordinatesListUtil.get(exteriorRing);
     final CoordinatesList newCoordinates = oldCoordinates.reverse();
-    final LinearRing shell = factory.createLinearRing(newCoordinates);
+    final LinearRing shell = factory.linearRing(newCoordinates);
     return factory.createPolygon(shell, null);
   }
 
@@ -1341,10 +1341,10 @@ public final class JtsGeometryUtil {
 
   public static boolean startAndEndEqual(final LineString geometry1,
     final LineString geometry2) {
-    final Coordinates g1c0 = geometry1.getCoordinateN(0);
-    final Coordinates g1cN = geometry1.getCoordinateN(geometry1.getNumPoints() - 1);
-    final Coordinates g2c0 = geometry2.getCoordinateN(0);
-    final Coordinates g2cN = geometry2.getCoordinateN(geometry2.getNumPoints() - 1);
+    final Coordinates g1c0 = geometry1.getCoordinate(0);
+    final Coordinates g1cN = geometry1.getCoordinate(geometry1.getVertexCount() - 1);
+    final Coordinates g2c0 = geometry2.getCoordinate(0);
+    final Coordinates g2cN = geometry2.getCoordinate(geometry2.getVertexCount() - 1);
     if (g1c0.equals2d(g2c0)) {
       return g1cN.equals2d(g2cN);
     } else if (g1c0.equals2d(g2cN)) {
@@ -1361,9 +1361,9 @@ public final class JtsGeometryUtil {
    */
   public static boolean touchesAtEnd(final LineString line1,
     final LineString line2) {
-    final Coordinates l1c0 = line1.getCoordinateN(0);
-    final Coordinates l1cN = line1.getCoordinateN(line1.getNumPoints() - 1);
-    final Coordinates l2cN = line2.getCoordinateN(line2.getNumPoints() - 1);
+    final Coordinates l1c0 = line1.getCoordinate(0);
+    final Coordinates l1cN = line1.getCoordinate(line1.getVertexCount() - 1);
+    final Coordinates l2cN = line2.getCoordinate(line2.getVertexCount() - 1);
     if (l2cN.equals2d(l1c0)) {
       return true;
     } else {
@@ -1378,9 +1378,9 @@ public final class JtsGeometryUtil {
    */
   public static boolean touchesAtStart(final LineString line1,
     final LineString line2) {
-    final Coordinates l1c0 = line1.getCoordinateN(0);
-    final Coordinates l1cN = line1.getCoordinateN(line1.getNumPoints() - 1);
-    final Coordinates l2c0 = line2.getCoordinateN(0);
+    final Coordinates l1c0 = line1.getCoordinate(0);
+    final Coordinates l1cN = line1.getCoordinate(line1.getVertexCount() - 1);
+    final Coordinates l2c0 = line2.getCoordinate(0);
     if (l2c0.equals2d(l1c0)) {
       return true;
     } else {

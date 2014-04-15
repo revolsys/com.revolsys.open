@@ -114,7 +114,7 @@ extends GeometricShapeBuilder
         new Coordinate((double)x, y + width, Coordinates.NULL_ORDINATE),
         new Coordinate((double)x, y, Coordinates.NULL_ORDINATE)
         }	;
-		return geomFactory.createLinearRing(pts); 
+		return geomFactory.linearRing(pts); 
 	}
 	
 

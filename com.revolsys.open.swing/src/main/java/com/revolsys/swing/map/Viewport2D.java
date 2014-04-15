@@ -36,7 +36,7 @@ import com.revolsys.swing.map.layer.Project;
 public class Viewport2D implements PropertyChangeSupportProxy {
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
-    .createEmptyGeometry();
+    .geometry();
 
   public static AffineTransform createScreenToModelTransform(
     final BoundingBox boundingBox, final double viewWidth,

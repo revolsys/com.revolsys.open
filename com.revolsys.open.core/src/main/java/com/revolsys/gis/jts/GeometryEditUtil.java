@@ -766,15 +766,21 @@ public class GeometryEditUtil {
   protected static CoordinatesList moveGeometry(
     final GeometryFactory geometryFactory, final CoordinatesList points,
     final double deltaX, final double deltaY) {
-    final CoordinatesList newPoints = geometryFactory.createCoordinatesList(points);
-    for (int i = 0; i < newPoints.size(); i++) {
-      final double x = points.getX(i);
-      newPoints.setX(i, x + deltaX);
+    if (points == null) {
+      return null;
+    } else {
+      final CoordinatesList newPoints = new DoubleCoordinatesList(
+        geometryFactory.getNumAxis(), points);
+      for (int i = 0; i < newPoints.size(); i++) {
+        final double x = points.getX(i);
+        newPoints.setX(i, x + deltaX);
 
-      final double y = points.getY(i);
-      newPoints.setY(i, y + deltaY);
+        final double y = points.getY(i);
+        newPoints.setY(i, y + deltaY);
+      }
+      geometryFactory.makePrecise(newPoints);
+      return newPoints;
     }
-    return newPoints;
   }
 
   protected static LineString moveGeometry(

@@ -90,7 +90,7 @@ public class LineSegment extends AbstractCoordinatesList implements
 
   public LineSegment(final LineString line) {
     this(GeometryFactory.getFactory(line), CoordinatesListUtil.get(line, 0),
-      CoordinatesListUtil.get(line, line.getNumPoints() - 1));
+      CoordinatesListUtil.get(line, line.getVertexCount() - 1));
   }
 
   public double angle() {

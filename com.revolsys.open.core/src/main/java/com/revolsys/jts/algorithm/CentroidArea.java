@@ -82,7 +82,7 @@ public class CentroidArea
   {
     if (geom instanceof Polygon) {
       Polygon poly = (Polygon) geom;
-      setBasePoint(poly.getExteriorRing().getCoordinateN(0));
+      setBasePoint(poly.getExteriorRing().getCoordinate(0));
       add(poly);
     }
     else if (geom instanceof GeometryCollection) {

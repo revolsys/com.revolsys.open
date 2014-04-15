@@ -306,7 +306,7 @@ public class WktWriter {
       out.print(" EMPTY");
     } else {
       out.print("(");
-      write(out, point, numAxis);
+      write(out, (Coordinates)point, numAxis);
       out.print(')');
     }
   }

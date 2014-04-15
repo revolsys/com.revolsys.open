@@ -127,7 +127,7 @@ public class TestListPanel extends JPanel {
         		sig += "[" + geom.getNumGeometries() + "]";
         	}
           else {
-            sig += "(" + geom.getNumPoints() + ")";
+            sig += "(" + geom.getVertexCount() + ")";
           }
         	return sig;
         }

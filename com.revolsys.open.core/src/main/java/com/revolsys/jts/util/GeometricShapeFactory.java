@@ -254,7 +254,7 @@ public class GeometricShapeFactory {
       pts[iPt++] = coord(x, y);
     }
     pts[iPt++] = coord(centreX, centreY);
-    final LinearRing ring = geomFact.createLinearRing(pts);
+    final LinearRing ring = geomFact.linearRing(pts);
     final Polygon poly = geomFact.createPolygon(ring, null);
     return (Polygon)rotate(poly);
   }
@@ -295,7 +295,7 @@ public class GeometricShapeFactory {
     }
     pts[iPt] = pts[0].cloneCoordinates();
 
-    final LinearRing ring = geomFact.createLinearRing(pts);
+    final LinearRing ring = geomFact.linearRing(pts);
     final Polygon poly = geomFact.createPolygon(ring, null);
     return (Polygon)rotate(poly);
   }
@@ -344,7 +344,7 @@ public class GeometricShapeFactory {
     }
     pts[ipt++] = pts[0].cloneCoordinates();
 
-    final LinearRing ring = geomFact.createLinearRing(pts);
+    final LinearRing ring = geomFact.linearRing(pts);
     final Polygon poly = geomFact.createPolygon(ring, null);
     return (Polygon)rotate(poly);
   }
@@ -408,7 +408,7 @@ public class GeometricShapeFactory {
     }
     pts[pts.length - 1] = pts[0].cloneCoordinates();
 
-    final LinearRing ring = geomFact.createLinearRing(pts);
+    final LinearRing ring = geomFact.linearRing(pts);
     final Polygon poly = geomFact.createPolygon(ring, null);
     return (Polygon)rotate(poly);
   }

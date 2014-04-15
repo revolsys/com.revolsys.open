@@ -535,7 +535,7 @@ public class WKTReader {
    *      encountered
    */
   private LinearRing readLinearRingText() throws IOException, ParseException {
-    return geometryFactory.createLinearRing(getCoordinates());
+    return geometryFactory.linearRing(getCoordinates());
   }
 
   /**
@@ -691,7 +691,7 @@ public class WKTReader {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
       return geometryFactory.createPolygon(
-        geometryFactory.createLinearRing(new Coordinates[] {}),
+        geometryFactory.linearRing(new Coordinates[] {}),
         new LinearRing[] {});
     }
     final List<LinearRing> holes = new ArrayList<LinearRing>();

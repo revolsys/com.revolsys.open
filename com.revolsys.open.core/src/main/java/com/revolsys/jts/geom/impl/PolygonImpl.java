@@ -114,7 +114,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     final GeometryFactory factory) {
     super(factory);
     if (shell == null) {
-      shell = getGeometryFactory().createLinearRing((CoordinatesList)null);
+      shell = getGeometryFactory().linearRing((CoordinatesList)null);
     }
     if (holes == null) {
       holes = new LinearRing[] {};
@@ -290,7 +290,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
       }
       // create LineString or MultiLineString as appropriate
       if (rings.length <= 1) {
-        return getGeometryFactory().createLinearRing(
+        return getGeometryFactory().linearRing(
           rings[0].getCoordinatesList());
       }
       return getGeometryFactory().createMultiLineString(rings);
@@ -312,7 +312,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     if (isEmpty()) {
       return new Coordinates[] {};
     }
-    final Coordinates[] coordinates = new Coordinates[getNumPoints()];
+    final Coordinates[] coordinates = new Coordinates[getVertexCount()];
     int k = -1;
     final Coordinates[] shellCoordinates = shell.getCoordinateArray();
     for (int x = 0; x < shellCoordinates.length; x++) {
@@ -370,10 +370,10 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   }
 
   @Override
-  public int getNumPoints() {
-    int numPoints = shell.getNumPoints();
+  public int getVertexCount() {
+    int numPoints = shell.getVertexCount();
     for (int i = 0; i < holes.length; i++) {
-      numPoints += holes[i].getNumPoints();
+      numPoints += holes[i].getVertexCount();
     }
     return numPoints;
   }
@@ -401,7 +401,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     if (shell == null) {
       return false;
     }
-    if (shell.getNumPoints() != 5) {
+    if (shell.getVertexCount() != 5) {
       return false;
     }
 
@@ -472,7 +472,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
         CoordinateArrays.reverse(ringCoordinates);
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.createLinearRing(ringCoordinates);
+      return geometryFactory.linearRing(ringCoordinates);
     }
   }
 

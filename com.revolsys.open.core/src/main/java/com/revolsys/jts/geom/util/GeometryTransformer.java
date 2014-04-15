@@ -227,12 +227,12 @@ public class GeometryTransformer
   protected Geometry transformLinearRing(LinearRing geom, Geometry parent) {
     CoordinatesList seq = transformCoordinates(geom.getCoordinatesList(), geom);
     if (seq == null) 
-      return factory.createLinearRing((CoordinatesList) null);
+      return factory.linearRing((CoordinatesList) null);
     int seqSize = seq.size();
     // ensure a valid LinearRing
     if (seqSize > 0 && seqSize < 4 && ! preserveType)
       return factory.lineString(seq);
-    return factory.createLinearRing(seq);
+    return factory.linearRing(seq);
   }
 
   /**

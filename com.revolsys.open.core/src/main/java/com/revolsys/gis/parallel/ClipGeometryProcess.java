@@ -31,11 +31,11 @@ public class ClipGeometryProcess extends
         && intersection.getClass() == geometry.getClass()) {
         if (intersection instanceof LineString) {
           final LineString lineString = (LineString)intersection;
-          final Coordinates c0 = lineString.getCoordinateN(0);
+          final Coordinates c0 = lineString.getCoordinate(0);
           if (Double.isNaN(c0.getZ())) {
             JtsGeometryUtil.addElevation(c0, (LineString)geometry);
           }
-          final Coordinates cN = lineString.getCoordinateN(lineString.getNumPoints() - 1);
+          final Coordinates cN = lineString.getCoordinate(lineString.getVertexCount() - 1);
           if (Double.isNaN(cN.getZ())) {
             JtsGeometryUtil.addElevation(cN, (LineString)geometry);
           }
