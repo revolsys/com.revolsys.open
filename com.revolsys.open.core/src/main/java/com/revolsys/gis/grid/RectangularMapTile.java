@@ -1,6 +1,6 @@
 package com.revolsys.gis.grid;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Polygon;
 
 public interface RectangularMapTile {

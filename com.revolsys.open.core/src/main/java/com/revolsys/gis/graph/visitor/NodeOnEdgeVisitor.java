@@ -5,12 +5,13 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
@@ -20,7 +21,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
     final Node<T> node, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final Coordinates point = node;
-    BoundingBox boundingBox = new BoundingBox(point);
+    BoundingBox boundingBox = new Envelope(point);
     boundingBox = boundingBox.expand(maxDistance);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<T>(node,
@@ -53,7 +54,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   public boolean visit(final Edge<T> edge) {
     if (!edge.hasNode(node)) {
       final LineString line = edge.getLine();
-      if (line.getEnvelopeInternal().intersects(boundingBox)) {
+      if (line.getBoundingBox().intersects(boundingBox)) {
         if (LineStringUtil.isPointOnLine(line, point, maxDistance)) {
           super.visit(edge);
         }

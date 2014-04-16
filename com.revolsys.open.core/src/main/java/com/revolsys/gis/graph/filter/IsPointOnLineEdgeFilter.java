@@ -1,10 +1,10 @@
 package com.revolsys.gis.graph.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 
@@ -27,7 +27,7 @@ public class IsPointOnLineEdgeFilter<T> implements Filter<Node<T>> {
   public boolean accept(final Node<T> node) {
     final LineString line = edge.getLine();
     if (!edge.hasNode(node)) {
-      if (envelope.intersects(new BoundingBox(node))) {
+      if (envelope.intersects(new Envelope(node))) {
         if (LineStringUtil.isPointOnLine(line, node, maxDistance)) {
           return true;
         }
@@ -36,7 +36,7 @@ public class IsPointOnLineEdgeFilter<T> implements Filter<Node<T>> {
     return false;
   }
 
-  public Envelope getEnvelope() {
+  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
     return envelope;
   }
 

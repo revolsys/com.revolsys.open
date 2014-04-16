@@ -28,7 +28,7 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;

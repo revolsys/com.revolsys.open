@@ -40,9 +40,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.Position;
@@ -91,7 +91,7 @@ class SubgraphDepthLocater
       BufferSubgraph bsg = (BufferSubgraph) i.next();
 
       // optimization - don't bother checking subgraphs which the ray does not intersect
-      Envelope env = bsg.getEnvelope();
+      BoundingBox env = bsg.getEnvelope();
       if (stabbingRayLeftPt.getY() < env.getMinY()
           || stabbingRayLeftPt.getY() > env.getMaxY())
         continue;

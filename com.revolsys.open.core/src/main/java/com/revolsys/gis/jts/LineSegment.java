@@ -1,7 +1,6 @@
 package com.revolsys.gis.jts;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -9,6 +8,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
@@ -219,7 +219,7 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   public BoundingBox getBoundingBox() {
-    return BoundingBox.getBoundingBox(getLine());
+    return Envelope.getBoundingBox(getLine());
   }
 
   private Coordinates getCoordinates1() {
@@ -270,8 +270,8 @@ public class LineSegment extends AbstractCoordinatesList implements
       getCoordinates2());
   }
 
-  public Envelope getEnvelope() {
-    return getLine().getEnvelopeInternal();
+  public BoundingBox getEnvelope() {
+    return getLine().getBoundingBox();
   }
 
   public GeometryFactory getGeometryFactory() {

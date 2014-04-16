@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
 import com.revolsys.gis.data.io.DataObjectReaderFactory;
@@ -17,6 +16,8 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
@@ -101,7 +102,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
             final DataObjectMetaData metaData = reader.getMetaData();
             setMetaData(metaData);
             final GeometryFactory geometryFactory = metaData.getGeometryFactory();
-            BoundingBox boundingBox = new BoundingBox(geometryFactory);
+            BoundingBox boundingBox = new Envelope(geometryFactory);
             for (final DataObject record : reader) {
               final Geometry geometry = record.getGeometryValue();
               boundingBox = boundingBox.expandToInclude(geometry);

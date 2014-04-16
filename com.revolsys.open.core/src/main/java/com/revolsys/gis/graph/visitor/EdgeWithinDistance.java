@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -28,7 +29,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Geometry geometry, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    BoundingBox env = BoundingBox.getBoundingBox(geometry);
+    BoundingBox env = Envelope.getBoundingBox(geometry);
     env = env.expand(maxDistance);
     graph.getEdgeIndex().visit(env,
       new EdgeWithinDistance<T>(geometry, maxDistance, results));

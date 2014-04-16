@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 
 public abstract class NodeBase<T> {
-  public static int getSubnodeIndex(final Envelope envelope,
+  public static int getSubnodeIndex(final BoundingBox envelope,
     final Coordinates centre) {
     int subnodeIndex = -1;
     final double minX = envelope.getMinX();
@@ -38,11 +38,11 @@ public abstract class NodeBase<T> {
     return subnodeIndex;
   }
 
-  private final List<T> items = new ArrayList<T>();
+  private final List<T> items = new ArrayList<>();
 
-  private final List<Envelope> envelopes = new ArrayList<Envelope>();
+  private final List<BoundingBox> envelopes = new ArrayList<>();
 
-  private final List<Node<T>> nodes = new ArrayList<Node<T>>(4);
+  private final List<Node<T>> nodes = new ArrayList<>(4);
 
   public NodeBase() {
     for (int i = 0; i < 4; i++) {
@@ -50,7 +50,7 @@ public abstract class NodeBase<T> {
     }
   }
 
-  public void add(final Envelope envelope, final T item) {
+  public void add(final BoundingBox envelope, final T item) {
     for (int i = 0; i < items.size(); i++) {
       final T oldItem = items.get(i);
       if (oldItem == item) {
@@ -128,9 +128,9 @@ public abstract class NodeBase<T> {
     return !(hasChildren() || hasItems());
   }
 
-  protected abstract boolean isSearchMatch(Envelope searchEnv);
+  protected abstract boolean isSearchMatch(BoundingBox searchEnv);
 
-  public boolean remove(final Envelope envelope, final T item) {
+  public boolean remove(final BoundingBox envelope, final T item) {
     if (isSearchMatch(envelope)) {
       for (int i = 0; i < 4; i++) {
         final Node<T> node = getNode(i);
@@ -176,10 +176,10 @@ public abstract class NodeBase<T> {
     return nodes + "=" + items.size();
   }
 
-  public boolean visit(final Envelope envelope, final Visitor<T> visitor) {
+  public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
     if (isSearchMatch(envelope)) {
       for (int i = 0; i < items.size(); i++) {
-        final Envelope itemEnvelope = envelopes.get(i);
+        final BoundingBox itemEnvelope = envelopes.get(i);
         if (isSearchMatch(itemEnvelope)) {
           final T item = items.get(i);
           if (!visitor.visit(item)) {

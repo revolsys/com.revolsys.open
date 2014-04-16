@@ -19,7 +19,7 @@ public abstract class LineStringStyle
     throws Exception
   {
     // cull non-visible geometries
-    if (! viewport.intersectsInModel(geom.getEnvelopeInternal())) 
+    if (! viewport.intersectsInModel(geom.getBoundingBox())) 
       return;
 
     if (geom instanceof LineString) {
@@ -56,7 +56,7 @@ public abstract class LineStringStyle
   throws Exception
   {
     // cull non-visible geometries
-    if (! viewport.intersectsInModel(line.getEnvelopeInternal())) 
+    if (! viewport.intersectsInModel(line.getBoundingBox())) 
       return;
     
     paintLineString(line, lineType, viewport, g);

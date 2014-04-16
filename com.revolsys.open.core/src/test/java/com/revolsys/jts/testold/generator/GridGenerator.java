@@ -34,6 +34,7 @@ package com.revolsys.jts.testold.generator;
 
 import java.util.NoSuchElementException;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 
@@ -92,7 +93,7 @@ public class GridGenerator extends GeometryGenerator {
    * @throws NoSuchElementException when all the grids have been created (@see #create())
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
-  public Envelope createEnv() {
+  public BoundingBox createEnv() {
     if (!canCreate()) {
       throw new NoSuchElementException(
         "There are not any grids left to create.");
@@ -122,9 +123,9 @@ public class GridGenerator extends GeometryGenerator {
     minx = x + col * sx;
     miny = y + row * sy;
 
-    final Envelope box = new Envelope(this.geometryFactory.getPrecisionModel()
-      .makePrecise(minx), this.geometryFactory.getPrecisionModel().makePrecise(
-      minx + sx), this.geometryFactory.getPrecisionModel().makePrecise(miny),
+    final BoundingBox box = new Envelope(this.geometryFactory.getPrecisionModel()
+      .makePrecise(minx), this.geometryFactory.getPrecisionModel().makePrecise(miny), this.geometryFactory.getPrecisionModel().makePrecise(
+      minx + sx),
       this.geometryFactory.getPrecisionModel().makePrecise(miny + sy));
 
     this.index++;

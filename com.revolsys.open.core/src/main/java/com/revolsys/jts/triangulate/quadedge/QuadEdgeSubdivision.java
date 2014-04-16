@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -245,7 +246,7 @@ public class QuadEdgeSubdivision {
    * @param tolerance
    *          the tolerance value for determining if two sites are equal
    */
-  public QuadEdgeSubdivision(final Envelope env, final double tolerance) {
+  public QuadEdgeSubdivision(final BoundingBox env, final double tolerance) {
     // currentSubdiv = this;
     this.tolerance = tolerance;
     edgeCoincidenceTolerance = tolerance / EDGE_COINCIDENCE_TOL_FACTOR;
@@ -271,7 +272,7 @@ public class QuadEdgeSubdivision {
     return q;
   }
 
-  private void createFrame(final Envelope env) {
+  private void createFrame(final BoundingBox env) {
     final double deltaX = env.getWidth();
     final double deltaY = env.getHeight();
     double offset = 0.0;
@@ -396,7 +397,7 @@ public class QuadEdgeSubdivision {
    * 
    * @return the envelope
    */
-  public Envelope getEnvelope() {
+  public BoundingBox getEnvelope() {
     return new Envelope(frameEnv);
   }
 

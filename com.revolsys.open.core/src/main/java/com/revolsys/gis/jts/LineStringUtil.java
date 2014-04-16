@@ -12,7 +12,6 @@ import java.util.Map;
 
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -23,9 +22,10 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -265,8 +265,8 @@ public final class LineStringUtil {
 
   public static double distance(final LineString line1, final LineString line2,
     final double terminateDistance) {
-    final double envelopeDistance = line1.getEnvelopeInternal().distance(
-      line2.getEnvelopeInternal());
+    final double envelopeDistance = line1.getBoundingBox().distance(
+      line2.getBoundingBox());
     if (envelopeDistance > terminateDistance) {
       return Double.MAX_VALUE;
     } else {
@@ -596,7 +596,7 @@ public final class LineStringUtil {
 
   private static LineSegment getLineSegment(final Coordinates point,
     final SpatialIndex index) {
-    BoundingBox envelope = new BoundingBox(point);
+    BoundingBox envelope = new Envelope(point);
     envelope = envelope.expand(2);
     @SuppressWarnings("unchecked")
     final List<LineSegment> segments = index.query(envelope);
@@ -843,7 +843,7 @@ public final class LineStringUtil {
 
   public static boolean intersects(final LineString line1,
     final LineString line2) {
-    if (line1.getEnvelopeInternal().intersects(line2.getEnvelopeInternal())) {
+    if (line1.getBoundingBox().intersects(line2.getBoundingBox())) {
       final LineMatchGraph<LineString> graph = new LineMatchGraph<LineString>(
         line2);
       for (final LineString line : new LineStringCoordinatesListIterator(line1)) {
@@ -995,7 +995,8 @@ public final class LineStringUtil {
     if (isWithinDistance(point, line, 0, maxDistance)) {
       return true;
     } else {
-      return isWithinDistance(point, line, line.getVertexCount() - 1, maxDistance);
+      return isWithinDistance(point, line, line.getVertexCount() - 1,
+        maxDistance);
     }
   }
 

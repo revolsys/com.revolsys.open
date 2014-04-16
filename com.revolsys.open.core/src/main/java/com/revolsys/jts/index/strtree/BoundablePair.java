@@ -35,6 +35,7 @@ package com.revolsys.jts.index.strtree;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.util.PriorityQueue;
 
@@ -98,7 +99,7 @@ class BoundablePair
           (ItemBoundable) boundable2);
     }
     // otherwise compute distance between bounds of boundables
-    return ((Envelope) boundable1.getBounds()).distance(
+    return ((BoundingBox) boundable1.getBounds()).distance(
         ((Envelope) boundable2.getBounds()));
   }
 
@@ -172,7 +173,7 @@ class BoundablePair
   
   private static double area(Boundable b)
   {
-    return ((Envelope) b.getBounds()).getArea();
+    return ((BoundingBox) b.getBounds()).getArea();
   }
   
   /**

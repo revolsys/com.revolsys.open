@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -21,8 +21,8 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends
 
     final LineString line = edge.getLine();
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    BoundingBox boundingBox = new BoundingBox(geometryFactory,
-      line.getEnvelopeInternal());
+    BoundingBox boundingBox = new Envelope(geometryFactory,
+      line.getBoundingBox());
     boundingBox = boundingBox.expand(maxDistance);
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<T>(
       boundingBox, results);
@@ -44,7 +44,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends
 
   @Override
   public boolean visit(final Edge<T> edge) {
-    final Envelope envelope = edge.getEnvelope();
+    final com.revolsys.jts.geom.BoundingBox envelope = edge.getEnvelope();
     if (this.boundingBox.intersects(envelope)) {
       super.visit(edge);
     }

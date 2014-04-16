@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.filter.LineSegmentCoordinateDistanceFilter;
@@ -39,7 +39,7 @@ public class LineSegmentQuadTree {
       minY = minY - minExtent / 2.0;
       maxY = minY + minExtent / 2.0;
     }
-    return new Envelope(minX, maxX, minY, maxY);
+    return new Envelope(minX, minY, maxX, maxY);
   }
 
   private final Geometry geometry;
@@ -94,14 +94,14 @@ public class LineSegmentQuadTree {
       final double y2 = points.getY(segmentEndVertexIndex);
       final int[] index = GeometryEditUtil.createVertexIndex(parentIndex,
         segmentIndex);
-      final Envelope envelope = new Envelope(x1, x2, y1, y2);
+      final Envelope envelope = new Envelope(x1, y1, x2, y2);
       insert(envelope, index);
       x1 = x2;
       y1 = y2;
     }
   }
 
-  private void collectStats(final Envelope envelope) {
+  private void collectStats(final com.revolsys.jts.geom.BoundingBox envelope) {
     final double width = envelope.getWidth();
     if (width < minExtent && width > 0.0) {
       minExtent = width;
@@ -123,14 +123,14 @@ public class LineSegmentQuadTree {
     return visitor.getList();
   }
 
-  protected Envelope getEnvelope(final int[] index) {
+  protected com.revolsys.jts.geom.BoundingBox getEnvelope(final int[] index) {
     final CoordinatesList points = GeometryEditUtil.getPoints(geometry, index);
     final int vertexIndex = GeometryEditUtil.getVertexIndex(index);
     final double x1 = points.getX(vertexIndex);
     final double y1 = points.getY(vertexIndex);
     final double x2 = points.getX(vertexIndex + 1);
     final double y2 = points.getY(vertexIndex + 1);
-    return new Envelope(x1, x2, y1, y2);
+    return new Envelope(x1, y1, x2, y2);
   }
 
   public List<LineSegment> getIntersecting(final BoundingBox boundingBox) {
@@ -140,7 +140,7 @@ public class LineSegmentQuadTree {
   }
 
   public List<LineSegment> getIntersectingBoundingBox(final Geometry geometry) {
-    final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
     return getIntersecting(boundingBox);
   }
 
@@ -166,7 +166,7 @@ public class LineSegmentQuadTree {
 
   public List<LineSegment> getWithinDistance(final Coordinates point,
     final double maxDistance) {
-    BoundingBox boundingBox = new BoundingBox(point);
+    BoundingBox boundingBox = new Envelope(point);
     boundingBox = boundingBox.expand(maxDistance);
     final LineSegmentCoordinateDistanceFilter filter = new LineSegmentCoordinateDistanceFilter(
       point, maxDistance);

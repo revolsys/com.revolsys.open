@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.visitor.LineSegmentIntersectionVisitor;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
@@ -26,7 +26,7 @@ public class LineSegmentIndex extends Quadtree {
   }
 
   public void insert(final LineSegment lineSegment) {
-    final Envelope envelope = lineSegment.getEnvelope();
+    final BoundingBox envelope = lineSegment.getEnvelope();
     insert(envelope, lineSegment);
   }
 
@@ -39,7 +39,7 @@ public class LineSegmentIndex extends Quadtree {
   }
 
   public boolean isWithinDistance(final Coordinates point) {
-    BoundingBox envelope = new BoundingBox(point);
+    BoundingBox envelope = new Envelope(point);
     envelope = envelope.expand(1);
     @SuppressWarnings("unchecked")
     final List<LineSegment> lines = query(envelope);
@@ -58,7 +58,7 @@ public class LineSegmentIndex extends Quadtree {
   }
 
   public List<CoordinatesList> queryIntersections(final LineSegment querySeg) {
-    final Envelope env = querySeg.getEnvelope();
+    final BoundingBox env = querySeg.getEnvelope();
     final LineSegmentIntersectionVisitor visitor = new LineSegmentIntersectionVisitor(
       querySeg);
     query(env, visitor);

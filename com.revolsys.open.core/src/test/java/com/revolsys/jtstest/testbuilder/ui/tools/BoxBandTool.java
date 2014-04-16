@@ -41,6 +41,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -124,7 +125,7 @@ public abstract class BoxBandTool extends IndicatorTool {
    * @return the coordinates for the rectangle
    */
   protected List getCoordinateArrayOfEnvelope() {
-    final Envelope env = getEnvelope();
+    final BoundingBox env = getEnvelope();
 
     final List coords = new ArrayList();
     coords.add(new Coordinate(env.getMinX(), env.getMinY()));
@@ -141,7 +142,7 @@ public abstract class BoxBandTool extends IndicatorTool {
    * 
    * @return
    */
-  protected Envelope getEnvelope() {
+  protected BoundingBox getEnvelope() {
     final Coordinates start = toModelSnapped(zoomBoxStart);
     final Coordinates end = toModelSnapped(zoomBoxEnd);
     return new Envelope(start, end);
@@ -153,7 +154,7 @@ public abstract class BoxBandTool extends IndicatorTool {
       return null;
     }
 
-    final Envelope envModel = getEnvelope();
+    final BoundingBox envModel = getEnvelope();
 
     final Point2D base = toView(new Coordinate(envModel.getMinX(),
       envModel.getMaxY()));

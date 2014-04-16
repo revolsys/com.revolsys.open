@@ -37,10 +37,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygonal;
@@ -104,7 +104,7 @@ public class GeometrySnapper {
   }
 
   public static double computeSizeBasedSnapTolerance(final Geometry g) {
-    final Envelope env = g.getEnvelopeInternal();
+    final BoundingBox env = g.getBoundingBox();
     final double minDimension = Math.min(env.getHeight(), env.getWidth());
     final double snapTol = minDimension * SNAP_PRECISION_FACTOR;
     return snapTol;

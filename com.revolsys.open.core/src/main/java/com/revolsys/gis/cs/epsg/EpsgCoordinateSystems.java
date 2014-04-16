@@ -316,7 +316,7 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(6));
             final Authority authority = new EpsgAuthority(code);
 
-            final Area area = new Area(name, new Envelope(minX, maxX, minY,
+            final Area area = new Area(name, new Envelope(minX, minY, maxX,
               maxY), authority, deprecated);
             areas.put(code, area);
           }

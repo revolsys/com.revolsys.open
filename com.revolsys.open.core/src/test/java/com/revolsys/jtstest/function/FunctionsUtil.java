@@ -3,6 +3,7 @@ package com.revolsys.jtstest.function;
 import java.awt.Graphics2D;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -14,7 +15,7 @@ import com.revolsys.jtstest.testbuilder.ui.render.GeometryPainter;
 
 public class FunctionsUtil {
 
-  public static final Envelope DEFAULT_ENVELOPE = new Envelope(0, 100, 0, 100);
+  public static final BoundingBox DEFAULT_ENVELOPE = new Envelope(0, 0, 100, 100);
 
   public static Geometry buildGeometry(final List geoms,
     final Geometry parentGeom) {
@@ -33,11 +34,11 @@ public class FunctionsUtil {
     return parentGeom.getGeometryFactory().buildGeometry(geoms);
   }
 
-  public static Envelope getEnvelopeOrDefault(final Geometry g) {
+  public static BoundingBox getEnvelopeOrDefault(final Geometry g) {
     if (g == null) {
       return DEFAULT_ENVELOPE;
     }
-    return g.getEnvelopeInternal();
+    return g.getBoundingBox();
   }
 
   public static GeometryFactory getFactoryOrDefault(final Geometry g) {

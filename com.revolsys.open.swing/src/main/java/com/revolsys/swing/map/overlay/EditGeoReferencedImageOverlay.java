@@ -18,10 +18,11 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -207,7 +208,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         }
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
-      moveImageBoundingBox = new BoundingBox(geometryFactory, minX, minY, maxX,
+      moveImageBoundingBox = new Envelope(geometryFactory, minX, minY, maxX,
         maxY);
     }
   }
@@ -314,7 +315,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   public BoundingBox getImageBoundingBox() {
     if (image == null) {
-      return new BoundingBox();
+      return new Envelope();
     } else {
       return this.layer.getBoundingBox();
     }
@@ -531,7 +532,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final Coordinates mousePoint = CoordinatesUtil.getInstance(getViewportPoint(event));
-      moveImageBoundingBox = new BoundingBox(geometryFactory, mousePoint,
+      moveImageBoundingBox = new Envelope(geometryFactory, mousePoint,
         this.moveCornerOppositePoint);
 
       if (SwingUtil.isShiftDown(event)) {
@@ -904,8 +905,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           final Point bottomLeft = warpFilter.sourcePixelToTargetPoint(0.0, 0.0);
           final Point bottomRight = warpFilter.sourcePixelToTargetPoint(width,
             0.0);
-          final LineString line = getGeometryFactory().lineString(
-            topLeft, topRight, bottomRight, bottomLeft, topLeft);
+          final LineString line = getGeometryFactory().lineString(topLeft,
+            topRight, bottomRight, bottomLeft, topLeft);
           GeometryStyleRenderer.renderLineString(viewport, graphics, line,
             STYLE_IMAGE_LINE);
         }
@@ -963,7 +964,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   public void setImageBoundingBox(BoundingBox boundingBox) {
     if (boundingBox == null) {
-      boundingBox = new BoundingBox(getGeometryFactory());
+      boundingBox = new Envelope(getGeometryFactory());
     }
     if (image != null) {
       image.setBoundingBox(boundingBox);

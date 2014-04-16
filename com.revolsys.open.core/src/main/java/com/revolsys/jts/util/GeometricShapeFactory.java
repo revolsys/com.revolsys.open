@@ -33,6 +33,7 @@
 package com.revolsys.jts.util;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -84,16 +85,16 @@ public class GeometricShapeFactory {
       return centre;
     }
 
-    public Envelope getEnvelope() {
+    public BoundingBox getEnvelope() {
       if (base != null) {
-        return new Envelope(base.getX(), base.getX() + width, base.getY(),
+        return new Envelope(base.getX(), base.getY(), base.getX() + width,
           base.getY() + height);
       }
       if (centre != null) {
-        return new Envelope(centre.getX() - width / 2, centre.getX() + width
-          / 2, centre.getY() - height / 2, centre.getY() + height / 2);
+        return new Envelope(centre.getX() - width / 2, centre.getY() - height / 2, centre.getX() + width
+            / 2, centre.getY() + height / 2);
       }
-      return new Envelope(0, width, 0, height);
+      return new Envelope(0, 0, width, height);
     }
 
     public double getHeight() {
@@ -116,7 +117,7 @@ public class GeometricShapeFactory {
       this.centre = centre;
     }
 
-    public void setEnvelope(final Envelope env) {
+    public void setEnvelope(final BoundingBox env) {
       this.width = env.getWidth();
       this.height = env.getHeight();
       this.base = new DoubleCoordinates(env.getMinX(), env.getMinY());
@@ -192,7 +193,7 @@ public class GeometricShapeFactory {
     * @return an elliptical arc
     */
   public LineString createArc(final double startAng, final double angExtent) {
-    final Envelope env = dim.getEnvelope();
+    final BoundingBox env = dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
     final double yRadius = env.getHeight() / 2.0;
 
@@ -227,7 +228,7 @@ public class GeometricShapeFactory {
    * @return an elliptical arc polygon
    */
   public Polygon createArcPolygon(final double startAng, final double angExtent) {
-    final Envelope env = dim.getEnvelope();
+    final BoundingBox env = dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
     final double yRadius = env.getHeight() / 2.0;
 
@@ -278,7 +279,7 @@ public class GeometricShapeFactory {
    */
   public Polygon createEllipse() {
 
-    final Envelope env = dim.getEnvelope();
+    final BoundingBox env = dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
     final double yRadius = env.getHeight() / 2.0;
 
@@ -317,7 +318,7 @@ public class GeometricShapeFactory {
     final double YsegLen = dim.getEnvelope().getHeight() / nSide;
 
     final Coordinates[] pts = new Coordinates[4 * nSide + 1];
-    final Envelope env = dim.getEnvelope();
+    final BoundingBox env = dim.getEnvelope();
 
     // double maxx = env.getMinX() + nSide * XsegLen;
     // double maxy = env.getMinY() + nSide * XsegLen;
@@ -443,7 +444,7 @@ public class GeometricShapeFactory {
     dim.setCentre(centre);
   }
 
-  public void setEnvelope(final Envelope env) {
+  public void setEnvelope(final BoundingBox env) {
     dim.setEnvelope(env);
   }
 

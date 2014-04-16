@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 
 public class DataObjectStoreCache {
   public static DataObjectStoreCache getCache(final DataObjectStore dataStore) {

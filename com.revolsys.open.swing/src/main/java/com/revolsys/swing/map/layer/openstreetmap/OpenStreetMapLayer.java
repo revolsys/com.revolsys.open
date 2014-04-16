@@ -7,10 +7,11 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
@@ -24,7 +25,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
-  private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBox(
+  private static final BoundingBox MAX_BOUNDING_BOX = new Envelope(
     GEOMETRY_FACTORY, -180, -85, 180, 85);
 
   public static OpenStreetMapLayer create(final Map<String, Object> properties) {

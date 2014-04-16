@@ -1,7 +1,8 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.util.NumberUtil;
 import com.revolsys.util.MathUtil;
 
@@ -180,7 +181,7 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   public BoundingBox getBoundingBox() {
-    return new BoundingBox(this);
+    return new Envelope(this);
   }
 
   @Override

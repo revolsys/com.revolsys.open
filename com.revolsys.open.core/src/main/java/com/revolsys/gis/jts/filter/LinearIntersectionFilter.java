@@ -1,7 +1,7 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
@@ -13,17 +13,17 @@ public class LinearIntersectionFilter implements Filter<LineString> {
 
   private final PreparedGeometry preparedLine;
 
-  private final Envelope envelope;
+  private final BoundingBox envelope;
 
   public LinearIntersectionFilter(final LineString line) {
     this.line = line;
     this.preparedLine = PreparedGeometryFactory.prepare(line);
-    this.envelope = line.getEnvelopeInternal();
+    this.envelope = line.getBoundingBox();
   }
 
   @Override
   public boolean accept(final LineString line) {
-    final Envelope envelope = line.getEnvelopeInternal();
+    final BoundingBox envelope = line.getBoundingBox();
     if (envelope.intersects(this.envelope)) {
       if (preparedLine.intersects(line)) {
         final IntersectionMatrix relate = this.line.relate(line);

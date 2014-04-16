@@ -33,10 +33,10 @@
 
 package com.revolsys.jts.operation.predicate;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -70,7 +70,7 @@ public class RectangleContains {
     return rc.contains(b);
   }
 
-  private final Envelope rectEnv;
+  private final BoundingBox rectEnv;
 
   /**
    * Create a new contains computer for two geometries.
@@ -78,12 +78,12 @@ public class RectangleContains {
    * @param rectangle a rectangular geometry
    */
   public RectangleContains(final Polygon rectangle) {
-    rectEnv = rectangle.getEnvelopeInternal();
+    rectEnv = rectangle.getBoundingBox();
   }
 
   public boolean contains(final Geometry geom) {
     // the test geometry must be wholly contained in the rectangle envelope
-    if (!rectEnv.contains(geom.getEnvelopeInternal())) {
+    if (!rectEnv.contains(geom.getBoundingBox())) {
       return false;
     }
 

@@ -21,7 +21,7 @@ import com.revolsys.gis.wms.capabilities.WmsCapabilities;
 import com.revolsys.io.xml.SimpleXmlProcessorContext;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.io.xml.XmlProcessorContext;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.util.Base64;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.UrlUtil;
@@ -59,7 +59,7 @@ public class WmsClient {
   }
 
   public Image getMapImage(final List<String> layers,
-    final List<String> styles, final String srid, final Envelope envelope,
+    final List<String> styles, final String srid, final BoundingBox envelope,
     final String format, final int width, final int height) throws IOException {
     final URL mapUrl = getMapUrl(layers, styles, srid, envelope, format, width,
       height);
@@ -74,7 +74,7 @@ public class WmsClient {
   }
 
   public URL getMapUrl(final List<String> layers, final List<String> styles,
-    final String srid, final Envelope envelope, final String format,
+    final String srid, final BoundingBox envelope, final String format,
     final int width, final int height) {
     final String version = getCapabilities().getVersion();
     final Map<String, Object> parameters = new LinkedHashMap<String, Object>();

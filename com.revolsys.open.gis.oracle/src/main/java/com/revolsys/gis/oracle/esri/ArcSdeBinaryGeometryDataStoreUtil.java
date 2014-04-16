@@ -17,8 +17,6 @@ import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
@@ -28,7 +26,6 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.FileUtil;
@@ -36,11 +33,14 @@ import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
-import com.revolsys.util.PasswordUtil;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.PasswordUtil;
 
 public class ArcSdeBinaryGeometryDataStoreUtil {
 
@@ -269,8 +269,8 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
       if (shape.isMeasured()) {
         numAxis = 4;
       }
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(srid,
-        numAxis, scaleXy, scaleZ);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
+        srid, numAxis, scaleXy, scaleZ);
 
       final int numParts = shape.getNumParts();
       final double[][][] allCoordinates = shape.getAllCoords();

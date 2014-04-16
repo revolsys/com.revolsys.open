@@ -22,7 +22,6 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -38,6 +37,8 @@ import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
@@ -60,13 +61,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return new DataObjectStoreLayer(properties);
   }
 
-  private BoundingBox boundingBox = new BoundingBox();
+  private BoundingBox boundingBox = new Envelope();
 
   private Map<String, LayerDataObject> cachedRecords = new HashMap<String, LayerDataObject>();
 
   private DataObjectStore dataStore;
 
-  private BoundingBox loadingBoundingBox = new BoundingBox();
+  private BoundingBox loadingBoundingBox = new Envelope();
 
   private SwingWorker<DataObjectQuadTree, Void> loadingWorker;
 
@@ -227,7 +228,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (loadedBoundingBox == this.loadingBoundingBox) {
         firePropertyChange("loaded", false, true);
         this.boundingBox = this.loadingBoundingBox;
-        this.loadingBoundingBox = new BoundingBox();
+        this.loadingBoundingBox = new Envelope();
         this.loadingWorker = null;
       }
 
@@ -258,9 +259,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       this.dataStore = null;
     }
     final SwingWorker<DataObjectQuadTree, Void> loadingWorker = this.loadingWorker;
-    this.boundingBox = new BoundingBox();
+    this.boundingBox = new Envelope();
     this.cachedRecords = new HashMap<String, LayerDataObject>();
-    this.loadingBoundingBox = new BoundingBox();
+    this.loadingBoundingBox = new Envelope();
     this.loadingWorker = null;
     this.typePath = null;
     super.delete();
@@ -360,7 +361,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     try {
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
       final Geometry queryGeometry = geometryFactory.copy(geometry);
-      BoundingBox boundingBox = BoundingBox.getBoundingBox(queryGeometry);
+      BoundingBox boundingBox = Envelope.getBoundingBox(queryGeometry);
       boundingBox = boundingBox.expand(distance);
       final String typePath = getTypePath();
       final DataObjectStore dataStore = getDataStore();
@@ -740,7 +741,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (this.loadingWorker != null) {
         this.loadingWorker.cancel(true);
       }
-      this.boundingBox = new BoundingBox();
+      this.boundingBox = new Envelope();
       this.loadingBoundingBox = this.boundingBox;
       setIndex(null);
       cleanCachedRecords();

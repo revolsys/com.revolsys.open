@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -40,6 +39,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.SpatialIndex;
@@ -62,25 +62,22 @@ import com.revolsys.jts.util.PriorityQueue;
  *
  * @version 1.7
  */
-public class STRtree extends AbstractSTRtree 
-implements SpatialIndex, Serializable 
-{
+public class STRtree extends AbstractSTRtree implements SpatialIndex,
+  Serializable {
 
-  private static final class STRtreeNode extends AbstractNode
-  {
-    private STRtreeNode(int level)
-    {
+  private static final class STRtreeNode extends AbstractNode {
+    private STRtreeNode(final int level) {
       super(level);
     }
 
+    @Override
     protected Object computeBounds() {
       Envelope bounds = null;
-      for (Iterator i = getChildBoundables().iterator(); i.hasNext(); ) {
-        Boundable childBoundable = (Boundable) i.next();
+      for (final Iterator i = getChildBoundables().iterator(); i.hasNext();) {
+        final Boundable childBoundable = (Boundable)i.next();
         if (bounds == null) {
           bounds = new Envelope((Envelope)childBoundable.getBounds());
-        }
-        else {
+        } else {
           bounds.expandToInclude((Envelope)childBoundable.getBounds());
         }
       }
@@ -92,98 +89,49 @@ implements SpatialIndex, Serializable
    * 
    */
   private static final long serialVersionUID = 259274702368956900L;
-  
-  private static Comparator xComparator =
-    new Comparator() {
-      public int compare(Object o1, Object o2) {
-        return compareDoubles(
-            centreX((Envelope)((Boundable)o1).getBounds()),
-            centreX((Envelope)((Boundable)o2).getBounds()));
-      }
-    };
-  private static Comparator yComparator =
-    new Comparator() {
-      public int compare(Object o1, Object o2) {
-        return compareDoubles(
-            centreY((Envelope)((Boundable)o1).getBounds()),
-            centreY((Envelope)((Boundable)o2).getBounds()));
-      }
-    };
 
-  private static double centreX(Envelope e) {
-    return avg(e.getMinX(), e.getMaxX());
-  }
-
-  private static double centreY(Envelope e) {
-    return avg(e.getMinY(), e.getMaxY());
-  }
-
-  private static double avg(double a, double b) { return (a + b) / 2d; }
-
-  private static IntersectsOp intersectsOp = new IntersectsOp() {
-    public boolean intersects(Object aBounds, Object bBounds) {
-      return ((Envelope)aBounds).intersects((Envelope)bBounds);
+  private static Comparator xComparator = new Comparator() {
+    @Override
+    public int compare(final Object o1, final Object o2) {
+      return compareDoubles(centreX((BoundingBox)((Boundable)o1).getBounds()),
+        centreX((BoundingBox)((Boundable)o2).getBounds()));
     }
   };
 
-  /**
-   * Creates the parent level for the given child level. First, orders the items
-   * by the x-values of the midpoints, and groups them into vertical slices.
-   * For each slice, orders the items by the y-values of the midpoints, and
-   * group them into runs of size M (the node capacity). For each run, creates
-   * a new (parent) node.
-   */
-  protected List createParentBoundables(List childBoundables, int newLevel) {
-    Assert.isTrue(!childBoundables.isEmpty());
-    int minLeafCount = (int) Math.ceil((childBoundables.size() / (double) getNodeCapacity()));
-    ArrayList sortedChildBoundables = new ArrayList(childBoundables);
-    Collections.sort(sortedChildBoundables, xComparator);
-    List[] verticalSlices = verticalSlices(sortedChildBoundables,
-        (int) Math.ceil(Math.sqrt(minLeafCount)));
-    return createParentBoundablesFromVerticalSlices(verticalSlices, newLevel);
-  }
-
-  private List createParentBoundablesFromVerticalSlices(List[] verticalSlices, int newLevel) {
-    Assert.isTrue(verticalSlices.length > 0);
-    List parentBoundables = new ArrayList();
-    for (int i = 0; i < verticalSlices.length; i++) {
-      parentBoundables.addAll(
-            createParentBoundablesFromVerticalSlice(verticalSlices[i], newLevel));
+  private static Comparator yComparator = new Comparator() {
+    @Override
+    public int compare(final Object o1, final Object o2) {
+      return compareDoubles(centreY((BoundingBox)((Boundable)o1).getBounds()),
+        centreY((BoundingBox)((Boundable)o2).getBounds()));
     }
-    return parentBoundables;
-  }
+  };
 
-  protected List createParentBoundablesFromVerticalSlice(List childBoundables, int newLevel) {
-    return super.createParentBoundables(childBoundables, newLevel);
-  }
-
-  /**
-   * @param childBoundables Must be sorted by the x-value of the envelope midpoints
-   */
-  protected List[] verticalSlices(List childBoundables, int sliceCount) {
-    int sliceCapacity = (int) Math.ceil(childBoundables.size() / (double) sliceCount);
-    List[] slices = new List[sliceCount];
-    Iterator i = childBoundables.iterator();
-    for (int j = 0; j < sliceCount; j++) {
-      slices[j] = new ArrayList();
-      int boundablesAddedToSlice = 0;
-      while (i.hasNext() && boundablesAddedToSlice < sliceCapacity) {
-        Boundable childBoundable = (Boundable) i.next();
-        slices[j].add(childBoundable);
-        boundablesAddedToSlice++;
-      }
+  private static IntersectsOp intersectsOp = new IntersectsOp() {
+    @Override
+    public boolean intersects(final Object aBounds, final Object bBounds) {
+      return ((BoundingBox)aBounds).intersects((Envelope)bBounds);
     }
-    return slices;
-  }
+  };
 
   private static final int DEFAULT_NODE_CAPACITY = 10;
-  
+
+  private static double avg(final double a, final double b) {
+    return (a + b) / 2d;
+  }
+
+  private static double centreX(final BoundingBox e) {
+    return avg(e.getMinX(), e.getMaxX());
+  }
+
+  private static double centreY(final BoundingBox e) {
+    return avg(e.getMinY(), e.getMaxY());
+  }
+
   /**
    * Constructs an STRtree with the default node capacity.
    */
-  public STRtree() 
-  { 
-    this(DEFAULT_NODE_CAPACITY); 
+  public STRtree() {
+    this(DEFAULT_NODE_CAPACITY);
   }
 
   /**
@@ -193,14 +141,66 @@ implements SpatialIndex, Serializable
    * The minimum recommended capacity setting is 4.
    * 
    */
-  public STRtree(int nodeCapacity) {
+  public STRtree(final int nodeCapacity) {
     super(nodeCapacity);
   }
 
-  protected AbstractNode createNode(int level) {
+  @Override
+  protected AbstractNode createNode(final int level) {
     return new STRtreeNode(level);
   }
 
+  /**
+   * Creates the parent level for the given child level. First, orders the items
+   * by the x-values of the midpoints, and groups them into vertical slices.
+   * For each slice, orders the items by the y-values of the midpoints, and
+   * group them into runs of size M (the node capacity). For each run, creates
+   * a new (parent) node.
+   */
+  @Override
+  protected List createParentBoundables(final List childBoundables,
+    final int newLevel) {
+    Assert.isTrue(!childBoundables.isEmpty());
+    final int minLeafCount = (int)Math.ceil((childBoundables.size() / (double)getNodeCapacity()));
+    final ArrayList sortedChildBoundables = new ArrayList(childBoundables);
+    Collections.sort(sortedChildBoundables, xComparator);
+    final List[] verticalSlices = verticalSlices(sortedChildBoundables,
+      (int)Math.ceil(Math.sqrt(minLeafCount)));
+    return createParentBoundablesFromVerticalSlices(verticalSlices, newLevel);
+  }
+
+  protected List createParentBoundablesFromVerticalSlice(
+    final List childBoundables, final int newLevel) {
+    return super.createParentBoundables(childBoundables, newLevel);
+  }
+
+  private List createParentBoundablesFromVerticalSlices(
+    final List[] verticalSlices, final int newLevel) {
+    Assert.isTrue(verticalSlices.length > 0);
+    final List parentBoundables = new ArrayList();
+    for (int i = 0; i < verticalSlices.length; i++) {
+      parentBoundables.addAll(createParentBoundablesFromVerticalSlice(
+        verticalSlices[i], newLevel));
+    }
+    return parentBoundables;
+  }
+
+  /**
+   * Returns the number of items in the tree.
+   *
+   * @return the number of items in the tree
+   */
+  @Override
+  public int depth() {
+    return super.depth();
+  }
+
+  @Override
+  protected Comparator getComparator() {
+    return yComparator;
+  }
+
+  @Override
   protected IntersectsOp getIntersectsOp() {
     return intersectsOp;
   }
@@ -208,79 +208,79 @@ implements SpatialIndex, Serializable
   /**
    * Inserts an item having the given bounds into the tree.
    */
-  public void insert(Envelope itemEnv, Object item) {
-    if (itemEnv.isNull()) { return; }
+  @Override
+  public void insert(final BoundingBox itemEnv, final Object item) {
+    if (itemEnv.isNull()) {
+      return;
+    }
     super.insert(itemEnv, item);
   }
 
-  /**
-   * Returns items whose bounds intersect the given envelope.
-   */
-  public List query(Envelope searchEnv) {
-    //Yes this method does something. It specifies that the bounds is an
-    //Envelope. super.query takes an Object, not an Envelope. [Jon Aquino 10/24/2003]
-    return super.query(searchEnv);
+  private Object[] nearestNeighbour(final BoundablePair initBndPair) {
+    return nearestNeighbour(initBndPair, Double.POSITIVE_INFINITY);
   }
 
-  /**
-   * Returns items whose bounds intersect the given envelope.
-   */
-  public void query(Envelope searchEnv, ItemVisitor visitor) {
-    //Yes this method does something. It specifies that the bounds is an
-    //Envelope. super.query takes an Object, not an Envelope. [Jon Aquino 10/24/2003]
-    super.query(searchEnv, visitor);
+  private Object[] nearestNeighbour(final BoundablePair initBndPair,
+    final double maxDistance) {
+    double distanceLowerBound = maxDistance;
+    BoundablePair minPair = null;
+
+    // initialize internal structures
+    final PriorityQueue priQ = new PriorityQueue();
+
+    // initialize queue
+    priQ.add(initBndPair);
+
+    while (!priQ.isEmpty() && distanceLowerBound > 0.0) {
+      // pop head of queue and expand one side of pair
+      final BoundablePair bndPair = (BoundablePair)priQ.poll();
+      final double currentDistance = bndPair.getDistance();
+
+      /**
+       * If the distance for the first node in the queue
+       * is >= the current minimum distance, all other nodes
+       * in the queue must also have a greater distance.
+       * So the current minDistance must be the true minimum,
+       * and we are done.
+       */
+      if (currentDistance >= distanceLowerBound) {
+        break;
+      }
+
+      /**
+       * If the pair members are leaves
+       * then their distance is the exact lower bound.
+       * Update the distanceLowerBound to reflect this
+       * (which must be smaller, due to the test 
+       * immediately prior to this). 
+       */
+      if (bndPair.isLeaves()) {
+        // assert: currentDistance < minimumDistanceFound
+        distanceLowerBound = currentDistance;
+        minPair = bndPair;
+      } else {
+        // testing - does allowing a tolerance improve speed?
+        // Ans: by only about 10% - not enough to matter
+        /*
+         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 <
+         * lastComputedDistance) return; //
+         */
+
+        /**
+         * Otherwise, expand one side of the pair,
+         * (the choice of which side to expand is heuristically determined) 
+         * and insert the new expanded pairs into the queue
+         */
+        bndPair.expandToQueue(priQ, distanceLowerBound);
+      }
+    }
+    // done - return items with min distance
+    return new Object[] {
+      ((ItemBoundable)minPair.getBoundable(0)).getItem(),
+      ((ItemBoundable)minPair.getBoundable(1)).getItem()
+    };
   }
 
-  /**
-   * Removes a single item from the tree.
-   *
-   * @param itemEnv the Envelope of the item to remove
-   * @param item the item to remove
-   * @return <code>true</code> if the item was found
-   */
-  public boolean remove(Envelope itemEnv, Object item) {
-    return super.remove(itemEnv, item);
-  }
-
-  /**
-   * Returns the number of items in the tree.
-   *
-   * @return the number of items in the tree
-   */
-  public int size()
-  {
-    return super.size();
-  }
-
-  /**
-   * Returns the number of items in the tree.
-   *
-   * @return the number of items in the tree
-   */
-  public int depth()
-  {
-    return super.depth();
-  }
-
-  protected Comparator getComparator() {
-    return yComparator;
-  }
-
-  /**
-   * Finds the two nearest items in the tree, 
-   * using {@link ItemDistance} as the distance metric.
-   * A Branch-and-Bound tree traversal algorithm is used
-   * to provide an efficient search.
-   * 
-   * @param itemDist a distance metric applicable to the items in this tree
-   * @return the pair of the nearest items
-   */
-  public Object[] nearestNeighbour(ItemDistance itemDist)
-  {
-    BoundablePair bp = new BoundablePair(this.getRoot(), this.getRoot(), itemDist);
-    return nearestNeighbour(bp);
-  }
-  
   /**
    * Finds the item in this tree which is nearest to the given {@link Object}, 
    * using {@link ItemDistance} as the distance metric.
@@ -297,13 +297,28 @@ implements SpatialIndex, Serializable
    * @param itemDist a distance metric applicable to the items in this tree and the query item
    * @return the nearest item in this tree
    */
-  public Object nearestNeighbour(Envelope env, Object item, ItemDistance itemDist)
-  {
-    Boundable bnd = new ItemBoundable(env, item);
-    BoundablePair bp = new BoundablePair(this.getRoot(), bnd, itemDist);
+  public Object nearestNeighbour(final BoundingBox env, final Object item,
+    final ItemDistance itemDist) {
+    final Boundable bnd = new ItemBoundable(env, item);
+    final BoundablePair bp = new BoundablePair(this.getRoot(), bnd, itemDist);
     return nearestNeighbour(bp)[0];
   }
-  
+
+  /**
+   * Finds the two nearest items in the tree, 
+   * using {@link ItemDistance} as the distance metric.
+   * A Branch-and-Bound tree traversal algorithm is used
+   * to provide an efficient search.
+   * 
+   * @param itemDist a distance metric applicable to the items in this tree
+   * @return the pair of the nearest items
+   */
+  public Object[] nearestNeighbour(final ItemDistance itemDist) {
+    final BoundablePair bp = new BoundablePair(this.getRoot(), this.getRoot(),
+      itemDist);
+    return nearestNeighbour(bp);
+  }
+
   /**
    * Finds the two nearest items from this tree 
    * and another tree,
@@ -318,77 +333,76 @@ implements SpatialIndex, Serializable
    * @param itemDist a distance metric applicable to the items in the trees
    * @return the pair of the nearest items, one from each tree
    */
-  public Object[] nearestNeighbour(STRtree tree, ItemDistance itemDist)
-  {
-    BoundablePair bp = new BoundablePair(this.getRoot(), tree.getRoot(), itemDist);
+  public Object[] nearestNeighbour(final STRtree tree,
+    final ItemDistance itemDist) {
+    final BoundablePair bp = new BoundablePair(this.getRoot(), tree.getRoot(),
+      itemDist);
     return nearestNeighbour(bp);
   }
-  
-  private Object[] nearestNeighbour(BoundablePair initBndPair) 
-  {
-    return nearestNeighbour(initBndPair, Double.POSITIVE_INFINITY);
+
+  /**
+   * Returns items whose bounds intersect the given envelope.
+   */
+  @Override
+  public List query(final BoundingBox searchEnv) {
+    // Yes this method does something. It specifies that the bounds is an
+    // Envelope. super.query takes an Object, not an Envelope. [Jon Aquino
+    // 10/24/2003]
+    return super.query(searchEnv);
   }
-  
-  private Object[] nearestNeighbour(BoundablePair initBndPair, double maxDistance) 
-  {
-    double distanceLowerBound = maxDistance;
-    BoundablePair minPair = null;
-    
-    // initialize internal structures
-    PriorityQueue priQ = new PriorityQueue();
 
-    // initialize queue
-    priQ.add(initBndPair);
+  /**
+   * Returns items whose bounds intersect the given envelope.
+   */
+  @Override
+  public void query(final BoundingBox searchEnv, final ItemVisitor visitor) {
+    // Yes this method does something. It specifies that the bounds is an
+    // Envelope. super.query takes an Object, not an Envelope. [Jon Aquino
+    // 10/24/2003]
+    super.query(searchEnv, visitor);
+  }
 
-    while (! priQ.isEmpty() && distanceLowerBound > 0.0) {
-      // pop head of queue and expand one side of pair
-      BoundablePair bndPair = (BoundablePair) priQ.poll();
-      double currentDistance = bndPair.getDistance();
-      
-      /**
-       * If the distance for the first node in the queue
-       * is >= the current minimum distance, all other nodes
-       * in the queue must also have a greater distance.
-       * So the current minDistance must be the true minimum,
-       * and we are done.
-       */
-      if (currentDistance >= distanceLowerBound) 
-        break;  
+  /**
+   * Removes a single item from the tree.
+   *
+   * @param itemEnv the Envelope of the item to remove
+   * @param item the item to remove
+   * @return <code>true</code> if the item was found
+   */
+  @Override
+  public boolean remove(final BoundingBox itemEnv, final Object item) {
+    return super.remove(itemEnv, item);
+  }
 
-      /**
-       * If the pair members are leaves
-       * then their distance is the exact lower bound.
-       * Update the distanceLowerBound to reflect this
-       * (which must be smaller, due to the test 
-       * immediately prior to this). 
-       */
-      if (bndPair.isLeaves()) {
-        // assert: currentDistance < minimumDistanceFound
-        distanceLowerBound = currentDistance;
-        minPair = bndPair;
-      }
-      else {
-        // testing - does allowing a tolerance improve speed?
-        // Ans: by only about 10% - not enough to matter
-        /*
-        double maxDist = bndPair.getMaximumDistance();
-        if (maxDist * .99 < lastComputedDistance) 
-          return;
-        //*/
+  /**
+   * Returns the number of items in the tree.
+   *
+   * @return the number of items in the tree
+   */
+  @Override
+  public int size() {
+    return super.size();
+  }
 
-        /**
-         * Otherwise, expand one side of the pair,
-         * (the choice of which side to expand is heuristically determined) 
-         * and insert the new expanded pairs into the queue
-         */
-        bndPair.expandToQueue(priQ, distanceLowerBound);
+  /**
+   * @param childBoundables Must be sorted by the x-value of the envelope midpoints
+   */
+  protected List[] verticalSlices(final List childBoundables,
+    final int sliceCount) {
+    final int sliceCapacity = (int)Math.ceil(childBoundables.size()
+      / (double)sliceCount);
+    final List[] slices = new List[sliceCount];
+    final Iterator i = childBoundables.iterator();
+    for (int j = 0; j < sliceCount; j++) {
+      slices[j] = new ArrayList();
+      int boundablesAddedToSlice = 0;
+      while (i.hasNext() && boundablesAddedToSlice < sliceCapacity) {
+        final Boundable childBoundable = (Boundable)i.next();
+        slices[j].add(childBoundable);
+        boundablesAddedToSlice++;
       }
     }
-    // done - return items with min distance
-    return new Object[] {    
-          ((ItemBoundable) minPair.getBoundable(0)).getItem(),
-          ((ItemBoundable) minPair.getBoundable(1)).getItem()
-      };
+    return slices;
   }
 
 }

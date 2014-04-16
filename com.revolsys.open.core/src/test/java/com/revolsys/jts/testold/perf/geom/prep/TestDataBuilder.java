@@ -35,9 +35,9 @@ package com.revolsys.jts.testold.perf.geom.prep;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.util.SineStarFactory;
@@ -90,7 +90,7 @@ public class TestDataBuilder {
     return poly;
   }
 
-  public List createTestGeoms(final Envelope env, final int nItems,
+  public List createTestGeoms(final BoundingBox env, final int nItems,
     final double size, final int nPts) {
     final int nCells = (int)Math.sqrt(nItems);
 

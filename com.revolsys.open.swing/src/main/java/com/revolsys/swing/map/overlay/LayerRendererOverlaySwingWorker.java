@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;

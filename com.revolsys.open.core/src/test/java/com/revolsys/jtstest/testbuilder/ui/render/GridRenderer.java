@@ -41,9 +41,9 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.text.NumberFormat;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jtstest.testbuilder.AppConstants;
@@ -125,7 +125,7 @@ public class GridRenderer {
      */
     final double gridSize10Model = 10 * gridSizeModel;
     final PrecisionModel pmGrid10 = new PrecisionModel(1.0 / gridSize10Model);
-    final Envelope modelEnv = viewport.getModelEnv();
+    final BoundingBox modelEnv = viewport.getModelEnv();
     final double basex10Model = pmGrid10.makePrecise(modelEnv.getMinX());
     final double basey10Model = pmGrid10.makePrecise(modelEnv.getMinY());
     final Point2D basePt10View = viewport.toView(new Coordinate(basex10Model,
@@ -296,7 +296,7 @@ public class GridRenderer {
     final int gridMagModel = viewport.gridMagnitudeModel();
     final double gridSizeModel = Math.pow(10, gridMagModel);
     final double gridSizeView = viewport.toView(gridSizeModel);
-    final Envelope modelEnv = viewport.getModelEnv();
+    final BoundingBox modelEnv = viewport.getModelEnv();
 
     // System.out.println("gridSizeView= " + gridSizeView);
 
@@ -385,7 +385,7 @@ public class GridRenderer {
    * @param g
    */
   private void drawScaleMarks(final Graphics2D g) {
-    final Envelope viewEnv = viewport.getViewEnv();
+    final BoundingBox viewEnv = viewport.getViewEnv();
 
     int viewMag = maxVisibleMagnitude();
     final double gridIncModel = Math.pow(10.0, viewMag);

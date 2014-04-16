@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.measure.unit.SI;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -19,6 +18,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonParser;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.UrlUtil;
@@ -167,8 +167,8 @@ public class GeoNamesService {
       if (elevation != null) {
         coordinate.setZ(elevation.doubleValue());
       }
-      dataObject.setGeometryValue(GeometryFactory.getFactory().point(
-        coordinate));
+      dataObject.setGeometryValue(GeometryFactory.getFactory()
+        .point(coordinate));
       results.add(dataObject);
     }
     return results;

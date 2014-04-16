@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataTypeProxy;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
@@ -800,6 +799,20 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   int getBoundaryDimension();
 
+  /**
+   * Gets an {@link Envelope} containing 
+   * the minimum and maximum x and y values in this <code>Geometry</code>.
+   * If the geometry is empty, an empty <code>Envelope</code> 
+   * is returned.
+   * <p>
+   * The returned object is a copy of the one maintained internally,
+   * to avoid aliasing issues.  
+   * For best performance, clients which access this
+   * envelope frequently should cache the return value.
+   *
+   *@return the envelope of this <code>Geometry</code>.
+   *@return an empty BoundingBox if this Geometry is empty
+   */
   BoundingBox getBoundingBox();
 
   /**
@@ -900,25 +913,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   Geometry getEnvelope();
 
   /**
-   * Gets an {@link Envelope} containing 
-   * the minimum and maximum x and y values in this <code>Geometry</code>.
-   * If the geometry is empty, an empty <code>Envelope</code> 
-   * is returned.
-   * <p>
-   * The returned object is a copy of the one maintained internally,
-   * to avoid aliasing issues.  
-   * For best performance, clients which access this
-   * envelope frequently should cache the return value.
-   *
-   *@return the envelope of this <code>Geometry</code>.
-   *@return an empty Envelope if this Geometry is empty
-   */
-  Envelope getEnvelopeInternal();
-
-  /**
    * @author Paul Austin <paul.austin@revolsys.com>
    */
-  @SuppressWarnings("unchecked")
   <V extends Geometry> List<V> getGeometries();
 
   /**

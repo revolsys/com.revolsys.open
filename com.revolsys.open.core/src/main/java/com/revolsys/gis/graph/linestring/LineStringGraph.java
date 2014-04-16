@@ -17,7 +17,6 @@ import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.collection.Visitor;
 import com.revolsys.comparator.CollectionComparator;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -36,8 +35,10 @@ import com.revolsys.gis.model.coordinates.filter.PointOnLineSegment;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -279,7 +280,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public boolean intersects(final LineString line) {
-    BoundingBox envelope = BoundingBox.getBoundingBox(line);
+    BoundingBox envelope = Envelope.getBoundingBox(line);
     final double scaleXY = geometryFactory.getScaleXY();
     double maxDistance = 0;
     if (scaleXY > 0) {

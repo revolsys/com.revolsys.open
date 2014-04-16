@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.data.model.ArrayDataObject;
@@ -26,6 +25,8 @@ import com.revolsys.gis.esri.gdb.file.test.field.XmlField;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class FgdbReader {
@@ -235,7 +236,7 @@ public class FgdbReader {
         final double maxY = in.readLEDouble();
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
           coordinateSystem, numAxis, xyScale, zScale);
-        final BoundingBox boundingBox = new BoundingBox(geometryFactory, minX,
+        final BoundingBox boundingBox = new Envelope(geometryFactory, minX,
           minY, maxX, maxY);
         boolean run = true;
         while (run) {

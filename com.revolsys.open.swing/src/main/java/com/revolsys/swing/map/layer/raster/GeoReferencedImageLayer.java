@@ -14,12 +14,13 @@ import bibliothek.gui.dock.common.event.CDockableStateListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
@@ -188,7 +189,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   public BoundingBox fitToViewport() {
     final Project project = getProject();
     if (project == null || this.image == null || !isInitialized()) {
-      return new BoundingBox();
+      return new Envelope();
     } else {
       final BoundingBox oldValue = this.image.getBoundingBox();
       final BoundingBox viewBoundingBox = project.getViewBoundingBox();
@@ -218,7 +219,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   public BoundingBox getBoundingBox() {
     final GeoReferencedImage image = getImage();
     if (image == null) {
-      return new BoundingBox();
+      return new Envelope();
     } else {
       final BoundingBox boundingBox = image.getBoundingBox();
       if (boundingBox.isEmpty()) {
@@ -233,7 +234,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return new BoundingBox(getGeometryFactory());
+      return new Envelope(getGeometryFactory());
     }
   }
 

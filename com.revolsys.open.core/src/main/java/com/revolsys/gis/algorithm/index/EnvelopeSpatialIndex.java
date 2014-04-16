@@ -4,22 +4,22 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 
 public interface EnvelopeSpatialIndex<T> {
-  List<T> find(Envelope envelope);
+  List<T> find(BoundingBox envelope);
 
-  List<T> find(Envelope envelope, Filter<T> filter);
+  List<T> find(BoundingBox envelope, Filter<T> filter);
 
   List<T> findAll();
 
-  void put(Envelope envelope, T object);
+  void put(BoundingBox envelope, T object);
 
-  boolean remove(Envelope envelope, T object);
+  boolean remove(BoundingBox envelope, T object);
 
-  void visit(Envelope envelope, Filter<T> filter, Visitor<T> visitor);
+  void visit(BoundingBox envelope, Filter<T> filter, Visitor<T> visitor);
 
-  void visit(final Envelope envelope, final Visitor<T> visitor);
+  void visit(final BoundingBox envelope, final Visitor<T> visitor);
 
   void visit(final Visitor<T> visitor);
 }

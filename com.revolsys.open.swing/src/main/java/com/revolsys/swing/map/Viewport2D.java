@@ -21,13 +21,14 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -86,7 +87,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   private double originY;
 
   /** The current bounding box of the project. */
-  private BoundingBox boundingBox = new BoundingBox();
+  private BoundingBox boundingBox = new Envelope();
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(3005);
 
@@ -155,15 +156,17 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return this.boundingBox;
   }
 
-  public BoundingBox getBoundingBox(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final int x, final int y, final int pixels) {
+  public BoundingBox getBoundingBox(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int x,
+    final int y, final int pixels) {
     final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
     final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
-    final BoundingBox boundingBox = new BoundingBox(p1, p2);
+    final BoundingBox boundingBox = new Envelope(p1, p2);
     return boundingBox;
   }
 
-  public BoundingBox getBoundingBox(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public BoundingBox getBoundingBox(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final MouseEvent event, final int pixels) {
     final int x = event.getX();
     final int y = event.getY();
@@ -174,7 +177,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final BoundingBox viewExtent = getBoundingBox();
     if (geometry != null && !geometry.isEmpty()) {
       if (!viewExtent.isEmpty()) {
-        final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
+        final BoundingBox geometryExtent = Envelope.getBoundingBox(geometry);
         if (geometryExtent.intersects(viewExtent)) {
           final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
           return geometryFactory.createGeometry(geometry);
@@ -502,7 +505,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double y1 = centreY - bottomOffset;
     final double x2 = centreX + rightOffset;
     final double y2 = centreY + topOffset;
-    final BoundingBox newBoundingBox = new BoundingBox(geometryFactory, x1, y1,
+    final BoundingBox newBoundingBox = new Envelope(geometryFactory, x1, y1,
       x2, y2);
     internalSetBoundingBox(newBoundingBox, unitsPerPixel);
     return newBoundingBox;
@@ -603,16 +606,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     }
   }
 
-  public Point toModelPoint(final double... viewCoordinates) {
-    if (this.geometryFactory == null) {
-      return GeometryFactory.getFactory().point();
-    } else {
-      final double[] coordinates = toModelCoordinates(viewCoordinates);
-      return this.geometryFactory.point(coordinates);
-    }
-  }
-
-  public Point toModelPoint(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point toModelPoint(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
@@ -624,17 +619,28 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     }
   }
 
-  public Point toModelPoint(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point toModelPoint(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final java.awt.Point point) {
     final double x = point.getX();
     final double y = point.getY();
     return toModelPoint(geometryFactory, x, y);
   }
 
-  public Point toModelPoint(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point toModelPoint(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final MouseEvent event) {
     final java.awt.Point eventPoint = event.getPoint();
     return toModelPoint(geometryFactory, eventPoint);
+  }
+
+  public Point toModelPoint(final double... viewCoordinates) {
+    if (this.geometryFactory == null) {
+      return GeometryFactory.getFactory().point();
+    } else {
+      final double[] coordinates = toModelCoordinates(viewCoordinates);
+      return this.geometryFactory.point(coordinates);
+    }
   }
 
   public Point toModelPoint(final java.awt.Point point) {
@@ -643,7 +649,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return toModelPoint(x, y);
   }
 
-  public Point toModelPointRounded(com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point toModelPointRounded(
+    com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final java.awt.Point point) {
     final double x = point.getX();
     final double y = point.getY();

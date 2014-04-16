@@ -124,7 +124,7 @@ public class STRtreeTest extends TestCase {
 
   public void testEmptyTreeUsingItemVisitorQuery() {
     final STRtree tree = new STRtree();
-    tree.query(new Envelope(0, 0, 1, 1), new ItemVisitor() {
+    tree.query(new Envelope(0, 1, 0, 1), new ItemVisitor() {
       @Override
       public void visitItem(final Object item) {
         assertTrue("Should never reach here", true);
@@ -134,7 +134,7 @@ public class STRtreeTest extends TestCase {
 
   public void testEmptyTreeUsingListQuery() {
     final STRtree tree = new STRtree();
-    final List list = tree.query(new Envelope(0, 0, 1, 1));
+    final List list = tree.query(new Envelope(0, 1, 0, 1));
     assertTrue(list.isEmpty());
   }
 
@@ -152,14 +152,14 @@ public class STRtreeTest extends TestCase {
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(4);
     for (final Iterator i = geometries.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
-      t.insert(g.getEnvelopeInternal(), new Object());
+      t.insert(g.getBoundingBox(), new Object());
     }
     t.build();
     try {
-      assertEquals(1, t.query(new Envelope(5, 6, 5, 6)).size());
-      assertEquals(0, t.query(new Envelope(20, 30, 0, 10)).size());
-      assertEquals(2, t.query(new Envelope(25, 26, 25, 26)).size());
-      assertEquals(3, t.query(new Envelope(0, 100, 0, 100)).size());
+      assertEquals(1, t.query(new Envelope(5, 5, 6, 6)).size());
+      assertEquals(0, t.query(new Envelope(20, 0, 30, 10)).size());
+      assertEquals(2, t.query(new Envelope(25, 25, 26, 26)).size());
+      assertEquals(3, t.query(new Envelope(0, 0, 100, 100)).size());
     } catch (final Throwable x) {
       STRtreeDemo.printSourceData(geometries, System.out);
       STRtreeDemo.printLevels(t, System.out);

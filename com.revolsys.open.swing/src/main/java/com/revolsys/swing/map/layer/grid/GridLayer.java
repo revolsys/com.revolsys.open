@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;

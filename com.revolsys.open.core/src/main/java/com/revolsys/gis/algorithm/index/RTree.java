@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 
 public class RTree<T> extends AbstractSpatialIndex<T> {
 
@@ -28,7 +28,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   }
 
   private RTreeLeaf<T> chooseLeaf(final List<RTreeBranch<T>> path,
-    final RTreeNode<T> node, final Envelope envelope) {
+    final RTreeNode<T> node, final BoundingBox envelope) {
     if (node instanceof RTreeLeaf) {
       return (RTreeLeaf<T>)node;
     } else {
@@ -55,7 +55,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   }
 
   private double getRequiredExpansion(final RTreeNode<T> node,
-    final Envelope envelope) {
+    final BoundingBox envelope) {
     double areaExpansion = 0;
 
     final double minX1 = node.getMinX();
@@ -91,7 +91,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   }
 
   @Override
-  public void put(final Envelope envelope, final T object) {
+  public void put(final BoundingBox envelope, final T object) {
     final LinkedList<RTreeBranch<T>> path = new LinkedList<RTreeBranch<T>>();
     final RTreeLeaf<T> leaf = chooseLeaf(path, root, envelope);
     if (leaf.getSize() == maxEntries) {
@@ -104,7 +104,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   }
 
   @Override
-  public boolean remove(final Envelope envelope, final T object) {
+  public boolean remove(final BoundingBox envelope, final T object) {
     // TODO rebalance after remove
     final LinkedList<RTreeNode<T>> path = new LinkedList<RTreeNode<T>>();
     if (root.remove(path, envelope, object)) {
@@ -133,13 +133,13 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   }
 
   @Override
-  public void visit(final Envelope envelope, final Filter<T> filter,
+  public void visit(final BoundingBox envelope, final Filter<T> filter,
     final Visitor<T> visitor) {
     root.visit(envelope, filter, visitor);
   }
 
   @Override
-  public void visit(final Envelope envelope, final Visitor<T> visitor) {
+  public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
     root.visit(envelope, visitor);
   }
 

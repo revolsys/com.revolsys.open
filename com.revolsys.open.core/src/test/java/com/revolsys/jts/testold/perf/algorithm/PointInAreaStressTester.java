@@ -34,9 +34,9 @@ package com.revolsys.jts.testold.perf.algorithm;
 
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
@@ -92,7 +92,7 @@ public class PointInAreaStressTester {
 
     final int ptGridWidth = (int)Math.sqrt(this.numPts);
 
-    final Envelope areaEnv = this.area.getEnvelopeInternal();
+    final BoundingBox areaEnv = this.area.getBoundingBox();
     final double xStep = areaEnv.getWidth() / (ptGridWidth - 1);
     final double yStep = areaEnv.getHeight() / (ptGridWidth - 1);
 

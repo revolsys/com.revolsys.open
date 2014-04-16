@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
@@ -30,7 +30,7 @@ public class LineSegmentMatch {
     segments.set(index, segment);
   }
 
-  public Envelope getEnvelope() {
+  public BoundingBox getEnvelope() {
     return segment.getEnvelope();
   }
 

@@ -10,12 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -134,7 +133,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
     final LineString geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = geometry;
-      final Envelope envelope = line.getEnvelopeInternal();
+      final com.revolsys.jts.geom.BoundingBox envelope = line.getBoundingBox();
       if (envelope.intersects(boundingBox)) {
         final LineString newLine = tin.getElevation(line);
         if (line != newLine) {

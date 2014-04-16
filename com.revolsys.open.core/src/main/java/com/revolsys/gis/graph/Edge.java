@@ -18,9 +18,9 @@ import java.util.Set;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
@@ -304,7 +304,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   }
 
   public BoundingBox getBoundingBox() {
-    return BoundingBox.getBoundingBox(getLine());
+    return Envelope.getBoundingBox(getLine());
   }
 
   public Collection<Node<T>> getCommonNodes(final Edge<T> edge) {
@@ -332,8 +332,8 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     return edges;
   }
 
-  public Envelope getEnvelope() {
-    return getLine().getEnvelopeInternal();
+  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
+    return getLine().getBoundingBox();
   }
 
   public double getFromAngle() {

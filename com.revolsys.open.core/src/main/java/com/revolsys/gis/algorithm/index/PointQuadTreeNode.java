@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.util.MathUtil;
 
 public class PointQuadTreeNode<T> {
@@ -62,7 +62,7 @@ public class PointQuadTreeNode<T> {
   }
 
   public void findEntriesWithin(final List<Entry<Coordinates, T>> results,
-    final Envelope envelope) {
+    final BoundingBox envelope) {
     final double minX = envelope.getMinX();
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
@@ -90,7 +90,7 @@ public class PointQuadTreeNode<T> {
   }
 
   public void findWithin(final List<T> results, final double x, final double y,
-    final double maxDistance, final Envelope envelope) {
+    final double maxDistance, final BoundingBox envelope) {
     final double minX = envelope.getMinX();
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
@@ -117,7 +117,7 @@ public class PointQuadTreeNode<T> {
     }
   }
 
-  public void findWithin(final List<T> results, final Envelope envelope) {
+  public void findWithin(final List<T> results, final BoundingBox envelope) {
     final double minX = envelope.getMinX();
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
@@ -234,7 +234,7 @@ public class PointQuadTreeNode<T> {
       "Cannot change the coordinates on a quad tree");
   }
 
-  public boolean visit(final Envelope envelope, final Visitor<T> visitor) {
+  public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
     final double minX = envelope.getMinX();
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();

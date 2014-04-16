@@ -25,7 +25,7 @@ import java.util.List;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterUtil;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;

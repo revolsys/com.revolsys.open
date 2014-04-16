@@ -34,6 +34,7 @@
 package com.revolsys.jts.algorithm.match;
 
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 
@@ -75,8 +76,8 @@ public class HausdorffSimilarityMeasure
 	{		
 		double distance = DiscreteHausdorffDistance.distance(g1, g2, DENSIFY_FRACTION);
 		
-		Envelope env = new Envelope(g1.getEnvelopeInternal());
-		env.expandToInclude(g2.getEnvelopeInternal());
+		Envelope env = new Envelope(g1.getBoundingBox());
+		env.expandToInclude(g2.getBoundingBox());
 		double envSize = diagonalSize(env);
 		// normalize so that more similarity produces a measure closer to 1
 		double measure = 1 - distance / envSize;
@@ -85,7 +86,7 @@ public class HausdorffSimilarityMeasure
 		return measure;
 	}
 	
-	public static double diagonalSize(Envelope env)
+	public static double diagonalSize(BoundingBox env)
 	{
 		if (env.isNull()) return 0.0;
 		

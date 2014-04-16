@@ -1,12 +1,13 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 
 public class Node<T> extends NodeBase<T> {
   public static <V> Node<V> createExpanded(final Node<V> node,
-    final Envelope addEnv) {
+    final BoundingBox addEnv) {
     final Envelope expandEnv = new Envelope(addEnv);
     if (node != null) {
       expandEnv.expandToInclude(node.env);
@@ -19,23 +20,23 @@ public class Node<T> extends NodeBase<T> {
     return largerNode;
   }
 
-  public static <V> Node<V> createNode(final Envelope env) {
+  public static <V> Node<V> createNode(final BoundingBox env) {
     final Key key = new Key(env);
     final Node<V> node = new Node<V>(key.getEnvelope(), key.getLevel());
     return node;
   }
 
-  private final Envelope env;
+  private final BoundingBox env;
 
   private final Coordinates centre;
 
   private final int level;
 
-  public Node(final Envelope env, final int level) {
+  public Node(final BoundingBox env, final int level) {
     this.env = env;
     this.level = level;
-    double x = (env.getMinX() + env.getMaxX()) / 2;
-    double y = (env.getMinY() + env.getMaxY()) / 2;
+    final double x = (env.getMinX() + env.getMaxX()) / 2;
+    final double y = (env.getMinY() + env.getMaxY()) / 2;
     centre = new DoubleCoordinates(x, y);
   }
 
@@ -71,12 +72,12 @@ public class Node<T> extends NodeBase<T> {
         maxY = env.getMaxY();
       break;
     }
-    final Envelope envelope = new Envelope(minX, maxX, minY, maxY);
+    final Envelope envelope = new Envelope(minX, minY, maxX, maxY);
     final Node<T> node = new Node<T>(envelope, level - 1);
     return node;
   }
 
-  public NodeBase<T> find(final Envelope searchEnv) {
+  public NodeBase<T> find(final BoundingBox searchEnv) {
     final int subnodeIndex = getSubnodeIndex(searchEnv, centre);
     if (subnodeIndex == -1) {
       return this;
@@ -88,11 +89,11 @@ public class Node<T> extends NodeBase<T> {
     return this;
   }
 
-  public Envelope getEnvelope() {
+  public BoundingBox getEnvelope() {
     return env;
   }
 
-  public Node<T> getNode(final Envelope searchEnv) {
+  public Node<T> getNode(final BoundingBox searchEnv) {
     final int subnodeIndex = getSubnodeIndex(searchEnv, centre);
     if (subnodeIndex != -1) {
       final Node<T> node = getSubnode(subnodeIndex);
@@ -121,7 +122,7 @@ public class Node<T> extends NodeBase<T> {
   }
 
   @Override
-  protected boolean isSearchMatch(final Envelope searchEnv) {
+  protected boolean isSearchMatch(final BoundingBox searchEnv) {
     return env.intersects(searchEnv);
   }
 

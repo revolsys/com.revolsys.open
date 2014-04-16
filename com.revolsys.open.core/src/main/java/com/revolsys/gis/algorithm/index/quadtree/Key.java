@@ -1,5 +1,6 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -14,7 +15,7 @@ import com.revolsys.jts.index.quadtree.DoubleBits;
  */
 public class Key {
 
-  public static int computeQuadLevel(final Envelope env) {
+  public static int computeQuadLevel(final BoundingBox env) {
     final double dx = env.getWidth();
     final double dy = env.getHeight();
     final double dMax = dx > dy ? dx : dy;
@@ -28,9 +29,9 @@ public class Key {
   private int level = 0;
 
   // auxiliary data which is derived from the key for use in computation
-  private Envelope env = null;
+  private BoundingBox env = null;
 
-  public Key(final Envelope itemEnv) {
+  public Key(final BoundingBox itemEnv) {
     computeKey(itemEnv);
   }
 
@@ -38,7 +39,7 @@ public class Key {
    * return a square envelope containing the argument envelope,
    * whose extent is a power of two and which is based at a power of 2
    */
-  public void computeKey(final Envelope itemEnv) {
+  private void computeKey(final BoundingBox itemEnv) {
     level = computeQuadLevel(itemEnv);
     env = new Envelope();
     computeKey(level, itemEnv);
@@ -49,11 +50,15 @@ public class Key {
     }
   }
 
-  private void computeKey(final int level, final Envelope itemEnv) {
+  private void computeKey(final int level, final BoundingBox itemEnv) {
     final double quadSize = DoubleBits.powerOf2(level);
     pt.setX(Math.floor(itemEnv.getMinX() / quadSize) * quadSize);
     pt.setY(Math.floor(itemEnv.getMinY() / quadSize) * quadSize);
-    env.init(pt.getX(), pt.getX() + quadSize, pt.getY(), pt.getY() + quadSize);
+    final double x1 = pt.getX();
+    final double y1 = pt.getY();
+    final double x2 = x1 + quadSize;
+    final double y2 = y1 + quadSize;
+    env = new Envelope(x1, y1, x2, y2);
   }
 
   public Coordinates getCentre() {
@@ -65,7 +70,7 @@ public class Key {
       Coordinates.NULL_ORDINATE);
   }
 
-  public Envelope getEnvelope() {
+  public BoundingBox getEnvelope() {
     return env;
   }
 

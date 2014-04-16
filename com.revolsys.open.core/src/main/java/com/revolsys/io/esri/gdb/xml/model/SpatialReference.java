@@ -1,9 +1,9 @@
 package com.revolsys.io.esri.gdb.xml.model;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class SpatialReference {

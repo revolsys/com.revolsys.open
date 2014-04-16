@@ -2,19 +2,19 @@ package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.InvokeMethodFilter;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 
 public class GeometryFilter {
-  public static boolean acceptEnvelopeIntersects(final Envelope envelope,
+  public static boolean acceptEnvelopeIntersects(final BoundingBox envelope,
     final Geometry geometry) {
-    final Envelope geometryEnvelope = geometry.getEnvelopeInternal();
+    final BoundingBox geometryEnvelope = geometry.getBoundingBox();
     return envelope.intersects(geometryEnvelope);
   }
 
   public static <T extends Geometry> Filter<T> intersects(
-    final Envelope envelope) {
+    final BoundingBox envelope) {
     return new InvokeMethodFilter<T>(GeometryFilter.class,
       "acceptEnvelopeIntersects", envelope);
   }

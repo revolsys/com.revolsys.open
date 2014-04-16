@@ -34,7 +34,6 @@ import org.w3c.dom.NodeList;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -45,7 +44,9 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.io.xml.DomUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.spring.SpringUtil;
@@ -81,7 +82,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     };
   }
 
-  private BoundingBox boundingBox = new BoundingBox();
+  private BoundingBox boundingBox = new Envelope();
 
   private BufferedImage image;
 
@@ -227,6 +228,12 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
     }
   }
 
+  public GeoReferencedImage getImage(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    return getImage(coordinateSystem);
+  }
+
   public GeoReferencedImage getImage(final CoordinateSystem coordinateSystem) {
     synchronized (this.projectedImages) {
       if (coordinateSystem.equals(getCoordinateSystem())) {
@@ -256,11 +263,6 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
       return new GeoReferencedImage(destBoundingBox, newImage);
     }
     return this;
-  }
-
-  public GeoReferencedImage getImage(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    return getImage(coordinateSystem);
   }
 
   public double getImageAspectRatio() {
@@ -487,7 +489,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
         final Map<String, Object> settings = JsonMapIoFactory.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (StringUtils.hasText(boundingBoxWkt)) {
-          final BoundingBox boundingBox = BoundingBox.create(boundingBoxWkt);
+          final BoundingBox boundingBox = Envelope.create(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setBoundingBox(boundingBox);
           }
@@ -544,7 +546,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
           setResolution(pixelWidth);
           // TODO rotation using a warp filter
           setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
-          // worldWarpFilter = new WarpAffineFilter(new BoundingBox(
+          // worldWarpFilter = new WarpAffineFilter(new Envelope(
           // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
           // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
           // yRotation);
@@ -625,8 +627,8 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
     final int imageHeight = getImageHeight();
     final double y2 = y1 - pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new BoundingBox(geometryFactory, x1, y1,
-      x2, y2);
+    final BoundingBox boundingBox = new Envelope(geometryFactory, x1, y1, x2,
+      y2);
     setBoundingBox(boundingBox);
   }
 

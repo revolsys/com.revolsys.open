@@ -1506,7 +1506,7 @@ public class GeometryFactory implements Serializable,
    *	a <code>Point</code> (when min x = max x and min y = max y) or a
    *      <code>Polygon</code> (in all other cases)
    */
-  public Geometry toGeometry(final Envelope envelope) {
+  public Geometry toGeometry(final BoundingBox envelope) {
     // null envelope - return empty point geometry
     if (envelope.isNull()) {
       return point((CoordinatesList)null);

@@ -2,11 +2,11 @@ package com.revolsys.gis.spatialite.io;
 
 import java.util.Map;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
+import com.revolsys.jts.geom.BoundingBox;
 
 public class SpatiaLiteJdbcQueryIterator extends JdbcQueryIterator {
 

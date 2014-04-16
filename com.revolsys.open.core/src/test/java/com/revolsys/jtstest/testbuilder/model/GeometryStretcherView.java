@@ -2,7 +2,7 @@ package com.revolsys.jtstest.testbuilder.model;
 
 import java.util.List;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testbuilder.topostretch.TopologyStretcher;
 
@@ -29,7 +29,7 @@ public class GeometryStretcherView
 	private Geometry[] stretchGeom = new Geometry[2];
 	private List[] stretchCoords;
   private boolean isViewPerformant = true;
-  private Envelope maskEnv = null;
+  private BoundingBox maskEnv = null;
 	private double stretchSize = 5.0;
   private double nearnessTol = 0.5;
 	
@@ -58,7 +58,7 @@ public class GeometryStretcherView
   {
     this.nearnessTol = nearnessTol;
   }
-	public void setEnvelope(Envelope maskEnv)
+	public void setEnvelope(BoundingBox maskEnv)
 	{
     this.maskEnv = maskEnv;
 		// clear cache

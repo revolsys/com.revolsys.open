@@ -1,7 +1,8 @@
 package com.revolsys.gis.converter.string;
 
 import com.revolsys.converter.string.StringConverter;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 
 public class BoundingBoxStringConverter implements StringConverter<BoundingBox> {
@@ -17,15 +18,15 @@ public class BoundingBoxStringConverter implements StringConverter<BoundingBox> 
 
   @Override
   public BoundingBox toObject(final Object value) {
-    if (value instanceof BoundingBox) {
-      final BoundingBox geometry = (BoundingBox)value;
+    if (value instanceof Envelope) {
+      final Envelope geometry = (Envelope)value;
       return geometry;
     }
     if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
-      return BoundingBox.getBoundingBox(geometry);
+      return geometry.getBoundingBox();
     } else if (value == null) {
-      return new BoundingBox();
+      return new Envelope();
     } else {
       return toObject(value.toString());
     }
@@ -33,7 +34,7 @@ public class BoundingBoxStringConverter implements StringConverter<BoundingBox> 
 
   @Override
   public BoundingBox toObject(final String string) {
-    return BoundingBox.create(string);
+    return Envelope.create(string);
   }
 
   @Override

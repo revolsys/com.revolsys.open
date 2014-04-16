@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RobustCGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -65,14 +65,14 @@ public class PolygonHandler implements ShapeHandler {
     for (int i = 0; i < holes.size(); i++) {
       final LinearRing testHole = (LinearRing)holes.get(i);
       LinearRing minShell = null;
-      Envelope minEnv = null;
-      final Envelope testHoleEnv = testHole.getEnvelopeInternal();
+      BoundingBox minEnv = null;
+      final BoundingBox testHoleEnv = testHole.getBoundingBox();
       final Coordinates testHolePt = testHole.getCoordinate(0);
       LinearRing tryShell;
       final int nShells = shells.size();
       for (int j = 0; j < nShells; j++) {
         tryShell = (LinearRing)shells.get(j);
-        final Envelope tryShellEnv = tryShell.getEnvelopeInternal();
+        final BoundingBox tryShellEnv = tryShell.getBoundingBox();
         if (!tryShellEnv.contains(testHoleEnv)) {
           continue;
         }
@@ -87,7 +87,7 @@ public class PolygonHandler implements ShapeHandler {
 
         // check if new containing ring is smaller than the current minimum ring
         if (minShell != null) {
-          minEnv = minShell.getEnvelopeInternal();
+          minEnv = minShell.getBoundingBox();
         }
         if (isContained) {
           if (minShell == null || minEnv.contains(tryShellEnv)) {

@@ -32,9 +32,9 @@
  */
 package com.revolsys.jts.testold.geom.prep;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
@@ -74,7 +74,7 @@ public abstract class StressTestHarness {
     return circle;
   }
 
-  Geometry createRandomTestGeometry(final Envelope env, final double size,
+  Geometry createRandomTestGeometry(final BoundingBox env, final double size,
     final int nPts) {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
@@ -128,7 +128,7 @@ public abstract class StressTestHarness {
     while (count < nIter) {
       count++;
       final Geometry test = createRandomTestGeometry(
-        target.getEnvelopeInternal(), 10, 20);
+        target.getBoundingBox(), 10, 20);
 
       // System.out.println("Test # " + count);
       // System.out.println(line);

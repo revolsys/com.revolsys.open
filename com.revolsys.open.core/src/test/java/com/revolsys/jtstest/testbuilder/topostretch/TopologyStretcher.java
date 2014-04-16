@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
@@ -24,11 +24,11 @@ import com.revolsys.jts.geom.util.LinearComponentExtracter;
 public class TopologyStretcher {
   private static class VertexInMaskCountCoordinateFilter implements
     CoordinateFilter {
-    private final Envelope mask;
+    private final BoundingBox mask;
 
     private int count = 0;
 
-    public VertexInMaskCountCoordinateFilter(final Envelope mask) {
+    public VertexInMaskCountCoordinateFilter(final BoundingBox mask) {
       this.mask = mask;
     }
 
@@ -63,7 +63,7 @@ public class TopologyStretcher {
     inputGeoms[1] = g2;
   }
 
-  private List extractLineStrings(final Geometry[] geom, final Envelope mask) {
+  private List extractLineStrings(final Geometry[] geom, final BoundingBox mask) {
     final List lines = new ArrayList();
     final LinearComponentExtracter lineExtracter = new LinearComponentExtracter(
       lines);
@@ -72,7 +72,7 @@ public class TopologyStretcher {
         continue;
       }
 
-      if (mask != null && !mask.intersects(geom[i].getEnvelopeInternal())) {
+      if (mask != null && !mask.intersects(geom[i].getBoundingBox())) {
         continue;
       }
 
@@ -82,7 +82,7 @@ public class TopologyStretcher {
       final List masked = new ArrayList();
       for (final Iterator i = lines.iterator(); i.hasNext();) {
         final LineString line = (LineString)i.next();
-        if (mask.intersects(line.getEnvelopeInternal())) {
+        if (mask.intersects(line.getBoundingBox())) {
           masked.add(line);
         }
       }
@@ -114,7 +114,7 @@ public class TopologyStretcher {
     return modifiedCoords;
   }
 
-  public int numVerticesInMask(final Envelope mask) {
+  public int numVerticesInMask(final BoundingBox mask) {
     final VertexInMaskCountCoordinateFilter filter = new VertexInMaskCountCoordinateFilter(
       mask);
     if (inputGeoms[0] != null) {
@@ -132,7 +132,7 @@ public class TopologyStretcher {
   }
 
   public Geometry[] stretch(final double nearnessTol,
-    final double stretchDistance, final Envelope mask) {
+    final double stretchDistance, final BoundingBox mask) {
     this.stretchDistance = stretchDistance;
     linestrings = extractLineStrings(inputGeoms, mask);
 

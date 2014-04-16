@@ -105,7 +105,7 @@ public class Layer
       if (geom == null) return;
       
       // cull non-visible geometries
-      if (! viewport.intersectsInModel(geom.getEnvelopeInternal())) 
+      if (! viewport.intersectsInModel(geom.getBoundingBox())) 
         return;
       
       GeometryPainter.paint(g, viewport, geom, styleList);

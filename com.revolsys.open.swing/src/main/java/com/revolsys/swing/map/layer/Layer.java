@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.Child;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.swing.component.TabbedValuePanel;

@@ -57,8 +57,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testbuilder.model.DrawingGrid;
 import com.revolsys.jtstest.testbuilder.model.GeometryDepiction;
@@ -401,7 +401,7 @@ public class GeometryEditPanel extends JPanel {
     g.draw(shape);
 
     // draw label box
-    final Envelope viewEnv = viewport.getViewEnv();
+    final BoundingBox viewEnv = viewport.getViewEnv();
 
     final int bottomOffset = 10;
     final int boxHgt = 20;
@@ -665,7 +665,7 @@ public class GeometryEditPanel extends JPanel {
     forceRepaint();
   }
 
-  public void zoom(final Envelope zoomEnv) {
+  public void zoom(BoundingBox zoomEnv) {
     if (zoomEnv == null) {
       return;
     }
@@ -684,9 +684,9 @@ public class GeometryEditPanel extends JPanel {
     }
     final double buffer = averageExtent * 0.03;
 
-    zoomEnv.expandToInclude(zoomEnv.getMaxX() + buffer, zoomEnv.getMaxY()
+    zoomEnv = zoomEnv.expand(zoomEnv.getMaxX() + buffer, zoomEnv.getMaxY()
       + buffer);
-    zoomEnv.expandToInclude(zoomEnv.getMinX() - buffer, zoomEnv.getMinY()
+    zoomEnv = zoomEnv.expand(zoomEnv.getMinX() - buffer, zoomEnv.getMinY()
       - buffer);
     viewport.zoom(zoomEnv);
   }
@@ -695,7 +695,7 @@ public class GeometryEditPanel extends JPanel {
     if (geom == null) {
       return;
     }
-    zoom(geom.getEnvelopeInternal());
+    zoom(geom.getBoundingBox());
   }
 
   public void zoom(final Point center, final double realZoomFactor) {
@@ -732,7 +732,7 @@ public class GeometryEditPanel extends JPanel {
     if (g == null) {
       return;
     }
-    zoom(g.getEnvelopeInternal());
+    zoom(g.getBoundingBox());
   }
 
   public void zoomToInput() {

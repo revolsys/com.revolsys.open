@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -35,6 +34,7 @@ package com.revolsys.jts.index;
 
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 
 /**
@@ -48,12 +48,11 @@ import com.revolsys.jts.geom.Envelope;
  *
  * @version 1.7
  */
-public interface SpatialIndex
-{
+public interface SpatialIndex {
   /**
    * Adds a spatial item with an extent specified by the given {@link Envelope} to the index
    */
-  void insert(Envelope itemEnv, Object item);
+  void insert(BoundingBox itemEnv, Object item);
 
   /**
    * Queries the index for all items whose extents intersect the given search {@link Envelope}
@@ -63,7 +62,7 @@ public interface SpatialIndex
    * @param searchEnv the envelope to query for
    * @return a list of the items found by the query
    */
-  List query(Envelope searchEnv);
+  List query(BoundingBox searchEnv);
 
   /**
    * Queries the index for all items whose extents intersect the given search {@link Envelope},
@@ -74,15 +73,15 @@ public interface SpatialIndex
    * @param searchEnv the envelope to query for
    * @param visitor a visitor object to apply to the items found
    */
-  void query(Envelope searchEnv, ItemVisitor visitor);
+  void query(BoundingBox searchEnv, ItemVisitor visitor);
 
   /**
    * Removes a single item from the tree.
    *
-   * @param itemEnv the Envelope of the item to remove
+   * @param itemEnv the BoundingBox of the item to remove
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */
-  boolean remove(Envelope itemEnv, Object item);
+  boolean remove(BoundingBox itemEnv, Object item);
 
 }

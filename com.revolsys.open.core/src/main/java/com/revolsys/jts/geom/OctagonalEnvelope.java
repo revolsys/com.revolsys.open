@@ -93,7 +93,7 @@ public class OctagonalEnvelope
   /**
    * Creates a new null bounding octagon bounding an {@link Envelope}
    */
-  public OctagonalEnvelope(Envelope env)
+  public OctagonalEnvelope(BoundingBox env)
   {
     expandToInclude(env);
   }
@@ -181,7 +181,7 @@ public class OctagonalEnvelope
     return this;
   }
 
-  public OctagonalEnvelope expandToInclude(Envelope env)
+  public OctagonalEnvelope expandToInclude(BoundingBox env)
   {
     expandToInclude(env.getMinX(), env.getMinY());
     expandToInclude(env.getMinX(), env.getMaxY());

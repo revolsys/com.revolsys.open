@@ -6,16 +6,16 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 
 class StretchedVertexFinder {
   private static LineSegment distSeg = new LineSegment();
 
-  private static boolean contains(final Envelope env, final Coordinates p0,
+  private static boolean contains(final BoundingBox env, final Coordinates p0,
     final Coordinates p1) {
     if (!env.contains(p0)) {
       return false;
@@ -41,7 +41,7 @@ class StretchedVertexFinder {
   }
 
   public static List findNear(final Collection linestrings,
-    final double tolerance, final Envelope mask) {
+    final double tolerance, final BoundingBox mask) {
     final StretchedVertexFinder finder = new StretchedVertexFinder(linestrings,
       tolerance, mask);
     return finder.getNearVertices();
@@ -79,7 +79,7 @@ class StretchedVertexFinder {
 
   private double tolerance = 0.0;
 
-  private Envelope limitEnv = null;
+  private BoundingBox limitEnv = null;
 
   private final List nearVerts = new ArrayList();
 
@@ -90,7 +90,7 @@ class StretchedVertexFinder {
   }
 
   public StretchedVertexFinder(final Collection linestrings,
-    final double tolerance, final Envelope limitEnv) {
+    final double tolerance, final BoundingBox limitEnv) {
     this(linestrings, tolerance);
     this.limitEnv = limitEnv;
   }

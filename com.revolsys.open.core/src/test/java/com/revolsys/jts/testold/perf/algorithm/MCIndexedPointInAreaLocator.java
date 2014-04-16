@@ -37,6 +37,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -117,7 +118,7 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
       throw new IllegalArgumentException("Argument must be Polygonal");
     }
     buildIndex(g);
-    final Envelope env = g.getEnvelopeInternal();
+    final BoundingBox env = g.getBoundingBox();
     this.maxXExtent = env.getMaxX() + 1.0;
   }
 
@@ -125,7 +126,7 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
     this.index = new MCIndexedGeometry(g);
   }
 
-  private void countSegs(final RayCrossingCounter rcc, final Envelope rayEnv,
+  private void countSegs(final RayCrossingCounter rcc, final BoundingBox rayEnv,
     final List monoChains, final MCSegmentCounter mcSegCounter) {
     for (final Iterator i = monoChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
@@ -147,7 +148,7 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
   public int locate(final Coordinates p) {
     final RayCrossingCounter rcc = new RayCrossingCounter(p);
     final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
-    final Envelope rayEnv = new Envelope(p.getX(), this.maxXExtent, p.getY(),
+    final Envelope rayEnv = new Envelope(p.getX(), p.getY(), this.maxXExtent,
       p.getY());
     final List mcs = this.index.query(rayEnv);
     countSegs(rcc, rayEnv, mcs, mcSegCounter);

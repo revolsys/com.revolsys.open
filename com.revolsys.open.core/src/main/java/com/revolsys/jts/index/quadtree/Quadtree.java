@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,10 +36,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.ArrayListVisitor;
 import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.SpatialIndex;
+
 /**
  * A Quadtree is a spatial index structure for efficient range querying
  * of items bounded by 2D rectangles.  
@@ -70,27 +71,28 @@ import com.revolsys.jts.index.SpatialIndex;
  *
  * @version 1.7
  */
-public class Quadtree
-    implements SpatialIndex, Serializable
-{
+public class Quadtree implements SpatialIndex, Serializable {
   private static final long serialVersionUID = -7461163625812743604L;
 
   /**
    * Ensure that the envelope for the inserted item has non-zero extents.
    * Use the current minExtent to pad the envelope, if necessary
    */
-  public static Envelope ensureExtent(Envelope itemEnv, double minExtent)
-  {
-    //The names "ensureExtent" and "minExtent" are misleading -- sounds like
-    //this method ensures that the extents are greater than minExtent.
-    //Perhaps we should rename them to "ensurePositiveExtent" and "defaultExtent".
-    //[Jon Aquino]
+  public static BoundingBox ensureExtent(final BoundingBox itemEnv,
+    final double minExtent) {
+    // The names "ensureExtent" and "minExtent" are misleading -- sounds like
+    // this method ensures that the extents are greater than minExtent.
+    // Perhaps we should rename them to "ensurePositiveExtent" and
+    // "defaultExtent".
+    // [Jon Aquino]
     double minx = itemEnv.getMinX();
     double maxx = itemEnv.getMaxX();
     double miny = itemEnv.getMinY();
     double maxy = itemEnv.getMaxY();
     // has a non-zero extent
-    if (minx != maxx && miny != maxy) return itemEnv;
+    if (minx != maxx && miny != maxy) {
+      return itemEnv;
+    }
 
     // pad one or both extents
     if (minx == maxx) {
@@ -101,10 +103,11 @@ public class Quadtree
       miny = miny - minExtent / 2.0;
       maxy = miny + minExtent / 2.0;
     }
-    return new Envelope(minx, maxx, miny, maxy);
+    return new Envelope(minx, miny, maxx, maxy);
   }
 
-  private Root root;
+  private final Root root;
+
   /**
 
   * minExtent is the minimum envelope extent of all items
@@ -119,21 +122,40 @@ public class Quadtree
   /**
    * Constructs a Quadtree with zero items.
    */
-  public Quadtree()
-  {
+  public Quadtree() {
     root = new Root();
+  }
+
+  private void collectStats(final BoundingBox itemEnv) {
+    final double delX = itemEnv.getWidth();
+    if (delX < minExtent && delX > 0.0) {
+      minExtent = delX;
+    }
+
+    final double delY = itemEnv.getHeight();
+    if (delY < minExtent && delY > 0.0) {
+      minExtent = delY;
+    }
   }
 
   /**
    * Returns the number of levels in the tree.
    */
-  public int depth()
-  {
-    //I don't think it's possible for root to be null. Perhaps we should
-    //remove the check. [Jon Aquino]
-    //Or make an assertion [Jon Aquino 10/29/2003]
-    if (root != null) return root.depth();
+  public int depth() {
+    // I don't think it's possible for root to be null. Perhaps we should
+    // remove the check. [Jon Aquino]
+    // Or make an assertion [Jon Aquino 10/29/2003]
+    if (root != null) {
+      return root.depth();
+    }
     return 0;
+  }
+
+  @Override
+  public void insert(final BoundingBox itemEnv, final Object item) {
+    collectStats(itemEnv);
+    final BoundingBox insertEnv = ensureExtent(itemEnv, minExtent);
+    root.insert(insertEnv, item);
   }
 
   /**
@@ -141,56 +163,12 @@ public class Quadtree
    * 
    * @return true if the index does not contain any items
    */
-  public boolean isEmpty()
-  {
-    if (root == null) return true;
+  public boolean isEmpty() {
+    if (root == null) {
+      return true;
+    }
     return false;
   }
-  
-  /**
-   * Returns the number of items in the tree.
-   *
-   * @return the number of items in the tree
-   */
-  public int size()
-  {
-    if (root != null) return root.size();
-    return 0;
-  }
-
-  public void insert(Envelope itemEnv, Object item)
-  {
-    collectStats(itemEnv);
-    Envelope insertEnv = ensureExtent(itemEnv, minExtent);
-    root.insert(insertEnv, item);
-  }
-
-  /**
-   * Removes a single item from the tree.
-   *
-   * @param itemEnv the Envelope of the item to be removed
-   * @param item the item to remove
-   * @return <code>true</code> if the item was found (and thus removed)
-   */
-  public boolean remove(Envelope itemEnv, Object item)
-  {
-    Envelope posEnv = ensureExtent(itemEnv, minExtent);
-    return root.remove(posEnv, item);
-  }
-
-/*
-  public List OLDquery(Envelope searchEnv)
-  {
-    /**
-     * the items that are matched are the items in quads which
-     * overlap the search envelope
-     */
-    /*
-    List foundItems = new ArrayList();
-    root.addAllItemsFromOverlapping(searchEnv, foundItems);
-    return foundItems;
-  }
-*/
 
   /**
    * Queries the tree and returns items which may lie in the given search envelope.
@@ -205,16 +183,26 @@ public class Quadtree
    * @param searchEnv the envelope of the desired query area.
    * @return a List of items which may intersect the search envelope
    */
-  public List query(Envelope searchEnv)
-  {
+  @Override
+  public List query(final BoundingBox searchEnv) {
     /**
      * the items that are matched are the items in quads which
      * overlap the search envelope
      */
-    ArrayListVisitor visitor = new ArrayListVisitor();
+    final ArrayListVisitor visitor = new ArrayListVisitor();
     query(searchEnv, visitor);
     return visitor.getItems();
   }
+
+  /*
+   * public List OLDquery(Envelope searchEnv) { /** the items that are matched
+   * are the items in quads which overlap the search envelope
+   */
+  /*
+   * List foundItems = new ArrayList();
+   * root.addAllItemsFromOverlapping(searchEnv, foundItems); return foundItems;
+   * }
+   */
 
   /**
    * Queries the tree and visits items which may lie in the given search envelope.
@@ -229,8 +217,8 @@ public class Quadtree
    * @param searchEnv the envelope of the desired query area.
    * @param visitor a visitor object which is passed the visited items
    */
-  public void query(Envelope searchEnv, ItemVisitor visitor)
-  {
+  @Override
+  public void query(final BoundingBox searchEnv, final ItemVisitor visitor) {
     /**
      * the items that are matched are the items in quads which
      * overlap the search envelope
@@ -241,22 +229,35 @@ public class Quadtree
   /**
    * Return a list of all items in the Quadtree
    */
-  public List queryAll()
-  {
-    List foundItems = new ArrayList();
+  public List queryAll() {
+    final List foundItems = new ArrayList();
     root.addAllItems(foundItems);
     return foundItems;
   }
 
-  private void collectStats(Envelope itemEnv)
-  {
-    double delX = itemEnv.getWidth();
-    if (delX < minExtent && delX > 0.0)
-      minExtent = delX;
+  /**
+   * Removes a single item from the tree.
+   *
+   * @param itemEnv the Envelope of the item to be removed
+   * @param item the item to remove
+   * @return <code>true</code> if the item was found (and thus removed)
+   */
+  @Override
+  public boolean remove(final BoundingBox itemEnv, final Object item) {
+    final BoundingBox posEnv = ensureExtent(itemEnv, minExtent);
+    return root.remove(posEnv, item);
+  }
 
-    double delY = itemEnv.getHeight();
-    if (delY < minExtent && delY > 0.0)
-      minExtent = delY;
+  /**
+   * Returns the number of items in the tree.
+   *
+   * @return the number of items in the tree
+   */
+  public int size() {
+    if (root != null) {
+      return root.size();
+    }
+    return 0;
   }
 
 }

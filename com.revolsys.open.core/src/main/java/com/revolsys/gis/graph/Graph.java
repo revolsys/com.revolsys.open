@@ -28,7 +28,6 @@ import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
 import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
@@ -55,6 +54,7 @@ import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparat
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
@@ -309,7 +309,7 @@ public class Graph<T> {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
       point, distance, results);
-    BoundingBox envelope = new BoundingBox(point);
+    BoundingBox envelope = new Envelope(point);
     envelope = envelope.expand(distance);
     getNodeIndex().visit(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
@@ -334,7 +334,7 @@ public class Graph<T> {
     final Comparator<Node<T>> comparator = new NodeDistanceComparator<T>(
       fromNode);
 
-    final Envelope envelope = filter.getEnvelope();
+    final com.revolsys.jts.geom.BoundingBox envelope = filter.getEnvelope();
     return getNodes(filter, comparator, envelope);
 
   }
@@ -350,7 +350,7 @@ public class Graph<T> {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
       geometry, distance, results);
-    BoundingBox envelope = BoundingBox.getBoundingBox(geometry);
+    BoundingBox envelope = Envelope.getBoundingBox(geometry);
     envelope = envelope.expand(distance);
     getNodeIndex().visit(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
@@ -475,7 +475,7 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> getEdges(final Edge<T> edge) {
-    final Envelope envelope = edge.getEnvelope();
+    final com.revolsys.jts.geom.BoundingBox envelope = edge.getEnvelope();
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     return edgeIndex.query(envelope);
   }
@@ -492,6 +492,18 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
+    final com.revolsys.jts.geom.BoundingBox envelope) {
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
+      filter);
+    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
+    edgeIndex.visit(envelope, results);
+    final List<Edge<T>> edges = results.getList();
+    Collections.sort(edges);
+    return edges;
+
+  }
+
+  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
     final Comparator<Edge<T>> comparator) {
     final List<Edge<T>> targetEdges = getEdges(filter);
     if (comparator != null) {
@@ -501,7 +513,8 @@ public class Graph<T> {
   }
 
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final Envelope envelope) {
+    final Comparator<Edge<T>> comparator,
+    final com.revolsys.jts.geom.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
       filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
@@ -518,25 +531,13 @@ public class Graph<T> {
 
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
     final Comparator<Edge<T>> comparator, final Geometry geometry) {
-    final Envelope envelope = geometry.getEnvelopeInternal();
+    final com.revolsys.jts.geom.BoundingBox envelope = geometry.getBoundingBox();
     return getEdges(filter, comparator, envelope);
   }
 
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
-    final Envelope envelope) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
-      filter);
-    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.visit(envelope, results);
-    final List<Edge<T>> edges = results.getList();
-    Collections.sort(edges);
-    return edges;
-
-  }
-
-  public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
     final Geometry geometry) {
-    final Envelope envelope = geometry.getEnvelopeInternal();
+    final com.revolsys.jts.geom.BoundingBox envelope = geometry.getBoundingBox();
     return getEdges(filter, envelope);
   }
 
@@ -659,6 +660,12 @@ public class Graph<T> {
   }
 
   public List<Node<T>> getNodes(final Filter<Node<T>> filter,
+    final com.revolsys.jts.geom.BoundingBox envelope) {
+    return getNodes(filter, null, envelope);
+
+  }
+
+  public List<Node<T>> getNodes(final Filter<Node<T>> filter,
     final Comparator<Node<T>> comparator) {
     final List<Node<T>> targetNodes = getNodes(filter);
     if (comparator != null) {
@@ -668,7 +675,8 @@ public class Graph<T> {
   }
 
   public List<Node<T>> getNodes(final Filter<Node<T>> filter,
-    final Comparator<Node<T>> comparator, final Envelope envelope) {
+    final Comparator<Node<T>> comparator,
+    final com.revolsys.jts.geom.BoundingBox envelope) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>(
       filter);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
@@ -680,12 +688,6 @@ public class Graph<T> {
       Collections.sort(nodes, comparator);
     }
     return nodes;
-
-  }
-
-  public List<Node<T>> getNodes(final Filter<Node<T>> filter,
-    final Envelope envelope) {
-    return getNodes(filter, null, envelope);
 
   }
 
@@ -930,7 +932,7 @@ public class Graph<T> {
   }
 
   public void queryEdges(final EdgeVisitor<T> visitor) {
-    final Envelope env = visitor.getEnvelope();
+    final com.revolsys.jts.geom.BoundingBox env = visitor.getEnvelope();
     final IdObjectIndex<Edge<T>> index = getEdgeIndex();
     index.visit(env, visitor);
   }
@@ -1382,7 +1384,8 @@ public class Graph<T> {
     visitEdges(filter, comparator, visitor);
   }
 
-  public void visitEdges(final Visitor<Edge<T>> visitor, final Envelope envelope) {
+  public void visitEdges(final Visitor<Edge<T>> visitor,
+    final com.revolsys.jts.geom.BoundingBox envelope) {
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.visit(envelope, visitor);
   }

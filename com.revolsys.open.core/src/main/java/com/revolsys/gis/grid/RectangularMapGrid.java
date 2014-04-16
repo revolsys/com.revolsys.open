@@ -2,8 +2,9 @@ package com.revolsys.gis.grid;
 
 import java.util.List;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
 
 public interface RectangularMapGrid {
@@ -13,20 +14,21 @@ public interface RectangularMapGrid {
 
   String getFormattedMapTileName(String name);
 
-  com.revolsys.jts.geom.GeometryFactory getGeometryFactory();
+  GeometryFactory getGeometryFactory();
 
   String getMapTileName(final double x, final double y);
 
   String getName();
 
   Polygon getPolygon(final String mapTileName,
-    final CoordinateSystem coordinateSystem);
-
-  Polygon getPolygon(final String mapTileName,
     final com.revolsys.jts.geom.GeometryFactory geometryFactory);
 
   Polygon getPolygon(final String mapTileName,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, int numX, int numY);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory, int numX,
+    int numY);
+
+  Polygon getPolygon(final String mapTileName,
+    final CoordinateSystem coordinateSystem);
 
   RectangularMapTile getTileByLocation(double x, double y);
 

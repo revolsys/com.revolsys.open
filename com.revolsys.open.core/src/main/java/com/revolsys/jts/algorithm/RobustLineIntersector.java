@@ -36,7 +36,7 @@ package com.revolsys.jts.algorithm;
  *@version 1.7
  */
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -334,8 +334,8 @@ public class RobustLineIntersector extends LineIntersector {
    * @return <code>true</code> if the input point lies within both input segment envelopes
    */
   private boolean isInSegmentEnvelopes(final Coordinates intPt) {
-    final Envelope env0 = new Envelope(inputLines[0][0], inputLines[0][1]);
-    final Envelope env1 = new Envelope(inputLines[1][0], inputLines[1][1]);
+    final BoundingBox env0 = new Envelope(inputLines[0][0], inputLines[0][1]);
+    final BoundingBox env1 = new Envelope(inputLines[1][0], inputLines[1][1]);
     return env0.contains(intPt) && env1.contains(intPt);
   }
 
@@ -374,10 +374,10 @@ public class RobustLineIntersector extends LineIntersector {
     normPt.setY(intMidY);
 
     /*
-     * // equilavalent code using more modular but slower method Envelope env0 =
-     * new Envelope(n00, n01); Envelope env1 = new Envelope(n10, n11); Envelope
-     * intEnv = env0.intersection(env1); Coordinates intMidPt = intEnv.centre();
-     * normPt.x = intMidPt.x; normPt.y = intMidPt.y;
+     * // equilavalent code using more modular but slower method BoundingBox
+     * env0 = new Envelope(n00, n01); BoundingBox env1 = new Envelope(n10, n11);
+     * Envelope intEnv = env0.intersection(env1); Coordinates intMidPt =
+     * intEnv.centre(); normPt.x = intMidPt.x; normPt.y = intMidPt.y;
      */
 
     n00.setX(n00.getX() - normPt.getX());

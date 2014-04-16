@@ -3,9 +3,9 @@ package com.revolsys.gis.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -32,7 +32,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBox(GEOMETRY_FACTORY, lon, lat, lon - tileWidth, lat
+    return new Envelope(GEOMETRY_FACTORY, lon, lat, lon - tileWidth, lat
       + tileHeight);
   }
 
@@ -187,7 +187,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
-    final Envelope envelope = boundingBox.convert(getGeometryFactory());
+    final com.revolsys.jts.geom.BoundingBox envelope = boundingBox.convert(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
     final int minXCeil = (int)Math.ceil(envelope.getMinX() / tileWidth);
     final double minX = minXCeil * tileWidth;

@@ -230,7 +230,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
       final long recordIndex = out.getFilePointer();
       Geometry geometry = object.getGeometryValue();
       geometry = GeometryProjectionUtil.performCopy(geometry, geometryFactory);
-      envelope.expandToInclude(geometry.getEnvelopeInternal());
+      envelope.expandToInclude(geometry.getBoundingBox());
       if (geometry == null || geometry.isEmpty()) {
         writeNull(out);
       } else {

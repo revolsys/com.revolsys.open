@@ -13,8 +13,8 @@ import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -661,7 +661,7 @@ public final class ShapefileGeometryUtil {
     JavaBeanUtil.method(method, this, out, geometry);
   }
 
-  public void writeEnvelope(final EndianOutput out, final Envelope envelope)
+  public void writeEnvelope(final EndianOutput out, final BoundingBox envelope)
     throws IOException {
     out.writeLEDouble(envelope.getMinX());
     out.writeLEDouble(envelope.getMinY());
@@ -769,7 +769,7 @@ public final class ShapefileGeometryUtil {
         // (numPoints * 2 * BYTES_IN_DOUBLE)) / BYTES_IN_SHORT;
         out.writeInt(recordLength);
       }
-      final Envelope envelope = geometry.getEnvelopeInternal();
+      final BoundingBox envelope = geometry.getBoundingBox();
       out.writeLEInt(shapeType);
       writeEnvelope(out, envelope);
       out.writeLEInt(numPoints);
@@ -924,7 +924,7 @@ public final class ShapefileGeometryUtil {
       out.writeInt(recordLength);
     }
     out.writeLEInt(shapeType);
-    final Envelope envelope = geometry.getEnvelopeInternal();
+    final BoundingBox envelope = geometry.getBoundingBox();
     writeEnvelope(out, envelope);
     out.writeLEInt(numParts);
     out.writeLEInt(numPoints);
@@ -973,7 +973,7 @@ public final class ShapefileGeometryUtil {
     if (geometry instanceof LineString || geometry instanceof MultiLineString) {
       final int numCoordinates = geometry.getVertexCount();
       final int numGeometries = geometry.getNumGeometries();
-      final Envelope envelope = geometry.getEnvelopeInternal();
+      final BoundingBox envelope = geometry.getBoundingBox();
 
       if (writeLength) {
         // final int recordLength = ((3 + numGeometries) * BYTES_IN_INT + (4 + 2

@@ -15,7 +15,6 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import com.revolsys.collection.InvokeMethodVisitor;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -29,8 +28,10 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -468,7 +469,7 @@ public class CoordinatesListUtil {
 
   public static BoundingBox getBoundingBox(
     final GeometryFactory geometryFactory, final CoordinatesList points) {
-    BoundingBox boundingBox = new BoundingBox(geometryFactory);
+    BoundingBox boundingBox = new Envelope(geometryFactory);
     for (final Coordinates point : points) {
       boundingBox = boundingBox.expand(point);
     }

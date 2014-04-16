@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.geom.util;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -82,7 +82,7 @@ public class SineStarFactory extends GeometricShapeFactory {
    * @return the geometry representing the sine star
    */
   public Geometry createSineStar() {
-    final Envelope env = dim.getEnvelope();
+    final BoundingBox env = dim.getEnvelope();
     final double radius = env.getWidth() / 2.0;
 
     double armRatio = armLengthRatio;

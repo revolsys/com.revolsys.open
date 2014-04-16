@@ -74,8 +74,8 @@ class BasicPreparedGeometry implements PreparedGeometry {
     // since raw relate is used, provide some optimizations
 
     // short-circuit test
-    if (!baseGeom.getEnvelopeInternal()
-      .contains(geometry.getEnvelopeInternal())) {
+    if (!baseGeom.getBoundingBox()
+      .contains(geometry.getBoundingBox())) {
       return false;
     }
 
@@ -125,7 +125,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * @return true if g is contained in this envelope
    */
   protected boolean envelopeCovers(final Geometry geometry) {
-    if (!baseGeom.getEnvelopeInternal().covers(geometry.getEnvelopeInternal())) {
+    if (!baseGeom.getBoundingBox().covers(geometry.getBoundingBox())) {
       return false;
     }
     return true;
@@ -139,8 +139,8 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * @return true if the envelopes intersect
    */
   protected boolean envelopesIntersect(final Geometry geometry) {
-    if (!baseGeom.getEnvelopeInternal().intersects(
-      geometry.getEnvelopeInternal())) {
+    if (!baseGeom.getBoundingBox().intersects(
+      geometry.getBoundingBox())) {
       return false;
     }
     return true;

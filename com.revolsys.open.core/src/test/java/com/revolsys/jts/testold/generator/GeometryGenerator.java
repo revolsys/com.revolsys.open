@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.testold.generator;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -118,7 +118,7 @@ public abstract class GeometryGenerator {
 
   protected GeometryFactory geometryFactory; // includes srid
 
-  protected Envelope boundingBox;
+  protected BoundingBox boundingBox;
 
   /**
    * @return A Geometry which uses some or all of the Bounding Box specified.
@@ -128,7 +128,7 @@ public abstract class GeometryGenerator {
   /**
    * @return Returns the boundingBox.
    */
-  public Envelope getBoundingBox() {
+  public BoundingBox getBoundingBox() {
     return this.boundingBox;
   }
 
@@ -149,7 +149,7 @@ public abstract class GeometryGenerator {
   /**
    * @param boundingBox The boundingBox to set.
    */
-  public void setBoundingBox(final Envelope boundingBox) {
+  public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
   }
 

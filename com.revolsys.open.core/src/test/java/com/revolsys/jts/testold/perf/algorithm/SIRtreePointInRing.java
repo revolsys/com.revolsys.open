@@ -37,9 +37,9 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.PointInRing;
 import com.revolsys.jts.algorithm.RobustDeterminant;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.index.strtree.SIRtree;
@@ -67,7 +67,7 @@ public class SIRtreePointInRing implements PointInRing {
   }
 
   private void buildIndex() {
-    final Envelope env = this.ring.getEnvelopeInternal();
+    final BoundingBox env = this.ring.getBoundingBox();
     this.sirTree = new SIRtree();
 
     final Coordinates[] pts = this.ring.getCoordinateArray();

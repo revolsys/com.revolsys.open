@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 
 public abstract class NodeBase {
-  public static int getSubnodeIndex(final Envelope envelope,
-    final Coordinates centre) {
+  public static int getSubnodeIndex(
+    final com.revolsys.jts.geom.BoundingBox envelope, final Coordinates centre) {
     int subnodeIndex = -1;
     final double minX = envelope.getMinX();
     final double minY = envelope.getMinY();
@@ -50,7 +49,8 @@ public abstract class NodeBase {
     }
   }
 
-  public void add(final Envelope envelope, final int[] item) {
+  public void add(final com.revolsys.jts.geom.BoundingBox envelope,
+    final int[] item) {
     for (int i = 0; i < segmentIndexes.size(); i++) {
       final int[] oldItem = segmentIndexes.get(i);
       if (oldItem == item) {
@@ -122,7 +122,7 @@ public abstract class NodeBase {
     return !(hasChildren() || hasItems());
   }
 
-  protected abstract boolean isSearchMatch(Envelope searchEnv);
+  protected abstract boolean isSearchMatch(BoundingBox searchEnv);
 
   protected void setNode(final int i, final Node node) {
     nodes.set(i, node);

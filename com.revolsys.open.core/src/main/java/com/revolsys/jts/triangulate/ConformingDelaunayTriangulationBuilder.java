@@ -103,7 +103,7 @@ public class ConformingDelaunayTriangulationBuilder {
 
     List segments = new ArrayList();
     if (constraintLines != null) {
-      siteEnv.expandToInclude(constraintLines.getEnvelopeInternal());
+      siteEnv.expandToInclude(constraintLines.getBoundingBox());
       createVertices(constraintLines);
       segments = createConstraintSegments(constraintLines);
     }

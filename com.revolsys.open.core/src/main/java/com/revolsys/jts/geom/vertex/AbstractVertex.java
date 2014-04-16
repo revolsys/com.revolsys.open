@@ -1,8 +1,9 @@
 package com.revolsys.jts.geom.vertex;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -29,7 +30,7 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBox(geometryFactory, this);
+    return new Envelope(geometryFactory, this);
   }
 
   @SuppressWarnings("unchecked")

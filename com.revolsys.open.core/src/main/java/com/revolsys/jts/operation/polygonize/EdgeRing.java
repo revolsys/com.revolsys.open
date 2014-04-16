@@ -38,11 +38,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
@@ -87,15 +86,15 @@ class EdgeRing {
   public static EdgeRing findEdgeRingContaining(final EdgeRing testEr,
     final List shellList) {
     final LinearRing testRing = testEr.getRing();
-    final Envelope testEnv = testRing.getEnvelopeInternal();
+    final BoundingBox testEnv = testRing.getBoundingBox();
     Coordinates testPt = testRing.getCoordinate(0);
 
     EdgeRing minShell = null;
-    Envelope minShellEnv = null;
+    BoundingBox minShellEnv = null;
     for (final Iterator it = shellList.iterator(); it.hasNext();) {
       final EdgeRing tryShell = (EdgeRing)it.next();
       final LinearRing tryShellRing = tryShell.getRing();
-      final Envelope tryShellEnv = tryShellRing.getEnvelopeInternal();
+      final BoundingBox tryShellEnv = tryShellRing.getBoundingBox();
       // the hole envelope cannot equal the shell envelope
       // (also guards against testing rings against themselves)
       if (tryShellEnv.equals(testEnv)) {
@@ -118,7 +117,7 @@ class EdgeRing {
       if (isContained) {
         if (minShell == null || minShellEnv.contains(tryShellEnv)) {
           minShell = tryShell;
-          minShellEnv = minShell.getRing().getEnvelopeInternal();
+          minShellEnv = minShell.getRing().getBoundingBox();
         }
       }
     }

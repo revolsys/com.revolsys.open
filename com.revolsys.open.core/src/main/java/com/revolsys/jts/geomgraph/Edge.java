@@ -35,6 +35,7 @@ package com.revolsys.jts.geomgraph;
 import java.io.PrintStream;
 
 import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -215,7 +216,7 @@ public class Edge extends GraphComponent {
     return eiList;
   }
 
-  public Envelope getEnvelope() {
+  public BoundingBox getEnvelope() {
     // compute envelope lazily
     if (env == null) {
       env = new Envelope();

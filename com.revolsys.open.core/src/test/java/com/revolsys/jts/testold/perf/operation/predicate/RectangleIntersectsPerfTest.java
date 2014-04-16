@@ -35,6 +35,7 @@ package com.revolsys.jts.testold.perf.operation.predicate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -99,7 +100,7 @@ public class RectangleIntersectsPerfTest {
    * @param rectSize
    * @return
    */
-  Geometry[] createRectangles(final Envelope env, final int nRect,
+  Geometry[] createRectangles(final BoundingBox env, final int nRect,
     final double rectSize) {
     final int nSide = 1 + (int)Math.sqrt(nRect);
     final double dx = env.getWidth() / nSide;
@@ -110,7 +111,7 @@ public class RectangleIntersectsPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final Envelope envRect = new Envelope(baseX, baseX + dx, baseY, baseY
+        final BoundingBox envRect = new Envelope(baseX, baseY, baseX + dx, baseY
           + dy);
         final Geometry rect = fact.toGeometry(envRect);
         rectList.add(rect);
@@ -181,7 +182,7 @@ public class RectangleIntersectsPerfTest {
 
   void testRectangles(final Geometry target, final int nRect,
     final double rectSize) {
-    final Geometry[] rects = createRectangles(target.getEnvelopeInternal(),
+    final Geometry[] rects = createRectangles(target.getBoundingBox(),
       nRect, rectSize);
     test(rects, target);
   }

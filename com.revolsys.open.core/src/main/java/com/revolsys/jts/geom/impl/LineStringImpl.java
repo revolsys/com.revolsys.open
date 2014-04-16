@@ -38,6 +38,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
@@ -234,11 +235,12 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   }
 
   @Override
-  protected Envelope computeEnvelopeInternal() {
+  protected BoundingBox computeEnvelopeInternal() {
+    final Envelope envelope = new Envelope(getGeometryFactory());
     if (isEmpty()) {
-      return new Envelope();
+      return envelope;
     } else {
-      return getCoordinatesList().expandEnvelope(new Envelope());
+      return getCoordinatesList().expandEnvelope(envelope);
     }
   }
 

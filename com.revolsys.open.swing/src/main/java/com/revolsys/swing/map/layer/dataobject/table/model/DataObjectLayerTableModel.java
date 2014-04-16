@@ -23,7 +23,7 @@ import javax.swing.SwingWorker;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;

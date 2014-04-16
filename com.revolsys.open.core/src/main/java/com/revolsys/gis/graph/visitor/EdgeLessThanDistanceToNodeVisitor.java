@@ -3,10 +3,10 @@ package com.revolsys.gis.graph.visitor;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.visitor.CreateListVisitor;
@@ -18,7 +18,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
     final Node<T> node, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
     final Coordinates point = node;
-    BoundingBox env = new BoundingBox(point);
+    BoundingBox env = new Envelope(point);
     env = env.expand(maxDistance);
     graph.getEdgeIndex().visit(env,
       new EdgeLessThanDistanceToNodeVisitor<T>(node, maxDistance, results));
@@ -38,13 +38,13 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
     this.node = node;
     this.maxDistance = maxDistance;
     final Coordinates point = node;
-    this.envelope = new BoundingBox(point);
+    this.envelope = new Envelope(point);
     this.envelope = this.envelope.expand(maxDistance);
   }
 
   @Override
   public boolean visit(final Edge<T> edge) {
-    final Envelope envelope = edge.getEnvelope();
+    final com.revolsys.jts.geom.BoundingBox envelope = edge.getEnvelope();
     if (this.envelope.distance(envelope) < maxDistance) {
       if (!edge.hasNode(node)) {
         if (edge.isLessThanDistance(node, maxDistance)) {

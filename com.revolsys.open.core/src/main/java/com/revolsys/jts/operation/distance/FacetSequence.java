@@ -35,6 +35,7 @@ package com.revolsys.jts.operation.distance;
 
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -86,7 +87,7 @@ public class FacetSequence
     this.end = start + 1;
   }
   
-  public Envelope getEnvelope()
+  public BoundingBox getEnvelope()
   {
     Envelope env = new Envelope();
     for (int i = start; i < end; i++) {

@@ -40,6 +40,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
@@ -183,13 +184,12 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
-  protected Envelope computeEnvelopeInternal() {
+  protected BoundingBox computeEnvelopeInternal() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return new Envelope();
+      return new Envelope(geometryFactory);
     } else {
-      final double x = getX();
-      final double y = getY();
-      return new Envelope(x, y);
+      return new Envelope(geometryFactory, this);
     }
   }
 

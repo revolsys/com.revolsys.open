@@ -36,8 +36,8 @@ package com.revolsys.jts.index.kdtree;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 
 /**
  * An implementation of a 2-D KD-Tree. KD-trees provide fast range searching on
@@ -179,7 +179,7 @@ public class KdTree {
    *          the range rectangle to query
    * @return a list of the KdNodes found
    */
-  public List query(final Envelope queryEnv) {
+  public List query(final BoundingBox queryEnv) {
     final List result = new ArrayList();
     queryNode(root, last, queryEnv, true, result);
     return result;
@@ -193,12 +193,12 @@ public class KdTree {
    * @param result
    *          a list to accumulate the result nodes into
    */
-  public void query(final Envelope queryEnv, final List result) {
+  public void query(final BoundingBox queryEnv, final List result) {
     queryNode(root, last, queryEnv, true, result);
   }
 
   private void queryNode(final KdNode currentNode, final KdNode bottomNode,
-    final Envelope queryEnv, final boolean odd, final List result) {
+    final BoundingBox queryEnv, final boolean odd, final List result) {
     if (currentNode == bottomNode) {
       return;
     }

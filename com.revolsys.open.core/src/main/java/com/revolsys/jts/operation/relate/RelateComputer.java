@@ -112,8 +112,8 @@ public class RelateComputer {
 
     // if the Geometries don't overlap there is nothing to do
     if (!arg[0].getGeometry()
-      .getEnvelopeInternal()
-      .intersects(arg[1].getGeometry().getEnvelopeInternal())) {
+      .getBoundingBox()
+      .intersects(arg[1].getGeometry().getBoundingBox())) {
       computeDisjointIM(im);
       return im;
     }

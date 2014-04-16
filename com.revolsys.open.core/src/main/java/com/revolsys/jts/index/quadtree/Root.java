@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,9 +32,9 @@
  */
 package com.revolsys.jts.index.quadtree;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -44,23 +43,20 @@ import com.revolsys.jts.util.Assert;
  *
  * @version 1.7
  */
-public class Root
-  extends NodeBase
-{
+public class Root extends NodeBase {
 
   // the singleton root quad is centred at the origin.
-  private static final Coordinates origin = new Coordinate((double)0.0, 0.0, Coordinates.NULL_ORDINATE);
+  private static final Coordinates origin = new Coordinate(0.0, 0.0,
+    Coordinates.NULL_ORDINATE);
 
-  public Root()
-  {
+  public Root() {
   }
 
   /**
    * Insert an item into the quadtree this is the root of.
    */
-  public void insert(Envelope itemEnv, Object item)
-  {
-    int index = getSubnodeIndex(itemEnv, origin.getX(), origin.getY());
+  public void insert(final BoundingBox itemEnv, final Object item) {
+    final int index = getSubnodeIndex(itemEnv, origin.getX(), origin.getY());
     // if index is -1, itemEnv must cross the X or Y axis.
     if (index == -1) {
       add(item);
@@ -70,23 +66,23 @@ public class Root
      * the item must be contained in one quadrant, so insert it into the
      * tree for that quadrant (which may not yet exist)
      */
-    Node node = subnode[index];
+    final Node node = subnode[index];
     /**
      *  If the subquad doesn't exist or this item is not contained in it,
      *  have to expand the tree upward to contain the item.
      */
 
-    if (node == null || ! node.getEnvelope().contains(itemEnv)) {
-       Node largerNode = Node.createExpanded(node, itemEnv);
-       subnode[index] = largerNode;
+    if (node == null || !node.getEnvelope().contains(itemEnv)) {
+      final Node largerNode = Node.createExpanded(node, itemEnv);
+      subnode[index] = largerNode;
     }
     /**
      * At this point we have a subquad which exists and must contain
      * contains the env for the item.  Insert the item into the tree.
      */
     insertContained(subnode[index], itemEnv, item);
-    //System.out.println("depth = " + root.depth() + " size = " + root.size());
-    //System.out.println(" size = " + size());
+    // System.out.println("depth = " + root.depth() + " size = " + root.size());
+    // System.out.println(" size = " + size());
   }
 
   /**
@@ -94,28 +90,30 @@ public class Root
    * the given QuadNode root.  Lower levels of the tree will be created
    * if necessary to hold the item.
    */
-  private void insertContained(Node tree, Envelope itemEnv, Object item)
-  {
+  private void insertContained(final Node tree, final BoundingBox itemEnv,
+    final Object item) {
     Assert.isTrue(tree.getEnvelope().contains(itemEnv));
-   /**
-    * Do NOT create a new quad for zero-area envelopes - this would lead
-    * to infinite recursion. Instead, use a heuristic of simply returning
-    * the smallest existing quad containing the query
-    */
-    boolean isZeroX = IntervalSize.isZeroWidth(itemEnv.getMinX(), itemEnv.getMaxX());
-    boolean isZeroY = IntervalSize.isZeroWidth(itemEnv.getMinY(), itemEnv.getMaxY());
+    /**
+     * Do NOT create a new quad for zero-area envelopes - this would lead
+     * to infinite recursion. Instead, use a heuristic of simply returning
+     * the smallest existing quad containing the query
+     */
+    final boolean isZeroX = IntervalSize.isZeroWidth(itemEnv.getMinX(),
+      itemEnv.getMaxX());
+    final boolean isZeroY = IntervalSize.isZeroWidth(itemEnv.getMinY(),
+      itemEnv.getMaxY());
     NodeBase node;
-    if (isZeroX || isZeroY)
+    if (isZeroX || isZeroY) {
       node = tree.find(itemEnv);
-    else
+    } else {
       node = tree.getNode(itemEnv);
+    }
     node.add(item);
   }
 
-  protected boolean isSearchMatch(Envelope searchEnv)
-  {
+  @Override
+  protected boolean isSearchMatch(final BoundingBox searchEnv) {
     return true;
   }
-
 
 }

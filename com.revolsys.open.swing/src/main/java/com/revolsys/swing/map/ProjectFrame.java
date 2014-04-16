@@ -45,11 +45,12 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
@@ -464,7 +465,7 @@ public class ProjectFrame extends BaseFrame {
     folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
 
     final BoundingBox initialBoundingBox = project.getInitialBoundingBox();
-    if (!BoundingBox.isEmpty(initialBoundingBox)) {
+    if (!Envelope.isEmpty(initialBoundingBox)) {
       project.setGeometryFactory(initialBoundingBox.getGeometryFactory());
       project.setViewBoundingBox(initialBoundingBox);
     }

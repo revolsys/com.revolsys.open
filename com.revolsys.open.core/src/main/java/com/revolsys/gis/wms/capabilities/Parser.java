@@ -78,7 +78,8 @@ public class Parser extends XmlProcessor {
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final Envelope envelope = new Envelope(minX, maxX, minY, maxY);
+    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(minX, minY,
+      maxX, maxY);
     boundingBox.setEnvelope(envelope);
     final double resX = StaxUtils.getDoubleAttribute(parser, null, "resx");
     boundingBox.setResX(resX);
@@ -334,13 +335,14 @@ public class Parser extends XmlProcessor {
     return keywords;
   }
 
-  public Envelope processLatLonBoundingBox(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+  public com.revolsys.jts.geom.BoundingBox processLatLonBoundingBox(
+    final XMLStreamReader parser) throws XMLStreamException, IOException {
     final double minX = StaxUtils.getDoubleAttribute(parser, null, "minx");
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final Envelope envelope = new Envelope(minX, maxX, minY, maxY);
+    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(minX, minY,
+      maxX, maxY);
     StaxUtils.skipSubTree(parser);
     return envelope;
 
@@ -385,8 +387,8 @@ public class Parser extends XmlProcessor {
         layer.addFeatureListUrl(processFormatUrl(parser));
       } else {
         final Object object = process(parser);
-        if (object instanceof Envelope) {
-          layer.setLatLonBoundingBox((Envelope)object);
+        if (object instanceof com.revolsys.jts.geom.BoundingBox) {
+          layer.setLatLonBoundingBox((com.revolsys.jts.geom.BoundingBox)object);
         } else if (object instanceof BoundingBox) {
           layer.addBoundingBox((BoundingBox)object);
         } else if (object instanceof Dimension) {

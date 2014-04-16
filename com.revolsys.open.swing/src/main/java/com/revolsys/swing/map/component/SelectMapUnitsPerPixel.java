@@ -21,7 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.swing.field.InvokeMethodStringConverter;

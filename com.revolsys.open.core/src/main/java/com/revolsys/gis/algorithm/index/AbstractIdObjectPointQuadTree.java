@@ -3,8 +3,8 @@ package com.revolsys.gis.algorithm.index;
 import java.util.Collection;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 
 public abstract class AbstractIdObjectPointQuadTree<T> extends
   AbstractPointSpatialIndex<T> implements IdObjectIndex<T> {
@@ -52,7 +52,7 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
   }
 
   @Override
-  public void visit(final Envelope envelope, final Visitor<T> visitor) {
+  public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
     final IdObjectIndexEnvelopeVisitor<T> itemVisitor = new IdObjectIndexEnvelopeVisitor<T>(
       this, envelope, visitor);
     index.visit(envelope, itemVisitor);

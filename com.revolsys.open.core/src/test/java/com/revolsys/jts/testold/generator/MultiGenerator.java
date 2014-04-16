@@ -34,7 +34,7 @@ package com.revolsys.jts.testold.generator;
 
 import java.util.ArrayList;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -172,7 +172,7 @@ public class MultiGenerator extends GeometryGenerator {
    * @see com.revolsys.jts.testold.generator.GeometryGenerator#setBoundingBox(com.revolsys.jts.testold.geom.Envelope)
    */
   @Override
-  public void setBoundingBox(final Envelope boundingBox) {
+  public void setBoundingBox(final BoundingBox boundingBox) {
     super.setBoundingBox(boundingBox);
     if (this.generator != null) {
       this.generator.setBoundingBox(boundingBox);

@@ -9,6 +9,7 @@ import java.util.List;
 import com.revolsys.collection.ArrayUtil;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 
 public class RTreeBranch<T> extends RTreeNode<T> implements
@@ -64,7 +65,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
 
   @Override
   public boolean remove(final LinkedList<RTreeNode<T>> path,
-    final Envelope envelope, final T object) {
+    final BoundingBox envelope, final T object) {
     for (int i = 0; i < size; i++) {
       final RTreeNode<T> node = nodes[i];
       if (node.contains(envelope)) {
@@ -123,7 +124,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
 
   @Override
   protected void updateEnvelope() {
-    init();
+    setToNull();
     for (int i = 0; i < size; i++) {
       final Envelope envelope = nodes[i];
       expandToInclude(envelope);
@@ -131,7 +132,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   }
 
   @Override
-  public boolean visit(final Envelope envelope, final Filter<T> filter,
+  public boolean visit(final BoundingBox envelope, final Filter<T> filter,
     final Visitor<T> visitor) {
     for (int i = 0; i < size; i++) {
       final RTreeNode<T> node = nodes[i];
@@ -145,7 +146,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   }
 
   @Override
-  public boolean visit(final Envelope envelope, final Visitor<T> visitor) {
+  public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
     for (int i = 0; i < size; i++) {
       final RTreeNode<T> node = nodes[i];
       if (envelope.intersects(node)) {

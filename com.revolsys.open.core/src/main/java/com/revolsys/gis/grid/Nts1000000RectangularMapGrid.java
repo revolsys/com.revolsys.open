@@ -8,8 +8,9 @@ import java.util.regex.Pattern;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.PrecisionModel;
 
@@ -43,7 +44,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBox(getGeometryFactory(), lon, lat, lon - tileWidth, lat
+    return new Envelope(getGeometryFactory(), lon, lat, lon - tileWidth, lat
       + tileHeight);
   }
 

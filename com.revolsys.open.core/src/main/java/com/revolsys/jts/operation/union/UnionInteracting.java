@@ -129,7 +129,7 @@ public class UnionInteracting
 		boolean interactsWithAny = false;
 		for (int i = 0; i < g1.getNumGeometries(); i++) {
 			Geometry elem1 = g1.getGeometry(i);
-			boolean interacts = elem1.getEnvelopeInternal().intersects(elem0.getEnvelopeInternal());
+			boolean interacts = elem1.getBoundingBox().intersects(elem0.getBoundingBox());
 			if (interacts) interacts1[i] = true;
 			if (interacts) 
 				interactsWithAny = true;

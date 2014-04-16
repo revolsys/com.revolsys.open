@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;

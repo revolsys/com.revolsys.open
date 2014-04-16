@@ -8,7 +8,8 @@ import java.net.URLConnection;
 
 import javax.imageio.ImageIO;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class OpenStreetMapClient {
@@ -34,7 +35,7 @@ public class OpenStreetMapClient {
     final double y1 = getLatitude(zoomLevel, tileY);
     final double x2 = getLongitude(zoomLevel, tileX + 1);
     final double y2 = getLatitude(zoomLevel, tileY + 1);
-    return new BoundingBox(GeometryFactory.wgs84(), x1, y1, x2, y2).convert(GeometryFactory.worldMercator());
+    return new Envelope(GeometryFactory.wgs84(), x1, y1, x2, y2).convert(GeometryFactory.worldMercator());
   }
 
   protected BufferedImage getImage(final String url) {

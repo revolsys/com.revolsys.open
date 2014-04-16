@@ -3,8 +3,6 @@ package com.revolsys.gis.wms.capabilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Envelope;
-
 public class WmsLayer {
   private String name;
 
@@ -16,7 +14,7 @@ public class WmsLayer {
 
   private final List<String> srs = new ArrayList<String>();
 
-  private Envelope latLonBoundingBox;
+  private com.revolsys.jts.geom.BoundingBox latLonBoundingBox;
 
   private List<BoundingBox> boundingBoxes = new ArrayList<BoundingBox>();
 
@@ -160,7 +158,7 @@ public class WmsLayer {
     return keywords;
   }
 
-  public Envelope getLatLonBoundingBox() {
+  public com.revolsys.jts.geom.BoundingBox getLatLonBoundingBox() {
     return latLonBoundingBox;
   }
 
@@ -260,7 +258,7 @@ public class WmsLayer {
     this.keywords = keywords;
   }
 
-  public void setLatLonBoundingBox(final Envelope latLonBoundingBox) {
+  public void setLatLonBoundingBox(final com.revolsys.jts.geom.BoundingBox latLonBoundingBox) {
     this.latLonBoundingBox = latLonBoundingBox;
   }
 

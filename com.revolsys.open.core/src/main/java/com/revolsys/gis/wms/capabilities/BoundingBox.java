@@ -1,17 +1,16 @@
 package com.revolsys.gis.wms.capabilities;
 
-import com.revolsys.jts.geom.Envelope;
 
 public class BoundingBox {
   private String srs;
 
-  private Envelope envelope;
+  private com.revolsys.jts.geom.BoundingBox envelope;
 
   private double resX;
 
   private double resY;
 
-  public Envelope getEnvelope() {
+  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
     return envelope;
   }
 
@@ -27,7 +26,7 @@ public class BoundingBox {
     return srs;
   }
 
-  public void setEnvelope(final Envelope envelope) {
+  public void setEnvelope(final com.revolsys.jts.geom.BoundingBox envelope) {
     this.envelope = envelope;
   }
 

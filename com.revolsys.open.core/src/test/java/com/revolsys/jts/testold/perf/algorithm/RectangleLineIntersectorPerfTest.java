@@ -35,6 +35,7 @@ package com.revolsys.jts.testold.perf.algorithm;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -64,7 +65,7 @@ public class RectangleLineIntersectorPerfTest {
 
   private final double rectSize = 100;
 
-  private Envelope rectEnv;
+  private BoundingBox rectEnv;
 
   private Coordinates[] pts;
 
@@ -72,8 +73,8 @@ public class RectangleLineIntersectorPerfTest {
 
   }
 
-  private Envelope createRectangle() {
-    final Envelope rectEnv = new Envelope(new Coordinate(this.baseX,
+  private BoundingBox createRectangle() {
+    final BoundingBox rectEnv = new Envelope(new Coordinate(this.baseX,
       this.baseY, Coordinates.NULL_ORDINATE), new Coordinate(this.baseX
       + this.rectSize, this.baseY + this.rectSize, Coordinates.NULL_ORDINATE));
     return rectEnv;
@@ -153,7 +154,7 @@ class SimpleRectangleIntersector {
   // for intersection testing, don't need to set precision model
   private final LineIntersector li = new RobustLineIntersector();
 
-  private final Envelope rectEnv;
+  private final BoundingBox rectEnv;
 
   /**
    * The corners of the rectangle, in the order:
@@ -162,12 +163,12 @@ class SimpleRectangleIntersector {
    */
   private final Coordinates[] corner = new Coordinates[4];
 
-  public SimpleRectangleIntersector(final Envelope rectEnv) {
+  public SimpleRectangleIntersector(final BoundingBox rectEnv) {
     this.rectEnv = rectEnv;
     initCorners(rectEnv);
   }
 
-  private void initCorners(final Envelope rectEnv) {
+  private void initCorners(final BoundingBox rectEnv) {
     this.corner[0] = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY(),
       Coordinates.NULL_ORDINATE);
     this.corner[1] = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY(),

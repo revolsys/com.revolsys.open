@@ -59,7 +59,7 @@ public class UnionPerfTester {
       if (o instanceof List) {
         printItemEnvelopes((List)o);
       } else if (o instanceof Geometry) {
-        itemEnv.expandToInclude(((Geometry)o).getEnvelopeInternal());
+        itemEnv.expandToInclude(((Geometry)o).getBoundingBox());
       }
     }
     System.out.println(this.factory.toGeometry(itemEnv));

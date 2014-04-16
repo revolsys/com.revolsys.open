@@ -1,8 +1,8 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.quadtree.IntervalSize;
 
 public class Root<T> extends NodeBase<T> {
@@ -11,7 +11,7 @@ public class Root<T> extends NodeBase<T> {
   public Root() {
   }
 
-  public void insert(final Envelope envelope, final T item) {
+  public void insert(final BoundingBox envelope, final T item) {
     final int index = getSubnodeIndex(envelope, origin);
     if (index == -1) {
       add(envelope, item);
@@ -25,7 +25,7 @@ public class Root<T> extends NodeBase<T> {
     }
   }
 
-  private void insertContained(final Node<T> tree, final Envelope envelope,
+  private void insertContained(final Node<T> tree, final BoundingBox envelope,
     final T item) {
     final boolean isZeroX = IntervalSize.isZeroWidth(envelope.getMinX(),
       envelope.getMaxX());
@@ -41,7 +41,7 @@ public class Root<T> extends NodeBase<T> {
   }
 
   @Override
-  protected boolean isSearchMatch(final Envelope searchEnv) {
+  protected boolean isSearchMatch(final BoundingBox searchEnv) {
     return true;
   }
 

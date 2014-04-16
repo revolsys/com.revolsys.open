@@ -118,7 +118,7 @@ public class SimplePointInAreaLocator
   private static boolean isPointInRing(Coordinates p, LinearRing ring)
   {
   	// short-circuit if point is not in ring envelope
-  	if (! ring.getEnvelopeInternal().intersects(p))
+  	if (! ring.getBoundingBox().intersects(p))
   		return false;
   	return CGAlgorithms.isPointInRing(p, ring.getCoordinateArray());
   }

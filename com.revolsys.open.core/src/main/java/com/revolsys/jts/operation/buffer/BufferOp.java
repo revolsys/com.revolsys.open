@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.buffer;
 /**
  * @version 1.7
  */
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.PrecisionModel;
@@ -130,7 +130,7 @@ public class BufferOp
       double distance,
     int maxPrecisionDigits)
   {
-    Envelope env = g.getEnvelopeInternal();
+    BoundingBox env = g.getBoundingBox();
     double envMax = MathUtil.max(
         Math.abs(env.getMaxX()), 
             Math.abs(env.getMaxY()), 
@@ -153,7 +153,7 @@ public class BufferOp
       double distance,
     int maxPrecisionDigits)
   {
-    Envelope env = g.getEnvelopeInternal();
+    BoundingBox env = g.getBoundingBox();
     double envSize = Math.max(env.getHeight(), env.getWidth());
     double expandByDistance = distance > 0.0 ? distance : 0.0;
     double bufEnvSize = envSize + 2 * expandByDistance;

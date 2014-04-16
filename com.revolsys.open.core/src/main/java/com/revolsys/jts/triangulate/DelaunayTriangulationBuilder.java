@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
@@ -128,7 +129,7 @@ public class DelaunayTriangulationBuilder {
       return;
     }
 
-    final Envelope siteEnv = envelope(siteCoords);
+    final BoundingBox siteEnv = envelope(siteCoords);
     final List vertices = toVertices(siteCoords);
     subdiv = new QuadEdgeSubdivision(siteEnv, tolerance);
     final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(

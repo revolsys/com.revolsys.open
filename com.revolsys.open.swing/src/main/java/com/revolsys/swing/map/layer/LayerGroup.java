@@ -20,7 +20,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
@@ -28,6 +27,8 @@ import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
@@ -303,7 +304,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
 
   @Override
   public BoundingBox getBoundingBox() {
-    BoundingBox boudingBox = new BoundingBox(getGeometryFactory());
+    BoundingBox boudingBox = new Envelope(getGeometryFactory());
     for (final Layer layer : this) {
       final BoundingBox layerBoundingBox = layer.getBoundingBox();
       if (!layerBoundingBox.isEmpty()) {
@@ -315,7 +316,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    BoundingBox boudingBox = new BoundingBox(getGeometryFactory());
+    BoundingBox boudingBox = new Envelope(getGeometryFactory());
     if (isExists() && (!visibleLayersOnly || isVisible())) {
       for (final Layer layer : this) {
         if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {

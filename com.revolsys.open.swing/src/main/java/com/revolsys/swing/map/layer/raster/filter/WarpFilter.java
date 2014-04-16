@@ -4,9 +4,9 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import com.jhlabs.image.WholeImageFilter;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Point;

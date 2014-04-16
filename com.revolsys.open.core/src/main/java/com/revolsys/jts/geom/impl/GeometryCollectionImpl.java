@@ -41,6 +41,7 @@ import java.util.TreeSet;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
@@ -72,6 +73,10 @@ public class GeometryCollectionImpl extends GeometryImpl implements
    */
   private Geometry[] geometries;
 
+  public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
+    super(geometryFactory);
+  }
+
   /**
    * @param geometries
    *            the <code>Geometry</code>s for this <code>GeometryCollection</code>,
@@ -90,10 +95,6 @@ public class GeometryCollectionImpl extends GeometryImpl implements
     } else {
       this.geometries = geometries;
     }
-  }
-
-  public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
-    super(geometryFactory);
   }
 
   @Override
@@ -183,10 +184,10 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   }
 
   @Override
-  protected Envelope computeEnvelopeInternal() {
-    final Envelope envelope = new Envelope();
+  protected BoundingBox computeEnvelopeInternal() {
+    BoundingBox envelope = new Envelope(getGeometryFactory());
     for (final Geometry geometry : geometries()) {
-      envelope.expandToInclude(geometry.getEnvelopeInternal());
+      envelope = envelope.expandToInclude(geometry);
     }
     return envelope;
   }

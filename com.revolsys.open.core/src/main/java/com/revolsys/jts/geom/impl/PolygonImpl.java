@@ -39,13 +39,13 @@ import java.util.List;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -225,8 +225,8 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   }
 
   @Override
-  protected Envelope computeEnvelopeInternal() {
-    return shell.getEnvelopeInternal();
+  protected BoundingBox computeEnvelopeInternal() {
+    return shell.getBoundingBox();
   }
 
   @Override
@@ -290,8 +290,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
       }
       // create LineString or MultiLineString as appropriate
       if (rings.length <= 1) {
-        return getGeometryFactory().linearRing(
-          rings[0].getCoordinatesList());
+        return getGeometryFactory().linearRing(rings[0].getCoordinatesList());
       }
       return getGeometryFactory().createMultiLineString(rings);
     }
@@ -408,7 +407,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     final CoordinatesList seq = shell.getCoordinatesList();
 
     // check vertices have correct values
-    final Envelope env = getEnvelopeInternal();
+    final BoundingBox env = getBoundingBox();
     for (int i = 0; i < 5; i++) {
       final double x = seq.getX(i);
       if (!(x == env.getMinX() || x == env.getMaxX())) {

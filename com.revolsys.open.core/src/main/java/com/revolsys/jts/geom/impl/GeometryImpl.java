@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -50,6 +49,7 @@ import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.algorithm.InteriorPointArea;
 import com.revolsys.jts.algorithm.InteriorPointLine;
 import com.revolsys.jts.algorithm.InteriorPointPoint;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
@@ -250,7 +250,7 @@ public abstract class GeometryImpl implements Geometry {
   /**
    *  The bounding box of this <code>Geometry</code>.
    */
-  protected Envelope envelope;
+  private BoundingBox envelope;
 
   /**
    * The {@link GeometryFactory} used to create this Geometry
@@ -632,7 +632,7 @@ public abstract class GeometryImpl implements Geometry {
    *@return    this <code>Geometry</code>s bounding box; if the <code>Geometry</code>
    *      is empty, <code>Envelope#isNull</code> will return <code>true</code>
    */
-  protected abstract Envelope computeEnvelopeInternal();
+  protected abstract BoundingBox computeEnvelopeInternal();
 
   /**
    * Tests whether this geometry contains the
@@ -664,7 +664,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean contains(final Geometry g) {
     // short-circuit test
-    if (!getEnvelopeInternal().contains(g.getEnvelopeInternal())) {
+    if (!getBoundingBox().contains(g.getBoundingBox())) {
       return false;
     }
     // optimization for rectangle arguments
@@ -716,7 +716,7 @@ public abstract class GeometryImpl implements Geometry {
    */
   @Override
   public Geometry convexHull() {
-    ConvexHull convexHull = new ConvexHull(this);
+    final ConvexHull convexHull = new ConvexHull(this);
     return convexHull.getConvexHull();
   }
 
@@ -796,7 +796,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean covers(final Geometry g) {
     // short-circuit test
-    if (!getEnvelopeInternal().covers(g.getEnvelopeInternal())) {
+    if (!getBoundingBox().covers(g.getBoundingBox())) {
       return false;
     }
     // optimization for rectangle arguments
@@ -840,7 +840,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean crosses(final Geometry g) {
     // short-circuit test
-    if (!getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+    if (!getBoundingBox().intersects(g.getBoundingBox())) {
       return false;
     }
     return relate(g).isCrosses(getDimension(), g.getDimension());
@@ -1102,7 +1102,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean equalsTopo(final Geometry g) {
     // short-circuit test
-    if (!getEnvelopeInternal().equals(g.getEnvelopeInternal())) {
+    if (!getBoundingBox().equals(g.getBoundingBox())) {
       return false;
     }
     return relate(g).isEquals(getDimension(), g.getDimension());
@@ -1174,9 +1174,26 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public abstract int getBoundaryDimension();
 
+  /**
+   * Gets an {@link Envelope} containing 
+   * the minimum and maximum x and y values in this <code>Geometry</code>.
+   * If the geometry is empty, an empty <code>Envelope</code> 
+   * is returned.
+   * <p>
+   * The returned object is a copy of the one maintained internally,
+   * to avoid aliasing issues.  
+   * For best performance, clients which access this
+   * envelope frequently should cache the return value.
+   *
+   *@return the envelope of this <code>Geometry</code>.
+   *@return an empty BoundingBox if this Geometry is empty
+   */
   @Override
   public BoundingBox getBoundingBox() {
-    return BoundingBox.getBoundingBox(this);
+    if (envelope == null) {
+      envelope = computeEnvelopeInternal();
+    }
+    return new Envelope(envelope);
   }
 
   /**
@@ -1302,29 +1319,7 @@ public abstract class GeometryImpl implements Geometry {
    */
   @Override
   public Geometry getEnvelope() {
-    return geometryFactory.toGeometry(getEnvelopeInternal());
-  }
-
-  /**
-   * Gets an {@link Envelope} containing 
-   * the minimum and maximum x and y values in this <code>Geometry</code>.
-   * If the geometry is empty, an empty <code>Envelope</code> 
-   * is returned.
-   * <p>
-   * The returned object is a copy of the one maintained internally,
-   * to avoid aliasing issues.  
-   * For best performance, clients which access this
-   * envelope frequently should cache the return value.
-   *
-   *@return the envelope of this <code>Geometry</code>.
-   *@return an empty Envelope if this Geometry is empty
-   */
-  @Override
-  public Envelope getEnvelopeInternal() {
-    if (envelope == null) {
-      envelope = computeEnvelopeInternal();
-    }
-    return new Envelope(envelope);
+    return geometryFactory.toGeometry(getBoundingBox());
   }
 
   /**
@@ -1416,16 +1411,20 @@ public abstract class GeometryImpl implements Geometry {
 
   protected GeometryFactory getNonZeroGeometryFactory(
     GeometryFactory geometryFactory) {
-    final int geometrySrid = getSrid();
-    final int srid = geometryFactory.getSrid();
-    if (srid == 0 && geometrySrid != 0) {
-      final int numAxis = geometryFactory.getNumAxis();
-      final double scaleXY = geometryFactory.getScaleXY();
-      final double scaleZ = geometryFactory.getScaleZ();
-      geometryFactory = GeometryFactory.getFactory(geometrySrid, numAxis,
-        scaleXY, scaleZ);
+    if (geometryFactory == null) {
+      return GeometryFactory.getFactory();
+    } else {
+      final int geometrySrid = getSrid();
+      final int srid = geometryFactory.getSrid();
+      if (srid == 0 && geometrySrid != 0) {
+        final int numAxis = geometryFactory.getNumAxis();
+        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.getFactory(geometrySrid, numAxis,
+          scaleXY, scaleZ);
+      }
+      return geometryFactory;
     }
-    return geometryFactory;
   }
 
   @Override
@@ -1443,16 +1442,6 @@ public abstract class GeometryImpl implements Geometry {
   public int getNumGeometries() {
     return 1;
   }
-
-  /**
-   *  Returns the count of this <code>Geometry</code>s vertices. The <code>Geometry</code>
-   *  s contained by composite <code>Geometry</code>s must be
-   *  Geometry's; that is, they must implement <code>getNumPoints</code>
-   *
-   *@return    the number of vertices in this <code>Geometry</code>
-   */
-  @Override
-  public abstract int getVertexCount();
 
   /**
    * @author Paul Austin <paul.austin@revolsys.com>
@@ -1524,13 +1513,23 @@ public abstract class GeometryImpl implements Geometry {
   }
 
   /**
+   *  Returns the count of this <code>Geometry</code>s vertices. The <code>Geometry</code>
+   *  s contained by composite <code>Geometry</code>s must be
+   *  Geometry's; that is, they must implement <code>getNumPoints</code>
+   *
+   *@return    the number of vertices in this <code>Geometry</code>
+   */
+  @Override
+  public abstract int getVertexCount();
+
+  /**
    * Gets a hash code for the Geometry.
    * 
    * @return an integer value suitable for use as a hashcode
    */
   @Override
   public int hashCode() {
-    return getEnvelopeInternal().hashCode();
+    return getBoundingBox().hashCode();
   }
 
   /**
@@ -1611,7 +1610,7 @@ public abstract class GeometryImpl implements Geometry {
   public boolean intersects(final Geometry g) {
 
     // short-circuit envelope test
-    if (!getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+    if (!getBoundingBox().intersects(g.getBoundingBox())) {
       return false;
     }
 
@@ -1737,8 +1736,7 @@ public abstract class GeometryImpl implements Geometry {
    */
   @Override
   public boolean isWithinDistance(final Geometry geom, final double distance) {
-    final double envDist = getEnvelopeInternal().distance(
-      geom.getEnvelopeInternal());
+    final double envDist = getBoundingBox().distance(geom.getBoundingBox());
     if (envDist > distance) {
       return false;
     }
@@ -1790,7 +1788,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean overlaps(final Geometry g) {
     // short-circuit test
-    if (!getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+    if (!getBoundingBox().intersects(g.getBoundingBox())) {
       return false;
     }
     return relate(g).isOverlaps(getDimension(), g.getDimension());
@@ -1937,7 +1935,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean touches(final Geometry g) {
     // short-circuit test
-    if (!getEnvelopeInternal().intersects(g.getEnvelopeInternal())) {
+    if (!getBoundingBox().intersects(g.getBoundingBox())) {
       return false;
     }
     return relate(g).isTouches(getDimension(), g.getDimension());

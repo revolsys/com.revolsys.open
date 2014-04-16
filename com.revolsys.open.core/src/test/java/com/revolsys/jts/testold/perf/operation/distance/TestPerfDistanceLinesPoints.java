@@ -3,6 +3,7 @@ package com.revolsys.jts.testold.perf.operation.distance;
 import java.util.List;
 
 import com.revolsys.jts.densify.Densifier;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -101,7 +102,7 @@ public class TestPerfDistanceLinesPoints {
 
   }
 
-  Geometry[] createPoints(final Envelope extent, final int nPtsSide) {
+  Geometry[] createPoints(final BoundingBox extent, final int nPtsSide) {
     final Geometry[] pts = new Geometry[nPtsSide * nPtsSide];
     int index = 0;
     final double xinc = extent.getWidth() / nPtsSide;
@@ -172,7 +173,7 @@ public class TestPerfDistanceLinesPoints {
   public void test(final int num) throws Exception {
     // Geometry lines = createLine(EXTENT, num);
     final Geometry target = createDiagonalCircles(EXTENT, NUM_TARGET_ITEMS);
-    final Geometry[] pts = createPoints(target.getEnvelopeInternal(), num);
+    final Geometry[] pts = createPoints(target.getBoundingBox(), num);
 
     /*
      * Geometry target =
@@ -185,7 +186,7 @@ public class TestPerfDistanceLinesPoints {
 
   public void xtest(final int num) throws Exception {
     final Geometry target = loadData("C:\\proj\\JTS\\test\\g2e\\ffmwdec08.wkt");
-    final Envelope bcEnv_Albers = new Envelope(-45838, 1882064, 255756, 1733287);
+    final BoundingBox bcEnv_Albers = new Envelope(-45838, 255756, 1882064, 1733287);
     final Geometry[] pts = createPoints(bcEnv_Albers, num);
 
     test(pts, target);

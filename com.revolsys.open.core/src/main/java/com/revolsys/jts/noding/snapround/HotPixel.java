@@ -34,6 +34,7 @@
 package com.revolsys.jts.noding.snapround;
 
 import com.revolsys.jts.algorithm.LineIntersector;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -84,7 +85,7 @@ public class HotPixel {
    */
   private final Coordinates[] corner = new Coordinates[4];
 
-  private Envelope safeEnv = null;
+  private BoundingBox safeEnv = null;
 
   private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
 
@@ -160,11 +161,11 @@ public class HotPixel {
    * 
    * @return an envelope which contains the hot pixel
    */
-  public Envelope getSafeEnvelope() {
+  public BoundingBox getSafeEnvelope() {
     if (safeEnv == null) {
       final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / scaleFactor;
       safeEnv = new Envelope(originalPt.getX() - safeTolerance,
-        originalPt.getX() + safeTolerance, originalPt.getY() - safeTolerance,
+        originalPt.getY() - safeTolerance, originalPt.getX() + safeTolerance,
         originalPt.getY() + safeTolerance);
     }
     return safeEnv;

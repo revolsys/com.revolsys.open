@@ -35,9 +35,9 @@ package com.revolsys.jts.shape.random;
 
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
@@ -88,7 +88,7 @@ extends GeometricShapeBuilder
   	if (! (mask instanceof Polygonal))
   		throw new IllegalArgumentException("Only polygonal extents are supported");
   	this.maskPoly = mask;
-  	setExtent(mask.getEnvelopeInternal());
+  	setExtent(mask.getBoundingBox());
   	extentLocator = new IndexedPointInAreaLocator(mask);
   }
   
@@ -119,7 +119,7 @@ extends GeometricShapeBuilder
     return pt;
   }
   
-  protected Coordinates createRandomCoord(Envelope env)
+  protected Coordinates createRandomCoord(BoundingBox env)
   {
     double x = env.getMinX() + env.getWidth() * Math.random();
     double y = env.getMinY() + env.getHeight() * Math.random();

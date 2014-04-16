@@ -8,10 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
@@ -26,7 +27,7 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
-  private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBox(
+  private static final BoundingBox MAX_BOUNDING_BOX = new Envelope(
     GEOMETRY_FACTORY, -180, -85, 180, 85);
 
   public static BingLayer create(final Map<String, Object> properties) {

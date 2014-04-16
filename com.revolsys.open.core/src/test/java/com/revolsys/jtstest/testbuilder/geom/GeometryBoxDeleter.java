@@ -1,9 +1,9 @@
 package com.revolsys.jtstest.testbuilder.geom;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -26,11 +26,11 @@ import com.revolsys.jts.geom.util.GeometryEditor;
 public class GeometryBoxDeleter {
   private static class BoxDeleteComponentOperation implements
     GeometryEditor.GeometryEditorOperation {
-    private final Envelope env;
+    private final BoundingBox env;
 
     private boolean isEdited = false;
 
-    public BoxDeleteComponentOperation(final Envelope env) {
+    public BoxDeleteComponentOperation(final BoundingBox env) {
       this.env = env;
     }
 
@@ -38,7 +38,7 @@ public class GeometryBoxDeleter {
     public Geometry edit(final Geometry geometry, final GeometryFactory factory) {
       // Allow any number of components to be deleted
       // if (isEdited) return geometry;
-      if (env.contains(geometry.getEnvelopeInternal())) {
+      if (env.contains(geometry.getBoundingBox())) {
         isEdited = true;
         return null;
       }
@@ -52,11 +52,11 @@ public class GeometryBoxDeleter {
 
   private static class BoxDeleteVertexOperation extends
     GeometryEditor.CoordinateOperation {
-    private final Envelope env;
+    private final BoundingBox env;
 
     private boolean isEdited = false;
 
-    public BoxDeleteVertexOperation(final Envelope env) {
+    public BoxDeleteVertexOperation(final BoundingBox env) {
       this.env = env;
     }
 
@@ -121,7 +121,7 @@ public class GeometryBoxDeleter {
     }
   }
 
-  public static Geometry delete(final Geometry geom, final Envelope env) {
+  public static Geometry delete(final Geometry geom, final BoundingBox env) {
     final Geometry gComp = deleteComponents(geom, env);
     if (gComp != null) {
       return gComp;
@@ -138,7 +138,7 @@ public class GeometryBoxDeleter {
   }
 
   private static Geometry deleteComponents(final Geometry geom,
-    final Envelope env) {
+    final BoundingBox env) {
     final GeometryEditor editor = new GeometryEditor();
     final BoxDeleteComponentOperation compOp = new BoxDeleteComponentOperation(
       env);
@@ -149,7 +149,7 @@ public class GeometryBoxDeleter {
     return null;
   }
 
-  private static Geometry deleteVertices(final Geometry geom, final Envelope env) {
+  private static Geometry deleteVertices(final Geometry geom, final BoundingBox env) {
     final GeometryEditor editor = new GeometryEditor();
     final BoxDeleteVertexOperation vertexOp = new BoxDeleteVertexOperation(env);
     final Geometry vertexEditGeom = editor.edit(geom, vertexOp);

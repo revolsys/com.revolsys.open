@@ -25,7 +25,7 @@ import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -46,6 +46,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.transaction.Propagation;
@@ -307,7 +308,7 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public Query createQuery(final String typePath, final String whereClause,
-    final BoundingBox boundingBox) {
+    final Envelope boundingBox) {
     throw new UnsupportedOperationException();
   }
 
@@ -643,7 +644,7 @@ public abstract class AbstractDataObjectStore extends
   @Override
   public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
     final String typePath, final Geometry geometry) {
-    final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
     final Query query = new Query(typePath);
     query.setBoundingBox(boundingBox);
     query.setProperty("dataObjectFactory", dataObjectFactory);

@@ -6,13 +6,14 @@ import java.util.Map;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.layer.dataobject.DataObjectBoundingBoxLayer;
@@ -66,7 +67,7 @@ public class GeoNamesBoundingBoxLayerWorker extends
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       final GeographicCoordinateSystem geoCs = projCs.getGeographicCoordinateSystem();
       geometryFactory = GeometryFactory.getFactory(geoCs);
-      boundingBox = new BoundingBox(geometryFactory, boundingBox);
+      boundingBox = new Envelope(geometryFactory, boundingBox);
     }
     final List<DataObject> results = this.geoNamesService.getNames(boundingBox);
     for (final DataObject dataObject : results) {

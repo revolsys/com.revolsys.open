@@ -8,6 +8,7 @@ import java.awt.geom.Point2D;
 import java.text.NumberFormat;
 
 import com.revolsys.jts.awt.PointTransformation;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -44,7 +45,7 @@ public class Viewport implements PointTransformation {
 
   private NumberFormat scaleFormat;
 
-  private Envelope viewEnvInModel;
+  private BoundingBox viewEnvInModel;
 
   private AffineTransform modelToViewTransform;
 
@@ -121,13 +122,13 @@ public class Viewport implements PointTransformation {
     setScaleNoUpdate(1.0);
   }
 
-  private Envelope computeEnvelopeInModel() {
+  private BoundingBox computeEnvelopeInModel() {
     final double widthInModel = panel.getWidth() / scale;
     final double heighInModel = panel.getHeight() / scale;
 
-    return new Envelope(viewOriginInModel.getX(), viewOriginInModel.getX()
-      + widthInModel, viewOriginInModel.getY(), viewOriginInModel.getY()
-      + heighInModel);
+    return new Envelope(viewOriginInModel.getX(), viewOriginInModel.getY(),
+      viewOriginInModel.getX() + widthInModel, viewOriginInModel.getY()
+        + heighInModel);
   }
 
   public boolean containsInModel(final Coordinates p) {
@@ -162,7 +163,7 @@ public class Viewport implements PointTransformation {
     return toModel(new Point(0, size.height));
   }
 
-  public Envelope getModelEnv() {
+  public BoundingBox getModelEnv() {
     return viewEnvInModel;
   }
 
@@ -186,8 +187,8 @@ public class Viewport implements PointTransformation {
     return toModel(new Point(size.width, 0));
   }
 
-  public Envelope getViewEnv() {
-    return new Envelope(0, getWidthInView(), 0, getHeightInView());
+  public BoundingBox getViewEnv() {
+    return new Envelope(0, 0, getWidthInView(), getHeightInView());
   }
 
   public double getViewOriginX() {
@@ -233,7 +234,7 @@ public class Viewport implements PointTransformation {
     return gridMag;
   }
 
-  public boolean intersectsInModel(final Envelope env) {
+  public boolean intersectsInModel(final BoundingBox env) {
     return viewEnvInModel.intersects(env);
   }
 
@@ -340,7 +341,7 @@ public class Viewport implements PointTransformation {
       -viewOriginInModel.getY());
   }
 
-  public void zoom(final Envelope zoomEnv) {
+  public void zoom(final BoundingBox zoomEnv) {
     zoomToInitialExtent();
     final double xScale = getWidthInModel() / zoomEnv.getWidth();
     final double yScale = getHeightInModel() / zoomEnv.getHeight();

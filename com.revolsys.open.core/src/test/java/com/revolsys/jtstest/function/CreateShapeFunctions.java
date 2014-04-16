@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.awt.FontGlyphReader;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -22,9 +23,9 @@ public class CreateShapeFunctions {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setNumPoints(nPts);
     if (g != null) {
-      gsf.setEnvelope(g.getEnvelopeInternal());
+      gsf.setEnvelope(g.getBoundingBox());
     } else {
-      gsf.setEnvelope(new Envelope(0, 1, 0, 1));
+      gsf.setEnvelope(new Envelope(0, 0, 1, 1));
     }
     return gsf.createCircle();
   }
@@ -35,20 +36,20 @@ public class CreateShapeFunctions {
     gsf.setNumPoints(nPts);
     gsf.setRotation(ang);
     if (g != null) {
-      gsf.setEnvelope(g.getEnvelopeInternal());
+      gsf.setEnvelope(g.getBoundingBox());
     } else {
-      gsf.setEnvelope(new Envelope(0, 1, 0, 1));
+      gsf.setEnvelope(new Envelope(0, 0, 1, 1));
     }
     return gsf.createCircle();
   }
 
   private static Geometry fontGlyph(final Geometry g, final String text,
     final Font font) {
-    final Envelope env = FunctionsUtil.getEnvelopeOrDefault(g);
+    final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
 
     final Geometry textGeom = FontGlyphReader.read(text, font, geomFact);
-    final Envelope envText = textGeom.getEnvelopeInternal();
+    final BoundingBox envText = textGeom.getBoundingBox();
 
     if (g != null) {
       // transform to baseline
@@ -81,7 +82,7 @@ public class CreateShapeFunctions {
   }
 
   public static Geometry grid(final Geometry g, final int nCells) {
-    final Envelope env = FunctionsUtil.getEnvelopeOrDefault(g);
+    final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
 
     final int nCellsOnSideY = (int)Math.sqrt(nCells);
@@ -101,7 +102,7 @@ public class CreateShapeFunctions {
         final double x = env.getMinX() + i * cellSizeX;
         final double y = env.getMinY() + j * cellSizeY;
 
-        final Envelope cellEnv = new Envelope(x, x + cellSizeX, y, y
+        final BoundingBox cellEnv = new Envelope(x, y, x + cellSizeX, y
           + cellSizeY);
         geoms.add(geomFact.toGeometry(cellEnv));
       }
@@ -118,9 +119,9 @@ public class CreateShapeFunctions {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setNumPoints(nPts);
     if (g != null) {
-      gsf.setEnvelope(g.getEnvelopeInternal());
+      gsf.setEnvelope(g.getBoundingBox());
     } else {
-      gsf.setEnvelope(new Envelope(0, 1, 0, 1));
+      gsf.setEnvelope(new Envelope(0, 0, 1, 1));
     }
     return gsf.createSupercircle(pow);
   }

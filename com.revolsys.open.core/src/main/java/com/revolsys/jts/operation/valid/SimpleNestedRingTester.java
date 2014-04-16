@@ -82,7 +82,7 @@ public class SimpleNestedRingTester
         if (innerRing == searchRing)
           continue;
 
-        if (! innerRing.getEnvelopeInternal().intersects(searchRing.getEnvelopeInternal()))
+        if (! innerRing.getBoundingBox().intersects(searchRing.getBoundingBox()))
           continue;
 
         Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);

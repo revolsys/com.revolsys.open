@@ -35,9 +35,9 @@ package com.revolsys.jts.testold.geom.prep;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -113,7 +113,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     return (LineString)circle.getBoundary();
   }
 
-  LineString createTestLine(final Envelope env, final double size,
+  LineString createTestLine(final BoundingBox env, final double size,
     final int nPts) {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
@@ -142,7 +142,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     int count = 0;
     while (count < MAX_ITER) {
       count++;
-      final LineString line = createTestLine(g.getEnvelopeInternal(), 10, 20);
+      final LineString line = createTestLine(g.getBoundingBox(), 10, 20);
 
       // System.out.println("Test # " + count);
       // System.out.println(line);

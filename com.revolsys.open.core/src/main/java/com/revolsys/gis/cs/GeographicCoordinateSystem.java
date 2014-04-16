@@ -9,6 +9,8 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class GeographicCoordinateSystem implements CoordinateSystem {
@@ -180,9 +182,9 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   public BoundingBox getAreaBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (area != null) {
-      return new BoundingBox(geometryFactory, area.getLatLonBounds());
+      return new Envelope(geometryFactory, area.getLatLonBounds());
     } else {
-      return new BoundingBox(geometryFactory, -180, -90, 180, 90);
+      return new Envelope(geometryFactory, -180, -90, 180, 90);
     }
   }
 

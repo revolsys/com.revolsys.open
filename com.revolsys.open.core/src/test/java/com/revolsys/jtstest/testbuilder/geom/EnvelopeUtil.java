@@ -1,17 +1,17 @@
 package com.revolsys.jtstest.testbuilder.geom;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 
 public class EnvelopeUtil 
 {
-	public static double minExtent(Envelope env)
+	public static double minExtent(BoundingBox env)
 	{
 		double w = env.getWidth();
 		double h = env.getHeight();
 		if (w < h) return w;
 		return h;
 	}
-	public static double maxExtent(Envelope env)
+	public static double maxExtent(BoundingBox env)
 	{
 		double w = env.getWidth();
 		double h = env.getHeight();

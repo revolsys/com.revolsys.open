@@ -10,8 +10,8 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -372,7 +372,7 @@ class LineStringNode extends GeometryNode {
   }
 
   private void populateChildren(final Coordinates[] pt) {
-    final Envelope env = line.getEnvelopeInternal();
+    final BoundingBox env = line.getBoundingBox();
 
     for (int i = 0; i < pt.length; i++) {
       double dist = Double.NaN;

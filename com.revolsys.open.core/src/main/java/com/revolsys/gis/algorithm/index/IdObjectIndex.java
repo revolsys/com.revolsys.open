@@ -3,12 +3,12 @@ package com.revolsys.gis.algorithm.index;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 
 public interface IdObjectIndex<T> extends Iterable<T> {
   public T add(final T object);
 
-  Envelope getEnvelope(T object);
+  BoundingBox getEnvelope(T object);
 
   int getId(T object);
 
@@ -16,9 +16,9 @@ public interface IdObjectIndex<T> extends Iterable<T> {
 
   List<T> getObjects(List<Integer> ids);
 
-  List<T> query(Envelope envelope);
+  List<T> query(BoundingBox envelope);
 
   boolean remove(T object);
 
-  void visit(Envelope envelope, Visitor<T> visitor);
+  void visit(BoundingBox envelope, Visitor<T> visitor);
 }

@@ -32,7 +32,7 @@
  */
 package com.revolsys.jtstest.testbuilder.ui.tools;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testbuilder.geom.GeometryBoxDeleter;
 
@@ -55,7 +55,7 @@ public class DeleteVertexTool extends BoxBandTool {
 
   protected void gestureFinished() 
   {      
-    Envelope env = getBox().getEnvelopeInternal();
+    BoundingBox env = getBox().getBoundingBox();
     Geometry g = geomModel().getGeometry();
     Geometry edit = GeometryBoxDeleter.delete(g, env);
     geomModel().setGeometry(edit);

@@ -38,8 +38,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
@@ -256,16 +256,16 @@ public class PolygonBuilder {
   private EdgeRing findEdgeRingContaining(EdgeRing testEr, List shellList)
   {
     LinearRing testRing = testEr.getLinearRing();
-    Envelope testEnv = testRing.getEnvelopeInternal();
+    BoundingBox testEnv = testRing.getBoundingBox();
     Coordinates testPt = testRing.getCoordinate(0);
 
     EdgeRing minShell = null;
-    Envelope minEnv = null;
+    BoundingBox minEnv = null;
     for (Iterator it = shellList.iterator(); it.hasNext(); ) {
       EdgeRing tryShell = (EdgeRing) it.next();
       LinearRing tryRing = tryShell.getLinearRing();
-      Envelope tryEnv = tryRing.getEnvelopeInternal();
-      if (minShell != null) minEnv = minShell.getLinearRing().getEnvelopeInternal();
+      BoundingBox tryEnv = tryRing.getBoundingBox();
+      if (minShell != null) minEnv = minShell.getLinearRing().getBoundingBox();
       boolean isContained = false;
       if (tryEnv.contains(testEnv)
           && CGAlgorithms.isPointInRing(testPt, tryRing.getCoordinateArray()) )

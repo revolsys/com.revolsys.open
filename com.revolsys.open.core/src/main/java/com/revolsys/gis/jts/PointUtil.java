@@ -2,9 +2,9 @@ package com.revolsys.gis.jts;
 
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -14,7 +14,7 @@ import com.revolsys.jts.geom.Polygon;
 public class PointUtil {
 
   public static Point createRandomPoint(
-    final com.revolsys.jts.geom.GeometryFactory factory, final Envelope envelope) {
+    final com.revolsys.jts.geom.GeometryFactory factory, final BoundingBox envelope) {
     final double x = envelope.getMinX() + envelope.getWidth() * Math.random();
     final double y = envelope.getMinY() + envelope.getHeight() * Math.random();
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(2, x, y);
@@ -49,7 +49,7 @@ public class PointUtil {
         coordinates.getX(), coordinates.getY());
       return factory.point(coordinatesList);
     } else {
-      final Envelope envelope = polygon.getEnvelopeInternal();
+      final BoundingBox envelope = polygon.getBoundingBox();
       Point point = createRandomPoint(factory, envelope);
       int i = 1;
       while (!point.within(polygon)) {

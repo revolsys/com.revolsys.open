@@ -11,6 +11,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -150,11 +151,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     BoundingBox boundingBox;
     final GeometryFactory geographicGeometryFactory = geographicCoordinateSystem.getGeometryFactory();
     if (area == null) {
-      boundingBox = new BoundingBox(geographicGeometryFactory, -180, -90, 180,
-        90);
+      boundingBox = new Envelope(geographicGeometryFactory, -180, -90, 180, 90);
     } else {
       final Envelope latLonBounds = area.getLatLonBounds();
-      boundingBox = new BoundingBox(geographicGeometryFactory, latLonBounds);
+      boundingBox = new Envelope(geographicGeometryFactory, latLonBounds);
     }
     final BoundingBox projectedBoundingBox = boundingBox.convert(getGeometryFactory());
     return projectedBoundingBox;

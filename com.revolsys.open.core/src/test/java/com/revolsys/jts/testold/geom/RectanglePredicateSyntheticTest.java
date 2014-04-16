@@ -7,6 +7,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -42,8 +43,8 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   double bufferWidth = 1.0;
 
-  Envelope rectEnv = new Envelope(this.baseX, this.baseX + this.rectSize,
-    this.baseY, this.baseY + this.rectSize);
+  BoundingBox rectEnv = new Envelope(this.baseX, this.baseY,
+    this.baseX + this.rectSize, this.baseY + this.rectSize);
 
   Geometry rect = this.fact.toGeometry(this.rectEnv);
 
@@ -78,7 +79,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     });
   }
 
-  public List<Geometry> createTestGeometries(final Envelope env,
+  public List<Geometry> createTestGeometries(final BoundingBox env,
     final double inc, final double size) {
     final List<Geometry> testGeoms = new ArrayList<Geometry>();
 
@@ -95,9 +96,9 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   }
 
   private List<Geometry> getTestGeometries() {
-    final Envelope testEnv = new Envelope(
-      this.rectEnv.getMinX() - this.bufSize, this.rectEnv.getMaxX()
-        + this.bufSize, this.rectEnv.getMinY() - this.bufSize,
+    final BoundingBox testEnv = new Envelope(
+      this.rectEnv.getMinX() - this.bufSize, this.rectEnv.getMinY() - this.bufSize, this.rectEnv.getMaxX()
+          + this.bufSize,
       this.rectEnv.getMaxY() + this.bufSize);
     final List<Geometry> testGeoms = createTestGeometries(testEnv, 5,
       this.testGeomSize);

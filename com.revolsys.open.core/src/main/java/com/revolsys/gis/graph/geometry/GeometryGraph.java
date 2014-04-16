@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -21,8 +20,10 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -52,7 +53,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public GeometryGraph(final GeometryFactory geometryFactory) {
     super(false);
     setGeometryFactory(geometryFactory);
-    boundingBox = new BoundingBox(geometryFactory);
+    boundingBox = new Envelope(geometryFactory);
     final double scaleXY = getGeometryFactory().getScaleXY();
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
@@ -229,7 +230,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public BoundingBox getBoundingBox(final Geometry geometry) {
-    BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+    BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
     boundingBox = boundingBox.expand(maxDistance);
     return boundingBox;
   }
@@ -299,7 +300,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public boolean intersects(final LineString line) {
-    BoundingBox boundingBox = BoundingBox.getBoundingBox(line);
+    BoundingBox boundingBox = Envelope.getBoundingBox(line);
     final double scaleXY = getGeometryFactory().getScaleXY();
     double maxDistance = 0;
     if (scaleXY > 0) {

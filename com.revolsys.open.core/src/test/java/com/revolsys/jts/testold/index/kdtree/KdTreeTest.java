@@ -5,6 +5,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -30,7 +31,7 @@ public class KdTreeTest extends TestCase {
     assertTrue("Inserting 2 identical points should create one node",
       node1 == node2);
 
-    final Envelope queryEnv = new Envelope(0, 10, 0, 10);
+    final BoundingBox queryEnv = new Envelope(0, 0, 10, 10);
 
     final List result = index.query(queryEnv);
     assertTrue(result.size() == 1);

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 
@@ -36,7 +37,7 @@ public class AbstractMapWrapper {
         }
         geometryFactory = GeometryFactory.getFactory(srid);
       }
-      return new BoundingBox(geometryFactory, minX, minY, maxX, maxY);
+      return new Envelope(geometryFactory, minX, minY, maxX, maxY);
     }
   }
 

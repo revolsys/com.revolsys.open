@@ -1,6 +1,7 @@
 package com.revolsys.gis.jts;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
@@ -78,7 +79,7 @@ public class LineSegment3D extends LineSegment {
     }
   }
 
-  public Envelope getEnvelope() {
+  public BoundingBox getEnvelope() {
     return new Envelope(getP0(), getP1());
   }
 

@@ -83,7 +83,7 @@ public class QuadtreeCorrectTest {
       for (int j = 0; j < gridSize; j++) {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
-        final Envelope env = new Envelope(x, x + cellSize, y, y + cellSize);
+        final Envelope env = new Envelope(x, y, x + cellSize, y + cellSize);
         this.q.insert(env, env);
         this.envList.add(env);
       }
@@ -118,7 +118,7 @@ public class QuadtreeCorrectTest {
       for (int j = 0; j < gridSize; j++) {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
-        final Envelope env = new Envelope(x, x + cellSize, y, y + cellSize);
+        final Envelope env = new Envelope(x, y, x + cellSize, y + cellSize);
         queryTest(env);
         // queryTime(env);
       }

@@ -12,7 +12,8 @@ import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.cos.COSObject;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
@@ -76,7 +77,7 @@ public class PdfUtil {
         }
       }
     }
-    return new BoundingBox();
+    return new Envelope();
   }
 
   public static Rectangle2D getPageMediaBox(final COSDictionary page) {
@@ -146,7 +147,7 @@ public class PdfUtil {
             }
             final com.revolsys.jts.geom.GeometryFactory geoGeometryFactory = geometryFactory.getGeographicGeometryFactory();
 
-            BoundingBox boundingBox = new BoundingBox(geometryFactory);
+            BoundingBox boundingBox = new Envelope(geometryFactory);
             final COSArray geoPoints = PdfUtil.getArray(measure, "GPTS");
 
             for (int i = 0; i < geoPoints.size(); i++) {
@@ -160,7 +161,7 @@ public class PdfUtil {
         }
       }
     }
-    return new BoundingBox();
+    return new Envelope();
   }
 
   public static boolean hasNameValue(final COSDictionary dictionary,

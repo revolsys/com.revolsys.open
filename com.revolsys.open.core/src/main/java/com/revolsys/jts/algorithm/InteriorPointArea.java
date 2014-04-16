@@ -33,10 +33,10 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -140,8 +140,8 @@ public class InteriorPointArea {
     else {
       Geometry intersections = bisector.intersection(geometry);
       Geometry widestIntersection = widestGeometry(intersections);
-      width = widestIntersection.getEnvelopeInternal().getWidth();
-      intPt = centre(widestIntersection.getEnvelopeInternal());
+      width = widestIntersection.getBoundingBox().getWidth();
+      intPt = centre(widestIntersection.getBoundingBox());
     }
     if (interiorPoint == null || width > maxWidth) {
       interiorPoint = intPt;
@@ -166,8 +166,8 @@ public class InteriorPointArea {
     Geometry widestGeometry = gc.getGeometry(0);
     // scan remaining geom components to see if any are wider
     for (int i = 1; i < gc.getNumGeometries(); i++) { 
-        if (gc.getGeometry(i).getEnvelopeInternal().getWidth() >
-            widestGeometry.getEnvelopeInternal().getWidth()) {
+        if (gc.getGeometry(i).getBoundingBox().getWidth() >
+            widestGeometry.getBoundingBox().getWidth()) {
             widestGeometry = gc.getGeometry(i);
         }
     }
@@ -175,7 +175,7 @@ public class InteriorPointArea {
   }
 
   protected LineString horizontalBisector(Geometry geometry) {
-    Envelope envelope = geometry.getEnvelopeInternal();
+    BoundingBox envelope = geometry.getBoundingBox();
 
     /**
      * Original algorithm.  Fails when geometry contains a horizontal
@@ -196,7 +196,7 @@ public class InteriorPointArea {
    * @param envelope the envelope to analyze
    * @return the centre of the envelope
    */
-  public static Coordinates centre(Envelope envelope) {
+  public static Coordinates centre(BoundingBox envelope) {
       return new Coordinate((double)avg(envelope.getMinX(),
               envelope.getMaxX()),
           avg(envelope.getMinY(), envelope.getMaxY()), Coordinates.NULL_ORDINATE);
@@ -230,8 +230,8 @@ public class InteriorPointArea {
 		  this.poly = poly;
 		  
 		  // initialize using extremal values
-		  hiY = poly.getEnvelopeInternal().getMaxY();
-		  loY = poly.getEnvelopeInternal().getMinY();
+		  hiY = poly.getBoundingBox().getMaxY();
+		  loY = poly.getBoundingBox().getMinY();
 		  centreY = avg(loY, hiY);
 	  }
 	  

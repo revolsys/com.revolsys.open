@@ -3,9 +3,10 @@ package com.revolsys.gis.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.MathUtil;
 
@@ -28,7 +29,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
       final double y1 = coordinates[1];
       final double x2 = x1 + tileWidth;
       final double y2 = y1 + tileHeight;
-      return new BoundingBox(geometryFactory, x1, y1, x2, y2);
+      return new Envelope(geometryFactory, x1, y1, x2, y2);
     } else {
       return null;
     }

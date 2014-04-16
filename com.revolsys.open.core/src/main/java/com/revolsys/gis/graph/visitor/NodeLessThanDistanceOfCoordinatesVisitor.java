@@ -5,10 +5,11 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
@@ -18,7 +19,7 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
       point, maxDistance, results);
-    BoundingBox envelope = new BoundingBox(point);
+    BoundingBox envelope = new Envelope(point);
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = graph.getNodeIndex();
     nodeIndex.visit(envelope, visitor);

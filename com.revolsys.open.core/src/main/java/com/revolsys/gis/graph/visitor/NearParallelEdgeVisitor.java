@@ -1,10 +1,10 @@
 package com.revolsys.gis.graph.visitor;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgeVisitor;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
@@ -22,14 +22,14 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
   }
 
   @Override
-  public Envelope getEnvelope() {
-    BoundingBox envelope = BoundingBox.getBoundingBox(line);
+  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
+    BoundingBox envelope = Envelope.getBoundingBox(line);
     envelope = envelope.expand(maxDistance);
     return envelope;
   }
 
   private boolean isAlmostParallel(final LineString matchLine) {
-    if (line.getEnvelopeInternal().distance(matchLine.getEnvelopeInternal()) > maxDistance) {
+    if (line.getBoundingBox().distance(matchLine.getBoundingBox()) > maxDistance) {
       return false;
     }
     final CoordinatesList coords = line.getCoordinatesList();

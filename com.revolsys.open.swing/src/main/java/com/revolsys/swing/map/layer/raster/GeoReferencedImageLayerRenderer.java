@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.Map;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.Viewport2D;

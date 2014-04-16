@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import com.jhlabs.image.WholeImageFilter;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;

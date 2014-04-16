@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.TopologyException;
@@ -75,7 +76,7 @@ class BufferSubgraph
   private List dirEdgeList  = new ArrayList();
   private List nodes        = new ArrayList();
   private Coordinates rightMostCoord = null;
-  private Envelope env = null;
+  private BoundingBox env = null;
 
   public BufferSubgraph()
   {
@@ -91,7 +92,7 @@ class BufferSubgraph
    *
    * @return the envelope of the graph.
    */
-  public Envelope getEnvelope()
+  public BoundingBox getEnvelope()
   {
     if (env == null) {
       Envelope edgeEnv = new Envelope();

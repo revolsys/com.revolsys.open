@@ -8,7 +8,7 @@ package com.revolsys.jtstest.testbuilder.io.shapefile;
 
 import java.io.IOException;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryCollection;
 
 /**
@@ -23,7 +23,7 @@ public class ShapefileHeader{
     private int version = -1;
     private int shapeType = -1;
     //private double[] bounds = new double[4];
-    private Envelope bounds;
+    private BoundingBox bounds;
     
     public ShapefileHeader(EndianDataInputStream file) throws IOException {
       //  file.setLittleEndianMode(false);
@@ -67,7 +67,7 @@ public class ShapefileHeader{
         shapeType = handle.getShapeType();
         version = Shapefile.VERSION;
         fileCode = Shapefile.SHAPEFILE_ID;
-        bounds = geometries.getEnvelopeInternal();
+        bounds = geometries.getBoundingBox();
         fileLength = 0;
         for(int i=0;i<numShapes;i++){
             fileLength+=handle.getLength(geometries.getGeometry(i));
@@ -89,7 +89,7 @@ public class ShapefileHeader{
         return version;
     }
     
-    public Envelope getBounds(){
+    public BoundingBox getBounds(){
         return bounds;
     }
     

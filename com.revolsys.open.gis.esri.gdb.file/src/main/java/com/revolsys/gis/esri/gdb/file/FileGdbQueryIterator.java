@@ -3,7 +3,7 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;

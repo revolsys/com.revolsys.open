@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.DataObject;
@@ -89,6 +88,7 @@ import com.revolsys.io.esri.gdb.xml.model.WorkspaceDefinition;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlProcessor;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
@@ -988,9 +988,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
               int count = 0;
               for (Row row = rows.next(); row != null; row = rows.next()) {
                 final Geometry geometry = (Geometry)geometryAttribute.getValue(row);
-                final BoundingBox geometryBoundingBox = BoundingBox.getBoundingBox(geometry);
-                if (geometryBoundingBox.intersects(boundingBox)) {
-                  count++;
+                if (geometry != null) {
+                  final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
+                  if (geometryBoundingBox.intersects(boundingBox)) {
+                    count++;
+                  }
                 }
                 row.delete();
               }

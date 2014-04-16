@@ -12,7 +12,7 @@ public abstract class ComponentStyle
     throws Exception
   {
     // cull non-visible geometries
-    if (! viewport.intersectsInModel(geom.getEnvelopeInternal())) 
+    if (! viewport.intersectsInModel(geom.getBoundingBox())) 
       return;
 
     if (geom instanceof GeometryCollection) {

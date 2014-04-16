@@ -30,9 +30,10 @@ import javax.swing.undo.UndoableEdit;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.PrecisionModel;
@@ -80,7 +81,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     500000L, 250000L, 100000L, 50000L, 25000L, 10000L, 5000L, 2500L, 1000L,
     500L, 250L, 100L, 50L, 25L, 10L, 5L);
 
-  public static final BoundingBox BC_ENVELOPE = new BoundingBox(
+  public static final BoundingBox BC_ENVELOPE = new Envelope(
     GeometryFactory.getFactory(3005, 3, 1000, 1000), 25000, 340000, 1900000,
     1750000);
 
@@ -827,8 +828,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     menu.show(zoomBookmarkButton, 0, 20);
   }
 
-  public void zoom(final com.revolsys.jts.geom.Point mapPoint,
-    final int steps) {
+  public void zoom(final com.revolsys.jts.geom.Point mapPoint, final int steps) {
     final BoundingBox extent = getBoundingBox();
     double factor = steps * 2;
     if (factor < 0) {
@@ -854,8 +854,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final double newY1 = y - newDeltaY;
 
     final GeometryFactory newGeometryFactory = extent.getGeometryFactory();
-    final BoundingBox newBoundingBox = new BoundingBox(newGeometryFactory,
-      newX1, newY1, newX1 + newWidth, newY1 + newHeight);
+    final BoundingBox newBoundingBox = new Envelope(newGeometryFactory, newX1,
+      newY1, newX1 + newWidth, newY1 + newHeight);
     setBoundingBox(newBoundingBox);
   }
 
@@ -900,7 +900,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void zoomTo(final Geometry geometry) {
     if (geometry != null) {
       final Geometry convertedGeometry = getGeometryFactory().copy(geometry);
-      final BoundingBox boudingBox = BoundingBox.getBoundingBox(convertedGeometry);
+      final BoundingBox boudingBox = Envelope.getBoundingBox(convertedGeometry);
       zoomTo(boudingBox);
     }
   }

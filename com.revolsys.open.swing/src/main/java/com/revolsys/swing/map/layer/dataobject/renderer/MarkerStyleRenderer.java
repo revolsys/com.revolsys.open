@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 import javax.swing.Icon;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -45,7 +45,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final BoundingBox viewExtent = viewport.getBoundingBox();
     if (geometry != null) {
       if (!viewExtent.isEmpty()) {
-        final BoundingBox geometryExtent = BoundingBox.getBoundingBox(geometry);
+        final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
           final com.revolsys.jts.geom.GeometryFactory geometryFactory = viewport.getGeometryFactory();
           return geometryFactory.createGeometry(geometry);

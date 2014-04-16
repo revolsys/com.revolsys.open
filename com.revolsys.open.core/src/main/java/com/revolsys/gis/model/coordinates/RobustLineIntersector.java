@@ -4,12 +4,12 @@ package com.revolsys.gis.model.coordinates;
  *@version 1.7
  */
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 
 /**
  * A robust version of {@link LineIntersector}.
@@ -24,10 +24,10 @@ public class RobustLineIntersector extends LineIntersector {
 
   private int computeCollinearIntersection(final Coordinates p1,
     final Coordinates p2, final Coordinates q1, final Coordinates q2) {
-    final boolean p1q1p2 = BoundingBox.intersects(p1, p2, q1);
-    final boolean p1q2p2 = BoundingBox.intersects(p1, p2, q2);
-    final boolean q1p1q2 = BoundingBox.intersects(q1, q2, p1);
-    final boolean q1p2q2 = BoundingBox.intersects(q1, q2, p2);
+    final boolean p1q1p2 = Envelope.intersects(p1, p2, q1);
+    final boolean p1q2p2 = Envelope.intersects(p1, p2, q2);
+    final boolean q1p1q2 = Envelope.intersects(q1, q2, p1);
+    final boolean q1p2q2 = Envelope.intersects(q1, q2, p2);
 
     if (p1q1p2 && p1q2p2) {
       intPt[0] = q1;
@@ -72,7 +72,7 @@ public class RobustLineIntersector extends LineIntersector {
     isProper = false;
 
     // first try a fast test to see if the envelopes of the lines intersect
-    if (!BoundingBox.intersects(p1, p2, q1, q2)) {
+    if (!Envelope.intersects(p1, p2, q1, q2)) {
       return NO_INTERSECTION;
     }
 
@@ -155,7 +155,7 @@ public class RobustLineIntersector extends LineIntersector {
     final Coordinates p2) {
     isProper = false;
     // do between check first, since it is faster than the orientation test
-    if (BoundingBox.intersects(p1, p2, p)) {
+    if (Envelope.intersects(p1, p2, p)) {
       if ((CoordinatesUtil.orientationIndex(p1, p2, p) == 0)
         && (CoordinatesUtil.orientationIndex(p2, p1, p) == 0)) {
         isProper = true;
@@ -235,8 +235,8 @@ public class RobustLineIntersector extends LineIntersector {
    *         envelopes
    */
   private boolean isInSegmentBoundingBoxs(final Coordinates intPt) {
-    final BoundingBox env0 = new BoundingBox(inputLines[0][0], inputLines[0][1]);
-    final BoundingBox env1 = new BoundingBox(inputLines[1][0], inputLines[1][1]);
+    final Envelope env0 = new Envelope(inputLines[0][0], inputLines[0][1]);
+    final Envelope env1 = new Envelope(inputLines[1][0], inputLines[1][1]);
     return env0.contains(intPt) && env1.contains(intPt);
   }
 
@@ -275,9 +275,9 @@ public class RobustLineIntersector extends LineIntersector {
 
     /*
      * // equilavalent code using more modular but slower method BoundingBox
-     * env0 = new BoundingBox(n00, n01); BoundingBox env1 = new BoundingBox(n10,
-     * n11); BoundingBox intEnv = env0.intersection(env1); Coordinates intMidPt
-     * = intEnv.centre(); normPt.getX() = intMidPt.getX(); normPt.getY() =
+     * env0 = new Envelope(n00, n01); BoundingBox env1 = new Envelope(n10, n11);
+     * BoundingBox intEnv = env0.intersection(env1); Coordinates intMidPt =
+     * intEnv.centre(); normPt.getX() = intMidPt.getX(); normPt.getY() =
      * intMidPt.getY();
      */
 

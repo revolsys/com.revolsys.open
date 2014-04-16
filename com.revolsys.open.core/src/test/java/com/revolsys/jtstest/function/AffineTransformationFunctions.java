@@ -1,19 +1,19 @@
 package com.revolsys.jtstest.function;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.util.AffineTransformation;
 import com.revolsys.jts.geom.util.AffineTransformationFactory;
 
 public class AffineTransformationFunctions {
   private static Coordinates envelopeCentre(final Geometry g) {
-    return g.getEnvelopeInternal().centre();
+    return g.getBoundingBox().centre();
   }
 
   private static Coordinates envelopeLowerLeft(final Geometry g) {
-    final Envelope env = g.getEnvelopeInternal();
+    final BoundingBox env = g.getBoundingBox();
     return new Coordinate(env.getMinX(), env.getMinY());
   }
 
@@ -55,7 +55,7 @@ public class AffineTransformationFunctions {
 
   public static Geometry transformByBaseline(final Geometry g,
     final Geometry destBaseline) {
-    final Envelope env = g.getEnvelopeInternal();
+    final BoundingBox env = g.getBoundingBox();
     final Coordinates src0 = new Coordinate(env.getMinX(), env.getMinY());
     final Coordinates src1 = new Coordinate(env.getMaxX(), env.getMinY());
 

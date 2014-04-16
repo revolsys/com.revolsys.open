@@ -33,7 +33,6 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
@@ -42,6 +41,8 @@ import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
@@ -389,7 +390,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBox(geometryFactory);
+    return new Envelope(geometryFactory);
   }
 
   @Override
@@ -398,7 +399,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       return getBoundingBox();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return new BoundingBox(geometryFactory);
+      return new Envelope(geometryFactory);
     }
   }
 
@@ -503,7 +504,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public BoundingBox getSelectedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBox(geometryFactory);
+    return new Envelope(geometryFactory);
   }
 
   protected String getSettingsFileName() {

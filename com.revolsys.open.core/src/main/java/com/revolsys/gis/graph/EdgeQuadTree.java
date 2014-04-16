@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.AbstractIdObjectQuadTree;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 
@@ -17,7 +18,7 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
   }
 
   @Override
-  public Envelope getEnvelope(final Edge<T> edge) {
+  public BoundingBox getEnvelope(final Edge<T> edge) {
     if (edge == null) {
       return new Envelope();
     } else {
@@ -25,7 +26,7 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
       if (line == null) {
         return new Envelope();
       } else {
-        final Envelope envelope = line.getEnvelopeInternal();
+        final BoundingBox envelope = line.getBoundingBox();
         return envelope;
       }
     }

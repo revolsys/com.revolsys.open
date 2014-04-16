@@ -17,7 +17,8 @@ import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -166,7 +167,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       final int y = event.getY();
       final double[] location = getViewport().toModelCoordinates(x, y);
       final GeometryFactory geometryFactory = getViewportGeometryFactory();
-      BoundingBox boundingBox = new BoundingBox(geometryFactory, location[0],
+      BoundingBox boundingBox = new Envelope(geometryFactory, location[0],
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
       boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
@@ -352,7 +353,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final Point bottomRight = getViewport().toModelPoint(maxX, maxY);
 
         final GeometryFactory geometryFactory = getMap().getGeometryFactory();
-        final BoundingBox boundingBox = new BoundingBox(geometryFactory,
+        final BoundingBox boundingBox = new Envelope(geometryFactory,
           topLeft.getX(), topLeft.getY(), bottomRight.getX(),
           bottomRight.getY());
 

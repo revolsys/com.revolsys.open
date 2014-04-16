@@ -3,9 +3,9 @@ package com.revolsys.jtstest.function;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.shape.random.RandomPointsBuilder;
@@ -35,7 +35,7 @@ public class CreateRandomShapeFunctions {
 
   public static Geometry haltonPointsWithBases(final Geometry g,
     final int nPts, final int basei, final int basej) {
-    final Envelope env = FunctionsUtil.getEnvelopeOrDefault(g);
+    final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final Coordinates[] pts = new Coordinates[nPts];
     final double baseX = env.getMinX();
     final double baseY = env.getMinY();
@@ -54,7 +54,7 @@ public class CreateRandomShapeFunctions {
   }
 
   public static Geometry randomLineString(final Geometry g, final int nPts) {
-    final Envelope env = FunctionsUtil.getEnvelopeOrDefault(g);
+    final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final double width = env.getWidth();
     final double hgt = env.getHeight();
@@ -166,7 +166,7 @@ public class CreateRandomShapeFunctions {
   }
 
   public static Geometry randomRadialPoints(final Geometry g, final int nPts) {
-    final Envelope env = FunctionsUtil.getEnvelopeOrDefault(g);
+    final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final double xLen = env.getWidth();
     final double yLen = env.getHeight();
@@ -192,7 +192,7 @@ public class CreateRandomShapeFunctions {
   }
 
   public static Geometry randomRectilinearWalk(final Geometry g, final int nPts) {
-    final Envelope env = FunctionsUtil.getEnvelopeOrDefault(g);
+    final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final double xLen = env.getWidth();
     final double yLen = env.getHeight();
@@ -223,7 +223,7 @@ public class CreateRandomShapeFunctions {
   }
 
   public static Geometry randomSegments(final Geometry g, final int nPts) {
-    final Envelope env = FunctionsUtil.getEnvelopeOrDefault(g);
+    final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final double xLen = env.getWidth();
     final double yLen = env.getHeight();
@@ -243,7 +243,7 @@ public class CreateRandomShapeFunctions {
   }
 
   public static Geometry randomSegmentsInGrid(final Geometry g, final int nPts) {
-    final Envelope env = FunctionsUtil.getEnvelopeOrDefault(g);
+    final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
 
     final int nCell = (int)Math.sqrt(nPts) + 1;

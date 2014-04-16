@@ -245,14 +245,14 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyGeometryCollection() throws Exception {
     final GeometryCollection g = this.geometryFactory.createGeometryCollection();
     assertEquals(-1, g.getDimension());
-    assertEquals(new Envelope(), g.getEnvelopeInternal());
+    assertEquals(new Envelope(), g.getBoundingBox());
     assertTrue(g.isSimple());
   }
 
   public void testEmptyLinearRing() throws Exception {
     final LineString l = this.geometryFactory.linearRing((CoordinatesList)null);
     assertEquals(1, l.getDimension());
-    assertEquals(new Envelope(), l.getEnvelopeInternal());
+    assertEquals(new Envelope(), l.getBoundingBox());
     assertTrue(l.isSimple());
     assertEquals(null, l.getStartPoint());
     assertEquals(null, l.getEndPoint());
@@ -263,7 +263,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyLineString() throws Exception {
     final LineString l = this.geometryFactory.lineString((Coordinates[])null);
     assertEquals(1, l.getDimension());
-    assertEquals(new Envelope(), l.getEnvelopeInternal());
+    assertEquals(new Envelope(), l.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -277,7 +277,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiLineString() throws Exception {
     final MultiLineString g = this.geometryFactory.createMultiLineString();
     assertEquals(1, g.getDimension());
-    assertEquals(new Envelope(), g.getEnvelopeInternal());
+    assertEquals(new Envelope(), g.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -288,7 +288,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiPoint() throws Exception {
     final MultiPoint g = this.geometryFactory.createMultiPoint((Point[])null);
     assertEquals(0, g.getDimension());
-    assertEquals(new Envelope(), g.getEnvelopeInternal());
+    assertEquals(new Envelope(), g.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -298,14 +298,14 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiPolygon() throws Exception {
     final MultiPolygon g = this.geometryFactory.createMultiPolygon();
     assertEquals(2, g.getDimension());
-    assertEquals(new Envelope(), g.getEnvelopeInternal());
+    assertEquals(new Envelope(), g.getBoundingBox());
     assertTrue(g.isSimple());
   }
 
   public void testEmptyPoint() throws Exception {
     final Point p = this.geometryFactory.point((Coordinates)null);
     assertEquals(0, p.getDimension());
-    assertEquals(new Envelope(), p.getEnvelopeInternal());
+    assertEquals(new Envelope(), p.getBoundingBox());
     assertTrue(p.isSimple());
     try {
       p.getX();
@@ -325,16 +325,16 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyPolygon() throws Exception {
     final Polygon p = this.geometryFactory.createPolygon(null, null);
     assertEquals(2, p.getDimension());
-    assertEquals(new Envelope(), p.getEnvelopeInternal());
+    assertEquals(new Envelope(), p.getBoundingBox());
     assertTrue(p.isSimple());
   }
 
   public void testEnvelopeCloned() throws Exception {
     final Geometry a = this.reader.read("LINESTRING(0 0, 10 10)");
     // Envelope is lazily initialized [Jon Aquino]
-    a.getEnvelopeInternal();
+    a.getBoundingBox();
     final Geometry b = (Geometry)a.clone();
-    assertTrue(a.getEnvelopeInternal() != b.getEnvelopeInternal());
+    assertTrue(a.getBoundingBox() != b.getBoundingBox());
   }
 
   public void testGetGeometryType() throws Exception {

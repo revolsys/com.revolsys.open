@@ -21,7 +21,7 @@ public class Nts1000000RectangularMapGridTest {
     final double tileHeight) {
     final RectangularMapTile tile = grid.getTileByName(tileName);
     Assert.equals(tileName, tile.getName(), "Tile Name");
-    final Envelope envelope = tile.getBoundingBox();
+    final BoundingBox envelope = tile.getBoundingBox();
     Assert.equals(lon - tileWidth, envelope.getMinX(), "minX: " + tileName);
     Assert.equals(lon, envelope.getMaxX(), "maxX: " + tileName);
     Assert.equals(lat, envelope.getMinY(), "minY: " + tileName);

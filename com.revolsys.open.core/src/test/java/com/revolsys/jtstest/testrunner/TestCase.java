@@ -161,6 +161,11 @@ public class TestCase implements Runnable {
     this.b = b;
   }
 
+  @Override
+  public String toString() {
+    return description;
+  }
+
   public String toXml() {
     final WKTWriter writer = new WKTWriter();
     String xml = "";

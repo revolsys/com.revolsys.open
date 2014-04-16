@@ -141,7 +141,7 @@ public class TriangulationFunctions {
     final VoronoiDiagramBuilder builder = new VoronoiDiagramBuilder();
     builder.setSites(sitesGeom);
     if (clipGeom != null) {
-      builder.setClipEnvelope(clipGeom.getEnvelopeInternal());
+      builder.setClipEnvelope(clipGeom.getBoundingBox());
     }
     builder.setTolerance(TRIANGULATION_TOLERANCE);
     final Geometry diagram = builder.getDiagram(sitesGeom.getGeometryFactory());
@@ -158,7 +158,7 @@ public class TriangulationFunctions {
     final VoronoiDiagramBuilder builder = new VoronoiDiagramBuilder();
     builder.setSites(mapper.getCoordinates());
     if (clipGeom != null) {
-      builder.setClipEnvelope(clipGeom.getEnvelopeInternal());
+      builder.setClipEnvelope(clipGeom.getBoundingBox());
     }
     builder.setTolerance(TRIANGULATION_TOLERANCE);
     final Geometry diagram = builder.getDiagram(sitesGeom.getGeometryFactory());

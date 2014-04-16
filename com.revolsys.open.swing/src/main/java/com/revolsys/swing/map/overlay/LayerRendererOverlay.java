@@ -7,7 +7,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;

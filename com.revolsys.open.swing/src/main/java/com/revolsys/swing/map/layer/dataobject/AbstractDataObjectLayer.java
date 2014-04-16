@@ -47,7 +47,6 @@ import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.gis.data.io.DataObjectReader;
@@ -70,7 +69,9 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -274,7 +275,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private final List<LayerDataObject> highlightedRecords = new ArrayList<LayerDataObject>();
 
-  private BoundingBox boundingBox = new BoundingBox();
+  private BoundingBox boundingBox = new Envelope();
 
   private boolean canAddRecords = true;
 
@@ -1735,7 +1736,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void removeFromIndex(final LayerDataObject record) {
     final Geometry geometry = record.getGeometryValue();
     if (geometry != null && !geometry.isEmpty()) {
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry);
+      final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
       removeFromIndex(boundingBox, record);
     }
   }
@@ -2343,7 +2344,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void updateSpatialIndex(final LayerDataObject record,
     final Geometry oldGeometry) {
     if (oldGeometry != null) {
-      final BoundingBox oldBoundingBox = BoundingBox.getBoundingBox(oldGeometry);
+      final BoundingBox oldBoundingBox = Envelope.getBoundingBox(oldGeometry);
       if (removeFromIndex(oldBoundingBox, record)) {
         addToIndex(record);
       }
@@ -2355,8 +2356,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (geometry != null) {
       final Project project = getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(
-        geometryFactory, geometry)
+      final BoundingBox boundingBox = Envelope.getBoundingBox(geometryFactory,
+        geometry)
         .expandPercent(0.1)
         .clipToCoordinateSystem();
 

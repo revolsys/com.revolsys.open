@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -112,7 +112,7 @@ public class TiePointsPanel extends TablePanel {
     if (geometry != null) {
       final Project project = Project.get();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(geometry)
+      final BoundingBox boundingBox = geometry.getBoundingBox()
         .convert(geometryFactory)
         .expand(200);
       project.setViewBoundingBox(boundingBox);

@@ -10,8 +10,8 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
@@ -47,7 +47,7 @@ public class SplitCrossingEdgesVisitor<T> extends
   public List<Edge<T>> queryCrosses(final IdObjectIndex<Edge<T>> edgeIndex,
     final LineString line) {
     final PreparedGeometry preparedLine = PreparedGeometryFactory.prepare(line);
-    final Envelope envelope = line.getEnvelopeInternal();
+    final BoundingBox envelope = line.getBoundingBox();
     final List<Edge<T>> edges = edgeIndex.query(envelope);
     // TODO change to use an visitor
     for (final Iterator<Edge<T>> iterator = edges.iterator(); iterator.hasNext();) {

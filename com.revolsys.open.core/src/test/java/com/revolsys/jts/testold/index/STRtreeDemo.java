@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -103,8 +104,8 @@ public class STRtreeDemo {
 
   private static GeometryFactory factory = GeometryFactory.getFactory();
 
-  private static Envelope envelope(final Boundable b) {
-    return (Envelope)b.getBounds();
+  private static BoundingBox envelope(final Boundable b) {
+    return (BoundingBox)b.getBounds();
   }
 
   private static void initTree(final TestTree t, final List sourceEnvelopes) {
@@ -153,7 +154,7 @@ public class STRtreeDemo {
     out.print("GEOMETRYCOLLECTION(");
     boolean first = true;
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
-      final Envelope e = (Envelope)i.next();
+      final BoundingBox e = (BoundingBox)i.next();
       final Geometry g = factory.createPolygon(
         factory.linearRing(new Coordinates[] {
           new Coordinate((double)e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE),
@@ -192,7 +193,7 @@ public class STRtreeDemo {
   private static List sourceData() {
     final ArrayList envelopes = new ArrayList();
     for (int i = 0; i < ITEM_COUNT; i++) {
-      envelopes.add(randomRectangle().getEnvelopeInternal());
+      envelopes.add(randomRectangle().getBoundingBox());
     }
     return envelopes;
   }

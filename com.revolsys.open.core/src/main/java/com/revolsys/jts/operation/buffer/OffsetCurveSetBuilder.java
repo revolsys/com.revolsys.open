@@ -40,10 +40,10 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -275,7 +275,7 @@ public class OffsetCurveSetBuilder {
     }
 
     // if envelope is narrower than twice the buffer distance, ring is eroded
-    final Envelope env = ring.getEnvelopeInternal();
+    final BoundingBox env = ring.getBoundingBox();
     final double envMinDimension = Math.min(env.getHeight(), env.getWidth());
     if (bufferDistance < 0.0 && 2 * Math.abs(bufferDistance) > envMinDimension) {
       return true;

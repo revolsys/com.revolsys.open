@@ -13,7 +13,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.PdfUtil;
 

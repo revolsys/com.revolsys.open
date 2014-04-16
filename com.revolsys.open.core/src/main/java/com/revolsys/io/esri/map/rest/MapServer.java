@@ -11,12 +11,13 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.io.esri.map.rest.map.LayerDescription;
 import com.revolsys.io.esri.map.rest.map.LevelOfDetail;
 import com.revolsys.io.esri.map.rest.map.TableDescription;
 import com.revolsys.io.esri.map.rest.map.TileInfo;
 import com.revolsys.io.esri.map.rest.map.TimeInfo;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.util.WrappedException;
 
 public class MapServer extends Service {
@@ -25,7 +26,7 @@ public class MapServer extends Service {
     super("MapServer");
   }
 
-  public BoundingBox getBoundingBox(final int zoomLevel, final int tileX,
+  public Envelope getBoundingBox(final int zoomLevel, final int tileX,
     final int tileY) {
     final TileInfo tileInfo = getTileInfo();
 
@@ -39,7 +40,7 @@ public class MapServer extends Service {
     final double y1 = originY - tileHeight * tileY;
     final double y2 = y1 - tileHeight;
 
-    return new BoundingBox(tileInfo.getSpatialReference(), x1, y1, x2, y2);
+    return new Envelope(tileInfo.getSpatialReference(), x1, y1, x2, y2);
   }
 
   public String getCapabilities() {

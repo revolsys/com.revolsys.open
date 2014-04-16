@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -38,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.ItemVisitor;
 
@@ -48,8 +48,8 @@ import com.revolsys.jts.index.ItemVisitor;
  */
 public abstract class NodeBase implements Serializable {
 
-//DEBUG private static int itemCount = 0;  // debugging
-  
+  // DEBUG private static int itemCount = 0; // debugging
+
   /**
    * Gets the index of the subquad that wholly contains the given envelope.
    * If none does, returns -1.
@@ -57,16 +57,24 @@ public abstract class NodeBase implements Serializable {
    * @return the index of the subquad that wholly contains the given envelope
    * or -1 if no subquad wholly contains the envelope
    */
-  public static int getSubnodeIndex(Envelope env, double centrex, double centrey)
-  {
+  public static int getSubnodeIndex(final BoundingBox env,
+    final double centrex, final double centrey) {
     int subnodeIndex = -1;
     if (env.getMinX() >= centrex) {
-      if (env.getMinY() >= centrey) subnodeIndex = 3;
-      if (env.getMaxY() <= centrey) subnodeIndex = 1;
+      if (env.getMinY() >= centrey) {
+        subnodeIndex = 3;
+      }
+      if (env.getMaxY() <= centrey) {
+        subnodeIndex = 1;
+      }
     }
     if (env.getMaxX() <= centrex) {
-      if (env.getMinY() >= centrey) subnodeIndex = 2;
-      if (env.getMaxY() <= centrey) subnodeIndex = 0;
+      if (env.getMinY() >= centrey) {
+        subnodeIndex = 2;
+      }
+      if (env.getMaxY() <= centrey) {
+        subnodeIndex = 0;
+      }
     }
     return subnodeIndex;
   }
@@ -86,80 +94,16 @@ public abstract class NodeBase implements Serializable {
   public NodeBase() {
   }
 
-  public List getItems() { return items; }
-
-  public boolean hasItems() { return ! items.isEmpty(); }
-
-  public void add(Object item)
-  {
+  public void add(final Object item) {
     items.add(item);
-//DEBUG itemCount++;
-//DEBUG System.out.print(itemCount);
+    // DEBUG itemCount++;
+    // DEBUG System.out.print(itemCount);
   }
 
-  /**
-   * Removes a single item from this subtree.
-   *
-   * @param itemEnv the envelope containing the item
-   * @param item the item to remove
-   * @return <code>true</code> if the item was found and removed
-   */
-  public boolean remove(Envelope itemEnv, Object item)
-  {
-    // use envelope to restrict nodes scanned
-    if (! isSearchMatch(itemEnv))
-      return false;
-
-    boolean found = false;
-    for (int i = 0; i < 4; i++) {
-      if (subnode[i] != null) {
-        found = subnode[i].remove(itemEnv, item);
-        if (found) {
-          // trim subtree if empty
-          if (subnode[i].isPrunable())
-            subnode[i] = null;
-          break;
-        }
-      }
-    }
-    // if item was found lower down, don't need to search for it here
-    if (found) return found;
-    // otherwise, try and remove the item from the list of items in this node
-    found = items.remove(item);
-    return found;
-  }
-
-  public boolean isPrunable()
-  {
-    return ! (hasChildren() || hasItems());
-  }
-
-  public boolean hasChildren()
-  {
-    for (int i = 0; i < 4; i++) {
-      if (subnode[i] != null)
-        return true;
-    }
-    return false;
-  }
-
-  public boolean isEmpty()
-  {
-    boolean isEmpty = true;
-    if (! items.isEmpty()) isEmpty = false;
-    for (int i = 0; i < 4; i++) {
-      if (subnode[i] != null) {
-        if (! subnode[i].isEmpty() )
-          isEmpty = false;
-      }
-    }
-    return isEmpty;
-  }
-
-  //<<TODO:RENAME?>> Sounds like this method adds resultItems to items
-  //(like List#addAll). Perhaps it should be renamed to "addAllItemsTo" [Jon Aquino]
-  public List addAllItems(List resultItems)
-  {
+  // <<TODO:RENAME?>> Sounds like this method adds resultItems to items
+  // (like List#addAll). Perhaps it should be renamed to "addAllItemsTo" [Jon
+  // Aquino]
+  public List addAllItems(final List resultItems) {
     // this node may have items as well as subnodes (since items may not
     // be wholely contained in any single subnode
     resultItems.addAll(this.items);
@@ -170,12 +114,12 @@ public abstract class NodeBase implements Serializable {
     }
     return resultItems;
   }
-  protected abstract boolean isSearchMatch(Envelope searchEnv);
 
-  public void addAllItemsFromOverlapping(Envelope searchEnv, List resultItems)
-  {
-    if (! isSearchMatch(searchEnv))
+  public void addAllItemsFromOverlapping(final Envelope searchEnv,
+    final List resultItems) {
+    if (!isSearchMatch(searchEnv)) {
       return;
+    }
 
     // this node may have items as well as subnodes (since items may not
     // be wholely contained in any single subnode
@@ -188,10 +132,119 @@ public abstract class NodeBase implements Serializable {
     }
   }
 
-  public void visit(Envelope searchEnv, ItemVisitor visitor)
-  {
-    if (! isSearchMatch(searchEnv))
+  // <<TODO:RENAME?>> In Samet's terminology, I think what we're returning here
+  // is
+  // actually level+1 rather than depth. (See p. 4 of his book) [Jon Aquino]
+  int depth() {
+    int maxSubDepth = 0;
+    for (int i = 0; i < 4; i++) {
+      if (subnode[i] != null) {
+        final int sqd = subnode[i].depth();
+        if (sqd > maxSubDepth) {
+          maxSubDepth = sqd;
+        }
+      }
+    }
+    return maxSubDepth + 1;
+  }
+
+  public List getItems() {
+    return items;
+  }
+
+  int getNodeCount() {
+    int subSize = 0;
+    for (int i = 0; i < 4; i++) {
+      if (subnode[i] != null) {
+        subSize += subnode[i].size();
+      }
+    }
+    return subSize + 1;
+  }
+
+  public boolean hasChildren() {
+    for (int i = 0; i < 4; i++) {
+      if (subnode[i] != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean hasItems() {
+    return !items.isEmpty();
+  }
+
+  public boolean isEmpty() {
+    boolean isEmpty = true;
+    if (!items.isEmpty()) {
+      isEmpty = false;
+    }
+    for (int i = 0; i < 4; i++) {
+      if (subnode[i] != null) {
+        if (!subnode[i].isEmpty()) {
+          isEmpty = false;
+        }
+      }
+    }
+    return isEmpty;
+  }
+
+  public boolean isPrunable() {
+    return !(hasChildren() || hasItems());
+  }
+
+  protected abstract boolean isSearchMatch(BoundingBox searchEnv);
+
+  /**
+   * Removes a single item from this subtree.
+   *
+   * @param itemEnv the envelope containing the item
+   * @param item the item to remove
+   * @return <code>true</code> if the item was found and removed
+   */
+  public boolean remove(final BoundingBox itemEnv, final Object item) {
+    // use envelope to restrict nodes scanned
+    if (!isSearchMatch(itemEnv)) {
+      return false;
+    }
+
+    boolean found = false;
+    for (int i = 0; i < 4; i++) {
+      if (subnode[i] != null) {
+        found = subnode[i].remove(itemEnv, item);
+        if (found) {
+          // trim subtree if empty
+          if (subnode[i].isPrunable()) {
+            subnode[i] = null;
+          }
+          break;
+        }
+      }
+    }
+    // if item was found lower down, don't need to search for it here
+    if (found) {
+      return found;
+    }
+    // otherwise, try and remove the item from the list of items in this node
+    found = items.remove(item);
+    return found;
+  }
+
+  int size() {
+    int subSize = 0;
+    for (int i = 0; i < 4; i++) {
+      if (subnode[i] != null) {
+        subSize += subnode[i].size();
+      }
+    }
+    return subSize + items.size();
+  }
+
+  public void visit(final BoundingBox searchEnv, final ItemVisitor visitor) {
+    if (!isSearchMatch(searchEnv)) {
       return;
+    }
 
     // this node may have items as well as subnodes (since items may not
     // be wholely contained in any single subnode
@@ -204,49 +257,12 @@ public abstract class NodeBase implements Serializable {
     }
   }
 
-  private void visitItems(Envelope searchEnv, ItemVisitor visitor)
-  {
-    // would be nice to filter items based on search envelope, but can't until they contain an envelope
-    for (Iterator i = items.iterator(); i.hasNext(); ) {
+  private void visitItems(final BoundingBox searchEnv, final ItemVisitor visitor) {
+    // would be nice to filter items based on search envelope, but can't until
+    // they contain an envelope
+    for (final Iterator i = items.iterator(); i.hasNext();) {
       visitor.visitItem(i.next());
     }
-  }
-
-//<<TODO:RENAME?>> In Samet's terminology, I think what we're returning here is
-//actually level+1 rather than depth. (See p. 4 of his book) [Jon Aquino]
-  int depth()
-  {
-    int maxSubDepth = 0;
-    for (int i = 0; i < 4; i++) {
-      if (subnode[i] != null) {
-        int sqd = subnode[i].depth();
-        if (sqd > maxSubDepth)
-          maxSubDepth = sqd;
-      }
-    }
-    return maxSubDepth + 1;
-  }
-
-  int size()
-  {
-    int subSize = 0;
-    for (int i = 0; i < 4; i++) {
-      if (subnode[i] != null) {
-        subSize += subnode[i].size();
-      }
-    }
-    return subSize + items.size();
-  }
-
-  int getNodeCount()
-  {
-    int subSize = 0;
-    for (int i = 0; i < 4; i++) {
-      if (subnode[i] != null) {
-        subSize += subnode[i].size();
-      }
-    }
-    return subSize + 1;
   }
 
 }

@@ -10,7 +10,6 @@ import javax.annotation.PreDestroy;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -21,6 +20,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -85,7 +85,7 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
 
   @Override
   public Query createQuery(final String typePath, final String whereClause,
-    final BoundingBox boundingBox) {
+    final Envelope boundingBox) {
     return dataStore.createQuery(typePath, whereClause, boundingBox);
   }
 

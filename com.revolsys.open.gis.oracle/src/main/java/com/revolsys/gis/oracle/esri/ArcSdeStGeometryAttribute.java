@@ -10,18 +10,19 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.cs.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.jts.JtsGeometryUtil;
-import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
@@ -115,7 +116,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       final Double mScale = this.spatialReference.getMScale();
       final Double mOffset = this.spatialReference.getMOffset();
 
-      final BoundingBox envelope = BoundingBox.getBoundingBox(geometry);
+      final BoundingBox envelope = Envelope.getBoundingBox(geometry);
       final double minX = envelope.getMinX();
       final double minY = envelope.getMinY();
       final double maxX = envelope.getMaxX();
@@ -131,7 +132,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       int numPoints = 0;
       byte[] data;
 
-      final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(geometry, false);
+      final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(
+        geometry, false);
       final int entityType = ArcSdeConstants.getStGeometryType(geometry);
       numPoints = PackedCoordinateUtil.getNumPoints(parts);
       data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,

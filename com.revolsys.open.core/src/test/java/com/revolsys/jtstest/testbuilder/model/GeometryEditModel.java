@@ -138,10 +138,10 @@ public class GeometryEditModel {
     final Envelope env = new Envelope();
 
     if (getGeometry(0) != null) {
-      env.expandToInclude(getGeometry(0).getEnvelopeInternal());
+      env.expandToInclude(getGeometry(0).getBoundingBox());
     }
     if (getGeometry(1) != null) {
-      env.expandToInclude(getGeometry(1).getEnvelopeInternal());
+      env.expandToInclude(getGeometry(1).getBoundingBox());
     }
     return env;
   }
@@ -150,13 +150,13 @@ public class GeometryEditModel {
     final Envelope env = new Envelope();
 
     if (getGeometry(0) != null) {
-      env.expandToInclude(getGeometry(0).getEnvelopeInternal());
+      env.expandToInclude(getGeometry(0).getBoundingBox());
     }
     if (getGeometry(1) != null) {
-      env.expandToInclude(getGeometry(1).getEnvelopeInternal());
+      env.expandToInclude(getGeometry(1).getBoundingBox());
     }
     if (getResult() != null) {
-      env.expandToInclude(getResult().getEnvelopeInternal());
+      env.expandToInclude(getResult().getBoundingBox());
     }
     return env;
   }
@@ -165,7 +165,7 @@ public class GeometryEditModel {
     final Envelope env = new Envelope();
 
     if (getResult() != null) {
-      env.expandToInclude(getResult().getEnvelopeInternal());
+      env.expandToInclude(getResult().getBoundingBox());
     }
     return env;
   }

@@ -2,6 +2,7 @@ package com.revolsys.gis.algorithm.index;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.ItemVisitor;
 
@@ -26,7 +27,7 @@ public class IndexItemVisitor implements ItemVisitor {
   @Override
   public void visitItem(final Object item) {
     final DataObject object = (DataObject)item;
-    final Envelope envelope = object.getGeometryValue().getEnvelopeInternal();
+    final BoundingBox envelope = object.getGeometryValue().getBoundingBox();
     if (envelope.intersects(this.envelope)) {
       visitor.visit(object);
     }

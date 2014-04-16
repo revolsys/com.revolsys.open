@@ -66,7 +66,7 @@ public class LayerRenderer implements Renderer {
     final Geometry geometry, final Style style) throws Exception {
     // cull non-visible geometries
     // for maximum rendering speed this needs to be checked for each component
-    if (!viewport.intersectsInModel(geometry.getEnvelopeInternal())) {
+    if (!viewport.intersectsInModel(geometry.getBoundingBox())) {
       return;
     }
 

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -12,6 +11,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.MathUtil;
 
@@ -300,7 +300,7 @@ public class LineSegmentUtil {
     line1End = geometryFactory.createCoordinates(line1End);
     line2Start = geometryFactory.createCoordinates(line2Start);
     line2End = geometryFactory.createCoordinates(line2End);
-    if (BoundingBox.intersects(line1Start, line1End, line2Start, line2End)) {
+    if (Envelope.intersects(line1Start, line1End, line2Start, line2End)) {
       final Set<Coordinates> intersections = new TreeSet<Coordinates>(
         new CoordinatesDistanceComparator(line1Start));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End,

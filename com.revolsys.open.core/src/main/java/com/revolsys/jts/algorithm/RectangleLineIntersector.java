@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -55,7 +56,7 @@ public class RectangleLineIntersector {
   // for intersection testing, don't need to set precision model
   private final LineIntersector li = new RobustLineIntersector();
 
-  private final Envelope rectEnv;
+  private final BoundingBox rectEnv;
 
   private final Coordinates diagUp0;
 
@@ -72,7 +73,7 @@ public class RectangleLineIntersector {
    * 
    * @param rectEnv the query rectangle, specified as an Envelope
    */
-  public RectangleLineIntersector(final Envelope rectEnv) {
+  public RectangleLineIntersector(final BoundingBox rectEnv) {
     this.rectEnv = rectEnv;
 
     /**
@@ -105,7 +106,7 @@ public class RectangleLineIntersector {
      * If the segment envelope is disjoint from the
      * rectangle envelope, there is no intersection
      */
-    final Envelope segEnv = new Envelope(p0, p1);
+    final BoundingBox segEnv = new Envelope(p0, p1);
     if (!rectEnv.intersects(segEnv)) {
       return false;
     }

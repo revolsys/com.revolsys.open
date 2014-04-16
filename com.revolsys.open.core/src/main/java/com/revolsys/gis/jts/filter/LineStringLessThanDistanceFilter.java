@@ -21,10 +21,10 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 
@@ -63,7 +63,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   @Override
   public boolean accept(final LineString line) {
-    if (line.getEnvelopeInternal().intersects(envelope)) {
+    if (line.getBoundingBox().intersects(envelope)) {
       final double distance = LineStringUtil.distance(line, this.geometry,
         this.distance);
       if (distance < this.distance) {
@@ -86,7 +86,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
     return distance;
   }
 
-  public Envelope getEnvelope() {
+  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
     return envelope;
   }
 
@@ -105,7 +105,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   public void setGeometry(final LineString geometry) {
     this.geometry = geometry;
-    this.envelope = BoundingBox.getBoundingBox(geometry);
+    this.envelope = Envelope.getBoundingBox(geometry);
     this.envelope = this.envelope.expand(distance);
   }
 }

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -19,20 +19,20 @@ public abstract class RTreeNode<T> extends Envelope {
   }
 
   public abstract boolean remove(LinkedList<RTreeNode<T>> path,
-    Envelope envelope, T object);
+    BoundingBox envelope, T object);
 
   @Override
   public String toString() {
-    return new BoundingBox(GeometryFactory.getFactory(), this).toPolygon(1)
+    return new Envelope(GeometryFactory.getFactory(), this).toPolygon(1)
       .toString();
   }
 
   protected abstract void updateEnvelope();
 
-  public abstract boolean visit(Envelope envelope, Filter<T> filter,
+  public abstract boolean visit(BoundingBox envelope, Filter<T> filter,
     Visitor<T> visitor);
 
-  public abstract boolean visit(Envelope envelope, Visitor<T> visitor);
+  public abstract boolean visit(BoundingBox envelope, Visitor<T> visitor);
 
   public abstract boolean visit(Visitor<T> visitor);
 }

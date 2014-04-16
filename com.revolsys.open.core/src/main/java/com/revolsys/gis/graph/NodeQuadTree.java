@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.AbstractIdObjectPointQuadTree;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.visitor.CreateListVisitor;
@@ -23,13 +24,13 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   }
 
   @Override
-  public Envelope getEnvelope(final Node<T> node) {
+  public BoundingBox getEnvelope(final Node<T> node) {
     if (node == null) {
       return new Envelope();
     } else {
       final double x = node.getX();
       final double y = node.getY();
-      final Envelope envelope = new Envelope(x, x, y, y);
+      final BoundingBox envelope = new Envelope(x, y, x, y);
       return envelope;
     }
   }
@@ -50,7 +51,7 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   }
 
   @Override
-  public List<Node<T>> query(final Envelope envelope) {
+  public List<Node<T>> query(final BoundingBox envelope) {
     final CreateListVisitor<Node<T>> visitor = new CreateListVisitor<Node<T>>();
     visit(envelope, visitor);
     return visitor.getList();

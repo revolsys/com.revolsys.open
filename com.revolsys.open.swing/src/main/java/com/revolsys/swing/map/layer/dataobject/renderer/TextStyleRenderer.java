@@ -26,7 +26,6 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.PointUtil;
@@ -35,6 +34,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;

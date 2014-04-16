@@ -33,6 +33,7 @@
 
 package com.revolsys.jts.shape;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -42,7 +43,7 @@ import com.revolsys.jts.geom.LineSegment;
 
 public abstract class GeometricShapeBuilder 
 {
-	protected Envelope extent = new Envelope(0, 1, 0, 1);
+	protected BoundingBox extent = new Envelope(0, 0, 1, 1);
 	protected int numPts = 0;
 	protected GeometryFactory geomFactory;
 	
@@ -51,12 +52,12 @@ public abstract class GeometricShapeBuilder
 		this.geomFactory = geomFactory;
 	}
 	
-	public void setExtent(Envelope extent)
+	public void setExtent(BoundingBox extent)
 	{
 		this.extent = extent;
 	}
 	
-	public Envelope getExtent()
+	public BoundingBox getExtent()
 	{
 		return extent;
 	}
@@ -86,13 +87,13 @@ public abstract class GeometricShapeBuilder
 		return new LineSegment(p0, p1);
 	}
 	
-	public Envelope getSquareExtent()
+	public BoundingBox getSquareExtent()
 	{
 		double radius = getRadius();
 		
 		Coordinates centre = getCentre();
-		return new Envelope(centre.getX() - radius, centre.getX() + radius,
-				centre.getY() - radius, centre.getY() + radius);
+		return new Envelope(centre.getX() - radius, centre.getY() - radius,
+				centre.getX() + radius, centre.getY() + radius);
 	}
 	
 

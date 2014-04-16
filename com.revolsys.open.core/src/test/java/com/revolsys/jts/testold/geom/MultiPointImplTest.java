@@ -39,8 +39,8 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
@@ -90,7 +90,7 @@ public class MultiPointImplTest extends TestCase {
 
   public void testGetEnvelope() throws Exception {
     final MultiPoint m = (MultiPoint)this.reader.read("MULTIPOINT(1.111 2.222, 3.333 4.444, 3.333 4.444)");
-    final Envelope e = m.getEnvelopeInternal();
+    final BoundingBox e = m.getBoundingBox();
     assertEquals(1.111, e.getMinX(), 1E-10);
     assertEquals(3.333, e.getMaxX(), 1E-10);
     assertEquals(2.222, e.getMinY(), 1E-10);

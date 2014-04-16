@@ -26,6 +26,7 @@ import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
@@ -156,10 +157,10 @@ public final class JtsGeometryUtil {
 
   }
 
-  public static Envelope buffer(final Envelope envelope, final int i) {
+  public static BoundingBox buffer(final BoundingBox envelope, final int i) {
     // TODO Auto-generated method stub
-    return new Envelope(envelope.getMinX() - i, envelope.getMaxX() + i,
-      envelope.getMinY() - i, envelope.getMaxY() + i);
+    return new Envelope(envelope.getMinX() - i, envelope.getMinY() - i,
+      envelope.getMaxX() + i, envelope.getMaxY() + i);
   }
 
   public static Coordinates closestCoordinate(final LineSegment lineSegment,

@@ -40,9 +40,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Location;
@@ -236,7 +236,7 @@ public abstract class EdgeRing {
   public boolean containsPoint(Coordinates p)
   {
     LinearRing shell = getLinearRing();
-    Envelope env = shell.getEnvelopeInternal();
+    BoundingBox env = shell.getBoundingBox();
     if (! env.contains(p)) return false;
     if (! CGAlgorithms.isPointInRing(p, shell.getCoordinateArray()) ) return false;
 

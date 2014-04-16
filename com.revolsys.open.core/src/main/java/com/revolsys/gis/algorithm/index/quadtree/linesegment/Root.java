@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.quadtree.IntervalSize;
@@ -25,7 +26,7 @@ public class Root extends NodeBase {
     }
   }
 
-  private void insertContained(final Node tree, final Envelope envelope,
+  private void insertContained(final Node tree, final BoundingBox envelope,
     final int[] item) {
     final boolean isZeroX = IntervalSize.isZeroWidth(envelope.getMinX(),
       envelope.getMaxX());
@@ -41,7 +42,7 @@ public class Root extends NodeBase {
   }
 
   @Override
-  protected boolean isSearchMatch(final Envelope searchEnv) {
+  protected boolean isSearchMatch(final BoundingBox searchEnv) {
     return true;
   }
 

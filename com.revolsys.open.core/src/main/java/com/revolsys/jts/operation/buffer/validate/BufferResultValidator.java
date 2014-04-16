@@ -183,10 +183,10 @@ public class BufferResultValidator
   	double padding = distance * MAX_ENV_DIFF_FRAC;
   	if (padding == 0.0) padding = 0.001;
 
-  	Envelope expectedEnv = new Envelope(input.getEnvelopeInternal());
+  	Envelope expectedEnv = new Envelope(input.getBoundingBox());
   	expectedEnv.expandBy(distance);
   	
-  	Envelope bufEnv = new Envelope(result.getEnvelopeInternal());
+  	Envelope bufEnv = new Envelope(result.getBoundingBox());
   	bufEnv.expandBy(padding);
 
   	if (! bufEnv.contains(expectedEnv)) {

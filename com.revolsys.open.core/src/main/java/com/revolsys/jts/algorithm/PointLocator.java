@@ -161,7 +161,7 @@ public class PointLocator {
 
   private int locate(final Coordinates p, final LineString l) {
     // bounding-box check
-    if (!l.getEnvelopeInternal().intersects(p)) {
+    if (!l.getBoundingBox().intersects(p)) {
       return Location.EXTERIOR;
     }
 
@@ -217,7 +217,7 @@ public class PointLocator {
 
   private int locateInPolygonRing(final Coordinates p, final LinearRing ring) {
     // bounding-box check
-    if (!ring.getEnvelopeInternal().intersects(p)) {
+    if (!ring.getBoundingBox().intersects(p)) {
       return Location.EXTERIOR;
     }
 

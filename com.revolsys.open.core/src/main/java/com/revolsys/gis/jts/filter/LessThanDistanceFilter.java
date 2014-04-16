@@ -21,8 +21,8 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.jts.LineStringUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -52,7 +52,7 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
 
   @Override
   public boolean accept(final Geometry geometry) {
-    if (geometry.getEnvelopeInternal().intersects(envelope)) {
+    if (geometry.getBoundingBox().intersects(envelope)) {
       double distance;
       if (geometry instanceof LineString && this.geometry instanceof LineString) {
         final LineString line1 = (LineString)geometry;
@@ -82,7 +82,7 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
     return distance;
   }
 
-  public Envelope getEnvelope() {
+  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
     return envelope;
   }
 
@@ -101,7 +101,7 @@ public class LessThanDistanceFilter implements Filter<Geometry> {
 
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
-    this.envelope = BoundingBox.getBoundingBox(geometry);
+    this.envelope = Envelope.getBoundingBox(geometry);
     this.envelope = this.envelope.expand(distance);
   }
 }

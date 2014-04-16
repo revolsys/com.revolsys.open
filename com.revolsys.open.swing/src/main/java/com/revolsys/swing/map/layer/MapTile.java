@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.cs.BoundingBox;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 

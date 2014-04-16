@@ -292,7 +292,7 @@ public class DistanceOp {
 
   private void computeMinDistance(final LineString line0,
     final LineString line1, final GeometryLocation[] locGeom) {
-    if (line0.getEnvelopeInternal().distance(line1.getEnvelopeInternal()) > minDistance) {
+    if (line0.getBoundingBox().distance(line1.getBoundingBox()) > minDistance) {
       return;
     }
     final Coordinates[] coord0 = line0.getCoordinateArray();
@@ -319,7 +319,7 @@ public class DistanceOp {
 
   private void computeMinDistance(final LineString line, final Point pt,
     final GeometryLocation[] locGeom) {
-    if (line.getEnvelopeInternal().distance(pt.getEnvelopeInternal()) > minDistance) {
+    if (line.getBoundingBox().distance(pt.getBoundingBox()) > minDistance) {
       return;
     }
     final Coordinates[] coord0 = line.getCoordinateArray();

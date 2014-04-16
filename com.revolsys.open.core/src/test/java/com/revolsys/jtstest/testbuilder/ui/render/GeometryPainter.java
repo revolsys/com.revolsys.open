@@ -148,7 +148,7 @@ public class GeometryPainter {
     }
 
     // cull non-visible geometries
-    if (!viewport.intersectsInModel(geometry.getEnvelopeInternal())) {
+    if (!viewport.intersectsInModel(geometry.getBoundingBox())) {
       return;
     }
 

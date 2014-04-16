@@ -37,9 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geomgraph.GeometryGraph;
 import com.revolsys.jts.index.sweepline.SweepLineIndex;
@@ -91,7 +91,7 @@ public class SweeplineNestedRingTester
 
     for (int i = 0; i < rings.size(); i++) {
       LinearRing ring = (LinearRing) rings.get(i);
-      Envelope env = ring.getEnvelopeInternal();
+      BoundingBox env = ring.getBoundingBox();
       SweepLineInterval sweepInt = new SweepLineInterval(env.getMinX(), env.getMaxX(), ring);
       sweepLine.add(sweepInt);
     }
@@ -102,7 +102,7 @@ public class SweeplineNestedRingTester
     Coordinates[] innerRingPts = innerRing.getCoordinateArray();
     Coordinates[] searchRingPts = searchRing.getCoordinateArray();
 
-    if (! innerRing.getEnvelopeInternal().intersects(searchRing.getEnvelopeInternal()))
+    if (! innerRing.getBoundingBox().intersects(searchRing.getBoundingBox()))
       return false;
 
     Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -36,7 +35,6 @@ package com.revolsys.jts.index.chain;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Quadrant;
 
@@ -86,7 +84,7 @@ public class MonotoneChainBuilder {
     return last - 1;
   }
 
-  public static List getChains(final Coordinates[] pts) {
+  public static List<MonotoneChain> getChains(final Coordinates[] pts) {
     return getChains(pts, null);
   }
 
@@ -94,8 +92,9 @@ public class MonotoneChainBuilder {
    * Return a list of the {@link MonotoneChain}s
    * for the given list of coordinates.
    */
-  public static List getChains(final Coordinates[] pts, final Object context) {
-    final List mcList = new ArrayList();
+  public static List<MonotoneChain> getChains(final Coordinates[] pts,
+    final Object context) {
+    final List<MonotoneChain> mcList = new ArrayList<>();
     final int[] startIndex = getChainStartIndices(pts);
     for (int i = 0; i < startIndex.length - 1; i++) {
       final MonotoneChain mc = new MonotoneChain(pts, startIndex[i],

@@ -36,9 +36,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -102,7 +102,7 @@ public class PreparedPolygonIntersectsPerfTest {
     return circle.getBoundary();
   }
 
-  List createLines(final Envelope env, final int nItems, final double size,
+  List createLines(final BoundingBox env, final int nItems, final double size,
     final int nPts) {
     final int nCells = (int)Math.sqrt(nItems);
 
@@ -167,7 +167,7 @@ public class PreparedPolygonIntersectsPerfTest {
     // Geometry target = sinePoly.getBoundary();
     final Geometry target = sinePoly;
 
-    final List lines = createLines(target.getEnvelopeInternal(), NUM_LINES,
+    final List lines = createLines(target.getBoundingBox(), NUM_LINES,
       1.0, NUM_LINE_PTS);
 
     System.out.println();

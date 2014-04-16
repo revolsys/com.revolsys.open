@@ -1,32 +1,33 @@
 package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.quadtree.DoubleBits;
 
 public class Node extends NodeBase {
-  public static Envelope computeKey(final Coordinates point, final int level,
-    final Envelope itemEnv) {
+  public static BoundingBox computeKey(final Coordinates point,
+    final int level, final BoundingBox itemEnv) {
     final double quadSize = DoubleBits.powerOf2(level);
     point.setX(Math.floor(itemEnv.getMinX() / quadSize) * quadSize);
     point.setY(Math.floor(itemEnv.getMinY() / quadSize) * quadSize);
-    return new Envelope(point.getX(), point.getX() + quadSize, point.getY(), point.getY()
-      + quadSize);
+    return new Envelope(point.getX(), point.getY(), point.getX() + quadSize,
+      point.getY() + quadSize);
   }
 
   public static Envelope computeKey(final int level, final Coordinates point,
-    final Envelope itemEnv) {
+    final BoundingBox itemEnv) {
     final double quadSize = DoubleBits.powerOf2(level);
     final double x = Math.floor(itemEnv.getMinX() / quadSize) * quadSize;
     final double y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
     point.setX(x);
     point.setY(y);
-    return new Envelope(x, x + quadSize, y, y + quadSize);
+    return new Envelope(x, y, x + quadSize, y + quadSize);
   }
 
-  public static int computeQuadLevel(final Envelope env) {
+  public static int computeQuadLevel(final BoundingBox env) {
     final double dx = env.getWidth();
     final double dy = env.getHeight();
     final double dMax = dx > dy ? dx : dy;
@@ -47,7 +48,7 @@ public class Node extends NodeBase {
     return largerNode;
   }
 
-  public static Node createNode(final Envelope itemEnv) {
+  public static Node createNode(final BoundingBox itemEnv) {
     final Coordinates point = new Coordinate();
     int level = computeQuadLevel(itemEnv);
     Envelope nodeEnvelope = computeKey(level, point, itemEnv);
@@ -107,12 +108,12 @@ public class Node extends NodeBase {
         maxY = env.getMaxY();
       break;
     }
-    final Envelope envelope = new Envelope(minX, maxX, minY, maxY);
+    final Envelope envelope = new Envelope(minX, minY, maxX, maxY);
     final Node node = new Node(envelope, level - 1);
     return node;
   }
 
-  public NodeBase find(final Envelope searchEnv) {
+  public NodeBase find(final BoundingBox searchEnv) {
     final int subnodeIndex = getSubnodeIndex(searchEnv, centre);
     if (subnodeIndex == -1) {
       return this;
@@ -124,11 +125,11 @@ public class Node extends NodeBase {
     return this;
   }
 
-  public Envelope getEnvelope() {
+  public BoundingBox getEnvelope() {
     return env;
   }
 
-  public Node getNode(final Envelope searchEnv) {
+  public Node getNode(final BoundingBox searchEnv) {
     final int subnodeIndex = getSubnodeIndex(searchEnv, centre);
     if (subnodeIndex != -1) {
       final Node node = getSubnode(subnodeIndex);
@@ -157,7 +158,7 @@ public class Node extends NodeBase {
   }
 
   @Override
-  protected boolean isSearchMatch(final Envelope searchEnv) {
+  protected boolean isSearchMatch(final BoundingBox searchEnv) {
     return env.intersects(searchEnv);
   }
 

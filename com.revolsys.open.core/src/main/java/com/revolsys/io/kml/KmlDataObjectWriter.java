@@ -9,11 +9,12 @@ import java.util.Map;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -224,9 +225,9 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     if (geometry != null) {
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.wgs84();
       final Geometry projectedGeometry = geometryFactory.copy(geometry);
-      final BoundingBox boundingBox = BoundingBox.getBoundingBox(projectedGeometry);
-      final Point centre = geometryFactory.point(
-        boundingBox.getCentreX(), boundingBox.getCentreY());
+      final BoundingBox boundingBox = Envelope.getBoundingBox(projectedGeometry);
+      final Point centre = geometryFactory.point(boundingBox.getCentreX(),
+        boundingBox.getCentreY());
 
       final Number configRange = getProperty(LOOK_AT_RANGE_PROPERTY);
       final long range;

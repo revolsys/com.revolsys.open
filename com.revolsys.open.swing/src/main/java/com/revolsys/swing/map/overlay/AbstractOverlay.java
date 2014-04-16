@@ -33,14 +33,15 @@ import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.PointQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.IndexedLineSegment;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.comparator.GeometryDistanceComparator;
 import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -349,7 +350,7 @@ public class AbstractOverlay extends JComponent implements
       boundingBox = viewport.getBoundingBox(geometryFactory, event,
         hotspotPixels);
     } else {
-      boundingBox = new BoundingBox();
+      boundingBox = new Envelope();
     }
     return boundingBox;
   }

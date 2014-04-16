@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -58,72 +57,72 @@ import com.revolsys.jts.index.chain.MonotoneChainSelectAction;
  * 
  * @see IndexedPointInAreaLocator for more general functionality
  */
-public class MCPointInRing   implements PointInRing {
+public class MCPointInRing implements PointInRing {
 
-  class MCSelecter extends MonotoneChainSelectAction
-  {
+  class MCSelecter extends MonotoneChainSelectAction {
     Coordinates p;
 
-    public MCSelecter(Coordinates p)
-    {
+    public MCSelecter(final Coordinates p) {
       this.p = p;
     }
 
-    public void select(LineSegment ls)
-    {
+    @Override
+    public void select(final LineSegment ls) {
       testLineSegment(p, ls);
     }
   }
 
-  private LinearRing ring;
-  private Bintree tree;
-  private int crossings = 0;  // number of segment/ray crossings
+  private final LinearRing ring;
 
-  public MCPointInRing(LinearRing ring)
-  {
+  private Bintree tree;
+
+  private int crossings = 0; // number of segment/ray crossings
+
+  private final Interval interval = new Interval();
+
+  public MCPointInRing(final LinearRing ring) {
     this.ring = ring;
     buildIndex();
   }
 
-  private void buildIndex()
-  {
-    //Envelope env = ring.getEnvelopeInternal();
+  private void buildIndex() {
+    // Envelope env = ring.getEnvelopeInternal();
     tree = new Bintree();
 
-    Coordinates[] pts = CoordinateArrays.removeRepeatedPoints(ring.getCoordinateArray());
-    List mcList = MonotoneChainBuilder.getChains(pts);
+    final Coordinates[] pts = CoordinateArrays.removeRepeatedPoints(ring.getCoordinateArray());
+    final List<MonotoneChain> mcList = MonotoneChainBuilder.getChains(pts);
 
     for (int i = 0; i < mcList.size(); i++) {
-      MonotoneChain mc = (MonotoneChain) mcList.get(i);
-      Envelope mcEnv = mc.getEnvelope();
+      final MonotoneChain mc = mcList.get(i);
+      final BoundingBox mcEnv = mc.getEnvelope();
       interval.min = mcEnv.getMinY();
       interval.max = mcEnv.getMaxY();
       tree.insert(interval, mc);
     }
   }
 
-  private Interval interval = new Interval();
-
-  public boolean isInside(Coordinates pt)
-  {
+  @Override
+  public boolean isInside(final Coordinates pt) {
     crossings = 0;
 
     // test all segments intersected by ray from pt in positive x direction
-    Envelope rayEnv = new Envelope(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, pt.getY(), pt.getY());
+    double y = pt.getY();
+    final BoundingBox rayEnv = new Envelope(Double.NEGATIVE_INFINITY,
+      y, Double.POSITIVE_INFINITY, y);
 
-    interval.min = pt.getY();
-    interval.max = pt.getY();
-    List segs = tree.query(interval);
-//System.out.println("query size = " + segs.size());
+    interval.min = y;
+    interval.max = y;
+    final List segs = tree.query(interval);
+    // System.out.println("query size = " + segs.size());
 
-    MCSelecter mcSelecter = new MCSelecter(pt);
-    for (Iterator i = segs.iterator(); i.hasNext(); ) {
-      MonotoneChain mc = (MonotoneChain) i.next();
+    final MCSelecter mcSelecter = new MCSelecter(pt);
+    for (final Iterator i = segs.iterator(); i.hasNext();) {
+      final MonotoneChain mc = (MonotoneChain)i.next();
       testMonotoneChain(rayEnv, mcSelecter, mc);
     }
 
     /*
-     *  p is inside if number of crossings is odd.
+     * p is inside if number of crossings is odd.
      */
     if ((crossings % 2) == 1) {
       return true;
@@ -131,43 +130,41 @@ public class MCPointInRing   implements PointInRing {
     return false;
   }
 
-
-  private void testMonotoneChain(Envelope rayEnv, MCSelecter mcSelecter, MonotoneChain mc)
-  {
-    mc.select(rayEnv, mcSelecter);
-  }
-
-  private void testLineSegment(Coordinates p, LineSegment seg) {
-    double xInt;  // x intersection of segment with ray
-    double x1;    // translated coordinates
+  private void testLineSegment(final Coordinates p, final LineSegment seg) {
+    double xInt; // x intersection of segment with ray
+    double x1; // translated coordinates
     double y1;
     double x2;
     double y2;
 
     /*
-     *  Test if segment crosses ray from test point in positive x direction.
+     * Test if segment crosses ray from test point in positive x direction.
      */
-    Coordinates p1 = seg.getP0();
-    Coordinates p2 = seg.getP1();
+    final Coordinates p1 = seg.getP0();
+    final Coordinates p2 = seg.getP1();
     x1 = p1.getX() - p.getX();
     y1 = p1.getY() - p.getY();
     x2 = p2.getX() - p.getX();
     y2 = p2.getY() - p.getY();
 
-    if (((y1 > 0) && (y2 <= 0)) ||
-        ((y2 > 0) && (y1 <= 0))) {
-        /*
-         *  segment straddles x axis, so compute intersection.
-         */
+    if (((y1 > 0) && (y2 <= 0)) || ((y2 > 0) && (y1 <= 0))) {
+      /*
+       * segment straddles x axis, so compute intersection.
+       */
       xInt = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2) / (y2 - y1);
-        //xsave = xInt;
-        /*
-         *  crosses ray if strictly positive intersection.
-         */
+      // xsave = xInt;
+      /*
+       * crosses ray if strictly positive intersection.
+       */
       if (0.0 < xInt) {
         crossings++;
       }
     }
+  }
+
+  private void testMonotoneChain(final BoundingBox rayEnv,
+    final MCSelecter mcSelecter, final MonotoneChain mc) {
+    mc.select(rayEnv, mcSelecter);
   }
 
 }

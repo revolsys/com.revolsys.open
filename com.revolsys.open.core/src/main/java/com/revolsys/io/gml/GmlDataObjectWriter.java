@@ -4,7 +4,6 @@ import java.io.Writer;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -17,6 +16,8 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.gml.type.GmlFieldType;
 import com.revolsys.io.gml.type.GmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
   GmlConstants {
@@ -52,7 +53,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     this.out.setPrefix(qualifiedName);
   }
 
-  private void box(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  private void box(final GeometryFactory geometryFactory,
     final BoundingBox areaBoundingBox) {
     out.startTag(BOX);
     srsName(out, geometryFactory);
@@ -78,7 +79,8 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
     out.close();
   }
 
-  private void envelope(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  private void envelope(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final BoundingBox areaBoundingBox) {
     out.startTag(ENVELOPE);
     srsName(out, geometryFactory);

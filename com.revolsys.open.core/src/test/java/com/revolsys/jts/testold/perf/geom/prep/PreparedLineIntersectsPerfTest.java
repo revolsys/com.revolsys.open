@@ -103,7 +103,7 @@ public class PreparedLineIntersectsPerfTest {
     final Geometry target = this.builder.createSineStar(nPts).getBoundary();
 
     final List lines = this.builder.createTestGeoms(
-      target.getEnvelopeInternal(), NUM_LINES, 1.0, NUM_LINE_PTS);
+      target.getBoundingBox(), NUM_LINES, 1.0, NUM_LINE_PTS);
 
     System.out.println();
     // System.out.println("Running with " + nPts + " points");

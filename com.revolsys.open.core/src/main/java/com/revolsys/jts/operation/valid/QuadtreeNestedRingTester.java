@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LinearRing;
@@ -68,7 +69,7 @@ public class QuadtreeNestedRingTester {
 
   public void add(final LinearRing ring) {
     rings.add(ring);
-    totalEnv.expandToInclude(ring.getEnvelopeInternal());
+    totalEnv.expandToInclude(ring.getBoundingBox());
   }
 
   private void buildQuadtree() {
@@ -76,7 +77,7 @@ public class QuadtreeNestedRingTester {
 
     for (int i = 0; i < rings.size(); i++) {
       final LinearRing ring = (LinearRing)rings.get(i);
-      final Envelope env = ring.getEnvelopeInternal();
+      final BoundingBox env = ring.getBoundingBox();
       quadtree.insert(env, ring);
     }
   }
@@ -92,7 +93,7 @@ public class QuadtreeNestedRingTester {
       final LinearRing innerRing = (LinearRing)rings.get(i);
       final Coordinates[] innerRingPts = innerRing.getCoordinateArray();
 
-      final List results = quadtree.query(innerRing.getEnvelopeInternal());
+      final List results = quadtree.query(innerRing.getBoundingBox());
       // System.out.println(results.size());
       for (int j = 0; j < results.size(); j++) {
         final LinearRing searchRing = (LinearRing)results.get(j);
@@ -102,8 +103,7 @@ public class QuadtreeNestedRingTester {
           continue;
         }
 
-        if (!innerRing.getEnvelopeInternal().intersects(
-          searchRing.getEnvelopeInternal())) {
+        if (!innerRing.getBoundingBox().intersects(searchRing.getBoundingBox())) {
           continue;
         }
 

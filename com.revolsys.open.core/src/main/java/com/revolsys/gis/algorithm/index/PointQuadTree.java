@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.cs.BoundingBox;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -35,7 +35,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<Entry<Coordinates, T>> findEntriesWithinDistance(
     final Coordinates from, final Coordinates to, final double maxDistance) {
-    final BoundingBox boundingBox = new BoundingBox(geometryFactory, from, to);
+    final Envelope boundingBox = new Envelope(geometryFactory, from, to);
     final List<Entry<Coordinates, T>> entries = new ArrayList<Entry<Coordinates, T>>();
     root.findEntriesWithin(entries, boundingBox);
     for (final Iterator<Entry<Coordinates, T>> iterator = entries.iterator(); iterator.hasNext();) {
@@ -53,13 +53,9 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     if (geometryFactory != null) {
       boundingBox = boundingBox.convert(geometryFactory);
     }
-    return findWithin((Envelope)boundingBox);
-  }
-
-  public List<T> findWithin(final Envelope envelope) {
     final List<T> results = new ArrayList<T>();
     if (root != null) {
-      root.findWithin(results, envelope);
+      root.findWithin(results, boundingBox);
     }
     return results;
   }
@@ -80,7 +76,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
-    BoundingBox envelope = new BoundingBox(x, y);
+    BoundingBox envelope = new Envelope(x, y);
     envelope = envelope.expand(maxDistance);
     final List<T> results = new ArrayList<T>();
     if (root != null) {
@@ -123,7 +119,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   @Override
-  public void visit(final Envelope envelope, final Visitor<T> visitor) {
+  public void visit(final com.revolsys.jts.geom.BoundingBox envelope,
+    final Visitor<T> visitor) {
     if (root != null) {
       root.visit(envelope, visitor);
     }
