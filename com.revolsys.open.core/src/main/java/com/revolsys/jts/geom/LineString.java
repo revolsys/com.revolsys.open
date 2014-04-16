@@ -70,13 +70,19 @@ public interface LineString extends Geometry, Lineal {
 
   Point getEndPoint();
 
-  Point getPoint(final int vertexIndex);
+  double getM(int vertexIndex);
 
-  CoordinatesList getPointList();
+  Point getPoint(final int vertexIndex);
 
   Point getStartPoint();
 
   AbstractVertex getVertex(int vertexIndex);
+
+  double getX(int vertexIndex);
+
+  double getY(int vertexIndex);
+
+  double getZ(int vertexIndex);
 
   boolean isClosed();
 

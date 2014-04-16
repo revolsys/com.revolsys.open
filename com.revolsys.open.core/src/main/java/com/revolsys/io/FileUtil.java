@@ -283,17 +283,21 @@ public final class FileUtil {
    * @param out The output stream to write the contents to.
    */
   public static long copy(final InputStream in, final OutputStream out) {
-    try {
-      final byte[] buffer = new byte[4906];
-      long numBytes = 0;
-      int count;
-      while ((count = in.read(buffer)) > -1) {
-        out.write(buffer, 0, count);
-        numBytes += count;
+    if (in == null) {
+      return 0;
+    } else {
+      try {
+        final byte[] buffer = new byte[4906];
+        long numBytes = 0;
+        int count;
+        while ((count = in.read(buffer)) > -1) {
+          out.write(buffer, 0, count);
+          numBytes += count;
+        }
+        return numBytes;
+      } catch (final IOException e) {
+        return (Long)ExceptionUtil.throwUncheckedException(e);
       }
-      return numBytes;
-    } catch (final IOException e) {
-      return (Long)ExceptionUtil.throwUncheckedException(e);
     }
   }
 

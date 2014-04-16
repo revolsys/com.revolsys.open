@@ -34,15 +34,12 @@ package com.revolsys.io.wkt;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.ref.Reference;
-import java.text.NumberFormat;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
@@ -52,19 +49,6 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.MathUtil;
 
 public class WktWriter {
-
-  private static final ThreadLocal<Reference<NumberFormat>> FORMAT = new ThreadLocal<>();
-
-  private static int getDimension(final Geometry geometry) {
-    int numAxis = GeometryFactory.getFactory(geometry).getNumAxis();
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
-      final Geometry subGeometry = geometry.getGeometry(i);
-      final int geometryDimension = CoordinatesListUtil.get(subGeometry)
-        .getNumAxis();
-      numAxis = Math.max(numAxis, geometryDimension);
-    }
-    return numAxis;
-  }
 
   public static String toString(final Geometry geometry) {
     final StringWriter out = new StringWriter();
@@ -182,7 +166,7 @@ public class WktWriter {
 
   public static void write(final PrintWriter out,
     final GeometryCollection multiGeometry) {
-    final int numAxis = Math.min(getDimension(multiGeometry), 4);
+    final int numAxis = Math.min(multiGeometry.getNumAxis(), 4);
     write(out, multiGeometry, numAxis);
   }
 
@@ -205,7 +189,7 @@ public class WktWriter {
   }
 
   public static void write(final PrintWriter out, final LineString line) {
-    final int numAxis = Math.min(getDimension(line), 4);
+    final int numAxis = Math.min(line.getNumAxis(), 4);
     write(out, line, numAxis);
   }
 
@@ -222,7 +206,7 @@ public class WktWriter {
 
   public static void write(final PrintWriter out,
     final MultiLineString multiLineString) {
-    final int numAxis = Math.min(getDimension(multiLineString), 4);
+    final int numAxis = Math.min(multiLineString.getNumAxis(), 4);
     write(out, multiLineString, numAxis);
   }
 
@@ -247,7 +231,7 @@ public class WktWriter {
   }
 
   public static void write(final PrintWriter out, final MultiPoint multiPoint) {
-    final int numAxis = Math.min(getDimension(multiPoint), 4);
+    final int numAxis = Math.min(multiPoint.getNumAxis(), 4);
     write(out, multiPoint, numAxis);
   }
 
@@ -271,7 +255,7 @@ public class WktWriter {
 
   public static void write(final PrintWriter out,
     final MultiPolygon multiPolygon) {
-    final int numAxis = Math.min(getDimension(multiPolygon), 4);
+    final int numAxis = Math.min(multiPolygon.getNumAxis(), 4);
     write(out, multiPolygon, numAxis);
   }
 
@@ -295,7 +279,7 @@ public class WktWriter {
   }
 
   public static void write(final PrintWriter out, final Point point) {
-    final int numAxis = Math.min(getDimension(point), 4);
+    final int numAxis = Math.min(point.getNumAxis(), 4);
     write(out, point, numAxis);
   }
 
@@ -312,7 +296,7 @@ public class WktWriter {
   }
 
   public static void write(final PrintWriter out, final Polygon polygon) {
-    final int numAxis = Math.min(getDimension(polygon), 4);
+    final int numAxis = Math.min(polygon.getNumAxis(), 4);
     write(out, polygon, numAxis);
   }
 

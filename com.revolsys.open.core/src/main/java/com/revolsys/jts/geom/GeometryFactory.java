@@ -1333,7 +1333,7 @@ public class GeometryFactory implements Serializable,
   }
 
   public LinearRing linearRing(final LinearRing linearRing) {
-    return linearRing(linearRing.getPointList());
+    return linearRing(linearRing.getCoordinatesList());
   }
 
   public LineString lineString() {
@@ -1373,7 +1373,7 @@ public class GeometryFactory implements Serializable,
   }
 
   public LineString lineString(final LineString lineString) {
-    return new LineStringImpl(this, lineString.getPointList());
+    return new LineStringImpl(this, lineString.getCoordinatesList());
   }
 
   @Override

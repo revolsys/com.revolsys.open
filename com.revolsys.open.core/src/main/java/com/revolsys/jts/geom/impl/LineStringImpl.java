@@ -230,7 +230,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   public int compareToSameClass(final Geometry o,
     final CoordinateSequenceComparator comp) {
     final LineString line = (LineString)o;
-    return comp.compare(getPointList(), line.getPointList());
+    return comp.compare(getCoordinatesList(), line.getCoordinatesList());
   }
 
   @Override
@@ -238,7 +238,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
     if (isEmpty()) {
       return new Envelope();
     } else {
-      return getPointList().expandEnvelope(new Envelope());
+      return getCoordinatesList().expandEnvelope(new Envelope());
     }
   }
 
@@ -369,12 +369,16 @@ public class LineStringImpl extends GeometryImpl implements LineString {
 
   @Override
   public Coordinates[] getCoordinateArray() {
-    return getPointList().toCoordinateArray();
+    return getCoordinatesList().toCoordinateArray();
   }
 
   @Override
   public CoordinatesList getCoordinatesList() {
-    return getPointList();
+    if (coordinates == null) {
+      return new DoubleCoordinatesList(getNumAxis());
+    } else {
+      return new DoubleCoordinatesList(getNumAxis(), coordinates);
+    }
   }
 
   @Override
@@ -402,7 +406,12 @@ public class LineStringImpl extends GeometryImpl implements LineString {
    */
   @Override
   public double getLength() {
-    return CGAlgorithms.length(getPointList());
+    return CGAlgorithms.length(getCoordinatesList());
+  }
+
+  @Override
+  public double getM(final int vertexIndex) {
+    return getCoordinate(vertexIndex, 3);
   }
 
   @Override
@@ -410,15 +419,6 @@ public class LineStringImpl extends GeometryImpl implements LineString {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Coordinates coordinate = getCoordinate(vertexIndex);
     return geometryFactory.point(coordinate);
-  }
-
-  @Override
-  public CoordinatesList getPointList() {
-    if (coordinates == null) {
-      return new DoubleCoordinatesList(getNumAxis());
-    } else {
-      return new DoubleCoordinatesList(getNumAxis(), coordinates);
-    }
   }
 
   @Override
@@ -458,6 +458,21 @@ public class LineStringImpl extends GeometryImpl implements LineString {
     } else {
       return coordinates.length / getNumAxis();
     }
+  }
+
+  @Override
+  public double getX(final int vertexIndex) {
+    return getCoordinate(vertexIndex, 0);
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    return getCoordinate(vertexIndex, 1);
+  }
+
+  @Override
+  public double getZ(final int vertexIndex) {
+    return getCoordinate(vertexIndex, 2);
   }
 
   @Override
@@ -501,7 +516,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   @Override
   public LineString normalize() {
     final int vertexCount = getVertexCount();
-    final CoordinatesList points = getPointList();
+    final CoordinatesList points = getCoordinatesList();
     for (int i = 0; i < vertexCount / 2; i++) {
       final int j = vertexCount - 1 - i;
       // skip equal points on both ends
@@ -517,7 +532,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
 
   @Override
   public Iterable<Coordinates> points() {
-    return getPointList();
+    return getCoordinatesList();
   }
 
   /**
@@ -528,7 +543,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
    */
   @Override
   public LineString reverse() {
-    final CoordinatesList points = getPointList();
+    final CoordinatesList points = getCoordinatesList();
     final CoordinatesList reversePoints = points.reverse();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final LineString reverseLine = geometryFactory.lineString(reversePoints);

@@ -374,7 +374,7 @@ public class CoordinatesListUtil {
     } else if (geometry instanceof Point) {
       return ((Point)geometry).getCoordinatesList();
     } else if (geometry instanceof LineString) {
-      return get((LineString)geometry);
+      return ((LineString)geometry).getCoordinatesList();
     } else if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
       return get(polygon);
