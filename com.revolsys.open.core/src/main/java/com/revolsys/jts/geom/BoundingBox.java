@@ -140,6 +140,8 @@ public interface BoundingBox {
 
   double getAspectRatio();
 
+  double[] getBounds();
+
   Coordinates getCentre();
 
   Point getCentrePoint();

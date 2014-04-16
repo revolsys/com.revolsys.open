@@ -8,9 +8,9 @@ import com.revolsys.jts.geom.Envelope;
 public class Node<T> extends NodeBase<T> {
   public static <V> Node<V> createExpanded(final Node<V> node,
     final BoundingBox addEnv) {
-    final Envelope expandEnv = new Envelope(addEnv);
+    BoundingBox expandEnv = new Envelope(addEnv);
     if (node != null) {
-      expandEnv.expandToInclude(node.env);
+      expandEnv = expandEnv.expandToInclude(node.env);
     }
 
     final Node<V> largerNode = createNode(expandEnv);

@@ -106,15 +106,6 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   boolean equals(CoordinatesList coordinatesList, int numAxis);
 
-  /**
-   * Expands the given {@link Envelope} to include the coordinates in the sequence.
-   * Allows implementing classes to optimize access to coordinate values.
-   *
-   * @param env the envelope to expand
-   * @return a ref to the expanded envelope
-   */
-  Envelope expandEnvelope(Envelope env);
-
   Coordinates get(int i);
 
   /**

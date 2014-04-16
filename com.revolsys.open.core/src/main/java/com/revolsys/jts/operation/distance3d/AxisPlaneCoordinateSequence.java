@@ -37,7 +37,6 @@ import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 
 /**
  * A CoordinatesList wrapper which 
@@ -110,11 +109,6 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
 
   @Override
   public AxisPlaneCoordinateSequence clone() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Envelope expandEnvelope(final Envelope env) {
     throw new UnsupportedOperationException();
   }
 

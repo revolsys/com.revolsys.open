@@ -451,7 +451,7 @@ public class PointImpl extends GeometryImpl implements Point {
   @Override
   public double getX() {
     if (isEmpty()) {
-      throw new IllegalStateException("getX called on empty Point");
+      return Double.NaN;
     } else {
       return getCoordinate(0);
     }
@@ -460,7 +460,7 @@ public class PointImpl extends GeometryImpl implements Point {
   @Override
   public double getY() {
     if (isEmpty()) {
-      throw new IllegalStateException("getY called on empty Point");
+      return Double.NaN;
     } else {
       return getCoordinate(1);
     }

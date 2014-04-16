@@ -9,7 +9,6 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCoordinatesList implements CoordinatesList,
@@ -223,16 +222,6 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Envelope expandEnvelope(final Envelope env) {
-    for (int i = 0; i < size(); i++) {
-      final double x = getX(i);
-      final double y = getY(i);
-      env.expandToInclude(x, y);
-    }
-    return env;
-  }
-
-  @Override
   public Coordinates get(final int i) {
     if (i >= 0 && i < size()) {
       return new CoordinatesListCoordinates(this, i);
@@ -279,12 +268,6 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  @Deprecated
-  public int getNumAxis() {
-    return getNumAxis();
-  }
-
-  @Override
   public List<Coordinates> getList() {
     final List<Coordinates> points = new ArrayList<Coordinates>();
     for (final Coordinates point : this) {
@@ -300,13 +283,19 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   @Deprecated
-  public double getValue(final int index, final int axisIndex) {
-    return getValue(index, axisIndex);
+  public int getNumAxis() {
+    return getNumAxis();
   }
 
   @Override
   public long getTime(final int index) {
     return (long)getM(index);
+  }
+
+  @Override
+  @Deprecated
+  public double getValue(final int index, final int axisIndex) {
+    return getValue(index, axisIndex);
   }
 
   @Override
@@ -368,13 +357,6 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  @Deprecated
-  public void setValue(final int index, final int axisIndex,
-    final double value) {
-    setValue(index, axisIndex, value);
-  }
-
-  @Override
   public void setPoint(final int i, final Coordinates point) {
     setX(i, point.getX());
     setY(i, point.getY());
@@ -386,6 +368,12 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   @Override
   public void setTime(final int index, final long time) {
     setM(index, time);
+  }
+
+  @Override
+  @Deprecated
+  public void setValue(final int index, final int axisIndex, final double value) {
+    setValue(index, axisIndex, value);
   }
 
   @Override

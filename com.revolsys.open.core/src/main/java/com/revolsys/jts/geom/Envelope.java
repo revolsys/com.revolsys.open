@@ -59,6 +59,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.wkt.WktParser;
+import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -281,29 +282,7 @@ public class Envelope implements Serializable, BoundingBox {
     }
   }
 
-  /**
-   *  the minimum x-coordinate
-   */
-  private double minX = 0;
-
-  /**
-   *  the maximum x-coordinate
-   */
-  private double maxX = -1;
-
-  /**
-   *  the minimum y-coordinate
-   */
-  private double minY = 0;
-
-  /**
-   *  the maximum y-coordinate
-   */
-  private double maxY = -1;
-
-  private double maxZ = Double.NaN;
-
-  private double minZ = Double.NaN;
+  private double[] bounds;
 
   private GeometryFactory geometryFactory;
 
@@ -317,21 +296,11 @@ public class Envelope implements Serializable, BoundingBox {
    */
   public Envelope(final BoundingBox boundingBox) {
     this.geometryFactory = boundingBox.getGeometryFactory();
-    this.minX = boundingBox.getMinX();
-    this.maxX = boundingBox.getMaxX();
-    this.minY = boundingBox.getMinY();
-    this.maxY = boundingBox.getMaxY();
-    this.minZ = boundingBox.getMinZ();
-    this.maxZ = boundingBox.getMaxZ();
+    this.bounds = boundingBox.getBounds();
   }
 
   public Envelope(final Coordinates point) {
-    this.minX = point.getX();
-    this.maxX = point.getX();
-    this.minY = point.getY();
-    this.maxY = point.getY();
-    this.minZ = point.getZ();
-    this.maxZ = point.getZ();
+    this((GeometryFactory)null, point);
   }
 
   /**
@@ -341,13 +310,11 @@ public class Envelope implements Serializable, BoundingBox {
    *@param  p2  the second Coordinate
    */
   public Envelope(final Coordinates point1, final Coordinates point2) {
-    init(point1.getX(), point1.getY(), point2.getX(), point2.getY());
-    this.minZ = Math.min(point1.getZ(), point2.getZ());
-    this.maxZ = Math.max(point1.getZ(), point2.getZ());
+    this((GeometryFactory)null, point1, point2);
   }
 
   public Envelope(final double x, final double y) {
-    this(x, y, x, y);
+    this(null, x, y);
   }
 
   /**
@@ -360,7 +327,7 @@ public class Envelope implements Serializable, BoundingBox {
    */
   public Envelope(final double x1, final double y1, final double x2,
     final double y2) {
-    init(x1, y1, x2, y2);
+    this(null, x1, y1, x2, y2);
   }
 
   public Envelope(final Geometry geometry) {
@@ -385,8 +352,6 @@ public class Envelope implements Serializable, BoundingBox {
   public Envelope(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox) {
     this.geometryFactory = geometryFactory;
-    this.minZ = boundingBox.getMinZ();
-    this.maxZ = boundingBox.getMaxZ();
     if (geometryFactory == null) {
       throw new IllegalArgumentException(
         "A bounding box must have a geometry factory");
@@ -416,25 +381,35 @@ public class Envelope implements Serializable, BoundingBox {
    * @param coordinate The coordinate.
    */
   public Envelope(final GeometryFactory geometryFactory, final Coordinates point) {
-    this(point);
     this.geometryFactory = geometryFactory;
-    this.minZ = point.getZ();
-    this.maxZ = point.getZ();
+    if (point != null) {
+      this.bounds = EnvelopeUtil.createBounds(point);
+    }
+
   }
 
   /**
    * Construct a new Bounding Box.
    * 
    * @param geometryFactory The geometry factory.
-   * @param coordinate1 The first coordinate.
-   * @param coordinate2 The second coordinate.
+   * @param point1 The first coordinate.
+   * @param point2 The second coordinate.
    */
   public Envelope(final GeometryFactory geometryFactory,
-    final Coordinates coordinate1, final Coordinates coordinate2) {
-    this(coordinate1, coordinate2);
+    final Coordinates point1, final Coordinates point2) {
     this.geometryFactory = geometryFactory;
-    this.minZ = Math.min(coordinate1.getZ(), coordinate2.getZ());
-    this.maxZ = Math.max(coordinate1.getZ(), coordinate2.getZ());
+    if (point1 == null) {
+      if (point2 != null) {
+        this.bounds = EnvelopeUtil.createBounds(geometryFactory, point2);
+      }
+    } else if (point2 == null) {
+      this.bounds = EnvelopeUtil.createBounds(geometryFactory, point1);
+    } else {
+      final int numAxis = Math.max(point1.getNumAxis(), point2.getNumAxis());
+      this.bounds = EnvelopeUtil.createBounds(geometryFactory, numAxis, point1);
+      EnvelopeUtil.expand(geometryFactory, bounds, point2);
+    }
+
   }
 
   /**
@@ -460,16 +435,14 @@ public class Envelope implements Serializable, BoundingBox {
    */
   public Envelope(final GeometryFactory geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
-    if (geometryFactory == null) {
-      init(x1, y1, x2, y2);
-    } else {
-      init(geometryFactory.makeXyPrecise(x1),
-        geometryFactory.makeXyPrecise(y1), geometryFactory.makeXyPrecise(x2),
-        geometryFactory.makeXyPrecise(y2));
-    }
     this.geometryFactory = geometryFactory;
-    this.minZ = Double.NaN;
-    this.maxZ = Double.NaN;
+    this.bounds = EnvelopeUtil.createBounds(geometryFactory, x1, y1);
+    EnvelopeUtil.expand(geometryFactory, bounds, x2, y2);
+  }
+
+  public Envelope(final GeometryFactory geometryFactory, final double[] bounds) {
+    this.geometryFactory = geometryFactory;
+    this.bounds = bounds;
   }
 
   /**
@@ -879,17 +852,16 @@ public class Envelope implements Serializable, BoundingBox {
    * @param deltaY the distance to expand the envelope along the the Y axis
    */
   public void expandBy(final double deltaX, final double deltaY) {
-    if (isNull()) {
-      return;
+    if (!isNull()) {
+      this.bounds[0] -= deltaX;
+      this.bounds[getNumAxis()] += deltaX;
+      this.bounds[1] -= deltaY;
+      this.bounds[getNumAxis() + 1] += deltaY;
+
     }
 
-    minX -= deltaX;
-    maxX += deltaX;
-    minY -= deltaY;
-    maxY += deltaY;
-
     // check for envelope disappearing
-    if (minX > maxX || minY > maxY) {
+    if (getMinX() > getMaxX() || getMinY() > getMaxY()) {
       setToNull();
     }
   }
@@ -960,24 +932,11 @@ public class Envelope implements Serializable, BoundingBox {
    *@param  y  the value to lower the minimum y to or to raise the maximum y to
    */
   public void expandToInclude(final double x, final double y) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (isNull()) {
-      minX = x;
-      maxX = x;
-      minY = y;
-      maxY = y;
+      this.bounds = EnvelopeUtil.createBounds(geometryFactory, x, y);
     } else {
-      if (x < minX) {
-        minX = x;
-      }
-      if (x > maxX) {
-        maxX = x;
-      }
-      if (y < minY) {
-        minY = y;
-      }
-      if (y > maxY) {
-        maxY = y;
-      }
+      EnvelopeUtil.expand(geometryFactory, bounds, x, y);
     }
   }
 
@@ -990,26 +949,18 @@ public class Envelope implements Serializable, BoundingBox {
    *@param  other  the <code>Envelope</code> to expand to include
    */
   public void expandToInclude(final Envelope other) {
-    if (other.isNull()) {
-      return;
-    }
-    if (isNull()) {
-      minX = other.getMinX();
-      maxX = other.getMaxX();
-      minY = other.getMinY();
-      maxY = other.getMaxY();
-    } else {
-      if (other.getMinX() < minX) {
-        minX = other.getMinX();
-      }
-      if (other.getMaxX() > maxX) {
-        maxX = other.getMaxX();
-      }
-      if (other.getMinY() < minY) {
-        minY = other.getMinY();
-      }
-      if (other.getMaxY() > maxY) {
-        maxY = other.getMaxY();
+    if (!other.isNull()) {
+      if (isNull()) {
+        this.bounds = other.getBounds();
+      } else {
+        for (int axisIndex = 0; axisIndex < Math.min(other.getNumAxis(),
+          getNumAxis()); axisIndex++) {
+          final double min = other.getMin(axisIndex);
+          final GeometryFactory geometryFactory = getGeometryFactory();
+          EnvelopeUtil.expand(geometryFactory, bounds, axisIndex, min);
+          final double max = other.getMax(axisIndex);
+          EnvelopeUtil.expand(geometryFactory, bounds, axisIndex, max);
+        }
       }
     }
   }
@@ -1067,6 +1018,15 @@ public class Envelope implements Serializable, BoundingBox {
 
   public Point getBottomRightPoint() {
     return getGeometryFactory().point(getMaxX(), getMinY());
+  }
+
+  @Override
+  public double[] getBounds() {
+    if (bounds == null) {
+      return bounds;
+    } else {
+      return bounds.clone();
+    }
   }
 
   @Override
@@ -1154,8 +1114,9 @@ public class Envelope implements Serializable, BoundingBox {
   public double getHeight() {
     if (isNull()) {
       return 0;
+    } else {
+      return getMaxY() - getMinY();
     }
-    return maxY - minY;
   }
 
   @Override
@@ -1179,6 +1140,14 @@ public class Envelope implements Serializable, BoundingBox {
       return string;
     } else {
       return geometryFactory.getSrid() + "-" + string;
+    }
+  }
+
+  public double getMax(final int axisIndex) {
+    if (bounds == null) {
+      return Double.NaN;
+    } else {
+      return EnvelopeUtil.getMax(bounds, axisIndex);
     }
   }
 
@@ -1216,7 +1185,7 @@ public class Envelope implements Serializable, BoundingBox {
    */
   @Override
   public double getMaxX() {
-    return maxX;
+    return getMax(0);
   }
 
   /**
@@ -1227,15 +1196,19 @@ public class Envelope implements Serializable, BoundingBox {
    */
   @Override
   public double getMaxY() {
-    return maxY;
+    return getMax(1);
   }
 
   @Override
   public double getMaxZ() {
-    if (Double.isNaN(maxZ)) {
-      return 0;
+    return getMax(2);
+  }
+
+  public double getMin(final int axisIndex) {
+    if (bounds == null) {
+      return Double.NaN;
     } else {
-      return maxZ;
+      return EnvelopeUtil.getMin(bounds, axisIndex);
     }
   }
 
@@ -1273,7 +1246,7 @@ public class Envelope implements Serializable, BoundingBox {
    */
   @Override
   public double getMinX() {
-    return minX;
+    return getMin(0);
   }
 
   /**
@@ -1284,22 +1257,26 @@ public class Envelope implements Serializable, BoundingBox {
    */
   @Override
   public double getMinY() {
-    return minY;
+    return getMin(1);
   }
 
   @Override
   public double getMinZ() {
-    if (Double.isNaN(minZ)) {
-      return 0;
-    } else {
-      return minZ;
-    }
+    return getMin(2);
   }
 
   @Override
   public LineSegment getNorthLine() {
     return new LineSegment(getGeometryFactory(), getMinX(), getMaxY(),
       getMaxX(), getMaxY());
+  }
+
+  public int getNumAxis() {
+    if (bounds == null) {
+      return 0;
+    } else {
+      return bounds.length / 2;
+    }
   }
 
   @Override
@@ -1383,46 +1360,6 @@ public class Envelope implements Serializable, BoundingBox {
     result = 37 * result + CoordinatesUtil.hashCode(minY);
     result = 37 * result + CoordinatesUtil.hashCode(maxY);
     return result;
-  }
-
-  /**
-   *  Initialize an <code>Envelope</code> for a region defined by maximum and minimum values.
-   *
-   *@param  x1  the first x-value
-   *@param  x2  the second x-value
-   *@param  y1  the first y-value
-   *@param  y2  the second y-value
-   */
-  private void init(final double x1, final double y1, final double x2,
-    final double y2) {
-    if (Double.isNaN(x1) || Double.isNaN(y1)) {
-      if (!Double.isNaN(x2) || Double.isNaN(y2)) {
-        this.minX = x2;
-        this.maxX = x2;
-        this.minY = y2;
-        this.maxY = y2;
-      }
-    } else if (Double.isNaN(x2) || Double.isNaN(y2)) {
-      this.minX = x1;
-      this.maxX = x1;
-      this.minY = y1;
-      this.maxY = y1;
-    } else {
-      if (x1 < x2) {
-        this.minX = x1;
-        this.maxX = x2;
-      } else {
-        this.minX = x2;
-        this.maxX = x1;
-      }
-      if (y1 < y2) {
-        this.minY = y1;
-        this.maxY = y2;
-      } else {
-        this.minY = y2;
-        this.maxY = y1;
-      }
-    }
   }
 
   /**
@@ -1539,8 +1476,13 @@ public class Envelope implements Serializable, BoundingBox {
   public boolean isNull() {
     final double minX = getMinX();
     final double maxX = getMaxX();
-
-    return maxX < minX;
+    if (Double.isNaN(minX)) {
+      return true;
+    } else if (Double.isNaN(maxX)) {
+      return true;
+    } else {
+      return maxX < minX;
+    }
   }
 
   /**
@@ -1602,41 +1544,12 @@ public class Envelope implements Serializable, BoundingBox {
     }
   }
 
-  public void setMaxZ(final double maxZ) {
-    if (isEmpty()) {
-      this.minZ = maxZ;
-      this.maxZ = maxZ;
-    }
-    if (maxZ < this.minZ) {
-      this.minZ = maxZ;
-    }
-    if (maxZ > this.maxZ) {
-      this.maxZ = maxZ;
-    }
-  }
-
-  public void setMinZ(final double minZ) {
-    if (isEmpty()) {
-      this.minZ = minZ;
-      this.maxZ = minZ;
-    }
-    if (minZ < this.minZ) {
-      this.minZ = minZ;
-    }
-    if (minZ > this.maxZ) {
-      this.maxZ = minZ;
-    }
-  }
-
   /**
    *  Makes this <code>Envelope</code> a "null" envelope, that is, the envelope
    *  of the empty geometry.
    */
   protected void setToNull() {
-    minX = 0;
-    maxX = -1;
-    minY = 0;
-    maxY = -1;
+    this.bounds = null;
   }
 
   @Override
@@ -1815,17 +1728,4 @@ public class Envelope implements Serializable, BoundingBox {
     return s.toString();
   }
 
-  /**
-   * Translates this envelope by given amounts in the X and Y direction.
-   *
-   * @param transX the amount to translate along the X axis
-   * @param transY the amount to translate along the Y axis
-   */
-  public void translate(final double transX, final double transY) {
-    if (isNull()) {
-      return;
-    }
-    init(getMinX() + transX, getMinY() + transY, getMaxX() + transX, getMaxY()
-      + transY);
-  }
 }
