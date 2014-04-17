@@ -292,7 +292,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       }
       rings.add(coordinates);
     }
-    return factory.createPolygon(rings);
+    return factory.polygon(rings);
   }
 
   private LinearRing toPgLinearRing(final com.revolsys.jts.geom.LineString ring) {
@@ -498,7 +498,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     final com.revolsys.jts.geom.LineString exteriorRing = polygon.getExteriorRing();
     rings[0] = toPgLinearRing(exteriorRing);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final com.revolsys.jts.geom.LineString ring = polygon.getInteriorRingN(i);
+      final com.revolsys.jts.geom.LineString ring = polygon.getInteriorRing(i);
       rings[i + 1] = toPgLinearRing(ring);
 
     }

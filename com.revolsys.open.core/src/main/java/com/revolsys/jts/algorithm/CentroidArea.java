@@ -130,7 +130,7 @@ public class CentroidArea
   {
     addShell(poly.getExteriorRing().getCoordinateArray());
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      addHole(poly.getInteriorRingN(i).getCoordinateArray());
+      addHole(poly.getInteriorRing(i).getCoordinateArray());
     }
   }
 

@@ -118,7 +118,7 @@ public class ValidateGeometryRange extends
           valid = false;
         }
         for (int k = 0; k < polygon.getNumInteriorRing(); k++) {
-          final LineString ring = polygon.getInteriorRingN(k);
+          final LineString ring = polygon.getInteriorRing(k);
           if (!isValid(type, ring)) {
             valid = false;
           }

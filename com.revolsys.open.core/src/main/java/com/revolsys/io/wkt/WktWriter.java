@@ -360,7 +360,7 @@ public class WktWriter {
     write(out, coordinates, numAxis);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       out.print(',');
-      final LineString hole = polygon.getInteriorRingN(i);
+      final LineString hole = polygon.getInteriorRing(i);
       final CoordinatesList holeCoordinates = hole.getCoordinatesList();
       write(out, holeCoordinates, numAxis);
     }

@@ -169,7 +169,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(OUTER_BOUNDARY_IS);
 
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString interiorRing = polygon.getInteriorRingN(i);
+      final LineString interiorRing = polygon.getInteriorRing(i);
       out.startTag(INNER_BOUNDARY_IS);
       linearRing(out, interiorRing, false);
       out.endTag(INNER_BOUNDARY_IS);

@@ -398,7 +398,7 @@ public final class LineStringUtil {
         final Polygon polygon = (Polygon)part;
         lines.add(polygon.getExteriorRing());
         for (int ringIndex = 0; ringIndex < polygon.getNumInteriorRing(); ringIndex++) {
-          final LineString ring = polygon.getInteriorRingN(ringIndex);
+          final LineString ring = polygon.getInteriorRing(ringIndex);
           lines.add(ring);
         }
       }

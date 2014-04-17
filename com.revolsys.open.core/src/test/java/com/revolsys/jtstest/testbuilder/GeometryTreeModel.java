@@ -416,7 +416,7 @@ class PolygonNode extends GeometryNode {
   protected void fillChildren() {
     children.add(new LinearRingNode(poly.getExteriorRing(), "Shell"));
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      children.add(new LinearRingNode(poly.getInteriorRingN(i), "Hole " + i));
+      children.add(new LinearRingNode(poly.getInteriorRing(i), "Hole " + i));
     }
   }
 

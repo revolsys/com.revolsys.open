@@ -180,7 +180,7 @@ public class PlanarPolygon3D {
     }
 
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      if (Location.INTERIOR == locate(intPt, poly.getInteriorRingN(i))) {
+      if (Location.INTERIOR == locate(intPt, poly.getInteriorRing(i))) {
         return false;
       }
     }

@@ -62,7 +62,7 @@ public class GeometryFunctions {
     // TODO: ensure ring is valid
     final LinearRing ring = g.getGeometryFactory().linearRing(
       g.getCoordinateArray());
-    return g.getGeometryFactory().createPolygon(ring, null);
+    return g.getGeometryFactory().polygon(ring);
   }
 
   public static Geometry envelope(final Geometry g) {
@@ -80,7 +80,7 @@ public class GeometryFunctions {
 
   public static Geometry getPolygonHoleN(final Geometry g, final int i) {
     if (g instanceof Polygon) {
-      final LinearRing ring = ((Polygon)g).getInteriorRingN(i);
+      final LinearRing ring = ((Polygon)g).getInteriorRing(i);
       return ring;
     }
     return null;
@@ -89,13 +89,13 @@ public class GeometryFunctions {
   public static Geometry getPolygonShell(final Geometry g) {
     if (g instanceof Polygon) {
       final LinearRing shell = ((Polygon)g).getExteriorRing();
-      return g.getGeometryFactory().createPolygon(shell, null);
+      return g.getGeometryFactory().polygon(shell);
     }
     if (g instanceof MultiPolygon) {
       final Polygon[] poly = new Polygon[g.getNumGeometries()];
       for (int i = 0; i < g.getNumGeometries(); i++) {
         final LinearRing shell = ((Polygon)g.getGeometry(i)).getExteriorRing();
-        poly[i] = g.getGeometryFactory().createPolygon(shell, null);
+        poly[i] = g.getGeometryFactory().polygon(shell);
       }
       return g.getGeometryFactory().createMultiPolygon(poly);
     }

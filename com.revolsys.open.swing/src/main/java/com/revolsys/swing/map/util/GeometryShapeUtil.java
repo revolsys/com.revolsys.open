@@ -80,7 +80,7 @@ public final class GeometryShapeUtil {
     final LineString exteriorRing = polygon.getExteriorRing();
     addLineString(viewport, path, exteriorRing);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString interiorRing = polygon.getInteriorRingN(i);
+      final LineString interiorRing = polygon.getInteriorRing(i);
       addLineString(viewport, path, interiorRing);
     }
     return path;

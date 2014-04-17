@@ -218,7 +218,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
         StaxUtils.skipSubTree(in);
       }
     }
-    final Polygon polygon = geometryFactory.createPolygon(rings);
+    final Polygon polygon = geometryFactory.polygon(rings);
     StaxUtils.skipToEndElementByLocalName(in, POLYGON);
     return polygon;
   }

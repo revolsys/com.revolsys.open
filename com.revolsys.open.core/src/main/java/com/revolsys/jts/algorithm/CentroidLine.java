@@ -75,7 +75,7 @@ public class CentroidLine
     	// add linear components of a polygon
       add(poly.getExteriorRing().getCoordinateArray());
       for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-        add(poly.getInteriorRingN(i).getCoordinateArray());
+        add(poly.getInteriorRing(i).getCoordinateArray());
       }
 		}
     else if (geom instanceof GeometryCollection) {

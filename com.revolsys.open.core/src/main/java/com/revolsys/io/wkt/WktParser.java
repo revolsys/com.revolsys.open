@@ -441,7 +441,7 @@ public class WktParser {
     } else {
       parts = parseParts(geometryFactory, text, numAxis);
     }
-    return geometryFactory.createPolygon(parts);
+    return geometryFactory.polygon(parts);
   }
 
 }

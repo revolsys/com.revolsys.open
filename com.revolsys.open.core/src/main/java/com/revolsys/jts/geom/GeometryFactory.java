@@ -818,7 +818,7 @@ public class GeometryFactory implements Serializable,
         return lineString.copy(this);
       } else if (geometry instanceof Polygon) {
         final Polygon polygon = (Polygon)geometry;
-        return createPolygon(polygon);
+        return polygon(polygon);
       } else {
         return null;
       }
@@ -983,108 +983,6 @@ public class GeometryFactory implements Serializable,
     return points;
   }
 
-  public Polygon createPolygon() {
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(0,
-      getNumAxis());
-    return createPolygon(points);
-  }
-
-  /**
-   * Constructs a <code>Polygon</code> with the given exterior boundary.
-   *
-   * @param shell
-   *            the outer boundary of the new <code>Polygon</code>, or
-   *            <code>null</code> or an empty <code>LinearRing</code> if
-   *            the empty geometry is to be created.
-   * @throws IllegalArgumentException if the boundary ring is invalid
-   */
-  public Polygon createPolygon(final Coordinates[] coordinates) {
-    return createPolygon(linearRing(coordinates));
-  }
-
-  /**
-   * Constructs a <code>Polygon</code> with the given exterior boundary.
-   *
-   * @param shell
-   *            the outer boundary of the new <code>Polygon</code>, or
-   *            <code>null</code> or an empty <code>LinearRing</code> if
-   *            the empty geometry is to be created.
-   * @throws IllegalArgumentException if the boundary ring is invalid
-   */
-  public Polygon createPolygon(final CoordinatesList coordinates) {
-    return createPolygon(linearRing(coordinates));
-  }
-
-  public Polygon createPolygon(final CoordinatesList... rings) {
-    final List<CoordinatesList> ringList = Arrays.asList(rings);
-    return createPolygon(ringList);
-  }
-
-  /**
-   * Constructs a <code>Polygon</code> with the given exterior boundary.
-   *
-   * @param shell
-   *            the outer boundary of the new <code>Polygon</code>, or
-   *            <code>null</code> or an empty <code>LinearRing</code> if
-   *            the empty geometry is to be created.
-   * @throws IllegalArgumentException if the boundary ring is invalid
-   */
-  public Polygon createPolygon(final LinearRing shell) {
-    return createPolygon(shell, null);
-  }
-
-  /**
-   * Constructs a <code>Polygon</code> with the given exterior boundary and
-   * interior boundaries.
-   *
-   * @param shell
-   *            the outer boundary of the new <code>Polygon</code>, or
-   *            <code>null</code> or an empty <code>LinearRing</code> if
-   *            the empty geometry is to be created.
-   * @param holes
-   *            the inner boundaries of the new <code>Polygon</code>, or
-   *            <code>null</code> or empty <code>LinearRing</code> s if
-   *            the empty geometry is to be created.
-   * @throws IllegalArgumentException if a ring is invalid
-   */
-  public Polygon createPolygon(final LinearRing shell, final LinearRing[] holes) {
-    return new PolygonImpl(shell, holes, this);
-  }
-
-  public Polygon createPolygon(final List<?> rings) {
-    if (rings.size() == 0) {
-      final DoubleCoordinatesList nullPoints = new DoubleCoordinatesList(0,
-        numAxis);
-      final LinearRing ring = linearRing(nullPoints);
-      return createPolygon(ring, null);
-    } else {
-      final LinearRing exteriorRing = getLinearRing(rings, 0);
-      final LinearRing[] interiorRings = new LinearRing[rings.size() - 1];
-      for (int i = 1; i < rings.size(); i++) {
-        interiorRings[i - 1] = getLinearRing(rings, i);
-      }
-      return createPolygon(exteriorRing, interiorRings);
-    }
-  }
-
-  public Polygon createPolygon(final Object... rings) {
-    return createPolygon(Arrays.asList(rings));
-  }
-
-  public Polygon createPolygon(final Polygon polygon) {
-    final List<LinearRing> rings = new ArrayList<LinearRing>();
-    final LinearRing exteriorRing = polygon.getExteriorRing();
-    final LinearRing newExteriorRing = exteriorRing.copy(this);
-    rings.add(newExteriorRing);
-    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LinearRing interiorRing = polygon.getInteriorRingN(i);
-      final LinearRing newInteriorRing = interiorRing.copy(this);
-      rings.add(newInteriorRing);
-
-    }
-    return createPolygon(rings);
-  }
-
   public Geometry geometry() {
     return point();
   }
@@ -1215,10 +1113,10 @@ public class GeometryFactory implements Serializable,
         polygon = (Polygon)value;
       } else if (value instanceof List) {
         final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
-        polygon = createPolygon(coordinateList);
+        polygon = polygon(coordinateList);
       } else if (value instanceof CoordinatesList) {
         final CoordinatesList coordinateList = (CoordinatesList)value;
-        polygon = createPolygon(coordinateList);
+        polygon = polygon(coordinateList);
       } else {
         polygon = null;
       }
@@ -1477,6 +1375,54 @@ public class GeometryFactory implements Serializable,
     }
   }
 
+  public PolygonImpl polygon() {
+    return new PolygonImpl(this);
+  }
+
+  public Polygon polygon(final CoordinatesList... rings) {
+    final List<CoordinatesList> ringList = Arrays.asList(rings);
+    return polygon(ringList);
+  }
+
+  /**
+   * Constructs a <code>Polygon</code> with the given exterior boundary.
+   *
+   * @param shell
+   *            the outer boundary of the new <code>Polygon</code>, or
+   *            <code>null</code> or an empty <code>LinearRing</code> if
+   *            the empty geometry is to be created.
+   * @throws IllegalArgumentException if the boundary ring is invalid
+   */
+  public Polygon polygon(final LinearRing shell) {
+    return new PolygonImpl(this, shell);
+  }
+
+  public Polygon polygon(final List<?> rings) {
+    if (rings.size() == 0) {
+      return polygon();
+    } else {
+      final LinearRing[] linearRings = new LinearRing[rings.size()];
+      for (int i = 0; i < rings.size(); i++) {
+        linearRings[i] = getLinearRing(rings, i);
+      }
+      return new PolygonImpl(this, linearRings);
+    }
+  }
+
+  public Polygon polygon(final Object... rings) {
+    return polygon(Arrays.asList(rings));
+  }
+
+  public Polygon polygon(final Polygon polygon) {
+    final List<LinearRing> rings = new ArrayList<LinearRing>();
+    for (final LinearRing ring : polygon.rings()) {
+      final LinearRing clone = ring.copy(this);
+      rings.add(clone);
+
+    }
+    return polygon(rings);
+  }
+
   /**
    * Project the geometry if it is in a different coordinate system
    * 
@@ -1531,19 +1477,11 @@ public class GeometryFactory implements Serializable,
     }
 
     // create a CW ring for the polygon
-    return createPolygon(
-      linearRing(new Coordinates[] {
-        new Coordinate(envelope.getMinX(), envelope.getMinY(),
-          Coordinates.NULL_ORDINATE),
-        new Coordinate(envelope.getMinX(), envelope.getMaxY(),
-          Coordinates.NULL_ORDINATE),
-        new Coordinate(envelope.getMaxX(), envelope.getMaxY(),
-          Coordinates.NULL_ORDINATE),
-        new Coordinate(envelope.getMaxX(), envelope.getMinY(),
-          Coordinates.NULL_ORDINATE),
-        new Coordinate(envelope.getMinX(), envelope.getMinY(),
-          Coordinates.NULL_ORDINATE)
-      }), null);
+    final LinearRing ring = linearRing(2, envelope.getMinX(),
+      envelope.getMinY(), envelope.getMinX(), envelope.getMaxY(),
+      envelope.getMaxX(), envelope.getMaxY(), envelope.getMaxX(),
+      envelope.getMinY(), envelope.getMinX(), envelope.getMinY());
+    return polygon(ring);
   }
 
   @Override

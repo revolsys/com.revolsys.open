@@ -33,6 +33,8 @@
 package com.revolsys.jts.io;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.revolsys.jts.geom.CoordinateSequenceFactory;
 import com.revolsys.jts.geom.CoordinateSequences;
@@ -366,16 +368,13 @@ public class WKBReader {
 
   private Polygon readPolygon() throws IOException {
     final int numRings = dis.readInt();
-    LinearRing[] holes = null;
-    if (numRings > 1) {
-      holes = new LinearRing[numRings - 1];
-    }
+    final List<LinearRing> rings = new ArrayList<>();
 
-    final LinearRing shell = readLinearRing();
-    for (int i = 0; i < numRings - 1; i++) {
-      holes[i] = readLinearRing();
+    for (int i = 0; i < numRings; i++) {
+      LinearRing ring = readLinearRing();
+      rings.add(ring);
     }
-    return factory.createPolygon(shell, holes);
+    return factory.polygon(rings);
   }
 
   /**

@@ -392,7 +392,7 @@ public class Distance3DOp {
     }
     final int nHole = poly.getPolygon().getNumInteriorRing();
     for (int i = 0; i < nHole; i++) {
-      computeMinDistanceLineLine(poly.getPolygon().getInteriorRingN(i), line,
+      computeMinDistanceLineLine(poly.getPolygon().getInteriorRing(i), line,
         flip);
       if (isDone) {
         return;
@@ -410,7 +410,7 @@ public class Distance3DOp {
 
       final int nHole = polyPlane.getPolygon().getNumInteriorRing();
       for (int i = 0; i < nHole; i++) {
-        final LineString hole = polyPlane.getPolygon().getInteriorRingN(i);
+        final LineString hole = polyPlane.getPolygon().getInteriorRing(i);
         if (polyPlane.intersects(pt, hole)) {
           computeMinDistanceLinePoint(hole, point, flip);
           return;
@@ -472,7 +472,7 @@ public class Distance3DOp {
     // compute hole rings
     final int nHole = ringPoly.getNumInteriorRing();
     for (int i = 0; i < nHole; i++) {
-      computeMinDistancePolygonLine(poly, ringPoly.getInteriorRingN(i), flip);
+      computeMinDistancePolygonLine(poly, ringPoly.getInteriorRing(i), flip);
       if (isDone) {
         return;
       }

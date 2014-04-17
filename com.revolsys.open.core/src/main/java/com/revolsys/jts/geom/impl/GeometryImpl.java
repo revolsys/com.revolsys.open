@@ -222,9 +222,9 @@ public abstract class GeometryImpl implements Geometry {
    *@return             <code>true</code> if any of the <code>Geometry</code>s
    *      <code>isEmpty</code> methods return <code>false</code>
    */
-  protected static boolean hasNonEmptyElements(final Geometry[] geometries) {
-    for (int i = 0; i < geometries.length; i++) {
-      if (!geometries[i].isEmpty()) {
+  protected static boolean hasNonEmptyElements(final Geometry... geometries) {
+    for (final Geometry geometry : geometries) {
+      if (!geometry.isEmpty()) {
         return true;
       }
     }

@@ -47,6 +47,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.util.Assert;
@@ -356,7 +357,8 @@ public class ConvexHull {
       // coordinates[1]},
       // geometry.getPrecisionModel(), geometry.getSRID());
     }
-    return geomFactory.createPolygon(coordinates);
+    final LinearRing ring = geomFactory.linearRing(coordinates);
+    return geomFactory.polygon(ring);
   }
 
   private Coordinates[] padArray3(final Coordinates[] pts) {

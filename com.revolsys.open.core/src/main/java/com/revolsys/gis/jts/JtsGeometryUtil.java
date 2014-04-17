@@ -267,17 +267,11 @@ public final class JtsGeometryUtil {
     return factory.lineString(newCoords);
   }
 
-  public static Polygon createPolygon(final GeometryFactory factory,
-    final List<Coordinates> coordinates) {
-    final LinearRing shell = createLinearRing(factory, coordinates);
-    return factory.createPolygon(shell, null);
-  }
-
   public static Polygon createPolygon(final MultiLineString multiLine) {
     final GeometryFactory factory = GeometryFactory.getFactory(multiLine);
     final Coordinates[] coordinates = getMergeLine(multiLine).getCoordinateArray();
     final LinearRing linearRing = factory.linearRing(coordinates);
-    final Polygon polygon = factory.createPolygon(linearRing, null);
+    final Polygon polygon = factory.polygon(linearRing);
     return polygon;
 
   }
@@ -360,8 +354,8 @@ public final class JtsGeometryUtil {
       final LineString exterior2 = polygon2.getExteriorRing();
       if (equalsExact3D(exterior1, exterior2)) {
         for (int i = 0; i < polygon1.getNumInteriorRing(); i++) {
-          if (!equalsExact3D(polygon1.getInteriorRingN(i),
-            polygon2.getInteriorRingN(i))) {
+          if (!equalsExact3D(polygon1.getInteriorRing(i),
+            polygon2.getInteriorRing(i))) {
             return false;
           }
         }
@@ -711,7 +705,7 @@ public final class JtsGeometryUtil {
     };
     final GeometryFactory factory = GeometryFactory.getFactory();
     final LinearRing exteriorRing = factory.linearRing(coords);
-    return factory.createPolygon(exteriorRing, null);
+    return factory.polygon(exteriorRing);
   }
 
   public static Polygon getMitredBuffer(final LineString lineString,
@@ -728,7 +722,7 @@ public final class JtsGeometryUtil {
     final Geometry exteriorBuffer = getMitredBuffer(exteriorRing, distance);
     buffer = buffer.union(exteriorBuffer);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString ring = polygon.getInteriorRingN(i);
+      final LineString ring = polygon.getInteriorRing(i);
       final Geometry bufferedRing = getMitredBuffer(ring, distance);
       buffer = buffer.union(bufferedRing);
     }

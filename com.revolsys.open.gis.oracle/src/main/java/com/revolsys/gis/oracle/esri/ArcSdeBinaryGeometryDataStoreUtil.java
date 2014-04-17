@@ -328,7 +328,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
               rings.add(coordinates);
             }
             if (!rings.isEmpty()) {
-              final Polygon polygon = geometryFactory.createPolygon(rings);
+              final Polygon polygon = geometryFactory.polygon(rings);
               polygons.add(polygon);
             }
           }

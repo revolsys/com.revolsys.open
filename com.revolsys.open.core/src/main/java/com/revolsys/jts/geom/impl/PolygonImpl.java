@@ -33,6 +33,7 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,7 +46,7 @@ import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -85,19 +86,11 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
 
   private static final long serialVersionUID = -3494792200821764533L;
 
-  /**
-   *  The exterior boundary,
-   * or <code>null</code> if this <code>Polygon</code>
-   *  is empty.
-   */
-  protected LinearRing shell = null;
+  protected LinearRing[] rings;
 
-  /**
-   * The interior boundaries, if any.
-   * This instance var is never null.
-   * If there are no holes, the array is of zero length.
-   */
-  protected LinearRing[] holes;
+  public PolygonImpl(final GeometryFactory factory) {
+    super(factory);
+  }
 
   /**
    *  Constructs a <code>Polygon</code> with the given exterior boundary and
@@ -110,42 +103,40 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
    *      , or <code>null</code> or empty <code>LinearRing</code>s if the empty
    *      geometry is to be created.
    */
-  public PolygonImpl(LinearRing shell, LinearRing[] holes,
-    final GeometryFactory factory) {
+  public PolygonImpl(final GeometryFactory factory, final LinearRing... rings) {
     super(factory);
-    if (shell == null) {
-      shell = getGeometryFactory().linearRing((CoordinatesList)null);
+    if (rings == null || rings.length == 0) {
+
+    } else if (hasNullElements(rings)) {
+      throw new IllegalArgumentException("rings must not contain null elements");
+    } else {
+      if (rings[0].isEmpty()) {
+        for (int i = 1; i < rings.length; i++) {
+          final LinearRing ring = rings[i];
+          if (!ring.isEmpty()) {
+            throw new IllegalArgumentException("shell is empty but hole "
+              + (i - 1) + " is not");
+          }
+        }
+      } else {
+        this.rings = rings;
+      }
     }
-    if (holes == null) {
-      holes = new LinearRing[] {};
-    }
-    if (hasNullElements(holes)) {
-      throw new IllegalArgumentException("holes must not contain null elements");
-    }
-    if (shell.isEmpty() && hasNonEmptyElements(holes)) {
-      throw new IllegalArgumentException("shell is empty but holes are not");
-    }
-    this.shell = shell;
-    this.holes = holes;
   }
 
   @Override
   public void apply(final CoordinateFilter filter) {
-    shell.apply(filter);
-    for (int i = 0; i < holes.length; i++) {
-      holes[i].apply(filter);
+    for (final LinearRing ring : rings()) {
+      ring.apply(filter);
     }
   }
 
   @Override
   public void apply(final CoordinateSequenceFilter filter) {
-    shell.apply(filter);
-    if (!filter.isDone()) {
-      for (int i = 0; i < holes.length; i++) {
-        holes[i].apply(filter);
-        if (filter.isDone()) {
-          break;
-        }
+    for (final LinearRing ring : rings()) {
+      ring.apply(filter);
+      if (filter.isDone()) {
+        break;
       }
     }
     if (filter.isGeometryChanged()) {
@@ -156,9 +147,8 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   @Override
   public void apply(final GeometryComponentFilter filter) {
     filter.filter(this);
-    shell.apply(filter);
-    for (int i = 0; i < holes.length; i++) {
-      holes[i].apply(filter);
+    for (final LinearRing ring : rings()) {
+      ring.apply(filter);
     }
   }
 
@@ -176,18 +166,16 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   @Override
   public PolygonImpl clone() {
     final PolygonImpl poly = (PolygonImpl)super.clone();
-    poly.shell = shell.clone();
-    poly.holes = new LinearRing[holes.length];
-    for (int i = 0; i < holes.length; i++) {
-      poly.holes[i] = holes[i].clone();
+    for (int i = 0; i < rings.length; i++) {
+      poly.rings[i] = rings[i].clone();
     }
-    return poly;// return the clone
+    return poly;
   }
 
   @Override
-  public int compareToSameClass(final Geometry o) {
-    final LinearRing thisShell = shell;
-    final LinearRing otherShell = ((Polygon)o).getExteriorRing();
+  public int compareToSameClass(final Geometry geometry) {
+    final LinearRing thisShell = getExteriorRing();
+    final LinearRing otherShell = ((Polygon)geometry).getExteriorRing();
     return thisShell.compareToSameClass(otherShell);
   }
 
@@ -196,7 +184,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     final CoordinateSequenceComparator comp) {
     final Polygon poly = (Polygon)o;
 
-    final LinearRing thisShell = shell;
+    final LinearRing thisShell = getExteriorRing();
     final LinearRing otherShell = poly.getExteriorRing();
     final int shellComp = thisShell.compareToSameClass(otherShell, comp);
     if (shellComp != 0) {
@@ -207,8 +195,8 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     final int nHole2 = poly.getNumInteriorRing();
     int i = 0;
     while (i < nHole1 && i < nHole2) {
-      final LinearRing thisHole = getInteriorRingN(i);
-      final LinearRing otherHole = poly.getInteriorRingN(i);
+      final LinearRing thisHole = getInteriorRing(i);
+      final LinearRing otherHole = poly.getInteriorRing(i);
       final int holeComp = thisHole.compareToSameClass(otherHole, comp);
       if (holeComp != 0) {
         return holeComp;
@@ -226,8 +214,9 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
 
   @Override
   protected BoundingBox computeEnvelopeInternal() {
-    BoundingBox boundingBox = shell.getBoundingBox();
-    for (final LinearRing ring : holes) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    BoundingBox boundingBox = new Envelope(geometryFactory);
+    for (final LinearRing ring : rings) {
       boundingBox = boundingBox.expandToInclude(ring);
     }
     return boundingBox;
@@ -242,23 +231,22 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {
       return false;
-    }
-    final Polygon otherPolygon = (Polygon)other;
-    final Geometry thisShell = shell;
-    final Geometry otherPolygonShell = otherPolygon.getExteriorRing();
-    if (!thisShell.equalsExact(otherPolygonShell, tolerance)) {
-      return false;
-    }
-    if (holes.length != otherPolygon.getNumInteriorRing()) {
-      return false;
-    }
-    for (int i = 0; i < holes.length; i++) {
-      if (!((Geometry)holes[i]).equalsExact(otherPolygon.getInteriorRingN(i),
-        tolerance)) {
+    } else {
+      final Polygon otherPolygon = (Polygon)other;
+      final int ringCount = getRingCount();
+      if (ringCount != otherPolygon.getRingCount()) {
         return false;
+      } else {
+        for (int i = 0; i < ringCount; i++) {
+          final LinearRing ring = getRing(i);
+          final LinearRing otherRing = otherPolygon.getRing(i);
+          if (!ring.equalsExact(otherRing, tolerance)) {
+            return false;
+          }
+        }
+        return true;
       }
     }
-    return true;
   }
 
   /**
@@ -268,12 +256,17 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
    */
   @Override
   public double getArea() {
-    double area = 0.0;
-    area += Math.abs(CGAlgorithms.signedArea(shell.getCoordinatesList()));
-    for (int i = 0; i < holes.length; i++) {
-      area -= Math.abs(CGAlgorithms.signedArea(holes[i].getCoordinatesList()));
+    double totalArea = 0.0;
+    for (int i = 0; i < getRingCount(); i++) {
+      final LinearRing ring = getRing(i);
+      final double area = Math.abs(CGAlgorithms.signedArea(ring.getCoordinatesList()));
+      if (i == 0) {
+        totalArea += area;
+      } else {
+        totalArea -= area;
+      }
     }
-    return area;
+    return totalArea;
   }
 
   /**
@@ -284,19 +277,15 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
    */
   @Override
   public Geometry getBoundary() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return getGeometryFactory().createMultiLineString();
+      return geometryFactory.createMultiLineString();
     } else {
-      final LinearRing[] rings = new LinearRing[holes.length + 1];
-      rings[0] = shell;
-      for (int i = 0; i < holes.length; i++) {
-        rings[i + 1] = holes[i];
+      if (rings.length == 1) {
+        return geometryFactory.linearRing(this.rings[0]);
+      } else {
+        return geometryFactory.createMultiLineString(this.rings);
       }
-      // create LineString or MultiLineString as appropriate
-      if (rings.length <= 1) {
-        return getGeometryFactory().linearRing(rings[0].getCoordinatesList());
-      }
-      return getGeometryFactory().createMultiLineString(rings);
     }
   }
 
@@ -307,29 +296,22 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
 
   @Override
   public Coordinates getCoordinate() {
-    return shell.getCoordinate();
+    return getExteriorRing().getCoordinate();
   }
 
   @Override
   public Coordinates[] getCoordinateArray() {
     if (isEmpty()) {
-      return new Coordinates[] {};
-    }
-    final Coordinates[] coordinates = new Coordinates[getVertexCount()];
-    int k = -1;
-    final Coordinates[] shellCoordinates = shell.getCoordinateArray();
-    for (int x = 0; x < shellCoordinates.length; x++) {
-      k++;
-      coordinates[k] = shellCoordinates[x];
-    }
-    for (int i = 0; i < holes.length; i++) {
-      final Coordinates[] childCoordinates = holes[i].getCoordinateArray();
-      for (int j = 0; j < childCoordinates.length; j++) {
-        k++;
-        coordinates[k] = childCoordinates[j];
+      return new Coordinates[0];
+    } else {
+      final Coordinates[] coordinates = new Coordinates[getVertexCount()];
+      int i = 0;
+      for (final Vertex vertex : vertices()) {
+        coordinates[i] = vertex.cloneCoordinates();
+        i++;
       }
+      return coordinates;
     }
-    return coordinates;
   }
 
   @Override
@@ -344,12 +326,16 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
 
   @Override
   public LinearRing getExteriorRing() {
-    return shell;
+    if (isEmpty()) {
+      return null;
+    } else {
+      return getRing(0);
+    }
   }
 
   @Override
-  public LinearRing getInteriorRingN(final int n) {
-    return holes[n];
+  public LinearRing getInteriorRing(final int ringIndex) {
+    return getRing(ringIndex + 1);
   }
 
   /**
@@ -360,84 +346,113 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   @Override
   public double getLength() {
     double len = 0.0;
-    len += shell.getLength();
-    for (int i = 0; i < holes.length; i++) {
-      len += holes[i].getLength();
+    for (final LinearRing ring : rings()) {
+      len += ring.getLength();
     }
     return len;
   }
 
   @Override
   public int getNumInteriorRing() {
-    return holes.length;
+    if (isEmpty()) {
+      return 0;
+    } else {
+      return rings.length - 1;
+    }
+  }
+
+  @Override
+  public LinearRing getRing(final int ringIndex) {
+    if (isEmpty() || ringIndex < 0 || ringIndex >= rings.length) {
+      return null;
+    } else {
+      return this.rings[ringIndex];
+    }
+  }
+
+  @Override
+  public int getRingCount() {
+    if (isEmpty()) {
+      return 0;
+    } else {
+      return rings.length;
+    }
+  }
+
+  @Override
+  public List<LinearRing> getRings() {
+    return new ArrayList<>(Arrays.asList(rings));
   }
 
   @Override
   public int getVertexCount() {
-    int numPoints = shell.getVertexCount();
-    for (int i = 0; i < holes.length; i++) {
-      numPoints += holes[i].getVertexCount();
+    int numPoints = 0;
+    for (final LinearRing ring : rings()) {
+      numPoints += ring.getVertexCount();
     }
     return numPoints;
   }
 
   @Override
-  public boolean isEmpty() {
-    return shell.isEmpty();
+  public Iterable<LinearRing> holes() {
+    if (getNumInteriorRing() == 0) {
+      return Collections.emptyList();
+    } else {
+      final List<LinearRing> holes = new ArrayList<>();
+      for (int i = 0; i < getNumInteriorRing(); i++) {
+        final LinearRing ring = getInteriorRing(i);
+        holes.add(ring);
+      }
+      return holes;
+    }
   }
 
-  /**
-   * Tests if a valid polygon is simple.
-   * This method always returns true, since a valid polygon is always simple
-   *
-   * @return <code>true</code>
-   */
-  /*
-   * public boolean isSimple() { return true; }
-   */
+  @Override
+  public boolean isEmpty() {
+    return rings == null;
+  }
 
   @Override
   public boolean isRectangle() {
-    if (getNumInteriorRing() != 0) {
+    if (isEmpty()) {
       return false;
-    }
-    if (shell == null) {
+    } else if (getNumInteriorRing() != 0) {
       return false;
-    }
-    if (shell.getVertexCount() != 5) {
-      return false;
-    }
-
-    final CoordinatesList seq = shell.getCoordinatesList();
-
-    // check vertices have correct values
-    final BoundingBox env = getBoundingBox();
-    for (int i = 0; i < 5; i++) {
-      final double x = seq.getX(i);
-      if (!(x == env.getMinX() || x == env.getMaxX())) {
+    } else {
+      final LinearRing shell = getExteriorRing();
+      if (shell.getVertexCount() != 5) {
         return false;
-      }
-      final double y = seq.getY(i);
-      if (!(y == env.getMinY() || y == env.getMaxY())) {
-        return false;
-      }
-    }
+      } else {
+        // check vertices have correct values
+        final BoundingBox boundingBox = getBoundingBox();
+        for (int i = 0; i < 5; i++) {
+          final double x = shell.getX(i);
+          if (!(x == boundingBox.getMinX() || x == boundingBox.getMaxX())) {
+            return false;
+          }
+          final double y = shell.getY(i);
+          if (!(y == boundingBox.getMinY() || y == boundingBox.getMaxY())) {
+            return false;
+          }
+        }
 
-    // check vertices are in right order
-    double prevX = seq.getX(0);
-    double prevY = seq.getY(0);
-    for (int i = 1; i <= 4; i++) {
-      final double x = seq.getX(i);
-      final double y = seq.getY(i);
-      final boolean xChanged = x != prevX;
-      final boolean yChanged = y != prevY;
-      if (xChanged == yChanged) {
-        return false;
+        // check vertices are in right order
+        double prevX = shell.getX(0);
+        double prevY = shell.getY(0);
+        for (int i = 1; i <= 4; i++) {
+          final double x = shell.getX(i);
+          final double y = shell.getY(i);
+          final boolean xChanged = x != prevX;
+          final boolean yChanged = y != prevY;
+          if (xChanged == yChanged) {
+            return false;
+          }
+          prevX = x;
+          prevY = y;
+        }
+        return true;
       }
-      prevX = x;
-      prevY = y;
     }
-    return true;
   }
 
   @Override
@@ -445,16 +460,16 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     if (isEmpty()) {
       return this;
     } else {
-      final LinearRing exteriorRing = normalize(shell, true);
+      final LinearRing exteriorRing = normalize(getExteriorRing(), true);
       final List<LinearRing> rings = new ArrayList<>();
-      for (final LinearRing hole : holes) {
+      for (final LinearRing hole : holes()) {
         final LinearRing normalizedHole = normalize(hole, false);
         rings.add(normalizedHole);
       }
       Collections.sort(rings);
       rings.add(0, exteriorRing);
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.createPolygon(rings);
+      return geometryFactory.polygon(rings);
     }
   }
 
@@ -482,27 +497,19 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   @Override
   public Polygon reverse() {
     final List<LinearRing> rings = new ArrayList<>();
-    rings.add(shell.reverse());
-    for (final LinearRing ring : holes) {
+    for (final LinearRing ring : rings()) {
       rings.add(ring.reverse());
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.createPolygon(rings);
+    return geometryFactory.polygon(rings);
   }
 
   @Override
   public Iterable<LinearRing> rings() {
     if (isEmpty()) {
       return Collections.emptyList();
-    } else if (holes.length == 0) {
-      return Collections.singletonList(shell);
     } else {
-      final List<LinearRing> rings = new ArrayList<>();
-      rings.add(shell);
-      for (final LinearRing ring : this.holes) {
-        rings.add(ring);
-      }
-      return rings;
+      return Arrays.asList(this.rings);
     }
   }
 

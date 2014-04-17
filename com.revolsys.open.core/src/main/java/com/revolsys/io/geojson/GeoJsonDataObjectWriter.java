@@ -133,7 +133,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     final LineString exteriorRing = polygon.getExteriorRing();
     coordinates(exteriorRing);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString interiorRing = polygon.getInteriorRingN(i);
+      final LineString interiorRing = polygon.getInteriorRing(i);
       out.endAttribute();
       out.indent();
       coordinates(interiorRing);

@@ -147,7 +147,7 @@ class PolygonalLineworkExtracter implements GeometryFilter {
       final Polygon poly = (Polygon)g;
       linework.add(poly.getExteriorRing());
       for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-        linework.add(poly.getInteriorRingN(i));
+        linework.add(poly.getInteriorRing(i));
       }
     }
   }

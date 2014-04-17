@@ -86,7 +86,7 @@ public class RepeatedPointTester {
   {
     if (hasRepeatedPoint(p.getExteriorRing().getCoordinateArray())) return true;
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      if (hasRepeatedPoint(p.getInteriorRingN(i).getCoordinateArray())) return true;
+      if (hasRepeatedPoint(p.getInteriorRing(i).getCoordinateArray())) return true;
     }
     return false;
   }

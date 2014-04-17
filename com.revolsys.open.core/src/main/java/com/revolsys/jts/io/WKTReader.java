@@ -690,20 +690,18 @@ public class WKTReader {
   private Polygon readPolygonText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.createPolygon(
-        geometryFactory.linearRing(new Coordinates[] {}),
-        new LinearRing[] {});
+      return geometryFactory.polygon();
     }
-    final List<LinearRing> holes = new ArrayList<LinearRing>();
+    final List<LinearRing> rings = new ArrayList<LinearRing>();
     final LinearRing shell = readLinearRingText();
+    rings.add(shell);
     nextToken = getNextCloserOrComma();
     while (nextToken.equals(COMMA)) {
       final LinearRing hole = readLinearRingText();
-      holes.add(hole);
+      rings.add(hole);
       nextToken = getNextCloserOrComma();
     }
-    final LinearRing[] array = new LinearRing[holes.size()];
-    return geometryFactory.createPolygon(shell, holes.toArray(array));
+    return geometryFactory.polygon(rings);
   }
 
   /**

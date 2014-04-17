@@ -2,7 +2,6 @@ package com.revolsys.jts.testold.perf.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
@@ -35,18 +34,18 @@ public class AreaPrecisionPerfTest {
 
       Coordinates vertex;
       for (int i = 0; i <= nrVertices; i++) {
-        vertex = new Coordinate((double)originX
+        vertex = new Coordinate(originX
           + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)), originY
-          + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)), Coordinates.NULL_ORDINATE);
+          + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)),
+          Coordinates.NULL_ORDINATE);
         coordinates[i] = vertex;
       }
       // close ring
       coordinates[nrVertices] = coordinates[0];
 
-      final Geometry g1 = GeometryFactory.getFactory().linearRing(coordinates);
-      final LinearRing[] holes = new LinearRing[] {};
-      final Polygon polygon = GeometryFactory.getFactory().createPolygon(
-        (LinearRing)g1, holes);
+      final LinearRing g1 = GeometryFactory.getFactory()
+        .linearRing(coordinates);
+      final Polygon polygon = GeometryFactory.getFactory().polygon(g1);
       System.out.println(polygon);
 
       final double area = originalSignedArea(coordinates);

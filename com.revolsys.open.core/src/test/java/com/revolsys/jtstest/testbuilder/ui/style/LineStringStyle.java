@@ -46,7 +46,7 @@ public abstract class LineStringStyle
       Polygon polygon = (Polygon) geom;
       paint(polygon.getExteriorRing(), POLY_SHELL, viewport, g);
       for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-          paint(polygon.getInteriorRingN(i), POLY_HOLE, viewport, g);
+          paint(polygon.getInteriorRing(i), POLY_HOLE, viewport, g);
       }
       return;
     }

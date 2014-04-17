@@ -356,7 +356,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       && in.getEvent() != EventType.endDocument);
     if (polygonRings != null) {
       for (final List<CoordinatesList> rings : polygonRings) {
-        final Polygon polygon = factory.createPolygon(rings);
+        final Polygon polygon = factory.polygon(rings);
         polygons.add(polygon);
       }
     }
@@ -415,6 +415,6 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
-    return factory.createPolygon(rings);
+    return factory.polygon(rings);
   }
 }

@@ -112,7 +112,7 @@ public class FacetLocater {
 
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
       path.push(new Integer(i + 1));
-      findLocations(path, poly.getInteriorRingN(i), poly.getInteriorRingN(i)
+      findLocations(path, poly.getInteriorRing(i), poly.getInteriorRing(i)
         .getCoordinatesList(), locations);
       path.pop();
     }

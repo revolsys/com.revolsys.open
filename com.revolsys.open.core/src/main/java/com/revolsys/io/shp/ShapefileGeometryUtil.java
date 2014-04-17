@@ -216,7 +216,7 @@ public final class ShapefileGeometryUtil {
       final boolean ringClockwise = !CoordinatesListUtil.isCCW(ring);
       if (ringClockwise == clockwise) {
         if (!currentParts.isEmpty()) {
-          final Polygon polygon = geometryFactory.createPolygon(currentParts);
+          final Polygon polygon = geometryFactory.polygon(currentParts);
           polygons.add(polygon);
           currentParts.clear();
         }
@@ -224,7 +224,7 @@ public final class ShapefileGeometryUtil {
       currentParts.add(ring);
     }
     if (!currentParts.isEmpty()) {
-      final Polygon polygon = geometryFactory.createPolygon(currentParts);
+      final Polygon polygon = geometryFactory.polygon(currentParts);
       polygons.add(polygon);
     }
     if (polygons.size() == 1) {
@@ -900,7 +900,7 @@ public final class ShapefileGeometryUtil {
         numPoints += exteroirPoints.size();
         final int numHoles = polygon.getNumInteriorRing();
         for (int j = 0; j < numHoles; j++) {
-          final LineString interior = polygon.getInteriorRingN(j);
+          final LineString interior = polygon.getInteriorRing(j);
           CoordinatesList interiorCoords = CoordinatesListUtil.get(interior);
           final boolean interiorClockwise = !interior.isCCW();
           if (interiorClockwise == clockwise) {

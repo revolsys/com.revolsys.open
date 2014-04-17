@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -233,7 +234,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       dimension);
 
     for (int i = 0; i < numInteriorRing; i++) {
-      final LineString ring = polygon.getInteriorRingN(i);
+      final LineString ring = polygon.getInteriorRing(i);
       ordinateArrays[i + 1] = toClockwiseCoordinatesArray(ring, dimension);
     }
     return ordinateArrays;
@@ -469,8 +470,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final long[] elemInfo = elemInfoArray.getLongArray();
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
 
-    LinearRing exteriorRing = null;
-    List<LinearRing> interiorRings = null;
+    List<LinearRing> rings = Collections.emptyList();
 
     for (int i = 0; i < elemInfo.length; i += 3) {
       final long offset = elemInfo[i];
@@ -492,19 +492,16 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
         switch ((int)type) {
           case 1003:
-            if (exteriorRing != null) {
-              // TODO convert to array of rings
-              final Polygon polygon = this.geometryFactory.createPolygon(
-                exteriorRing,
-                com.revolsys.jts.geom.GeometryFactory.toLinearRingArray(interiorRings));
+            if (!rings.isEmpty()) {
+              final Polygon polygon = this.geometryFactory.polygon(rings);
               polygons.add(polygon);
             }
-            exteriorRing = ring;
-            interiorRings = new ArrayList<LinearRing>();
+            rings = new ArrayList<>();
+            rings.add(ring);
 
           break;
           case 2003:
-            interiorRings.add(ring);
+            rings.add(ring);
           break;
 
           default:
@@ -516,9 +513,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
           + " interpretation " + interpretation);
       }
     }
-    if (exteriorRing != null) {
-      final Polygon polygon = this.geometryFactory.createPolygon(exteriorRing,
-        com.revolsys.jts.geom.GeometryFactory.toLinearRingArray(interiorRings));
+    if (!rings.isEmpty()) {
+      final Polygon polygon = this.geometryFactory.polygon(rings);
       polygons.add(polygon);
     }
 
@@ -545,8 +541,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final long[] elemInfo = elemInfoArray.getLongArray();
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
 
-    LinearRing exteriorRing = null;
-    final LinearRing[] interiorRings = new LinearRing[elemInfo.length / 3 - 1];
+    final List<LinearRing> rings = new ArrayList<>();
     int numInteriorRings = 0;
 
     for (int i = 0; i < elemInfo.length; i += 3) {
@@ -569,18 +564,19 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
         switch ((int)type) {
           case 1003:
-            if (exteriorRing == null) {
-              exteriorRing = ring;
+            if (rings.isEmpty()) {
+              rings.add(ring);
             } else {
               throw new IllegalArgumentException(
                 "Cannot have two exterior rings on a geometry");
             }
           break;
           case 2003:
-            if (numInteriorRings == interiorRings.length) {
+            if (numInteriorRings == rings.size() - 1) {
               throw new IllegalArgumentException("Too many interior rings");
             } else {
-              interiorRings[numInteriorRings++] = ring;
+              numInteriorRings++;
+              rings.add(ring);
             }
           break;
 
@@ -593,8 +589,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
           + " interpretation " + interpretation);
       }
     }
-    final Polygon polygon = this.geometryFactory.createPolygon(exteriorRing,
-      interiorRings);
+    final Polygon polygon = this.geometryFactory.polygon(rings);
     return polygon;
   }
 }

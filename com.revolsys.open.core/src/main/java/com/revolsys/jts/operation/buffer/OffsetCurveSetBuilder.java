@@ -187,7 +187,7 @@ public class OffsetCurveSetBuilder {
 
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
 
-      final LinearRing hole = (LinearRing)p.getInteriorRingN(i);
+      final LinearRing hole = (LinearRing)p.getInteriorRing(i);
       final Coordinates[] holeCoord = CoordinateArrays.removeRepeatedPoints(hole.getCoordinateArray());
 
       // optimization - don't bother computing buffer for this hole

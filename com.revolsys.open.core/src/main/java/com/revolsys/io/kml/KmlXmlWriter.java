@@ -388,7 +388,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       startTag(Kml22Constants.INNER_BOUNDARY_IS);
-      final LineString ring = polygon.getInteriorRingN(i);
+      final LineString ring = polygon.getInteriorRing(i);
       writeLinearRing(ring);
       endTag();
     }

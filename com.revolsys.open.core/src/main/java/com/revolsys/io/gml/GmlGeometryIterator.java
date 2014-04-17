@@ -263,7 +263,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     } else {
       StaxUtils.skipSubTree(in);
     }
-    final Polygon polygon = factory.createPolygon(rings);
+    final Polygon polygon = factory.polygon(rings);
     return polygon;
   }
 

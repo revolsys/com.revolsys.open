@@ -73,7 +73,7 @@ public class LineStringExtracter {
   private void addLines(final Polygon poly, final List lines) {
     lines.add(fact.lineString(poly.getExteriorRing().getCoordinateArray()));
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      lines.add(fact.lineString(poly.getInteriorRingN(i).getCoordinateArray()));
+      lines.add(fact.lineString(poly.getInteriorRing(i).getCoordinateArray()));
     }
   }
 

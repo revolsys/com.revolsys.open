@@ -3,6 +3,7 @@ package com.revolsys.jtstest.testbuilder.io.shapefile;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RobustCGAlgorithms;
@@ -28,7 +29,7 @@ public class PolygonHandler implements ShapeHandler {
    * @param o
    * @return
    */
-  private static int findIndex(final ArrayList list, final Object o) {
+  private static int findIndex(final List<LinearRing> list, final Object o) {
     final int n = list.size();
     for (int i = 0; i < n; i++) {
       if (list.get(i) == o) {
@@ -53,8 +54,8 @@ public class PolygonHandler implements ShapeHandler {
     myShapeType = type;
   }
 
-  private ArrayList assignHolesToShells(final ArrayList shells,
-    final ArrayList holes) {
+  private List<List<LinearRing>> assignHolesToShells(
+    final List<LinearRing> shells, final List<LinearRing> holes) {
     // now we have a list of all shells and all holes
     final ArrayList holesForShells = new ArrayList(shells.size());
     for (int i = 0; i < shells.size(); i++) {
@@ -63,7 +64,7 @@ public class PolygonHandler implements ShapeHandler {
 
     // find homes
     for (int i = 0; i < holes.size(); i++) {
-      final LinearRing testHole = (LinearRing)holes.get(i);
+      final LinearRing testHole = holes.get(i);
       LinearRing minShell = null;
       BoundingBox minEnv = null;
       final BoundingBox testHoleEnv = testHole.getBoundingBox();
@@ -71,7 +72,7 @@ public class PolygonHandler implements ShapeHandler {
       LinearRing tryShell;
       final int nShells = shells.size();
       for (int j = 0; j < nShells; j++) {
-        tryShell = (LinearRing)shells.get(j);
+        tryShell = shells.get(j);
         final BoundingBox tryShellEnv = tryShell.getBoundingBox();
         if (!tryShellEnv.contains(testHoleEnv)) {
           continue;
@@ -208,8 +209,8 @@ public class PolygonHandler implements ShapeHandler {
     }
 
     // LinearRing[] rings = new LinearRing[numParts];
-    ArrayList shells = new ArrayList();
-    ArrayList holes = new ArrayList();
+    List<LinearRing> shells = new ArrayList<>();
+    List<LinearRing> holes = new ArrayList<>();
     final Coordinates[] coords = new Coordinates[numPoints];
 
     for (int t = 0; t < numPoints; t++) {
@@ -281,13 +282,16 @@ public class PolygonHandler implements ShapeHandler {
       }
     }
 
-    ArrayList holesForShells = assignHolesToShells(shells, holes);
+    List<List<LinearRing>> holesForShells = assignHolesToShells(shells, holes);
 
     final Polygon[] polygons = new Polygon[shells.size()];
     for (int i = 0; i < shells.size(); i++) {
-      polygons[i] = geometryFactory.createPolygon(
-        (LinearRing)shells.get(i),
-        (LinearRing[])((ArrayList)holesForShells.get(i)).toArray(new LinearRing[0]));
+      final LinearRing shell = shells.get(i);
+      final List<LinearRing> holesForShell = holesForShells.get(i);
+      final List<LinearRing> rings = new ArrayList<LinearRing>();
+      rings.add(shell);
+      rings.addAll(holesForShell);
+      polygons[i] = geometryFactory.polygon(rings);
     }
 
     if (polygons.length == 1) {

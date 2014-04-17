@@ -32,6 +32,9 @@
  */
 package com.revolsys.jts.testold.generator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -128,11 +131,11 @@ public class PolygonGenerator extends GeometryGenerator {
     final LinearRing outer = createBox(x, dx, y, dy, npoints, gf);
 
     if (nholes == 0) {
-      return gf.createPolygon(outer, null);
+      return gf.polygon(outer);
     }
 
-    final LinearRing[] inner = new LinearRing[nholes];
-
+    final List<LinearRing> rings = new ArrayList<>();
+    rings.add(outer);
     final int nrow = (int)Math.sqrt(nholes);
     final int ncol = nholes / nrow;
 
@@ -151,14 +154,14 @@ public class PolygonGenerator extends GeometryGenerator {
           // make another box
           int pts = npoints / 2;
           pts = pts < 4 ? 4 : pts;
-
-          inner[cindex++] = createBox(spx + x + j * (ddx + spx), ddx, spy + y
-            + i * (ddy + spy), ddy, pts, gf);
+          cindex++;
+          rings.add(createBox(spx + x + j * (ddx + spx), ddx, spy + y + i
+            * (ddy + spy), ddy, pts, gf));
         }
       }
     }
 
-    return gf.createPolygon(outer, inner);
+    return gf.polygon(rings);
   }
 
   protected int numberPoints = 4;
@@ -191,10 +194,10 @@ public class PolygonGenerator extends GeometryGenerator {
     final LinearRing outer = createArc(cx, cy, radius, npoints, gf);
 
     if (nholes == 0) {
-      return gf.createPolygon(outer, null);
+      return gf.polygon(outer);
     }
-
-    final LinearRing[] inner = new LinearRing[nholes];
+    final List<LinearRing> rings = new ArrayList<LinearRing>();
+    rings.add(outer);
 
     radius *= .75;
     int degreesPerHole = 360 / (nholes + 1);
@@ -210,10 +213,10 @@ public class PolygonGenerator extends GeometryGenerator {
     for (int i = 0; i < nholes; i++) {
       final int st = start + i * (degreesPerHole + degreesPerGap); // start
                                                                    // angle
-      inner[i] = createTri(cx, cy, st, st + degreesPerHole, radius, gf);
+      rings.add(createTri(cx, cy, st, st + degreesPerHole, radius, gf));
     }
 
-    return gf.createPolygon(outer, inner);
+    return gf.polygon(rings);
   }
 
   private static LinearRing createTri(final double cx, final double cy,

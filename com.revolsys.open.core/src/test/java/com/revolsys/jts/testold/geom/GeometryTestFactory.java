@@ -81,7 +81,7 @@ public class GeometryTestFactory {
     final double minx, final double miny, final int nSide, final double segLen) {
     final Coordinates[] pts = createBox(minx, minx, nSide, segLen);
     final LinearRing ring = fact.linearRing(pts);
-    final Polygon poly = fact.createPolygon(ring, null);
+    final Polygon poly = fact.polygon(ring);
     return poly;
   }
 
@@ -114,7 +114,7 @@ public class GeometryTestFactory {
     final double basex, final double basey, final double size, final int nPts) {
     final Coordinates[] pts = createCircle(basex, basey, size, nPts);
     final LinearRing ring = fact.linearRing(pts);
-    final Polygon poly = fact.createPolygon(ring, null);
+    final Polygon poly = fact.polygon(ring);
     return poly;
   }
 
@@ -170,7 +170,7 @@ public class GeometryTestFactory {
     final Coordinates[] pts = createSineStar(basex, basey, size, armLen, nArms,
       nPts);
     final LinearRing ring = fact.linearRing(pts);
-    final Polygon poly = fact.createPolygon(ring, null);
+    final Polygon poly = fact.polygon(ring);
     return poly;
   }
 

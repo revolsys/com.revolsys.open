@@ -203,7 +203,7 @@ public class PointLocator {
     }
     // now test if the point lies in or on the holes
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      final LinearRing hole = (LinearRing)poly.getInteriorRingN(i);
+      final LinearRing hole = (LinearRing)poly.getInteriorRing(i);
       final int holeLoc = locateInPolygonRing(p, hole);
       if (holeLoc == Location.INTERIOR) {
         return Location.EXTERIOR;

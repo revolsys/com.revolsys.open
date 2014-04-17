@@ -458,7 +458,7 @@ public class CoordinatesListUtil {
           final LineString exteriorRing = polygon.getExteriorRing();
           pointsList.add(get(exteriorRing));
           for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
-            final LineString ring = polygon.getInteriorRingN(j);
+            final LineString ring = polygon.getInteriorRing(j);
             pointsList.add(get(ring));
           }
         }

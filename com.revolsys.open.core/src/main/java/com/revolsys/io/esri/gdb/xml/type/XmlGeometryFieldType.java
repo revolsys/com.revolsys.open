@@ -130,7 +130,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     writeRing(out, exteriorRing, hasZ);
 
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString interiorRing = polygon.getInteriorRingN(i);
+      final LineString interiorRing = polygon.getInteriorRing(i);
       writeRing(out, interiorRing, hasZ);
     }
 

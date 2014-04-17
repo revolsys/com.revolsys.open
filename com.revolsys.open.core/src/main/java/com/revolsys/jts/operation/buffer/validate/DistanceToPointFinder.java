@@ -85,7 +85,7 @@ public class DistanceToPointFinder {
     final PointPairDistance ptDist) {
     computeDistance(poly.getExteriorRing(), pt, ptDist);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      computeDistance(poly.getInteriorRingN(i), pt, ptDist);
+      computeDistance(poly.getInteriorRing(i), pt, ptDist);
     }
   }
 

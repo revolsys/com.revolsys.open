@@ -1560,8 +1560,8 @@ public class Envelope implements Serializable, BoundingBox {
       return geometryFactory.lineString(new DoubleCoordinatesList(2, minX,
         minY, maxX, maxY));
     } else {
-      return geometryFactory.createPolygon(new DoubleCoordinatesList(2, minX,
-        minY, minX, maxY, maxX, maxY, maxX, minY, minX, minY));
+      return geometryFactory.polygon(new DoubleCoordinatesList(2, minX, minY,
+        minX, maxY, maxX, maxY, maxX, minY, minX, minY));
     }
   }
 
@@ -1585,7 +1585,7 @@ public class Envelope implements Serializable, BoundingBox {
   public Polygon toPolygon(final GeometryFactory geometryFactory, int numX,
     int numY) {
     if (isEmpty()) {
-      return geometryFactory.createPolygon();
+      return geometryFactory.polygon();
     } else {
       final GeometryFactory factory = getGeometryFactory();
       try {
@@ -1675,12 +1675,12 @@ public class Envelope implements Serializable, BoundingBox {
             geometryFactory.getCoordinateSystem());
         }
 
-        final Polygon polygon = geometryFactory.createPolygon(coordinates);
+        final Polygon polygon = geometryFactory.polygon(coordinates);
         return polygon;
       } catch (final IllegalArgumentException e) {
         LoggerFactory.getLogger(getClass()).error(
           "Unable to convert to polygon: " + this, e);
-        return geometryFactory.createPolygon();
+        return geometryFactory.polygon();
       }
     }
   }

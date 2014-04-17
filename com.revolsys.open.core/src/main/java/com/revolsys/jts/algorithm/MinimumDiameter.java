@@ -236,8 +236,7 @@ public class MinimumDiameter {
 
     // return empty linestring if no minimum width calculated
     if (minWidthPt == null) {
-      return inputGeom.getGeometryFactory().lineString(
-        (Coordinates[])null);
+      return inputGeom.getGeometryFactory().lineString((Coordinates[])null);
     }
 
     final Coordinates basePt = minBaseSeg.project(minWidthPt);
@@ -331,7 +330,7 @@ public class MinimumDiameter {
       new Coordinates[] {
         p0, p1, p2, p3, p0
       });
-    return inputGeom.getGeometryFactory().createPolygon(shell, null);
+    return inputGeom.getGeometryFactory().polygon(shell);
 
   }
 

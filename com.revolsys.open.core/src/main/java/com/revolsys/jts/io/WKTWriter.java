@@ -619,7 +619,7 @@ public class WKTWriter
       appendLineStringText(polygon.getExteriorRing(), level, false, writer);
       for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
         writer.write(", ");
-        appendLineStringText(polygon.getInteriorRingN(i), level + 1, true, writer);
+        appendLineStringText(polygon.getInteriorRing(i), level + 1, true, writer);
       }
       writer.write(")");
     }

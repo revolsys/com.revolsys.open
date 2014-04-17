@@ -60,13 +60,9 @@ public class GeometryCombiner {
   }
 
   public Polygon addHole(final Polygon poly, final LinearRing hole) {
-    final int nOrigHoles = poly.getNumInteriorRing();
-    final LinearRing[] newHoles = new LinearRing[nOrigHoles + 1];
-    for (int i = 0; i < nOrigHoles; i++) {
-      newHoles[i] = poly.getInteriorRingN(i);
-    }
-    newHoles[nOrigHoles] = hole;
-    return geomFactory.createPolygon(poly.getExteriorRing(), newHoles);
+    final List<LinearRing> rings = poly.getRings();
+    rings.add(hole);
+    return geomFactory.polygon(rings);
   }
 
   public Geometry addLineString(final Geometry orig, final Coordinates[] pts) {
@@ -83,15 +79,15 @@ public class GeometryCombiner {
     final LinearRing ring = geomFactory.linearRing(pts);
 
     if (orig == null) {
-      return geomFactory.createPolygon(ring, null);
+      return geomFactory.polygon(ring);
     }
     if (!(orig instanceof Polygonal)) {
-      return combine(orig, geomFactory.createPolygon(ring, null));
+      return combine(orig, geomFactory.polygon(ring));
     }
     // add the ring as either a hole or a shell
     final Polygon polyContaining = findPolygonContaining(orig, pts[0]);
     if (polyContaining == null) {
-      return combine(orig, geomFactory.createPolygon(ring, null));
+      return combine(orig, geomFactory.polygon(ring));
     }
 
     // add ring as hole

@@ -204,7 +204,7 @@ public class ShapeWriter
 		
 		appendRing(poly, p.getExteriorRing().getCoordinateArray());
 		for (int j = 0; j < p.getNumInteriorRing(); j++) {
-		  appendRing(poly, p.getInteriorRingN(j).getCoordinateArray());
+		  appendRing(poly, p.getInteriorRing(j).getCoordinateArray());
 		}
 
 		return poly;

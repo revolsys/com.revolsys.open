@@ -133,7 +133,7 @@ public class GeometryEditUtil {
 
     rings.set(ringIndex, newPoints);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
-    return geometryFactory.createPolygon(rings);
+    return geometryFactory.polygon(rings);
   }
 
   public static int[] createVertexIndex(final int[] index, final int vertexIndex) {
@@ -191,7 +191,7 @@ public class GeometryEditUtil {
             final CoordinatesList newPoints = deleteVertex(points, pointIndex);
             if (newPoints != points) {
               rings.set(ringIndex, newPoints);
-              final Polygon newPart = geometryFactory.createPolygon(rings);
+              final Polygon newPart = geometryFactory.polygon(rings);
               parts.set(partIndex, newPart);
               return geometryFactory.createGeometry(parts);
             }
@@ -238,7 +238,7 @@ public class GeometryEditUtil {
       return polygon;
     } else {
       rings.set(ringIndex, newPoints);
-      return geometryFactory.createPolygon(rings);
+      return geometryFactory.polygon(rings);
     }
   }
 
@@ -709,7 +709,7 @@ public class GeometryEditUtil {
 
     rings.set(ringIndex, points);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
-    return geometryFactory.createPolygon(rings);
+    return geometryFactory.polygon(rings);
   }
 
   public static boolean isFromPoint(final Geometry geometry,
@@ -812,7 +812,7 @@ public class GeometryEditUtil {
       rings.set(i, newRing);
     }
 
-    final Polygon newPolygon = geometryFactory.createPolygon(rings);
+    final Polygon newPolygon = geometryFactory.polygon(rings);
     return newPolygon;
   }
 
@@ -900,7 +900,7 @@ public class GeometryEditUtil {
     }
     rings.set(ringIndex, points);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(polygon);
-    return geometryFactory.createPolygon(rings);
+    return geometryFactory.polygon(rings);
   }
 
   @SuppressWarnings("unchecked")
@@ -967,7 +967,7 @@ public class GeometryEditUtil {
       }
       if (changed) {
         return (G)GeometryFactory.getFactory(geometry)
-          .createPolygon(pointsList);
+          .polygon(pointsList);
       } else {
         return geometry;
       }

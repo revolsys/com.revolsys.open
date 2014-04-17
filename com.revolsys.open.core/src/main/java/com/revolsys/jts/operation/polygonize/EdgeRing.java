@@ -174,7 +174,7 @@ class EdgeRing {
 
   private Coordinates[] ringPts = null;
 
-  private List holes;
+  private List<LinearRing> holes;
 
   public EdgeRing(final GeometryFactory factory) {
     this.factory = factory;
@@ -237,14 +237,12 @@ class EdgeRing {
    * @return the {@link Polygon} formed by this ring and its holes.
    */
   public Polygon getPolygon() {
-    LinearRing[] holeLR = null;
+    final List<LinearRing> rings = new ArrayList<>();
+    rings.add(ring);
     if (holes != null) {
-      holeLR = new LinearRing[holes.size()];
-      for (int i = 0; i < holes.size(); i++) {
-        holeLR[i] = (LinearRing)holes.get(i);
-      }
+      rings.addAll(holes);
     }
-    final Polygon poly = factory.createPolygon(ring, holeLR);
+    final Polygon poly = factory.polygon(rings);
     return poly;
   }
 

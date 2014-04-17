@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom;
 
+import java.util.List;
+
 /**
  * Represents a polygon with linear edges, which may include holes.
  * The outer boundary (shell) 
@@ -67,19 +69,27 @@ public interface Polygon extends Geometry, Polygonal {
    * @return a clone of this instance
    */
   @Override
-  public Polygon clone();
+  Polygon clone();
 
-  public LinearRing getExteriorRing();
+  LinearRing getExteriorRing();
 
-  public LinearRing getInteriorRingN(final int n);
+  LinearRing getInteriorRing(int ringIndex);
 
-  public int getNumInteriorRing();
+  int getNumInteriorRing();
+
+  LinearRing getRing(int ringIndex);
+
+  int getRingCount();
+
+  List<LinearRing> getRings();
+
+  Iterable<LinearRing> holes();
 
   @Override
   Polygon normalize();
 
   @Override
-  public Polygon reverse();
+  Polygon reverse();
 
-  public Iterable<LinearRing> rings();
+  Iterable<LinearRing> rings();
 }

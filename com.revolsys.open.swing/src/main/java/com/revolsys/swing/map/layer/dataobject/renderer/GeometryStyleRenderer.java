@@ -127,7 +127,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
           final Polygon polygon = (Polygon)part;
           renderLineString(viewport, graphics, polygon.getExteriorRing(), style);
           for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
-            final LineString ring = polygon.getInteriorRingN(j);
+            final LineString ring = polygon.getInteriorRing(j);
             renderLineString(viewport, graphics, ring, style);
           }
         }

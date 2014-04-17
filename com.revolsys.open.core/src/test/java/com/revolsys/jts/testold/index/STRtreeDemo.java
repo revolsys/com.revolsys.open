@@ -155,14 +155,13 @@ public class STRtreeDemo {
     boolean first = true;
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
       final BoundingBox e = (BoundingBox)i.next();
-      final Geometry g = factory.createPolygon(
-        factory.linearRing(new Coordinates[] {
-          new Coordinate((double)e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE),
-          new Coordinate((double)e.getMinX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
-          new Coordinate((double)e.getMaxX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
-          new Coordinate((double)e.getMaxX(), e.getMinY(), Coordinates.NULL_ORDINATE),
-          new Coordinate((double)e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE)
-        }), null);
+      final Geometry g = factory.polygon(factory.linearRing(new Coordinates[] {
+        new Coordinate(e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE),
+        new Coordinate(e.getMinX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
+        new Coordinate(e.getMaxX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
+        new Coordinate(e.getMaxX(), e.getMinY(), Coordinates.NULL_ORDINATE),
+        new Coordinate(e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE)
+      }));
       if (first) {
         first = false;
       } else {
@@ -182,12 +181,13 @@ public class STRtreeDemo {
     final double left = EXTENT * Math.random();
     final double top = bottom + height;
     final double right = left + width;
-    return factory.createPolygon(
-      factory.linearRing(new Coordinates[] {
-        new Coordinate((double)left, bottom, Coordinates.NULL_ORDINATE), new Coordinate((double)right, bottom, Coordinates.NULL_ORDINATE),
-        new Coordinate((double)right, top, Coordinates.NULL_ORDINATE), new Coordinate((double)left, top, Coordinates.NULL_ORDINATE),
-        new Coordinate((double)left, bottom, Coordinates.NULL_ORDINATE)
-      }), null);
+    return factory.polygon(factory.linearRing(new Coordinates[] {
+      new Coordinate(left, bottom, Coordinates.NULL_ORDINATE),
+      new Coordinate(right, bottom, Coordinates.NULL_ORDINATE),
+      new Coordinate(right, top, Coordinates.NULL_ORDINATE),
+      new Coordinate(left, top, Coordinates.NULL_ORDINATE),
+      new Coordinate(left, bottom, Coordinates.NULL_ORDINATE)
+    }));
   }
 
   private static List sourceData() {

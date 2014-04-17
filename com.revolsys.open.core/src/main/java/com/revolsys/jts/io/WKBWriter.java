@@ -465,7 +465,7 @@ public class WKBWriter {
     writeCoordinateSequence(poly.getExteriorRing().getCoordinatesList(), true,
       os);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      writeCoordinateSequence(poly.getInteriorRingN(i).getCoordinatesList(),
+      writeCoordinateSequence(poly.getInteriorRing(i).getCoordinatesList(),
         true, os);
     }
   }

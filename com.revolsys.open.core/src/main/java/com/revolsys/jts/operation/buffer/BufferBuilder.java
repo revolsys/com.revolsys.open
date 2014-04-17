@@ -1,5 +1,4 @@
 
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -44,7 +43,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
@@ -67,7 +65,6 @@ import com.revolsys.jts.noding.SegmentString;
 import com.revolsys.jts.operation.overlay.OverlayNodeFactory;
 import com.revolsys.jts.operation.overlay.PolygonBuilder;
 
-
 /**
  * Builds the buffer geometry for a given input geometry and precision model.
  * Allows setting the level of approximation for circular arcs,
@@ -81,198 +78,182 @@ import com.revolsys.jts.operation.overlay.PolygonBuilder;
  *
  * @version 1.7
  */
-class BufferBuilder
-{
+class BufferBuilder {
+  private static Geometry convertSegStrings(final Iterator it) {
+    final GeometryFactory fact = GeometryFactory.getFactory();
+    final List lines = new ArrayList();
+    while (it.hasNext()) {
+      final SegmentString ss = (SegmentString)it.next();
+      final LineString line = fact.lineString(ss.getCoordinates());
+      lines.add(line);
+    }
+    return fact.buildGeometry(lines);
+  }
+
   /**
    * Compute the change in depth as an edge is crossed from R to L
    */
-  private static int depthDelta(Label label)
-  {
-    int lLoc = label.getLocation(0, Position.LEFT);
-    int rLoc = label.getLocation(0, Position.RIGHT);
-    if (lLoc == Location.INTERIOR && rLoc == Location.EXTERIOR)
+  private static int depthDelta(final Label label) {
+    final int lLoc = label.getLocation(0, Position.LEFT);
+    final int rLoc = label.getLocation(0, Position.RIGHT);
+    if (lLoc == Location.INTERIOR && rLoc == Location.EXTERIOR) {
       return 1;
-    else if (lLoc == Location.EXTERIOR && rLoc == Location.INTERIOR)
+    } else if (lLoc == Location.EXTERIOR && rLoc == Location.INTERIOR) {
       return -1;
+    }
     return 0;
   }
 
-  private BufferParameters bufParams;
+  private final BufferParameters bufParams;
 
   private PrecisionModel workingPrecisionModel;
+
   private Noder workingNoder;
+
   private GeometryFactory geomFact;
+
   private PlanarGraph graph;
-  private EdgeList edgeList     = new EdgeList();
+
+  private final EdgeList edgeList = new EdgeList();
 
   /**
    * Creates a new BufferBuilder
    */
-  public BufferBuilder(BufferParameters bufParams)
-  {
+  public BufferBuilder(final BufferParameters bufParams) {
     this.bufParams = bufParams;
   }
 
-  /**
-   * Sets the precision model to use during the curve computation and noding,
-   * if it is different to the precision model of the Geometry.
-   * If the precision model is less than the precision of the Geometry precision model,
-   * the Geometry must have previously been rounded to that precision.
-   *
-   * @param pm the precision model to use
-   */
-  public void setWorkingPrecisionModel(PrecisionModel pm)
-  {
-    workingPrecisionModel = pm;
-  }
-
-  /**
-   * Sets the {@link Noder} to use during noding.
-   * This allows choosing fast but non-robust noding, or slower
-   * but robust noding.
-   *
-   * @param noder the noder to use
-   */
-  public void setNoder(Noder noder) { workingNoder = noder; }
-
-
-  public Geometry buffer(Geometry g, double distance)
-  {
+  public Geometry buffer(final Geometry g, final double distance) {
     PrecisionModel precisionModel = workingPrecisionModel;
-    if (precisionModel == null)
+    if (precisionModel == null) {
       precisionModel = g.getPrecisionModel();
+    }
 
     // factory must be the same as the one used by the input
     geomFact = g.getGeometryFactory();
 
-    OffsetCurveBuilder curveBuilder = new OffsetCurveBuilder(precisionModel, bufParams);
-    
-    OffsetCurveSetBuilder curveSetBuilder = new OffsetCurveSetBuilder(g, distance, curveBuilder);
+    final OffsetCurveBuilder curveBuilder = new OffsetCurveBuilder(
+      precisionModel, bufParams);
 
-    List bufferSegStrList = curveSetBuilder.getCurves();
+    final OffsetCurveSetBuilder curveSetBuilder = new OffsetCurveSetBuilder(g,
+      distance, curveBuilder);
+
+    final List bufferSegStrList = curveSetBuilder.getCurves();
 
     // short-circuit test
     if (bufferSegStrList.size() <= 0) {
       return createEmptyResultGeometry();
     }
 
-//BufferDebug.runCount++;
-//String filename = "run" + BufferDebug.runCount + "_curves";
-//System.out.println("saving " + filename);
-//BufferDebug.saveEdges(bufferEdgeList, filename);
-// DEBUGGING ONLY
-//WKTWriter wktWriter = new WKTWriter();
-//Debug.println("Rings: " + wktWriter.write(convertSegStrings(bufferSegStrList.iterator())));
-//wktWriter.setMaxCoordinatesPerLine(10);
-//System.out.println(wktWriter.writeFormatted(convertSegStrings(bufferSegStrList.iterator())));
+    // BufferDebug.runCount++;
+    // String filename = "run" + BufferDebug.runCount + "_curves";
+    // System.out.println("saving " + filename);
+    // BufferDebug.saveEdges(bufferEdgeList, filename);
+    // DEBUGGING ONLY
+    // WKTWriter wktWriter = new WKTWriter();
+    // Debug.println("Rings: " +
+    // wktWriter.write(convertSegStrings(bufferSegStrList.iterator())));
+    // wktWriter.setMaxCoordinatesPerLine(10);
+    // System.out.println(wktWriter.writeFormatted(convertSegStrings(bufferSegStrList.iterator())));
 
     computeNodedEdges(bufferSegStrList, precisionModel);
     graph = new PlanarGraph(new OverlayNodeFactory());
     graph.addEdges(edgeList.getEdges());
 
-    List subgraphList = createSubgraphs(graph);
-    PolygonBuilder polyBuilder = new PolygonBuilder(geomFact);
+    final List subgraphList = createSubgraphs(graph);
+    final PolygonBuilder polyBuilder = new PolygonBuilder(geomFact);
     buildSubgraphs(subgraphList, polyBuilder);
-    List resultPolyList = polyBuilder.getPolygons();
+    final List resultPolyList = polyBuilder.getPolygons();
 
     // just in case...
     if (resultPolyList.size() <= 0) {
       return createEmptyResultGeometry();
     }
 
-    Geometry resultGeom = geomFact.buildGeometry(resultPolyList);
+    final Geometry resultGeom = geomFact.buildGeometry(resultPolyList);
     return resultGeom;
   }
 
-  private Noder getNoder(PrecisionModel precisionModel)
-  {
-    if (workingNoder != null) return workingNoder;
-
-    // otherwise use a fast (but non-robust) noder
-    MCIndexNoder noder = new MCIndexNoder();
-    LineIntersector li = new RobustLineIntersector();
-    li.setPrecisionModel(precisionModel);
-    noder.setSegmentIntersector(new IntersectionAdder(li));
-//    Noder noder = new IteratedNoder(precisionModel);
-    return noder;
-//    Noder noder = new SimpleSnapRounder(precisionModel);
-//    Noder noder = new MCIndexSnapRounder(precisionModel);
-//    Noder noder = new ScaledNoder(new MCIndexSnapRounder(new PrecisionModel(1.0)),
-//                                  precisionModel.getScale());
+  /**
+   * Completes the building of the input subgraphs by depth-labelling them,
+   * and adds them to the PolygonBuilder.
+   * The subgraph list must be sorted in rightmost-coordinate order.
+   *
+   * @param subgraphList the subgraphs to build
+   * @param polyBuilder the PolygonBuilder which will build the final polygons
+   */
+  private void buildSubgraphs(final List subgraphList,
+    final PolygonBuilder polyBuilder) {
+    final List processedGraphs = new ArrayList();
+    for (final Iterator i = subgraphList.iterator(); i.hasNext();) {
+      final BufferSubgraph subgraph = (BufferSubgraph)i.next();
+      final Coordinates p = subgraph.getRightmostCoordinate();
+      // int outsideDepth = 0;
+      // if (polyBuilder.containsPoint(p))
+      // outsideDepth = 1;
+      final SubgraphDepthLocater locater = new SubgraphDepthLocater(
+        processedGraphs);
+      final int outsideDepth = locater.getDepth(p);
+      // try {
+      subgraph.computeDepth(outsideDepth);
+      // }
+      // catch (RuntimeException ex) {
+      // // debugging only
+      // //subgraph.saveDirEdges();
+      // throw ex;
+      // }
+      subgraph.findResultEdges();
+      processedGraphs.add(subgraph);
+      polyBuilder.add(subgraph.getDirectedEdges(), subgraph.getNodes());
+    }
   }
 
-  private void computeNodedEdges(List bufferSegStrList, PrecisionModel precisionModel)
-  {
-    Noder noder = getNoder(precisionModel);
+  private void computeNodedEdges(final List bufferSegStrList,
+    final PrecisionModel precisionModel) {
+    final Noder noder = getNoder(precisionModel);
     noder.computeNodes(bufferSegStrList);
-    Collection nodedSegStrings = noder.getNodedSubstrings();
-// DEBUGGING ONLY
-//BufferDebug.saveEdges(nodedEdges, "run" + BufferDebug.runCount + "_nodedEdges");
+    final Collection nodedSegStrings = noder.getNodedSubstrings();
+    // DEBUGGING ONLY
+    // BufferDebug.saveEdges(nodedEdges, "run" + BufferDebug.runCount +
+    // "_nodedEdges");
 
-    for (Iterator i = nodedSegStrings.iterator(); i.hasNext(); ) {
-      SegmentString segStr = (SegmentString) i.next();
-      
+    for (final Iterator i = nodedSegStrings.iterator(); i.hasNext();) {
+      final SegmentString segStr = (SegmentString)i.next();
+
       /**
        * Discard edges which have zero length, 
        * since they carry no information and cause problems with topology building
        */
-      Coordinates[] pts = segStr.getCoordinates();
-      if (pts.length == 2 && pts[0].equals2d(pts[1]))
+      final Coordinates[] pts = segStr.getCoordinates();
+      if (pts.length == 2 && pts[0].equals2d(pts[1])) {
         continue;
+      }
 
-      Label oldLabel = (Label) segStr.getData();
-      Edge edge = new Edge(segStr.getCoordinates(), new Label(oldLabel));
+      final Label oldLabel = (Label)segStr.getData();
+      final Edge edge = new Edge(segStr.getCoordinates(), new Label(oldLabel));
       insertUniqueEdge(edge);
     }
-    //saveEdges(edgeList.getEdges(), "run" + runCount + "_collapsedEdges");
+    // saveEdges(edgeList.getEdges(), "run" + runCount + "_collapsedEdges");
   }
-
 
   /**
-   * Inserted edges are checked to see if an identical edge already exists.
-   * If so, the edge is not inserted, but its label is merged
-   * with the existing edge.
+   * Gets the standard result for an empty buffer.
+   * Since buffer always returns a polygonal result,
+   * this is chosen to be an empty polygon.
+   * 
+   * @return the empty result geometry
    */
-  protected void insertUniqueEdge(Edge e)
-  {
-//<FIX> MD 8 Oct 03  speed up identical edge lookup
-    // fast lookup
-    Edge existingEdge = edgeList.findEqualEdge(e);
-
-    // If an identical edge already exists, simply update its label
-    if (existingEdge != null) {
-      Label existingLabel = existingEdge.getLabel();
-
-      Label labelToMerge = e.getLabel();
-      // check if new edge is in reverse direction to existing edge
-      // if so, must flip the label before merging it
-      if (! existingEdge.isPointwiseEqual(e)) {
-        labelToMerge = new Label(e.getLabel());
-        labelToMerge.flip();
-      }
-      existingLabel.merge(labelToMerge);
-
-      // compute new depth delta of sum of edges
-      int mergeDelta = depthDelta(labelToMerge);
-      int existingDelta = existingEdge.getDepthDelta();
-      int newDelta = existingDelta + mergeDelta;
-      existingEdge.setDepthDelta(newDelta);
-    }
-    else {   // no matching existing edge was found
-      // add this new edge to the list of edges in this graph
-      //e.setName(name + edges.size());
-      edgeList.add(e);
-      e.setDepthDelta(depthDelta(e.getLabel()));
-    }
+  private Geometry createEmptyResultGeometry() {
+    final Geometry emptyGeom = geomFact.polygon();
+    return emptyGeom;
   }
 
-  private List createSubgraphs(PlanarGraph graph)
-  {
-    List subgraphList = new ArrayList();
-    for (Iterator i = graph.getNodes().iterator(); i.hasNext(); ) {
-      Node node = (Node) i.next();
-      if (! node.isVisited()) {
-        BufferSubgraph subgraph = new BufferSubgraph();
+  private List createSubgraphs(final PlanarGraph graph) {
+    final List subgraphList = new ArrayList();
+    for (final Iterator i = graph.getNodes().iterator(); i.hasNext();) {
+      final Node node = (Node)i.next();
+      if (!node.isVisited()) {
+        final BufferSubgraph subgraph = new BufferSubgraph();
         subgraph.create(node);
         subgraphList.add(subgraph);
       }
@@ -287,61 +268,81 @@ class BufferBuilder
     return subgraphList;
   }
 
+  private Noder getNoder(final PrecisionModel precisionModel) {
+    if (workingNoder != null) {
+      return workingNoder;
+    }
+
+    // otherwise use a fast (but non-robust) noder
+    final MCIndexNoder noder = new MCIndexNoder();
+    final LineIntersector li = new RobustLineIntersector();
+    li.setPrecisionModel(precisionModel);
+    noder.setSegmentIntersector(new IntersectionAdder(li));
+    // Noder noder = new IteratedNoder(precisionModel);
+    return noder;
+    // Noder noder = new SimpleSnapRounder(precisionModel);
+    // Noder noder = new MCIndexSnapRounder(precisionModel);
+    // Noder noder = new ScaledNoder(new MCIndexSnapRounder(new
+    // PrecisionModel(1.0)),
+    // precisionModel.getScale());
+  }
+
   /**
-   * Completes the building of the input subgraphs by depth-labelling them,
-   * and adds them to the PolygonBuilder.
-   * The subgraph list must be sorted in rightmost-coordinate order.
-   *
-   * @param subgraphList the subgraphs to build
-   * @param polyBuilder the PolygonBuilder which will build the final polygons
+   * Inserted edges are checked to see if an identical edge already exists.
+   * If so, the edge is not inserted, but its label is merged
+   * with the existing edge.
    */
-  private void buildSubgraphs(List subgraphList, PolygonBuilder polyBuilder)
-  {
-    List processedGraphs = new ArrayList();
-    for (Iterator i = subgraphList.iterator(); i.hasNext(); ) {
-      BufferSubgraph subgraph = (BufferSubgraph) i.next();
-      Coordinates p = subgraph.getRightmostCoordinate();
-//      int outsideDepth = 0;
-//      if (polyBuilder.containsPoint(p))
-//        outsideDepth = 1;
-      SubgraphDepthLocater locater = new SubgraphDepthLocater(processedGraphs);
-      int outsideDepth = locater.getDepth(p);
-//      try {
-      subgraph.computeDepth(outsideDepth);
-//      }
-//      catch (RuntimeException ex) {
-//        // debugging only
-//        //subgraph.saveDirEdges();
-//        throw ex;
-//      }
-      subgraph.findResultEdges();
-      processedGraphs.add(subgraph);
-      polyBuilder.add(subgraph.getDirectedEdges(), subgraph.getNodes());
+  protected void insertUniqueEdge(final Edge e) {
+    // <FIX> MD 8 Oct 03 speed up identical edge lookup
+    // fast lookup
+    final Edge existingEdge = edgeList.findEqualEdge(e);
+
+    // If an identical edge already exists, simply update its label
+    if (existingEdge != null) {
+      final Label existingLabel = existingEdge.getLabel();
+
+      Label labelToMerge = e.getLabel();
+      // check if new edge is in reverse direction to existing edge
+      // if so, must flip the label before merging it
+      if (!existingEdge.isPointwiseEqual(e)) {
+        labelToMerge = new Label(e.getLabel());
+        labelToMerge.flip();
+      }
+      existingLabel.merge(labelToMerge);
+
+      // compute new depth delta of sum of edges
+      final int mergeDelta = depthDelta(labelToMerge);
+      final int existingDelta = existingEdge.getDepthDelta();
+      final int newDelta = existingDelta + mergeDelta;
+      existingEdge.setDepthDelta(newDelta);
+    } else { // no matching existing edge was found
+      // add this new edge to the list of edges in this graph
+      // e.setName(name + edges.size());
+      edgeList.add(e);
+      e.setDepthDelta(depthDelta(e.getLabel()));
     }
   }
-  
-  private static Geometry convertSegStrings(Iterator it)
-  {
-  	GeometryFactory fact = GeometryFactory.getFactory();
-  	List lines = new ArrayList();
-  	while (it.hasNext()) {
-  		SegmentString ss = (SegmentString) it.next();
-  		LineString line = fact.lineString(ss.getCoordinates());
-  		lines.add(line);
-  	}
-  	return fact.buildGeometry(lines);
-  }
-  
+
   /**
-   * Gets the standard result for an empty buffer.
-   * Since buffer always returns a polygonal result,
-   * this is chosen to be an empty polygon.
-   * 
-   * @return the empty result geometry
+   * Sets the {@link Noder} to use during noding.
+   * This allows choosing fast but non-robust noding, or slower
+   * but robust noding.
+   *
+   * @param noder the noder to use
    */
-  private Geometry createEmptyResultGeometry()
-  {
-    Geometry emptyGeom = geomFact.createPolygon(null, null);
-    return emptyGeom;
+  public void setNoder(final Noder noder) {
+    workingNoder = noder;
+  }
+
+  /**
+   * Sets the precision model to use during the curve computation and noding,
+   * if it is different to the precision model of the Geometry.
+   * If the precision model is less than the precision of the Geometry precision model,
+   * the Geometry must have previously been rounded to that precision.
+   *
+   * @param pm the precision model to use
+   */
+  public void setWorkingPrecisionModel(final PrecisionModel pm) {
+    workingPrecisionModel = pm;
   }
 }

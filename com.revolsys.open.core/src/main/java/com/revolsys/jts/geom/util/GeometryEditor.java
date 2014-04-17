@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -34,8 +33,8 @@
 package com.revolsys.jts.geom.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -49,7 +48,6 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.util.Assert;
-
 
 /**
  * A class which supports creating new {@link Geometry}s 
@@ -93,133 +91,87 @@ import com.revolsys.jts.util.Assert;
  *
  * @version 1.7
  */
-public class GeometryEditor
-{
+public class GeometryEditor {
   /**
-   * The factory used to create the modified Geometry.
-   * If <tt>null</tt> the GeometryFactory of the input is used.
+   * A {@link GeometryEditorOperation} which edits the coordinate list of a {@link Geometry}.
+   * Operates on Geometry subclasses which contains a single coordinate list.
    */
-  private GeometryFactory factory = null;
+  public abstract static class CoordinateOperation implements
+    GeometryEditorOperation {
+    /**
+     * Edits the array of {@link Coordinates}s from a {@link Geometry}.
+     * <p>
+     * If it is desired to preserve the immutability of Geometrys,
+     * if the coordinates are changed a new array should be created
+     * and returned.
+     *
+     * @param coordinates the coordinate array to operate on
+     * @param geometry the geometry containing the coordinate list
+     * @return an edited coordinate array (which may be the same as the input)
+     */
+    public abstract Coordinates[] edit(Coordinates[] coordinates,
+      Geometry geometry);
 
-  /**
-   * Creates a new GeometryEditor object which will create
-   * edited {@link Geometry}s with the same {@link GeometryFactory} as the input Geometry.
-   */
-  public GeometryEditor()
-  {
-  }
-
-  /**
-   * Creates a new GeometryEditor object which will create
-   * edited {@link Geometry}s with the given {@link GeometryFactory}.
-   *
-   * @param factory the GeometryFactory to create  edited Geometrys with
-   */
-  public GeometryEditor(GeometryFactory factory)
-  {
-    this.factory = factory;
-  }
-
-  /**
-   * Edit the input {@link Geometry} with the given edit operation.
-   * Clients can create subclasses of {@link GeometryEditorOperation} or
-   * {@link CoordinateOperation} to perform required modifications.
-   *
-   * @param geometry the Geometry to edit
-   * @param operation the edit operation to carry out
-   * @return a new {@link Geometry} which is the result of the editing (which may be empty)
-   */
-  public Geometry edit(Geometry geometry, GeometryEditorOperation operation)
-  {
-    // nothing to do
-    if (geometry == null) return null;
-
-    // if client did not supply a GeometryFactory, use the one from the input Geometry
-    if (factory == null)
-      factory = geometry.getGeometryFactory();
-
-    if (geometry instanceof GeometryCollection) {
-      return editGeometryCollection((GeometryCollection) geometry,
-                                    operation);
-    }
-
-    if (geometry instanceof Polygon) {
-      return editPolygon((Polygon) geometry, operation);
-    }
-
-    if (geometry instanceof Point) {
-      return operation.edit(geometry, factory);
-    }
-
-    if (geometry instanceof LineString) {
-      return operation.edit(geometry, factory);
-    }
-
-    Assert.shouldNeverReachHere("Unsupported Geometry class: " + geometry.getClass().getName());
-    return null;
-  }
-
-  private Polygon editPolygon(Polygon polygon,
-                              GeometryEditorOperation operation) {
-    Polygon newPolygon = (Polygon) operation.edit(polygon, factory);
-    // create one if needed
-    if (newPolygon == null)
-      newPolygon = factory.createPolygon((CoordinatesList) null);
-    if (newPolygon.isEmpty()) {
-      //RemoveSelectedPlugIn relies on this behaviour. [Jon Aquino]
-      return newPolygon;
-    }
-
-    LinearRing shell = (LinearRing) edit(newPolygon.getExteriorRing(), operation);
-    if (shell == null || shell.isEmpty()) {
-      //RemoveSelectedPlugIn relies on this behaviour. [Jon Aquino]
-      return factory.createPolygon(null, null);
-    }
-
-    ArrayList holes = new ArrayList();
-    for (int i = 0; i < newPolygon.getNumInteriorRing(); i++) {
-      LinearRing hole = (LinearRing) edit(newPolygon.getInteriorRingN(i), operation);
-      if (hole == null || hole.isEmpty()) {
-        continue;
+    @Override
+    public final Geometry edit(final Geometry geometry,
+      final GeometryFactory factory) {
+      if (geometry instanceof LinearRing) {
+        return factory.linearRing(edit(geometry.getCoordinateArray(), geometry));
       }
-      holes.add(hole);
-    }
 
-    return factory.createPolygon(shell,
-                                 (LinearRing[]) holes.toArray(new LinearRing[] {  }));
+      if (geometry instanceof LineString) {
+        return factory.lineString(edit(geometry.getCoordinateArray(), geometry));
+      }
+
+      if (geometry instanceof Point) {
+        final Coordinates[] newCoordinates = edit(
+          geometry.getCoordinateArray(), geometry);
+
+        return factory.point((newCoordinates.length > 0) ? newCoordinates[0]
+          : null);
+      }
+
+      return geometry;
+    }
   }
 
-  private GeometryCollection editGeometryCollection(
-      GeometryCollection collection, GeometryEditorOperation operation) {
-    // first edit the entire collection
-    // MD - not sure why this is done - could just check original collection?
-    GeometryCollection collectionForType = (GeometryCollection) operation.edit(collection,
-        factory);
-    
-    // edit the component geometries
-    ArrayList geometries = new ArrayList();
-    for (int i = 0; i < collectionForType.getNumGeometries(); i++) {
-      Geometry geometry = edit(collectionForType.getGeometry(i), operation);
-      if (geometry == null || geometry.isEmpty()) {
-        continue;
-      }
-      geometries.add(geometry);
-    }
+  /**
+   * A {@link GeometryEditorOperation} which edits the {@link CoordinatesList}
+   * of a {@link Geometry}.
+   * Operates on Geometry subclasses which contains a single coordinate list.
+   */
+  public abstract static class CoordinateSequenceOperation implements
+    GeometryEditorOperation {
+    /**
+     * Edits a {@link CoordinatesList} from a {@link Geometry}.
+     *
+     * @param coordseq the coordinate array to operate on
+     * @param geometry the geometry containing the coordinate list
+     * @return an edited coordinate sequence (which may be the same as the input)
+     */
+    public abstract CoordinatesList edit(CoordinatesList coordSeq,
+      Geometry geometry);
 
-    if (collectionForType.getClass() == MultiPoint.class) {
-      return factory.createMultiPoint((Point[]) geometries.toArray(
-            new Point[] {  }));
+    @Override
+    public final Geometry edit(final Geometry geometry,
+      final GeometryFactory factory) {
+      if (geometry instanceof LinearRing) {
+        return factory.linearRing(edit(
+          ((LinearRing)geometry).getCoordinatesList(), geometry));
+      }
+
+      if (geometry instanceof LineString) {
+        return factory.lineString(edit(
+          ((LineString)geometry).getCoordinatesList(), geometry));
+      }
+
+      if (geometry instanceof Point) {
+        return factory.point(edit(((Point)geometry).getCoordinatesList(),
+          geometry));
+      }
+
+      return geometry;
     }
-    if (collectionForType.getClass() == MultiLineString.class) {
-      return factory.createMultiLineString((LineString[]) geometries.toArray(
-            new LineString[] {  }));
-    }
-    if (collectionForType.getClass() == MultiPolygon.class) {
-      return factory.createMultiPolygon((Polygon[]) geometries.toArray(
-            new Polygon[] {  }));
-    }
-    return factory.createGeometryCollection((Geometry[]) geometries.toArray(
-          new Geometry[] {  }));
   }
 
   /**
@@ -227,8 +179,7 @@ public class GeometryEditor
    *
    * @version 1.7
    */
-  public interface GeometryEditorOperation
-  {
+  public interface GeometryEditorOperation {
     /**
      * Edits a Geometry by returning a new Geometry with a modification.
      * The returned Geometry might be the same as the Geometry passed in.
@@ -251,97 +202,139 @@ public class GeometryEditor
    * @author mbdavis
    *
    */
-  public static class NoOpGeometryOperation
-  implements GeometryEditorOperation
-  {
-  	public Geometry edit(Geometry geometry, GeometryFactory factory)
-  	{
-  		return geometry;
-  	}
-  }
-  
-  /**
-   * A {@link GeometryEditorOperation} which edits the coordinate list of a {@link Geometry}.
-   * Operates on Geometry subclasses which contains a single coordinate list.
-   */
-  public abstract static class CoordinateOperation
-      implements GeometryEditorOperation
-  {
-    public final Geometry edit(Geometry geometry, GeometryFactory factory) {
-      if (geometry instanceof LinearRing) {
-        return factory.linearRing(edit(geometry.getCoordinateArray(),
-            geometry));
-      }
-
-      if (geometry instanceof LineString) {
-        return factory.lineString(edit(geometry.getCoordinateArray(),
-            geometry));
-      }
-
-      if (geometry instanceof Point) {
-        Coordinates[] newCoordinates = edit(geometry.getCoordinateArray(),
-            geometry);
-
-        return factory.point((newCoordinates.length > 0)
-                                   ? newCoordinates[0] : null);
-      }
-
+  public static class NoOpGeometryOperation implements GeometryEditorOperation {
+    @Override
+    public Geometry edit(final Geometry geometry, final GeometryFactory factory) {
       return geometry;
     }
-
-    /**
-     * Edits the array of {@link Coordinates}s from a {@link Geometry}.
-     * <p>
-     * If it is desired to preserve the immutability of Geometrys,
-     * if the coordinates are changed a new array should be created
-     * and returned.
-     *
-     * @param coordinates the coordinate array to operate on
-     * @param geometry the geometry containing the coordinate list
-     * @return an edited coordinate array (which may be the same as the input)
-     */
-    public abstract Coordinates[] edit(Coordinates[] coordinates,
-                                      Geometry geometry);
   }
-  
+
   /**
-   * A {@link GeometryEditorOperation} which edits the {@link CoordinatesList}
-   * of a {@link Geometry}.
-   * Operates on Geometry subclasses which contains a single coordinate list.
+   * The factory used to create the modified Geometry.
+   * If <tt>null</tt> the GeometryFactory of the input is used.
    */
-  public abstract static class CoordinateSequenceOperation
-      implements GeometryEditorOperation
-  {
-    public final Geometry edit(Geometry geometry, GeometryFactory factory) {
-      if (geometry instanceof LinearRing) {
-        return factory.linearRing(edit(
-            ((LinearRing)geometry).getCoordinatesList(),
-            geometry));
-      }
+  private GeometryFactory factory = null;
 
-      if (geometry instanceof LineString) {
-        return factory.lineString(edit(
-            ((LineString)geometry).getCoordinatesList(),
-            geometry));
-      }
+  /**
+   * Creates a new GeometryEditor object which will create
+   * edited {@link Geometry}s with the same {@link GeometryFactory} as the input Geometry.
+   */
+  public GeometryEditor() {
+  }
 
-      if (geometry instanceof Point) {
-        return factory.point(edit(
-            ((Point)geometry).getCoordinatesList(),
-            geometry));
-      }
+  /**
+   * Creates a new GeometryEditor object which will create
+   * edited {@link Geometry}s with the given {@link GeometryFactory}.
+   *
+   * @param factory the GeometryFactory to create  edited Geometrys with
+   */
+  public GeometryEditor(final GeometryFactory factory) {
+    this.factory = factory;
+  }
 
-      return geometry;
+  /**
+   * Edit the input {@link Geometry} with the given edit operation.
+   * Clients can create subclasses of {@link GeometryEditorOperation} or
+   * {@link CoordinateOperation} to perform required modifications.
+   *
+   * @param geometry the Geometry to edit
+   * @param operation the edit operation to carry out
+   * @return a new {@link Geometry} which is the result of the editing (which may be empty)
+   */
+  public Geometry edit(final Geometry geometry,
+    final GeometryEditorOperation operation) {
+    // nothing to do
+    if (geometry == null) {
+      return null;
     }
 
-    /**
-     * Edits a {@link CoordinatesList} from a {@link Geometry}.
-     *
-     * @param coordseq the coordinate array to operate on
-     * @param geometry the geometry containing the coordinate list
-     * @return an edited coordinate sequence (which may be the same as the input)
-     */
-    public abstract CoordinatesList edit(CoordinatesList coordSeq,
-                                      Geometry geometry);
+    // if client did not supply a GeometryFactory, use the one from the input
+    // Geometry
+    if (factory == null) {
+      factory = geometry.getGeometryFactory();
+    }
+
+    if (geometry instanceof GeometryCollection) {
+      return editGeometryCollection((GeometryCollection)geometry, operation);
+    }
+
+    if (geometry instanceof Polygon) {
+      return editPolygon((Polygon)geometry, operation);
+    }
+
+    if (geometry instanceof Point) {
+      return operation.edit(geometry, factory);
+    }
+
+    if (geometry instanceof LineString) {
+      return operation.edit(geometry, factory);
+    }
+
+    Assert.shouldNeverReachHere("Unsupported Geometry class: "
+      + geometry.getClass().getName());
+    return null;
+  }
+
+  private GeometryCollection editGeometryCollection(
+    final GeometryCollection collection, final GeometryEditorOperation operation) {
+    // first edit the entire collection
+    // MD - not sure why this is done - could just check original collection?
+    final GeometryCollection collectionForType = (GeometryCollection)operation.edit(
+      collection, factory);
+
+    // edit the component geometries
+    final ArrayList geometries = new ArrayList();
+    for (int i = 0; i < collectionForType.getNumGeometries(); i++) {
+      final Geometry geometry = edit(collectionForType.getGeometry(i),
+        operation);
+      if (geometry == null || geometry.isEmpty()) {
+        continue;
+      }
+      geometries.add(geometry);
+    }
+
+    if (collectionForType.getClass() == MultiPoint.class) {
+      return factory.createMultiPoint((Point[])geometries.toArray(new Point[] {}));
+    }
+    if (collectionForType.getClass() == MultiLineString.class) {
+      return factory.createMultiLineString((LineString[])geometries.toArray(new LineString[] {}));
+    }
+    if (collectionForType.getClass() == MultiPolygon.class) {
+      return factory.createMultiPolygon((Polygon[])geometries.toArray(new Polygon[] {}));
+    }
+    return factory.createGeometryCollection((Geometry[])geometries.toArray(new Geometry[] {}));
+  }
+
+  private Polygon editPolygon(final Polygon polygon,
+    final GeometryEditorOperation operation) {
+    Polygon newPolygon = (Polygon)operation.edit(polygon, factory);
+    // create one if needed
+    if (newPolygon == null) {
+      newPolygon = factory.polygon();
+    }
+    if (newPolygon.isEmpty()) {
+      // RemoveSelectedPlugIn relies on this behaviour. [Jon Aquino]
+      return newPolygon;
+    }
+
+    final LinearRing shell = (LinearRing)edit(newPolygon.getExteriorRing(),
+      operation);
+    if (shell == null || shell.isEmpty()) {
+      // RemoveSelectedPlugIn relies on this behaviour. [Jon Aquino]
+      return factory.polygon();
+    }
+
+    final List<LinearRing> rings = new ArrayList<>();
+    rings.add(shell);
+    for (int i = 0; i < newPolygon.getNumInteriorRing(); i++) {
+      final LinearRing hole = (LinearRing)edit(newPolygon.getInteriorRing(i),
+        operation);
+      if (hole == null || hole.isEmpty()) {
+        continue;
+      }
+      rings.add(hole);
+    }
+
+    return factory.polygon(rings);
   }
 }

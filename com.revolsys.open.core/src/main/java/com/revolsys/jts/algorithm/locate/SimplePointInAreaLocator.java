@@ -101,7 +101,7 @@ public class SimplePointInAreaLocator
     if (! isPointInRing(p, shell)) return false;
     // now test if the point lies in or on the holes
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      LinearRing hole = (LinearRing) poly.getInteriorRingN(i);
+      LinearRing hole = (LinearRing) poly.getInteriorRing(i);
       if (isPointInRing(p, hole)) return false;
     }
     return true;

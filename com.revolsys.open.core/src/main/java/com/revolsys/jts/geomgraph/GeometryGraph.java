@@ -235,7 +235,7 @@ public class GeometryGraph extends PlanarGraph {
       Location.INTERIOR);
 
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      final LinearRing hole = (LinearRing)p.getInteriorRingN(i);
+      final LinearRing hole = (LinearRing)p.getInteriorRing(i);
 
       // Holes are topologically labelled opposite to the shell, since
       // the interior of the polygon lies on their opposite side

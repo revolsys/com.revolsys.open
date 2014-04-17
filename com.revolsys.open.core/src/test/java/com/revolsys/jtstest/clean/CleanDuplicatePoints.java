@@ -137,14 +137,15 @@ public class CleanDuplicatePoints {
     final Coordinates[] shellCoords = removeDuplicatePoints(poly.getExteriorRing()
       .getCoordinateArray());
     final LinearRing shell = fact.linearRing(shellCoords);
-    final List holes = new ArrayList();
+    final List<LinearRing> rings = new ArrayList<>();
+    rings.add(shell);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      final Coordinates[] holeCoords = removeDuplicatePoints(poly.getInteriorRingN(
+      final Coordinates[] holeCoords = removeDuplicatePoints(poly.getInteriorRing(
         i)
         .getCoordinateArray());
-      holes.add(fact.linearRing(holeCoords));
+      rings.add(fact.linearRing(holeCoords));
     }
-    return fact.createPolygon(shell, GeometryFactory.toLinearRingArray(holes));
+    return fact.polygon(rings);
   }
 
 }

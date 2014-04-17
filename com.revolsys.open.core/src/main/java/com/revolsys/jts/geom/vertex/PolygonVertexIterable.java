@@ -29,7 +29,7 @@ public class PolygonVertexIterable extends AbstractIterator<Vertex> {
       vertexIndex = 0;
       ringIndex++;
       if (ringIndex < 1 + polygon.getNumInteriorRing()) {
-        this.ring = polygon.getInteriorRingN(ringIndex - 1);
+        this.ring = polygon.getInteriorRing(ringIndex - 1);
       } else {
         this.polygon = null;
         this.ring = null;

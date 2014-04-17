@@ -489,7 +489,7 @@ public class QuadEdgeSubdivision {
     int i = 0;
     for (final Iterator it = triPtsList.iterator(); it.hasNext();) {
       final Coordinates[] triPt = (Coordinates[])it.next();
-      tris[i++] = geomFact.createPolygon(geomFact.linearRing(triPt), null);
+      tris[i++] = geomFact.polygon(geomFact.linearRing(triPt));
     }
     return geomFact.createGeometryCollection(tris);
   }
@@ -626,7 +626,7 @@ public class QuadEdgeSubdivision {
       coordList.add(coordList.get(coordList.size() - 1), true);
     }
 
-    final Polygon cellPoly = geomFact.createPolygon(coordList);
+    final Polygon cellPoly = geomFact.polygon(coordList);
 
     final Vertex v = startQE.orig();
     cellPoly.setUserData(v.getCoordinate());

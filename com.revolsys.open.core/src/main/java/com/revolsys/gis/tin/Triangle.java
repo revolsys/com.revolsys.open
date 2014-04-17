@@ -198,7 +198,7 @@ public class Triangle extends AbstractCoordinatesList {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final LinearRing shell = geometryFactory.linearRing(new DoubleCoordinatesList(
       getNumAxis(), getP0(), getP1(), getP2(), getP0()));
-    return geometryFactory.createPolygon(shell, null);
+    return geometryFactory.polygon(shell);
   }
 
   @Override

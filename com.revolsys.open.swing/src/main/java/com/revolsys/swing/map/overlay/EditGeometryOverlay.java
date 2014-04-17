@@ -320,7 +320,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           final Point p1 = line.getPoint(1);
           final LinearRing ring = geometryFactory.linearRing(Arrays.asList(
             p0, p1, newPoint, p0));
-          geometry = geometryFactory.createPolygon(ring);
+          geometry = geometryFactory.polygon(ring);
         } else if (geometry instanceof Polygon) {
           final Polygon polygon = (Polygon)geometry;
           geometry = GeometryEditUtil.appendVertex(polygon, newPoint,

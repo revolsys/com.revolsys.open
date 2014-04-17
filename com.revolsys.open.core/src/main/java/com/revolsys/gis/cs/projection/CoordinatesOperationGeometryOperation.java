@@ -1,5 +1,7 @@
 package com.revolsys.gis.cs.projection;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.jts.JtsGeometryUtil;
@@ -180,15 +182,12 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
   }
 
   public Polygon perform(final Polygon polygon) {
-
-    final LinearRing shell = polygon.getExteriorRing();
-    final LinearRing newShell = perform(shell);
-    final LinearRing[] newHoles = new LinearRing[polygon.getNumInteriorRing()];
-    for (int i = 0; i < newHoles.length; i++) {
-      final LinearRing hole = polygon.getInteriorRingN(i);
-      newHoles[i] = perform(hole);
+    final List<LinearRing> rings = new ArrayList<>();
+    for (final LinearRing ring : polygon.rings()) {
+      final LinearRing newRing = perform(ring);
+      rings.add(newRing);
     }
-    final Polygon newPolygon = geometryFactory.createPolygon(newShell, newHoles);
+    final Polygon newPolygon = geometryFactory.polygon(rings);
     addUserData(newPolygon, polygon);
     return newPolygon;
 

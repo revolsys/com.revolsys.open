@@ -397,7 +397,7 @@ public class PackedCoordinateUtil {
       numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale,
       pointsIn);
     try {
-      return geometryFactory.createPolygon(pointsList);
+      return geometryFactory.polygon(pointsList);
     } catch (final IllegalArgumentException e) {
       e.printStackTrace();
       LoggerFactory.getLogger(PackedCoordinateUtil.class).error(

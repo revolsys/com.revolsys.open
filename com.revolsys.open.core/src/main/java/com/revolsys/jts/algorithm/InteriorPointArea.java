@@ -239,7 +239,7 @@ public class InteriorPointArea {
 	  {
 		  process(poly.getExteriorRing());
 		  for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-			  process(poly.getInteriorRingN(i));
+			  process(poly.getInteriorRing(i));
 		  }
 		  double bisectY = avg(hiY, loY);
 		  return bisectY;

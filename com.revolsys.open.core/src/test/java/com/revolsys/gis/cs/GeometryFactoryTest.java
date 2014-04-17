@@ -105,11 +105,10 @@ public class GeometryFactoryTest {
     final LinearRing linearRing = GEOMETRY_FACTORY.linearRing(ringPoints);
     assertCopyGeometry(linearRing, ringPoints);
 
-    final Polygon polygon = GEOMETRY_FACTORY.createPolygon(ringPoints);
+    final Polygon polygon = GEOMETRY_FACTORY.polygon(ringPoints);
     assertCopyGeometry(polygon, ringPoints);
 
-    final Polygon polygon2 = GEOMETRY_FACTORY.createPolygon(ringPoints,
-      ring2Points);
+    final Polygon polygon2 = GEOMETRY_FACTORY.polygon(ringPoints, ring2Points);
     assertCopyGeometry(polygon2, ringPoints, ring2Points);
 
     final MultiPoint multiPoint = GEOMETRY_FACTORY.createMultiPoint(pointPoints);

@@ -169,7 +169,7 @@ public class IsValidOp {
       return false;
     }
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      valid &= checkClosedRing(poly.getInteriorRingN(i));
+      valid &= checkClosedRing(poly.getInteriorRing(i));
       if (isErrorReturn()) {
         return false;
       }
@@ -230,7 +230,7 @@ public class IsValidOp {
 
     final PointInRing pir = new MCPointInRing(shell);
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      final LinearRing hole = p.getInteriorRingN(i);
+      final LinearRing hole = p.getInteriorRing(i);
       final Coordinates holePt = findPtNotNode(hole.getCoordinateArray(),
         shell, graph);
       /**
@@ -273,7 +273,7 @@ public class IsValidOp {
     // SweeplineNestedRingTester(arg[0]);
 
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      final LinearRing innerHole = p.getInteriorRingN(i);
+      final LinearRing innerHole = p.getInteriorRing(i);
       nestedTester.add(innerHole);
     }
     final boolean isNonNested = nestedTester.isNonNested();
@@ -440,7 +440,7 @@ public class IsValidOp {
        */
       Coordinates badNestedPt = null;
       for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-        final LinearRing hole = polygon.getInteriorRingN(i);
+        final LinearRing hole = polygon.getInteriorRing(i);
         badNestedPt = checkShellInsideHole(shell, hole, graph);
         if (badNestedPt == null) {
           return true;
