@@ -6,7 +6,6 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -17,13 +16,6 @@ import com.revolsys.jts.io.WKBReader;
 import com.revolsys.jts.io.WKBWriter;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.GeometricShapeFactory;
-
-class AverageZFilter implements CoordinateFilter {
-  @Override
-  public void filter(final Coordinates coord) {
-    coord.setZ((coord.getX() + coord.getY()) / 2);
-  }
-}
 
 /**
  * Tests the {@link WKBReader} and {@link WKBWriter}.
@@ -85,7 +77,6 @@ public class WKBTest extends TestCase {
 
   private void runWKBTest(final Geometry g, final int dimension,
     final boolean toHex) throws IOException, ParseException {
-    setZ(g);
     runWKBTest(g, dimension, ByteOrderValues.LITTLE_ENDIAN, toHex);
     runWKBTest(g, dimension, ByteOrderValues.BIG_ENDIAN, toHex);
   }
@@ -126,10 +117,6 @@ public class WKBTest extends TestCase {
     // Since we are using a PCS of dim=2, only check 2-dimensional storage
     runWKBTest(g, 2, true);
     runWKBTest(g, 2, false);
-  }
-
-  private void setZ(final Geometry g) {
-    g.apply(new AverageZFilter());
   }
 
   public void testBigPolygon() throws IOException, ParseException {

@@ -36,6 +36,7 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * Removes common most-significant mantissa bits 
@@ -67,23 +68,6 @@ import com.revolsys.jts.geom.Geometry;
  * @version 1.7
  */
 public class CommonBitsRemover {
-  class CommonCoordinateFilter implements CoordinateFilter {
-    private final CommonBits commonBitsX = new CommonBits();
-
-    private final CommonBits commonBitsY = new CommonBits();
-
-    @Override
-    public void filter(final Coordinates coord) {
-      commonBitsX.add(coord.getX());
-      commonBitsY.add(coord.getY());
-    }
-
-    public Coordinates getCommonCoordinate() {
-      return new Coordinate(commonBitsX.getCommon(), commonBitsY.getCommon(),
-        Coordinates.NULL_ORDINATE);
-    }
-  }
-
   class Translater implements CoordinateFilter {
     Coordinates trans = null;
 
@@ -99,9 +83,11 @@ public class CommonBitsRemover {
 
   }
 
-  private Coordinates commonCoord;
+  private final CommonBits commonBitsX = new CommonBits();
 
-  private final CommonCoordinateFilter ccFilter = new CommonCoordinateFilter();
+  private final CommonBits commonBitsY = new CommonBits();
+
+  private Coordinates commonCoord;
 
   public CommonBitsRemover() {
   }
@@ -112,11 +98,16 @@ public class CommonBitsRemover {
    * common coordinate reflects the common bits of all added
    * geometries.
    *
-   * @param geom a Geometry to test for common bits
+   * @param geometry a Geometry to test for common bits
    */
-  public void add(final Geometry geom) {
-    geom.apply(ccFilter);
-    commonCoord = ccFilter.getCommonCoordinate();
+  public void add(final Geometry geometry) {
+    for (final Vertex vertex : geometry.vertices()) {
+      commonBitsX.add(vertex.getX());
+      commonBitsY.add(vertex.getY());
+
+    }
+    commonCoord = new Coordinate(commonBitsX.getCommon(),
+      commonBitsY.getCommon(), Coordinates.NULL_ORDINATE);
   }
 
   /**

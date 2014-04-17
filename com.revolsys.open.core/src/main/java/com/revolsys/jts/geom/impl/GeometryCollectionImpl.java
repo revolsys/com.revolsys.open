@@ -137,7 +137,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
     for (int i = 0; i < geometries.length; i++) {
       gc.geometries[i] = geometries[i].clone();
     }
-    return gc;// return the clone
+    return gc;
   }
 
   @Override
