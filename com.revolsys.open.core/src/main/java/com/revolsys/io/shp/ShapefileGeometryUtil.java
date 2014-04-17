@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.io.EndianOutput;
-import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
@@ -893,7 +892,7 @@ public final class ShapefileGeometryUtil {
         final Polygon polygon = (Polygon)part;
         final LineString exterior = polygon.getExteriorRing();
         CoordinatesList exteroirPoints = CoordinatesListUtil.get(exterior);
-        final boolean exteriorClockwise = !JtsGeometryUtil.isCCW(exteroirPoints);
+        final boolean exteriorClockwise = !exterior.isCCW();
         if (exteriorClockwise != clockwise) {
           exteroirPoints = exteroirPoints.reverse();
         }
@@ -903,7 +902,7 @@ public final class ShapefileGeometryUtil {
         for (int j = 0; j < numHoles; j++) {
           final LineString interior = polygon.getInteriorRingN(j);
           CoordinatesList interiorCoords = CoordinatesListUtil.get(interior);
-          final boolean interiorClockwise = !JtsGeometryUtil.isCCW(interiorCoords);
+          final boolean interiorClockwise = !interior.isCCW();
           if (interiorClockwise == clockwise) {
             interiorCoords = interiorCoords.reverse();
           }

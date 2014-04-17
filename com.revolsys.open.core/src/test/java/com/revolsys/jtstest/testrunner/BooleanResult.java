@@ -32,7 +32,6 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-
 /**
  * @version 1.7
  */
@@ -41,10 +40,6 @@ public class BooleanResult implements Result {
 
   public BooleanResult(final boolean result) {
     this.result = result;
-  }
-
-  public BooleanResult(final Boolean result) {
-    this(result.booleanValue());
   }
 
   @Override
@@ -69,5 +64,10 @@ public class BooleanResult implements Result {
   @Override
   public String toShortString() {
     return result ? "true" : "false";
+  }
+
+  @Override
+  public String toString() {
+    return Boolean.toString(result);
   }
 }

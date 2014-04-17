@@ -32,7 +32,8 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -50,11 +51,13 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeIntersection;
 import com.revolsys.jts.geomgraph.EdgeIntersectionList;
 import com.revolsys.jts.geomgraph.GeometryGraph;
 import com.revolsys.jts.util.Assert;
+import com.revolsys.util.CollectionUtil;
 
 /**
  * Implements the algorithms required to compute the <code>isValid()</code> method
@@ -121,7 +124,7 @@ public class IsValidOp {
     return isValidOp.isValid();
   }
 
-  private final Geometry parentGeometry; // the base Geometry to be validated
+  private final Geometry geometry; // the base Geometry to be validated
 
   /**
    * If the following condition is TRUE JTS will validate inverted shells and exverted holes
@@ -129,41 +132,59 @@ public class IsValidOp {
    */
   private boolean isSelfTouchingRingFormingHoleValid = false;
 
-  private TopologyValidationError validErr;
+  private final List<TopologyValidationError> errors = new ArrayList<TopologyValidationError>();
 
-  public IsValidOp(final Geometry parentGeometry) {
-    this.parentGeometry = parentGeometry;
+  private boolean shortCircuit = true;
+
+  public IsValidOp(final Geometry geometry) {
+    this.geometry = geometry;
   }
 
-  private void checkClosedRing(final LinearRing ring) {
-    if (!ring.isClosed()) {
-      Coordinates pt = null;
+  public IsValidOp(final Geometry geometry, final boolean shortCircuit) {
+    this.geometry = geometry;
+    this.shortCircuit = shortCircuit;
+  }
+
+  private void addError(final TopologyValidationError error) {
+    errors.add(error);
+  }
+
+  private boolean checkClosedRing(final LinearRing ring) {
+    if (ring.isClosed()) {
+      return true;
+    } else {
+      Coordinates point = null;
       if (ring.getVertexCount() >= 1) {
-        pt = ring.getCoordinate(0);
+        point = ring.getCoordinate(0);
       }
-      validErr = new TopologyValidationError(
-        TopologyValidationError.RING_NOT_CLOSED, pt);
+      addError(new TopologyValidationError(
+        TopologyValidationError.RING_NOT_CLOSED, point));
+      return false;
     }
   }
 
-  private void checkClosedRings(final Polygon poly) {
-    checkClosedRing(poly.getExteriorRing());
-    if (hasError()) {
-      return;
+  private boolean checkClosedRings(final Polygon poly) {
+    boolean valid = checkClosedRing(poly.getExteriorRing());
+    if (isErrorReturn()) {
+      return false;
     }
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      checkClosedRing(poly.getInteriorRingN(i));
-      if (hasError()) {
-        return;
+      valid &= checkClosedRing(poly.getInteriorRingN(i));
+      if (isErrorReturn()) {
+        return false;
       }
     }
+    return valid;
   }
 
-  private void checkConnectedInteriors(final GeometryGraph graph) {
+  private boolean checkConnectedInteriors(final GeometryGraph graph) {
     final ConnectedInteriorTester cit = new ConnectedInteriorTester(graph);
-    if (!cit.isInteriorsConnected()) {
-      validErr = new TopologyValidationError(
-        TopologyValidationError.DISCONNECTED_INTERIOR, cit.getCoordinate());
+    if (cit.isInteriorsConnected()) {
+      return true;
+    } else {
+      addError(new TopologyValidationError(
+        TopologyValidationError.DISCONNECTED_INTERIOR, cit.getCoordinate()));
+      return false;
     }
   }
 
@@ -175,17 +196,19 @@ public class IsValidOp {
    *
    * @see ConsistentAreaTester
    */
-  private void checkConsistentArea(final GeometryGraph graph) {
+  private boolean checkConsistentArea(final GeometryGraph graph) {
     final ConsistentAreaTester cat = new ConsistentAreaTester(graph);
     final boolean isValidArea = cat.isNodeConsistentArea();
     if (!isValidArea) {
-      validErr = new TopologyValidationError(
-        TopologyValidationError.SELF_INTERSECTION, cat.getInvalidPoint());
-      return;
-    }
-    if (cat.hasDuplicateRings()) {
-      validErr = new TopologyValidationError(
-        TopologyValidationError.DUPLICATE_RINGS, cat.getInvalidPoint());
+      addError(new TopologyValidationError(
+        TopologyValidationError.SELF_INTERSECTION, cat.getInvalidPoint()));
+      return false;
+    } else if (cat.hasDuplicateRings()) {
+      addError(new TopologyValidationError(
+        TopologyValidationError.DUPLICATE_RINGS, cat.getInvalidPoint()));
+      return false;
+    } else {
+      return true;
     }
   }
 
@@ -201,11 +224,10 @@ public class IsValidOp {
    * @param p the polygon to be tested for hole inclusion
    * @param graph a GeometryGraph incorporating the polygon
    */
-  private void checkHolesInShell(final Polygon p, final GeometryGraph graph) {
+  private boolean checkHolesInShell(final Polygon p, final GeometryGraph graph) {
+    boolean valid = true;
     final LinearRing shell = p.getExteriorRing();
 
-    // PointInRing pir = new SimplePointInRing(shell);
-    // PointInRing pir = new SIRtreePointInRing(shell);
     final PointInRing pir = new MCPointInRing(shell);
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
       final LinearRing hole = p.getInteriorRingN(i);
@@ -216,18 +238,19 @@ public class IsValidOp {
        * split the polygon into disconnected interiors.
        * This will be caught by a subsequent check.
        */
-      if (holePt == null) {
-        return;
-      } else {
-
+      if (holePt != null) {
         final boolean outside = !pir.isInside(holePt);
         if (outside) {
-          validErr = new TopologyValidationError(
-            TopologyValidationError.HOLE_OUTSIDE_SHELL, holePt);
-          return;
+          valid = false;
+          addError(new TopologyValidationError(
+            TopologyValidationError.HOLE_OUTSIDE_SHELL, holePt));
+          if (isErrorReturn()) {
+            return false;
+          }
         }
       }
     }
+    return valid;
   }
 
   /**
@@ -242,7 +265,7 @@ public class IsValidOp {
    *      (checked by <code>checkRelateConsistency</code>)
    * </ul>
    */
-  private void checkHolesNotNested(final Polygon p, final GeometryGraph graph) {
+  private boolean checkHolesNotNested(final Polygon p, final GeometryGraph graph) {
     final IndexedNestedRingTester nestedTester = new IndexedNestedRingTester(
       graph);
     // SimpleNestedRingTester nestedTester = new SimpleNestedRingTester(arg[0]);
@@ -254,33 +277,43 @@ public class IsValidOp {
       nestedTester.add(innerHole);
     }
     final boolean isNonNested = nestedTester.isNonNested();
-    if (!isNonNested) {
-      validErr = new TopologyValidationError(
-        TopologyValidationError.NESTED_HOLES, nestedTester.getNestedPoint());
+    if (isNonNested) {
+      return true;
+    } else {
+      addError(new TopologyValidationError(
+        TopologyValidationError.NESTED_HOLES, nestedTester.getNestedPoint()));
+      return false;
     }
   }
 
-  private void checkInvalidCoordinates(final Coordinates[] coords) {
+  private boolean checkInvalidCoordinates(final Coordinates[] coords) {
+    boolean valid = true;
     for (int i = 0; i < coords.length; i++) {
       if (!isValid(coords[i])) {
-        validErr = new TopologyValidationError(
-          TopologyValidationError.INVALID_COORDINATE, coords[i]);
-        return;
+        addError(new TopologyValidationError(
+          TopologyValidationError.INVALID_COORDINATE, coords[i]));
+        valid = false;
+        if (isErrorReturn()) {
+          return false;
+        }
       }
     }
+    return valid;
   }
 
-  private void checkInvalidCoordinates(final Polygon poly) {
-    checkInvalidCoordinates(poly.getExteriorRing().getCoordinateArray());
-    if (hasError()) {
-      return;
-    }
-    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      checkInvalidCoordinates(poly.getInteriorRingN(i).getCoordinateArray());
-      if (hasError()) {
-        return;
+  private boolean checkInvalidCoordinates(final Geometry geometry) {
+    boolean valid = true;
+    for (final Vertex vertex : geometry.vertices()) {
+      if (!isValid(vertex)) {
+        addError(new TopologyValidationError(
+          TopologyValidationError.INVALID_COORDINATE, vertex.cloneCoordinates()));
+        valid = false;
+        if (isErrorReturn()) {
+          return false;
+        }
       }
     }
+    return valid;
   }
 
   /**
@@ -288,23 +321,25 @@ public class IsValidOp {
    * Algorithm is to count the number of times each node along edge occurs.
    * If any occur more than once, that must be a self-intersection.
    */
-  private void checkNoSelfIntersectingRing(final EdgeIntersectionList eiList) {
-    final Set nodeSet = new TreeSet();
+  private boolean checkNoSelfIntersectingRing(final EdgeIntersectionList eiList) {
+    boolean valid = true;
+    final Set<Coordinates> nodeSet = new TreeSet<>();
     boolean isFirst = true;
-    for (final Iterator i = eiList.iterator(); i.hasNext();) {
-      final EdgeIntersection ei = (EdgeIntersection)i.next();
+    for (final EdgeIntersection ei : eiList) {
       if (isFirst) {
         isFirst = false;
-        continue;
-      }
-      if (nodeSet.contains(ei.coord)) {
-        validErr = new TopologyValidationError(
-          TopologyValidationError.RING_SELF_INTERSECTION, ei.coord);
-        return;
+      } else if (nodeSet.contains(ei.coord)) {
+        valid = false;
+        addError(new TopologyValidationError(
+          TopologyValidationError.RING_SELF_INTERSECTION, ei.coord));
+        if (isErrorReturn()) {
+          return false;
+        }
       } else {
         nodeSet.add(ei.coord);
       }
     }
+    return valid;
   }
 
   /**
@@ -314,14 +349,16 @@ public class IsValidOp {
    *
    * @param graph the topology graph of the geometry
    */
-  private void checkNoSelfIntersectingRings(final GeometryGraph graph) {
-    for (final Iterator i = graph.getEdgeIterator(); i.hasNext();) {
-      final Edge e = (Edge)i.next();
-      checkNoSelfIntersectingRing(e.getEdgeIntersectionList());
-      if (hasError()) {
-        return;
+  private boolean checkNoSelfIntersectingRings(final GeometryGraph graph) {
+    boolean valid = true;
+    for (final Edge edge : graph.edges()) {
+      final EdgeIntersectionList edgeIntersectionList = edge.getEdgeIntersectionList();
+      valid &= checkNoSelfIntersectingRing(edgeIntersectionList);
+      if (isErrorReturn()) {
+        return false;
       }
     }
+    return valid;
   }
 
   /**
@@ -370,46 +407,49 @@ public class IsValidOp {
    * E.g. they cannot partially overlap (this has been previously checked by
    * <code>checkRelateConsistency</code> )
    */
-  private void checkShellNotNested(final LinearRing shell, final Polygon p,
-    final GeometryGraph graph) {
+  private boolean checkShellNotNested(final LinearRing shell,
+    final Polygon polygon, final GeometryGraph graph) {
     final Coordinates[] shellPts = shell.getCoordinateArray();
     // test if shell is inside polygon shell
-    final LinearRing polyShell = p.getExteriorRing();
+    final LinearRing polyShell = polygon.getExteriorRing();
     final Coordinates[] polyPts = polyShell.getCoordinateArray();
     final Coordinates shellPt = findPtNotNode(shellPts, polyShell, graph);
     // if no point could be found, we can assume that the shell is outside the
     // polygon
     if (shellPt == null) {
-      return;
-    }
-    final boolean insidePolyShell = CGAlgorithms.isPointInRing(shellPt, polyPts);
-    if (!insidePolyShell) {
-      return;
-    }
-
-    // if no holes, this is an error!
-    if (p.getNumInteriorRing() <= 0) {
-      validErr = new TopologyValidationError(
-        TopologyValidationError.NESTED_SHELLS, shellPt);
-      return;
-    }
-
-    /**
-     * Check if the shell is inside one of the holes.
-     * This is the case if one of the calls to checkShellInsideHole
-     * returns a null coordinate.
-     * Otherwise, the shell is not properly contained in a hole, which is an error.
-     */
-    Coordinates badNestedPt = null;
-    for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      final LinearRing hole = p.getInteriorRingN(i);
-      badNestedPt = checkShellInsideHole(shell, hole, graph);
-      if (badNestedPt == null) {
-        return;
+      return true;
+    } else {
+      final boolean insidePolyShell = CGAlgorithms.isPointInRing(shellPt,
+        polyPts);
+      if (!insidePolyShell) {
+        return true;
       }
+
+      // if no holes, this is an error!
+      if (polygon.getNumInteriorRing() <= 0) {
+        addError(new TopologyValidationError(
+          TopologyValidationError.NESTED_SHELLS, shellPt));
+        return false;
+      }
+
+      /**
+       * Check if the shell is inside one of the holes.
+       * This is the case if one of the calls to checkShellInsideHole
+       * returns a null coordinate.
+       * Otherwise, the shell is not properly contained in a hole, which is an error.
+       */
+      Coordinates badNestedPt = null;
+      for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+        final LinearRing hole = polygon.getInteriorRingN(i);
+        badNestedPt = checkShellInsideHole(shell, hole, graph);
+        if (badNestedPt == null) {
+          return true;
+        }
+      }
+      addError(new TopologyValidationError(
+        TopologyValidationError.NESTED_SHELLS, badNestedPt));
+      return false;
     }
-    validErr = new TopologyValidationError(
-      TopologyValidationError.NESTED_SHELLS, badNestedPt);
   }
 
   /**
@@ -424,209 +464,216 @@ public class IsValidOp {
    * This routine relies on the fact that while polygon shells may touch at one or
    * more vertices, they cannot touch at ALL vertices.
    */
-  private void checkShellsNotNested(final MultiPolygon mp,
+  private boolean checkShellsNotNested(final MultiPolygon multiPolygon,
     final GeometryGraph graph) {
-    for (int i = 0; i < mp.getNumGeometries(); i++) {
-      final Polygon p = (Polygon)mp.getGeometry(i);
-      final LinearRing shell = p.getExteriorRing();
-      for (int j = 0; j < mp.getNumGeometries(); j++) {
-        if (i == j) {
-          continue;
-        }
-        final Polygon p2 = (Polygon)mp.getGeometry(j);
-        checkShellNotNested(shell, p2, graph);
-        if (hasError()) {
-          return;
+    boolean valid = true;
+    for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+      final Polygon polygon1 = multiPolygon.getPolygon(i);
+      final LinearRing shell = polygon1.getExteriorRing();
+      for (int j = 0; j < multiPolygon.getNumGeometries(); j++) {
+        if (i != j) {
+          final Polygon polygon2 = multiPolygon.getPolygon(j);
+          valid &= checkShellNotNested(shell, polygon2, graph);
+          if (isErrorReturn()) {
+            return false;
+          }
         }
       }
     }
+    return valid;
   }
 
-  private void checkTooFewPoints(final GeometryGraph graph) {
+  private boolean checkTooFewPoints(final GeometryGraph graph) {
     if (graph.hasTooFewPoints()) {
-      validErr = new TopologyValidationError(
-        TopologyValidationError.TOO_FEW_POINTS, graph.getInvalidPoint());
-      return;
-    }
-  }
-
-  private void checkValid(final Geometry g) {
-    validErr = null;
-
-    // empty geometries are always valid!
-    if (g.isEmpty()) {
-      return;
-    }
-
-    if (g instanceof Point) {
-      checkValid((Point)g);
-    } else if (g instanceof MultiPoint) {
-      checkValid((MultiPoint)g);
-    } else if (g instanceof LinearRing) {
-      checkValid((LinearRing)g);
-    } else if (g instanceof LineString) {
-      checkValid((LineString)g);
-    } else if (g instanceof Polygon) {
-      checkValid((Polygon)g);
-    } else if (g instanceof MultiPolygon) {
-      checkValid((MultiPolygon)g);
-    } else if (g instanceof GeometryCollection) {
-      checkValid((GeometryCollection)g);
+      addError(new TopologyValidationError(
+        TopologyValidationError.TOO_FEW_POINTS, graph.getInvalidPoint()));
+      return false;
     } else {
-      throw new UnsupportedOperationException(g.getClass().getName());
+      return true;
     }
   }
 
-  private void checkValid(final GeometryCollection gc) {
-    for (int i = 0; i < gc.getNumGeometries(); i++) {
-      final Geometry g = gc.getGeometry(i);
-      checkValid(g);
-      if (hasError()) {
-        return;
+  private boolean checkValid(final Geometry geometry) {
+    errors.clear();
+    if (geometry.isEmpty()) {
+      return true;
+    } else if (geometry instanceof Point) {
+      return checkValid((Point)geometry);
+    } else if (geometry instanceof MultiPoint) {
+      return checkValid((MultiPoint)geometry);
+    } else if (geometry instanceof LinearRing) {
+      return checkValid((LinearRing)geometry);
+    } else if (geometry instanceof LineString) {
+      return checkValid((LineString)geometry);
+    } else if (geometry instanceof Polygon) {
+      return checkValid((Polygon)geometry);
+    } else if (geometry instanceof MultiPolygon) {
+      return checkValid((MultiPolygon)geometry);
+    } else if (geometry instanceof GeometryCollection) {
+      return checkValid((GeometryCollection)geometry);
+    } else {
+      throw new UnsupportedOperationException(geometry.getClass().getName());
+    }
+  }
+
+  private boolean checkValid(final GeometryCollection geometryCollection) {
+    boolean valid = true;
+    for (final Geometry geometry : geometryCollection.geometries()) {
+      valid &= checkValid(geometry);
+      if (isErrorReturn()) {
+        return false;
       }
     }
+    return valid;
   }
 
   /**
    * Checks validity of a LinearRing.
    */
-  private void checkValid(final LinearRing g) {
-    checkInvalidCoordinates(g.getCoordinateArray());
-    if (hasError()) {
-      return;
+  private boolean checkValid(final LinearRing ring) {
+    boolean valid = checkInvalidCoordinates(ring);
+    if (isErrorReturn()) {
+      return false;
     }
-    checkClosedRing(g);
-    if (hasError()) {
-      return;
+    valid &= checkClosedRing(ring);
+    if (isErrorReturn()) {
+      return false;
     }
 
-    final GeometryGraph graph = new GeometryGraph(0, g);
-    checkTooFewPoints(graph);
-    if (hasError()) {
-      return;
+    final GeometryGraph graph = new GeometryGraph(0, ring);
+    valid &= checkTooFewPoints(graph);
+    if (isErrorReturn()) {
+      return false;
     }
     final LineIntersector li = new RobustLineIntersector();
     graph.computeSelfNodes(li, true);
-    checkNoSelfIntersectingRings(graph);
+    valid &= checkNoSelfIntersectingRings(graph);
+    return valid;
   }
 
   /**
    * Checks validity of a LineString.  Almost anything goes for linestrings!
    */
-  private void checkValid(final LineString g) {
-    checkInvalidCoordinates(g.getCoordinateArray());
-    if (hasError()) {
-      return;
+  private boolean checkValid(final LineString line) {
+    boolean valid = checkInvalidCoordinates(line);
+    if (isErrorReturn()) {
+      return false;
     }
-    final GeometryGraph graph = new GeometryGraph(0, g);
-    checkTooFewPoints(graph);
+    final GeometryGraph graph = new GeometryGraph(0, line);
+    valid &= checkTooFewPoints(graph);
+    return valid;
   }
 
   /**
    * Checks validity of a MultiPoint.
    */
-  private void checkValid(final MultiPoint g) {
-    checkInvalidCoordinates(g.getCoordinateArray());
+  private boolean checkValid(final MultiPoint multiPoint) {
+    return checkInvalidCoordinates(multiPoint);
   }
 
-  private void checkValid(final MultiPolygon g) {
-    for (int i = 0; i < g.getNumGeometries(); i++) {
-      final Polygon p = (Polygon)g.getGeometry(i);
-      checkInvalidCoordinates(p);
-      if (hasError()) {
-        return;
+  private boolean checkValid(final MultiPolygon multiPolygon) {
+    boolean valid = true;
+    for (final Polygon polygon : multiPolygon.getPolygons()) {
+      valid &= checkInvalidCoordinates(polygon);
+      if (isErrorReturn()) {
+        return false;
       }
-      checkClosedRings(p);
-      if (hasError()) {
-        return;
+      valid &= checkClosedRings(polygon);
+      if (isErrorReturn()) {
+        return false;
       }
     }
 
-    final GeometryGraph graph = new GeometryGraph(0, g);
+    final GeometryGraph graph = new GeometryGraph(0, multiPolygon);
 
-    checkTooFewPoints(graph);
-    if (hasError()) {
-      return;
+    valid &= checkTooFewPoints(graph);
+    if (isErrorReturn()) {
+      return false;
     }
-    checkConsistentArea(graph);
-    if (hasError()) {
-      return;
+    valid &= checkConsistentArea(graph);
+    if (isErrorReturn()) {
+      return false;
     }
     if (!isSelfTouchingRingFormingHoleValid) {
-      checkNoSelfIntersectingRings(graph);
-      if (hasError()) {
-        return;
+      valid &= checkNoSelfIntersectingRings(graph);
+      if (isErrorReturn()) {
+        return false;
       }
     }
-    for (int i = 0; i < g.getNumGeometries(); i++) {
-      final Polygon p = (Polygon)g.getGeometry(i);
-      checkHolesInShell(p, graph);
-      if (hasError()) {
-        return;
+    for (final Polygon polygon : multiPolygon.getPolygons()) {
+      valid &= checkHolesInShell(polygon, graph);
+      if (isErrorReturn()) {
+        return false;
       }
     }
-    for (int i = 0; i < g.getNumGeometries(); i++) {
-      final Polygon p = (Polygon)g.getGeometry(i);
-      checkHolesNotNested(p, graph);
-      if (hasError()) {
-        return;
+    for (final Polygon polygon : multiPolygon.getPolygons()) {
+      valid &= checkHolesNotNested(polygon, graph);
+      if (isErrorReturn()) {
+        return false;
       }
     }
-    checkShellsNotNested(g, graph);
-    if (hasError()) {
-      return;
+    valid &= checkShellsNotNested(multiPolygon, graph);
+    if (isErrorReturn()) {
+      return false;
     }
-    checkConnectedInteriors(graph);
+    valid &= checkConnectedInteriors(graph);
+    return valid;
   }
 
   /**
    * Checks validity of a Point.
    */
-  private void checkValid(final Point g) {
-    checkInvalidCoordinates(g.getCoordinateArray());
+  private boolean checkValid(final Point point) {
+    return checkInvalidCoordinates(point);
   }
 
   /**
    * Checks the validity of a polygon.
    * Sets the validErr flag.
    */
-  private void checkValid(final Polygon g) {
-    checkInvalidCoordinates(g);
-    if (hasError()) {
-      return;
+  private boolean checkValid(final Polygon g) {
+    boolean valid = true;
+    valid &= checkInvalidCoordinates(g);
+    if (isErrorReturn()) {
+      return false;
     }
-    checkClosedRings(g);
-    if (hasError()) {
-      return;
+    valid &= checkClosedRings(g);
+    if (isErrorReturn()) {
+      return false;
     }
 
     final GeometryGraph graph = new GeometryGraph(0, g);
 
-    checkTooFewPoints(graph);
-    if (hasError()) {
-      return;
+    valid &= checkTooFewPoints(graph);
+    if (isErrorReturn()) {
+      return false;
     }
-    checkConsistentArea(graph);
-    if (hasError()) {
-      return;
+    valid &= checkConsistentArea(graph);
+    if (isErrorReturn()) {
+      return false;
     }
 
     if (!isSelfTouchingRingFormingHoleValid) {
-      checkNoSelfIntersectingRings(graph);
-      if (hasError()) {
-        return;
+      valid &= checkNoSelfIntersectingRings(graph);
+      if (isErrorReturn()) {
+        return false;
       }
     }
-    checkHolesInShell(g, graph);
-    if (hasError()) {
-      return;
+    valid &= checkHolesInShell(g, graph);
+    if (isErrorReturn()) {
+      return false;
     }
     // SLOWcheckHolesNotNested(g);
-    checkHolesNotNested(g, graph);
-    if (hasError()) {
-      return;
+    valid &= checkHolesNotNested(g, graph);
+    if (isErrorReturn()) {
+      return false;
     }
-    checkConnectedInteriors(graph);
+    valid &= checkConnectedInteriors(graph);
+    return valid;
+  }
+
+  public List<TopologyValidationError> getErrors() {
+    return errors;
   }
 
   /**
@@ -638,16 +685,24 @@ public class IsValidOp {
    * or null if the geometry is valid
    */
   public TopologyValidationError getValidationError() {
-    checkValid(parentGeometry);
-    return validErr;
+    checkValid(geometry);
+    if (isErrorReturn()) {
+      return errors.get(0);
+    } else {
+      return null;
+    }
   }
 
   public boolean hasError() {
-    if (validErr == null) {
+    if (errors.isEmpty()) {
       return false;
     } else {
       return true;
     }
+  }
+
+  private boolean isErrorReturn() {
+    return shortCircuit && hasError();
   }
 
   /**
@@ -657,8 +712,7 @@ public class IsValidOp {
    * @return true if the geometry is valid
    */
   public boolean isValid() {
-    checkValid(parentGeometry);
-    return validErr == null;
+    return checkValid(geometry);
   }
 
   /**
@@ -691,10 +745,10 @@ public class IsValidOp {
 
   @Override
   public String toString() {
-    if (validErr == null) {
-      return "Valid";
+    if (isErrorReturn()) {
+      return CollectionUtil.toString("\n" + errors);
     } else {
-      return validErr.toString();
+      return "Valid";
     }
   }
 

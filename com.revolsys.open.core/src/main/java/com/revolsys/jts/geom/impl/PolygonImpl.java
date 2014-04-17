@@ -226,7 +226,11 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
 
   @Override
   protected BoundingBox computeEnvelopeInternal() {
-    return shell.getBoundingBox();
+    BoundingBox boundingBox = shell.getBoundingBox();
+    for (final LinearRing ring : holes) {
+      boundingBox = boundingBox.expandToInclude(ring);
+    }
+    return boundingBox;
   }
 
   @Override
@@ -484,6 +488,22 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.createPolygon(rings);
+  }
+
+  @Override
+  public Iterable<LinearRing> rings() {
+    if (isEmpty()) {
+      return Collections.emptyList();
+    } else if (holes.length == 0) {
+      return Collections.singletonList(shell);
+    } else {
+      final List<LinearRing> rings = new ArrayList<>();
+      rings.add(shell);
+      for (final LinearRing ring : this.holes) {
+        rings.add(ring);
+      }
+      return rings;
+    }
   }
 
   /**

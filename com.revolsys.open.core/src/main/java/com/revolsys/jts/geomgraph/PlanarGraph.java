@@ -42,7 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Location;
 
@@ -131,6 +130,10 @@ public class PlanarGraph {
 
   void debugPrintln(final Object o) {
     System.out.println(o);
+  }
+
+  public Iterable<Edge> edges() {
+    return edges;
   }
 
   /**

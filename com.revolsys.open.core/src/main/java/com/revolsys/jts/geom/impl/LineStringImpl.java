@@ -36,6 +36,7 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
@@ -484,6 +485,12 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   @Override
   public double getZ(final int vertexIndex) {
     return getCoordinate(vertexIndex, 2);
+  }
+
+  @Override
+  public boolean isCCW() {
+    final CoordinatesList points = getCoordinatesList();
+    return CoordinatesListUtil.isCCW(points);
   }
 
   @Override

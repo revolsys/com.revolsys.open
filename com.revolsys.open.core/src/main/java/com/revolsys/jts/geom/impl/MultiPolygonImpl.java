@@ -124,6 +124,10 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
     return 2;
   }
 
+  public Polygon getPolygon(final int partIndex) {
+    return (Polygon)super.getGeometry(partIndex);
+  }
+
   @Override
   @SuppressWarnings({
     "unchecked", "rawtypes"

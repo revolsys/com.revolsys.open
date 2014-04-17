@@ -48,7 +48,7 @@ import com.revolsys.jts.geom.Coordinates;
  *
  * @version 1.7
  */
-public class EdgeIntersectionList {
+public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
   // a Map <EdgeIntersection, EdgeIntersection>
   private final Map nodeMap = new TreeMap();
 
@@ -162,7 +162,8 @@ public class EdgeIntersectionList {
    *
    * @return an Iterator of EdgeIntersections
    */
-  public Iterator iterator() {
+  @Override
+  public Iterator<EdgeIntersection> iterator() {
     return nodeMap.values().iterator();
   }
 

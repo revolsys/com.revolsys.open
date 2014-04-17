@@ -51,7 +51,7 @@ import com.revolsys.jts.geom.vertex.AbstractVertex;
  *
  *@version 1.7
  */
-public interface LineString extends Geometry, Lineal {
+public interface LineString extends Lineal {
 
   /**
    * Creates and returns a full copy of this {@link LineString} object.
@@ -83,6 +83,8 @@ public interface LineString extends Geometry, Lineal {
   double getY(int vertexIndex);
 
   double getZ(int vertexIndex);
+
+  boolean isCCW();
 
   boolean isClosed();
 

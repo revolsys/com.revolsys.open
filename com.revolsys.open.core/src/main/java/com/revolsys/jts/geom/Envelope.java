@@ -969,23 +969,16 @@ public class Envelope implements Serializable, BoundingBox {
   public BoundingBox expandToInclude(final Geometry geometry) {
     if (geometry == null || geometry.isEmpty()) {
       return this;
-    } else if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      return expandToInclude(point);
     } else {
-      final BoundingBox box = getBoundingBox(geometry);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Geometry convertedGeometry = geometry.convert(geometryFactory);
+      final BoundingBox box = convertedGeometry.getBoundingBox();
       return expandToInclude(box);
     }
   }
 
   public BoundingBox expandToInclude(final Point point) {
-    if (point == null || point.isEmpty()) {
-      return this;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point copy = point.convert(geometryFactory);
-      return expand(copy);
-    }
+    return expandToInclude((Geometry)point);
   }
 
   /**

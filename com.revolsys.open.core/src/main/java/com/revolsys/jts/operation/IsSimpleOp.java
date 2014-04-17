@@ -32,13 +32,14 @@
  */
 package com.revolsys.jts.operation;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
@@ -47,12 +48,9 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Lineal;
-import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeIntersection;
 import com.revolsys.jts.geomgraph.GeometryGraph;
@@ -101,11 +99,11 @@ import com.revolsys.jts.geomgraph.index.SegmentIntersector;
  */
 public class IsSimpleOp {
   private static class EndpointInfo {
-    Coordinates pt;
+    int degree;
 
     boolean isClosed;
 
-    int degree;
+    Coordinates pt;
 
     public EndpointInfo(final Coordinates pt) {
       this.pt = pt;
@@ -123,76 +121,51 @@ public class IsSimpleOp {
     }
   }
 
-  private Geometry inputGeom;
+  private final Geometry geometry;
 
   private boolean isClosedEndpointsInInterior = true;
 
-  private Coordinates nonSimpleLocation = null;
+  private final List<Coordinates> nonSimplePoints = new ArrayList<Coordinates>();
+
+  private boolean shortCircuit = true;
 
   /**
    * Creates a simplicity checker using the default SFS Mod-2 Boundary Node Rule
    *
-   * @deprecated use IsSimpleOp(Geometry)
+   * @param geometry the geometry to test
    */
-  @Deprecated
-  public IsSimpleOp() {
+  public IsSimpleOp(final Geometry geometry) {
+    this.geometry = geometry;
   }
 
-  /**
-   * Creates a simplicity checker using the default SFS Mod-2 Boundary Node Rule
-   *
-   * @param geom the geometry to test
-   */
-  public IsSimpleOp(final Geometry geom) {
-    this.inputGeom = geom;
+  public IsSimpleOp(final Geometry geometry, final boolean shortCircuit) {
+    this.geometry = geometry;
+    this.shortCircuit = shortCircuit;
   }
 
   /**
    * Creates a simplicity checker using a given {@link BoundaryNodeRule}
    *
-   * @param geom the geometry to test
+   * @param geometry the geometry to test
    * @param boundaryNodeRule the rule to use.
    */
-  public IsSimpleOp(final Geometry geom, final BoundaryNodeRule boundaryNodeRule) {
-    this.inputGeom = geom;
+  public IsSimpleOp(final Geometry geometry,
+    final BoundaryNodeRule boundaryNodeRule) {
+    this.geometry = geometry;
     isClosedEndpointsInInterior = !boundaryNodeRule.isInBoundary(2);
   }
 
   /**
    * Add an endpoint to the map, creating an entry for it if none exists
    */
-  private void addEndpoint(final Map endPoints, final Coordinates p,
-    final boolean isClosed) {
-    EndpointInfo eiInfo = (EndpointInfo)endPoints.get(p);
+  private void addEndpoint(final Map<Coordinates, EndpointInfo> endPoints,
+    final Coordinates p, final boolean isClosed) {
+    EndpointInfo eiInfo = endPoints.get(p);
     if (eiInfo == null) {
       eiInfo = new EndpointInfo(p);
       endPoints.put(p, eiInfo);
     }
     eiInfo.addEndpoint(isClosed);
-  }
-
-  private boolean computeSimple(final Geometry geom) {
-    nonSimpleLocation = null;
-    if (geom.isEmpty()) {
-      return true;
-    }
-    if (geom instanceof LineString) {
-      return isSimpleLinearGeometry(geom);
-    }
-    if (geom instanceof MultiLineString) {
-      return isSimpleLinearGeometry(geom);
-    }
-    if (geom instanceof MultiPoint) {
-      return isSimpleMultiPoint((MultiPoint)geom);
-    }
-    if (geom instanceof Polygonal) {
-      return isSimplePolygonal(geom);
-    }
-    if (geom instanceof GeometryCollection) {
-      return isSimpleGeometryCollection(geom);
-    }
-    // all other geometry types are simple by definition
-    return true;
   }
 
   /**
@@ -205,7 +178,15 @@ public class IsSimpleOp {
    * or null if the geometry is simple
    */
   public Coordinates getNonSimpleLocation() {
-    return nonSimpleLocation;
+    if (nonSimplePoints.isEmpty()) {
+      return null;
+    } else {
+      return nonSimplePoints.get(0);
+    }
+  }
+
+  public List<Coordinates> getNonSimplePoints() {
+    return nonSimplePoints;
   }
 
   /**
@@ -217,10 +198,8 @@ public class IsSimpleOp {
    * must be exactly 2.
    */
   private boolean hasClosedEndpointIntersection(final GeometryGraph graph) {
-    final Map endPoints = new TreeMap();
-    for (final Iterator i = graph.getEdgeIterator(); i.hasNext();) {
-      final Edge e = (Edge)i.next();
-      final int maxSegmentIndex = e.getMaximumSegmentIndex();
+    final Map<Coordinates, EndpointInfo> endPoints = new TreeMap<>();
+    for (final Edge e : graph.edges()) {
       final boolean isClosed = e.isClosed();
       final Coordinates p0 = e.getCoordinate(0);
       addEndpoint(endPoints, p0, isClosed);
@@ -228,10 +207,9 @@ public class IsSimpleOp {
       addEndpoint(endPoints, p1, isClosed);
     }
 
-    for (final Iterator i = endPoints.values().iterator(); i.hasNext();) {
-      final EndpointInfo eiInfo = (EndpointInfo)i.next();
+    for (final EndpointInfo eiInfo : endPoints.values()) {
       if (eiInfo.isClosed && eiInfo.degree != 2) {
-        nonSimpleLocation = eiInfo.getCoordinate();
+        nonSimplePoints.add(eiInfo.getCoordinate());
         return true;
       }
     }
@@ -243,18 +221,20 @@ public class IsSimpleOp {
    * The Geometry is not simple if there are intersections not at endpoints.
    */
   private boolean hasNonEndpointIntersection(final GeometryGraph graph) {
-    for (final Iterator i = graph.getEdgeIterator(); i.hasNext();) {
-      final Edge e = (Edge)i.next();
-      final int maxSegmentIndex = e.getMaximumSegmentIndex();
-      for (final Iterator eiIt = e.getEdgeIntersectionList().iterator(); eiIt.hasNext();) {
-        final EdgeIntersection ei = (EdgeIntersection)eiIt.next();
+    for (final Edge edge : graph.edges()) {
+      final int maxSegmentIndex = edge.getMaximumSegmentIndex();
+      for (final EdgeIntersection ei : edge.getEdgeIntersectionList()) {
         if (!ei.isEndPoint(maxSegmentIndex)) {
-          nonSimpleLocation = ei.getCoordinate();
+          nonSimplePoints.add(ei.getCoordinate());
           return true;
         }
       }
     }
     return false;
+  }
+
+  private boolean isErrorReturn() {
+    return shortCircuit && !nonSimplePoints.isEmpty();
   }
 
   /**
@@ -263,64 +243,45 @@ public class IsSimpleOp {
    * @return true if the geometry is simple
    */
   public boolean isSimple() {
-    nonSimpleLocation = null;
-    return computeSimple(inputGeom);
+    nonSimplePoints.clear();
+    return isSimple(geometry);
   }
 
-  /**
-   * Reports whether a {@link LineString} is simple.
-   *
-   * @param geom the lineal geometry to test
-   * @return true if the geometry is simple
-   * @deprecated use isSimple()
-   */
-  @Deprecated
-  public boolean isSimple(final LineString geom) {
-    return isSimpleLinearGeometry(geom);
-  }
-
-  /**
-   * Reports whether a {@link MultiLineString} geometry is simple.
-   *
-   * @param geom the lineal geometry to test
-   * @return true if the geometry is simple
-   * @deprecated use isSimple()
-   */
-  @Deprecated
-  public boolean isSimple(final MultiLineString geom) {
-    return isSimpleLinearGeometry(geom);
-  }
-
-  /**
-   * A MultiPoint is simple iff it has no repeated points
-   * @deprecated use isSimple()
-   */
-  @Deprecated
-  public boolean isSimple(final MultiPoint mp) {
-    return isSimpleMultiPoint(mp);
+  private boolean isSimple(final Geometry geometry) {
+    if (geometry.isEmpty()) {
+      return true;
+    } else if (geometry instanceof Lineal) {
+      return isSimple((Lineal)geometry);
+    } else if (geometry instanceof Polygon) {
+      return isSimple((Polygon)geometry);
+    } else if (geometry instanceof MultiPoint) {
+      return isSimple((MultiPoint)geometry);
+    } else if (geometry instanceof GeometryCollection) {
+      return isSimple((GeometryCollection)geometry);
+    } else {
+      return true;
+    }
   }
 
   /**
    * Semantics for GeometryCollection is 
-   * simple iff all components are simple.
+   * simple if all components are simple.
    * 
    * @param geom
    * @return true if the geometry is simple
    */
-  private boolean isSimpleGeometryCollection(final Geometry geom) {
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
-      final Geometry comp = geom.getGeometry(i);
-      if (!computeSimple(comp)) {
+  private boolean isSimple(final GeometryCollection geom) {
+    boolean simple = true;
+    for (final Geometry part : geom.geometries()) {
+      simple &= isSimple(part);
+      if (isErrorReturn()) {
         return false;
       }
     }
-    return true;
+    return simple;
   }
 
-  private boolean isSimpleLinearGeometry(final Geometry geom) {
-    if (geom.isEmpty()) {
-      return true;
-    }
+  private boolean isSimple(final Lineal geom) {
     final GeometryGraph graph = new GeometryGraph(0, geom);
     final LineIntersector li = new RobustLineIntersector();
     final SegmentIntersector si = graph.computeSelfNodes(li, true);
@@ -329,7 +290,7 @@ public class IsSimpleOp {
       return true;
     }
     if (si.hasProperIntersection()) {
-      nonSimpleLocation = si.getProperIntersectionPoint();
+      nonSimplePoints.add(si.getProperIntersectionPoint());
       return false;
     }
     if (hasNonEndpointIntersection(graph)) {
@@ -343,21 +304,22 @@ public class IsSimpleOp {
     return true;
   }
 
-  private boolean isSimpleMultiPoint(final MultiPoint mp) {
-    if (mp.isEmpty()) {
-      return true;
-    }
-    final Set points = new TreeSet();
-    for (int i = 0; i < mp.getNumGeometries(); i++) {
-      final Point pt = (Point)mp.getGeometry(i);
-      final Coordinates p = pt.getCoordinate();
-      if (points.contains(p)) {
-        nonSimpleLocation = p;
-        return false;
+  private boolean isSimple(final MultiPoint mulitPoint) {
+    boolean simple = true;
+    final Set<Coordinates> points = new TreeSet<>();
+    for (final Point point : mulitPoint.getPoints()) {
+      final Coordinates coordinates = new DoubleCoordinates(point, 2);
+      if (points.contains(coordinates)) {
+        simple = false;
+        nonSimplePoints.add(coordinates);
+        if (!isErrorReturn()) {
+          return false;
+        }
+      } else {
+        points.add(coordinates);
       }
-      points.add(p);
     }
-    return true;
+    return simple;
   }
 
   /**
@@ -368,15 +330,14 @@ public class IsSimpleOp {
    * @param geom a Polygonal geometry
    * @return true if the geometry is simple
    */
-  private boolean isSimplePolygonal(final Geometry geom) {
-    final List rings = LinearComponentExtracter.getLines(geom);
-    for (final Iterator i = rings.iterator(); i.hasNext();) {
-      final LinearRing ring = (LinearRing)i.next();
-      if (!isSimpleLinearGeometry(ring)) {
+  private boolean isSimple(final Polygon polygon) {
+    boolean simple = true;
+    for (final LineString ring : polygon.rings()) {
+      simple &= isSimple(ring);
+      if (isErrorReturn()) {
         return false;
       }
     }
-    return true;
+    return simple;
   }
-
 }

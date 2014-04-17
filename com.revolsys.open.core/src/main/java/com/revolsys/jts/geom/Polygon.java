@@ -80,4 +80,6 @@ public interface Polygon extends Geometry, Polygonal {
 
   @Override
   public Polygon reverse();
+
+  public Iterable<LinearRing> rings();
 }

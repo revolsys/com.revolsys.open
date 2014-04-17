@@ -26,11 +26,9 @@ import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -145,22 +143,6 @@ public final class JtsGeometryUtil {
         lines.add(line);
       }
     }
-  }
-
-  public static void applyPrecisionModel(final Geometry geometry) {
-    final PrecisionModel precisionModel = geometry.getPrecisionModel();
-    final Coordinates[] coordinates = geometry.getCoordinateArray();
-    for (int i = 0; i < coordinates.length; i++) {
-      final Coordinates coordinate = coordinates[i];
-      precisionModel.makePrecise(coordinate);
-    }
-
-  }
-
-  public static BoundingBox buffer(final BoundingBox envelope, final int i) {
-    // TODO Auto-generated method stub
-    return new Envelope(envelope.getMinX() - i, envelope.getMinY() - i,
-      envelope.getMaxX() + i, envelope.getMaxY() + i);
   }
 
   public static Coordinates closestCoordinate(final LineSegment lineSegment,
@@ -389,51 +371,6 @@ public final class JtsGeometryUtil {
       }
     } else {
       return false;
-    }
-  }
-
-  public static boolean equalsZ(final double z1, final double z2) {
-    if (z1 == z2) {
-      return true;
-    } else if (Double.isNaN(z1)) {
-      return (Double.isNaN(z2) || z2 == 0);
-    } else if (z1 == 0 && Double.isNaN(z2)) {
-      return true;
-    } else {
-      return false;
-    }
-
-  }
-
-  public static Coordinates getCoordinate(final Geometry geometry,
-    final int pointIndex) {
-    final CoordinatesList points = CoordinatesListUtil.get(geometry);
-    if (pointIndex < points.size()) {
-      return new DoubleCoordinates(points.get(pointIndex));
-    } else {
-      return null;
-    }
-  }
-
-  public static Coordinates getCoordinate(final GeometryCollection geometry,
-    final int partIndex, final int pointIndex) {
-    if (partIndex < geometry.getNumGeometries()) {
-      final Geometry part = geometry.getGeometry(partIndex);
-      return getCoordinate(part, pointIndex);
-    }
-    return null;
-  }
-
-  public static Coordinates getCoordinate(final Polygon polygon,
-    final int ringIndex, final int pointIndex) {
-    if (ringIndex == 0) {
-      final LineString ring = polygon.getExteriorRing();
-      return getCoordinate(ring, pointIndex);
-    } else if (ringIndex - 1 < polygon.getNumInteriorRing()) {
-      final LineString ring = polygon.getInteriorRingN(ringIndex - 1);
-      return getCoordinate(ring, pointIndex);
-    } else {
-      return null;
     }
   }
 
@@ -798,10 +735,6 @@ public final class JtsGeometryUtil {
     return (Polygon)buffer;
   }
 
-  public static double[] getMRange(final CoordinatesList coordinates) {
-    return getOrdinateRange(coordinates, 3);
-  }
-
   public static double[] getMRange(final Geometry geometry) {
     return getOrdinateRange(geometry, 3);
   }
@@ -870,10 +803,6 @@ public final class JtsGeometryUtil {
       }
     }
     return null;
-  }
-
-  public static double[] getZRange(final CoordinatesList coordinates) {
-    return getOrdinateRange(coordinates, 2);
   }
 
   public static double[] getZRange(final Geometry geometry) {
@@ -1002,83 +931,6 @@ public final class JtsGeometryUtil {
     } else {
       return false;
     }
-  }
-
-  /**
-   * Computes whether a ring defined by an array of {@link Coordinates} is
-   * oriented counter-clockwise.
-   * <ul>
-   * <li>The list of points is assumed to have the first and last points equal.
-   * <li>This will handle coordinate lists which contain repeated points.
-   * </ul>
-   * This algorithm is <b>only</b> guaranteed to work with valid rings. If the
-   * ring is invalid (e.g. self-crosses or touches), the computed result
-   * <b>may</b> not be correct.
-   * 
-   * @param ring an array of coordinates forming a ring
-   * @return <code>true</code> if the ring is oriented counter-clockwise.
-   */
-  public static boolean isCCW(final CoordinatesList ring) {
-    // # of points without closing endpoint
-    final int nPts = ring.size() - 1;
-
-    // find highest point
-    Coordinates hiPt = ring.getCoordinate(0);
-    int hiIndex = 0;
-    for (int i = 1; i <= nPts; i++) {
-      final Coordinates p = ring.getCoordinate(i);
-      if (p.getY() > hiPt.getY()) {
-        hiPt = p;
-        hiIndex = i;
-      }
-    }
-
-    // find distinct point before highest point
-    int iPrev = hiIndex;
-    do {
-      iPrev = iPrev - 1;
-      if (iPrev < 0) {
-        iPrev = nPts;
-      }
-    } while (ring.getCoordinate(iPrev).equals2d(hiPt) && iPrev != hiIndex);
-
-    // find distinct point after highest point
-    int iNext = hiIndex;
-    do {
-      iNext = (iNext + 1) % nPts;
-    } while (ring.getCoordinate(iNext).equals2d(hiPt) && iNext != hiIndex);
-
-    final Coordinates prev = ring.getCoordinate(iPrev);
-    final Coordinates next = ring.getCoordinate(iNext);
-
-    /**
-     * This check catches cases where the ring contains an A-B-A configuration
-     * of points. This can happen if the ring does not contain 3 distinct points
-     * (including the case where the input array has fewer than 4 elements), or
-     * it contains coincident line segments.
-     */
-    if (prev.equals2d(hiPt) || next.equals2d(hiPt) || prev.equals2d(next)) {
-      return false;
-    }
-
-    final int disc = CGAlgorithms.computeOrientation(prev, hiPt, next);
-
-    /**
-     * If disc is exactly 0, lines are collinear. There are two possible cases:
-     * (1) the lines lie along the x axis in opposite directions (2) the lines
-     * lie on top of one another (1) is handled by checking if next is left of
-     * prev ==> CCW (2) will never happen if the ring is valid, so don't check
-     * for it (Might want to assert this)
-     */
-    boolean isCCW = false;
-    if (disc == 0) {
-      // poly is CCW if prev x is right of next x
-      isCCW = (prev.getX() > next.getX());
-    } else {
-      // if area is positive, points are ordered CCW
-      isCCW = (disc > 0);
-    }
-    return isCCW;
   }
 
   public static boolean isFromPoint(final Geometry geometry, final Point point) {
@@ -1227,15 +1079,6 @@ public final class JtsGeometryUtil {
     } else {
       return null;
     }
-  }
-
-  public static Polygon reversePolygon(final Polygon polygon) {
-    final GeometryFactory factory = GeometryFactory.getFactory(polygon);
-    final LineString exteriorRing = polygon.getExteriorRing();
-    final CoordinatesList oldCoordinates = CoordinatesListUtil.get(exteriorRing);
-    final CoordinatesList newCoordinates = oldCoordinates.reverse();
-    final LinearRing shell = factory.linearRing(newCoordinates);
-    return factory.createPolygon(shell, null);
   }
 
   public static Point setElevation(final Point newLocation,

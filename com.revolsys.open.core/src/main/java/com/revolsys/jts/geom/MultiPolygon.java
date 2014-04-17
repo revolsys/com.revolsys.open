@@ -47,6 +47,8 @@ import java.util.List;
  *@version 1.7
  */
 public interface MultiPolygon extends GeometryCollection, Polygonal {
+  Polygon getPolygon(int partIndex);
+
   public <V extends Polygon> List<V> getPolygons();
 
   @Override

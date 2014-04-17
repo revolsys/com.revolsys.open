@@ -9,8 +9,6 @@ import java.util.List;
 import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.jts.IsSimpleOp;
-import com.revolsys.gis.jts.IsValidOp;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -18,6 +16,8 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.operation.IsSimpleOp;
+import com.revolsys.jts.operation.valid.IsValidOp;
 import com.revolsys.jts.operation.valid.TopologyValidationError;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
@@ -115,8 +115,8 @@ public class SelectedRecordsRenderer {
   }
 
   public void paintSelected(final Viewport2D viewport,
-    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory, final Graphics2D graphics,
-    Geometry geometry) {
+    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory,
+    final Graphics2D graphics, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
 
@@ -144,9 +144,9 @@ public class SelectedRecordsRenderer {
         }
       }
 
-      final IsValidOp validOp = new IsValidOp(geometry);
+      final IsValidOp validOp = new IsValidOp(geometry, false);
       if (validOp.isValid()) {
-        final IsSimpleOp simpleOp = new IsSimpleOp(geometry);
+        final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
         if (!simpleOp.isSimple()) {
           for (final Coordinates coordinates : simpleOp.getNonSimplePoints()) {
             final Point point = viewportGeometryFactory.point(coordinates);
