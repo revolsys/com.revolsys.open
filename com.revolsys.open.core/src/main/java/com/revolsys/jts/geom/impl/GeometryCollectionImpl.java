@@ -52,7 +52,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.GeometryFilter;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.util.Assert;
 
@@ -119,14 +118,6 @@ public class GeometryCollectionImpl extends GeometryImpl implements
 
   @Override
   public void apply(final GeometryComponentFilter filter) {
-    filter.filter(this);
-    for (final Geometry geometry : geometries()) {
-      geometry.apply(filter);
-    }
-  }
-
-  @Override
-  public void apply(final GeometryFilter filter) {
     filter.filter(this);
     for (final Geometry geometry : geometries()) {
       geometry.apply(filter);

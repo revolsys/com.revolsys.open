@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFilter;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
@@ -50,7 +49,7 @@ import com.revolsys.jts.geom.Polygon;
  *
  * @version 1.7
  */
-public class ConnectedElementLocationFilter implements GeometryFilter {
+public class ConnectedElementLocationFilter {
 
   /**
    * Returns a list containing a point from each Polygon, LineString, and Point
@@ -58,24 +57,14 @@ public class ConnectedElementLocationFilter implements GeometryFilter {
    * not a GeometryCollection, an empty list will be returned. The elements of the list 
    * are {@link com.revolsys.jts.operation.distance.GeometryLocation}s.
    */
-  public static List getLocations(final Geometry geom) {
-    final List locations = new ArrayList();
-    geom.apply(new ConnectedElementLocationFilter(locations));
+  public static List<GeometryLocation> getLocations(final Geometry geometry) {
+    final List<GeometryLocation> locations = new ArrayList<GeometryLocation>();
+    for (final Geometry part : geometry.geometries()) {
+      if (part instanceof Point || part instanceof LineString
+        || part instanceof Polygon) {
+        locations.add(new GeometryLocation(part, 0, part.getCoordinate()));
+      }
+    }
     return locations;
   }
-
-  private final List locations;
-
-  ConnectedElementLocationFilter(final List locations) {
-    this.locations = locations;
-  }
-
-  @Override
-  public void filter(final Geometry geom) {
-    if (geom instanceof Point || geom instanceof LineString
-      || geom instanceof Polygon) {
-      locations.add(new GeometryLocation(geom, 0, geom.getCoordinate()));
-    }
-  }
-
 }

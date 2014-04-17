@@ -50,7 +50,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.GeometryFilter;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.vertex.PolygonVertexIterable;
@@ -150,11 +149,6 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     for (final LinearRing ring : rings()) {
       ring.apply(filter);
     }
-  }
-
-  @Override
-  public void apply(final GeometryFilter filter) {
-    filter.filter(this);
   }
 
   /**

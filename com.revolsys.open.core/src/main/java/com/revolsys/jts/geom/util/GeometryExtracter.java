@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,43 +36,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryFilter;
 
 /**
  * Extracts the components of a given type from a {@link Geometry}.
  *
  * @version 1.7
  */
-public class GeometryExtracter
-  implements GeometryFilter
-{
-	
-	protected static boolean isOfClass(Object o, Class clz)
-	{
-		return clz.isAssignableFrom(o.getClass());
-//		return o.getClass() == clz;
-	}
-	
-  /**
-   * Extracts the components of type <tt>clz</tt> from a {@link Geometry}
-   * and adds them to the provided {@link List}.
-   * 
-   * @param geom the geometry from which to extract
-   * @param list the list to add the extracted elements to
-   */
-  public static List extract(Geometry geom, Class clz, List list)
-  {
-  	if (isOfClass(geom, clz)) {
-  		list.add(geom);
-  	}
-  	else if (geom instanceof GeometryCollection) {
-  		geom.apply(new GeometryExtracter(clz, list));
-  	}
-  	// skip non-LineString elemental geometries
-  	
-    return list;
-  }
+public class GeometryExtracter {
 
   /**
    * Extracts the components of type <tt>clz</tt> from a {@link Geometry}
@@ -81,29 +50,26 @@ public class GeometryExtracter
    * 
    * @param geom the geometry from which to extract
    */
-  public static List extract(Geometry geom, Class clz)
-  {
-    return extract(geom, clz, new ArrayList());
+  public static List<Geometry> extract(final Geometry geom, final Class<?> clz) {
+    return extract(geom, clz, new ArrayList<Geometry>());
   }
 
-  private Class clz;
-  private List comps;
-  
   /**
-   * Constructs a filter with a list in which to store the elements found.
+   * Extracts the components of type <tt>clz</tt> from a {@link Geometry}
+   * and adds them to the provided {@link List}.
    * 
-   * @param clz the class of the components to extract (null means all types)
-   * @param comps the list to extract into
+   * @param geom the geometry from which to extract
+   * @param list the list to add the extracted elements to
    */
-  public GeometryExtracter(Class clz, List comps)
-  {
-  	this.clz = clz;
-    this.comps = comps;
-  }
+  public static List<Geometry> extract(final Geometry geometry,
+    final Class<?> clz, final List<Geometry> list) {
+    for (final Geometry part : geometry.geometries()) {
+      if (clz.isAssignableFrom(part.getClass())) {
+        list.add(part);
+      }
+    }
 
-  public void filter(Geometry geom)
-  {
-    if (clz == null || isOfClass(geom, clz)) comps.add(geom);
+    return list;
   }
 
 }

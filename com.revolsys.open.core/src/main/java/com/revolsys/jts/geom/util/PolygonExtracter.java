@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,8 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryFilter;
 import com.revolsys.jts.geom.Polygon;
 
 /**
@@ -47,52 +44,33 @@ import com.revolsys.jts.geom.Polygon;
  * @version 1.7
  * @see GeometryExtracter
  */
-public class PolygonExtracter
-  implements GeometryFilter
-{
-  /**
-   * Extracts the {@link Polygon} elements from a single {@link Geometry}
-   * and adds them to the provided {@link List}.
-   * 
-   * @param geom the geometry from which to extract
-   * @param list the list to add the extracted elements to
-   */
-  public static List getPolygons(Geometry geom, List list)
-  {
-  	if (geom instanceof Polygon) {
-  		list.add(geom);
-  	}
-  	else if (geom instanceof GeometryCollection) {
-  		geom.apply(new PolygonExtracter(list));
-  	}
-  	// skip non-Polygonal elemental geometries
-  	
-    return list;
-  }
-
+public class PolygonExtracter {
   /**
    * Extracts the {@link Polygon} elements from a single {@link Geometry}
    * and returns them in a {@link List}.
    * 
    * @param geom the geometry from which to extract
    */
-  public static List getPolygons(Geometry geom)
-  {
-    return getPolygons(geom, new ArrayList());
+  public static List<Polygon> getPolygons(final Geometry geom) {
+    final ArrayList<Polygon> polygons = new ArrayList<Polygon>();
+    return getPolygons(geom, polygons);
   }
 
-  private List comps;
   /**
-   * Constructs a PolygonExtracterFilter with a list in which to store Polygons found.
+   * Extracts the {@link Polygon} elements from a single {@link Geometry}
+   * and adds them to the provided {@link List}.
+   * 
+   * @param geometrt the geometry from which to extract
+   * @param list the list to add the extracted elements to
    */
-  public PolygonExtracter(List comps)
-  {
-    this.comps = comps;
-  }
-
-  public void filter(Geometry geom)
-  {
-    if (geom instanceof Polygon) comps.add(geom);
+  public static List<Polygon> getPolygons(final Geometry geometry,
+    final List<Polygon> list) {
+    for (final Geometry part : geometry.geometries()) {
+      if (part instanceof Polygon) {
+        list.add((Polygon)part);
+      }
+    }
+    return list;
   }
 
 }

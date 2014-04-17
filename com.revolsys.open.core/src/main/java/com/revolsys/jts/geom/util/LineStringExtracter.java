@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,8 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryFilter;
 import com.revolsys.jts.geom.LineString;
 
 /**
@@ -47,9 +44,17 @@ import com.revolsys.jts.geom.LineString;
  * @version 1.7
  * @see GeometryExtracter
  */
-public class LineStringExtracter
-  implements GeometryFilter
-{
+public class LineStringExtracter {
+  /**
+   * Extracts the {@link LineString} elements from a single {@link Geometry}
+   * and returns them in a {@link List}.
+   * 
+   * @param geom the geometry from which to extract
+   */
+  public static List<LineString> getLines(final Geometry geom) {
+    return getLines(geom, new ArrayList<LineString>());
+  }
+
   /**
    * Extracts the {@link LineString} elements from a single {@link Geometry}
    * and adds them to the provided {@link List}.
@@ -57,43 +62,13 @@ public class LineStringExtracter
    * @param geom the geometry from which to extract
    * @param lines the list to add the extracted LineStrings to
    */
-  public static List getLines(Geometry geom, List lines)
-  {
-  	if (geom instanceof LineString) {
-  		lines.add(geom);
-  	}
-  	else if (geom instanceof GeometryCollection) {
-  		geom.apply(new LineStringExtracter(lines));
-  	}
-  	// skip non-LineString elemental geometries
-  	
-    return lines;
+  public static List<LineString> getLines(final Geometry geometry,
+    final List<LineString> list) {
+    for (final Geometry part : geometry.geometries()) {
+      if (part instanceof LineString) {
+        list.add((LineString)part);
+      }
+    }
+    return list;
   }
-
-  /**
-   * Extracts the {@link LineString} elements from a single {@link Geometry}
-   * and returns them in a {@link List}.
-   * 
-   * @param geom the geometry from which to extract
-   */
-  public static List getLines(Geometry geom)
-  {
-    return getLines(geom, new ArrayList());
-  }
-
-  private List comps;
-  
-  /**
-   * Constructs a filter with a list in which to store the elements found.
-   */
-  public LineStringExtracter(List comps)
-  {
-    this.comps = comps;
-  }
-
-  public void filter(Geometry geom)
-  {
-    if (geom instanceof LineString) comps.add(geom);
-  }
-
 }

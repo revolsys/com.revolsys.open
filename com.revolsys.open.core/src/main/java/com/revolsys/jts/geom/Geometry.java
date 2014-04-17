@@ -193,17 +193,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   void apply(GeometryComponentFilter filter);
 
   /**
-   *  Performs an operation with or on this <code>Geometry</code> and its
-   *  subelement <code>Geometry</code>s (if any).
-   *  Only GeometryCollections and subclasses
-   *  have subelement Geometry's.
-   *
-   *@param  filter  the filter to apply to this <code>Geometry</code> (and
-   *      its children, if it is a <code>GeometryCollection</code>).
-   */
-  void apply(GeometryFilter filter);
-
-  /**
    * Computes a buffer area around this geometry having the given width. The
    * buffer of a Geometry is the Minkowski sum or difference of the geometry
    * with a disc of radius <code>abs(distance)</code>.

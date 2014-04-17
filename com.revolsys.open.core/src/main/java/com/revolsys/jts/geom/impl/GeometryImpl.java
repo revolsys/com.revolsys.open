@@ -60,7 +60,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.GeometryFilter;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -309,18 +308,6 @@ public abstract class GeometryImpl implements Geometry {
    */
   @Override
   public abstract void apply(GeometryComponentFilter filter);
-
-  /**
-   *  Performs an operation with or on this <code>Geometry</code> and its
-   *  subelement <code>Geometry</code>s (if any).
-   *  Only GeometryCollections and subclasses
-   *  have subelement Geometry's.
-   *
-   *@param  filter  the filter to apply to this <code>Geometry</code> (and
-   *      its children, if it is a <code>GeometryCollection</code>).
-   */
-  @Override
-  public abstract void apply(GeometryFilter filter);
 
   /**
    * Computes a buffer area around this geometry having the given width. The

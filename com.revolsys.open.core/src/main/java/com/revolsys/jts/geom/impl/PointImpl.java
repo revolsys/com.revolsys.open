@@ -52,7 +52,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.GeometryFilter;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.util.NumberUtil;
@@ -133,11 +132,6 @@ public class PointImpl extends GeometryImpl implements Point {
 
   @Override
   public void apply(final GeometryComponentFilter filter) {
-    filter.filter(this);
-  }
-
-  @Override
-  public void apply(final GeometryFilter filter) {
     filter.filter(this);
   }
 

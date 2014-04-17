@@ -33,16 +33,11 @@
 
 package com.revolsys.jts.operation.overlay.validate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.GeometryFilter;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
@@ -82,15 +77,17 @@ public class FuzzyPointLocator {
   /**
    * Extracts linework for polygonal components.
    * 
-   * @param g the geometry from which to extract
+   * @param geometry the geometry from which to extract
    * @return a lineal geometry containing the extracted linework
    */
-  private MultiLineString extractLinework(final Geometry g) {
-    final PolygonalLineworkExtracter extracter = new PolygonalLineworkExtracter();
-    g.apply(extracter);
-    final List linework = extracter.getLinework();
-    final LineString[] lines = GeometryFactory.toLineStringArray(linework);
-    return g.getGeometryFactory().createMultiLineString(lines);
+  private MultiLineString extractLinework(final Geometry geometry) {
+    final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+    if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      return geometryFactory.createMultiLineString(polygon.getRings());
+    } else {
+      return geometryFactory.createMultiLineString();
+    }
   }
 
   public int getLocation(final Coordinates pt) {
@@ -122,42 +119,5 @@ public class FuzzyPointLocator {
       }
     }
     return false;
-  }
-}
-
-/**
- * Extracts the LineStrings in the boundaries 
- * of all the polygonal elements in the target {@link Geometry}.
- * 
- * @author Martin Davis
- */
-class PolygonalLineworkExtracter implements GeometryFilter {
-  private final List linework;
-
-  public PolygonalLineworkExtracter() {
-    linework = new ArrayList();
-  }
-
-  /**
-   * Filters out all linework for polygonal elements
-   */
-  @Override
-  public void filter(final Geometry g) {
-    if (g instanceof Polygon) {
-      final Polygon poly = (Polygon)g;
-      linework.add(poly.getExteriorRing());
-      for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-        linework.add(poly.getInteriorRing(i));
-      }
-    }
-  }
-
-  /**
-   * Gets the list of polygonal linework.
-   * 
-   * @return a List of LineStrings
-   */
-  public List getLinework() {
-    return linework;
   }
 }
