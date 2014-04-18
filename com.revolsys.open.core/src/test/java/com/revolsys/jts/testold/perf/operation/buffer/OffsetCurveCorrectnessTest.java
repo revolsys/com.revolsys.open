@@ -36,7 +36,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.operation.buffer.OffsetCurveBuilder;
@@ -72,10 +71,8 @@ public class OffsetCurveCorrectnessTest {
 
   }
 
-  private final PrecisionModel precisionModel = new PrecisionModel();
-
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    2);
 
   WKTReader rdr = new WKTReader(this.geometryFactory);
 

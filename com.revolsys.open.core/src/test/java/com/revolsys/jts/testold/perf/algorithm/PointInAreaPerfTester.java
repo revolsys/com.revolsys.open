@@ -35,9 +35,9 @@ public class PointInAreaPerfTester {
 
   public void printStats() {
     System.out.println("Location counts: " + " Boundary = "
-      + this.locationCount[Location.BOUNDARY] + " Interior = "
-      + this.locationCount[Location.INTERIOR] + " Exterior = "
-      + this.locationCount[Location.EXTERIOR]);
+      + this.locationCount[Location.BOUNDARY.getIndex()] + " Interior = "
+      + this.locationCount[Location.INTERIOR.getIndex()] + " Exterior = "
+      + this.locationCount[Location.EXTERIOR.getIndex()]);
   }
 
   /**
@@ -59,11 +59,11 @@ public class PointInAreaPerfTester {
         // compute test point
         final double x = areaEnv.getMinX() + i * xStep;
         final double y = areaEnv.getMinY() + j * yStep;
-        final Coordinates pt = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
+        final Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
         this.geomFactory.getPrecisionModel().makePrecise(pt);
 
-        final int loc = this.pia1.locate(pt);
-        this.locationCount[loc]++;
+        final Location loc = this.pia1.locate(pt);
+        this.locationCount[loc.getIndex()]++;
       }
     }
     System.out.println("Test completed in " + sw.getTimeString());

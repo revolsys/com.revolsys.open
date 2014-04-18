@@ -180,7 +180,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<Geometry> geometries = new ArrayList<Geometry>();
     StaxUtils.skipSubTree(in);
-    return factory.createGeometry(geometries);
+    return factory.geometry(geometries);
   }
 
   private MultiLineString readMultiLineString(

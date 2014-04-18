@@ -45,7 +45,7 @@ public class IOUtil {
       geomList.add(geom);
     } while (true);
 
-    return geomFact.createGeometryCollection(GeometryFactory.toGeometryArray(geomList));
+    return geomFact.geometryCollection(GeometryFactory.toGeometryArray(geomList));
   }
 
   public static Geometry readGeometriesFromWKBHexString(final String wkb,
@@ -59,7 +59,7 @@ public class IOUtil {
       return (Geometry)geomList.get(0);
     }
 
-    return geomFact.createGeometryCollection(GeometryFactory.toGeometryArray(geomList));
+    return geomFact.geometryCollection(GeometryFactory.toGeometryArray(geomList));
   }
 
   private static Geometry readGeometriesFromWKTFile(final String filename,
@@ -87,7 +87,7 @@ public class IOUtil {
       return (Geometry)geomList.get(0);
     }
 
-    return geomFact.createGeometryCollection(GeometryFactory.toGeometryArray(geomList));
+    return geomFact.geometryCollection(GeometryFactory.toGeometryArray(geomList));
   }
 
   private static Geometry readGeometryFromWKBHexFile(final String filename,

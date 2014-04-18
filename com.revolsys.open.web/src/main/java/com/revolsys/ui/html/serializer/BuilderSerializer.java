@@ -2,6 +2,8 @@ package com.revolsys.ui.html.serializer;
 
 import java.io.IOException;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
@@ -12,6 +14,8 @@ public class BuilderSerializer extends AbstractKeySerializer implements
   TypeSerializer, HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   /** The HTML UI Builder */
   private HtmlUiBuilder<?> builder;
+
+  private String methodName;
 
   public BuilderSerializer() {
   }
@@ -26,6 +30,14 @@ public class BuilderSerializer extends AbstractKeySerializer implements
     this.builder = builder;
   }
 
+  public String getMethodName() {
+    if (StringUtils.hasText(methodName)) {
+      return methodName;
+    } else {
+      return getName();
+    }
+  }
+
   /**
    * Serialize the value to the XML writer.
    * 
@@ -33,17 +45,23 @@ public class BuilderSerializer extends AbstractKeySerializer implements
    * @param value The object to get the value from.
    * @throws IOException If there was an I/O error serializing the value.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object value) {
     if (builder == null) {
       out.text("-");
     } else {
-      builder.serialize(out, value, getName());
+      builder.serialize(out, value, getMethodName());
     }
   }
 
+  @Override
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
     if (uiBuilder != null) {
       this.builder = uiBuilder;
     }
+  }
+
+  public void setMethodName(final String methodName) {
+    this.methodName = methodName;
   }
 }

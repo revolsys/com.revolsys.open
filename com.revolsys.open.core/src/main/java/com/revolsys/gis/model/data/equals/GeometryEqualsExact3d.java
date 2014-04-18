@@ -6,15 +6,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 
-public class Geometry3DExactEquals implements Equals<Geometry> {
+public class GeometryEqualsExact3d implements Equals<Geometry> {
   public static final Set<String> USER_DATA_EXCLUDE = new TreeSet<String>();
 
   public static void addExclude(final String name) {
     USER_DATA_EXCLUDE.add(name);
+  }
+
+  public static boolean equal(final Geometry geometry1, final Geometry geometry2) {
+    if (geometry1 == null) {
+      return geometry2 == null;
+    } else if (geometry2 == null) {
+      return false;
+    } else {
+      return geometry1.equalsExact3d(geometry2);
+    }
   }
 
   private EqualsRegistry equalsRegistry;
@@ -22,16 +31,13 @@ public class Geometry3DExactEquals implements Equals<Geometry> {
   @Override
   public boolean equals(final Geometry geometry1, final Geometry geometry2,
     final Collection<String> exclude) {
-    if (geometry1.getNumGeometries() != geometry2.getNumGeometries()) {
+    if (!geometry1.equalsExact3d(geometry2)) {
       return false;
     }
     final boolean userDataEquals = !exclude.contains("userData");
     for (int j = 0; j < geometry1.getNumGeometries(); j++) {
       final Geometry geometryPart1 = geometry1.getGeometry(j);
       final Geometry geometryPart2 = geometry2.getGeometry(j);
-      if (!JtsGeometryUtil.equalsExact3D(geometryPart1, geometryPart2)) {
-        return false;
-      }
       if (userDataEquals) {
         if (!userDataEquals(geometryPart1, geometryPart2, exclude)) {
           return false;

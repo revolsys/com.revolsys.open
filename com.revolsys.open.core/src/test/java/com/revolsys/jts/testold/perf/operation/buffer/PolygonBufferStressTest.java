@@ -2,7 +2,6 @@ package com.revolsys.jts.testold.perf.operation.buffer;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.GeometricShapeFactory;
@@ -26,13 +25,10 @@ public class PolygonBufferStressTest {
 
   static final int MAX_ITER = 50;
 
-  static PrecisionModel pm = new PrecisionModel();
+  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    0, 2);
 
-  // static PrecisionModel pm = new PrecisionModel(10);
-
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
-
-  static WKTReader wktRdr = new WKTReader(fact);
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   static WKTWriter wktWriter = new WKTWriter();
 
@@ -119,7 +115,8 @@ public class PolygonBufferStressTest {
 
   public void test() {
     final String geomStr;
-    final GeometricShapeFactory shapeFact = new GeometricShapeFactory(fact);
+    final GeometricShapeFactory shapeFact = new GeometricShapeFactory(
+      geometryFactory);
 
     final Geometry g = getSampleGeometry();
 

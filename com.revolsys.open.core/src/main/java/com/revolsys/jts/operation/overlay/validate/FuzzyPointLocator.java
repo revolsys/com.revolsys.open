@@ -90,7 +90,7 @@ public class FuzzyPointLocator {
     }
   }
 
-  public int getLocation(final Coordinates pt) {
+  public Location getLocation(final Coordinates pt) {
     if (isWithinToleranceOfBoundary(pt)) {
       return Location.BOUNDARY;
       /*

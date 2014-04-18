@@ -8,7 +8,6 @@ import com.revolsys.jts.algorithm.match.HausdorffSimilarityMeasure;
 import com.revolsys.jts.algorithm.match.SimilarityMeasureCombiner;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 
@@ -22,9 +21,7 @@ import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 public class CascadedPolygonUnionTester {
   public static final double MIN_SIMILARITY_MEAURE = 0.999999;;
 
-  static PrecisionModel pm = new PrecisionModel();
-
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
+  private static final GeometryFactory fact = GeometryFactory.getFactory(0, 2);
 
   static WKTReader wktRdr = new WKTReader(fact);
 
@@ -80,7 +77,7 @@ public class CascadedPolygonUnionTester {
       final Geometry geom = (Geometry)i.next();
 
       if (unionAll == null) {
-        unionAll = (Geometry)geom.clone();
+        unionAll = geom.clone();
       } else {
         unionAll = unionAll.union(geom);
       }

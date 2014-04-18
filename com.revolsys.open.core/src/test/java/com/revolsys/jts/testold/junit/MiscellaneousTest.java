@@ -52,8 +52,11 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.impl.GeometryCollectionImpl;
+import com.revolsys.jts.geom.impl.MultiLineStringImpl;
+import com.revolsys.jts.geom.impl.MultiPointImpl;
 import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.util.Assert;
 
 /**
  * @version 1.7
@@ -64,9 +67,8 @@ public class MiscellaneousTest extends TestCase {
     TestRunner.run(MiscellaneousTest.class);
   }
 
-  PrecisionModel precisionModel = new PrecisionModel(1);
-
-  GeometryFactory geometryFactory = new GeometryFactory(this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -75,27 +77,27 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testBoundaryOfEmptyGeometry() throws Exception {
-    assertTrue(this.geometryFactory.point((Coordinates)null)
+    Assert.equals(this.geometryFactory.point().getBoundary().getClass(),
+      GeometryCollectionImpl.class);
+    Assert.equals(this.geometryFactory.linearRing().getBoundary().getClass(),
+      MultiPointImpl.class);
+    Assert.equals(this.geometryFactory.lineString(new Coordinates[] {})
       .getBoundary()
-      .getClass() == GeometryCollection.class);
-    assertTrue(this.geometryFactory.linearRing(new Coordinates[] {})
+      .getClass(), MultiPointImpl.class);
+    Assert.equals(this.geometryFactory.polygon().getBoundary().getClass(),
+      MultiLineStringImpl.class);
+    Assert.equals(this.geometryFactory.createMultiPolygon(new Polygon[] {})
       .getBoundary()
-      .getClass() == MultiPoint.class);
-    assertTrue(this.geometryFactory.lineString(new Coordinates[] {})
+      .getClass(), MultiLineStringImpl.class);
+    Assert.equals(
+      this.geometryFactory.createMultiLineString(new LineString[] {})
+        .getBoundary()
+        .getClass(), MultiPointImpl.class);
+    Assert.equals(this.geometryFactory.createMultiPoint(new Point[] {})
       .getBoundary()
-      .getClass() == MultiPoint.class);
-    assertTrue(this.geometryFactory.polygon().getBoundary().getClass() == MultiLineString.class);
-    assertTrue(this.geometryFactory.createMultiPolygon(new Polygon[] {})
-      .getBoundary()
-      .getClass() == MultiLineString.class);
-    assertTrue(this.geometryFactory.createMultiLineString(new LineString[] {})
-      .getBoundary()
-      .getClass() == MultiPoint.class);
-    assertTrue(this.geometryFactory.createMultiPoint(new Point[] {})
-      .getBoundary()
-      .getClass() == GeometryCollection.class);
+      .getClass(), GeometryCollectionImpl.class);
     try {
-      this.geometryFactory.createGeometryCollection(new Geometry[] {})
+      this.geometryFactory.geometryCollection(new Geometry[] {})
         .getBoundary();
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
@@ -222,7 +224,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyGeometryCollection() throws Exception {
-    final GeometryCollection g = this.geometryFactory.createGeometryCollection();
+    final GeometryCollection g = this.geometryFactory.geometryCollection();
     assertEquals(-1, g.getDimension());
     assertEquals(new Envelope(), g.getBoundingBox());
     assertTrue(g.isSimple());
@@ -286,16 +288,6 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(0, p.getDimension());
     assertEquals(new Envelope(), p.getBoundingBox());
     assertTrue(p.isSimple());
-    try {
-      p.getX();
-      assertTrue(false);
-    } catch (final IllegalStateException e1) {
-    }
-    try {
-      p.getY();
-      assertTrue(false);
-    } catch (final IllegalStateException e2) {
-    }
 
     assertEquals("POINT EMPTY", p.toString());
     assertEquals("POINT EMPTY", p.toWkt());

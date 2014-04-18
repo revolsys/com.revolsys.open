@@ -38,7 +38,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.io.WKTWriter;
@@ -47,9 +46,7 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 public abstract class StressTestHarness {
   static final int MAX_ITER = 10000;
 
-  static PrecisionModel pm = new PrecisionModel();
-
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
+  private static final GeometryFactory fact = GeometryFactory.getFactory(0, 2);
 
   static WKTReader wktRdr = new WKTReader(fact);
 
@@ -79,7 +76,7 @@ public abstract class StressTestHarness {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Coordinates basePt = new Coordinate((double)env.getMinX() + xOffset,
+    final Coordinates basePt = new Coordinate(env.getMinX() + xOffset,
       env.getMinY() + yOffset, Coordinates.NULL_ORDINATE);
     Geometry test = createTestCircle(basePt, size, nPts);
     if (test instanceof Polygon && Math.random() > 0.5) {
@@ -114,8 +111,8 @@ public abstract class StressTestHarness {
   public void run(final int nIter) {
     System.out.println("Running " + nIter + " tests");
     // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
-    final Geometry poly = createSineStar(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), 100,
-      this.numTargetPts);
+    final Geometry poly = createSineStar(new Coordinate((double)0, 0,
+      Coordinates.NULL_ORDINATE), 100, this.numTargetPts);
     System.out.println(poly);
 
     System.out.println();
@@ -127,8 +124,8 @@ public abstract class StressTestHarness {
     int count = 0;
     while (count < nIter) {
       count++;
-      final Geometry test = createRandomTestGeometry(
-        target.getBoundingBox(), 10, 20);
+      final Geometry test = createRandomTestGeometry(target.getBoundingBox(),
+        10, 20);
 
       // System.out.println("Test # " + count);
       // System.out.println(line);

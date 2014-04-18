@@ -45,7 +45,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -63,9 +62,8 @@ public class MultiPointImplTest extends TestCase {
     return new TestSuite(MultiPointImplTest.class);
   }
 
-  PrecisionModel precisionModel = new PrecisionModel(1000);
-
-  GeometryFactory geometryFactory = new GeometryFactory(this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1000.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 

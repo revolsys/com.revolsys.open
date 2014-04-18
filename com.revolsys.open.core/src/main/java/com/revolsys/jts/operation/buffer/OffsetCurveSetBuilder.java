@@ -38,10 +38,8 @@ package com.revolsys.jts.operation.buffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -123,8 +121,8 @@ public class OffsetCurveSetBuilder {
    * <br>Left: Location.EXTERIOR
    * <br>Right: Location.INTERIOR
    */
-  private void addCurve(final Coordinates[] coord, final int leftLoc,
-    final int rightLoc) {
+  private void addCurve(final Coordinates[] coord, final Location leftLoc,
+    final Location rightLoc) {
     // don't add null or trivial curves
     if (coord == null || coord.length < 2) {
       return;
@@ -170,7 +168,7 @@ public class OffsetCurveSetBuilder {
       offsetSide = Position.RIGHT;
     }
 
-    final LinearRing shell = (LinearRing)p.getExteriorRing();
+    final LinearRing shell = p.getExteriorRing();
     final Coordinates[] shellCoord = CoordinateArrays.removeRepeatedPoints(shell.getCoordinateArray());
     // optimization - don't bother computing buffer
     // if the polygon would be completely eroded
@@ -187,7 +185,7 @@ public class OffsetCurveSetBuilder {
 
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
 
-      final LinearRing hole = (LinearRing)p.getInteriorRing(i);
+      final LinearRing hole = p.getInteriorRing(i);
       final Coordinates[] holeCoord = CoordinateArrays.removeRepeatedPoints(hole.getCoordinateArray());
 
       // optimization - don't bother computing buffer for this hole
@@ -218,15 +216,15 @@ public class OffsetCurveSetBuilder {
    * @param cwRightLoc the location on the R side of the ring (if it is CW)
    */
   private void addPolygonRing(final Coordinates[] coord,
-    final double offsetDistance, int side, final int cwLeftLoc,
-    final int cwRightLoc) {
+    final double offsetDistance, int side, final Location cwLeftLoc,
+    final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
     if (offsetDistance == 0.0 && coord.length < LinearRing.MINIMUM_VALID_SIZE) {
       return;
     }
 
-    int leftLoc = cwLeftLoc;
-    int rightLoc = cwRightLoc;
+    Location leftLoc = cwLeftLoc;
+    Location rightLoc = cwRightLoc;
     if (coord.length >= LinearRing.MINIMUM_VALID_SIZE
       && CGAlgorithms.isCCW(coord)) {
       leftLoc = cwRightLoc;
@@ -319,8 +317,8 @@ public class OffsetCurveSetBuilder {
    * @param bufferDistance
    * @return
    */
-  private boolean isTriangleErodedCompletely(
-    final Coordinates[] triangleCoord, final double bufferDistance) {
+  private boolean isTriangleErodedCompletely(final Coordinates[] triangleCoord,
+    final double bufferDistance) {
     final Triangle tri = new Triangle(triangleCoord[0], triangleCoord[1],
       triangleCoord[2]);
     final Coordinates inCentre = tri.inCentre();

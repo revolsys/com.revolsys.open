@@ -40,7 +40,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance.DistanceOp;
@@ -54,10 +53,8 @@ public class DistanceTest extends TestCase {
     TestRunner.run(DistanceTest.class);
   }
 
-  private final PrecisionModel precisionModel = new PrecisionModel(1);
-
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -81,49 +78,55 @@ public class DistanceTest extends TestCase {
 
   public void testClosestPoints1() throws Exception {
     doNearestPointsTest("POLYGON ((200 180, 60 140, 60 260, 200 180))",
-      "POINT (140 280)", 57.05597791103589, new Coordinate((double)111.6923076923077,
-        230.46153846153845, Coordinates.NULL_ORDINATE), new Coordinate((double)140, 280, Coordinates.NULL_ORDINATE));
+      "POINT (140 280)", 57.05597791103589, new Coordinate(111.6923076923077,
+        230.46153846153845, Coordinates.NULL_ORDINATE), new Coordinate(
+        (double)140, 280, Coordinates.NULL_ORDINATE));
   }
 
   public void testClosestPoints2() throws Exception {
     doNearestPointsTest("POLYGON ((200 180, 60 140, 60 260, 200 180))",
-      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589, new Coordinate((double)
-        111.6923076923077, 230.46153846153845, Coordinates.NULL_ORDINATE), new Coordinate((double)140, 280, Coordinates.NULL_ORDINATE));
+      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589, new Coordinate(
+        111.6923076923077, 230.46153846153845, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)140, 280, Coordinates.NULL_ORDINATE));
   }
 
   public void testClosestPoints3() throws Exception {
     doNearestPointsTest(
       "LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)",
-      "POINT (10 10)", 127.27922061357856, new Coordinate((double)100, 100, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE));
+      "POINT (10 10)", 127.27922061357856, new Coordinate((double)100, 100,
+        Coordinates.NULL_ORDINATE), new Coordinate((double)10, 10,
+        Coordinates.NULL_ORDINATE));
   }
 
   public void testClosestPoints4() throws Exception {
     doNearestPointsTest("LINESTRING (100 100, 200 200)",
-      "LINESTRING (100 200, 200 100)", 0.0, new Coordinate((double)150, 150, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)150, 150, Coordinates.NULL_ORDINATE));
+      "LINESTRING (100 200, 200 100)", 0.0, new Coordinate((double)150, 150,
+        Coordinates.NULL_ORDINATE), new Coordinate((double)150, 150,
+        Coordinates.NULL_ORDINATE));
   }
 
   public void testClosestPoints5() throws Exception {
     doNearestPointsTest("LINESTRING (100 100, 200 200)",
-      "LINESTRING (150 121, 200 0)", 20.506096654409877, new Coordinate((double)135.5,
-        135.5, Coordinates.NULL_ORDINATE), new Coordinate((double)150, 121, Coordinates.NULL_ORDINATE));
+      "LINESTRING (150 121, 200 0)", 20.506096654409877, new Coordinate(135.5,
+        135.5, Coordinates.NULL_ORDINATE), new Coordinate((double)150, 121,
+        Coordinates.NULL_ORDINATE));
   }
 
   public void testClosestPoints6() throws Exception {
     doNearestPointsTest(
       "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
       "LINESTRING (153 204, 185 224, 209 207, 238 222, 254 186)",
-      13.788860460124573,
-      new Coordinate((double)139.4956500724988, 206.78661188980183, Coordinates.NULL_ORDINATE), new Coordinate((double)
-        153, 204, Coordinates.NULL_ORDINATE));
+      13.788860460124573, new Coordinate(139.4956500724988, 206.78661188980183,
+        Coordinates.NULL_ORDINATE), new Coordinate((double)153, 204,
+        Coordinates.NULL_ORDINATE));
   }
 
   public void testClosestPoints7() throws Exception {
     doNearestPointsTest(
       "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
       "LINESTRING (120 215, 185 224, 209 207, 238 222, 254 186)", 0.0,
-      new Coordinate((double)120, 215, Coordinates.NULL_ORDINATE), new Coordinate((double)120, 215, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)120, 215, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)120, 215, Coordinates.NULL_ORDINATE));
   }
 
   public void testDisjointCollinearSegments() throws Exception {

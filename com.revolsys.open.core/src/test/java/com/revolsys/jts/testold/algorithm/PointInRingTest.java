@@ -58,7 +58,7 @@ public class PointInRingTest extends AbstractPointInRingTest {
   }
 
   @Override
-  protected void runPtInRing(final int expectedLoc, final Coordinates pt,
+  protected void runPtInRing(final Location expectedLoc, final Coordinates pt,
     final String wkt) throws Exception {
     // isPointInRing is not defined for pts on boundary
     if (expectedLoc == Location.BOUNDARY) {

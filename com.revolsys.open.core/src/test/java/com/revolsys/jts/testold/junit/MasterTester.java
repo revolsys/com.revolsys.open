@@ -74,7 +74,6 @@ import com.revolsys.jts.testold.operation.RelateBoundaryNodeRuleTest;
 import com.revolsys.jts.testold.operation.UnaryUnionTest;
 import com.revolsys.jts.testold.operation.ValidClosedRingTest;
 import com.revolsys.jts.testold.operation.ValidSelfTouchingRingFormingHoleTest;
-import com.revolsys.jts.testold.precision.SimpleGeometryPrecisionReducerTest;
 import com.revolsys.jts.testold.triangulate.ConformingDelaunayTest;
 import com.revolsys.jts.testold.triangulate.DelaunayTest;
 
@@ -92,7 +91,8 @@ public class MasterTester extends TestCase {
 
   public static Test suite() {
     final TestSuite result = new TestSuite();
-    result.addTest(new TestSuite(com.revolsys.jts.testold.algorithm.AngleTest.class));
+    result.addTest(new TestSuite(
+      com.revolsys.jts.testold.algorithm.AngleTest.class));
     result.addTest(new TestSuite(AreaLengthTest.class));
     result.addTest(new TestSuite(BasicCoordinateSequenceTest.class));
     result.addTest(new TestSuite(BidirectionalComparatorTest.class));
@@ -111,7 +111,8 @@ public class MasterTester extends TestCase {
     result.addTest(new TestSuite(GeometryImplTest.class));
     result.addTest(new TestSuite(IntersectionMatrixTest.class));
     result.addTest(new TestSuite(IntervalTest.class));
-    result.addTest(new TestSuite(com.revolsys.jts.testold.algorithm.IsCCWTest.class));
+    result.addTest(new TestSuite(
+      com.revolsys.jts.testold.algorithm.IsCCWTest.class));
     result.addTest(new TestSuite(IsRectangleTest.class));
     result.addTest(new TestSuite(IsValidTest.class));
     result.addTest(new TestSuite(LengthIndexedLineTest.class));
@@ -133,7 +134,6 @@ public class MasterTester extends TestCase {
     result.addTest(new TestSuite(RectanglePredicateTest.class));
     result.addTest(new TestSuite(RelateBoundaryNodeRuleTest.class));
     result.addTest(new TestSuite(RobustLineIntersectionTest.class));
-    result.addTest(new TestSuite(SimpleGeometryPrecisionReducerTest.class));
     result.addTest(new TestSuite(SimpleTest.class));
     result.addTest(new TestSuite(SIRtreeTest.class));
     result.addTest(new TestSuite(STRtreeTest.class));

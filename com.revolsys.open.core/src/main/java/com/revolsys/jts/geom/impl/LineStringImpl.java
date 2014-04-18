@@ -38,6 +38,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateFilter;
@@ -307,6 +308,28 @@ public class LineStringImpl extends GeometryImpl implements LineString {
       }
     }
     return true;
+  }
+
+  @Override
+  public boolean equalsExact3d(final Geometry geometry) {
+    if (geometry == this) {
+      return true;
+    } else if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      final int vertexCount = getVertexCount();
+      if (vertexCount == line.getVertexCount()) {
+        for (int i = 0; i < line.getVertexCount(); i++) {
+          for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
+            final double value1 = getCoordinate(i, axisIndex);
+            final double value2 = line.getCoordinate(i, axisIndex);
+            if (!NumberEquals.equal(value1, value2)) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+    return false;
   }
 
   /**

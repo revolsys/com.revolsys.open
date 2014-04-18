@@ -6,6 +6,28 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.JavaBeanUtil;
 
 public class BooleanImageKeySerializer extends AbstractKeySerializer {
+  public static boolean serialize(final XmlWriter out, final Object object,
+    final String name) {
+    final Object value = JavaBeanUtil.getBooleanValue(object, name);
+    String text;
+    String imageName;
+    final boolean result = Boolean.TRUE.equals(value);
+    if (result) {
+      imageName = "tick";
+      text = "Yes";
+    } else {
+      imageName = "cross";
+      text = "No";
+    }
+    out.startTag(HtmlUtil.IMG);
+    out.attribute(HtmlUtil.ATTR_SRC,
+      HttpServletUtils.getAbsoluteUrl("/images/" + imageName + ".png"));
+    out.attribute(HtmlUtil.ATTR_ALT, text);
+    out.attribute(HtmlUtil.ATTR_TITLE, text);
+    out.endTag(HtmlUtil.IMG);
+    return result;
+  }
+
   public BooleanImageKeySerializer() {
     setProperty("searchable", false);
   }
@@ -26,22 +48,9 @@ public class BooleanImageKeySerializer extends AbstractKeySerializer {
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = JavaBeanUtil.getBooleanValue(object, getName());
-    String text;
-    String imageName;
-    if (Boolean.TRUE.equals(value)) {
-      imageName = "tick";
-      text = "Yes";
-    } else {
-      imageName = "cross";
-      text = "No";
-    }
-    out.startTag(HtmlUtil.IMG);
-    out.attribute(HtmlUtil.ATTR_SRC,
-      HttpServletUtils.getAbsoluteUrl("/images/" + imageName + ".png"));
-    out.attribute(HtmlUtil.ATTR_ALT, text);
-    out.attribute(HtmlUtil.ATTR_TITLE, text);
-    out.endTag(HtmlUtil.IMG);
+    final String name = getName();
+    serialize(out, object, name);
   }
 }

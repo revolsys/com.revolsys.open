@@ -53,7 +53,6 @@ import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.vertex.Vertex;
-import com.revolsys.jts.util.Assert;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -203,6 +202,29 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   }
 
   @Override
+  public boolean equalsExact3d(final Geometry geometry) {
+    if (geometry == this) {
+      return true;
+    } else if (geometry != null) {
+      if (getDataType().equals(geometry.getDataType())) {
+        final int geometryCount = getNumGeometries();
+        if (geometryCount == geometry.getNumGeometries()) {
+          for (int i = 0; i < geometryCount; i++) {
+            final Geometry part1 = getGeometry(i);
+            final Geometry part2 = geometry.getGeometry(i);
+            if (!part1.equals(part2)) {
+              return false;
+            }
+          }
+          return true;
+        }
+
+      }
+    }
+    return false;
+  }
+
+  @Override
   public Iterable<Geometry> geometries() {
     return getGeometries();
   }
@@ -223,9 +245,8 @@ public class GeometryCollectionImpl extends GeometryImpl implements
 
   @Override
   public Geometry getBoundary() {
-    checkNotGeometryCollection(this);
-    Assert.shouldNeverReachHere();
-    return null;
+    throw new IllegalArgumentException(
+      "This method does not support GeometryCollection arguments");
   }
 
   @Override
@@ -287,9 +308,9 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   @Override
   public <V extends Geometry> List<V> getGeometries() {
     if (geometries == null) {
-      return Collections.emptyList();
+      return new ArrayList<V>();
     } else {
-      return (List<V>)Arrays.asList(geometries);
+      return (List<V>)new ArrayList<>(Arrays.asList(geometries));
     }
   }
 
@@ -353,7 +374,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
     }
     Collections.sort(geometries);
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final GeometryCollection normalizedGeometry = geometryFactory.createGeometryCollection(geometries);
+    final GeometryCollection normalizedGeometry = geometryFactory.geometryCollection(geometries);
     return normalizedGeometry;
   }
 
@@ -374,7 +395,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
       }
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.createGeometryCollection(revGeoms);
+    return geometryFactory.geometryCollection(revGeoms);
   }
 
   /**

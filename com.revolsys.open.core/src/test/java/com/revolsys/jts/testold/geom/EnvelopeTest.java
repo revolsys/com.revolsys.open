@@ -43,7 +43,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.test.geometry.CoordinateTest;
@@ -56,10 +55,8 @@ public class EnvelopeTest extends TestCase {
     TestRunner.run(EnvelopeTest.class);
   }
 
-  private final PrecisionModel precisionModel = new PrecisionModel(1);
-
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 

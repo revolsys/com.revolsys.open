@@ -302,7 +302,7 @@ public class GeometryEditor {
     if (collectionForType.getClass() == MultiPolygon.class) {
       return factory.createMultiPolygon((Polygon[])geometries.toArray(new Polygon[] {}));
     }
-    return factory.createGeometryCollection((Geometry[])geometries.toArray(new Geometry[] {}));
+    return factory.geometryCollection((Geometry[])geometries.toArray(new Geometry[] {}));
   }
 
   private Polygon editPolygon(final Polygon polygon,

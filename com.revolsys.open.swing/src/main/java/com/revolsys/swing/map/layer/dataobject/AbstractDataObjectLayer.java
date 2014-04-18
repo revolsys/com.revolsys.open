@@ -1095,7 +1095,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
                   }
                   return null;
                 }
-                geometry = geometryFactory.createGeometry(layerGeometryClass,
+                geometry = geometryFactory.geometry(layerGeometryClass,
                   sourceGeometry);
                 if (geometry == null) {
                   if (alert) {
@@ -1540,7 +1540,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
               sourceGeometry = StringConverterRegistry.toObject(Geometry.class,
                 value);
             }
-            final Geometry geometry = geometryFactory.createGeometry(
+            final Geometry geometry = geometryFactory.geometry(
               layerGeometryClass, sourceGeometry);
             if (geometry == null) {
               newValues.clear();

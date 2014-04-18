@@ -33,12 +33,13 @@
 
 package com.revolsys.jts.noding;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.util.CollectionUtil;
 
 /**
  * Wraps a {@link Noder} and transforms its input
@@ -99,16 +100,10 @@ public class ScaledNoder implements Noder {
     return scaleFactor == 1.0;
   }
 
-  private void rescale(final Collection segStrings) {
-    // System.out.println("Rescaled: scaleFactor = " + scaleFactor);
-    CollectionUtil.apply(segStrings, new CollectionUtil.Function() {
-      @Override
-      public Object execute(final Object obj) {
-        final SegmentString ss = (SegmentString)obj;
-        rescale(ss.getCoordinates());
-        return null;
-      }
-    });
+  private void rescale(final Collection<SegmentString> segStrings) {
+    for (final SegmentString ss : segStrings) {
+      rescale(ss.getCoordinates());
+    }
   }
 
   private void rescale(final Coordinates[] pts) {
@@ -133,15 +128,18 @@ public class ScaledNoder implements Noder {
   // private double scale(double val) { return (double) Math.round(val *
   // scaleFactor); }
 
-  private Collection scale(final Collection segStrings) {
-    // System.out.println("Scaled: scaleFactor = " + scaleFactor);
-    return CollectionUtil.transform(segStrings, new CollectionUtil.Function() {
-      @Override
-      public Object execute(final Object obj) {
-        final SegmentString ss = (SegmentString)obj;
-        return new NodedSegmentString(scale(ss.getCoordinates()), ss.getData());
-      }
-    });
+  private Collection<SegmentString> scale(
+    final Collection<SegmentString> segStrings) {
+    final List<SegmentString> result = new ArrayList<>();
+    for (final SegmentString ss : segStrings) {
+      Coordinates[] coordinates = ss.getCoordinates();
+      Object data = ss.getData();
+      Coordinates[] scale = scale(coordinates);
+      NodedSegmentString nodedSegmentString = new NodedSegmentString(scale,
+        data);
+      result.add(nodedSegmentString);
+    }
+    return result;
   }
 
   private Coordinates[] scale(final Coordinates[] pts) {

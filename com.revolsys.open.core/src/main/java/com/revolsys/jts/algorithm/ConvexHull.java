@@ -258,7 +258,7 @@ public class ConvexHull {
   public Geometry getConvexHull() {
 
     if (inputPts.length == 0) {
-      return geomFactory.createGeometryCollection();
+      return geomFactory.geometryCollection();
     }
     if (inputPts.length == 1) {
       return geomFactory.point(inputPts[0]);

@@ -306,6 +306,15 @@ public class PointImpl extends GeometryImpl implements Point {
       tolerance);
   }
 
+  @Override
+  public boolean equalsExact3d(final Geometry geometry) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return equals3d(point);
+    }
+    return false;
+  }
+
   /**
    * Gets the boundary of this geometry.
    * Zero-dimensional geometries have no boundary by definition,

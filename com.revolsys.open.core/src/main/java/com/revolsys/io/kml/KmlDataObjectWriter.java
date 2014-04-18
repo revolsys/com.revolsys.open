@@ -173,7 +173,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
           }
         }
         if (!geometries.isEmpty()) {
-          geometry = metaData.getGeometryFactory().createGeometry(geometries);
+          geometry = metaData.getGeometryFactory().geometry(geometries);
         }
       }
       if (geometry != null) {

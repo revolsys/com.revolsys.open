@@ -195,7 +195,7 @@ public class PlanarPolygon3D {
       seqProj);
   }
 
-  private int locate(final Coordinates pt, final LineString ring) {
+  private Location locate(final Coordinates pt, final LineString ring) {
     final CoordinatesList seq = ring.getCoordinatesList();
     final CoordinatesList seqProj = project(seq, facingPlane);
     final Coordinates ptProj = project(pt, facingPlane);

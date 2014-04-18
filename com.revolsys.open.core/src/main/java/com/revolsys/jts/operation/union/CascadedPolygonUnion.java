@@ -194,7 +194,7 @@ public class CascadedPolygonUnion {
 
   private Geometry bufferUnion(final Geometry g0, final Geometry g1) {
     final GeometryFactory factory = g0.getGeometryFactory();
-    final Geometry gColl = factory.createGeometryCollection(new Geometry[] {
+    final Geometry gColl = factory.geometryCollection(new Geometry[] {
       g0, g1
     });
     final Geometry unionAll = gColl.buffer(0.0);

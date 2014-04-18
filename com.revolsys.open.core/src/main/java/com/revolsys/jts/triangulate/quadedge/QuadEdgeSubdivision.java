@@ -491,7 +491,7 @@ public class QuadEdgeSubdivision {
       final Coordinates[] triPt = (Coordinates[])it.next();
       tris[i++] = geomFact.polygon(geomFact.linearRing(triPt));
     }
-    return geomFact.createGeometryCollection(tris);
+    return geomFact.geometryCollection(tris);
   }
 
   /**
@@ -675,7 +675,7 @@ public class QuadEdgeSubdivision {
    */
   public Geometry getVoronoiDiagram(final GeometryFactory geomFact) {
     final List vorCells = getVoronoiCellPolygons(geomFact);
-    return geomFact.createGeometryCollection(GeometryFactory.toGeometryArray(vorCells));
+    return geomFact.geometryCollection(GeometryFactory.toGeometryArray(vorCells));
   }
 
   private QuadEdge initSubdiv() {

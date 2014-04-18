@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -32,7 +32,7 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
     final Object userData = oldGeometry.getUserData();
     if (userData != null) {
       if (userData instanceof Map) {
-        JtsGeometryUtil.copyUserData(oldGeometry, newGeometry);
+        GeometryProperties.copyUserData(oldGeometry, newGeometry);
       } else {
         newGeometry.setUserData(userData);
       }

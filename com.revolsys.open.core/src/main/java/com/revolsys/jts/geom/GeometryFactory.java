@@ -110,12 +110,6 @@ public class GeometryFactory implements Serializable,
     return GeometryFactory.getFactory(srid, numAxis, scaleXY, scaleZ);
   }
 
-  public static Point createPointFromInternalCoord(final Coordinates coord,
-    final Geometry exemplar) {
-    exemplar.getPrecisionModel().makePrecise(coord);
-    return exemplar.getGeometryFactory().point(coord);
-  }
-
   /**
    * <p>
    * Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and
@@ -473,19 +467,6 @@ public class GeometryFactory implements Serializable,
     this.numAxis = Math.max(numAxis, 2);
   }
 
-  /**
-   * Constructs a GeometryFactory that generates Geometries having the given
-   * {@link PrecisionModel} and spatial-reference ID, and the default CoordinatesList
-   * implementation.
-   *
-   * @param precisionModel the PrecisionModel to use
-   * @param srid the srid to use
-   */
-  @Deprecated
-  public GeometryFactory(final PrecisionModel precisionModel, final int srid) {
-    this(srid, 3, precisionModel.getScale(), precisionModel.getScale());
-  }
-
   public void addGeometries(final List<Geometry> geometryList,
     final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
@@ -554,10 +535,10 @@ public class GeometryFactory implements Serializable,
      */
     // for the empty geometry, return an empty GeometryCollection
     if (geomClass == null) {
-      return createGeometryCollection();
+      return geometryCollection();
     }
     if (isHeterogeneous || hasGeometryCollection) {
-      return createGeometryCollection(toGeometryArray(geomList));
+      return geometryCollection(toGeometryArray(geomList));
     }
     // at this point we know the collection is hetereogenous.
     // Determine the type of the result from the first Geometry in the list
@@ -581,13 +562,7 @@ public class GeometryFactory implements Serializable,
 
   @SuppressWarnings("unchecked")
   public <G extends Geometry> G copy(final G geometry) {
-    return (G)createGeometry(geometry);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends GeometryCollection> V createCollection(
-    final Geometry... geometries) {
-    return (V)createGeometryCollection(Arrays.asList(geometries));
+    return (G)geometry(geometry);
   }
 
   public Coordinates createCoordinates(final Coordinates point) {
@@ -641,234 +616,6 @@ public class GeometryFactory implements Serializable,
       makePrecise(coordinatesList);
       return coordinatesList;
     }
-  }
-
-  /**
-   * <p>
-   * Create a new geometry of the requested target geometry class.
-   * <p>
-   * 
-   * @param targetClass
-   * @param geometry
-   * @return
-   */
-  @SuppressWarnings({
-    "unchecked"
-  })
-  public <V extends Geometry> V createGeometry(final Class<?> targetClass,
-    Geometry geometry) {
-    if (geometry != null && !geometry.isEmpty()) {
-      geometry = copy(geometry);
-      if (geometry instanceof GeometryCollection) {
-        if (geometry.getNumGeometries() == 1) {
-          geometry = geometry.getGeometry(0);
-        } else {
-          geometry = geometry.union();
-          // Union doesn't use this geometry factory
-          geometry = copy(geometry);
-        }
-      }
-      final Class<?> geometryClass = geometry.getClass();
-      if (targetClass.isAssignableFrom(geometryClass)) {
-        // TODO if geometry collection then clean up
-        return (V)geometry;
-      } else if (Point.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof MultiPoint) {
-          if (geometry.getNumGeometries() == 1) {
-            return (V)geometry.getGeometry(0);
-          }
-        }
-      } else if (LineString.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof MultiLineString) {
-          if (geometry.getNumGeometries() == 1) {
-            return (V)geometry.getGeometry(0);
-          } else {
-            final LineMerger merger = new LineMerger();
-            merger.add(geometry);
-            final List<LineString> mergedLineStrings = (List<LineString>)merger.getMergedLineStrings();
-            if (mergedLineStrings.size() == 1) {
-              return (V)mergedLineStrings.get(0);
-            }
-          }
-        }
-      } else if (Polygon.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof MultiPolygon) {
-          if (geometry.getNumGeometries() == 1) {
-            return (V)geometry.getGeometry(0);
-          }
-        }
-      } else if (MultiPoint.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof Point) {
-          return (V)createMultiPoint(geometry);
-        }
-      } else if (MultiLineString.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof LineString) {
-          return (V)createMultiLineString(geometry);
-        }
-      } else if (MultiPolygon.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof Polygon) {
-          return (V)createMultiPolygon(geometry);
-        }
-      }
-    }
-    return null;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends Geometry> V createGeometry(
-    final Collection<? extends Geometry> geometries) {
-    final Collection<? extends Geometry> geometryList = getGeometries(geometries);
-    if (geometryList == null || geometries.size() == 0) {
-      return (V)geometryCollection();
-    } else if (geometries.size() == 1) {
-      return (V)CollectionUtil.get(geometries, 0);
-    } else {
-      final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
-      if (dataTypes.size() == 1) {
-        final DataType dataType = CollectionUtil.get(dataTypes, 0);
-        if (dataType.equals(DataTypes.POINT)) {
-          return (V)createMultiPoint(geometryList);
-        } else if (dataType.equals(DataTypes.LINE_STRING)) {
-          return (V)createMultiLineString(geometryList);
-        } else if (dataType.equals(DataTypes.POLYGON)) {
-          return (V)createMultiPolygon(geometryList);
-        }
-      }
-      final Geometry[] geometryArray = GeometryFactory.toGeometryArray(geometries);
-      return (V)createGeometryCollection(geometryArray);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends Geometry> V createGeometry(final Geometry... geometries) {
-    return (V)createGeometry(Arrays.asList(geometries));
-  }
-
-  /**
-   * Creates a deep copy of the input {@link Geometry}.
-   * The {@link CoordinateSequenceFactory} defined for this factory
-   * is used to copy the {@link CoordinatesList}s
-   * of the input geometry.
-   * <p>
-   * This is a convenient way to change the <tt>CoordinatesList</tt>
-   * used to represent a geometry, or to change the 
-   * factory used for a geometry.
-   * <p>
-   * {@link Geometry#clone()} can also be used to make a deep copy,
-   * but it does not allow changing the CoordinatesList type.
-   * 
-   * @return a deep copy of the input geometry, using the CoordinatesList type of this factory
-   * 
-   * @see Geometry#clone() 
-   */
-  public Geometry createGeometry(final Geometry geometry) {
-    if (geometry == null) {
-      return null;
-    } else {
-      final int srid = getSrid();
-      final int geometrySrid = geometry.getSrid();
-      if (srid == 0 && geometrySrid != 0) {
-        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
-          geometrySrid, numAxis, getScaleXY(), getScaleZ());
-        return geometryFactory.createGeometry(geometry);
-      } else if (srid != 0 && geometrySrid != 0 && geometrySrid != srid) {
-        if (geometry instanceof MultiPoint) {
-          final List<Geometry> geometries = new ArrayList<Geometry>();
-          addGeometries(geometries, geometry);
-          return createMultiPoint(geometries);
-        } else if (geometry instanceof MultiLineString) {
-          final List<Geometry> geometries = new ArrayList<Geometry>();
-          addGeometries(geometries, geometry);
-          return createMultiLineString(geometries);
-        } else if (geometry instanceof MultiPolygon) {
-          final List<Geometry> geometries = new ArrayList<Geometry>();
-          addGeometries(geometries, geometry);
-          return createMultiPolygon(geometries);
-        } else if (geometry instanceof GeometryCollection) {
-          final List<Geometry> geometries = new ArrayList<Geometry>();
-          addGeometries(geometries, geometry);
-          return createGeometryCollection(geometries);
-        } else {
-          return GeometryProjectionUtil.performCopy(geometry, this);
-        }
-      } else if (geometry instanceof MultiPoint) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
-        addGeometries(geometries, geometry);
-        return createMultiPoint(geometries);
-      } else if (geometry instanceof MultiLineString) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
-        addGeometries(geometries, geometry);
-        return createMultiLineString(geometries);
-      } else if (geometry instanceof MultiPolygon) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
-        addGeometries(geometries, geometry);
-        return createMultiPolygon(geometries);
-      } else if (geometry instanceof GeometryCollection) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
-        addGeometries(geometries, geometry);
-        return createGeometryCollection(geometries);
-      } else if (geometry instanceof Point) {
-        final Point point = (Point)geometry;
-        return point.copy(this);
-      } else if (geometry instanceof LinearRing) {
-        final LinearRing linearRing = (LinearRing)geometry;
-        return linearRing.copy(this);
-      } else if (geometry instanceof LineString) {
-        final LineString lineString = (LineString)geometry;
-        return lineString.copy(this);
-      } else if (geometry instanceof Polygon) {
-        final Polygon polygon = (Polygon)geometry;
-        return polygon(polygon);
-      } else {
-        return null;
-      }
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends Geometry> T createGeometry(final String wkt) {
-    return (T)parser.parseGeometry(wkt);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends Geometry> T createGeometry(final String wkt,
-    final boolean useNumAxisFromGeometryFactory) {
-    return (T)parser.parseGeometry(wkt, useNumAxisFromGeometryFactory);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends GeometryCollection> V createGeometryCollection(
-    final Collection<? extends Geometry> geometries) {
-    final List<Geometry> geometryList = getGeometries(geometries);
-    if (geometryList == null || geometryList.size() == 0) {
-      return (V)geometryCollection();
-    } else {
-      final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
-      if (dataTypes.size() == 1) {
-        final DataType dataType = CollectionUtil.get(dataTypes, 0);
-        if (dataType.equals(DataTypes.POINT)) {
-          return (V)createMultiPoint(geometryList);
-        } else if (dataType.equals(DataTypes.LINE_STRING)) {
-          return (V)createMultiLineString(geometryList);
-        } else if (dataType.equals(DataTypes.POLYGON)) {
-          return (V)createMultiPolygon(geometryList);
-        }
-      }
-      final Geometry[] geometryArray = GeometryFactory.toGeometryArray(geometryList);
-      return (V)createGeometryCollection(geometryArray);
-    }
-  }
-
-  /**
-   * Creates a GeometryCollection using the given Geometries; a null or empty
-   * array will create an empty GeometryCollection.
-   * 
-   * @param geometries an array of Geometries, each of which may be empty but not null, or null
-   * @return the created GeometryCollection
-   */
-  public GeometryCollection createGeometryCollection(
-    final Geometry... geometries) {
-    return new GeometryCollectionImpl(this, geometries);
   }
 
   public MultiLineString createMultiLineString(final Collection<?> lines) {
@@ -974,21 +721,233 @@ public class GeometryFactory implements Serializable,
     return new MultiPolygonImpl(polygons, this);
   }
 
-  public List<Point> createPointList(final CoordinatesList sourcePoints) {
-    final List<Point> points = new ArrayList<Point>(sourcePoints.size());
-    for (final Coordinates coordinates : sourcePoints) {
-      final Point point = point(coordinates);
-      points.add(point);
-    }
-    return points;
-  }
-
   public Geometry geometry() {
     return point();
   }
 
+  /**
+   * <p>
+   * Create a new geometry of the requested target geometry class.
+   * <p>
+   * 
+   * @param targetClass
+   * @param geometry
+   * @return
+   */
+  @SuppressWarnings({
+    "unchecked"
+  })
+  public <V extends Geometry> V geometry(final Class<?> targetClass,
+    Geometry geometry) {
+    if (geometry != null && !geometry.isEmpty()) {
+      geometry = copy(geometry);
+      if (geometry instanceof GeometryCollection) {
+        if (geometry.getNumGeometries() == 1) {
+          geometry = geometry.getGeometry(0);
+        } else {
+          geometry = geometry.union();
+          // Union doesn't use this geometry factory
+          geometry = copy(geometry);
+        }
+      }
+      final Class<?> geometryClass = geometry.getClass();
+      if (targetClass.isAssignableFrom(geometryClass)) {
+        // TODO if geometry collection then clean up
+        return (V)geometry;
+      } else if (Point.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof MultiPoint) {
+          if (geometry.getNumGeometries() == 1) {
+            return (V)geometry.getGeometry(0);
+          }
+        }
+      } else if (LineString.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof MultiLineString) {
+          if (geometry.getNumGeometries() == 1) {
+            return (V)geometry.getGeometry(0);
+          } else {
+            final LineMerger merger = new LineMerger();
+            merger.add(geometry);
+            final List<LineString> mergedLineStrings = (List<LineString>)merger.getMergedLineStrings();
+            if (mergedLineStrings.size() == 1) {
+              return (V)mergedLineStrings.get(0);
+            }
+          }
+        }
+      } else if (Polygon.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof MultiPolygon) {
+          if (geometry.getNumGeometries() == 1) {
+            return (V)geometry.getGeometry(0);
+          }
+        }
+      } else if (MultiPoint.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof Point) {
+          return (V)createMultiPoint(geometry);
+        }
+      } else if (MultiLineString.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof LineString) {
+          return (V)createMultiLineString(geometry);
+        }
+      } else if (MultiPolygon.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof Polygon) {
+          return (V)createMultiPolygon(geometry);
+        }
+      }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends Geometry> V geometry(
+    final Collection<? extends Geometry> geometries) {
+    final Collection<? extends Geometry> geometryList = getGeometries(geometries);
+    if (geometryList == null || geometries.size() == 0) {
+      return (V)geometryCollection();
+    } else if (geometries.size() == 1) {
+      return (V)CollectionUtil.get(geometries, 0);
+    } else {
+      final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
+      if (dataTypes.size() == 1) {
+        final DataType dataType = CollectionUtil.get(dataTypes, 0);
+        if (dataType.equals(DataTypes.POINT)) {
+          return (V)createMultiPoint(geometryList);
+        } else if (dataType.equals(DataTypes.LINE_STRING)) {
+          return (V)createMultiLineString(geometryList);
+        } else if (dataType.equals(DataTypes.POLYGON)) {
+          return (V)createMultiPolygon(geometryList);
+        }
+      }
+      return (V)geometryCollection(geometries);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends Geometry> V geometry(final Geometry... geometries) {
+    return (V)geometry(Arrays.asList(geometries));
+  }
+
+  /**
+   * Creates a deep copy of the input {@link Geometry}.
+   * The {@link CoordinateSequenceFactory} defined for this factory
+   * is used to copy the {@link CoordinatesList}s
+   * of the input geometry.
+   * <p>
+   * This is a convenient way to change the <tt>CoordinatesList</tt>
+   * used to represent a geometry, or to change the 
+   * factory used for a geometry.
+   * <p>
+   * {@link Geometry#clone()} can also be used to make a deep copy,
+   * but it does not allow changing the CoordinatesList type.
+   * 
+   * @return a deep copy of the input geometry, using the CoordinatesList type of this factory
+   * 
+   * @see Geometry#clone() 
+   */
+  public Geometry geometry(final Geometry geometry) {
+    if (geometry == null) {
+      return null;
+    } else {
+      final int srid = getSrid();
+      final int geometrySrid = geometry.getSrid();
+      if (srid == 0 && geometrySrid != 0) {
+        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+          geometrySrid, numAxis, getScaleXY(), getScaleZ());
+        return geometryFactory.geometry(geometry);
+      } else if (srid != 0 && geometrySrid != 0 && geometrySrid != srid) {
+        if (geometry instanceof MultiPoint) {
+          final List<Geometry> geometries = new ArrayList<Geometry>();
+          addGeometries(geometries, geometry);
+          return createMultiPoint(geometries);
+        } else if (geometry instanceof MultiLineString) {
+          final List<Geometry> geometries = new ArrayList<Geometry>();
+          addGeometries(geometries, geometry);
+          return createMultiLineString(geometries);
+        } else if (geometry instanceof MultiPolygon) {
+          final List<Geometry> geometries = new ArrayList<Geometry>();
+          addGeometries(geometries, geometry);
+          return createMultiPolygon(geometries);
+        } else if (geometry instanceof GeometryCollection) {
+          final List<Geometry> geometries = new ArrayList<Geometry>();
+          addGeometries(geometries, geometry);
+          return geometryCollection(geometries);
+        } else {
+          return GeometryProjectionUtil.performCopy(geometry, this);
+        }
+      } else if (geometry instanceof MultiPoint) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return createMultiPoint(geometries);
+      } else if (geometry instanceof MultiLineString) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return createMultiLineString(geometries);
+      } else if (geometry instanceof MultiPolygon) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return createMultiPolygon(geometries);
+      } else if (geometry instanceof GeometryCollection) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return geometryCollection(geometries);
+      } else if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        return point.copy(this);
+      } else if (geometry instanceof LinearRing) {
+        final LinearRing linearRing = (LinearRing)geometry;
+        return linearRing.copy(this);
+      } else if (geometry instanceof LineString) {
+        final LineString lineString = (LineString)geometry;
+        return lineString.copy(this);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        return polygon(polygon);
+      } else {
+        return null;
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Geometry> T geometry(final String wkt) {
+    return (T)parser.parseGeometry(wkt);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Geometry> T geometry(final String wkt,
+    final boolean useNumAxisFromGeometryFactory) {
+    return (T)parser.parseGeometry(wkt, useNumAxisFromGeometryFactory);
+  }
+
   public GeometryCollection geometryCollection() {
     return new GeometryCollectionImpl(this, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends GeometryCollection> V geometryCollection(
+    final Collection<? extends Geometry> geometries) {
+    final List<Geometry> geometryList = getGeometries(geometries);
+    if (geometryList == null || geometryList.size() == 0) {
+      return (V)geometryCollection();
+    } else {
+      final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
+      if (dataTypes.size() == 1) {
+        final DataType dataType = CollectionUtil.get(dataTypes, 0);
+        if (dataType.equals(DataTypes.POINT)) {
+          return (V)createMultiPoint(geometryList);
+        } else if (dataType.equals(DataTypes.LINE_STRING)) {
+          return (V)createMultiLineString(geometryList);
+        } else if (dataType.equals(DataTypes.POLYGON)) {
+          return (V)createMultiPolygon(geometryList);
+        }
+      }
+      final Geometry[] geometryArray = GeometryFactory.toGeometryArray(geometryList);
+      return (V)new GeometryCollectionImpl(this, geometryArray);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends GeometryCollection> V geometryCollection(
+    final Geometry... geometries) {
+    return (V)geometryCollection(Arrays.asList(geometries));
   }
 
   public Coordinates getCoordinates(final Point point) {

@@ -76,11 +76,11 @@ public class Node extends GraphComponent {
    * in this case, the rule is that the node is considered to be in the boundary.
    * The merged location is the maximum of the two input values.
    */
-  int computeMergedLocation(final Label label2, final int eltIndex) {
-    int loc = Location.NONE;
+  Location computeMergedLocation(final Label label2, final int eltIndex) {
+    Location loc = Location.NONE;
     loc = label.getLocation(eltIndex);
     if (!label2.isNull(eltIndex)) {
-      final int nLoc = label2.getLocation(eltIndex);
+      final Location nLoc = label2.getLocation(eltIndex);
       if (loc != Location.BOUNDARY) {
         loc = nLoc;
       }
@@ -129,8 +129,8 @@ public class Node extends GraphComponent {
 
   public void mergeLabel(final Label label2) {
     for (int i = 0; i < 2; i++) {
-      final int loc = computeMergedLocation(label2, i);
-      final int thisLoc = label.getLocation(i);
+      final Location loc = computeMergedLocation(label2, i);
+      final Location thisLoc = label.getLocation(i);
       if (thisLoc == Location.NONE) {
         label.setLocation(i, loc);
       }
@@ -145,7 +145,7 @@ public class Node extends GraphComponent {
     out.println("node " + coord + " lbl: " + label);
   }
 
-  public void setLabel(final int argIndex, final int onLocation) {
+  public void setLabel(final int argIndex, final Location onLocation) {
     if (label == null) {
       label = new Label(argIndex, onLocation);
     } else {
@@ -163,17 +163,17 @@ public class Node extends GraphComponent {
     }
 
     // determine the current location for the point (if any)
-    int loc = Location.NONE;
+    Location loc = Location.NONE;
     if (label != null) {
       loc = label.getLocation(argIndex);
     }
     // flip the loc
-    int newLoc;
+    Location newLoc;
     switch (loc) {
-      case Location.BOUNDARY:
+      case BOUNDARY:
         newLoc = Location.INTERIOR;
       break;
-      case Location.INTERIOR:
+      case INTERIOR:
         newLoc = Location.BOUNDARY;
       break;
       default:

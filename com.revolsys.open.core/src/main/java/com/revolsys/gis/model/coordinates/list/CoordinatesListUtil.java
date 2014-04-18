@@ -20,8 +20,6 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.gis.jts.LineSegment;
-import com.revolsys.gis.jts.Location;
-import com.revolsys.gis.jts.RayCrossingCounter;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -651,11 +649,6 @@ public class CoordinatesListUtil {
     return isCCW;
   }
 
-  public static boolean isPointInRing(final Coordinates p,
-    final CoordinatesList ring) {
-    return locatePointInRing(p, ring) != Location.EXTERIOR;
-  }
-
   public static boolean isPointOnLine(final Coordinates coordinate,
     final CoordinatesList points, final double tolerance) {
     final CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
@@ -724,23 +717,6 @@ public class CoordinatesListUtil {
       }
     }
     return length;
-  }
-
-  /**
-   * Determines whether a point lies in the interior, on the boundary, or in the
-   * exterior of a ring. The ring may be oriented in either direction.
-   * <p>
-   * This method does <i>not</i> first check the point against the envelope of
-   * the ring.
-   * 
-   * @param p point to check for ring inclusion
-   * @param ring an array of coordinates representing the ring (which must have
-   *          first point identical to last point)
-   * @return the {@link Location} of p relative to the ring
-   */
-  public static com.revolsys.gis.jts.Location locatePointInRing(
-    final Coordinates p, final CoordinatesList ring) {
-    return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
   public static CoordinatesList merge(final Coordinates point,

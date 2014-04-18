@@ -305,7 +305,7 @@ public class WKBReader {
     for (int i = 0; i < numGeom; i++) {
       geoms[i] = readGeometry();
     }
-    return factory.createGeometryCollection(geoms);
+    return factory.geometryCollection(geoms);
   }
 
   private LinearRing readLinearRing() throws IOException {

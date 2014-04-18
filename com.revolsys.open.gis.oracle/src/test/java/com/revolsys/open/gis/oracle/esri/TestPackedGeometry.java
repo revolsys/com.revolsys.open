@@ -6,7 +6,7 @@ import java.util.List;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
+import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
 import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
 import com.revolsys.io.wkt.WktWriter;
@@ -40,7 +40,7 @@ public class TestPackedGeometry {
       geometryFactory, geometryType, numPoints, xOffset, yOffset, xyScale,
       zOffset, zScale, mOffset, mScale);
     System.out.println(WktWriter.toString(geometry));
-    if (!new Geometry3DExactEquals().equals(geometry, geometry2,
+    if (!new GeometryEqualsExact3d().equals(geometry, geometry2,
       Collections.<String> emptyList())) {
       System.err.println(WktWriter.toString(geometry2));
       throw new RuntimeException("Geometry not equal");
@@ -48,7 +48,7 @@ public class TestPackedGeometry {
   }
 
   public static void checkGeometry(final String wkt) {
-    checkGeometry(GEOMETRY_FACTORY.createGeometry(wkt));
+    checkGeometry(GEOMETRY_FACTORY.geometry(wkt));
   }
 
   public static void main(final String[] args) {

@@ -39,6 +39,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
 import com.revolsys.jts.geomgraph.Edge;
@@ -53,91 +54,41 @@ import com.revolsys.jts.util.Assert;
  * @version 1.7
  */
 public class LineBuilder {
-  private OverlayOp op;
-  private GeometryFactory geometryFactory;
-  private PointLocator ptLocator;
+  private final OverlayOp op;
 
-  private List lineEdgesList    = new ArrayList();
-  private List resultLineList   = new ArrayList();
+  private final GeometryFactory geometryFactory;
 
-  public LineBuilder(OverlayOp op, GeometryFactory geometryFactory, PointLocator ptLocator) {
+  private final PointLocator ptLocator;
+
+  private final List lineEdgesList = new ArrayList();
+
+  private final List resultLineList = new ArrayList();
+
+  public LineBuilder(final OverlayOp op, final GeometryFactory geometryFactory,
+    final PointLocator ptLocator) {
     this.op = op;
     this.geometryFactory = geometryFactory;
     this.ptLocator = ptLocator;
   }
+
   /**
    * @return a list of the LineStrings in the result of the specified overlay operation
    */
-  public List build(int opCode)
-  {
+  public List build(final int opCode) {
     findCoveredLineEdges();
     collectLines(opCode);
-    //labelIsolatedLines(lineEdgesList);
+    // labelIsolatedLines(lineEdgesList);
     buildLines(opCode);
     return resultLineList;
   }
-  /**
-   * Find and mark L edges which are "covered" by the result area (if any).
-   * L edges at nodes which also have A edges can be checked by checking
-   * their depth at that node.
-   * L edges at nodes which do not have A edges can be checked by doing a
-   * point-in-polygon test with the previously computed result areas.
-   */
-  private void findCoveredLineEdges()
-  {
-    // first set covered for all L edges at nodes which have A edges too
-    for (Iterator nodeit = op.getGraph().getNodes().iterator(); nodeit.hasNext(); ) {
-      Node node = (Node) nodeit.next();
-//node.print(System.out);
-      ((DirectedEdgeStar) node.getEdges()).findCoveredLineEdges();
-    }
 
-    /**
-     * For all L edges which weren't handled by the above,
-     * use a point-in-poly test to determine whether they are covered
-     */
-    for (Iterator it = op.getGraph().getEdgeEnds().iterator(); it.hasNext(); ) {
-      DirectedEdge de = (DirectedEdge) it.next();
-      Edge e = de.getEdge();
-      if (de.isLineEdge() && ! e.isCoveredSet()) {
-        boolean isCovered = op.isCoveredByA(de.getCoordinate());
-        e.setCovered(isCovered);
-      }
-    }
-  }
-
-  private void collectLines(int opCode)
-  {
-    for (Iterator it = op.getGraph().getEdgeEnds().iterator(); it.hasNext(); ) {
-      DirectedEdge de = (DirectedEdge) it.next();
-      collectLineEdge(de, opCode, lineEdgesList);
-      collectBoundaryTouchEdge(de, opCode, lineEdgesList);
-    }
-  }
-
-  /**
-   * Collect line edges which are in the result.
-   * Line edges are in the result if they are not part of
-   * an area boundary, if they are in the result of the overlay operation,
-   * and if they are not covered by a result area.
-   *
-   * @param de the directed edge to test
-   * @param opCode the overlap operation
-   * @param edges the list of included line edges
-   */
-  private void collectLineEdge(DirectedEdge de, int opCode, List edges)
-  {
-    Label label = de.getLabel();
-    Edge e = de.getEdge();
-    // include L edges which are in the result
-    if (de.isLineEdge()) {
-      if (! de.isVisited() && OverlayOp.isResultOfOp(label, opCode) && ! e.isCovered()) {
-//Debug.println("de: " + de.getLabel());
-//Debug.println("edge: " + e.getLabel());
-
-        edges.add(e);
-        de.setVisitedEdge(true);
-      }
+  private void buildLines(final int opCode) {
+    for (final Iterator it = lineEdgesList.iterator(); it.hasNext();) {
+      final Edge e = (Edge)it.next();
+      final Label label = e.getLabel();
+      final LineString line = geometryFactory.lineString(e.getCoordinates());
+      resultLineList.add(line);
+      e.setInResult(true);
     }
   }
 
@@ -151,59 +102,121 @@ public class LineBuilder {
    * <li> OR as a result of a dimensional collapse.
    * </ul>
    */
-  private void collectBoundaryTouchEdge(DirectedEdge de, int opCode, List edges)
-  {
-    Label label = de.getLabel();
-    if (de.isLineEdge()) return;  // only interested in area edges
-    if (de.isVisited()) return;  // already processed
-    if (de.isInteriorAreaEdge()) return;  // added to handle dimensional collapses
-    if (de.getEdge().isInResult()) return;  // if the edge linework is already included, don't include it again
+  private void collectBoundaryTouchEdge(final DirectedEdge de,
+    final int opCode, final List edges) {
+    final Label label = de.getLabel();
+    if (de.isLineEdge()) {
+      return; // only interested in area edges
+    }
+    if (de.isVisited()) {
+      return; // already processed
+    }
+    if (de.isInteriorAreaEdge()) {
+      return; // added to handle dimensional collapses
+    }
+    if (de.getEdge().isInResult()) {
+      return; // if the edge linework is already included, don't include it
+              // again
+    }
 
     // sanity check for labelling of result edgerings
-    Assert.isTrue(! (de.isInResult() || de.getSym().isInResult()) || ! de.getEdge().isInResult());
+    Assert.isTrue(!(de.isInResult() || de.getSym().isInResult())
+      || !de.getEdge().isInResult());
 
     // include the linework if it's in the result of the operation
     if (OverlayOp.isResultOfOp(label, opCode)
-          && opCode == OverlayOp.INTERSECTION)
-    {
+      && opCode == OverlayOp.INTERSECTION) {
       edges.add(de.getEdge());
       de.setVisitedEdge(true);
     }
   }
 
-  private void buildLines(int opCode)
-  {
-    for (Iterator it = lineEdgesList.iterator(); it.hasNext(); ) {
-      Edge e = (Edge) it.next();
-      Label label = e.getLabel();
-        LineString line = geometryFactory.lineString(e.getCoordinates());
-        resultLineList.add(line);
-        e.setInResult(true);
-    }
-  }
+  /**
+   * Collect line edges which are in the result.
+   * Line edges are in the result if they are not part of
+   * an area boundary, if they are in the result of the overlay operation,
+   * and if they are not covered by a result area.
+   *
+   * @param de the directed edge to test
+   * @param opCode the overlap operation
+   * @param edges the list of included line edges
+   */
+  private void collectLineEdge(final DirectedEdge de, final int opCode,
+    final List edges) {
+    final Label label = de.getLabel();
+    final Edge e = de.getEdge();
+    // include L edges which are in the result
+    if (de.isLineEdge()) {
+      if (!de.isVisited() && OverlayOp.isResultOfOp(label, opCode)
+        && !e.isCovered()) {
+        // Debug.println("de: " + de.getLabel());
+        // Debug.println("edge: " + e.getLabel());
 
-  private void labelIsolatedLines(List edgesList)
-  {
-    for (Iterator it = edgesList.iterator(); it.hasNext(); ) {
-      Edge e = (Edge) it.next();
-      Label label = e.getLabel();
-//n.print(System.out);
-      if (e.isIsolated()) {
-        if (label.isNull(0))
-          labelIsolatedLine(e, 0);
-        else
-          labelIsolatedLine(e, 1);
+        edges.add(e);
+        de.setVisitedEdge(true);
       }
     }
   }
+
+  private void collectLines(final int opCode) {
+    for (final Iterator it = op.getGraph().getEdgeEnds().iterator(); it.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)it.next();
+      collectLineEdge(de, opCode, lineEdgesList);
+      collectBoundaryTouchEdge(de, opCode, lineEdgesList);
+    }
+  }
+
+  /**
+   * Find and mark L edges which are "covered" by the result area (if any).
+   * L edges at nodes which also have A edges can be checked by checking
+   * their depth at that node.
+   * L edges at nodes which do not have A edges can be checked by doing a
+   * point-in-polygon test with the previously computed result areas.
+   */
+  private void findCoveredLineEdges() {
+    // first set covered for all L edges at nodes which have A edges too
+    for (final Iterator nodeit = op.getGraph().getNodes().iterator(); nodeit.hasNext();) {
+      final Node node = (Node)nodeit.next();
+      // node.print(System.out);
+      ((DirectedEdgeStar)node.getEdges()).findCoveredLineEdges();
+    }
+
+    /**
+     * For all L edges which weren't handled by the above,
+     * use a point-in-poly test to determine whether they are covered
+     */
+    for (final Iterator it = op.getGraph().getEdgeEnds().iterator(); it.hasNext();) {
+      final DirectedEdge de = (DirectedEdge)it.next();
+      final Edge e = de.getEdge();
+      if (de.isLineEdge() && !e.isCoveredSet()) {
+        final boolean isCovered = op.isCoveredByA(de.getCoordinate());
+        e.setCovered(isCovered);
+      }
+    }
+  }
+
   /**
    * Label an isolated node with its relationship to the target geometry.
    */
-  private void labelIsolatedLine(Edge e, int targetIndex)
-  {
-    int loc = ptLocator.locate(e.getCoordinate(), op.getArgGeometry(targetIndex));
+  private void labelIsolatedLine(final Edge e, final int targetIndex) {
+    final Location loc = ptLocator.locate(e.getCoordinate(),
+      op.getArgGeometry(targetIndex));
     e.getLabel().setLocation(targetIndex, loc);
   }
 
+  private void labelIsolatedLines(final List edgesList) {
+    for (final Iterator it = edgesList.iterator(); it.hasNext();) {
+      final Edge e = (Edge)it.next();
+      final Label label = e.getLabel();
+      // n.print(System.out);
+      if (e.isIsolated()) {
+        if (label.isNull(0)) {
+          labelIsolatedLine(e, 0);
+        } else {
+          labelIsolatedLine(e, 1);
+        }
+      }
+    }
+  }
 
 }

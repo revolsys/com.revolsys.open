@@ -37,6 +37,7 @@ import junit.textui.TestRunner;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -57,7 +58,7 @@ public class RayCrossingCounterTest extends AbstractPointInRingTest {
   }
 
   @Override
-  protected void runPtInRing(final int expectedLoc, final Coordinates pt,
+  protected void runPtInRing(final Location expectedLoc, final Coordinates pt,
     final String wkt) throws Exception {
     final Geometry geom = this.reader.read(wkt);
     assertEquals(expectedLoc,

@@ -64,7 +64,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
         final BoundingBox geometryExtent = Envelope.getBoundingBox(geometry);
         if (geometryExtent.intersects(viewExtent)) {
           final com.revolsys.jts.geom.GeometryFactory geometryFactory = viewport.getGeometryFactory();
-          final Geometry convertedGeometry = geometryFactory.createGeometry(geometry);
+          final Geometry convertedGeometry = geometryFactory.geometry(geometry);
           // TODO clipping
           return GeometryShapeUtil.toShape(viewport, convertedGeometry);
         }

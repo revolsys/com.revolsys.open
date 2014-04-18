@@ -38,7 +38,6 @@ import java.util.List;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -126,8 +125,9 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
     this.index = new MCIndexedGeometry(g);
   }
 
-  private void countSegs(final RayCrossingCounter rcc, final BoundingBox rayEnv,
-    final List monoChains, final MCSegmentCounter mcSegCounter) {
+  private void countSegs(final RayCrossingCounter rcc,
+    final BoundingBox rayEnv, final List monoChains,
+    final MCSegmentCounter mcSegCounter) {
     for (final Iterator i = monoChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
       mc.select(rayEnv, mcSegCounter);
@@ -145,7 +145,7 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
    * @return the location of the point in the geometry  
    */
   @Override
-  public int locate(final Coordinates p) {
+  public Location locate(final Coordinates p) {
     final RayCrossingCounter rcc = new RayCrossingCounter(p);
     final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
     final Envelope rayEnv = new Envelope(p.getX(), p.getY(), this.maxXExtent,

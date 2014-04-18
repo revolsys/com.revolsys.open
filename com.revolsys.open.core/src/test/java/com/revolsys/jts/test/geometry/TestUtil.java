@@ -29,7 +29,7 @@ public class TestUtil {
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
           srid, numAxis, scaleXy, scaleZ);
         final String wkt = object.getValue("wkt");
-        final Geometry geometry = geometryFactory.createGeometry(wkt);
+        final Geometry geometry = geometryFactory.geometry(wkt);
         valid &= equalsExpectedWkt(i, object, geometry);
         final CoordinateSystem coordinateSystem = geometry.getCoordinateSystem();
         GeometryFactory otherGeometryFactory;
@@ -73,7 +73,7 @@ public class TestUtil {
     final Geometry actualGeometry) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory();
     final String wkt = object.getValue("expectedWkt");
-    final Geometry expectedGeometry = geometryFactory.createGeometry(wkt, true);
+    final Geometry expectedGeometry = geometryFactory.geometry(wkt, true);
     return equalsExpectedGeometry(i, actualGeometry, expectedGeometry);
   }
 

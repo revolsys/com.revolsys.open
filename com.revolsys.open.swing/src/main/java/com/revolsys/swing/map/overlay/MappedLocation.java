@@ -32,7 +32,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
     final double sourceX = CollectionUtil.getDouble(map, "sourceX", 0.0);
     final double sourceY = CollectionUtil.getDouble(map, "sourceY", 0.0);
     this.sourcePixel = new DoubleCoordinates(sourceX, sourceY);
-    this.targetPoint = GeometryFactory.getFactory().createGeometry(
+    this.targetPoint = GeometryFactory.getFactory().geometry(
       (String)map.get("target"));
   }
 

@@ -67,7 +67,8 @@ public class OverlayResultValidator {
       GeometrySnapper.computeSizeBasedSnapTolerance(g1));
   }
 
-  private static boolean hasLocation(final int[] location, final int loc) {
+  private static boolean hasLocation(final Location[] location,
+    final Location loc) {
     for (int i = 0; i < 3; i++) {
       if (location[i] == loc) {
         return true;
@@ -87,7 +88,7 @@ public class OverlayResultValidator {
 
   private final FuzzyPointLocator[] locFinder;
 
-  private final int[] location = new int[3];
+  private final Location[] location = new Location[3];
 
   private Coordinates invalidLocation = null;
 
@@ -162,7 +163,7 @@ public class OverlayResultValidator {
     return isValid;
   }
 
-  private boolean isValidResult(final int overlayOp, final int[] location) {
+  private boolean isValidResult(final int overlayOp, final Location[] location) {
     final boolean expectedInterior = OverlayOp.isResultOfOp(location[0],
       location[1], overlayOp);
 
@@ -177,7 +178,7 @@ public class OverlayResultValidator {
     return isValid;
   }
 
-  private void reportResult(final int overlayOp, final int[] location,
+  private void reportResult(final int overlayOp, final Location[] location,
     final boolean expectedInterior) {
     System.out.println("Overlay result invalid - A:"
       + Location.toLocationSymbol(location[0]) + " B:"

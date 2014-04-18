@@ -18,7 +18,7 @@ public class PolygonizeFunctions {
     polygonizer.add(lines);
     final Collection polys = polygonizer.getPolygons();
     final Polygon[] polyArray = GeometryFactory.toPolygonArray(polys);
-    return g.getGeometryFactory().createGeometryCollection(polyArray);
+    return g.getGeometryFactory().geometryCollection(polyArray);
   }
 
   public static Geometry polygonizeAllErrors(final Geometry g) {

@@ -6,7 +6,6 @@ import java.util.List;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.operation.union.CascadedPolygonUnion;
@@ -23,11 +22,10 @@ public class UnionPerfTester {
 
   static final int MAX_ITER = 1;
 
-  static PrecisionModel pm = new PrecisionModel();
+  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    0, 2);
 
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
-
-  static WKTReader wktRdr = new WKTReader(fact);
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   static WKTWriter wktWriter = new WKTWriter();
 
@@ -113,7 +111,7 @@ public class UnionPerfTester {
       final Geometry geom = (Geometry)i.next();
 
       if (unionAll == null) {
-        unionAll = (Geometry)geom.clone();
+        unionAll = geom.clone();
       } else {
         unionAll = unionAll.union(geom);
       }

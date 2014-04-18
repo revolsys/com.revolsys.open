@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -260,7 +259,7 @@ public abstract class EdgeRing {
    * does not contribute any information to the overall labelling, and is simply skipped.
    */
   protected void mergeLabel(final Label deLabel, final int geomIndex) {
-    final int loc = deLabel.getLocation(geomIndex, Position.RIGHT);
+    final Location loc = deLabel.getLocation(geomIndex, Position.RIGHT);
     // no information to be had from this label
     if (loc == Location.NONE) {
       return;

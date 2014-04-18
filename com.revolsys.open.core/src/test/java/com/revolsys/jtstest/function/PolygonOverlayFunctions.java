@@ -35,7 +35,7 @@ public class PolygonOverlayFunctions {
 
     // convert to collection for return
     final Polygon[] polyArray = GeometryFactory.toPolygonArray(polys);
-    return geomFact.createGeometryCollection(polyArray);
+    return geomFact.geometryCollection(polyArray);
   }
 
 }

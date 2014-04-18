@@ -86,7 +86,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
     if (GeometryMethodOperation.isGeometryFunction(opName)) {
       return new GeometryResult(testCase.getTestRun()
         .getGeometryFactory()
-        .createGeometryCollection((Geometry[])null));
+        .geometryCollection((Geometry[])null));
     }
     Assert.shouldNeverReachHere();
     return null;

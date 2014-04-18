@@ -462,7 +462,7 @@ public class WKTReader {
     ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.createGeometryCollection(new Geometry[] {});
+      return geometryFactory.geometryCollection(new Geometry[] {});
     }
     final ArrayList geometries = new ArrayList();
     Geometry geometry = readGeometryTaggedText();
@@ -474,7 +474,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final Geometry[] array = new Geometry[geometries.size()];
-    return geometryFactory.createGeometryCollection((Geometry[])geometries.toArray(array));
+    return geometryFactory.geometryCollection((Geometry[])geometries.toArray(array));
   }
 
   /**

@@ -37,7 +37,6 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -45,10 +44,8 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class AreaLengthTest extends TestCase {
 
-  private final PrecisionModel precisionModel = new PrecisionModel();
-
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 

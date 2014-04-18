@@ -13,7 +13,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
-public final class JsonWriter {
+public final class JsonWriter implements AutoCloseable {
 
   private int depth = 0;
 
@@ -68,6 +68,7 @@ public final class JsonWriter {
     }
   }
 
+  @Override
   public void close() {
     out.close();
   }

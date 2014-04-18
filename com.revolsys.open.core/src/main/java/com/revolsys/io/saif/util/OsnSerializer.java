@@ -42,7 +42,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.EnumerationDataType;
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
@@ -266,7 +266,7 @@ public class OsnSerializer {
   }
 
   private void serialize(final Geometry geometry) throws IOException {
-    final String type = (String)JtsGeometryUtil.getGeometryProperty(geometry,
+    final String type = (String)GeometryProperties.getGeometryProperty(geometry,
       "type");
     OsnConverter converter = converters.getConverter(type);
     if (converter == null) {

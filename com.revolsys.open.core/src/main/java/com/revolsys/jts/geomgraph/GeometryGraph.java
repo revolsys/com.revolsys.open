@@ -44,7 +44,6 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -87,8 +86,8 @@ public class GeometryGraph extends PlanarGraph {
    * Location.INTERIOR; }
    */
 
-  public static int determineBoundary(final BoundaryNodeRule boundaryNodeRule,
-    final int boundaryCount) {
+  public static Location determineBoundary(
+    final BoundaryNodeRule boundaryNodeRule, final int boundaryCount) {
     return boundaryNodeRule.isInBoundary(boundaryCount) ? Location.BOUNDARY
       : Location.INTERIOR;
   }
@@ -231,11 +230,10 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private void addPolygon(final Polygon p) {
-    addPolygonRing((LinearRing)p.getExteriorRing(), Location.EXTERIOR,
-      Location.INTERIOR);
+    addPolygonRing(p.getExteriorRing(), Location.EXTERIOR, Location.INTERIOR);
 
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      final LinearRing hole = (LinearRing)p.getInteriorRing(i);
+      final LinearRing hole = p.getInteriorRing(i);
 
       // Holes are topologically labelled opposite to the shell, since
       // the interior of the polygon lies on their opposite side
@@ -252,8 +250,8 @@ public class GeometryGraph extends PlanarGraph {
    * If the ring is in the opposite orientation,
    * the left and right locations must be interchanged.
    */
-  private void addPolygonRing(final LinearRing lr, final int cwLeft,
-    final int cwRight) {
+  private void addPolygonRing(final LinearRing lr, final Location cwLeft,
+    final Location cwRight) {
     // don't bother adding empty holes
     if (lr.isEmpty()) {
       return;
@@ -267,8 +265,8 @@ public class GeometryGraph extends PlanarGraph {
       return;
     }
 
-    int left = cwLeft;
-    int right = cwRight;
+    Location left = cwLeft;
+    Location right = cwRight;
     if (CGAlgorithms.isCCW(coord)) {
       left = cwRight;
       right = cwLeft;
@@ -289,7 +287,7 @@ public class GeometryGraph extends PlanarGraph {
    * Otherwise, just add it as a regular node.
    */
   private void addSelfIntersectionNode(final int argIndex,
-    final Coordinates coord, final int loc) {
+    final Coordinates coord, final Location loc) {
     // if this node is already a boundary node, don't change it
     if (isBoundaryNode(argIndex, coord)) {
       return;
@@ -304,7 +302,7 @@ public class GeometryGraph extends PlanarGraph {
   private void addSelfIntersectionNodes(final int argIndex) {
     for (final Iterator i = edges.iterator(); i.hasNext();) {
       final Edge e = (Edge)i.next();
-      final int eLoc = e.getLabel().getLocation(argIndex);
+      final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final Iterator eiIt = e.eiList.iterator(); eiIt.hasNext();) {
         final EdgeIntersection ei = (EdgeIntersection)eiIt.next();
         addSelfIntersectionNode(argIndex, ei.coord, eLoc);
@@ -439,7 +437,7 @@ public class GeometryGraph extends PlanarGraph {
     // the new point to insert is on a boundary
     int boundaryCount = 1;
     // determine the current location for the point (if any)
-    int loc = Location.NONE;
+    Location loc = Location.NONE;
     loc = lbl.getLocation(argIndex, Position.ON);
     if (loc == Location.BOUNDARY) {
       boundaryCount++;
@@ -447,12 +445,12 @@ public class GeometryGraph extends PlanarGraph {
 
     // determine the boundary status of the point according to the Boundary
     // Determination Rule
-    final int newLoc = determineBoundary(boundaryNodeRule, boundaryCount);
+    final Location newLoc = determineBoundary(boundaryNodeRule, boundaryCount);
     lbl.setLocation(argIndex, newLoc);
   }
 
   private void insertPoint(final int argIndex, final Coordinates coord,
-    final int onLocation) {
+    final Location onLocation) {
     final NodeMap nodes = getNodeMap();
     final Node n = nodes.addNode(coord);
     final Label lbl = n.getLabel();
@@ -471,7 +469,7 @@ public class GeometryGraph extends PlanarGraph {
    * @param p the point to test
    * @return the location of the point in the geometry
    */
-  public int locate(final Coordinates pt) {
+  public Location locate(final Coordinates pt) {
     if (parentGeom instanceof Polygonal && parentGeom.getNumGeometries() > 50) {
       // lazily init point locator
       if (areaPtLocator == null) {

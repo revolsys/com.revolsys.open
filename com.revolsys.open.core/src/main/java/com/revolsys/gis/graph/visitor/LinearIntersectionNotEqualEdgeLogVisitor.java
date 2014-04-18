@@ -13,10 +13,10 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.jts.filter.LinearIntersectionFilter;
-import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
+import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
@@ -26,7 +26,7 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
   private static final String PROCESSED = LinearIntersectionNotEqualLineEdgeCleanupVisitor.class.getName()
     + ".PROCESSED";
   static {
-    Geometry3DExactEquals.addExclude(PROCESSED);
+    GeometryEqualsExact3d.addExclude(PROCESSED);
   }
 
   @Override
@@ -39,7 +39,7 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
   public boolean visit(final Edge<DataObject> edge) {
     final DataObject object = edge.getObject();
     final LineString line = edge.getLine();
-    if (JtsGeometryUtil.getGeometryProperty(line, PROCESSED) != Boolean.TRUE) {
+    if (GeometryProperties.getGeometryProperty(line, PROCESSED) != Boolean.TRUE) {
       final String typePath = edge.getTypeName();
 
       final Graph<DataObject> graph = edge.getGraph();
@@ -69,12 +69,12 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
 
       if (!intersectingEdges.isEmpty()) {
         DataObjectLog.error(getClass(), "Overlapping edge", object);
-        JtsGeometryUtil.setGeometryProperty(line, PROCESSED, Boolean.TRUE);
+        GeometryProperties.setGeometryProperty(line, PROCESSED, Boolean.TRUE);
         for (final Edge<DataObject> intersectingEdge : intersectingEdges) {
           final DataObject intersectingObject = intersectingEdge.getObject();
           final LineString intersectingLine = intersectingObject.getGeometryValue();
-          if (JtsGeometryUtil.getGeometryProperty(intersectingLine, PROCESSED) != Boolean.TRUE) {
-            JtsGeometryUtil.setGeometryProperty(intersectingLine, PROCESSED,
+          if (GeometryProperties.getGeometryProperty(intersectingLine, PROCESSED) != Boolean.TRUE) {
+            GeometryProperties.setGeometryProperty(intersectingLine, PROCESSED,
               Boolean.TRUE);
           }
         }

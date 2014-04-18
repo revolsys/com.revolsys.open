@@ -33,7 +33,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.Geometry;
@@ -63,7 +63,7 @@ public final class DataObjectUtil {
     final Geometry oldGeometry = object.getGeometryValue();
     final T newObject = (T)object.clone();
     newObject.setGeometryValue(geometry);
-    JtsGeometryUtil.copyUserData(oldGeometry, geometry);
+    GeometryProperties.copyUserData(oldGeometry, geometry);
     return newObject;
   }
 
@@ -114,7 +114,7 @@ public final class DataObjectUtil {
         }
       } else if (propertyValue instanceof Geometry) {
         final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = JtsGeometryUtil.getGeometryProperty(geometry,
+        propertyValue = GeometryProperties.getGeometryProperty(geometry,
           propertyName);
       } else if (propertyValue instanceof Map) {
         final Map<String, Object> map = (Map<String, Object>)propertyValue;

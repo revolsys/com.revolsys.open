@@ -243,6 +243,28 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
     }
   }
 
+  @Override
+  public boolean equalsExact3d(final Geometry geometry) {
+    if (geometry == this) {
+      return true;
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      final int ringCount = getRingCount();
+      if (ringCount == polygon.getRingCount()) {
+        for (int i = 0; i < ringCount; i++) {
+          final LinearRing ring1 = getRing(i);
+          final LinearRing ring2 = polygon.getRing(i);
+          if (!ring1.equalsExact3d(ring2)) {
+            return false;
+          }
+        }
+        return true;
+
+      }
+    }
+    return false;
+  }
+
   /**
    *  Returns the area of this <code>Polygon</code>
    *

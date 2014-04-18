@@ -44,7 +44,7 @@ public class GeometryFactoryTest {
     Assert.assertEquals("Geometry", geometry, copy);
     assertCoordinatesListEqual(copy, pointsList);
 
-    final Geometry copy2 = GEOMETRY_FACTORY.createGeometry(geometryClass,
+    final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass,
       geometry);
     Assert.assertEquals("Geometry class", geometryClass, copy2.getClass());
     Assert.assertEquals("Geometry", geometry, copy2);
@@ -59,21 +59,21 @@ public class GeometryFactoryTest {
         final Geometry part = geometry.getGeometry(0);
         final Class<? extends Geometry> geometryClass = geometry.getClass();
 
-        final Geometry copy2 = GEOMETRY_FACTORY.createGeometry(geometryClass,
+        final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass,
           part);
         Assert.assertEquals("Geometry class", geometryClass, copy2.getClass());
         Assert.assertEquals("Geometry", geometry, copy2);
         assertCoordinatesListEqual(copy2, pointsList);
       }
     } else if (!(geometry instanceof LinearRing)) {
-      final GeometryCollection collection = GEOMETRY_FACTORY.createCollection(geometry);
+      final GeometryCollection collection = GEOMETRY_FACTORY.geometryCollection(geometry);
       final Geometry copy = collection.getGeometry(0);
       final Class<? extends Geometry> geometryClass = geometry.getClass();
       Assert.assertEquals("Geometry class", geometryClass, copy.getClass());
       Assert.assertEquals("Geometry", geometry, copy);
       assertCoordinatesListEqual(collection, pointsList);
 
-      final Geometry copy2 = GEOMETRY_FACTORY.createGeometry(geometryClass,
+      final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass,
         collection);
       Assert.assertEquals("Geometry class", geometryClass, copy2.getClass());
       Assert.assertEquals("Geometry", geometry, copy2);

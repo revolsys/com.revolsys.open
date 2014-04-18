@@ -8,6 +8,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Location;
 
 public class IndexedPointInAreaLocator {
 
@@ -49,11 +50,11 @@ public class IndexedPointInAreaLocator {
   private static final String KEY = IndexedPointInAreaLocator.class.getName();
 
   public static IndexedPointInAreaLocator get(final Geometry geometry) {
-    IndexedPointInAreaLocator locator = JtsGeometryUtil.getGeometryProperty(
+    IndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(
       geometry, KEY);
     if (locator == null) {
       locator = new IndexedPointInAreaLocator(geometry);
-      JtsGeometryUtil.setGeometryProperty(geometry, KEY, locator);
+      GeometryProperties.setGeometryProperty(geometry, KEY, locator);
     }
     return locator;
   }

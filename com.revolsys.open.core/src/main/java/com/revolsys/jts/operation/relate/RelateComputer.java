@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -191,7 +190,7 @@ public class RelateComputer {
   private void computeIntersectionNodes(final int argIndex) {
     for (final Iterator i = arg[argIndex].getEdgeIterator(); i.hasNext();) {
       final Edge e = (Edge)i.next();
-      final int eLoc = e.getLabel().getLocation(argIndex);
+      final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final Iterator eiIt = e.getEdgeIntersectionList().iterator(); eiIt.hasNext();) {
         final EdgeIntersection ei = (EdgeIntersection)eiIt.next();
         final RelateNode n = (RelateNode)nodes.addNode(ei.coord);
@@ -300,7 +299,7 @@ public class RelateComputer {
   private void labelIntersectionNodes(final int argIndex) {
     for (final Iterator i = arg[argIndex].getEdgeIterator(); i.hasNext();) {
       final Edge e = (Edge)i.next();
-      final int eLoc = e.getLabel().getLocation(argIndex);
+      final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final Iterator eiIt = e.getEdgeIntersectionList().iterator(); eiIt.hasNext();) {
         final EdgeIntersection ei = (EdgeIntersection)eiIt.next();
         final RelateNode n = (RelateNode)nodes.find(ei.coord);
@@ -329,7 +328,7 @@ public class RelateComputer {
       // PointLocator?
       // Possibly should use ptInArea locator instead? We probably know here
       // that the edge does not touch the bdy of the target Geometry
-      final int loc = ptLocator.locate(e.getCoordinate(), target);
+      final Location loc = ptLocator.locate(e.getCoordinate(), target);
       e.getLabel().setAllLocations(targetIndex, loc);
     } else {
       e.getLabel().setAllLocations(targetIndex, Location.EXTERIOR);
@@ -358,7 +357,7 @@ public class RelateComputer {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIsolatedNode(final Node n, final int targetIndex) {
-    final int loc = ptLocator.locate(n.getCoordinate(),
+    final Location loc = ptLocator.locate(n.getCoordinate(),
       arg[targetIndex].getGeometry());
     n.getLabel().setAllLocations(targetIndex, loc);
     // debugPrintln(n.getLabel());

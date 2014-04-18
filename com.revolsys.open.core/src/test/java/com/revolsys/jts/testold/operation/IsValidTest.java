@@ -39,7 +39,6 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.valid.IsValidOp;
 import com.revolsys.jts.operation.valid.TopologyValidationError;
@@ -53,10 +52,8 @@ public class IsValidTest extends TestCase {
     TestRunner.run(IsValidTest.class);
   }
 
-  private final PrecisionModel precisionModel = new PrecisionModel();
-
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -65,9 +62,10 @@ public class IsValidTest extends TestCase {
   }
 
   public void testInvalidCoordinate() throws Exception {
-    final Coordinates badCoord = new Coordinate((double)1.0, Double.NaN, Coordinates.NULL_ORDINATE);
+    final Coordinates badCoord = new Coordinate(1.0, Double.NaN,
+      Coordinates.NULL_ORDINATE);
     final Coordinates[] pts = {
-      new Coordinate((double)0.0, 0.0, Coordinates.NULL_ORDINATE), badCoord
+      new Coordinate(0.0, 0.0, Coordinates.NULL_ORDINATE), badCoord
     };
     final Geometry line = this.geometryFactory.lineString(pts);
     final IsValidOp isValidOp = new IsValidOp(line);

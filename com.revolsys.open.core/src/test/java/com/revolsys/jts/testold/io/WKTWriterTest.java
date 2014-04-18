@@ -50,7 +50,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTWriter;
 
 /**
@@ -68,9 +67,8 @@ public class WKTWriterTest extends TestCase {
     return new TestSuite(WKTWriterTest.class);
   }
 
-  PrecisionModel precisionModel = new PrecisionModel(1);
-
-  GeometryFactory geometryFactory = new GeometryFactory(this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1.0);
 
   WKTWriter writer = new WKTWriter();
 
@@ -110,34 +108,29 @@ public class WKTWriterTest extends TestCase {
     final Geometry[] geometries = {
       point1, point2, lineString1
     };
-    final GeometryCollection geometryCollection = this.geometryFactory.createGeometryCollection(geometries);
+    final GeometryCollection geometryCollection = this.geometryFactory.geometryCollection(geometries);
     assertEquals(
       "GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))",
       this.writer.write(geometryCollection).toString());
   }
 
   public void testWriteLargeNumbers1() {
-    final PrecisionModel precisionModel = new PrecisionModel(1E9);
-    final GeometryFactory geometryFactory = new GeometryFactory(precisionModel,
-      0);
+
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 1E9);
     final Point point1 = geometryFactory.point(new Coordinate(
       123456789012345678d, 10E9, Coordinates.NULL_ORDINATE));
     assertEquals("POINT (123456789012345680 10000000000)", point1.toWkt());
   }
 
   public void testWriteLargeNumbers2() {
-    final PrecisionModel precisionModel = new PrecisionModel(1E9);
-    final GeometryFactory geometryFactory = new GeometryFactory(precisionModel,
-      0);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 1E9);
     final Point point1 = geometryFactory.point(new Coordinate(1234d, 10E9,
       Coordinates.NULL_ORDINATE));
     assertEquals("POINT (1234 10000000000)", point1.toWkt());
   }
 
   public void testWriteLargeNumbers3() {
-    final PrecisionModel precisionModel = new PrecisionModel(1E9);
-    final GeometryFactory geometryFactory = new GeometryFactory(precisionModel,
-      0);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 1E9);
     final Point point1 = geometryFactory.point(new Coordinate(
       123456789012345678000000E9d, 10E9, Coordinates.NULL_ORDINATE));
     assertEquals("POINT (123456789012345690000000000000000 10000000000)",

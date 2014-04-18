@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -37,7 +37,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     final Object userData = oldGeometry.getUserData();
     if (userData != null) {
       if (userData instanceof Map) {
-        JtsGeometryUtil.copyUserData(oldGeometry, newGeometry);
+        GeometryProperties.copyUserData(oldGeometry, newGeometry);
       } else {
         newGeometry.setUserData(userData);
       }
@@ -75,7 +75,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
         addUserData(geometry, newGeometry);
         newGeometries[i] = newGeometry;
       }
-      final GeometryCollection newGeometryCollection = geometryFactory.createGeometryCollection(newGeometries);
+      final GeometryCollection newGeometryCollection = geometryFactory.geometryCollection(newGeometries);
       addUserData(geometryCollection, newGeometryCollection);
       return newGeometryCollection;
     } else {

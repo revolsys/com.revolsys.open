@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.testold.TestFiles;
@@ -14,11 +13,10 @@ import com.revolsys.jts.util.Stopwatch;
 public class FileBufferPerfTest {
   static final int MAX_ITER = 1;
 
-  static PrecisionModel pm = new PrecisionModel();
+  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    0, 2);
 
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
-
-  static WKTReader wktRdr = new WKTReader(fact);
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   public static void main(final String[] args) {
     final FileBufferPerfTest test = new FileBufferPerfTest();

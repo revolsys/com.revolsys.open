@@ -3,7 +3,6 @@ package com.revolsys.jts.testold.perf.operation.union;
 import java.util.List;
 
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.io.WKTWriter;
@@ -12,11 +11,10 @@ import com.revolsys.jts.testold.TestFiles;
 public class FileUnionPerfTest {
   static final int MAX_ITER = 1;
 
-  static PrecisionModel pm = new PrecisionModel();
+  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    0, 2);
 
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
-
-  static WKTReader wktRdr = new WKTReader(fact);
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   static WKTWriter wktWriter = new WKTWriter();
 

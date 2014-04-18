@@ -269,13 +269,13 @@ public class Shapefile {
         // System.out.println("Done record: " + recordNumber);
       } catch (final IllegalArgumentException r2d2) {
         // System.out.println("Record " +recordNumber+ " has is NULL Shape");
-        geom = GeometryFactory.getFactory().createGeometryCollection(
+        geom = GeometryFactory.getFactory().geometryCollection(
           (Geometry[])null);
       } catch (final Exception c3p0) {
         System.out.println("Error processing record (a):" + recordNumber);
         System.out.println(c3p0.getMessage());
         c3p0.printStackTrace();
-        geom = GeometryFactory.getFactory().createGeometryCollection(
+        geom = GeometryFactory.getFactory().geometryCollection(
           (Geometry[])null);
       }
       // System.out.println("processing:" +recordNumber);
@@ -328,13 +328,13 @@ public class Shapefile {
           // System.out.println("Done record: " + recordNumber);
         } catch (final IllegalArgumentException r2d2) {
           // System.out.println("Record " +recordNumber+ " has is NULL Shape");
-          list.add(GeometryFactory.getFactory().createGeometryCollection(
+          list.add(GeometryFactory.getFactory().geometryCollection(
             (Geometry[])null));
         } catch (final Exception c3p0) {
           System.out.println("Error processing record (a):" + recordNumber);
           System.out.println(c3p0.getMessage());
           c3p0.printStackTrace();
-          list.add(GeometryFactory.getFactory().createGeometryCollection(
+          list.add(GeometryFactory.getFactory().geometryCollection(
             (Geometry[])null));
         }
         // System.out.println("processing:" +recordNumber);
@@ -342,7 +342,7 @@ public class Shapefile {
     } catch (final EOFException e) {
 
     }
-    return geometryFactory.createGeometryCollection((Geometry[])list.toArray(new Geometry[] {}));
+    return geometryFactory.geometryCollection((Geometry[])list.toArray(new Geometry[] {}));
   }
 
   public synchronized void readIndex(final InputStream is) throws IOException {

@@ -42,13 +42,12 @@ import com.revolsys.jts.geom.Location;
  * 
  * @author Martin Davis
  */
-public interface PointOnGeometryLocator 
-{
+public interface PointOnGeometryLocator {
   /**
    * Determines the {@link Location} of a point in the {@link Geometry}.
    * 
    * @param p the point to test
    * @return the location of the point in the geometry  
    */
-	int locate(Coordinates p);
+  Location locate(Coordinates p);
 }

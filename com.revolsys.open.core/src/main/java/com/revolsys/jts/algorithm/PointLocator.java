@@ -34,7 +34,6 @@ package com.revolsys.jts.algorithm;
 
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -135,7 +134,7 @@ public class PointLocator {
    *
    * @return the {@link Location} of the point relative to the input Geometry
    */
-  public int locate(final Coordinates p, final Geometry geom) {
+  public Location locate(final Coordinates p, final Geometry geom) {
     if (geom.isEmpty()) {
       return Location.EXTERIOR;
     }
@@ -159,7 +158,7 @@ public class PointLocator {
     return Location.EXTERIOR;
   }
 
-  private int locate(final Coordinates p, final LineString l) {
+  private Location locate(final Coordinates p, final LineString l) {
     // bounding-box check
     if (!l.getBoundingBox().intersects(p)) {
       return Location.EXTERIOR;
@@ -177,7 +176,7 @@ public class PointLocator {
     return Location.EXTERIOR;
   }
 
-  private int locate(final Coordinates p, final Point pt) {
+  private Location locate(final Coordinates p, final Point pt) {
     // no point in doing envelope test, since equality test is just as fast
 
     final Coordinates ptCoord = pt.getCoordinate();
@@ -187,14 +186,14 @@ public class PointLocator {
     return Location.EXTERIOR;
   }
 
-  private int locate(final Coordinates p, final Polygon poly) {
+  private Location locate(final Coordinates p, final Polygon poly) {
     if (poly.isEmpty()) {
       return Location.EXTERIOR;
     }
 
-    final LinearRing shell = (LinearRing)poly.getExteriorRing();
+    final LinearRing shell = poly.getExteriorRing();
 
-    final int shellLoc = locateInPolygonRing(p, shell);
+    final Location shellLoc = locateInPolygonRing(p, shell);
     if (shellLoc == Location.EXTERIOR) {
       return Location.EXTERIOR;
     }
@@ -203,8 +202,8 @@ public class PointLocator {
     }
     // now test if the point lies in or on the holes
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      final LinearRing hole = (LinearRing)poly.getInteriorRing(i);
-      final int holeLoc = locateInPolygonRing(p, hole);
+      final LinearRing hole = poly.getInteriorRing(i);
+      final Location holeLoc = locateInPolygonRing(p, hole);
       if (holeLoc == Location.INTERIOR) {
         return Location.EXTERIOR;
       }
@@ -215,7 +214,8 @@ public class PointLocator {
     return Location.INTERIOR;
   }
 
-  private int locateInPolygonRing(final Coordinates p, final LinearRing ring) {
+  private Location locateInPolygonRing(final Coordinates p,
+    final LinearRing ring) {
     // bounding-box check
     if (!ring.getBoundingBox().intersects(p)) {
       return Location.EXTERIOR;
@@ -224,7 +224,7 @@ public class PointLocator {
     return CGAlgorithms.locatePointInRing(p, ring.getCoordinateArray());
   }
 
-  private void updateLocationInfo(final int loc) {
+  private void updateLocationInfo(final Location loc) {
     if (loc == Location.INTERIOR) {
       isIn = true;
     }

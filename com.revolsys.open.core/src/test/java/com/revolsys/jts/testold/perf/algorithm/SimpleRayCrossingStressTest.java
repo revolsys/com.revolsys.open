@@ -43,6 +43,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.testold.algorithm.PerturbedGridPolygonBuilder;
 
@@ -89,7 +90,7 @@ public class SimpleRayCrossingStressTest extends TestCase {
     }
 
     @Override
-    public int locate(final Coordinates p) {
+    public Location locate(final Coordinates p) {
       final RayCrossingCounter rcc = new RayCrossingCounter(p);
       final RayCrossingSegmentFilter filter = new RayCrossingSegmentFilter(rcc);
       this.geom.apply(filter);

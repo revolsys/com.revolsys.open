@@ -34,7 +34,6 @@ package com.revolsys.jts.testold.perf.operation.buffer;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -57,11 +56,8 @@ public class IteratedBufferStressTest {
 
   }
 
-  private final PrecisionModel precisionModel = new PrecisionModel();
-
-  // private PrecisionModel precisionModel = new PrecisionModel(1);
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    2);
 
   WKTReader rdr = new WKTReader(this.geometryFactory);
 
@@ -73,7 +69,8 @@ public class IteratedBufferStressTest {
   Geometry doBuffer(final Geometry g, final double dist) {
     System.out.println("Buffering with dist = " + dist);
     final Geometry buf = g.buffer(dist);
-    System.out.println("Buffer result has " + buf.getVertexCount() + " vertices");
+    System.out.println("Buffer result has " + buf.getVertexCount()
+      + " vertices");
 
     System.out.println(buf);
     return buf;

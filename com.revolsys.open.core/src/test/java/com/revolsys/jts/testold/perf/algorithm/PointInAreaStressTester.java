@@ -73,9 +73,9 @@ public class PointInAreaStressTester {
 
   public void printStats() {
     System.out.println("Location counts: " + " Boundary = "
-      + this.locationCount[Location.BOUNDARY] + " Interior = "
-      + this.locationCount[Location.INTERIOR] + " Exterior = "
-      + this.locationCount[Location.EXTERIOR]);
+      + this.locationCount[Location.BOUNDARY.getIndex()] + " Interior = "
+      + this.locationCount[Location.INTERIOR.getIndex()] + " Exterior = "
+      + this.locationCount[Location.EXTERIOR.getIndex()]);
   }
 
   /**
@@ -102,7 +102,7 @@ public class PointInAreaStressTester {
         // compute test point
         final double x = areaEnv.getMinX() + i * xStep;
         final double y = areaEnv.getMinY() + j * yStep;
-        final Coordinates pt = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
+        final Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
         this.geomFactory.getPrecisionModel().makePrecise(pt);
 
         final boolean isEqual = testPIA(pt);
@@ -140,10 +140,10 @@ public class PointInAreaStressTester {
   private boolean testPIA(final Coordinates p) {
     // System.out.println(WKTWriter.toPoint(p));
 
-    final int loc1 = this.pia1.locate(p);
-    final int loc2 = this.pia2.locate(p);
+    final Location loc1 = this.pia1.locate(p);
+    final Location loc2 = this.pia2.locate(p);
 
-    this.locationCount[loc1]++;
+    this.locationCount[loc1.getIndex()]++;
 
     if ((loc1 == Location.BOUNDARY || loc2 == Location.BOUNDARY)
       && this.ignoreBoundaryResults) {

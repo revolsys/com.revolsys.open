@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.util.SineStarFactory;
@@ -60,11 +59,10 @@ public class PreparedPolygonIntersectsPerfTest {
 
   static final int NUM_LINE_PTS = 100;
 
-  static PrecisionModel pm = new PrecisionModel();
+  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    0, 2);
 
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
-
-  static WKTReader wktRdr = new WKTReader(fact);
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   static WKTWriter wktWriter = new WKTWriter();
 
@@ -112,7 +110,7 @@ public class PreparedPolygonIntersectsPerfTest {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Coordinates base = new Coordinate((double)env.getMinX() + i * xInc,
+        final Coordinates base = new Coordinate(env.getMinX() + i * xInc,
           env.getMinY() + j * yInc, Coordinates.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);
@@ -162,13 +160,14 @@ public class PreparedPolygonIntersectsPerfTest {
 
   public void test(final int nPts) {
     // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
-    final Geometry sinePoly = createSineStar(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), 100, nPts);
+    final Geometry sinePoly = createSineStar(new Coordinate((double)0, 0,
+      Coordinates.NULL_ORDINATE), 100, nPts);
     // System.out.println(poly);
     // Geometry target = sinePoly.getBoundary();
     final Geometry target = sinePoly;
 
-    final List lines = createLines(target.getBoundingBox(), NUM_LINES,
-      1.0, NUM_LINE_PTS);
+    final List lines = createLines(target.getBoundingBox(), NUM_LINES, 1.0,
+      NUM_LINE_PTS);
 
     System.out.println();
     // System.out.println("Running with " + nPts + " points");

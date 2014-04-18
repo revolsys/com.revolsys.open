@@ -48,7 +48,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
         final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
           final com.revolsys.jts.geom.GeometryFactory geometryFactory = viewport.getGeometryFactory();
-          return geometryFactory.createGeometry(geometry);
+          return geometryFactory.geometry(geometry);
         }
       }
     }

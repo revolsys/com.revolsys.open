@@ -60,7 +60,7 @@ public class MCPointInRingTest extends AbstractPointInRingTest {
   }
 
   @Override
-  protected void runPtInRing(final int expectedLoc, final Coordinates pt,
+  protected void runPtInRing(final Location expectedLoc, final Coordinates pt,
     final String wkt) throws Exception {
     // isPointInRing is not defined for pts on boundary
     if (expectedLoc == Location.BOUNDARY) {
@@ -72,7 +72,7 @@ public class MCPointInRingTest extends AbstractPointInRingTest {
       return;
     }
 
-    final LinearRing ring = (LinearRing)((Polygon)geom).getExteriorRing();
+    final LinearRing ring = ((Polygon)geom).getExteriorRing();
     final boolean expected = expectedLoc == Location.INTERIOR;
     final MCPointInRing pir = new MCPointInRing(ring);
     final boolean result = pir.isInside(pt);

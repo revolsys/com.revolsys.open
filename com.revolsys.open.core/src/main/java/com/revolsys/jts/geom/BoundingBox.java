@@ -171,6 +171,8 @@ public interface BoundingBox {
 
   String getId();
 
+  double getMax(int i);
+
   <Q extends Quantity> Measurable<Q> getMaximumX();
 
   <Q extends Quantity> Measurable<Q> getMaximumY();
@@ -192,6 +194,8 @@ public interface BoundingBox {
   double getMaxY();
 
   double getMaxZ();
+
+  double getMin(int i);
 
   <Q extends Quantity> Measurable<Q> getMinimumX();
 

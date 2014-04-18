@@ -5,8 +5,8 @@ import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class PointInArea extends com.revolsys.gis.jts.RayCrossingCounter
-  implements Visitor<LineSegment> {
+public class PointInArea extends RayCrossingCounter implements
+  Visitor<LineSegment> {
 
   private final GeometryFactory geometryFactory;
 

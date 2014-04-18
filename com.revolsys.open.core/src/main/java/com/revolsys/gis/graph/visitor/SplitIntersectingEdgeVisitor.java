@@ -14,11 +14,11 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.filter.LineFilter;
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
+import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -27,7 +27,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
 
   public static final String MTACHED = "mtached";
   static {
-    Geometry3DExactEquals.addExclude(MTACHED);
+    GeometryEqualsExact3d.addExclude(MTACHED);
   }
 
   /**
@@ -84,8 +84,8 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
         if (started) {
           if (hasMatches != matched) {
             final LineString newLine = factory.lineString(coordinates);
-            JtsGeometryUtil.copyUserData(line, newLine);
-            JtsGeometryUtil.setGeometryProperty(newLine, MTACHED, matched);
+            GeometryProperties.copyUserData(line, newLine);
+            GeometryProperties.setGeometryProperty(newLine, MTACHED, matched);
             lines.add(newLine);
             matched = hasMatches;
             coordinates.clear();
@@ -103,7 +103,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
     }
     if (coordinates.size() > 1) {
       final LineString newLine = factory.lineString(coordinates);
-      JtsGeometryUtil.copyUserData(line, newLine);
+      GeometryProperties.copyUserData(line, newLine);
       lines.add(newLine);
     }
     return lines;

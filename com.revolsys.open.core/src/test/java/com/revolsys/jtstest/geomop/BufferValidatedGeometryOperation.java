@@ -173,7 +173,7 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
      * This allows the test case to avoid specifying an exact result
      */
     if (returnEmptyGC) {
-      result = result.getGeometryFactory().createGeometryCollection(
+      result = result.getGeometryFactory().geometryCollection(
         (Geometry[])null);
     }
     return new GeometryResult(result);

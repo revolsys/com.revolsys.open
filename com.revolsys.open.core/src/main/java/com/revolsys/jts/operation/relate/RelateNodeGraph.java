@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -69,16 +68,13 @@ import com.revolsys.jts.geomgraph.NodeMap;
  */
 public class RelateNodeGraph {
 
-  private NodeMap nodes = new NodeMap(new RelateNodeFactory());
+  private final NodeMap nodes = new NodeMap(new RelateNodeFactory());
 
   public RelateNodeGraph() {
   }
 
-  public Iterator getNodeIterator() { return nodes.iterator(); }
-
-  public void build(GeometryGraph geomGraph)
-  {
-      // compute nodes for intersections between previously noded edges
+  public void build(final GeometryGraph geomGraph) {
+    // compute nodes for intersections between previously noded edges
     computeIntersectionNodes(geomGraph, 0);
     /**
      * Copy the labelling for the nodes in the parent Geometry.  These override
@@ -89,12 +85,12 @@ public class RelateNodeGraph {
     /**
      * Build EdgeEnds for all intersections.
      */
-    EdgeEndBuilder eeBuilder = new EdgeEndBuilder();
-    List eeList = eeBuilder.computeEdgeEnds(geomGraph.getEdgeIterator());
+    final EdgeEndBuilder eeBuilder = new EdgeEndBuilder();
+    final List eeList = eeBuilder.computeEdgeEnds(geomGraph.getEdgeIterator());
     insertEdgeEnds(eeList);
 
-//Debug.println("==== NodeList ===");
-//Debug.print(nodes);
+    // Debug.println("==== NodeList ===");
+    // Debug.print(nodes);
   }
 
   /**
@@ -106,51 +102,54 @@ public class RelateNodeGraph {
    * <p>
    * Precondition: edge intersections have been computed.
    */
-  public void computeIntersectionNodes(GeometryGraph geomGraph, int argIndex)
-  {
-    for (Iterator edgeIt = geomGraph.getEdgeIterator(); edgeIt.hasNext(); ) {
-      Edge e = (Edge) edgeIt.next();
-      int eLoc = e.getLabel().getLocation(argIndex);
-      for (Iterator eiIt = e.getEdgeIntersectionList().iterator(); eiIt.hasNext(); ) {
-        EdgeIntersection ei = (EdgeIntersection) eiIt.next();
-        RelateNode n = (RelateNode) nodes.addNode(ei.coord);
-        if (eLoc == Location.BOUNDARY)
+  public void computeIntersectionNodes(final GeometryGraph geomGraph,
+    final int argIndex) {
+    for (final Iterator edgeIt = geomGraph.getEdgeIterator(); edgeIt.hasNext();) {
+      final Edge e = (Edge)edgeIt.next();
+      final Location eLoc = e.getLabel().getLocation(argIndex);
+      for (final Iterator eiIt = e.getEdgeIntersectionList().iterator(); eiIt.hasNext();) {
+        final EdgeIntersection ei = (EdgeIntersection)eiIt.next();
+        final RelateNode n = (RelateNode)nodes.addNode(ei.coord);
+        if (eLoc == Location.BOUNDARY) {
           n.setLabelBoundary(argIndex);
-        else {
-          if (n.getLabel().isNull(argIndex))
+        } else {
+          if (n.getLabel().isNull(argIndex)) {
             n.setLabel(argIndex, Location.INTERIOR);
+          }
         }
-//Debug.println(n);
+        // Debug.println(n);
       }
     }
   }
 
-    /**
-     * Copy all nodes from an arg geometry into this graph.
-     * The node label in the arg geometry overrides any previously computed
-     * label for that argIndex.
-     * (E.g. a node may be an intersection node with
-     * a computed label of BOUNDARY,
-     * but in the original arg Geometry it is actually
-     * in the interior due to the Boundary Determination Rule)
-     */
-  public void copyNodesAndLabels(GeometryGraph geomGraph, int argIndex)
-  {
-    for (Iterator nodeIt = geomGraph.getNodeIterator(); nodeIt.hasNext(); ) {
-      Node graphNode = (Node) nodeIt.next();
-      Node newNode = nodes.addNode(graphNode.getCoordinate());
+  /**
+   * Copy all nodes from an arg geometry into this graph.
+   * The node label in the arg geometry overrides any previously computed
+   * label for that argIndex.
+   * (E.g. a node may be an intersection node with
+   * a computed label of BOUNDARY,
+   * but in the original arg Geometry it is actually
+   * in the interior due to the Boundary Determination Rule)
+   */
+  public void copyNodesAndLabels(final GeometryGraph geomGraph,
+    final int argIndex) {
+    for (final Iterator nodeIt = geomGraph.getNodeIterator(); nodeIt.hasNext();) {
+      final Node graphNode = (Node)nodeIt.next();
+      final Node newNode = nodes.addNode(graphNode.getCoordinate());
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
-//node.print(System.out);
+      // node.print(System.out);
     }
   }
 
-  public void insertEdgeEnds(List ee)
-  {
-    for (Iterator i = ee.iterator(); i.hasNext(); ) {
-      EdgeEnd e = (EdgeEnd) i.next();
+  public Iterator getNodeIterator() {
+    return nodes.iterator();
+  }
+
+  public void insertEdgeEnds(final List ee) {
+    for (final Iterator i = ee.iterator(); i.hasNext();) {
+      final EdgeEnd e = (EdgeEnd)i.next();
       nodes.add(e);
     }
   }
-
 
 }

@@ -84,7 +84,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public void addGeometry(Geometry geometry) {
-    geometry = getGeometryFactory().createGeometry(geometry);
+    geometry = getGeometryFactory().geometry(geometry);
     final Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
     final int geometryIndex = geometries.size();
@@ -296,7 +296,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       final LineString line = geometryFactory.lineString(points);
       geometries.add(line);
     }
-    return geometryFactory.createGeometry(geometries);
+    return geometryFactory.geometry(geometries);
   }
 
   public boolean intersects(final LineString line) {

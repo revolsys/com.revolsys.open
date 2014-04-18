@@ -148,7 +148,7 @@ public class MultiGenerator extends GeometryGenerator {
           return this.geometryFactory.createMultiPolygon((Polygon[])geoms.toArray(new Polygon[this.numberGeometries]));
         } else {
           // same as multi
-          return this.geometryFactory.createGeometryCollection((Geometry[])geoms.toArray(new Geometry[this.numberGeometries]));
+          return this.geometryFactory.geometryCollection((Geometry[])geoms.toArray(new Geometry[this.numberGeometries]));
         }
       }
     }

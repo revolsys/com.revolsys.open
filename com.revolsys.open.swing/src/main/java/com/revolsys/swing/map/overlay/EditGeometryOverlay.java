@@ -28,15 +28,15 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -84,7 +84,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     @Override
     public boolean canRedo() {
       if (super.canRedo()) {
-        if (JtsGeometryUtil.equalsExact3D(this.oldGeometry,
+        if (GeometryEqualsExact3d.equal(this.oldGeometry,
           EditGeometryOverlay.this.addGeometry)) {
           return true;
         }
@@ -95,7 +95,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     @Override
     public boolean canUndo() {
       if (super.canUndo()) {
-        if (JtsGeometryUtil.equalsExact3D(this.newGeometry,
+        if (GeometryEqualsExact3d.equal(this.newGeometry,
           EditGeometryOverlay.this.addGeometry)) {
           return true;
         }
@@ -318,8 +318,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           final LineString line = (LineString)geometry;
           final Point p0 = line.getPoint(0);
           final Point p1 = line.getPoint(1);
-          final LinearRing ring = geometryFactory.linearRing(Arrays.asList(
-            p0, p1, newPoint, p0));
+          final LinearRing ring = geometryFactory.linearRing(Arrays.asList(p0,
+            p1, newPoint, p0));
           geometry = geometryFactory.polygon(ring);
         } else if (geometry instanceof Polygon) {
           final Polygon polygon = (Polygon)geometry;
@@ -704,7 +704,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
       Point point = getPoint(event);
       // TODO make work with multi-part
-      final Point fromPoint = JtsGeometryUtil.getFromPoint(this.addGeometry);
+      final Point fromPoint = this.addGeometry.getPoint();
       final boolean snapToFirst = !SwingUtil.isControlDown(event)
         && boundingBox.contains(fromPoint);
       if (snapToFirst
@@ -739,8 +739,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
                 final Point p1 = geometryFactory.point(previousPoint);
                 final Point p3 = geometryFactory.point(firstPoint);
                 final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
-                xorGeometry = viewportGeometryFactory.lineString(p1,
-                  point, p3);
+                xorGeometry = viewportGeometryFactory.lineString(p1, point, p3);
               }
             }
           } else {
@@ -984,7 +983,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   private void setAddGeometry(final Geometry geometry) {
-    if (!JtsGeometryUtil.equalsExact3D(geometry, this.addGeometry)) {
+    if (!GeometryEqualsExact3d.equal(geometry, this.addGeometry)) {
       final AddGeometryUndoEdit undo = new AddGeometryUndoEdit(geometry);
       addUndo(undo);
       repaint();
@@ -999,7 +998,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   protected UndoableEdit setGeometry(final CloseLocation location,
     final Geometry newGeometry) {
     if (isModeAddGeometry()) {
-      if (JtsGeometryUtil.equalsExact3D(newGeometry, this.addGeometry)) {
+      if (GeometryEqualsExact3d.equal(newGeometry, this.addGeometry)) {
         return null;
       } else {
         return new AddGeometryUndoEdit(newGeometry);
@@ -1009,7 +1008,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       final DataObjectMetaData metaData = location.getMetaData();
       final String geometryAttributeName = metaData.getGeometryAttributeName();
       final Geometry oldValue = object.getValue(geometryAttributeName);
-      if (JtsGeometryUtil.equalsExact3D(newGeometry, oldValue)) {
+      if (GeometryEqualsExact3d.equal(newGeometry, oldValue)) {
         return null;
       } else {
         final AbstractDataObjectLayer layer = location.getLayer();

@@ -145,7 +145,7 @@ public class GeometryProjectionUtil {
           geometryFactory);
         T newGeometry = perform(operation, geometry);
         if (geometry == newGeometry) {
-          newGeometry = (T)geometryFactory.createGeometry(geometry);
+          newGeometry = (T)geometryFactory.geometry(geometry);
         }
         return newGeometry;
       }

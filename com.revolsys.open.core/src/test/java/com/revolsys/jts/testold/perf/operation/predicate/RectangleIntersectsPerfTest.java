@@ -58,11 +58,10 @@ public class RectangleIntersectsPerfTest {
 
   static final int NUM_LINE_PTS = 1000;
 
-  static PrecisionModel pm = new PrecisionModel();
+  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    0, 2);
 
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
-
-  static WKTReader wktRdr = new WKTReader(fact);
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   static WKTWriter wktWriter = new WKTWriter();
 
@@ -111,9 +110,9 @@ public class RectangleIntersectsPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final BoundingBox envRect = new Envelope(baseX, baseY, baseX + dx, baseY
-          + dy);
-        final Geometry rect = fact.toGeometry(envRect);
+        final BoundingBox envRect = new Envelope(baseX, baseY, baseX + dx,
+          baseY + dy);
+        final Geometry rect = geometryFactory.toGeometry(envRect);
         rectList.add(rect);
       }
     }
@@ -163,7 +162,8 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Coordinates origin = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
+    final Coordinates origin = new Coordinate((double)0, 0,
+      Coordinates.NULL_ORDINATE);
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
     /**
      * Make the geometry "crinkly" by rounding off the points.
@@ -182,8 +182,8 @@ public class RectangleIntersectsPerfTest {
 
   void testRectangles(final Geometry target, final int nRect,
     final double rectSize) {
-    final Geometry[] rects = createRectangles(target.getBoundingBox(),
-      nRect, rectSize);
+    final Geometry[] rects = createRectangles(target.getBoundingBox(), nRect,
+      rectSize);
     test(rects, target);
   }
 

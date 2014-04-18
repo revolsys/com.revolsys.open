@@ -217,7 +217,7 @@ public class GeometryTransformer {
       transGeomList.add(transformGeom);
     }
     if (preserveGeometryCollectionType) {
-      return factory.createGeometryCollection(GeometryFactory.toGeometryArray(transGeomList));
+      return factory.geometryCollection(GeometryFactory.toGeometryArray(transGeomList));
     }
     return factory.buildGeometry(transGeomList);
   }

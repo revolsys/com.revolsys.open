@@ -44,7 +44,6 @@ import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -62,9 +61,8 @@ public class GeometryCollectionImplTest extends TestCase {
     return new TestSuite(GeometryCollectionImplTest.class);
   }
 
-  PrecisionModel precisionModel = new PrecisionModel(1000);
-
-  GeometryFactory geometryFactory = new GeometryFactory(this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1000.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 

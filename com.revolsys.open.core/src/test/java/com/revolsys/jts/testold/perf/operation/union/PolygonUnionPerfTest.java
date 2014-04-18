@@ -7,7 +7,6 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.GeometricShapeFactory;
@@ -16,11 +15,10 @@ public class PolygonUnionPerfTest {
 
   static final int MAX_ITER = 1;
 
-  static PrecisionModel pm = new PrecisionModel();
+  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    0, 2);
 
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
-
-  static WKTReader wktRdr = new WKTReader(fact);
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   static WKTWriter wktWriter = new WKTWriter();
 
@@ -88,7 +86,8 @@ public class PolygonUnionPerfTest {
     final double yInc = height / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Coordinates base = new Coordinate((double)i * xInc, j * yInc, Coordinates.NULL_ORDINATE);
+        final Coordinates base = new Coordinate(i * xInc, j * yInc,
+          Coordinates.NULL_ORDINATE);
         final Geometry poly = createPoly(base, size, nPts);
         geoms.add(poly);
         // System.out.println(poly);

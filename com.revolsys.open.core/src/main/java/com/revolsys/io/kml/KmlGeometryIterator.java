@@ -161,7 +161,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
         geometries.add(geometry);
       }
     }
-    final Geometry geometryCollection = geometryFactory.createGeometry(geometries);
+    final Geometry geometryCollection = geometryFactory.geometry(geometries);
     StaxUtils.skipToEndElementByLocalName(in, MULTI_GEOMETRY);
     return geometryCollection;
   }

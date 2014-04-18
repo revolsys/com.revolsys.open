@@ -54,7 +54,7 @@ public class PreparedLineIntersectsPerfTest {
 
   static PrecisionModel pm = new PrecisionModel();
 
-  static GeometryFactory fact = new GeometryFactory(pm, 0);
+  static GeometryFactory fact = GeometryFactory.getFactory(0, 2);
 
   public static void main(final String[] args) {
     final PreparedLineIntersectsPerfTest test = new PreparedLineIntersectsPerfTest();
@@ -102,8 +102,8 @@ public class PreparedLineIntersectsPerfTest {
     this.builder.setTestDimension(1);
     final Geometry target = this.builder.createSineStar(nPts).getBoundary();
 
-    final List lines = this.builder.createTestGeoms(
-      target.getBoundingBox(), NUM_LINES, 1.0, NUM_LINE_PTS);
+    final List lines = this.builder.createTestGeoms(target.getBoundingBox(),
+      NUM_LINES, 1.0, NUM_LINE_PTS);
 
     System.out.println();
     // System.out.println("Running with " + nPts + " points");

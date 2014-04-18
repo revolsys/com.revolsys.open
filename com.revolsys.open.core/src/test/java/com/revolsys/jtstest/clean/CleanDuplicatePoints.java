@@ -102,7 +102,7 @@ public class CleanDuplicatePoints {
       final Geometry geom = g.getGeometry(i);
       geoms.add(clean(geom));
     }
-    return fact.createGeometryCollection(GeometryFactory.toGeometryArray(geoms));
+    return fact.geometryCollection(GeometryFactory.toGeometryArray(geoms));
   }
 
   private LinearRing clean(final LinearRing g) {

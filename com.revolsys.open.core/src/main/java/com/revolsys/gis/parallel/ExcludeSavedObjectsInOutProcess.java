@@ -8,7 +8,7 @@ import java.util.Set;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.io.StatisticsMap;
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
@@ -58,7 +58,7 @@ public class ExcludeSavedObjectsInOutProcess extends
     } else {
       final Set<String> ids = Collections.singleton(id);
       final Geometry geometry = object.getGeometryValue();
-      JtsGeometryUtil.setGeometryProperty(geometry, "ORIGINAL_IDS", ids);
+      GeometryProperties.setGeometryProperty(geometry, "ORIGINAL_IDS", ids);
       out.write(object);
     }
   }

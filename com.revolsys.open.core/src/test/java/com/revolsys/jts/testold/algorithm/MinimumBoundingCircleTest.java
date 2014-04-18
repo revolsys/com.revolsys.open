@@ -35,13 +35,11 @@ package com.revolsys.jts.testold.algorithm;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.MinimumBoundingCircle;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -56,10 +54,8 @@ public class MinimumBoundingCircleTest extends TestCase {
     TestRunner.run(MinimumBoundingCircleTest.class);
   }
 
-  private final PrecisionModel precisionModel = new PrecisionModel(1);
-
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -111,7 +107,8 @@ public class MinimumBoundingCircleTest extends TestCase {
   public void testObtuseTriangle() throws Exception {
     doMinimumBoundingCircleTest(
       "POLYGON ((100 100, 200 100, 150 90, 100 100))",
-      "MULTIPOINT ((100 100), (200 100))", new Coordinate((double)150, 100, Coordinates.NULL_ORDINATE), 50);
+      "MULTIPOINT ((100 100), (200 100))", new Coordinate((double)150, 100,
+        Coordinates.NULL_ORDINATE), 50);
   }
 
   public void testPoint() throws Exception {
@@ -121,27 +118,27 @@ public class MinimumBoundingCircleTest extends TestCase {
 
   public void testPoints2() throws Exception {
     doMinimumBoundingCircleTest("MULTIPOINT ((10 10), (20 20))",
-      "MULTIPOINT ((10 10), (20 20))", new Coordinate((double)15, 15, Coordinates.NULL_ORDINATE),
-      7.0710678118654755);
+      "MULTIPOINT ((10 10), (20 20))", new Coordinate((double)15, 15,
+        Coordinates.NULL_ORDINATE), 7.0710678118654755);
   }
 
   public void testPoints3() throws Exception {
     doMinimumBoundingCircleTest("MULTIPOINT ((10 10), (20 20), (10 20))",
-      "MULTIPOINT ((10 10), (20 20), (10 20))", new Coordinate((double)15, 15, Coordinates.NULL_ORDINATE),
-      7.0710678118654755);
+      "MULTIPOINT ((10 10), (20 20), (10 20))", new Coordinate((double)15, 15,
+        Coordinates.NULL_ORDINATE), 7.0710678118654755);
   }
 
   public void testPointsInLine() throws Exception {
     doMinimumBoundingCircleTest("MULTIPOINT ((10 10), (20 20), (30 30))",
-      "MULTIPOINT ((10 10), (30 30))", new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE),
-      14.142135623730951);
+      "MULTIPOINT ((10 10), (30 30))", new Coordinate((double)20, 20,
+        Coordinates.NULL_ORDINATE), 14.142135623730951);
   }
 
   public void testTriangleWithMiddlePoint() throws Exception {
     doMinimumBoundingCircleTest(
       "MULTIPOINT ((10 10), (20 20), (10 20), (15 19))",
-      "MULTIPOINT ((10 10), (20 20), (10 20))", new Coordinate((double)15, 15, Coordinates.NULL_ORDINATE),
-      7.0710678118654755);
+      "MULTIPOINT ((10 10), (20 20), (10 20))", new Coordinate((double)15, 15,
+        Coordinates.NULL_ORDINATE), 7.0710678118654755);
   }
 
 }

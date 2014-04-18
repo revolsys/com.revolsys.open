@@ -23,7 +23,7 @@ import com.revolsys.jts.geom.Geometry;
 public class GeometryTest {
   public static void createTestFile(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final String wkt) {
-    final Geometry geometry = geometryFactory.createGeometry(wkt);
+    final Geometry geometry = geometryFactory.geometry(wkt);
 
     final DataType geometryDataType = DataTypes.getType(geometry);
 

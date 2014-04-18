@@ -113,7 +113,7 @@ public class OverlayOp extends GeometryGraphOperation {
     Geometry result = null;
     switch (resultDimension(overlayOpCode, a, b)) {
       case -1:
-        result = geomFact.createGeometryCollection(new Geometry[0]);
+        result = geomFact.geometryCollection(new Geometry[0]);
       break;
       case 0:
         result = geomFact.point();
@@ -129,6 +129,24 @@ public class OverlayOp extends GeometryGraphOperation {
   }
 
   /**
+   * Tests whether a point with a given topological {@link Label}
+   * relative to two geometries is contained in 
+   * the result of overlaying the geometries using
+   * a given overlay operation.
+   * <p>
+   * The method handles arguments of {@link Location#NONE} correctly
+   * 
+   * @param label the topological label of the point
+   * @param opCode the code for the overlay operation to test
+   * @return true if the label locations correspond to the overlayOpCode
+   */
+  public static boolean isResultOfOp(final Label label, final int opCode) {
+    final Location loc0 = label.getLocation(0);
+    final Location loc1 = label.getLocation(1);
+    return isResultOfOp(loc0, loc1, opCode);
+  }
+
+  /**
    * Tests whether a point with given {@link Location}s
    * relative to two geometries is contained in 
    * the result of overlaying the geometries using
@@ -141,7 +159,8 @@ public class OverlayOp extends GeometryGraphOperation {
    * @param overlayOpCode the code for the overlay operation to test
    * @return true if the locations correspond to the overlayOpCode
    */
-  public static boolean isResultOfOp(int loc0, int loc1, final int overlayOpCode) {
+  public static boolean isResultOfOp(Location loc0, Location loc1,
+    final int overlayOpCode) {
     if (loc0 == Location.BOUNDARY) {
       loc0 = Location.INTERIOR;
     }
@@ -160,24 +179,6 @@ public class OverlayOp extends GeometryGraphOperation {
           || (loc0 != Location.INTERIOR && loc1 == Location.INTERIOR);
     }
     return false;
-  }
-
-  /**
-   * Tests whether a point with a given topological {@link Label}
-   * relative to two geometries is contained in 
-   * the result of overlaying the geometries using
-   * a given overlay operation.
-   * <p>
-   * The method handles arguments of {@link Location#NONE} correctly
-   * 
-   * @param label the topological label of the point
-   * @param opCode the code for the overlay operation to test
-   * @return true if the label locations correspond to the overlayOpCode
-   */
-  public static boolean isResultOfOp(final Label label, final int opCode) {
-    final int loc0 = label.getLocation(0);
-    final int loc1 = label.getLocation(1);
-    return isResultOfOp(loc0, loc1, opCode);
   }
 
   /**
@@ -577,7 +578,7 @@ public class OverlayOp extends GeometryGraphOperation {
   private boolean isCovered(final Coordinates coord, final List geomList) {
     for (final Iterator it = geomList.iterator(); it.hasNext();) {
       final Geometry geom = (Geometry)it.next();
-      final int loc = ptLocator.locate(coord, geom);
+      final Location loc = ptLocator.locate(coord, geom);
       if (loc != Location.EXTERIOR) {
         return true;
       }
@@ -618,7 +619,7 @@ public class OverlayOp extends GeometryGraphOperation {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIncompleteNode(final Node n, final int targetIndex) {
-    final int loc = ptLocator.locate(n.getCoordinate(),
+    final Location loc = ptLocator.locate(n.getCoordinate(),
       arg[targetIndex].getGeometry());
 
     // MD - 2008-10-24 - experimental for now

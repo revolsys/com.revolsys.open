@@ -236,14 +236,14 @@ public class WktParser {
         if (useNumAxisFromGeometryFactory) {
           geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
             scaleZ);
-          return (T)geometryFactory.createGeometry(geometry);
+          return (T)geometryFactory.geometry(geometry);
         } else {
           return (T)geometry;
         }
       } else if (geometryFactory == this.geometryFactory) {
         return (T)geometry;
       } else {
-        return (T)this.geometryFactory.createGeometry(geometry);
+        return (T)this.geometryFactory.geometry(geometry);
       }
     } else {
       return null;

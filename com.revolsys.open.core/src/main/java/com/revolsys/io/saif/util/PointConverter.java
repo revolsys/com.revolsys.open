@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Coordinates;
@@ -101,7 +101,7 @@ public class PointConverter implements OsnConverter {
       serializer.endObject();
       serializer.endAttribute();
 
-      final Map<String, Object> values = JtsGeometryUtil.getGeometryProperties(point);
+      final Map<String, Object> values = GeometryProperties.getGeometryProperties(point);
       writeAttributes(serializer, values);
       serializer.endObject();
     }

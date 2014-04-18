@@ -13,6 +13,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.util.MathUtil;
 
 public class LineSegmentUtil {
@@ -23,6 +24,15 @@ public class LineSegmentUtil {
     final double z = getElevation(lineStart, lineEnd, point);
     point.setZ(z);
     precisionModel.makePrecise(point);
+  }
+
+  public static void addElevation(final PrecisionModel precisionModel,
+    final Coordinates lineStart, final Coordinates lineEnd,
+    final Coordinates point) {
+    final double z = getElevation(lineStart, lineEnd, point);
+    if (!MathUtil.isNanOrInfinite(z)) {
+      point.setZ(precisionModel.makePrecise(z));
+    }
   }
 
   static double det(final double a, final double b, final double c,

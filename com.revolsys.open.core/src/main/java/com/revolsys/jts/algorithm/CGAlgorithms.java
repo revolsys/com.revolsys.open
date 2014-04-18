@@ -450,7 +450,7 @@ public class CGAlgorithms {
    *          first point identical to last point)
    * @return the {@link Location} of p relative to the ring
    */
-  public static int locatePointInRing(final Coordinates p,
+  public static Location locatePointInRing(final Coordinates p,
     final Coordinates[] ring) {
     return RayCrossingCounter.locatePointInRing(p, ring);
   }

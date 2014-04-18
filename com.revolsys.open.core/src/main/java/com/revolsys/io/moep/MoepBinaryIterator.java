@@ -16,7 +16,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.AbstractObjectWithProperties;
@@ -57,21 +57,21 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     final Number angle = object.getValue(MoepConstants.ANGLE);
     if (angle != null) {
       final double orientation = getAngle(angle.doubleValue());
-      JtsGeometryUtil.setGeometryProperty(geometry, "orientation", orientation);
+      GeometryProperties.setGeometryProperty(geometry, "orientation", orientation);
     }
-    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
       MoepConstants.TEXT_GROUP, object.getValue(MoepConstants.TEXT_GROUP));
-    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
       MoepConstants.TEXT_INDEX, object.getValue(MoepConstants.TEXT_INDEX));
-    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "text",
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "text",
       object.getValue(MoepConstants.TEXT));
-    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "textType",
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "textType",
       SaifConstants.TEXT_LINE);
-    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "fontName",
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "fontName",
       object.getValue(MoepConstants.FONT_NAME));
-    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(),
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
       "characterHeight", object.getValue(MoepConstants.FONT_SIZE));
-    JtsGeometryUtil.setGeometryProperty(object.getGeometryValue(), "other",
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "other",
       object.getValue(MoepConstants.FONT_WEIGHT));
   }
 

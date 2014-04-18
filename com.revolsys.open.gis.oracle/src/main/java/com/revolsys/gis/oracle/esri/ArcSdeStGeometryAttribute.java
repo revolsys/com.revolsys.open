@@ -14,13 +14,11 @@ import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.jts.JtsGeometryUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -116,7 +114,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       final Double mScale = this.spatialReference.getMScale();
       final Double mOffset = this.spatialReference.getMOffset();
 
-      final BoundingBox envelope = Envelope.getBoundingBox(geometry);
+      final BoundingBox envelope = geometry.getBoundingBox();
       final double minX = envelope.getMinX();
       final double minY = envelope.getMinY();
       final double maxX = envelope.getMaxX();
@@ -146,9 +144,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       statement.setFloat(index++, (float)maxX);
       statement.setFloat(index++, (float)maxY);
       if (hasZ) {
-        final double[] zRange = JtsGeometryUtil.getZRange(geometry);
-        double minZ = zRange[0];
-        double maxZ = zRange[1];
+        double minZ = envelope.getMin(2);
+        double maxZ = envelope.getMax(2);
         if (minZ == Double.MAX_VALUE && maxZ == -Double.MAX_VALUE) {
           minZ = 0;
           maxZ = 0;
@@ -160,9 +157,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
         statement.setNull(index++, Types.FLOAT);
       }
       if (hasM) {
-        final double[] mRange = JtsGeometryUtil.getMRange(geometry);
-        double minM = mRange[0];
-        double maxM = mRange[1];
+        double minM = envelope.getMin(3);
+        double maxM = envelope.getMax(3);
         if (minM == Double.MAX_VALUE && maxM == -Double.MAX_VALUE) {
           minM = 0;
           maxM = 0;

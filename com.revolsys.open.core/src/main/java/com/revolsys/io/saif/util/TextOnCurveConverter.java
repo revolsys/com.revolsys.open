@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.MultiPoint;
@@ -79,7 +79,7 @@ public class TextOnCurveConverter implements OsnConverter {
       serializer.endCollection();
       serializer.endAttribute();
 
-      final Map<String, Object> values = JtsGeometryUtil.getGeometryProperties(multiPoint);
+      final Map<String, Object> values = GeometryProperties.getGeometryProperties(multiPoint);
       writeAttributes(serializer, values);
       serializer.endObject();
     }

@@ -47,7 +47,7 @@ public class EqualsRegistry implements Equals<Object> {
     register(Byte.class, numberEquals);
     register(Integer.class, numberEquals);
     register(Short.class, numberEquals);
-    register(Geometry.class, new Geometry3DExactEquals());
+    register(Geometry.class, new GeometryEqualsExact3d());
     final DateEquals dateEquals = new DateEquals();
     register(Date.class, dateEquals);
     register(java.sql.Date.class, dateEquals);

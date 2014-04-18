@@ -1,6 +1,3 @@
-
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -35,8 +32,6 @@
  */
 package com.revolsys.jts.geomgraph;
 
-
-
 import com.revolsys.jts.geom.Location;
 
 /**
@@ -62,12 +57,13 @@ import com.revolsys.jts.geom.Location;
  */
 public class TopologyLocation {
 
-  int location[];
+  Location location[];
 
-  public TopologyLocation(int[] location)
-  {
-    init(location.length);
+  public TopologyLocation(final Location on) {
+    init(1);
+    location[Position.ON] = on;
   }
+
   /**
    * Constructs a TopologyLocation specifying how points on, to the left of, and to the
    * right of some GraphComponent relate to some Geometry. Possible values for the
@@ -75,18 +71,19 @@ public class TopologyLocation {
    * and Location.INTERIOR.
    * @see Location
    */
-  public TopologyLocation(int on, int left, int right) {
-   init(3);
-   location[Position.ON] = on;
-   location[Position.LEFT] = left;
-   location[Position.RIGHT] = right;
+  public TopologyLocation(final Location on, final Location left,
+    final Location right) {
+    init(3);
+    location[Position.ON] = on;
+    location[Position.LEFT] = left;
+    location[Position.RIGHT] = right;
   }
 
-  public TopologyLocation(int on) {
-   init(1);
-   location[Position.ON] = on;
+  public TopologyLocation(final Location[] location) {
+    init(location.length);
   }
-  public TopologyLocation(TopologyLocation gl) {
+
+  public TopologyLocation(final TopologyLocation gl) {
     init(gl.location.length);
     if (gl != null) {
       for (int i = 0; i < location.length; i++) {
@@ -94,83 +91,73 @@ public class TopologyLocation {
       }
     }
   }
-  private void init(int size)
-  {
-    location = new int[size];
-    setAllLocations(Location.NONE);
-  }
-  public int get(int posIndex)
-  {
-    if (posIndex < location.length) return location[posIndex];
-    return Location.NONE;
-  }
-  /**
-   * @return true if all locations are NULL
-   */
-  public boolean isNull()
-  {
+
+  public boolean allPositionsEqual(final Location loc) {
     for (int i = 0; i < location.length; i++) {
-      if (location[i] != Location.NONE) return false;
+      if (location[i] != loc) {
+        return false;
+      }
     }
     return true;
   }
-  /**
-   * @return true if any locations are NULL
-   */
-  public boolean isAnyNull()
-  {
-    for (int i = 0; i < location.length; i++) {
-      if (location[i] == Location.NONE) return true;
-    }
-    return false;
-  }
-  public boolean isEqualOnSide(TopologyLocation le, int locIndex)
-  {
-    return location[locIndex] == le.location[locIndex];
-  }
-  public boolean isArea() { return location.length > 1; }
-  public boolean isLine() { return location.length == 1; }
 
-  public void flip()
-  {
-    if (location.length <= 1) return;
-    int temp = location[Position.LEFT];
+  public void flip() {
+    if (location.length <= 1) {
+      return;
+    }
+    final Location temp = location[Position.LEFT];
     location[Position.LEFT] = location[Position.RIGHT];
     location[Position.RIGHT] = temp;
   }
 
-
-  public void setAllLocations(int locValue)
-  {
-    for (int i = 0; i < location.length; i++) {
-      location[i]     = locValue;
+  public Location get(final int posIndex) {
+    if (posIndex < location.length) {
+      return location[posIndex];
     }
-  }
-  public void setAllLocationsIfNull(int locValue)
-  {
-    for (int i = 0; i < location.length; i++) {
-      if (location[i] == Location.NONE) location[i]     = locValue;
-    }
+    return Location.NONE;
   }
 
-  public void setLocation(int locIndex, int locValue)
-  {
-      location[locIndex] = locValue;
+  public Location[] getLocations() {
+    return location;
   }
-  public void setLocation(int locValue)
-  {
-    setLocation(Position.ON, locValue);
+
+  private void init(final int size) {
+    location = new Location[size];
+    setAllLocations(Location.NONE);
   }
-  public int[] getLocations() { return location; }
-  public void setLocations(int on, int left, int right) {
-      location[Position.ON] = on;
-      location[Position.LEFT] = left;
-      location[Position.RIGHT] = right;
-  }
-  public boolean allPositionsEqual(int loc)
-  {
+
+  /**
+   * @return true if any locations are NULL
+   */
+  public boolean isAnyNull() {
     for (int i = 0; i < location.length; i++) {
-      if (location[i] != loc) return false;
+      if (location[i] == Location.NONE) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean isArea() {
+    return location.length > 1;
+  }
+
+  public boolean isEqualOnSide(final TopologyLocation le, final int locIndex) {
+    return location[locIndex] == le.location[locIndex];
+  }
+
+  public boolean isLine() {
+    return location.length == 1;
+  }
+
+  /**
+   * @return true if all locations are NULL
+   */
+  public boolean isNull() {
+    for (int i = 0; i < location.length; i++) {
+      if (location[i] != Location.NONE) {
+        return false;
+      }
     }
     return true;
   }
@@ -179,28 +166,62 @@ public class TopologyLocation {
    * merge updates only the NULL attributes of this object
    * with the attributes of another.
    */
-  public void merge(TopologyLocation gl)
-  {
-    // if the src is an Area label & and the dest is not, increase the dest to be an Area
+  public void merge(final TopologyLocation gl) {
+    // if the src is an Area label & and the dest is not, increase the dest to
+    // be an Area
     if (gl.location.length > location.length) {
-      int [] newLoc = new int[3];
+      final Location[] newLoc = new Location[3];
       newLoc[Position.ON] = location[Position.ON];
       newLoc[Position.LEFT] = Location.NONE;
       newLoc[Position.RIGHT] = Location.NONE;
       location = newLoc;
     }
     for (int i = 0; i < location.length; i++) {
-      if (location[i] == Location.NONE && i < gl.location.length)
+      if (location[i] == Location.NONE && i < gl.location.length) {
         location[i] = gl.location[i];
+      }
     }
   }
 
-  public String toString()
-  {
-    StringBuffer buf = new StringBuffer();
-    if (location.length > 1) buf.append(Location.toLocationSymbol(location[Position.LEFT]));
+  public void setAllLocations(final Location locValue) {
+    for (int i = 0; i < location.length; i++) {
+      location[i] = locValue;
+    }
+  }
+
+  public void setAllLocationsIfNull(final Location locValue) {
+    for (int i = 0; i < location.length; i++) {
+      if (location[i] == Location.NONE) {
+        location[i] = locValue;
+      }
+    }
+  }
+
+  public void setLocation(final int locIndex, final Location locValue) {
+    location[locIndex] = locValue;
+  }
+
+  public void setLocation(final Location locValue) {
+    setLocation(Position.ON, locValue);
+  }
+
+  public void setLocations(final Location on, final Location left,
+    final Location right) {
+    location[Position.ON] = on;
+    location[Position.LEFT] = left;
+    location[Position.RIGHT] = right;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuffer buf = new StringBuffer();
+    if (location.length > 1) {
+      buf.append(Location.toLocationSymbol(location[Position.LEFT]));
+    }
     buf.append(Location.toLocationSymbol(location[Position.ON]));
-    if (location.length > 1) buf.append(Location.toLocationSymbol(location[Position.RIGHT]));
+    if (location.length > 1) {
+      buf.append(Location.toLocationSymbol(location[Position.RIGHT]));
+    }
     return buf.toString();
   }
 }

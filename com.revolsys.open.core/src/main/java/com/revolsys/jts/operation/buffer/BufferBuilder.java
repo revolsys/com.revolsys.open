@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -94,8 +93,8 @@ class BufferBuilder {
    * Compute the change in depth as an edge is crossed from R to L
    */
   private static int depthDelta(final Label label) {
-    final int lLoc = label.getLocation(0, Position.LEFT);
-    final int rLoc = label.getLocation(0, Position.RIGHT);
+    final Location lLoc = label.getLocation(0, Position.LEFT);
+    final Location rLoc = label.getLocation(0, Position.RIGHT);
     if (lLoc == Location.INTERIOR && rLoc == Location.EXTERIOR) {
       return 1;
     } else if (lLoc == Location.EXTERIOR && rLoc == Location.INTERIOR) {

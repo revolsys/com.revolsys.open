@@ -34,6 +34,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.index.quadtree.Quadtree;
+import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.util.CollectionUtil;
 
 public final class LineStringUtil {
@@ -1008,7 +1009,7 @@ public final class LineStringUtil {
       coordinates1, coordinates2);
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.lineString(coordinates);
-    JtsGeometryUtil.copyUserData(line1, line);
+    GeometryProperties.copyUserData(line1, line);
     return line;
   }
 
@@ -1030,7 +1031,7 @@ public final class LineStringUtil {
       coordinates2);
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.lineString(coordinates);
-    JtsGeometryUtil.copyUserData(line1, line);
+    GeometryProperties.copyUserData(line1, line);
 
     return line;
   }
@@ -1071,7 +1072,7 @@ public final class LineStringUtil {
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
     final CoordinatesList reverseCoordinates = coordinates.reverse();
     final LineString newLine = factory.lineString(reverseCoordinates);
-    JtsGeometryUtil.copyUserData(line, newLine);
+    GeometryProperties.copyUserData(line, newLine);
     return newLine;
   }
 
@@ -1277,7 +1278,7 @@ public final class LineStringUtil {
       return null;
     } else {
       final LineString newLine = factory.lineString(newPoints);
-      JtsGeometryUtil.copyUserData(line, newLine);
+      GeometryProperties.copyUserData(line, newLine);
       return newLine;
     }
 
@@ -1290,6 +1291,25 @@ public final class LineStringUtil {
   public static LineString subLineString(final LineString line,
     final int length, final Coordinates coordinate) {
     return subLineString(line, null, 0, length, coordinate);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Collection<LineString> getMergedLines(
+    final MultiLineString multiLineString) {
+    final LineMerger merger = new LineMerger();
+    merger.add(multiLineString);
+    final Collection<LineString> lineStrings = merger.getMergedLineStrings();
+    return lineStrings;
+  }
+
+  public static LineString getMergeLine(final MultiLineString multiLineString) {
+    final Collection<LineString> lineStrings = getMergedLines(multiLineString);
+    final int numLines = lineStrings.size();
+    if (numLines == 1) {
+      return lineStrings.iterator().next();
+    } else {
+      return null;
+    }
   }
 
 }

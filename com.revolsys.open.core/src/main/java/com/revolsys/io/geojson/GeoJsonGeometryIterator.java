@@ -270,7 +270,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
 
-    return factory.createGeometry(geometries);
+    return factory.geometry(geometries);
   }
 
   private List<Geometry> readGeometryList() {

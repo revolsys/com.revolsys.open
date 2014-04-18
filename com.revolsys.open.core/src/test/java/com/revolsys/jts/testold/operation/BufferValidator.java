@@ -48,7 +48,6 @@ import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.io.WKTWriter;
-import com.revolsys.jts.util.StringUtil;
 
 /**
  * @version 1.7
@@ -273,8 +272,7 @@ public class BufferValidator {
         test.test();
       }
     } catch (final Exception e) {
-      throw new Exception(supplement(e.toString())
-        + StringUtil.getStackTrace(e));
+      throw new Exception(supplement(e.toString()), e);
     }
   }
 

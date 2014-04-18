@@ -56,53 +56,40 @@ import com.revolsys.jts.geom.Polygonal;
  *
  * @version 1.7
  */
-public class SimplePointInAreaLocator
-	implements PointOnGeometryLocator
-{
+public class SimplePointInAreaLocator implements PointOnGeometryLocator {
 
-  /**
-   * Determines the {@link Location} of a point in an areal {@link Geometry}.
-   * Currently this will never return a value of BOUNDARY.  
-   * 
-   * @param p the point to test
-   * @param geom the areal geometry to test
-   * @return the Location of the point in the geometry  
-   */
-  public static int locate(Coordinates p, Geometry geom)
-  {
-    if (geom.isEmpty()) return Location.EXTERIOR;
-
-    if (containsPoint(p, geom))
-      return Location.INTERIOR;
-    return Location.EXTERIOR;
-  }
-
-  private static boolean containsPoint(Coordinates p, Geometry geom)
-  {
+  private static boolean containsPoint(final Coordinates p, final Geometry geom) {
     if (geom instanceof Polygon) {
-      return containsPointInPolygon(p, (Polygon) geom);
-    }
-    else if (geom instanceof GeometryCollection) {
-      Iterator geomi = new GeometryCollectionIterator((GeometryCollection) geom);
+      return containsPointInPolygon(p, (Polygon)geom);
+    } else if (geom instanceof GeometryCollection) {
+      final Iterator geomi = new GeometryCollectionIterator(geom);
       while (geomi.hasNext()) {
-        Geometry g2 = (Geometry) geomi.next();
-        if (g2 != geom)
-          if (containsPoint(p, g2))
+        final Geometry g2 = (Geometry)geomi.next();
+        if (g2 != geom) {
+          if (containsPoint(p, g2)) {
             return true;
+          }
+        }
       }
     }
     return false;
   }
 
-  public static boolean containsPointInPolygon(Coordinates p, Polygon poly)
-  {
-    if (poly.isEmpty()) return false;
-    LinearRing shell = (LinearRing) poly.getExteriorRing();
-    if (! isPointInRing(p, shell)) return false;
+  public static boolean containsPointInPolygon(final Coordinates p,
+    final Polygon poly) {
+    if (poly.isEmpty()) {
+      return false;
+    }
+    final LinearRing shell = poly.getExteriorRing();
+    if (!isPointInRing(p, shell)) {
+      return false;
+    }
     // now test if the point lies in or on the holes
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      LinearRing hole = (LinearRing) poly.getInteriorRing(i);
-      if (isPointInRing(p, hole)) return false;
+      final LinearRing hole = poly.getInteriorRing(i);
+      if (isPointInRing(p, hole)) {
+        return false;
+      }
     }
     return true;
   }
@@ -115,22 +102,43 @@ public class SimplePointInAreaLocator
    * @param ring a linear ring
    * @return true if the point lies inside the ring
    */
-  private static boolean isPointInRing(Coordinates p, LinearRing ring)
-  {
-  	// short-circuit if point is not in ring envelope
-  	if (! ring.getBoundingBox().intersects(p))
-  		return false;
-  	return CGAlgorithms.isPointInRing(p, ring.getCoordinateArray());
+  private static boolean isPointInRing(final Coordinates p,
+    final LinearRing ring) {
+    // short-circuit if point is not in ring envelope
+    if (!ring.getBoundingBox().intersects(p)) {
+      return false;
+    }
+    return CGAlgorithms.isPointInRing(p, ring.getCoordinateArray());
   }
 
-	private Geometry geom;
+  /**
+   * Determines the {@link Location} of a point in an areal {@link Geometry}.
+   * Currently this will never return a value of BOUNDARY.  
+   * 
+   * @param p the point to test
+   * @param geom the areal geometry to test
+   * @return the Location of the point in the geometry  
+   */
+  public static Location locate(final Coordinates p, final Geometry geom) {
+    if (geom.isEmpty()) {
+      return Location.EXTERIOR;
+    }
 
-	public SimplePointInAreaLocator(Geometry geom) {
-		this.geom = geom;
-	}
+    if (containsPoint(p, geom)) {
+      return Location.INTERIOR;
+    }
+    return Location.EXTERIOR;
+  }
 
-	public int locate(Coordinates p) {
-		return SimplePointInAreaLocator.locate(p, geom);
-	}
+  private final Geometry geom;
+
+  public SimplePointInAreaLocator(final Geometry geom) {
+    this.geom = geom;
+  }
+
+  @Override
+  public Location locate(final Coordinates p) {
+    return SimplePointInAreaLocator.locate(p, geom);
+  }
 
 }

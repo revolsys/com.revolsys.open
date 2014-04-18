@@ -92,7 +92,7 @@ public class BufferByUnionFunctions {
       }
       bufs.add(comp.buffer(distance));
     }
-    return FunctionsUtil.getFactoryOrDefault(g).createGeometryCollection(
+    return FunctionsUtil.getFactoryOrDefault(g).geometryCollection(
       GeometryFactory.toGeometryArray(bufs));
   }
 }

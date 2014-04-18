@@ -40,7 +40,6 @@ import com.revolsys.jts.geom.CoordinateSequenceFactory;
 import com.revolsys.jts.geom.CoordinateSequences;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -64,10 +63,8 @@ public class CoordinateSequencesTest extends TestCase {
     TestRunner.run(CoordinateSequencesTest.class);
   }
 
-  private final PrecisionModel precisionModel = new PrecisionModel();
-
-  private final GeometryFactory geometryFactory = new GeometryFactory(
-    this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 

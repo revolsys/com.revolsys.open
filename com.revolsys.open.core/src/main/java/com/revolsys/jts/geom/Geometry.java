@@ -700,6 +700,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   boolean equalsExact(Geometry other, double tolerance);
 
+  boolean equalsExact3d(Geometry geometry);
+
   /**
    * Tests whether two geometries are exactly equal
    * in their normalized forms.
@@ -963,6 +965,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @return the number of geometries contained in this geometry
    */
   int getNumGeometries();
+
+  Point getPoint();
 
   /**
    * @author Paul Austin <paul.austin@revolsys.com>

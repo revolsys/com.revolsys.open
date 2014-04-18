@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.saif.SaifConstants;
@@ -127,7 +127,7 @@ public class ArcConverter implements OsnConverter {
       serializer.endCollection();
       serializer.endAttribute();
       if (writeAttributes) {
-        writeAttributes(serializer, JtsGeometryUtil.getGeometryProperties(line));
+        writeAttributes(serializer, GeometryProperties.getGeometryProperties(line));
       }
       serializer.endObject();
     }

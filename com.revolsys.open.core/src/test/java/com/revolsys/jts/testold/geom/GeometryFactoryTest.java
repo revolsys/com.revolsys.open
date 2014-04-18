@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -57,9 +56,8 @@ public class GeometryFactoryTest extends TestCase {
     TestRunner.run(GeometryFactoryTest.class);
   }
 
-  PrecisionModel precisionModel = new PrecisionModel();
-
-  GeometryFactory geometryFactory = new GeometryFactory(this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -68,8 +66,8 @@ public class GeometryFactoryTest extends TestCase {
   }
 
   private void checkCreateGeometryExact(final String wkt) throws ParseException {
-    final Geometry g = geometryFactory.createGeometry(wkt);
-    final Geometry g2 = this.geometryFactory.createGeometry(g);
+    final Geometry g = geometryFactory.geometry(wkt);
+    final Geometry g2 = this.geometryFactory.geometry(g);
     if (!g.equalsExact(g2)) {
       failNotEquals("Geometry not equal exact", g, g2);
     }

@@ -27,7 +27,7 @@ public class FunctionsUtil {
     }
     // if parent was a GC, ensure returning a GC
     if (parentGeom.getGeometryType().equals("GeometryCollection")) {
-      return parentGeom.getGeometryFactory().createGeometryCollection(
+      return parentGeom.getGeometryFactory().geometryCollection(
         GeometryFactory.toGeometryArray(geoms));
     }
     // otherwise return MultiGeom

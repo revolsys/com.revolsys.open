@@ -35,7 +35,7 @@ public class ConversionFunctions {
     if (g2 != null) {
       addComponents(g2, atomicGeoms);
     }
-    return g.getGeometryFactory().createGeometryCollection(
+    return g.getGeometryFactory().geometryCollection(
       GeometryFactory.toGeometryArray(atomicGeoms));
   }
 

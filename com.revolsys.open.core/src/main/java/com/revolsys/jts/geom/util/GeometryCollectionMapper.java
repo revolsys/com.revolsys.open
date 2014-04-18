@@ -71,7 +71,7 @@ public class GeometryCollectionMapper
       if (!g.isEmpty())
         mapped.add(g);
     }
-    return gc.getGeometryFactory().createGeometryCollection(
+    return gc.getGeometryFactory().geometryCollection(
         GeometryFactory.toGeometryArray(mapped));
   }
 }

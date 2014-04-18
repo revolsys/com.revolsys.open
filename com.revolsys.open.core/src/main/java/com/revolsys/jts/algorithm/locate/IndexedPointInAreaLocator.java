@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
@@ -131,7 +130,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
    * @return the location of the point in the geometry  
    */
   @Override
-  public int locate(final Coordinates p) {
+  public Location locate(final Coordinates p) {
     final RayCrossingCounter rcc = new RayCrossingCounter(p);
 
     final SegmentVisitor visitor = new SegmentVisitor(rcc);

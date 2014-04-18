@@ -38,7 +38,7 @@ public class GeometryCombiner {
     final PointLocator locator = new PointLocator();
     for (int i = 0; i < geom.getNumGeometries(); i++) {
       final Polygon poly = (Polygon)geom.getGeometry(i);
-      final int loc = locator.locate(pt, poly);
+      final Location loc = locator.locate(pt, poly);
       if (loc == Location.INTERIOR) {
         return poly;
       }

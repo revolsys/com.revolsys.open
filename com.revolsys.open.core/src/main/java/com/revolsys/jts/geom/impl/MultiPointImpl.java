@@ -91,7 +91,7 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
    */
   @Override
   public Geometry getBoundary() {
-    return getGeometryFactory().createGeometryCollection();
+    return getGeometryFactory().geometryCollection();
   }
 
   @Override

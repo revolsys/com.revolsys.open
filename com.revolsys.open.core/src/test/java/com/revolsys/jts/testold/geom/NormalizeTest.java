@@ -44,7 +44,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.test.geometry.CoordinateTest;
 
@@ -60,9 +59,8 @@ public class NormalizeTest extends TestCase {
     junit.textui.TestRunner.main(testCaseName);
   }
 
-  PrecisionModel precisionModel = new PrecisionModel(1);
-
-  GeometryFactory geometryFactory = new GeometryFactory(this.precisionModel, 0);
+  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+    1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 

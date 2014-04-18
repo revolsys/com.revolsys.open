@@ -180,7 +180,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
         final BoundingBox geometryExtent = Envelope.getBoundingBox(geometry);
         if (geometryExtent.intersects(viewExtent)) {
           final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
-          return geometryFactory.createGeometry(geometry);
+          return geometryFactory.geometry(geometry);
         }
       }
     }

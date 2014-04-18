@@ -14,7 +14,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIt
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.ListCoordinatesList;
-import com.revolsys.gis.model.data.equals.Geometry3DExactEquals;
+import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -31,8 +31,8 @@ public class GeometryEditUtil {
   private static final String POINT_QUAD_TREE = "PointQuadTree";
 
   static {
-    Geometry3DExactEquals.addExclude(LINE_SEGMENT_QUAD_TREE);
-    Geometry3DExactEquals.addExclude(POINT_QUAD_TREE);
+    GeometryEqualsExact3d.addExclude(LINE_SEGMENT_QUAD_TREE);
+    GeometryEqualsExact3d.addExclude(POINT_QUAD_TREE);
   }
 
   protected static void add(final Map<int[], Coordinates> pointIndexes,
@@ -83,7 +83,7 @@ public class GeometryEditUtil {
       } else {
         final int partIndex = geometryId[0];
         if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final List<Geometry> parts = JtsGeometryUtil.getGeometries(geometry);
+          final List<Geometry> parts = geometry.getGeometries();
           final Geometry part = parts.get(partIndex);
           Geometry newPart = part;
           if (part instanceof Point) {
@@ -171,17 +171,17 @@ public class GeometryEditUtil {
       } else {
         final int partIndex = vertexId[0];
         if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final List<Geometry> parts = JtsGeometryUtil.getGeometries(geometry);
+          final List<Geometry> parts = geometry.getGeometries();
           final Geometry part = parts.get(partIndex);
           if (part instanceof Point) {
             parts.remove(partIndex);
-            return geometryFactory.createGeometry(parts);
+            return geometryFactory.geometry(parts);
           } else if (part instanceof LineString) {
             final LineString line = (LineString)part;
             final Geometry newLine = deleteVertex(line, pointIndex);
             if (line != newLine) {
               parts.set(partIndex, newLine);
-              return geometryFactory.createGeometry(parts);
+              return geometryFactory.geometry(parts);
             }
           } else if (part instanceof Polygon) {
             final Polygon polygon = (Polygon)part;
@@ -193,7 +193,7 @@ public class GeometryEditUtil {
               rings.set(ringIndex, newPoints);
               final Polygon newPart = geometryFactory.polygon(rings);
               parts.set(partIndex, newPart);
-              return geometryFactory.createGeometry(parts);
+              return geometryFactory.geometry(parts);
             }
           }
 
@@ -310,7 +310,7 @@ public class GeometryEditUtil {
   public static QuadTree<IndexedLineSegment> getLineSegmentQuadTree(
     final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
-      final Reference<QuadTree<IndexedLineSegment>> reference = JtsGeometryUtil.getGeometryProperty(
+      final Reference<QuadTree<IndexedLineSegment>> reference = GeometryProperties.getGeometryProperty(
         geometry, LINE_SEGMENT_QUAD_TREE);
       QuadTree<IndexedLineSegment> index;
       if (reference == null) {
@@ -376,7 +376,8 @@ public class GeometryEditUtil {
             }
           }
         }
-        JtsGeometryUtil.setGeometryProperty(geometry, LINE_SEGMENT_QUAD_TREE,
+        GeometryProperties.setGeometryProperty(geometry,
+          LINE_SEGMENT_QUAD_TREE,
           new SoftReference<QuadTree<IndexedLineSegment>>(index));
       }
       return index;
@@ -388,7 +389,7 @@ public class GeometryEditUtil {
     if (geometry == null || geometry.isEmpty()) {
       return new PointQuadTree<int[]>();
     } else {
-      final Reference<PointQuadTree<int[]>> reference = JtsGeometryUtil.getGeometryProperty(
+      final Reference<PointQuadTree<int[]>> reference = GeometryProperties.getGeometryProperty(
         geometry, POINT_QUAD_TREE);
       PointQuadTree<int[]> index;
       if (reference == null) {
@@ -464,7 +465,7 @@ public class GeometryEditUtil {
             }
           }
         }
-        JtsGeometryUtil.setGeometryProperty(geometry, POINT_QUAD_TREE,
+        GeometryProperties.setGeometryProperty(geometry, POINT_QUAD_TREE,
           new SoftReference<PointQuadTree<int[]>>(index));
       }
       return index;
@@ -653,7 +654,7 @@ public class GeometryEditUtil {
       } else {
         final int partIndex = vertexId[0];
         if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final List<Geometry> parts = JtsGeometryUtil.getGeometries(geometry);
+          final List<Geometry> parts = geometry.getGeometries();
           final Geometry part = parts.get(partIndex);
           Geometry newPart = part;
           if (part instanceof Point) {
@@ -756,7 +757,7 @@ public class GeometryEditUtil {
               parts.add(newPart);
             }
           }
-          return (T)geometryFactory.createGeometry(parts);
+          return (T)geometryFactory.geometry(parts);
         }
       }
     }
@@ -847,7 +848,7 @@ public class GeometryEditUtil {
       } else {
         final int partIndex = vertexId[0];
         if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
-          final List<Geometry> parts = JtsGeometryUtil.getGeometries(geometry);
+          final List<Geometry> parts = geometry.getGeometries();
           final Geometry part = parts.get(partIndex);
           Geometry newPart = part;
           if (part instanceof Point) {
@@ -863,7 +864,7 @@ public class GeometryEditUtil {
             newPart = moveVertex(polygon, ringIndex, pointIndex, newPoint);
           }
           parts.set(partIndex, newPart);
-          return (T)geometryFactory.createGeometry(parts);
+          return (T)geometryFactory.geometry(parts);
         }
       }
     }
@@ -966,8 +967,7 @@ public class GeometryEditUtil {
         }
       }
       if (changed) {
-        return (G)GeometryFactory.getFactory(geometry)
-          .polygon(pointsList);
+        return (G)GeometryFactory.getFactory(geometry).polygon(pointsList);
       } else {
         return geometry;
       }

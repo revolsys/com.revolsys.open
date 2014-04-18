@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -60,7 +60,7 @@ public class ContourConverter extends ArcConverter {
       serializer.attributeName("arc");
       super.write(serializer, object);
       serializer.endAttribute();
-      final Map<String, Object> values = JtsGeometryUtil.getGeometryProperties(lineString);
+      final Map<String, Object> values = GeometryProperties.getGeometryProperties(lineString);
       writeEnumAttribute(serializer, values, "form");
       writeEnumAttribute(serializer, values, "qualifier");
       writeAttribute(serializer, values, "value");

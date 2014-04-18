@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import com.revolsys.gis.jts.JtsGeometryUtil;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
@@ -63,7 +63,7 @@ public class TextLineConverter implements OsnConverter {
       osnConverter.write(serializer, point);
       serializer.endAttribute();
 
-      final Map<String, Object> values = JtsGeometryUtil.getGeometryProperties(point);
+      final Map<String, Object> values = GeometryProperties.getGeometryProperties(point);
       writeAttributes(serializer, values);
       serializer.endObject();
     }

@@ -667,7 +667,7 @@ public abstract class GeometryImpl implements Geometry {
     if (getGeometryFactory() == geometryFactory) {
       return this;
     } else {
-      return geometryFactory.createGeometry(this);
+      return geometryFactory.geometry(this);
     }
   }
 
@@ -1178,7 +1178,11 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public BoundingBox getBoundingBox() {
     if (envelope == null) {
-      envelope = computeEnvelopeInternal();
+      if (isEmpty()) {
+        envelope = new Envelope(getGeometryFactory());
+      } else {
+        envelope = computeEnvelopeInternal();
+      }
     }
     return new Envelope(envelope);
   }
@@ -1428,6 +1432,17 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public int getNumGeometries() {
     return 1;
+  }
+
+  @Override
+  public Point getPoint() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (isEmpty()) {
+      return geometryFactory.point();
+    } else {
+      final Coordinates point = getCoordinate();
+      return geometryFactory.point(point);
+    }
   }
 
   /**

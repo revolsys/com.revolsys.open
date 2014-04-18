@@ -26,6 +26,66 @@ import com.revolsys.util.Property;
 
 public class ActionFormKeySerializer extends AbstractKeySerializer implements
   HtmlUiBuilderAware<HtmlUiBuilder<?>> {
+  public static void serialize(final XmlWriter out, final Object object,
+    final HtmlUiBuilder<?> uiBuilder, final List<String> parameterNames,
+    final Map<String, String> parameterNameMap, final String target,
+    final String label, final Expression enabledExpression, final String name,
+    String cssClass) {
+    try {
+      final Map<String, Object> parameters = new HashMap<String, Object>();
+      for (final String parameterName : parameterNames) {
+        final Object value = Property.get(object, parameterName);
+        parameters.put(parameterName, value);
+      }
+      for (final Entry<String, String> entry : parameterNameMap.entrySet()) {
+        final String parameterName = entry.getKey();
+        final String keyName = entry.getValue();
+        final Object value = uiBuilder.getProperty(object, keyName);
+        parameters.put(parameterName, value);
+      }
+      if (enabledExpression != null) {
+        final StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+        if (object instanceof Map) {
+          @SuppressWarnings("unchecked")
+          final Map<String, Object> map = (Map<String, Object>)object;
+          evaluationContext.setVariables(map);
+        } else {
+          evaluationContext.setRootObject(object);
+        }
+        if (!ExpressionUtils.evaluateAsBoolean(enabledExpression,
+          evaluationContext)) {
+          return;
+        }
+      }
+      final Object id = uiBuilder.getIdValue(object);
+      parameters.put(uiBuilder.getIdParameterName(), id);
+
+      final String actionUrl = uiBuilder.getPageUrl(name, parameters);
+      if (actionUrl != null) {
+        out.startTag(HtmlUtil.FORM);
+        out.attribute(HtmlUtil.ATTR_ACTION, actionUrl);
+        out.attribute(HtmlUtil.ATTR_METHOD, "post");
+        out.attribute(HtmlUtil.ATTR_TARGET, target);
+        final String lowerLabel = label.toLowerCase();
+        final HttpServletRequest request = HttpServletUtils.getRequest();
+        for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
+          HtmlUtil.serializeHiddenInput(out, parameterName,
+            request.getParameter(parameterName));
+        }
+        if (!StringUtils.hasText(cssClass)) {
+          cssClass = lowerLabel;
+        }
+
+        HtmlUtil.serializeButton(out, lowerLabel, "submit", label, label,
+          cssClass);
+        out.endTag(HtmlUtil.FORM);
+      }
+    } catch (final Throwable t) {
+      LoggerFactory.getLogger(ActionFormKeySerializer.class).error(
+        "Unable to serialize", t);
+    }
+  }
+
   private String cssClass;
 
   private Expression enabledExpression;
@@ -42,14 +102,6 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
     setProperties(null);
   }
 
-  public String getTarget() {
-    return target;
-  }
-
-  public void setTarget(String target) {
-    this.target = target;
-  }
-
   public String getCssClass() {
     return cssClass;
   }
@@ -62,71 +114,22 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
     return parameterNames;
   }
 
-  @Override
-  public void setProperties(Map<String, ? extends Object> properties) {
-    getProperties().clear();
-    if (properties != null) {
-      getProperties().putAll(properties);
-    }
-    setProperty("sortable", false);
-    setProperty("searchable", false);
+  public String getTarget() {
+    return target;
   }
 
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    try {
-      final Map<String, Object> parameters = new HashMap<String, Object>();
-      for (final String name : parameterNames) {
-        final Object value = Property.get(object, name);
-        parameters.put(name, value);
-      }
-      for (final Entry<String, String> entry : parameterNameMap.entrySet()) {
-        final String parameterName = entry.getKey();
-        String keyName = entry.getValue();
-        final Object value = uiBuilder.getProperty(object, keyName);
-        parameters.put(parameterName, value);
-      }
-      if (enabledExpression != null) {
-        final StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
-        if (object instanceof Map) {
-          @SuppressWarnings("unchecked")
-          Map<String, Object> map = (Map<String, Object>)object;
-          evaluationContext.setVariables(map);
-        } else {
-          evaluationContext.setRootObject(object);
-        }
-        if (!ExpressionUtils.evaluateAsBoolean(enabledExpression,
-          evaluationContext)) {
-          return;
-        }
-      }
-      final Object id = uiBuilder.getIdValue(object);
-      parameters.put(uiBuilder.getIdParameterName(), id);
-
-      final String actionUrl = uiBuilder.getPageUrl(getName(), parameters);
-      if (actionUrl != null) {
-        out.startTag(HtmlUtil.FORM);
-        out.attribute(HtmlUtil.ATTR_ACTION, actionUrl);
-        out.attribute(HtmlUtil.ATTR_METHOD, "post");
-        out.attribute(HtmlUtil.ATTR_TARGET, getTarget());
-        final String lowerLabel = getLabel().toLowerCase();
-        final HttpServletRequest request = HttpServletUtils.getRequest();
-        for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
-          HtmlUtil.serializeHiddenInput(out, parameterName,
-            request.getParameter(parameterName));
-        }
-        String cssClass = getCssClass();
-        if (!StringUtils.hasText(cssClass)) {
-          cssClass = lowerLabel;
-        }
-
-        HtmlUtil.serializeButton(out, lowerLabel, "submit", getLabel(),
-          getLabel(), cssClass);
-        out.endTag(HtmlUtil.FORM);
-      }
-    } catch (final Throwable t) {
-      LoggerFactory.getLogger(getClass()).error("Unable to serialize", t);
-    }
+    final HtmlUiBuilder<?> uiBuilder = this.uiBuilder;
+    final List<String> parameterNames = getParameterNames();
+    final Map<String, String> parameterNameMap = getParameterNameMap();
+    final String target = getTarget();
+    final String label = getLabel();
+    final Expression enabledExpression = this.enabledExpression;
+    final String name = getName();
+    final String cssClass = getCssClass();
+    serialize(out, object, uiBuilder, parameterNames, parameterNameMap, target,
+      label, enabledExpression, name, cssClass);
   }
 
   public void setCssClass(final String cssClass) {
@@ -148,5 +151,19 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
 
   public void setParameterNames(final List<String> parameterNames) {
     this.parameterNames = parameterNames;
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> properties) {
+    getProperties().clear();
+    if (properties != null) {
+      getProperties().putAll(properties);
+    }
+    setProperty("sortable", false);
+    setProperty("searchable", false);
+  }
+
+  public void setTarget(final String target) {
+    this.target = target;
   }
 }

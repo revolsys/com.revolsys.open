@@ -77,7 +77,7 @@ public class VoronoiDiagramBuilder {
         clipped.add(result);
       }
     }
-    return geom.getGeometryFactory().createGeometryCollection(
+    return geom.getGeometryFactory().geometryCollection(
       GeometryFactory.toGeometryArray(clipped));
   }
 

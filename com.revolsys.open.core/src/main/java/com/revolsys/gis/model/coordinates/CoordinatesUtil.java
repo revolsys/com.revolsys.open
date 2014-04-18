@@ -10,6 +10,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
@@ -42,7 +43,7 @@ public class CoordinatesUtil {
 
   public static Point add(final Point c1, final Point c2) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
-    final Point p2 = (Point)factory.createGeometry(c2);
+    final Point p2 = (Point)factory.geometry(c2);
     return factory.point(add(getInstance(c1), getInstance(p2)));
   }
 
@@ -486,7 +487,7 @@ public class CoordinatesUtil {
 
   public static Point subtract(final Point c1, final Point c2) {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
-    final Point p2 = (Point)factory.createGeometry(c2);
+    final Point p2 = (Point)factory.geometry(c2);
     return factory.point(subtract(getInstance(c1), getInstance(p2)));
   }
 
@@ -511,5 +512,27 @@ public class CoordinatesUtil {
 
     final Coordinates newPoint = new DoubleCoordinates(newX, newY);
     return newPoint;
+  }
+
+  public static void addElevation(final Coordinates coordinate,
+    final LineString line) {
+    final CoordinatesList coordinates = line.getCoordinatesList();
+    Coordinates previousCoordinate = coordinates.getCoordinate(0);
+    for (int i = 1; i < coordinates.size(); i++) {
+      final Coordinates currentCoordinate = coordinates.getCoordinate(i);
+  
+      if (LineSegmentUtil.distance(previousCoordinate, currentCoordinate,
+        coordinate) < 1) {
+        final CoordinatesPrecisionModel precisionModel = line.getGeometryFactory()
+          .getCoordinatesPrecisionModel();
+  
+        LineSegmentUtil.addElevation(precisionModel, previousCoordinate,
+          currentCoordinate, coordinate);
+  
+        return;
+      }
+      previousCoordinate = currentCoordinate;
+    }
+  
   }
 }

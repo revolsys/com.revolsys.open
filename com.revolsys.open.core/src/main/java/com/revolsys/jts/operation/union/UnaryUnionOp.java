@@ -245,7 +245,7 @@ public class UnaryUnionOp {
     }
 
     if (union == null) {
-      return geomFact.createGeometryCollection();
+      return geomFact.geometryCollection();
     }
 
     return union;

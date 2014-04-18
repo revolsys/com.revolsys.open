@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -68,65 +66,11 @@ package com.revolsys.jts.geom;
  *@version 1.7
  */
 public class IntersectionMatrix implements Cloneable {
-  /**
-   *  Internal representation of this <code>IntersectionMatrix</code>.
-   */
-  private int[][] matrix;
+  public static final int EXTERIOR = Location.EXTERIOR.getIndex();
 
-  /**
-   *  Creates an <code>IntersectionMatrix</code> with <code>FALSE</code>
-   *  dimension values.
-   */
-  public IntersectionMatrix() {
-    matrix = new int[3][3];
-    setAll(Dimension.FALSE);
-  }
+  public static final int BOUNDARY = Location.BOUNDARY.getIndex();
 
-  /**
-   *  Creates an <code>IntersectionMatrix</code> with the given dimension
-   *  symbols.
-   *
-   *@param  elements  a String of nine dimension symbols in row major order
-   */
-  public IntersectionMatrix(String elements) {
-    this();
-    set(elements);
-  }
-
-  /**
-   *  Creates an <code>IntersectionMatrix</code> with the same elements as
-   *  <code>other</code>.
-   *
-   *@param  other  an <code>IntersectionMatrix</code> to copy
-   */
-  public IntersectionMatrix(IntersectionMatrix other) {
-    this();
-    matrix[Location.INTERIOR][Location.INTERIOR] = other.matrix[Location.INTERIOR][Location.INTERIOR];
-    matrix[Location.INTERIOR][Location.BOUNDARY] = other.matrix[Location.INTERIOR][Location.BOUNDARY];
-    matrix[Location.INTERIOR][Location.EXTERIOR] = other.matrix[Location.INTERIOR][Location.EXTERIOR];
-    matrix[Location.BOUNDARY][Location.INTERIOR] = other.matrix[Location.BOUNDARY][Location.INTERIOR];
-    matrix[Location.BOUNDARY][Location.BOUNDARY] = other.matrix[Location.BOUNDARY][Location.BOUNDARY];
-    matrix[Location.BOUNDARY][Location.EXTERIOR] = other.matrix[Location.BOUNDARY][Location.EXTERIOR];
-    matrix[Location.EXTERIOR][Location.INTERIOR] = other.matrix[Location.EXTERIOR][Location.INTERIOR];
-    matrix[Location.EXTERIOR][Location.BOUNDARY] = other.matrix[Location.EXTERIOR][Location.BOUNDARY];
-    matrix[Location.EXTERIOR][Location.EXTERIOR] = other.matrix[Location.EXTERIOR][Location.EXTERIOR];
-  }
-
-  /**
-   * Adds one matrix to another.
-   * Addition is defined by taking the maximum dimension value of each position
-   * in the summand matrices.
-   *
-   * @param im the matrix to add
-   */
-  public void add(IntersectionMatrix im)
-  {
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        setAtLeast(i, j, im.get(i, j));
-      }
-    }
-  }
+  public static final int INTERIOR = Location.INTERIOR.getIndex();
 
   /**
    *  Tests if the dimension value matches <tt>TRUE</tt>
@@ -136,13 +80,13 @@ public class IntersectionMatrix implements Cloneable {
    *      . Possible values are <code>{TRUE, FALSE, DONTCARE, 0, 1, 2}</code>.
    *@return true if the dimension value matches TRUE
    */
-  public static boolean isTrue(int actualDimensionValue) {
-    if (actualDimensionValue >= 0 || actualDimensionValue  == Dimension.TRUE) {
+  public static boolean isTrue(final int actualDimensionValue) {
+    if (actualDimensionValue >= 0 || actualDimensionValue == Dimension.TRUE) {
       return true;
     }
     return false;
   }
-  
+
   /**
    *  Tests if the dimension value satisfies the dimension symbol.
    *
@@ -154,24 +98,29 @@ public class IntersectionMatrix implements Cloneable {
    *@return                          true if the dimension symbol matches
    *      the dimension value
    */
-  public static boolean matches(int actualDimensionValue, char requiredDimensionSymbol) {
+  public static boolean matches(final int actualDimensionValue,
+    final char requiredDimensionSymbol) {
     if (requiredDimensionSymbol == Dimension.SYM_DONTCARE) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_TRUE && (actualDimensionValue >= 0 || actualDimensionValue
-         == Dimension.TRUE)) {
+    if (requiredDimensionSymbol == Dimension.SYM_TRUE
+      && (actualDimensionValue >= 0 || actualDimensionValue == Dimension.TRUE)) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_FALSE && actualDimensionValue == Dimension.FALSE) {
+    if (requiredDimensionSymbol == Dimension.SYM_FALSE
+      && actualDimensionValue == Dimension.FALSE) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_P && actualDimensionValue == Dimension.P) {
+    if (requiredDimensionSymbol == Dimension.SYM_P
+      && actualDimensionValue == Dimension.P) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_L && actualDimensionValue == Dimension.L) {
+    if (requiredDimensionSymbol == Dimension.SYM_L
+      && actualDimensionValue == Dimension.L) {
       return true;
     }
-    if (requiredDimensionSymbol == Dimension.SYM_A && actualDimensionValue == Dimension.A) {
+    if (requiredDimensionSymbol == Dimension.SYM_A
+      && actualDimensionValue == Dimension.A) {
       return true;
     }
     return false;
@@ -188,106 +137,67 @@ public class IntersectionMatrix implements Cloneable {
    *@return                           true if each of the required dimension
    *      symbols encompass the corresponding actual dimension symbol
    */
-  public static boolean matches(String actualDimensionSymbols, String requiredDimensionSymbols) {
-    IntersectionMatrix m = new IntersectionMatrix(actualDimensionSymbols);
+  public static boolean matches(final String actualDimensionSymbols,
+    final String requiredDimensionSymbols) {
+    final IntersectionMatrix m = new IntersectionMatrix(actualDimensionSymbols);
     return m.matches(requiredDimensionSymbols);
   }
 
   /**
-   *  Changes the value of one of this <code>IntersectionMatrix</code>s
-   *  elements.
-   *
-   *@param  row             the row of this <code>IntersectionMatrix</code>,
-   *      indicating the interior, boundary or exterior of the first <code>Geometry</code>
-   *@param  column          the column of this <code>IntersectionMatrix</code>,
-   *      indicating the interior, boundary or exterior of the second <code>Geometry</code>
-   *@param  dimensionValue  the new value of the element
+   *  Internal representation of this <code>IntersectionMatrix</code>.
    */
-  public void set(int row, int column, int dimensionValue) {
-    matrix[row][column] = dimensionValue;
+  private final int[][] matrix;
+
+  /**
+   *  Creates an <code>IntersectionMatrix</code> with <code>FALSE</code>
+   *  dimension values.
+   */
+  public IntersectionMatrix() {
+    matrix = new int[3][3];
+    setAll(Dimension.FALSE);
   }
 
   /**
-   *  Changes the elements of this <code>IntersectionMatrix</code> to the
-   *  dimension symbols in <code>dimensionSymbols</code>.
+   *  Creates an <code>IntersectionMatrix</code> with the same elements as
+   *  <code>other</code>.
    *
-   *@param  dimensionSymbols  nine dimension symbols to which to set this <code>IntersectionMatrix</code>
-   *      s elements. Possible values are <code>{T, F, * , 0, 1, 2}</code>
+   *@param  other  an <code>IntersectionMatrix</code> to copy
    */
-  public void set(String dimensionSymbols) {
-    for (int i = 0; i < dimensionSymbols.length(); i++) {
-      int row = i / 3;
-      int col = i % 3;
-      matrix[row][col] = Dimension.toDimensionValue(dimensionSymbols.charAt(i));
-    }
+  public IntersectionMatrix(final IntersectionMatrix other) {
+    this();
+    matrix[INTERIOR][INTERIOR] = other.matrix[INTERIOR][INTERIOR];
+    matrix[INTERIOR][BOUNDARY] = other.matrix[INTERIOR][BOUNDARY];
+    matrix[INTERIOR][EXTERIOR] = other.matrix[INTERIOR][EXTERIOR];
+    matrix[BOUNDARY][INTERIOR] = other.matrix[BOUNDARY][INTERIOR];
+    matrix[BOUNDARY][BOUNDARY] = other.matrix[BOUNDARY][BOUNDARY];
+    matrix[BOUNDARY][EXTERIOR] = other.matrix[BOUNDARY][EXTERIOR];
+    matrix[EXTERIOR][INTERIOR] = other.matrix[EXTERIOR][INTERIOR];
+    matrix[EXTERIOR][BOUNDARY] = other.matrix[EXTERIOR][BOUNDARY];
+    matrix[EXTERIOR][EXTERIOR] = other.matrix[EXTERIOR][EXTERIOR];
   }
 
   /**
-   *  Changes the specified element to <code>minimumDimensionValue</code> if the
-   *  element is less.
+   *  Creates an <code>IntersectionMatrix</code> with the given dimension
+   *  symbols.
    *
-   *@param  row                    the row of this <code>IntersectionMatrix</code>
-   *      , indicating the interior, boundary or exterior of the first <code>Geometry</code>
-   *@param  column                 the column of this <code>IntersectionMatrix</code>
-   *      , indicating the interior, boundary or exterior of the second <code>Geometry</code>
-   *@param  minimumDimensionValue  the dimension value with which to compare the
-   *      element. The order of dimension values from least to greatest is
-   *      <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>.
+   *@param  elements  a String of nine dimension symbols in row major order
    */
-  public void setAtLeast(int row, int column, int minimumDimensionValue) {
-    if (matrix[row][column] < minimumDimensionValue) {
-      matrix[row][column] = minimumDimensionValue;
-    }
+  public IntersectionMatrix(final String elements) {
+    this();
+    set(elements);
   }
 
   /**
-   *  If row >= 0 and column >= 0, changes the specified element to <code>minimumDimensionValue</code>
-   *  if the element is less. Does nothing if row <0 or column < 0.
+   * Adds one matrix to another.
+   * Addition is defined by taking the maximum dimension value of each position
+   * in the summand matrices.
    *
-   *@param  row                    the row of this <code>IntersectionMatrix</code>
-   *      , indicating the interior, boundary or exterior of the first <code>Geometry</code>
-   *@param  column                 the column of this <code>IntersectionMatrix</code>
-   *      , indicating the interior, boundary or exterior of the second <code>Geometry</code>
-   *@param  minimumDimensionValue  the dimension value with which to compare the
-   *      element. The order of dimension values from least to greatest is
-   *      <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>.
+   * @param im the matrix to add
    */
-  public void setAtLeastIfValid(int row, int column, int minimumDimensionValue) {
-    if (row >= 0 && column >= 0) {
-      setAtLeast(row, column, minimumDimensionValue);
-    }
-  }
-
-  /**
-   *  For each element in this <code>IntersectionMatrix</code>, changes the
-   *  element to the corresponding minimum dimension symbol if the element is
-   *  less.
-   *
-   *@param  minimumDimensionSymbols  nine dimension symbols with which to
-   *      compare the elements of this <code>IntersectionMatrix</code>. The
-   *      order of dimension values from least to greatest is <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>
-   *      .
-   */
-  public void setAtLeast(String minimumDimensionSymbols) {
-    for (int i = 0; i < minimumDimensionSymbols.length(); i++) {
-      int row = i / 3;
-      int col = i % 3;
-      setAtLeast(row, col, Dimension.toDimensionValue(minimumDimensionSymbols.charAt(i)));
-    }
-  }
-
-  /**
-   *  Changes the elements of this <code>IntersectionMatrix</code> to <code>dimensionValue</code>
-   *  .
-   *
-   *@param  dimensionValue  the dimension value to which to set this <code>IntersectionMatrix</code>
-   *      s elements. Possible values <code>{TRUE, FALSE, DONTCARE, 0, 1, 2}</code>
-   *      .
-   */
-  public void setAll(int dimensionValue) {
-    for (int ai = 0; ai < 3; ai++) {
-      for (int bi = 0; bi < 3; bi++) {
-        matrix[ai][bi] = dimensionValue;
+  public void add(final IntersectionMatrix im) {
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        setAtLeast(i, j, im.get(i, j));
       }
     }
   }
@@ -306,61 +216,61 @@ public class IntersectionMatrix implements Cloneable {
    *      indicating the interior, boundary or exterior of the second <code>Geometry</code>
    *@return         the dimension value at the given matrix position.
    */
-  public int get(int row, int column) {
+  public int get(final int row, final int column) {
     return matrix[row][column];
   }
 
   /**
-   *  Returns <code>true</code> if this <code>IntersectionMatrix</code> is
-   *  FF*FF****.
+   *  Tests whether this <code>IntersectionMatrix</code> is
+   *  T*****FF*.
    *
-   *@return    <code>true</code> if the two <code>Geometry</code>s related by
-   *      this <code>IntersectionMatrix</code> are disjoint
+   *@return    <code>true</code> if the first <code>Geometry</code> contains the
+   *      second
    */
-  public boolean isDisjoint() {
-    return
-        matrix[Location.INTERIOR][Location.INTERIOR] == Dimension.FALSE &&
-        matrix[Location.INTERIOR][Location.BOUNDARY] == Dimension.FALSE &&
-        matrix[Location.BOUNDARY][Location.INTERIOR] == Dimension.FALSE &&
-        matrix[Location.BOUNDARY][Location.BOUNDARY] == Dimension.FALSE;
-  }
-
-  /**
-   *  Returns <code>true</code> if <code>isDisjoint</code> returns false.
-   *
-   *@return    <code>true</code> if the two <code>Geometry</code>s related by
-   *      this <code>IntersectionMatrix</code> intersect
-   */
-  public boolean isIntersects() {
-    return ! isDisjoint();
+  public boolean isContains() {
+    return isTrue(matrix[INTERIOR][INTERIOR])
+      && matrix[EXTERIOR][INTERIOR] == Dimension.FALSE
+      && matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
   }
 
   /**
    *  Returns <code>true</code> if this <code>IntersectionMatrix</code> is
-   *  FT*******, F**T***** or F***T****.
+   *    <code>T*F**F***</code>
+   * or <code>*TF**F***</code>
+   * or <code>**FT*F***</code>
+   * or <code>**F*TF***</code>
    *
-   *@param  dimensionOfGeometryA  the dimension of the first <code>Geometry</code>
-   *@param  dimensionOfGeometryB  the dimension of the second <code>Geometry</code>
-   *@return                       <code>true</code> if the two <code>Geometry</code>
-   *      s related by this <code>IntersectionMatrix</code> touch; Returns false
-   *      if both <code>Geometry</code>s are points.
+   *@return    <code>true</code> if the first <code>Geometry</code>
+   * is covered by the second
    */
-  public boolean isTouches(int dimensionOfGeometryA, int dimensionOfGeometryB) {
-    if (dimensionOfGeometryA > dimensionOfGeometryB) {
-      //no need to get transpose because pattern matrix is symmetrical
-      return isTouches(dimensionOfGeometryB, dimensionOfGeometryA);
-    }
-    if ((dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.A) ||
-        (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.L) ||
-        (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.A) ||
-        (dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A) ||
-        (dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.L)) {
-      return matrix[Location.INTERIOR][Location.INTERIOR] == Dimension.FALSE &&
-          (isTrue(matrix[Location.INTERIOR][Location.BOUNDARY])
-           || isTrue(matrix[Location.BOUNDARY][Location.INTERIOR])
-           || isTrue(matrix[Location.BOUNDARY][Location.BOUNDARY]));
-    }
-    return false;
+  public boolean isCoveredBy() {
+    final boolean hasPointInCommon = isTrue(matrix[INTERIOR][INTERIOR])
+      || isTrue(matrix[INTERIOR][BOUNDARY])
+      || isTrue(matrix[BOUNDARY][INTERIOR])
+      || isTrue(matrix[BOUNDARY][BOUNDARY]);
+
+    return hasPointInCommon && matrix[INTERIOR][EXTERIOR] == Dimension.FALSE
+      && matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE;
+  }
+
+  /**
+   *  Returns <code>true</code> if this <code>IntersectionMatrix</code> is
+   *    <code>T*****FF*</code>
+   * or <code>*T****FF*</code>
+   * or <code>***T**FF*</code>
+   * or <code>****T*FF*</code>
+   *
+   *@return    <code>true</code> if the first <code>Geometry</code> covers the
+   *      second
+   */
+  public boolean isCovers() {
+    final boolean hasPointInCommon = isTrue(matrix[INTERIOR][INTERIOR])
+      || isTrue(matrix[INTERIOR][BOUNDARY])
+      || isTrue(matrix[BOUNDARY][INTERIOR])
+      || isTrue(matrix[BOUNDARY][BOUNDARY]);
+
+    return hasPointInCommon && matrix[EXTERIOR][INTERIOR] == Dimension.FALSE
+      && matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
   }
 
   /**
@@ -388,93 +298,39 @@ public class IntersectionMatrix implements Cloneable {
    *@return                       <code>true</code> if the two <code>Geometry</code>s
    *      related by this <code>IntersectionMatrix</code> cross.
    */
-  public boolean isCrosses(int dimensionOfGeometryA, int dimensionOfGeometryB) {
-    if ((dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.L) ||
-        (dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A) ||
-        (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.A)) {
-      return isTrue(matrix[Location.INTERIOR][Location.INTERIOR]) &&
-      isTrue(matrix[Location.INTERIOR][Location.EXTERIOR]);
+  public boolean isCrosses(final int dimensionOfGeometryA,
+    final int dimensionOfGeometryB) {
+    if ((dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.L)
+      || (dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A)
+      || (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.A)) {
+      return isTrue(matrix[INTERIOR][INTERIOR])
+        && isTrue(matrix[INTERIOR][EXTERIOR]);
     }
-    if ((dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.P) ||
-        (dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.P) ||
-        (dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.L)) {
-      return isTrue(matrix[Location.INTERIOR][Location.INTERIOR]) &&
-      isTrue(matrix[Location.EXTERIOR][Location.INTERIOR]);
+    if ((dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.P)
+      || (dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.P)
+      || (dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.L)) {
+      return isTrue(matrix[INTERIOR][INTERIOR])
+        && isTrue(matrix[EXTERIOR][INTERIOR]);
     }
-    if (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.L) {
-      return matrix[Location.INTERIOR][Location.INTERIOR] == 0;
+    if (dimensionOfGeometryA == Dimension.L
+      && dimensionOfGeometryB == Dimension.L) {
+      return matrix[INTERIOR][INTERIOR] == 0;
     }
     return false;
   }
 
   /**
-   *  Tests whether this <code>IntersectionMatrix</code> is
-   *  T*F**F***.
-   *
-   *@return    <code>true</code> if the first <code>Geometry</code> is within
-   *      the second
-   */
-  public boolean isWithin() {
-    return isTrue(matrix[Location.INTERIOR][Location.INTERIOR]) &&
-        matrix[Location.INTERIOR][Location.EXTERIOR] == Dimension.FALSE &&
-        matrix[Location.BOUNDARY][Location.EXTERIOR] == Dimension.FALSE;
-  }
-
-  /**
-   *  Tests whether this <code>IntersectionMatrix</code> is
-   *  T*****FF*.
-   *
-   *@return    <code>true</code> if the first <code>Geometry</code> contains the
-   *      second
-   */
-  public boolean isContains() {
-    return isTrue(matrix[Location.INTERIOR][Location.INTERIOR]) &&
-        matrix[Location.EXTERIOR][Location.INTERIOR] == Dimension.FALSE &&
-        matrix[Location.EXTERIOR][Location.BOUNDARY] == Dimension.FALSE;
-  }
-
-  /**
    *  Returns <code>true</code> if this <code>IntersectionMatrix</code> is
-   *    <code>T*****FF*</code>
-   * or <code>*T****FF*</code>
-   * or <code>***T**FF*</code>
-   * or <code>****T*FF*</code>
+   *  FF*FF****.
    *
-   *@return    <code>true</code> if the first <code>Geometry</code> covers the
-   *      second
+   *@return    <code>true</code> if the two <code>Geometry</code>s related by
+   *      this <code>IntersectionMatrix</code> are disjoint
    */
-  public boolean isCovers() {
-    boolean hasPointInCommon =
-        isTrue(matrix[Location.INTERIOR][Location.INTERIOR])
-        || isTrue(matrix[Location.INTERIOR][Location.BOUNDARY])
-        || isTrue(matrix[Location.BOUNDARY][Location.INTERIOR])
-        || isTrue(matrix[Location.BOUNDARY][Location.BOUNDARY]);
-
-    return hasPointInCommon &&
-        matrix[Location.EXTERIOR][Location.INTERIOR] == Dimension.FALSE &&
-        matrix[Location.EXTERIOR][Location.BOUNDARY] == Dimension.FALSE;
-  }
-
-  /**
-   *  Returns <code>true</code> if this <code>IntersectionMatrix</code> is
-   *    <code>T*F**F***</code>
-   * or <code>*TF**F***</code>
-   * or <code>**FT*F***</code>
-   * or <code>**F*TF***</code>
-   *
-   *@return    <code>true</code> if the first <code>Geometry</code>
-   * is covered by the second
-   */
-  public boolean isCoveredBy() {
-    boolean hasPointInCommon =
-        isTrue(matrix[Location.INTERIOR][Location.INTERIOR])
-        || isTrue(matrix[Location.INTERIOR][Location.BOUNDARY])
-        || isTrue(matrix[Location.BOUNDARY][Location.INTERIOR])
-        || isTrue(matrix[Location.BOUNDARY][Location.BOUNDARY]);
-
-    return hasPointInCommon &&
-        matrix[Location.INTERIOR][Location.EXTERIOR] == Dimension.FALSE &&
-        matrix[Location.BOUNDARY][Location.EXTERIOR] == Dimension.FALSE;
+  public boolean isDisjoint() {
+    return matrix[INTERIOR][INTERIOR] == Dimension.FALSE
+      && matrix[INTERIOR][BOUNDARY] == Dimension.FALSE
+      && matrix[BOUNDARY][INTERIOR] == Dimension.FALSE
+      && matrix[BOUNDARY][BOUNDARY] == Dimension.FALSE;
   }
 
   /**
@@ -495,15 +351,26 @@ public class IntersectionMatrix implements Cloneable {
    *      related by this <code>IntersectionMatrix</code> are equal; the
    *      <code>Geometry</code>s must have the same dimension to be equal
    */
-  public boolean isEquals(int dimensionOfGeometryA, int dimensionOfGeometryB) {
+  public boolean isEquals(final int dimensionOfGeometryA,
+    final int dimensionOfGeometryB) {
     if (dimensionOfGeometryA != dimensionOfGeometryB) {
       return false;
     }
-    return isTrue(matrix[Location.INTERIOR][Location.INTERIOR]) &&
-        matrix[Location.INTERIOR][Location.EXTERIOR] == Dimension.FALSE &&
-        matrix[Location.BOUNDARY][Location.EXTERIOR] == Dimension.FALSE &&
-        matrix[Location.EXTERIOR][Location.INTERIOR] == Dimension.FALSE &&
-        matrix[Location.EXTERIOR][Location.BOUNDARY] == Dimension.FALSE;
+    return isTrue(matrix[INTERIOR][INTERIOR])
+      && matrix[INTERIOR][EXTERIOR] == Dimension.FALSE
+      && matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE
+      && matrix[EXTERIOR][INTERIOR] == Dimension.FALSE
+      && matrix[EXTERIOR][BOUNDARY] == Dimension.FALSE;
+  }
+
+  /**
+   *  Returns <code>true</code> if <code>isDisjoint</code> returns false.
+   *
+   *@return    <code>true</code> if the two <code>Geometry</code>s related by
+   *      this <code>IntersectionMatrix</code> intersect
+   */
+  public boolean isIntersects() {
+    return !isDisjoint();
   }
 
   /**
@@ -520,19 +387,62 @@ public class IntersectionMatrix implements Cloneable {
    *      function to return <code>true</code>, the <code>Geometry</code>s must
    *      be two points, two curves or two surfaces.
    */
-  public boolean isOverlaps(int dimensionOfGeometryA, int dimensionOfGeometryB) {
-    if ((dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.P) ||
-        (dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.A)) {
-      return isTrue(matrix[Location.INTERIOR][Location.INTERIOR]) 
-          && isTrue(matrix[Location.INTERIOR][Location.EXTERIOR]) 
-          && isTrue(matrix[Location.EXTERIOR][Location.INTERIOR]);
+  public boolean isOverlaps(final int dimensionOfGeometryA,
+    final int dimensionOfGeometryB) {
+    if ((dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.P)
+      || (dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.A)) {
+      return isTrue(matrix[INTERIOR][INTERIOR])
+        && isTrue(matrix[INTERIOR][EXTERIOR])
+        && isTrue(matrix[EXTERIOR][INTERIOR]);
     }
-    if (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.L) {
-      return matrix[Location.INTERIOR][Location.INTERIOR] == 1 
-         && isTrue(matrix[Location.INTERIOR][Location.EXTERIOR]) 
-         && isTrue(matrix[Location.EXTERIOR][Location.INTERIOR]);
+    if (dimensionOfGeometryA == Dimension.L
+      && dimensionOfGeometryB == Dimension.L) {
+      return matrix[INTERIOR][INTERIOR] == 1
+        && isTrue(matrix[INTERIOR][EXTERIOR])
+        && isTrue(matrix[EXTERIOR][INTERIOR]);
     }
     return false;
+  }
+
+  /**
+   *  Returns <code>true</code> if this <code>IntersectionMatrix</code> is
+   *  FT*******, F**T***** or F***T****.
+   *
+   *@param  dimensionOfGeometryA  the dimension of the first <code>Geometry</code>
+   *@param  dimensionOfGeometryB  the dimension of the second <code>Geometry</code>
+   *@return                       <code>true</code> if the two <code>Geometry</code>
+   *      s related by this <code>IntersectionMatrix</code> touch; Returns false
+   *      if both <code>Geometry</code>s are points.
+   */
+  public boolean isTouches(final int dimensionOfGeometryA,
+    final int dimensionOfGeometryB) {
+    if (dimensionOfGeometryA > dimensionOfGeometryB) {
+      // no need to get transpose because pattern matrix is symmetrical
+      return isTouches(dimensionOfGeometryB, dimensionOfGeometryA);
+    }
+    if ((dimensionOfGeometryA == Dimension.A && dimensionOfGeometryB == Dimension.A)
+      || (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.L)
+      || (dimensionOfGeometryA == Dimension.L && dimensionOfGeometryB == Dimension.A)
+      || (dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.A)
+      || (dimensionOfGeometryA == Dimension.P && dimensionOfGeometryB == Dimension.L)) {
+      return matrix[INTERIOR][INTERIOR] == Dimension.FALSE
+        && (isTrue(matrix[INTERIOR][BOUNDARY])
+          || isTrue(matrix[BOUNDARY][INTERIOR]) || isTrue(matrix[BOUNDARY][BOUNDARY]));
+    }
+    return false;
+  }
+
+  /**
+   *  Tests whether this <code>IntersectionMatrix</code> is
+   *  T*F**F***.
+   *
+   *@return    <code>true</code> if the first <code>Geometry</code> is within
+   *      the second
+   */
+  public boolean isWithin() {
+    return isTrue(matrix[INTERIOR][INTERIOR])
+      && matrix[INTERIOR][EXTERIOR] == Dimension.FALSE
+      && matrix[BOUNDARY][EXTERIOR] == Dimension.FALSE;
   }
 
   /**
@@ -545,19 +455,150 @@ public class IntersectionMatrix implements Cloneable {
    *@return                           <code>true</code> if this <code>IntersectionMatrix</code>
    *      matches the required dimension symbols
    */
-  public boolean matches(String requiredDimensionSymbols) {
+  public boolean matches(final String requiredDimensionSymbols) {
     if (requiredDimensionSymbols.length() != 9) {
-      throw new IllegalArgumentException("Should be length 9: " + requiredDimensionSymbols);
+      throw new IllegalArgumentException("Should be length 9: "
+        + requiredDimensionSymbols);
     }
     for (int ai = 0; ai < 3; ai++) {
       for (int bi = 0; bi < 3; bi++) {
-        if (!matches(matrix[ai][bi], requiredDimensionSymbols.charAt(3 * ai +
-            bi))) {
+        if (!matches(matrix[ai][bi],
+          requiredDimensionSymbols.charAt(3 * ai + bi))) {
           return false;
         }
       }
     }
     return true;
+  }
+
+  /**
+   *  Changes the value of one of this <code>IntersectionMatrix</code>s
+   *  elements.
+   *
+   *@param  row             the row of this <code>IntersectionMatrix</code>,
+   *      indicating the interior, boundary or exterior of the first <code>Geometry</code>
+   *@param  column          the column of this <code>IntersectionMatrix</code>,
+   *      indicating the interior, boundary or exterior of the second <code>Geometry</code>
+   *@param  dimensionValue  the new value of the element
+   */
+  public void set(final int row, final int column, final int dimensionValue) {
+    matrix[row][column] = dimensionValue;
+  }
+
+  public void set(final Location row, final Location column,
+    final int dimensionValue) {
+    set(row.getIndex(), column.getIndex(), dimensionValue);
+  }
+
+  /**
+   *  Changes the elements of this <code>IntersectionMatrix</code> to the
+   *  dimension symbols in <code>dimensionSymbols</code>.
+   *
+   *@param  dimensionSymbols  nine dimension symbols to which to set this <code>IntersectionMatrix</code>
+   *      s elements. Possible values are <code>{T, F, * , 0, 1, 2}</code>
+   */
+  public void set(final String dimensionSymbols) {
+    for (int i = 0; i < dimensionSymbols.length(); i++) {
+      final int row = i / 3;
+      final int col = i % 3;
+      matrix[row][col] = Dimension.toDimensionValue(dimensionSymbols.charAt(i));
+    }
+  }
+
+  /**
+   *  Changes the elements of this <code>IntersectionMatrix</code> to <code>dimensionValue</code>
+   *  .
+   *
+   *@param  dimensionValue  the dimension value to which to set this <code>IntersectionMatrix</code>
+   *      s elements. Possible values <code>{TRUE, FALSE, DONTCARE, 0, 1, 2}</code>
+   *      .
+   */
+  public void setAll(final int dimensionValue) {
+    for (int ai = 0; ai < 3; ai++) {
+      for (int bi = 0; bi < 3; bi++) {
+        matrix[ai][bi] = dimensionValue;
+      }
+    }
+  }
+
+  /**
+   *  Changes the specified element to <code>minimumDimensionValue</code> if the
+   *  element is less.
+   *
+   *@param  row                    the row of this <code>IntersectionMatrix</code>
+   *      , indicating the interior, boundary or exterior of the first <code>Geometry</code>
+   *@param  column                 the column of this <code>IntersectionMatrix</code>
+   *      , indicating the interior, boundary or exterior of the second <code>Geometry</code>
+   *@param  minimumDimensionValue  the dimension value with which to compare the
+   *      element. The order of dimension values from least to greatest is
+   *      <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>.
+   */
+  public void setAtLeast(final int row, final int column,
+    final int minimumDimensionValue) {
+    if (matrix[row][column] < minimumDimensionValue) {
+      matrix[row][column] = minimumDimensionValue;
+    }
+  }
+
+  /**
+   *  For each element in this <code>IntersectionMatrix</code>, changes the
+   *  element to the corresponding minimum dimension symbol if the element is
+   *  less.
+   *
+   *@param  minimumDimensionSymbols  nine dimension symbols with which to
+   *      compare the elements of this <code>IntersectionMatrix</code>. The
+   *      order of dimension values from least to greatest is <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>
+   *      .
+   */
+  public void setAtLeast(final String minimumDimensionSymbols) {
+    for (int i = 0; i < minimumDimensionSymbols.length(); i++) {
+      final int row = i / 3;
+      final int col = i % 3;
+      setAtLeast(row, col,
+        Dimension.toDimensionValue(minimumDimensionSymbols.charAt(i)));
+    }
+  }
+
+  /**
+   *  If row >= 0 and column >= 0, changes the specified element to <code>minimumDimensionValue</code>
+   *  if the element is less. Does nothing if row <0 or column < 0.
+   *
+   *@param  row                    the row of this <code>IntersectionMatrix</code>
+   *      , indicating the interior, boundary or exterior of the first <code>Geometry</code>
+   *@param  column                 the column of this <code>IntersectionMatrix</code>
+   *      , indicating the interior, boundary or exterior of the second <code>Geometry</code>
+   *@param  minimumDimensionValue  the dimension value with which to compare the
+   *      element. The order of dimension values from least to greatest is
+   *      <code>{DONTCARE, TRUE, FALSE, 0, 1, 2}</code>.
+   */
+  public void setAtLeastIfValid(final int row, final int column,
+    final int minimumDimensionValue) {
+    if (row >= 0 && column >= 0) {
+      setAtLeast(row, column, minimumDimensionValue);
+    }
+  }
+
+  public void setAtLeastIfValid(final Location row, final Location column,
+    final int minimumDimensionValue) {
+    setAtLeastIfValid(row.getIndex(), column.getIndex(), minimumDimensionValue);
+  }
+
+  /**
+   *  Returns a nine-character <code>String</code> representation of this <code>IntersectionMatrix</code>
+   *  .
+   *
+   *@return    the nine dimension symbols of this <code>IntersectionMatrix</code>
+   *      in row-major order.
+   */
+  @Override
+  public String toString() {
+    final StringBuffer buf = new StringBuffer("123456789");
+    for (int ai = 0; ai < 3; ai++) {
+      for (int bi = 0; bi < 3; bi++) {
+        buf.setCharAt(3 * ai + bi, Dimension.toDimensionSymbol(matrix[ai][bi]));
+      }
+    }
+    return buf.toString();
   }
 
   /**
@@ -577,22 +618,4 @@ public class IntersectionMatrix implements Cloneable {
     matrix[1][2] = temp;
     return this;
   }
-
-  /**
-   *  Returns a nine-character <code>String</code> representation of this <code>IntersectionMatrix</code>
-   *  .
-   *
-   *@return    the nine dimension symbols of this <code>IntersectionMatrix</code>
-   *      in row-major order.
-   */
-  public String toString() {
-    StringBuffer buf = new StringBuffer("123456789");
-    for (int ai = 0; ai < 3; ai++) {
-      for (int bi = 0; bi < 3; bi++) {
-        buf.setCharAt(3 * ai + bi, Dimension.toDimensionSymbol(matrix[ai][bi]));
-      }
-    }
-    return buf.toString();
-  }
 }
-
