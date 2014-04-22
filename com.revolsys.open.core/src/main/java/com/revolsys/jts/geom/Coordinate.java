@@ -75,17 +75,17 @@ public class Coordinate extends AbstractCoordinates {
    *@param  c  the <code>Coordinate</code> to copy.
    */
   public Coordinate(final Coordinates point) {
-    final int numAxis = point.getNumAxis();
-    this.coordinates = new double[numAxis];
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = point.getAxisCount();
+    this.coordinates = new double[axisCount];
+    for (int i = 0; i < axisCount; i++) {
       final double value = point.getValue(i);
       this.coordinates[i] = value;
     }
   }
 
-  public Coordinate(final Coordinates point, final int numAxis) {
-    this(numAxis);
-    final int count = Math.min(numAxis, point.getNumAxis());
+  public Coordinate(final Coordinates point, final int axisCount) {
+    this(axisCount);
+    final int count = Math.min(axisCount, point.getAxisCount());
     for (int i = 0; i < count; i++) {
       final double value = point.getValue(i);
       setValue(i, value);
@@ -96,14 +96,14 @@ public class Coordinate extends AbstractCoordinates {
     this(coordinates.length, coordinates);
   }
 
-  public Coordinate(final int numAxis) {
-    this.coordinates = new double[numAxis];
+  public Coordinate(final int axisCount) {
+    this.coordinates = new double[axisCount];
   }
 
-  public Coordinate(final int numAxis, final double... coordinates) {
-    this.coordinates = new double[numAxis];
+  public Coordinate(final int axisCount, final double... coordinates) {
+    this.coordinates = new double[axisCount];
     System.arraycopy(coordinates, 0, this.coordinates, 0,
-      Math.min(numAxis, coordinates.length));
+      Math.min(axisCount, coordinates.length));
   }
 
   public Coordinate(final List<Number> coordinates) {
@@ -116,7 +116,7 @@ public class Coordinate extends AbstractCoordinates {
   }
 
   @Override
-  public int getNumAxis() {
+  public int getAxisCount() {
     return (byte)coordinates.length;
   }
 
@@ -131,7 +131,7 @@ public class Coordinate extends AbstractCoordinates {
    */
   @Override
   public double getValue(final int axisIndex) {
-    if (axisIndex >= 0 && axisIndex < getNumAxis()) {
+    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
       return coordinates[axisIndex];
     } else {
       return Double.NaN;
@@ -150,7 +150,7 @@ public class Coordinate extends AbstractCoordinates {
    */
   @Override
   public void setValue(final int axisIndex, final double value) {
-    if (axisIndex >= 0 && axisIndex < getNumAxis()) {
+    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
       coordinates[axisIndex] = value;
     }
   }
@@ -164,8 +164,8 @@ public class Coordinate extends AbstractCoordinates {
   public String toString() {
     final StringBuffer s = new StringBuffer("POINT(");
     s.append(coordinates[0]);
-    final int numAxis = getNumAxis();
-    for (int i = 1; i < numAxis; i++) {
+    final int axisCount = getAxisCount();
+    for (int i = 1; i < axisCount; i++) {
       final Double ordinate = coordinates[i];
       s.append(' ');
       s.append(ordinate);

@@ -17,7 +17,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.jtstest.test.TestCaseList;
 import com.revolsys.jtstest.test.Testable;
@@ -147,8 +146,6 @@ public class TestBuilderModel {
   private final GeometryEditModel geomEditModel;
 
   private final LayerList layerList = new LayerList();
-
-  private final WKTWriter writer = new WKTWriter();
 
   private Object currResult = null;
 
@@ -344,7 +341,7 @@ public class TestBuilderModel {
     if (g.getVertexCount() > MAX_DISPLAY_POINTS) {
       return GeometryEditModel.toStringVeryLarge(g);
     }
-    return writer.writeFormatted(g);
+    return g.toWkt();
   }
 
   public TestCaseList getTestCaseList() {

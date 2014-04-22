@@ -15,7 +15,7 @@ public class JdbcAttributeAdder {
 
   public static String GEOMETRY_FACTORY = "geometryFactory";
 
-  public static String NUM_AXIS = "numAxis";
+  public static String NUM_AXIS = "axisCount";
 
   public static String GEOMETRY_TYPE = "geometryType";
 

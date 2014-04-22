@@ -467,10 +467,10 @@ public class IsValidOp {
   private boolean checkShellsNotNested(final MultiPolygon multiPolygon,
     final GeometryGraph graph) {
     boolean valid = true;
-    for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+    for (int i = 0; i < multiPolygon.getGeometryCount(); i++) {
       final Polygon polygon1 = multiPolygon.getPolygon(i);
       final LinearRing shell = polygon1.getExteriorRing();
-      for (int j = 0; j < multiPolygon.getNumGeometries(); j++) {
+      for (int j = 0; j < multiPolygon.getGeometryCount(); j++) {
         if (i != j) {
           final Polygon polygon2 = multiPolygon.getPolygon(j);
           valid &= checkShellNotNested(shell, polygon2, graph);

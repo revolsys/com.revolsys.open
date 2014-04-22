@@ -38,7 +38,6 @@ import java.util.Iterator;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.jtstest.geomop.GeometryMethodOperation;
 import com.revolsys.jtstest.test.Testable;
@@ -56,8 +55,6 @@ public class TestRunnerTestCaseAdapter implements Testable {
   private final TestCase testCase;
 
   private boolean ranAtLeastOnce = false;
-
-  private final WKTWriter wktWriter = new WKTWriter();
 
   public TestRunnerTestCaseAdapter(final TestCase testCase) {
     this.testCase = testCase;
@@ -194,12 +191,12 @@ public class TestRunnerTestCaseAdapter implements Testable {
       if (testCase.getGeometryA() == null) {
         return null;
       }
-      return wktWriter.write(testCase.getGeometryA());
+      return testCase.getGeometryA().toWkt();
     } else if (index == 1) {
       if (testCase.getGeometryB() == null) {
         return null;
       }
-      return wktWriter.write(testCase.getGeometryB());
+      return testCase.getGeometryB().toWkt();
     }
     Assert.shouldNeverReachHere();
     return null;

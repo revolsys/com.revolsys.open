@@ -63,14 +63,14 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
     try {
       int srid = 0;
       String type = "geometry";
-      int numAxis = 3;
+      int axisCount = 3;
       try {
         final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where UPPER(F_TABLE_SCHEMA) = UPPER(?) AND UPPER(F_TABLE_NAME) = UPPER(?) AND UPPER(F_GEOMETRY_COLUMN) = UPPER(?)";
         final Map<String, Object> values = JdbcUtils.selectMap(dataSource, sql,
           owner, tableName, columnName);
         srid = (Integer)values.get("srid");
         type = (String)values.get("type");
-        numAxis = (Integer)values.get("coord_dimension");
+        axisCount = (Integer)values.get("coord_dimension");
       } catch (final IllegalArgumentException e) {
         LOG.warn("Cannot get geometry column metadata for " + typePath + "."
           + columnName);
@@ -80,13 +80,13 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       final com.revolsys.jts.geom.GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
       final com.revolsys.jts.geom.GeometryFactory geometryFactory;
       if (storeGeometryFactory == null) {
-        geometryFactory = GeometryFactory.getFactory(srid, numAxis, 0, 0);
+        geometryFactory = GeometryFactory.getFactory(srid, axisCount, 0, 0);
       } else {
-        geometryFactory = GeometryFactory.getFactory(srid, numAxis,
+        geometryFactory = GeometryFactory.getFactory(srid, axisCount,
           storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
       final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(name,
-        dataType, required, description, null, srid, numAxis, geometryFactory);
+        dataType, required, description, null, srid, axisCount, geometryFactory);
       metaData.addAttribute(attribute);
       attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
         "intersects(", ")"));

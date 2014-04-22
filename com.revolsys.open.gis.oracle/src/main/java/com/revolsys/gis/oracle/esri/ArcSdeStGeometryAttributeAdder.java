@@ -40,9 +40,9 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
       LOG.error("Column not registered in SDE.ST_GEOMETRY table " + owner + "."
         + tableName + "." + name);
     }
-    final int numAxis = JdbcAttributeAdder.getIntegerColumnProperty(schema,
+    final int axisCount = JdbcAttributeAdder.getIntegerColumnProperty(schema,
       typePath, columnName, JdbcAttributeAdder.NUM_AXIS);
-    if (numAxis == -1) {
+    if (axisCount == -1) {
       LOG.error("Column not found in SDE.GEOMETRY_COLUMNS table " + owner + "."
         + tableName + "." + name);
     }
@@ -60,7 +60,7 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
       schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
 
     final Attribute attribute = new ArcSdeStGeometryAttribute(name, dataType,
-      required, description, null, spatialReference, numAxis);
+      required, description, null, spatialReference, axisCount);
 
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(

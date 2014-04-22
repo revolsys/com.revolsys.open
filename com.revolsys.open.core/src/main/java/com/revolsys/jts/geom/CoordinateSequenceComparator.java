@@ -109,8 +109,8 @@ public class CoordinateSequenceComparator
     int size1 = s1.size();
     int size2 = s2.size();
 
-    int dim1 = s1.getNumAxis();
-    int dim2 = s2.getNumAxis();
+    int dim1 = s1.getAxisCount();
+    int dim2 = s2.getAxisCount();
 
     int minDim = dim1;
     if (dim2 < minDim)

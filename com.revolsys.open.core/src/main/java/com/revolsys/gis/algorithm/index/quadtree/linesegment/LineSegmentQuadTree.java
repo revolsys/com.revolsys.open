@@ -66,7 +66,7 @@ public class LineSegmentQuadTree {
         add(points, ringIndex);
       }
     } else {
-      for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+      for (int partIndex = 0; partIndex < geometry.getGeometryCount(); partIndex++) {
         final Geometry part = geometry.getGeometry(partIndex);
         if (part instanceof Point) {
         } else if (part instanceof LineString) {

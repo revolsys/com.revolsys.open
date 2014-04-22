@@ -993,7 +993,7 @@ public class Graph<T> {
       final List<Edge<T>> edges = new ArrayList<Edge<T>>();
       final T object = edge.getObject();
       remove(edge);
-      for (int i = 0; i < lines.getNumGeometries(); i++) {
+      for (int i = 0; i < lines.getGeometryCount(); i++) {
         final LineString line = (LineString)lines.getGeometry(i);
         final T newObject = clone(object, line);
         final Edge<T> newEdge = addEdge(newObject, line);
@@ -1211,7 +1211,7 @@ public class Graph<T> {
 
               final CoordinatesList newPoints;
               if (startIndex > index) {
-                newPoints = CoordinatesListUtil.create(points.getNumAxis(),
+                newPoints = CoordinatesListUtil.create(points.getAxisCount(),
                   startPoint, point);
               } else {
                 newPoints = CoordinatesListUtil.subList(points, startPoint,

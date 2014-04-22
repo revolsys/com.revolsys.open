@@ -36,11 +36,11 @@ package com.revolsys.jts.noding;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.TopologyException;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * Validates that a collection of {@link SegmentString}s is correctly noded.
@@ -114,9 +114,9 @@ public class FastNodingValidator
   	
 		Coordinates[] intSegs = segInt.getIntersectionSegments();
     return "found non-noded intersection between "
-        + WKTWriter.toLineString(intSegs[0], intSegs[1])
+        + WktWriter.lineString(intSegs[0], intSegs[1])
         + " and "
-        + WKTWriter.toLineString(intSegs[2], intSegs[3]);
+        + WktWriter.lineString(intSegs[2], intSegs[3]);
   }
   
   /**

@@ -35,7 +35,7 @@ package com.revolsys.jts.testold.perf.operation.buffer;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.buffer.BufferOp;
+import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 
 /**
@@ -104,7 +104,7 @@ public class BufferCorrectnessTest {
 
     final BufferParameters params = new BufferParameters(10,
       BufferParameters.CAP_SQUARE, BufferParameters.JOIN_MITRE, 10);
-    final Geometry buf = new BufferOp(g, params).getResultGeometry(200);
+    final Geometry buf = Buffer.buffer(g, 200, params);
 
     System.out.println(buf);
   }
@@ -117,7 +117,7 @@ public class BufferCorrectnessTest {
 
     final BufferParameters params = new BufferParameters(8,
       BufferParameters.CAP_ROUND, BufferParameters.JOIN_MITRE, 5);
-    final Geometry buf = new BufferOp(g, params).getResultGeometry(-5);
+    final Geometry buf = Buffer.buffer(g, -5, params);
 
     System.out.println(buf);
   };
@@ -130,7 +130,7 @@ public class BufferCorrectnessTest {
 
     final BufferParameters params = new BufferParameters(8,
       BufferParameters.CAP_ROUND, BufferParameters.JOIN_MITRE, 5);
-    final Geometry buf = new BufferOp(g, params).getResultGeometry(-5);
+    final Geometry buf = Buffer.buffer(g, -5, params);
 
     System.out.println(buf);
   };

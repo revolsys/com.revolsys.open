@@ -126,7 +126,7 @@ public class SelectedRecordsRenderer {
         outlineStyle);
 
       if (!geometry.isEmpty()) {
-        for (int i = 0; i < geometry.getNumGeometries(); i++) {
+        for (int i = 0; i < geometry.getGeometryCount(); i++) {
           final Geometry part = geometry.getGeometry(i);
           if (part instanceof LineString) {
             final LineString lineString = (LineString)part;

@@ -62,10 +62,10 @@ public class LineSegment extends AbstractCoordinatesList implements
   public LineSegment(final GeometryFactory geometryFactory,
     final Coordinates coordinates1, final Coordinates coordinates2) {
     this.geometryFactory = geometryFactory;
-    final int numAxis = Math.max(coordinates1.getNumAxis(),
-      coordinates2.getNumAxis());
-    points = new double[numAxis * 2];
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = Math.max(coordinates1.getAxisCount(),
+      coordinates2.getAxisCount());
+    points = new double[axisCount * 2];
+    for (int i = 0; i < axisCount; i++) {
       setValue(0, i, coordinates1.getValue(i));
       setValue(1, i, coordinates2.getValue(i));
     }
@@ -223,9 +223,9 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   private Coordinates getCoordinates1() {
-    final int numAxis = getNumAxis();
-    final Coordinates coordinates = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = getAxisCount();
+    final Coordinates coordinates = new DoubleCoordinates(axisCount);
+    for (int i = 0; i < axisCount; i++) {
       final double value = getValue(0, i);
       coordinates.setValue(i, value);
     }
@@ -233,9 +233,9 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   private Coordinates getCoordinates2() {
-    final int numAxis = getNumAxis();
-    final Coordinates coordinates = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = getAxisCount();
+    final Coordinates coordinates = new DoubleCoordinates(axisCount);
+    for (int i = 0; i < axisCount; i++) {
       final double value = getValue(1, i);
       coordinates.setValue(i, value);
     }
@@ -343,7 +343,7 @@ public class LineSegment extends AbstractCoordinatesList implements
   }
 
   @Override
-  public int getNumAxis() {
+  public int getAxisCount() {
     return (byte)(points.length / 2);
   }
 
@@ -354,10 +354,10 @@ public class LineSegment extends AbstractCoordinatesList implements
 
   @Override
   public double getValue(final int index, final int axisIndex) {
-    final int numAxis = getNumAxis();
-    if (axisIndex >= 0 && axisIndex < numAxis) {
+    final int axisCount = getAxisCount();
+    if (axisIndex >= 0 && axisIndex < axisCount) {
       if (index >= 0 && index < 2) {
-        final int valueIndex = index * numAxis + axisIndex;
+        final int valueIndex = index * axisCount + axisIndex;
         final double value = points[valueIndex];
         return value;
       }
@@ -518,10 +518,10 @@ public class LineSegment extends AbstractCoordinatesList implements
 
   @Override
   public void setValue(final int index, final int axisIndex, final double value) {
-    final int numAxis = getNumAxis();
-    if (axisIndex >= 0 && axisIndex < numAxis) {
+    final int axisCount = getAxisCount();
+    if (axisIndex >= 0 && axisIndex < axisCount) {
       if (index >= 0 && index < 2) {
-        final int valueIndex = index * numAxis + axisIndex;
+        final int valueIndex = index * axisCount + axisIndex;
         points[valueIndex] = value;
       }
     }

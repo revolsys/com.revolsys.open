@@ -46,16 +46,16 @@ public class PackedCoordinateUtil {
       final boolean hasZ = (dimensionFlag & 0x01) == 0x01;
       final boolean hasM = (dimensionFlag & 0x02) == 0x02;
 
-      int numAxis;
+      int axisCount;
       if (hasM) {
-        numAxis = 4;
+        axisCount = 4;
       } else if (hasZ) {
-        numAxis = 3;
+        axisCount = 3;
       } else {
-        numAxis = 2;
+        axisCount = 2;
       }
       final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-        numAxis);
+        axisCount);
 
       double x = xOffset;
       double y = yOffset;
@@ -97,16 +97,16 @@ public class PackedCoordinateUtil {
       final boolean hasZ = (dimensionFlag & 0x01) == 0x01;
       final boolean hasM = (dimensionFlag & 0x02) == 0x02;
 
-      int numAxis;
+      int axisCount;
       if (hasM) {
-        numAxis = 4;
+        axisCount = 4;
       } else if (hasZ) {
-        numAxis = 3;
+        axisCount = 3;
       } else {
-        numAxis = 2;
+        axisCount = 2;
       }
       final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-        numAxis);
+        axisCount);
 
       double x = xOffset;
       double y = yOffset;
@@ -244,18 +244,18 @@ public class PackedCoordinateUtil {
       final boolean hasZ = (dimensionFlag & 0x01) == 0x01;
       final boolean hasM = (dimensionFlag & 0x02) == 0x02;
 
-      int numAxis;
+      int axisCount;
       if (hasM) {
-        numAxis = 4;
+        axisCount = 4;
       } else if (hasZ) {
-        numAxis = 3;
+        axisCount = 3;
       } else {
-        numAxis = 2;
+        axisCount = 2;
       }
 
       List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
       final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-        numAxis);
+        axisCount);
 
       double x = xOffset;
       double y = yOffset;
@@ -423,16 +423,16 @@ public class PackedCoordinateUtil {
       final boolean hasZ = (dimensionFlag & 0x01) == 0x01;
       final boolean hasM = (dimensionFlag & 0x02) == 0x02;
 
-      int numAxis;
+      int axisCount;
       if (hasM) {
-        numAxis = 4;
+        axisCount = 4;
       } else if (hasZ) {
-        numAxis = 3;
+        axisCount = 3;
       } else {
-        numAxis = 2;
+        axisCount = 2;
       }
       final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-        numAxis);
+        axisCount);
 
       double x = xOffset;
       double y = yOffset;
@@ -580,7 +580,7 @@ public class PackedCoordinateUtil {
         previous = writeOrdinate(out, previous, scale, 0);
       }
       for (final CoordinatesList points : part) {
-        if (points.getNumAxis() > axisIndex) {
+        if (points.getAxisCount() > axisIndex) {
           previous = writeCoordinates(out, points, previous, scale, axisIndex);
         } else {
           previous = writeZeroCoordinates(out, points.size(), scale, previous);

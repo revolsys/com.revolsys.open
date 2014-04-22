@@ -297,7 +297,7 @@ public class Distance3DOp {
   private void computeMinDistanceMultiMulti(final Geometry g0,
     final Geometry g1, final boolean flip) {
     if (g0 instanceof GeometryCollection) {
-      final int n = g0.getNumGeometries();
+      final int n = g0.getGeometryCount();
       for (int i = 0; i < n; i++) {
         final Geometry g = g0.getGeometry(i);
         computeMinDistanceMultiMulti(g, g1, flip);
@@ -323,7 +323,7 @@ public class Distance3DOp {
   private void computeMinDistanceOneMulti(final Geometry g0, final Geometry g1,
     final boolean flip) {
     if (g1 instanceof GeometryCollection) {
-      final int n = g1.getNumGeometries();
+      final int n = g1.getGeometryCount();
       for (int i = 0; i < n; i++) {
         final Geometry g = g1.getGeometry(i);
         computeMinDistanceOneMulti(g0, g, flip);
@@ -339,7 +339,7 @@ public class Distance3DOp {
   private void computeMinDistanceOneMulti(final PlanarPolygon3D poly,
     final Geometry geom, final boolean flip) {
     if (geom instanceof GeometryCollection) {
-      final int n = geom.getNumGeometries();
+      final int n = geom.getGeometryCount();
       for (int i = 0; i < n; i++) {
         final Geometry g = geom.getGeometry(i);
         computeMinDistanceOneMulti(poly, g, flip);

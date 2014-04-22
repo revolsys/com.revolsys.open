@@ -17,7 +17,7 @@ public abstract class ComponentStyle
 
     if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
+      for (int i = 0; i < gc.getGeometryCount(); i++) {
         paint(gc.getGeometry(i), viewport, g);
       }
       return;

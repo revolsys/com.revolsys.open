@@ -690,7 +690,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (geometryFactory.getNumAxis() != 3) {
+    if (geometryFactory.getAxisCount() != 3) {
       final int srid = geometryFactory.getSrid();
       final double scaleXY = geometryFactory.getScaleXY();
       this.geometryFactory = GeometryFactory.getFactory(srid, 3, scaleXY, 1);

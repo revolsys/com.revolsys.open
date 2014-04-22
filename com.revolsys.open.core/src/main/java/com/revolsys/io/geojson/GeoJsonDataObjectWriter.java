@@ -180,7 +180,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.endAttribute();
     out.label(GEOMETRIES);
     out.startList();
-    final int numGeometries = geometryCollection.getNumGeometries();
+    final int numGeometries = geometryCollection.getGeometryCount();
     if (numGeometries > 0) {
       geometry(geometryCollection.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
@@ -218,7 +218,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.label(COORDINATES);
     out.startList();
     out.indent();
-    final int numGeometries = multiLineString.getNumGeometries();
+    final int numGeometries = multiLineString.getGeometryCount();
     if (numGeometries > 0) {
       coordinates((LineString)multiLineString.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
@@ -238,7 +238,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.label(COORDINATES);
     out.startList();
     out.indent();
-    final int numGeometries = multiPoint.getNumGeometries();
+    final int numGeometries = multiPoint.getGeometryCount();
     if (numGeometries > 0) {
       coordinates((Point)multiPoint.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
@@ -262,7 +262,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     out.label(COORDINATES);
     out.startList();
     out.indent();
-    final int numGeometries = multiPolygon.getNumGeometries();
+    final int numGeometries = multiPolygon.getGeometryCount();
     if (numGeometries > 0) {
       coordinates((Polygon)multiPolygon.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {

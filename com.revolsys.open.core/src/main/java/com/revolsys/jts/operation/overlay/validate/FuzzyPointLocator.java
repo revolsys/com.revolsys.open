@@ -106,7 +106,7 @@ public class FuzzyPointLocator {
   }
 
   private boolean isWithinToleranceOfBoundary(final Coordinates pt) {
-    for (int i = 0; i < linework.getNumGeometries(); i++) {
+    for (int i = 0; i < linework.getGeometryCount(); i++) {
       final LineString line = (LineString)linework.getGeometry(i);
       final CoordinatesList seq = line.getCoordinatesList();
       for (int j = 0; j < seq.size() - 1; j++) {

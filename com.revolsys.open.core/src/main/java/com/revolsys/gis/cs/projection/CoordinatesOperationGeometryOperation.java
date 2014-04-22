@@ -50,7 +50,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
     } else {
       final int size = coordinates.size();
       final CoordinatesList newCoordinates = new DoubleCoordinatesList(size,
-        geometryFactory.getNumAxis());
+        geometryFactory.getAxisCount());
       final CoordinatesListCoordinates sourceCoordinates = new CoordinatesListCoordinates(
         coordinates);
       final CoordinatesListCoordinates targetCoordinates = new CoordinatesListCoordinates(
@@ -68,8 +68,8 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
 
   public GeometryCollection perform(final GeometryCollection geometryCollection) {
     if (geometryCollection != null) {
-      final Geometry[] newGeometries = new Geometry[geometryCollection.getNumGeometries()];
-      for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
+      final Geometry[] newGeometries = new Geometry[geometryCollection.getGeometryCount()];
+      for (int i = 0; i < geometryCollection.getGeometryCount(); i++) {
         final Geometry geometry = geometryCollection.getGeometry(i);
         final Geometry newGeometry = perform(geometry);
         addUserData(geometry, newGeometry);
@@ -107,8 +107,8 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
 
   public MultiLineString perform(final MultiLineString multiLineString) {
     if (multiLineString != null) {
-      final LineString[] newLineStrings = new LineString[multiLineString.getNumGeometries()];
-      for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
+      final LineString[] newLineStrings = new LineString[multiLineString.getGeometryCount()];
+      for (int i = 0; i < multiLineString.getGeometryCount(); i++) {
         final LineString line = (LineString)multiLineString.getGeometry(i);
         final LineString newLineString = perform(line);
         addUserData(line, newLineString);
@@ -124,8 +124,8 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
 
   public Geometry perform(final MultiPoint multiPoint) {
     if (multiPoint != null) {
-      final Point[] newPoints = new Point[multiPoint.getNumGeometries()];
-      for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
+      final Point[] newPoints = new Point[multiPoint.getGeometryCount()];
+      for (int i = 0; i < multiPoint.getGeometryCount(); i++) {
         final Point point = (Point)multiPoint.getGeometry(i);
         final Point newPoint = perform(point);
         addUserData(point, newPoint);
@@ -141,8 +141,8 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
 
   public MultiPolygon perform(final MultiPolygon multiPolygon) {
     if (multiPolygon != null) {
-      final Polygon[] newPolygons = new Polygon[multiPolygon.getNumGeometries()];
-      for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+      final Polygon[] newPolygons = new Polygon[multiPolygon.getGeometryCount()];
+      for (int i = 0; i < multiPolygon.getGeometryCount(); i++) {
         final Polygon polygon = (Polygon)multiPolygon.getGeometry(i);
         final Polygon newPolygon = perform(polygon);
         addUserData(polygon, newPolygon);
@@ -162,15 +162,15 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
       if (point.isEmpty()) {
         newPoint = geometryFactory.point();
       } else {
-        final int numAxis = point.getNumAxis();
-        final double[] sourceCoordinates = new double[numAxis];
-        final double[] targetCoordinates = new double[numAxis];
-        for (int i = 0; i < numAxis; i++) {
+        final int axisCount = point.getAxisCount();
+        final double[] sourceCoordinates = new double[axisCount];
+        final double[] targetCoordinates = new double[axisCount];
+        for (int i = 0; i < axisCount; i++) {
           final double value = point.getValue(i);
           sourceCoordinates[i] = value;
           targetCoordinates[i] = value;
         }
-        operation.perform(numAxis, sourceCoordinates, numAxis,
+        operation.perform(axisCount, sourceCoordinates, axisCount,
           targetCoordinates);
         newPoint = geometryFactory.point(targetCoordinates);
       }

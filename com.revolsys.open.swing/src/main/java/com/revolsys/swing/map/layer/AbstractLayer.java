@@ -199,11 +199,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       if (coordinateSystem == null) {
         coordinateSystemPanel.add(new JLabel("Unknown"));
       } else {
-        final int numAxis = geometryFactory.getNumAxis();
+        final int axisCount = geometryFactory.getAxisCount();
         SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "ID",
           coordinateSystem.getId(), 10);
-        SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "numAxis",
-          numAxis, 10);
+        SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "axisCount",
+          axisCount, 10);
 
         final double scaleXY = geometryFactory.getScaleXY();
         if (scaleXY > 0) {
@@ -214,7 +214,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
             "Floating", 10);
         }
 
-        if (numAxis > 2) {
+        if (axisCount > 2) {
           final double scaleZ = geometryFactory.getScaleZ();
           if (scaleZ > 0) {
             SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleZ",

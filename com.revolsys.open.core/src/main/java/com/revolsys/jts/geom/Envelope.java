@@ -356,10 +356,10 @@ public class Envelope implements Serializable, BoundingBox {
       throw new IllegalArgumentException(
         "A bounding box must have a geometry factory");
     } else if (boundingBox.getGeometryFactory() == null) {
-      expandToInclude(boundingBox);
+      expandToInclude((Envelope)boundingBox);
     } else if (boundingBox.getGeometryFactory().equals(geometryFactory)) {
       this.geometryFactory = boundingBox.getGeometryFactory();
-      expandToInclude(boundingBox);
+      expandToInclude((Envelope)boundingBox);
     } else {
       final Polygon polygon = boundingBox.toPolygon();
       final GeometryOperation operation = ProjectionFactory.getGeometryOperation(
@@ -367,9 +367,9 @@ public class Envelope implements Serializable, BoundingBox {
       if (operation != null) {
         final Polygon projectedPolygon = operation.perform(polygon);
         final BoundingBox envelope = projectedPolygon.getBoundingBox();
-        expandToInclude(envelope);
+        expandToInclude((Envelope)envelope);
       } else {
-        expandToInclude(boundingBox);
+        expandToInclude((Envelope)boundingBox);
       }
     }
   }
@@ -405,8 +405,10 @@ public class Envelope implements Serializable, BoundingBox {
     } else if (point2 == null) {
       this.bounds = EnvelopeUtil.createBounds(geometryFactory, point1);
     } else {
-      final int numAxis = Math.max(point1.getNumAxis(), point2.getNumAxis());
-      this.bounds = EnvelopeUtil.createBounds(geometryFactory, numAxis, point1);
+      final int axisCount = Math.max(point1.getAxisCount(),
+        point2.getAxisCount());
+      this.bounds = EnvelopeUtil.createBounds(geometryFactory, axisCount,
+        point1);
       EnvelopeUtil.expand(geometryFactory, bounds, point2);
     }
 
@@ -854,9 +856,9 @@ public class Envelope implements Serializable, BoundingBox {
   public void expandBy(final double deltaX, final double deltaY) {
     if (!isNull()) {
       this.bounds[0] -= deltaX;
-      this.bounds[getNumAxis()] += deltaX;
+      this.bounds[getAxisCount()] += deltaX;
       this.bounds[1] -= deltaY;
-      this.bounds[getNumAxis() + 1] += deltaY;
+      this.bounds[getAxisCount() + 1] += deltaY;
 
     }
 
@@ -953,8 +955,8 @@ public class Envelope implements Serializable, BoundingBox {
       if (isNull()) {
         this.bounds = other.getBounds();
       } else {
-        for (int axisIndex = 0; axisIndex < Math.min(other.getNumAxis(),
-          getNumAxis()); axisIndex++) {
+        for (int axisIndex = 0; axisIndex < Math.min(other.getAxisCount(),
+          getAxisCount()); axisIndex++) {
           final double min = other.getMin(axisIndex);
           final GeometryFactory geometryFactory = getGeometryFactory();
           EnvelopeUtil.expand(geometryFactory, bounds, axisIndex, min);
@@ -1003,6 +1005,14 @@ public class Envelope implements Serializable, BoundingBox {
     final double height = getHeight();
     final double aspectRatio = width / height;
     return aspectRatio;
+  }
+
+  public int getAxisCount() {
+    if (bounds == null) {
+      return 0;
+    } else {
+      return bounds.length / 2;
+    }
   }
 
   public Point getBottomLeftPoint() {
@@ -1136,6 +1146,7 @@ public class Envelope implements Serializable, BoundingBox {
     }
   }
 
+  @Override
   public double getMax(final int axisIndex) {
     if (bounds == null) {
       return Double.NaN;
@@ -1197,6 +1208,7 @@ public class Envelope implements Serializable, BoundingBox {
     return getMax(2);
   }
 
+  @Override
   public double getMin(final int axisIndex) {
     if (bounds == null) {
       return Double.NaN;
@@ -1262,14 +1274,6 @@ public class Envelope implements Serializable, BoundingBox {
   public LineSegment getNorthLine() {
     return new LineSegment(getGeometryFactory(), getMinX(), getMaxY(),
       getMaxX(), getMaxY());
-  }
-
-  public int getNumAxis() {
-    if (bounds == null) {
-      return 0;
-    } else {
-      return bounds.length / 2;
-    }
   }
 
   @Override

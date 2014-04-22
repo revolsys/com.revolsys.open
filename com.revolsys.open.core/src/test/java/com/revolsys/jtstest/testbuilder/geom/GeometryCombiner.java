@@ -23,7 +23,7 @@ public class GeometryCombiner {
       return elem;
     }
 
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry elemGeom = geom.getGeometry(i);
       if (skipEmpty && elemGeom.isEmpty()) {
         continue;
@@ -36,7 +36,7 @@ public class GeometryCombiner {
   private static Polygon findPolygonContaining(final Geometry geom,
     final Coordinates pt) {
     final PointLocator locator = new PointLocator();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Polygon poly = (Polygon)geom.getGeometry(i);
       final Location loc = locator.locate(pt, poly);
       if (loc == Location.INTERIOR) {

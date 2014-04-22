@@ -28,15 +28,15 @@ import com.revolsys.jts.geom.LineString;
 public class LineEqualExactFilter implements Filter<LineString> {
   private final CoordinatesList points;
 
-  int numAxis = -1;
+  int axisCount = -1;
 
   public LineEqualExactFilter(final LineString line) {
     this.points = CoordinatesListUtil.get(line);
   }
 
-  public LineEqualExactFilter(final LineString line, final int numAxis) {
+  public LineEqualExactFilter(final LineString line, final int axisCount) {
     this.points = CoordinatesListUtil.get(line);
-    this.numAxis = numAxis;
+    this.axisCount = axisCount;
   }
 
   @Override
@@ -44,8 +44,8 @@ public class LineEqualExactFilter implements Filter<LineString> {
     final CoordinatesList points = CoordinatesListUtil.get(line);
 
     final boolean equal;
-    if (numAxis >= 2) {
-      equal = this.points.equals(points, numAxis);
+    if (axisCount >= 2) {
+      equal = this.points.equals(points, axisCount);
     } else {
       equal = this.points.equals(points);
     }

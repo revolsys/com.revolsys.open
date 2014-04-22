@@ -5,7 +5,6 @@ import java.util.List;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.testold.TestFiles;
 
 public class FileUnionPerfTest {
@@ -15,8 +14,6 @@ public class FileUnionPerfTest {
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
-
-  static WKTWriter wktWriter = new WKTWriter();
 
   public static void main(final String[] args) {
     final FileUnionPerfTest test = new FileUnionPerfTest();

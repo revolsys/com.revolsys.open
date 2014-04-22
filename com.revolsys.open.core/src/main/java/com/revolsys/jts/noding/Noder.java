@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -44,8 +43,7 @@ import java.util.Collection;
  *
  * @version 1.7
  */
-public interface Noder
-{
+public interface Noder {
 
   /**
    * Computes the noding for a collection of {@link SegmentString}s.
@@ -62,6 +60,6 @@ public interface Noder
    *
    * @return a Collection of SegmentStrings
    */
-  Collection getNodedSubstrings();
+  Collection<SegmentString> getNodedSubstrings();
 
 }

@@ -41,7 +41,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.util.DateUtil;
 
 public class GpxIterator implements DataObjectIterator {
-  private static final DateTimeFormatter XML_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeNoMillis();
+  private static final DateTimeFormatter XML_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeParser();
 
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
@@ -276,7 +276,7 @@ public class GpxIterator implements DataObjectIterator {
     dataObject.setValue("index", index);
     dataObject.setValue("feature_type", "rte");
     final List<DataObject> pointObjects = new ArrayList<DataObject>();
-    int numAxis = 2;
+    int axisCount = 2;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
         StaxUtils.skipSubTree(in);
@@ -286,18 +286,18 @@ public class GpxIterator implements DataObjectIterator {
         pointObjects.add(pointObject);
         final Point point = pointObject.getGeometryValue();
         final Coordinates coordinates = CoordinatesUtil.getInstance(point);
-        numAxis = Math.max(numAxis, coordinates.getNumAxis());
+        axisCount = Math.max(axisCount, coordinates.getAxisCount());
       } else {
         parseAttribute(dataObject);
       }
     }
     final CoordinatesList points = new DoubleCoordinatesList(
-      pointObjects.size(), numAxis);
+      pointObjects.size(), axisCount);
     for (int i = 0; i < points.size(); i++) {
       final DataObject pointObject = pointObjects.get(i);
       final Point point = pointObject.getGeometryValue();
       final Coordinates coordinates = CoordinatesUtil.getInstance(point);
-      for (int j = 0; j < numAxis; j++) {
+      for (int j = 0; j < axisCount; j++) {
         final double value = coordinates.getValue(j);
         points.setValue(i, j, value);
       }
@@ -356,7 +356,7 @@ public class GpxIterator implements DataObjectIterator {
     final double lat = Double.parseDouble(latText);
     points.setY(index, lat);
 
-    int numAxis = 2;
+    int axisCount = 2;
 
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (in.getName().equals(GpxConstants.EXTENSION_ELEMENT)
@@ -367,16 +367,16 @@ public class GpxIterator implements DataObjectIterator {
           final String elevationText = StaxUtils.getElementText(in);
           final double elevation = Double.parseDouble(elevationText);
           points.setZ(index, elevation);
-          if (numAxis < 3) {
-            numAxis = 3;
+          if (axisCount < 3) {
+            axisCount = 3;
           }
         } else if (in.getName().equals(GpxConstants.TIME_ELEMENT)) {
           final String dateText = StaxUtils.getElementText(in);
           final DateTime date = XML_DATE_TIME_FORMAT.parseDateTime(dateText);
           final long time = date.getMillis();
           points.setTime(index, time);
-          if (numAxis < 4) {
-            numAxis = 4;
+          if (axisCount < 4) {
+            axisCount = 4;
           }
         } else {
           // TODO decide if we want to handle the metadata on a track point
@@ -385,17 +385,17 @@ public class GpxIterator implements DataObjectIterator {
       }
     }
 
-    return numAxis;
+    return axisCount;
   }
 
   private CoordinatesList parseTrackSegment() throws XMLStreamException {
     final CoordinatesList points = new DoubleListCoordinatesList(4);
-    int numAxis = 2;
+    int axisCount = 2;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      final int pointNumAxis = parseTrackPoint(points);
-      numAxis = Math.max(numAxis, pointNumAxis);
+      final int pointAxisCount = parseTrackPoint(points);
+      axisCount = Math.max(axisCount, pointAxisCount);
     }
-    return new DoubleCoordinatesList(numAxis, points);
+    return new DoubleCoordinatesList(axisCount, points);
   }
 
   private DataObject parseWaypoint() throws XMLStreamException {

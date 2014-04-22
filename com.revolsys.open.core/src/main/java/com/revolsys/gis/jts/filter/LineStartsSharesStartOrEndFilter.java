@@ -39,10 +39,10 @@ public class LineStartsSharesStartOrEndFilter implements Filter<LineString> {
   public boolean accept(final LineString line) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
 
-    if (this.points.startsWith(points, this.points.getNumAxis())) {
+    if (this.points.startsWith(points, this.points.getAxisCount())) {
       return true;
     } else if (this.reversePoints.startsWith(points.reverse(),
-      this.points.getNumAxis())) {
+      this.points.getAxisCount())) {
       return true;
     } else {
       return false;

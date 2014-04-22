@@ -185,7 +185,7 @@ public class LinearLocation implements Comparable {
    * @param linear a linear geometry
    */
   public void clamp(final Geometry linear) {
-    if (componentIndex >= linear.getNumGeometries()) {
+    if (componentIndex >= linear.getGeometryCount()) {
       setToEnd(linear);
       return;
     }
@@ -409,7 +409,7 @@ public class LinearLocation implements Comparable {
    * @return true if this location is valid
    */
   public boolean isValid(final Geometry linearGeom) {
-    if (componentIndex < 0 || componentIndex >= linearGeom.getNumGeometries()) {
+    if (componentIndex < 0 || componentIndex >= linearGeom.getGeometryCount()) {
       return false;
     }
 
@@ -473,7 +473,7 @@ public class LinearLocation implements Comparable {
    * @param linear the linear geometry to use to set the end
    */
   public void setToEnd(final Geometry linear) {
-    componentIndex = linear.getNumGeometries() - 1;
+    componentIndex = linear.getGeometryCount() - 1;
     final LineString lastLine = (LineString)linear.getGeometry(componentIndex);
     segmentIndex = lastLine.getVertexCount() - 1;
     segmentFraction = 1.0;

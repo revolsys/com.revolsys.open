@@ -33,11 +33,18 @@
 package com.revolsys.jtstest.testrunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.springframework.util.StringUtils;
+
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.geomop.GeometryOperation;
 
@@ -46,7 +53,7 @@ import com.revolsys.jtstest.geomop.GeometryOperation;
  *
  * @version 1.7
  */
-public class Test implements Runnable {
+public class Test implements Runnable, MapSerializer {
   private final String description;
 
   private final String operation;
@@ -57,13 +64,13 @@ public class Test implements Runnable {
 
   private final String geometryIndex;
 
-  private final ArrayList arguments;
+  private List<String> arguments = new ArrayList<String>();
 
   private final TestCase testCase;
 
   private boolean passed;
 
-  private final double tolerance;
+  private double tolerance;
 
   // cache for actual computed result
   private Geometry targetGeometry;
@@ -76,21 +83,32 @@ public class Test implements Runnable {
 
   private Exception exception = null;
 
+  @SuppressWarnings("unchecked")
+  public Test(final TestCase testCase, final int testIndex,
+    final Map<String, Object> map) {
+    this.testCase = testCase;
+    this.testIndex = testIndex;
+    this.description = (String)map.get("description");
+    this.operation = (String)map.get("operation");
+    this.geometryIndex = (String)map.get("geometryIndex");
+    this.arguments = (List<String>)map.get("arguments");
+  }
+
   /**
    *  Creates a Test with the given description. The given operation (e.g.
    *  "equals") will be performed, the expected result of which is <tt>expectedResult</tt>.
    */
   public Test(final TestCase testCase, final int testIndex,
     final String description, final String operation,
-    final String geometryIndex, final List arguments,
+    final String geometryIndex, final List<String> arguments,
     final Result expectedResult, final double tolerance) {
     this.tolerance = tolerance;
-    this.description = description;
+    this.description = StringUtils.trimWhitespace(description);
     this.operation = operation;
     this.expectedResult = expectedResult;
     this.testIndex = testIndex;
     this.geometryIndex = geometryIndex;
-    this.arguments = new ArrayList(arguments);
+    this.arguments = new ArrayList<>(arguments);
     this.testCase = testCase;
   }
 
@@ -150,7 +168,7 @@ public class Test implements Runnable {
   }
 
   public String getArgument(final int i) {
-    return (String)arguments.get(i);
+    return arguments.get(i);
   }
 
   public int getArgumentCount() {
@@ -230,6 +248,41 @@ public class Test implements Runnable {
     this.expectedResult = result;
   }
 
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    map.put("type", "test");
+    MapSerializerUtil.add(map, "description", description);
+
+    map.put("propertyName", geometryIndex.toLowerCase());
+    map.put("methodName", operation);
+    final List<Object> arguments = new ArrayList<>();
+
+    for (int i = 0; i < this.arguments.size(); i++) {
+      final Object argument = this.arguments.get(i);
+      if (argument instanceof String) {
+        final String string = (String)argument;
+        if ("a".equalsIgnoreCase(string)) {
+          arguments.add(Collections.singletonMap("reference", "a"));
+        } else if ("b".equalsIgnoreCase(string)) {
+          arguments.add(Collections.singletonMap("reference", "b"));
+        } else {
+          arguments.add(argument);
+        }
+
+      } else {
+        arguments.add(argument);
+      }
+    }
+    MapSerializerUtil.add(map, "arguments", arguments, Collections.emptyList());
+    return map;
+  }
+
+  @Override
+  public String toString() {
+    return toMap().toString();
+  }
+
   public String toXml() {
     String xml = "";
     xml += "<test>" + StringUtil.newLine;
@@ -254,5 +307,4 @@ public class Test implements Runnable {
     xml += "</test>" + StringUtil.newLine;
     return xml;
   }
-
 }

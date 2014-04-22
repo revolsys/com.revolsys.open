@@ -93,7 +93,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void write(final CoordinatesList coordinateSequence) {
     startTag(Kml22Constants.COORDINATES);
-    final boolean hasZ = coordinateSequence.getNumAxis() > 2;
+    final boolean hasZ = coordinateSequence.getAxisCount() > 2;
     for (int i = 0; i < coordinateSequence.size(); i++) {
       write(String.valueOf(coordinateSequence.getX(i)));
       write(',');
@@ -113,7 +113,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
   public void writeCoordinates(final Coordinates point) {
     startTag(Kml22Constants.COORDINATES);
     if (point != null) {
-      final boolean hasZ = point.getNumAxis() > 2;
+      final boolean hasZ = point.getAxisCount() > 2;
       write(String.valueOf(point.getX()));
       write(',');
       write(String.valueOf(point.getY()));
@@ -166,7 +166,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writeGeometry(final Geometry geometry) {
     if (geometry != null) {
-      final int numGeometries = geometry.getNumGeometries();
+      final int numGeometries = geometry.getGeometryCount();
       if (numGeometries > 1) {
         startTag(Kml22Constants.MULTI_GEOMETRY);
         for (int i = 0; i < numGeometries; i++) {
@@ -223,7 +223,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writeMultiGeometry(final GeometryCollection collection) {
     startTag(Kml22Constants.MULTI_GEOMETRY);
-    for (int i = 0; i < collection.getNumGeometries(); i++) {
+    for (int i = 0; i < collection.getGeometryCount(); i++) {
       final Geometry geometry = collection.getGeometry(i);
       writeGeometry(geometry);
     }

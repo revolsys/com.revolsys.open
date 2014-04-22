@@ -273,10 +273,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
       StaxUtils.skipSubTree(in);
       return null;
     } else {
-      final int numAxis = Integer.parseInt(dimension);
+      final int axisCount = Integer.parseInt(dimension);
       final String value = in.getElementText();
       final CoordinatesList points = CoordinatesListUtil.parse(value, "\\s+",
-        numAxis);
+        axisCount);
       StaxUtils.skipToEndElement(in);
       return points;
     }

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -44,7 +45,6 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.geom.util.PolygonExtracter;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.operation.distance.DistanceOp;
 
 /**
@@ -203,7 +203,7 @@ public class BufferDistanceValidator
   		errorIndicator = g1.getGeometryFactory().lineString(pts);
   		errMsg = "Distance between buffer curve and input is too small "
   			+ "(" + minDistanceFound
-  			+ " at " + WKTWriter.toLineString(pts[0], pts[1]) +" )";
+  			+ " at " + WktWriter.lineString(pts[0], pts[1]) +" )";
   	}
   }
   
@@ -234,7 +234,7 @@ public class BufferDistanceValidator
       errorIndicator = input.getGeometryFactory().lineString(pts);
       errMsg = "Distance between buffer curve and input is too large "
         + "(" + maxDistanceFound
-        + " at " + WKTWriter.toLineString(pts[0], pts[1]) +")";
+        + " at " + WktWriter.lineString(pts[0], pts[1]) +")";
     }
   }
   

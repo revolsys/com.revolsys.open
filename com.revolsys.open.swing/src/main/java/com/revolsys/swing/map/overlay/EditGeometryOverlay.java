@@ -784,8 +784,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           final double deltaX = endPoint.getX() - startPoint.getX();
           final double deltaY = endPoint.getY() - startPoint.getY();
           if (deltaX != 0 || deltaY != 0) {
-            final Geometry newGeometry = GeometryEditUtil.moveGeometry(
-              location.getGeometry(), deltaX, deltaY);
+            final Geometry newGeometry = (Geometry)location.getGeometry().move(deltaX, deltaY);
             final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
             addUndo(geometryEdit);
           }

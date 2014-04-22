@@ -8,7 +8,6 @@ import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.jtstest.testbuilder.JTSTestBuilder;
 import com.revolsys.jtstest.testbuilder.geom.AdjacentVertexFinder;
@@ -25,7 +24,6 @@ import com.revolsys.jtstest.testbuilder.geom.GeometryVertexMover;
  *
  */
 public class GeometryEditModel {
-  private static WKTWriter wktWriter = new WKTWriter();
 
   private static Coordinates[] getRing(final List<Coordinates> coordList) {
     List<Coordinates> closedPts = coordList;
@@ -42,7 +40,7 @@ public class GeometryEditModel {
   public static String getText(final Geometry geom, final int textType) {
     switch (textType) {
       case GeometryType.WELLKNOWNTEXT:
-        final String wkt = wktWriter.writeFormatted(geom);
+        final String wkt = geom.toWkt();
         return wkt;
     }
     Assert.shouldNeverReachHere();

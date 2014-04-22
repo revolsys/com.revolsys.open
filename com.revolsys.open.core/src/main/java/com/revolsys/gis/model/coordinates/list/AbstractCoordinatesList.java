@@ -19,11 +19,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
    */
   private static final long serialVersionUID = 9211011581013036939L;
 
-  public void append(final StringBuffer s, final int i, final int numAxis) {
+  public void append(final StringBuffer s, final int i, final int axisCount) {
     s.append(getX(i));
     s.append(' ');
     s.append(getY(i));
-    for (int j = 2; j < numAxis; j++) {
+    for (int j = 2; j < axisCount; j++) {
       final Double coordinate = getValue(i, j);
       s.append(' ');
       s.append(coordinate);
@@ -51,17 +51,17 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public void copy(final int sourceIndex, final CoordinatesList target,
-    final int targetIndex, final int numAxis, final int count) {
+    final int targetIndex, final int axisCount, final int count) {
     for (int i = 0; i < count; i++) {
-      for (int j = 0; j < numAxis; j++) {
+      for (int j = 0; j < axisCount; j++) {
         final double coordinate = getValue(sourceIndex + i, j);
         target.setValue(targetIndex + i, j, coordinate);
       }
     }
   }
 
-  public CoordinatesList create(final int length, final int numAxis) {
-    return new DoubleCoordinatesList(length, numAxis);
+  public CoordinatesList create(final int length, final int axisCount) {
+    return new DoubleCoordinatesList(length, axisCount);
   }
 
   @Override
@@ -93,20 +93,20 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public boolean equal(final int index, final Coordinates point) {
-    final int numAxis = Math.max(getNumAxis(), point.getNumAxis());
-    return equal(index, point, numAxis);
+    final int axisCount = Math.max(getAxisCount(), point.getAxisCount());
+    return equal(index, point, axisCount);
   }
 
   @Override
   public boolean equal(final int index, final Coordinates point,
-    final int numAxis) {
-    int maxAxis = Math.max(getNumAxis(), point.getNumAxis());
-    if (maxAxis > numAxis) {
-      maxAxis = numAxis;
+    final int axisCount) {
+    int maxAxis = Math.max(getAxisCount(), point.getAxisCount());
+    if (maxAxis > axisCount) {
+      maxAxis = axisCount;
     }
-    if (getNumAxis() < maxAxis) {
+    if (getAxisCount() < maxAxis) {
       return false;
-    } else if (point.getNumAxis() < maxAxis) {
+    } else if (point.getAxisCount() < maxAxis) {
       return false;
     } else if (index < size()) {
       for (int j = 0; j < maxAxis; j++) {
@@ -125,9 +125,9 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   @Override
   public boolean equal(final int index, final CoordinatesList other,
     final int otherIndex) {
-    final int numAxis = Math.max(getNumAxis(), other.getNumAxis());
+    final int axisCount = Math.max(getAxisCount(), other.getAxisCount());
     if (index < size() || otherIndex < other.size()) {
-      for (int j = 0; j < numAxis; j++) {
+      for (int j = 0; j < axisCount; j++) {
         final double value1 = getValue(index, j);
         final double value2 = other.getValue(otherIndex, j);
         if (Double.compare(value1, value2) != 0) {
@@ -142,10 +142,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public boolean equal(final int index, final CoordinatesList other,
-    final int otherIndex, int numAxis) {
-    numAxis = Math.min(numAxis, Math.max(getNumAxis(), other.getNumAxis()));
+    final int otherIndex, int axisCount) {
+    axisCount = Math.min(axisCount, Math.max(getAxisCount(), other.getAxisCount()));
     if (index < size() || otherIndex < other.size()) {
-      for (int j = 0; j < numAxis; j++) {
+      for (int j = 0; j < axisCount; j++) {
         final double value1 = getValue(index, j);
         final double value2 = other.getValue(otherIndex, j);
         if (Double.compare(value1, value2) != 0) {
@@ -165,10 +165,10 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public boolean equals(final CoordinatesList coordinatesList) {
-    if (getNumAxis() == coordinatesList.getNumAxis()) {
+    if (getAxisCount() == coordinatesList.getAxisCount()) {
       if (size() == coordinatesList.size()) {
         for (int i = 0; i < size(); i++) {
-          for (int j = 0; j < getNumAxis(); j++) {
+          for (int j = 0; j < getAxisCount(); j++) {
             final double value1 = getValue(i, j);
             final double value2 = coordinatesList.getValue(i, j);
             if (Double.compare(value1, value2) != 0) {
@@ -186,18 +186,18 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public boolean equals(final CoordinatesList points, final int numAxis) {
-    double maxAxis = Math.max(getNumAxis(), points.getNumAxis());
-    if (maxAxis > numAxis) {
-      maxAxis = numAxis;
+  public boolean equals(final CoordinatesList points, final int axisCount) {
+    double maxAxis = Math.max(getAxisCount(), points.getAxisCount());
+    if (maxAxis > axisCount) {
+      maxAxis = axisCount;
     }
-    if (getNumAxis() < maxAxis) {
+    if (getAxisCount() < maxAxis) {
       return false;
-    } else if (points.getNumAxis() < maxAxis) {
+    } else if (points.getAxisCount() < maxAxis) {
       return false;
     } else if (size() == points.size()) {
       for (int i = 0; i < size(); i++) {
-        for (int j = 0; j < numAxis; j++) {
+        for (int j = 0; j < axisCount; j++) {
           final double value1 = getValue(i, j);
           final double value2 = points.getValue(i, j);
           if (Double.compare(value1, value2) != 0) {
@@ -232,7 +232,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public Coordinates getCoordinate(final int i) {
-    final Coordinates coordinate = new DoubleCoordinates(getNumAxis());
+    final Coordinates coordinate = new DoubleCoordinates(getAxisCount());
     getCoordinate(i, coordinate);
     return coordinate;
   }
@@ -241,7 +241,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   public void getCoordinate(final int index, final Coordinates coord) {
     coord.setX(getX(index));
     coord.setY(getY(index));
-    if (getNumAxis() > 2) {
+    if (getAxisCount() > 2) {
       coord.setZ(getZ(index));
     }
   }
@@ -254,11 +254,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   @Override
   public double[] getCoordinates() {
     final int size = size();
-    final int numAxis = getNumAxis();
-    final double[] coordinates = new double[size * numAxis];
+    final int axisCount = getAxisCount();
+    final double[] coordinates = new double[size * axisCount];
     int k = 0;
     for (int i = 0; i < size; i++) {
-      for (int j = 0; j < numAxis; j++) {
+      for (int j = 0; j < axisCount; j++) {
         final double coordinate = getValue(i, j);
         coordinates[k] = coordinate;
         k++;
@@ -283,8 +283,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   @Deprecated
-  public int getNumAxis() {
-    return getNumAxis();
+  public int getAxisCount() {
+    return getAxisCount();
   }
 
   @Override
@@ -317,7 +317,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   public int hashCode() {
     int h = 0;
     for (int i = 0; i < size(); i++) {
-      for (int j = 0; j < getNumAxis(); j++) {
+      for (int j = 0; j < getAxisCount(); j++) {
         h = 31 * h + ((Double)getValue(i, j)).hashCode();
       }
     }
@@ -346,7 +346,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   public void setCoordinate(final int i, final Coordinates coordinate) {
     setValue(i, 0, coordinate.getX());
     setValue(i, 1, coordinate.getY());
-    if (getNumAxis() > 2) {
+    if (getAxisCount() > 2) {
       setValue(i, 2, coordinate.getZ());
     }
   }
@@ -360,7 +360,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   public void setPoint(final int i, final Coordinates point) {
     setX(i, point.getX());
     setY(i, point.getY());
-    if (getNumAxis() > 2) {
+    if (getAxisCount() > 2) {
       setZ(i, point.getZ());
     }
   }
@@ -393,11 +393,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public boolean startsWith(final CoordinatesList coordinatesList,
-    final int numAxis) {
+    final int axisCount) {
     if (size() > 1 && coordinatesList.size() > 1) {
-      if (getNumAxis() >= numAxis && coordinatesList.getNumAxis() >= numAxis) {
+      if (getAxisCount() >= axisCount && coordinatesList.getAxisCount() >= axisCount) {
         for (int i = 0; i < 2; i++) {
-          for (int j = 0; j < numAxis; j++) {
+          for (int j = 0; j < axisCount; j++) {
             final double value1 = getValue(i, j);
             final double value2 = coordinatesList.getValue(i, j);
             if (Double.compare(value1, value2) != 0) {
@@ -430,9 +430,9 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   @Override
   public CoordinatesList subList(final int length, final int sourceIndex,
     final int targetIndex, final int count) {
-    final int numAxis = getNumAxis();
-    final CoordinatesList target = create(length, numAxis);
-    copy(sourceIndex, target, targetIndex, numAxis, count);
+    final int axisCount = getAxisCount();
+    final CoordinatesList target = create(length, axisCount);
+    copy(sourceIndex, target, targetIndex, axisCount, count);
     return target;
   }
 
@@ -447,13 +447,13 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public String toString() {
-    final int numAxis = getNumAxis();
-    if (numAxis > 0 && size() > 0) {
+    final int axisCount = getAxisCount();
+    if (axisCount > 0 && size() > 0) {
       final StringBuffer s = new StringBuffer("LINESTRING(");
-      append(s, 0, numAxis);
+      append(s, 0, axisCount);
       for (int i = 1; i < size(); i++) {
         s.append(',');
-        append(s, i, numAxis);
+        append(s, i, axisCount);
       }
       s.append(')');
       return s.toString();

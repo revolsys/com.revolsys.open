@@ -40,7 +40,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 public abstract class StressTestHarness {
@@ -49,8 +48,6 @@ public abstract class StressTestHarness {
   private static final GeometryFactory fact = GeometryFactory.getFactory(0, 2);
 
   static WKTReader wktRdr = new WKTReader(fact);
-
-  static WKTWriter wktWriter = new WKTWriter();
 
   private int numTargetPts = 1000;
 

@@ -52,7 +52,7 @@ import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.vertex.PolygonVertexIterable;
+import com.revolsys.jts.geom.vertex.PolygonVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
@@ -401,6 +401,25 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   }
 
   @Override
+  public Vertex getVertex(final int... vertexId) {
+    if (vertexId == null || vertexId.length != 2) {
+      return null;
+    } else {
+      final int ringIndex = vertexId[0];
+      if (ringIndex >= 0) {
+        final LinearRing ring = getRing(ringIndex);
+        if (ring != null) {
+          final int vertexIndex = vertexId[1];
+          if (vertexIndex >= 0 && vertexIndex < ring.getVertexCount()) {
+            return new PolygonVertex(this, vertexId);
+          }
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
   public int getVertexCount() {
     int numPoints = 0;
     for (final LinearRing ring : rings()) {
@@ -472,6 +491,21 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   }
 
   @Override
+  public Polygon move(final double... deltas) {
+    if (deltas == null || isEmpty()) {
+      return this;
+    } else {
+      final List<LinearRing> rings = new ArrayList<>();
+      for (final LinearRing part : rings()) {
+        final LinearRing movedPart = part.move(deltas);
+        rings.add(movedPart);
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.polygon(rings);
+    }
+  }
+
+  @Override
   public Polygon normalize() {
     if (isEmpty()) {
       return this;
@@ -534,6 +568,6 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
    */
   @Override
   public Iterable<Vertex> vertices() {
-    return new PolygonVertexIterable(this);
+    return new PolygonVertex(this, 0, -1);
   }
 }

@@ -47,7 +47,6 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * @version 1.7
@@ -105,10 +104,6 @@ public class BufferValidator {
   private static final int QUADRANT_SEGMENTS_2 = 50;
 
   private final String wkt;
-
-  private final GeometryFactory geomFact = GeometryFactory.getFactory();
-
-  private final WKTWriter wktWriter = new WKTWriter();
 
   private WKTReader wktReader;
 
@@ -199,7 +194,7 @@ public class BufferValidator {
           return ((Polygon)buffer).getNumInteriorRing() > 0;
         }
         final MultiPolygon multiPolygon = (MultiPolygon)buffer;
-        for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+        for (int i = 0; i < multiPolygon.getGeometryCount(); i++) {
           if (hasHoles(multiPolygon.getGeometry(i))) {
             return true;
           }
@@ -256,11 +251,9 @@ public class BufferValidator {
 
   private String supplement(final String message) throws ParseException {
     String newMessage = "\n" + message + "\n";
-    newMessage += "Original: " + this.wktWriter.writeFormatted(getOriginal())
-      + "\n";
+    newMessage += "Original: " + getOriginal() + "\n";
     newMessage += "Buffer Distance: " + this.bufferDistance + "\n";
-    newMessage += "Buffer: " + this.wktWriter.writeFormatted(getBuffer())
-      + "\n";
+    newMessage += "Buffer: " + getBuffer() + "\n";
     return newMessage.substring(0, newMessage.length() - 1);
   }
 

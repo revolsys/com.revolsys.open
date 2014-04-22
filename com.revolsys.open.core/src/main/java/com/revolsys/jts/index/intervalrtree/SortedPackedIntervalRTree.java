@@ -36,10 +36,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.index.ItemVisitor;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * A static index on a set of 1-dimensional intervals,
@@ -141,7 +141,7 @@ public class SortedPackedIntervalRTree
 	
   private void printNode(IntervalRTreeNode node)
   {
-    System.out.println(WKTWriter.toLineString(new Coordinate((double)node.min, level, Coordinates.NULL_ORDINATE), new Coordinate((double)node.max, level, Coordinates.NULL_ORDINATE)));
+    System.out.println(WktWriter.lineString(new Coordinate((double)node.min, level, Coordinates.NULL_ORDINATE), new Coordinate((double)node.max, level, Coordinates.NULL_ORDINATE)));
   }
   
   /**

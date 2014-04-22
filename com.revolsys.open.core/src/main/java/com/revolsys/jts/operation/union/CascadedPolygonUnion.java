@@ -213,7 +213,7 @@ public class CascadedPolygonUnion {
   private Geometry extractByEnvelope(final BoundingBox env,
     final Geometry geom, final List disjointGeoms) {
     final List intersectingGeoms = new ArrayList();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry elem = geom.getGeometry(i);
       if (elem.getBoundingBox().intersects(env)) {
         intersectingGeoms.add(elem);
@@ -334,7 +334,7 @@ public class CascadedPolygonUnion {
     // */
     // System.out.println(g0.getNumGeometries() + ", " + g1.getNumGeometries());
 
-    if (g0.getNumGeometries() <= 1 && g1.getNumGeometries() <= 1) {
+    if (g0.getGeometryCount() <= 1 && g1.getGeometryCount() <= 1) {
       return unionActual(g0, g1);
     }
 

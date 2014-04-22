@@ -92,13 +92,13 @@ public class PointLocator {
       updateLocationInfo(locate(p, (Polygon)geom));
     } else if (geom instanceof MultiLineString) {
       final MultiLineString ml = (MultiLineString)geom;
-      for (int i = 0; i < ml.getNumGeometries(); i++) {
+      for (int i = 0; i < ml.getGeometryCount(); i++) {
         final LineString l = (LineString)ml.getGeometry(i);
         updateLocationInfo(locate(p, l));
       }
     } else if (geom instanceof MultiPolygon) {
       final MultiPolygon mpoly = (MultiPolygon)geom;
-      for (int i = 0; i < mpoly.getNumGeometries(); i++) {
+      for (int i = 0; i < mpoly.getGeometryCount(); i++) {
         final Polygon poly = (Polygon)mpoly.getGeometry(i);
         updateLocationInfo(locate(p, poly));
       }

@@ -44,7 +44,7 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
   @Override
   public void inverse(final double x, final double y,
     final double[] targetCoordinates, final int targetOffset,
-    final int targetNumAxis) {
+    final int targetAxisCount) {
     final double dX = (x - x0) / multiple;
     final double dY = (y - y0) / multiple;
 
@@ -61,14 +61,14 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
       phi = phi1;
     } while (delta > 1.0e-011);
 
-    targetCoordinates[targetOffset * targetNumAxis] = lambda;
-    targetCoordinates[targetOffset * targetNumAxis + 1] = phi;
+    targetCoordinates[targetOffset * targetAxisCount] = lambda;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = phi;
   }
 
   @Override
   public void project(final double lambda, final double phi,
     final double[] targetCoordinates, final int targetOffset,
-    final int targetNumAxis) {
+    final int targetAxisCount) {
 
     final double x = (a * (lambda - lambda0)) * multiple;
 
@@ -77,8 +77,8 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
       * Math.pow((1 - eSinPhi) / (1 + eSinPhi), eOver2)))
       * multiple;
 
-    targetCoordinates[targetOffset * targetNumAxis] = x0 + x;
-    targetCoordinates[targetOffset * targetNumAxis + 1] = y0 + y;
+    targetCoordinates[targetOffset * targetAxisCount] = x0 + x;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = y0 + y;
   }
 
 }

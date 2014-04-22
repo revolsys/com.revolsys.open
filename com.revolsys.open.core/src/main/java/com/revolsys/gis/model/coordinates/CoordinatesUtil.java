@@ -18,9 +18,9 @@ import com.revolsys.util.Trig;
 public class CoordinatesUtil {
 
   public static Coordinates add(final Coordinates c1, final Coordinates c2) {
-    final int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
-    final Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());
+    final Coordinates newPoint = new DoubleCoordinates(axisCount);
+    for (int i = 0; i < axisCount; i++) {
       final double value1 = c1.getValue(i);
       final double value2 = c2.getValue(i);
       final double value = value1 + value2;
@@ -94,9 +94,9 @@ public class CoordinatesUtil {
   }
 
   public static Coordinates average(final Coordinates c1, final Coordinates c2) {
-    final int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
-    final Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());
+    final Coordinates newPoint = new DoubleCoordinates(axisCount);
+    for (int i = 0; i < axisCount; i++) {
       final double value1 = c1.getValue(i);
       final double value2 = c2.getValue(i);
       double value;
@@ -190,9 +190,9 @@ public class CoordinatesUtil {
   }
 
   public static Coordinates divide(final Coordinates c1, final double d) {
-    final int numAxis = c1.getNumAxis();
-    final Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = c1.getAxisCount();
+    final Coordinates newPoint = new DoubleCoordinates(axisCount);
+    for (int i = 0; i < axisCount; i++) {
       final double value1 = c1.getValue(i);
       final double value = value1 / d;
       newPoint.setValue(i, value);
@@ -264,7 +264,7 @@ public class CoordinatesUtil {
   }
 
   public static double[] getCoordinates(final Coordinates point) {
-    final double[] coordinates = new double[point.getNumAxis()];
+    final double[] coordinates = new double[point.getAxisCount()];
     for (int i = 0; i < coordinates.length; i++) {
       coordinates[i] = point.getValue(i);
     }
@@ -287,12 +287,12 @@ public class CoordinatesUtil {
     }
   }
 
-  public static int getNumAxis(final Coordinates... points) {
-    int numAxis = 2;
+  public static int getAxisCount(final Coordinates... points) {
+    int axisCount = 2;
     for (final Coordinates point : points) {
-      numAxis = Math.max(numAxis, point.getNumAxis());
+      axisCount = Math.max(axisCount, point.getAxisCount());
     }
-    return numAxis;
+    return axisCount;
   }
 
   public static double getX(final Coordinates point) {
@@ -338,9 +338,9 @@ public class CoordinatesUtil {
   }
 
   public static Coordinates multiply(final double d, final Coordinates c1) {
-    final int numAxis = c1.getNumAxis();
-    final Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = c1.getAxisCount();
+    final Coordinates newPoint = new DoubleCoordinates(axisCount);
+    for (int i = 0; i < axisCount; i++) {
       final double value1 = c1.getValue(i);
       final double value = value1 * d;
       newPoint.setValue(i, value);
@@ -458,13 +458,13 @@ public class CoordinatesUtil {
 
   public static Coordinates setElevation(final Coordinates newLocation,
     final Coordinates originalLocation) {
-    if (originalLocation.getNumAxis() > 2) {
+    if (originalLocation.getAxisCount() > 2) {
       final double z = originalLocation.getZ();
       if (Double.isNaN(z)) {
         return newLocation;
       } else {
         final Coordinates newCoordinates = new DoubleCoordinates(newLocation,
-          originalLocation.getNumAxis());
+          originalLocation.getAxisCount());
         newCoordinates.setZ(z);
         return newCoordinates;
       }
@@ -474,9 +474,9 @@ public class CoordinatesUtil {
   }
 
   public static Coordinates subtract(final Coordinates c1, final Coordinates c2) {
-    final int numAxis = Math.min(c1.getNumAxis(), c2.getNumAxis());
-    final Coordinates newPoint = new DoubleCoordinates(numAxis);
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());
+    final Coordinates newPoint = new DoubleCoordinates(axisCount);
+    for (int i = 0; i < axisCount; i++) {
       final double value1 = c1.getValue(i);
       final double value2 = c2.getValue(i);
       final double value = value1 - value2;
@@ -492,11 +492,11 @@ public class CoordinatesUtil {
   }
 
   public static float[] toFloatArray(final CoordinatesList points,
-    final int numAxis) {
-    final float[] coordinates = new float[numAxis * points.size()];
+    final int axisCount) {
+    final float[] coordinates = new float[axisCount * points.size()];
     for (int i = 0; i < points.size(); i++) {
-      for (int axis = 0; axis < numAxis; axis++) {
-        coordinates[i * numAxis + axis] = (float)points.getValue(i, axis);
+      for (int axis = 0; axis < axisCount; axis++) {
+        coordinates[i * axisCount + axis] = (float)points.getValue(i, axis);
       }
     }
     return coordinates;

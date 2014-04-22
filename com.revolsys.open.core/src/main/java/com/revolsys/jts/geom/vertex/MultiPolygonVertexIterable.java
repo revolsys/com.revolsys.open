@@ -39,7 +39,7 @@ public class MultiPolygonVertexIterable extends AbstractIterator<Vertex> {
         ring = polygon.getInteriorRing(ringIndex - 1);
       } else {
         partIndex++;
-        if (partIndex < multiPolygon.getNumGeometries()) {
+        if (partIndex < multiPolygon.getGeometryCount()) {
           polygon = multiPolygon.getPolygons().get(partIndex);
           ring = polygon.getExteriorRing();
         } else {

@@ -19,7 +19,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
-import com.revolsys.jts.operation.buffer.BufferOp;
+import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.parallel.channel.Channel;
@@ -98,9 +98,9 @@ public class CreateObjectsWithinDistanceOfGeometry extends
           newMetaData = new DataObjectMetaDataImpl(typePath,
             metaData.getAttributes());
           if (distance > 0) {
-            final BufferOp buffer = new BufferOp(geometry,
-              new BufferParameters(1, 3, 2, 1.0D));
-            geometry = buffer.getResultGeometry(distance);
+            final BufferParameters parameters = new BufferParameters(1, 3, 2,
+              1.0D);
+            geometry = Buffer.buffer(geometry, distance, parameters);
           }
           geometry = DouglasPeuckerSimplifier.simplify(geometry, 2D);
           preparedGeometry = preparedGeometryFactory.create(geometry);

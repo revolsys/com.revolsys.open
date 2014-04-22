@@ -61,7 +61,6 @@ import java.util.List;
  *@version 1.7
  */
 public interface Polygon extends Geometry, Polygonal {
-
   /**
    * Creates and returns a full copy of this {@link Polygon} object.
    * (including all coordinates contained by it).
@@ -84,6 +83,9 @@ public interface Polygon extends Geometry, Polygonal {
   List<LinearRing> getRings();
 
   Iterable<LinearRing> holes();
+
+  @Override
+  Polygon move(double... deltas);
 
   @Override
   Polygon normalize();

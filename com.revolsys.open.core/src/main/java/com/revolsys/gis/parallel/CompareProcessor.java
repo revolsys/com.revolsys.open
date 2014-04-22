@@ -278,10 +278,10 @@ public class CompareProcessor extends AbstractMergeProcess {
 
         } else {
           removeObject(sourceObject);
-          if (nonMatchedLines.getNumGeometries() == 1
+          if (nonMatchedLines.getGeometryCount() == 1
             && nonMatchedLines.getGeometry(0).getLength() == 1) {
           } else {
-            for (int j = 0; j < nonMatchedLines.getNumGeometries(); j++) {
+            for (int j = 0; j < nonMatchedLines.getGeometryCount(); j++) {
               final Geometry newGeometry = nonMatchedLines.getGeometry(j);
               final DataObject newObject = DataObjectUtil.copy(sourceObject,
                 newGeometry);
@@ -293,7 +293,7 @@ public class CompareProcessor extends AbstractMergeProcess {
           final DataObject otherObject = otherObjects.get(i);
           final MultiLineString otherNonMatched = graph.getNonMatchedLines(
             i + 1, 0);
-          for (int j = 0; j < otherNonMatched.getNumGeometries(); j++) {
+          for (int j = 0; j < otherNonMatched.getGeometryCount(); j++) {
             final Geometry newGeometry = otherNonMatched.getGeometry(j);
             final DataObject newOtherObject = DataObjectUtil.copy(otherObject,
               newGeometry);

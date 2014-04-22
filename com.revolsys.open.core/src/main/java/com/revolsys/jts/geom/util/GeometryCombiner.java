@@ -182,7 +182,7 @@ public class GeometryCombiner {
       return;
     }
 
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry elemGeom = geom.getGeometry(i);
       if (skipEmpty && elemGeom.isEmpty()) {
         continue;

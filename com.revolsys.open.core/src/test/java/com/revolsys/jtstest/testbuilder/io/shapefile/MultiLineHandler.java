@@ -35,7 +35,7 @@ public class MultiLineHandler implements ShapeHandler {
 
     int numlines, numpoints;
 
-    numlines = multi.getNumGeometries();
+    numlines = multi.getGeometryCount();
     numpoints = multi.getVertexCount();
 
     if (myShapeType == 3) {

@@ -61,7 +61,6 @@ import com.revolsys.jts.testold.index.SIRtreeTest;
 import com.revolsys.jts.testold.index.STRtreeTest;
 import com.revolsys.jts.testold.io.WKBTest;
 import com.revolsys.jts.testold.io.WKTReaderTest;
-import com.revolsys.jts.testold.io.WKTWriterTest;
 import com.revolsys.jts.testold.linearref.LengthIndexedLineTest;
 import com.revolsys.jts.testold.linearref.LocationIndexedLineTest;
 import com.revolsys.jts.testold.operation.BufferTest;
@@ -138,7 +137,6 @@ public class MasterTester extends TestCase {
     result.addTest(new TestSuite(SIRtreeTest.class));
     result.addTest(new TestSuite(STRtreeTest.class));
     result.addTest(new TestSuite(WKTReaderTest.class));
-    result.addTest(new TestSuite(WKTWriterTest.class));
     result.addTest(new TestSuite(WKBTest.class));
     result.addTest(new TestSuite(UnaryUnionTest.class));
     result.addTest(new TestSuite(ValidClosedRingTest.class));

@@ -98,7 +98,7 @@ public class CleanDuplicatePoints {
 
   private GeometryCollection clean(final GeometryCollection g) {
     final List geoms = new ArrayList();
-    for (int i = 0; i < g.getNumGeometries(); i++) {
+    for (int i = 0; i < g.getGeometryCount(); i++) {
       final Geometry geom = g.getGeometry(i);
       geoms.add(clean(geom));
     }
@@ -117,7 +117,7 @@ public class CleanDuplicatePoints {
 
   private MultiLineString clean(final MultiLineString g) {
     final List lines = new ArrayList();
-    for (int i = 0; i < g.getNumGeometries(); i++) {
+    for (int i = 0; i < g.getGeometryCount(); i++) {
       final LineString line = (LineString)g.getGeometry(i);
       lines.add(clean(line));
     }
@@ -126,7 +126,7 @@ public class CleanDuplicatePoints {
 
   private MultiPolygon clean(final MultiPolygon g) {
     final List polys = new ArrayList();
-    for (int i = 0; i < g.getNumGeometries(); i++) {
+    for (int i = 0; i < g.getGeometryCount(); i++) {
       final Polygon poly = (Polygon)g.getGeometry(i);
       polys.add(clean(poly));
     }

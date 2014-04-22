@@ -37,7 +37,7 @@ public class ComponentLocater {
   private void findComponents(final Stack path, final Geometry geom,
     final List components) {
     if (geom instanceof GeometryCollection) {
-      for (int i = 0; i < geom.getNumGeometries(); i++) {
+      for (int i = 0; i < geom.getGeometryCount(); i++) {
         final Geometry subGeom = geom.getGeometry(i);
         path.push(new Integer(i));
         findComponents(path, subGeom, components);

@@ -124,7 +124,7 @@ public class TestListPanel extends JPanel {
         	
         	String sig = geom.getGeometryType();
         	if (geom instanceof GeometryCollection) {
-        		sig += "[" + geom.getNumGeometries() + "]";
+        		sig += "[" + geom.getGeometryCount() + "]";
         	}
           else {
             sig += "(" + geom.getVertexCount() + ")";

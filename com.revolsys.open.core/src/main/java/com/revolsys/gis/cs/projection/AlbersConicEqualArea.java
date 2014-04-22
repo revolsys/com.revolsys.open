@@ -165,7 +165,7 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
   @Override
   public void inverse(final double x, final double y,
     final double[] targetCoordinates, final int targetOffset,
-    final int targetNumAxis) {
+    final int targetAxisCount) {
     final double dX = x - x0;
     final double dY = y - y0;
     final double theta = Math.atan(dX / (rho0 - dY));
@@ -199,8 +199,8 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
     } else {
       phi = li;
     }
-    targetCoordinates[targetOffset * targetNumAxis] = lambda;
-    targetCoordinates[targetOffset * targetNumAxis + 1] = phi;
+    targetCoordinates[targetOffset * targetAxisCount] = lambda;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = phi;
   }
 
   /**
@@ -233,7 +233,7 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
   @Override
   public void project(final double lambda, final double phi,
     final double[] targetCoordinates, final int targetOffset,
-    final int targetNumAxis) {
+    final int targetAxisCount) {
     final double q = q(phi);
     final double lminusl0 = lambda - lambda0;
     final double theta = n * lminusl0;
@@ -243,8 +243,8 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
     final double x = x0 + rho * Math.sin(theta);
     final double y = y0 + rho0 - rho * Math.cos(theta);
 
-    targetCoordinates[targetOffset * targetNumAxis] = x;
-    targetCoordinates[targetOffset * targetNumAxis + 1] = y;
+    targetCoordinates[targetOffset * targetAxisCount] = x;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = y;
   }
 
   /**

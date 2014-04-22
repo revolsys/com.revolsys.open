@@ -44,7 +44,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   private List<int[]> vertexIndices = Collections.emptyList();
 
-  private int numAxis;
+  private int axisCount;
 
   private int numIndexItems;
 
@@ -94,8 +94,8 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return this.geometry;
   }
 
-  public int getNumAxis() {
-    return this.numAxis;
+  public int getAxisCount() {
+    return this.axisCount;
   }
 
   public int getNumIndexItems() {
@@ -153,7 +153,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       this.vertexIndexMap = GeometryEditUtil.getIndexOfVertices(geometry);
       this.vertexIndices = new ArrayList<int[]>(this.vertexIndexMap.keySet());
     }
-    this.numAxis = this.geometryFactory.getNumAxis();
+    this.axisCount = this.geometryFactory.getAxisCount();
     this.axisNames = new ArrayList<String>();
     if (geometry instanceof Polygon) {
       this.axisNames.add("R");
@@ -176,10 +176,10 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     this.numIndexItems = this.axisNames.size();
     this.axisNames.add("X");
     this.axisNames.add("Y");
-    if (this.numAxis > 2) {
+    if (this.axisCount > 2) {
       this.axisNames.add("Z");
     }
-    if (this.numAxis > 3) {
+    if (this.axisCount > 3) {
       this.axisNames.add("M");
     }
     this.columnCount = this.axisNames.size();

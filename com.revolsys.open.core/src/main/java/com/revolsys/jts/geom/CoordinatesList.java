@@ -86,7 +86,7 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
   boolean contains(Coordinates point);
 
   void copy(int sourceIndex, CoordinatesList target, int targetIndex,
-    int numAxis, int count);
+    int axisCount, int count);
 
   double distance(int index, Coordinates point);
 
@@ -94,17 +94,17 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   boolean equal(int i, Coordinates point);
 
-  boolean equal(int i, Coordinates point, int numAxis);
+  boolean equal(int i, Coordinates point, int axisCount);
 
   boolean equal(int index, CoordinatesList other, int otherIndex);
 
-  boolean equal(int index, CoordinatesList other, int otherIndex, int numAxis);
+  boolean equal(int index, CoordinatesList other, int otherIndex, int axisCount);
 
   boolean equal2d(int index, Coordinates point);
 
   boolean equals(CoordinatesList coordinatesList);
 
-  boolean equals(CoordinatesList coordinatesList, int numAxis);
+  boolean equals(CoordinatesList coordinatesList, int axisCount);
 
   Coordinates get(int i);
 
@@ -149,7 +149,7 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   double getM(int index);
 
-  int getNumAxis();
+  int getAxisCount();
 
   long getTime(int index);
 
@@ -215,7 +215,7 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    */
   int size();
 
-  boolean startsWith(CoordinatesList coordinatesList, int numAxis);
+  boolean startsWith(CoordinatesList coordinatesList, int axisCount);
 
   CoordinatesList subList(int index);
 

@@ -39,10 +39,10 @@ public class DoubleCoordinatesListFactory implements CoordinateSequenceFactory,
   @Override
   public CoordinatesList create(final CoordinatesList coordinateSequence) {
     final int size = coordinateSequence.size();
-    final int numAxis = coordinateSequence.getNumAxis();
-    final CoordinatesList coordinatesList = create(size, numAxis);
+    final int axisCount = coordinateSequence.getAxisCount();
+    final CoordinatesList coordinatesList = create(size, axisCount);
     for (int i = 0; i < size; i++) {
-      for (int j = 0; j < numAxis; j++) {
+      for (int j = 0; j < axisCount; j++) {
         final double coordinate = coordinateSequence.getValue(i, j);
         coordinatesList.setValue(i, j, coordinate);
       }

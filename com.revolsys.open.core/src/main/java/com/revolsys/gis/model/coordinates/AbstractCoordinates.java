@@ -186,7 +186,7 @@ public abstract class AbstractCoordinates implements Coordinates {
 
   @Override
   public double[] getCoordinates() {
-    final double[] coordinates = new double[getNumAxis()];
+    final double[] coordinates = new double[getAxisCount()];
     for (int i = 0; i < coordinates.length; i++) {
       coordinates[i] = getValue(i);
     }
@@ -199,7 +199,7 @@ public abstract class AbstractCoordinates implements Coordinates {
   }
 
   @Override
-  public int getNumAxis() {
+  public int getAxisCount() {
     return 2;
   }
 
@@ -239,7 +239,7 @@ public abstract class AbstractCoordinates implements Coordinates {
    */
   @Override
   public void setCoordinate(final Coordinates other) {
-    for (int i = 0; i < getNumAxis(); i++) {
+    for (int i = 0; i < getAxisCount(); i++) {
       final double value = other.getValue(i);
       setValue(i, value);
     }
@@ -279,11 +279,11 @@ public abstract class AbstractCoordinates implements Coordinates {
       s.append(srid);
       s.append(';');
     }
-    final int numAxis = getNumAxis();
+    final int axisCount = getAxisCount();
     final double[] coordinates = getCoordinates();
-    if (numAxis > 0) {
+    if (axisCount > 0) {
       s.append("POINT(");
-      for (int i = 0; i < numAxis; i++) {
+      for (int i = 0; i < axisCount; i++) {
         final Double ordinate = coordinates[i];
         if (i > 0) {
           s.append(' ');

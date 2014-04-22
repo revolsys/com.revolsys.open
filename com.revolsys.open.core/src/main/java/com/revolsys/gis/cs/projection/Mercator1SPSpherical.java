@@ -32,7 +32,7 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
   @Override
   public void inverse(final double x, final double y,
     final double[] targetCoordinates, final int targetOffset,
-    final int targetNumAxis) {
+    final int targetAxisCount) {
     final double dX = x - x0;
     final double dY = y - y0;
 
@@ -41,20 +41,20 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
     final double phi = Angle.PI_OVER_2 - 2
       * Math.atan(Math.pow(Math.E, -dY / r));
 
-    targetCoordinates[targetOffset * targetNumAxis] = lambda;
-    targetCoordinates[targetOffset * targetNumAxis + 1] = phi;
+    targetCoordinates[targetOffset * targetAxisCount] = lambda;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = phi;
   }
 
   @Override
   public void project(final double lambda, final double phi,
     final double[] targetCoordinates, final int targetOffset,
-    final int targetNumAxis) {
+    final int targetAxisCount) {
     final double x = r * (lambda - lambda0);
 
     final double y = r * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2));
 
-    targetCoordinates[targetOffset * targetNumAxis] = x0 + x;
-    targetCoordinates[targetOffset * targetNumAxis + 1] = y0 + y;
+    targetCoordinates[targetOffset * targetAxisCount] = x0 + x;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = y0 + y;
   }
 
 }

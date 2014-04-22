@@ -11,7 +11,7 @@ public class GeometryUtil {
       structure = ((Polygon) g).getNumInteriorRing() + " holes" ;
     }
     else if (g instanceof GeometryCollection)
-      structure = g.getNumGeometries() + " elements";
+      structure = g.getGeometryCount() + " elements";
 
     return
     g.getGeometryType().toUpperCase() 

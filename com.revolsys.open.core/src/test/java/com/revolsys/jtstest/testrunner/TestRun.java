@@ -35,50 +35,109 @@ package com.revolsys.jtstest.testrunner;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.util.StringUtils;
+
+import com.revolsys.io.map.InvokeMethodMapObjectFactory;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jtstest.geomop.GeometryOperation;
 
 /**
  * @version 1.7
  */
-public class TestRun implements Runnable {
-  // default is to run all cases
-  private int testCaseIndexToRun = -1;
+public class TestRun implements Runnable, MapSerializer {
 
-  private final String description;
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "testRun", "Test Run", TestRun.class, "create");
 
-  private final List testCases = new ArrayList();
+  public static TestRun create(final Map<String, Object> map) {
+    return new TestRun(map);
+  }
 
-  private final GeometryFactory geometryFactory;
+  private String description;
 
-  private GeometryOperation geomOp = null;
+  private final List<TestCase> testCases = new ArrayList<TestCase>();
+
+  private GeometryFactory geometryFactory;
+
+  private GeometryOperation geometryOperation = null;
 
   private ResultMatcher resultMatcher = null;
 
-  private final int runIndex;
+  private int runIndex;
 
-  private final File testFile;
+  private File testFile;
 
   private File workspace;
+
+  @SuppressWarnings("unchecked")
+  public TestRun(final Map<String, Object> map) {
+    final GeometryFactory oldGeometryFactory = TestEngine.getGeometryFactory();
+    try {
+      this.description = (String)map.get("description");
+      final Map<String, Object> geometryFactoryDef = (Map<String, Object>)map.get("geometryFactory");
+      if (geometryFactoryDef != null) {
+        final GeometryFactory geometryFactory = MapObjectFactoryRegistry.toObject(geometryFactoryDef);
+        this.geometryFactory = geometryFactory;
+        TestEngine.setGeometryFactory(geometryFactory);
+      }
+
+      final String geometryOperationClassName = (String)map.get("geometryOperation");
+      if (StringUtils.hasText(geometryOperationClassName)) {
+        try {
+          this.geometryOperation = (GeometryOperation)Class.forName(
+            geometryOperationClassName).newInstance();
+        } catch (final Throwable e) {
+          throw new RuntimeException("Unable to create geometry operation "
+            + geometryOperationClassName, e);
+        }
+      }
+      final String resultMatcherClassName = (String)map.get("resultMatcher");
+      if (StringUtils.hasText(resultMatcherClassName)) {
+        try {
+          this.resultMatcher = (ResultMatcher)Class.forName(
+            resultMatcherClassName).newInstance();
+        } catch (final Throwable e) {
+          throw new RuntimeException("Unable to create result matcher "
+            + resultMatcherClassName, e);
+        }
+      }
+      int caseIndex = 1;
+      final List<Map<String, Object>> testCases = (List<Map<String, Object>>)map.get("testCases");
+      for (final Map<String, Object> testCaseMap : testCases) {
+        final TestCase testCase = new TestCase(this, caseIndex++, testCaseMap);
+        this.testCases.add(testCase);
+      }
+    } finally {
+      TestEngine.setGeometryFactory(oldGeometryFactory);
+    }
+
+  }
 
   /**
    * 
    * @param description
    * @param runIndex
    * @param precisionModel
-   * @param geomOp a GeometryOperation to use for all tests in this run (may be null)
+   * @param geometryOperation a GeometryOperation to use for all tests in this run (may be null)
    * @param testFile
    */
   public TestRun(final String description, final int runIndex,
     final GeometryFactory geometryFactory, final GeometryOperation geomOp,
     final ResultMatcher resultMatcher, final File testFile) {
-    this.description = description;
+    if (description != null) {
+      this.description = description.replaceAll("\\s+", " ");
+    }
     this.runIndex = runIndex;
     this.geometryFactory = geometryFactory;
-    this.geomOp = geomOp;
+    this.geometryOperation = geomOp;
     this.resultMatcher = resultMatcher;
     this.testFile = testFile;
   }
@@ -98,11 +157,12 @@ public class TestRun implements Runnable {
   public GeometryOperation getGeometryOperation() {
     // use the main one if it was user-specified or this run does not have an op
     // specified
-    if (TopologyTestApp.isGeometryOperationSpecified() || geomOp == null) {
+    if (TopologyTestApp.isGeometryOperationSpecified()
+      || geometryOperation == null) {
       return TopologyTestApp.getGeometryOperation();
     }
 
-    return geomOp;
+    return geometryOperation;
   }
 
   public ResultMatcher getResultMatcher() {
@@ -119,14 +179,13 @@ public class TestRun implements Runnable {
     return runIndex;
   }
 
-  public List getTestCases() {
+  public List<TestCase> getTestCases() {
     return Collections.unmodifiableList(testCases);
   }
 
   public int getTestCount() {
     int count = 0;
-    for (final Iterator i = testCases.iterator(); i.hasNext();) {
-      final TestCase testCase = (TestCase)i.next();
+    for (final TestCase testCase : testCases) {
       count += testCase.getTestCount();
     }
     return count;
@@ -145,21 +204,40 @@ public class TestRun implements Runnable {
 
   @Override
   public void run() {
-    for (final Iterator j = testCases.iterator(); j.hasNext();) {
-      final TestCase testCase = (TestCase)j.next();
-      if (testCaseIndexToRun < 0
-        || testCase.getCaseIndex() == testCaseIndexToRun) {
-        testCase.run();
-      }
+    for (final TestCase testCase : testCases) {
+      testCase.run();
     }
   }
 
   public void setTestCaseIndexToRun(final int testCaseIndexToRun) {
-    this.testCaseIndexToRun = testCaseIndexToRun;
   }
 
   public void setWorkspace(final File workspace) {
     this.workspace = workspace;
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    map.put("type", "test");
+    MapSerializerUtil.add(map, "description", description);
+
+    final Map<String, Object> properties = getProperties();
+    MapSerializerUtil.add(map, "properties", properties, Collections.emptyMap());
+
+    MapSerializerUtil.add(map, "tests", testCases, Collections.emptyList());
+    return map;
+  }
+
+  public Map<String, Object> getProperties() {
+    final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    MapSerializerUtil.add(properties, "geometryFactory", geometryFactory);
+    return properties;
+  }
+
+  @Override
+  public String toString() {
+    return toMap().toString();
   }
 
 }

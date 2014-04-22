@@ -17,7 +17,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.util.MathUtil;
 
 public class Triangle extends AbstractCoordinatesList {
@@ -109,6 +108,11 @@ public class Triangle extends AbstractCoordinatesList {
     return coords.size() == 3;
   }
 
+  @Override
+  public int getAxisCount() {
+    return 3;
+  }
+
   /**
    * Computes the circumcircle of a triangle. The circumcircle is the smallest
    * circle which encloses the triangle.
@@ -133,13 +137,13 @@ public class Triangle extends AbstractCoordinatesList {
   }
 
   private int getCoordinatesIndex(final int index, int axisIndex) {
-    final byte numAxis = 3;
+    final byte axisCount = 3;
     axisIndex = axisIndex % 3;
     if (axisIndex < 0) {
       axisIndex = 3 - axisIndex;
     }
 
-    final int coordinateIndex = index * numAxis + axisIndex;
+    final int coordinateIndex = index * axisCount + axisIndex;
     return coordinateIndex;
   }
 
@@ -177,11 +181,6 @@ public class Triangle extends AbstractCoordinatesList {
     return new DoubleCoordinates(inCentreX, inCentreY);
   }
 
-  @Override
-  public int getNumAxis() {
-    return 3;
-  }
-
   public Coordinates getP0() {
     return get(0);
   }
@@ -197,7 +196,7 @@ public class Triangle extends AbstractCoordinatesList {
   public Polygon getPolygon(
     final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     final LinearRing shell = geometryFactory.linearRing(new DoubleCoordinatesList(
-      getNumAxis(), getP0(), getP1(), getP2(), getP0()));
+      getAxisCount(), getP0(), getP1(), getP2(), getP0()));
     return geometryFactory.polygon(shell);
   }
 
@@ -256,6 +255,6 @@ public class Triangle extends AbstractCoordinatesList {
 
   @Override
   public String toString() {
-    return new WKTWriter(3).write(getPolygon(GEOMETRY_FACTORY));
+    return getPolygon(GEOMETRY_FACTORY).toWkt();
   }
 }

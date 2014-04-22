@@ -50,7 +50,7 @@ public abstract class ShortCircuitedGeometryVisitor
   }
 
   public void applyTo(Geometry geom) {
-    for (int i = 0; i < geom.getNumGeometries() && ! isDone; i++) {
+    for (int i = 0; i < geom.getGeometryCount() && ! isDone; i++) {
       Geometry element = geom.getGeometry(i);
       if (! (element instanceof GeometryCollection)) {
         visit(element);

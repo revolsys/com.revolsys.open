@@ -64,7 +64,7 @@ public class LineStringExtracter {
   }
 
   private void addLines(final GeometryCollection g, final List lines) {
-    for (int i = 0; i < g.getNumGeometries(); i++) {
+    for (int i = 0; i < g.getGeometryCount(); i++) {
       final Geometry geom = g.getGeometry(i);
       addLines(geom, lines);
     }

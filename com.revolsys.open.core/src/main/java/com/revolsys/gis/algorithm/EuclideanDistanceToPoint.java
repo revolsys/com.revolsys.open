@@ -59,7 +59,7 @@ public class EuclideanDistanceToPoint {
       computeDistance(geom, pt, ptDist);
     } else if (geom instanceof GeometryCollection) {
       final GeometryCollection gc = (GeometryCollection)geom;
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
+      for (int i = 0; i < gc.getGeometryCount(); i++) {
         final Geometry g = gc.getGeometry(i);
         computeDistance(g, pt, ptDist);
       }

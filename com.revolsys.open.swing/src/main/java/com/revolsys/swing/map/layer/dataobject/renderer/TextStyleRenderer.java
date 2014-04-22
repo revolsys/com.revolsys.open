@@ -172,7 +172,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             if (!clippedGeometry.isEmpty()) {
               double maxArea = 0;
               double maxLength = 0;
-              for (int i = 0; i < clippedGeometry.getNumGeometries(); i++) {
+              for (int i = 0; i < clippedGeometry.getGeometryCount(); i++) {
                 final Geometry part = clippedGeometry.getGeometry(i);
                 if (part instanceof Polygon) {
                   final double area = part.getArea();

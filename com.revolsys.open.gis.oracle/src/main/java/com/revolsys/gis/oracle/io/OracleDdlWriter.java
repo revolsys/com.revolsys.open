@@ -85,7 +85,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print(",'");
       out.print(geometryType);
       out.print("', ");
-      out.print(geometryFactory.getNumAxis());
+      out.print(geometryFactory.getAxisCount());
       out.println(");");
 
     }
@@ -178,7 +178,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     if (geometryAttribute != null) {
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
-      final int numAxis = geometryFactory.getNumAxis();
+      final int axisCount = geometryFactory.getAxisCount();
       final DataType dataType = geometryAttribute.getType();
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       final int srid = coordinateSystem.getId();
@@ -189,14 +189,14 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print(name.toUpperCase());
       // TODO get from geometry factory
       out.print("',MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', 263000, 1876000, 0.001),MDSYS.SDO_DIM_ELEMENT('Y', 356000, 1738000, 0.001)");
-      if (numAxis > 2) {
+      if (axisCount > 2) {
         out.print(",MDSYS.SDO_DIM_ELEMENT('Z',-2500, 5000, 0.001)");
       }
       out.print("),");
       out.println("3005);");
 
       final int geometryType = OracleSdoGeometryAttributeAdder.getGeometryTypeId(
-        dataType, numAxis);
+        dataType, axisCount);
       out.print("INSERT INTO OGIS_GEOMETRY_COLUMNS(F_TABLE_SCHEMA,F_TABLE_NAME,F_GEOMETRY_COLUMN,G_TABLE_SCHEMA,G_TABLE_NAME,GEOMETRY_TYPE,COORD_DIMENSION,SRID) VALUES ('");
       out.print(schemaName.toUpperCase());
       out.print("', '");
@@ -210,7 +210,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("',");
       out.print(geometryType);
       out.print(",");
-      out.print(numAxis);
+      out.print(axisCount);
       out.print(",");
       out.print("100");
       out.print(srid);

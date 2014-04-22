@@ -15,40 +15,40 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
 
   private List<Coordinates> coordinates = new ArrayList<Coordinates>();
 
-  private final byte numAxis;
+  private final byte axisCount;
 
   public ListCoordinatesList(final CoordinatesList coordinatesList) {
-    this(coordinatesList.getNumAxis(), coordinatesList);
+    this(coordinatesList.getAxisCount(), coordinatesList);
   }
 
-  public ListCoordinatesList(final int numAxis) {
-    this.numAxis = (byte)numAxis;
+  public ListCoordinatesList(final int axisCount) {
+    this.axisCount = (byte)axisCount;
   }
 
-  public ListCoordinatesList(final int numAxis,
+  public ListCoordinatesList(final int axisCount,
     final Coordinates... coordinates) {
-    this.numAxis = (byte)numAxis;
+    this.axisCount = (byte)axisCount;
     for (final Coordinates coordinate : coordinates) {
       add(coordinate);
     }
   }
 
-  public ListCoordinatesList(final int numAxis,
+  public ListCoordinatesList(final int axisCount,
     final CoordinatesList coordinatesList) {
-    this(numAxis);
-    coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
+    this(axisCount);
+    coordinatesList.copy(0, this, 0, axisCount, coordinatesList.size());
   }
 
-  public ListCoordinatesList(final int numAxis,
+  public ListCoordinatesList(final int axisCount,
     final List<Coordinates> coordinates) {
-    this(numAxis);
+    this(axisCount);
     for (final Coordinates coordinate : coordinates) {
       add(coordinate);
     }
   }
 
   public void add(final Coordinates point) {
-    coordinates.add(new DoubleCoordinates(point, numAxis));
+    coordinates.add(new DoubleCoordinates(point, axisCount));
   }
 
   public void add(final int index, final Coordinates point) {
@@ -71,14 +71,14 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public int getNumAxis() {
-    return numAxis;
+  public int getAxisCount() {
+    return axisCount;
   }
 
   @Override
   public double getValue(final int index, final int axisIndex) {
-    final int numAxis = getNumAxis();
-    if (axisIndex < numAxis && index < size()) {
+    final int axisCount = getAxisCount();
+    if (axisIndex < axisCount && index < size()) {
       return coordinates.get(index).getValue(axisIndex);
     } else {
       return Double.NaN;
@@ -91,11 +91,11 @@ public class ListCoordinatesList extends AbstractCoordinatesList {
 
   @Override
   public void setValue(final int index, final int axisIndex, final double value) {
-    final int numAxis = getNumAxis();
-    if (axisIndex < numAxis) {
+    final int axisCount = getAxisCount();
+    if (axisIndex < axisCount) {
       if (index <= size()) {
         for (int i = coordinates.size(); i < (index + 1); i++) {
-          add(new DoubleCoordinates(numAxis));
+          add(new DoubleCoordinates(axisCount));
         }
       }
       coordinates.get(index).setValue(axisIndex, value);

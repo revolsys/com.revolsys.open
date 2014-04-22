@@ -70,7 +70,7 @@ public class GeometryPainter {
        * Otherwise it is not possible to render both filled and non-filled
        * (1D) elements correctly
        */
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
+      for (int i = 0; i < gc.getGeometryCount(); i++) {
         paint(gc.getGeometry(i), converter, g, lineColor, fillColor, stroke);
       }
       return;
@@ -159,7 +159,7 @@ public class GeometryPainter {
        * Otherwise it is not possible to render both filled and non-filled
        * (1D) elements correctly
        */
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
+      for (int i = 0; i < gc.getGeometryCount(); i++) {
         paint(g, viewport, gc.getGeometry(i), style);
       }
       return;

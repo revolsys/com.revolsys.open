@@ -2,7 +2,6 @@ package com.revolsys.gis.jts;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,10 +54,10 @@ public class GeometryEditUtil {
       return new ListCoordinatesList(points);
     } else {
       final int size = points.size();
-      final int numAxis = points.getNumAxis();
+      final int axisCount = points.getAxisCount();
       final CoordinatesList newPoints = new DoubleCoordinatesList(size + 1,
-        numAxis);
-      points.copy(0, newPoints, 0, numAxis, size);
+        axisCount);
+      points.copy(0, newPoints, 0, axisCount, size);
       newPoints.setPoint(size, newPoint);
       return newPoints;
     }
@@ -82,7 +81,7 @@ public class GeometryEditUtil {
         return (T)appendVertex(multiPoint, newPoint);
       } else {
         final int partIndex = geometryId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+        if (partIndex >= 0 && partIndex < geometry.getGeometryCount()) {
           final List<Geometry> parts = geometry.getGeometries();
           final Geometry part = parts.get(partIndex);
           Geometry newPart = part;
@@ -170,7 +169,7 @@ public class GeometryEditUtil {
         return deleteVertex(polygon, ringIndex, pointIndex);
       } else {
         final int partIndex = vertexId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+        if (partIndex >= 0 && partIndex < geometry.getGeometryCount()) {
           final List<Geometry> parts = geometry.getGeometries();
           final Geometry part = parts.get(partIndex);
           if (part instanceof Point) {
@@ -275,7 +274,7 @@ public class GeometryEditUtil {
       } else if (geometry instanceof MultiPoint) {
         add(pointIndexes, geometry);
       } else {
-        for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+        for (int partIndex = 0; partIndex < geometry.getGeometryCount(); partIndex++) {
           final Geometry part = geometry.getGeometry(partIndex);
           if (part instanceof Point) {
             final Point point = (Point)part;
@@ -346,7 +345,7 @@ public class GeometryEditUtil {
             }
           }
         } else {
-          for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+          for (int partIndex = 0; partIndex < geometry.getGeometryCount(); partIndex++) {
             final Geometry part = geometry.getGeometry(partIndex);
             if (part instanceof LineString) {
               final LineString line = (LineString)part;
@@ -431,7 +430,7 @@ public class GeometryEditUtil {
             }
           }
         } else {
-          for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+          for (int partIndex = 0; partIndex < geometry.getGeometryCount(); partIndex++) {
             final Geometry part = geometry.getGeometry(partIndex);
             if (part instanceof Point) {
               final Point point = (Point)part;
@@ -492,7 +491,7 @@ public class GeometryEditUtil {
         return points;
       } else {
         final int partIndex = vertexId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+        if (partIndex >= 0 && partIndex < geometry.getGeometryCount()) {
           final Geometry part = geometry.getGeometry(partIndex);
           if (part instanceof Point) {
             final CoordinatesList points = CoordinatesListUtil.get(part);
@@ -560,7 +559,7 @@ public class GeometryEditUtil {
         return getVertex(points, pointIndex);
       } else {
         final int partIndex = vertexId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+        if (partIndex >= 0 && partIndex < geometry.getGeometryCount()) {
           final Geometry part = geometry.getGeometry(partIndex);
           if (part instanceof Point) {
             if (pointIndex == 0) {
@@ -653,7 +652,7 @@ public class GeometryEditUtil {
         return (T)insertVertex(multiPoint, pointIndex, newPoint);
       } else {
         final int partIndex = vertexId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+        if (partIndex >= 0 && partIndex < geometry.getGeometryCount()) {
           final List<Geometry> parts = geometry.getGeometries();
           final Geometry part = parts.get(partIndex);
           Geometry newPart = part;
@@ -732,91 +731,6 @@ public class GeometryEditUtil {
     return false;
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T extends Geometry> T moveGeometry(final Geometry geometry,
-    final double deltaX, final double deltaY) {
-
-    if (geometry != null && !geometry.isEmpty()) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-      if (deltaX != 0 && deltaY != 0) {
-        if (geometry instanceof Point) {
-          final Point point = (Point)geometry;
-          return (T)moveGeometry(geometryFactory, point, deltaX, deltaY);
-        } else if (geometry instanceof LineString) {
-          final LineString line = (LineString)geometry;
-          return (T)moveGeometry(geometryFactory, line, deltaX, deltaY);
-        } else if (geometry instanceof Polygon) {
-          final Polygon polygon = (Polygon)geometry;
-          return (T)moveGeometry(geometryFactory, polygon, deltaX, deltaY);
-        } else {
-          final List<Geometry> parts = new ArrayList<Geometry>();
-          for (int i = 0; i < geometry.getNumGeometries(); i++) {
-            final Geometry part = geometry.getGeometry(i);
-            if (part != null && !part.isEmpty()) {
-              final Geometry newPart = moveGeometry(part, deltaX, deltaY);
-              parts.add(newPart);
-            }
-          }
-          return (T)geometryFactory.geometry(parts);
-        }
-      }
-    }
-    return (T)geometry;
-  }
-
-  protected static CoordinatesList moveGeometry(
-    final GeometryFactory geometryFactory, final CoordinatesList points,
-    final double deltaX, final double deltaY) {
-    if (points == null) {
-      return null;
-    } else {
-      final CoordinatesList newPoints = new DoubleCoordinatesList(
-        geometryFactory.getNumAxis(), points);
-      for (int i = 0; i < newPoints.size(); i++) {
-        final double x = points.getX(i);
-        newPoints.setX(i, x + deltaX);
-
-        final double y = points.getY(i);
-        newPoints.setY(i, y + deltaY);
-      }
-      geometryFactory.makePrecise(newPoints);
-      return newPoints;
-    }
-  }
-
-  protected static LineString moveGeometry(
-    final GeometryFactory geometryFactory, final LineString line,
-    final double deltaX, final double deltaY) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    final CoordinatesList newPoints = moveGeometry(geometryFactory, points,
-      deltaX, deltaY);
-    final LineString newLine = geometryFactory.lineString(newPoints);
-    return newLine;
-  }
-
-  protected static Point moveGeometry(final GeometryFactory geometryFactory,
-    final Point point, final double deltaX, final double deltaY) {
-    final double[] coordinates = point.getCoordinates();
-    coordinates[0] += deltaX;
-    coordinates[1] += deltaY;
-    final Point newPoint = geometryFactory.point(coordinates);
-    return newPoint;
-  }
-
-  protected static Polygon moveGeometry(final GeometryFactory geometryFactory,
-    final Polygon polygon, final double deltaX, final double deltaY) {
-    final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
-    for (int i = 0; i < rings.size(); i++) {
-      final CoordinatesList ring = rings.get(i);
-      final CoordinatesList newRing = moveGeometry(geometryFactory, ring,
-        deltaX, deltaY);
-      rings.set(i, newRing);
-    }
-
-    final Polygon newPolygon = geometryFactory.polygon(rings);
-    return newPolygon;
-  }
-
   protected static CoordinatesList moveVertex(
     final CoordinatesList coordinatesList, final int pointIndex,
     final Coordinates newPoint) {
@@ -847,7 +761,7 @@ public class GeometryEditUtil {
         return (T)moveVertex(multiPoint, pointIndex, newPoint);
       } else {
         final int partIndex = vertexId[0];
-        if (partIndex >= 0 && partIndex < geometry.getNumGeometries()) {
+        if (partIndex >= 0 && partIndex < geometry.getGeometryCount()) {
           final List<Geometry> parts = geometry.getGeometries();
           final Geometry part = parts.get(partIndex);
           Geometry newPart = part;

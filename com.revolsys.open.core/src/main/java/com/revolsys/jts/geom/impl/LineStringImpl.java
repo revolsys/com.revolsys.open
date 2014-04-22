@@ -105,7 +105,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
           "Invalid number of points in LineString (found " + vertexCount
             + " - must be 0 or >= 2)");
       } else {
-        final int axisCount = getNumAxis();
+        final int axisCount = getAxisCount();
         this.coordinates = new double[axisCount * vertexCount];
         for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
@@ -118,36 +118,39 @@ public class LineStringImpl extends GeometryImpl implements LineString {
     }
   }
 
-  public LineStringImpl(final GeometryFactory factory, final int numAxis,
+  public LineStringImpl(final GeometryFactory factory, final int axisCount,
     final double... points) {
     super(factory);
-    if (points == null) {
+    if (axisCount < 0 || axisCount == 1) {
+      throw new IllegalArgumentException("axisCount must 0 or > 1 not "
+        + axisCount);
+    } else if (points == null || axisCount == 0) {
       this.coordinates = null;
     } else {
       final int coordinateCount = points.length;
-      final int vertexCount = coordinateCount / numAxis;
+      final int vertexCount = coordinateCount / axisCount;
       if (coordinateCount == 0) {
         this.coordinates = null;
-      } else if (coordinateCount % numAxis != 0) {
-        throw new IllegalArgumentException("Point array length "
-          + coordinateCount + " is not a multiple of numAxis=" + numAxis);
-      } else if (coordinateCount == numAxis) {
+      } else if (coordinateCount % axisCount != 0) {
+        throw new IllegalArgumentException("Coordinate array length "
+          + coordinateCount + " is not a multiple of axisCount=" + axisCount);
+      } else if (coordinateCount == axisCount) {
         throw new IllegalArgumentException(
           "Invalid number of points in LineString (found " + vertexCount
             + " - must be 0 or >= 2)");
       } else {
-        final int axisCount = getNumAxis();
-        this.coordinates = new double[axisCount * vertexCount];
+        final int axisCountThis = getAxisCount();
+        this.coordinates = new double[axisCountThis * vertexCount];
         for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-          for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+          for (int axisIndex = 0; axisIndex < axisCountThis; axisIndex++) {
             double value;
-            if (axisIndex < numAxis) {
-              value = points[vertexIndex * numAxis + axisIndex];
+            if (axisIndex < axisCount) {
+              value = points[vertexIndex * axisCount + axisIndex];
               value = factory.makePrecise(axisIndex, value);
             } else {
               value = Double.NaN;
             }
-            this.coordinates[vertexIndex * axisCount + axisIndex] = value;
+            this.coordinates[vertexIndex * axisCountThis + axisIndex] = value;
           }
         }
       }
@@ -270,11 +273,11 @@ public class LineStringImpl extends GeometryImpl implements LineString {
       if (coordinatesOperation == null) {
         return this.coordinates;
       } else {
-        final int sourceNumAxis = getNumAxis();
-        final int targetNumAxis = geometryFactory.getNumAxis();
-        targetCoordinates = new double[targetNumAxis * getVertexCount()];
-        coordinatesOperation.perform(sourceNumAxis, this.coordinates,
-          targetNumAxis, targetCoordinates);
+        final int sourceAxisCount = getAxisCount();
+        final int targetAxisCount = geometryFactory.getAxisCount();
+        targetCoordinates = new double[targetAxisCount * getVertexCount()];
+        coordinatesOperation.perform(sourceAxisCount, this.coordinates,
+          targetAxisCount, targetCoordinates);
         return targetCoordinates;
       }
     }
@@ -286,8 +289,8 @@ public class LineStringImpl extends GeometryImpl implements LineString {
       return geometryFactory.lineString();
     } else {
       final double[] coordinates = convertCoordinates(geometryFactory);
-      final int numAxis = getNumAxis();
-      return geometryFactory.lineString(numAxis, coordinates);
+      final int axisCount = getAxisCount();
+      return geometryFactory.lineString(axisCount, coordinates);
     }
   }
 
@@ -366,10 +369,10 @@ public class LineStringImpl extends GeometryImpl implements LineString {
     if (isEmpty()) {
       return null;
     } else {
-      final int numAxis = getNumAxis();
-      final double[] coordinates = new double[numAxis];
-      System.arraycopy(this.coordinates, vertexIndex * numAxis, coordinates, 0,
-        numAxis);
+      final int axisCount = getAxisCount();
+      final double[] coordinates = new double[axisCount];
+      System.arraycopy(this.coordinates, vertexIndex * axisCount, coordinates,
+        0, axisCount);
       return new DoubleCoordinates(coordinates);
     }
   }
@@ -379,8 +382,8 @@ public class LineStringImpl extends GeometryImpl implements LineString {
     if (isEmpty()) {
       return Double.NaN;
     } else {
-      final int numAxis = getNumAxis();
-      if (axisIndex < 0 || axisIndex >= numAxis) {
+      final int axisCount = getAxisCount();
+      if (axisIndex < 0 || axisIndex >= axisCount) {
         return Double.NaN;
       } else {
         final int numPoints = getVertexCount();
@@ -388,7 +391,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
           while (vertexIndex < 0) {
             vertexIndex += numPoints;
           }
-          return coordinates[vertexIndex * numAxis + axisIndex];
+          return coordinates[vertexIndex * axisCount + axisIndex];
         } else {
           return Double.NaN;
         }
@@ -404,9 +407,9 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   @Override
   public CoordinatesList getCoordinatesList() {
     if (coordinates == null) {
-      return new DoubleCoordinatesList(getNumAxis());
+      return new DoubleCoordinatesList(getAxisCount());
     } else {
-      return new DoubleCoordinatesList(getNumAxis(), coordinates);
+      return new DoubleCoordinatesList(getAxisCount(), coordinates);
     }
   }
 
@@ -485,7 +488,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
     if (isEmpty()) {
       return 0;
     } else {
-      return coordinates.length / getNumAxis();
+      return coordinates.length / getAxisCount();
     }
   }
 
@@ -541,6 +544,31 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   @Override
   public boolean isRing() {
     return isClosed() && isSimple();
+  }
+
+  @Override
+  public LineString move(final double... deltas) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (deltas == null || isEmpty()) {
+      return this;
+    } else {
+      final double[] coordinates = moveCoordinates(deltas);
+      final int axisCount = getAxisCount();
+      return geometryFactory.lineString(axisCount, coordinates);
+    }
+  }
+
+  protected double[] moveCoordinates(final double... deltas) {
+    final double[] coordinates = this.coordinates.clone();
+    final int vertexCount = getVertexCount();
+    final int axisCount = getAxisCount();
+    final int deltaCount = Math.min(deltas.length, getAxisCount());
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      for (int axisIndex = 0; axisIndex < deltaCount; axisIndex++) {
+        coordinates[vertexIndex * axisCount + axisIndex] += deltas[axisIndex];
+      }
+    }
+    return coordinates;
   }
 
   /**

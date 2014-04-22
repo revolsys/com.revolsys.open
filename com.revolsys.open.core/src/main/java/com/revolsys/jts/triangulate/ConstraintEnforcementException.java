@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.triangulate;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * Indicates a failure during constraint enforcement.
@@ -49,7 +49,7 @@ public class ConstraintEnforcementException extends RuntimeException {
 
   private static String msgWithCoord(final String msg, final Coordinates pt) {
     if (pt != null) {
-      return msg + " [ " + WKTWriter.toPoint(pt) + " ]";
+      return msg + " [ " + WktWriter.point(pt) + " ]";
     }
     return msg;
   }

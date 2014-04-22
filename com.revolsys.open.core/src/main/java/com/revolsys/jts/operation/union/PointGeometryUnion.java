@@ -78,7 +78,7 @@ public class PointGeometryUnion {
     // use a set to eliminate duplicates, as required for union
     final Set exteriorCoords = new TreeSet();
 
-    for (int i = 0; i < pointGeom.getNumGeometries(); i++) {
+    for (int i = 0; i < pointGeom.getGeometryCount(); i++) {
       final Point point = (Point)pointGeom.getGeometry(i);
       final Coordinates coord = point.getCoordinate();
       final Location loc = locater.locate(coord, otherGeom);

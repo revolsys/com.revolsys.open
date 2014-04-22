@@ -8,7 +8,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class PolygonUnionPerfTest {
@@ -19,8 +18,6 @@ public class PolygonUnionPerfTest {
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
-
-  static WKTWriter wktWriter = new WKTWriter();
 
   public static void main(final String[] args) {
     final PolygonUnionPerfTest test = new PolygonUnionPerfTest();

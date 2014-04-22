@@ -8,20 +8,20 @@ import com.revolsys.jts.geom.Coordinates;
 public class PointArrayCoordinatesList extends AbstractCoordinatesList {
   private static final long serialVersionUID = 5567278244212676984L;
 
-  private int numAxis;
+  private int axisCount;
 
   private List<Coordinates> points = new ArrayList<Coordinates>();
 
   public PointArrayCoordinatesList() {
   }
 
-  public PointArrayCoordinatesList(final int numAxis) {
-    this.numAxis = numAxis;
+  public PointArrayCoordinatesList(final int axisCount) {
+    this.axisCount = axisCount;
   }
 
-  public PointArrayCoordinatesList(final int numAxis,
+  public PointArrayCoordinatesList(final int axisCount,
     final Coordinates... points) {
-    this.numAxis = numAxis;
+    this.axisCount = axisCount;
     for (final Coordinates point : points) {
       add(point);
     }
@@ -43,8 +43,8 @@ public class PointArrayCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public int getNumAxis() {
-    return numAxis;
+  public int getAxisCount() {
+    return axisCount;
   }
 
   @Override

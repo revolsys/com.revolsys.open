@@ -43,7 +43,6 @@ import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.Puntal;
 import com.revolsys.jts.io.WKBWriter;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.jtstest.test.TestCase;
 import com.revolsys.jtstest.test.TestCaseList;
@@ -109,8 +108,6 @@ public class XMLTestWriter {
       + precisionModel.getScale() + "\"/>";
   }
 
-  private final WKTWriter wktWriter = new WKTWriter();
-
   private final WKBWriter wkbWriter = new WKBWriter();
 
   public XMLTestWriter() {
@@ -175,7 +172,7 @@ public class XMLTestWriter {
       j++;
     }
     xml += ">\n";
-    xml += StringUtil.indent(wktWriter.writeFormatted(geometry) + "\n", 6);
+    xml += StringUtil.indent(geometry.toWkt() + "\n", 6);
     xml += "    </op>\n";
     xml += "  </test>\n";
     return xml;
@@ -269,7 +266,7 @@ public class XMLTestWriter {
 
   private String getWKTorWKB(final Geometry g, final boolean useWKT) {
     if (useWKT) {
-      return wktWriter.writeFormatted(g);
+      return g.toWkt();
     }
     return WKBWriter.toHex(wkbWriter.write(g));
   }

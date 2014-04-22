@@ -151,8 +151,8 @@ public class GeometryCollectionImpl extends GeometryImpl implements
     final CoordinateSequenceComparator comp) {
     final GeometryCollection gc = (GeometryCollection)o;
 
-    final int n1 = getNumGeometries();
-    final int n2 = gc.getNumGeometries();
+    final int n1 = getGeometryCount();
+    final int n2 = gc.getGeometryCount();
     int i = 0;
     while (i < n1 && i < n2) {
       final Geometry thisGeom = getGeometry(i);
@@ -188,7 +188,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
       return false;
     }
     final GeometryCollection otherCollection = (GeometryCollection)other;
-    if (getNumGeometries() != otherCollection.getNumGeometries()) {
+    if (getGeometryCount() != otherCollection.getGeometryCount()) {
       return false;
     }
     int i = 0;
@@ -207,8 +207,8 @@ public class GeometryCollectionImpl extends GeometryImpl implements
       return true;
     } else if (geometry != null) {
       if (getDataType().equals(geometry.getDataType())) {
-        final int geometryCount = getNumGeometries();
-        if (geometryCount == geometry.getNumGeometries()) {
+        final int geometryCount = getGeometryCount();
+        if (geometryCount == geometry.getGeometryCount()) {
           for (int i = 0; i < geometryCount; i++) {
             final Geometry part1 = getGeometry(i);
             final Geometry part2 = geometry.getGeometry(i);
@@ -334,7 +334,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   }
 
   @Override
-  public int getNumGeometries() {
+  public int getGeometryCount() {
     if (geometries == null) {
       return 0;
     } else {
@@ -353,7 +353,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
 
   @Override
   public boolean isEmpty() {
-    if (getNumGeometries() == 0) {
+    if (getGeometryCount() == 0) {
       return true;
     } else {
       for (final Geometry geometry : geometries()) {
@@ -362,6 +362,21 @@ public class GeometryCollectionImpl extends GeometryImpl implements
         }
       }
       return true;
+    }
+  }
+
+  @Override
+  public Geometry move(final double... deltas) {
+    if (deltas == null || isEmpty()) {
+      return this;
+    } else {
+      final List<Geometry> parts = new ArrayList<>();
+      for (final Geometry part : geometries()) {
+        final Geometry movedPart = part.move(deltas);
+        parts.add(movedPart);
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.geometryCollection(parts);
     }
   }
 

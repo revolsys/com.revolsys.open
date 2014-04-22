@@ -114,7 +114,7 @@ public class FontGlyphReader
     List polys = new ArrayList();
     for (int i = 0; i < gv.getNumGlyphs(); i++) {
       Geometry geom = ShapeReader.read(gv.getGlyphOutline(i), flatness, geomFact);
-      for (int j = 0; j < geom.getNumGeometries(); j++) {
+      for (int j = 0; j < geom.getGeometryCount(); j++) {
         polys.add(geom.getGeometry(j));
       }
     }

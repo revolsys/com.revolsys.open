@@ -279,8 +279,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       final double resolution = getUnitsPerPixel();
       if (resolution > 2) {
         final int srid = geometryFactory.getSrid();
-        final int numAxis = geometryFactory.getNumAxis();
-        geometryFactory = GeometryFactory.getFactory(srid, numAxis, 1, 1);
+        final int axisCount = geometryFactory.getAxisCount();
+        geometryFactory = GeometryFactory.getFactory(srid, axisCount, 1, 1);
       }
     }
     return geometryFactory;

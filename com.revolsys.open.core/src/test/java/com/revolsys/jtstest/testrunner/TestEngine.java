@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,53 +31,93 @@
  *     www.vividsolutions.com
  */
 package com.revolsys.jtstest.testrunner;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 /**
  *  Converts test File's to TestCase's and runs them.
  *
  * @version 1.7
  */
-public class TestEngine
-     implements Runnable
-{
-  private List testFiles;
+public class TestEngine implements Runnable {
+  public static GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
+  public static void setGeometryFactory(final GeometryFactory geometryFactory) {
+    TestEngine.geometryFactory = geometryFactory;
+  }
+
+  private List<File> testFiles;
+
   // default is to run all tests
   private int testCaseIndexToRun = -1;
+
   private boolean running = false;
-  private List testRuns = new Vector();
-  private TestReader testReader = new TestReader();
+
+  private List<TestRun> testRuns = new Vector<>();
+
+  private final TestReader testReader = new TestReader();
 
   private Date start = null;
 
   private Date end = null;
 
+  static {
+    MapObjectFactoryRegistry.addFactory(TestRun.FACTORY);
+    MapObjectFactoryRegistry.addFactory(TestCase.FACTORY);
+    MapObjectFactoryRegistry.addFactory(com.revolsys.jtstest.test.Test.FACTORY);
+  }
+
+  private static GeometryFactory geometryFactory = GeometryFactory.getFactory();
+
   /**
    *  Creates a TestEngine.
    */
-  public TestEngine() { }
+  public TestEngine() {
+  }
+
+  public void clearParsingProblems() {
+    testReader.clearParsingProblems();
+  }
 
   /**
-   *  Sets the File's that contain the tests.
+   *  Creates TestRun's, one for each test File.
    */
-  public void setTestFiles(List testFiles) {
-    this.testFiles = testFiles;
+  private List<TestRun> createTestRuns() {
+    final Vector<TestRun> testRuns = new Vector<>();
+    int runIndex = 0;
+    for (final File testFile : testFiles) {
+      runIndex++;
+      System.out.println("Reading test file " + testFile.getAbsolutePath());
+      final TestRun testRun;
+      if (FileUtil.getFileNameExtension(testFile).equals("json")) {
+        testRun = MapObjectFactoryRegistry.toObject(testFile);
+      } else {
+        testRun = testReader.createTestRun(testFile, runIndex);
+      }
+      if (testRun != null) {
+        testRuns.add(testRun);
+      }
+    }
+    return testRuns;
   }
 
-  public void setTestCaseIndexToRun(int testCaseIndexToRun)
-  {
-  	this.testCaseIndexToRun = testCaseIndexToRun;
+  public Date getEnd() {
+    return end;
   }
-  
+
   public int getExceptionCount() {
     int exceptionCount = 0;
-    for (Iterator i = getTests().iterator(); i.hasNext(); ) {
-      Test test = (Test) i.next();
+    for (final Test test : getTests()) {
       if (test.getException() != null) {
         exceptionCount++;
       }
@@ -89,8 +127,7 @@ public class TestEngine
 
   public int getFailedCount() {
     int failedCount = 0;
-    for (Iterator i = getTests().iterator(); i.hasNext(); ) {
-      Test test = (Test) i.next();
+    for (final Test test : getTests()) {
       if ((test.getException() == null) && (!test.isPassed())) {
         failedCount++;
       }
@@ -98,10 +135,17 @@ public class TestEngine
     return failedCount;
   }
 
+  public int getParseExceptionCount() {
+    return testReader.getParsingProblems().size();
+  }
+
+  public List getParsingProblems() {
+    return Collections.unmodifiableList(testReader.getParsingProblems());
+  }
+
   public int getPassedCount() {
     int passedCount = 0;
-    for (Iterator i = getTests().iterator(); i.hasNext(); ) {
-      Test test = (Test) i.next();
+    for (final Test test : getTests()) {
       if (test.isPassed()) {
         passedCount++;
       }
@@ -109,8 +153,47 @@ public class TestEngine
     return passedCount;
   }
 
-  public int getParseExceptionCount() {
-    return testReader.getParsingProblems().size();
+  public Date getStart() {
+    return start;
+  }
+
+  public int getTestCaseCount() {
+    int count = 0;
+    for (final TestRun testRun : testRuns) {
+      count += testRun.getTestCases().size();
+    }
+    return count;
+  }
+
+  /**
+   *  Returns the total number of tests.
+   */
+  public int getTestCount() {
+    int count = 0;
+    for (final TestRun testRun : testRuns) {
+      count += testRun.getTestCount();
+    }
+    return count;
+  }
+
+  public List<TestRun> getTestRuns() {
+    return testRuns;
+  }
+
+  private List<Test> getTests() {
+    final Vector<Test> tests = new Vector<Test>();
+    for (final TestRun testRun : testRuns) {
+      tests.addAll(getTests(testRun));
+    }
+    return tests;
+  }
+
+  private List<Test> getTests(final TestRun testRun) {
+    final Vector<Test> tests = new Vector<Test>();
+    for (final TestCase testCase : testRun.getTestCases()) {
+      tests.addAll(testCase.getTests());
+    }
+    return tests;
   }
 
   /**
@@ -120,97 +203,48 @@ public class TestEngine
     return running;
   }
 
-  /**
-   *  Returns the total number of tests.
-   */
-  public int getTestCount() {
-    int count = 0;
-    for (Iterator i = testRuns.iterator(); i.hasNext(); ) {
-      TestRun testRun = (TestRun) i.next();
-      count += testRun.getTestCount();
-    }
-    return count;
-  }
-
-  public int getTestCaseCount() {
-    int count = 0;
-    for (Iterator i = testRuns.iterator(); i.hasNext(); ) {
-      TestRun testRun = (TestRun) i.next();
-      count += testRun.getTestCases().size();
-    }
-    return count;
-  }
-
-  public List getParsingProblems() {
-    return Collections.unmodifiableList(testReader.getParsingProblems());
-  }
-
-  public List getTestRuns() {
-    return testRuns;
-  }
-
-  public Date getStart() {
-    return start;
-  }
-
-  public Date getEnd() {
-    return end;
-  }
-
-  public void clearParsingProblems() {
-    testReader.clearParsingProblems();
-  }
-
+  @Override
   public void run() {
     running = true;
     start = new Date();
     clearParsingProblems();
     testRuns = createTestRuns();
     System.out.println("Running tests...");
-    for (Iterator i = testRuns.iterator(); i.hasNext(); ) {
-      TestRun testRun = (TestRun) i.next();
+    for (final TestRun testRun : testRuns) {
       if (testCaseIndexToRun >= 0) {
-      	testRun.setTestCaseIndexToRun(testCaseIndexToRun);
+        testRun.setTestCaseIndexToRun(testCaseIndexToRun);
       }
-    	testRun.run();
+      testRun.run();
+
+      // final File file = FileUtil.getFile(testRun.getTestFile());
+      // final String fileExtension = FileUtil.getFileNameExtension(file);
+      // if (fileExtension.equals("xml")) {
+      // final File directory = FileUtil.getDirectory(file.toString()
+      // .replaceAll("testxml", "json")
+      // .replaceAll(".xml", ""));
+      // for (final TestCase testCase : testRun.getTestCases()) {
+      // final File newFile = new File(directory, testCase.getCaseIndex()
+      // + ".json");
+      // JsonMapIoFactory.write(testCase.toMap(), newFile);
+      // final com.revolsys.jtstest.test.Test test =
+      // MapObjectFactoryRegistry.toObject(newFile);
+      // System.out.println(test);
+      //
+      // }
+      // }
     }
     end = new Date();
     running = false;
   }
 
-  private List getTests(TestRun testRun) {
-    Vector tests = new Vector();
-    for (Iterator i = testRun.getTestCases().iterator(); i.hasNext(); ) {
-      TestCase testCase = (TestCase) i.next();
-      tests.addAll(testCase.getTests());
-    }
-    return tests;
-  }
-
-  private List getTests() {
-    Vector tests = new Vector();
-    for (Iterator i = testRuns.iterator(); i.hasNext(); ) {
-      TestRun testRun = (TestRun) i.next();
-      tests.addAll(getTests(testRun));
-    }
-    return tests;
+  public void setTestCaseIndexToRun(final int testCaseIndexToRun) {
+    this.testCaseIndexToRun = testCaseIndexToRun;
   }
 
   /**
-   *  Creates TestRun's, one for each test File.
+   *  Sets the File's that contain the tests.
    */
-  private List createTestRuns() {
-    Vector testRuns = new Vector();
-    int runIndex = 0;
-    for (Iterator i = testFiles.iterator(); i.hasNext(); ) {
-      File testFile = (File) i.next();
-      runIndex++;
-      System.out.println("Reading test file " + testFile.getAbsolutePath());
-      TestRun testRun = testReader.createTestRun(testFile, runIndex);
-      if (testRun != null) {
-        testRuns.add(testRun);
-      }
-    }
-    return testRuns;
+  public void setTestFiles(final List<File> testFiles) {
+    this.testFiles = testFiles;
   }
 }

@@ -77,20 +77,20 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
               + spatialReference.getLatestWKID());
         }
 
-        int numAxis = 2;
+        int axisCount = 2;
         final boolean hasZ = geometryDef.isHasZ();
         if (hasZ) {
-          numAxis = 3;
+          axisCount = 3;
         }
         final boolean hasM = geometryDef.isHasM();
         if (hasM) {
-          numAxis = 4;
+          axisCount = 4;
         }
-        if (numAxis != geometryFactory.getNumAxis()) {
+        if (axisCount != geometryFactory.getAxisCount()) {
           final int srid = geometryFactory.getSrid();
           final double scaleXY = geometryFactory.getScaleXY();
           final double scaleZ = geometryFactory.getScaleZ();
-          geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXY,
+          geometryFactory = GeometryFactory.getFactory(srid, axisCount, scaleXY,
             scaleZ);
         }
         setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);

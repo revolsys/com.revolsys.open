@@ -363,7 +363,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       }
       coords.setValue(index, i, center.getValue(i) + coordinate);
     }
-    if (coords.getNumAxis() > 2) {
+    if (coords.getAxisCount() > 2) {
       final int z = readLEShort(in);
       coords.setValue(index, 2, z);
     }

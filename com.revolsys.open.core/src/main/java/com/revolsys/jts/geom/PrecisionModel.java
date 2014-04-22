@@ -36,8 +36,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.jts.io.WKTWriter;
-
 /**
  * Specifies the precision model of the {@link Coordinates}s in a {@link Geometry}.
  * In other words, specifies the grid of allowable
@@ -286,7 +284,7 @@ public class PrecisionModel implements Serializable, Comparable {
    * Returns the maximum number of significant digits provided by this
    * precision model.
    * Intended for use by routines which need to print out 
-   * decimal representations of precise values (such as {@link WKTWriter}).
+   * decimal representations of precise values .
    * <p>
    * This method would be more correctly called
    * <tt>getMinimumDecimalPlaces</tt>, 

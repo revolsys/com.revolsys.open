@@ -134,7 +134,7 @@ public class BoundaryOp {
   private Coordinates[] computeBoundaryCoordinates(final MultiLineString mLine) {
     final List bdyPts = new ArrayList();
     endpointMap = new TreeMap();
-    for (int i = 0; i < mLine.getNumGeometries(); i++) {
+    for (int i = 0; i < mLine.getGeometryCount(); i++) {
       final LineString line = (LineString)mLine.getGeometry(i);
       if (line.getVertexCount() == 0) {
         continue;

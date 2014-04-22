@@ -35,10 +35,10 @@ public class SameStructureTester {
 
   private static boolean isSameStructureCollection(final GeometryCollection g1,
     final GeometryCollection g2) {
-    if (g1.getNumGeometries() != g2.getNumGeometries()) {
+    if (g1.getGeometryCount() != g2.getGeometryCount()) {
       return false;
     }
-    for (int i = 0; i < g1.getNumGeometries(); i++) {
+    for (int i = 0; i < g1.getGeometryCount(); i++) {
       if (!isSameStructure(g1.getGeometry(i), g2.getGeometry(i))) {
         return false;
       }

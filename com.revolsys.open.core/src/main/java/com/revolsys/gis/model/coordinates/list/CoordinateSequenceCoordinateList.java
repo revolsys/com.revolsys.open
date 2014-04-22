@@ -22,8 +22,8 @@ public class CoordinateSequenceCoordinateList extends AbstractCoordinatesList {
   }
 
   @Override
-  public int getNumAxis() {
-    return (byte)coordinateSequence.getNumAxis();
+  public int getAxisCount() {
+    return (byte)coordinateSequence.getAxisCount();
   }
 
   @Override

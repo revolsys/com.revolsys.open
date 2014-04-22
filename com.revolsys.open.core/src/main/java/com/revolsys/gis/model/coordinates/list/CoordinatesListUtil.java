@@ -117,8 +117,8 @@ public class CoordinatesListUtil {
   public static int append(final CoordinatesList src,
     final CoordinatesList dest, final int startIndex) {
     int coordIndex = startIndex;
-    final int srcDimension = src.getNumAxis();
-    final int destDimension = dest.getNumAxis();
+    final int srcDimension = src.getAxisCount();
+    final int destDimension = dest.getAxisCount();
     final int dimension = Math.min(srcDimension, destDimension);
     final int srcSize = src.size();
     final int destSize = dest.size();
@@ -152,8 +152,8 @@ public class CoordinatesListUtil {
   public static int appendReversed(final CoordinatesList src,
     final CoordinatesList dest, final int startIndex) {
     int coordIndex = startIndex;
-    final int srcDimension = src.getNumAxis();
-    final int destDimension = dest.getNumAxis();
+    final int srcDimension = src.getAxisCount();
+    final int destDimension = dest.getAxisCount();
     final int dimension = Math.min(srcDimension, destDimension);
     final int srcSize = src.size();
     final int destSize = dest.size();
@@ -235,19 +235,19 @@ public class CoordinatesListUtil {
     return true;
   }
 
-  public static CoordinatesList create(final int numAxis,
+  public static CoordinatesList create(final int axisCount,
     final Coordinates... coordinateArray) {
-    return create(Arrays.asList(coordinateArray), numAxis);
+    return create(Arrays.asList(coordinateArray), axisCount);
   }
 
   public static CoordinatesList create(final List<Coordinates> coordinateArray,
-    final int numAxis) {
+    final int axisCount) {
     CoordinatesList coordinatesList = new DoubleCoordinatesList(
-      coordinateArray.size(), numAxis);
+      coordinateArray.size(), axisCount);
     int i = 0;
     for (final Coordinates coordinates : coordinateArray) {
       if (coordinates != null) {
-        for (int j = 0; j < coordinates.getNumAxis(); j++) {
+        for (int j = 0; j < coordinates.getAxisCount(); j++) {
           coordinatesList.setValue(i, j, coordinates.getValue(j));
         }
         i++;
@@ -380,7 +380,7 @@ public class CoordinatesListUtil {
     } else if (geometry instanceof MultiPoint) {
       final MultiPoint multiPoint = (MultiPoint)geometry;
       return get(multiPoint);
-    } else if (geometry.getNumGeometries() > 0) {
+    } else if (geometry.getGeometryCount() > 0) {
       return get(geometry.getGeometry(0));
     } else {
       return null;
@@ -405,9 +405,9 @@ public class CoordinatesListUtil {
     if (size == 0) {
       return new DoubleCoordinatesList(0, 3);
     } else {
-      final int numAxis = points.get(0).getNumAxis();
+      final int axisCount = points.get(0).getAxisCount();
       final DoubleCoordinatesList coordinatesList = new DoubleCoordinatesList(
-        size, numAxis);
+        size, axisCount);
       int i = 0;
       for (final Point point : points) {
         coordinatesList.setPoint(i, point);
@@ -418,11 +418,11 @@ public class CoordinatesListUtil {
   }
 
   public static CoordinatesList get(final MultiPoint multiPoint) {
-    final int numPoints = multiPoint.getNumGeometries();
+    final int numPoints = multiPoint.getGeometryCount();
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
-    final int numAxis = geometryFactory.getNumAxis();
+    final int axisCount = geometryFactory.getAxisCount();
     final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-      numAxis);
+      axisCount);
     for (int i = 0; i < numPoints; i++) {
       final Point point = (Point)multiPoint.getGeometry(i);
       points.setPoint(i, point);
@@ -445,7 +445,7 @@ public class CoordinatesListUtil {
   public static List<CoordinatesList> getAll(final Geometry geometry) {
     final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
     if (geometry != null) {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry subGeometry = geometry.getGeometry(i);
         if (subGeometry instanceof Point) {
           pointsList.add(((Point)subGeometry).getCoordinatesList());
@@ -487,7 +487,7 @@ public class CoordinatesListUtil {
     final boolean clockwise) {
     final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
     if (geometry != null) {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry part = geometry.getGeometry(i);
         if (!part.isEmpty()) {
           final List<CoordinatesList> pointsList = getAll(part);
@@ -546,7 +546,7 @@ public class CoordinatesListUtil {
     }
     final List<CoordinatesList> intersections = new ArrayList<CoordinatesList>();
     final PointArrayCoordinatesList currentCoordinates = new PointArrayCoordinatesList(
-      points1.getNumAxis());
+      points1.getAxisCount());
     Node<LineSegment> previousNode = graph1.getNode(startPoint);
     do {
       final List<Edge<LineSegment>> outEdges = previousNode.getOutEdges();
@@ -721,8 +721,8 @@ public class CoordinatesListUtil {
 
   public static CoordinatesList merge(final Coordinates point,
     final CoordinatesList coordinates1, final CoordinatesList coordinates2) {
-    final int dimension = Math.max(coordinates1.getNumAxis(),
-      coordinates2.getNumAxis());
+    final int dimension = Math.max(coordinates1.getAxisCount(),
+      coordinates2.getAxisCount());
     final int maxSize = coordinates1.size() + coordinates2.size();
     final CoordinatesList coordinates = new DoubleCoordinatesList(maxSize,
       dimension);
@@ -758,8 +758,8 @@ public class CoordinatesListUtil {
 
   public static CoordinatesList merge(final CoordinatesList coordinates1,
     final CoordinatesList coordinates2) {
-    final int dimension = Math.max(coordinates1.getNumAxis(),
-      coordinates2.getNumAxis());
+    final int dimension = Math.max(coordinates1.getAxisCount(),
+      coordinates2.getAxisCount());
     final int maxSize = coordinates1.size() + coordinates2.size();
     final CoordinatesList coordinates = new DoubleCoordinatesList(maxSize,
       dimension);
@@ -870,14 +870,14 @@ public class CoordinatesListUtil {
   }
 
   public static final CoordinatesList parse(final String value,
-    final String separator, final int numAxis) {
+    final String separator, final int axisCount) {
     final String[] values = value.split(separator);
     final double[] coordinates = new double[values.length];
     for (int i = 0; i < values.length; i++) {
       final String string = values[i];
       coordinates[i] = Double.parseDouble(string);
     }
-    return new DoubleCoordinatesList(numAxis, coordinates);
+    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   public static CoordinatesList parse(final String value, final String decimal,
@@ -894,7 +894,7 @@ public class CoordinatesListUtil {
     final Pattern coordinatePattern = Pattern.compile("\\s*" + coordSeperator
       + "\\s*");
 
-    int numAxis = 0;
+    int axisCount = 0;
     final List<double[]> listOfCoordinateArrays = new ArrayList<double[]>();
     if (touples.length == 0) {
       return null;
@@ -903,24 +903,24 @@ public class CoordinatesListUtil {
         final String[] values = coordinatePattern.split(touple);
         if (values.length > 0) {
           final double[] coordinates = MathUtil.toDoubleArray(values);
-          numAxis = Math.max(numAxis, coordinates.length);
+          axisCount = Math.max(axisCount, coordinates.length);
           listOfCoordinateArrays.add(coordinates);
         }
       }
     }
 
-    return toCoordinateList(numAxis, listOfCoordinateArrays);
+    return toCoordinateList(axisCount, listOfCoordinateArrays);
   }
 
   public static CoordinatesList removeRepeatedPoints(
     final CoordinatesList points) {
-    final int numAxis = points.getNumAxis();
+    final int axisCount = points.getAxisCount();
     final List<Double> coordinates = new ArrayList<Double>();
     double x = points.getX(0);
     double y = points.getY(0);
     coordinates.add(x);
     coordinates.add(y);
-    for (int axisIndex = 2; axisIndex < numAxis; axisIndex++) {
+    for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
       coordinates.add(points.getValue(0, axisIndex));
     }
     for (int i = 0; i < points.size(); i++) {
@@ -929,14 +929,14 @@ public class CoordinatesListUtil {
       if (x != x1 || y != y1) {
         coordinates.add(x1);
         coordinates.add(y1);
-        for (int axisIndex = 2; axisIndex < numAxis; axisIndex++) {
+        for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
           coordinates.add(points.getValue(i, axisIndex));
         }
         x = x1;
         y = y1;
       }
     }
-    return new DoubleCoordinatesList(numAxis, coordinates);
+    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   public static double signedArea(final CoordinatesList ring) {
@@ -1063,7 +1063,7 @@ public class CoordinatesListUtil {
 
             final CoordinatesList newPoints;
             if (startIndex > index) {
-              newPoints = CoordinatesListUtil.create(points.getNumAxis(),
+              newPoints = CoordinatesListUtil.create(points.getAxisCount(),
                 startPoint, point);
             } else {
               newPoints = CoordinatesListUtil.subList(points, startPoint,
@@ -1089,7 +1089,7 @@ public class CoordinatesListUtil {
 
   public static CoordinatesList subList(final CoordinatesList points,
     final Coordinates startPoint, final int start) {
-    final int dimension = points.getNumAxis();
+    final int dimension = points.getAxisCount();
     final int length = points.size() - start;
     int size = length;
     int startIndex = 0;
@@ -1116,7 +1116,7 @@ public class CoordinatesListUtil {
   public static CoordinatesList subList(final CoordinatesList points,
     final Coordinates startPoint, final int start, final int length,
     final Coordinates endPoint) {
-    final int dimension = points.getNumAxis();
+    final int dimension = points.getAxisCount();
     int size = length;
     int startIndex = 0;
     int lastIndex = length;
@@ -1153,10 +1153,10 @@ public class CoordinatesListUtil {
     return newPoints;
   }
 
-  public static CoordinatesList toCoordinateList(final int numAxis,
+  public static CoordinatesList toCoordinateList(final int axisCount,
     final List<double[]> listOfCoordinateArrays) {
     final CoordinatesList points = new DoubleCoordinatesList(
-      listOfCoordinateArrays.size(), numAxis);
+      listOfCoordinateArrays.size(), axisCount);
     for (int i = 0; i < listOfCoordinateArrays.size(); i++) {
       final double[] coordinates = listOfCoordinateArrays.get(i);
       for (int j = 0; j < coordinates.length; j++) {

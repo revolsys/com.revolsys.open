@@ -88,19 +88,19 @@ public class PointImpl extends GeometryImpl implements Point {
   public PointImpl(final GeometryFactory geometryFactory,
     final double... coordinates) {
     super(geometryFactory);
-    final int numAxis = geometryFactory.getNumAxis();
-    this.coordinates = new double[numAxis];
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = geometryFactory.getAxisCount();
+    this.coordinates = new double[axisCount];
+    for (int i = 0; i < axisCount; i++) {
       double coordinate;
       if (i < coordinates.length) {
         coordinate = coordinates[i];
+        if (i < 2) {
+          coordinate = geometryFactory.makeXyPrecise(coordinate);
+        } else if (i == 2) {
+          coordinate = geometryFactory.makeZPrecise(coordinate);
+        }
       } else {
         coordinate = Double.NaN;
-      }
-      if (i < 2) {
-        coordinate = geometryFactory.makeXyPrecise(coordinate);
-      } else if (i == 2) {
-        coordinate = geometryFactory.makeZPrecise(coordinate);
       }
       this.coordinates[i] = coordinate;
     }
@@ -209,11 +209,11 @@ public class PointImpl extends GeometryImpl implements Point {
       if (coordinatesOperation == null) {
         targetCoordinates = coordinates;
       } else {
-        final int sourceNumAxis = getNumAxis();
-        final int targetNumAxis = geometryFactory.getNumAxis();
-        targetCoordinates = new double[targetNumAxis];
-        coordinatesOperation.perform(sourceNumAxis, coordinates, targetNumAxis,
-          targetCoordinates);
+        final int sourceAxisCount = getAxisCount();
+        final int targetAxisCount = geometryFactory.getAxisCount();
+        targetCoordinates = new double[targetAxisCount];
+        coordinatesOperation.perform(sourceAxisCount, coordinates,
+          targetAxisCount, targetCoordinates);
       }
 
       return geometryFactory.point(targetCoordinates);
@@ -350,8 +350,8 @@ public class PointImpl extends GeometryImpl implements Point {
     if (isEmpty()) {
       return Double.NaN;
     } else {
-      final int numAxis = getNumAxis();
-      if (axisIndex >= 0 && axisIndex < numAxis) {
+      final int axisCount = getAxisCount();
+      if (axisIndex >= 0 && axisIndex < axisCount) {
         return coordinates[axisIndex];
       } else {
         return Double.NaN;
@@ -377,8 +377,8 @@ public class PointImpl extends GeometryImpl implements Point {
 
   @Override
   public CoordinatesList getCoordinatesList() {
-    final int numAxis = getNumAxis();
-    return new DoubleCoordinatesList(numAxis, coordinates);
+    final int axisCount = getAxisCount();
+    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   @Override
@@ -499,6 +499,21 @@ public class PointImpl extends GeometryImpl implements Point {
       }
     }
     return true;
+  }
+
+  @Override
+  public Point move(final double... deltas) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (deltas == null || isEmpty()) {
+      return this;
+    } else {
+      final double[] coordinates = this.coordinates.clone();
+      final int axisCount = Math.min(deltas.length, getAxisCount());
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[axisIndex] += deltas[axisIndex];
+      }
+      return geometryFactory.point(coordinates);
+    }
   }
 
   @Override

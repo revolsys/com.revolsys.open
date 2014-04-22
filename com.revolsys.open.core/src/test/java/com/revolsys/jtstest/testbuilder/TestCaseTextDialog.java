@@ -49,7 +49,6 @@ import javax.swing.JTextArea;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKBWriter;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jtstest.testbuilder.model.JavaTestWriter;
 import com.revolsys.jtstest.testbuilder.model.TestCaseEdit;
 import com.revolsys.jtstest.testbuilder.model.XMLTestWriter;
@@ -153,10 +152,7 @@ public class TestCaseTextDialog extends JDialog {
     if (!isFormatted) {
       return g.toString();
     }
-    final WKTWriter writer = new WKTWriter();
-    writer.setFormatted(isFormatted);
-    writer.setMaxCoordinatesPerLine(5);
-    return writer.write(g);
+    return g.toWkt();
   }
 
   void jbInit() throws Exception {

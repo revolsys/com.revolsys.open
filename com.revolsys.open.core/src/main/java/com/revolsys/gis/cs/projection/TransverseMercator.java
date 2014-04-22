@@ -117,7 +117,7 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
   @Override
   public void inverse(final double x, final double y,
     final double[] targetCoordinates, final int targetOffset,
-    final int targetNumAxis) {
+    final int targetAxisCount) {
     final double m = m0 + (y - y0) / k0;
     final double sqrt1MinusESq = Math.sqrt(1 - eSq);
     final double e1 = (1 - sqrt1MinusESq) / (1 + sqrt1MinusESq);
@@ -162,8 +162,8 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
         * ePrimeSq + 24 * t1Sq)
         * d5 / 120) / cosPhi1;
 
-    targetCoordinates[targetOffset * targetNumAxis] = lambda;
-    targetCoordinates[targetOffset * targetNumAxis + 1] = phi;
+    targetCoordinates[targetOffset * targetAxisCount] = lambda;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = phi;
   }
 
   /**
@@ -217,7 +217,7 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
   @Override
   public void project(final double lambda, final double phi,
     final double[] targetCoordinates, final int targetOffset,
-    final int targetNumAxis) {
+    final int targetAxisCount) {
     final double cosPhi = Math.cos(phi);
     final double sinPhi = Math.sin(phi);
     final double tanPhi = Math.tan(phi);
@@ -247,8 +247,8 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
         * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24 + (61 - 58 * t
           + tSq + 600 * c - 330 * ePrimeSq)
           * a1Pow6 / 720));
-    targetCoordinates[targetOffset * targetNumAxis] = x;
-    targetCoordinates[targetOffset * targetNumAxis + 1] = y;
+    targetCoordinates[targetOffset * targetAxisCount] = x;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = y;
   }
 
   /**

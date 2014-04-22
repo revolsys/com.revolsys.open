@@ -26,13 +26,13 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   private void coordinates(final XmlWriter out, final Coordinates point) {
     out.startTag(GmlConstants.COORDINATES);
-    final int numAxis = point.getNumAxis();
+    final int axisCount = point.getAxisCount();
     final double x = point.getX();
     out.text(x);
     final double y = point.getY();
     out.text(",");
     out.text(y);
-    if (numAxis > 2) {
+    if (axisCount > 2) {
       final double z = point.getZ();
       if (Double.isNaN(z)) {
         out.text(0);
@@ -45,7 +45,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   private void coordinates(final XmlWriter out, final CoordinatesList points) {
     out.startTag(GmlConstants.COORDINATES);
-    final int numAxis = points.getNumAxis();
+    final int axisCount = points.getAxisCount();
     boolean first = true;
     for (int i = 0; i < points.size(); i++) {
       if (first) {
@@ -58,7 +58,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
       final double y = points.getY(i);
       out.text(",");
       out.text(y);
-      if (numAxis > 2) {
+      if (axisCount > 2) {
         final double z = points.getZ(i);
         if (Double.isNaN(z)) {
           out.text(0);
@@ -107,7 +107,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     final boolean writeSrsName) {
     out.startTag(tag);
     srsName(out, geometryCollection, writeSrsName);
-    for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
+    for (int i = 0; i < geometryCollection.getGeometryCount(); i++) {
       final Geometry geometry = geometryCollection.getGeometry(i);
       out.startTag(memberTag);
       geometry(out, geometry, false);
@@ -180,14 +180,14 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   private void pos(final XmlWriter out, final Coordinates coordinates) {
     out.startTag(GmlConstants.POS);
-    final int numAxis = coordinates.getNumAxis();
-    out.attribute(GmlConstants.DIMENSION, numAxis);
+    final int axisCount = coordinates.getAxisCount();
+    out.attribute(GmlConstants.DIMENSION, axisCount);
     final double x = coordinates.getX();
     out.text(x);
     final double y = coordinates.getY();
     out.text(" ");
     out.text(y);
-    if (numAxis > 2) {
+    if (axisCount > 2) {
       final double z = coordinates.getZ();
       out.text(" ");
       if (Double.isNaN(z)) {
@@ -201,8 +201,8 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   private void posList(final XmlWriter out, final CoordinatesList points) {
     out.startTag(GmlConstants.POS_LIST);
-    final int numAxis = points.getNumAxis();
-    out.attribute(GmlConstants.DIMENSION, numAxis);
+    final int axisCount = points.getAxisCount();
+    out.attribute(GmlConstants.DIMENSION, axisCount);
     boolean first = true;
     for (int i = 0; i < points.size(); i++) {
       if (first) {
@@ -215,7 +215,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
       final double y = points.getY(i);
       out.text(" ");
       out.text(y);
-      if (numAxis > 2) {
+      if (axisCount > 2) {
         final double z = points.getZ(i);
         out.text(" ");
         if (Double.isNaN(z)) {

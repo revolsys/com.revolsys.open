@@ -86,7 +86,7 @@ public class GeometryCollectionIterator implements Iterator {
     this.parent = parent;
     atStart = true;
     index = 0;
-    max = parent.getNumGeometries();
+    max = parent.getGeometryCount();
   }
 
   /**

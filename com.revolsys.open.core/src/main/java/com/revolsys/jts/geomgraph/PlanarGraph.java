@@ -217,7 +217,7 @@ public class PlanarGraph {
     return nodes;
   }
 
-  public Collection getNodes() {
+  public Collection<Node> getNodes() {
     return nodes.values();
   }
 

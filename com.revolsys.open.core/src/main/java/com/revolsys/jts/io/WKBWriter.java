@@ -373,7 +373,7 @@ public class WKBWriter {
       // if 3rd dim is requested, only write it if the CoordinatesList provides
       // it
       double ordVal = Coordinates.NULL_ORDINATE;
-      if (seq.getNumAxis() >= 3) {
+      if (seq.getAxisCount() >= 3) {
         ordVal = seq.getValue(index, 2);
       }
       ByteOrderValues.putDouble(ordVal, buf, byteOrder);
@@ -393,7 +393,7 @@ public class WKBWriter {
       // if 3rd dim is requested, only write it if the CoordinatesList provides
       // it
       double ordVal = Coordinates.NULL_ORDINATE;
-      if (seq.getNumAxis() >= 3) {
+      if (seq.getAxisCount() >= 3) {
         ordVal = seq.getValue(2);
       }
       ByteOrderValues.putDouble(ordVal, buf, byteOrder);
@@ -416,8 +416,8 @@ public class WKBWriter {
     final GeometryCollection gc, final OutStream os) throws IOException {
     writeByteOrder(os);
     writeGeometryType(geometryType, gc, os);
-    writeInt(gc.getNumGeometries(), os);
-    for (int i = 0; i < gc.getNumGeometries(); i++) {
+    writeInt(gc.getGeometryCount(), os);
+    for (int i = 0; i < gc.getGeometryCount(); i++) {
       write(gc.getGeometry(i), os);
     }
   }

@@ -46,7 +46,6 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *@version 1.7
  */
 public interface Point extends Geometry, Puntal, Vertex {
-
   /**
    * Creates and returns a full copy of this {@link Point} object.
    * (including all coordinates contained by it).
@@ -67,6 +66,8 @@ public interface Point extends Geometry, Puntal, Vertex {
   double getCoordinate(final int axisIndex);
 
   CoordinatesList getCoordinatesList();
+
+  Point move(double... deltas);
 
   @Override
   Point normalize();

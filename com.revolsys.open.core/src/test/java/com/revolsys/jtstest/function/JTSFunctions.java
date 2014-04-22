@@ -6,7 +6,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.operation.buffer.BufferOp;
+import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
@@ -111,7 +111,7 @@ public class JTSFunctions {
     final Geometry lines = logoLines(g);
     final BufferParameters bufParams = new BufferParameters();
     bufParams.setEndCapStyle(BufferParameters.CAP_SQUARE);
-    return BufferOp.bufferOp(lines, distance, bufParams);
+    return Buffer.buffer(lines, distance, bufParams);
   }
 
   public static Geometry logoLines(final Geometry g) {

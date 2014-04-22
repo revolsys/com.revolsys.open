@@ -100,7 +100,7 @@ public class ValidateGeometryRange extends
 
   private boolean isValid(final String type, final Geometry geometry) {
     boolean valid = true;
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof Point) {
         final Coordinates coordinate = geometry.getCoordinate();

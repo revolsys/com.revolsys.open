@@ -90,7 +90,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     final int geometryIndex = geometries.size();
     properties.put("geometryIndex", geometryIndex);
     geometries.add(geometry);
-    for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+    for (int partIndex = 0; partIndex < geometry.getGeometryCount(); partIndex++) {
       properties.put("partIndex", partIndex);
       final Geometry part = geometry.getGeometry(partIndex);
       if (part instanceof Point) {
@@ -258,8 +258,8 @@ public class GeometryGraph extends Graph<LineSegment> {
       "geometryIndex", "partIndex", "segmentIndex");
     final List<Geometry> geometries = new ArrayList<Geometry>(points);
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
-    final int numAxis = geometryFactory.getNumAxis();
-    DoubleListCoordinatesList points = new DoubleListCoordinatesList(numAxis);
+    final int axisCount = geometryFactory.getAxisCount();
+    DoubleListCoordinatesList points = new DoubleListCoordinatesList(axisCount);
     Node<LineSegment> previousNode = null;
     for (final Edge<LineSegment> edge : getEdges(comparator)) {
       final LineSegment lineSegment = edge.getObject();
@@ -277,7 +277,7 @@ public class GeometryGraph extends Graph<LineSegment> {
             final LineString line = geometryFactory.lineString(points);
             geometries.add(line);
           }
-          points = new DoubleListCoordinatesList(numAxis);
+          points = new DoubleListCoordinatesList(axisCount);
           points.addAll(lineSegment);
         }
         if (points.size() > 1) {
@@ -285,7 +285,7 @@ public class GeometryGraph extends Graph<LineSegment> {
           if (toDegree != 2) {
             final LineString line = geometryFactory.lineString(points);
             geometries.add(line);
-            points = new DoubleListCoordinatesList(numAxis);
+            points = new DoubleListCoordinatesList(axisCount);
             points.add(toNode);
           }
         }

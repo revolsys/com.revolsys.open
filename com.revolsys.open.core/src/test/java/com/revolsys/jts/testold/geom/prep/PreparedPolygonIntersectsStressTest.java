@@ -46,7 +46,6 @@ import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.prep.PreparedPolygon;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 /**
@@ -61,9 +60,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
 
   private static final GeometryFactory fact = GeometryFactory.getFactory(0, 2);
 
-  static WKTReader wktRdr = new WKTReader(fact);
-
-  static WKTWriter wktWriter = new WKTWriter();
+  private static WKTReader wktRdr = new WKTReader(fact);
 
   public static void main(final String args[]) {
     TestRunner.run(PreparedPolygonIntersectsStressTest.class);

@@ -122,7 +122,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   public boolean add(final MultiLineString multiLine) {
     final int index = startNodes.size();
     if (multiLine != null && multiLine.getLength() > 0) {
-      for (int i = 0; i < multiLine.getNumGeometries(); i++) {
+      for (int i = 0; i < multiLine.getGeometryCount(); i++) {
         final LineString line = (LineString)multiLine.getGeometry(i);
         add(line, index);
       }
@@ -673,7 +673,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
   private void integrateMultiLine(final MultiLineString multLine,
     final int index) {
-    for (int i = 0; i < multLine.getNumGeometries(); i++) {
+    for (int i = 0; i < multLine.getGeometryCount(); i++) {
       final LineString line = (LineString)multLine.getGeometry(i);
       integrateLine(line, index);
     }

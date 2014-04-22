@@ -74,7 +74,7 @@ public class VertexTaggedGeometryDataMapper {
   }
 
   public void loadSourceGeometries(final Geometry geomColl) {
-    for (int i = 0; i < geomColl.getNumGeometries(); i++) {
+    for (int i = 0; i < geomColl.getGeometryCount(); i++) {
       final Geometry geom = geomColl.getGeometry(i);
       loadVertices(geom.getCoordinateArray(), geom.getUserData());
     }
@@ -96,7 +96,7 @@ public class VertexTaggedGeometryDataMapper {
    * @param targetGeom
    */
   public void transferData(final Geometry targetGeom) {
-    for (int i = 0; i < targetGeom.getNumGeometries(); i++) {
+    for (int i = 0; i < targetGeom.getGeometryCount(); i++) {
       final Geometry geom = targetGeom.getGeometry(i);
       final Coordinates vertexKey = (Coordinates)geom.getUserData();
       if (vertexKey == null) {

@@ -14,7 +14,7 @@ public class MultiPointVertexIterable extends AbstractIterator<Vertex> {
 
   public MultiPointVertexIterable(final MultiPoint geometry) {
     this.vertex = new MultiPointVertex(geometry, 0);
-    this.partCount = geometry.getNumGeometries();
+    this.partCount = geometry.getGeometryCount();
   }
 
   @Override

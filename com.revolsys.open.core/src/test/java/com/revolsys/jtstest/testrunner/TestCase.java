@@ -35,11 +35,19 @@ package com.revolsys.jtstest.testrunner;
 import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
+import org.springframework.util.StringUtils;
+
+import com.revolsys.io.map.InvokeMethodMapObjectFactory;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.WKTWriter;
+import com.revolsys.jts.geom.GeometryFactory;
 
 /**
  *  A set of tests for two Geometry's.
@@ -49,8 +57,19 @@ import com.revolsys.jts.io.WKTWriter;
  *
  * @version 1.7
  */
-public class TestCase implements Runnable {
+public class TestCase implements Runnable, MapSerializer {
   private String description;
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "testCase", "Test Case", TestCase.class, "create");
+
+  public static TestCase create(final Map<String, Object> map) {
+    return new TestCase(map);
+  }
+
+  private String aWkt;
+
+  private String bWkt;
 
   private Geometry a;
 
@@ -58,17 +77,19 @@ public class TestCase implements Runnable {
 
   private final Vector<Test> tests = new Vector<Test>();
 
-  private final TestRun testRun;
+  private TestRun testRun;
 
-  private final int caseIndex;
-
-  private final int lineNumber;
-
-  private File aWktFile;
-
-  private File bWktFile;
+  private int caseIndex;
 
   private boolean isRun = false;
+
+  private GeometryFactory geometryFactory;
+
+  public TestCase(final Map<String, Object> map) {
+    this.description = (String)map.get("description");
+    this.aWkt = (String)map.get("a");
+    this.bWkt = (String)map.get("b");
+  }
 
   /**
    *  Creates a TestCase with the given description. The tests will be applied
@@ -77,14 +98,22 @@ public class TestCase implements Runnable {
   public TestCase(final String description, final Geometry a, final Geometry b,
     final File aWktFile, final File bWktFile, final TestRun testRun,
     final int caseIndex, final int lineNumber) {
-    this.description = description;
+    if (description != null) {
+      this.description = description.replaceAll("\\s+", " ");
+    }
     this.a = a;
     this.b = b;
-    this.aWktFile = aWktFile;
-    this.bWktFile = bWktFile;
     this.testRun = testRun;
     this.caseIndex = caseIndex;
-    this.lineNumber = lineNumber;
+  }
+
+  public TestCase(final TestRun testRun, final int index,
+    final Map<String, Object> map) {
+    this.testRun = testRun;
+    this.caseIndex = index;
+    this.description = (String)map.get("description");
+    this.aWkt = (String)map.get("a");
+    this.bWkt = (String)map.get("b");
   }
 
   /**
@@ -110,8 +139,12 @@ public class TestCase implements Runnable {
     return b;
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
   public int getLineNumber() {
-    return lineNumber;
+    return 0;
   }
 
   /**
@@ -127,7 +160,7 @@ public class TestCase implements Runnable {
     return testRun;
   }
 
-  public List getTests() {
+  public List<Test> getTests() {
     return Collections.unmodifiableList(tests);
   }
 
@@ -148,34 +181,55 @@ public class TestCase implements Runnable {
   }
 
   public void setDescription(final String description) {
-    this.description = description;
+    this.description = StringUtils.trimWhitespace(description);
   }
 
   public void setGeometryA(final Geometry a) {
-    aWktFile = null;
     this.a = a;
   }
 
   public void setGeometryB(final Geometry b) {
-    bWktFile = null;
     this.b = b;
   }
 
   @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    map.put("type", "test");
+
+    if (StringUtils.hasText(description)) {
+      map.put("description", description);
+    }
+    MapSerializerUtil.add(map, "geometryFactory", geometryFactory);
+    final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    if (testRun != null) {
+      MapSerializerUtil.addAll(properties, testRun.getProperties());
+    }
+    MapSerializerUtil.add(properties, "a", a);
+    MapSerializerUtil.add(properties, "b", b);
+
+    if (!properties.isEmpty()) {
+      map.put("properties", properties);
+    }
+
+    MapSerializerUtil.add(map, "tests", tests);
+    return map;
+  }
+
+  @Override
   public String toString() {
-    return description;
+    return toMap().toString();
   }
 
   public String toXml() {
-    final WKTWriter writer = new WKTWriter();
     String xml = "";
     xml += "<case>" + StringUtil.newLine;
     if (description != null && description.length() > 0) {
       xml += "  <desc>" + StringUtil.escapeHTML(description) + "</desc>"
         + StringUtil.newLine;
     }
-    xml += xml("a", a, aWktFile, writer) + StringUtil.newLine;
-    xml += xml("b", b, bWktFile, writer);
+    xml += xml("a", a) + StringUtil.newLine;
+    xml += xml("b", b);
     for (final Iterator i = tests.iterator(); i.hasNext();) {
       final Test test = (Test)i.next();
       xml += test.toXml();
@@ -184,17 +238,13 @@ public class TestCase implements Runnable {
     return xml;
   }
 
-  private String xml(final String id, final Geometry g, final File wktFile,
-    final WKTWriter writer) {
+  private String xml(final String id, final Geometry g) {
     if (g == null) {
       return "";
     }
-    if (wktFile != null) {
-      return "  <" + id + " file=\"" + wktFile + "\"/>";
-    }
     String xml = "";
     xml += "  <" + id + ">" + StringUtil.newLine;
-    xml += StringUtil.indent(writer.writeFormatted(g), 4) + StringUtil.newLine;
+    xml += StringUtil.indent(g.toWkt(), 4) + StringUtil.newLine;
     xml += "  </" + id + ">" + StringUtil.newLine;
     return xml;
   }

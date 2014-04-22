@@ -48,7 +48,7 @@ public class SelectionFunctions {
 
   public static Geometry disjoint(final Geometry a, final Geometry mask) {
     final List selected = new ArrayList();
-    for (int i = 0; i < a.getNumGeometries(); i++) {
+    for (int i = 0; i < a.getGeometryCount(); i++) {
       final Geometry g = a.getGeometry(i);
       if (mask.disjoint(g)) {
         selected.add(g);
@@ -59,7 +59,7 @@ public class SelectionFunctions {
 
   public static Geometry firstNComponents(final Geometry g, final int n) {
     final List comp = new ArrayList();
-    for (int i = 0; i < g.getNumGeometries() && i < n; i++) {
+    for (int i = 0; i < g.getGeometryCount() && i < n; i++) {
       comp.add(g.getGeometry(i));
     }
     return g.getGeometryFactory().buildGeometry(comp);
@@ -76,7 +76,7 @@ public class SelectionFunctions {
 
   public static Geometry invalid(final Geometry a) {
     final List selected = new ArrayList();
-    for (int i = 0; i < a.getNumGeometries(); i++) {
+    for (int i = 0; i < a.getGeometryCount(); i++) {
       final Geometry g = a.getGeometry(i);
       if (!g.isValid()) {
         selected.add(g);
@@ -88,7 +88,7 @@ public class SelectionFunctions {
   private static Geometry select(final Geometry geom,
     final GeometryPredicate pred) {
     final List selected = new ArrayList();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry g = geom.getGeometry(i);
       if (pred.isTrue(g)) {
         selected.add(g);
@@ -100,7 +100,7 @@ public class SelectionFunctions {
 
   public static Geometry valid(final Geometry a) {
     final List selected = new ArrayList();
-    for (int i = 0; i < a.getNumGeometries(); i++) {
+    for (int i = 0; i < a.getGeometryCount(); i++) {
       final Geometry g = a.getGeometry(i);
       if (g.isValid()) {
         selected.add(g);

@@ -101,7 +101,7 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
     final List<LineString> allRings = new ArrayList<>();
     for (final Polygon polygon : getPolygons()) {
       final Geometry rings = polygon.getBoundary();
-      for (int j = 0; j < rings.getNumGeometries(); j++) {
+      for (int j = 0; j < rings.getGeometryCount(); j++) {
         final LineString ring = (LineString)rings.getGeometry(j);
         allRings.add(ring);
       }

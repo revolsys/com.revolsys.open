@@ -284,7 +284,7 @@ public class GeometryEditor {
 
     // edit the component geometries
     final ArrayList geometries = new ArrayList();
-    for (int i = 0; i < collectionForType.getNumGeometries(); i++) {
+    for (int i = 0; i < collectionForType.getGeometryCount(); i++) {
       final Geometry geometry = edit(collectionForType.getGeometry(i),
         operation);
       if (geometry == null || geometry.isEmpty()) {

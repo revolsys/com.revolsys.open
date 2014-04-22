@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
@@ -53,7 +54,6 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Triangle;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * A class that contains the {@link QuadEdge}s representing a planar
@@ -121,10 +121,10 @@ public class QuadEdgeSubdivision {
     private void checkTriangleSize(final Coordinates[] pts) {
       String loc = "";
       if (pts.length >= 2) {
-        loc = WKTWriter.toLineString(pts[0], pts[1]);
+        loc = WktWriter.lineString(pts[0], pts[1]);
       } else {
         if (pts.length >= 1) {
-          loc = WKTWriter.toPoint(pts[0]);
+          loc = WktWriter.point(pts[0]);
         }
       }
       // Assert.isTrue(pts.length == 4,

@@ -65,7 +65,7 @@ public class GeometryMapper
   public static Geometry map(Geometry geom, MapOp op)
   {
     List mapped = new ArrayList();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       Geometry g = op.map(geom.getGeometry(i));
       if (g != null)
         mapped.add(g);

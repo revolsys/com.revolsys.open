@@ -133,13 +133,13 @@ class GeometryCollectionNode extends GeometryNode {
   GeometryCollection coll;
 
   GeometryCollectionNode(final GeometryCollection coll) {
-    super(coll, coll.getNumGeometries(), null);
+    super(coll, coll.getGeometryCount(), null);
     this.coll = coll;
   }
 
   @Override
   protected void fillChildren() {
-    for (int i = 0; i < coll.getNumGeometries(); i++) {
+    for (int i = 0; i < coll.getGeometryCount(); i++) {
       final GeometryNode node = create(coll.getGeometry(i));
       node.setIndex(i);
       children.add(node);

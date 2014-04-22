@@ -103,7 +103,7 @@ public class LinearIterator {
       throw new IllegalArgumentException("Lineal geometry is required");
     }
     this.linearGeom = linearGeom;
-    numLines = linearGeom.getNumGeometries();
+    numLines = linearGeom.getGeometryCount();
     this.componentIndex = componentIndex;
     this.vertexIndex = vertexIndex;
     loadCurrentLine();

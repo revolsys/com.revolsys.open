@@ -59,10 +59,10 @@ public class ArcSdeStGeometryDataStoreExtension implements
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.ESRI_SRID_PROPERTY, esriSrid);
 
-          int numAxis = resultSet.getInt(5);
-          numAxis = Math.max(numAxis, 2);
+          int axisCount = resultSet.getInt(5);
+          axisCount = Math.max(axisCount, 2);
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
-            JdbcAttributeAdder.NUM_AXIS, numAxis);
+            JdbcAttributeAdder.NUM_AXIS, axisCount);
 
           final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache.getSpatialReference(
             schema, esriSrid);
@@ -77,8 +77,8 @@ public class ArcSdeStGeometryDataStoreExtension implements
           if (srid <= 0) {
             srid = geometryFactory.getSrid();
           }
-          numAxis = Math.min(numAxis, 3);
-          geometryFactory = GeometryFactory.getFactory(srid, numAxis, scaleXy,
+          axisCount = Math.min(axisCount, 3);
+          geometryFactory = GeometryFactory.getFactory(srid, axisCount, scaleXy,
             scaleZ);
 
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,

@@ -52,7 +52,6 @@ import com.revolsys.jts.geom.vertex.AbstractVertex;
  *@version 1.7
  */
 public interface LineString extends Lineal {
-
   /**
    * Creates and returns a full copy of this {@link LineString} object.
    * (including all coordinates contained by it).
@@ -89,6 +88,9 @@ public interface LineString extends Lineal {
   boolean isClosed();
 
   boolean isRing();
+
+  @Override
+  LineString move(final double... deltas);
 
   /**
    * Normalizes a LineString.  A normalized linestring

@@ -124,7 +124,7 @@ public class GeometryPrecisionReducer {
   private GeometryFactory createFactory(final GeometryFactory inputFactory,
     final PrecisionModel pm) {
     final GeometryFactory newFactory = GeometryFactory.getFactory(
-      inputFactory.getSrid(), inputFactory.getNumAxis(), pm.getScale(),
+      inputFactory.getSrid(), inputFactory.getAxisCount(), pm.getScale(),
       inputFactory.getScaleZ());
     return newFactory;
   }

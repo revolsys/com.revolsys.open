@@ -55,7 +55,7 @@ public class ShapefileHeader{
     public ShapefileHeader(GeometryCollection geometries,int dims) throws Exception
     {
         ShapeHandler handle;
-        if (geometries.getNumGeometries() == 0)
+        if (geometries.getGeometryCount() == 0)
         {
             handle = new PointHandler(); //default
         }
@@ -63,7 +63,7 @@ public class ShapefileHeader{
         {
                handle = Shapefile.getShapeHandler(geometries.getGeometry(0),dims);
         }
-        int numShapes = geometries.getNumGeometries();
+        int numShapes = geometries.getGeometryCount();
         shapeType = handle.getShapeType();
         version = Shapefile.VERSION;
         fileCode = Shapefile.SHAPEFILE_ID;

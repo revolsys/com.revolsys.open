@@ -110,7 +110,7 @@ public class RectangleContains {
       return isLineStringContainedInBoundary((LineString)geom);
     }
 
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry comp = geom.getGeometry(i);
       if (!isContainedInBoundary(comp)) {
         return false;

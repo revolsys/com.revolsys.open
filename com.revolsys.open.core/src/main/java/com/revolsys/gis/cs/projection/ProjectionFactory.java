@@ -65,7 +65,7 @@ public final class ProjectionFactory {
         return point;
       } else {
         final DoubleCoordinates newPoint = new DoubleCoordinates(
-          point.getNumAxis());
+          point.getAxisCount());
         operation.perform(point, newPoint);
         targetGeometryFactory.makePrecise(newPoint);
         return newPoint;

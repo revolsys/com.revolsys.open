@@ -120,7 +120,7 @@ public class PolygonHandler implements ShapeHandler {
 
     int nrings = 0;
 
-    for (int t = 0; t < multi.getNumGeometries(); t++) {
+    for (int t = 0; t < multi.getGeometryCount(); t++) {
       Polygon p;
       p = (Polygon)multi.getGeometry(t);
       nrings = nrings + 1 + p.getNumInteriorRing();

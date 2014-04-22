@@ -37,7 +37,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -45,8 +44,6 @@ import com.revolsys.jts.util.Assert;
  */
 public class TestCase implements Testable {
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 2);
-
-  private final WKTWriter wktWriter = new WKTWriter();
 
   protected String name, description, expectedIM;
 
@@ -218,7 +215,7 @@ public class TestCase implements Testable {
     if (geom[i] == null) {
       return null;
     }
-    return wktWriter.write(geom[i]);
+    return geom[i].toWkt();
   }
 
   void init(final String name, final String description, final String wkta,

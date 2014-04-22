@@ -165,7 +165,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     if ("line".equals(style.getMarkerPlacement())) {
       renderMarkerVertices(viewport, graphics, geometry, style);
     } else {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry part = geometry.getGeometry(i);
         if (part instanceof Point) {
           final Point point = (Point)part;
@@ -298,7 +298,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, Geometry geometry, final MarkerStyle style) {
     geometry = getGeometry(viewport, geometry);
     if (!geometry.isEmpty()) {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry part = geometry.getGeometry(i);
         if (part instanceof Point) {
           final Point point = (Point)part;
@@ -323,7 +323,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final MarkerStyle style) {
     geometry = getGeometry(viewport, geometry);
     if (!geometry.isEmpty()) {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry part = geometry.getGeometry(i);
         if (part instanceof LineString) {
           final LineString lineString = (LineString)part;

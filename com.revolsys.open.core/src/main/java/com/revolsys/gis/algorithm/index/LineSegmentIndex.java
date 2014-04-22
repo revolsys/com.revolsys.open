@@ -16,7 +16,7 @@ import com.revolsys.jts.index.quadtree.Quadtree;
 
 public class LineSegmentIndex extends Quadtree {
   public void insert(final Geometry geometry) {
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof LineString) {
         final LineString line = (LineString)subGeometry;

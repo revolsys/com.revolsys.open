@@ -71,8 +71,8 @@ public class UnionInteracting
 		this.g0 = g0;
 		this.g1 = g1;
 		geomFactory = g0.getGeometryFactory();
-		interacts0 = new boolean[g0.getNumGeometries()];
-		interacts1 = new boolean[g1.getNumGeometries()];
+		interacts0 = new boolean[g0.getGeometryCount()];
+		interacts1 = new boolean[g1.getGeometryCount()];
 	}
 	
 	public Geometry union()
@@ -118,7 +118,7 @@ public class UnionInteracting
 
 	private void computeInteracting()
 	{
-		for (int i = 0; i < g0.getNumGeometries(); i++) {
+		for (int i = 0; i < g0.getGeometryCount(); i++) {
 			Geometry elem = g0.getGeometry(i);
 			interacts0[i] = computeInteracting(elem);
 		}
@@ -127,7 +127,7 @@ public class UnionInteracting
 	private boolean computeInteracting(Geometry elem0)
 	{
 		boolean interactsWithAny = false;
-		for (int i = 0; i < g1.getNumGeometries(); i++) {
+		for (int i = 0; i < g1.getGeometryCount(); i++) {
 			Geometry elem1 = g1.getGeometry(i);
 			boolean interacts = elem1.getBoundingBox().intersects(elem0.getBoundingBox());
 			if (interacts) interacts1[i] = true;
@@ -141,7 +141,7 @@ public class UnionInteracting
   		boolean[] interacts, boolean isInteracting)
   {
   	List extractedGeoms = new ArrayList();
-  	for (int i = 0; i < geom.getNumGeometries(); i++) { 
+  	for (int i = 0; i < geom.getGeometryCount(); i++) { 
   		Geometry elem = geom.getGeometry(i);
   		if (interacts[i] == isInteracting)
   			extractedGeoms.add(elem);

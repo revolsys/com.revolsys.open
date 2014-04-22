@@ -55,8 +55,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
       return false;
     } else if (geometry1.getClass() == geometry2.getClass()) {
       if (geometry1 instanceof GeometryCollection) {
-        if (geometry1.getNumGeometries() == geometry2.getNumGeometries()) {
-          for (int i = 0; i < geometry1.getNumGeometries(); i++) {
+        if (geometry1.getGeometryCount() == geometry2.getGeometryCount()) {
+          for (int i = 0; i < geometry1.getGeometryCount(); i++) {
             final Geometry subGeometry1 = geometry1.getGeometry(i);
             final Geometry subGeometry2 = geometry2.getGeometry(i);
             if (!equals(subGeometry1, subGeometry2)) {
@@ -75,9 +75,9 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
             final CoordinatesList points1 = parts1.get(i);
             final CoordinatesList points2 = parts2.get(i);
             if (points1.size() == points2.size()
-              && points1.getNumAxis() == points2.getNumAxis()) {
+              && points1.getAxisCount() == points2.getAxisCount()) {
               for (int j = 0; j < points1.size(); j++) {
-                for (int k = 0; k < points1.getNumAxis(); k++) {
+                for (int k = 0; k < points1.getAxisCount(); k++) {
                   double value1 = points1.getValue(j, k);
                   double value2 = points2.getValue(j, k);
                   value1 = precisionModel.makePrecise(value1);

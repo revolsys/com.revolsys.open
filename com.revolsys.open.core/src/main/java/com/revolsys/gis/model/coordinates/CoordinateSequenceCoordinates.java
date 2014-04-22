@@ -27,13 +27,13 @@ public class CoordinateSequenceCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public int getNumAxis() {
-    return (byte)coordinates.getNumAxis();
+  public int getAxisCount() {
+    return (byte)coordinates.getAxisCount();
   }
 
   @Override
   public double getValue(final int index) {
-    if (index >= 0 && index < getNumAxis()) {
+    if (index >= 0 && index < getAxisCount()) {
       return coordinates.getValue(this.index, index);
     } else {
       return 0;
@@ -46,7 +46,7 @@ public class CoordinateSequenceCoordinates extends AbstractCoordinates {
 
   @Override
   public void setValue(final int index, final double value) {
-    if (index >= 0 && index < getNumAxis()) {
+    if (index >= 0 && index < getAxisCount()) {
       coordinates.setValue(this.index, index, value);
     }
   }

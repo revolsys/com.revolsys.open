@@ -21,10 +21,10 @@ public class Geometry2DEquals implements Equals<Geometry> {
   @Override
   public boolean equals(final Geometry geometry1, final Geometry geometry2,
     final Collection<String> exclude) {
-    if (geometry1.getNumGeometries() != geometry2.getNumGeometries()) {
+    if (geometry1.getGeometryCount() != geometry2.getGeometryCount()) {
       return false;
     }
-    for (int j = 0; j < geometry1.getNumGeometries(); j++) {
+    for (int j = 0; j < geometry1.getGeometryCount(); j++) {
       final Geometry geometryPart1 = geometry1.getGeometry(j);
       final Geometry geometryPart2 = geometry2.getGeometry(j);
       if (!geometryPart1.equals(geometryPart2)) {

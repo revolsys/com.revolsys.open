@@ -15,55 +15,55 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   double[] coordinates;
 
-  private final byte numAxis;
+  private final byte axisCount;
 
   public DoubleCoordinatesList(final CoordinatesList coordinatesList) {
-    this(coordinatesList.getNumAxis(), coordinatesList.getCoordinates());
+    this(coordinatesList.getAxisCount(), coordinatesList.getCoordinates());
   }
 
-  public DoubleCoordinatesList(final int numAxis) {
-    this(0, numAxis);
+  public DoubleCoordinatesList(final int axisCount) {
+    this(0, axisCount);
   }
 
-  public DoubleCoordinatesList(final int numAxis,
+  public DoubleCoordinatesList(final int axisCount,
     final Collection<Coordinates> points) {
-    this(points.size(), numAxis);
+    this(points.size(), axisCount);
     int i = 0;
     for (final Coordinates point : points) {
       setPoint(i++, point);
     }
   }
 
-  public DoubleCoordinatesList(final int numAxis, final Coordinates... points) {
-    this(points.length, numAxis);
+  public DoubleCoordinatesList(final int axisCount, final Coordinates... points) {
+    this(points.length, axisCount);
     for (int i = 0; i < points.length; i++) {
       final Coordinates point = points[i];
       setPoint(i, point);
     }
   }
 
-  public DoubleCoordinatesList(final int numAxis,
+  public DoubleCoordinatesList(final int axisCount,
     final CoordinatesList coordinatesList) {
-    this(coordinatesList.size(), numAxis);
-    coordinatesList.copy(0, this, 0, numAxis, coordinatesList.size());
+    this(coordinatesList.size(), axisCount);
+    coordinatesList.copy(0, this, 0, axisCount, coordinatesList.size());
   }
 
-  public DoubleCoordinatesList(final int numAxis, final double... coordinates) {
-    assert numAxis > 2;
-    this.numAxis = (byte)numAxis;
+  public DoubleCoordinatesList(final int axisCount, final double... coordinates) {
+    assert axisCount > 2;
+    this.axisCount = (byte)axisCount;
     this.coordinates = coordinates;
   }
 
-  public DoubleCoordinatesList(final int size, final int numAxis) {
-    assert numAxis > 2;
+  public DoubleCoordinatesList(final int size, final int axisCount) {
+    assert axisCount > 2;
     assert size >= 0;
-    this.coordinates = new double[size * numAxis];
-    this.numAxis = (byte)numAxis;
+    this.coordinates = new double[size * axisCount];
+    this.axisCount = (byte)axisCount;
   }
 
-  public DoubleCoordinatesList(final int numAxis,
+  public DoubleCoordinatesList(final int axisCount,
     final List<? extends Number> coordinates) {
-    this(numAxis, MathUtil.toDoubleArray(coordinates));
+    this(axisCount, MathUtil.toDoubleArray(coordinates));
   }
 
   @Override
@@ -79,15 +79,15 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public int getNumAxis() {
-    return numAxis;
+  public int getAxisCount() {
+    return axisCount;
   }
 
   @Override
   public double getValue(final int index, final int axisIndex) {
-    final int numAxis = getNumAxis();
-    if (axisIndex < numAxis) {
-      return coordinates[index * numAxis + axisIndex];
+    final int axisCount = getAxisCount();
+    if (axisIndex < axisCount) {
+      return coordinates[index * axisCount + axisIndex];
     } else {
       return Double.NaN;
     }
@@ -95,18 +95,18 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   @Override
   public void setValue(final int index, final int axisIndex, final double value) {
-    final int numAxis = getNumAxis();
-    if (axisIndex < numAxis) {
-      coordinates[index * numAxis + axisIndex] = value;
+    final int axisCount = getAxisCount();
+    if (axisIndex < axisCount) {
+      coordinates[index * axisCount + axisIndex] = value;
     }
   }
 
   @Override
   public int size() {
-    if (numAxis < 2 || coordinates == null) {
+    if (axisCount < 2 || coordinates == null) {
       return 0;
     } else {
-      return coordinates.length / numAxis;
+      return coordinates.length / axisCount;
     }
   }
 }

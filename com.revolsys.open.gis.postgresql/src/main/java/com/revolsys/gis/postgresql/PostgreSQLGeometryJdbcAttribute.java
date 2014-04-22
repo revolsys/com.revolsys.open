@@ -33,23 +33,23 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private final int srid;
 
-  private final int numAxis;
+  private final int axisCount;
 
   public PostgreSQLGeometryJdbcAttribute(final String name,
     final DataType type, final boolean required, final String description,
-    final Map<String, Object> properties, final int srid, final int numAxis,
+    final Map<String, Object> properties, final int srid, final int axisCount,
     final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     super(name, type, -1, 0, 0, required, description, properties);
     this.srid = srid;
     this.geometryFactory = geometryFactory;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
-    this.numAxis = numAxis;
+    this.axisCount = axisCount;
   }
 
   @Override
   public JdbcAttribute clone() {
     return new PostgreSQLGeometryJdbcAttribute(getName(), getType(),
-      isRequired(), getDescription(), getProperties(), srid, numAxis,
+      isRequired(), getDescription(), getProperties(), srid, axisCount,
       geometryFactory);
   }
 
@@ -192,14 +192,14 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     final LineString lineString) {
     final Point[] points = lineString.getPoints();
     final CoordinatesList coordinates = new DoubleCoordinatesList(
-      points.length, numAxis);
+      points.length, axisCount);
     for (int i = 0; i < points.length; i++) {
       final Point point = points[i];
       coordinates.setX(i, point.x);
       coordinates.setY(i, point.y);
-      if (numAxis > 2) {
+      if (axisCount > 2) {
         coordinates.setZ(i, point.z);
-        if (numAxis > 3) {
+        if (axisCount > 3) {
           coordinates.setValue(i, 3, point.m);
         }
       }
@@ -257,7 +257,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   private com.revolsys.jts.geom.Point toJtsPoint(
     final com.revolsys.jts.geom.GeometryFactory factory, final Point point) {
     final Coordinates coordinate;
-    switch (numAxis) {
+    switch (axisCount) {
       case 3:
         coordinate = new DoubleCoordinates(point.x, point.y, point.z);
       break;
@@ -278,14 +278,14 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       final LinearRing ring = polygon.getRing(ringIndex);
       final Point[] points = ring.getPoints();
       final CoordinatesList coordinates = new DoubleCoordinatesList(
-        points.length, numAxis);
+        points.length, axisCount);
       for (int i = 0; i < points.length; i++) {
         final Point point = points[i];
         coordinates.setValue(i, 0, point.x);
         coordinates.setValue(i, 1, point.y);
-        if (numAxis > 2) {
+        if (axisCount > 2) {
           coordinates.setValue(i, 2, point.z);
-          if (numAxis > 3) {
+          if (axisCount > 3) {
             coordinates.setValue(i, 3, point.m);
           }
         }
@@ -319,7 +319,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       return toPgLineString(lineString);
     } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
       final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
-      if (geometryCollection.getNumGeometries() == 1) {
+      if (geometryCollection.getGeometryCount() == 1) {
         final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometry(0);
         if (firstGeometry instanceof com.revolsys.jts.geom.LineString) {
           final com.revolsys.jts.geom.LineString line = (com.revolsys.jts.geom.LineString)firstGeometry;
@@ -340,7 +340,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   private Geometry toPgMultiLineString(
     final com.revolsys.jts.geom.Geometry geometry) {
     final List<LineString> pgLineStrings = new ArrayList<LineString>();
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof com.revolsys.jts.geom.LineString) {
         final com.revolsys.jts.geom.LineString line = (com.revolsys.jts.geom.LineString)subGeometry;
@@ -366,7 +366,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private Geometry toPgMultiPoint(final com.revolsys.jts.geom.Geometry geometry) {
     final List<Point> pgPoints = new ArrayList<Point>();
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof com.revolsys.jts.geom.Point) {
         final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)subGeometry;
@@ -391,7 +391,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   private Geometry toPgMultiPolygon(
     final com.revolsys.jts.geom.Geometry geometry) {
     final List<Polygon> pgPolygons = new ArrayList<Polygon>();
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final com.revolsys.jts.geom.Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof com.revolsys.jts.geom.Polygon) {
         final com.revolsys.jts.geom.Polygon line = (com.revolsys.jts.geom.Polygon)subGeometry;
@@ -415,18 +415,18 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Point toPgPoint(final com.revolsys.jts.geom.Point point) {
-    final int numAxis = point.getNumAxis();
+    final int axisCount = point.getAxisCount();
 
     Point pgPoint;
     final double x = point.getX();
     final double y = point.getY();
-    if (numAxis > 2) {
+    if (axisCount > 2) {
       double z = point.getZ();
       if (Double.isNaN(z)) {
         z = 0;
       }
       pgPoint = new Point(x, y, z);
-      if (numAxis > 3) {
+      if (axisCount > 3) {
         double m = point.getM();
         if (Double.isNaN(m)) {
           m = 0;
@@ -446,7 +446,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       return toPgPoint(point);
     } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
       final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
-      if (geometryCollection.getNumGeometries() == 1) {
+      if (geometryCollection.getGeometryCount() == 1) {
         final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometry(0);
         if (firstGeometry instanceof com.revolsys.jts.geom.Point) {
           final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)firstGeometry;
@@ -472,13 +472,13 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       final double y = coordinates.getY(i);
       final double x = coordinates.getX(i);
 
-      if (numAxis > 2) {
+      if (axisCount > 2) {
         double z = coordinates.getZ(i);
         if (Double.isNaN(z)) {
           z = 0;
         }
         pgPoint = new Point(x, y, z);
-        if (numAxis > 3) {
+        if (axisCount > 3) {
           double m = coordinates.getM(i);
           if (Double.isNaN(m)) {
             m = 0;
@@ -513,7 +513,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       return toPgPolygon(polygon);
     } else if (object instanceof com.revolsys.jts.geom.GeometryCollection) {
       final com.revolsys.jts.geom.GeometryCollection geometryCollection = (com.revolsys.jts.geom.GeometryCollection)object;
-      if (geometryCollection.getNumGeometries() == 1) {
+      if (geometryCollection.getGeometryCount() == 1) {
         final com.revolsys.jts.geom.Geometry firstGeometry = geometryCollection.getGeometry(0);
         if (firstGeometry instanceof com.revolsys.jts.geom.Polygon) {
           final com.revolsys.jts.geom.Polygon polygon = (com.revolsys.jts.geom.Polygon)firstGeometry;

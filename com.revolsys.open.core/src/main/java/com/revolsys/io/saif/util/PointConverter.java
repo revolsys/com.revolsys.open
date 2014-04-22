@@ -78,13 +78,13 @@ public class PointConverter implements OsnConverter {
     throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
-      final int numAxis = point.getNumAxis();
+      final int axisCount = point.getAxisCount();
       final double x = point.getX();
       final double y = point.getY();
       final double z = point.getZ();
       serializer.startObject(geometryClass);
       serializer.attributeName("coords");
-      if (numAxis == 2) {
+      if (axisCount == 2) {
         serializer.startObject("/Coord2D");
         serializer.attribute("c1", x, true);
         serializer.attribute("c2", y, false);

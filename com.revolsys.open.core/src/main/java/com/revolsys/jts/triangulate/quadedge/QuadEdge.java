@@ -33,10 +33,10 @@
 
 package com.revolsys.jts.triangulate.quadedge;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * A class that represents the edge data structure which implements the quadedge algebra. 
@@ -435,6 +435,6 @@ public class QuadEdge {
   public String toString() {
     final Coordinates p0 = vertex.getCoordinate();
     final Coordinates p1 = dest().getCoordinate();
-    return WKTWriter.toLineString(p0, p1);
+    return WktWriter.lineString(p0, p1);
   }
 }

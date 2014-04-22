@@ -27,13 +27,13 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public int getNumAxis() {
-    return coordinates.getNumAxis();
+  public int getAxisCount() {
+    return coordinates.getAxisCount();
   }
 
   @Override
   public double getValue(final int index) {
-    if (index >= 0 && index < coordinates.getNumAxis()) {
+    if (index >= 0 && index < coordinates.getAxisCount()) {
       return coordinates.getValue(this.index, index);
     } else {
       return 0;
@@ -50,7 +50,7 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
 
   @Override
   public void setValue(final int index, final double value) {
-    if (index >= 0 && index < coordinates.getNumAxis()) {
+    if (index >= 0 && index < coordinates.getAxisCount()) {
       coordinates.setValue(this.index, index, value);
     }
   }
@@ -61,15 +61,15 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
 
   @Override
   public String toString() {
-    final int numAxis = getNumAxis();
-    if (numAxis > 0) {
+    final int axisCount = getAxisCount();
+    if (axisCount > 0) {
       final double x = coordinates.getX(index);
       final StringBuffer s = new StringBuffer(String.valueOf(x));
       final double y = coordinates.getY(index);
       s.append(',');
       s.append(y);
 
-      for (int i = 2; i < numAxis; i++) {
+      for (int i = 2; i < axisCount; i++) {
         final Double ordinate = coordinates.getValue(index, i);
         s.append(',');
         s.append(ordinate);

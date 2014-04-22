@@ -44,14 +44,14 @@ public class MultiPointHandler implements ShapeHandler {
     final MultiPoint mp = (MultiPoint)geometry;
 
     if (myShapeType == 8) {
-      return mp.getNumGeometries() * 8 + 20;
+      return mp.getGeometryCount() * 8 + 20;
     }
     if (myShapeType == 28) {
-      return mp.getNumGeometries() * 8 + 20 + 8 + 4 * mp.getNumGeometries();
+      return mp.getGeometryCount() * 8 + 20 + 8 + 4 * mp.getGeometryCount();
     }
 
-    return mp.getNumGeometries() * 8 + 20 + 8 + 4 * mp.getNumGeometries() + 8
-      + 4 * mp.getNumGeometries();
+    return mp.getGeometryCount() * 8 + 20 + 8 + 4 * mp.getGeometryCount() + 8
+      + 4 * mp.getGeometryCount();
   }
 
   /**

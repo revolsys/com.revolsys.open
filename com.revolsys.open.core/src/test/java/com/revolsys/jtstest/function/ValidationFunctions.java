@@ -10,7 +10,7 @@ import com.revolsys.jts.operation.valid.TopologyValidationError;
 public class ValidationFunctions {
   public static Geometry invalidGeoms(final Geometry g) {
     final List invalidGeoms = new ArrayList();
-    for (int i = 0; i < g.getNumGeometries(); i++) {
+    for (int i = 0; i < g.getGeometryCount(); i++) {
       final Geometry geom = g.getGeometry(i);
       final IsValidOp ivop = new IsValidOp(geom);
       final TopologyValidationError err = ivop.getValidationError();
@@ -30,7 +30,7 @@ public class ValidationFunctions {
    */
   public static Geometry invalidLocations(final Geometry g) {
     final List invalidLoc = new ArrayList();
-    for (int i = 0; i < g.getNumGeometries(); i++) {
+    for (int i = 0; i < g.getGeometryCount(); i++) {
       final Geometry geom = g.getGeometry(i);
       final IsValidOp ivop = new IsValidOp(geom);
       final TopologyValidationError err = ivop.getValidationError();

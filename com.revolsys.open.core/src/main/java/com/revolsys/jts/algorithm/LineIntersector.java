@@ -35,10 +35,10 @@ package com.revolsys.jts.algorithm;
 /**
  * @version 1.7
  */
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.PrecisionModel;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -437,8 +437,8 @@ public abstract class LineIntersector {
 
   @Override
   public String toString() {
-    return WKTWriter.toLineString(inputLines[0][0], inputLines[0][1]) + " - "
-      + WKTWriter.toLineString(inputLines[1][0], inputLines[1][1])
+    return WktWriter.lineString(inputLines[0][0], inputLines[0][1]) + " - "
+      + WktWriter.lineString(inputLines[1][0], inputLines[1][1])
       + getTopologySummary();
   }
 }

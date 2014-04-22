@@ -20,8 +20,8 @@ public class ReverseCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public int getNumAxis() {
-    return coordinateList.getNumAxis();
+  public int getAxisCount() {
+    return coordinateList.getAxisCount();
   }
 
   @Override

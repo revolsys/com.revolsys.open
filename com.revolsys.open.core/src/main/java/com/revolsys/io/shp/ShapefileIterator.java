@@ -113,16 +113,16 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           xbaseIterator.setCloseFile(closeFile);
         }
         loadHeader();
-        int numAxis = 3;
+        int axisCount = 3;
         int srid = 0;
         if (shapeType < 10) {
-          numAxis = 2;
+          axisCount = 2;
         } else if (shapeType < 20) {
-          numAxis = 3;
+          axisCount = 3;
         } else if (shapeType < 30) {
-          numAxis = 4;
+          axisCount = 4;
         } else {
-          numAxis = 4;
+          axisCount = 4;
         }
         geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         final Resource projResource = this.resource.createRelative(name
@@ -140,7 +140,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           if (srid < 1) {
             srid = 4326;
           }
-          geometryFactory = GeometryFactory.getFactory(srid, numAxis);
+          geometryFactory = GeometryFactory.getFactory(srid, axisCount);
         }
 
         if (xbaseIterator != null) {

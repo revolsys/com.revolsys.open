@@ -20,7 +20,7 @@ public class RingCoordinatesList extends DoubleCoordinatesList {
 
   @Override
   public double getValue(final int index, final int axisIndex) {
-    if (axisIndex >= getNumAxis()) {
+    if (axisIndex >= getAxisCount()) {
       return Double.NaN;
     } else {
       if (index >= super.size()) {

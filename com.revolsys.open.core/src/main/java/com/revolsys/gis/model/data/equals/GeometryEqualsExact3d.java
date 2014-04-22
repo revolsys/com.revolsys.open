@@ -35,7 +35,7 @@ public class GeometryEqualsExact3d implements Equals<Geometry> {
       return false;
     }
     final boolean userDataEquals = !exclude.contains("userData");
-    for (int j = 0; j < geometry1.getNumGeometries(); j++) {
+    for (int j = 0; j < geometry1.getGeometryCount(); j++) {
       final Geometry geometryPart1 = geometry1.getGeometry(j);
       final Geometry geometryPart2 = geometry2.getGeometry(j);
       if (userDataEquals) {

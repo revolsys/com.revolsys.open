@@ -138,7 +138,6 @@ import com.revolsys.jts.util.AssertionFailedException;
  *
  *
  *@version 1.7
- * @see WKTWriter
  */
 public class WKTReader {
   private static final String EMPTY = "EMPTY";

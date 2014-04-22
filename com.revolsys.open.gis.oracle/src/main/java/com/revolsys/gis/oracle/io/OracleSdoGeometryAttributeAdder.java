@@ -98,11 +98,11 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  public static int getGeometryTypeId(final DataType dataType, final int numAxis) {
+  public static int getGeometryTypeId(final DataType dataType, final int axisCount) {
     final int id = DATA_TYPE_TO_2D_ID.get(dataType);
-    if (numAxis > 3) {
+    if (axisCount > 3) {
       return 3000 + id;
-    } else if (numAxis > 2) {
+    } else if (axisCount > 2) {
       return 1000 + id;
     } else {
       return id;
@@ -140,14 +140,14 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
       dataType = DataTypes.GEOMETRY;
     }
 
-    int numAxis = getIntegerColumnProperty(schema, typePath, columnName,
+    int axisCount = getIntegerColumnProperty(schema, typePath, columnName,
       NUM_AXIS);
-    if (numAxis == -1) {
-      numAxis = geometryFactory.getNumAxis();
+    if (axisCount == -1) {
+      axisCount = geometryFactory.getAxisCount();
     }
 
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
-      dataType, sqlType, required, description, null, geometryFactory, numAxis);
+      dataType, sqlType, required, description, null, geometryFactory, axisCount);
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
       "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));
@@ -201,18 +201,18 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
                 srid = 0;
               }
               final ARRAY dimInfo = (ARRAY)resultSet.getObject("DIMINFO");
-              int numAxis = dimInfo.length();
-              setColumnProperty(schema, typePath, columnName, NUM_AXIS, numAxis);
-              if (numAxis < 2) {
-                numAxis = 2;
-              } else if (numAxis > 4) {
-                numAxis = 4;
+              int axisCount = dimInfo.length();
+              setColumnProperty(schema, typePath, columnName, NUM_AXIS, axisCount);
+              if (axisCount < 2) {
+                axisCount = 2;
+              } else if (axisCount > 4) {
+                axisCount = 4;
               }
               final Datum[] values = dimInfo.getOracleArray();
               final double scaleXy = getScale(values, 0);
               final double scaleZ = getScale(values, 2);
               final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
-                srid, numAxis, scaleXy, scaleZ);
+                srid, axisCount, scaleXy, scaleZ);
               setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
                 geometryFactory);
 

@@ -50,9 +50,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.valid.IsValidOp;
 import com.revolsys.jts.operation.valid.TopologyValidationError;
@@ -138,7 +138,7 @@ public class ValidPanel extends JPanel {
       nonSimpleLoc = simpleOp.getNonSimpleLocation();
     }
     final String msg = isSimple ? "" : "Self-intersection at "
-      + WKTWriter.toPoint(nonSimpleLoc);
+      + WktWriter.point(nonSimpleLoc);
     taInvalidMsg.setText(msg);
     txtIsValid.setText(isSimple ? "Y" : "N");
     setMarkPoint(nonSimpleLoc);

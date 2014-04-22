@@ -23,11 +23,11 @@ public class TestUtil {
       int i = 0;
       for (final DataObject object : reader) {
         final int srid = object.getInteger("srid");
-        final int numAxis = object.getInteger("numAxis");
+        final int axisCount = object.getInteger("axisCount");
         final double scaleXy = object.getInteger("scaleXy");
         final double scaleZ = object.getInteger("scaleZ");
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
-          srid, numAxis, scaleXy, scaleZ);
+          srid, axisCount, scaleXy, scaleZ);
         final String wkt = object.getValue("wkt");
         final Geometry geometry = geometryFactory.geometry(wkt);
         valid &= equalsExpectedWkt(i, object, geometry);
@@ -36,9 +36,9 @@ public class TestUtil {
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
           otherGeometryFactory = GeometryFactory.getFactory(
-            projectedCoordinateSystem, numAxis, scaleXy, scaleZ);
+            projectedCoordinateSystem, axisCount, scaleXy, scaleZ);
         } else {
-          otherGeometryFactory = GeometryFactory.getFactory(3005, numAxis,
+          otherGeometryFactory = GeometryFactory.getFactory(3005, axisCount,
             scaleXy, scaleZ);
         }
         final Geometry convertedGeometry = geometry.convert(otherGeometryFactory);

@@ -72,7 +72,7 @@ public class TextOnCurveConverter implements OsnConverter {
       serializer.attributeName("characters");
       serializer.startCollection("List");
       final OsnConverter osnConverter = converters.getConverter(SaifConstants.TEXT_LINE);
-      for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
+      for (int i = 0; i < multiPoint.getGeometryCount(); i++) {
         final Point point = (Point)multiPoint.getGeometry(i);
         osnConverter.write(serializer, point);
       }

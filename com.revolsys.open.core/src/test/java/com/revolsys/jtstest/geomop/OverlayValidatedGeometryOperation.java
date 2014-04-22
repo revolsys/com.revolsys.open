@@ -32,9 +32,9 @@
  */
 package com.revolsys.jtstest.geomop;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.operation.overlay.OverlayOp;
 import com.revolsys.jts.operation.overlay.validate.OverlayResultValidator;
 import com.revolsys.jtstest.testrunner.GeometryResult;
@@ -197,7 +197,7 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
     if (!validator.isValid(opCode)) {
       final Coordinates invalidLoc = validator.getInvalidLocation();
       final String msg = "Operation result is invalid [OverlayResultValidator] ( "
-        + WKTWriter.toPoint(invalidLoc) + " )";
+        + WktWriter.point(invalidLoc) + " )";
       reportError(msg);
     }
   }

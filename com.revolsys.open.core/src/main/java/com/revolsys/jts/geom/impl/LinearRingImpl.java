@@ -54,7 +54,6 @@ import com.revolsys.jts.geom.LinearRing;
  * @version 1.7
  */
 public class LinearRingImpl extends LineStringImpl implements LinearRing {
-
   private static final long serialVersionUID = -4261142084085851829L;
 
   public LinearRingImpl(final GeometryFactory factory) {
@@ -97,9 +96,9 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingImpl(final GeometryFactory factory, final int numAxis,
+  public LinearRingImpl(final GeometryFactory factory, final int axisCount,
     final double... points) {
-    super(factory, numAxis, points);
+    super(factory, axisCount, points);
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
@@ -134,8 +133,8 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
       return geometryFactory.linearRing();
     } else {
       final double[] coordinates = convertCoordinates(geometryFactory);
-      final int numAxis = getNumAxis();
-      return geometryFactory.linearRing(numAxis, coordinates);
+      final int axisCount = getAxisCount();
+      return geometryFactory.linearRing(axisCount, coordinates);
     }
   }
 
@@ -163,6 +162,18 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
       return true;
     } else {
       return super.isClosed();
+    }
+  }
+
+  @Override
+  public LinearRing move(final double... deltas) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (deltas == null || isEmpty()) {
+      return this;
+    } else {
+      final double[] coordinates = moveCoordinates(deltas);
+      final int axisCount = getAxisCount();
+      return geometryFactory.linearRing(axisCount, coordinates);
     }
   }
 

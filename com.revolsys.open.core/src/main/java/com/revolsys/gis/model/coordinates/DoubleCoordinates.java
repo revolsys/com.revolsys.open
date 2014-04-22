@@ -13,17 +13,17 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   private final double[] coordinates;
 
   public DoubleCoordinates(final Coordinates coordinates) {
-    final int numAxis = coordinates.getNumAxis();
-    this.coordinates = new double[numAxis];
-    for (int i = 0; i < numAxis; i++) {
+    final int axisCount = coordinates.getAxisCount();
+    this.coordinates = new double[axisCount];
+    for (int i = 0; i < axisCount; i++) {
       final double value = coordinates.getValue(i);
       this.coordinates[i] = value;
     }
   }
 
-  public DoubleCoordinates(final Coordinates point, final int numAxis) {
-    this(numAxis);
-    final int count = Math.min(numAxis, point.getNumAxis());
+  public DoubleCoordinates(final Coordinates point, final int axisCount) {
+    this(axisCount);
+    final int count = Math.min(axisCount, point.getAxisCount());
     for (int i = 0; i < count; i++) {
       final double value = point.getValue(i);
       setValue(i, value);
@@ -34,14 +34,14 @@ public class DoubleCoordinates extends AbstractCoordinates implements
     this(coordinates.length, coordinates);
   }
 
-  public DoubleCoordinates(final int numAxis) {
-    this.coordinates = new double[numAxis];
+  public DoubleCoordinates(final int axisCount) {
+    this.coordinates = new double[axisCount];
   }
 
-  public DoubleCoordinates(final int numAxis, final double... coordinates) {
-    this.coordinates = new double[numAxis];
+  public DoubleCoordinates(final int axisCount, final double... coordinates) {
+    this.coordinates = new double[axisCount];
     System.arraycopy(coordinates, 0, this.coordinates, 0,
-      Math.min(numAxis, coordinates.length));
+      Math.min(axisCount, coordinates.length));
   }
 
   public DoubleCoordinates(final List<Number> coordinates) {
@@ -62,13 +62,13 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   }
 
   @Override
-  public int getNumAxis() {
+  public int getAxisCount() {
     return (byte)coordinates.length;
   }
 
   @Override
   public double getValue(final int index) {
-    if (index >= 0 && index < getNumAxis()) {
+    if (index >= 0 && index < getAxisCount()) {
       return coordinates[index];
     } else {
       return Double.NaN;
@@ -77,17 +77,17 @@ public class DoubleCoordinates extends AbstractCoordinates implements
 
   @Override
   public void setValue(final int index, final double value) {
-    if (index >= 0 && index < getNumAxis()) {
+    if (index >= 0 && index < getAxisCount()) {
       coordinates[index] = value;
     }
   }
 
   @Override
   public String toString() {
-    final int numAxis = getNumAxis();
-    if (numAxis > 0) {
+    final int axisCount = getAxisCount();
+    if (axisCount > 0) {
       final StringBuffer s = new StringBuffer(String.valueOf(coordinates[0]));
-      for (int i = 1; i < numAxis; i++) {
+      for (int i = 1; i < axisCount; i++) {
         final Double ordinate = coordinates[i];
         s.append(',');
         s.append(ordinate);

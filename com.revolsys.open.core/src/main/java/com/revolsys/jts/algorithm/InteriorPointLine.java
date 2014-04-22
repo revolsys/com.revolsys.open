@@ -91,7 +91,7 @@ public class InteriorPointLine {
       addEndpoints(geom.getCoordinateArray());
     } else if (geom instanceof GeometryCollection) {
       final GeometryCollection gc = (GeometryCollection)geom;
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
+      for (int i = 0; i < gc.getGeometryCount(); i++) {
         addEndpoints(gc.getGeometry(i));
       }
     }
@@ -114,7 +114,7 @@ public class InteriorPointLine {
       addInterior(geom.getCoordinateArray());
     } else if (geom instanceof GeometryCollection) {
       final GeometryCollection gc = (GeometryCollection)geom;
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
+      for (int i = 0; i < gc.getGeometryCount(); i++) {
         addInterior(gc.getGeometry(i));
       }
     }

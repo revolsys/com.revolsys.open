@@ -149,17 +149,17 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
 
   public CoordinatesList getCoordinates(final SeShape shape,
     final double[][][] allCoordinates, final int partIndex,
-    final int ringIndex, final int numAxis) {
+    final int ringIndex, final int axisCount) {
     try {
       final int numCoords = shape.getNumPoints(partIndex + 1, ringIndex + 1);
       final CoordinatesList coordinates = new DoubleCoordinatesList(numCoords,
-        numAxis);
+        axisCount);
       for (int coordinateIndex = 0; coordinateIndex < numCoords; coordinateIndex++) {
 
         final double x = allCoordinates[partIndex][ringIndex][coordinateIndex
-          * numAxis];
+          * axisCount];
         final double y = allCoordinates[partIndex][ringIndex][coordinateIndex
-          * numAxis + 1];
+          * axisCount + 1];
         coordinates.setX(coordinateIndex, x);
         coordinates.setY(coordinateIndex, y);
       }
@@ -262,15 +262,15 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
       final int srid = (int)coordRef.getSrid().longValue();
       final double scaleXy = coordRef.getXYUnits();
       final double scaleZ = coordRef.getZUnits();
-      int numAxis = 2;
+      int axisCount = 2;
       if (shape.is3D()) {
-        numAxis = 3;
+        axisCount = 3;
       }
       if (shape.isMeasured()) {
-        numAxis = 4;
+        axisCount = 4;
       }
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
-        srid, numAxis, scaleXy, scaleZ);
+        srid, axisCount, scaleXy, scaleZ);
 
       final int numParts = shape.getNumParts();
       final double[][][] allCoordinates = shape.getAllCoords();
@@ -285,7 +285,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
             final int numRings = shape.getNumSubParts(partIndex + 1);
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
               final CoordinatesList coordinates = getCoordinates(shape,
-                allCoordinates, partIndex, ringIndex, numAxis);
+                allCoordinates, partIndex, ringIndex, axisCount);
               final Point point = geometryFactory.point(coordinates);
               if (!point.isEmpty()) {
                 points.add(point);
@@ -304,7 +304,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
             final int numRings = shape.getNumSubParts(partIndex + 1);
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
               final CoordinatesList coordinates = getCoordinates(shape,
-                allCoordinates, partIndex, ringIndex, numAxis);
+                allCoordinates, partIndex, ringIndex, axisCount);
               final LineString line = geometryFactory.lineString(coordinates);
               if (!line.isEmpty()) {
                 lines.add(line);
@@ -324,7 +324,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
             final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
               final CoordinatesList coordinates = getCoordinates(shape,
-                allCoordinates, partIndex, ringIndex, numAxis);
+                allCoordinates, partIndex, ringIndex, axisCount);
               rings.add(coordinates);
             }
             if (!rings.isEmpty()) {

@@ -103,7 +103,7 @@ public class GeometryLocationsWriter {
 
       buf.append(comp.getGeometryType().toUpperCase());
       if (comp instanceof GeometryCollection) {
-        buf.append("[" + comp.getNumGeometries() + "]");
+        buf.append("[" + comp.getGeometryCount() + "]");
       } else {
         buf.append("(" + comp.getVertexCount() + ")");
       }

@@ -206,7 +206,7 @@ public class GeometryTransformer {
   protected Geometry transformGeometryCollection(final GeometryCollection geom,
     final Geometry parent) {
     final List transGeomList = new ArrayList();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry transformGeom = transform(geom.getGeometry(i));
       if (transformGeom == null) {
         continue;
@@ -267,7 +267,7 @@ public class GeometryTransformer {
   protected Geometry transformMultiLineString(final MultiLineString geom,
     final Geometry parent) {
     final List transGeomList = new ArrayList();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry transformGeom = transformLineString(
         (LineString)geom.getGeometry(i), geom);
       if (transformGeom == null) {
@@ -284,7 +284,7 @@ public class GeometryTransformer {
   protected Geometry transformMultiPoint(final MultiPoint geom,
     final Geometry parent) {
     final List transGeomList = new ArrayList();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry transformGeom = transformPoint((Point)geom.getGeometry(i),
         geom);
       if (transformGeom == null) {
@@ -301,7 +301,7 @@ public class GeometryTransformer {
   protected Geometry transformMultiPolygon(final MultiPolygon geom,
     final Geometry parent) {
     final List transGeomList = new ArrayList();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry transformGeom = transformPolygon(
         (Polygon)geom.getGeometry(i), geom);
       if (transformGeom == null) {

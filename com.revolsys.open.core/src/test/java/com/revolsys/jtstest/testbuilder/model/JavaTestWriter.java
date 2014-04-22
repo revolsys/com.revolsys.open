@@ -33,7 +33,6 @@
 package com.revolsys.jtstest.testbuilder.model;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jtstest.test.TestCaseList;
 import com.revolsys.jtstest.test.Testable;
 import com.revolsys.jtstest.testrunner.StringUtil;
@@ -65,8 +64,6 @@ public class JavaTestWriter {
     return java.toString();
   }
 
-  private final WKTWriter writer = new WKTWriter();
-
   public JavaTestWriter() {
   }
 
@@ -74,7 +71,7 @@ public class JavaTestWriter {
     if (geometry == null) {
       return "null";
     }
-    return "\"" + writer.write(geometry) + "\"";
+    return "\"" + geometry.toWkt() + "\"";
   }
 
   public String write(final Testable testable) {
@@ -84,9 +81,9 @@ public class JavaTestWriter {
     final String description = testable.getDescription() == null ? ""
       : testable.getDescription();
     final String a = testable.getGeometry(0) == null ? null
-      : writer.write(testable.getGeometry(0));
+      : testable.getGeometry(0).toWkt();
     final String b = testable.getGeometry(1) == null ? null
-      : writer.write(testable.getGeometry(1));
+      : testable.getGeometry(1).toWkt();
     final String im = testable.getExpectedIntersectionMatrix() != null ? testable.getExpectedIntersectionMatrix()
       .toString()
       : null;

@@ -253,7 +253,7 @@ public class ShapeWriter
 	{
 		GeometryCollectionShape shape = new GeometryCollectionShape();
 		// add components to GC shape
-		for (int i = 0; i < gc.getNumGeometries(); i++) {
+		for (int i = 0; i < gc.getGeometryCount(); i++) {
 			Geometry g = (Geometry) gc.getGeometry(i);
 			shape.add(toShape(g));
 		}
@@ -264,7 +264,7 @@ public class ShapeWriter
 	{
 		GeneralPath path = new GeneralPath();
 
-		for (int i = 0; i < mls.getNumGeometries(); i++) {
+		for (int i = 0; i < mls.getGeometryCount(); i++) {
 			LineString lineString = (LineString) mls.getGeometry(i);
 			path.append(toShape(lineString), false);
 		}

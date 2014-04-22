@@ -79,7 +79,7 @@ public class FacetLocater {
   private void findLocations(final Stack path, final Geometry geom,
     final List locations) {
     if (geom instanceof GeometryCollection) {
-      for (int i = 0; i < geom.getNumGeometries(); i++) {
+      for (int i = 0; i < geom.getGeometryCount(); i++) {
         final Geometry subGeom = geom.getGeometry(i);
         path.push(new Integer(i));
         findLocations(path, subGeom, locations);

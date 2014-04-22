@@ -47,6 +47,17 @@ public class MapSerializerUtil {
     }
   }
 
+  public static void addAll(final Map<String, Object> map,
+    final Map<String, Object> values) {
+    if (map != null && values != null) {
+      for (final Entry<String, Object> entry : values.entrySet()) {
+        final String name = entry.getKey();
+        final Object value = entry.getValue();
+        add(map, name, value);
+      }
+    }
+  }
+
   @SuppressWarnings("rawtypes")
   public static Object getValue(final Object value) {
     if (value == null) {

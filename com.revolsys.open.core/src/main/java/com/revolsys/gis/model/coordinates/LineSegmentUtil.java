@@ -258,9 +258,9 @@ public class LineSegmentUtil {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory,
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
-    final int numAxis = geometryFactory.getNumAxis();
+    final int axisCount = geometryFactory.getAxisCount();
     final Coordinates newPoint = geometryFactory.createCoordinates(point);
-    if (numAxis > 2) {
+    if (axisCount > 2) {
       final double fraction = point.distance(lineStart)
         / lineStart.distance(lineEnd);
       double z1 = lineStart.getZ();
@@ -373,7 +373,7 @@ public class LineSegmentUtil {
             intersection = getElevation(geometryFactory, line1Start, line1End,
               intersection);
             final DoubleCoordinatesList points = new DoubleCoordinatesList(
-              geometryFactory.getNumAxis(), intersection);
+              geometryFactory.getAxisCount(), intersection);
             geometryFactory.makePrecise(points);
             return points;
           }
@@ -552,8 +552,8 @@ public class LineSegmentUtil {
       return point.cloneCoordinates();
     } else {
       final double r = projectionFactor(lineStart, lineEnd, point);
-      final int numAxis = CoordinatesUtil.getNumAxis(point, lineStart, lineEnd);
-      final Coordinates projectedCoordinate = project(numAxis, lineStart,
+      final int axisCount = CoordinatesUtil.getAxisCount(point, lineStart, lineEnd);
+      final Coordinates projectedCoordinate = project(axisCount, lineStart,
         lineEnd, r);
       precisionModel.makePrecise(projectedCoordinate);
       if (projectedCoordinate.equals2d(lineStart)) {
@@ -561,7 +561,7 @@ public class LineSegmentUtil {
       } else if (projectedCoordinate.equals2d(lineEnd)) {
         return lineEnd;
       } else {
-        if (numAxis > 2) {
+        if (axisCount > 2) {
           final double z = projectedCoordinate.getZ();
           if (MathUtil.isNanOrInfinite(z) || z == 0) {
             projectedCoordinate.setZ(point.getZ());
@@ -576,8 +576,8 @@ public class LineSegmentUtil {
   public static Coordinates project(
     final CoordinatesPrecisionModel precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd, final double r) {
-    final int numAxis = CoordinatesUtil.getNumAxis(lineStart, lineEnd);
-    final Coordinates point = project(numAxis, lineStart, lineEnd, r);
+    final int axisCount = CoordinatesUtil.getAxisCount(lineStart, lineEnd);
+    final Coordinates point = project(axisCount, lineStart, lineEnd, r);
     if (precisionModel != null) {
       precisionModel.makePrecise(point);
     }
@@ -585,7 +585,7 @@ public class LineSegmentUtil {
     return point;
   }
 
-  public static Coordinates project(final int numAxis,
+  public static Coordinates project(final int axisCount,
     final Coordinates lineStart, final Coordinates lineEnd, final double r) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
@@ -598,7 +598,7 @@ public class LineSegmentUtil {
     final double x = x1 + r * (x2 - x1);
     final double y = y1 + r * (y2 - y1);
 
-    if (numAxis == 2) {
+    if (axisCount == 2) {
       return new DoubleCoordinates(x, y);
     } else {
       double z;
@@ -607,7 +607,7 @@ public class LineSegmentUtil {
       } else {
         z = z1 + r * (z2 - z1);
       }
-      return new DoubleCoordinates(numAxis, x, y, z);
+      return new DoubleCoordinates(axisCount, x, y, z);
     }
   }
 
@@ -669,10 +669,10 @@ public class LineSegmentUtil {
     }
   }
 
-  public static CoordinatesList toCoordinatesList(final int numAxis,
+  public static CoordinatesList toCoordinatesList(final int axisCount,
     final List<LineSegment> lineSegments) {
     final CoordinatesList points = new DoubleCoordinatesList(
-      lineSegments.size() + 1, numAxis);
+      lineSegments.size() + 1, axisCount);
 
     for (int i = 0; i < lineSegments.size(); i++) {
       final LineSegment lineSegment = lineSegments.get(i);

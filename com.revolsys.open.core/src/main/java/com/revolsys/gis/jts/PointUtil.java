@@ -22,7 +22,7 @@ public class PointUtil {
   }
 
   public static Point getPointWithin(final Geometry geometry) {
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final Geometry part = geometry.getGeometry(i);
       if (!part.isEmpty()) {
         if (part instanceof Point) {

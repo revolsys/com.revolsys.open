@@ -56,7 +56,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     final LineString line2) {
     final CoordinatesList points1 = CoordinatesListUtil.get(line1);
     final CoordinatesList points2 = CoordinatesListUtil.get(line2);
-    if (points1.getNumAxis() > 2) {
+    if (points1.getAxisCount() > 2) {
       final int numPoints = points1.size();
       final boolean reverse = isReverse(points1, points2);
       if (reverse) {

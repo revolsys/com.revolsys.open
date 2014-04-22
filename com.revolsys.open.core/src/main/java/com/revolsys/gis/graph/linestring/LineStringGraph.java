@@ -111,7 +111,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   public LineString getLine() {
     final Set<Edge<LineSegment>> processedEdges = new HashSet<Edge<LineSegment>>();
     final DoubleListCoordinatesList newPoints = new DoubleListCoordinatesList(
-      points.getNumAxis());
+      points.getAxisCount());
     Node<LineSegment> previousNode = findNode(fromPoint);
     newPoints.add(previousNode);
     do {
@@ -137,8 +137,8 @@ public class LineStringGraph extends Graph<LineSegment> {
     final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
       "INDEX");
     final List<LineString> lines = new ArrayList<LineString>();
-    final int numAxis = geometryFactory.getNumAxis();
-    DoubleListCoordinatesList points = new DoubleListCoordinatesList(numAxis);
+    final int axisCount = geometryFactory.getAxisCount();
+    DoubleListCoordinatesList points = new DoubleListCoordinatesList(axisCount);
     Node<LineSegment> previousNode = null;
     for (final Edge<LineSegment> edge : getEdges(comparator)) {
       final LineSegment lineSegment = edge.getObject();
@@ -156,7 +156,7 @@ public class LineStringGraph extends Graph<LineSegment> {
             final LineString line = geometryFactory.lineString(points);
             lines.add(line);
           }
-          points = new DoubleListCoordinatesList(numAxis);
+          points = new DoubleListCoordinatesList(axisCount);
           points.addAll(lineSegment);
         }
         if (points.size() > 1) {
@@ -164,7 +164,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           if (toDegree != 2) {
             final LineString line = geometryFactory.lineString(points);
             lines.add(line);
-            points = new DoubleListCoordinatesList(numAxis);
+            points = new DoubleListCoordinatesList(axisCount);
             points.add(toNode);
           }
         }

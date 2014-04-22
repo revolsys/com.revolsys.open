@@ -44,7 +44,7 @@ import com.revolsys.jts.geom.util.GeometryMapper.MapOp;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.noding.SegmentString;
 import com.revolsys.jts.operation.buffer.BufferInputLineSimplifier;
-import com.revolsys.jts.operation.buffer.BufferOp;
+import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.operation.buffer.OffsetCurveBuilder;
 import com.revolsys.jts.operation.buffer.OffsetCurveSetBuilder;
@@ -143,7 +143,7 @@ public class BufferFunctions {
       bufParams.setMitreLimit(mitreLimit.doubleValue());
     }
 
-    return BufferOp.bufferOp(g, dist, bufParams);
+    return Buffer.buffer(g, dist, bufParams);
   }
 
   private static Geometry buildBufferLineSimplifiedSet(final Geometry g,
@@ -184,7 +184,7 @@ public class BufferFunctions {
     final double distance) {
     final BufferParameters bufParams = new BufferParameters();
     bufParams.setSingleSided(true);
-    return BufferOp.bufferOp(geom, distance, bufParams);
+    return Buffer.buffer(geom, distance, bufParams);
   }
 
   public static Geometry singleSidedBufferCurve(final Geometry geom,

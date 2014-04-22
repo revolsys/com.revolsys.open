@@ -10,7 +10,7 @@ public class CoordinateProjectionUtil {
       return coordinate;
     } else {
       final Coordinates newCoordinate = new DoubleCoordinates(
-        coordinate.getNumAxis());
+        coordinate.getAxisCount());
       perform(operation, coordinate, newCoordinate);
       return newCoordinate;
     }

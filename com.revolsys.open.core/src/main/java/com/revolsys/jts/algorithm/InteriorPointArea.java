@@ -115,7 +115,7 @@ public class InteriorPointArea {
     }
     else if (geom instanceof GeometryCollection) {
       GeometryCollection gc = (GeometryCollection) geom;
-      for (int i = 0; i < gc.getNumGeometries(); i++) {
+      for (int i = 0; i < gc.getGeometryCount(); i++) {
         add(gc.getGeometry(i));
       }
     }
@@ -165,7 +165,7 @@ public class InteriorPointArea {
 
     Geometry widestGeometry = gc.getGeometry(0);
     // scan remaining geom components to see if any are wider
-    for (int i = 1; i < gc.getNumGeometries(); i++) { 
+    for (int i = 1; i < gc.getGeometryCount(); i++) { 
         if (gc.getGeometry(i).getBoundingBox().getWidth() >
             widestGeometry.getBoundingBox().getWidth()) {
             widestGeometry = gc.getGeometry(i);

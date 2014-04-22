@@ -132,7 +132,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
         y1 = y2;
       }
       if (!removeIndicies.isEmpty()) {
-        final int dimension = coordinates.getNumAxis();
+        final int dimension = coordinates.getAxisCount();
         final CoordinatesList newCoordinates = new DoubleCoordinatesList(
           numCoordinates - removeIndicies.size(), dimension);
         int k = 0;

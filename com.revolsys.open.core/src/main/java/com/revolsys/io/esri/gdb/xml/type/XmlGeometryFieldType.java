@@ -39,7 +39,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
   private void writeLineString(final XmlWriter out, final LineString line) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
-    final boolean hasZ = points.getNumAxis() > 2;
+    final boolean hasZ = points.getAxisCount() > 2;
     out.element(HAS_ID, false);
     out.element(HAS_Z, hasZ);
     out.element(HAS_M, false);
@@ -59,7 +59,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
       hasZ = false;
     } else {
       final CoordinatesList points = CoordinatesListUtil.get((LineString)multiLine.getGeometry(0));
-      hasZ = points.getNumAxis() > 2;
+      hasZ = points.getAxisCount() > 2;
     }
     out.element(HAS_ID, false);
     out.element(HAS_Z, hasZ);
@@ -67,7 +67,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
     out.startTag(PATH_ARRAY);
     out.attribute(XsiConstants.TYPE, PATH_ARRAY_TYPE);
-    for (int i = 0; i < multiLine.getNumGeometries(); i++) {
+    for (int i = 0; i < multiLine.getGeometryCount(); i++) {
       final LineString line = (LineString)multiLine.getGeometry(i);
       final CoordinatesList points = CoordinatesListUtil.get(line);
       writePath(out, points, hasZ);
@@ -96,7 +96,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
   private void writePoint(final XmlWriter out, final Point point) {
     final Coordinates coordinates = CoordinatesUtil.getInstance(point);
-    final boolean hasZ = coordinates.getNumAxis() > 2;
+    final boolean hasZ = coordinates.getAxisCount() > 2;
     writePoint(out, coordinates, hasZ);
   }
 
@@ -119,7 +119,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     final boolean hasZ;
     final LineString exteriorRing = polygon.getExteriorRing();
     final CoordinatesList points = CoordinatesListUtil.get(exteriorRing);
-    hasZ = points.getNumAxis() > 2;
+    hasZ = points.getAxisCount() > 2;
     out.element(HAS_ID, false);
     out.element(HAS_Z, hasZ);
     out.element(HAS_M, false);

@@ -55,7 +55,7 @@ public class GeometryFactoryTest {
   public static void assertCreateGeometryCollection(final Geometry geometry,
     final CoordinatesList... pointsList) {
     if (geometry instanceof GeometryCollection) {
-      if (geometry.getNumGeometries() == 1) {
+      if (geometry.getGeometryCount() == 1) {
         final Geometry part = geometry.getGeometry(0);
         final Class<? extends Geometry> geometryClass = geometry.getClass();
 

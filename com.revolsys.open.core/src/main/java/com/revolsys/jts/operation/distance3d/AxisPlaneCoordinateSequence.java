@@ -130,7 +130,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public int getNumAxis() {
+  public int getAxisCount() {
     return 2;
   }
 

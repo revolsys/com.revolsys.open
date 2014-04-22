@@ -241,7 +241,7 @@ public class ConnectedInteriorTester {
     }
     if (g instanceof MultiPolygon) {
       final MultiPolygon mp = (MultiPolygon)g;
-      for (int i = 0; i < mp.getNumGeometries(); i++) {
+      for (int i = 0; i < mp.getGeometryCount(); i++) {
         final Polygon p = (Polygon)mp.getGeometry(i);
         visitInteriorRing(p.getExteriorRing(), graph);
       }

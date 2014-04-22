@@ -34,9 +34,9 @@ package com.revolsys.jts.testold.operation;
 
 import junit.framework.TestCase;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 
 /**
@@ -64,7 +64,7 @@ public class BufferResultValidatorTest extends TestCase {
       final String msg = validator.getErrorMessage();
 
       System.out.println(msg);
-      System.out.println(WKTWriter.toPoint(validator.getErrorLocation()));
+      System.out.println(WktWriter.point(validator.getErrorLocation()));
     }
     assertTrue(validator.isValid());
   }

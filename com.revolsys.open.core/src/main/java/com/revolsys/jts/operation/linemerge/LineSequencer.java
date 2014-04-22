@@ -157,7 +157,7 @@ public class LineSequencer {
 
     Coordinates lastNode = null;
     final List currNodes = new ArrayList();
-    for (int i = 0; i < mls.getNumGeometries(); i++) {
+    for (int i = 0; i < mls.getGeometryCount(); i++) {
       final LineString line = (LineString)mls.getGeometry(i);
       final Coordinates startNode = line.getCoordinate(0);
       final Coordinates endNode = line.getCoordinate(line.getVertexCount() - 1);
@@ -327,7 +327,7 @@ public class LineSequencer {
     sequencedGeometry = buildSequencedGeometry(sequences);
     isSequenceable = true;
 
-    final int finalLineCount = sequencedGeometry.getNumGeometries();
+    final int finalLineCount = sequencedGeometry.getGeometryCount();
     Assert.isTrue(lineCount == finalLineCount, "Lines were missing from result");
     Assert.isTrue(sequencedGeometry instanceof LineString
       || sequencedGeometry instanceof MultiLineString, "Result is not lineal");

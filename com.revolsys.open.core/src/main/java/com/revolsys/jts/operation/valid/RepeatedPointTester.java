@@ -92,7 +92,7 @@ public class RepeatedPointTester {
   }
   private boolean hasRepeatedPoint(GeometryCollection gc)
   {
-    for (int i = 0; i < gc.getNumGeometries(); i++) {
+    for (int i = 0; i < gc.getGeometryCount(); i++) {
       Geometry g = gc.getGeometry(i);
       if (hasRepeatedPoint(g)) return true;
     }

@@ -212,7 +212,7 @@ abstract class AbstractPreparedPolygonContains
 	private boolean isSingleShell(Geometry geom)
 	{
     // handles single-element MultiPolygons, as well as Polygons
-		if (geom.getNumGeometries() != 1) return false;
+		if (geom.getGeometryCount() != 1) return false;
 		
 		Polygon poly = (Polygon) geom.getGeometry(0);
 		int numHoles = poly.getNumInteriorRing();

@@ -40,8 +40,8 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
   }
 
   public CoordinatesList perform(final CoordinatesList coordinates) {
-    final int numAxis = geometryFactory.getNumAxis();
-    final CoordinatesList newCoordinates = new DoubleCoordinatesList(numAxis,
+    final int axisCount = geometryFactory.getAxisCount();
+    final CoordinatesList newCoordinates = new DoubleCoordinatesList(axisCount,
       coordinates);
     newCoordinates.makePrecise(geometryFactory);
     return newCoordinates;
@@ -71,8 +71,8 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
 
   public MultiLineString perform(final MultiLineString multiLineString) {
     if (multiLineString != null) {
-      final LineString[] newLineStrings = new LineString[multiLineString.getNumGeometries()];
-      for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
+      final LineString[] newLineStrings = new LineString[multiLineString.getGeometryCount()];
+      for (int i = 0; i < multiLineString.getGeometryCount(); i++) {
         final LineString line = (LineString)multiLineString.getGeometry(i);
         final LineString newLineString = perform(line);
         addUserData(line, newLineString);
@@ -88,8 +88,8 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
 
   public Geometry perform(final MultiPoint multiPoint) {
     if (multiPoint != null) {
-      final Point[] newPoints = new Point[multiPoint.getNumGeometries()];
-      for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
+      final Point[] newPoints = new Point[multiPoint.getGeometryCount()];
+      for (int i = 0; i < multiPoint.getGeometryCount(); i++) {
         final Point point = (Point)multiPoint.getGeometry(i);
         final Point newPoint = perform(point);
         addUserData(point, newPoint);
@@ -105,8 +105,8 @@ public class PrecisionModelGeometryOperation implements GeometryOperation {
 
   public MultiPolygon perform(final MultiPolygon multiPolygon) {
     if (multiPolygon != null) {
-      final Polygon[] newPolygons = new Polygon[multiPolygon.getNumGeometries()];
-      for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+      final Polygon[] newPolygons = new Polygon[multiPolygon.getGeometryCount()];
+      for (int i = 0; i < multiPolygon.getGeometryCount(); i++) {
         final Polygon polygon = (Polygon)multiPolygon.getGeometry(i);
         final Polygon newPolygon = perform(polygon);
         addUserData(polygon, newPolygon);

@@ -170,7 +170,7 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private void addCollection(final GeometryCollection gc) {
-    for (int i = 0; i < gc.getNumGeometries(); i++) {
+    for (int i = 0; i < gc.getGeometryCount(); i++) {
       final Geometry g = gc.getGeometry(i);
       add(g);
     }
@@ -405,7 +405,7 @@ public class GeometryGraph extends PlanarGraph {
 
   /**
    * This constructor is used by clients that wish to add Edges explicitly,
-   * rather than adding a Geometry.  (An example is BufferOp).
+   * rather than adding a Geometry.  (An example is Buffer).
    */
   // no longer used
   // public GeometryGraph(int argIndex, PrecisionModel precisionModel, int SRID)
@@ -470,7 +470,7 @@ public class GeometryGraph extends PlanarGraph {
    * @return the location of the point in the geometry
    */
   public Location locate(final Coordinates pt) {
-    if (parentGeom instanceof Polygonal && parentGeom.getNumGeometries() > 50) {
+    if (parentGeom instanceof Polygonal && parentGeom.getGeometryCount() > 50) {
       // lazily init point locator
       if (areaPtLocator == null) {
         areaPtLocator = new IndexedPointInAreaLocator(parentGeom);

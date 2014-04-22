@@ -92,8 +92,8 @@ public class GeometryFunctions {
       return g.getGeometryFactory().polygon(shell);
     }
     if (g instanceof MultiPolygon) {
-      final Polygon[] poly = new Polygon[g.getNumGeometries()];
-      for (int i = 0; i < g.getNumGeometries(); i++) {
+      final Polygon[] poly = new Polygon[g.getGeometryCount()];
+      for (int i = 0; i < g.getGeometryCount(); i++) {
         final LinearRing shell = ((Polygon)g.getGeometry(i)).getExteriorRing();
         poly[i] = g.getGeometryFactory().polygon(shell);
       }

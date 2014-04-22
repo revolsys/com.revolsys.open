@@ -28,12 +28,12 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
   }
 
   @Override
-  public void perform(int sourceNumAxis, double[] sourceCoordinates,
-    final int targetNumAxis, final double[] targetCoordinates) {
+  public void perform(int sourceAxisCount, double[] sourceCoordinates,
+    final int targetAxisCount, final double[] targetCoordinates) {
     for (final CoordinatesOperation operation : operations) {
-      operation.perform(sourceNumAxis, sourceCoordinates, targetNumAxis,
+      operation.perform(sourceAxisCount, sourceCoordinates, targetAxisCount,
         targetCoordinates);
-      sourceNumAxis = targetNumAxis;
+      sourceAxisCount = targetAxisCount;
       sourceCoordinates = targetCoordinates;
     }
   }

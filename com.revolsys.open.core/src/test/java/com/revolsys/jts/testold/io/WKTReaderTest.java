@@ -44,7 +44,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * Test for {@link WKTReader}
@@ -61,8 +60,6 @@ public class WKTReaderTest extends TestCase {
     return new TestSuite(WKTReaderTest.class);
   }
 
-  WKTWriter writer = new WKTWriter();
-
   private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
     1.0);
 
@@ -73,17 +70,24 @@ public class WKTReaderTest extends TestCase {
   }
 
   public void testReadGeometryCollection() throws Exception {
+
     assertEquals(
       "GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))",
-      this.writer.write(this.reader.read("GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))")));
+      this.reader.read(
+        "GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))")
+        .toWkt());
     assertEquals(
       "GEOMETRYCOLLECTION (POINT (10 10), LINEARRING EMPTY, LINESTRING (15 15, 20 20))",
-      this.writer.write(this.reader.read("GEOMETRYCOLLECTION (POINT (10 10), LINEARRING EMPTY, LINESTRING (15 15, 20 20))")));
+      this.reader.read(
+        "GEOMETRYCOLLECTION (POINT (10 10), LINEARRING EMPTY, LINESTRING (15 15, 20 20))")
+        .toWkt());
     assertEquals(
       "GEOMETRYCOLLECTION (POINT (10 10), LINEARRING (10 10, 20 20, 30 40, 10 10), LINESTRING (15 15, 20 20))",
-      this.writer.write(this.reader.read("GEOMETRYCOLLECTION (POINT (10 10), LINEARRING (10 10, 20 20, 30 40, 10 10), LINESTRING (15 15, 20 20))")));
+      this.reader.read(
+        "GEOMETRYCOLLECTION (POINT (10 10), LINEARRING (10 10, 20 20, 30 40, 10 10), LINESTRING (15 15, 20 20))")
+        .toWkt());
     assertEquals("GEOMETRYCOLLECTION EMPTY",
-      this.writer.write(this.reader.read("GEOMETRYCOLLECTION EMPTY")));
+      this.reader.read("GEOMETRYCOLLECTION EMPTY").toWkt());
   }
 
   public void testReadLargeNumbers() throws Exception {
@@ -104,65 +108,75 @@ public class WKTReaderTest extends TestCase {
     } catch (final IllegalArgumentException e) {
       assertTrue(e.getMessage().indexOf("not form a closed linestring") > -1);
     }
-    assertEquals(
-      "LINEARRING (10 10, 20 20, 30 40, 10 10)",
-      this.writer.write(this.reader.read("LINEARRING (10 10, 20 20, 30 40, 10 10)")));
-    assertEquals("LINEARRING EMPTY",
-      this.writer.write(this.reader.read("LINEARRING EMPTY")));
+
+    assertEquals("LINEARRING (10 10, 20 20, 30 40, 10 10)",
+      this.reader.read("LINEARRING (10 10, 20 20, 30 40, 10 10)").toWkt());
+
+    assertEquals("LINEARRING EMPTY", this.reader.read("LINEARRING EMPTY")
+      .toWkt());
   }
 
   public void testReadLineString() throws Exception {
+
     assertEquals("LINESTRING (10 10, 20 20, 30 40)",
-      this.writer.write(this.reader.read("LINESTRING (10 10, 20 20, 30 40)")));
-    assertEquals("LINESTRING EMPTY",
-      this.writer.write(this.reader.read("LINESTRING EMPTY")));
+      this.reader.read("LINESTRING (10 10, 20 20, 30 40)").toWkt());
+
+    assertEquals("LINESTRING EMPTY", this.reader.read("LINESTRING EMPTY")
+      .toWkt());
   }
 
   public void testReadMultiLineString() throws Exception {
-    assertEquals(
-      "MULTILINESTRING ((10 10, 20 20), (15 15, 30 15))",
-      this.writer.write(this.reader.read("MULTILINESTRING ((10 10, 20 20), (15 15, 30 15))")));
+
+    assertEquals("MULTILINESTRING ((10 10, 20 20), (15 15, 30 15))",
+      this.reader.read("MULTILINESTRING ((10 10, 20 20), (15 15, 30 15))")
+        .toWkt());
+
     assertEquals("MULTILINESTRING EMPTY",
-      this.writer.write(this.reader.read("MULTILINESTRING EMPTY")));
+      this.reader.read("MULTILINESTRING EMPTY").toWkt());
   }
 
   public void testReadMultiPoint() throws Exception {
+
     assertEquals("MULTIPOINT ((10 10), (20 20))",
-      this.writer.write(this.reader.read("MULTIPOINT ((10 10), (20 20))")));
-    assertEquals("MULTIPOINT EMPTY",
-      this.writer.write(this.reader.read("MULTIPOINT EMPTY")));
+      this.reader.read("MULTIPOINT ((10 10), (20 20))").toWkt());
+
+    assertEquals("MULTIPOINT EMPTY", this.reader.read("MULTIPOINT EMPTY")
+      .toWkt());
   }
 
   public void testReadMultiPolygon() throws Exception {
+
     assertEquals(
       "MULTIPOLYGON (((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))",
-      this.writer.write(this.reader.read("MULTIPOLYGON (((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))")));
-    assertEquals("MULTIPOLYGON EMPTY",
-      this.writer.write(this.reader.read("MULTIPOLYGON EMPTY")));
+      this.reader.read(
+        "MULTIPOLYGON (((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))")
+        .toWkt());
+
+    assertEquals("MULTIPOLYGON EMPTY", this.reader.read("MULTIPOLYGON EMPTY")
+      .toWkt());
   }
 
   public void testReadNaN() throws Exception {
-    assertEquals("POINT (10 10)",
-      this.writer.write(this.reader.read("POINT (10 10 NaN)")));
-    assertEquals("POINT (10 10)",
-      this.writer.write(this.reader.read("POINT (10 10 nan)")));
-    assertEquals("POINT (10 10)",
-      this.writer.write(this.reader.read("POINT (10 10 NAN)")));
+
+    assertEquals("POINT (10 10)", this.reader.read("POINT (10 10 NaN)").toWkt());
+
+    assertEquals("POINT (10 10)", this.reader.read("POINT (10 10 nan)").toWkt());
+    assertEquals("POINT (10 10)", this.reader.read("POINT (10 10 NAN)").toWkt());
   }
 
   public void testReadPoint() throws Exception {
-    assertEquals("POINT (10 10)",
-      this.writer.write(this.reader.read("POINT (10 10)")));
-    assertEquals("POINT EMPTY",
-      this.writer.write(this.reader.read("POINT EMPTY")));
+
+    assertEquals("POINT (10 10)", this.reader.read("POINT (10 10)").toWkt());
+
+    assertEquals("POINT EMPTY", this.reader.read("POINT EMPTY").toWkt());
   }
 
   public void testReadPolygon() throws Exception {
-    assertEquals(
-      "POLYGON ((10 10, 10 20, 20 20, 20 15, 10 10))",
-      this.writer.write(this.reader.read("POLYGON ((10 10, 10 20, 20 20, 20 15, 10 10))")));
-    assertEquals("POLYGON EMPTY",
-      this.writer.write(this.reader.read("POLYGON EMPTY")));
+
+    assertEquals("POLYGON ((10 10, 10 20, 20 20, 20 15, 10 10))",
+      this.reader.read("POLYGON ((10 10, 10 20, 20 20, 20 15, 10 10))").toWkt());
+
+    assertEquals("POLYGON EMPTY", this.reader.read("POLYGON EMPTY").toWkt());
   }
 
   public void testReadZ() throws Exception {

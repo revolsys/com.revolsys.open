@@ -61,7 +61,7 @@ public class VoronoiDiagramBuilder {
     final BoundingBox clipEnv) {
     final Geometry clipPoly = geom.getGeometryFactory().toGeometry(clipEnv);
     final List clipped = new ArrayList();
-    for (int i = 0; i < geom.getNumGeometries(); i++) {
+    for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry g = geom.getGeometry(i);
       Geometry result = null;
       // don't clip unless necessary

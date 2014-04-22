@@ -94,7 +94,7 @@ public class LineStringRelate {
     final List<CoordinatesList> intersections = new ArrayList<CoordinatesList>();
     final CoordinatesList points1 = CoordinatesListUtil.get(line1);
     final DoubleListCoordinatesList currentCoordinates = new DoubleListCoordinatesList(
-      points1.getNumAxis());
+      points1.getAxisCount());
     Node<LineSegment> previousNode = graph1.getNode(fromPoint1);
     do {
       final List<Edge<LineSegment>> outEdges = previousNode.getOutEdges();
@@ -177,7 +177,7 @@ public class LineStringRelate {
       }
       if (overlaps) {
         final MultiLineString intersection = getOverlap();
-        if (intersection.getNumGeometries() == 1) {
+        if (intersection.getGeometryCount() == 1) {
           return true;
         }
       }

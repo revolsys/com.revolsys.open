@@ -64,6 +64,9 @@ public interface LinearRing extends LineString {
   LinearRing copy(GeometryFactory geometryFactory);
 
   @Override
+  LinearRing move(double... deltas);
+
+  @Override
   LinearRing reverse();
 
 }

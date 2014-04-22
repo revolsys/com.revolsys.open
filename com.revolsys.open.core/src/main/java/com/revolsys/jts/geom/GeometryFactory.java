@@ -104,10 +104,10 @@ public class GeometryFactory implements Serializable,
 
   public static GeometryFactory create(final Map<String, Object> properties) {
     final int srid = CollectionUtil.getInteger(properties, "srid", 0);
-    final int numAxis = CollectionUtil.getInteger(properties, "numAxis", 2);
+    final int axisCount = CollectionUtil.getInteger(properties, "axisCount", 2);
     final double scaleXY = CollectionUtil.getDouble(properties, "scaleXy", 0.0);
     final double scaleZ = CollectionUtil.getDouble(properties, "scaleZ", 0.0);
-    return GeometryFactory.getFactory(srid, numAxis, scaleXY, scaleZ);
+    return GeometryFactory.getFactory(srid, axisCount, scaleXY, scaleZ);
   }
 
   /**
@@ -132,9 +132,9 @@ public class GeometryFactory implements Serializable,
   }
 
   public static GeometryFactory getFactory(
-    final CoordinateSystem coordinateSystem, final int numAxis,
+    final CoordinateSystem coordinateSystem, final int axisCount,
     final double scaleXY, final double scaleZ) {
-    return new GeometryFactory(coordinateSystem, numAxis, scaleXY, scaleZ);
+    return new GeometryFactory(coordinateSystem, axisCount, scaleXY, scaleZ);
   }
 
   /**
@@ -224,12 +224,12 @@ public class GeometryFactory implements Serializable,
    * 
    * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
-   * @param numAxis The number of coordinate axis. 2 for 2D x &amp; y
+   * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
    *          coordinates. 3 for 3D x, y &amp; z coordinates.
    * @return The geometry factory.
    */
-  public static GeometryFactory getFactory(final int srid, final int numAxis) {
-    return getFactory(srid, numAxis, 0, 0);
+  public static GeometryFactory getFactory(final int srid, final int axisCount) {
+    return getFactory(srid, axisCount, 0, 0);
   }
 
   /**
@@ -240,7 +240,7 @@ public class GeometryFactory implements Serializable,
    * 
    * @param srid The <a href="http://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
-   * @param numAxis The number of coordinate axis. 2 for 2D x &amp; y
+   * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
    *          coordinates. 3 for 3D x, y &amp; z coordinates.
    * @param scaleXY The scale factor used to round the x, y coordinates. The
    *          precision is 1 / scaleXy. A scale factor of 1000 will give a
@@ -252,13 +252,13 @@ public class GeometryFactory implements Serializable,
    *          metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory getFactory(final int srid, final int numAxis,
+  public static GeometryFactory getFactory(final int srid, final int axisCount,
     final double scaleXY, final double scaleZ) {
     synchronized (factories) {
-      final String key = srid + "-" + numAxis + "-" + scaleXY + "-" + scaleZ;
+      final String key = srid + "-" + axisCount + "-" + scaleXY + "-" + scaleZ;
       GeometryFactory factory = factories.get(key);
       if (factory == null) {
-        factory = new GeometryFactory(srid, numAxis, scaleXY, scaleZ);
+        factory = new GeometryFactory(srid, axisCount, scaleXY, scaleZ);
         factories.put(key, factory);
       }
       return factory;
@@ -435,7 +435,7 @@ public class GeometryFactory implements Serializable,
 
   private final CoordinateSystem coordinateSystem;
 
-  private int numAxis = 2;
+  private int axisCount = 2;
 
   private final CoordinateSequenceFactory coordinateSequenceFactory;
 
@@ -444,7 +444,7 @@ public class GeometryFactory implements Serializable,
   private final WktParser parser = new WktParser(this);
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem,
-    final int numAxis, final double scaleXY, final double scaleZ) {
+    final int axisCount, final double scaleXY, final double scaleZ) {
     this.precisionModel = PrecisionModelUtil.getPrecisionModel(scaleXY);
     this.coordinateSequenceFactory = new DoubleCoordinatesListFactory();
     this.srid = coordinateSystem.getId();
@@ -452,10 +452,10 @@ public class GeometryFactory implements Serializable,
     this.coordinateSystem = coordinateSystem;
     this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
       scaleXY, scaleZ);
-    this.numAxis = Math.max(numAxis, 2);
+    this.axisCount = Math.max(axisCount, 2);
   }
 
-  protected GeometryFactory(final int srid, final int numAxis,
+  protected GeometryFactory(final int srid, final int axisCount,
     final double scaleXY, final double scaleZ) {
     this.precisionModel = PrecisionModelUtil.getPrecisionModel(scaleXY);
     this.coordinateSequenceFactory = new DoubleCoordinatesListFactory();
@@ -464,7 +464,7 @@ public class GeometryFactory implements Serializable,
     this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
       scaleXY, scaleZ);
-    this.numAxis = Math.max(numAxis, 2);
+    this.axisCount = Math.max(axisCount, 2);
   }
 
   public void addGeometries(final List<Geometry> geometryList,
@@ -566,13 +566,13 @@ public class GeometryFactory implements Serializable,
   }
 
   public Coordinates createCoordinates(final Coordinates point) {
-    final Coordinates newPoint = new DoubleCoordinates(point, this.numAxis);
+    final Coordinates newPoint = new DoubleCoordinates(point, this.axisCount);
     makePrecise(newPoint);
     return newPoint;
   }
 
   public Coordinates createCoordinates(final double... coordinates) {
-    final Coordinates newPoint = new DoubleCoordinates(this.numAxis,
+    final Coordinates newPoint = new DoubleCoordinates(this.axisCount,
       coordinates);
     makePrecise(newPoint);
     return newPoint;
@@ -583,9 +583,9 @@ public class GeometryFactory implements Serializable,
       return null;
     } else {
       final int numPoints = points.size();
-      final int numAxis = getNumAxis();
+      final int axisCount = getAxisCount();
       CoordinatesList coordinatesList = new DoubleCoordinatesList(numPoints,
-        numAxis);
+        axisCount);
       int i = 0;
       for (final Object object : points) {
         Coordinates point;
@@ -605,12 +605,12 @@ public class GeometryFactory implements Serializable,
           throw new IllegalArgumentException("Unexepected data type: " + object);
         }
 
-        if (point != null) {
+        if (point != null && point.getAxisCount() > 1) {
           coordinatesList.setPoint(i, point);
           i++;
         }
       }
-      if (i < coordinatesList.size() - 1) {
+      if (i < coordinatesList.size()) {
         coordinatesList = coordinatesList.subList(0, i);
       }
       makePrecise(coordinatesList);
@@ -742,7 +742,7 @@ public class GeometryFactory implements Serializable,
     if (geometry != null && !geometry.isEmpty()) {
       geometry = copy(geometry);
       if (geometry instanceof GeometryCollection) {
-        if (geometry.getNumGeometries() == 1) {
+        if (geometry.getGeometryCount() == 1) {
           geometry = geometry.getGeometry(0);
         } else {
           geometry = geometry.union();
@@ -756,13 +756,13 @@ public class GeometryFactory implements Serializable,
         return (V)geometry;
       } else if (Point.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof MultiPoint) {
-          if (geometry.getNumGeometries() == 1) {
+          if (geometry.getGeometryCount() == 1) {
             return (V)geometry.getGeometry(0);
           }
         }
       } else if (LineString.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof MultiLineString) {
-          if (geometry.getNumGeometries() == 1) {
+          if (geometry.getGeometryCount() == 1) {
             return (V)geometry.getGeometry(0);
           } else {
             final LineMerger merger = new LineMerger();
@@ -775,7 +775,7 @@ public class GeometryFactory implements Serializable,
         }
       } else if (Polygon.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof MultiPolygon) {
-          if (geometry.getNumGeometries() == 1) {
+          if (geometry.getGeometryCount() == 1) {
             return (V)geometry.getGeometry(0);
           }
         }
@@ -850,7 +850,7 @@ public class GeometryFactory implements Serializable,
       final int geometrySrid = geometry.getSrid();
       if (srid == 0 && geometrySrid != 0) {
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
-          geometrySrid, numAxis, getScaleXY(), getScaleZ());
+          geometrySrid, axisCount, getScaleXY(), getScaleZ());
         return geometryFactory.geometry(geometry);
       } else if (srid != 0 && geometrySrid != 0 && geometrySrid != srid) {
         if (geometry instanceof MultiPoint) {
@@ -913,8 +913,8 @@ public class GeometryFactory implements Serializable,
 
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T geometry(final String wkt,
-    final boolean useNumAxisFromGeometryFactory) {
-    return (T)parser.parseGeometry(wkt, useNumAxisFromGeometryFactory);
+    final boolean useAxisCountFromGeometryFactory) {
+    return (T)parser.parseGeometry(wkt, useAxisCountFromGeometryFactory);
   }
 
   public GeometryCollection geometryCollection() {
@@ -948,6 +948,10 @@ public class GeometryFactory implements Serializable,
   public <V extends GeometryCollection> V geometryCollection(
     final Geometry... geometries) {
     return (V)geometryCollection(Arrays.asList(geometries));
+  }
+
+  public int getAxisCount() {
+    return axisCount;
   }
 
   public Coordinates getCoordinates(final Point point) {
@@ -990,9 +994,9 @@ public class GeometryFactory implements Serializable,
       final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)coordinateSystem;
       final GeographicCoordinateSystem geographicCs = projectedCs.getGeographicCoordinateSystem();
       final int srid = geographicCs.getId();
-      return getFactory(srid, getNumAxis(), 0, 0);
+      return getFactory(srid, getAxisCount(), 0, 0);
     } else {
-      return getFactory(4326, getNumAxis(), 0, 0);
+      return getFactory(4326, getAxisCount(), 0, 0);
     }
   }
 
@@ -1019,7 +1023,7 @@ public class GeometryFactory implements Serializable,
     } else if (ring instanceof double[]) {
       final double[] coordinates = (double[])ring;
       final DoubleCoordinatesList points = new DoubleCoordinatesList(
-        getNumAxis(), coordinates);
+        getAxisCount(), coordinates);
       return linearRing(points);
     } else {
       return null;
@@ -1037,7 +1041,7 @@ public class GeometryFactory implements Serializable,
         lineString = lineString(coordinates);
       } else if (value instanceof double[]) {
         final double[] points = (double[])value;
-        lineString = lineString(getNumAxis(), points);
+        lineString = lineString(getAxisCount(), points);
       } else {
         lineString = null;
       }
@@ -1046,10 +1050,6 @@ public class GeometryFactory implements Serializable,
       }
     }
     return lineStrings.toArray(new LineString[lineStrings.size()]);
-  }
-
-  public int getNumAxis() {
-    return numAxis;
   }
 
   public Point[] getPointArray(final Collection<?> pointsList) {
@@ -1133,11 +1133,11 @@ public class GeometryFactory implements Serializable,
   }
 
   public boolean hasM() {
-    return numAxis > 3;
+    return axisCount > 3;
   }
 
   public boolean hasZ() {
-    return numAxis > 2;
+    return axisCount > 2;
   }
 
   @Override
@@ -1185,8 +1185,8 @@ public class GeometryFactory implements Serializable,
     return new LinearRingImpl(this, points);
   }
 
-  public LinearRing linearRing(final int numAxis, final double... coordinates) {
-    return new LinearRingImpl(this, numAxis, coordinates);
+  public LinearRing linearRing(final int axisCount, final double... coordinates) {
+    return new LinearRingImpl(this, axisCount, coordinates);
   }
 
   public LinearRing linearRing(final LinearRing linearRing) {
@@ -1210,8 +1210,8 @@ public class GeometryFactory implements Serializable,
     if (points == null) {
       return lineString();
     } else {
-      final List<Coordinates> p = Arrays.asList(points);
-      return lineString(p);
+      final List<Coordinates> pointList = Arrays.asList(points);
+      return lineString(pointList);
     }
   }
 
@@ -1225,12 +1225,16 @@ public class GeometryFactory implements Serializable,
     return new LineStringImpl(this, points);
   }
 
-  public LineString lineString(final int numAxis, final double... coordinates) {
-    return new LineStringImpl(this, numAxis, coordinates);
+  public LineString lineString(final int axisCount, final double... coordinates) {
+    return new LineStringImpl(this, axisCount, coordinates);
   }
 
   public LineString lineString(final LineString lineString) {
-    return new LineStringImpl(this, lineString.getCoordinatesList());
+    if (lineString == null || lineString.isEmpty()) {
+      return lineString();
+    } else {
+      return new LineStringImpl(this, lineString.getCoordinatesList());
+    }
   }
 
   @Override
@@ -1253,8 +1257,8 @@ public class GeometryFactory implements Serializable,
   }
 
   @Override
-  public void makePrecise(final int numAxis, final double... coordinates) {
-    coordinatesPrecisionModel.makePrecise(numAxis, coordinates);
+  public void makePrecise(final int axisCount, final double... coordinates) {
+    coordinatesPrecisionModel.makePrecise(axisCount, coordinates);
   }
 
   @Override
@@ -1267,10 +1271,25 @@ public class GeometryFactory implements Serializable,
     return coordinatesPrecisionModel.makeZPrecise(value);
   }
 
+  /**
+   * <p>Create an empty {@link Point}.</p>
+   *
+   * @return The point.
+   */
   public Point point() {
     return new PointImpl(this);
   }
 
+  /**
+   * <p>Create a new {@link Point} from the specified point ({@link Coordinates}).
+   * If the point is null or has {@link Coordinates#getAxisCount()} &lt; 2 an empty
+   * point will be returned. The result point will have the same  {@link #getAxisCount()} from this
+   * factory. Additional axis in the point will be ignored. If the point has a smaller
+   * {@link Point#getAxisCount()} then {@link Double#NaN} will be used for that axis.</p>
+   * 
+   * @param point The coordinates to create the point from.
+   * @return The point.
+   */
   public Point point(final Coordinates point) {
     if (point == null) {
       return point();
@@ -1294,9 +1313,9 @@ public class GeometryFactory implements Serializable,
       if (size == 0) {
         return point();
       } else if (size == 1) {
-        final int numAxis = Math.min(points.getNumAxis(), getNumAxis());
-        final double[] coordinates = new double[numAxis];
-        for (int axisIndex = 0; axisIndex < numAxis; axisIndex++) {
+        final int axisCount = Math.min(points.getAxisCount(), getAxisCount());
+        final double[] coordinates = new double[axisCount];
+        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
           final double coordinate = points.getValue(0, axisIndex);
           coordinates[axisIndex] = coordinate;
         }
@@ -1308,6 +1327,16 @@ public class GeometryFactory implements Serializable,
     }
   }
 
+  /**
+   * <p>Create a new {@link Point} from the specified point coordinates.
+   * If the point is null or has length < 2 an empty point will be returned.
+   * The result point will have the same  {@link #getAxisCount()} from this factory.
+   * Additional coordinates in the point will be ignored. If the point length is &lt;
+   * {@link #getAxisCount()} then {@link Double#NaN} will be used for that axis.</p>
+   * 
+   * @param point The coordinates to create the point from.
+   * @return The point.
+   */
   public Point point(final double... coordinates) {
     if (coordinates == null || coordinates.length < 2) {
       return point();
@@ -1316,6 +1345,21 @@ public class GeometryFactory implements Serializable,
     }
   }
 
+  /**
+   * <p>Create a new {@link Point} from the object using the following rules.<p>
+   * <ul>
+   *   <li><code>null</code> using {@link #point()}</li>
+   *   <li>Instances of {@link Point} using {@link Point#copy(GeometryFactory)}</li>
+   *   <li>Instances of {@link Coordinates} using {@link #point(Coordinates)}</li>
+   *   <li>Instances of {@link CoordinatesList} using {@link #point(CoordinatesList)}</li>
+   *   <li>Instances of {@link double[]} using {@link #point(double[])}</li>
+   *   <li>Instances of any other class throws {@link IllegalArgumentException}.<li>
+   * </ul>
+   * 
+   * @param point The coordinates to create the point from.
+   * @return The point.
+   * @throws IllegalArgumentException If the object is not an instance of a supported class.
+   */
   public Point point(final Object object) {
     if (object == null) {
       return point();
@@ -1448,13 +1492,13 @@ public class GeometryFactory implements Serializable,
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "geometryFactory");
     map.put("srid", getSrid());
-    map.put("numAxis", getNumAxis());
+    map.put("axisCount", getAxisCount());
 
     final double scaleXY = getScaleXY();
     if (scaleXY > 0) {
       map.put("scaleXy", scaleXY);
     }
-    if (numAxis > 2) {
+    if (axisCount > 2) {
       final double scaleZ = getScaleZ();
       if (scaleZ > 0) {
         map.put("scaleZ", scaleZ);
@@ -1473,8 +1517,8 @@ public class GeometryFactory implements Serializable,
     }
     string.append("srid=");
     string.append(srid);
-    string.append(", numAxis=");
-    string.append(numAxis);
+    string.append(", axisCount=");
+    string.append(axisCount);
     final double scaleXY = coordinatesPrecisionModel.getScaleXY();
     string.append(", scaleXy=");
     if (scaleXY <= 0) {

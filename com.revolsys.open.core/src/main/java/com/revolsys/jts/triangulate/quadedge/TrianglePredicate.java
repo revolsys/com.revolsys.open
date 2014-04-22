@@ -36,10 +36,10 @@ package com.revolsys.jts.triangulate.quadedge;
 import java.util.Arrays;
 
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Triangle;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.math.DD;
 
 /**
@@ -81,7 +81,7 @@ public class TrianglePredicate {
         + nonRobustInCircle + ", DD result = " + isInCircleDD
         + ", CC result = " + isInCircleCC + ")");
       System.out.println(Arrays.asList(a, b, c, p));
-      System.out.println("Circumcentre = " + WKTWriter.toPoint(circumCentre)
+      System.out.println("Circumcentre = " + WktWriter.point(circumCentre)
         + " radius = " + a.distance(circumCentre));
       System.out.println("p radius diff a = "
         + Math.abs(p.distance(circumCentre) / a.distance(circumCentre) - 1));

@@ -10,9 +10,9 @@ public class RadiansToDegreesOperation implements CoordinatesOperation {
 
   @Override
   public void perform(final Coordinates from, final Coordinates to) {
-    final int numAxis = Math.min(from.getNumAxis(), to.getNumAxis());
+    final int axisCount = Math.min(from.getAxisCount(), to.getAxisCount());
 
-    for (int i = 0; i < numAxis; i++) {
+    for (int i = 0; i < axisCount; i++) {
       final double value = from.getValue(i);
       if (i < 2) {
         final double convertedValue = Math.toDegrees(value);
@@ -24,22 +24,22 @@ public class RadiansToDegreesOperation implements CoordinatesOperation {
   }
 
   @Override
-  public void perform(final int sourceNumAxis,
-    final double[] sourceCoordinates, final int targetNumAxis,
+  public void perform(final int sourceAxisCount,
+    final double[] sourceCoordinates, final int targetAxisCount,
     final double[] targetCoordinates) {
-    final int numPoints = sourceCoordinates.length / sourceNumAxis;
+    final int numPoints = sourceCoordinates.length / sourceAxisCount;
     for (int vertexIndex = 0; vertexIndex < numPoints; vertexIndex++) {
-      for (int axisIndex = 0; axisIndex < targetNumAxis; axisIndex++) {
+      for (int axisIndex = 0; axisIndex < targetAxisCount; axisIndex++) {
         double value;
-        if (axisIndex < sourceNumAxis) {
-          value = sourceCoordinates[vertexIndex * sourceNumAxis + axisIndex];
+        if (axisIndex < sourceAxisCount) {
+          value = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
           if (axisIndex < 2) {
             value = Math.toDegrees(value);
           }
         } else {
           value = Double.NaN;
         }
-        targetCoordinates[vertexIndex * sourceNumAxis + axisIndex] = value;
+        targetCoordinates[vertexIndex * sourceAxisCount + axisIndex] = value;
       }
     }
   }

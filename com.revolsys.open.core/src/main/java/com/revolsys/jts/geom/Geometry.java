@@ -42,7 +42,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataTypeProxy;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.jts.geom.vertex.Vertex;
-import com.revolsys.jts.operation.buffer.BufferOp;
+import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.operation.union.UnaryUnionOp;
 import com.revolsys.jts.operation.valid.IsValidOp;
@@ -265,9 +265,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * The end cap style specifies the buffer geometry that will be
    * created at the ends of linestrings.  The styles provided are:
    * <ul>
-   * <li><code>BufferOp.CAP_ROUND</code> - (default) a semi-circle
-   * <li><code>BufferOp.CAP_BUTT</code> - a straight line perpendicular to the end segment
-   * <li><code>BufferOp.CAP_SQUARE</code> - a half-square
+   * <li><code>Buffer.CAP_ROUND</code> - (default) a semi-circle
+   * <li><code>Buffer.CAP_BUTT</code> - a straight line perpendicular to the end segment
+   * <li><code>Buffer.CAP_SQUARE</code> - a half-square
    * </ul>
    * <p>
    * The buffer operation always returns a polygonal result. The negative or
@@ -283,7 +283,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *
    * @see #buffer(double)
    * @see #buffer(double, int)
-   * @see BufferOp
+   * @see Buffer
    */
   Geometry buffer(final double distance, final int quadrantSegments,
     final int endCapStyle);
@@ -956,7 +956,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   double getLength();
 
-  int getNumAxis();
+  int getAxisCount();
 
   /**
    * Returns the number of {@link Geometry}s in a {@link GeometryCollection}
@@ -964,7 +964,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *
    * @return the number of geometries contained in this geometry
    */
-  int getNumGeometries();
+  int getGeometryCount();
 
   Point getPoint();
 
@@ -1134,6 +1134,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @return <code>true</code> if the geometries are less than <code>distance</code> apart.
    */
   boolean isWithinDistance(final Geometry geom, final double distance);
+
+  Geometry move(final double... deltas);
 
   /**
    *  Converts this <code>Geometry</code> to <b>normal form</b> (or <b>

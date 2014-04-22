@@ -229,6 +229,14 @@ public final class MathUtil {
     return getNorthClockwiseAngle(angle);
   }
 
+  public static void append(final StringBuffer string, final double number) {
+    if (Double.isNaN(number)) {
+      string.append("NaN");
+    } else {
+      DoubleFormatUtil.formatDoublePrecise(number, 15, 15, string);
+    }
+  }
+
   public static double avg(final double a, final double b) {
     return (a + b) / 2d;
   }
@@ -752,7 +760,7 @@ public final class MathUtil {
 
   public static String toString(final double number) {
     final StringBuffer string = new StringBuffer();
-    DoubleFormatUtil.formatDoublePrecise(number, 15, 15, string);
+    append(string, number);
     return string.toString();
   }
 

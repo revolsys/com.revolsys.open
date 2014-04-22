@@ -33,13 +33,13 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
   }
 
   @Override
-  public int getNumAxis() {
-    return (byte)coordinates.getNumAxis();
+  public int getAxisCount() {
+    return (byte)coordinates.getAxisCount();
   }
 
   @Override
   public double getValue(final int axisIndex) {
-    if (axisIndex >= 0 && axisIndex < getNumAxis()) {
+    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
       return coordinates.getValue(this.index, axisIndex);
     } else {
       return 0;
@@ -47,7 +47,7 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
   }
 
   public double getValue(final int relativeIndex, final int axisIndex) {
-    if (axisIndex >= 0 && axisIndex < getNumAxis()) {
+    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
       return coordinates.getValue(this.index + relativeIndex, axisIndex);
     } else {
       return 0;
@@ -86,14 +86,14 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
 
   @Override
   public void setValue(final int axisIndex, final double value) {
-    if (axisIndex >= 0 && axisIndex < getNumAxis()) {
+    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
       coordinates.setValue(this.index, axisIndex, value);
     }
   }
 
   public void setValue(final int relativeIndex, final int axisIndex,
     final double value) {
-    if (axisIndex >= 0 && axisIndex < getNumAxis()) {
+    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
       coordinates.setValue(this.index + relativeIndex, axisIndex, value);
     }
   }

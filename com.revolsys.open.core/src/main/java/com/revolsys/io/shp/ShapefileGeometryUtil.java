@@ -110,9 +110,9 @@ public final class ShapefileGeometryUtil {
   public static int getShapeType(final Geometry geometry) {
     if (geometry != null) {
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-      final int numAxis = geometryFactory.getNumAxis();
-      final boolean hasZ = numAxis > 2;
-      final boolean hasM = numAxis > 3;
+      final int axisCount = geometryFactory.getAxisCount();
+      final boolean hasZ = axisCount > 2;
+      final boolean hasM = axisCount > 3;
 
       if (geometry instanceof Point) {
         if (hasM) {
@@ -158,9 +158,9 @@ public final class ShapefileGeometryUtil {
 
   public static Method getWriteMethod(final Geometry geometry) {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
-    final int numAxis = geometryFactory.getNumAxis();
-    final boolean hasZ = numAxis > 2;
-    final boolean hasM = numAxis > 3;
+    final int axisCount = geometryFactory.getAxisCount();
+    final boolean hasZ = axisCount > 2;
+    final boolean hasM = axisCount > 3;
     final String geometryType = geometry.getGeometryType();
     final String geometryTypeKey = geometryType.toUpperCase() + hasZ + hasM;
     return getWriteMethod(geometryTypeKey);
@@ -195,13 +195,13 @@ public final class ShapefileGeometryUtil {
   }
 
   public List<CoordinatesList> createCoordinatesLists(final int[] partIndex,
-    final int numAxis) {
+    final int axisCount) {
     final List<CoordinatesList> parts = new ArrayList<CoordinatesList>(
       partIndex.length);
     for (int i = 0; i < partIndex.length; i++) {
       final int partNumPoints = partIndex[i];
       final DoubleCoordinatesList points = new DoubleCoordinatesList(
-        partNumPoints, numAxis);
+        partNumPoints, axisCount);
       parts.add(points);
     }
     return parts;
@@ -498,10 +498,10 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int numAxis = 2;
+    final int axisCount = 2;
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
+      final CoordinatesList points = readXYCoordinates(in, numPoints, axisCount);
 
       return geometryFactory.lineString(points);
     } else {
@@ -516,7 +516,7 @@ public final class ShapefileGeometryUtil {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = readXYCoordinates(in, numCoords, numAxis);
+        final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
         pointsList.add(points);
       }
       return geometryFactory.createMultiLineString(pointsList);
@@ -529,10 +529,10 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int numAxis = 4;
+    final int axisCount = 4;
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
+      final CoordinatesList points = readXYCoordinates(in, numPoints, axisCount);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       readCoordinates(in, points, 3);
       return geometryFactory.lineString(points);
@@ -547,7 +547,7 @@ public final class ShapefileGeometryUtil {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = readXYCoordinates(in, numCoords, numAxis);
+        final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
         pointsList.add(points);
       }
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
@@ -565,10 +565,10 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int numAxis = 3;
+    final int axisCount = 3;
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
+      final CoordinatesList points = readXYCoordinates(in, numPoints, axisCount);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       readCoordinates(in, points, 2);
       return geometryFactory.lineString(points);
@@ -583,7 +583,7 @@ public final class ShapefileGeometryUtil {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = readXYCoordinates(in, numCoords, numAxis);
+        final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
         pointsList.add(points);
       }
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
@@ -601,10 +601,10 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
     final int numPoints = in.readLEInt();
-    final int numAxis = 4;
+    final int axisCount = 4;
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = readXYCoordinates(in, numPoints, numAxis);
+      final CoordinatesList points = readXYCoordinates(in, numPoints, axisCount);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       readCoordinates(in, points, 2);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
@@ -621,7 +621,7 @@ public final class ShapefileGeometryUtil {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = readXYCoordinates(in, numCoords, numAxis);
+        final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
         pointsList.add(points);
       }
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
@@ -649,8 +649,8 @@ public final class ShapefileGeometryUtil {
   }
 
   public CoordinatesList readXYCoordinates(final EndianInput in,
-    final int numPoints, final int numAxis) throws IOException {
-    final CoordinatesList points = new DoubleCoordinatesList(numPoints, numAxis);
+    final int numPoints, final int axisCount) throws IOException {
+    final CoordinatesList points = new DoubleCoordinatesList(numPoints, axisCount);
     readXYCoordinates(in, points);
     return points;
   }
@@ -670,7 +670,7 @@ public final class ShapefileGeometryUtil {
 
   public void writeMCoordinates(final EndianOutput out,
     final CoordinatesList coordinates) throws IOException {
-    if (coordinates.getNumAxis() >= 4) {
+    if (coordinates.getAxisCount() >= 4) {
       for (int i = 0; i < coordinates.size(); i++) {
         final double m = coordinates.getM(i);
         if (!Double.isNaN(m)) {
@@ -689,7 +689,7 @@ public final class ShapefileGeometryUtil {
   public void writeMCoordinates(final EndianOutput out, final Geometry geometry)
     throws IOException {
     writeMCoordinatesRange(out, geometry);
-    for (int n = 0; n < geometry.getNumGeometries(); n++) {
+    for (int n = 0; n < geometry.getGeometryCount(); n++) {
       final Geometry subGeometry = geometry.getGeometry(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
       writeMCoordinates(out, coordinates);
@@ -708,10 +708,10 @@ public final class ShapefileGeometryUtil {
     final Geometry geometry) throws IOException {
     double minM = Double.MAX_VALUE;
     double maxM = -Double.MAX_VALUE;
-    for (int n = 0; n < geometry.getNumGeometries(); n++) {
+    for (int n = 0; n < geometry.getGeometryCount(); n++) {
       final Geometry subGeometry = geometry.getGeometry(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
-      if (coordinates.getNumAxis() >= 4) {
+      if (coordinates.getAxisCount() >= 4) {
         for (int i = 0; i < coordinates.size(); i++) {
           final double m = coordinates.getM(i);
           if (!Double.isNaN(m)) {
@@ -886,7 +886,7 @@ public final class ShapefileGeometryUtil {
     int numPoints = 0;
 
     final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final Geometry part = geometry.getGeometry(i);
       if (part instanceof Polygon) {
         final Polygon polygon = (Polygon)part;
@@ -971,7 +971,7 @@ public final class ShapefileGeometryUtil {
     final int shapeType, final int wordsPerPoint) throws IOException {
     if (geometry instanceof LineString || geometry instanceof MultiLineString) {
       final int numCoordinates = geometry.getVertexCount();
-      final int numGeometries = geometry.getNumGeometries();
+      final int numGeometries = geometry.getGeometryCount();
       final BoundingBox envelope = geometry.getBoundingBox();
 
       if (writeLength) {
@@ -1004,7 +1004,7 @@ public final class ShapefileGeometryUtil {
   public void writePolylinePartIndexes(final EndianOutput out,
     final Geometry geometry) throws IOException {
     int partIndex = 0;
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final LineString line = (LineString)geometry.getGeometry(i);
       out.writeLEInt(partIndex);
       partIndex += line.getVertexCount();
@@ -1034,7 +1034,7 @@ public final class ShapefileGeometryUtil {
 
   public void writeXYCoordinates(final EndianOutput out, final Geometry geometry)
     throws IOException {
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final Geometry subGeometry = geometry.getGeometry(i);
       final CoordinatesList points = CoordinatesListUtil.get(subGeometry);
       writeXYCoordinates(out, points);
@@ -1043,7 +1043,7 @@ public final class ShapefileGeometryUtil {
 
   public void writeZCoordinates(final EndianOutput out,
     final CoordinatesList coordinates) throws IOException {
-    if (coordinates.getNumAxis() >= 3) {
+    if (coordinates.getAxisCount() >= 3) {
       for (int i = 0; i < coordinates.size(); i++) {
         final double z = coordinates.getZ(i);
         if (Double.isNaN(z)) {
@@ -1062,7 +1062,7 @@ public final class ShapefileGeometryUtil {
   public void writeZCoordinates(final EndianOutput out, final Geometry geometry)
     throws IOException {
     writeZCoordinatesRange(out, geometry);
-    for (int n = 0; n < geometry.getNumGeometries(); n++) {
+    for (int n = 0; n < geometry.getGeometryCount(); n++) {
       final Geometry subGeometry = geometry.getGeometry(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
       writeZCoordinates(out, coordinates);
@@ -1081,10 +1081,10 @@ public final class ShapefileGeometryUtil {
     final Geometry geometry) throws IOException {
     double minZ = Double.MAX_VALUE;
     double maxZ = -Double.MAX_VALUE;
-    for (int n = 0; n < geometry.getNumGeometries(); n++) {
+    for (int n = 0; n < geometry.getGeometryCount(); n++) {
       final Geometry subGeometry = geometry.getGeometry(n);
       final CoordinatesList coordinates = CoordinatesListUtil.get(subGeometry);
-      if (coordinates.getNumAxis() >= 3) {
+      if (coordinates.getAxisCount() >= 3) {
         for (int i = 0; i < coordinates.size(); i++) {
           final double z = coordinates.getZ(i);
           if (!Double.isNaN(z)) {

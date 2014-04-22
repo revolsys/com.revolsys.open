@@ -12,7 +12,7 @@ public abstract class AbstractCoordinatesProjection implements
     inverse(x, y, result, 0, 2);
     to.setValue(0, result[0]);
     to.setValue(1, result[1]);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
+    for (int i = 2; i < from.getAxisCount() && i < to.getAxisCount(); i++) {
       final double ordinate = from.getValue(i);
       to.setValue(i, ordinate);
     }
@@ -26,7 +26,7 @@ public abstract class AbstractCoordinatesProjection implements
     project(x, y, result, 0, 2);
     to.setValue(0, result[0]);
     to.setValue(1, result[1]);
-    for (int i = 2; i < from.getNumAxis() && i < to.getNumAxis(); i++) {
+    for (int i = 2; i < from.getAxisCount() && i < to.getAxisCount(); i++) {
       final double ordinate = from.getValue(i);
       to.setValue(i, ordinate);
     }

@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.algorithm.distance;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * Contains a pair of points and the distance between them.
@@ -124,6 +124,6 @@ public class PointPairDistance {
 
   @Override
   public String toString() {
-    return WKTWriter.toLineString(pt[0], pt[1]);
+    return WktWriter.lineString(pt[0], pt[1]);
   }
 }

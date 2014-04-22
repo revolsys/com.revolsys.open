@@ -77,7 +77,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final Geometry geometry,
     final GeometryStyle style) {
     if (geometry != null) {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry part = geometry.getGeometry(i);
         if (part instanceof Point) {
           final Point point = (Point)part;
@@ -115,7 +115,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final Geometry geometry,
     final GeometryStyle style) {
     if (geometry != null) {
-      for (int i = 0; i < geometry.getNumGeometries(); i++) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry part = geometry.getGeometry(i);
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;

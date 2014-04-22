@@ -198,36 +198,36 @@ public class FgdbReader {
         final String wkt = readUtf8String();
         final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
         final int geometryFlags = in.read();
-        int numAxis = 2;
+        int axisCount = 2;
         if (geometryFlags == 5) {
-          numAxis = 3;
+          axisCount = 3;
         }
         if (geometryFlags == 7) {
-          numAxis = 4;
+          axisCount = 4;
         }
         final double xOrigin = in.readLEDouble();
         final double yOrigin = in.readLEDouble();
         final double xyScale = in.readLEDouble();
         double zScale;
         double mScale;
-        if (numAxis == 4) {
+        if (axisCount == 4) {
           final double mOrigin = in.readLEDouble();
           mScale = in.readLEDouble();
         } else {
           mScale = 0;
         }
-        if (numAxis >= 3) {
+        if (axisCount >= 3) {
           final double zOrigin = in.readLEDouble();
           zScale = in.readLEDouble();
         } else {
           zScale = 0;
         }
         final double xyTolerance = in.readLEDouble();
-        if (numAxis == 4) {
+        if (axisCount == 4) {
           final double mTolerance = in.readLEDouble();
 
         }
-        if (numAxis >= 3) {
+        if (axisCount >= 3) {
           final double zTolerance = in.readLEDouble();
         }
         final double minX = in.readLEDouble();
@@ -235,7 +235,7 @@ public class FgdbReader {
         final double maxX = in.readLEDouble();
         final double maxY = in.readLEDouble();
         final GeometryFactory geometryFactory = GeometryFactory.getFactory(
-          coordinateSystem, numAxis, xyScale, zScale);
+          coordinateSystem, axisCount, xyScale, zScale);
         final BoundingBox boundingBox = new Envelope(geometryFactory, minX,
           minY, maxX, maxY);
         boolean run = true;

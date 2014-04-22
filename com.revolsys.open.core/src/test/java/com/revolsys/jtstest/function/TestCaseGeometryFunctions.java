@@ -34,7 +34,7 @@ package com.revolsys.jtstest.function;
 
 import com.revolsys.jts.densify.Densifier;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.operation.buffer.BufferOp;
+import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.precision.MinimumClearance;
 
@@ -59,7 +59,7 @@ public class TestCaseGeometryFunctions {
     final BufferParameters bufParams = new BufferParameters();
     bufParams.setJoinStyle(BufferParameters.JOIN_MITRE);
 
-    return BufferOp.bufferOp(g, distance, bufParams);
+    return Buffer.buffer(g, distance, bufParams);
   }
 
   public static Geometry densify(final Geometry g, final double distance) {

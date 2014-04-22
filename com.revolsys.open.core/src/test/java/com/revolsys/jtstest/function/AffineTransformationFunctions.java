@@ -69,7 +69,7 @@ public class AffineTransformationFunctions {
 
   public static Geometry transformByVectors(final Geometry g,
     final Geometry control) {
-    final int nControl = control.getNumGeometries();
+    final int nControl = control.getGeometryCount();
     final Coordinates src[] = new Coordinates[nControl];
     final Coordinates dest[] = new Coordinates[nControl];
     for (int i = 0; i < nControl; i++) {

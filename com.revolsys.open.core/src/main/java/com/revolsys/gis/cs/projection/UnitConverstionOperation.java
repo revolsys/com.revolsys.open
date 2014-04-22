@@ -12,7 +12,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
 
   private final Unit targetUnit;
 
-  private int numAxis = 0;
+  private int axisCount = 0;
 
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit) {
     this.sourceUnit = sourceUnit;
@@ -21,20 +21,20 @@ public class UnitConverstionOperation implements CoordinatesOperation {
   }
 
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit,
-    final int numAxis) {
+    final int axisCount) {
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
-    this.numAxis = numAxis;
+    this.axisCount = axisCount;
     converter = sourceUnit.getConverterTo(targetUnit);
   }
 
   @Override
   public void perform(final Coordinates from, final Coordinates to) {
-    final int numAxis = Math.min(from.getNumAxis(), to.getNumAxis());
+    final int axisCount = Math.min(from.getAxisCount(), to.getAxisCount());
 
-    for (int i = 0; i < numAxis; i++) {
+    for (int i = 0; i < axisCount; i++) {
       final double value = from.getValue(i);
-      if (i < this.numAxis) {
+      if (i < this.axisCount) {
         final double convertedValue = converter.convert(value);
         to.setValue(i, convertedValue);
       } else {
@@ -45,22 +45,22 @@ public class UnitConverstionOperation implements CoordinatesOperation {
   }
 
   @Override
-  public void perform(final int sourceNumAxis,
-    final double[] sourceCoordinates, final int targetNumAxis,
+  public void perform(final int sourceAxisCount,
+    final double[] sourceCoordinates, final int targetAxisCount,
     final double[] targetCoordinates) {
-    final int numPoints = sourceCoordinates.length / sourceNumAxis;
+    final int numPoints = sourceCoordinates.length / sourceAxisCount;
     for (int vertexIndex = 0; vertexIndex < numPoints; vertexIndex++) {
-      for (int axisIndex = 0; axisIndex < targetNumAxis; axisIndex++) {
+      for (int axisIndex = 0; axisIndex < targetAxisCount; axisIndex++) {
         double value;
-        if (axisIndex < sourceNumAxis) {
-          value = sourceCoordinates[vertexIndex * sourceNumAxis + axisIndex];
-          if (axisIndex < this.numAxis) {
+        if (axisIndex < sourceAxisCount) {
+          value = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
+          if (axisIndex < this.axisCount) {
             value = converter.convert(value);
           }
         } else {
           value = Double.NaN;
         }
-        targetCoordinates[vertexIndex * sourceNumAxis + axisIndex] = value;
+        targetCoordinates[vertexIndex * sourceAxisCount + axisIndex] = value;
       }
     }
   }

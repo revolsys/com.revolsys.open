@@ -33,7 +33,6 @@
 package com.revolsys.jtstest.testrunner;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.WKTWriter;
 
 /**
  * @version 1.7
@@ -64,8 +63,7 @@ public class GeometryResult implements Result {
 
   @Override
   public String toFormattedString() {
-    final WKTWriter writer = new WKTWriter();
-    return writer.writeFormatted(geometry);
+    return geometry.toWkt();
   }
 
   @Override

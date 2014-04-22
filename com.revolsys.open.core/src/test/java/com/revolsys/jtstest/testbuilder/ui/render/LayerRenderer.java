@@ -87,7 +87,7 @@ public class LayerRenderer implements Renderer {
      * (1D) elements correctly.
      * This also allows cancellation.
      */
-    for (int i = 0; i < gc.getNumGeometries(); i++) {
+    for (int i = 0; i < gc.getGeometryCount(); i++) {
       render(g, viewport, gc.getGeometry(i), style);
       if (isCancelled) {
         return;

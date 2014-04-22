@@ -119,11 +119,6 @@ public class SimpleReportWriter implements ReportWriter {
     reportBuf.write(AppStrings.LABEL_TEST_CASE
       + " "
       + testCase.getTestRun().getTestFile().getName()
-      + " - #"
-      + testCase.getCaseIndex()
-      + " ("
-      + testCase.getLineNumber()
-      + ")"
       + (testCase.getDescription().length() > 0 ? ": "
         + testCase.getDescription() : "") + "\n");
     reportOnTests(testCase.getTests());

@@ -108,7 +108,7 @@ public class SimpleCoordinatesPrecisionModel implements
       coordinates.setY(newY);
     }
     if (scaleZ > 0) {
-      if (coordinates.getNumAxis() > 2) {
+      if (coordinates.getAxisCount() > 2) {
         final double z = coordinates.getZ();
         final double newZ = makeZPrecise(z);
         coordinates.setZ(newZ);
@@ -117,13 +117,13 @@ public class SimpleCoordinatesPrecisionModel implements
   }
 
   @Override
-  public void makePrecise(final int numAxis, final double... coordinates) {
+  public void makePrecise(final int axisCount, final double... coordinates) {
     final boolean hasXyScale = scaleXY > 0;
     final boolean hasZScale = scaleZ > 0;
     if (hasXyScale || hasZScale) {
       for (int i = 0; i < coordinates.length; i++) {
         final double value = coordinates[i];
-        final int axisIndex = i % numAxis;
+        final int axisIndex = i % axisCount;
         if (axisIndex < 2) {
           if (hasXyScale) {
             coordinates[i] = makeXyPrecise(value);

@@ -72,7 +72,7 @@ import com.revolsys.jts.geom.util.GeometryMapper;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geom.vertex.VertexImpl;
 import com.revolsys.jts.operation.IsSimpleOp;
-import com.revolsys.jts.operation.buffer.BufferOp;
+import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.distance.DistanceOp;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.operation.overlay.OverlayOp;
@@ -337,7 +337,7 @@ public abstract class GeometryImpl implements Geometry {
    */
   @Override
   public Geometry buffer(final double distance) {
-    return BufferOp.bufferOp(this, distance);
+    return Buffer.buffer(this, distance);
   }
 
   /**
@@ -371,7 +371,7 @@ public abstract class GeometryImpl implements Geometry {
    */
   @Override
   public Geometry buffer(final double distance, final int quadrantSegments) {
-    return BufferOp.bufferOp(this, distance, quadrantSegments);
+    return Buffer.buffer(this, distance, quadrantSegments);
   }
 
   /**
@@ -388,9 +388,9 @@ public abstract class GeometryImpl implements Geometry {
    * The end cap style specifies the buffer geometry that will be
    * created at the ends of linestrings.  The styles provided are:
    * <ul>
-   * <li><code>BufferOp.CAP_ROUND</code> - (default) a semi-circle
-   * <li><code>BufferOp.CAP_BUTT</code> - a straight line perpendicular to the end segment
-   * <li><code>BufferOp.CAP_SQUARE</code> - a half-square
+   * <li><code>Buffer.CAP_ROUND</code> - (default) a semi-circle
+   * <li><code>Buffer.CAP_BUTT</code> - a straight line perpendicular to the end segment
+   * <li><code>Buffer.CAP_SQUARE</code> - a half-square
    * </ul>
    * <p>
    * The buffer operation always returns a polygonal result. The negative or
@@ -406,12 +406,12 @@ public abstract class GeometryImpl implements Geometry {
    *
    * @see #buffer(double)
    * @see #buffer(double, int)
-   * @see BufferOp
+   * @see Buffer
    */
   @Override
   public Geometry buffer(final double distance, final int quadrantSegments,
     final int endCapStyle) {
-    return BufferOp.bufferOp(this, distance, quadrantSegments, endCapStyle);
+    return Buffer.buffer(this, distance, quadrantSegments, endCapStyle);
   }
 
   /**
@@ -1408,10 +1408,10 @@ public abstract class GeometryImpl implements Geometry {
       final int geometrySrid = getSrid();
       final int srid = geometryFactory.getSrid();
       if (srid == 0 && geometrySrid != 0) {
-        final int numAxis = geometryFactory.getNumAxis();
+        final int axisCount = geometryFactory.getAxisCount();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
-        geometryFactory = GeometryFactory.getFactory(geometrySrid, numAxis,
+        geometryFactory = GeometryFactory.getFactory(geometrySrid, axisCount,
           scaleXY, scaleZ);
       }
       return geometryFactory;
@@ -1419,8 +1419,8 @@ public abstract class GeometryImpl implements Geometry {
   }
 
   @Override
-  public int getNumAxis() {
-    return (byte)geometryFactory.getNumAxis();
+  public int getAxisCount() {
+    return (byte)geometryFactory.getAxisCount();
   }
 
   /**
@@ -1430,8 +1430,12 @@ public abstract class GeometryImpl implements Geometry {
    * @return the number of geometries contained in this geometry
    */
   @Override
-  public int getNumGeometries() {
-    return 1;
+  public int getGeometryCount() {
+    if (isEmpty()) {
+      return 0;
+    } else {
+      return 1;
+    }
   }
 
   @Override

@@ -26,13 +26,13 @@ public class LineStringRelateTest {
   };
 
   public static LineString createLineString(double... coordinates) {
-    final int numAxis = 2;
+    final int axisCount = 2;
     DoubleCoordinatesList points = new DoubleCoordinatesList(coordinates.length
-      / numAxis, numAxis);
+      / axisCount, axisCount);
     for (int i = 0; i < points.size(); i++) {
-      for (int axisIndex = 0; axisIndex < numAxis; axisIndex++) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double value = OFFSETS[axisIndex]
-          + coordinates[i * numAxis + axisIndex];
+          + coordinates[i * axisCount + axisIndex];
         points.setValue(i, axisIndex, value);
       }
     }

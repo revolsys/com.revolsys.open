@@ -99,14 +99,14 @@ public class ArcConverter implements OsnConverter {
       serializer.attributeName("pointList");
       serializer.startCollection("List");
       final CoordinatesList points = CoordinatesListUtil.get(line);
-      final int numAxis = points.getNumAxis();
+      final int axisCount = points.getAxisCount();
       for (int i = 0; i < points.size(); i++) {
         serializer.startObject(SaifConstants.POINT);
         serializer.attributeName("coords");
         final double x = points.getX(i);
         final double y = points.getY(i);
         final double z = points.getZ(i);
-        if (numAxis == 2) {
+        if (axisCount == 2) {
           serializer.startObject("/Coord2D");
           serializer.attribute("c1", x, true);
           serializer.attribute("c2", y, false);

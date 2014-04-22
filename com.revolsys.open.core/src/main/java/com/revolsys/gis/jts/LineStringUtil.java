@@ -228,7 +228,7 @@ public final class LineStringUtil {
   public static double distance(final double x, final double y,
     final Geometry geometry, final double tolerance) {
     double distance = Double.MAX_VALUE;
-    for (int i = 0; i < geometry.getNumGeometries(); i++) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final Geometry part = geometry.getGeometry(i);
       if (part instanceof LineString) {
         final LineString line = (LineString)part;
@@ -309,17 +309,17 @@ public final class LineStringUtil {
    * 
    * @param line1 The first line.
    * @param line2 The second line.
-   * @param numAxis The dimension.
+   * @param axisCount The dimension.
    * @return True if the coordinates match.
    */
   public static boolean equalsExact(final LineString line1,
-    final LineString line2, final int numAxis) {
+    final LineString line2, final int axisCount) {
     if (line1 == line2) {
       return true;
     } else {
       final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
       final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
-      return coordinates1.equals(coordinates2, numAxis);
+      return coordinates1.equals(coordinates2, axisCount);
     }
   }
 
@@ -390,7 +390,7 @@ public final class LineStringUtil {
 
   public static List<LineString> getAll(final Geometry geometry) {
     final List<LineString> lines = new ArrayList<LineString>();
-    for (int partIndex = 0; partIndex < geometry.getNumGeometries(); partIndex++) {
+    for (int partIndex = 0; partIndex < geometry.getGeometryCount(); partIndex++) {
       final Geometry part = geometry.getGeometry(partIndex);
       if (part instanceof LineString) {
         final LineString line = (LineString)part;
@@ -588,7 +588,7 @@ public final class LineStringUtil {
 
   public static double getLength(final MultiLineString lines) {
     double length = 0;
-    for (int i = 0; i < lines.getNumGeometries(); i++) {
+    for (int i = 0; i < lines.getGeometryCount(); i++) {
       final LineString line = (LineString)lines.getGeometry(i);
       length += line.getLength();
     }
@@ -675,7 +675,7 @@ public final class LineStringUtil {
     final Coordinates point) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final CoordinatesList newPoints = new DoubleCoordinatesList(
-      points.size() + 1, points.getNumAxis());
+      points.size() + 1, points.getAxisCount());
     int j = 0;
     for (int i = 0; i < newPoints.size(); i++) {
       if (i == index) {
@@ -739,7 +739,7 @@ public final class LineStringUtil {
         }
       }
     }
-    final int dimension = line.getCoordinatesList().getNumAxis();
+    final int dimension = line.getCoordinatesList().getAxisCount();
     final CoordinatesList newCoordinates = new DoubleCoordinatesList(
       segments.size() + 1, dimension);
     final LineSegment firstSegment = segments.get(0);
@@ -1216,7 +1216,7 @@ public final class LineStringUtil {
     final List<LineString> lines = new ArrayList<LineString>();
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final boolean containsPoint = point.equals(points.get(segmentIndex));
-    final int numAxis = points.getNumAxis();
+    final int axisCount = points.getAxisCount();
     int coords1Size;
     int coords2Size = points.size() - segmentIndex;
     if (containsPoint) {
@@ -1227,15 +1227,15 @@ public final class LineStringUtil {
       coords2Size = points.size() - segmentIndex;
     }
     final CoordinatesList points1 = new DoubleCoordinatesList(coords1Size,
-      numAxis);
-    points.copy(0, points1, 0, numAxis, segmentIndex + 1);
+      axisCount);
+    points.copy(0, points1, 0, axisCount, segmentIndex + 1);
 
     final CoordinatesList points2 = new DoubleCoordinatesList(coords2Size,
-      numAxis);
+      axisCount);
     if (!containsPoint) {
       points1.setPoint(coords1Size - 1, point);
       points2.setPoint(0, point);
-      if (points1.getNumAxis() > 2) {
+      if (points1.getAxisCount() > 2) {
         final Coordinates previous = points1.get(segmentIndex);
         final Coordinates next = points.get(segmentIndex + 1);
         final double z = getElevation(point, previous, next);
@@ -1243,9 +1243,9 @@ public final class LineStringUtil {
         points2.setZ(0, z);
       }
 
-      points.copy(segmentIndex + 1, points2, 1, numAxis, points2.size() - 1);
+      points.copy(segmentIndex + 1, points2, 1, axisCount, points2.size() - 1);
     } else {
-      points.copy(segmentIndex, points2, 0, numAxis, points2.size());
+      points.copy(segmentIndex, points2, 0, axisCount, points2.size());
     }
 
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);

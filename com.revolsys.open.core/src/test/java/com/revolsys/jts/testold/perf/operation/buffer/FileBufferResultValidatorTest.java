@@ -39,10 +39,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -83,7 +83,7 @@ public class FileBufferResultValidatorTest extends TestCase {
       final String msg = validator.getErrorMessage();
 
       System.out.println(msg);
-      System.out.println(WKTWriter.toPoint(validator.getErrorLocation()));
+      System.out.println(WktWriter.point(validator.getErrorLocation()));
       System.out.println(g);
     }
     assertTrue(validator.isValid());

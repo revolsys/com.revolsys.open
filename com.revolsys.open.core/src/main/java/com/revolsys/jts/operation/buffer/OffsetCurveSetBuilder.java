@@ -72,7 +72,7 @@ public class OffsetCurveSetBuilder {
 
   private final OffsetCurveBuilder curveBuilder;
 
-  private final List curveList = new ArrayList();
+  private final List<SegmentString> curveList = new ArrayList<>();
 
   public OffsetCurveSetBuilder(final Geometry inputGeom, final double distance,
     final OffsetCurveBuilder curveBuilder) {
@@ -106,7 +106,7 @@ public class OffsetCurveSetBuilder {
   }
 
   private void addCollection(final GeometryCollection gc) {
-    for (int i = 0; i < gc.getNumGeometries(); i++) {
+    for (int i = 0; i < gc.getGeometryCount(); i++) {
       final Geometry g = gc.getGeometry(i);
       add(g);
     }
@@ -243,7 +243,7 @@ public class OffsetCurveSetBuilder {
    *
    * @return a Collection of SegmentStrings representing the raw buffer curves
    */
-  public List getCurves() {
+  public List<SegmentString> getCurves() {
     add(inputGeom);
     return curveList;
   }
@@ -260,7 +260,6 @@ public class OffsetCurveSetBuilder {
   private boolean isErodedCompletely(final LinearRing ring,
     final double bufferDistance) {
     final Coordinates[] ringCoord = ring.getCoordinateArray();
-    final double minDiam = 0.0;
     // degenerate ring has no area
     if (ringCoord.length < 4) {
       return bufferDistance < 0;

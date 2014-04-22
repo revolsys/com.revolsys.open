@@ -191,7 +191,7 @@ public class WKBReader {
   private CoordinatesList readCoordinateSequence(final int size)
     throws IOException {
     final CoordinatesList seq = csFactory.create(size, inputDimension);
-    int targetDim = seq.getNumAxis();
+    int targetDim = seq.getAxisCount();
     if (targetDim > inputDimension) {
       targetDim = inputDimension;
     }

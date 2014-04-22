@@ -1,8 +1,7 @@
 <run>
  	<desc>Overlay function tests from external sources</desc>
  	<precisionModel type="FLOATING"/>
- 	<!-- <geometryOperation>com.revolsys.jtstest.geomop.OverlayValidatedGeometryOperation</geometryOperation> -->
-
+ 
 <case>
   <desc>
     http://trac.osgeo.org/geos/ticket/275

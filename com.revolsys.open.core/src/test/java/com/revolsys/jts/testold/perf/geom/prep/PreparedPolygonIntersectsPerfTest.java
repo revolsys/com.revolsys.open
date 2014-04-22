@@ -46,7 +46,6 @@ import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.util.GeometricShapeFactory;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -63,8 +62,6 @@ public class PreparedPolygonIntersectsPerfTest {
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
-
-  static WKTWriter wktWriter = new WKTWriter();
 
   public static void main(final String[] args) {
     final PreparedPolygonIntersectsPerfTest test = new PreparedPolygonIntersectsPerfTest();

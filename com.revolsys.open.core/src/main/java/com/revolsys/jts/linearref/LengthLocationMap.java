@@ -192,11 +192,11 @@ public class LengthLocationMap
       return loc;
     int compIndex = loc.getComponentIndex();
     // if last component can't resolve any higher
-    if (compIndex >= linearGeom.getNumGeometries() - 1) return loc;
+    if (compIndex >= linearGeom.getGeometryCount() - 1) return loc;
  
     do {
       compIndex++;
-    } while (compIndex < linearGeom.getNumGeometries() - 1
+    } while (compIndex < linearGeom.getGeometryCount() - 1
         && linearGeom.getGeometry(compIndex).getLength() == 0);
     // resolve to next higher location
     return new LinearLocation(compIndex, 0, 0.0); 

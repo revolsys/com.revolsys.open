@@ -69,7 +69,7 @@ public class CoordinateSequences {
    */
   public static void copyCoord(final CoordinatesList src, final int srcPos,
     final CoordinatesList dest, final int destPos) {
-    final int minDim = Math.min(src.getNumAxis(), dest.getNumAxis());
+    final int minDim = Math.min(src.getAxisCount(), dest.getAxisCount());
     for (int dim = 0; dim < minDim; dim++) {
       dest.setValue(destPos, dim, src.getValue(srcPos, dim));
     }
@@ -78,7 +78,7 @@ public class CoordinateSequences {
   private static CoordinatesList createClosedRing(
     final CoordinateSequenceFactory fact, final CoordinatesList seq,
     final int size) {
-    final CoordinatesList newseq = fact.create(size, seq.getNumAxis());
+    final CoordinatesList newseq = fact.create(size, seq.getAxisCount());
     final int n = seq.size();
     copy(seq, 0, newseq, 0, n);
     // fill remaining coordinates with start point
@@ -125,7 +125,7 @@ public class CoordinateSequences {
 
   public static CoordinatesList extend(final CoordinateSequenceFactory fact,
     final CoordinatesList seq, final int size) {
-    final CoordinatesList newseq = fact.create(size, seq.getNumAxis());
+    final CoordinatesList newseq = fact.create(size, seq.getAxisCount());
     final int n = seq.size();
     copy(seq, 0, newseq, 0, n);
     // fill remaining coordinates with end point, if it exists
@@ -156,7 +156,7 @@ public class CoordinateSequences {
     if (cs1Size != cs2Size) {
       return false;
     }
-    final int dim = Math.min(cs1.getNumAxis(), cs2.getNumAxis());
+    final int dim = Math.min(cs1.getAxisCount(), cs2.getAxisCount());
     for (int i = 0; i < cs1Size; i++) {
       for (int d = 0; d < dim; d++) {
         final double v1 = cs1.getValue(i, d);
@@ -222,7 +222,7 @@ public class CoordinateSequences {
     if (i == j) {
       return;
     }
-    for (int dim = 0; dim < seq.getNumAxis(); dim++) {
+    for (int dim = 0; dim < seq.getAxisCount(); dim++) {
       final double tmp = seq.getValue(i, dim);
       seq.setValue(i, dim, seq.getValue(j, dim));
       seq.setValue(j, dim, tmp);

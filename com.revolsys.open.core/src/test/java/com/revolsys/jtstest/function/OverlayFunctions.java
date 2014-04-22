@@ -40,7 +40,7 @@ import com.revolsys.jts.geom.Geometry;
 public class OverlayFunctions {
   public static Geometry clip(final Geometry a, final Geometry mask) {
     final List geoms = new ArrayList();
-    for (int i = 0; i < a.getNumGeometries(); i++) {
+    for (int i = 0; i < a.getGeometryCount(); i++) {
       final Geometry clip = a.getGeometry(i).intersection(mask);
       geoms.add(clip);
     }

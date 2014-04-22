@@ -7,7 +7,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.io.WKTWriter;
 import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -26,8 +25,6 @@ public class UnionPerfTester {
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
-
-  static WKTWriter wktWriter = new WKTWriter();
 
   public static void run(final String testName, final int testType,
     final List polys) {
