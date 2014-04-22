@@ -25,7 +25,6 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStringLessThanDistanceFilter implements Filter<LineString> {
@@ -105,7 +104,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   public void setGeometry(final LineString geometry) {
     this.geometry = geometry;
-    this.envelope = Envelope.getBoundingBox(geometry);
+    this.envelope = geometry.getBoundingBox();
     this.envelope = this.envelope.expand(distance);
   }
 }

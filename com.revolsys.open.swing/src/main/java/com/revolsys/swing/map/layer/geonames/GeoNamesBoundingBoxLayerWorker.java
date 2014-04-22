@@ -13,7 +13,6 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.layer.dataobject.DataObjectBoundingBoxLayer;
@@ -67,7 +66,7 @@ public class GeoNamesBoundingBoxLayerWorker extends
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       final GeographicCoordinateSystem geoCs = projCs.getGeographicCoordinateSystem();
       geometryFactory = GeometryFactory.getFactory(geoCs);
-      boundingBox = new Envelope(geometryFactory, boundingBox);
+      boundingBox = boundingBox.convert(geometryFactory);
     }
     final List<DataObject> results = this.geoNamesService.getNames(boundingBox);
     for (final DataObject dataObject : results) {

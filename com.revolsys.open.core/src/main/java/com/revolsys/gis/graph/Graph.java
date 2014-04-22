@@ -347,15 +347,19 @@ public class Graph<T> {
    * @return The list of nodes.
    */
   public List<Node<T>> findNodes(final Geometry geometry, final double distance) {
-    final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-    final Visitor<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
-      geometry, distance, results);
-    BoundingBox envelope = Envelope.getBoundingBox(geometry);
-    envelope = envelope.expand(distance);
-    getNodeIndex().visit(envelope, visitor);
-    final List<Node<T>> nodes = results.getList();
-    Collections.sort(nodes);
-    return nodes;
+    if (geometry == null) {
+      return Collections.emptyList();
+    } else {
+      final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
+      final Visitor<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
+        geometry, distance, results);
+      BoundingBox envelope = geometry.getBoundingBox();
+      envelope = envelope.expand(distance);
+      getNodeIndex().visit(envelope, visitor);
+      final List<Node<T>> nodes = results.getList();
+      Collections.sort(nodes);
+      return nodes;
+    }
   }
 
   /**

@@ -664,7 +664,9 @@ public abstract class GeometryImpl implements Geometry {
 
   @Override
   public Geometry convert(final GeometryFactory geometryFactory) {
-    if (getGeometryFactory() == geometryFactory) {
+    if (geometryFactory == null) {
+      return this;
+    } else if (getGeometryFactory() == geometryFactory) {
       return this;
     } else {
       return geometryFactory.geometry(this);
@@ -1137,6 +1139,11 @@ public abstract class GeometryImpl implements Geometry {
     return 0.0;
   }
 
+  @Override
+  public int getAxisCount() {
+    return (byte)geometryFactory.getAxisCount();
+  }
+
   /**
    * Returns the boundary, or an empty geometry of appropriate dimension
    * if this <code>Geometry</code>  is empty.
@@ -1336,6 +1343,21 @@ public abstract class GeometryImpl implements Geometry {
   }
 
   /**
+   * Returns the number of {@link Geometry}s in a {@link GeometryCollection}
+   * (or 1, if the geometry is not a collection).
+   *
+   * @return the number of geometries contained in this geometry
+   */
+  @Override
+  public int getGeometryCount() {
+    if (isEmpty()) {
+      return 0;
+    } else {
+      return 1;
+    }
+  }
+
+  /**
    * Gets the geometryFactory which contains the context in which this geometry was created.
    *
    * @return the geometryFactory for this geometry
@@ -1415,26 +1437,6 @@ public abstract class GeometryImpl implements Geometry {
           scaleXY, scaleZ);
       }
       return geometryFactory;
-    }
-  }
-
-  @Override
-  public int getAxisCount() {
-    return (byte)geometryFactory.getAxisCount();
-  }
-
-  /**
-   * Returns the number of {@link Geometry}s in a {@link GeometryCollection}
-   * (or 1, if the geometry is not a collection).
-   *
-   * @return the number of geometries contained in this geometry
-   */
-  @Override
-  public int getGeometryCount() {
-    if (isEmpty()) {
-      return 0;
-    } else {
-      return 1;
     }
   }
 

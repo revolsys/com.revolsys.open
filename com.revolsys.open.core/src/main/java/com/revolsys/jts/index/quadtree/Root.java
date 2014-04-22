@@ -72,7 +72,7 @@ public class Root extends NodeBase {
      *  have to expand the tree upward to contain the item.
      */
 
-    if (node == null || !node.getEnvelope().contains(itemEnv)) {
+    if (node == null || !node.contains(itemEnv)) {
       final Node largerNode = Node.createExpanded(node, itemEnv);
       subnode[index] = largerNode;
     }
@@ -92,7 +92,7 @@ public class Root extends NodeBase {
    */
   private void insertContained(final Node tree, final BoundingBox itemEnv,
     final Object item) {
-    Assert.isTrue(tree.getEnvelope().contains(itemEnv));
+    Assert.isTrue(tree.contains(itemEnv));
     /**
      * Do NOT create a new quad for zero-area envelopes - this would lead
      * to infinite recursion. Instead, use a heuristic of simply returning

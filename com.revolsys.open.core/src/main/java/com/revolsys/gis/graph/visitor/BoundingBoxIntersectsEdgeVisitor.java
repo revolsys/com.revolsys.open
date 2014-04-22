@@ -7,8 +7,6 @@ import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
@@ -20,9 +18,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
 
     final LineString line = edge.getLine();
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    BoundingBox boundingBox = new Envelope(geometryFactory,
-      line.getBoundingBox());
+    BoundingBox boundingBox = line.getBoundingBox();
     boundingBox = boundingBox.expand(maxDistance);
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<T>(
       boundingBox, results);

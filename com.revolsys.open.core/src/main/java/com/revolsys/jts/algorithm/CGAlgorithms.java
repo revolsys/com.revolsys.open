@@ -35,9 +35,9 @@ package com.revolsys.jts.algorithm;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.math.MathUtil;
+import com.revolsys.jts.util.EnvelopeUtil;
 
 /**
  * Specifies and implements various fundamental Computational Geometric
@@ -134,7 +134,7 @@ public class CGAlgorithms {
      */
 
     boolean noIntersection = false;
-    if (!Envelope.intersects(A, B, C, D)) {
+    if (!EnvelopeUtil.intersects(A, B, C, D)) {
       noIntersection = true;
     } else {
       final double denom = (B.getX() - A.getX()) * (D.getY() - C.getY())

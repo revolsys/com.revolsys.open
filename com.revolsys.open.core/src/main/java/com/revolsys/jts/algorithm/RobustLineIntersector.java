@@ -40,6 +40,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.util.EnvelopeUtil;
 
 /**
  * A robust version of {@link LineIntersector}.
@@ -107,10 +108,10 @@ public class RobustLineIntersector extends LineIntersector {
 
   private int computeCollinearIntersection(final Coordinates p1,
     final Coordinates p2, final Coordinates q1, final Coordinates q2) {
-    final boolean p1q1p2 = Envelope.intersects(p1, p2, q1);
-    final boolean p1q2p2 = Envelope.intersects(p1, p2, q2);
-    final boolean q1p1q2 = Envelope.intersects(q1, q2, p1);
-    final boolean q1p2q2 = Envelope.intersects(q1, q2, p2);
+    final boolean p1q1p2 = EnvelopeUtil.intersects(p1, p2, q1);
+    final boolean p1q2p2 = EnvelopeUtil.intersects(p1, p2, q2);
+    final boolean q1p1q2 = EnvelopeUtil.intersects(q1, q2, p1);
+    final boolean q1p2q2 = EnvelopeUtil.intersects(q1, q2, p2);
 
     if (p1q1p2 && p1q2p2) {
       intPt[0] = q1;
@@ -155,7 +156,7 @@ public class RobustLineIntersector extends LineIntersector {
     isProper = false;
 
     // first try a fast test to see if the envelopes of the lines intersect
-    if (!Envelope.intersects(p1, p2, q1, q2)) {
+    if (!EnvelopeUtil.intersects(p1, p2, q1, q2)) {
       return NO_INTERSECTION;
     }
 
@@ -243,7 +244,7 @@ public class RobustLineIntersector extends LineIntersector {
     final Coordinates p2) {
     isProper = false;
     // do between check first, since it is faster than the orientation test
-    if (Envelope.intersects(p1, p2, p)) {
+    if (EnvelopeUtil.intersects(p1, p2, p)) {
       if ((CGAlgorithms.orientationIndex(p1, p2, p) == 0)
         && (CGAlgorithms.orientationIndex(p2, p1, p) == 0)) {
         isProper = true;

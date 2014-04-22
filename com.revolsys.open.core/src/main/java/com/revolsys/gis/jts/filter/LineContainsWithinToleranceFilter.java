@@ -24,7 +24,6 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 
 public class LineContainsWithinToleranceFilter implements Filter<LineString> {
@@ -38,14 +37,14 @@ public class LineContainsWithinToleranceFilter implements Filter<LineString> {
 
   public LineContainsWithinToleranceFilter(final LineString line) {
     this.points = CoordinatesListUtil.get(line);
-    this.envelope = Envelope.getBoundingBox(line);
+    this.envelope = line.getBoundingBox();
   }
 
   public LineContainsWithinToleranceFilter(final LineString line,
     final double tolerance) {
     this.points = CoordinatesListUtil.get(line);
     this.tolerance = tolerance;
-    this.envelope = Envelope.getBoundingBox(line);
+    this.envelope = line.getBoundingBox();
     this.envelope = this.envelope.expand(tolerance);
   }
 

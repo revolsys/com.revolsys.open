@@ -288,8 +288,7 @@ public class QuadEdgeSubdivision {
     frameVertex[2] = new Vertex(env.getMaxX() + offset, env.getMinY() - offset);
 
     frameEnv = new Envelope(frameVertex[0].getCoordinate(),
-      frameVertex[1].getCoordinate());
-    frameEnv.expandToInclude(frameVertex[2].getCoordinate());
+      frameVertex[1].getCoordinate(), frameVertex[2].getCoordinate());
   }
 
   /**

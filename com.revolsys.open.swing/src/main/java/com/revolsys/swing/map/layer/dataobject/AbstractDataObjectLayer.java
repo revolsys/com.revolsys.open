@@ -1736,7 +1736,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public void removeFromIndex(final LayerDataObject record) {
     final Geometry geometry = record.getGeometryValue();
     if (geometry != null && !geometry.isEmpty()) {
-      final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
+      final BoundingBox boundingBox = geometry.getBoundingBox();
       removeFromIndex(boundingBox, record);
     }
   }
@@ -2344,7 +2344,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void updateSpatialIndex(final LayerDataObject record,
     final Geometry oldGeometry) {
     if (oldGeometry != null) {
-      final BoundingBox oldBoundingBox = Envelope.getBoundingBox(oldGeometry);
+      final BoundingBox oldBoundingBox = oldGeometry.getBoundingBox();
       if (removeFromIndex(oldBoundingBox, record)) {
         addToIndex(record);
       }
@@ -2356,8 +2356,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     if (geometry != null) {
       final Project project = getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = Envelope.getBoundingBox(geometryFactory,
-        geometry)
+      final BoundingBox boundingBox = geometry.getBoundingBox()
+        .convert(geometryFactory)
         .expandPercent(0.1)
         .clipToCoordinateSystem();
 

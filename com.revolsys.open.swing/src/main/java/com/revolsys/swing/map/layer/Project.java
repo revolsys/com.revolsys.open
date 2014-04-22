@@ -476,7 +476,7 @@ public class Project extends LayerGroup {
               boundingBox = (BoundingBox)object;
             } else if (object instanceof Geometry) {
               final Geometry geometry = (Geometry)object;
-              boundingBox = Envelope.getBoundingBox(geometry);
+              boundingBox = geometry.getBoundingBox();
             } else if (object != null) {
               final String wkt = object.toString();
               boundingBox = Envelope.create(wkt);

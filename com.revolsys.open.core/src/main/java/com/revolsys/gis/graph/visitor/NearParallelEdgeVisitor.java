@@ -7,7 +7,6 @@ import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 
 public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
@@ -22,8 +21,8 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
   }
 
   @Override
-  public com.revolsys.jts.geom.BoundingBox getEnvelope() {
-    BoundingBox envelope = Envelope.getBoundingBox(line);
+  public BoundingBox getEnvelope() {
+    BoundingBox envelope = line.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     return envelope;
   }

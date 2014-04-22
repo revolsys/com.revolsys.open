@@ -11,9 +11,9 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.MathUtil;
 
 public class LineSegmentUtil {
@@ -310,7 +310,7 @@ public class LineSegmentUtil {
     line1End = geometryFactory.createCoordinates(line1End);
     line2Start = geometryFactory.createCoordinates(line2Start);
     line2End = geometryFactory.createCoordinates(line2End);
-    if (Envelope.intersects(line1Start, line1End, line2Start, line2End)) {
+    if (EnvelopeUtil.intersects(line1Start, line1End, line2Start, line2End)) {
       final Set<Coordinates> intersections = new TreeSet<Coordinates>(
         new CoordinatesDistanceComparator(line1Start));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End,

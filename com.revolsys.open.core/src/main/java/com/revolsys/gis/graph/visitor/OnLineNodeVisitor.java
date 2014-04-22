@@ -1,5 +1,6 @@
 package com.revolsys.gis.graph.visitor;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
@@ -9,20 +10,24 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph,
     final LineString line, final double maxDistance) {
-    final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-    BoundingBox env = Envelope.getBoundingBox(line);
-    env = env.expand(maxDistance);
-    final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
-    final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<T>(line, results);
-    index.visit(env, visitor);
-    return results.getList();
+    if (line == null) {
+      return Collections.emptyList();
+    } else {
+      final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
+      BoundingBox env = line.getBoundingBox();
+      env = env.expand(maxDistance);
+      final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
+      final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<T>(line,
+        results);
+      index.visit(env, visitor);
+      return results.getList();
+    }
   }
 
   private final LineString line;

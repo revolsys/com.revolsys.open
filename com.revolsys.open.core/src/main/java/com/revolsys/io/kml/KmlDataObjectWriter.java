@@ -14,7 +14,6 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -223,9 +222,9 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private void writeLookAt(final Geometry geometry) {
     if (geometry != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.wgs84();
+      final GeometryFactory geometryFactory = GeometryFactory.wgs84();
       final Geometry projectedGeometry = geometryFactory.copy(geometry);
-      final BoundingBox boundingBox = Envelope.getBoundingBox(projectedGeometry);
+      final BoundingBox boundingBox = projectedGeometry.getBoundingBox();
       final Point centre = geometryFactory.point(boundingBox.getCentreX(),
         boundingBox.getCentreY());
 

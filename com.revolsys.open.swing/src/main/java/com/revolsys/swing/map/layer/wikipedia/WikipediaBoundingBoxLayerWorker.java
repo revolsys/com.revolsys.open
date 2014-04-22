@@ -12,7 +12,6 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.layer.dataobject.DataObjectBoundingBoxLayer;
@@ -69,7 +68,7 @@ public class WikipediaBoundingBoxLayerWorker extends
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       geometryFactory = GeometryFactory.getFactory(projCs.getGeographicCoordinateSystem());
-      boundingBox = new Envelope(geometryFactory, boundingBox);
+      boundingBox = boundingBox.convert(geometryFactory);
     }
     final List<DataObject> results = this.geoNamesService.getWikipediaArticles(boundingBox);
     for (final DataObject dataObject : results) {

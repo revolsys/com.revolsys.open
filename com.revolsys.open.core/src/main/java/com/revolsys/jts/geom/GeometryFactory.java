@@ -560,6 +560,22 @@ public class GeometryFactory implements Serializable,
     return geom0;
   }
 
+  public GeometryCollection collection(final List<Geometry> geometries) {
+    if (geometries == null || geometries.size() == 0) {
+      return geometryCollection();
+    } else {
+      final Geometry[] geometryArray = new Geometry[geometries.size()];
+      for (int i = 0; i < geometries.size(); i++) {
+        Geometry geometry = geometries.get(i);
+        if (geometry != null) {
+          geometry = geometry.convert(this);
+        }
+        geometryArray[i] = geometry;
+      }
+      return new GeometryCollectionImpl(this, geometryArray);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public <G extends Geometry> G copy(final G geometry) {
     return (G)geometry(geometry);

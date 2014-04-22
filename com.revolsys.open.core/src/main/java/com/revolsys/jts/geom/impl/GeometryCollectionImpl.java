@@ -157,7 +157,7 @@ public class GeometryCollectionImpl extends GeometryImpl implements
     while (i < n1 && i < n2) {
       final Geometry thisGeom = getGeometry(i);
       final Geometry otherGeom = gc.getGeometry(i);
-      final int holeComp = thisGeom.compareToSameClass(otherGeom, comp);
+      final int holeComp = thisGeom.compareTo(otherGeom, comp);
       if (holeComp != 0) {
         return holeComp;
       }
@@ -325,21 +325,21 @@ public class GeometryCollectionImpl extends GeometryImpl implements
   }
 
   @Override
-  public double getLength() {
-    double sum = 0.0;
-    for (final Geometry geometry : geometries()) {
-      sum += geometry.getLength();
-    }
-    return sum;
-  }
-
-  @Override
   public int getGeometryCount() {
     if (geometries == null) {
       return 0;
     } else {
       return geometries.length;
     }
+  }
+
+  @Override
+  public double getLength() {
+    double sum = 0.0;
+    for (final Geometry geometry : geometries()) {
+      sum += geometry.getLength();
+    }
+    return sum;
   }
 
   @Override

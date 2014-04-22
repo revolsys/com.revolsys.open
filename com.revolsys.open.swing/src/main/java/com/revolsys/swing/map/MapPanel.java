@@ -900,7 +900,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void zoomTo(final Geometry geometry) {
     if (geometry != null) {
       final Geometry convertedGeometry = getGeometryFactory().copy(geometry);
-      final BoundingBox boudingBox = Envelope.getBoundingBox(convertedGeometry);
+      final BoundingBox boudingBox = convertedGeometry.getBoundingBox();
       zoomTo(boudingBox);
     }
   }

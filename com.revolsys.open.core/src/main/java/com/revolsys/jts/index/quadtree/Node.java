@@ -44,13 +44,14 @@ import com.revolsys.jts.util.Assert;
  * @version 1.7
  */
 public class Node extends NodeBase {
-  public static Node createExpanded(final Node node, final BoundingBox addEnv) {
-    final Envelope expandEnv = new Envelope(addEnv);
+  public static Node createExpanded(final Node node,
+    final BoundingBox boundingBox) {
+    BoundingBox newBoundingBox = new Envelope(boundingBox);
     if (node != null) {
-      expandEnv.expandToInclude(node.env);
+      newBoundingBox = newBoundingBox.expandToInclude(node.boundingBox);
     }
 
-    final Node largerNode = createNode(expandEnv);
+    final Node largerNode = createNode(newBoundingBox);
     if (node != null) {
       largerNode.insertNode(node);
     }
@@ -63,59 +64,72 @@ public class Node extends NodeBase {
     return node;
   }
 
-  private final BoundingBox env;
-
-  private final double centrex;
-
-  private final double centrey;
+  private final BoundingBox boundingBox;
 
   private final int level;
 
-  public Node(final BoundingBox env, final int level) {
-    // this.parent = parent;
-    this.env = env;
+  public Node(final BoundingBox boundingBox, final int level) {
+    this.boundingBox = boundingBox;
     this.level = level;
-    centrex = (env.getMinX() + env.getMaxX()) / 2;
-    centrey = (env.getMinY() + env.getMaxY()) / 2;
+  }
+
+  public boolean contains(final BoundingBox envelope) {
+    return boundingBox.contains(envelope);
   }
 
   private Node createSubnode(final int index) {
     // create a new subquad in the appropriate quadrant
 
-    double minx = 0.0;
-    double maxx = 0.0;
-    double miny = 0.0;
-    double maxy = 0.0;
+    double minX = 0.0;
+    double maxX = 0.0;
+    double minY = 0.0;
+    double maxY = 0.0;
 
     switch (index) {
       case 0:
-        minx = env.getMinX();
-        maxx = centrex;
-        miny = env.getMinY();
-        maxy = centrey;
+        minX = getMinX();
+        maxX = getCentreX();
+        minY = getMinY();
+        maxY = getCentreY();
       break;
       case 1:
-        minx = centrex;
-        maxx = env.getMaxX();
-        miny = env.getMinY();
-        maxy = centrey;
+        minX = getCentreX();
+        maxX = getMaxX();
+        minY = getMinY();
+        maxY = getCentreY();
       break;
       case 2:
-        minx = env.getMinX();
-        maxx = centrex;
-        miny = centrey;
-        maxy = env.getMaxY();
+        minX = getMinX();
+        maxX = getCentreX();
+        minY = getCentreY();
+        maxY = getMaxY();
       break;
       case 3:
-        minx = centrex;
-        maxx = env.getMaxX();
-        miny = centrey;
-        maxy = env.getMaxY();
+        minX = getCentreX();
+        maxX = getMaxX();
+        minY = getCentreY();
+        maxY = getMaxY();
       break;
     }
-    final BoundingBox sqEnv = new Envelope(minx, miny, maxx, maxy);
-    final Node node = new Node(sqEnv, level - 1);
+    final BoundingBox newEnvelope = new Envelope(minX, minY, maxX, maxY);
+    final Node node = new Node(newEnvelope, level - 1);
     return node;
+  }
+
+  private double getMinX() {
+    return boundingBox.getMinX();
+  }
+
+  private double getMinY() {
+    return boundingBox.getMinY();
+  }
+
+  private double getMaxY() {
+    return boundingBox.getMaxY();
+  }
+
+  private double getMaxX() {
+    return boundingBox.getMaxX();
   }
 
   /**
@@ -123,7 +137,8 @@ public class Node extends NodeBase {
    * node containing the envelope.
    */
   public NodeBase find(final BoundingBox searchEnv) {
-    final int subnodeIndex = getSubnodeIndex(searchEnv, centrex, centrey);
+    final int subnodeIndex = getSubnodeIndex(searchEnv, getCentreX(),
+      getCentreY());
     if (subnodeIndex == -1) {
       return this;
     }
@@ -136,8 +151,12 @@ public class Node extends NodeBase {
     return this;
   }
 
-  public BoundingBox getEnvelope() {
-    return env;
+  private double getCentreX() {
+    return boundingBox.getCentreX();
+  }
+
+  private double getCentreY() {
+    return boundingBox.getCentreY();
   }
 
   /**
@@ -148,7 +167,8 @@ public class Node extends NodeBase {
    * @return the subquad containing the search envelope
    */
   public Node getNode(final BoundingBox searchEnv) {
-    final int subnodeIndex = getSubnodeIndex(searchEnv, centrex, centrey);
+    final int subnodeIndex = getSubnodeIndex(searchEnv, getCentreX(),
+      getCentreY());
     // if subquadIndex is -1 searchEnv is not contained in a subquad
     if (subnodeIndex != -1) {
       // create the quad if it does not exist
@@ -172,10 +192,11 @@ public class Node extends NodeBase {
   }
 
   void insertNode(final Node node) {
-    Assert.isTrue(env == null || env.contains(node.env));
+    Assert.isTrue(boundingBox == null || boundingBox.contains(node.boundingBox));
     // System.out.println(env);
     // System.out.println(quad.env);
-    final int index = getSubnodeIndex(node.env, centrex, centrey);
+    final int index = getSubnodeIndex(node.boundingBox, getCentreX(),
+      getCentreY());
     // System.out.println(index);
     if (node.level == level - 1) {
       subnode[index] = node;
@@ -191,7 +212,7 @@ public class Node extends NodeBase {
 
   @Override
   protected boolean isSearchMatch(final BoundingBox searchEnv) {
-    return env.intersects(searchEnv);
+    return boundingBox.intersects(searchEnv);
   }
 
 }

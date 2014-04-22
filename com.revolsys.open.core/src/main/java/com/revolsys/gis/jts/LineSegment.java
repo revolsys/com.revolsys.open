@@ -11,7 +11,6 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -218,8 +217,13 @@ public class LineSegment extends AbstractCoordinatesList implements
 
   }
 
+  @Override
+  public int getAxisCount() {
+    return (byte)(points.length / 2);
+  }
+
   public BoundingBox getBoundingBox() {
-    return Envelope.getBoundingBox(getLine());
+    return getLine().getBoundingBox();
   }
 
   private Coordinates getCoordinates1() {
@@ -340,11 +344,6 @@ public class LineSegment extends AbstractCoordinatesList implements
 
   public LineString getLine() {
     return geometryFactory.lineString(this);
-  }
-
-  @Override
-  public int getAxisCount() {
-    return (byte)(points.length / 2);
   }
 
   public Point getPoint(final int i) {

@@ -154,7 +154,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       boundingBox = new Envelope(geographicGeometryFactory, -180, -90, 180, 90);
     } else {
       final Envelope latLonBounds = area.getLatLonBounds();
-      boundingBox = new Envelope(geographicGeometryFactory, latLonBounds);
+      boundingBox = latLonBounds.convert(geographicGeometryFactory);
     }
     final BoundingBox projectedBoundingBox = boundingBox.convert(getGeometryFactory());
     return projectedBoundingBox;

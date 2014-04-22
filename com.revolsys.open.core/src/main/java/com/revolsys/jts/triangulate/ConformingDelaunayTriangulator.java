@@ -38,8 +38,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.ConvexHull;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -90,11 +90,11 @@ import com.revolsys.jts.util.Debug;
 public class ConformingDelaunayTriangulator {
   private final static int MAX_SPLIT_ITER = 99;
 
-  private static Envelope computeVertexEnvelope(final Collection vertices) {
-    final Envelope env = new Envelope();
+  private static BoundingBox computeVertexEnvelope(final Collection vertices) {
+    BoundingBox env = new Envelope();
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
       final Vertex v = (Vertex)i.next();
-      env.expandToInclude(v.getCoordinate());
+      env = env.expand(v.getCoordinate());
     }
     return env;
   }
@@ -151,8 +151,8 @@ public class ConformingDelaunayTriangulator {
   }
 
   private void computeBoundingBox() {
-    final Envelope vertexEnv = computeVertexEnvelope(initialVertices);
-    final Envelope segEnv = computeVertexEnvelope(segVertices);
+    final BoundingBox vertexEnv = computeVertexEnvelope(initialVertices);
+    final BoundingBox segEnv = computeVertexEnvelope(segVertices);
 
     final Envelope allPointsEnv = new Envelope(vertexEnv);
     allPointsEnv.expandToInclude(segEnv);
@@ -320,9 +320,8 @@ public class ConformingDelaunayTriangulator {
     final Coordinates p = seg.getStart();
     final Coordinates q = seg.getEnd();
     // Find the mid point on the line and compute the radius of enclosing circle
-    final Coordinates midPt = new Coordinate(
-      (p.getX() + q.getX()) / 2.0, (p.getY() + q.getY()) / 2.0,
-      Coordinates.NULL_ORDINATE);
+    final Coordinates midPt = new Coordinate((p.getX() + q.getX()) / 2.0,
+      (p.getY() + q.getY()) / 2.0, Coordinates.NULL_ORDINATE);
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle

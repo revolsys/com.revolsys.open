@@ -343,7 +343,7 @@ public class AbstractOverlay extends JComponent implements
 
   protected BoundingBox getHotspotBoundingBox(final MouseEvent event) {
     final Viewport2D viewport = getViewport();
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getViewport().getGeometryFactory();
+    final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
     final BoundingBox boundingBox;
     if (geometryFactory != null) {
       final int hotspotPixels = getHotspotPixels();

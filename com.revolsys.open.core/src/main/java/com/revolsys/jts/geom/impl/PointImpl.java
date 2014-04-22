@@ -174,7 +174,7 @@ public class PointImpl extends GeometryImpl implements Point {
   public int compareToSameClass(final Geometry other,
     final CoordinateSequenceComparator comp) {
     final Point point = (Point)other;
-    return comp.compare(getCoordinates(), point.getCoordinates());
+    return comp.compare(getCoordinatesList(), point.getCoordinatesList());
   }
 
   @Override
@@ -190,7 +190,7 @@ public class PointImpl extends GeometryImpl implements Point {
   @Override
   public Point convert(final GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (sourceGeometryFactory == geometryFactory) {
+    if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
       return this;
     } else {
       return copy(geometryFactory);
@@ -200,7 +200,9 @@ public class PointImpl extends GeometryImpl implements Point {
   @Override
   public Point copy(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (isEmpty()) {
+    if (geometryFactory == null) {
+      return this.clone();
+    } else if (isEmpty()) {
       return geometryFactory.point();
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);

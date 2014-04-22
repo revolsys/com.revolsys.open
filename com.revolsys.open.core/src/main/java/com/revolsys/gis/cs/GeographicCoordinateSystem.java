@@ -182,7 +182,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   public BoundingBox getAreaBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (area != null) {
-      return new Envelope(geometryFactory, area.getLatLonBounds());
+      return area.getLatLonBounds().convert(geometryFactory);
     } else {
       return new Envelope(geometryFactory, -180, -90, 180, 90);
     }

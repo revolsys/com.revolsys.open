@@ -1,14 +1,15 @@
 package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.filter.LineSegmentCoordinateDistanceFilter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
@@ -140,8 +141,12 @@ public class LineSegmentQuadTree {
   }
 
   public List<LineSegment> getIntersectingBoundingBox(final Geometry geometry) {
-    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
-    return getIntersecting(boundingBox);
+    if (geometry == null) {
+      return Collections.emptyList();
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      return getIntersecting(boundingBox);
+    }
   }
 
   protected LineSegment getLineSegment(final int[] index) {

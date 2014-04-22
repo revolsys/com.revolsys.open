@@ -6,7 +6,6 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public abstract class RTreeNode<T> extends Envelope {
 
@@ -23,8 +22,7 @@ public abstract class RTreeNode<T> extends Envelope {
 
   @Override
   public String toString() {
-    return new Envelope(GeometryFactory.getFactory(), this).toPolygon(1)
-      .toString();
+    return toPolygon(1).toString();
   }
 
   protected abstract void updateEnvelope();

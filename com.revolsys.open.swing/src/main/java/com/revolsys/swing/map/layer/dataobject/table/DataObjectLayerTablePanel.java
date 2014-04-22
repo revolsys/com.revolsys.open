@@ -15,7 +15,6 @@ import javax.swing.SwingUtilities;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.SwingUtil;
@@ -306,7 +305,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = Envelope.getBoundingBox(geometry)
+      final BoundingBox boundingBox = geometry.getBoundingBox()
         .convert(geometryFactory)
         .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);

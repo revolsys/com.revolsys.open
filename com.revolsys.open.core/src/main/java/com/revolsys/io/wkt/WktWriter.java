@@ -41,6 +41,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
@@ -186,6 +187,9 @@ public class WktWriter {
       } else if (geometry instanceof MultiPoint) {
         final MultiPoint multiPoint = (MultiPoint)geometry;
         write(out, multiPoint);
+      } else if (geometry instanceof LinearRing) {
+        final LinearRing line = (LinearRing)geometry;
+        write(out, line);
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
         write(out, line);
@@ -217,6 +221,9 @@ public class WktWriter {
       } else if (geometry instanceof MultiPoint) {
         final MultiPoint multiPoint = (MultiPoint)geometry;
         write(out, multiPoint, axisCount);
+      } else if (geometry instanceof LinearRing) {
+        final LinearRing line = (LinearRing)geometry;
+        write(out, line, axisCount);
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
         write(out, line, axisCount);
@@ -247,7 +254,7 @@ public class WktWriter {
 
   private static void write(final PrintWriter out,
     final GeometryCollection multiGeometry, final int axisCount) {
-    writeGeometryType(out, "MULTIGEOMETRY", axisCount);
+    writeGeometryType(out, "GEOMETRYCOLLECTION", axisCount);
     if (multiGeometry.isEmpty()) {
       out.print(" EMPTY");
     } else {
@@ -260,6 +267,22 @@ public class WktWriter {
         write(out, geometry, axisCount);
       }
       out.print(')');
+    }
+  }
+
+  public static void write(final PrintWriter out, final LinearRing line) {
+    final int axisCount = Math.min(line.getAxisCount(), 4);
+    write(out, line, axisCount);
+  }
+
+  private static void write(final PrintWriter out, final LinearRing line,
+    final int axisCount) {
+    writeGeometryType(out, "LINEARRING", axisCount);
+    if (line.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      final CoordinatesList coordinates = line.getCoordinatesList();
+      write(out, coordinates, axisCount);
     }
   }
 
@@ -316,12 +339,12 @@ public class WktWriter {
     if (multiPoint.isEmpty()) {
       out.print(" EMPTY");
     } else {
-      Point point = (Point)multiPoint.getGeometry(0);
+      Coordinates point = multiPoint.getPoint(0);
       out.print("((");
       write(out, point, axisCount);
       for (int i = 1; i < multiPoint.getGeometryCount(); i++) {
         out.print("),(");
-        point = (Point)multiPoint.getGeometry(i);
+        point = multiPoint.getPoint(i);
         write(out, point, axisCount);
       }
       out.print("))");

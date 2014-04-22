@@ -23,7 +23,6 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 
 public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
@@ -304,7 +303,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   }
 
   public BoundingBox getBoundingBox() {
-    return Envelope.getBoundingBox(getLine());
+    return getLine().getBoundingBox();
   }
 
   public Collection<Node<T>> getCommonNodes(final Edge<T> edge) {

@@ -40,6 +40,7 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.quadtree.Quadtree;
+import com.revolsys.jts.util.EnvelopeUtil;
 
 /**
  * An spatial index on a set of {@link LineSegment}s.
@@ -108,7 +109,7 @@ class LineSegmentVisitor
   public void visitItem(Object item)
   {
     LineSegment seg = (LineSegment) item;
-    if (Envelope.intersects(seg.getP0(), seg.getP1(), querySeg.getP0(), querySeg.getP1()))
+    if (EnvelopeUtil.intersects(seg.getP0(), seg.getP1(), querySeg.getP0(), querySeg.getP1()))
       items.add(item);
   }
 

@@ -25,7 +25,6 @@ import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.filter.Filter;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -42,10 +41,12 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FilterReader;
+import com.revolsys.io.ListReader;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -644,14 +645,18 @@ public abstract class AbstractDataObjectStore extends
   @Override
   public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
     final String typePath, final Geometry geometry) {
-    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
-    final Query query = new Query(typePath);
-    query.setBoundingBox(boundingBox);
-    query.setProperty("dataObjectFactory", dataObjectFactory);
-    final Reader<DataObject> reader = query(query);
-    final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
-      geometry);
-    return new FilterReader<DataObject>(filter, reader);
+    if (geometry == null) {
+      return new ListReader<DataObject>(Collections.<DataObject> emptyList());
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      final Query query = new Query(typePath);
+      query.setBoundingBox(boundingBox);
+      query.setProperty("dataObjectFactory", dataObjectFactory);
+      final Reader<DataObject> reader = query(query);
+      final Filter<DataObject> filter = new DataObjectGeometryIntersectsFilter(
+        geometry);
+      return new FilterReader<DataObject>(filter, reader);
+    }
   }
 
   @Override

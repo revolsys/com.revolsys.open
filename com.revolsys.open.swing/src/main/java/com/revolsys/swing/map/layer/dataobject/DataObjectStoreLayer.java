@@ -357,25 +357,30 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   public List<LayerDataObject> doQuery(final Geometry geometry,
     final double distance) {
-    final boolean enabled = setEventsEnabled(false);
-    try {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
-      final Geometry queryGeometry = geometryFactory.copy(geometry);
-      BoundingBox boundingBox = Envelope.getBoundingBox(queryGeometry);
-      boundingBox = boundingBox.expand(distance);
-      final String typePath = getTypePath();
-      final DataObjectStore dataStore = getDataStore();
-      final Reader reader = dataStore.query(this, typePath, queryGeometry,
-        distance);
+    if (geometry == null) {
+      return Collections.emptyList();
+    } else {
+      final boolean enabled = setEventsEnabled(false);
       try {
-        final List<LayerDataObject> results = reader.read();
-        final List<LayerDataObject> records = getCachedRecords(results);
-        return records;
+        final GeometryFactory geometryFactory = getGeometryFactory();
+
+        final Geometry queryGeometry = geometryFactory.copy(geometry);
+        BoundingBox boundingBox = queryGeometry.getBoundingBox();
+        boundingBox = boundingBox.expand(distance);
+        final String typePath = getTypePath();
+        final DataObjectStore dataStore = getDataStore();
+        final Reader reader = dataStore.query(this, typePath, queryGeometry,
+          distance);
+        try {
+          final List<LayerDataObject> results = reader.read();
+          final List<LayerDataObject> records = getCachedRecords(results);
+          return records;
+        } finally {
+          reader.close();
+        }
       } finally {
-        reader.close();
+        setEventsEnabled(enabled);
       }
-    } finally {
-      setEventsEnabled(enabled);
     }
   }
 

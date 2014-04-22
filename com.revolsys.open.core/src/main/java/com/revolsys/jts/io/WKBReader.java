@@ -301,11 +301,12 @@ public class WKBReader {
   private GeometryCollection readGeometryCollection() throws IOException,
     ParseException {
     final int numGeom = dis.readInt();
-    final Geometry[] geoms = new Geometry[numGeom];
+    final List<Geometry> geoms = new ArrayList<Geometry>();
     for (int i = 0; i < numGeom; i++) {
-      geoms[i] = readGeometry();
+      final Geometry geometry = readGeometry();
+      geoms.add(geometry);
     }
-    return factory.geometryCollection(geoms);
+    return factory.collection(geoms);
   }
 
   private LinearRing readLinearRing() throws IOException {
@@ -371,7 +372,7 @@ public class WKBReader {
     final List<LinearRing> rings = new ArrayList<>();
 
     for (int i = 0; i < numRings; i++) {
-      LinearRing ring = readLinearRing();
+      final LinearRing ring = readLinearRing();
       rings.add(ring);
     }
     return factory.polygon(rings);

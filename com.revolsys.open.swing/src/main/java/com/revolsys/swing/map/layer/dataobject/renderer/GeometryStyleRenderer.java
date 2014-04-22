@@ -16,7 +16,6 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -61,7 +60,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final BoundingBox viewExtent = viewport.getBoundingBox();
     if (geometry != null) {
       if (!viewExtent.isEmpty()) {
-        final BoundingBox geometryExtent = Envelope.getBoundingBox(geometry);
+        final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
           final com.revolsys.jts.geom.GeometryFactory geometryFactory = viewport.getGeometryFactory();
           final Geometry convertedGeometry = geometryFactory.geometry(geometry);

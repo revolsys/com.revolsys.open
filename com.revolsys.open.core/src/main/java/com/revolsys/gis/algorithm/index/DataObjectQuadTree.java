@@ -15,7 +15,6 @@ import com.revolsys.gis.data.model.filter.DataObjectEqualsFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.visitor.CreateListVisitor;
@@ -48,7 +47,7 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     if (object != null) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null && !geometry.isEmpty()) {
-        final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
+        final BoundingBox boundingBox = geometry.getBoundingBox();
         insert(boundingBox, object);
       }
     }
@@ -66,7 +65,7 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     for (final Iterator<DataObject> iterator = results.iterator(); iterator.hasNext();) {
       final DataObject object = iterator.next();
       final Geometry geometry = object.getGeometryValue();
-      final BoundingBox objectBoundingBox = Envelope.getBoundingBox(geometry);
+      final BoundingBox objectBoundingBox = geometry.getBoundingBox();
       if (!boundingBox.intersects(objectBoundingBox)) {
         iterator.remove();
       }
@@ -75,13 +74,13 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
   }
 
   public void query(final Geometry geometry, final Visitor<DataObject> visitor) {
-    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
+    final BoundingBox boundingBox = geometry.getBoundingBox();
     query(boundingBox, visitor);
   }
 
   public List<DataObject> queryDistance(final Geometry geometry,
     final double distance) {
-    BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
+    BoundingBox boundingBox = geometry.getBoundingBox();
     boundingBox = boundingBox.expand(distance);
     final DataObjectGeometryDistanceFilter filter = new DataObjectGeometryDistanceFilter(
       geometry, distance);
@@ -154,13 +153,13 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
 
   public List<DataObject> queryList(final Geometry geometry,
     final Filter<DataObject> filter) {
-    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
+    final BoundingBox boundingBox = geometry.getBoundingBox();
     return queryList(boundingBox, filter);
   }
 
   public List<DataObject> queryList(final Geometry geometry,
     final Filter<DataObject> filter, final Comparator<DataObject> comparator) {
-    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
+    final BoundingBox boundingBox = geometry.getBoundingBox();
     return queryList(boundingBox, filter, comparator);
   }
 
@@ -175,7 +174,7 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     if (geometry == null) {
       return false;
     } else {
-      final BoundingBox boundinBox = Envelope.getBoundingBox(geometry);
+      final BoundingBox boundinBox = geometry.getBoundingBox();
       return super.remove(boundinBox, object);
     }
   }

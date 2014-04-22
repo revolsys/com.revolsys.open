@@ -1,5 +1,6 @@
 package com.revolsys.gis.graph.visitor;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
@@ -9,7 +10,6 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -28,12 +28,16 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
 
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Geometry geometry, final double maxDistance) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    BoundingBox env = Envelope.getBoundingBox(geometry);
-    env = env.expand(maxDistance);
-    graph.getEdgeIndex().visit(env,
-      new EdgeWithinDistance<T>(geometry, maxDistance, results));
-    return results.getList();
+    if (geometry == null) {
+      return Collections.emptyList();
+    } else {
+      final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
+      BoundingBox env = geometry.getBoundingBox();
+      env = env.expand(maxDistance);
+      graph.getEdgeIndex().visit(env,
+        new EdgeWithinDistance<T>(geometry, maxDistance, results));
+      return results.getList();
+    }
   }
 
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,

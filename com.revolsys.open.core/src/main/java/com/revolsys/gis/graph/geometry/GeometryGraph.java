@@ -230,9 +230,13 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public BoundingBox getBoundingBox(final Geometry geometry) {
-    BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
-    boundingBox = boundingBox.expand(maxDistance);
-    return boundingBox;
+    if (geometry == null) {
+      return new Envelope();
+    } else {
+      BoundingBox boundingBox = geometry.getBoundingBox();
+      boundingBox = boundingBox.expand(maxDistance);
+      return boundingBox;
+    }
   }
 
   @Override
@@ -300,7 +304,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public boolean intersects(final LineString line) {
-    BoundingBox boundingBox = Envelope.getBoundingBox(line);
+    BoundingBox boundingBox = line.getBoundingBox();
     final double scaleXY = getGeometryFactory().getScaleXY();
     double maxDistance = 0;
     if (scaleXY > 0) {

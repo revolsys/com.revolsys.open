@@ -39,7 +39,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
@@ -67,13 +66,8 @@ public class DelaunayTriangulationBuilder {
    * @param coords a List of Coordinates
    * @return the envelope of the set of coordinates
    */
-  public static Envelope envelope(final Collection coords) {
-    final Envelope env = new Envelope();
-    for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinates coord = (Coordinates)i.next();
-      env.expandToInclude(coord);
-    }
-    return env;
+  public static Envelope envelope(final Collection<Coordinates> coords) {
+    return new Envelope(coords);
   }
 
   /**

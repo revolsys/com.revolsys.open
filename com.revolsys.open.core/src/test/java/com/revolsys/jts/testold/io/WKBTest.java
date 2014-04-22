@@ -174,7 +174,7 @@ public class WKBTest extends TestCase {
   }
 
   public void testNestedGeometryCollection() throws IOException, ParseException {
-    runWKBTest("GEOMETRYCOLLECTION ( POINT (20 20), GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)) ) )");
+    runWKBTest("GEOMETRYCOLLECTION(POINT(20 20),GEOMETRYCOLLECTION(POINT( 1 1),LINESTRING(0 0,10 10),POLYGON((0 0,100 0,100 100,0 100,0 0))))");
   }
 
   public void testPoint() throws IOException, ParseException {

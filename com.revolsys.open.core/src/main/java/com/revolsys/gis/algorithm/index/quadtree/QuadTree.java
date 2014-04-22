@@ -1,5 +1,6 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
@@ -14,7 +15,7 @@ import com.revolsys.visitor.SingleObjectVisitor;
 
 public class QuadTree<T> {
   public static com.revolsys.jts.geom.BoundingBox ensureExtent(
-    final com.revolsys.jts.geom.BoundingBox envelope, final double minExtent) {
+    final BoundingBox envelope, final double minExtent) {
     double minX = envelope.getMinX();
     double maxX = envelope.getMaxX();
     double minY = envelope.getMinY();
@@ -55,7 +56,7 @@ public class QuadTree<T> {
     size = 0;
   }
 
-  private void collectStats(final com.revolsys.jts.geom.BoundingBox envelope) {
+  private void collectStats(final BoundingBox envelope) {
     final double delX = envelope.getWidth();
     if (delX < minExtent && delX > 0.0) {
       minExtent = delX;
@@ -93,8 +94,7 @@ public class QuadTree<T> {
       boundingBox = convert(boundingBox);
       size++;
       collectStats(boundingBox);
-      final com.revolsys.jts.geom.BoundingBox insertEnv = ensureExtent(
-        boundingBox, minExtent);
+      final BoundingBox insertEnv = ensureExtent(boundingBox, minExtent);
       root.insert(insertEnv, item);
     }
   }
@@ -130,8 +130,12 @@ public class QuadTree<T> {
   }
 
   public List<T> queryBoundingBox(final Geometry geometry) {
-    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
-    return query(boundingBox);
+    if (geometry == null) {
+      return Collections.emptyList();
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      return query(boundingBox);
+    }
   }
 
   public T queryFirst(final BoundingBox boundingBox, final Filter<T> filter) {
@@ -141,14 +145,17 @@ public class QuadTree<T> {
   }
 
   public T queryFirst(final Geometry geometry, final Filter<T> filter) {
-    final BoundingBox boundingBox = Envelope.getBoundingBox(geometry);
-    return queryFirst(boundingBox, filter);
+    if (geometry == null) {
+      return null;
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      return queryFirst(boundingBox, filter);
+    }
   }
 
   public boolean remove(BoundingBox boundingBox, final T item) {
     boundingBox = convert(boundingBox);
-    final com.revolsys.jts.geom.BoundingBox posEnv = ensureExtent(boundingBox,
-      minExtent);
+    final BoundingBox posEnv = ensureExtent(boundingBox, minExtent);
     final boolean removed = root.remove(posEnv, item);
     if (removed) {
       size--;

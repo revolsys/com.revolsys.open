@@ -157,7 +157,7 @@ public class MiscellaneousTest2 extends TestCase {
       nodedLineStrings = nodedLineStrings.union((LineString)lineStrings.get(i));
     }
     assertEquals(
-      "MULTILINESTRING ((0 0, 50 50), (50 50, 100 100), (0 100, 50 50), (50 50, 100 0))",
+      "MULTILINESTRING((0 0,50 50),(50 50,100 100),(0 100,50 50),(50 50,100 0))",
       nodedLineStrings.toString());
   }
 
@@ -194,12 +194,12 @@ public class MiscellaneousTest2 extends TestCase {
     final Geometry[] polygons = new Geometry[] {
       a, b
     };
-    final GeometryCollection polygonCollection = GeometryFactory.getFactory()
-      .geometryCollection(polygons);
+    final GeometryCollection polygonCollection = GeometryFactory.getFactory(0,
+      2).geometryCollection(polygons);
     final Geometry union = polygonCollection.buffer(0);
     System.out.println(union);
     assertEquals(
-      "POLYGON ((0 0, 0 100, 50 100, 50 150, 150 150, 150 50, 100 50, 100 0, 0 0))",
+      "POLYGON((0 0,0 100,50 100,50 150,150 150,150 50,100 50,100 0,0 0))",
       union.toString());
   }
 

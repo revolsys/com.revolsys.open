@@ -255,7 +255,7 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   @Override
   public LineString convert(final GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (sourceGeometryFactory == geometryFactory) {
+    if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
       return this;
     } else {
       return copy(geometryFactory);
@@ -285,7 +285,9 @@ public class LineStringImpl extends GeometryImpl implements LineString {
 
   @Override
   public LineString copy(final GeometryFactory geometryFactory) {
-    if (isEmpty()) {
+    if (geometryFactory == null) {
+      return this.clone();
+    } else if (isEmpty()) {
       return geometryFactory.lineString();
     } else {
       final double[] coordinates = convertCoordinates(geometryFactory);

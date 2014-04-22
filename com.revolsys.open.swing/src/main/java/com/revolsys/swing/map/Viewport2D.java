@@ -91,6 +91,9 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory(3005);
 
+  private GeometryFactory geometryFactory2d = GeometryFactory.getFactory(3005,
+    2);
+
   private Reference<Project> project;
 
   private AffineTransform modelToScreenTransform;
@@ -120,7 +123,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   public Viewport2D(final Project project) {
     this.project = new WeakReference<Project>(project);
-    this.geometryFactory = project.getGeometryFactory();
+    setGeometryFactory(project.getGeometryFactory());
   }
 
   public Viewport2D(final Project project, final int width, final int height,
@@ -156,17 +159,15 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return this.boundingBox;
   }
 
-  public BoundingBox getBoundingBox(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int x,
-    final int y, final int pixels) {
+  public BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
+    final int x, final int y, final int pixels) {
     final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
     final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
     final BoundingBox boundingBox = new Envelope(p1, p2);
     return boundingBox;
   }
 
-  public BoundingBox getBoundingBox(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
     final MouseEvent event, final int pixels) {
     final int x = event.getX();
     final int y = event.getY();
@@ -177,9 +178,9 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final BoundingBox viewExtent = getBoundingBox();
     if (geometry != null && !geometry.isEmpty()) {
       if (!viewExtent.isEmpty()) {
-        final BoundingBox geometryExtent = Envelope.getBoundingBox(geometry);
+        final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
-          final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+          final GeometryFactory geometryFactory = getGeometryFactory();
           return geometryFactory.geometry(geometry);
         }
       }
@@ -261,9 +262,9 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     if (geometry == null) {
       return null;
     } else {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
 
-      final com.revolsys.jts.geom.GeometryFactory roundedGeometryFactory = getRoundedGeometryFactory(geometryFactory);
+      final GeometryFactory roundedGeometryFactory = getRoundedGeometryFactory(geometryFactory);
       if (geometryFactory == roundedGeometryFactory) {
         return geometry;
       } else {
@@ -524,6 +525,12 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     if (!EqualsRegistry.equal(this.geometryFactory, geometryFactory)) {
       final GeometryFactory oldGeometryFactory = this.geometryFactory;
       this.geometryFactory = geometryFactory;
+      if (geometryFactory == null) {
+        this.geometryFactory2d = null;
+      } else {
+        this.geometryFactory2d = GeometryFactory.getFactory(
+          geometryFactory.getSrid(), 2, geometryFactory.getScaleXY(), 1);
+      }
       this.propertyChangeSupport.firePropertyChange("geometryFactory",
         oldGeometryFactory, geometryFactory);
     }
@@ -581,7 +588,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       }
     } else {
       convertedValue = value.doubleValue(SI.METRE);
-      final CoordinateSystem coordinateSystem = this.geometryFactory.getCoordinateSystem();
+      final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geoCs = (GeographicCoordinateSystem)coordinateSystem;
         final double radius = geoCs.getDatum().getSpheroid().getSemiMajorAxis();
@@ -606,41 +613,38 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     }
   }
 
-  public Point toModelPoint(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point toModelPoint(final double... viewCoordinates) {
+    if (this.geometryFactory2d == null) {
+      return GeometryFactory.getFactory().point();
+    } else {
+      final double[] coordinates = toModelCoordinates(viewCoordinates);
+      return this.geometryFactory2d.point(coordinates);
+    }
+  }
+
+  public Point toModelPoint(final GeometryFactory geometryFactory,
     final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
       || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
       return geometryFactory.point();
     } else {
-      final Point point = this.geometryFactory.point(coordinates);
+      final Point point = this.geometryFactory2d.point(coordinates);
       return geometryFactory.copy(point);
     }
   }
 
-  public Point toModelPoint(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point toModelPoint(final GeometryFactory geometryFactory,
     final java.awt.Point point) {
     final double x = point.getX();
     final double y = point.getY();
     return toModelPoint(geometryFactory, x, y);
   }
 
-  public Point toModelPoint(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point toModelPoint(final GeometryFactory geometryFactory,
     final MouseEvent event) {
     final java.awt.Point eventPoint = event.getPoint();
     return toModelPoint(geometryFactory, eventPoint);
-  }
-
-  public Point toModelPoint(final double... viewCoordinates) {
-    if (this.geometryFactory == null) {
-      return GeometryFactory.getFactory().point();
-    } else {
-      final double[] coordinates = toModelCoordinates(viewCoordinates);
-      return this.geometryFactory.point(coordinates);
-    }
   }
 
   public Point toModelPoint(final java.awt.Point point) {
@@ -683,7 +687,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   }
 
   public Point2D toViewPoint(Point point) {
-    point = this.geometryFactory.project(point);
+    point = this.geometryFactory2d.project(point);
     final double x = point.getX();
     final double y = point.getY();
     return toViewPoint(x, y);
