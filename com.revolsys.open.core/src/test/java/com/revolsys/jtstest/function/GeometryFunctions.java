@@ -71,7 +71,7 @@ public class GeometryFunctions {
 
   public static Geometry getCoordinates(final Geometry g) {
     final Coordinates[] pts = g.getCoordinateArray();
-    return g.getGeometryFactory().createMultiPoint(pts);
+    return g.getGeometryFactory().multiPoint(pts);
   }
 
   public static Geometry getGeometry(final Geometry g, final int i) {
@@ -97,7 +97,7 @@ public class GeometryFunctions {
         final LinearRing shell = ((Polygon)g.getGeometry(i)).getExteriorRing();
         poly[i] = g.getGeometryFactory().polygon(shell);
       }
-      return g.getGeometryFactory().createMultiPolygon(poly);
+      return g.getGeometryFactory().multiPolygon(poly);
     }
     return null;
   }

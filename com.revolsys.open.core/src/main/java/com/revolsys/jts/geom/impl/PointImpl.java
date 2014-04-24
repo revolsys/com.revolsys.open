@@ -68,7 +68,7 @@ import com.revolsys.util.MathUtil;
  * 
  *@version 1.7
  */
-public class PointImpl extends GeometryImpl implements Point {
+public class PointImpl extends AbstractGeometry implements Point {
   private static final long serialVersionUID = 4902022702746614570L;
 
   private static final int[] VERTEX_ID = new int[] {
@@ -178,7 +178,7 @@ public class PointImpl extends GeometryImpl implements Point {
   }
 
   @Override
-  protected BoundingBox computeEnvelopeInternal() {
+  protected BoundingBox computeBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
       return new Envelope(geometryFactory);

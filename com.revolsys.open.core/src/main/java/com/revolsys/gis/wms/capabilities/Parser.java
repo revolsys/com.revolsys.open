@@ -78,8 +78,8 @@ public class Parser extends XmlProcessor {
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(minX, minY,
-      maxX, maxY);
+    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(2, minX,
+      minY, maxX, maxY);
     boundingBox.setEnvelope(envelope);
     final double resX = StaxUtils.getDoubleAttribute(parser, null, "resx");
     boundingBox.setResX(resX);
@@ -341,8 +341,8 @@ public class Parser extends XmlProcessor {
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(minX, minY,
-      maxX, maxY);
+    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(2, minX,
+      minY, maxX, maxY);
     StaxUtils.skipSubTree(parser);
     return envelope;
 

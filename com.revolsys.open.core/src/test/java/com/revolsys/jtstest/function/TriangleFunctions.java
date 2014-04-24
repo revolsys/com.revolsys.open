@@ -50,7 +50,7 @@ public class TriangleFunctions {
     line[0] = geomFact.lineString(pts[0], cc);
     line[1] = geomFact.lineString(pts[1], cc);
     line[2] = geomFact.lineString(pts[2], cc);
-    return geomFact.createMultiLineString(line);
+    return geomFact.multiLineString(line);
   }
 
   public static Geometry centroid(final Geometry g) {
@@ -100,7 +100,7 @@ public class TriangleFunctions {
     line[1] = geomFact.lineString(p1, cc);
     final Coordinates p2 = (new LineSegment(pts[0], pts[1])).closestPoint(cc);
     line[2] = geomFact.lineString(p2, cc);
-    return geomFact.createMultiLineString(line);
+    return geomFact.multiLineString(line);
   }
 
   private static Coordinates[] trianglePts(final Geometry g) {

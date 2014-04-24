@@ -389,18 +389,19 @@ public class Buffer {
    * The scale factor is based on the absolute magnitude of the (geometry + buffer distance).
    * since this determines the number of digits of precision which must be handled.
    *
-   * @param g the Geometry being buffered
+   * @param geometry the Geometry being buffered
    * @param distance the buffer distance
    * @param maxPrecisionDigits the max # of digits that should be allowed by
    *          the precision determined by the computed scale factor
    *
    * @return a scale factor for the buffer computation
    */
-  private static double precisionScaleFactor(final Geometry g,
+  private static double precisionScaleFactor(final Geometry geometry,
     final double distance, final int maxPrecisionDigits) {
-    final BoundingBox env = g.getBoundingBox();
-    final double envMax = MathUtil.max(Math.abs(env.getMaxX()),
-      Math.abs(env.getMaxY()), Math.abs(env.getMinX()), Math.abs(env.getMinY()));
+    final BoundingBox boundingBox = geometry.getBoundingBox();
+    final double envMax = MathUtil.max(Math.abs(boundingBox.getMaxX()),
+      Math.abs(boundingBox.getMaxY()), Math.abs(boundingBox.getMinX()),
+      Math.abs(boundingBox.getMinY()));
 
     final double expandByDistance = distance > 0.0 ? distance : 0.0;
     final double bufEnvMax = envMax + 2 * expandByDistance;

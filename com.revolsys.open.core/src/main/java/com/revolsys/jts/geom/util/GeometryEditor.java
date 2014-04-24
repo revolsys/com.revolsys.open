@@ -283,7 +283,7 @@ public class GeometryEditor {
       collection, factory);
 
     // edit the component geometries
-    final ArrayList geometries = new ArrayList();
+    final List<Geometry> geometries = new ArrayList<Geometry>();
     for (int i = 0; i < collectionForType.getGeometryCount(); i++) {
       final Geometry geometry = edit(collectionForType.getGeometry(i),
         operation);
@@ -294,15 +294,15 @@ public class GeometryEditor {
     }
 
     if (collectionForType.getClass() == MultiPoint.class) {
-      return factory.createMultiPoint((Point[])geometries.toArray(new Point[] {}));
+      return factory.multiPoint(geometries);
     }
     if (collectionForType.getClass() == MultiLineString.class) {
-      return factory.createMultiLineString((LineString[])geometries.toArray(new LineString[] {}));
+      return factory.multiLineString(geometries);
     }
     if (collectionForType.getClass() == MultiPolygon.class) {
-      return factory.createMultiPolygon((Polygon[])geometries.toArray(new Polygon[] {}));
+      return factory.multiPolygon(geometries);
     }
-    return factory.geometryCollection((Geometry[])geometries.toArray(new Geometry[] {}));
+    return factory.geometryCollection(geometries);
   }
 
   private Polygon editPolygon(final Polygon polygon,

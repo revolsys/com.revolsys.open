@@ -1,7 +1,7 @@
 package com.revolsys.io.esri.gdb.xml.model;
 
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.jts.geom.BoundingBox;
 
 public class EnvelopeN extends Envelope {
   private double xMin;
@@ -33,8 +33,8 @@ public class EnvelopeN extends Envelope {
       yMin = boundingBox.getMinY();
       xMax = boundingBox.getMaxX();
       yMax = boundingBox.getMaxY();
-      zMin = boundingBox.getMinZ();
-      zMax = boundingBox.getMaxZ();
+      zMin = boundingBox.getMin(2);
+      zMax = boundingBox.getMax(2);
       this.spatialReference = spatialReference;
     }
   }

@@ -101,7 +101,7 @@ public class GeometryFactoryTest extends TestCase {
       1, 1);
     final CoordinatesList mpSeq = new DoubleCoordinatesList(2, 50, -2, 10, 20);
 
-    final MultiPoint mp = geometryFactory.createMultiPoint(mpSeq);
+    final MultiPoint mp = geometryFactory.multiPoint(mpSeq);
     final CoordinatesList pSeq = ((Point)mp.getGeometry(0)).getCoordinatesList();
     assertEquals(4, pSeq.getAxisCount());
     for (int i = 0; i < 4; i++) {

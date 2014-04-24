@@ -100,7 +100,7 @@ public class JTSFunctions {
     final LineString[] lines = new LineString[] {
       gf.lineString(tTop), gf.lineString(tBottom)
     };
-    return gf.createMultiLineString(lines);
+    return gf.multiLineString(lines);
   }
 
   public static String jtsVersion(final Geometry g) {

@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.LineStringExtracter;
 import com.revolsys.jts.operation.polygonize.Polygonizer;
 
@@ -17,8 +15,7 @@ public class PolygonizeFunctions {
     final Polygonizer polygonizer = new Polygonizer();
     polygonizer.add(lines);
     final Collection polys = polygonizer.getPolygons();
-    final Polygon[] polyArray = GeometryFactory.toPolygonArray(polys);
-    return g.getGeometryFactory().geometryCollection(polyArray);
+    return g.getGeometryFactory().geometryCollection(polys);
   }
 
   public static Geometry polygonizeAllErrors(final Geometry g) {

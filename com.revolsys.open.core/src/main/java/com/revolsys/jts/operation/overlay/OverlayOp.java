@@ -113,7 +113,7 @@ public class OverlayOp extends GeometryGraphOperation {
     Geometry result = null;
     switch (resultDimension(overlayOpCode, a, b)) {
       case -1:
-        result = geomFact.geometryCollection(new Geometry[0]);
+        result = geomFact.geometryCollection();
       break;
       case 0:
         result = geomFact.point();

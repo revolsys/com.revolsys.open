@@ -230,7 +230,7 @@ public final class ShapefileGeometryUtil {
     if (polygons.size() == 1) {
       return polygons.get(0);
     } else {
-      return geometryFactory.createMultiPolygon(polygons);
+      return geometryFactory.multiPolygon(polygons);
     }
   }
 
@@ -330,7 +330,7 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numPoints = in.readLEInt();
     final CoordinatesList points = readXYCoordinates(in, numPoints, 2);
-    return geometryFactory.createMultiPoint(points);
+    return geometryFactory.multiPoint(points);
   }
 
   public MultiPoint readMultipointM(
@@ -341,7 +341,7 @@ public final class ShapefileGeometryUtil {
     final CoordinatesList points = readXYCoordinates(in, numPoints, 4);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     readCoordinates(in, points, 3);
-    return geometryFactory.createMultiPoint(points);
+    return geometryFactory.multiPoint(points);
   }
 
   public MultiPoint readMultipointZ(
@@ -352,7 +352,7 @@ public final class ShapefileGeometryUtil {
     final CoordinatesList points = readXYCoordinates(in, numPoints, 3);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     readCoordinates(in, points, 2);
-    return geometryFactory.createMultiPoint(points);
+    return geometryFactory.multiPoint(points);
   }
 
   public MultiPoint readMultipointZM(
@@ -365,7 +365,7 @@ public final class ShapefileGeometryUtil {
     readCoordinates(in, points, 2);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     readCoordinates(in, points, 3);
-    return geometryFactory.createMultiPoint(points);
+    return geometryFactory.multiPoint(points);
   }
 
   public int[] readPartIndex(final EndianInput in, final int numParts,
@@ -519,7 +519,7 @@ public final class ShapefileGeometryUtil {
         final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
         pointsList.add(points);
       }
-      return geometryFactory.createMultiLineString(pointsList);
+      return geometryFactory.multiLineString(pointsList);
     }
   }
 
@@ -555,7 +555,7 @@ public final class ShapefileGeometryUtil {
         final CoordinatesList points = pointsList.get(i);
         readCoordinates(in, points, points.size(), 3);
       }
-      return geometryFactory.createMultiLineString(pointsList);
+      return geometryFactory.multiLineString(pointsList);
     }
   }
 
@@ -591,7 +591,7 @@ public final class ShapefileGeometryUtil {
         final CoordinatesList points = pointsList.get(i);
         readCoordinates(in, points, points.size(), 2);
       }
-      return geometryFactory.createMultiLineString(pointsList);
+      return geometryFactory.multiLineString(pointsList);
     }
   }
 
@@ -634,7 +634,7 @@ public final class ShapefileGeometryUtil {
         final CoordinatesList points = pointsList.get(i);
         readCoordinates(in, points, points.size(), 3);
       }
-      return geometryFactory.createMultiLineString(pointsList);
+      return geometryFactory.multiLineString(pointsList);
     }
   }
 

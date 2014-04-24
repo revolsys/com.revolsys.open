@@ -58,7 +58,6 @@ import com.revolsys.jts.geom.vertex.LineStringVertex;
 import com.revolsys.jts.geom.vertex.LineStringVertexIterable;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.BoundaryOp;
-import com.revolsys.jts.util.EnvelopeUtil;
 
 /**
  *  Models an OGC-style <code>LineString</code>.
@@ -77,7 +76,7 @@ import com.revolsys.jts.util.EnvelopeUtil;
  *
  *@version 1.7
  */
-public class LineStringImpl extends GeometryImpl implements LineString {
+public class LineStringImpl extends AbstractGeometry implements LineString {
 
   private static final long serialVersionUID = 3110669828065365560L;
 
@@ -235,20 +234,12 @@ public class LineStringImpl extends GeometryImpl implements LineString {
   }
 
   @Override
-  protected BoundingBox computeEnvelopeInternal() {
+  protected BoundingBox computeBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
       return new Envelope(geometryFactory);
     } else {
-      double[] bounds = null;
-      for (final Vertex vertex : vertices()) {
-        if (bounds == null) {
-          bounds = EnvelopeUtil.createBounds(vertex);
-        } else {
-          EnvelopeUtil.expand(geometryFactory, bounds, vertex);
-        }
-      }
-      return new Envelope(geometryFactory, bounds);
+      return new Envelope(geometryFactory, vertices());
     }
   }
 

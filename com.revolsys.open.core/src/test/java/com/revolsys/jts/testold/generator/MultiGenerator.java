@@ -37,9 +37,6 @@ import java.util.ArrayList;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 
 /**
  * 
@@ -139,16 +136,16 @@ public class MultiGenerator extends GeometryGenerator {
 
     // yes ... there are better ways
     if (this.generator instanceof PointGenerator) {
-      return this.geometryFactory.createMultiPoint((Point[])geoms.toArray(new Point[this.numberGeometries]));
+      return this.geometryFactory.multiPoint(geoms);
     } else {
       if (this.generator instanceof LineStringGenerator) {
-        return this.geometryFactory.createMultiLineString((LineString[])geoms.toArray(new LineString[this.numberGeometries]));
+        return this.geometryFactory.multiLineString(geoms);
       } else {
         if (this.generator instanceof PolygonGenerator) {
-          return this.geometryFactory.createMultiPolygon((Polygon[])geoms.toArray(new Polygon[this.numberGeometries]));
+          return this.geometryFactory.multiPolygon(geoms);
         } else {
           // same as multi
-          return this.geometryFactory.geometryCollection((Geometry[])geoms.toArray(new Geometry[this.numberGeometries]));
+          return this.geometryFactory.geometryCollection(geoms);
         }
       }
     }

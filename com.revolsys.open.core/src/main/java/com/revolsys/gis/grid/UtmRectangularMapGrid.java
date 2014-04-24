@@ -32,7 +32,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new Envelope(GEOMETRY_FACTORY, lon, lat, lon - tileWidth, lat
+    return new Envelope(GEOMETRY_FACTORY, 2, lon, lat, lon - tileWidth, lat
       + tileHeight);
   }
 

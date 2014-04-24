@@ -388,7 +388,7 @@ public class QuadEdgeSubdivision {
         qe.orig().getCoordinate(), qe.dest().getCoordinate()
       });
     }
-    return geomFact.createMultiLineString(edges);
+    return geomFact.multiLineString(edges);
   }
 
   /**
@@ -397,7 +397,7 @@ public class QuadEdgeSubdivision {
    * @return the envelope
    */
   public BoundingBox getEnvelope() {
-    return new Envelope(frameEnv);
+    return frameEnv;
   }
 
   /**
@@ -673,8 +673,8 @@ public class QuadEdgeSubdivision {
    * @return a GeometryCollection of Polygons
    */
   public Geometry getVoronoiDiagram(final GeometryFactory geomFact) {
-    final List vorCells = getVoronoiCellPolygons(geomFact);
-    return geomFact.geometryCollection(GeometryFactory.toGeometryArray(vorCells));
+    final List<Geometry> vorCells = getVoronoiCellPolygons(geomFact);
+    return geomFact.geometryCollection(vorCells);
   }
 
   private QuadEdge initSubdiv() {

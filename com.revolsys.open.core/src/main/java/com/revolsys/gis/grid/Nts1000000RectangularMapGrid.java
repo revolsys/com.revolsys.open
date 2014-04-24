@@ -44,7 +44,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new Envelope(getGeometryFactory(), lon, lat, lon - tileWidth, lat
+    return new Envelope(getGeometryFactory(), 2, lon, lat, lon - tileWidth, lat
       + tileHeight);
   }
 

@@ -46,7 +46,7 @@ import com.revolsys.jts.util.Assert;
 public class Node extends NodeBase {
   public static Node createExpanded(final Node node,
     final BoundingBox boundingBox) {
-    BoundingBox newBoundingBox = new Envelope(boundingBox);
+    BoundingBox newBoundingBox = boundingBox;
     if (node != null) {
       newBoundingBox = newBoundingBox.expandToInclude(node.boundingBox);
     }
@@ -111,25 +111,9 @@ public class Node extends NodeBase {
         maxY = getMaxY();
       break;
     }
-    final BoundingBox newEnvelope = new Envelope(minX, minY, maxX, maxY);
+    final BoundingBox newEnvelope = new Envelope(2, minX, minY, maxX, maxY);
     final Node node = new Node(newEnvelope, level - 1);
     return node;
-  }
-
-  private double getMinX() {
-    return boundingBox.getMinX();
-  }
-
-  private double getMinY() {
-    return boundingBox.getMinY();
-  }
-
-  private double getMaxY() {
-    return boundingBox.getMaxY();
-  }
-
-  private double getMaxX() {
-    return boundingBox.getMaxX();
   }
 
   /**
@@ -157,6 +141,22 @@ public class Node extends NodeBase {
 
   private double getCentreY() {
     return boundingBox.getCentreY();
+  }
+
+  private double getMaxX() {
+    return boundingBox.getMaxX();
+  }
+
+  private double getMaxY() {
+    return boundingBox.getMaxY();
+  }
+
+  private double getMinX() {
+    return boundingBox.getMinX();
+  }
+
+  private double getMinY() {
+    return boundingBox.getMinY();
   }
 
   /**

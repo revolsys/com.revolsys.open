@@ -608,6 +608,15 @@ public final class CollectionUtil {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <V> List<V> toList(final V... values) {
+    if (values == null) {
+      return Collections.emptyList();
+    } else {
+      return Arrays.asList(values);
+    }
+  }
+
   public static Map<String, Object> toMap(final Preferences preferences) {
     try {
       final Map<String, Object> map = new HashMap<String, Object>();

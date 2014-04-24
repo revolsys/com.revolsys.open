@@ -112,7 +112,7 @@ public class CascadedPolygonUnion {
     if (polygons.size() == 1) {
       return (Polygon)polygons.get(0);
     }
-    return g.getGeometryFactory().createMultiPolygon(
+    return g.getGeometryFactory().multiPolygon(
       GeometryFactory.toPolygonArray(polygons));
   }
 
@@ -194,9 +194,7 @@ public class CascadedPolygonUnion {
 
   private Geometry bufferUnion(final Geometry g0, final Geometry g1) {
     final GeometryFactory factory = g0.getGeometryFactory();
-    final Geometry gColl = factory.geometryCollection(new Geometry[] {
-      g0, g1
-    });
+    final Geometry gColl = factory.geometryCollection(g0, g1);
     final Geometry unionAll = gColl.buffer(0.0);
     return unionAll;
   }

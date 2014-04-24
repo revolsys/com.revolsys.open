@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jtstest.testbuilder.geom.ComponentLocater;
 import com.revolsys.jtstest.testbuilder.geom.GeometryLocation;
 
@@ -38,8 +37,7 @@ public class LayerList {
     }
     // if parent was a GC, ensure returning a GC
     if (parentGeom.getGeometryType().equals("GeometryCollection")) {
-      return parentGeom.getGeometryFactory().geometryCollection(
-        GeometryFactory.toGeometryArray(geoms));
+      return parentGeom.getGeometryFactory().geometryCollection(geoms);
     }
     // otherwise return MultiGeom
     return parentGeom.getGeometryFactory().buildGeometry(geoms);

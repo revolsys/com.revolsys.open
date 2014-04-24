@@ -107,10 +107,6 @@ public class GeometryLocationsWriter {
       } else {
         buf.append("(" + comp.getVertexCount() + ")");
       }
-      if (comp.getUserData() != null) {
-        buf.append("  Data: ");
-        buf.append(comp.getUserData().toString());
-      }
       buf.append(eol);
 
       if (count++ > MAX_ITEMS_TO_DISPLAY) {

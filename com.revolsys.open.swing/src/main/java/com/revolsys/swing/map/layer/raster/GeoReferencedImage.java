@@ -627,8 +627,8 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
     final int imageHeight = getImageHeight();
     final double y2 = y1 - pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new Envelope(geometryFactory, x1, y1, x2,
-      y2);
+    final BoundingBox boundingBox = new Envelope(geometryFactory, 2, x1, y1,
+      x2, y2);
     setBoundingBox(boundingBox);
   }
 

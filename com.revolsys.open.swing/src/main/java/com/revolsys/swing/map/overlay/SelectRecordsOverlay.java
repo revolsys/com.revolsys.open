@@ -167,7 +167,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       final int y = event.getY();
       final double[] location = getViewport().toModelCoordinates(x, y);
       final GeometryFactory geometryFactory = getViewportGeometryFactory();
-      BoundingBox boundingBox = new Envelope(geometryFactory, location[0],
+      BoundingBox boundingBox = new Envelope(geometryFactory, 2, location[0],
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
       boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
@@ -353,7 +353,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final Point bottomRight = getViewport().toModelPoint(maxX, maxY);
 
         final GeometryFactory geometryFactory = getMap().getGeometryFactory();
-        final BoundingBox boundingBox = new Envelope(geometryFactory,
+        final BoundingBox boundingBox = new Envelope(geometryFactory, 2,
           topLeft.getX(), topLeft.getY(), bottomRight.getX(),
           bottomRight.getY());
 

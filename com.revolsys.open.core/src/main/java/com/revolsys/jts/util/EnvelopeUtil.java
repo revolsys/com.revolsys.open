@@ -55,7 +55,16 @@ public class EnvelopeUtil {
     return bounds;
   }
 
-  public static double[] createBounds(final int axisCount, final Coordinates point) {
+  public static double[] createBounds(final int axisCount) {
+    final double[] newBounds = new double[axisCount * 2];
+    for (int i = 0; i < newBounds.length; i++) {
+      newBounds[i] = Double.NaN;
+    }
+    return newBounds;
+  }
+
+  public static double[] createBounds(final int axisCount,
+    final Coordinates point) {
     final double[] bounds = new double[axisCount * 2];
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       final double value = point.getValue(axisIndex);
@@ -98,9 +107,9 @@ public class EnvelopeUtil {
   public static void expand(final GeometryFactory geometryFactory,
     final double[] bounds, final double... values) {
     final int axisCount = bounds.length / 2;
-    final int count = Math.min(axisCount, values.length);
-    for (int axisIndex = 0; axisIndex < count; axisIndex++) {
-      final double value = values[axisIndex];
+    for (int i = 0; i < values.length; i++) {
+      final double value = values[i];
+      final int axisIndex = i % axisCount;
       expand(geometryFactory, bounds, axisCount, axisIndex, value);
     }
   }
@@ -122,7 +131,8 @@ public class EnvelopeUtil {
   }
 
   public static void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, final int axisCount, final int axisIndex, double value) {
+    final double[] bounds, final int axisCount, final int axisIndex,
+    double value) {
     if (!Double.isNaN(value)) {
       if (geometryFactory != null) {
         value = geometryFactory.makePrecise(axisIndex, value);
@@ -195,7 +205,7 @@ public class EnvelopeUtil {
     final double y1 = lineStart.getY();
     final double x2 = lineEnd.getX();
     final double y2 = lineEnd.getY();
-  
+
     final double x = point.getX();
     final double y = point.getY();
     return intersects(x1, y1, x2, y2, x, y);
@@ -219,7 +229,7 @@ public class EnvelopeUtil {
     final double line1y1 = line1Start.getY();
     final double line1x2 = line1End.getX();
     final double line1y2 = line1End.getY();
-  
+
     final double line2x1 = line2Start.getX();
     final double line2y1 = line2Start.getY();
     final double line2x2 = line2End.getX();

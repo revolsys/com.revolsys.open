@@ -13,8 +13,8 @@ public class Node extends NodeBase {
     final double quadSize = DoubleBits.powerOf2(level);
     point.setX(Math.floor(itemEnv.getMinX() / quadSize) * quadSize);
     point.setY(Math.floor(itemEnv.getMinY() / quadSize) * quadSize);
-    return new Envelope(point.getX(), point.getY(), point.getX() + quadSize,
-      point.getY() + quadSize);
+    return new Envelope(2, point.getX(), point.getY(),
+      point.getX() + quadSize, point.getY() + quadSize);
   }
 
   public static Envelope computeKey(final int level, final Coordinates point,
@@ -24,7 +24,7 @@ public class Node extends NodeBase {
     final double y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
     point.setX(x);
     point.setY(y);
-    return new Envelope(x, y, x + quadSize, y + quadSize);
+    return new Envelope(2, x, y, x + quadSize, y + quadSize);
   }
 
   public static int computeQuadLevel(final BoundingBox env) {
@@ -36,9 +36,9 @@ public class Node extends NodeBase {
   }
 
   public static Node createExpanded(final Node node, final Envelope addEnv) {
-    final Envelope expandEnv = new Envelope(addEnv);
+    BoundingBox expandEnv = addEnv;
     if (node != null) {
-      expandEnv.expandToInclude(node.env);
+      expandEnv = expandEnv.expandToInclude(node.env);
     }
 
     final Node largerNode = createNode(expandEnv);
@@ -62,7 +62,7 @@ public class Node extends NodeBase {
     return node;
   }
 
-  private final Envelope env;
+  private final BoundingBox env;
 
   private final Coordinates centre;
 
@@ -108,7 +108,7 @@ public class Node extends NodeBase {
         maxY = env.getMaxY();
       break;
     }
-    final Envelope envelope = new Envelope(minX, minY, maxX, maxY);
+    final Envelope envelope = new Envelope(2, minX, minY, maxX, maxY);
     final Node node = new Node(envelope, level - 1);
     return node;
   }

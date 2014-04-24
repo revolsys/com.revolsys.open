@@ -167,12 +167,12 @@ public class LineStringImplTest extends TestCase {
     assertTrue(r.isEmpty());
     assertTrue(r.isClosed());
 
-    final MultiLineString m = this.geometryFactory.createMultiLineString(new LineString[] {
+    final MultiLineString m = this.geometryFactory.multiLineString(new LineString[] {
       l, r
     });
     assertTrue(!m.isClosed());
 
-    final MultiLineString m2 = this.geometryFactory.createMultiLineString(new LineString[] {
+    final MultiLineString m2 = this.geometryFactory.multiLineString(new LineString[] {
       r
     });
     assertTrue(!m2.isClosed());

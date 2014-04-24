@@ -672,7 +672,7 @@ public class GeometryEditPanel extends JPanel {
 
     renderMgr.setDirty(true);
 
-    if (zoomEnv.isNull()) {
+    if (zoomEnv.isEmpty()) {
       viewport.zoomToInitialExtent();
       return;
     }

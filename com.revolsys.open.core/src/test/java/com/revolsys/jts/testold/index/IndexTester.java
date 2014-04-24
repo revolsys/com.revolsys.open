@@ -73,7 +73,7 @@ public class IndexTester {
       for (int j = 0; j < gridSize; j++) {
         final double x = EXTENT_MIN + gridInc * i;
         final double y = EXTENT_MIN + gridInc * j;
-        final Envelope env = new Envelope(x, y, x + cellSize, y + cellSize);
+        final Envelope env = new Envelope(2, x, y, x + cellSize, y + cellSize);
         items.add(env);
       }
     }
@@ -105,7 +105,7 @@ public class IndexTester {
       for (int j = 0; j < gridSize; j++) {
         final double x = EXTENT_MIN + gridInc * i;
         final double y = EXTENT_MIN + gridInc * j;
-        final Envelope env = new Envelope(x, y, x + cellSize, y + cellSize);
+        final Envelope env = new Envelope(2, x, y, x + cellSize, y + cellSize);
         this.index.query(env);
       }
     }

@@ -8,7 +8,7 @@ import com.revolsys.jts.geom.Envelope;
 public class Node<T> extends NodeBase<T> {
   public static <V> Node<V> createExpanded(final Node<V> node,
     final BoundingBox addEnv) {
-    BoundingBox expandEnv = new Envelope(addEnv);
+    BoundingBox expandEnv = addEnv;
     if (node != null) {
       expandEnv = expandEnv.expandToInclude(node.env);
     }
@@ -72,7 +72,7 @@ public class Node<T> extends NodeBase<T> {
         maxY = env.getMaxY();
       break;
     }
-    final Envelope envelope = new Envelope(minX, minY, maxX, maxY);
+    final Envelope envelope = new Envelope(2, minX, minY, maxX, maxY);
     final Node<T> node = new Node<T>(envelope, level - 1);
     return node;
   }

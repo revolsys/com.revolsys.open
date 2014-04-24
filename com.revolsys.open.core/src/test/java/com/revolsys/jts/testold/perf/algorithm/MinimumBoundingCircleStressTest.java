@@ -54,7 +54,7 @@ public class MinimumBoundingCircleStressTest {
 
   void run(final int nPts) {
     final Coordinates[] randPts = createRandomPoints(nPts);
-    final Geometry mp = this.geomFact.createMultiPoint(randPts);
+    final Geometry mp = this.geomFact.multiPoint(randPts);
     final MinimumBoundingCircle mbc = new MinimumBoundingCircle(mp);
     final Coordinates centre = mbc.getCentre();
     final double radius = mbc.getRadius();

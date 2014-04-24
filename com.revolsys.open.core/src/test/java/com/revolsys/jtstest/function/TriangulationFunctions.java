@@ -39,7 +39,6 @@ import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.jts.triangulate.VertexTaggedGeometryDataMapper;
 import com.revolsys.jts.triangulate.VoronoiDiagramBuilder;
 import com.revolsys.jts.triangulate.quadedge.LocateFailureException;
-import com.revolsys.jtstest.util.GeometryDataUtil;
 
 public class TriangulationFunctions {
   private static final double TRIANGULATION_TOLERANCE = 0.0;
@@ -150,7 +149,6 @@ public class TriangulationFunctions {
 
   public static Geometry voronoiDiagramWithData(final Geometry sitesGeom,
     final Geometry clipGeom) {
-    GeometryDataUtil.setComponentDataToIndex(sitesGeom);
 
     final VertexTaggedGeometryDataMapper mapper = new VertexTaggedGeometryDataMapper();
     mapper.loadSourceGeometries(sitesGeom);

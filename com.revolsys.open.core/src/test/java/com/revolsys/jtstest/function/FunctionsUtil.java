@@ -15,7 +15,8 @@ import com.revolsys.jtstest.testbuilder.ui.render.GeometryPainter;
 
 public class FunctionsUtil {
 
-  public static final BoundingBox DEFAULT_ENVELOPE = new Envelope(0, 0, 100, 100);
+  public static final BoundingBox DEFAULT_ENVELOPE = new Envelope(2, 0, 0,
+    100, 100);
 
   public static Geometry buildGeometry(final List geoms,
     final Geometry parentGeom) {
@@ -27,8 +28,7 @@ public class FunctionsUtil {
     }
     // if parent was a GC, ensure returning a GC
     if (parentGeom.getGeometryType().equals("GeometryCollection")) {
-      return parentGeom.getGeometryFactory().geometryCollection(
-        GeometryFactory.toGeometryArray(geoms));
+      return parentGeom.getGeometryFactory().geometryCollection(geoms);
     }
     // otherwise return MultiGeom
     return parentGeom.getGeometryFactory().buildGeometry(geoms);

@@ -81,7 +81,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public class PolygonImpl extends GeometryImpl implements Polygon {
+public class PolygonImpl extends AbstractGeometry implements Polygon {
 
   private static final long serialVersionUID = -3494792200821764533L;
 
@@ -207,7 +207,7 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   }
 
   @Override
-  protected BoundingBox computeEnvelopeInternal() {
+  protected BoundingBox computeBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     BoundingBox boundingBox = new Envelope(geometryFactory);
     for (final LinearRing ring : rings) {
@@ -295,12 +295,12 @@ public class PolygonImpl extends GeometryImpl implements Polygon {
   public Geometry getBoundary() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return geometryFactory.createMultiLineString();
+      return geometryFactory.multiLineString();
     } else {
       if (rings.length == 1) {
         return geometryFactory.linearRing(this.rings[0]);
       } else {
-        return geometryFactory.createMultiLineString(this.rings);
+        return geometryFactory.multiLineString(this.rings);
       }
     }
   }

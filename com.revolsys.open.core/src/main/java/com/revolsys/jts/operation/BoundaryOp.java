@@ -101,10 +101,10 @@ public class BoundaryOp {
       if (closedEndpointOnBoundary) {
         return line.getStartPoint();
       } else {
-        return geomFact.createMultiPoint((Coordinates[])null);
+        return geomFact.multiPoint((Coordinates[])null);
       }
     }
-    return geomFact.createMultiPoint(new Point[] {
+    return geomFact.multiPoint(new Point[] {
       line.getStartPoint(), line.getEndPoint()
     });
   }
@@ -128,7 +128,7 @@ public class BoundaryOp {
       return geomFact.point(bdyPts[0]);
     }
     // this handles 0 points case as well
-    return geomFact.createMultiPoint(bdyPts);
+    return geomFact.multiPoint(bdyPts);
   }
 
   private Coordinates[] computeBoundaryCoordinates(final MultiLineString mLine) {
@@ -166,7 +166,7 @@ public class BoundaryOp {
   }
 
   private MultiPoint getEmptyMultiPoint() {
-    return geomFact.createMultiPoint((CoordinatesList)null);
+    return geomFact.multiPoint((CoordinatesList)null);
   }
 }
 

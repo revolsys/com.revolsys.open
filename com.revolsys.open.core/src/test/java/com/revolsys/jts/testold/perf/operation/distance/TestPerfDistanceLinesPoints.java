@@ -75,7 +75,7 @@ public class TestPerfDistanceLinesPoints {
       final Geometry pt = geomFact.point(p);
       circles[i] = (Polygon)pt.buffer(inc / 2);
     }
-    return geomFact.createMultiPolygon(circles);
+    return geomFact.multiPolygon(circles);
 
   }
 
@@ -186,7 +186,7 @@ public class TestPerfDistanceLinesPoints {
 
   public void xtest(final int num) throws Exception {
     final Geometry target = loadData("C:\\proj\\JTS\\test\\g2e\\ffmwdec08.wkt");
-    final BoundingBox bcEnv_Albers = new Envelope(-45838, 255756, 1882064, 1733287);
+    final BoundingBox bcEnv_Albers = new Envelope(2, -45838, 255756, 1882064, 1733287);
     final Geometry[] pts = createPoints(bcEnv_Albers, num);
 
     test(pts, target);

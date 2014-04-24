@@ -25,7 +25,7 @@ public class CreateShapeFunctions {
     if (g != null) {
       gsf.setEnvelope(g.getBoundingBox());
     } else {
-      gsf.setEnvelope(new Envelope(0, 0, 1, 1));
+      gsf.setEnvelope(new Envelope(2, 0, 0, 1, 1));
     }
     return gsf.createCircle();
   }
@@ -38,7 +38,7 @@ public class CreateShapeFunctions {
     if (g != null) {
       gsf.setEnvelope(g.getBoundingBox());
     } else {
-      gsf.setEnvelope(new Envelope(0, 0, 1, 1));
+      gsf.setEnvelope(new Envelope(2, 0, 0, 1, 1));
     }
     return gsf.createCircle();
   }
@@ -102,7 +102,7 @@ public class CreateShapeFunctions {
         final double x = env.getMinX() + i * cellSizeX;
         final double y = env.getMinY() + j * cellSizeY;
 
-        final BoundingBox cellEnv = new Envelope(x, y, x + cellSizeX, y
+        final BoundingBox cellEnv = new Envelope(2, x, y, x + cellSizeX, y
           + cellSizeY);
         geoms.add(geomFact.toGeometry(cellEnv));
       }
@@ -121,7 +121,7 @@ public class CreateShapeFunctions {
     if (g != null) {
       gsf.setEnvelope(g.getBoundingBox());
     } else {
-      gsf.setEnvelope(new Envelope(0, 0, 1, 1));
+      gsf.setEnvelope(new Envelope(2, 0, 0, 1, 1));
     }
     return gsf.createSupercircle(pow);
   }

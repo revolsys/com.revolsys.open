@@ -50,6 +50,12 @@ public interface GeometryCollection extends Geometry {
   GeometryCollection clone();
 
   @Override
+  GeometryCollection convert(GeometryFactory geometryFactory);
+
+  @Override
+  GeometryCollection copy(GeometryFactory geometryFactory);
+
+  @Override
   GeometryCollection normalize();
 
 }

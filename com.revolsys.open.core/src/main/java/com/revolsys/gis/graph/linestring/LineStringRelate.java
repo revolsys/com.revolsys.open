@@ -104,7 +104,7 @@ public class LineStringRelate {
         System.err.println("Cannot handle overlaps\n" + getLine1() + "\n "
           + getLine2());
         final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
-        return factory.createMultiLineString();
+        return factory.multiLineString();
       } else {
         final Edge<LineSegment> edge = outEdges.get(0);
         final LineSegment line = edge.getObject();
@@ -132,7 +132,7 @@ public class LineStringRelate {
       intersections.add(points);
     }
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
-    return factory.createMultiLineString(intersections);
+    return factory.multiLineString(intersections);
   }
 
   public LineString getRelateLine1() {

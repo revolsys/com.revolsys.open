@@ -195,7 +195,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     StaxUtils.skipToEndElement(in, MULTI_LINE_STRING);
-    return factory.createMultiLineString(lines);
+    return factory.multiLineString(lines);
   }
 
   private MultiPoint readMultiPoint(
@@ -210,7 +210,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     StaxUtils.skipToEndElement(in, MULTI_POINT);
-    return factory.createMultiPoint(points);
+    return factory.multiPoint(points);
   }
 
   private MultiPolygon readMultiPolygon(
@@ -225,7 +225,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
       }
     }
     StaxUtils.skipToEndElement(in, MULTI_POLYGON);
-    return factory.createMultiPolygon(polygons);
+    return factory.multiPolygon(polygons);
   }
 
   private Point readPoint(

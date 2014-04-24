@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.LineSegment;
 
 public abstract class GeometricShapeBuilder 
 {
-	protected BoundingBox extent = new Envelope(0, 0, 1, 1);
+	protected BoundingBox extent = new Envelope(2, 0, 0, 1, 1);
 	protected int numPts = 0;
 	protected GeometryFactory geomFactory;
 	
@@ -92,8 +92,8 @@ public abstract class GeometricShapeBuilder
 		double radius = getRadius();
 		
 		Coordinates centre = getCentre();
-		return new Envelope(centre.getX() - radius, centre.getY() - radius,
-				centre.getX() + radius, centre.getY() + radius);
+		return new Envelope(2, centre.getX() - radius,
+				centre.getY() - radius, centre.getX() + radius, centre.getY() + radius);
 	}
 	
 

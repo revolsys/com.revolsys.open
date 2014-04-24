@@ -40,7 +40,7 @@ public class LineSegmentQuadTree {
       minY = minY - minExtent / 2.0;
       maxY = minY + minExtent / 2.0;
     }
-    return new Envelope(minX, minY, maxX, maxY);
+    return new Envelope(2, minX, minY, maxX, maxY);
   }
 
   private final Geometry geometry;
@@ -95,7 +95,7 @@ public class LineSegmentQuadTree {
       final double y2 = points.getY(segmentEndVertexIndex);
       final int[] index = GeometryEditUtil.createVertexIndex(parentIndex,
         segmentIndex);
-      final Envelope envelope = new Envelope(x1, y1, x2, y2);
+      final Envelope envelope = new Envelope(2, x1, y1, x2, y2);
       insert(envelope, index);
       x1 = x2;
       y1 = y2;
@@ -131,7 +131,7 @@ public class LineSegmentQuadTree {
     final double y1 = points.getY(vertexIndex);
     final double x2 = points.getX(vertexIndex + 1);
     final double y2 = points.getY(vertexIndex + 1);
-    return new Envelope(x1, y1, x2, y2);
+    return new Envelope(2, x1, y1, x2, y2);
   }
 
   public List<LineSegment> getIntersecting(final BoundingBox boundingBox) {

@@ -120,7 +120,7 @@ public class ConformingDelaunayTriangulator {
   private ConstraintVertexFactory vertexFactory = null;
 
   // allPointsEnv expanded by a small buffer
-  private Envelope computeAreaEnv;
+  private BoundingBox computeAreaEnv;
 
   // records the last split point computed, for error reporting
   private Coordinates splitPt = null;
@@ -154,16 +154,14 @@ public class ConformingDelaunayTriangulator {
     final BoundingBox vertexEnv = computeVertexEnvelope(initialVertices);
     final BoundingBox segEnv = computeVertexEnvelope(segVertices);
 
-    final Envelope allPointsEnv = new Envelope(vertexEnv);
-    allPointsEnv.expandToInclude(segEnv);
+    final BoundingBox allPointsEnv = vertexEnv.expandToInclude(segEnv);
 
     final double deltaX = allPointsEnv.getWidth() * 0.2;
     final double deltaY = allPointsEnv.getHeight() * 0.2;
 
     final double delta = Math.max(deltaX, deltaY);
 
-    computeAreaEnv = new Envelope(allPointsEnv);
-    computeAreaEnv.expandBy(delta);
+    computeAreaEnv = allPointsEnv.expand(delta);
   }
 
   private void computeConvexHull() {
@@ -325,8 +323,7 @@ public class ConformingDelaunayTriangulator {
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle
-    final Envelope env = new Envelope(midPt);
-    env.expandBy(segRadius);
+    final BoundingBox env = new Envelope(midPt).expand(segRadius);
     // Find all points in envelope
     final List result = kdt.query(env);
 

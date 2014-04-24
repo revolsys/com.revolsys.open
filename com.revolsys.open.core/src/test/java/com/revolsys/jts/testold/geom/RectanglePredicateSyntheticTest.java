@@ -43,8 +43,8 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   double bufferWidth = 1.0;
 
-  BoundingBox rectEnv = new Envelope(this.baseX, this.baseY,
-    this.baseX + this.rectSize, this.baseY + this.rectSize);
+  BoundingBox rectEnv = new Envelope(2, this.baseX,
+    this.baseY, this.baseX + this.rectSize, this.baseY + this.rectSize);
 
   Geometry rect = this.fact.toGeometry(this.rectEnv);
 
@@ -97,9 +97,9 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   private List<Geometry> getTestGeometries() {
     final BoundingBox testEnv = new Envelope(
-      this.rectEnv.getMinX() - this.bufSize, this.rectEnv.getMinY() - this.bufSize, this.rectEnv.getMaxX()
-          + this.bufSize,
-      this.rectEnv.getMaxY() + this.bufSize);
+      2, this.rectEnv.getMinX() - this.bufSize, this.rectEnv.getMinY() - this.bufSize,
+      this.rectEnv.getMaxX()
+          + this.bufSize, this.rectEnv.getMaxY() + this.bufSize);
     final List<Geometry> testGeoms = createTestGeometries(testEnv, 5,
       this.testGeomSize);
     return testGeoms;

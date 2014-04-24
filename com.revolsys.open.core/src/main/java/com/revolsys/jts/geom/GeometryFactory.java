@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -74,7 +73,6 @@ import com.revolsys.jts.geom.impl.MultiPolygonImpl;
 import com.revolsys.jts.geom.impl.PointImpl;
 import com.revolsys.jts.geom.impl.PolygonImpl;
 import com.revolsys.jts.operation.linemerge.LineMerger;
-import com.revolsys.jts.util.Assert;
 import com.revolsys.util.CollectionUtil;
 
 /**
@@ -500,32 +498,31 @@ public class GeometryFactory implements Serializable,
    * any MultiGeometries are contained in the input a GeometryCollection containing
    * them will be returned.
    *
-   *@param  geomList  the <code>Geometry</code>s to combine
+   *@param  geometries  the <code>Geometry</code>s to combine
    *@return           a <code>Geometry</code> of the "smallest", "most
    *      type-specific" class that can contain the elements of <code>geomList</code>
    *      .
    */
-  @SuppressWarnings({
-    "rawtypes"
-  })
-  public Geometry buildGeometry(final Collection geomList) {
+  public Geometry buildGeometry(final Collection<? extends Geometry> geometries) {
 
     /**
      * Determine some facts about the geometries in the list
      */
-    Class geomClass = null;
+    DataType collectionDataType = null;
     boolean isHeterogeneous = false;
     boolean hasGeometryCollection = false;
-    for (final Iterator i = geomList.iterator(); i.hasNext();) {
-      final Geometry geom = (Geometry)i.next();
-      final Class partClass = geom.getClass();
-      if (geomClass == null) {
-        geomClass = partClass;
+    for (final Geometry geometry : geometries) {
+      DataType geometryDataType = geometry.getDataType();
+      if (geometry instanceof LinearRing) {
+        geometryDataType = DataTypes.LINE_STRING;
       }
-      if (partClass != geomClass) {
+      if (collectionDataType == null) {
+        collectionDataType = geometryDataType;
+      } else if (geometryDataType != collectionDataType) {
+
         isHeterogeneous = true;
       }
-      if (geom instanceof GeometryCollection) {
+      if (geometry instanceof GeometryCollection) {
         hasGeometryCollection = true;
       }
     }
@@ -533,46 +530,21 @@ public class GeometryFactory implements Serializable,
     /**
      * Now construct an appropriate geometry to return
      */
-    // for the empty geometry, return an empty GeometryCollection
-    if (geomClass == null) {
+    if (collectionDataType == null) {
       return geometryCollection();
-    }
-    if (isHeterogeneous || hasGeometryCollection) {
-      return geometryCollection(toGeometryArray(geomList));
-    }
-    // at this point we know the collection is hetereogenous.
-    // Determine the type of the result from the first Geometry in the list
-    // this should always return a geometry, since otherwise an empty collection
-    // would have already been returned
-    final Geometry geom0 = (Geometry)geomList.iterator().next();
-    final boolean isCollection = geomList.size() > 1;
-    if (isCollection) {
-      if (geom0 instanceof Polygon) {
-        return createMultiPolygon(toPolygonArray(geomList));
-      } else if (geom0 instanceof LineString) {
-        return createMultiLineString(toLineStringArray(geomList));
-      } else if (geom0 instanceof Point) {
-        return createMultiPoint(toPointArray(geomList));
-      }
-      Assert.shouldNeverReachHere("Unhandled class: "
-        + geom0.getClass().getName());
-    }
-    return geom0;
-  }
-
-  public GeometryCollection collection(final List<Geometry> geometries) {
-    if (geometries == null || geometries.size() == 0) {
-      return geometryCollection();
+    } else if (isHeterogeneous || hasGeometryCollection) {
+      return geometryCollection(geometries);
+    } else if (geometries.size() == 1) {
+      return geometries.iterator().next();
+    } else if (DataTypes.POINT.equals(collectionDataType)) {
+      return multiPoint(geometries);
+    } else if (DataTypes.LINE_STRING.equals(collectionDataType)) {
+      return multiLineString(geometries);
+    } else if (DataTypes.POLYGON.equals(collectionDataType)) {
+      return multiPolygon(geometries);
     } else {
-      final Geometry[] geometryArray = new Geometry[geometries.size()];
-      for (int i = 0; i < geometries.size(); i++) {
-        Geometry geometry = geometries.get(i);
-        if (geometry != null) {
-          geometry = geometry.convert(this);
-        }
-        geometryArray[i] = geometry;
-      }
-      return new GeometryCollectionImpl(this, geometryArray);
+      throw new IllegalArgumentException("Unknown geometry type "
+        + collectionDataType);
     }
   }
 
@@ -632,109 +604,6 @@ public class GeometryFactory implements Serializable,
       makePrecise(coordinatesList);
       return coordinatesList;
     }
-  }
-
-  public MultiLineString createMultiLineString(final Collection<?> lines) {
-    final LineString[] lineArray = getLineStringArray(lines);
-    return createMultiLineString(lineArray);
-  }
-
-  /**
-   * Creates a MultiLineString using the given LineStrings; a null or empty
-   * array will create an empty MultiLineString.
-   * 
-   * @param lineStrings LineStrings, each of which may be empty but not null
-   * @return the created MultiLineString
-   */
-  public MultiLineString createMultiLineString(final LineString[] lineStrings) {
-    return new MultiLineStringImpl(lineStrings, this);
-  }
-
-  public MultiLineString createMultiLineString(final Object... lines) {
-    return createMultiLineString(Arrays.asList(lines));
-  }
-
-  public MultiPoint createMultiPoint() {
-    return new MultiPointImpl(this);
-  }
-
-  public MultiPoint createMultiPoint(final Collection<?> points) {
-    final Point[] pointArray = getPointArray(points);
-    return createMultiPoint(pointArray);
-  }
-
-  /**
-   * Creates a {@link MultiPoint} using the given {@link Coordinates}s.
-   * A null or empty array will create an empty MultiPoint.
-   *
-   * @param coordinates an array (without null elements), or an empty array, or <code>null</code>
-   * @return a MultiPoint object
-   */
-  public MultiPoint createMultiPoint(final Coordinates[] coordinates) {
-    return createMultiPoint(coordinates != null ? getCoordinateSequenceFactory().create(
-      coordinates)
-      : null);
-  }
-
-  /**
-   * Creates a {@link MultiPoint} using the 
-   * points in the given {@link CoordinatesList}.
-   * A <code>null</code> or empty CoordinatesList creates an empty MultiPoint.
-   *
-   * @param coordinates a CoordinatesList (possibly empty), or <code>null</code>
-   * @return a MultiPoint geometry
-   */
-  public MultiPoint createMultiPoint(final CoordinatesList coordinatesList) {
-    if (coordinatesList == null) {
-      return createMultiPoint();
-    } else {
-      final Point[] points = new Point[coordinatesList.size()];
-      for (int i = 0; i < points.length; i++) {
-        final Coordinates coordinates = coordinatesList.get(i);
-        final Point point = point(coordinates);
-        points[i] = point;
-      }
-      return createMultiPoint(points);
-    }
-  }
-
-  public MultiPoint createMultiPoint(final Object... points) {
-    return createMultiPoint(Arrays.asList(points));
-  }
-
-  /**
-   * Creates a {@link MultiPoint} using the given {@link Point}s.
-   * A null or empty array will create an empty MultiPoint.
-   *
-   * @param point an array of Points (without null elements), or an empty array, or <code>null</code>
-   * @return a MultiPoint object
-   */
-  public MultiPoint createMultiPoint(final Point[] point) {
-    return new MultiPointImpl(this, point);
-  }
-
-  public MultiPolygon createMultiPolygon(final Collection<?> polygons) {
-    final Polygon[] polygonArray = getPolygonArray(polygons);
-    return createMultiPolygon(polygonArray);
-  }
-
-  public MultiPolygon createMultiPolygon(final Object... polygons) {
-    return createMultiPolygon(Arrays.asList(polygons));
-  }
-
-  /**
-   * Creates a MultiPolygon using the given Polygons; a null or empty array
-   * will create an empty Polygon. The polygons must conform to the
-   * assertions specified in the <A
-   * HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
-   * Specification for SQL</A>.
-   *
-   * @param polygons
-   *            Polygons, each of which may be empty but not null
-   * @return the created MultiPolygon
-   */
-  public MultiPolygon createMultiPolygon(final Polygon[] polygons) {
-    return new MultiPolygonImpl(polygons, this);
   }
 
   public Geometry geometry() {
@@ -797,21 +666,31 @@ public class GeometryFactory implements Serializable,
         }
       } else if (MultiPoint.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof Point) {
-          return (V)createMultiPoint(geometry);
+          return (V)multiPoint(geometry);
         }
       } else if (MultiLineString.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof LineString) {
-          return (V)createMultiLineString(geometry);
+          return (V)multiLineString(geometry);
         }
       } else if (MultiPolygon.class.isAssignableFrom(targetClass)) {
         if (geometry instanceof Polygon) {
-          return (V)createMultiPolygon(geometry);
+          return (V)multiPolygon(geometry);
         }
       }
     }
     return null;
   }
 
+  /**
+   * Create a new geometry my flattening the input geometries, ignoring and null or empty
+   * geometries. If there are no geometries an empty {@link GeometryCollection} will be returned.
+   * If there is one geometry that single geometry will be returned. Otherwise the result
+   * will be a subclass of {@link GeometryCollection}.
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param geometries
+   * @return
+   */
   @SuppressWarnings("unchecked")
   public <V extends Geometry> V geometry(
     final Collection<? extends Geometry> geometries) {
@@ -825,11 +704,11 @@ public class GeometryFactory implements Serializable,
       if (dataTypes.size() == 1) {
         final DataType dataType = CollectionUtil.get(dataTypes, 0);
         if (dataType.equals(DataTypes.POINT)) {
-          return (V)createMultiPoint(geometryList);
+          return (V)multiPoint(geometryList);
         } else if (dataType.equals(DataTypes.LINE_STRING)) {
-          return (V)createMultiLineString(geometryList);
+          return (V)multiLineString(geometryList);
         } else if (dataType.equals(DataTypes.POLYGON)) {
-          return (V)createMultiPolygon(geometryList);
+          return (V)multiPolygon(geometryList);
         }
       }
       return (V)geometryCollection(geometries);
@@ -872,15 +751,15 @@ public class GeometryFactory implements Serializable,
         if (geometry instanceof MultiPoint) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
-          return createMultiPoint(geometries);
+          return multiPoint(geometries);
         } else if (geometry instanceof MultiLineString) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
-          return createMultiLineString(geometries);
+          return multiLineString(geometries);
         } else if (geometry instanceof MultiPolygon) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
-          return createMultiPolygon(geometries);
+          return multiPolygon(geometries);
         } else if (geometry instanceof GeometryCollection) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
@@ -891,15 +770,15 @@ public class GeometryFactory implements Serializable,
       } else if (geometry instanceof MultiPoint) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
         addGeometries(geometries, geometry);
-        return createMultiPoint(geometries);
+        return multiPoint(geometries);
       } else if (geometry instanceof MultiLineString) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
         addGeometries(geometries, geometry);
-        return createMultiLineString(geometries);
+        return multiLineString(geometries);
       } else if (geometry instanceof MultiPolygon) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
         addGeometries(geometries, geometry);
-        return createMultiPolygon(geometries);
+        return multiPolygon(geometries);
       } else if (geometry instanceof GeometryCollection) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
         addGeometries(geometries, geometry);
@@ -940,22 +819,20 @@ public class GeometryFactory implements Serializable,
   @SuppressWarnings("unchecked")
   public <V extends GeometryCollection> V geometryCollection(
     final Collection<? extends Geometry> geometries) {
-    final List<Geometry> geometryList = getGeometries(geometries);
+    final List<Geometry> geometryList = new ArrayList<>();
+    if (geometries != null) {
+      for (final Geometry geometry : geometries) {
+        if (geometry != null) {
+          final Geometry copy = geometry.copy(this);
+          geometryList.add(copy);
+        }
+      }
+    }
     if (geometryList == null || geometryList.size() == 0) {
       return (V)geometryCollection();
     } else {
-      final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
-      if (dataTypes.size() == 1) {
-        final DataType dataType = CollectionUtil.get(dataTypes, 0);
-        if (dataType.equals(DataTypes.POINT)) {
-          return (V)createMultiPoint(geometryList);
-        } else if (dataType.equals(DataTypes.LINE_STRING)) {
-          return (V)createMultiLineString(geometryList);
-        } else if (dataType.equals(DataTypes.POLYGON)) {
-          return (V)createMultiPolygon(geometryList);
-        }
-      }
-      final Geometry[] geometryArray = GeometryFactory.toGeometryArray(geometryList);
+      final Geometry[] geometryArray = new Geometry[geometries.size()];
+      geometries.toArray(geometryArray);
       return (V)new GeometryCollectionImpl(this, geometryArray);
     }
   }
@@ -1287,6 +1164,109 @@ public class GeometryFactory implements Serializable,
     return coordinatesPrecisionModel.makeZPrecise(value);
   }
 
+  public MultiLineString multiLineString(final Collection<?> lines) {
+    final LineString[] lineArray = getLineStringArray(lines);
+    return multiLineString(lineArray);
+  }
+
+  /**
+   * Creates a MultiLineString using the given LineStrings; a null or empty
+   * array will create an empty MultiLineString.
+   * 
+   * @param lineStrings LineStrings, each of which may be empty but not null
+   * @return the created MultiLineString
+   */
+  public MultiLineString multiLineString(final LineString[] lineStrings) {
+    return new MultiLineStringImpl(lineStrings, this);
+  }
+
+  public MultiLineString multiLineString(final Object... lines) {
+    return multiLineString(Arrays.asList(lines));
+  }
+
+  public MultiPoint multiPoint() {
+    return new MultiPointImpl(this);
+  }
+
+  public MultiPoint multiPoint(final Collection<?> points) {
+    final Point[] pointArray = getPointArray(points);
+    return multiPoint(pointArray);
+  }
+
+  /**
+   * Creates a {@link MultiPoint} using the given {@link Coordinates}s.
+   * A null or empty array will create an empty MultiPoint.
+   *
+   * @param coordinates an array (without null elements), or an empty array, or <code>null</code>
+   * @return a MultiPoint object
+   */
+  public MultiPoint multiPoint(final Coordinates[] coordinates) {
+    return multiPoint(coordinates != null ? getCoordinateSequenceFactory().create(
+      coordinates)
+      : null);
+  }
+
+  /**
+   * Creates a {@link MultiPoint} using the 
+   * points in the given {@link CoordinatesList}.
+   * A <code>null</code> or empty CoordinatesList creates an empty MultiPoint.
+   *
+   * @param coordinates a CoordinatesList (possibly empty), or <code>null</code>
+   * @return a MultiPoint geometry
+   */
+  public MultiPoint multiPoint(final CoordinatesList coordinatesList) {
+    if (coordinatesList == null) {
+      return multiPoint();
+    } else {
+      final Point[] points = new Point[coordinatesList.size()];
+      for (int i = 0; i < points.length; i++) {
+        final Coordinates coordinates = coordinatesList.get(i);
+        final Point point = point(coordinates);
+        points[i] = point;
+      }
+      return multiPoint(points);
+    }
+  }
+
+  public MultiPoint multiPoint(final Object... points) {
+    return multiPoint(Arrays.asList(points));
+  }
+
+  /**
+   * Creates a {@link MultiPoint} using the given {@link Point}s.
+   * A null or empty array will create an empty MultiPoint.
+   *
+   * @param point an array of Points (without null elements), or an empty array, or <code>null</code>
+   * @return a MultiPoint object
+   */
+  public MultiPoint multiPoint(final Point[] point) {
+    return new MultiPointImpl(this, point);
+  }
+
+  public MultiPolygon multiPolygon(final Collection<?> polygons) {
+    final Polygon[] polygonArray = getPolygonArray(polygons);
+    return multiPolygon(polygonArray);
+  }
+
+  public MultiPolygon multiPolygon(final Object... polygons) {
+    return multiPolygon(Arrays.asList(polygons));
+  }
+
+  /**
+   * Creates a MultiPolygon using the given Polygons; a null or empty array
+   * will create an empty Polygon. The polygons must conform to the
+   * assertions specified in the <A
+   * HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
+   * Specification for SQL</A>.
+   *
+   * @param polygons
+   *            Polygons, each of which may be empty but not null
+   * @return the created MultiPolygon
+   */
+  public MultiPolygon multiPolygon(final Polygon[] polygons) {
+    return new MultiPolygonImpl(polygons, this);
+  }
+
   /**
    * <p>Create an empty {@link Point}.</p>
    *
@@ -1473,8 +1453,8 @@ public class GeometryFactory implements Serializable,
    */
   public Geometry toGeometry(final BoundingBox envelope) {
     // null envelope - return empty point geometry
-    if (envelope.isNull()) {
-      return point((CoordinatesList)null);
+    if (envelope.isEmpty()) {
+      return point();
     }
 
     // point?

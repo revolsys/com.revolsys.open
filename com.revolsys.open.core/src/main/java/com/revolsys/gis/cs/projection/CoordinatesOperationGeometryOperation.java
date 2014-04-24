@@ -114,7 +114,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
         addUserData(line, newLineString);
         newLineStrings[i] = newLineString;
       }
-      final MultiLineString newMultiLineString = geometryFactory.createMultiLineString(newLineStrings);
+      final MultiLineString newMultiLineString = geometryFactory.multiLineString(newLineStrings);
       addUserData(multiLineString, newMultiLineString);
       return newMultiLineString;
     } else {
@@ -131,7 +131,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
         addUserData(point, newPoint);
         newPoints[i] = newPoint;
       }
-      final MultiPoint newMultiPoint = geometryFactory.createMultiPoint(newPoints);
+      final MultiPoint newMultiPoint = geometryFactory.multiPoint(newPoints);
       addUserData(multiPoint, newMultiPoint);
       return newMultiPoint;
     } else {
@@ -148,7 +148,7 @@ public class CoordinatesOperationGeometryOperation implements GeometryOperation 
         addUserData(polygon, newPolygon);
         newPolygons[i] = newPolygon;
       }
-      final MultiPolygon newMultiPolygon = geometryFactory.createMultiPolygon(newPolygons);
+      final MultiPolygon newMultiPolygon = geometryFactory.multiPolygon(newPolygons);
       addUserData(multiPolygon, newMultiPolygon);
       return newMultiPolygon;
     } else {

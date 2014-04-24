@@ -28,12 +28,16 @@ public class CoordinatesListProjectionUtil {
   public static CoordinatesList perform(final CoordinatesList coordinates,
     final CoordinateSystem fromCoordinateSystem,
     final CoordinateSystem toCoordinateSystem) {
-    final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
-      fromCoordinateSystem, toCoordinateSystem);
-    if (operation == null) {
+    if (fromCoordinateSystem == null || toCoordinateSystem == null) {
       return coordinates;
     } else {
-      return perform(coordinates, operation);
+      final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
+        fromCoordinateSystem, toCoordinateSystem);
+      if (operation == null) {
+        return coordinates;
+      } else {
+        return perform(coordinates, operation);
+      }
     }
   }
 

@@ -32,8 +32,8 @@
  */
 package com.revolsys.jts.operation.buffer.validate;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
@@ -52,22 +52,23 @@ import com.revolsys.jts.geom.Polygon;
  *
  * @author Martin Davis
  */
-public class BufferResultValidator 
-{
+public class BufferResultValidator {
   private static boolean VERBOSE = false;
-  
-	/**
-	 * Maximum allowable fraction of buffer distance the 
-	 * actual distance can differ by.
-	 * 1% sometimes causes an error - 1.2% should be safe.
-	 */
-	private static final double MAX_ENV_DIFF_FRAC = .012;
 
-  public static boolean isValid(Geometry g, double distance, Geometry result)
-  {
-  	BufferResultValidator validator = new BufferResultValidator(g, distance, result);
-    if (validator.isValid())
-    	return true;
+  /**
+   * Maximum allowable fraction of buffer distance the 
+   * actual distance can differ by.
+   * 1% sometimes causes an error - 1.2% should be safe.
+   */
+  private static final double MAX_ENV_DIFF_FRAC = .012;
+
+  public static boolean isValid(final Geometry g, final double distance,
+    final Geometry result) {
+    final BufferResultValidator validator = new BufferResultValidator(g,
+      distance, result);
+    if (validator.isValid()) {
+      return true;
+    }
     return false;
   }
 
@@ -81,53 +82,116 @@ public class BufferResultValidator
    * @return an appropriate error message
    * or null if the buffer is valid
    */
-  public static String isValidMsg(Geometry g, double distance, Geometry result)
-  {
-  	BufferResultValidator validator = new BufferResultValidator(g, distance, result);
-    if (! validator.isValid())
-    	return validator.getErrorMessage();
+  public static String isValidMsg(final Geometry g, final double distance,
+    final Geometry result) {
+    final BufferResultValidator validator = new BufferResultValidator(g,
+      distance, result);
+    if (!validator.isValid()) {
+      return validator.getErrorMessage();
+    }
     return null;
   }
 
-  private Geometry input;
-  private double distance;
-  private Geometry result;
+  private final Geometry input;
+
+  private final double distance;
+
+  private final Geometry result;
+
   private boolean isValid = true;
+
   private String errorMsg = null;
+
   private Coordinates errorLocation = null;
+
   private Geometry errorIndicator = null;
-  
-  public BufferResultValidator(Geometry input, double distance, Geometry result)
-  {
-  	this.input = input;
-  	this.distance = distance;
-  	this.result = result;
+
+  public BufferResultValidator(final Geometry input, final double distance,
+    final Geometry result) {
+    this.input = input;
+    this.distance = distance;
+    this.result = result;
   }
-  
-  public boolean isValid()
-  {
-  	checkPolygonal();
-  	if (! isValid) return isValid;
-  	checkExpectedEmpty();
-  	if (! isValid) return isValid;
-  	checkEnvelope();
-  	if (! isValid) return isValid;
-  	checkArea();
-  	if (! isValid) return isValid;
-  	checkDistance();
-  	return isValid;
+
+  private void checkArea() {
+    final double inputArea = input.getArea();
+    final double resultArea = result.getArea();
+
+    if (distance > 0.0 && inputArea > resultArea) {
+      isValid = false;
+      errorMsg = "Area of positive buffer is smaller than input";
+      errorIndicator = result;
+    }
+    if (distance < 0.0 && inputArea < resultArea) {
+      isValid = false;
+      errorMsg = "Area of negative buffer is larger than input";
+      errorIndicator = result;
+    }
+    report("Area");
   }
-  
-  public String getErrorMessage()
-  {
-  	return errorMsg;
+
+  private void checkDistance() {
+    final BufferDistanceValidator distValid = new BufferDistanceValidator(
+      input, distance, result);
+    if (!distValid.isValid()) {
+      isValid = false;
+      errorMsg = distValid.getErrorMessage();
+      errorLocation = distValid.getErrorLocation();
+      errorIndicator = distValid.getErrorIndicator();
+    }
+    report("Distance");
   }
-  
-  public Coordinates getErrorLocation()
-  {
-  	return errorLocation;
+
+  private void checkEnvelope() {
+    if (distance < 0.0) {
+      return;
+    }
+
+    double padding = distance * MAX_ENV_DIFF_FRAC;
+    if (padding == 0.0) {
+      padding = 0.001;
+    }
+
+    final BoundingBox expectedEnv = input.getBoundingBox().expand(distance);
+
+    final BoundingBox bufEnv = result.getBoundingBox().expand(padding);
+
+    if (!bufEnv.contains(expectedEnv)) {
+      isValid = false;
+      errorMsg = "Buffer envelope is incorrect";
+      errorIndicator = input.getGeometryFactory().toGeometry(bufEnv);
+    }
+    report("Envelope");
   }
-  
+
+  private void checkExpectedEmpty() {
+    // can't check areal features
+    if (input.getDimension() >= 2) {
+      return;
+    }
+    // can't check positive distances
+    if (distance > 0.0) {
+      return;
+    }
+
+    // at this point can expect an empty result
+    if (!result.isEmpty()) {
+      isValid = false;
+      errorMsg = "Result is non-empty";
+      errorIndicator = result;
+    }
+    report("ExpectedEmpty");
+  }
+
+  private void checkPolygonal() {
+    if (!(result instanceof Polygon || result instanceof MultiPolygon)) {
+      isValid = false;
+    }
+    errorMsg = "Result is not polygonal";
+    errorIndicator = result;
+    report("Polygonal");
+  }
+
   /**
    * Gets a geometry which indicates the location and nature of a validation failure.
    * <p>
@@ -138,94 +202,44 @@ public class BufferResultValidator
    * @return a geometric error indicator
    * or null if no error was found
    */
-  public Geometry getErrorIndicator()
-  {
+  public Geometry getErrorIndicator() {
     return errorIndicator;
   }
-  
-  private void report(String checkName)
-  {
-    if (! VERBOSE) return;
-    System.out.println("Check " + checkName + ": " 
-        + (isValid ? "passed" : "FAILED"));
-  }
-  
-  private void checkPolygonal()
-  {
-  	if (! (result instanceof Polygon 
-  			|| result instanceof MultiPolygon))
-  	isValid = false;
-  	errorMsg = "Result is not polygonal";
-    errorIndicator = result;
-    report("Polygonal");
-  }
-  
-  private void checkExpectedEmpty()
-  {
-  	// can't check areal features
-  	if (input.getDimension() >= 2) return;
-  	// can't check positive distances
-  	if (distance > 0.0) return;
-  		
-  	// at this point can expect an empty result
-  	if (! result.isEmpty()) {
-  		isValid = false;
-  		errorMsg = "Result is non-empty";
-      errorIndicator = result;
-  	}
-    report("ExpectedEmpty");
-  }
-  
-  private void checkEnvelope()
-  {
-  	if (distance < 0.0) return;
-  	
-  	double padding = distance * MAX_ENV_DIFF_FRAC;
-  	if (padding == 0.0) padding = 0.001;
 
-  	Envelope expectedEnv = new Envelope(input.getBoundingBox());
-  	expectedEnv.expandBy(distance);
-  	
-  	Envelope bufEnv = new Envelope(result.getBoundingBox());
-  	bufEnv.expandBy(padding);
+  public Coordinates getErrorLocation() {
+    return errorLocation;
+  }
 
-  	if (! bufEnv.contains(expectedEnv)) {
-  		isValid = false;
-  		errorMsg = "Buffer envelope is incorrect";
-  		errorIndicator = input.getGeometryFactory().toGeometry(bufEnv);
-  	}
-    report("Envelope");
+  public String getErrorMessage() {
+    return errorMsg;
   }
-  
-  private void checkArea()
-  {
-  	double inputArea = input.getArea();
-  	double resultArea = result.getArea();
-  	
-  	if (distance > 0.0
-  			&& inputArea > resultArea) {
-  		isValid = false;
-  		errorMsg = "Area of positive buffer is smaller than input";
-      errorIndicator = result;
-  	}
-  	if (distance < 0.0
-  			&& inputArea < resultArea) {
-  		isValid = false;
-  		errorMsg = "Area of negative buffer is larger than input";
-  		errorIndicator = result;
-  	}
-    report("Area");
+
+  public boolean isValid() {
+    checkPolygonal();
+    if (!isValid) {
+      return isValid;
+    }
+    checkExpectedEmpty();
+    if (!isValid) {
+      return isValid;
+    }
+    checkEnvelope();
+    if (!isValid) {
+      return isValid;
+    }
+    checkArea();
+    if (!isValid) {
+      return isValid;
+    }
+    checkDistance();
+    return isValid;
   }
-  
-  private void checkDistance()
-  {
-  	BufferDistanceValidator distValid = new BufferDistanceValidator(input, distance, result);
-  	if (! distValid.isValid()) {
-  		isValid = false;
-  		errorMsg = distValid.getErrorMessage();
-  		errorLocation = distValid.getErrorLocation();
-  		errorIndicator = distValid.getErrorIndicator();
-  	}
-    report("Distance");
+
+  private void report(final String checkName) {
+    if (!VERBOSE) {
+      return;
+    }
+    System.out.println("Check " + checkName + ": "
+      + (isValid ? "passed" : "FAILED"));
   }
 }

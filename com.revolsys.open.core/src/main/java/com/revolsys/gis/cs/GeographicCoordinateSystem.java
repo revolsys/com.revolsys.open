@@ -184,7 +184,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     if (area != null) {
       return area.getLatLonBounds().convert(geometryFactory);
     } else {
-      return new Envelope(geometryFactory, -180, -90, 180, 90);
+      return new Envelope(geometryFactory, 2, -180, -90, 180, 90);
     }
   }
 

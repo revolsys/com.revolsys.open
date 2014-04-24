@@ -74,7 +74,7 @@ public class MinimumBoundingCircleTest extends TestCase {
     final MinimumBoundingCircle mbc = new MinimumBoundingCircle(
       this.reader.read(wkt));
     final Coordinates[] exPts = mbc.getExtremalPoints();
-    final Geometry actual = this.geometryFactory.createMultiPoint(exPts);
+    final Geometry actual = this.geometryFactory.multiPoint(exPts);
     final double actualRadius = mbc.getRadius();
     final Coordinates actualCentre = mbc.getCentre();
     System.out.println("   Centre = " + actualCentre + "   Radius = "

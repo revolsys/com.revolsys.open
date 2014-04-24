@@ -269,14 +269,12 @@ public class Shapefile {
         // System.out.println("Done record: " + recordNumber);
       } catch (final IllegalArgumentException r2d2) {
         // System.out.println("Record " +recordNumber+ " has is NULL Shape");
-        geom = GeometryFactory.getFactory().geometryCollection(
-          (Geometry[])null);
+        geom = GeometryFactory.getFactory().geometryCollection();
       } catch (final Exception c3p0) {
         System.out.println("Error processing record (a):" + recordNumber);
         System.out.println(c3p0.getMessage());
         c3p0.printStackTrace();
-        geom = GeometryFactory.getFactory().geometryCollection(
-          (Geometry[])null);
+        geom = GeometryFactory.getFactory().geometryCollection();
       }
       // System.out.println("processing:" +recordNumber);
     } catch (final EOFException e) {
@@ -328,21 +326,19 @@ public class Shapefile {
           // System.out.println("Done record: " + recordNumber);
         } catch (final IllegalArgumentException r2d2) {
           // System.out.println("Record " +recordNumber+ " has is NULL Shape");
-          list.add(GeometryFactory.getFactory().geometryCollection(
-            (Geometry[])null));
+          list.add(GeometryFactory.getFactory().geometryCollection());
         } catch (final Exception c3p0) {
           System.out.println("Error processing record (a):" + recordNumber);
           System.out.println(c3p0.getMessage());
           c3p0.printStackTrace();
-          list.add(GeometryFactory.getFactory().geometryCollection(
-            (Geometry[])null));
+          list.add(GeometryFactory.getFactory().geometryCollection());
         }
         // System.out.println("processing:" +recordNumber);
       }
     } catch (final EOFException e) {
 
     }
-    return geometryFactory.geometryCollection((Geometry[])list.toArray(new Geometry[] {}));
+    return geometryFactory.geometryCollection(list);
   }
 
   public synchronized void readIndex(final InputStream is) throws IOException {

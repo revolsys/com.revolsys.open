@@ -87,14 +87,14 @@ public class GeometricShapeFactory {
 
     public BoundingBox getEnvelope() {
       if (base != null) {
-        return new Envelope(base.getX(), base.getY(), base.getX() + width,
-          base.getY() + height);
+        return new Envelope(2, base.getX(), base.getY(),
+          base.getX() + width, base.getY() + height);
       }
       if (centre != null) {
-        return new Envelope(centre.getX() - width / 2, centre.getY() - height
-          / 2, centre.getX() + width / 2, centre.getY() + height / 2);
+        return new Envelope(2, centre.getX() - width / 2, centre.getY() - height
+            / 2, centre.getX() + width / 2, centre.getY() + height / 2);
       }
-      return new Envelope(0, 0, width, height);
+      return new Envelope(2, 0, 0, width, height);
     }
 
     public double getHeight() {

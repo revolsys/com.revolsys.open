@@ -159,7 +159,7 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
       }
       Collections.sort(geometries);
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiPoint normalizedGeometry = geometryFactory.createMultiPoint(geometries);
+      final MultiPoint normalizedGeometry = geometryFactory.multiPoint(geometries);
       return normalizedGeometry;
     }
   }

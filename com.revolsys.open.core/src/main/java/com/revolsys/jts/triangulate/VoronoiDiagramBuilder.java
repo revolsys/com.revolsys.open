@@ -60,7 +60,7 @@ public class VoronoiDiagramBuilder {
   private static Geometry clipGeometryCollection(final Geometry geom,
     final BoundingBox clipEnv) {
     final Geometry clipPoly = geom.getGeometryFactory().toGeometry(clipEnv);
-    final List clipped = new ArrayList();
+    final List<Geometry> clipped = new ArrayList<Geometry>();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry g = geom.getGeometry(i);
       Geometry result = null;
@@ -77,8 +77,7 @@ public class VoronoiDiagramBuilder {
         clipped.add(result);
       }
     }
-    return geom.getGeometryFactory().geometryCollection(
-      GeometryFactory.toGeometryArray(clipped));
+    return geom.getGeometryFactory().geometryCollection(clipped);
   }
 
   private Collection siteCoords;

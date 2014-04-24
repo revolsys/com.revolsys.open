@@ -40,7 +40,7 @@ public class MapServer extends Service {
     final double y1 = originY - tileHeight * tileY;
     final double y2 = y1 - tileHeight;
 
-    return new Envelope(tileInfo.getSpatialReference(), x1, y1, x2, y2);
+    return new Envelope(tileInfo.getSpatialReference(), 2, x1, y1, x2, y2);
   }
 
   public String getCapabilities() {

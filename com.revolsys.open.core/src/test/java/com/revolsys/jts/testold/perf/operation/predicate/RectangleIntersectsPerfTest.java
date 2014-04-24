@@ -33,6 +33,7 @@
 package com.revolsys.jts.testold.perf.operation.predicate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
@@ -96,24 +97,24 @@ public class RectangleIntersectsPerfTest {
    * @param rectSize
    * @return
    */
-  Geometry[] createRectangles(final BoundingBox env, final int nRect,
+  List<Geometry> createRectangles(final BoundingBox env, final int nRect,
     final double rectSize) {
     final int nSide = 1 + (int)Math.sqrt(nRect);
     final double dx = env.getWidth() / nSide;
     final double dy = env.getHeight() / nSide;
 
-    final List rectList = new ArrayList();
+    final List<Geometry> rectList = new ArrayList<>();
     for (int i = 0; i < nSide; i++) {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final BoundingBox envRect = new Envelope(baseX, baseY, baseX + dx,
-          baseY + dy);
+        final BoundingBox envRect = new Envelope(2, baseX, baseY,
+          baseX + dx, baseY + dy);
         final Geometry rect = geometryFactory.toGeometry(envRect);
         rectList.add(rect);
       }
     }
-    return GeometryFactory.toGeometryArray(rectList);
+    return rectList;
   }
 
   Geometry createSineStar(final Coordinates origin, final double size,
@@ -140,9 +141,9 @@ public class RectangleIntersectsPerfTest {
      */
   }
 
-  void test(final Geometry[] rect, final Geometry g) {
+  void test(final Collection<Geometry> rect, final Geometry g) {
     System.out.println("Target # pts: " + g.getVertexCount()
-      + "  -- # Rectangles: " + rect.length);
+      + "  -- # Rectangles: " + rect.size());
 
     final int maxCount = MAX_ITER;
     final Stopwatch sw = new Stopwatch();
@@ -179,8 +180,8 @@ public class RectangleIntersectsPerfTest {
 
   void testRectangles(final Geometry target, final int nRect,
     final double rectSize) {
-    final Geometry[] rects = createRectangles(target.getBoundingBox(), nRect,
-      rectSize);
+    final Collection<Geometry> rects = createRectangles(
+      target.getBoundingBox(), nRect, rectSize);
     test(rects, target);
   }
 

@@ -40,16 +40,16 @@ public class LineStringRelateTest {
     return GEOMETRY_FACTORY.createLineString(points);
   }
 
-  public static MultiLineString createMultiLineString(double... coordinates) {
+  public static MultiLineString multiLineString(double... coordinates) {
     LineString line = createLineString(coordinates);
-    return GEOMETRY_FACTORY.createMultiLineString(line);
+    return GEOMETRY_FACTORY.multiLineString(line);
   }
 
   @Test
   public void testIntersects() {
     LineString line1 = createLineString(20, 20, 40, 20, 60, 20);
     LineString line2 = createLineString(40, 20, 60, 20, 80, 20);
-    MultiLineString expectedIntersection = createMultiLineString(40, 20, 60, 20);
+    MultiLineString expectedIntersection = multiLineString(40, 20, 60, 20);
     testIntersection(line1, line2, expectedIntersection);
 
   }
@@ -58,7 +58,7 @@ public class LineStringRelateTest {
   public void testEndOverlaps() {
     final LineString line1 = createLineString(20, 20, 40, 20, 60, 20);
     final LineString line2 = createLineString(40, 20, 60, 20, 80, 20);
-    final MultiLineString line1OverlapLine2 = createMultiLineString(40, 20, 60,
+    final MultiLineString line1OverlapLine2 = multiLineString(40, 20, 60,
       20);
 
     // ---

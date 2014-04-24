@@ -98,7 +98,7 @@ public class STRtreeTest extends TestCase {
   private List itemWrappers(final int size) {
     final ArrayList itemWrappers = new ArrayList();
     for (int i = 0; i < size; i++) {
-      itemWrappers.add(new ItemBoundable(new Envelope(0, 0, 0, 0), new Object()));
+      itemWrappers.add(new ItemBoundable(new Envelope(2, 0, 0, 0, 0), new Object()));
     }
     return itemWrappers;
   }
@@ -111,11 +111,11 @@ public class STRtreeTest extends TestCase {
 
   public void testDisallowedInserts() {
     final STRtree t = new STRtree(5);
-    t.insert(new Envelope(0, 0, 0, 0), new Object());
-    t.insert(new Envelope(0, 0, 0, 0), new Object());
+    t.insert(new Envelope(2, 0, 0, 0, 0), new Object());
+    t.insert(new Envelope(2, 0, 0, 0, 0), new Object());
     t.query(new Envelope());
     try {
-      t.insert(new Envelope(0, 0, 0, 0), new Object());
+      t.insert(new Envelope(2, 0, 0, 0, 0), new Object());
       assertTrue(false);
     } catch (final AssertionFailedException e) {
       assertTrue(true);
@@ -124,7 +124,7 @@ public class STRtreeTest extends TestCase {
 
   public void testEmptyTreeUsingItemVisitorQuery() {
     final STRtree tree = new STRtree();
-    tree.query(new Envelope(0, 1, 0, 1), new ItemVisitor() {
+    tree.query(new Envelope(2, 0, 1, 0, 1), new ItemVisitor() {
       @Override
       public void visitItem(final Object item) {
         assertTrue("Should never reach here", true);
@@ -134,7 +134,7 @@ public class STRtreeTest extends TestCase {
 
   public void testEmptyTreeUsingListQuery() {
     final STRtree tree = new STRtree();
-    final List list = tree.query(new Envelope(0, 1, 0, 1));
+    final List list = tree.query(new Envelope(2, 0, 1, 0, 1));
     assertTrue(list.isEmpty());
   }
 
@@ -156,10 +156,10 @@ public class STRtreeTest extends TestCase {
     }
     t.build();
     try {
-      assertEquals(1, t.query(new Envelope(5, 5, 6, 6)).size());
-      assertEquals(0, t.query(new Envelope(20, 0, 30, 10)).size());
-      assertEquals(2, t.query(new Envelope(25, 25, 26, 26)).size());
-      assertEquals(3, t.query(new Envelope(0, 0, 100, 100)).size());
+      assertEquals(1, t.query(new Envelope(2, 5, 5, 6, 6)).size());
+      assertEquals(0, t.query(new Envelope(2, 20, 0, 30, 10)).size());
+      assertEquals(2, t.query(new Envelope(2, 25, 25, 26, 26)).size());
+      assertEquals(3, t.query(new Envelope(2, 0, 0, 100, 100)).size());
     } catch (final Throwable x) {
       STRtreeDemo.printSourceData(geometries, System.out);
       STRtreeDemo.printLevels(t, System.out);

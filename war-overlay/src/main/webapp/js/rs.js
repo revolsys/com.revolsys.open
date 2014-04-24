@@ -164,10 +164,11 @@ function tableShowEvents(table, heightPercent) {
   }
 }
 
-function validateIntegerNumber(element, value, min, max) {
+function validateIntegerNumber(element, value, optional, min, max) {
+  return new function(value, element) {
   var text = $.trim(value);
   if (!text) {
-    if (this.optional(element)) {
+    if (optional) {
       return true;
     } else {
       return false;
@@ -183,12 +184,13 @@ function validateIntegerNumber(element, value, min, max) {
     }
   }
   return false;
+  }
 }
 
-function validateDecimalNumber(element, value, min, max) {
+function validateDecimalNumber(element, value, optional, min, max) {
   var text = $.trim(value);
   if (!text) {
-    if (this.optional(element)) {
+    if (optional) {
       return true;
     } else {
       return false;
@@ -295,67 +297,86 @@ $(document).ready(
         function() {
           var formWrapper = this;
           var form = $('form', this);
-          var validate = form.validate({
+          var validator = form.bind("invalid-form.validate", function() {
+            $('div.errorContainer div.title ', formWrapper).html("The form contains errors. Update the highlighted fields to fix the errors.");
+          }).validate({
+            errorElement: "div",
             errorContainer : $('div.errorContainer', formWrapper),
-            errorLabelContainer: 'div.errorContainer ul',
-            wrapper : 'li',
-            errorPlacement: function(label, element) {
-              label.addClass('errorMessage');
-              label.insertAfter(element);
+            errorPlacement: function(error, element) {
+              error.insertBefore(element);
+              error.addClass('errorMessage');
             },
             highlight : function(element, errorClass, validClass) {
               $(element).closest('div.fieldComponent').addClass('invalid');
               $(element).addClass(errorClass).removeClass(validClass);
               $(element.form).find("label[for=" + element.id + "]").addClass(
                 errorClass);
+              $('.tempError').hide();
             },
             unhighlight : function(element, errorClass, validClass) {
               $(element).closest('div.fieldComponent').removeClass('invalid');
               $(element).removeClass(errorClass).addClass(validClass);
               $(element.form).find("label[for=" + element.id + "]").removeClass(
                 errorClass);
+              $('.tempError').hide();
             }
           });
           if ($(formWrapper).hasClass('formInvalid')) {
-            validate.form();
+            validator.form();
           }
         }
       );
 
       jQuery.validator.addMethod("integer", function(value, element) {
-        return validateIntegerNumber(element, value);
+        return validateIntegerNumber(element, value, this.optional(element));
       }, "Please enter a valid integer number.");
   
       jQuery.validator.addMethod("byte", function(value, element) {
-        return validateIntegerNumber(element, value, -128, 127);
+        return validateIntegerNumber(element, value, this.optional(element), -128, 127);
       }, "Please enter a valid integer number -128 >=< 127.");
   
       jQuery.validator.addMethod("short", function(value, element) {
-        return validateIntegerNumber(element, value, -32768, 32767);
+        return validateIntegerNumber(element, value, this.optional(element), -32768, 32767);
       }, "Please enter a valid integer number -32768 >=< 32767.");
   
       jQuery.validator.addMethod("int", function(value, element) {
-        return validateIntegerNumber(element, value, -2147483648, 2147483647);
+        return validateIntegerNumber(element, value, this.optional(element), -2147483648, 2147483647);
       }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
   
       jQuery.validator.addMethod("long", function(value, element) {
-        return validateIntegerNumber(element, value, -9223372036854775808, 9223372036854775807);
+        return validateIntegerNumber(element, value, this.optional(element), -9223372036854775808, 9223372036854775807);
       }, "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
   
       jQuery.validator.addMethod("number", function(value, element) {
-        return validateDecimalNumber(element, value);
+        return validateDecimalNumber(element, value, this.optional(element));
       }, "Please enter a valid number.");
   
       jQuery.validator.addMethod("float", function(value, element) {
-        return validateDecimalNumber(element, value);
+        return validateDecimalNumber(element, value, this.optional(element));
       }, "Please enter a valid float number.");
   
       jQuery.validator.addMethod("double", function(value, element) {
-        return validateDecimalNumber(element, value);
+        return validateDecimalNumber(element, value, this.optional(element));
       }, "Please enter a valid double number.");
     }
     showParentsHash(window.location.hash);
   });
+
+function clearTempErrorsOnChange() {
+  $(':input').change(function() {
+    console.log($(this).attr('name'));
+    var errors = $('.tempError', $(this).closest('form'));
+    if (errors) {
+      errors.next(':input').each(function() {
+        if ($(this).val()) {
+          $(this).valid();
+        }
+        $(this).parent('div.fieldComponent').removeClass('invalid');
+      });
+      errors.remove();
+    }
+  });
+}
 
 function showParentsAClick(element) {
   var href = $(element).attr('href');

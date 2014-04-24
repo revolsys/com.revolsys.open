@@ -101,7 +101,7 @@ public class GridGenerator extends GeometryGenerator {
     if (this.geometryFactory == null) {
       throw new NullPointerException("GeometryFactoryI is not declared");
     }
-    if (this.boundingBox == null || this.boundingBox.isNull()) {
+    if (this.boundingBox == null || this.boundingBox.isEmpty()) {
       throw new NullPointerException("Bounding Box is not declared");
     }
 
@@ -123,10 +123,11 @@ public class GridGenerator extends GeometryGenerator {
     minx = x + col * sx;
     miny = y + row * sy;
 
-    final BoundingBox box = new Envelope(this.geometryFactory.getPrecisionModel()
-      .makePrecise(minx), this.geometryFactory.getPrecisionModel().makePrecise(miny), this.geometryFactory.getPrecisionModel().makePrecise(
-      minx + sx),
-      this.geometryFactory.getPrecisionModel().makePrecise(miny + sy));
+    final BoundingBox box = new Envelope(
+      2,
+      this.geometryFactory.getPrecisionModel().makePrecise(minx),
+      this.geometryFactory.getPrecisionModel().makePrecise(miny),
+      this.geometryFactory.getPrecisionModel().makePrecise(minx + sx), this.geometryFactory.getPrecisionModel().makePrecise(miny + sy));
 
     this.index++;
     return box;

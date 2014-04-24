@@ -120,7 +120,7 @@ public class GeometryEditUtil {
     final CoordinatesList points = CoordinatesListUtil.get(multiPoint);
     final CoordinatesList newPoints = appendVertex(points, newPoint);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
-    return geometryFactory.createMultiPoint(newPoints);
+    return geometryFactory.multiPoint(newPoints);
   }
 
   public static Polygon appendVertex(final Polygon polygon,
@@ -696,7 +696,7 @@ public class GeometryEditUtil {
     final ListCoordinatesList points = insertVertex(coordinatesList,
       pointIndex, newPoint);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
-    return geometryFactory.createMultiPoint(points);
+    return geometryFactory.multiPoint(points);
   }
 
   public static Polygon insertVertex(final Polygon polygon,
@@ -800,7 +800,7 @@ public class GeometryEditUtil {
     final CoordinatesList points = moveVertex(coordinatesList, pointIndex,
       newPoint);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(multiPoint);
-    return geometryFactory.createMultiPoint(points);
+    return geometryFactory.multiPoint(points);
   }
 
   public static Polygon moveVertex(final Polygon polygon, final int ringIndex,

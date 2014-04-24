@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
@@ -25,6 +24,7 @@ import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlConstants;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -228,7 +228,8 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(DATA_ELEMENT);
   }
 
-  public void writeExtent(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public void writeExtent(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
@@ -239,8 +240,8 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
         out.element(Y_MIN, boundingBox.getMinY());
         out.element(X_MAX, boundingBox.getMaxX());
         out.element(Y_MAX, boundingBox.getMaxY());
-        out.element(Z_MIN, boundingBox.getMinZ());
-        out.element(Z_MAX, boundingBox.getMaxZ());
+        out.element(Z_MIN, boundingBox.getMin(2));
+        out.element(Z_MAX, boundingBox.getMax(2));
         writeSpatialReference(geometryFactory);
         out.endTag(EXTENT);
       }
@@ -359,7 +360,8 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(FIELD);
   }
 
-  public void writeSpatialReference(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public void writeSpatialReference(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {

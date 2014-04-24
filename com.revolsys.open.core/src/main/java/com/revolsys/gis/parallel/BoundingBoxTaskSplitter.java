@@ -72,7 +72,7 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
           double x = boundingBox.getMinX();
           for (int i = 0; i < numX; i++) {
             final BoundingBox cellBoundingBox = new Envelope(geometryFactory,
-              x, y, x + xInc, y + yInc);
+              2, x, y, x + xInc, y + yInc);
             if (preparedBoundary == null
               || preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
               if (logScriptInfo) {

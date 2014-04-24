@@ -58,7 +58,7 @@ public class Key {
     final double y1 = pt.getY();
     final double x2 = x1 + quadSize;
     final double y2 = y1 + quadSize;
-    env = new Envelope(x1, y1, x2, y2);
+    env = new Envelope(2, x1, y1, x2, y2);
   }
 
   public Coordinates getCentre() {

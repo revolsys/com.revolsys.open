@@ -143,7 +143,7 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
       }
       Collections.sort(geometries);
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiLineString normalizedGeometry = geometryFactory.createMultiLineString(geometries);
+      final MultiLineString normalizedGeometry = geometryFactory.multiLineString(geometries);
       return normalizedGeometry;
     }
   }
@@ -166,7 +166,7 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
       revLines.addFirst(reverse);
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.createMultiLineString(revLines);
+    return geometryFactory.multiLineString(revLines);
   }
 
   /**

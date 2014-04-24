@@ -304,7 +304,7 @@ class BufferSubgraph implements Comparable {
           }
         }
       }
-      env = new Envelope(bounds);
+      env = new Envelope(2, bounds);
     }
     return env;
   }

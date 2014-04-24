@@ -72,13 +72,13 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
 
     @Override
     protected Object computeBounds() {
-      Envelope bounds = null;
+      BoundingBox bounds = null;
       for (final Iterator i = getChildBoundables().iterator(); i.hasNext();) {
         final Boundable childBoundable = (Boundable)i.next();
         if (bounds == null) {
-          bounds = new Envelope((Envelope)childBoundable.getBounds());
+          bounds = (BoundingBox)childBoundable.getBounds();
         } else {
-          bounds.expandToInclude((Envelope)childBoundable.getBounds());
+          bounds = bounds.expandToInclude((BoundingBox)childBoundable.getBounds());
         }
       }
       return bounds;
@@ -210,7 +210,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
    */
   @Override
   public void insert(final BoundingBox itemEnv, final Object item) {
-    if (itemEnv.isNull()) {
+    if (itemEnv.isEmpty()) {
       return;
     }
     super.insert(itemEnv, item);

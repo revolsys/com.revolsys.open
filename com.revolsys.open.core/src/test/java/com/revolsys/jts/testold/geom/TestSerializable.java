@@ -89,7 +89,7 @@ public class TestSerializable {
   List createData() {
     final List objList = new ArrayList();
 
-    final Envelope env = new Envelope(123, 123, 456, 456);
+    final Envelope env = new Envelope(2, 123, 123, 456, 456);
     objList.add(env);
 
     objList.add(GeometryTestFactory.createBox(fact, 0.0, 100.0, 10, 10.0));

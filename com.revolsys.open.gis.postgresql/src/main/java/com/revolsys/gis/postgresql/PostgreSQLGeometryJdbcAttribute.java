@@ -219,7 +219,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
         final LineString line = lines[i];
         lineStrings[i] = toJtsLineString(factory, line);
       }
-      return factory.createMultiLineString(lineStrings);
+      return factory.multiLineString(lineStrings);
     }
   }
 
@@ -234,7 +234,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     if (points.size() == 1) {
       return points.get(0);
     } else {
-      return factory.createMultiPoint(points);
+      return factory.multiPoint(points);
     }
   }
 
@@ -250,7 +250,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     if (polygons.size() == 1) {
       return polygons.get(0);
     } else {
-      return factory.createMultiPolygon(polygons);
+      return factory.multiPolygon(polygons);
     }
   }
 

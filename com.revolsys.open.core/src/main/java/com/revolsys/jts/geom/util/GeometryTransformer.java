@@ -205,7 +205,7 @@ public class GeometryTransformer {
 
   protected Geometry transformGeometryCollection(final GeometryCollection geom,
     final Geometry parent) {
-    final List transGeomList = new ArrayList();
+    final List<Geometry> transGeomList = new ArrayList<>();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry transformGeom = transform(geom.getGeometry(i));
       if (transformGeom == null) {
@@ -217,7 +217,7 @@ public class GeometryTransformer {
       transGeomList.add(transformGeom);
     }
     if (preserveGeometryCollectionType) {
-      return factory.geometryCollection(GeometryFactory.toGeometryArray(transGeomList));
+      return factory.geometryCollection(transGeomList);
     }
     return factory.buildGeometry(transGeomList);
   }

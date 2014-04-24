@@ -177,8 +177,7 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
      * This allows the test case to avoid specifying an exact result
      */
     if (returnEmptyGC) {
-      result = result.getGeometryFactory().geometryCollection(
-        (Geometry)null);
+      result = result.getGeometryFactory().geometryCollection();
     }
 
     return new GeometryResult(result);

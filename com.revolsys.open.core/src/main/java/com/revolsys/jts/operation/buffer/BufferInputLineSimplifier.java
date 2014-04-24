@@ -32,9 +32,7 @@
  */
 package com.revolsys.jts.operation.buffer;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
 
@@ -70,8 +68,15 @@ import com.revolsys.jts.geom.Coordinates;
  * @author Martin Davis
  *
  */
-public class BufferInputLineSimplifier 
-{
+public class BufferInputLineSimplifier {
+  private static final int INIT = 0;
+
+  private static final int DELETE = 1;
+
+  private static final int KEEP = 1;
+
+  private static final int NUM_PTS_TO_CHECK = 10;
+
   /**
    * Simplify the input coordinate list.
    * If the distance tolerance is positive, 
@@ -83,146 +88,134 @@ public class BufferInputLineSimplifier
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public static Coordinates[] simplify(Coordinates[] inputLine, double distanceTol)
-  {
-    BufferInputLineSimplifier simp = new BufferInputLineSimplifier(inputLine);
+  public static Coordinates[] simplify(final Coordinates[] inputLine,
+    final double distanceTol) {
+    final BufferInputLineSimplifier simp = new BufferInputLineSimplifier(
+      inputLine);
     return simp.simplify(distanceTol);
   }
-  
-  private static final int INIT = 0;
-  private static final int DELETE = 1;
-  private static final int KEEP = 1;
-  
-  
-  private Coordinates[] inputLine;
+
+  private final Coordinates[] inputLine;
+
   private double distanceTol;
+
   private byte[] isDeleted;
+
   private int angleOrientation = CGAlgorithms.COUNTERCLOCKWISE;
-  
-  public BufferInputLineSimplifier(Coordinates[] inputLine) {
+
+  public BufferInputLineSimplifier(final Coordinates[] inputLine) {
     this.inputLine = inputLine;
   }
 
-  /**
-   * Simplify the input coordinate list.
-   * If the distance tolerance is positive, 
-   * concavities on the LEFT side of the line are simplified.
-   * If the supplied distance tolerance is negative,
-   * concavities on the RIGHT side of the line are simplified.
-   * 
-   * @param distanceTol simplification distance tolerance to use
-   * @return the simplified coordinate list
-   */
-  public Coordinates[] simplify(double distanceTol)
-  {
-    this.distanceTol = Math.abs(distanceTol);
-    if (distanceTol < 0)
-      angleOrientation = CGAlgorithms.CLOCKWISE;
-    
-    // rely on fact that boolean array is filled with false value
-    isDeleted = new byte[inputLine.length];
-    
-    boolean isChanged = false;
-    do {
-      isChanged = deleteShallowConcavities();
-    } while (isChanged);
-    
-    return collapseLine();
+  private Coordinates[] collapseLine() {
+    final CoordinateList coordList = new CoordinateList();
+    for (int i = 0; i < inputLine.length; i++) {
+      if (isDeleted[i] != DELETE) {
+        coordList.add(inputLine[i]);
+      }
+    }
+    // if (coordList.size() < inputLine.length) System.out.println("Simplified "
+    // + (inputLine.length - coordList.size()) + " pts");
+    return coordList.toCoordinateArray();
   }
-  
+
   /**
    * Uses a sliding window containing 3 vertices to detect shallow angles
    * in which the middle vertex can be deleted, since it does not
    * affect the shape of the resulting buffer in a significant way.
    * @return
    */
-  private boolean deleteShallowConcavities()
-  {
+  private boolean deleteShallowConcavities() {
     /**
      * Do not simplify end line segments of the line string.
      * This ensures that end caps are generated consistently.
      */
     int index = 1;
-    int maxIndex = inputLine.length - 1;
-    
+    final int maxIndex = inputLine.length - 1;
+
     int midIndex = findNextNonDeletedIndex(index);
     int lastIndex = findNextNonDeletedIndex(midIndex);
-    
+
     boolean isChanged = false;
     while (lastIndex < inputLine.length) {
       // test triple for shallow concavity
-    	boolean isMiddleVertexDeleted = false;
-      if (isDeletable(index, midIndex, lastIndex, 
-          distanceTol)) {
+      boolean isMiddleVertexDeleted = false;
+      if (isDeletable(index, midIndex, lastIndex, distanceTol)) {
         isDeleted[midIndex] = DELETE;
         isMiddleVertexDeleted = true;
         isChanged = true;
       }
       // move simplification window forward
-      if (isMiddleVertexDeleted)
-      	index = lastIndex;
-      else 
-      	index = midIndex;
-      
+      if (isMiddleVertexDeleted) {
+        index = lastIndex;
+      } else {
+        index = midIndex;
+      }
+
       midIndex = findNextNonDeletedIndex(index);
       lastIndex = findNextNonDeletedIndex(midIndex);
     }
     return isChanged;
   }
-  
+
   /**
    * Finds the next non-deleted index, or the end of the point array if none
    * @param index
    * @return the next non-deleted index, if any
    * or inputLine.length if there are no more non-deleted indices
    */
-  private int findNextNonDeletedIndex(int index)
-  {
+  private int findNextNonDeletedIndex(final int index) {
     int next = index + 1;
-    while (next < inputLine.length && isDeleted[next] == DELETE)
+    while (next < inputLine.length && isDeleted[next] == DELETE) {
       next++;
-    return next;  
-  }
-  
-  private Coordinates[] collapseLine()
-  {
-    CoordinateList coordList = new CoordinateList();
-    for (int i = 0; i < inputLine.length; i++) {
-      if (isDeleted[i] != DELETE)
-        coordList.add(inputLine[i]);
     }
-//    if (coordList.size() < inputLine.length)      System.out.println("Simplified " + (inputLine.length - coordList.size()) + " pts");
-    return coordList.toCoordinateArray();
-  }
-  
-  private boolean isDeletable(int i0, int i1, int i2, double distanceTol)
-  {
-  	Coordinates p0 = inputLine[i0];
-  	Coordinates p1 = inputLine[i1];
-  	Coordinates p2 = inputLine[i2];
-  	
-  	if (! isConcave(p0, p1, p2)) return false;
-  	if (! isShallow(p0, p1, p2, distanceTol)) return false;
-  	
-  	// MD - don't use this heuristic - it's too restricting 
-//  	if (p0.distance(p2) > distanceTol) return false;
-  	
-  	return isShallowSampled(p0, p1, i0, i2, distanceTol);
+    return next;
   }
 
-  private boolean isShallowConcavity(Coordinates p0, Coordinates p1, Coordinates p2, double distanceTol)
-  {
-    int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
-    boolean isAngleToSimplify = (orientation == angleOrientation);
-    if (! isAngleToSimplify)
+  private boolean isConcave(final Coordinates p0, final Coordinates p1,
+    final Coordinates p2) {
+    final int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
+    final boolean isConcave = (orientation == angleOrientation);
+    return isConcave;
+  }
+
+  private boolean isDeletable(final int i0, final int i1, final int i2,
+    final double distanceTol) {
+    final Coordinates p0 = inputLine[i0];
+    final Coordinates p1 = inputLine[i1];
+    final Coordinates p2 = inputLine[i2];
+
+    if (!isConcave(p0, p1, p2)) {
       return false;
-    
-    double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
+    }
+    if (!isShallow(p0, p1, p2, distanceTol)) {
+      return false;
+    }
+
+    // MD - don't use this heuristic - it's too restricting
+    // if (p0.distance(p2) > distanceTol) return false;
+
+    return isShallowSampled(p0, p1, i0, i2, distanceTol);
+  }
+
+  private boolean isShallow(final Coordinates p0, final Coordinates p1,
+    final Coordinates p2, final double distanceTol) {
+    final double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
     return dist < distanceTol;
   }
-  
-  private static final int NUM_PTS_TO_CHECK = 10;
-  
+
+  private boolean isShallowConcavity(final Coordinates p0,
+    final Coordinates p1, final Coordinates p2, final double distanceTol) {
+    final int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
+    final boolean isAngleToSimplify = (orientation == angleOrientation);
+    if (!isAngleToSimplify) {
+      return false;
+    }
+
+    final double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
+    return dist < distanceTol;
+  }
+
   /**
    * Checks for shallowness over a sample of points in the given section.
    * This helps prevents the siplification from incrementally  
@@ -235,29 +228,46 @@ public class BufferInputLineSimplifier
    * @param distanceTol distance tolerance
    * @return
    */
-  private boolean isShallowSampled(Coordinates p0, Coordinates p2, int i0, int i2, double distanceTol)
-  {
+  private boolean isShallowSampled(final Coordinates p0, final Coordinates p2,
+    final int i0, final int i2, final double distanceTol) {
     // check every n'th point to see if it is within tolerance
-  	int inc = (i2 - i0) / NUM_PTS_TO_CHECK;
-  	if (inc <= 0) inc = 1;
-  	
-  	for (int i = i0; i < i2; i += inc) {
-  		if (! isShallow(p0, p2, inputLine[i], distanceTol)) return false;
-  	}
-  	return true;
+    int inc = (i2 - i0) / NUM_PTS_TO_CHECK;
+    if (inc <= 0) {
+      inc = 1;
+    }
+
+    for (int i = i0; i < i2; i += inc) {
+      if (!isShallow(p0, p2, inputLine[i], distanceTol)) {
+        return false;
+      }
+    }
+    return true;
   }
-  
-  private boolean isShallow(Coordinates p0, Coordinates p1, Coordinates p2, double distanceTol)
-  {
-    double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
-    return dist < distanceTol;
-  }
-  
-  
-  private boolean isConcave(Coordinates p0, Coordinates p1, Coordinates p2)
-  {
-    int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
-    boolean isConcave = (orientation == angleOrientation);
-    return isConcave;
+
+  /**
+   * Simplify the input coordinate list.
+   * If the distance tolerance is positive, 
+   * concavities on the LEFT side of the line are simplified.
+   * If the supplied distance tolerance is negative,
+   * concavities on the RIGHT side of the line are simplified.
+   * 
+   * @param distanceTol simplification distance tolerance to use
+   * @return the simplified coordinate list
+   */
+  public Coordinates[] simplify(final double distanceTol) {
+    this.distanceTol = Math.abs(distanceTol);
+    if (distanceTol < 0) {
+      angleOrientation = CGAlgorithms.CLOCKWISE;
+    }
+
+    // rely on fact that boolean array is filled with false value
+    isDeleted = new byte[inputLine.length];
+
+    boolean isChanged = false;
+    do {
+      isChanged = deleteShallowConcavities();
+    } while (isChanged);
+
+    return collapseLine();
   }
 }

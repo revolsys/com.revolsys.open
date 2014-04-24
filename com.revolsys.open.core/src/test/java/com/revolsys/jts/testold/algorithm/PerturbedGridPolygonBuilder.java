@@ -51,7 +51,7 @@ public class PerturbedGridPolygonBuilder {
       lines[index++] = line;
     }
 
-    final MultiLineString ml = this.geomFactory.createMultiLineString(lines);
+    final MultiLineString ml = this.geomFactory.multiLineString(lines);
     final Geometry grid = ml.buffer(this.lineWidth);
     System.out.println(grid);
     return grid;

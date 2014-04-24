@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 
@@ -18,9 +19,9 @@ public class TextOnCurveConverter implements OsnConverter {
 
   private final OsnConverterRegistry converters;
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
-  public TextOnCurveConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public TextOnCurveConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
     this.geometryFactory = geometryFactory;
     this.converters = converters;
@@ -47,7 +48,7 @@ public class TextOnCurveConverter implements OsnConverter {
       }
       attributeName = iterator.nextAttributeName();
     }
-    geometry = geometryFactory.createMultiPoint(points);
+    geometry = geometryFactory.multiPoint(points);
     for (int i = 0; i < points.size(); i++) {
       final Point originalPoint = points.get(0);
       final Point geometryPoint = (Point)geometry.getGeometry(i);

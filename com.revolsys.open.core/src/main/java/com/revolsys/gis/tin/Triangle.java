@@ -17,6 +17,7 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.MathUtil;
 
 public class Triangle extends AbstractCoordinatesList {
@@ -153,13 +154,17 @@ public class Triangle extends AbstractCoordinatesList {
    * @return The envelope.
    */
   public Envelope getEnvelopeInternal() {
-    final Envelope envelope = new Envelope();
+    double[] bounds = null;
     for (int i = 0; i < 3; i++) {
       final double x = getX(i);
       final double y = getY(i);
-      envelope.expandToInclude(x, y);
+      if (bounds == null) {
+        bounds = EnvelopeUtil.createBounds(2, x, y);
+      } else {
+        EnvelopeUtil.expand(null, bounds, 2, x, y);
+      }
     }
-    return envelope;
+    return new Envelope(2, bounds);
   }
 
   public Coordinates getInCentre() {

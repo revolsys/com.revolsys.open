@@ -326,7 +326,7 @@ public class ZoomOverlay extends AbstractOverlay {
 
       final GeometryFactory geometryFactory = getMap().getGeometryFactory();
       final BoundingBox boundingBox = new Envelope(geometryFactory,
-        topLeft.getX(), topLeft.getY(), bottomRight.getX(), bottomRight.getY());
+        2, topLeft.getX(), topLeft.getY(), bottomRight.getX(), bottomRight.getY());
 
       this.zoomBoxFirstPoint = null;
       this.zoomBox = null;

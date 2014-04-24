@@ -339,7 +339,7 @@ public class GpxIterator implements DataObjectIterator {
         parseAttribute(dataObject);
       }
     }
-    final MultiLineString lines = geometryFactory.createMultiLineString(segments);
+    final MultiLineString lines = geometryFactory.multiLineString(segments);
     dataObject.setGeometryValue(lines);
     return dataObject;
   }

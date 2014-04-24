@@ -39,7 +39,6 @@ import java.util.List;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class BufferByUnionFunctions {
 
@@ -92,7 +91,6 @@ public class BufferByUnionFunctions {
       }
       bufs.add(comp.buffer(distance));
     }
-    return FunctionsUtil.getFactoryOrDefault(g).geometryCollection(
-      GeometryFactory.toGeometryArray(bufs));
+    return FunctionsUtil.getFactoryOrDefault(g).geometryCollection(bufs);
   }
 }

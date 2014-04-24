@@ -148,8 +148,8 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
   public Location locate(final Coordinates p) {
     final RayCrossingCounter rcc = new RayCrossingCounter(p);
     final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
-    final Envelope rayEnv = new Envelope(p.getX(), p.getY(), this.maxXExtent,
-      p.getY());
+    final Envelope rayEnv = new Envelope(2, p.getX(), p.getY(),
+      this.maxXExtent, p.getY());
     final List mcs = this.index.query(rayEnv);
     countSegs(rcc, rayEnv, mcs, mcSegCounter);
 

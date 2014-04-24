@@ -96,7 +96,7 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
   public Geometry getBoundary() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return geometryFactory.createMultiLineString();
+      return geometryFactory.multiLineString();
     }
     final List<LineString> allRings = new ArrayList<>();
     for (final Polygon polygon : getPolygons()) {
@@ -106,7 +106,7 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
         allRings.add(ring);
       }
     }
-    return geometryFactory.createMultiLineString(allRings);
+    return geometryFactory.multiLineString(allRings);
   }
 
   @Override
@@ -152,7 +152,7 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
       }
       Collections.sort(geometries);
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiPolygon normalizedGeometry = geometryFactory.createMultiPolygon(geometries);
+      final MultiPolygon normalizedGeometry = geometryFactory.multiPolygon(geometries);
       return normalizedGeometry;
     }
   }
@@ -173,7 +173,7 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
       polygons.add(reverse);
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.createMultiPolygon(polygons);
+    return geometryFactory.multiPolygon(polygons);
   }
 
   /**

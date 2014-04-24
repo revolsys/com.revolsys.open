@@ -34,7 +34,7 @@ public class Circle extends DoubleCoordinates {
   public Circle(final Coordinates centre, final double radius) {
     super(centre);
     this.radius = radius;
-    this.envelope = new Envelope(getX(), getY());
+    this.envelope = new Envelope(2, getX(), getY());
     envelope = envelope.expand(radius);
   }
 

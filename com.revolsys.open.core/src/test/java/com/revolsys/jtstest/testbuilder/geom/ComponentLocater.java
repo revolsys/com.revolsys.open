@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -29,8 +30,7 @@ public class ComponentLocater {
   }
 
   private Geometry createAOI(final Coordinates queryPt, final double tolerance) {
-    final Envelope env = new Envelope(queryPt);
-    env.expandBy(2 * tolerance);
+    final BoundingBox env = new Envelope(queryPt).expand(2 * tolerance);
     return parentGeom.getGeometryFactory().toGeometry(env);
   }
 

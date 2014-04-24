@@ -31,7 +31,7 @@ public class KdTreeTest extends TestCase {
     assertTrue("Inserting 2 identical points should create one node",
       node1 == node2);
 
-    final BoundingBox queryEnv = new Envelope(0, 0, 10, 10);
+    final BoundingBox queryEnv = new Envelope(2, 0, 0, 10, 10);
 
     final List result = index.query(queryEnv);
     assertTrue(result.size() == 1);

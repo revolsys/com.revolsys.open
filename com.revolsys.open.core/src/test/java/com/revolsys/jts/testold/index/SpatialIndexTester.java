@@ -73,7 +73,7 @@ public class SpatialIndexTester {
       for (int j = 0; j < CELLS_PER_GRID_SIDE; j++) {
         final double miny = j * CELL_EXTENT + offset;
         final double maxy = miny + FEATURE_EXTENT;
-        final Envelope e = new Envelope(minx, miny, maxx, maxy);
+        final Envelope e = new Envelope(2, minx, miny, maxx, maxy);
         sourceData.add(e);
       }
     }
@@ -106,8 +106,8 @@ public class SpatialIndexTester {
     int queryCount = 0;
     for (int x = 0; x < CELL_EXTENT * CELLS_PER_GRID_SIDE; x += queryEnvelopeExtent) {
       for (int y = 0; y < CELL_EXTENT * CELLS_PER_GRID_SIDE; y += queryEnvelopeExtent) {
-        final Envelope queryEnvelope = new Envelope(x, y,
-          x + queryEnvelopeExtent, y + queryEnvelopeExtent);
+        final Envelope queryEnvelope = new Envelope(2, x,
+          y, x + queryEnvelopeExtent, y + queryEnvelopeExtent);
         final List expectedMatches = intersectingEnvelopes(queryEnvelope,
           sourceData);
         final List actualMatches = index.query(queryEnvelope);

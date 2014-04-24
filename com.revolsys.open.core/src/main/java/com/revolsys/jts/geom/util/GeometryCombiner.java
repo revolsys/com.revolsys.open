@@ -35,7 +35,6 @@ package com.revolsys.jts.geom.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
@@ -62,7 +61,7 @@ public class GeometryCombiner {
    * @param geoms the geometries to combine
    * @return the combined geometry
    */
-  public static Geometry combine(final Collection geoms) {
+  public static Geometry combine(final Collection<? extends Geometry> geoms) {
     final GeometryCombiner combiner = new GeometryCombiner(geoms);
     return combiner.combine();
   }
@@ -101,8 +100,9 @@ public class GeometryCombiner {
    * @param obj1
    * @return a List containing the two items
    */
-  private static List createList(final Object obj0, final Object obj1) {
-    final List list = new ArrayList();
+  private static List<Geometry> createList(final Geometry obj0,
+    final Geometry obj1) {
+    final List<Geometry> list = new ArrayList<Geometry>();
     list.add(obj0);
     list.add(obj1);
     return list;
@@ -115,9 +115,9 @@ public class GeometryCombiner {
    * @param obj1
    * @return a List containing the two items
    */
-  private static List createList(final Object obj0, final Object obj1,
-    final Object obj2) {
-    final List list = new ArrayList();
+  private static List<Geometry> createList(final Geometry obj0,
+    final Geometry obj1, final Geometry obj2) {
+    final List<Geometry> list = new ArrayList<Geometry>();
     list.add(obj0);
     list.add(obj1);
     list.add(obj2);
@@ -130,7 +130,8 @@ public class GeometryCombiner {
    * @param geoms
    * @return a GeometryFactory
    */
-  public static GeometryFactory extractFactory(final Collection geoms) {
+  public static GeometryFactory extractFactory(
+    final Collection<? extends Geometry> geoms) {
     if (geoms.isEmpty()) {
       return null;
     }
@@ -139,16 +140,14 @@ public class GeometryCombiner {
 
   private final GeometryFactory geomFactory;
 
-  private final boolean skipEmpty = false;
-
-  private final Collection inputGeoms;
+  private final Collection<? extends Geometry> inputGeoms;
 
   /**
    * Creates a new combiner for a collection of geometries
    * 
    * @param geoms the geometries to combine
    */
-  public GeometryCombiner(final Collection geoms) {
+  public GeometryCombiner(final Collection<? extends Geometry> geoms) {
     geomFactory = extractFactory(geoms);
     this.inputGeoms = geoms;
   }
@@ -160,9 +159,8 @@ public class GeometryCombiner {
    * @return a Geometry which is the combination of the inputs
    */
   public Geometry combine() {
-    final List elems = new ArrayList();
-    for (final Iterator i = inputGeoms.iterator(); i.hasNext();) {
-      final Geometry g = (Geometry)i.next();
+    final List<Geometry> elems = new ArrayList<>();
+    for (final Geometry g : inputGeoms) {
       extractElements(g, elems);
     }
 
@@ -177,17 +175,12 @@ public class GeometryCombiner {
     return geomFactory.buildGeometry(elems);
   }
 
-  private void extractElements(final Geometry geom, final List elems) {
-    if (geom == null) {
-      return;
-    }
-
-    for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry elemGeom = geom.getGeometry(i);
-      if (skipEmpty && elemGeom.isEmpty()) {
-        continue;
+  private void extractElements(final Geometry geom, final List<Geometry> elems) {
+    if (geom != null) {
+      for (int i = 0; i < geom.getGeometryCount(); i++) {
+        final Geometry elemGeom = geom.getGeometry(i);
+        elems.add(elemGeom);
       }
-      elems.add(elemGeom);
     }
   }
 

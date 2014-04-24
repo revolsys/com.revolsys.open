@@ -102,7 +102,7 @@ public class CleanDuplicatePoints {
       final Geometry geom = g.getGeometry(i);
       geoms.add(clean(geom));
     }
-    return fact.geometryCollection(GeometryFactory.toGeometryArray(geoms));
+    return fact.geometryCollection(geoms);
   }
 
   private LinearRing clean(final LinearRing g) {
@@ -121,7 +121,7 @@ public class CleanDuplicatePoints {
       final LineString line = (LineString)g.getGeometry(i);
       lines.add(clean(line));
     }
-    return fact.createMultiLineString(GeometryFactory.toLineStringArray(lines));
+    return fact.multiLineString(lines);
   }
 
   private MultiPolygon clean(final MultiPolygon g) {
@@ -130,7 +130,7 @@ public class CleanDuplicatePoints {
       final Polygon poly = (Polygon)g.getGeometry(i);
       polys.add(clean(poly));
     }
-    return fact.createMultiPolygon(GeometryFactory.toPolygonArray(polys));
+    return fact.multiPolygon(polys);
   }
 
   private Polygon clean(final Polygon poly) {

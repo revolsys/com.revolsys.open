@@ -5,24 +5,36 @@ import java.util.LinkedList;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 
-public abstract class RTreeNode<T> extends Envelope {
+public abstract class RTreeNode<T> {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -8110404083135361671L;
+  private BoundingBox boundingBox;
 
   public RTreeNode() {
+  }
+
+  public boolean contains(final BoundingBox boundingBox) {
+    return boundingBox.contains(boundingBox);
+  }
+
+  public double getArea() {
+    return boundingBox.getArea();
+  }
+
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
   }
 
   public abstract boolean remove(LinkedList<RTreeNode<T>> path,
     BoundingBox envelope, T object);
 
+  protected void setBoundingBox(final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
+  }
+
   @Override
   public String toString() {
-    return toPolygon(1).toString();
+    return boundingBox.toString();
   }
 
   protected abstract void updateEnvelope();

@@ -75,7 +75,7 @@ public class MultiLineHandler implements ShapeHandler {
     actualReadWords += 2;
 
     if (shapeType == 0) {
-      return GeometryFactory.getFactory().createMultiLineString(
+      return GeometryFactory.getFactory().multiLineString(
         (LineString[])null); // null shape
     }
 
@@ -177,7 +177,7 @@ public class MultiLineHandler implements ShapeHandler {
     if (numParts == 1) {
       return lines[0];
     } else {
-      return geometryFactory.createMultiLineString(lines);
+      return geometryFactory.multiLineString(lines);
     }
   }
 

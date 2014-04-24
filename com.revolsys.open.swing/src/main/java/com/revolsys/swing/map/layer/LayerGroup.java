@@ -29,6 +29,7 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
@@ -304,7 +305,8 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
 
   @Override
   public BoundingBox getBoundingBox() {
-    BoundingBox boudingBox = new Envelope(getGeometryFactory());
+    GeometryFactory geometryFactory = getGeometryFactory();
+    BoundingBox boudingBox = new Envelope(geometryFactory);
     for (final Layer layer : this) {
       final BoundingBox layerBoundingBox = layer.getBoundingBox();
       if (!layerBoundingBox.isEmpty()) {
@@ -316,7 +318,8 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    BoundingBox boudingBox = new Envelope(getGeometryFactory());
+    GeometryFactory geometryFactory = getGeometryFactory();
+    BoundingBox boudingBox = new Envelope(geometryFactory);
     if (isExists() && (!visibleLayersOnly || isVisible())) {
       for (final Layer layer : this) {
         if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {

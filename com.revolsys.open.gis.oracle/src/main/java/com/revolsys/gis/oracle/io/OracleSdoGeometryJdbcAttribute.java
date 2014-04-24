@@ -448,7 +448,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       }
     }
 
-    return this.geometryFactory.createMultiLineString(pointsList);
+    return this.geometryFactory.multiLineString(pointsList);
   }
 
   private MultiPoint toMultiPoint(final ResultSet resultSet,
@@ -459,7 +459,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(axisCount,
       coordinates);
 
-    return this.geometryFactory.createMultiPoint(coordinatesList);
+    return this.geometryFactory.multiPoint(coordinatesList);
   }
 
   private MultiPolygon toMultiPolygon(final ResultSet resultSet,
@@ -518,7 +518,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       polygons.add(polygon);
     }
 
-    return this.geometryFactory.createMultiPolygon(polygons);
+    return this.geometryFactory.multiPolygon(polygons);
   }
 
   private Point toPoint(final ResultSet resultSet, final int columnIndex,

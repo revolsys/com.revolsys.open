@@ -107,8 +107,8 @@ public class MCPointInRing implements PointInRing {
 
     // test all segments intersected by ray from pt in positive x direction
     double y = pt.getY();
-    final BoundingBox rayEnv = new Envelope(Double.NEGATIVE_INFINITY,
-      y, Double.POSITIVE_INFINITY, y);
+    final BoundingBox rayEnv = new Envelope(2,
+      Double.NEGATIVE_INFINITY, y, Double.POSITIVE_INFINITY, y);
 
     interval.min = y;
     interval.max = y;

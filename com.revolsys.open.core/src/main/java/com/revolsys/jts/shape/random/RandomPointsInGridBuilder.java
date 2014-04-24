@@ -131,7 +131,7 @@ extends GeometricShapeBuilder
         pts[index++] = randomPointInCell(orgX, orgY, cellDX, cellDY);
       }
     }
-    return geomFactory.createMultiPoint(pts);
+    return geomFactory.multiPoint(pts);
   }
   
   private Coordinates randomPointInCell(double orgX, double orgY, double xLen, double yLen)

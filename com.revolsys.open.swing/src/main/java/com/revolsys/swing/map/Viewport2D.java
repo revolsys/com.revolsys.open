@@ -163,7 +163,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final int x, final int y, final int pixels) {
     final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
     final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
-    final BoundingBox boundingBox = new Envelope(p1, p2);
+    final BoundingBox boundingBox = new Envelope(geometryFactory, p1, p2);
     return boundingBox;
   }
 
@@ -506,8 +506,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double y1 = centreY - bottomOffset;
     final double x2 = centreX + rightOffset;
     final double y2 = centreY + topOffset;
-    final BoundingBox newBoundingBox = new Envelope(geometryFactory, x1, y1,
-      x2, y2);
+    final BoundingBox newBoundingBox = new Envelope(geometryFactory, 2, x1,
+      y1, x2, y2);
     internalSetBoundingBox(newBoundingBox, unitsPerPixel);
     return newBoundingBox;
   }

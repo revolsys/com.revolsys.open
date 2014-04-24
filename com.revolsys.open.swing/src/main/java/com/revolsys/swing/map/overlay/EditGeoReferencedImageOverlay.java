@@ -208,8 +208,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         }
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
-      moveImageBoundingBox = new Envelope(geometryFactory, minX, minY, maxX,
-        maxY);
+      moveImageBoundingBox = new Envelope(geometryFactory, 2, minX, minY,
+        maxX, maxY);
     }
   }
 

@@ -37,7 +37,7 @@ public class AbstractMapWrapper {
         }
         geometryFactory = GeometryFactory.getFactory(srid);
       }
-      return new Envelope(geometryFactory, minX, minY, maxX, maxY);
+      return new Envelope(geometryFactory, 2, minX, minY, maxX, maxY);
     }
   }
 

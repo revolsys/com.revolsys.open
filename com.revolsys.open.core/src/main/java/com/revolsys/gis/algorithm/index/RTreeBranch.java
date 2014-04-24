@@ -42,7 +42,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   private void add(final RTreeNode<T> node) {
     nodes[size] = node;
     size++;
-    expandToInclude(node);
+    setBoundingBox(getBoundingBox().expandToInclude(node.getBoundingBox()));
   }
 
   public List<RTreeNode<T>> getNodes() {
@@ -124,11 +124,13 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
 
   @Override
   protected void updateEnvelope() {
-    setToNull();
+    BoundingBox boundingBox = new Envelope();
     for (int i = 0; i < size; i++) {
-      final Envelope envelope = nodes[i];
-      expandToInclude(envelope);
+      final BoundingBox envelope = nodes[i].getBoundingBox();
+      boundingBox = boundingBox.expandToInclude(envelope);
     }
+    setBoundingBox(boundingBox);
+
   }
 
   @Override
@@ -136,7 +138,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
     final Visitor<T> visitor) {
     for (int i = 0; i < size; i++) {
       final RTreeNode<T> node = nodes[i];
-      if (envelope.intersects(node)) {
+      if (envelope.intersects(node.getBoundingBox())) {
         if (!node.visit(envelope, filter, visitor)) {
           return false;
         }
@@ -149,7 +151,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
     for (int i = 0; i < size; i++) {
       final RTreeNode<T> node = nodes[i];
-      if (envelope.intersects(node)) {
+      if (envelope.intersects(node.getBoundingBox())) {
         if (!node.visit(envelope, visitor)) {
           return false;
         }

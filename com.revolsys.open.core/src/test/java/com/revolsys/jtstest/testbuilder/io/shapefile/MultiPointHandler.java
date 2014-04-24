@@ -75,7 +75,7 @@ public class MultiPointHandler implements ShapeHandler {
     actualReadWords += 2;
 
     if (shapeType == 0) {
-      return GeometryFactory.getFactory().createMultiPoint();
+      return GeometryFactory.getFactory().multiPoint();
     }
     if (shapeType != myShapeType) {
       throw new InvalidShapefileException(
@@ -142,7 +142,7 @@ public class MultiPointHandler implements ShapeHandler {
       actualReadWords += 1;
     }
 
-    return geometryFactory.createMultiPoint(coords);
+    return geometryFactory.multiPoint(coords);
   }
 
   double[] zMinMax(final Geometry g) {

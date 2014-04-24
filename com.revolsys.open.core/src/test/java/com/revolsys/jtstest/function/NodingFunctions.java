@@ -39,7 +39,7 @@ public class NodingFunctions {
       // use default factory in case intersections are not fixed
       pts[i] = FunctionsUtil.getFactoryOrDefault(null).point(coord);
     }
-    return FunctionsUtil.getFactoryOrDefault(null).createMultiPoint(pts);
+    return FunctionsUtil.getFactoryOrDefault(null).multiPoint(pts);
   }
 
   private static List createNodedSegmentStrings(final Geometry geom) {
@@ -71,7 +71,7 @@ public class NodingFunctions {
         .lineString(ss.getCoordinates());
       lines[index++] = line;
     }
-    return FunctionsUtil.getFactoryOrDefault(null).createMultiLineString(lines);
+    return FunctionsUtil.getFactoryOrDefault(null).multiLineString(lines);
   }
 
   public static Geometry MCIndexNoding(final Geometry geom) {

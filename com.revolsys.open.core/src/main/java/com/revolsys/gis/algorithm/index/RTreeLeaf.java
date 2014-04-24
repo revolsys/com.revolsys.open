@@ -11,11 +11,6 @@ import com.revolsys.jts.geom.Envelope;
 
 public class RTreeLeaf<T> extends RTreeNode<T> {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 5073275000676209987L;
-
   private Object[] objects;
 
   private BoundingBox[] envelopes;
@@ -34,7 +29,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
     envelopes[size] = envelope;
     objects[size] = object;
     size++;
-    expandToInclude(envelope);
+    setBoundingBox(getBoundingBox().expandToInclude(envelope));
   }
 
   @SuppressWarnings("unchecked")
@@ -93,11 +88,12 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
 
   @Override
   protected void updateEnvelope() {
-    setToNull();
+    BoundingBox boundingBox = new Envelope();
     for (int i = 0; i < size; i++) {
       final BoundingBox envelope = envelopes[i];
-      expandToInclude(envelope);
+      boundingBox = boundingBox.expandToInclude(envelope);
     }
+    setBoundingBox(boundingBox);
   }
 
   @Override

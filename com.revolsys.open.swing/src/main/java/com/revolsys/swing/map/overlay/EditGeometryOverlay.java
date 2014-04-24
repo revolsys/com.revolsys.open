@@ -294,7 +294,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (DataTypes.MULTI_POINT.equals(geometryDataType)) {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          geometry = geometryFactory.createMultiPoint(point, newPoint);
+          geometry = geometryFactory.multiPoint(point, newPoint);
         } else {
           geometry = GeometryEditUtil.appendVertex(geometry, newPoint,
             geometryPartIndex);
@@ -532,7 +532,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         pointsList.add(createXorLine(geometryFactory, nextPoint, point));
       }
       if (!pointsList.isEmpty()) {
-        return geometryFactory.createMultiLineString(pointsList);
+        return geometryFactory.multiLineString(pointsList);
       }
     }
     return null;

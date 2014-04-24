@@ -111,24 +111,24 @@ public class GeometryFactoryTest {
     final Polygon polygon2 = GEOMETRY_FACTORY.polygon(ringPoints, ring2Points);
     assertCopyGeometry(polygon2, ringPoints, ring2Points);
 
-    final MultiPoint multiPoint = GEOMETRY_FACTORY.createMultiPoint(pointPoints);
+    final MultiPoint multiPoint = GEOMETRY_FACTORY.multiPoint(pointPoints);
     assertCopyGeometry(multiPoint, pointPoints);
 
-    final MultiPoint multiPoint2 = GEOMETRY_FACTORY.createMultiPoint(
+    final MultiPoint multiPoint2 = GEOMETRY_FACTORY.multiPoint(
       pointPoints, point2Points);
     assertCopyGeometry(multiPoint2, pointPoints, point2Points);
 
-    final MultiLineString multiLineString = GEOMETRY_FACTORY.createMultiLineString(ringPoints);
+    final MultiLineString multiLineString = GEOMETRY_FACTORY.multiLineString(ringPoints);
     assertCopyGeometry(multiLineString, ringPoints);
 
-    final MultiLineString multiLineString2 = GEOMETRY_FACTORY.createMultiLineString(
+    final MultiLineString multiLineString2 = GEOMETRY_FACTORY.multiLineString(
       ringPoints, ring2Points);
     assertCopyGeometry(multiLineString2, ringPoints, ring2Points);
 
-    final MultiPolygon multiPolygon = GEOMETRY_FACTORY.createMultiPolygon(ringPoints);
+    final MultiPolygon multiPolygon = GEOMETRY_FACTORY.multiPolygon(ringPoints);
     assertCopyGeometry(multiPolygon, ringPoints);
 
-    final MultiPolygon multiPolygon2 = GEOMETRY_FACTORY.createMultiPolygon(
+    final MultiPolygon multiPolygon2 = GEOMETRY_FACTORY.multiPolygon(
       ringPoints, ring3Points);
     assertCopyGeometry(multiPolygon2, ringPoints, ring3Points);
 

@@ -126,8 +126,8 @@ public class Viewport implements PointTransformation {
     final double widthInModel = panel.getWidth() / scale;
     final double heighInModel = panel.getHeight() / scale;
 
-    return new Envelope(viewOriginInModel.getX(), viewOriginInModel.getY(),
-      viewOriginInModel.getX() + widthInModel, viewOriginInModel.getY()
+    return new Envelope(2, viewOriginInModel.getX(),
+      viewOriginInModel.getY(), viewOriginInModel.getX() + widthInModel, viewOriginInModel.getY()
         + heighInModel);
   }
 
@@ -188,7 +188,7 @@ public class Viewport implements PointTransformation {
   }
 
   public BoundingBox getViewEnv() {
-    return new Envelope(0, 0, getWidthInView(), getHeightInView());
+    return new Envelope(2, 0, 0, getWidthInView(), getHeightInView());
   }
 
   public double getViewOriginX() {

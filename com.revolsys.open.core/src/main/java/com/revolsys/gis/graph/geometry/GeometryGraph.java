@@ -214,16 +214,16 @@ public class GeometryGraph extends Graph<LineSegment> {
       }
     }
     if (lineIntersections.isEmpty()) {
-      return geometryFactory.createMultiPoint(pointIntersections);
+      return geometryFactory.multiPoint(pointIntersections);
     } else {
       final LineMerger merger = new LineMerger();
       merger.add(lineIntersections);
       final Collection mergedLineStrings = merger.getMergedLineStrings();
-      final MultiLineString multiLine = geometryFactory.createMultiLineString(mergedLineStrings);
+      final MultiLineString multiLine = geometryFactory.multiLineString(mergedLineStrings);
       if (pointIntersections.isEmpty()) {
         return multiLine;
       } else {
-        final MultiPoint multiPoint = geometryFactory.createMultiPoint(pointIntersections);
+        final MultiPoint multiPoint = geometryFactory.multiPoint(pointIntersections);
         return multiPoint.union(multiLine);
       }
     }

@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.revolsys.io.saif.SaifConstants;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcDirectedConverter extends ArcConverter {
 
-  public ArcDirectedConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public ArcDirectedConverter(final GeometryFactory geometryFactory) {
     super(geometryFactory, SaifConstants.ARC_DIRECTED);
   }
 

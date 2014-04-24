@@ -472,7 +472,7 @@ public class WKTReader {
         geometries.add(geometry);
         nextToken = getNextCloserOrComma();
       }
-      return geometryFactory.collection(geometries);
+      return geometryFactory.geometryCollection(geometries);
     }
   }
 
@@ -554,7 +554,7 @@ public class WKTReader {
   /*
    * private MultiPoint OLDreadMultiPointText() throws IOException,
    * ParseException { return
-   * geometryFactory.createMultiPoint(toPoints(getCoordinates())); }
+   * geometryFactory.multiPoint(toPoints(getCoordinates())); }
    */
 
   /**
@@ -571,7 +571,7 @@ public class WKTReader {
     throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.createMultiLineString(new LineString[] {});
+      return geometryFactory.multiLineString(new LineString[] {});
     }
     final ArrayList lineStrings = new ArrayList();
     LineString lineString = readLineStringText();
@@ -583,7 +583,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final LineString[] array = new LineString[lineStrings.size()];
-    return geometryFactory.createMultiLineString((LineString[])lineStrings.toArray(array));
+    return geometryFactory.multiLineString((LineString[])lineStrings.toArray(array));
   }
 
   /**
@@ -599,7 +599,7 @@ public class WKTReader {
   private MultiPoint readMultiPointText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.createMultiPoint(new Point[0]);
+      return geometryFactory.multiPoint(new Point[0]);
     }
 
     // check for old-style JTS syntax and parse it if present
@@ -608,7 +608,7 @@ public class WKTReader {
     if (ALLOW_OLD_JTS_MULTIPOINT_SYNTAX) {
       final String nextWord = lookaheadWord();
       if (nextWord != L_PAREN) {
-        return geometryFactory.createMultiPoint(toPoints(getCoordinatesNoLeftParen()));
+        return geometryFactory.multiPoint(toPoints(getCoordinatesNoLeftParen()));
       }
     }
 
@@ -621,7 +621,7 @@ public class WKTReader {
       points.add(point);
       nextToken = getNextCloserOrComma();
     }
-    return geometryFactory.createMultiPoint(points);
+    return geometryFactory.multiPoint(points);
   }
 
   /**
@@ -639,7 +639,7 @@ public class WKTReader {
     ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.createMultiPolygon(new Polygon[] {});
+      return geometryFactory.multiPolygon(new Polygon[] {});
     }
     final ArrayList polygons = new ArrayList();
     Polygon polygon = readPolygonText();
@@ -651,7 +651,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final Polygon[] array = new Polygon[polygons.size()];
-    return geometryFactory.createMultiPolygon((Polygon[])polygons.toArray(array));
+    return geometryFactory.multiPolygon((Polygon[])polygons.toArray(array));
   }
 
   /**

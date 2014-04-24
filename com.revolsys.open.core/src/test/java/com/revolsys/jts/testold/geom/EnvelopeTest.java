@@ -80,14 +80,13 @@ public class EnvelopeTest extends TestCase {
     assertTrue(isEqual);
   }
 
-  private Envelope expandToInclude(final Envelope a, final Envelope b) {
-    a.expandToInclude(b);
-    return a;
+  private BoundingBox expandToInclude(final BoundingBox a, final BoundingBox b) {
+    return a.expandToInclude(b);
   }
 
   public void testAsGeometry() throws Exception {
     assertTrue(this.geometryFactory.point((Coordinates)null)
-      .getEnvelope()
+      .getBoundingBox()
       .isEmpty());
 
     final Geometry g = this.geometryFactory.point(5.0, 6).getEnvelope();
@@ -115,86 +114,38 @@ public class EnvelopeTest extends TestCase {
   }
 
   public void testContainsEmpty() {
-    assertTrue(!new Envelope(-5, -5, 5, 5).contains(new Envelope()));
-    assertTrue(!new Envelope().contains(new Envelope(-5, -5, 5, 5)));
-    assertTrue(!new Envelope().contains(new Envelope(100, 100, 101, 101)));
-    assertTrue(!new Envelope(100, 100, 101, 101).contains(new Envelope()));
-  }
-
-  public void testCopyConstructor() throws Exception {
-    final Envelope e1 = new Envelope(1, 3, 2, 4);
-    final BoundingBox e2 = new Envelope(e1);
-    assertEquals(1, e2.getMinX(), 1E-5);
-    assertEquals(2, e2.getMaxX(), 1E-5);
-    assertEquals(3, e2.getMinY(), 1E-5);
-    assertEquals(4, e2.getMaxY(), 1E-5);
+    assertTrue(!new Envelope(2, -5, -5, 5, 5).contains(new Envelope()));
+    assertTrue(!new Envelope().contains(new Envelope(2, -5, -5, 5, 5)));
+    assertTrue(!new Envelope().contains(new Envelope(2, 100, 100, 101, 101)));
+    assertTrue(!new Envelope(2, 100, 100, 101, 101).contains(new Envelope()));
   }
 
   public void testEquals() throws Exception {
-    final Envelope e1 = new Envelope(1, 3, 2, 4);
-    final Envelope e2 = new Envelope(1, 3, 2, 4);
+    final Envelope e1 = new Envelope(2, 1, 3, 2, 4);
+    final Envelope e2 = new Envelope(2, 1, 3, 2, 4);
     assertEquals(e1, e2);
     assertEquals(e1.hashCode(), e2.hashCode());
 
-    final Envelope e3 = new Envelope(1, 3, 2, 5);
+    final Envelope e3 = new Envelope(2, 1, 3, 2, 5);
     assertTrue(!e1.equals(e3));
     assertTrue(e1.hashCode() != e3.hashCode());
   }
 
   public void testEquals2() {
     assertTrue(new Envelope().equals(new Envelope()));
-    assertTrue(new Envelope(1, 1, 2, 2).equals(new Envelope(1, 1, 2, 2)));
-    assertTrue(!new Envelope(1, 1.5, 2, 2).equals(new Envelope(1, 1, 2, 2)));
-  }
-
-  public void testEverything() throws Exception {
-    final Envelope e1 = new Envelope();
-    assertTrue(e1.isNull());
-    assertEquals(0, e1.getWidth(), 1E-3);
-    assertEquals(0, e1.getHeight(), 1E-3);
-    e1.expandToInclude(100, 101);
-    e1.expandToInclude(200, 202);
-    e1.expandToInclude(150, 151);
-    assertEquals(200, e1.getMaxX(), 1E-3);
-    assertEquals(202, e1.getMaxY(), 1E-3);
-    assertEquals(100, e1.getMinX(), 1E-3);
-    assertEquals(101, e1.getMinY(), 1E-3);
-    assertTrue(e1.contains(120, 120));
-    assertTrue(e1.contains(120, 101));
-    assertTrue(!e1.contains(120, 100));
-    assertEquals(101, e1.getHeight(), 1E-3);
-    assertEquals(100, e1.getWidth(), 1E-3);
-    assertTrue(!e1.isNull());
-
-    final Envelope e2 = new Envelope(499, 500, 500, 501);
-    assertTrue(!e1.contains(e2));
-    assertTrue(!e1.intersects(e2));
-    e1.expandToInclude(e2);
-    assertTrue(e1.contains(e2));
-    assertTrue(e1.intersects(e2));
-    assertEquals(500, e1.getMaxX(), 1E-3);
-    assertEquals(501, e1.getMaxY(), 1E-3);
-    assertEquals(100, e1.getMinX(), 1E-3);
-    assertEquals(101, e1.getMinY(), 1E-3);
-
-    final Envelope e3 = new Envelope(300, 300, 700, 700);
-    assertTrue(!e1.contains(e3));
-    assertTrue(e1.intersects(e3));
-
-    final Envelope e4 = new Envelope(300, 300, 301, 301);
-    assertTrue(e1.contains(e4));
-    assertTrue(e1.intersects(e4));
+    assertTrue(new Envelope(2, 1, 1, 2, 2).equals(new Envelope(2, 1, 1, 2, 2)));
+    assertTrue(!new Envelope(2, 1, 1.5, 2, 2).equals(new Envelope(2, 1, 1, 2, 2)));
   }
 
   public void testExpandToIncludeEmpty() {
-    assertEquals(new Envelope(-5, -5, 5, 5),
-      expandToInclude(new Envelope(-5, -5, 5, 5), new Envelope()));
-    assertEquals(new Envelope(-5, -5, 5, 5),
-      expandToInclude(new Envelope(), new Envelope(-5, -5, 5, 5)));
-    assertEquals(new Envelope(100, 100, 101, 101),
-      expandToInclude(new Envelope(), new Envelope(100, 100, 101, 101)));
-    assertEquals(new Envelope(100, 100, 101, 101),
-      expandToInclude(new Envelope(100, 100, 101, 101), new Envelope()));
+    assertEquals(new Envelope(2, -5, -5, 5, 5),
+      expandToInclude(new Envelope(2, -5, -5, 5, 5), new Envelope()));
+    assertEquals(new Envelope(2, -5, -5, 5, 5),
+      expandToInclude(new Envelope(), new Envelope(2, -5, -5, 5, 5)));
+    assertEquals(new Envelope(2, 100, 100, 101, 101),
+      expandToInclude(new Envelope(), new Envelope(2, 100, 100, 101, 101)));
+    assertEquals(new Envelope(2, 100, 100, 101, 101),
+      expandToInclude(new Envelope(2, 100, 100, 101, 101), new Envelope()));
   }
 
   public void testGeometryFactoryCreateEnvelope() throws Exception {
@@ -213,10 +164,10 @@ public class EnvelopeTest extends TestCase {
   }
 
   public void testIntersectsEmpty() {
-    assertTrue(!new Envelope(-5, -5, 5, 5).intersects(new Envelope()));
-    assertTrue(!new Envelope().intersects(new Envelope(-5, -5, 5, 5)));
-    assertTrue(!new Envelope().intersects(new Envelope(100, 100, 101, 101)));
-    assertTrue(!new Envelope(100, 100, 101, 101).intersects(new Envelope()));
+    assertTrue(!new Envelope(2, -5, -5, 5, 5).intersects(new Envelope()));
+    assertTrue(!new Envelope().intersects(new Envelope(2, -5, -5, 5, 5)));
+    assertTrue(!new Envelope().intersects(new Envelope(2, 100, 100, 101, 101)));
+    assertTrue(!new Envelope(2, 100, 100, 101, 101).intersects(new Envelope()));
   }
 
 }

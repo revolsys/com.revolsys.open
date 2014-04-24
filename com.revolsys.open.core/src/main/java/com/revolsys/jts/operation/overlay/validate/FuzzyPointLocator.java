@@ -84,9 +84,9 @@ public class FuzzyPointLocator {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
-      return geometryFactory.createMultiLineString(polygon.getRings());
+      return geometryFactory.multiLineString(polygon.getRings());
     } else {
-      return geometryFactory.createMultiLineString();
+      return geometryFactory.multiLineString();
     }
   }
 

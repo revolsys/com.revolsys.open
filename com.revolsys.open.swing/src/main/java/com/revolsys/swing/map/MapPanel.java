@@ -82,8 +82,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     500L, 250L, 100L, 50L, 25L, 10L, 5L);
 
   public static final BoundingBox BC_ENVELOPE = new Envelope(
-    GeometryFactory.getFactory(3005, 3, 1000, 1000), 25000, 340000, 1900000,
-    1750000);
+    GeometryFactory.getFactory(3005, 3, 1000, 1000), 2, 25000, 340000,
+    1900000, 1750000);
 
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
 
@@ -854,8 +854,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final double newY1 = y - newDeltaY;
 
     final GeometryFactory newGeometryFactory = extent.getGeometryFactory();
-    final BoundingBox newBoundingBox = new Envelope(newGeometryFactory, newX1,
-      newY1, newX1 + newWidth, newY1 + newHeight);
+    final BoundingBox newBoundingBox = new Envelope(newGeometryFactory, 2,
+      newX1, newY1, newX1 + newWidth, newY1 + newHeight);
     setBoundingBox(newBoundingBox);
   }
 

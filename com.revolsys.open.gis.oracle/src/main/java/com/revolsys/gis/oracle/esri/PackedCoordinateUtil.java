@@ -196,7 +196,7 @@ public class PackedCoordinateUtil {
     final Double mScale) {
     final List<CoordinatesList> parts = getCoordinatesLists(numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
-    return geometryFactory.createMultiLineString(parts);
+    return geometryFactory.multiLineString(parts);
   }
 
   private static MultiPoint getMultiPoint(final InputStream pointsIn,
@@ -206,7 +206,7 @@ public class PackedCoordinateUtil {
     final Double mScale) {
     final List<CoordinatesList> parts = getCoordinatesLists(numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
-    return geometryFactory.createMultiPoint(parts);
+    return geometryFactory.multiPoint(parts);
   }
 
   private static MultiPolygon getMultiPolygon(final InputStream pointsIn,
@@ -218,7 +218,7 @@ public class PackedCoordinateUtil {
       numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale,
       pointsIn);
     try {
-      return geometryFactory.createMultiPolygon(pointsList);
+      return geometryFactory.multiPolygon(pointsList);
     } catch (final IllegalArgumentException e) {
       e.printStackTrace();
       LoggerFactory.getLogger(PackedCoordinateUtil.class).error(

@@ -64,8 +64,8 @@ public class ComponentViewport2D extends Viewport2D implements
     final double y1 = y - height / 2;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new Envelope(getGeometryFactory(), x1, y1,
-      x2, y2);
+    final BoundingBox boundingBox = new Envelope(getGeometryFactory(), 2, x1,
+      y1, x2, y2);
     return boundingBox;
   }
 
@@ -83,8 +83,8 @@ public class ComponentViewport2D extends Viewport2D implements
     final double x2, final double y2) {
     final double[] c1 = toModelCoordinates(x1, y1);
     final double[] c2 = toModelCoordinates(x2, y2);
-    final BoundingBox boundingBox = new Envelope(getGeometryFactory(), c1[0],
-      c1[1], c2[0], c2[1]);
+    final BoundingBox boundingBox = new Envelope(getGeometryFactory(), 2,
+      c1[0], c1[1], c2[0], c2[1]);
 
     // Clip the bounding box with the map's visible area
     BoundingBox intersection = boundingBox.intersection(boundingBox);
@@ -210,7 +210,6 @@ public class ComponentViewport2D extends Viewport2D implements
     }
     final double logUnits = Math.log10(Math.abs(modelUnitsPerViewUnit));
     if (logUnits < 0 && Math.abs(Math.floor(logUnits)) > this.maxDecimalDigits) {
-      validBoundingBox = new Envelope(validBoundingBox);
       modelUnitsPerViewUnit = 2 * Math.pow(10, -this.maxDecimalDigits);
       final double minModelWidth = getViewWidthPixels() * modelUnitsPerViewUnit;
       final double minModelHeight = getViewHeightPixels()
@@ -291,9 +290,9 @@ public class ComponentViewport2D extends Viewport2D implements
   public void translate(final double dx, final double dy) {
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox newBoundingBox = new Envelope(
-      boundingBox.getGeometryFactory(), boundingBox.getMinX() + dx,
-      boundingBox.getMinY() + dy, boundingBox.getMaxX() + dx,
-      boundingBox.getMaxY() + dy);
+      boundingBox.getGeometryFactory(), 2,
+      boundingBox.getMinX() + dx, boundingBox.getMinY() + dy,
+      boundingBox.getMaxX() + dx, boundingBox.getMaxY() + dy);
     setBoundingBox(newBoundingBox);
 
   }

@@ -103,7 +103,7 @@ public class Quadtree implements SpatialIndex, Serializable {
       miny = miny - minExtent / 2.0;
       maxy = miny + minExtent / 2.0;
     }
-    return new Envelope(minx, miny, maxx, maxy);
+    return new Envelope(2, minx, miny, maxx, maxy);
   }
 
   private final Root root;

@@ -32,7 +32,7 @@ public class QuadTree<T> {
       minY = minY - minExtent / 2.0;
       maxY = minY + minExtent / 2.0;
     }
-    return new Envelope(minX, minY, maxX, maxY);
+    return new Envelope(2, minX, minY, maxX, maxY);
   }
 
   private GeometryFactory geometryFactory;

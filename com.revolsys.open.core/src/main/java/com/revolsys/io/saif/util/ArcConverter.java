@@ -12,18 +12,19 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class ArcConverter implements OsnConverter {
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
   private String geometryType = SaifConstants.ARC;
 
-  public ArcConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public ArcConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public ArcConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public ArcConverter(final GeometryFactory geometryFactory,
     final String geometryType) {
     this.geometryFactory = geometryFactory;
     this.geometryType = geometryType;
@@ -127,7 +128,8 @@ public class ArcConverter implements OsnConverter {
       serializer.endCollection();
       serializer.endAttribute();
       if (writeAttributes) {
-        writeAttributes(serializer, GeometryProperties.getGeometryProperties(line));
+        writeAttributes(serializer,
+          GeometryProperties.getGeometryProperties(line));
       }
       serializer.endObject();
     }

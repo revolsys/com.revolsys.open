@@ -33,7 +33,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
       return (RTreeLeaf<T>)node;
     } else {
       final RTreeBranch<T> branch = (RTreeBranch<T>)node;
-      branch.expandToInclude(envelope);
+      branch.setBoundingBox(branch.getBoundingBox().expandToInclude(envelope));
       path.add(branch);
       double minExpansion = Float.MAX_VALUE;
       RTreeNode<T> next = null;
@@ -58,14 +58,15 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
     final BoundingBox envelope) {
     double areaExpansion = 0;
 
-    final double minX1 = node.getMinX();
+    final BoundingBox boundingBox = node.getBoundingBox();
+    final double minX1 = boundingBox.getMinX();
     final double minX2 = envelope.getMinX();
-    final double minY1 = node.getMinY();
+    final double minY1 = boundingBox.getMinY();
     final double minY2 = envelope.getMinY();
 
-    final double maxX1 = node.getMaxX();
+    final double maxX1 = boundingBox.getMaxX();
     final double maxX2 = envelope.getMaxX();
-    final double maxY1 = node.getMaxY();
+    final double maxY1 = boundingBox.getMaxY();
     final double maxY2 = envelope.getMaxY();
 
     final double maxWidth = Math.max(maxX1, maxX2) - Math.min(minX1, minX2);

@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.noding.snapround.GeometryNoder;
@@ -34,8 +33,7 @@ public class PolygonOverlayFunctions {
     final Collection polys = polygonizer.getPolygons();
 
     // convert to collection for return
-    final Polygon[] polyArray = GeometryFactory.toPolygonArray(polys);
-    return geomFact.geometryCollection(polyArray);
+    return geomFact.geometryCollection(polys);
   }
 
 }

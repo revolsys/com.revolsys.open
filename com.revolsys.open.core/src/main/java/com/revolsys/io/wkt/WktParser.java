@@ -291,7 +291,7 @@ public class WktParser {
     } else {
       lines = parseParts(geometryFactory, text, axisCount);
     }
-    return geometryFactory.createMultiLineString(lines);
+    return geometryFactory.multiLineString(lines);
   }
 
   private MultiPoint parseMultiPoint(GeometryFactory geometryFactory,
@@ -308,11 +308,11 @@ public class WktParser {
     }
 
     if (isEmpty(text)) {
-      return geometryFactory.createMultiPoint();
+      return geometryFactory.multiPoint();
     } else {
       final List<CoordinatesList> pointsList = parseParts(geometryFactory,
         text, axisCount);
-      return geometryFactory.createMultiPoint(pointsList);
+      return geometryFactory.multiPoint(pointsList);
     }
   }
 
@@ -335,7 +335,7 @@ public class WktParser {
     } else {
       polygons = parsePartsList(geometryFactory, text, axisCount);
     }
-    return geometryFactory.createMultiPolygon(polygons);
+    return geometryFactory.multiPolygon(polygons);
   }
 
   private List<CoordinatesList> parseParts(

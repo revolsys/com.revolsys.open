@@ -1,19 +1,19 @@
 package com.revolsys.jts.test.geometry;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.TestConstants;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
-public class PointTest {
+public class PointTest implements TestConstants {
 
   public static void assertCoordinatesEquals(final Point point,
     final double... coordinates) {
@@ -25,10 +25,11 @@ public class PointTest {
       final double value = point.getValue(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
         if (!Double.isNaN(value)) {
-          Assert.failNotEquals("Value NaN", Double.NaN, value);
+          TestUtil.failNotEquals("Value NaN", Double.NaN, value);
         }
       } else {
-        Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value);
+        Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value,
+          0);
       }
     }
   }
@@ -40,7 +41,7 @@ public class PointTest {
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getValue(axisIndex);
       if (!Double.isNaN(value)) {
-        Assert.failNotEquals("Value NaN", Double.NaN, value);
+        TestUtil.failNotEquals("Value NaN", Double.NaN, value);
       }
     }
   }
@@ -175,10 +176,10 @@ public class PointTest {
         double value;
         switch (i) {
           case 0:
-            value = 500000;
+            value = UTM10_X_START;
           break;
           case 1:
-            value = 6000000;
+            value = UTM10_Y_START;
           break;
           default:
             value = i * 10 + i;

@@ -26,7 +26,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = new Envelope(
-    GEOMETRY_FACTORY, -180, -85, 180, 85);
+    GEOMETRY_FACTORY, 2, -180, -85, 180, 85);
 
   public static OpenStreetMapLayer create(final Map<String, Object> properties) {
     return new OpenStreetMapLayer(properties);

@@ -199,7 +199,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *
  *@version 1.7
  */
-public abstract class GeometryImpl implements Geometry {
+public abstract class AbstractGeometry implements Geometry {
   private static final long serialVersionUID = 8763622679187376702L;
 
   private static final List<String> sortedGeometryTypes = Arrays.asList(
@@ -249,7 +249,7 @@ public abstract class GeometryImpl implements Geometry {
   /**
    *  The bounding box of this <code>Geometry</code>.
    */
-  private BoundingBox envelope;
+  private BoundingBox boundingBox;
 
   /**
    * The {@link GeometryFactory} used to create this Geometry
@@ -267,7 +267,7 @@ public abstract class GeometryImpl implements Geometry {
    *
    * @param geometryFactory
    */
-  public GeometryImpl(final GeometryFactory geometryFactory) {
+  public AbstractGeometry(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
@@ -418,15 +418,13 @@ public abstract class GeometryImpl implements Geometry {
    *  Throws an exception if <code>g</code>'s class is <code>GeometryCollection</code>
    *  . (Its subclasses do not trigger an exception).
    *
-   *@param  g                          the <code>Geometry</code> to check
+   *@param  geometry                          the <code>Geometry</code> to check
    *@throws  IllegalArgumentException  if <code>g</code> is a <code>GeometryCollection</code>
    *      but not one of its subclasses
    */
-  protected void checkNotGeometryCollection(final Geometry g) {
-    // Don't use instanceof because we want to allow subclasses
-    if (g.getClass()
-      .getName()
-      .equals("com.revolsys.jts.geom.GeometryCollection")) {
+  protected void checkNotGeometryCollection(final Geometry geometry) {
+    final DataType dataType = geometry.getDataType();
+    if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
       throw new IllegalArgumentException(
         "This method does not support GeometryCollection arguments");
     }
@@ -441,12 +439,9 @@ public abstract class GeometryImpl implements Geometry {
    * @return a clone of this instance
    */
   @Override
-  public GeometryImpl clone() {
+  public AbstractGeometry clone() {
     try {
-      final GeometryImpl clone = (GeometryImpl)super.clone();
-      if (clone.envelope != null) {
-        clone.envelope = new Envelope(clone.envelope);
-      }
+      final AbstractGeometry clone = (AbstractGeometry)super.clone();
       return clone;
     } catch (final CloneNotSupportedException e) {
       return null;
@@ -619,7 +614,7 @@ public abstract class GeometryImpl implements Geometry {
    *@return    this <code>Geometry</code>s bounding box; if the <code>Geometry</code>
    *      is empty, <code>Envelope#isNull</code> will return <code>true</code>
    */
-  protected abstract BoundingBox computeEnvelopeInternal();
+  protected abstract BoundingBox computeBoundingBox();
 
   /**
    * Tests whether this geometry contains the
@@ -651,7 +646,9 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean contains(final Geometry g) {
     // short-circuit test
-    if (!getBoundingBox().contains(g.getBoundingBox())) {
+    final BoundingBox boundingBox = getBoundingBox();
+    final BoundingBox otherBoundingBox = g.getBoundingBox();
+    if (!boundingBox.contains(otherBoundingBox)) {
       return false;
     }
     // optimization for rectangle arguments
@@ -790,7 +787,7 @@ public abstract class GeometryImpl implements Geometry {
     }
     // optimization for rectangle arguments
     if (isRectangle()) {
-      // since we have already tested that the test envelope is covered
+      // since we have already tested that the test boundingBox is covered
       return true;
     }
     return relate(g).isCovers();
@@ -1123,7 +1120,7 @@ public abstract class GeometryImpl implements Geometry {
    */
   @Override
   public void geometryChangedAction() {
-    envelope = null;
+    boundingBox = null;
   }
 
   /**
@@ -1177,21 +1174,21 @@ public abstract class GeometryImpl implements Geometry {
    * The returned object is a copy of the one maintained internally,
    * to avoid aliasing issues.  
    * For best performance, clients which access this
-   * envelope frequently should cache the return value.
+   * boundingBox frequently should cache the return value.
    *
-   *@return the envelope of this <code>Geometry</code>.
+   *@return the boundingBox of this <code>Geometry</code>.
    *@return an empty BoundingBox if this Geometry is empty
    */
   @Override
   public BoundingBox getBoundingBox() {
-    if (envelope == null) {
+    if (boundingBox == null) {
       if (isEmpty()) {
-        envelope = new Envelope(getGeometryFactory());
+        boundingBox = new Envelope(getGeometryFactory());
       } else {
-        envelope = computeEnvelopeInternal();
+        boundingBox = computeBoundingBox();
       }
     }
-    return new Envelope(envelope);
+    return boundingBox;
   }
 
   /**
@@ -1298,7 +1295,7 @@ public abstract class GeometryImpl implements Geometry {
   public abstract int getDimension();
 
   /**
-   *  Gets a Geometry representing the envelope (bounding box) of 
+   *  Gets a Geometry representing the boundingBox (bounding box) of 
    *  this <code>Geometry</code>. 
    *  <p>
    *  If this <code>Geometry</code> is:
@@ -1311,7 +1308,7 @@ public abstract class GeometryImpl implements Geometry {
    *  maxx maxy, minx maxy, minx miny).
    *  </ul>
    *
-   *@return a Geometry representing the envelope of this Geometry
+   *@return a Geometry representing the boundingBox of this Geometry
    *      
    * @see GeometryFactory#toGeometry(Envelope) 
    */
@@ -1617,7 +1614,7 @@ public abstract class GeometryImpl implements Geometry {
   @Override
   public boolean intersects(final Geometry g) {
 
-    // short-circuit envelope test
+    // short-circuit boundingBox test
     if (!getBoundingBox().intersects(g.getBoundingBox())) {
       return false;
     }

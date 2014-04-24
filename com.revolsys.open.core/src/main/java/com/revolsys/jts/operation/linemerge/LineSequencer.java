@@ -308,7 +308,7 @@ public class LineSequencer {
       }
     }
     if (lines.size() == 0) {
-      return factory.createMultiLineString(new LineString[0]);
+      return factory.multiLineString(new LineString[0]);
     }
     return factory.buildGeometry(lines);
   }

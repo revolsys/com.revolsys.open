@@ -40,7 +40,6 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -86,19 +85,15 @@ public class MiscellaneousTest extends TestCase {
       .getClass(), MultiPointImpl.class);
     Assert.equals(this.geometryFactory.polygon().getBoundary().getClass(),
       MultiLineStringImpl.class);
-    Assert.equals(this.geometryFactory.createMultiPolygon(new Polygon[] {})
+    Assert.equals(this.geometryFactory.multiPolygon().getBoundary().getClass(),
+      MultiLineStringImpl.class);
+    Assert.equals(this.geometryFactory.multiLineString()
       .getBoundary()
-      .getClass(), MultiLineStringImpl.class);
-    Assert.equals(
-      this.geometryFactory.createMultiLineString(new LineString[] {})
-        .getBoundary()
-        .getClass(), MultiPointImpl.class);
-    Assert.equals(this.geometryFactory.createMultiPoint(new Point[] {})
-      .getBoundary()
-      .getClass(), GeometryCollectionImpl.class);
+      .getClass(), MultiPointImpl.class);
+    Assert.equals(this.geometryFactory.multiPoint().getBoundary().getClass(),
+      GeometryCollectionImpl.class);
     try {
-      this.geometryFactory.geometryCollection(new Geometry[] {})
-        .getBoundary();
+      this.geometryFactory.geometryCollection().getBoundary();
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
     }
@@ -134,11 +129,10 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.linearRing(new Coordinates[] {}).isEmpty());
     assertTrue(this.geometryFactory.lineString(new Coordinates[] {}).isEmpty());
     assertTrue(this.geometryFactory.polygon().isEmpty());
-    assertTrue(this.geometryFactory.createMultiPolygon(new Polygon[] {})
+    assertTrue(this.geometryFactory.multiPolygon(new Polygon[] {}).isEmpty());
+    assertTrue(this.geometryFactory.multiLineString(new LineString[] {})
       .isEmpty());
-    assertTrue(this.geometryFactory.createMultiLineString(new LineString[] {})
-      .isEmpty());
-    assertTrue(this.geometryFactory.createMultiPoint(new Point[] {}).isEmpty());
+    assertTrue(this.geometryFactory.multiPoint(new Point[] {}).isEmpty());
 
     assertTrue(this.geometryFactory.point().isSimple());
     assertTrue(this.geometryFactory.linearRing(new Coordinates[] {}).isSimple());
@@ -149,11 +143,11 @@ public class MiscellaneousTest extends TestCase {
     // }).isSimple());
     // assertTrue(geometryFactory.createPolygon(geometryFactory.createLinearRing(new
     // Coordinates[] { }), new LinearRing[] { }).isSimple());
-    // assertTrue(geometryFactory.createMultiPolygon(new Polygon[] {
+    // assertTrue(geometryFactory.multiPolygon(new Polygon[] {
     // }).isSimple());
-    // assertTrue(geometryFactory.createMultiLineString(new LineString[] {
+    // assertTrue(geometryFactory.multiLineString(new LineString[] {
     // }).isSimple());
-    // assertTrue(geometryFactory.createMultiPoint(new Point[] { }).isSimple());
+    // assertTrue(geometryFactory.multiPoint(new Point[] { }).isSimple());
 
     assertTrue(this.geometryFactory.point((Coordinates)null)
       .getBoundary()
@@ -165,62 +159,53 @@ public class MiscellaneousTest extends TestCase {
       .getBoundary()
       .isEmpty());
     assertTrue(this.geometryFactory.polygon().getBoundary().isEmpty());
-    assertTrue(this.geometryFactory.createMultiPolygon(new Polygon[] {})
+    assertTrue(this.geometryFactory.multiPolygon(new Polygon[] {})
       .getBoundary()
       .isEmpty());
-    assertTrue(this.geometryFactory.createMultiLineString(new LineString[] {})
+    assertTrue(this.geometryFactory.multiLineString(new LineString[] {})
       .getBoundary()
       .isEmpty());
-    assertTrue(this.geometryFactory.createMultiPoint(new Point[] {})
+    assertTrue(this.geometryFactory.multiPoint(new Point[] {})
       .getBoundary()
       .isEmpty());
 
-    assertTrue(this.geometryFactory.linearRing((CoordinatesList)null).isEmpty());
-    assertTrue(this.geometryFactory.lineString((Coordinates[])null).isEmpty());
+    assertTrue(this.geometryFactory.linearRing().isEmpty());
+    assertTrue(this.geometryFactory.lineString().isEmpty());
     assertTrue(this.geometryFactory.polygon().isEmpty());
-    assertTrue(this.geometryFactory.createMultiPolygon().isEmpty());
-    assertTrue(this.geometryFactory.createMultiLineString().isEmpty());
-    assertTrue(this.geometryFactory.createMultiPoint((Point[])null).isEmpty());
+    assertTrue(this.geometryFactory.multiPolygon().isEmpty());
+    assertTrue(this.geometryFactory.multiLineString().isEmpty());
+    assertTrue(this.geometryFactory.multiPoint().isEmpty());
 
     assertEquals(-1, this.geometryFactory.point((Coordinates)null)
       .getBoundaryDimension());
-    assertEquals(-1, this.geometryFactory.linearRing((CoordinatesList)null)
-      .getBoundaryDimension());
-    assertEquals(0, this.geometryFactory.lineString((Coordinates[])null)
-      .getBoundaryDimension());
+    assertEquals(-1, this.geometryFactory.linearRing().getBoundaryDimension());
+    assertEquals(0, this.geometryFactory.lineString().getBoundaryDimension());
     assertEquals(1, this.geometryFactory.polygon().getBoundaryDimension());
-    assertEquals(1, this.geometryFactory.createMultiPolygon()
+    assertEquals(1, this.geometryFactory.multiPolygon().getBoundaryDimension());
+    assertEquals(0, this.geometryFactory.multiLineString()
       .getBoundaryDimension());
-    assertEquals(0, this.geometryFactory.createMultiLineString()
-      .getBoundaryDimension());
-    assertEquals(-1, this.geometryFactory.createMultiPoint((Point[])null)
-      .getBoundaryDimension());
+    assertEquals(-1, this.geometryFactory.multiPoint().getBoundaryDimension());
 
     assertEquals(0, this.geometryFactory.point().getVertexCount());
-    assertEquals(0, this.geometryFactory.linearRing((CoordinatesList)null)
-      .getVertexCount());
-    assertEquals(0, this.geometryFactory.lineString((Coordinates[])null)
-      .getVertexCount());
+    assertEquals(0, this.geometryFactory.linearRing().getVertexCount());
+    assertEquals(0, this.geometryFactory.lineString().getVertexCount());
     assertEquals(0, this.geometryFactory.polygon().getVertexCount());
-    assertEquals(0, this.geometryFactory.createMultiPolygon().getVertexCount());
-    assertEquals(0, this.geometryFactory.createMultiLineString()
-      .getVertexCount());
-    assertEquals(0, this.geometryFactory.createMultiPoint((Point[])null)
-      .getVertexCount());
+    assertEquals(0, this.geometryFactory.multiPolygon().getVertexCount());
+    assertEquals(0, this.geometryFactory.multiLineString().getVertexCount());
+    assertEquals(0, this.geometryFactory.multiPoint().getVertexCount());
 
-    assertEquals(0, this.geometryFactory.point((Coordinates)null)
-      .getCoordinateArray().length);
-    assertEquals(0, this.geometryFactory.linearRing((CoordinatesList)null)
-      .getCoordinateArray().length);
-    assertEquals(0, this.geometryFactory.lineString((Coordinates[])null)
-      .getCoordinateArray().length);
+    assertEquals(0, this.geometryFactory.point().getCoordinateArray().length);
+    assertEquals(0,
+      this.geometryFactory.linearRing().getCoordinateArray().length);
+    assertEquals(0,
+      this.geometryFactory.lineString().getCoordinateArray().length);
     assertEquals(0, this.geometryFactory.polygon().getCoordinateArray().length);
-    assertEquals(0, this.geometryFactory.createMultiPolygon()
-      .getCoordinateArray().length);
-    assertEquals(0, this.geometryFactory.createMultiLineString()
-      .getCoordinateArray().length);
-    assertEquals(0, this.geometryFactory.createMultiPoint((Point[])null)
-      .getCoordinateArray().length);
+    assertEquals(0,
+      this.geometryFactory.multiPolygon().getCoordinateArray().length);
+    assertEquals(0,
+      this.geometryFactory.multiLineString().getCoordinateArray().length);
+    assertEquals(0,
+      this.geometryFactory.multiPoint().getCoordinateArray().length);
   }
 
   public void testEmptyGeometryCollection() throws Exception {
@@ -231,7 +216,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyLinearRing() throws Exception {
-    final LineString l = this.geometryFactory.linearRing((CoordinatesList)null);
+    final LineString l = this.geometryFactory.linearRing();
     assertEquals(1, l.getDimension());
     assertEquals(new Envelope(), l.getBoundingBox());
     assertTrue(l.isSimple());
@@ -242,7 +227,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyLineString() throws Exception {
-    final LineString l = this.geometryFactory.lineString((Coordinates[])null);
+    final LineString l = this.geometryFactory.lineString();
     assertEquals(1, l.getDimension());
     assertEquals(new Envelope(), l.getBoundingBox());
     /**
@@ -256,7 +241,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyMultiLineString() throws Exception {
-    final MultiLineString g = this.geometryFactory.createMultiLineString();
+    final MultiLineString g = this.geometryFactory.multiLineString();
     assertEquals(1, g.getDimension());
     assertEquals(new Envelope(), g.getBoundingBox());
     /**
@@ -267,7 +252,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyMultiPoint() throws Exception {
-    final MultiPoint g = this.geometryFactory.createMultiPoint((Point[])null);
+    final MultiPoint g = this.geometryFactory.multiPoint();
     assertEquals(0, g.getDimension());
     assertEquals(new Envelope(), g.getBoundingBox());
     /**
@@ -277,7 +262,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyMultiPolygon() throws Exception {
-    final MultiPolygon g = this.geometryFactory.createMultiPolygon();
+    final MultiPolygon g = this.geometryFactory.multiPolygon();
     assertEquals(2, g.getDimension());
     assertEquals(new Envelope(), g.getBoundingBox());
     assertTrue(g.isSimple());
@@ -300,16 +285,8 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(p.isSimple());
   }
 
-  public void testEnvelopeCloned() throws Exception {
-    final Geometry a = this.reader.read("LINESTRING(0 0, 10 10)");
-    // Envelope is lazily initialized [Jon Aquino]
-    a.getBoundingBox();
-    final Geometry b = a.clone();
-    assertTrue(a.getBoundingBox() != b.getBoundingBox());
-  }
-
   public void testGetGeometryType() throws Exception {
-    final GeometryCollection g = this.geometryFactory.createMultiPolygon();
+    final GeometryCollection g = this.geometryFactory.multiPolygon();
     assertEquals("MultiPolygon", g.getGeometryType());
   }
 

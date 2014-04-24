@@ -140,6 +140,8 @@ public interface BoundingBox {
 
   double getAspectRatio();
 
+  int getAxisCount();
+
   double[] getBounds();
 
   Coordinates getCentre();
@@ -193,8 +195,6 @@ public interface BoundingBox {
    */
   double getMaxY();
 
-  double getMaxZ();
-
   double getMin(int i);
 
   <Q extends Quantity> Measurable<Q> getMinimumX();
@@ -216,8 +216,6 @@ public interface BoundingBox {
    *@return    the minimum y-coordinate
    */
   double getMinY();
-
-  double getMinZ();
 
   LineSegment getNorthLine();
 
@@ -277,15 +275,6 @@ public interface BoundingBox {
   boolean intersects(double x, double y);
 
   boolean isEmpty();
-
-  /**
-   *  Returns <code>true</code> if this <code>BoundingBox</code> is a "null"
-   *  envelope.
-   *
-   *@return    <code>true</code> if this <code>BoundingBox</code> is uninitialized
-   *      or is the envelope of the empty geometry.
-   */
-  boolean isNull();
 
   /**
    * Gets the maximum extent of this envelope across both dimensions.

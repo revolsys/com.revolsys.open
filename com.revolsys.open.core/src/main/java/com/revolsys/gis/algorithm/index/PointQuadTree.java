@@ -76,7 +76,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
-    BoundingBox envelope = new Envelope(x, y);
+    BoundingBox envelope = new Envelope(2, x, y);
     envelope = envelope.expand(maxDistance);
     final List<T> results = new ArrayList<T>();
     if (root != null) {

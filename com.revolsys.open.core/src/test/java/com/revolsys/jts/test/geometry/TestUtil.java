@@ -1,7 +1,6 @@
 package com.revolsys.jts.test.geometry;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -75,6 +74,36 @@ public class TestUtil {
     final String wkt = object.getValue("expectedWkt");
     final Geometry expectedGeometry = geometryFactory.geometry(wkt, true);
     return equalsExpectedGeometry(i, actualGeometry, expectedGeometry);
+  }
+
+  public static void failNotEquals(final String message, final Object expected,
+    final Object actual) {
+    Assert.fail(format(message, expected, actual));
+  }
+
+  public static String format(final String message, final Object expected,
+    final Object actual) {
+    String formatted = "";
+    if (message != null && !message.equals("")) {
+      formatted = message + " ";
+    }
+    final String expectedString = String.valueOf(expected);
+    final String actualString = String.valueOf(actual);
+    if (expectedString.equals(actualString)) {
+      return formatted + "expected: "
+        + formatClassAndValue(expected, expectedString) + " but was: "
+        + formatClassAndValue(actual, actualString);
+    } else {
+      return formatted + "expected:<" + expectedString + "> but was:<"
+        + actualString + ">";
+    }
+  }
+
+  public static String formatClassAndValue(final Object value,
+    final String valueString) {
+    final String className = value == null ? "null" : value.getClass()
+      .getName();
+    return className + "<" + valueString + ">";
   }
 
 }

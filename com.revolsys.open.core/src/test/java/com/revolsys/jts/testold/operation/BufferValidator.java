@@ -34,7 +34,6 @@ package com.revolsys.jts.testold.operation;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -53,7 +52,7 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class BufferValidator {
 
-  private static abstract class Test implements Comparable {
+  private static abstract class Test implements Comparable<Test> {
     private final String name;
 
     private final int priority;
@@ -68,8 +67,8 @@ public class BufferValidator {
     }
 
     @Override
-    public int compareTo(final Object o) {
-      return this.priority - ((Test)o).priority;
+    public int compareTo(final Test test) {
+      return this.priority - test.priority;
     }
 
     public String getName() {
@@ -95,7 +94,7 @@ public class BufferValidator {
 
   private final double bufferDistance;
 
-  private final Map nameToTestMap = new HashMap();
+  private final Map<String, Test> nameToTestMap = new HashMap<String, Test>();
 
   private Geometry buffer;
 
@@ -141,7 +140,8 @@ public class BufferValidator {
         if (getOriginal().getClass() == GeometryCollection.class) {
           return;
         }
-        com.revolsys.jts.util.Assert.isTrue(getOriginal().isValid());
+        boolean valid = getOriginal().isValid();
+        com.revolsys.jts.util.Assert.isTrue(valid);
         if (BufferValidator.this.bufferDistance > 0) {
           Assert.assertTrue(supplement("Expected buffer to contain original"),
             contains(getBuffer(), getOriginal()));
@@ -259,9 +259,8 @@ public class BufferValidator {
 
   public void test() throws Exception {
     try {
-      final Collection tests = this.nameToTestMap.values();
-      for (final Iterator i = tests.iterator(); i.hasNext();) {
-        final Test test = (Test)i.next();
+      final Collection<Test> tests = this.nameToTestMap.values();
+      for (final Test test : tests) {
         test.test();
       }
     } catch (final Exception e) {

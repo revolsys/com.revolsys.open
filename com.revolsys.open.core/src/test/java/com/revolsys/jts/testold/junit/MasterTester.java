@@ -37,6 +37,15 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+
+import com.revolsys.jts.testold.algorithm.AngleTest;
+import com.revolsys.jts.testold.algorithm.ConvexHullTest;
+import com.revolsys.jts.testold.algorithm.IsCCWTest;
+import com.revolsys.jts.testold.algorithm.NonRobustLineIntersectorTest;
+import com.revolsys.jts.testold.algorithm.OrientationIndexTest;
 import com.revolsys.jts.testold.algorithm.RobustLineIntersectionTest;
 import com.revolsys.jts.testold.geom.AreaLengthTest;
 import com.revolsys.jts.testold.geom.BasicCoordinateSequenceTest;
@@ -81,6 +90,28 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
  *
  * @version 1.7
  */
+@RunWith(Suite.class)
+@SuiteClasses({
+  AngleTest.class, AreaLengthTest.class, BasicCoordinateSequenceTest.class,
+  BidirectionalComparatorTest.class, BufferTest.class,
+  CascadedPolygonUnionTest.class, OrientationIndexTest.class,
+  ConformingDelaunayTest.class, ConvexHullTest.class,
+  CoordinateArraysTest.class, DelaunayTest.class, DistanceTest.class,
+  EnvelopeTest.class, GeometryCollectionImplTest.class, GeometryImplTest.class,
+  IntersectionMatrixTest.class, IntervalTest.class, IsCCWTest.class,
+  IsRectangleTest.class, IsValidTest.class, LengthIndexedLineTest.class,
+  LineMergerTest.class, LineStringImplTest.class,
+  LocationIndexedLineTest.class, MiscellaneousTest.class,
+  MiscellaneousTest2.class, MultiPointImplTest.class,
+  NonRobustLineIntersectorTest.class, NormalizeTest.class, PointImplTest.class,
+  PolygonizeTest.class, PredicateShortCircuitTest.class,
+  PrecisionModelTest.class, QuadtreeTest.class,
+  RectanglePredicateSyntheticTest.class, RectanglePredicateTest.class,
+  RelateBoundaryNodeRuleTest.class, RobustLineIntersectionTest.class,
+  SimpleTest.class, SIRtreeTest.class, STRtreeTest.class, WKTReaderTest.class,
+  WKBTest.class, UnaryUnionTest.class, ValidClosedRingTest.class,
+  ValidSelfTouchingRingFormingHoleTest.class,
+})
 public class MasterTester extends TestCase {
 
   public static void main(final String[] args) {
@@ -90,6 +121,7 @@ public class MasterTester extends TestCase {
 
   public static Test suite() {
     final TestSuite result = new TestSuite();
+
     result.addTest(new TestSuite(
       com.revolsys.jts.testold.algorithm.AngleTest.class));
     result.addTest(new TestSuite(AreaLengthTest.class));

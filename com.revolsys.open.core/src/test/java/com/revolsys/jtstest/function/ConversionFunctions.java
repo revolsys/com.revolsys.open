@@ -6,7 +6,6 @@ import java.util.List;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
 
 public class ConversionFunctions {
@@ -35,17 +34,16 @@ public class ConversionFunctions {
     if (g2 != null) {
       addComponents(g2, atomicGeoms);
     }
-    return g.getGeometryFactory().geometryCollection(
-      GeometryFactory.toGeometryArray(atomicGeoms));
+    return g.getGeometryFactory().geometryCollection(atomicGeoms);
   }
 
   public static Geometry toLines(final Geometry g) {
-    return g.getGeometryFactory().buildGeometry(
-      LinearComponentExtracter.getLines(g));
+    return g.getGeometryFactory()
+      .geometry(LinearComponentExtracter.getLines(g));
   }
 
   public static Geometry toPoints(final Geometry g) {
-    return g.getGeometryFactory().createMultiPoint(g.getCoordinateArray());
+    return g.getGeometryFactory().multiPoint(g.getCoordinateArray());
   }
 
 }

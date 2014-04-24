@@ -114,7 +114,7 @@ public class PolygonHandler implements ShapeHandler {
     if (geometry instanceof MultiPolygon) {
       multi = (MultiPolygon)geometry;
     } else {
-      multi = geometry.getGeometryFactory().createMultiPolygon(
+      multi = geometry.getGeometryFactory().multiPolygon(
         (Polygon)geometry);
     }
 
@@ -177,7 +177,7 @@ public class PolygonHandler implements ShapeHandler {
     actualReadWords += 2;
 
     if (shapeType == 0) {
-      return GeometryFactory.getFactory().createMultiPolygon((Polygon[])null); // null
+      return GeometryFactory.getFactory().multiPolygon((Polygon[])null); // null
                                                                                // shape
     }
 
@@ -303,7 +303,7 @@ public class PolygonHandler implements ShapeHandler {
     holes = null;
     // its a multi part
 
-    final Geometry result = geometryFactory.createMultiPolygon(polygons);
+    final Geometry result = geometryFactory.multiPolygon(polygons);
     // if (!(result.isValid() ))
     // System.out.println("geom isnt valid");
     return result;

@@ -306,7 +306,7 @@ public class WKBReader {
       final Geometry geometry = readGeometry();
       geoms.add(geometry);
     }
-    return factory.collection(geoms);
+    return factory.geometryCollection(geoms);
   }
 
   private LinearRing readLinearRing() throws IOException {
@@ -332,7 +332,7 @@ public class WKBReader {
       }
       geoms[i] = (LineString)g;
     }
-    return factory.createMultiLineString(geoms);
+    return factory.multiLineString(geoms);
   }
 
   private MultiPoint readMultiPoint() throws IOException, ParseException {
@@ -345,7 +345,7 @@ public class WKBReader {
       }
       geoms[i] = (Point)g;
     }
-    return factory.createMultiPoint(geoms);
+    return factory.multiPoint(geoms);
   }
 
   private MultiPolygon readMultiPolygon() throws IOException, ParseException {
@@ -359,7 +359,7 @@ public class WKBReader {
       }
       geoms[i] = (Polygon)g;
     }
-    return factory.createMultiPolygon(geoms);
+    return factory.multiPolygon(geoms);
   }
 
   private Point readPoint() throws IOException {

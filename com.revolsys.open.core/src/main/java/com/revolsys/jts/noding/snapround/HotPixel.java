@@ -164,9 +164,9 @@ public class HotPixel {
   public BoundingBox getSafeEnvelope() {
     if (safeEnv == null) {
       final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / scaleFactor;
-      safeEnv = new Envelope(originalPt.getX() - safeTolerance,
-        originalPt.getY() - safeTolerance, originalPt.getX() + safeTolerance,
-        originalPt.getY() + safeTolerance);
+      safeEnv = new Envelope(2,
+        originalPt.getX() - safeTolerance, originalPt.getY() - safeTolerance,
+        originalPt.getX() + safeTolerance, originalPt.getY() + safeTolerance);
     }
     return safeEnv;
   }

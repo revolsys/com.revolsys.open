@@ -2,13 +2,11 @@ package com.revolsys.io.kml;
 
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.Set;
 
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryWriterFactory;
 import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.gis.data.model.DataObject;
@@ -43,7 +41,7 @@ public class KmzIoFactory extends AbstractDataObjectAndGeometryWriterFactory
 
   @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
-    return Collections.singleton(EpsgCoordinateSystems.wgs84());
+    return KmlIoFactory.COORDINATE_SYSTEMS;
   }
 
   @Override
@@ -75,7 +73,7 @@ public class KmzIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   @Override
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
-    return EpsgCoordinateSystems.wgs84().equals(coordinateSystem);
+    return KmlIoFactory.COORDINATE_SYSTEMS.contains(coordinateSystem);
   }
 
   @Override

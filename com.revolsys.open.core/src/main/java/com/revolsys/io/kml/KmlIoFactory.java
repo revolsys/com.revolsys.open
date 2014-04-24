@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Set;
 
 import org.springframework.core.io.Resource;
@@ -24,7 +25,7 @@ import com.revolsys.spring.SpringUtil;
 public class KmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   implements MapWriterFactory, GeometryReaderFactory {
 
-  private final Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
+  public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections.singleton(EpsgCoordinateSystems.wgs84());
 
   public KmlIoFactory() {
     super(Kml22Constants.KML_FORMAT_DESCRIPTION, true, true);
@@ -48,7 +49,7 @@ public class KmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
 
   @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
-    return coordinateSystems;
+    return COORDINATE_SYSTEMS;
   }
 
   @Override
@@ -82,7 +83,7 @@ public class KmlIoFactory extends AbstractDataObjectAndGeometryWriterFactory
   @Override
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
-    return EpsgCoordinateSystems.wgs84().equals(coordinateSystem);
+    return COORDINATE_SYSTEMS.contains(coordinateSystem);
   }
 
   @Override
