@@ -111,11 +111,11 @@ public class TestPerfDistanceGeomPair {
       computeDistanceToAllPoints(geom);
     }
     if (!this.verbose) {
-      System.out.println(sw.getTimeString());
+    //  System.out.println(sw.getTimeString());
     }
     if (this.verbose) {
-      System.out.println("Finished in " + sw.getTimeString());
-      System.out.println("       (Distance = " + dist + ")");
+    //  System.out.println("Finished in " + sw.getTimeString());
+    //  System.out.println("       (Distance = " + dist + ")");
     }
   }
 
@@ -125,7 +125,7 @@ public class TestPerfDistanceGeomPair {
     final Geometry[] geom = createSineStars(nPts);
 
     if (this.verbose) {
-      System.out.println("Running with " + nPts + " points");
+    //  System.out.println("Running with " + nPts + " points");
     }
     if (!this.verbose) {
       System.out.print(nPts + ": ");

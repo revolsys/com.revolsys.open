@@ -102,11 +102,11 @@ public class TestPerfDistanceGeomSet {
       testAll(geom);
     }
     if (!this.verbose) {
-      System.out.println(sw.getTimeString());
+    //  System.out.println(sw.getTimeString());
     }
     if (this.verbose) {
-      System.out.println("Finished in " + sw.getTimeString());
-      System.out.println("       (Distance = " + dist + ")");
+    //  System.out.println("Finished in " + sw.getTimeString());
+    //  System.out.println("       (Distance = " + dist + ")");
     }
   }
 
@@ -117,7 +117,7 @@ public class TestPerfDistanceGeomSet {
     // Geometry[] geom = createSineStarsRandomLocation(nPts);
 
     if (this.verbose) {
-      System.out.println("Running with " + num + " points");
+    //  System.out.println("Running with " + num + " points");
     }
     if (!this.verbose) {
       System.out.print(num + ", ");

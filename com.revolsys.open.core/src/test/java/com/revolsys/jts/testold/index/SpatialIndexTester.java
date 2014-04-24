@@ -106,8 +106,8 @@ public class SpatialIndexTester {
     int queryCount = 0;
     for (int x = 0; x < CELL_EXTENT * CELLS_PER_GRID_SIDE; x += queryEnvelopeExtent) {
       for (int y = 0; y < CELL_EXTENT * CELLS_PER_GRID_SIDE; y += queryEnvelopeExtent) {
-        final Envelope queryEnvelope = new Envelope(2, x,
-          y, x + queryEnvelopeExtent, y + queryEnvelopeExtent);
+        final Envelope queryEnvelope = new Envelope(2, x, y, x
+          + queryEnvelopeExtent, y + queryEnvelopeExtent);
         final List expectedMatches = intersectingEnvelopes(queryEnvelope,
           sourceData);
         final List actualMatches = index.query(queryEnvelope);
@@ -124,18 +124,18 @@ public class SpatialIndexTester {
       }
     }
     if (VERBOSE) {
-      System.out.println("---------------");
-      System.out.println("Envelope Extent: " + queryEnvelopeExtent);
-      System.out.println("Expected Matches: " + expectedMatchCount);
-      System.out.println("Actual Matches: " + actualMatchCount);
-      System.out.println("Extra Matches: " + extraMatchCount);
-      System.out.println("Query Count: " + queryCount);
-      System.out.println("Average Expected Matches: " + expectedMatchCount
-        / (double)queryCount);
-      System.out.println("Average Actual Matches: " + actualMatchCount
-        / (double)queryCount);
-      System.out.println("Average Extra Matches: " + extraMatchCount
-        / (double)queryCount);
+      // System.out.println("---------------");
+      // System.out.println("Envelope Extent: " + queryEnvelopeExtent);
+      // System.out.println("Expected Matches: " + expectedMatchCount);
+      // System.out.println("Actual Matches: " + actualMatchCount);
+      // System.out.println("Extra Matches: " + extraMatchCount);
+      // System.out.println("Query Count: " + queryCount);
+      // System.out.println("Average Expected Matches: " + expectedMatchCount
+      // / (double)queryCount);
+      // System.out.println("Average Actual Matches: " + actualMatchCount
+      // / (double)queryCount);
+      // System.out.println("Average Extra Matches: " + extraMatchCount
+      // / (double)queryCount);
     }
   }
 
@@ -148,13 +148,14 @@ public class SpatialIndexTester {
     addSourceData(0, this.sourceData);
     addSourceData(OFFSET, this.sourceData);
     if (VERBOSE) {
-      System.out.println("===============================");
-      System.out.println("Grid Extent: " + CELL_EXTENT * CELLS_PER_GRID_SIDE);
-      System.out.println("Cell Extent: " + CELL_EXTENT);
-      System.out.println("Feature Extent: " + FEATURE_EXTENT);
-      System.out.println("Cells Per Grid Side: " + CELLS_PER_GRID_SIDE);
-      System.out.println("Offset For 2nd Set Of Features: " + OFFSET);
-      System.out.println("Feature Count: " + this.sourceData.size());
+      // System.out.println("===============================");
+      // System.out.println("Grid Extent: " + CELL_EXTENT *
+      // CELLS_PER_GRID_SIDE);
+      // System.out.println("Cell Extent: " + CELL_EXTENT);
+      // System.out.println("Feature Extent: " + FEATURE_EXTENT);
+      // System.out.println("Cells Per Grid Side: " + CELLS_PER_GRID_SIDE);
+      // System.out.println("Offset For 2nd Set Of Features: " + OFFSET);
+      // System.out.println("Feature Count: " + this.sourceData.size());
     }
     insert(this.sourceData, this.index);
   }

@@ -63,14 +63,14 @@ public class FileBufferResultValidatorTest extends TestCase {
 
   void runAll(final List geoms, final double dist) {
     final Stopwatch sw = new Stopwatch();
-    System.out.println("Geom count = " + geoms.size() + "   distance = " + dist);
+  //  System.out.println("Geom count = " + geoms.size() + "   distance = " + dist);
     for (final Iterator i = geoms.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
       runBuffer(g, dist);
       runBuffer(g.reverse(), dist);
       System.out.print(".");
     }
-    System.out.println("  " + sw.getTimeString());
+  //  System.out.println("  " + sw.getTimeString());
 
   }
 
@@ -82,9 +82,9 @@ public class FileBufferResultValidatorTest extends TestCase {
     if (!validator.isValid()) {
       final String msg = validator.getErrorMessage();
 
-      System.out.println(msg);
-      System.out.println(WktWriter.point(validator.getErrorLocation()));
-      System.out.println(g);
+    //  System.out.println(msg);
+    //  System.out.println(WktWriter.point(validator.getErrorLocation()));
+    //  System.out.println(g);
     }
     assertTrue(validator.isValid());
   }

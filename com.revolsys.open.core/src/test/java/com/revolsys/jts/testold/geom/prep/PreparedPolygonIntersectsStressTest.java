@@ -122,9 +122,9 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
     final Geometry poly = createSineStar(new Coordinate((double)0, 0,
       Coordinates.NULL_ORDINATE), 100, nPts);
-    System.out.println(poly);
-
-    System.out.println();
+    // System.out.println(poly);
+    //
+    // System.out.println();
     // System.out.println("Running with " + nPts + " points");
     test(poly);
   }
@@ -154,9 +154,9 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     final boolean fastIntersects = prepGeom.intersects(line);
 
     if (slowIntersects != fastIntersects) {
-      System.out.println(line);
-      System.out.println("Slow = " + slowIntersects + ", Fast = "
-        + fastIntersects);
+      // System.out.println(line);
+      // System.out.println("Slow = " + slowIntersects + ", Fast = "
+      // + fastIntersects);
       throw new RuntimeException("Different results found for intersects() !");
     }
   }

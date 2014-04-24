@@ -49,8 +49,8 @@ public class DDComputeTest extends TestCase {
       t = t.multiply(t2);
       sign = -sign;
     }
-    System.out.println("Computed DD.atan(): " + at + "    Math.atan = "
-      + Math.atan(x.doubleValue()));
+    // System.out.println("Computed DD.atan(): " + at + "    Math.atan = "
+    // + Math.atan(x.doubleValue()));
     return at;
   }
 
@@ -72,7 +72,7 @@ public class DDComputeTest extends TestCase {
       n += 1.0;
       t = t.divide(DD.valueOf(n));
       s = s.add(t);
-      System.out.println(i + ": " + s);
+      // System.out.println(i + ": " + s);
     }
     return s;
   }
@@ -90,25 +90,25 @@ public class DDComputeTest extends TestCase {
 
     final DD pi4 = DD.valueOf(4.0).multiply(arctan(t1)).subtract(arctan(t2));
     final DD pi = DD.valueOf(4.0).multiply(pi4);
-    System.out.println("Computed value = " + pi);
+    // System.out.println("Computed value = " + pi);
     return pi;
   }
 
   public void testEByTaylorSeries() {
-    System.out.println("--------------------------------");
-    System.out.println("Computing e by Taylor series");
+    // System.out.println("--------------------------------");
+    // System.out.println("Computing e by Taylor series");
     final DD testE = computeEByTaylorSeries();
     final double err = Math.abs(testE.subtract(DD.E).doubleValue());
-    System.out.println("Difference from DoubleDouble.E = " + err);
+    // System.out.println("Difference from DoubleDouble.E = " + err);
     assertTrue(err < 64 * DD.EPS);
   }
 
   public void testPiByMachin() {
-    System.out.println("--------------------------------");
-    System.out.println("Computing Pi by Machin's rule");
+    // System.out.println("--------------------------------");
+    // System.out.println("Computing Pi by Machin's rule");
     final DD testE = computePiByMachin();
     final double err = Math.abs(testE.subtract(DD.PI).doubleValue());
-    System.out.println("Difference from DoubleDouble.PI = " + err);
+    // System.out.println("Difference from DoubleDouble.PI = " + err);
     assertTrue(err < 8 * DD.EPS);
   }
 

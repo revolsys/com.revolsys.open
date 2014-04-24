@@ -73,7 +73,7 @@ public class DelaunayTest extends TestCase {
     } else {
       result = builder.getEdges(this.geomFact);
     }
-    System.out.println(result);
+  //  System.out.println(result);
 
     Geometry expected = this.reader.read(expectedWKT);
     result = result.normalize();

@@ -99,8 +99,8 @@ public class PolygonUnionPerfTest {
   }
 
   public void test(final int nItems, final int nPts, final double size) {
-    System.out.println("---------------------------------------------------------");
-    System.out.println("# pts/item: " + nPts);
+  //  System.out.println("---------------------------------------------------------");
+  //  System.out.println("# pts/item: " + nPts);
 
     final List polys = createPolys(nItems, size, nPts);
 

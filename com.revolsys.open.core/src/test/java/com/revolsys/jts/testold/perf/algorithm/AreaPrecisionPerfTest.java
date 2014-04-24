@@ -46,7 +46,7 @@ public class AreaPrecisionPerfTest {
       final LinearRing g1 = GeometryFactory.getFactory()
         .linearRing(coordinates);
       final Polygon polygon = GeometryFactory.getFactory().polygon(g1);
-      System.out.println(polygon);
+      // System.out.println(polygon);
 
       final double area = originalSignedArea(coordinates);
       final double area2 = accurateSignedArea(coordinates);
@@ -56,10 +56,11 @@ public class AreaPrecisionPerfTest {
       final double eps = exactArea - area;
       final double eps2 = exactArea - area2;
 
-      System.out.println(nrVertices + "   orig err: " + eps + "    acc err: "
-        + eps2);
+      // System.out.println(nrVertices + "   orig err: " + eps + "    acc err: "
+      // + eps2);
     }
-    System.out.println("Time: " + (System.currentTimeMillis() - start) / 1000.0);
+    // System.out.println("Time: " + (System.currentTimeMillis() - start) /
+    // 1000.0);
   }
 
   public static double originalSignedArea(final Coordinates[] ring) {

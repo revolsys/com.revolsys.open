@@ -84,7 +84,7 @@ public class DistanceLineLineStressTest extends TestCase {
         failCount++;
       }
     }
-    System.out.println("# failed = " + failCount + " out of " + n);
+  //  System.out.println("# failed = " + failCount + " out of " + n);
   }
 
 }

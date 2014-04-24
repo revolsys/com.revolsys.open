@@ -61,20 +61,20 @@ public class LineDissolvePerfTest extends PerformanceTestCase {
 
   public void runBruteForce_World() {
     final Geometry result = dissolveLines(this.data);
-    System.out.println(Memory.allString());
+  //  System.out.println(Memory.allString());
   }
 
   public void runDissolver_World() {
     final LineDissolver dis = new LineDissolver();
     dis.add(this.data);
     final Geometry result = dis.getResult();
-    System.out.println();
-    System.out.println(Memory.allString());
+  //  System.out.println();
+  //  System.out.println(Memory.allString());
   }
 
   @Override
   public void setUp() throws IOException, ParseException {
-    System.out.println("Loading data...");
+  //  System.out.println("Loading data...");
     this.data = GeometryUtils.readWKTFile("/Users/mdavis/myproj/jts/svn/jts-topo-suite/trunk/jts/testdata/world.wkt");
   }
 

@@ -108,7 +108,7 @@ public class BinTreeCorrectTest {
       queryTest(interval);
       // queryTime(env);
     }
-    System.out.println("Time = " + sw.getTimeString());
+    // System.out.println("Time = " + sw.getTimeString());
   }
 
   void queryTest(final Interval interval) {
@@ -116,7 +116,7 @@ public class BinTreeCorrectTest {
     final List finalList = getOverlapping(candidateList, interval);
 
     final List eList = this.intervalList.query(interval);
-    System.out.println(finalList.size());
+    // System.out.println(finalList.size());
 
     if (finalList.size() != eList.size()) {
       throw new RuntimeException("queries do not match");
@@ -131,8 +131,8 @@ public class BinTreeCorrectTest {
 
   public void run() {
     fill();
-    System.out.println("depth = " + this.btree.depth() + "  size = "
-      + this.btree.size());
+    // System.out.println("depth = " + this.btree.depth() + "  size = "
+    // + this.btree.size());
     runQueries();
   }
 

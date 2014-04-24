@@ -55,10 +55,10 @@ public class OverlayNodingStressTest extends TestCase {
     // this line can be used to test for the presence of noding failures for
     // non-tricky cases
     // Geometry star = rr2;
-    System.out.println("Star:");
-    System.out.println(base);
-    System.out.println("Rectangle:");
-    System.out.println(testGeom);
+    // System.out.println("Star:");
+    // System.out.println(base);
+    // System.out.println("Rectangle:");
+    // System.out.println(testGeom);
 
     // test to see whether the basic overlay code fails
     try {
@@ -71,8 +71,8 @@ public class OverlayNodingStressTest extends TestCase {
     // stopping the run
     final Geometry intersection = SnapIfNeededOverlayOp.intersection(base,
       testGeom);
-    System.out.println("Intersection:");
-    System.out.println(intersection);
+    // System.out.println("Intersection:");
+    // System.out.println(intersection);
   }
 
   public Geometry[] generateGeometryAccum(final double angle1,
@@ -128,16 +128,16 @@ public class OverlayNodingStressTest extends TestCase {
   public void testNoding() {
     final int iterLimit = ITER_LIMIT;
     for (int i = 0; i < iterLimit; i++) {
-      System.out.println("Iter: " + i + "  Noding failure count = "
-        + this.failureCount);
+      // System.out.println("Iter: " + i + "  Noding failure count = "
+      // + this.failureCount);
       final double ang1 = getRand() * Math.PI;
       final double ang2 = getRand() * Math.PI;
       // Geometry[] geom = generateGeometryStar(ang1, ang2);
       final Geometry[] geom = generateGeometryAccum(ang1, ang2);
       checkIntersection(geom[0], geom[1]);
     }
-    System.out.println("Test count = " + iterLimit
-      + "  Noding failure count = " + this.failureCount);
+    // System.out.println("Test count = " + iterLimit
+    // + "  Noding failure count = " + this.failureCount);
   }
 }
 

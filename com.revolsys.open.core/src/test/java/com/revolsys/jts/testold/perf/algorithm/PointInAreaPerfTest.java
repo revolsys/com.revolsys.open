@@ -61,7 +61,7 @@ public class PointInAreaPerfTest {
     ssFact.setNumArms(100);
 
     final Geometry area = ssFact.createSineStar();
-    System.out.println(area);
+  //  System.out.println(area);
 
     final Stopwatch sw = new Stopwatch();
 
@@ -75,6 +75,6 @@ public class PointInAreaPerfTest {
     perfTester.setPIA(pia);
     perfTester.run();
 
-    System.out.println("Overall time: " + sw.getTimeString());
+  //  System.out.println("Overall time: " + sw.getTimeString());
   }
 }

@@ -128,7 +128,7 @@ public class IndexTester {
       Assert.isTrue(!list.isEmpty());
       querySize += list.size();
     }
-    System.out.println("Avg query size = " + querySize / items.size());
+    // System.out.println("Avg query size = " + querySize / items.size());
   }
 
   public IndexResult testAll(final List items) {
@@ -146,9 +146,8 @@ public class IndexTester {
     runSelfQuery(items);
     final String queryTime = sw.getTimeString();
     result.queryMilliseconds = sw.getTime();
-    System.out.println("  Load Time = " + loadTime + "  Query Time = "
-      + queryTime);
+    // System.out.println("  Load Time = " + loadTime + "  Query Time = "
+    // + queryTime);
     return result;
   }
-
 }

@@ -108,8 +108,8 @@ public class RectangleIntersectsPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final BoundingBox envRect = new Envelope(2, baseX, baseY,
-          baseX + dx, baseY + dy);
+        final BoundingBox envRect = new Envelope(2, baseX, baseY, baseX + dx,
+          baseY + dy);
         final Geometry rect = geometryFactory.toGeometry(envRect);
         rectList.add(rect);
       }
@@ -142,8 +142,8 @@ public class RectangleIntersectsPerfTest {
   }
 
   void test(final Collection<Geometry> rect, final Geometry g) {
-    System.out.println("Target # pts: " + g.getVertexCount()
-      + "  -- # Rectangles: " + rect.size());
+    // System.out.println("Target # pts: " + g.getVertexCount()
+    // + "  -- # Rectangles: " + rect.size());
 
     final int maxCount = MAX_ITER;
     final Stopwatch sw = new Stopwatch();
@@ -154,8 +154,8 @@ public class RectangleIntersectsPerfTest {
         element.intersects(g);
       }
     }
-    System.out.println("Finished in " + sw.getTimeString());
-    System.out.println();
+    // System.out.println("Finished in " + sw.getTimeString());
+    // System.out.println();
   }
 
   void test(final int nPts) {

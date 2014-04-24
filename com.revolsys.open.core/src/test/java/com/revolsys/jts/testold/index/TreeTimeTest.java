@@ -124,13 +124,13 @@ public class TreeTimeTest {
     final int n = 10000;
     final TreeTimeTest test = new TreeTimeTest();
     final List items = IndexTester.createGridItems(n);
-    System.out.println("----------------------------------------------");
-    System.out.println("Dummy run to ensure classes are loaded before real run");
-    System.out.println("----------------------------------------------");
+  //  System.out.println("----------------------------------------------");
+  //  System.out.println("Dummy run to ensure classes are loaded before real run");
+  //  System.out.println("----------------------------------------------");
     test.run(items);
-    System.out.println("----------------------------------------------");
-    System.out.println("Real run");
-    System.out.println("----------------------------------------------");
+  //  System.out.println("----------------------------------------------");
+  //  System.out.println("Real run");
+  //  System.out.println("----------------------------------------------");
     test.run(items);
   }
 
@@ -144,7 +144,7 @@ public class TreeTimeTest {
 
   public List run(final List items) throws Exception {
     final ArrayList indexResults = new ArrayList();
-    System.out.println("# items = " + items.size());
+  //  System.out.println("# items = " + items.size());
     indexResults.add(run(new QuadtreeIndex(), items));
     indexResults.add(run(new STRtreeIndex(10), items));
     // indexResults.add(run(new QXtreeIndex(), n));

@@ -43,8 +43,8 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   double bufferWidth = 1.0;
 
-  BoundingBox rectEnv = new Envelope(2, this.baseX,
-    this.baseY, this.baseX + this.rectSize, this.baseY + this.rectSize);
+  BoundingBox rectEnv = new Envelope(2, this.baseX, this.baseY, this.baseX
+    + this.rectSize, this.baseY + this.rectSize);
 
   Geometry rect = this.fact.toGeometry(this.rectEnv);
 
@@ -96,10 +96,10 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   }
 
   private List<Geometry> getTestGeometries() {
-    final BoundingBox testEnv = new Envelope(
-      2, this.rectEnv.getMinX() - this.bufSize, this.rectEnv.getMinY() - this.bufSize,
-      this.rectEnv.getMaxX()
-          + this.bufSize, this.rectEnv.getMaxY() + this.bufSize);
+    final BoundingBox testEnv = new Envelope(2, this.rectEnv.getMinX()
+      - this.bufSize, this.rectEnv.getMinY() - this.bufSize,
+      this.rectEnv.getMaxX() + this.bufSize, this.rectEnv.getMaxY()
+        + this.bufSize);
     final List<Geometry> testGeoms = createTestGeometries(testEnv, 5,
       this.testGeomSize);
     return testGeoms;
@@ -117,14 +117,14 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
     // System.out.println(testGeom);
     if (!intersectsOK || !containsOK) {
-      System.out.println(testGeom);
+      // System.out.println(testGeom);
     }
     assertTrue(intersectsOK);
     assertTrue(containsOK);
   }
 
   public void testDenseLines() {
-    System.out.println(this.rect);
+    // System.out.println(this.rect);
 
     final List<Geometry> testGeoms = getTestGeometries();
     for (final Iterator i = testGeoms.iterator(); i.hasNext();) {
@@ -139,7 +139,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   }
 
   public void testLines() {
-    System.out.println(this.rect);
+    // System.out.println(this.rect);
 
     final List<Geometry> testGeoms = getTestGeometries();
     for (final Geometry testGeom : testGeoms) {

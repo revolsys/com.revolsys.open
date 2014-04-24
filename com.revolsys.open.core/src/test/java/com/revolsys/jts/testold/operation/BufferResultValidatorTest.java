@@ -63,8 +63,8 @@ public class BufferResultValidatorTest extends TestCase {
     if (!validator.isValid()) {
       final String msg = validator.getErrorMessage();
 
-      System.out.println(msg);
-      System.out.println(WktWriter.point(validator.getErrorLocation()));
+    //  System.out.println(msg);
+    //  System.out.println(WktWriter.point(validator.getErrorLocation()));
     }
     assertTrue(validator.isValid());
   }

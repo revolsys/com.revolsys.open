@@ -46,13 +46,13 @@ public class PolygonBufferStressTest {
     int i = 0;
     while (i < maxCount) {
       i++;
-      System.out.println("Iter: " + i
-        + " --------------------------------------------------------");
+      // System.out.println("Iter: " + i
+      // + " --------------------------------------------------------");
 
       dist += 1.0;
-      System.out.println("Pos Buffer (" + dist + ")");
+      // System.out.println("Pos Buffer (" + dist + ")");
       g = getBuffer(g, dist);
-      System.out.println("Neg Buffer (" + -dist + ")");
+      // System.out.println("Neg Buffer (" + -dist + ")");
       g = getBuffer(g, -dist);
     }
   }
@@ -63,11 +63,11 @@ public class PolygonBufferStressTest {
     double dist = initDist;
     while (i < maxCount) {
       i++;
-      System.out.println("Iter: " + i
-        + " --------------------------------------------------------");
+      // System.out.println("Iter: " + i
+      // + " --------------------------------------------------------");
 
       dist += distanceInc;
-      System.out.println("Buffer (" + dist + ")");
+      // System.out.println("Buffer (" + dist + ")");
       g = getBuffer(g, dist);
       // if (((Polygon) g).getNumInteriorRing() > 0)
       // return;
@@ -77,7 +77,7 @@ public class PolygonBufferStressTest {
   private Geometry getBuffer(final Geometry geom, final double dist) {
     final Geometry buf = geom.buffer(dist);
     // System.out.println(buf);
-    System.out.println(this.sw.getTimeString());
+    // System.out.println(this.sw.getTimeString());
     if (!buf.isValid()) {
       throw new RuntimeException("buffer not valid!");
     }
@@ -131,7 +131,7 @@ public class PolygonBufferStressTest {
     // 20, 1);
     // Geometry g = circle.union(handle);
 
-    System.out.println(g);
+    // System.out.println(g);
     test(g);
   }
 
@@ -141,7 +141,7 @@ public class PolygonBufferStressTest {
     // doIteratedBuffer(g, 1, 2, maxCount);
     doAlternatingIteratedBuffer(g, 1, maxCount);
     if (this.testFailed) {
-      System.out.println("FAILED!");
+      // System.out.println("FAILED!");
     }
   }
 }

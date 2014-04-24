@@ -69,19 +69,19 @@ public class TestSerializable {
     boolean matched = false;
     if (o1 instanceof BoundingBox) {
       if (!((Envelope)o1).equals(o2)) {
-        System.out.println("expected " + o1 + ", found " + o2);
+        // System.out.println("expected " + o1 + ", found " + o2);
       } else {
         matched = true;
       }
     } else if (o1 instanceof Geometry) {
       if (!((Geometry)o1).equalsExact((Geometry)o2)) {
-        System.out.println("expected " + o1 + ", found " + o2);
+        // System.out.println("expected " + o1 + ", found " + o2);
       } else {
         matched = true;
       }
     }
     if (matched) {
-      System.out.println("found match for object");
+      // System.out.println("found match for object");
     }
     return true;
   }

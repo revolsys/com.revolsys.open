@@ -608,6 +608,18 @@ public final class CollectionUtil {
     }
   }
 
+  public static List<Double> toList(final double... values) {
+    if (values == null) {
+      return Collections.emptyList();
+    } else {
+      final List<Double> list = new ArrayList<Double>();
+      for (final double value : values) {
+        list.add(value);
+      }
+      return list;
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public static <V> List<V> toList(final V... values) {
     if (values == null) {

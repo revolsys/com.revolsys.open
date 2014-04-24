@@ -37,7 +37,7 @@ public class RelateBoundaryNodeRuleTest extends TestCase {
     final Geometry g2 = this.rdr.read(wkt2);
     final IntersectionMatrix im = RelateOp.relate(g1, g2, bnRule);
     final String imStr = im.toString();
-    System.out.println(imStr);
+    // System.out.println(imStr);
     assertTrue(im.matches(expectedIM));
   }
 

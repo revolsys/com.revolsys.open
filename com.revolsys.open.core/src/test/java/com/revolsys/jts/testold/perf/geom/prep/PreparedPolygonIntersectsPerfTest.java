@@ -141,8 +141,8 @@ public class PreparedPolygonIntersectsPerfTest {
   }
 
   public void test(final Geometry g, final List lines) {
-    System.out.println("AOI # pts: " + g.getVertexCount() + "      # lines: "
-      + lines.size() + "   # pts in line: " + NUM_LINE_PTS);
+    // System.out.println("AOI # pts: " + g.getVertexCount() + "      # lines: "
+    // + lines.size() + "   # pts in line: " + NUM_LINE_PTS);
 
     final Stopwatch sw = new Stopwatch();
     int count = 0;
@@ -151,8 +151,8 @@ public class PreparedPolygonIntersectsPerfTest {
       count = testPrepGeomCached(i, g, lines);
       // count = testOriginal(i, g, lines);
     }
-    System.out.println("Count of intersections = " + count);
-    System.out.println("Finished in " + sw.getTimeString());
+    // System.out.println("Count of intersections = " + count);
+    // System.out.println("Finished in " + sw.getTimeString());
   }
 
   public void test(final int nPts) {
@@ -166,14 +166,14 @@ public class PreparedPolygonIntersectsPerfTest {
     final List lines = createLines(target.getBoundingBox(), NUM_LINES, 1.0,
       NUM_LINE_PTS);
 
-    System.out.println();
+    // System.out.println();
     // System.out.println("Running with " + nPts + " points");
     test(target, lines);
   }
 
   public int testOriginal(final int iter, final Geometry g, final List lines) {
     if (iter == 0) {
-      System.out.println("Using orginal JTS algorithm");
+      // System.out.println("Using orginal JTS algorithm");
     }
     int count = 0;
     for (final Iterator i = lines.iterator(); i.hasNext();) {
@@ -188,7 +188,7 @@ public class PreparedPolygonIntersectsPerfTest {
   public int testPrepGeomCached(final int iter, final Geometry g,
     final List lines) {
     if (iter == 0) {
-      System.out.println("Using cached Prepared Geometry");
+      // System.out.println("Using cached Prepared Geometry");
     }
     final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
     final PreparedGeometry prepGeom = pgFact.create(g);
@@ -218,7 +218,7 @@ public class PreparedPolygonIntersectsPerfTest {
   public int testPrepGeomNotCached(final int iter, final Geometry g,
     final List lines) {
     if (iter == 0) {
-      System.out.println("Using NON-CACHED Prepared Geometry");
+      // System.out.println("Using NON-CACHED Prepared Geometry");
     }
     final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
     // PreparedGeometry prepGeom = pgFact.create(g);

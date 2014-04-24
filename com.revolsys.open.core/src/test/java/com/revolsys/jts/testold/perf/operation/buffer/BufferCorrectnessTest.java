@@ -65,14 +65,14 @@ public class BufferCorrectnessTest {
   void doBuffer(final String wkt, final double dist) throws Exception {
     final Geometry g = this.rdr.read(wkt);
     final Geometry buf = g.buffer(dist, -4);
-    System.out.println(buf);
+  //  System.out.println(buf);
   };
 
   void doBuffer(final String wkt, final double dist, final int quadSegs)
     throws Exception {
     final Geometry g = this.rdr.read(wkt);
     final Geometry buf = g.buffer(dist, quadSegs);
-    System.out.println(buf);
+  //  System.out.println(buf);
   };
 
   void run() throws Exception {
@@ -84,14 +84,14 @@ public class BufferCorrectnessTest {
     final String wkt = "POLYGON ((-2531.310546875 -17.19328498840332, -2518.694580078125 -27.471830368041992, -2564.515869140625 -44.53504943847656, -2531.310546875 -17.19328498840332))";
     final Geometry g = this.rdr.read(wkt);
     final Geometry buf = g.buffer(1.0, 1);
-    System.out.println(buf);
+  //  System.out.println(buf);
   };
 
   void run3() throws Exception {
     final String wkt = "MULTILINESTRING ((1335558.59524 631743.01449, 1335572.28215 631775.89056, 1335573.2578018496 631782.1915185435),  (1335573.2578018496 631782.1915185435, 1335576.62035 631803.90754), (1335558.59524 631743.01449, 1335573.2578018496 631782.1915185435), (1335573.2578018496 631782.1915185435, 1335580.70187 631802.08139))";
     final Geometry g = this.rdr.read(wkt);
     final Geometry buf = g.buffer(15);
-    System.out.println(buf);
+  //  System.out.println(buf);
   };
 
   void run4() throws Exception {
@@ -106,7 +106,7 @@ public class BufferCorrectnessTest {
       BufferParameters.CAP_SQUARE, BufferParameters.JOIN_MITRE, 10);
     final Geometry buf = Buffer.buffer(g, 200, params);
 
-    System.out.println(buf);
+  //  System.out.println(buf);
   }
 
   void run5() throws Exception {
@@ -119,7 +119,7 @@ public class BufferCorrectnessTest {
       BufferParameters.CAP_ROUND, BufferParameters.JOIN_MITRE, 5);
     final Geometry buf = Buffer.buffer(g, -5, params);
 
-    System.out.println(buf);
+  //  System.out.println(buf);
   };
 
   void run6() throws Exception {
@@ -132,7 +132,7 @@ public class BufferCorrectnessTest {
       BufferParameters.CAP_ROUND, BufferParameters.JOIN_MITRE, 5);
     final Geometry buf = Buffer.buffer(g, -5, params);
 
-    System.out.println(buf);
+  //  System.out.println(buf);
   };
 
   void run7() throws Exception {
@@ -140,7 +140,7 @@ public class BufferCorrectnessTest {
     final String wkt = "MULTILINESTRING ((1335558.59524 631743.01449, 1335572.28215 631775.89056, 1335573.2578018496 631782.1915185435),  (1335573.2578018496 631782.1915185435, 1335576.62035 631803.90754),  (1335573.2578018496 631782.1915185435, 1335580.70187 631802.08139))";
     final Geometry g = this.rdr.read(wkt);
     final Geometry buf = g.buffer(15);
-    System.out.println(buf);
+  //  System.out.println(buf);
   };
 
 }

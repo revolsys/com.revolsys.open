@@ -56,7 +56,7 @@ public class PerformanceTestRunner {
           for (int iter = 0; iter < runIter; iter++) {
             element.invoke(test);
           }
-          System.out.println(element.getName() + " : " + sw.getTimeString());
+        //  System.out.println(element.getName() + " : " + sw.getTimeString());
         }
         test.endRun();
       }

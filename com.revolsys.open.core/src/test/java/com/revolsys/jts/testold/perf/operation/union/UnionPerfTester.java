@@ -57,12 +57,12 @@ public class UnionPerfTester {
         itemEnv.expandToInclude(((Geometry)o).getBoundingBox());
       }
     }
-    System.out.println(this.factory.toGeometry(itemEnv));
+  //  System.out.println(this.factory.toGeometry(itemEnv));
   }
 
   public void run(final String testName, final int testType) {
-    System.out.println();
-    System.out.println("======= Union Algorithm: " + testName + " ===========");
+  //  System.out.println();
+  //  System.out.println("======= Union Algorithm: " + testName + " ===========");
 
     final Stopwatch sw = new Stopwatch();
     for (int i = 0; i < MAX_ITER; i++) {
@@ -82,11 +82,11 @@ public class UnionPerfTester {
       // printFormatted(union);
 
     }
-    System.out.println("Finished in " + sw.getTimeString());
+  //  System.out.println("Finished in " + sw.getTimeString());
   }
 
   public void runAll() {
-    System.out.println("# items: " + this.polys.size());
+  //  System.out.println("# items: " + this.polys.size());
     run("Cascaded", CASCADED, this.polys);
     // run("Buffer-0", BUFFER0, polys);
 

@@ -52,7 +52,7 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
       @Override
       public void run() {
         while (true) {
-          System.out.println(threadIndex);
+        //  System.out.println(threadIndex);
           PreparedGeometryThreadSafeTest.this.pg.intersects(PreparedGeometryThreadSafeTest.this.g);
         }
       }

@@ -26,7 +26,7 @@ public class DDIOTest extends TestCase {
     final double err = xdd.subtract(expectedVal).doubleValue();
     final double relErr = err / xdd.doubleValue();
 
-    System.out.println("Parsed= " + xdd + " rel err= " + relErr);
+  //  System.out.println("Parsed= " + xdd + " rel err= " + relErr);
 
     assertTrue(err <= relErrBound);
   }
@@ -48,7 +48,7 @@ public class DDIOTest extends TestCase {
 
   private void checkSciNotation(final DD x, final String expectedStr) {
     final String xStr = x.toSciNotation();
-    System.out.println("Sci Notation: " + xStr);
+  //  System.out.println("Sci Notation: " + xStr);
     assertEquals(xStr, expectedStr);
   }
 
@@ -58,7 +58,7 @@ public class DDIOTest extends TestCase {
 
   private void checkStandardNotation(final DD x, final String expectedStr) {
     final String xStr = x.toStandardNotation();
-    System.out.println("Standard Notation: " + xStr);
+  //  System.out.println("Standard Notation: " + xStr);
     assertEquals(expectedStr, xStr);
   }
 
@@ -190,7 +190,7 @@ public class DDIOTest extends TestCase {
       final double x = xdd.doubleValue();
       final DD xSqr = xdd.sqr();
       final String s = xSqr.toString();
-      System.out.println(count + ": " + s);
+    //  System.out.println(count + ": " + s);
 
       final DD xSqr2 = DD.parse(s);
 

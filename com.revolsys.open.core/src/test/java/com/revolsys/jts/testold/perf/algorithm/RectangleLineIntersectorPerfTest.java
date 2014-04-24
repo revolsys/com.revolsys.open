@@ -94,12 +94,12 @@ public class RectangleLineIntersectorPerfTest {
 
   public void run(final boolean useSegInt, final boolean useSideInt) {
     if (useSegInt) {
-      System.out.println("Using Segment Intersector");
+    //  System.out.println("Using Segment Intersector");
     }
     if (useSideInt) {
-      System.out.println("Using Side Intersector");
+    //  System.out.println("Using Side Intersector");
     }
-    System.out.println("# pts: " + this.pts.length);
+  //  System.out.println("# pts: " + this.pts.length);
 
     final RectangleLineIntersector rectSegIntersector = new RectangleLineIntersector(
       this.rectEnv);
@@ -131,8 +131,8 @@ public class RectangleLineIntersectorPerfTest {
       }
     }
 
-    System.out.println("Finished in " + sw.getTimeString());
-    System.out.println();
+  //  System.out.println("Finished in " + sw.getTimeString());
+  //  System.out.println();
   }
 
   public void runBoth(final int nPts) {

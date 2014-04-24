@@ -553,6 +553,12 @@ public class GeometryFactory implements Serializable,
     return (G)geometry(geometry);
   }
 
+  public double[] copyPrecise(final double[] values) {
+    final double[] valuesPrecise = new double[values.length];
+    makePrecise(values, valuesPrecise);
+    return valuesPrecise;
+  }
+
   public Coordinates createCoordinates(final Coordinates point) {
     final Coordinates newPoint = new DoubleCoordinates(point, this.axisCount);
     makePrecise(newPoint);
@@ -1135,8 +1141,25 @@ public class GeometryFactory implements Serializable,
     coordinatesPrecisionModel.makePrecise(point);
   }
 
+  public void makePrecise(final Coordinates... points) {
+    for (final Coordinates point : points) {
+      coordinatesPrecisionModel.makePrecise(point);
+    }
+  }
+
   public void makePrecise(final CoordinatesList points) {
     points.makePrecise(coordinatesPrecisionModel);
+  }
+
+  public void makePrecise(final double[] values) {
+    makePrecise(values, values);
+  }
+
+  public void makePrecise(final double[] values, final double[] valuesPrecise) {
+    for (int i = 0; i < valuesPrecise.length; i++) {
+      final int axisIndex = i % axisCount;
+      valuesPrecise[i] = makePrecise(axisIndex, values[i]);
+    }
   }
 
   public double makePrecise(final int axisIndex, final double value) {
@@ -1152,6 +1175,12 @@ public class GeometryFactory implements Serializable,
   @Override
   public void makePrecise(final int axisCount, final double... coordinates) {
     coordinatesPrecisionModel.makePrecise(axisCount, coordinates);
+  }
+
+  public void makePrecise(final Iterable<Coordinates> points) {
+    for (final Coordinates point : points) {
+      coordinatesPrecisionModel.makePrecise(point);
+    }
   }
 
   @Override

@@ -26,8 +26,8 @@ public class LineDissolverTest extends TestCase {
     final Geometry normalizedResult = result.normalize();
     final boolean equal = normalizedResult.equalsExact(expected.normalize());
     if (!equal) {
-      System.out.println("Expected = " + expected + " actual = "
-        + normalizedResult);
+      // System.out.println("Expected = " + expected + " actual = "
+      // + normalizedResult);
     }
     assertTrue(equal);
   }

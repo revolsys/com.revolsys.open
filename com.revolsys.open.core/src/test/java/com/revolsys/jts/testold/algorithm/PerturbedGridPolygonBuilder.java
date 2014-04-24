@@ -34,8 +34,10 @@ public class PerturbedGridPolygonBuilder {
     int index = 0;
 
     for (int i = 0; i < this.numLines; i++) {
-      final Coordinates p0 = new Coordinate((double)getRandOrdinate(), 0, Coordinates.NULL_ORDINATE);
-      final Coordinates p1 = new Coordinate((double)getRandOrdinate(), this.gridWidth, Coordinates.NULL_ORDINATE);
+      final Coordinates p0 = new Coordinate(getRandOrdinate(), 0,
+        Coordinates.NULL_ORDINATE);
+      final Coordinates p1 = new Coordinate(getRandOrdinate(), this.gridWidth,
+        Coordinates.NULL_ORDINATE);
       final LineString line = this.geomFactory.lineString(new Coordinates[] {
         p0, p1
       });
@@ -43,8 +45,10 @@ public class PerturbedGridPolygonBuilder {
     }
 
     for (int i = 0; i < this.numLines; i++) {
-      final Coordinates p0 = new Coordinate((double)0, getRandOrdinate(), Coordinates.NULL_ORDINATE);
-      final Coordinates p1 = new Coordinate((double)this.gridWidth, getRandOrdinate(), Coordinates.NULL_ORDINATE);
+      final Coordinates p0 = new Coordinate((double)0, getRandOrdinate(),
+        Coordinates.NULL_ORDINATE);
+      final Coordinates p1 = new Coordinate(this.gridWidth, getRandOrdinate(),
+        Coordinates.NULL_ORDINATE);
       final LineString line = this.geomFactory.lineString(new Coordinates[] {
         p0, p1
       });
@@ -53,7 +57,7 @@ public class PerturbedGridPolygonBuilder {
 
     final MultiLineString ml = this.geomFactory.multiLineString(lines);
     final Geometry grid = ml.buffer(this.lineWidth);
-    System.out.println(grid);
+    // System.out.println(grid);
     return grid;
 
   }
@@ -67,7 +71,7 @@ public class PerturbedGridPolygonBuilder {
 
   private double getRand() {
     if (this.rand == null) {
-      System.out.println("Seed = " + this.seed);
+      // System.out.println("Seed = " + this.seed);
       this.rand = new Random(this.seed);
     }
     return this.rand.nextDouble();

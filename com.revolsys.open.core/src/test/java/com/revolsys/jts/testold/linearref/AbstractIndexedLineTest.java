@@ -24,7 +24,7 @@ public abstract class AbstractIndexedLineTest extends TestCase {
     final Geometry subLine = read(expected);
     final boolean isEqual = result.equalsExact(subLine, 1.0e-5);
     if (!isEqual) {
-      System.out.println("Computed result is: " + result);
+      // System.out.println("Computed result is: " + result);
     }
     assertTrue(isEqual);
   }
@@ -106,8 +106,8 @@ public abstract class AbstractIndexedLineTest extends TestCase {
 
     final boolean isOk = offsetPt.distance(expectedPt) < TOLERANCE_DIST;
     if (!isOk) {
-      System.out.println("Expected = " + expectedPoint + "  Actual = "
-        + offsetPt);
+      // System.out.println("Expected = " + expectedPoint + "  Actual = "
+      // + offsetPt);
     }
     assertTrue(isOk);
   }

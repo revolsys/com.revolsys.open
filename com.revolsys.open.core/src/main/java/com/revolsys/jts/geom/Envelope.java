@@ -849,29 +849,20 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   @Override
-  public <Q extends Quantity> Measurable<Q> getMaximumX() {
+  public <Q extends Quantity> Measurable<Q> getMaximum(final int axisIndex) {
     final Unit<Q> unit = getUnit();
-    return Measure.valueOf(this.getMaxX(), unit);
-  }
-
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public <Q extends Quantity> double getMaximumX(final Unit convertUnit) {
-    return getMaximumX().doubleValue(convertUnit);
+    final double max = this.getMax(axisIndex);
+    return Measure.valueOf(max, unit);
   }
 
   @Override
-  public <Q extends Quantity> Measurable<Q> getMaximumY() {
-    final Unit<Q> unit = getUnit();
-    return Measure.valueOf(this.getMaxY(), unit);
-  }
-
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public <Q extends Quantity> double getMaximumY(final Unit convertUnit) {
-    return getMaximumY().doubleValue(convertUnit);
+  public <Q extends Quantity> double getMaximum(final int axisIndex,
+    final Unit convertUnit) {
+    final Measurable<Quantity> max = getMaximum(axisIndex);
+    return max.doubleValue(convertUnit);
   }
 
   /**
@@ -906,29 +897,20 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   @Override
-  public <Q extends Quantity> Measurable<Q> getMinimumX() {
+  public <Q extends Quantity> Measurable<Q> getMinimum(final int axisIndex) {
     final Unit<Q> unit = getUnit();
-    return Measure.valueOf(this.getMinX(), unit);
-  }
-
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public <Q extends Quantity> double getMinimumX(final Unit convertUnit) {
-    return getMinimumX().doubleValue(convertUnit);
+    final double min = this.getMin(axisIndex);
+    return Measure.valueOf(min, unit);
   }
 
   @Override
-  public <Q extends Quantity> Measurable<Q> getMinimumY() {
-    final Unit<Q> unit = getUnit();
-    return Measure.valueOf(this.getMinY(), unit);
-  }
-
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public <Q extends Quantity> double getMinimumY(final Unit convertUnit) {
-    return getMinimumY().doubleValue(convertUnit);
+  public <Q extends Quantity> double getMinimum(final int axisIndex,
+    final Unit convertUnit) {
+    final Measurable<Quantity> min = getMinimum(axisIndex);
+    return min.doubleValue(convertUnit);
   }
 
   /**

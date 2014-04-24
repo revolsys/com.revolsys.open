@@ -177,16 +177,16 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         extentPanel.add(new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
             + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-            + boundingBox.getMaximumY()
+            + boundingBox.getMaximum(1)
             + "</td><td>&nbsp;</td></tr><tr>"
             + "<td><b>Left</b>: "
-            + boundingBox.getMinimumX()
+            + boundingBox.getMinimum(0)
             + "</td><td>&nbsp;</td><td>&nbsp;</td>"
             + "<td><b>Right</b>: "
-            + boundingBox.getMaximumX()
+            + boundingBox.getMaximum(0)
             + "</td></tr>"
             + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-            + boundingBox.getMinimumY() + "</td><td>&nbsp;</td></tr><tr>"
+            + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
             + "</tr></table></html>"));
 
       }

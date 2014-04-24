@@ -37,7 +37,8 @@ public class CascadedPolygonUnionTest extends TestCase {
     final List geoms = new ArrayList();
     for (int i = 0; i < num; i++) {
       for (int j = 0; j < num; j++) {
-        final Coordinates pt = new Coordinate((double)i, j, Coordinates.NULL_ORDINATE);
+        final Coordinates pt = new Coordinate((double)i, j,
+          Coordinates.NULL_ORDINATE);
         final Geometry ptGeom = this.geomFact.point(pt);
         final Geometry disc = ptGeom.buffer(radius);
         geoms.add(disc);
@@ -64,7 +65,7 @@ public class CascadedPolygonUnionTest extends TestCase {
   public void testDiscs1() throws Exception {
     final Collection geoms = createDiscs(5, 0.7);
 
-    System.out.println(this.geomFact.buildGeometry(geoms));
+    // System.out.println(this.geomFact.buildGeometry(geoms));
 
     runTest(geoms, CascadedPolygonUnionTester.MIN_SIMILARITY_MEAURE);
   }
@@ -72,7 +73,7 @@ public class CascadedPolygonUnionTest extends TestCase {
   public void testDiscs2() throws Exception {
     final Collection geoms = createDiscs(5, 0.55);
 
-    System.out.println(this.geomFact.buildGeometry(geoms));
+    // System.out.println(this.geomFact.buildGeometry(geoms));
 
     runTest(geoms, CascadedPolygonUnionTester.MIN_SIMILARITY_MEAURE);
   }

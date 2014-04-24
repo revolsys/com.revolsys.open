@@ -67,12 +67,12 @@ public class IteratedBufferStressTest {
   }
 
   Geometry doBuffer(final Geometry g, final double dist) {
-    System.out.println("Buffering with dist = " + dist);
+    // System.out.println("Buffering with dist = " + dist);
     final Geometry buf = g.buffer(dist);
-    System.out.println("Buffer result has " + buf.getVertexCount()
-      + " vertices");
+    // System.out.println("Buffer result has " + buf.getVertexCount()
+    // + " vertices");
 
-    System.out.println(buf);
+    // System.out.println(buf);
     return buf;
 
   }
@@ -86,8 +86,9 @@ public class IteratedBufferStressTest {
       final Geometry b2 = doBuffer(b1, -dist);
       dist += 1;
       base = b2;
-      System.out.println("----------------------  " + totalSW.getTimeString());
-      System.out.println();
+      // System.out.println("----------------------  " +
+      // totalSW.getTimeString());
+      // System.out.println();
     }
   }
 }

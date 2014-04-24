@@ -70,10 +70,10 @@ public class RandomLineBufferStressTest {
     final Geometry buf = g.buffer(distance);
     final String isValidMsg = BufferResultValidator.isValidMsg(g, distance, buf);
     if (isValidMsg != null) {
-      System.out.println("Input: ");
-      System.out.println(g);
-      System.out.println("Buffer: ");
-      System.out.println(buf);
+      // System.out.println("Input: ");
+      // System.out.println(g);
+      // System.out.println("Buffer: ");
+      // System.out.println(buf);
 
       throw new IllegalStateException(isValidMsg);
     }
@@ -92,8 +92,8 @@ public class RandomLineBufferStressTest {
 
     final Geometry line = RandomOffsetLineStringGenerator.generate(lineScale,
       numPts, this.geometryFactory);
-    System.out.println();
-    System.out.println(line);
+    // System.out.println();
+    // System.out.println(line);
 
     runCase(line, 10, lineScale, numPts);
     runCase(line, 1, lineScale, numPts);
@@ -103,8 +103,9 @@ public class RandomLineBufferStressTest {
   void runCase(final Geometry line, final double dist, final double lineScale,
     final int numPts) throws Exception {
     this.caseCount++;
-    System.out.println("Running case " + this.caseCount + "  (line scale = "
-      + lineScale + "  buffer dist = " + dist + "  num pts = " + numPts + " )");
+    // System.out.println("Running case " + this.caseCount + "  (line scale = "
+    // + lineScale + "  buffer dist = " + dist + "  num pts = " + numPts +
+    // " )");
     checkBuffer(line, dist);
   }
 

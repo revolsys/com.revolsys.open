@@ -32,7 +32,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final Coordinates p1, final int expectedPositionValue) {
     final int octant = Octant.octant(seg.getP0(), seg.getP1());
     final int posValue = SegmentPointComparator.compare(octant, p0, p1);
-    System.out.println(octant + " " + p0 + " " + p1 + " " + posValue);
+  //  System.out.println(octant + " " + p0 + " " + p1 + " " + posValue);
     assertTrue(posValue == expectedPositionValue);
   }
 

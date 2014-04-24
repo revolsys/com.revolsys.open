@@ -31,13 +31,13 @@ public class CascadedPolygonUnionTester {
   }
 
   public boolean test(final Collection geoms, final double minimumMeasure) {
-    System.out.println("Computing Iterated union");
+    // System.out.println("Computing Iterated union");
     final Geometry union1 = unionIterated(geoms);
-    System.out.println("Computing Cascaded union");
+    // System.out.println("Computing Cascaded union");
     final Geometry union2 = unionCascaded(geoms);
 
-    System.out.println("Testing similarity with min measure = "
-      + minimumMeasure);
+    // System.out.println("Testing similarity with min measure = "
+    // + minimumMeasure);
 
     final double areaMeasure = new AreaSimilarityMeasure().measure(union1,
       union2);
@@ -46,9 +46,9 @@ public class CascadedPolygonUnionTester {
     final double overallMeasure = SimilarityMeasureCombiner.combine(
       areaMeasure, hausMeasure);
 
-    System.out.println("Area measure = " + areaMeasure
-      + "   Hausdorff measure = " + hausMeasure + "    Overall = "
-      + overallMeasure);
+    // System.out.println("Area measure = " + areaMeasure
+    // + "   Hausdorff measure = " + hausMeasure + "    Overall = "
+    // + overallMeasure);
 
     return overallMeasure > minimumMeasure;
   }

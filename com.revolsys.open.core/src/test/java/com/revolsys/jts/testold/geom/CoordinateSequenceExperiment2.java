@@ -36,7 +36,6 @@ import java.io.IOException;
 
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 
 /**
  * @version 1.7
@@ -50,8 +49,7 @@ public class CoordinateSequenceExperiment2 {
     System.exit(0);
   }
 
-  GeometryFactory fact = GeometryFactory.getFactory(0,
-    2);
+  GeometryFactory fact = GeometryFactory.getFactory(0, 2);
 
   public void run() throws IOException {
     int factor = 1;
@@ -78,7 +76,7 @@ public class CoordinateSequenceExperiment2 {
     long totalTime = endTime - startTime;
     String totalTimeStr = totalTime < 10000 ? totalTime + " ms" : totalTime
       / 1000.0 + " s";
-    System.out.println("Sine Star Creation Executed in " + totalTimeStr);
+    // System.out.println("Sine Star Creation Executed in " + totalTimeStr);
 
     final Polygon box = GeometryTestFactory.createBox(this.fact, 0, 0, 1, 100.0);
 
@@ -89,7 +87,7 @@ public class CoordinateSequenceExperiment2 {
     totalTime = endTime - startTime;
     totalTimeStr = totalTime < 10000 ? totalTime + " ms" : totalTime / 1000.0
       + " s";
-    System.out.println("n Pts: " + nPts + "   Executed in " + totalTimeStr);
+    // System.out.println("n Pts: " + nPts + "   Executed in " + totalTimeStr);
   }
 
   public void run2(final int nPts) throws IOException {
@@ -105,10 +103,10 @@ public class CoordinateSequenceExperiment2 {
     long totalTime = endTime - startTime;
     String totalTimeStr = totalTime < 10000 ? totalTime + " ms" : totalTime
       / 1000.0 + " s";
-    System.out.println("Sine Star Creation Executed in " + totalTimeStr);
+    // System.out.println("Sine Star Creation Executed in " + totalTimeStr);
 
     // RobustDeterminant.callCount = 0;
-    System.out.println("n Pts: " + nPts);
+    // System.out.println("n Pts: " + nPts);
 
     startTime = System.currentTimeMillis();
     poly.intersects(box);
@@ -121,6 +119,6 @@ public class CoordinateSequenceExperiment2 {
 
     // System.out.println("   signOfDet2x2 calls: " +
     // RobustDeterminant.callCount);
-    System.out.println("   Executed in " + totalTimeStr);
+    // System.out.println("   Executed in " + totalTimeStr);
   }
 }

@@ -1,6 +1,5 @@
 package com.revolsys.jts.testold.perf.algorithm;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.MinimumBoundingCircle;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -40,7 +39,7 @@ public class MinimumBoundingCircleStressTest {
     for (int i = 0; i < n; i++) {
       final double x = 100 * Math.random();
       final double y = 100 * Math.random();
-      pts[i] = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
+      pts[i] = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
     }
     return pts;
   }
@@ -58,8 +57,8 @@ public class MinimumBoundingCircleStressTest {
     final MinimumBoundingCircle mbc = new MinimumBoundingCircle(mp);
     final Coordinates centre = mbc.getCentre();
     final double radius = mbc.getRadius();
-    System.out.println("Testing " + nPts + " random points.  Radius = "
-      + radius);
+    // System.out.println("Testing " + nPts + " random points.  Radius = "
+    // + radius);
 
     checkWithinCircle(randPts, centre, radius, 0.0001);
   }

@@ -71,10 +71,10 @@ public class InteriorPointTest extends TestCase {
     for (final Iterator i = geoms.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
       checkInteriorPoint(g);
-      System.out.print(".");
+      // System.out.print(".");
     }
-    System.out.println();
-    System.out.println("  " + sw.getTimeString());
+    // System.out.println();
+    // System.out.println("  " + sw.getTimeString());
   }
 
   void checkInteriorPointFile(final String file) throws Exception {

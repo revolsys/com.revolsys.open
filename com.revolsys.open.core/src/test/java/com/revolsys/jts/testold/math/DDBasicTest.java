@@ -47,10 +47,10 @@ public class DDBasicTest extends TestCase {
 
     final DD delta = diff.subtract(b2dd);
 
-    System.out.println();
-    System.out.println("A = " + a + ", B = " + b);
-    System.out.println("[DD] (a+b)(a-b) = " + abProd
-      + "   -((a^2 - b^2) - a^2) = " + diff + "   delta = " + delta);
+    // System.out.println();
+    // System.out.println("A = " + a + ", B = " + b);
+    // System.out.println("[DD] (a+b)(a-b) = " + abProd
+    // + "   -((a^2 - b^2) - a^2) = " + diff + "   delta = " + delta);
     // printBinomialSquareDouble(a,b);
 
     final boolean isSame = diff.equals(b2dd);
@@ -87,10 +87,10 @@ public class DDBasicTest extends TestCase {
 
     final DD delta = diff.subtract(sum);
 
-    System.out.println();
-    System.out.println("A = " + a + ", B = " + b);
-    System.out.println("[DD]     2ab+b^2 = " + sum + "   (a+b)^2 - a^2 = "
-      + diff + "   delta = " + delta);
+    // System.out.println();
+    // System.out.println("A = " + a + ", B = " + b);
+    // System.out.println("[DD]     2ab+b^2 = " + sum + "   (a+b)^2 - a^2 = "
+    // + diff + "   delta = " + delta);
     printBinomialSquareDouble(a, b);
 
     final boolean isSame = diff.equals(sum);
@@ -107,7 +107,7 @@ public class DDBasicTest extends TestCase {
   private void checkErrorBound(final String tag, final DD x, final DD y,
     final double errBound) {
     final DD err = x.subtract(y).abs();
-    System.out.println(tag + " err=" + err);
+    // System.out.println(tag + " err=" + err);
     final boolean isWithinEps = err.doubleValue() <= errBound;
     assertTrue(isWithinEps);
   }
@@ -120,14 +120,14 @@ public class DDBasicTest extends TestCase {
   private void checkPow(final double x, final int exp, final double errBound) {
     final DD xdd = new DD(x);
     final DD pow = xdd.pow(exp);
-    System.out.println("Pow(" + x + ", " + exp + ") = " + pow);
+    // System.out.println("Pow(" + x + ", " + exp + ") = " + pow);
     final DD pow2 = slowPow(xdd, exp);
 
     final double err = pow.subtract(pow2).doubleValue();
 
     final boolean isOK = err < errBound;
     if (!isOK) {
-      System.out.println("Test slowPow value " + pow2);
+      // System.out.println("Test slowPow value " + pow2);
     }
 
     assertTrue(err <= errBound);
@@ -139,8 +139,8 @@ public class DDBasicTest extends TestCase {
 
     final double err = xdd.subtract(rr).doubleValue();
 
-    System.out.println("DD Recip = " + xdd + " DD delta= " + err
-      + " double recip delta= " + (x - 1.0 / (1.0 / x)));
+    // System.out.println("DD Recip = " + xdd + " DD delta= " + err
+    // + " double recip delta= " + (x - 1.0 / (1.0 / x)));
 
     assertTrue(err <= errBound);
   }
@@ -160,8 +160,8 @@ public class DDBasicTest extends TestCase {
   void printBinomialSquareDouble(final double a, final double b) {
     final double sum = 2 * a * b + b * b;
     final double diff = (a + b) * (a + b) - a * a;
-    System.out.println("[double] 2ab+b^2= " + sum + "   (a+b)^2-a^2= " + diff
-      + "   delta= " + (sum - diff));
+    // System.out.println("[double] 2ab+b^2= " + sum + "   (a+b)^2-a^2= " + diff
+    // + "   delta= " + (sum - diff));
   }
 
   private DD slowPow(final DD x, final int exp) {

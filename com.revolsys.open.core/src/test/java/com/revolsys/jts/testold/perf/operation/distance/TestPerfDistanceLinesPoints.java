@@ -71,7 +71,7 @@ public class TestPerfDistanceLinesPoints {
     final double inc = extent / nSegs;
     for (int i = 0; i < nSegs; i++) {
       final double ord = i * inc;
-      final Coordinates p = new Coordinate((double)ord, ord, Coordinates.NULL_ORDINATE);
+      final Coordinates p = new Coordinate(ord, ord, Coordinates.NULL_ORDINATE);
       final Geometry pt = geomFact.point(p);
       circles[i] = (Polygon)pt.buffer(inc / 2);
     }
@@ -85,15 +85,17 @@ public class TestPerfDistanceLinesPoints {
     final double inc = extent / nSegs;
     for (int i = 1; i <= nSegs; i++) {
       final double ord = i * inc;
-      pts[i] = new Coordinate((double)ord, ord, Coordinates.NULL_ORDINATE);
+      pts[i] = new Coordinate(ord, ord, Coordinates.NULL_ORDINATE);
     }
     return geomFact.lineString(pts);
   }
 
   Geometry createLine(final double extent, final int nSegs) {
     final Coordinates[] pts = new Coordinates[] {
-      new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), new Coordinate((double)0, extent, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)extent, extent, Coordinates.NULL_ORDINATE), new Coordinate((double)extent, 0, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)0, extent, Coordinates.NULL_ORDINATE),
+      new Coordinate(extent, extent, Coordinates.NULL_ORDINATE),
+      new Coordinate(extent, 0, Coordinates.NULL_ORDINATE)
 
     };
     final Geometry outline = geomFact.lineString(pts);
@@ -109,7 +111,7 @@ public class TestPerfDistanceLinesPoints {
     final double yinc = extent.getHeight() / nPtsSide;
     for (int i = 0; i < nPtsSide; i++) {
       for (int j = 0; j < nPtsSide; j++) {
-        pts[index++] = geomFact.point(new Coordinate((double)extent.getMinX() + i
+        pts[index++] = geomFact.point(new Coordinate(extent.getMinX() + i
           * xinc, extent.getMinY() + j * yinc, Coordinates.NULL_ORDINATE));
       }
     }
@@ -148,8 +150,8 @@ public class TestPerfDistanceLinesPoints {
 
   public void test(final Geometry[] pts, final Geometry target) {
     if (this.verbose) {
-      System.out.println("Query points = " + pts.length
-        + "     Target points = " + target.getVertexCount());
+      // System.out.println("Query points = " + pts.length
+      // + "     Target points = " + target.getVertexCount());
       // if (! verbose) System.out.print(num + ", ");
     }
 
@@ -159,14 +161,14 @@ public class TestPerfDistanceLinesPoints {
       computeDistance(pts, target);
     }
     if (!this.verbose) {
-      System.out.println(sw.getTimeString());
+      // System.out.println(sw.getTimeString());
     }
     if (this.verbose) {
       final String name = USE_INDEXED_DIST ? "IndexedFacetDistance"
         : "Distance";
-      System.out.println(name + " - Run time: " + sw.getTimeString());
+      // System.out.println(name + " - Run time: " + sw.getTimeString());
       // System.out.println("       (Distance = " + dist + ")\n");
-      System.out.println();
+      // System.out.println();
     }
   }
 
@@ -186,7 +188,8 @@ public class TestPerfDistanceLinesPoints {
 
   public void xtest(final int num) throws Exception {
     final Geometry target = loadData("C:\\proj\\JTS\\test\\g2e\\ffmwdec08.wkt");
-    final BoundingBox bcEnv_Albers = new Envelope(2, -45838, 255756, 1882064, 1733287);
+    final BoundingBox bcEnv_Albers = new Envelope(2, -45838, 255756, 1882064,
+      1733287);
     final Geometry[] pts = createPoints(bcEnv_Albers, num);
 
     test(pts, target);

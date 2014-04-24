@@ -34,10 +34,10 @@ public class PointInAreaPerfTester {
   }
 
   public void printStats() {
-    System.out.println("Location counts: " + " Boundary = "
-      + this.locationCount[Location.BOUNDARY.getIndex()] + " Interior = "
-      + this.locationCount[Location.INTERIOR.getIndex()] + " Exterior = "
-      + this.locationCount[Location.EXTERIOR.getIndex()]);
+    // System.out.println("Location counts: " + " Boundary = "
+    // + this.locationCount[Location.BOUNDARY.getIndex()] + " Interior = "
+    // + this.locationCount[Location.INTERIOR.getIndex()] + " Exterior = "
+    // + this.locationCount[Location.EXTERIOR.getIndex()]);
   }
 
   /**
@@ -66,7 +66,7 @@ public class PointInAreaPerfTester {
         this.locationCount[loc.getIndex()]++;
       }
     }
-    System.out.println("Test completed in " + sw.getTimeString());
+    // System.out.println("Test completed in " + sw.getTimeString());
     printStats();
     return true;
   }

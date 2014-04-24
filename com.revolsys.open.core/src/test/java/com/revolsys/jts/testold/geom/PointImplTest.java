@@ -139,8 +139,8 @@ public class PointImplTest extends TestCase {
     }
     final Point albersPoint3 = webMercatorPoint.convert(albers2d);
     final Point albersPoint4 = albersPoint3.convert(albers3d);
-    System.out.println(webMercatorPoint);
-    System.out.println(albersPoint);
+    // System.out.println(webMercatorPoint);
+    // System.out.println(albersPoint);
 
   }
 }

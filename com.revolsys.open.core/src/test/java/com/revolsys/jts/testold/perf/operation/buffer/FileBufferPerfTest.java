@@ -35,16 +35,16 @@ public class FileBufferPerfTest {
   }
 
   void runAll(final List polys, final double distance) {
-    System.out.println("Geom count = " + polys.size() + "   distance = "
-      + distance);
+    // System.out.println("Geom count = " + polys.size() + "   distance = "
+    // + distance);
     final Stopwatch sw = new Stopwatch();
     for (final Iterator i = polys.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
       g.buffer(distance);
       System.out.print(".");
     }
-    System.out.println();
-    System.out.println("   Time = " + sw.getTimeString());
+    // System.out.println();
+    // System.out.println("   Time = " + sw.getTimeString());
   }
 
   public void test() throws Exception {

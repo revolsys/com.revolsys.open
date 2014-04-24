@@ -123,7 +123,7 @@ public class QuadtreeCorrectTest {
         // queryTime(env);
       }
     }
-    System.out.println("Time = " + sw.getTimeString());
+    // System.out.println("Time = " + sw.getTimeString());
   }
 
   void queryTest(final Envelope env) {
@@ -146,8 +146,8 @@ public class QuadtreeCorrectTest {
 
   public void run() {
     fill();
-    System.out.println("depth = " + this.q.depth() + "  size = "
-      + this.q.size());
+    // System.out.println("depth = " + this.q.depth() + "  size = "
+    // + this.q.size());
     runQueries();
   }
 

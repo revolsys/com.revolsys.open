@@ -7,7 +7,6 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
-import com.revolsys.jts.util.Memory;
 import com.revolsys.jts.util.Stopwatch;
 
 public class DelaunayPerfTest {
@@ -26,7 +25,7 @@ public class DelaunayPerfTest {
     for (int i = 0; i < nPts; i++) {
       final double x = SIDE_LEN * Math.random();
       final double y = SIDE_LEN * Math.random();
-      pts.add(new Coordinate((double)x, y, Coordinates.NULL_ORDINATE));
+      pts.add(new Coordinate(x, y, Coordinates.NULL_ORDINATE));
     }
     return pts;
   }
@@ -40,7 +39,7 @@ public class DelaunayPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double x = i * SIDE_LEN + SIDE_LEN * Math.random();
         final double y = j * SIDE_LEN + SIDE_LEN * Math.random();
-        pts.add(new Coordinate((double)x, y, Coordinates.NULL_ORDINATE));
+        pts.add(new Coordinate(x, y, Coordinates.NULL_ORDINATE));
       }
     }
     return pts;
@@ -64,7 +63,7 @@ public class DelaunayPerfTest {
 
   public void run(final int nPts) {
     final List pts = randomPoints(nPts);
-    System.out.println("# pts: " + pts.size());
+    // System.out.println("# pts: " + pts.size());
     final Stopwatch sw = new Stopwatch();
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(pts);
@@ -73,8 +72,8 @@ public class DelaunayPerfTest {
     // don't actually form output geometry, to save time and memory
     builder.getSubdivision();
 
-    System.out.println("  --  Time: " + sw.getTimeString() + "  Mem: "
-      + Memory.usedTotalString());
+    // System.out.println("  --  Time: " + sw.getTimeString() + "  Mem: "
+    // + Memory.usedTotalString());
     // System.out.println(g);
   }
 }

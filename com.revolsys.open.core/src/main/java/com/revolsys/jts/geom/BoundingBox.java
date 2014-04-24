@@ -4,6 +4,7 @@ import javax.measure.Measurable;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
+import javax.measure.unit.Unit;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
@@ -175,9 +176,10 @@ public interface BoundingBox {
 
   double getMax(int i);
 
-  <Q extends Quantity> Measurable<Q> getMaximumX();
+  <Q extends Quantity> Measurable<Q> getMaximum(int axisIndex);
 
-  <Q extends Quantity> Measurable<Q> getMaximumY();
+  @SuppressWarnings("rawtypes")
+  <Q extends Quantity> double getMaximum(int axisIndex, final Unit convertUnit);
 
   /**
    *  Returns the <code>BoundingBox</code>s maximum x-value. min x > max x
@@ -197,9 +199,10 @@ public interface BoundingBox {
 
   double getMin(int i);
 
-  <Q extends Quantity> Measurable<Q> getMinimumX();
+  <Q extends Quantity> Measurable<Q> getMinimum(int axisIndex);
 
-  <Q extends Quantity> Measurable<Q> getMinimumY();
+  @SuppressWarnings("rawtypes")
+  <Q extends Quantity> double getMinimum(int axisIndex, final Unit convertUnit);
 
   /**
    *  Returns the <code>BoundingBox</code>s minimum x-value. min x > max x

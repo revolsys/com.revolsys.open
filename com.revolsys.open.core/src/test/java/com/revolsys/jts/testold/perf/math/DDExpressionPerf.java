@@ -29,15 +29,15 @@ public class DDExpressionPerf {
     final double ddSelfTime = runDoubleDoubleSelf(n);
     final double bigDecTime = runBigDecimal(n);
 
-    System.out.println("BigDecimal VS double performance factor = "
-      + bigDecTime / doubleTime);
-    System.out.println("BigDecimal VS DD performance factor = " + bigDecTime
-      / ddTime);
+    // System.out.println("BigDecimal VS double performance factor = "
+    // + bigDecTime / doubleTime);
+    // System.out.println("BigDecimal VS DD performance factor = " + bigDecTime
+    // / ddTime);
 
-    System.out.println("DD VS double performance factor = " + ddTime
-      / doubleTime);
-    System.out.println("DD-Self VS double performance factor = " + ddSelfTime
-      / doubleTime);
+    // System.out.println("DD VS double performance factor = " + ddTime
+    // / doubleTime);
+    // System.out.println("DD-Self VS double performance factor = " + ddSelfTime
+    // / doubleTime);
 
   }
 
@@ -55,8 +55,8 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    System.out.println("BigDecimal:      nIter = " + nIter + "   time = "
-      + sw.getTimeString());
+    // System.out.println("BigDecimal:      nIter = " + nIter + "   time = "
+    // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
 
@@ -73,8 +73,8 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    System.out.println("double:          nIter = " + nIter + "   time = "
-      + sw.getTimeString());
+    // System.out.println("double:          nIter = " + nIter + "   time = "
+    // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
 
@@ -92,8 +92,8 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    System.out.println("DD:              nIter = " + nIter + "   time = "
-      + sw.getTimeString());
+    // System.out.println("DD:              nIter = " + nIter + "   time = "
+    // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
 
@@ -119,8 +119,8 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    System.out.println("DD-Self:         nIter = " + nIter + "   time = "
-      + sw.getTimeString());
+    // System.out.println("DD-Self:         nIter = " + nIter + "   time = "
+    // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
 
@@ -140,9 +140,8 @@ public class DDExpressionPerf {
       // System.out.println(det);
     }
     sw.stop();
-    System.out.println("DD:              nIter = " + nIter + "   time = "
-      + sw.getTimeString());
+    // // System.out.println("DD:              nIter = " + nIter + "   time = "
+    // + sw.getTimeString());
     return sw.getTime() / (double)nIter;
   }
-
 }

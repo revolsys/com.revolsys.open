@@ -194,7 +194,7 @@ public class MiscellaneousTest2 extends TestCase {
     final GeometryCollection polygonCollection = GeometryFactory.getFactory(0,
       2).geometryCollection(a, b);
     final Geometry union = polygonCollection.buffer(0);
-    System.out.println(union);
+  //  System.out.println(union);
     assertEquals(
       "POLYGON((0 0,0 100,50 100,50 150,150 150,150 50,100 50,100 0,0 0))",
       union.toString());

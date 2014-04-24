@@ -72,10 +72,10 @@ public class PointInAreaStressTester {
   }
 
   public void printStats() {
-    System.out.println("Location counts: " + " Boundary = "
-      + this.locationCount[Location.BOUNDARY.getIndex()] + " Interior = "
-      + this.locationCount[Location.INTERIOR.getIndex()] + " Exterior = "
-      + this.locationCount[Location.EXTERIOR.getIndex()]);
+    // System.out.println("Location counts: " + " Boundary = "
+    // + this.locationCount[Location.BOUNDARY.getIndex()] + " Interior = "
+    // + this.locationCount[Location.INTERIOR.getIndex()] + " Exterior = "
+    // + this.locationCount[Location.EXTERIOR.getIndex()]);
   }
 
   /**
@@ -111,7 +111,7 @@ public class PointInAreaStressTester {
         }
       }
     }
-    System.out.println("Test completed in " + sw.getTimeString());
+    // System.out.println("Test completed in " + sw.getTimeString());
     printStats();
     return true;
   }

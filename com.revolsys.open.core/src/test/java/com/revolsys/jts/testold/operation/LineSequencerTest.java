@@ -59,8 +59,8 @@ public class LineSequencerTest extends TestCase {
       final Geometry result = sequencer.getSequencedLineStrings();
       final boolean isOK = expected.equalsNorm(result);
       if (!isOK) {
-        System.out.println("ERROR - Expected: " + expected);
-        System.out.println("          Actual: " + result);
+      //  System.out.println("ERROR - Expected: " + expected);
+      //  System.out.println("          Actual: " + result);
       }
       assertTrue(isOK);
 
