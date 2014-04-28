@@ -244,7 +244,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString(GeometryFactory.toLineStringArray(Arrays.asList(geometries)));
+        return GeometryImplTest.this.geometryFactory.multiLineString((Object[])geometries);
       }
     };
 
@@ -273,7 +273,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString(GeometryFactory.toLineStringArray(Arrays.asList(geometries)));
+        return GeometryImplTest.this.geometryFactory.multiLineString((Object[])geometries);
       }
     };
 
@@ -283,7 +283,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory2 = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString(GeometryFactory.toLineStringArray(Arrays.asList(geometries)));
+        return GeometryImplTest.this.geometryFactory.multiLineString((Object[])geometries);
       }
     };
 
@@ -301,7 +301,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
-        return GeometryImplTest.this.geometryFactory.multiPoint(GeometryFactory.toPointArray(Arrays.asList(geometries)));
+        return GeometryImplTest.this.geometryFactory.multiPoint((Object[])geometries);
       }
     };
 
@@ -318,7 +318,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
-        return GeometryImplTest.this.geometryFactory.multiPolygon(GeometryFactory.toPolygonArray(Arrays.asList(geometries)));
+        return GeometryImplTest.this.geometryFactory.multiPolygon((Object[])geometries);
       }
     };
 

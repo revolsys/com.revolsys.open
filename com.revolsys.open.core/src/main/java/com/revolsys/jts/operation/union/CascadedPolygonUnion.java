@@ -112,8 +112,7 @@ public class CascadedPolygonUnion {
     if (polygons.size() == 1) {
       return (Polygon)polygons.get(0);
     }
-    return g.getGeometryFactory().multiPolygon(
-      GeometryFactory.toPolygonArray(polygons));
+    return g.getGeometryFactory().multiPolygon(polygons);
   }
 
   /**

@@ -146,7 +146,7 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
   }
 
   @Override
-  public Segment getSegment(final int... vertexId) {
+  public Segment getSegment(final int... segmentId) {
     return null;
   }
 

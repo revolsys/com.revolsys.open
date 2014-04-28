@@ -33,11 +33,10 @@
 
 package com.revolsys.jts.testold.junit;
 
-import java.util.ArrayList;
-
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
@@ -51,7 +50,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.impl.GeometryCollectionImpl;
 import com.revolsys.jts.geom.impl.MultiLineStringImpl;
 import com.revolsys.jts.geom.impl.MultiPointImpl;
 import com.revolsys.jts.io.WKTReader;
@@ -76,8 +74,8 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testBoundaryOfEmptyGeometry() throws Exception {
-    Assert.equals(this.geometryFactory.point().getBoundary().getClass(),
-      GeometryCollectionImpl.class);
+    Assert.equals(this.geometryFactory.point().getBoundary().getDataType(),
+      DataTypes.GEOMETRY_COLLECTION);
     Assert.equals(this.geometryFactory.linearRing().getBoundary().getClass(),
       MultiPointImpl.class);
     Assert.equals(this.geometryFactory.lineString(new Coordinates[] {})
@@ -90,8 +88,9 @@ public class MiscellaneousTest extends TestCase {
     Assert.equals(this.geometryFactory.multiLineString()
       .getBoundary()
       .getClass(), MultiPointImpl.class);
-    Assert.equals(this.geometryFactory.multiPoint().getBoundary().getClass(),
-      GeometryCollectionImpl.class);
+    Assert.equals(
+      this.geometryFactory.multiPoint().getBoundary().getDataType(),
+      DataTypes.GEOMETRY_COLLECTION);
     try {
       this.geometryFactory.geometryCollection().getBoundary();
       assertTrue(false);
@@ -510,23 +509,6 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(false, p2.within(p1));
     assertEquals(false, p2.contains(p1));
     assertEquals(false, p2.overlaps(p1));
-  }
-
-  public void testToPointArray() {
-    final ArrayList list = new ArrayList();
-    list.add(this.geometryFactory.point(new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE)));
-    list.add(this.geometryFactory.point(new Coordinate((double)10, 0,
-      Coordinates.NULL_ORDINATE)));
-    list.add(this.geometryFactory.point(new Coordinate((double)10, 10,
-      Coordinates.NULL_ORDINATE)));
-    list.add(this.geometryFactory.point(new Coordinate((double)0, 10,
-      Coordinates.NULL_ORDINATE)));
-    list.add(this.geometryFactory.point(new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE)));
-    final Point[] points = GeometryFactory.toPointArray(list);
-    assertEquals(10, points[1].getX(), 1E-1);
-    assertEquals(0, points[1].getY(), 1E-1);
   }
 
 }

@@ -36,7 +36,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -300,123 +302,6 @@ public class GeometryFactory implements Serializable,
     } else {
       return coordinateSystem.getId();
     }
-  }
-
-  /**
-   *  Converts the <code>List</code> to an array.
-   *
-   *@param  geometries  the list of <code>Geometry's</code> to convert
-   *@return            the <code>List</code> in array format
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static Geometry[] toGeometryArray(final Collection geometries) {
-    if (geometries == null) {
-      return null;
-    }
-    final Geometry[] geometryArray = new Geometry[geometries.size()];
-    return (Geometry[])geometries.toArray(geometryArray);
-  }
-
-  /**
-   *  Converts the <code>List</code> to an array.
-   *
-   *@param  linearRings  the <code>List</code> of LinearRings to convert
-   *@return              the <code>List</code> in array format
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static LinearRing[] toLinearRingArray(final Collection linearRings) {
-    final LinearRing[] linearRingArray = new LinearRing[linearRings.size()];
-    return (LinearRing[])linearRings.toArray(linearRingArray);
-  }
-
-  /**
-   *  Converts the <code>List</code> to an array.
-   *
-   *@param  lineStrings  the <code>List</code> of LineStrings to convert
-   *@return              the <code>List</code> in array format
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static LineString[] toLineStringArray(final Collection lineStrings) {
-    final LineString[] lineStringArray = new LineString[lineStrings.size()];
-    return (LineString[])lineStrings.toArray(lineStringArray);
-  }
-
-  /**
-   *  Converts the <code>List</code> to an array.
-   *
-   *@param  multiLineStrings  the <code>List</code> of MultiLineStrings to convert
-   *@return                   the <code>List</code> in array format
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static MultiLineString[] toMultiLineStringArray(
-    final Collection multiLineStrings) {
-    final MultiLineString[] multiLineStringArray = new MultiLineString[multiLineStrings.size()];
-    return (MultiLineString[])multiLineStrings.toArray(multiLineStringArray);
-  }
-
-  /**
-   *  Converts the <code>List</code> to an array.
-   *
-   *@param  multiPoints  the <code>List</code> of MultiPoints to convert
-   *@return              the <code>List</code> in array format
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static MultiPoint[] toMultiPointArray(final Collection multiPoints) {
-    final MultiPoint[] multiPointArray = new MultiPoint[multiPoints.size()];
-    return (MultiPoint[])multiPoints.toArray(multiPointArray);
-  }
-
-  /**
-   *  Converts the <code>List</code> to an array.
-   *
-   *@param  multiPolygons  the <code>List</code> of MultiPolygons to convert
-   *@return                the <code>List</code> in array format
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static MultiPolygon[] toMultiPolygonArray(
-    final Collection multiPolygons) {
-    final MultiPolygon[] multiPolygonArray = new MultiPolygon[multiPolygons.size()];
-    return (MultiPolygon[])multiPolygons.toArray(multiPolygonArray);
-  }
-
-  /**
-   *  Converts the <code>List</code> to an array.
-   *
-   *@param  points  the <code>List</code> of Points to convert
-   *@return         the <code>List</code> in array format
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static Point[] toPointArray(final Collection points) {
-    final Point[] pointArray = new Point[points.size()];
-    return (Point[])points.toArray(pointArray);
-  }
-
-  /**
-   *  Converts the <code>List</code> to an array.
-   *
-   *@param  polygons  the <code>List</code> of Polygons to convert
-   *@return           the <code>List</code> in array format
-   */
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static Polygon[] toPolygonArray(final Collection polygons) {
-    final Polygon[] polygonArray = new Polygon[polygons.size()];
-    return (Polygon[])polygons.toArray(polygonArray);
   }
 
   public static GeometryFactory wgs84() {
@@ -819,16 +704,18 @@ public class GeometryFactory implements Serializable,
   }
 
   public GeometryCollection geometryCollection() {
-    return new GeometryCollectionImpl(this, null);
+    return new GeometryCollectionImpl(this);
   }
 
   @SuppressWarnings("unchecked")
   public <V extends GeometryCollection> V geometryCollection(
     final Collection<? extends Geometry> geometries) {
+    final Set<DataType> dataTypes = new HashSet<>();
     final List<Geometry> geometryList = new ArrayList<>();
     if (geometries != null) {
       for (final Geometry geometry : geometries) {
         if (geometry != null) {
+          dataTypes.add(geometry.getDataType());
           final Geometry copy = geometry.copy(this);
           geometryList.add(copy);
         }
@@ -836,6 +723,12 @@ public class GeometryFactory implements Serializable,
     }
     if (geometryList == null || geometryList.size() == 0) {
       return (V)geometryCollection();
+    } else if (dataTypes.equals(Collections.singleton(DataTypes.POINT))) {
+      return (V)multiPoint(geometryList);
+    } else if (dataTypes.equals(Collections.singleton(DataTypes.LINE_STRING))) {
+      return (V)multiLineString(geometryList);
+    } else if (dataTypes.equals(Collections.singleton(DataTypes.POLYGON))) {
+      return (V)multiPolygon(geometryList);
     } else {
       final Geometry[] geometryArray = new Geometry[geometries.size()];
       geometries.toArray(geometryArray);

@@ -41,6 +41,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.GeometryCollectionVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
@@ -140,27 +141,27 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection
   }
 
   @Override
-  public Segment getSegment(final int... vertexId) {
-    throw new UnsupportedOperationException(
-      "Segments not currently implemented for geometry collections");
+  public Segment getSegment(final int... segmentId) {
+    return new GeometryCollectionSegment(this, segmentId);
   }
 
   @Override
   public Vertex getVertex(final int... vertexId) {
-    throw new UnsupportedOperationException(
-      "Vertices not currently implemented for geometry collections");
+    return new GeometryCollectionVertex(this, vertexId);
   }
 
   @Override
   public Reader<Segment> segments() {
-    throw new UnsupportedOperationException(
-      "Segments not currently implemented for geometry collections");
+    final GeometryCollectionSegment iterator = new GeometryCollectionSegment(
+      this, -1);
+    return iterator.reader();
   }
 
   @Override
   public Reader<Vertex> vertices() {
-    throw new UnsupportedOperationException(
-      "Vertices not currently implemented for geometry collections");
+    final GeometryCollectionVertex iterator = new GeometryCollectionVertex(
+      this, -1);
+    return iterator.reader();
   }
 
 }
