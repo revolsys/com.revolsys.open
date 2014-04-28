@@ -50,6 +50,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Polygon;
@@ -227,7 +228,7 @@ public class QuadEdgeSubdivision {
 
   private QuadEdgeLocator locator = null;
 
-  private final LineSegment seg = new LineSegment();
+  private final LineSegment seg = new LineSegmentImpl();
 
   /**
    * The quadedges forming a single triangle.

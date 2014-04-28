@@ -18,6 +18,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;

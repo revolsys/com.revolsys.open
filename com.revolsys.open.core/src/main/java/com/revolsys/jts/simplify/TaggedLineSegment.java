@@ -35,14 +35,14 @@ package com.revolsys.jts.simplify;
 
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 
 /**
- * A {@link LineSegment} which is tagged with its location in a parent {@link Geometry}.
+ * A {@link LineSegmentImpl} which is tagged with its location in a parent {@link Geometry}.
  * Used to index the segments in a geometry and recover the segment locations
  * from the index.
  */
-class TaggedLineSegment extends LineSegment {
+class TaggedLineSegment extends LineSegmentImpl {
   private final Geometry parent;
 
   private final int index;

@@ -109,7 +109,7 @@ extends GeometricShapeBuilder
   {
   	if (extentLocator != null) 
   		return extentLocator.locate(p) != Location.EXTERIOR;
-  	return getExtent().contains(p);
+  	return getExtent().covers(p);
   }
   
   protected Coordinates createCoord(double x, double y)

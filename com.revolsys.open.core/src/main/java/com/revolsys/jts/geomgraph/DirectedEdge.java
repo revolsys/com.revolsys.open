@@ -100,9 +100,9 @@ public class DirectedEdge extends EdgeEnd {
    * Compute the label in the appropriate orientation for this DirEdge
    */
   private void computeDirectedLabel() {
-    label = new Label(edge.getLabel());
+    setLabel(new Label(edge.getLabel()));
     if (!isForward) {
-      label.flip();
+      getLabel().flip();
     }
   }
 
@@ -168,8 +168,8 @@ public class DirectedEdge extends EdgeEnd {
   public boolean isInteriorAreaEdge() {
     boolean isInteriorAreaEdge = true;
     for (int i = 0; i < 2; i++) {
-      if (!(label.isArea(i)
-        && label.getLocation(i, Position.LEFT) == Location.INTERIOR && label.getLocation(
+      if (!(getLabel().isArea(i)
+        && getLabel().getLocation(i, Position.LEFT) == Location.INTERIOR && getLabel().getLocation(
         i, Position.RIGHT) == Location.INTERIOR)) {
         isInteriorAreaEdge = false;
       }
@@ -185,11 +185,11 @@ public class DirectedEdge extends EdgeEnd {
    * </ul>
    */
   public boolean isLineEdge() {
-    final boolean isLine = label.isLine(0) || label.isLine(1);
-    final boolean isExteriorIfArea0 = !label.isArea(0)
-      || label.allPositionsEqual(0, Location.EXTERIOR);
-    final boolean isExteriorIfArea1 = !label.isArea(1)
-      || label.allPositionsEqual(1, Location.EXTERIOR);
+    final boolean isLine = getLabel().isLine(0) || getLabel().isLine(1);
+    final boolean isExteriorIfArea0 = !getLabel().isArea(0)
+      || getLabel().allPositionsEqual(0, Location.EXTERIOR);
+    final boolean isExteriorIfArea1 = !getLabel().isArea(1)
+      || getLabel().allPositionsEqual(1, Location.EXTERIOR);
 
     return isLine && isExteriorIfArea0 && isExteriorIfArea1;
   }

@@ -57,18 +57,18 @@ public class FacetSequence {
   private final int end;
 
   // temporary Coordinates to materialize points from the CoordinatesList
-  private final Coordinates pt = new Coordinate();
+  private Coordinates pt = new Coordinate();
 
-  private final Coordinates seqPt = new Coordinate();
+  private Coordinates seqPt = new Coordinate();
 
   // temporary Coordinates to materialize points from the CoordinatesList
-  private final Coordinates p0 = new Coordinate();
+  private Coordinates p0 = new Coordinate();
 
-  private final Coordinates p1 = new Coordinate();
+  private Coordinates p1 = new Coordinate();
 
-  private final Coordinates q0 = new Coordinate();
+  private Coordinates q0 = new Coordinate();
 
-  private final Coordinates q1 = new Coordinate();
+  private Coordinates q1 = new Coordinate();
 
   /**
    * Creates a new sequence for a single point from a CoordinatesList.
@@ -101,10 +101,10 @@ public class FacetSequence {
 
     for (int i = start; i < end - 1; i++) {
       for (int j = facetSeq.start; j < facetSeq.end - 1; j++) {
-        pts.getCoordinate(i, p0);
-        pts.getCoordinate(i + 1, p1);
-        facetSeq.pts.getCoordinate(j, q0);
-        facetSeq.pts.getCoordinate(j + 1, q1);
+        p0 = pts.getCoordinate(i);
+        p1 = pts.getCoordinate(i + 1);
+        q0 = facetSeq.pts.getCoordinate(j);
+        q1 = facetSeq.pts.getCoordinate(j + 1);
 
         final double dist = CGAlgorithms.distanceLineLine(p0, p1, q0, q1);
         if (dist == 0.0) {
@@ -123,8 +123,8 @@ public class FacetSequence {
     double minDistance = Double.MAX_VALUE;
 
     for (int i = facetSeq.start; i < facetSeq.end - 1; i++) {
-      facetSeq.pts.getCoordinate(i, q0);
-      facetSeq.pts.getCoordinate(i + 1, q1);
+      q0 = facetSeq.pts.getCoordinate(i);
+      q1 = facetSeq.pts.getCoordinate(i + 1);
       final double dist = CGAlgorithms.distancePointLine(pt, q0, q1);
       if (dist == 0.0) {
         return 0.0;
@@ -141,14 +141,14 @@ public class FacetSequence {
     final boolean isPointOther = facetSeq.isPoint();
 
     if (isPoint && isPointOther) {
-      pts.getCoordinate(start, pt);
-      facetSeq.pts.getCoordinate(facetSeq.start, seqPt);
+      pt = pts.getCoordinate(start);
+      seqPt = facetSeq.pts.getCoordinate(facetSeq.start);
       return pt.distance(seqPt);
     } else if (isPoint) {
-      pts.getCoordinate(start, pt);
+      pt = pts.getCoordinate(start);
       return computePointLineDistance(pt, facetSeq);
     } else if (isPointOther) {
-      facetSeq.pts.getCoordinate(facetSeq.start, seqPt);
+      seqPt = facetSeq.pts.getCoordinate(facetSeq.start);
       return computePointLineDistance(seqPt, this);
     }
     return computeLineLineDistance(facetSeq);
@@ -176,13 +176,11 @@ public class FacetSequence {
   public String toString() {
     final StringBuffer buf = new StringBuffer();
     buf.append("LINESTRING ( ");
-    final Coordinates p = new Coordinate();
     for (int i = start; i < end; i++) {
       if (i > start) {
         buf.append(", ");
       }
-      pts.getCoordinate(i, p);
-      buf.append(p.getX() + " " + p.getY());
+      buf.append(pts.getX(i) + " " + pts.getY(i));
     }
     buf.append(" )");
     return buf.toString();

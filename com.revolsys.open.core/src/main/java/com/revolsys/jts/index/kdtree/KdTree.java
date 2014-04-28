@@ -221,7 +221,7 @@ public class KdTree {
     if (searchLeft) {
       queryNode(currentNode.getLeft(), bottomNode, queryEnv, !odd, result);
     }
-    if (queryEnv.contains(currentNode.getCoordinate())) {
+    if (queryEnv.covers(currentNode.getCoordinate())) {
       result.add(currentNode);
     }
     if (searchRight) {

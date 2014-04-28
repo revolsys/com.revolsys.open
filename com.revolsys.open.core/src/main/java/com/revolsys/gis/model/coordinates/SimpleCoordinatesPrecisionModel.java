@@ -57,10 +57,25 @@ public class SimpleCoordinatesPrecisionModel implements
   }
 
   @Override
-  public Coordinates getPreciseCoordinates(final Coordinates coordinates) {
-    final Coordinates newCoordinates = new DoubleCoordinates(coordinates);
-    makePrecise(newCoordinates);
-    return newCoordinates;
+  public Coordinates getPreciseCoordinates(final Coordinates point) {
+    final double[] coordinates = point.getCoordinates();
+    if (scaleXY > 0) {
+      final double x = coordinates[0];
+      final double newX = makeXyPrecise(x);
+      coordinates[0] = newX;
+
+      final double y = coordinates[1];
+      final double newY = makeXyPrecise(y);
+      coordinates[1] = newY;
+    }
+    if (scaleZ > 0) {
+      if (coordinates.length > 2) {
+        final double z = coordinates[2];
+        final double newZ = makeZPrecise(z);
+        coordinates[2] = newZ;
+      }
+    }
+    return new DoubleCoordinates(coordinates);
   }
 
   @Override

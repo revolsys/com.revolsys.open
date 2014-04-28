@@ -41,6 +41,8 @@ import java.util.List;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataTypeProxy;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
+import com.revolsys.io.Reader;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.linemerge.LineMerger;
@@ -768,6 +770,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   double getArea();
 
+  int getAxisCount();
+
   /**
    * Returns the boundary, or an empty geometry of appropriate dimension
    * if this <code>Geometry</code>  is empty.
@@ -899,7 +903,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *
    *@return a Geometry representing the envelope of this Geometry
    *      
-   * @see GeometryFactory#toGeometry(Envelope) 
+   * @see GeometryFactory#toLineString(Envelope) 
    */
   Geometry getEnvelope();
 
@@ -917,6 +921,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   @SuppressWarnings("unchecked")
   <V extends Geometry> V getGeometry(final int partIndex);
+
+  /**
+   * Returns the number of {@link Geometry}s in a {@link GeometryCollection}
+   * (or 1, if the geometry is not a collection).
+   *
+   * @return the number of geometries contained in this geometry
+   */
+  int getGeometryCount();
 
   /**
    * Gets the geometryFactory which contains the context in which this geometry was created.
@@ -956,22 +968,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   double getLength();
 
-  int getAxisCount();
-
-  /**
-   * Returns the number of {@link Geometry}s in a {@link GeometryCollection}
-   * (or 1, if the geometry is not a collection).
-   *
-   * @return the number of geometries contained in this geometry
-   */
-  int getGeometryCount();
-
   Point getPoint();
-
-  /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
-  List<CoordinatesList> getPointLists();
 
   /**
    *  Returns the <code>PrecisionModel</code> used by the <code>Geometry</code>.
@@ -980,6 +977,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *      <code>Geometry</code> and all other <code>Geometry</code>s
    */
   PrecisionModel getPrecisionModel();
+
+  /**
+   * <p>Get the {@link Segment} at the specified vertexId (see {@link Segment#getSegmentId()}).</p>
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param vertexId The id of the vertex.
+   * @return The vertex or null if it does not exist.
+   */
+  Segment getSegment(final int... segmentId);
 
   /**
    *  Returns the ID of the Spatial Reference System used by the <code>Geometry</code>.
@@ -1218,6 +1224,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   Geometry reverse();
 
+  Reader<Segment> segments();
+
   /**
    * A simple scheme for applications to add their own custom data to a Geometry.
    * An example use might be to add an object representing a Coordinates Reference System.
@@ -1358,7 +1366,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return The iterator over the vertices of the geometry.
    */
-  Iterable<Vertex> vertices();
+  Reader<Vertex> vertices();
 
   /**
    * Tests whether this geometry is within the

@@ -66,7 +66,7 @@ import com.revolsys.jts.noding.SegmentString;
  */
 public class OffsetCurveSetBuilder {
 
-  private final Geometry inputGeom;
+  private final Geometry geometry;
 
   private final double distance;
 
@@ -76,7 +76,7 @@ public class OffsetCurveSetBuilder {
 
   public OffsetCurveSetBuilder(final Geometry inputGeom, final double distance,
     final OffsetCurveBuilder curveBuilder) {
-    this.inputGeom = inputGeom;
+    this.geometry = inputGeom;
     this.distance = distance;
     this.curveBuilder = curveBuilder;
   }
@@ -123,14 +123,11 @@ public class OffsetCurveSetBuilder {
    */
   private void addCurve(final Coordinates[] coord, final Location leftLoc,
     final Location rightLoc) {
-    // don't add null or trivial curves
-    if (coord == null || coord.length < 2) {
-      return;
+    if (coord != null && coord.length >= 2) {
+      final Label label = new Label(0, Location.BOUNDARY, leftLoc, rightLoc);
+      final SegmentString e = new NodedSegmentString(coord, label);
+      curveList.add(e);
     }
-    // add the edge for a coordinate list which is a raw offset curve
-    final SegmentString e = new NodedSegmentString(coord, new Label(0,
-      Location.BOUNDARY, leftLoc, rightLoc));
-    curveList.add(e);
   }
 
   private void addLineString(final LineString line) {
@@ -169,36 +166,37 @@ public class OffsetCurveSetBuilder {
     }
 
     final LinearRing shell = p.getExteriorRing();
+    final boolean shellClockwise = shell.isClockwise();
     final Coordinates[] shellCoord = CoordinateArrays.removeRepeatedPoints(shell.getCoordinateArray());
     // optimization - don't bother computing buffer
     // if the polygon would be completely eroded
     if (distance < 0.0 && isErodedCompletely(shell, distance)) {
       return;
     }
-    // don't attemtp to buffer a polygon with too few distinct vertices
+    // don't attempt to buffer a polygon with too few distinct vertices
     if (distance <= 0.0 && shellCoord.length < 3) {
       return;
     }
 
-    addPolygonRing(shellCoord, offsetDistance, offsetSide, Location.EXTERIOR,
-      Location.INTERIOR);
+    addPolygonRing(shellCoord, shellClockwise, offsetDistance, offsetSide,
+      Location.EXTERIOR, Location.INTERIOR);
 
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
 
       final LinearRing hole = p.getInteriorRing(i);
+      final boolean holeClockwise = hole.isClockwise();
       final Coordinates[] holeCoord = CoordinateArrays.removeRepeatedPoints(hole.getCoordinateArray());
 
       // optimization - don't bother computing buffer for this hole
       // if the hole would be completely covered
-      if (distance > 0.0 && isErodedCompletely(hole, -distance)) {
-        continue;
+      if (!(distance > 0.0 && isErodedCompletely(hole, -distance))) {
+        // Holes are topologically labeled opposite to the shell, since
+        // the interior of the polygon lies on their opposite side
+        // (on the left, if the hole is oriented CCW)
+        final int opposite = Position.opposite(offsetSide);
+        addPolygonRing(holeCoord, holeClockwise, offsetDistance, opposite,
+          Location.INTERIOR, Location.EXTERIOR);
       }
-
-      // Holes are topologically labelled opposite to the shell, since
-      // the interior of the polygon lies on their opposite side
-      // (on the left, if the hole is oriented CCW)
-      addPolygonRing(holeCoord, offsetDistance, Position.opposite(offsetSide),
-        Location.INTERIOR, Location.EXTERIOR);
     }
   }
 
@@ -216,8 +214,8 @@ public class OffsetCurveSetBuilder {
    * @param cwRightLoc the location on the R side of the ring (if it is CW)
    */
   private void addPolygonRing(final Coordinates[] coord,
-    final double offsetDistance, int side, final Location cwLeftLoc,
-    final Location cwRightLoc) {
+    final boolean clockwise, final double offsetDistance, int side,
+    final Location cwLeftLoc, final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
     if (offsetDistance == 0.0 && coord.length < LinearRing.MINIMUM_VALID_SIZE) {
       return;
@@ -225,8 +223,7 @@ public class OffsetCurveSetBuilder {
 
     Location leftLoc = cwLeftLoc;
     Location rightLoc = cwRightLoc;
-    if (coord.length >= LinearRing.MINIMUM_VALID_SIZE
-      && CGAlgorithms.isCCW(coord)) {
+    if (coord.length >= LinearRing.MINIMUM_VALID_SIZE && !clockwise) {
       leftLoc = cwRightLoc;
       rightLoc = cwLeftLoc;
       side = Position.opposite(side);
@@ -244,7 +241,7 @@ public class OffsetCurveSetBuilder {
    * @return a Collection of SegmentStrings representing the raw buffer curves
    */
   public List<SegmentString> getCurves() {
-    add(inputGeom);
+    add(geometry);
     return curveList;
   }
 
@@ -279,24 +276,6 @@ public class OffsetCurveSetBuilder {
     }
 
     return false;
-    /**
-     * The following is a heuristic test to determine whether an
-     * inside buffer will be eroded completely.
-     * It is based on the fact that the minimum diameter of the ring pointset
-     * provides an upper bound on the buffer distance which would erode the
-     * ring.
-     * If the buffer distance is less than the minimum diameter, the ring
-     * may still be eroded, but this will be determined by
-     * a full topological computation.
-     *
-     */
-    // System.out.println(ring);
-    /*
-     * MD 7 Feb 2005 - there's an unknown bug in the MD code, so disable this
-     * for now MinimumDiameter md = new MinimumDiameter(ring); minDiam =
-     * md.getLength(); //System.out.println(md.getDiameter()); return minDiam <
-     * 2 * Math.abs(bufferDistance);
-     */
   }
 
   /**

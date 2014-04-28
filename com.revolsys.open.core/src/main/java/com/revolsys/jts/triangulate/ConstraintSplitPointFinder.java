@@ -34,7 +34,6 @@
 package com.revolsys.jts.triangulate;
 
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
 /**

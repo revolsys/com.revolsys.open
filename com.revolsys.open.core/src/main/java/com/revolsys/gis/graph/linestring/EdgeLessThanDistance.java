@@ -5,12 +5,13 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
@@ -32,7 +33,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   public static List<Edge<LineSegment>> getEdges(final LineStringGraph graph,
     final Coordinates fromPoint, final Coordinates toPoint,
     final double maxDistance) {
-    final LineSegment lineSegment = new LineSegment(fromPoint, toPoint);
+    final LineSegment lineSegment = new LineSegmentImpl(fromPoint, toPoint);
     return getEdges(graph, lineSegment, maxDistance);
 
   }

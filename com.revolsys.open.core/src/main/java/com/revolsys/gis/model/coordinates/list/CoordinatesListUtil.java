@@ -19,7 +19,6 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
-import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -32,6 +31,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
@@ -46,28 +46,6 @@ public class CoordinatesListUtil {
   public static final String SEGMENT_DISTANCE = "segmentDistance";
 
   public static final String SEGMENT_INDEX = "segmentIndex";
-
-  public static void addElevation(
-    final CoordinatesPrecisionModel precisionModel,
-    final Coordinates coordinate, final CoordinatesList line) {
-    final CoordinatesList points = line;
-    final CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
-      points, 0);
-    final CoordinatesListCoordinates currentCoordinate = new CoordinatesListCoordinates(
-      points, 0);
-    for (int i = 1; i < points.size(); i++) {
-      currentCoordinate.next();
-
-      if (LineSegmentUtil.isPointOnLine(precisionModel, previousCoordinate,
-        currentCoordinate, coordinate)) {
-        LineSegmentUtil.addElevation(precisionModel, previousCoordinate,
-          currentCoordinate, coordinate);
-        return;
-      }
-      previousCoordinate.next();
-    }
-
-  }
 
   public static double angle(final CoordinatesList points, final int i1,
     final int i2) {

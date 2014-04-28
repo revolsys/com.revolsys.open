@@ -36,14 +36,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.vertex.MultiPolygonVertexIterable;
+import com.revolsys.jts.geom.segment.MultiPolygonSegment;
+import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.MultiPolygonVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
@@ -124,6 +129,7 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
     return 2;
   }
 
+  @Override
   public Polygon getPolygon(final int partIndex) {
     return (Polygon)super.getGeometry(partIndex);
   }
@@ -136,9 +142,47 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
     return (List)super.getGeometries();
   }
 
-  /*
-   * public boolean isSimple() { return true; }
-   */
+  @Override
+  public Segment getSegment(final int... segmentId) {
+    if (segmentId == null || segmentId.length != 3) {
+      return null;
+    } else {
+      final int partIndex = segmentId[0];
+      if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final Polygon polygon = getPolygon(partIndex);
+        final int ringIndex = segmentId[1];
+        if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
+          final LinearRing ring = polygon.getRing(ringIndex);
+          final int segmentIndex = segmentId[2];
+          if (segmentIndex >= 0 && segmentIndex < ring.getSegmentCount()) {
+            return new MultiPolygonSegment(this, segmentId);
+          }
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
+  public Vertex getVertex(final int... vertexId) {
+    if (vertexId == null || vertexId.length != 3) {
+      return null;
+    } else {
+      final int partIndex = vertexId[0];
+      if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final Polygon polygon = getPolygon(partIndex);
+        final int ringIndex = vertexId[1];
+        if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
+          final LinearRing ring = polygon.getRing(ringIndex);
+          final int vertexIndex = vertexId[2];
+          if (vertexIndex >= 0 && vertexIndex < ring.getVertexCount()) {
+            return new MultiPolygonVertex(this, vertexId);
+          }
+        }
+      }
+      return null;
+    }
+  }
 
   @Override
   public MultiPolygon normalize() {
@@ -176,11 +220,15 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
     return geometryFactory.multiPolygon(polygons);
   }
 
-  /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
   @Override
-  public Iterable<Vertex> vertices() {
-    return new MultiPolygonVertexIterable(this);
+  public Reader<Segment> segments() {
+    final MultiPolygonSegment iterator = new MultiPolygonSegment(this, 0, 0, -1);
+    return new IteratorReader<>(iterator);
+  }
+
+  @Override
+  public Reader<Vertex> vertices() {
+    final MultiPolygonVertex vertex = new MultiPolygonVertex(this, 0, 0, -1);
+    return vertex.reader();
   }
 }

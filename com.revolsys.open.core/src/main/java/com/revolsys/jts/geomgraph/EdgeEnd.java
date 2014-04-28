@@ -53,7 +53,7 @@ import com.revolsys.jts.util.Assert;
 public class EdgeEnd implements Comparable {
   protected Edge edge; // the parent edge of this edge end
 
-  protected Label label;
+  private Label label;
 
   private Node node; // the node this edge end originates at
 
@@ -76,7 +76,7 @@ public class EdgeEnd implements Comparable {
     final Label label) {
     this(edge);
     init(p0, p1);
-    this.label = label;
+    this.setLabel(label);
   }
 
   /**
@@ -168,7 +168,7 @@ public class EdgeEnd implements Comparable {
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
     out.print("  " + name + ": " + p0 + " - " + p1 + " " + quadrant + ":"
-      + angle + "   " + label);
+      + angle + "   " + getLabel());
   }
 
   public void setNode(final Node node) {
@@ -182,6 +182,10 @@ public class EdgeEnd implements Comparable {
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
     return "  " + name + ": " + p0 + " - " + p1 + " " + quadrant + ":" + angle
-      + "   " + label;
+      + "   " + getLabel();
+  }
+
+  protected void setLabel(Label label) {
+    this.label = label;
   }
 }

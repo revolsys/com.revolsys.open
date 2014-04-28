@@ -113,25 +113,18 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
+  public int getAxisCount() {
+    return 2;
+  }
+
+  @Override
   public Coordinates getCoordinate(final int i) {
     return getCoordinateCopy(i);
   }
 
   @Override
-  public void getCoordinate(final int index, final Coordinates coord) {
-    coord.setX(getValue(index, X));
-    coord.setY(getValue(index, Y));
-    coord.setZ(getValue(index, Z));
-  }
-
-  @Override
   public Coordinates getCoordinateCopy(final int i) {
     return new Coordinate(getX(i), getY(i), getZ(i));
-  }
-
-  @Override
-  public int getAxisCount() {
-    return 2;
   }
 
   @Override

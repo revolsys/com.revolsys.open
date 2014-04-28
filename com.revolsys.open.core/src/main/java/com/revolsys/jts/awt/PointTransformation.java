@@ -34,7 +34,6 @@ package com.revolsys.jts.awt;
 
 import java.awt.geom.Point2D;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Point;
 

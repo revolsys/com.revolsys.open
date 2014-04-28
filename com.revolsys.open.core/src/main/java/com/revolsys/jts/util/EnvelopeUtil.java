@@ -182,7 +182,7 @@ public class EnvelopeUtil {
       return Double.NaN;
     } else {
       final int axisCount = bounds.length / 2;
-      if (axisIndex < 0 || axisIndex > axisCount) {
+      if (axisIndex < 0 || axisIndex >= axisCount) {
         return Double.NaN;
       } else {
         final double min = bounds[axisIndex];

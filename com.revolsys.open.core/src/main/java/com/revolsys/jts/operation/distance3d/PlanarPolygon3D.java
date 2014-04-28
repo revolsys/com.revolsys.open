@@ -107,14 +107,16 @@ public class PlanarPolygon3D {
   private Vector3D averageNormal(final CoordinatesList seq) {
     final int n = seq.size();
     final double[] sum = new double[3];
-    final Coordinates p1 = new Coordinate(0.0, 0.0, 0.0);
-    final Coordinates p2 = new Coordinate(0.0, 0.0, 0.0);
     for (int i = 0; i < n - 1; i++) {
-      seq.getCoordinate(i, p1);
-      seq.getCoordinate(i + 1, p2);
-      sum[0] += (p1.getY() - p2.getY()) * (p1.getZ() + p2.getZ());
-      sum[1] += (p1.getZ() - p2.getZ()) * (p1.getX() + p2.getX());
-      sum[2] += (p1.getX() - p2.getX()) * (p1.getY() + p2.getY());
+      final double x1 = seq.getX(0);
+      final double y1 = seq.getY(0);
+      final double z1 = seq.getZ(0);
+      final double x2 = seq.getX(1);
+      final double y2 = seq.getY(1);
+      final double z2 = seq.getZ(1);
+      sum[0] += (y1 - y2) * (z1 + z2);
+      sum[1] += (z1 - z2) * (x1 + x2);
+      sum[2] += (x1 - x2) * (y1 + y2);
     }
     sum[0] /= n;
     sum[1] /= n;

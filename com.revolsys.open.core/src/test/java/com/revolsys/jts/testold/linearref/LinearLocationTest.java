@@ -7,6 +7,7 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.linearref.LinearLocation;
 import com.revolsys.jts.linearref.LocationIndexedLine;
@@ -41,11 +42,11 @@ public class LinearLocationTest extends TestCase {
     final LinearLocation loc2_5 = indexedLine.indexOf(new Coordinate((double)25, 0, Coordinates.NULL_ORDINATE));
     final LinearLocation loc3 = indexedLine.indexOf(new Coordinate((double)30, 0, Coordinates.NULL_ORDINATE));
 
-    final LineSegment seg0 = new LineSegment(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
+    final LineSegment seg0 = new LineSegmentImpl(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
       new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE));
-    final LineSegment seg1 = new LineSegment(new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE),
+    final LineSegment seg1 = new LineSegmentImpl(new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE),
       new Coordinate((double)20, 0, Coordinates.NULL_ORDINATE));
-    final LineSegment seg2 = new LineSegment(new Coordinate((double)20, 0, Coordinates.NULL_ORDINATE),
+    final LineSegment seg2 = new LineSegmentImpl(new Coordinate((double)20, 0, Coordinates.NULL_ORDINATE),
       new Coordinate((double)30, 0, Coordinates.NULL_ORDINATE));
 
     assertTrue(loc0.getSegment(line).equals(seg0));

@@ -1,15 +1,20 @@
 package com.revolsys.jtstest.testbuilder.model;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 
-import com.revolsys.jtstest.*;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testbuilder.Viewport;
-import com.revolsys.jtstest.testbuilder.geom.*;
 import com.revolsys.jtstest.testbuilder.ui.ColorUtil;
-import com.revolsys.jtstest.testbuilder.ui.render.*;
-import com.revolsys.jtstest.testbuilder.ui.style.*;
-
-import com.revolsys.jts.geom.*;
+import com.revolsys.jtstest.testbuilder.ui.render.GeometryPainter;
+import com.revolsys.jtstest.testbuilder.ui.style.ArrowEndpointStyle;
+import com.revolsys.jtstest.testbuilder.ui.style.ArrowLineStyle;
+import com.revolsys.jtstest.testbuilder.ui.style.BasicStyle;
+import com.revolsys.jtstest.testbuilder.ui.style.CircleEndpointStyle;
+import com.revolsys.jtstest.testbuilder.ui.style.PolygonStructureStyle;
+import com.revolsys.jtstest.testbuilder.ui.style.SegmentIndexStyle;
+import com.revolsys.jtstest.testbuilder.ui.style.Style;
+import com.revolsys.jtstest.testbuilder.ui.style.StyleList;
+import com.revolsys.jtstest.testbuilder.ui.style.VertexStyle;
 
 public class Layer 
 {

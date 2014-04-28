@@ -33,10 +33,10 @@
 
 package com.revolsys.jts.operation.overlay.snap;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 
 /**
@@ -60,9 +60,6 @@ public class LineStringSnapper {
   private double snapTolerance = 0.0;
 
   private final Coordinates[] srcPts;
-
-  private final LineSegment seg = new LineSegment(); // for reuse during
-                                                     // snapping
 
   private boolean allowSnappingToSourceVertices = false;
 
@@ -117,15 +114,15 @@ public class LineStringSnapper {
     double minDist = Double.MAX_VALUE;
     int snapIndex = -1;
     for (int i = 0; i < srcCoords.size() - 1; i++) {
-      seg.setP0(srcCoords.get(i));
-      seg.setP1(srcCoords.get(i + 1));
+      final Coordinates p0 = srcCoords.get(i);
+      final Coordinates p1 = srcCoords.get(i + 1);
 
       /**
        * Check if the snap pt is equal to one of the segment endpoints.
        * 
        * If the snap pt is already in the src list, don't snap at all.
        */
-      if (seg.getP0().equals2d(snapPt) || seg.getP1().equals2d(snapPt)) {
+      if (p0.equals2d(snapPt) || p1.equals2d(snapPt)) {
         if (allowSnappingToSourceVertices) {
           continue;
         } else {
@@ -133,7 +130,7 @@ public class LineStringSnapper {
         }
       }
 
-      final double dist = seg.distance(snapPt);
+      final double dist = LineSegmentUtil.distance(p0, p1, snapPt);
       if (dist < snapTolerance && dist < minDist) {
         minDist = dist;
         snapIndex = i;

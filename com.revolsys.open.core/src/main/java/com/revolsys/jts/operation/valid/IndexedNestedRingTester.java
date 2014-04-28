@@ -96,7 +96,6 @@ public class IndexedNestedRingTester {
       // System.out.println(results.size());
       for (int j = 0; j < results.size(); j++) {
         final LinearRing searchRing = (LinearRing)results.get(j);
-        final Coordinates[] searchRingPts = searchRing.getCoordinateArray();
 
         if (innerRing == searchRing) {
           continue;
@@ -124,7 +123,7 @@ public class IndexedNestedRingTester {
         }
 
         final boolean isInside = CGAlgorithms.isPointInRing(innerRingPt,
-          searchRingPts);
+          searchRing);
         if (isInside) {
           nestedPt = innerRingPt;
           return false;

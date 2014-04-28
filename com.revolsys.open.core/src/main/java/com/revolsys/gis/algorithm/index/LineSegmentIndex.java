@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.visitor.LineSegmentIntersectionVisitor;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.index.quadtree.Quadtree;
 
@@ -26,7 +27,7 @@ public class LineSegmentIndex extends Quadtree {
   }
 
   public void insert(final LineSegment lineSegment) {
-    final BoundingBox envelope = lineSegment.getEnvelope();
+    final BoundingBox envelope = lineSegment.getBoundingBox();
     insert(envelope, lineSegment);
   }
 
@@ -54,11 +55,11 @@ public class LineSegmentIndex extends Quadtree {
 
   public List<CoordinatesList> queryIntersections(final Coordinates c0,
     final Coordinates c1) {
-    return queryIntersections(new LineSegment(c0, c1));
+    return queryIntersections(new LineSegmentImpl(c0, c1));
   }
 
   public List<CoordinatesList> queryIntersections(final LineSegment querySeg) {
-    final BoundingBox env = querySeg.getEnvelope();
+    final BoundingBox env = querySeg.getBoundingBox();
     final LineSegmentIntersectionVisitor visitor = new LineSegmentIntersectionVisitor(
       querySeg);
     query(env, visitor);

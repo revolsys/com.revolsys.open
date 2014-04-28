@@ -5,6 +5,7 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.math.Vector2D;
 
@@ -259,7 +260,7 @@ public class StretchedVertex {
 
   private Coordinates displaceFromPoint(final Coordinates nearPt,
     final double dist) {
-    final LineSegment seg = new LineSegment(nearPt, vertexPt);
+    final LineSegment seg = new LineSegmentImpl(nearPt, vertexPt);
 
     // compute an adjustment which displaces in the direction of the
     // nearPt-vertexPt vector

@@ -36,6 +36,7 @@ package com.revolsys.jts.triangulate;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 
 /**
  * Models a constraint segment in a triangulation.
@@ -57,7 +58,7 @@ public class Segment {
    * @param p1 the end point
    */
   public Segment(final Coordinates p0, final Coordinates p1) {
-    ls = new LineSegment(p0, p1);
+    ls = new LineSegmentImpl(p0, p1);
   }
 
   /** 
@@ -68,7 +69,7 @@ public class Segment {
    * @param data an external data object
    */
   public Segment(final Coordinates p0, final Coordinates p1, final Object data) {
-    ls = new LineSegment(p0, p1);
+    ls = new LineSegmentImpl(p0, p1);
     this.data = data;
   }
 
@@ -148,9 +149,9 @@ public class Segment {
   }
 
   /**
-   * Gets a <tt>LineSegment</tt> modelling this segment.
+   * Gets a <tt>LineSegmentImpl</tt> modelling this segment.
    * 
-   * @return a LineSegment
+   * @return a LineSegmentImpl
    */
   public LineSegment getLineSegment() {
     return ls;

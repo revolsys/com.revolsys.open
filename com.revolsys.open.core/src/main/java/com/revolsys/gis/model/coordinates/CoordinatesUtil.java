@@ -47,6 +47,28 @@ public class CoordinatesUtil {
     return factory.point(add(getInstance(c1), getInstance(p2)));
   }
 
+  public static void addElevation(final Coordinates coordinate,
+    final LineString line) {
+    final CoordinatesList coordinates = line.getCoordinatesList();
+    Coordinates previousCoordinate = coordinates.getCoordinate(0);
+    for (int i = 1; i < coordinates.size(); i++) {
+      final Coordinates currentCoordinate = coordinates.getCoordinate(i);
+
+      if (LineSegmentUtil.distance(previousCoordinate, currentCoordinate,
+        coordinate) < 1) {
+        final CoordinatesPrecisionModel precisionModel = line.getGeometryFactory()
+          .getCoordinatesPrecisionModel();
+
+        LineSegmentUtil.addElevation(precisionModel, previousCoordinate,
+          currentCoordinate, coordinate);
+
+        return;
+      }
+      previousCoordinate = currentCoordinate;
+    }
+
+  }
+
   public static double angle(final Coordinates p1, final Coordinates p2,
     final Coordinates p3) {
     final double x1 = p1.getX();
@@ -58,12 +80,21 @@ public class CoordinatesUtil {
     return MathUtil.angle(x1, y1, x2, y2, x3, y3);
   }
 
-  public static double angle2d(final Coordinates point1,
-    final Coordinates point2) {
-    final double dx = point2.getX() - point1.getX();
-    final double dy = point2.getY() - point1.getY();
+  public static double angle(final double x1, final double y1, final double x2,
+    final double y2) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
     final double angle = Math.atan2(dy, dx);
     return angle;
+  }
+
+  public static double angle2d(final Coordinates point1,
+    final Coordinates point2) {
+    final double x1 = point1.getX();
+    final double y1 = point1.getY();
+    final double x2 = point2.getX();
+    final double y2 = point2.getY();
+    return angle(x1, y1, x2, y2);
   }
 
   /**
@@ -263,6 +294,14 @@ public class CoordinatesUtil {
     }
   }
 
+  public static int getAxisCount(final Coordinates... points) {
+    int axisCount = 2;
+    for (final Coordinates point : points) {
+      axisCount = Math.max(axisCount, point.getAxisCount());
+    }
+    return axisCount;
+  }
+
   public static double[] getCoordinates(final Coordinates point) {
     final double[] coordinates = new double[point.getAxisCount()];
     for (int i = 0; i < coordinates.length; i++) {
@@ -285,14 +324,6 @@ public class CoordinatesUtil {
     } else {
       return point;
     }
-  }
-
-  public static int getAxisCount(final Coordinates... points) {
-    int axisCount = 2;
-    for (final Coordinates point : points) {
-      axisCount = Math.max(axisCount, point.getAxisCount());
-    }
-    return axisCount;
   }
 
   public static double getX(final Coordinates point) {
@@ -463,9 +494,9 @@ public class CoordinatesUtil {
       if (Double.isNaN(z)) {
         return newLocation;
       } else {
-        final Coordinates newCoordinates = new DoubleCoordinates(newLocation,
-          originalLocation.getAxisCount());
-        newCoordinates.setZ(z);
+        final double[] points = originalLocation.getCoordinates();
+        points[2] = z;
+        final Coordinates newCoordinates = new DoubleCoordinates(points);
         return newCoordinates;
       }
     } else {
@@ -512,27 +543,5 @@ public class CoordinatesUtil {
 
     final Coordinates newPoint = new DoubleCoordinates(newX, newY);
     return newPoint;
-  }
-
-  public static void addElevation(final Coordinates coordinate,
-    final LineString line) {
-    final CoordinatesList coordinates = line.getCoordinatesList();
-    Coordinates previousCoordinate = coordinates.getCoordinate(0);
-    for (int i = 1; i < coordinates.size(); i++) {
-      final Coordinates currentCoordinate = coordinates.getCoordinate(i);
-  
-      if (LineSegmentUtil.distance(previousCoordinate, currentCoordinate,
-        coordinate) < 1) {
-        final CoordinatesPrecisionModel precisionModel = line.getGeometryFactory()
-          .getCoordinatesPrecisionModel();
-  
-        LineSegmentUtil.addElevation(precisionModel, previousCoordinate,
-          currentCoordinate, coordinate);
-  
-        return;
-      }
-      previousCoordinate = currentCoordinate;
-    }
-  
   }
 }

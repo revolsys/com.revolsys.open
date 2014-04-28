@@ -34,9 +34,9 @@
 package com.revolsys.jts.triangulate.quadedge;
 
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 
 /**
  * A class that represents the edge data structure which implements the quadedge algebra. 
@@ -416,13 +416,13 @@ public class QuadEdge {
   }
 
   /**
-   * Creates a {@link LineSegment} representing the
+   * Creates a {@link LineSegmentImpl} representing the
    * geometry of this edge.
    * 
-   * @return a LineSegment
+   * @return a LineSegmentImpl
    */
   public LineSegment toLineSegment() {
-    return new LineSegment(vertex.getCoordinate(), dest().getCoordinate());
+    return new LineSegmentImpl(vertex.getCoordinate(), dest().getCoordinate());
   }
 
   /**

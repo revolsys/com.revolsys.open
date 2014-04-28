@@ -52,7 +52,7 @@ public interface Noder {
    *
    * @param segStrings a collection of {@link SegmentString}s to node
    */
-  void computeNodes(Collection segStrings);
+  void computeNodes(Collection<? extends SegmentString> segStrings);
 
   /**
    * Returns a {@link Collection} of fully noded {@link SegmentString}s.

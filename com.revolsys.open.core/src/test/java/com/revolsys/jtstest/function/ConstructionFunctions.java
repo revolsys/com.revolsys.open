@@ -32,8 +32,6 @@
  */
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.algorithm.MinimumBoundingCircle;
-import com.revolsys.jts.algorithm.MinimumDiameter;
 import com.revolsys.jts.densify.Densifier;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.OctagonalEnvelope;
@@ -57,31 +55,6 @@ public class ConstructionFunctions {
 
   public static Geometry interiorPoint(final Geometry g) {
     return g.getInteriorPoint();
-  }
-
-  public static double maximumDiameter(final Geometry g) {
-    return 2 * (new MinimumBoundingCircle(g)).getRadius();
-  }
-
-  public static Geometry minimumBoundingCircle(final Geometry g) {
-    return (new MinimumBoundingCircle(g)).getCircle();
-  }
-
-  public static Geometry minimumBoundingCirclePoints(final Geometry g) {
-    return g.getGeometryFactory().lineString(
-      (new MinimumBoundingCircle(g)).getExtremalPoints());
-  }
-
-  public static double minimumDiameter(final Geometry g) {
-    return (new MinimumDiameter(g)).getDiameter().getLength();
-  }
-
-  public static Geometry minimumDiameterLine(final Geometry g) {
-    return (new MinimumDiameter(g)).getDiameter();
-  }
-
-  public static Geometry minimumRectangle(final Geometry g) {
-    return (new MinimumDiameter(g)).getMinimumRectangle();
   }
 
   public static Geometry octagonalEnvelope(final Geometry g) {

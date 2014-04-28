@@ -182,4 +182,9 @@ public class Node extends GraphComponent {
     }
     label.setLocation(argIndex, newLoc);
   }
+
+  @Override
+  public String toString() {
+    return coord.toString();
+  }
 }

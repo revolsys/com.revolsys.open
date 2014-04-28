@@ -63,10 +63,6 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
   implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
 
-  public AbstractGeometryCollection(final GeometryFactory geometryFactory) {
-    super(geometryFactory);
-  }
-
   @Override
   public void apply(final CoordinateFilter filter) {
     for (final Geometry geometry : geometries()) {

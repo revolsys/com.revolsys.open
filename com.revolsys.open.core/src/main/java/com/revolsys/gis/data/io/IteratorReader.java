@@ -61,7 +61,9 @@ public class IteratorReader<T> extends AbstractReader<T> {
 
   @Override
   public void open() {
-    iterator.hasNext();
+    if (iterator != null) {
+      iterator.hasNext();
+    }
   }
 
   protected void setIterator(final Iterator<T> iterator) {

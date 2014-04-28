@@ -34,7 +34,6 @@ package com.revolsys.jts.geom.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,7 +41,6 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.Centroid;
 import com.revolsys.jts.algorithm.ConvexHull;
@@ -69,8 +67,6 @@ import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geom.util.GeometryCollectionMapper;
 import com.revolsys.jts.geom.util.GeometryMapper;
-import com.revolsys.jts.geom.vertex.Vertex;
-import com.revolsys.jts.geom.vertex.VertexImpl;
 import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.distance.DistanceOp;
@@ -252,24 +248,10 @@ public abstract class AbstractGeometry implements Geometry {
   private BoundingBox boundingBox;
 
   /**
-   * The {@link GeometryFactory} used to create this Geometry
-   */
-  private final GeometryFactory geometryFactory;
-
-  /**
    * An object reference which can be used to carry ancillary data defined
    * by the client.
    */
   private Object userData = null;
-
-  /**
-   * Creates a new <code>Geometry</code> via the specified GeometryFactory.
-   *
-   * @param geometryFactory
-   */
-  public AbstractGeometry(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
 
   /**
    *  Performs an operation with or on this <code>Geometry</code>'s
@@ -648,7 +630,7 @@ public abstract class AbstractGeometry implements Geometry {
     // short-circuit test
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox otherBoundingBox = g.getBoundingBox();
-    if (!boundingBox.contains(otherBoundingBox)) {
+    if (!boundingBox.covers(otherBoundingBox)) {
       return false;
     }
     // optimization for rectangle arguments
@@ -854,7 +836,7 @@ public abstract class AbstractGeometry implements Geometry {
     // special case: if A.isEmpty ==> empty; if B.isEmpty ==> A
     if (this.isEmpty()) {
       return OverlayOp.createEmptyResult(OverlayOp.DIFFERENCE, this, other,
-        geometryFactory);
+        getGeometryFactory());
     }
     if (other.isEmpty()) {
       return clone();
@@ -1138,7 +1120,7 @@ public abstract class AbstractGeometry implements Geometry {
 
   @Override
   public int getAxisCount() {
-    return (byte)geometryFactory.getAxisCount();
+    return (byte)getGeometryFactory().getAxisCount();
   }
 
   /**
@@ -1205,7 +1187,7 @@ public abstract class AbstractGeometry implements Geometry {
   @Override
   public Point getCentroid() {
     if (isEmpty()) {
-      return geometryFactory.point();
+      return getGeometryFactory().point();
     }
     final Coordinates centPt = Centroid.getCentroid(this);
     return createPointFromInternalCoord(centPt, this);
@@ -1259,7 +1241,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
-    return geometryFactory.getCoordinatesPrecisionModel();
+    return getGeometryFactory().getCoordinatesPrecisionModel();
   }
 
   /**
@@ -1269,7 +1251,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public CoordinateSystem getCoordinateSystem() {
-    return geometryFactory.getCoordinateSystem();
+    return getGeometryFactory().getCoordinateSystem();
   }
 
   @Override
@@ -1310,11 +1292,11 @@ public abstract class AbstractGeometry implements Geometry {
    *
    *@return a Geometry representing the boundingBox of this Geometry
    *      
-   * @see GeometryFactory#toGeometry(Envelope) 
+   * @see GeometryFactory#toLineString(Envelope) 
    */
   @Override
   public Geometry getEnvelope() {
-    return geometryFactory.toGeometry(getBoundingBox());
+    return getBoundingBox().toGeometry();
   }
 
   /**
@@ -1355,17 +1337,6 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   /**
-   * Gets the geometryFactory which contains the context in which this geometry was created.
-   *
-   * @return the geometryFactory for this geometry
-  * @author Paul Austin <paul.austin@revolsys.com>
-   */
-  @Override
-  public final GeometryFactory getGeometryFactory() {
-    return geometryFactory;
-  }
-
-  /**
    * Returns the name of this Geometry's actual class.
    *
    *@return the name of this <code>Geometry</code>s actual class
@@ -1388,7 +1359,7 @@ public abstract class AbstractGeometry implements Geometry {
   @Override
   public Point getInteriorPoint() {
     if (isEmpty()) {
-      return geometryFactory.point();
+      return getGeometryFactory().point();
     }
     Coordinates interiorPt = null;
     final int dim = getDimension();
@@ -1449,14 +1420,6 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
-  @Override
-  public List<CoordinatesList> getPointLists() {
-    return CoordinatesListUtil.getAll(this);
-  }
-
-  /**
    *  Returns the <code>PrecisionModel</code> used by the <code>Geometry</code>.
    *
    *@return    the specification of the grid of allowable points, for this
@@ -1464,7 +1427,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public PrecisionModel getPrecisionModel() {
-    return geometryFactory.getPrecisionModel();
+    return getGeometryFactory().getPrecisionModel();
   }
 
   /**
@@ -1483,7 +1446,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public int getSrid() {
-    return geometryFactory.getSrid();
+    return getGeometryFactory().getSrid();
   }
 
   /**
@@ -1495,37 +1458,6 @@ public abstract class AbstractGeometry implements Geometry {
   public Object getUserData() {
     return userData;
   }
-
-  /**
-   * <p>Get the {@link Vertex} at the specified vertexId (see {@link Vertex#getVertexId()}).</p>
-   * 
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @param vertexId The id of the vertex.
-   * @return The vertex or null if it does not exist.
-   */
-  @Override
-  public Vertex getVertex(final int... vertexId) {
-    if (isEmpty()) {
-      return null;
-    } else {
-      final VertexImpl vertex = new VertexImpl(this, vertexId);
-      if (vertex.isEmpty()) {
-        return null;
-      } else {
-        return vertex;
-      }
-    }
-  }
-
-  /**
-   *  Returns the count of this <code>Geometry</code>s vertices. The <code>Geometry</code>
-   *  s contained by composite <code>Geometry</code>s must be
-   *  Geometry's; that is, they must implement <code>getNumPoints</code>
-   *
-   *@return    the number of vertices in this <code>Geometry</code>
-   */
-  @Override
-  public abstract int getVertexCount();
 
   /**
    * Gets a hash code for the Geometry.
@@ -1566,7 +1498,7 @@ public abstract class AbstractGeometry implements Geometry {
     // special case: if one input is empty ==> empty
     if (this.isEmpty() || other.isEmpty()) {
       return OverlayOp.createEmptyResult(OverlayOp.INTERSECTION, this, other,
-        geometryFactory);
+        getGeometryFactory());
     }
 
     // compute for GCs
@@ -1890,7 +1822,7 @@ public abstract class AbstractGeometry implements Geometry {
       // both empty - check dimensions
       if (this.isEmpty() && other.isEmpty()) {
         return OverlayOp.createEmptyResult(OverlayOp.SYMDIFFERENCE, this,
-          other, geometryFactory);
+          other, getGeometryFactory());
       }
 
       // special case: if either input is empty ==> result = other arg
@@ -2025,7 +1957,7 @@ public abstract class AbstractGeometry implements Geometry {
     if (this.isEmpty() || other.isEmpty()) {
       if (this.isEmpty() && other.isEmpty()) {
         return OverlayOp.createEmptyResult(OverlayOp.UNION, this, other,
-          geometryFactory);
+          getGeometryFactory());
       }
 
       // special case: if either input is empty ==> other input
@@ -2042,23 +1974,6 @@ public abstract class AbstractGeometry implements Geometry {
     checkNotGeometryCollection(this);
     checkNotGeometryCollection(other);
     return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.UNION);
-  }
-
-  /**
-   * <p>Get an {@link Iterable} that iterates over the {@link Vertex} of the geometry. For memory
-   * efficiency the {@link Vertex} returned is the same instance for each call to next
-   * on the iterator. If the vertex is required to track the previous vertex then the
-   * {@link Vertex#clone()} method must be called to get a copy of the vertex.</p>
-   * 
-   * <p>The {@link Iterable#iterator()} method always returns the same {@link Iterator} instance.
-   * Therefore that method should not be called more than once.</p>
-   * 
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @return The iterator over the vertices of the geometry.
-   */
-  @Override
-  public Iterable<Vertex> vertices() {
-    return Collections.<Vertex> emptyList();
   }
 
   /**

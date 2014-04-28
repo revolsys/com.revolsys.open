@@ -1,7 +1,9 @@
 package com.revolsys.jtstest.testbuilder.ui.style;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.Point2D;
 
 public class AWTUtil 
 {

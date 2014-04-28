@@ -1,6 +1,8 @@
 package com.revolsys.jtstest.testbuilder.ui;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;

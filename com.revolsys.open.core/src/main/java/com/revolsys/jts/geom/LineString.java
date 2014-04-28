@@ -32,8 +32,6 @@
  */
 package com.revolsys.jts.geom;
 
-import com.revolsys.jts.geom.vertex.AbstractVertex;
-
 /**
  *  Models an OGC-style <code>LineString</code>.
  *  A LineString consists of a sequence of two or more vertices,
@@ -73,9 +71,9 @@ public interface LineString extends Lineal {
 
   Point getPoint(final int vertexIndex);
 
-  Point getStartPoint();
+  int getSegmentCount();
 
-  AbstractVertex getVertex(int vertexIndex);
+  Point getStartPoint();
 
   double getX(int vertexIndex);
 
@@ -83,7 +81,9 @@ public interface LineString extends Lineal {
 
   double getZ(int vertexIndex);
 
-  boolean isCCW();
+  boolean isCounterClockwise();
+
+  boolean isClockwise();
 
   boolean isClosed();
 

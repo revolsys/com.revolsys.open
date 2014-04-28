@@ -36,6 +36,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 
 /**
  * Monotone Chains are a way of partitioning the segments of a linestring to
@@ -233,9 +234,8 @@ public class MonotoneChain {
    * @param index index of segment
    * @param ls line segment to extract into
    */
-  public void getLineSegment(final int index, final LineSegment ls) {
-    ls.setP0(pts[index]);
-    ls.setP1(pts[index + 1]);
+  public LineSegment getLineSegment(final int index) {
+    return new LineSegmentImpl(pts[index], pts[index + 1]);
   }
 
   public int getStartIndex() {

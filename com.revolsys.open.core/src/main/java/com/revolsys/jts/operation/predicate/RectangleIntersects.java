@@ -39,7 +39,6 @@ import java.util.List;
 import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -90,7 +89,7 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
       return;
     }
     // rectangle contains target env => must intersect
-    if (rectEnv.contains(elementEnv)) {
+    if (rectEnv.covers(elementEnv)) {
       intersects = true;
       return;
     }
@@ -166,10 +165,9 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
     }
 
     // test each corner of rectangle for inclusion
-    final Coordinates rectPt = new Coordinate();
     for (int i = 0; i < 4; i++) {
-      rectSeq.getCoordinate(i, rectPt);
-      if (!elementEnv.contains(rectPt)) {
+      final Coordinates rectPt = rectSeq.getCoordinate(i);
+      if (!elementEnv.covers(rectPt)) {
         continue;
       }
       // check rect point in poly (rect is known not to touch polygon at this
@@ -286,10 +284,6 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
 
   private boolean hasIntersection = false;
 
-  private final Coordinates p0 = new Coordinate();
-
-  private final Coordinates p1 = new Coordinate();
-
   /**
    * Creates a visitor for checking rectangle intersection
    * with segments
@@ -314,8 +308,8 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
   private void checkIntersectionWithSegments(final LineString testLine) {
     final CoordinatesList seq1 = testLine.getCoordinatesList();
     for (int j = 1; j < seq1.size(); j++) {
-      seq1.getCoordinate(j - 1, p0);
-      seq1.getCoordinate(j, p1);
+      final Coordinates p0 = seq1.getCoordinate(j - 1);
+      final Coordinates p1 = seq1.getCoordinate(j);
 
       if (rectIntersector.intersects(p0, p1)) {
         hasIntersection = true;

@@ -1,8 +1,11 @@
 package com.revolsys.jtstest.testbuilder.geom;
 
-import java.util.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jts.geom.util.*;
+import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.util.GeometryEditor;
 
 public class GeometryVertexDeleter 
 {

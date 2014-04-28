@@ -33,7 +33,6 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;

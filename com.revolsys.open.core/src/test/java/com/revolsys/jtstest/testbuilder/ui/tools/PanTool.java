@@ -33,11 +33,9 @@
 package com.revolsys.jtstest.testbuilder.ui.tools;
 
 import java.awt.Cursor;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
-import com.revolsys.jtstest.*;
 import com.revolsys.jtstest.testbuilder.AppCursors;
 
 /**

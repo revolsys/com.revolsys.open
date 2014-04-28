@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geomgraph.GeometryGraph;
@@ -50,46 +48,50 @@ import com.revolsys.jts.util.Assert;
  *
  * @version 1.7
  */
-public class SimpleNestedRingTester
-{
+public class SimpleNestedRingTester {
 
-  private GeometryGraph graph;  // used to find non-node vertices
-  private List rings = new ArrayList();
+  private final GeometryGraph graph; // used to find non-node vertices
+
+  private final List rings = new ArrayList();
+
   private Coordinates nestedPt;
 
-  public SimpleNestedRingTester(GeometryGraph graph)
-  {
+  public SimpleNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;
   }
 
-  public void add(LinearRing ring)
-  {
+  public void add(final LinearRing ring) {
     rings.add(ring);
   }
 
-  public Coordinates getNestedPoint() { return nestedPt; }
+  public Coordinates getNestedPoint() {
+    return nestedPt;
+  }
 
-  public boolean isNonNested()
-  {
+  public boolean isNonNested() {
     for (int i = 0; i < rings.size(); i++) {
-      LinearRing innerRing = (LinearRing) rings.get(i);
-      Coordinates[] innerRingPts = innerRing.getCoordinateArray();
+      final LinearRing innerRing = (LinearRing)rings.get(i);
+      final Coordinates[] innerRingPts = innerRing.getCoordinateArray();
 
       for (int j = 0; j < rings.size(); j++) {
-        LinearRing searchRing = (LinearRing) rings.get(j);
-        Coordinates[] searchRingPts = searchRing.getCoordinateArray();
+        final LinearRing searchRing = (LinearRing)rings.get(j);
 
-        if (innerRing == searchRing)
+        if (innerRing == searchRing) {
           continue;
+        }
 
-        if (! innerRing.getBoundingBox().intersects(searchRing.getBoundingBox()))
+        if (!innerRing.getBoundingBox().intersects(searchRing.getBoundingBox())) {
           continue;
+        }
 
-        Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts, searchRing, graph);
-        Assert.isTrue(innerRingPt != null, "Unable to find a ring point not a node of the search ring");
-        //Coordinate innerRingPt = innerRingPts[0];
+        final Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts,
+          searchRing, graph);
+        Assert.isTrue(innerRingPt != null,
+          "Unable to find a ring point not a node of the search ring");
+        // Coordinate innerRingPt = innerRingPts[0];
 
-        boolean isInside = CGAlgorithms.isPointInRing(innerRingPt, searchRingPts);
+        final boolean isInside = CGAlgorithms.isPointInRing(innerRingPt,
+          searchRing);
         if (isInside) {
           nestedPt = innerRingPt;
           return false;

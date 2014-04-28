@@ -38,7 +38,7 @@ public class GeometryBoxDeleter {
     public Geometry edit(final Geometry geometry, final GeometryFactory factory) {
       // Allow any number of components to be deleted
       // if (isEdited) return geometry;
-      if (env.contains(geometry.getBoundingBox())) {
+      if (env.covers(geometry.getBoundingBox())) {
         isEdited = true;
         return null;
       }
@@ -79,7 +79,7 @@ public class GeometryBoxDeleter {
       final Coordinates[] newPts = new Coordinates[coords.length];
       int newIndex = 0;
       for (int i = 0; i < coords.length; i++) {
-        if (!env.contains(coords[i])) {
+        if (!env.covers(coords[i])) {
           newPts[newIndex++] = coords[i];
         }
       }
@@ -109,7 +109,7 @@ public class GeometryBoxDeleter {
 
     private boolean hasVertexInBox(final Coordinates[] coords) {
       for (int i = 0; i < coords.length; i++) {
-        if (env.contains(coords[i])) {
+        if (env.covers(coords[i])) {
           return true;
         }
       }

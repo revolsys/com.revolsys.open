@@ -16,10 +16,12 @@ import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
+import com.revolsys.util.MathUtil;
 
 public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   private static final Logger LOG = LoggerFactory.getLogger(TinProcess.class);
@@ -38,6 +40,20 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
 
   public BoundingBox getBoundingBox() {
     return boundingBox;
+  }
+
+  private String getId() {
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    final String string = MathUtil.toString(boundingBox.getMinX()) + "_"
+      + MathUtil.toString(boundingBox.getMinY()) + "_"
+      + MathUtil.toString(boundingBox.getMaxX()) + "_"
+      + MathUtil.toString(boundingBox.getMaxY());
+    if (geometryFactory == null) {
+      return string;
+    } else {
+      return geometryFactory.getSrid() + "-" + string;
+    }
+
   }
 
   public File getTinCache() {
@@ -66,7 +82,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
 
   protected void loadTin() {
     if (tinCache != null && tinCache.exists()) {
-      final File tinFile = new File(tinCache, boundingBox.getId() + ".tin");
+      final File tinFile = new File(tinCache, getId() + ".tin");
       if (tinFile.exists()) {
         LOG.info("Loading tin from file " + tinFile);
         final FileSystemResource resource = new FileSystemResource(tinFile);
@@ -96,7 +112,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
       lines = null;
       tin.finishEditing();
       if (tinCache != null) {
-        final File tinFile = new File(tinCache, boundingBox.getId() + ".tin");
+        final File tinFile = new File(tinCache, getId() + ".tin");
         try {
           tinCache.mkdirs();
           final FileSystemResource resource = new FileSystemResource(tinFile);

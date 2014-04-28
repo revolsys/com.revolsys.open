@@ -74,7 +74,7 @@ public class Node extends NodeBase {
   }
 
   public boolean contains(final BoundingBox envelope) {
-    return boundingBox.contains(envelope);
+    return boundingBox.covers(envelope);
   }
 
   private Node createSubnode(final int index) {
@@ -192,7 +192,7 @@ public class Node extends NodeBase {
   }
 
   void insertNode(final Node node) {
-    Assert.isTrue(boundingBox == null || boundingBox.contains(node.boundingBox));
+    Assert.isTrue(boundingBox == null || boundingBox.covers(node.boundingBox));
     // System.out.println(env);
     // System.out.println(quad.env);
     final int index = getSubnodeIndex(node.boundingBox, getCentreX(),

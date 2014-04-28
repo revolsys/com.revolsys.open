@@ -1,6 +1,5 @@
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
@@ -45,14 +44,11 @@ public class SegmentDensifier {
 
     final CoordinatesList seq = this.inputLine.getCoordinatesList();
 
-    final Coordinates p0 = new Coordinate();
-    final Coordinates p1 = new Coordinate();
-    seq.getCoordinate(0, p0);
-    this.newCoords.add(new Coordinate(p0));
+    this.newCoords.add(seq.getCoordinate(0).cloneCoordinates());
 
     for (int i = 0; i < seq.size() - 1; i++) {
-      seq.getCoordinate(i, p0);
-      seq.getCoordinate(i + 1, p1);
+      final Coordinates p0 = seq.getCoordinate(i);
+      final Coordinates p1 = seq.getCoordinate(i + 1);
       densify(p0, p1, segLength);
     }
     final Coordinates[] newPts = this.newCoords.toCoordinateArray();

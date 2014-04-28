@@ -1,7 +1,9 @@
 package com.revolsys.jts.geom.vertex;
 
+import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -28,6 +30,12 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   }
 
   @Override
+  public int getAxisCount() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (byte)geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return new Envelope(geometryFactory, this);
@@ -42,12 +50,6 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   @Override
   public GeometryFactory getGeometryFactory() {
     return geometry.getGeometryFactory();
-  }
-
-  @Override
-  public int getAxisCount() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return (byte)geometryFactory.getAxisCount();
   }
 
   @Override
@@ -78,6 +80,11 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   @Override
   public boolean isEmpty() {
     return false;
+  }
+
+  @Override
+  public Reader<Vertex> reader() {
+    return new IteratorReader<Vertex>(this);
   }
 
   @Override

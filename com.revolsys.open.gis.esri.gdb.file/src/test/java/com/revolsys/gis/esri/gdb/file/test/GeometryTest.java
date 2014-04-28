@@ -2,7 +2,6 @@ package com.revolsys.gis.esri.gdb.file.test;
 
 import java.io.File;
 
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -12,16 +11,17 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory;
-import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.io.FileUtil;
+import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class GeometryTest {
-  public static void createTestFile(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public static void createTestFile(final GeometryFactory geometryFactory,
     final String wkt) {
     final Geometry geometry = geometryFactory.geometry(wkt);
 
@@ -69,7 +69,7 @@ public class GeometryTest {
 
   public static void main(final String[] args) {
 
-    for (final com.revolsys.jts.geom.GeometryFactory geometryFactory : new com.revolsys.jts.geom.GeometryFactory[] {
+    for (final GeometryFactory geometryFactory : new com.revolsys.jts.geom.GeometryFactory[] {
       GeometryFactory.getFactory(3005, 2, 1000.0, 1),
       GeometryFactory.getFactory(3005, 3, 1000.0, 1.0)
     }) {

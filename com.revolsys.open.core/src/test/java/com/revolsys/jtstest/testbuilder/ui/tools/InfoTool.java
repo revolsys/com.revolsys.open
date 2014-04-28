@@ -34,7 +34,6 @@ package com.revolsys.jtstest.testbuilder.ui.tools;
 
 import java.awt.event.MouseEvent;
 
-import com.revolsys.jtstest.*;
 import com.revolsys.jtstest.testbuilder.JTSTestBuilderFrame;
 
 /**

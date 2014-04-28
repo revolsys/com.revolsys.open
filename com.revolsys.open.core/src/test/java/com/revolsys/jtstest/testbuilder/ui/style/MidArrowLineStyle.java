@@ -1,7 +1,10 @@
 package com.revolsys.jtstest.testbuilder.ui.style;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 
 import com.revolsys.jtstest.testbuilder.Viewport;
 

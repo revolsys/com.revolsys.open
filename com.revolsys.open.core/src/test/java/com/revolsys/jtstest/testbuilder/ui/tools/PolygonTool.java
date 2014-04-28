@@ -32,7 +32,7 @@
  */
 package com.revolsys.jtstest.testbuilder.ui.tools;
 
-import com.revolsys.jtstest.testbuilder.model.*;
+import com.revolsys.jtstest.testbuilder.model.GeometryType;
 
 
 /**

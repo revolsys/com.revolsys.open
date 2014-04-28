@@ -34,7 +34,6 @@ package com.revolsys.jts.noding;
 
 import java.io.PrintStream;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 

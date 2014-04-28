@@ -38,12 +38,13 @@ import java.util.List;
 
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.quadtree.Quadtree;
 import com.revolsys.jts.util.EnvelopeUtil;
 
 /**
- * An spatial index on a set of {@link LineSegment}s.
+ * An spatial index on a set of {@link LineSegmentImpl}s.
  * Supports adding and removing items.
  *
  * @author Martin Davis

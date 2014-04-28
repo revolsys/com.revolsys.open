@@ -39,6 +39,7 @@ import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygonal;
@@ -68,7 +69,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
     private void addLine(final Coordinates[] pts) {
       for (int i = 1; i < pts.length; i++) {
-        final LineSegment seg = new LineSegment(pts[i - 1], pts[i]);
+        final LineSegment seg = new LineSegmentImpl(pts[i - 1], pts[i]);
         final double min = Math.min(seg.getP0().getY(), seg.getP1().getY());
         final double max = Math.max(seg.getP0().getY(), seg.getP1().getY());
         index.insert(min, max, seg);

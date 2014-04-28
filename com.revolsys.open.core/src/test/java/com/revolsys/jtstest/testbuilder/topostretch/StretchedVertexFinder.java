@@ -5,41 +5,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 
 class StretchedVertexFinder {
-  private static LineSegment distSeg = new LineSegment();
-
-  private static boolean contains(final BoundingBox env, final Coordinates p0,
-    final Coordinates p1) {
-    if (!env.contains(p0)) {
-      return false;
-    }
-    if (!env.contains(p1)) {
-      return false;
-    }
-    return true;
-  }
-
-  private static double distanceToSeg(final Coordinates p,
-    final Coordinates p0, final Coordinates p1) {
-    distSeg.setP0(p0);
-    distSeg.setP1(p1);
-    double segDist = distSeg.distance(p);
-
-    // robust calculation of zero distance
-    if (CGAlgorithms.computeOrientation(p0, p1, p) == CGAlgorithms.COLLINEAR) {
-      segDist = 0.0;
-    }
-
-    return segDist;
-  }
-
   public static List findNear(final Collection linestrings,
     final double tolerance, final BoundingBox mask) {
     final StretchedVertexFinder finder = new StretchedVertexFinder(linestrings,
@@ -66,9 +40,7 @@ class StretchedVertexFinder {
     }
 
     // compute actual distance
-    distSeg.setP0(p0);
-    distSeg.setP1(p1);
-    final double segDist = distSeg.distance(p);
+    final double segDist = LineSegmentUtil.distance(p0, p1, p);
     if (segDist > distTol) {
       return false;
     }
@@ -152,7 +124,7 @@ class StretchedVertexFinder {
         // Check if it is near the segment at all.
         if (isPointNearButNotOnSeg(targetPt, testPt, segEndPt, tolerance)) {
           stretchVert = new StretchedVertex(targetPt, targetPts, i,
-            new LineSegment(testPt, testPts[i + 1]));
+            new LineSegmentImpl(testPt, testPts[i + 1]));
         }
       }
       if (stretchVert != null) {

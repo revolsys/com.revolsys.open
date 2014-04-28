@@ -6,7 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  CoordinateTest.class, EnvelopeTest.class, PointTest.class,
+  CoordinateTest.class, BoundingBoxTest.class, PointTest.class,
   LineStringTest.class, PolygonTest.class, MultiPointTest.class,
   MultiLineStringTest.class, MultiPolygonTest.class
 })

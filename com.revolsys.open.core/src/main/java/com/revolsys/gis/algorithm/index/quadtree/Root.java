@@ -17,7 +17,7 @@ public class Root<T> extends NodeBase<T> {
       add(envelope, item);
     } else {
       final Node<T> node = getNode(index);
-      if (node == null || !node.getEnvelope().contains(envelope)) {
+      if (node == null || !node.getEnvelope().covers(envelope)) {
         final Node<T> largerNode = Node.createExpanded(node, envelope);
         setNode(index, largerNode);
       }

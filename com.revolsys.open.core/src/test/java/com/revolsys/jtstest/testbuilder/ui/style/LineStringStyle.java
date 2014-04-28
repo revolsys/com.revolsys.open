@@ -2,7 +2,12 @@ package com.revolsys.jtstest.testbuilder.ui.style;
 
 import java.awt.Graphics2D;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jtstest.testbuilder.Viewport;
 
 public abstract class LineStringStyle

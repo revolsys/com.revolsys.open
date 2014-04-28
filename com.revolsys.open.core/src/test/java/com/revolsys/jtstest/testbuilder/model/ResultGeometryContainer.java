@@ -1,7 +1,6 @@
 package com.revolsys.jtstest.testbuilder.model;
 
-import com.revolsys.jts.geom.*;
-import com.revolsys.jtstest.testbuilder.geom.*;
+import com.revolsys.jts.geom.Geometry;
 
 public class ResultGeometryContainer
 implements GeometryContainer

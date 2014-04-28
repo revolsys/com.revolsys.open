@@ -258,22 +258,20 @@ public class AbstractOverlay extends JComponent implements
     final double maxDistance = getMaxDistance(boundingBox);
     final QuadTree<IndexedLineSegment> lineSegments = GeometryEditUtil.getLineSegmentQuadTree(convertedGeometry);
     if (lineSegments != null) {
-      final Point point = boundingBox.getCentrePoint();
-      final Coordinates coordinates = CoordinatesUtil.getInstance(point);
-
+      final Point point = boundingBox.getCentre();
       double closestDistance = Double.MAX_VALUE;
       final List<IndexedLineSegment> segments = lineSegments.query(boundingBox,
         "isWithinDistance", point, maxDistance);
       IndexedLineSegment closestSegment = null;
       for (final IndexedLineSegment segment : segments) {
-        final double distance = segment.distance(coordinates);
+        final double distance = segment.distance(point);
         if (distance < closestDistance) {
           closestSegment = segment;
           closestDistance = distance;
         }
       }
       if (closestSegment != null) {
-        Coordinates pointOnLine = closestSegment.project(coordinates);
+        Coordinates pointOnLine = closestSegment.project(point);
         final com.revolsys.jts.geom.GeometryFactory geometryFactory = layer.getGeometryFactory();
         pointOnLine = ProjectionFactory.convert(pointOnLine,
           viewportGeometryFactory, geometryFactory);
@@ -293,7 +291,7 @@ public class AbstractOverlay extends JComponent implements
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
       int[] closestVertexIndex = null;
       Point closeVertex = null;
-      final Point centre = boundingBox.getCentrePoint();
+      final Point centre = boundingBox.getCentre();
 
       final List<int[]> closeVertices = index.findWithin(boundingBox);
       Collections.sort(closeVertices, INT_ARRAY_COMPARATOR);
@@ -461,7 +459,7 @@ public class AbstractOverlay extends JComponent implements
     final java.awt.Point eventPoint = event.getPoint();
     snapEventPoint = eventPoint;
     new TreeMap<Coordinates, List<CloseLocation>>();
-    final Point point = boundingBox.getCentrePoint();
+    final Point point = boundingBox.getCentre();
     final List<AbstractDataObjectLayer> layers = getSnapLayers();
     final TreeMap<Point, Set<CloseLocation>> snapLocations = new TreeMap<Point, Set<CloseLocation>>(
       new GeometryDistanceComparator(point));

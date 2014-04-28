@@ -15,7 +15,7 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -26,6 +26,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
@@ -64,7 +65,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public void addEdge(final Node<LineSegment> fromNode,
     final Node<LineSegment> toNode) {
-    final LineSegment lineSegment = new LineSegment(fromNode, toNode);
+    final LineSegment lineSegment = new LineSegmentImpl(fromNode, toNode);
     addEdge(lineSegment, fromNode, toNode);
   }
 
@@ -123,7 +124,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   @Override
   protected LineSegment clone(final LineSegment segment, final LineString line) {
-    return new LineSegment(line);
+    return new LineSegmentImpl(line);
   }
 
   /**
@@ -147,7 +148,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       Coordinates previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Coordinates nextPoint = points.get(i);
-        final LineSegment line1 = new LineSegment(getGeometryFactory(),
+        final LineSegment line1 = new LineSegmentImpl(getGeometryFactory(),
           previousPoint, nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
           this, line1, maxDistance);
@@ -245,7 +246,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     if (object == null) {
       return null;
     } else {
-      final LineString line = object.getLine();
+      final LineString line = object.toLineString();
       return line;
     }
   }
@@ -320,7 +321,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       Coordinates previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Coordinates nextPoint = points.get(i);
-        final LineSegment line1 = new LineSegment(previousPoint, nextPoint);
+        final LineSegment line1 = new LineSegmentImpl(previousPoint, nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {

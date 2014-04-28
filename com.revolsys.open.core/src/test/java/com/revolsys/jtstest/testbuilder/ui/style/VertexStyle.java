@@ -5,8 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jtstest.testbuilder.AppConstants;
 import com.revolsys.jtstest.testbuilder.Viewport;
 
@@ -33,14 +33,12 @@ public class VertexStyle implements Style {
   public void paint(final Geometry geom, final Viewport viewport,
     final Graphics2D g) {
     g.setPaint(color);
-    final Coordinates[] coordinates = geom.getCoordinateArray();
-
-    for (int i = 0; i < coordinates.length; i++) {
-      if (!viewport.containsInModel(coordinates[i])) {
+    for (final Vertex vertex : geom.vertices()) {
+      if (!viewport.containsInModel(vertex)) {
         // Otherwise get "sun.dc.pr.PRException: endPath: bad path" exception
         continue;
       }
-      pM.setLocation(coordinates[i].getX(), coordinates[i].getY());
+      pM.setLocation(vertex.getX(), vertex.getY());
       viewport.toView(pM, pV);
       shape.setLocation((int)(pV.getX() - sizeOver2),
         (int)(pV.getY() - sizeOver2));

@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
@@ -120,14 +120,13 @@ public class FacetLocater {
 
   private void findSegmentLocations(final Stack path, final Geometry compGeom,
     final CoordinatesList seq, final List locations) {
-    final LineSegment seg = new LineSegment();
     for (int i = 0; i < seq.size() - 1; i++) {
-      seg.setP0(seq.getCoordinate(i));
-      seg.setP1(seq.getCoordinate(i + 1));
-      final double dist = seg.distance(queryPt);
+      final Coordinates p0 = seq.getCoordinate(i);
+      final Coordinates p1 = seq.getCoordinate(i + 1);
+      final double dist = LineSegmentUtil.distance(p0, p1, queryPt);
       if (dist <= tolerance) {
         locations.add(new GeometryLocation(parentGeom, compGeom,
-          toIntArray(path), i, false, seg.getP0()));
+          toIntArray(path), i, false, p0));
       }
     }
   }

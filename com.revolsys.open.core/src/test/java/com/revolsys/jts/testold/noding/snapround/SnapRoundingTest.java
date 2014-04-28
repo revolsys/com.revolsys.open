@@ -6,9 +6,9 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
@@ -53,7 +53,7 @@ public class SnapRoundingTest extends TestCase {
     if (v.equals2d(p1)) {
       return true;
     }
-    final LineSegment seg = new LineSegment(p0, p1);
+    final LineSegment seg = new LineSegmentImpl(p0, p1);
     final double dist = seg.distance(v);
     if (dist < SNAP_TOLERANCE / 2.05) {
       return false;

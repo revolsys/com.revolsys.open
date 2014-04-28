@@ -37,8 +37,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.Reader;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
@@ -52,6 +54,8 @@ import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.segment.PolygonSegment;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.PolygonVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 
@@ -83,12 +87,17 @@ import com.revolsys.jts.geom.vertex.Vertex;
  */
 public class PolygonImpl extends AbstractGeometry implements Polygon {
 
+  /**
+   * The {@link GeometryFactory} used to create this Geometry
+   */
+  private final GeometryFactory geometryFactory;
+
   private static final long serialVersionUID = -3494792200821764533L;
 
   protected LinearRing[] rings;
 
-  public PolygonImpl(final GeometryFactory factory) {
-    super(factory);
+  public PolygonImpl(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   /**
@@ -103,7 +112,7 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
    *      geometry is to be created.
    */
   public PolygonImpl(final GeometryFactory factory, final LinearRing... rings) {
-    super(factory);
+    this.geometryFactory = factory;
     if (rings == null || rings.length == 0) {
 
     } else if (hasNullElements(rings)) {
@@ -350,6 +359,11 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
   }
 
   @Override
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
+  @Override
   public LinearRing getInteriorRing(final int ringIndex) {
     return getRing(ringIndex + 1);
   }
@@ -401,18 +415,33 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
   }
 
   @Override
+  public Segment getSegment(final int... segmentId) {
+    if (segmentId == null || segmentId.length != 2) {
+      return null;
+    } else {
+      final int ringIndex = segmentId[0];
+      if (ringIndex >= 0 && ringIndex < getRingCount()) {
+        final LinearRing ring = getRing(ringIndex);
+        final int vertexIndex = segmentId[1];
+        if (vertexIndex >= 0 && vertexIndex < ring.getSegmentCount()) {
+          return new PolygonSegment(this, segmentId);
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
   public Vertex getVertex(final int... vertexId) {
     if (vertexId == null || vertexId.length != 2) {
       return null;
     } else {
       final int ringIndex = vertexId[0];
-      if (ringIndex >= 0) {
+      if (ringIndex >= 0 && ringIndex < getRingCount()) {
         final LinearRing ring = getRing(ringIndex);
-        if (ring != null) {
-          final int vertexIndex = vertexId[1];
-          if (vertexIndex >= 0 && vertexIndex < ring.getVertexCount()) {
-            return new PolygonVertex(this, vertexId);
-          }
+        final int vertexIndex = vertexId[1];
+        if (vertexIndex >= 0 && vertexIndex < ring.getVertexCount()) {
+          return new PolygonVertex(this, vertexId);
         }
       }
       return null;
@@ -559,15 +588,19 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
     if (isEmpty()) {
       return Collections.emptyList();
     } else {
-      return Arrays.asList(this.rings);
+      return new ArrayList<>(Arrays.asList(this.rings));
     }
   }
 
-  /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
   @Override
-  public Iterable<Vertex> vertices() {
-    return new PolygonVertex(this, 0, -1);
+  public Reader<Segment> segments() {
+    final PolygonSegment iterator = new PolygonSegment(this, 0, -1);
+    return new IteratorReader<>(iterator);
+  }
+
+  @Override
+  public Reader<Vertex> vertices() {
+    final PolygonVertex vertex = new PolygonVertex(this, 0, -1);
+    return vertex.reader();
   }
 }

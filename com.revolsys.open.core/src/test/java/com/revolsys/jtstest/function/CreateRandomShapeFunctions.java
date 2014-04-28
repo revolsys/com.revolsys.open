@@ -45,7 +45,7 @@ public class CreateRandomShapeFunctions {
       final double x = baseX + env.getWidth() * haltonOrdinate(i + 1, basei);
       final double y = baseY + env.getHeight() * haltonOrdinate(i + 1, basej);
       final Coordinates p = new Coordinate(x, y);
-      if (!env.contains(p)) {
+      if (!env.covers(p)) {
         continue;
       }
       pts[i++] = p;
@@ -64,7 +64,7 @@ public class CreateRandomShapeFunctions {
     for (int i = 0; i < nPts; i++) {
       final double xLen = width * Math.random();
       final double yLen = hgt * Math.random();
-      pts[i] = randomPtInRectangleAround(env.centre(), xLen, yLen);
+      pts[i] = randomPtInRectangleAround(env.getCentre(), xLen, yLen);
     }
     return geomFact.lineString(pts);
   }
@@ -203,7 +203,7 @@ public class CreateRandomShapeFunctions {
     for (int i = 0; i < nPts; i++) {
       Coordinates pt = null;
       if (i == 0) {
-        pt = randomPtInRectangleAround(env.centre(), xLen, yLen);
+        pt = randomPtInRectangleAround(env.getCentre(), xLen, yLen);
       } else {
         final double dist = xLen * (Math.random() - 0.5);
         double x = pts[i - 1].getX();

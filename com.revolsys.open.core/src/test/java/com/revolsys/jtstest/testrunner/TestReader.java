@@ -51,6 +51,9 @@ import org.jdom.input.SAXBuilder;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jtstest.function.GeometryFunctionRegistry;
+import com.revolsys.jtstest.function.TestCaseGeometryFunctions;
+import com.revolsys.jtstest.geomop.GeometryFunctionOperation;
 import com.revolsys.jtstest.geomop.GeometryOperation;
 import com.revolsys.jtstest.util.FileUtil;
 import com.revolsys.jtstest.util.LineNumberElement;
@@ -61,11 +64,19 @@ import com.revolsys.jtstest.util.WKTOrWKBReader;
  * @version 1.7
  */
 public class TestReader {
+  public static final EqualityResultMatcher EQUALITY_RESULT_MATCHER = new EqualityResultMatcher();
+
+  public static final GeometryFunctionRegistry GEOMETRY_FUNCTION_REGISTRY = new GeometryFunctionRegistry(
+    TestCaseGeometryFunctions.class);
+
+  public static final GeometryFunctionOperation GEOMETRY_FUNCTION_OPERATION = new GeometryFunctionOperation(
+    GEOMETRY_FUNCTION_REGISTRY);
+
   private static final String TAG_geometryOperation = "geometryOperation";
 
   private static final String TAG_resultMatcher = "resultMatcher";
 
-  Vector parsingProblems = new Vector();
+  private final List<String> parsingProblems = new ArrayList<>();
 
   private GeometryFactory geometryFactory;
 
@@ -73,9 +84,9 @@ public class TestReader {
 
   private double tolerance = 0.0;
 
-  private GeometryOperation geomOp = null;
+  private GeometryOperation geomOp = GEOMETRY_FUNCTION_OPERATION;
 
-  private ResultMatcher resultMatcher = null;
+  private ResultMatcher resultMatcher = EQUALITY_RESULT_MATCHER;
 
   public TestReader() {
   }
@@ -133,12 +144,6 @@ public class TestReader {
   }
 
   public GeometryOperation getGeometryOperation() {
-    // use the main one if it was user-specified or this run does not have an op
-    // specified
-    if (TopologyTestApp.isGeometryOperationSpecified() || geomOp == null) {
-      return TopologyTestApp.getGeometryOperation();
-    }
-
     return geomOp;
   }
 
@@ -149,10 +154,10 @@ public class TestReader {
    * @return an instance of the class, if it is assignment-compatible, or
    *  null if the requested class is not assigment-compatible
    */
-  private Object getInstance(final String classname, final Class baseClass) {
+  private Object getInstance(final String classname, final Class<?> baseClass) {
     Object o = null;
     try {
-      final Class goClass = Class.forName(classname);
+      final Class<?> goClass = Class.forName(classname);
       if (!(baseClass.isAssignableFrom(goClass))) {
         return null;
       }
@@ -163,7 +168,7 @@ public class TestReader {
     return o;
   }
 
-  public List getParsingProblems() {
+  public List<String> getParsingProblems() {
     return Collections.unmodifiableList(parsingProblems);
   }
 
@@ -176,7 +181,7 @@ public class TestReader {
   }
 
   public boolean isGeometryFunction(final String name) {
-    final Class returnType = getGeometryOperation().getReturnType(name);
+    final Class<?> returnType = getGeometryOperation().getReturnType(name);
     if (returnType == null) {
       return false;
     }
@@ -200,7 +205,7 @@ public class TestReader {
     throws TestParseException {
     final Element goElement = runElement.getChild(TAG_geometryOperation);
     if (goElement == null) {
-      return null;
+      return GEOMETRY_FUNCTION_OPERATION;
     }
     final String goClass = goElement.getTextTrim();
     final GeometryOperation geomOp = (GeometryOperation)getInstance(goClass,
@@ -259,7 +264,7 @@ public class TestReader {
     throws TestParseException {
     final Element goElement = runElement.getChild(TAG_resultMatcher);
     if (goElement == null) {
-      return null;
+      return EQUALITY_RESULT_MATCHER;
     }
     final String goClass = goElement.getTextTrim();
     final ResultMatcher resultMatcher = (ResultMatcher)getInstance(goClass,
@@ -540,10 +545,9 @@ public class TestReader {
     // return null;
   }
 
-  private String toString(final List stringList) {
+  private String toString(final List<String> stringList) {
     String string = "";
-    for (final Iterator i = stringList.iterator(); i.hasNext();) {
-      final String line = (String)i.next();
+    for (final String line : stringList) {
       string += line + "\n";
     }
     return string;

@@ -37,7 +37,6 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -54,10 +53,6 @@ public class SimpleRayCrossingStressTest extends TestCase {
     static class RayCrossingSegmentFilter implements CoordinateSequenceFilter {
       private final RayCrossingCounter rcc;
 
-      private final Coordinates p0 = new Coordinate();
-
-      private final Coordinates p1 = new Coordinate();
-
       public RayCrossingSegmentFilter(final RayCrossingCounter rcc) {
         this.rcc = rcc;
       }
@@ -67,9 +62,9 @@ public class SimpleRayCrossingStressTest extends TestCase {
         if (i == 0) {
           return;
         }
-        seq.getCoordinate(i - 1, this.p0);
-        seq.getCoordinate(i, this.p1);
-        this.rcc.countSegment(this.p0, this.p1);
+        final Coordinates p0 = seq.getCoordinate(i - 1);
+        final Coordinates p1 = seq.getCoordinate(i);
+        this.rcc.countSegment(p0, p1);
       }
 
       @Override

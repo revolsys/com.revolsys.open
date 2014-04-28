@@ -34,7 +34,6 @@
 package com.revolsys.jts.operation.predicate;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -83,7 +82,7 @@ public class RectangleContains {
 
   public boolean contains(final Geometry geom) {
     // the test geometry must be wholly contained in the rectangle envelope
-    if (!rectEnv.contains(geom.getBoundingBox())) {
+    if (!rectEnv.covers(geom.getBoundingBox())) {
       return false;
     }
 
@@ -159,11 +158,9 @@ public class RectangleContains {
    */
   private boolean isLineStringContainedInBoundary(final LineString line) {
     final CoordinatesList seq = line.getCoordinatesList();
-    final Coordinates p0 = new Coordinate();
-    final Coordinates p1 = new Coordinate();
     for (int i = 0; i < seq.size() - 1; i++) {
-      seq.getCoordinate(i, p0);
-      seq.getCoordinate(i + 1, p1);
+      final Coordinates p0 = seq.getCoordinate(i);
+      final Coordinates p1 = seq.getCoordinate(i + 1);
 
       if (!isLineSegmentContainedInBoundary(p0, p1)) {
         return false;

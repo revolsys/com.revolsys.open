@@ -10,7 +10,7 @@ import java.util.TreeSet;
 
 import com.revolsys.gis.algorithm.index.EnvelopeSpatialIndex;
 import com.revolsys.gis.algorithm.index.RTree;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.comparator.AngleFromPointComparator;
@@ -23,6 +23,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
@@ -50,8 +51,7 @@ public class TriangulatedIrregularNetwork {
     this(boundingBox.getGeometryFactory(), boundingBox, loadMode);
   }
 
-  public TriangulatedIrregularNetwork(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public TriangulatedIrregularNetwork(final GeometryFactory geometryFactory) {
     this(geometryFactory.getCoordinateSystem().getAreaBoundingBox());
   }
 
@@ -90,7 +90,7 @@ public class TriangulatedIrregularNetwork {
       final Coordinates triCorner = triangle.get(i);
       if (!triCorner.equals2d(intersectCoord)
         && !previousCoord.equals2d(intersectCoord)) {
-        final double distance = new LineSegment(previousCoord, triCorner).distance(intersectCoord);
+        final double distance = new LineSegmentImpl(previousCoord, triCorner).distance(intersectCoord);
         if (distance == 0) {
           final Coordinates nextCoordinates = triangle.get((i + 1) % 3);
           replaceTriangle(triangle, Triangle.createClockwiseTriangle(
@@ -132,7 +132,7 @@ public class TriangulatedIrregularNetwork {
           endCornerDistance = endCorner;
         }
 
-        final LineSegment edge = new LineSegment(corner, nextCorner);
+        final LineSegment edge = new LineSegmentImpl(corner, nextCorner);
         final double startEdge = edge.distance(lc0);
         if (startClosestEdge == -1 || startEdge < startEdgeDistance) {
           startClosestEdge = i;
@@ -190,9 +190,14 @@ public class TriangulatedIrregularNetwork {
     final LineSegment breakline, final LineSegment intersectLine) {
     final Coordinates lc0 = intersectLine.get(0);
     final Coordinates lc1 = intersectLine.get(0);
-    breakline.setElevationOnPoint(geometryFactory, lc0);
-    breakline.setElevationOnPoint(geometryFactory, lc1);
-    final LineSegment lineSegment = new LineSegment(lc0, lc1);
+    final double x1 = lc0.getX();
+    final double y1 = lc0.getY();
+    final double x2 = lc1.getX();
+    final double y2 = lc1.getY();
+    final double z1 = breakline.getElevation(lc0);
+    final double z2 = breakline.getElevation(lc1);
+    final LineSegment lineSegment = new LineSegmentImpl(geometryFactory,
+      3, x1, y1, z1, x2, y2, z2);
     addBreaklineIntersect(triangle, lineSegment);
   }
 
@@ -427,19 +432,19 @@ public class TriangulatedIrregularNetwork {
         return t2.getZ();
       }
       Coordinates closestCorner = t0;
-      LineSegment oppositeEdge = new LineSegment(t1, t2);
+      LineSegment oppositeEdge = new LineSegmentImpl(t1, t2);
       double closestDistance = coordinate.distance(closestCorner);
       final double t1Distance = coordinate.distance(t1);
       if (closestDistance > t1Distance) {
         closestCorner = t1;
-        oppositeEdge = new LineSegment(t2, t0);
+        oppositeEdge = new LineSegmentImpl(t2, t0);
         closestDistance = t1Distance;
       }
       if (closestDistance > coordinate.distance(t2)) {
         closestCorner = t2;
-        oppositeEdge = new LineSegment(t0, t1);
+        oppositeEdge = new LineSegmentImpl(t0, t1);
       }
-      LineSegment segment = new LineSegment(closestCorner, coordinate).extend(
+      LineSegment segment = new LineSegmentImpl(closestCorner, coordinate).extend(
         0, t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
       final CoordinatesList intersectCoordinates = oppositeEdge.getIntersection(segment);
       if (intersectCoordinates.size() > 0) {
@@ -449,7 +454,7 @@ public class TriangulatedIrregularNetwork {
           final double x = intersectPoint.getX();
           final double y = intersectPoint.getY();
           final Coordinates end = new DoubleCoordinates(x, y, z);
-          segment = new LineSegment(t0, end);
+          segment = new LineSegmentImpl(t0, end);
           return segment.getElevation(coordinate);
         }
       }
@@ -458,22 +463,33 @@ public class TriangulatedIrregularNetwork {
   }
 
   public LineString getElevation(final LineString line) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final CoordinatesList oldPoints = CoordinatesListUtil.get(line);
     final CoordinatesList newPoints = new DoubleCoordinatesList(oldPoints);
+    final int vertexCount = line.getVertexCount();
+    final int axisCount = line.getAxisCount();
+    final double[] newCoordinates = new double[vertexCount * axisCount];
+
     boolean modified = false;
-    for (final Coordinates point : new InPlaceIterator(newPoints)) {
-      final double oldZ = point.getZ();
-      final double newZ = getElevation(point);
-      if (!Double.isNaN(newZ)) {
-        if (oldZ != newZ) {
-          point.setZ(newZ);
-          modified = true;
+    int i = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        double value = line.getCoordinate(vertexIndex, axisIndex);
+        if (axisIndex == 2) {
+          final double newZ = getElevation(line.getPoint(vertexIndex));
+          if (!Double.isNaN(newZ)) {
+            if (value != newZ) {
+              value = newZ;
+              modified = true;
+            }
+          }
         }
+        newCoordinates[i] = value;
+        i++;
       }
     }
     if (modified) {
-      return geometryFactory.lineString(newPoints);
+      return geometryFactory.lineString(axisCount, newCoordinates);
     } else {
       return line;
     }
@@ -531,27 +547,25 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  public List<Triangle> getTriangles(
-    final com.revolsys.jts.geom.BoundingBox envelope) {
+  public List<Triangle> getTriangles(final BoundingBox envelope) {
     return getTriangleIndex().find(envelope);
   }
 
   public List<Triangle> getTriangles(final Coordinates coordinate) {
-    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(coordinate);
+    final BoundingBox envelope = new Envelope(coordinate);
     final TriangleContainsPointFilter filter = new TriangleContainsPointFilter(
       coordinate);
     return getTriangleIndex().find(envelope, filter);
   }
 
   public List<Triangle> getTriangles(final LineSegment segment) {
-    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(
-      segment.getGeometryFactory(), segment.get(0), segment.get(1));
+    final BoundingBox envelope = segment.getBoundingBox();
     return getTriangles(envelope);
   }
 
   private List<Triangle> getTrianglesCircumcircleIntersections(
     final Coordinates point) {
-    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(point);
+    final BoundingBox envelope = new Envelope(point);
     final List<Triangle> triangles = getCircumcircleIndex().find(envelope);
     for (final Iterator<Triangle> iterator = triangles.iterator(); iterator.hasNext();) {
       final Triangle triangle = iterator.next();
@@ -566,7 +580,7 @@ public class TriangulatedIrregularNetwork {
     Coordinates previousCoordinates = coordinates.get(0);
     for (int i = 1; i < coordinates.size(); i++) {
       final Coordinates coordinate = coordinates.get(i);
-      final LineSegment segment = new LineSegment(this.geometryFactory,
+      final LineSegment segment = new LineSegmentImpl(this.geometryFactory,
         previousCoordinates, coordinate);
       insertEdge(segment);
       previousCoordinates = coordinate;
@@ -598,7 +612,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void insertNode(final Coordinates coordinate) {
-    if (boundingBox.contains(coordinate)) {
+    if (boundingBox.covers(coordinate)) {
       final Coordinates point = new DoubleCoordinates(coordinate, 3);
       geometryFactory.makePrecise(point);
       if (!nodes.contains(point)) {

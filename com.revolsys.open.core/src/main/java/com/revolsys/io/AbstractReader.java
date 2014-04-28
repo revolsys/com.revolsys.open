@@ -45,8 +45,10 @@ public abstract class AbstractReader<T> extends AbstractObjectWithProperties
   @Override
   public List<T> read() {
     final List<T> items = new ArrayList<T>();
-    for (final T item : this) {
-      items.add(item);
+    if (iterator() != null) {
+      for (final T item : this) {
+        items.add(item);
+      }
     }
     return items;
   }
@@ -59,9 +61,11 @@ public abstract class AbstractReader<T> extends AbstractObjectWithProperties
    */
   @Override
   public void visit(final Visitor<T> visitor) {
-    for (final T item : this) {
-      if (!visitor.visit(item)) {
-        return;
+    if (iterator() != null) {
+      for (final T item : this) {
+        if (!visitor.visit(item)) {
+          return;
+        }
       }
     }
   }

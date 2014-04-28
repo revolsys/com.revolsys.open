@@ -2,7 +2,6 @@ package com.revolsys.jts.testold.geom;
 
 import junit.framework.TestCase;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.util.AffineTransformation;

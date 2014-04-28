@@ -46,14 +46,12 @@ import org.apache.commons.beanutils.Converter;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -225,21 +223,6 @@ public class Envelope implements Serializable, BoundingBox {
     this(null, points);
   }
 
-  /**
-   * Computes the coordinate of the centre of this envelope (as long as it is non-null
-   *
-   * @return the centre coordinate of this envelope
-   * <code>null</code> if the envelope is null
-   */
-  @Override
-  public Coordinates centre() {
-    if (isEmpty()) {
-      return null;
-    }
-    return new Coordinate((getMinX() + getMaxX()) / 2.0,
-      (getMinY() + getMaxY()) / 2.0, Coordinates.NULL_ORDINATE);
-  }
-
   @Override
   public BoundingBox clipToCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
@@ -260,79 +243,6 @@ public class Envelope implements Serializable, BoundingBox {
   @Override
   public BoundingBox clone() {
     return this;
-  }
-
-  /**
-   * Tests if the <code>Envelope other</code>
-   * lies wholely inside this <code>Envelope</code> (inclusive of the boundary).
-   * <p>
-   * Note that this is <b>not</b> the same definition as the SFS <tt>contains</tt>,
-   * which would exclude the envelope boundary.
-   *
-   *@param  other the <code>Envelope</code> to check
-   *@return true if <code>other</code> is contained in this <code>Envelope</code>
-   *
-   *@see #covers(Envelope)
-   */
-  @Override
-  public boolean contains(final BoundingBox other) {
-    return covers(other);
-  }
-
-  /**
-   * Tests if the given point lies in or on the envelope.
-   * <p>
-   * Note that this is <b>not</b> the same definition as the SFS <tt>contains</tt>,
-   * which would exclude the envelope boundary.
-   *
-   *@param  p  the point which this <code>Envelope</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>Envelope</code>.
-   *      
-   *@see #covers(Coordinates)
-   */
-  @Override
-  public boolean contains(final Coordinates p) {
-    return covers(p);
-  }
-
-  /**
-   * Tests if the given point lies in or on the envelope.
-   * <p>
-   * Note that this is <b>not</b> the same definition as the SFS <tt>contains</tt>,
-   * which would exclude the envelope boundary.
-   *
-   *@param  x  the x-coordinate of the point which this <code>Envelope</code> is
-   *      being checked for containing
-   *@param  y  the y-coordinate of the point which this <code>Envelope</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if <code>(x, y)</code> lies in the interior or
-   *      on the boundary of this <code>Envelope</code>.
-   *      
-   *@see #covers(double, double)
-   */
-  @Override
-  public boolean contains(final double x, final double y) {
-    return covers(x, y);
-  }
-
-  @Override
-  public boolean contains(final Geometry geometry) {
-    if (geometry == null) {
-      return false;
-    } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      return contains(boundingBox);
-    }
-  }
-
-  @Override
-  public boolean contains(final Point point) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point projectedPoint = point.convert(geometryFactory);
-    final boolean contains = contains((Coordinates)projectedPoint);
-    return contains;
   }
 
   @Override
@@ -464,6 +374,24 @@ public class Envelope implements Serializable, BoundingBox {
 
       return x >= minX && x <= maxX && y >= minY && y <= maxY;
     }
+  }
+
+  @Override
+  public boolean covers(final Geometry geometry) {
+    if (geometry == null) {
+      return false;
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      return covers(boundingBox);
+    }
+  }
+
+  @Override
+  public boolean covers(final Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point projectedPoint = point.convert(geometryFactory);
+    final boolean contains = covers((Coordinates)projectedPoint);
+    return contains;
   }
 
   /**
@@ -638,7 +566,7 @@ public class Envelope implements Serializable, BoundingBox {
       final BoundingBox convertedOther = other.convert(geometryFactory);
       if (isEmpty()) {
         return convertedOther;
-      } else if (contains(convertedOther)) {
+      } else if (covers(convertedOther)) {
         return this;
       } else {
         final double minX = Math.min(getMinX(), convertedOther.getMinX());
@@ -683,7 +611,13 @@ public class Envelope implements Serializable, BoundingBox {
    */
   @Override
   public double getArea() {
-    return getWidth() * getHeight();
+    if (getAxisCount() < 2) {
+      return 0;
+    } else {
+      final double width = getWidth();
+      final double height = getHeight();
+      return width * height;
+    }
   }
 
   /**
@@ -726,14 +660,14 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   @Override
-  public Coordinates getCentre() {
-    return new DoubleCoordinates(getCentreX(), getCentreY());
-  }
-
-  @Override
-  public Point getCentrePoint() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.point(getCentre());
+  public Point getCentre() {
+    if (isEmpty()) {
+      return geometryFactory.point();
+    } else {
+      final double centreX = getCentreX();
+      final double centreY = getCentreY();
+      return geometryFactory.point(centreX, centreY);
+    }
   }
 
   @Override
@@ -791,12 +725,6 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   @Override
-  public LineSegment getEastLine() {
-    return new LineSegment(getGeometryFactory(), getMaxX(), getMinY(),
-      getMaxX(), getMaxY());
-  }
-
-  @Override
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
@@ -808,7 +736,7 @@ public class Envelope implements Serializable, BoundingBox {
    */
   @Override
   public double getHeight() {
-    if (isEmpty()) {
+    if (getAxisCount() < 2) {
       return 0;
     } else {
       return getMaxY() - getMinY();
@@ -823,19 +751,6 @@ public class Envelope implements Serializable, BoundingBox {
       return Measure.valueOf(height, SI.METRE);
     } else {
       return Measure.valueOf(height, coordinateSystem.getLengthUnit());
-    }
-  }
-
-  @Override
-  public String getId() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final String string = MathUtil.toString(getMinX()) + "_"
-      + MathUtil.toString(getMinY()) + "_" + MathUtil.toString(getMaxX()) + "_"
-      + MathUtil.toString(getMaxY());
-    if (geometryFactory == null) {
-      return string;
-    } else {
-      return geometryFactory.getSrid() + "-" + string;
     }
   }
 
@@ -936,22 +851,10 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   @Override
-  public LineSegment getNorthLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMaxY(),
-      getMaxX(), getMaxY());
-  }
-
-  @Override
-  public LineSegment getSouthLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
-      getMaxX(), getMinY());
-  }
-
-  @Override
   public int getSrid() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
-      return -1;
+      return 0;
     } else {
       return geometryFactory.getSrid();
     }
@@ -976,12 +879,6 @@ public class Envelope implements Serializable, BoundingBox {
     }
   }
 
-  @Override
-  public LineSegment getWestLine() {
-    return new LineSegment(getGeometryFactory(), getMinX(), getMinY(),
-      getMinX(), getMaxY());
-  }
-
   /**
    *  Returns the difference between the maximum and minimum x values.
    *
@@ -989,7 +886,7 @@ public class Envelope implements Serializable, BoundingBox {
    */
   @Override
   public double getWidth() {
-    if (isEmpty()) {
+    if (getAxisCount() < 2) {
       return 0;
     } else {
       final double minX = getMinX();
@@ -1132,42 +1029,6 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   /**
-   * Gets the maximum extent of this envelope across both dimensions.
-   * 
-   * @return the maximum extent of this envelope
-   */
-  @Override
-  public double maxExtent() {
-    if (isEmpty()) {
-      return 0.0;
-    }
-    final double w = getWidth();
-    final double h = getHeight();
-    if (w > h) {
-      return w;
-    }
-    return h;
-  }
-
-  /**
-   * Gets the minimum extent of this envelope across both dimensions.
-   * 
-   * @return the minimum extent of this envelope
-   */
-  @Override
-  public double minExtent() {
-    if (isEmpty()) {
-      return 0.0;
-    }
-    final double w = getWidth();
-    final double h = getHeight();
-    if (w < h) {
-      return w;
-    }
-    return h;
-  }
-
-  /**
    * <p>Create a new BoundingBox by moving the min/max x coordinates by xDisplacement and
    * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
    * and yDisplacement are 0 then this bounding box will be returned.</p>
@@ -1192,21 +1053,27 @@ public class Envelope implements Serializable, BoundingBox {
 
   @Override
   public Geometry toGeometry() {
-    final double minX = getMinX();
-    final double minY = getMinY();
-    final double maxX = getMaxX();
-    final double maxY = getMaxY();
-    final double width = getWidth();
-    final double height = getHeight();
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (width == 0 && height == 0) {
-      return geometryFactory.point(new DoubleCoordinatesList(2, minX, minY));
-    } else if (width == 0 || height == 0) {
-      return geometryFactory.lineString(new DoubleCoordinatesList(2, minX,
-        minY, maxX, maxY));
+    GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      geometryFactory = GeometryFactory.getFactory(0, 2);
+    }
+    if (isEmpty()) {
+      return geometryFactory.point();
     } else {
-      return geometryFactory.polygon(new DoubleCoordinatesList(2, minX, minY,
-        minX, maxY, maxX, maxY, maxX, minY, minX, minY));
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+      final double width = getWidth();
+      final double height = getHeight();
+      if (width == 0 && height == 0) {
+        return geometryFactory.point(minX, minY);
+      } else if (width == 0 || height == 0) {
+        return geometryFactory.lineString(2, minX, minY, maxX, maxY);
+      } else {
+        return geometryFactory.polygon(geometryFactory.linearRing(2, minX,
+          minY, minX, maxY, maxX, maxY, maxX, minY, minX, minY));
+      }
     }
   }
 
@@ -1321,7 +1188,7 @@ public class Envelope implements Serializable, BoundingBox {
         coordinates.setX(i, maxX);
         coordinates.setY(i, minY);
 
-        if (geometryFactory != factory) {
+        if (geometryFactory != factory && factory != null) {
           coordinates = CoordinatesListProjectionUtil.perform(coordinates,
             factory.getCoordinateSystem(), coordinateSystem);
         }
@@ -1348,24 +1215,40 @@ public class Envelope implements Serializable, BoundingBox {
 
   @Override
   public String toString() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
     final StringBuffer s = new StringBuffer();
-    if (geometryFactory != null) {
+    final int srid = getSrid();
+    if (srid > 0) {
       s.append("SRID=");
-      s.append(geometryFactory.getSrid());
+      s.append(srid);
       s.append(";");
     }
     if (isEmpty()) {
       s.append("BBOX EMPTY");
     } else {
-      s.append("BBOX(");
-      s.append(StringConverterRegistry.toString(getMinX()));
-      s.append(',');
-      s.append(StringConverterRegistry.toString(getMinY()));
+      s.append("BBOX");
+      final int axisCount = getAxisCount();
+      if (axisCount == 3) {
+        s.append(" Z");
+      } else if (axisCount == 4) {
+        s.append(" ZM");
+      } else if (axisCount != 2) {
+        s.append(" ");
+        s.append(axisCount);
+      }
+      s.append("(");
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        if (axisIndex > 0) {
+          s.append(',');
+        }
+        s.append(MathUtil.toString(getMin(axisIndex)));
+      }
       s.append(' ');
-      s.append(StringConverterRegistry.toString(getMaxX()));
-      s.append(',');
-      s.append(StringConverterRegistry.toString(getMaxY()));
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        if (axisIndex > 0) {
+          s.append(',');
+        }
+        s.append(MathUtil.toString(getMax(axisIndex)));
+      }
       s.append(')');
     }
     return s.toString();

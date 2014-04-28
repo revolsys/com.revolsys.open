@@ -32,7 +32,7 @@ public class NodeWithinBoundingBoxVisitor<T> implements Visitor<Node<T>> {
 
   @Override
   public boolean visit(final Node<T> node) {
-    if (boundingBox.contains(node)) {
+    if (boundingBox.covers(node)) {
       matchVisitor.visit(node);
     }
     return true;

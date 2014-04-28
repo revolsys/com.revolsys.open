@@ -32,17 +32,18 @@
  */
 package com.revolsys.jtstest.testbuilder.ui.tools;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 
 import javax.swing.SwingUtilities;
 
 import com.revolsys.jts.awt.GeometryCollectionShape;
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jtstest.testbuilder.AppCursors;
-import com.revolsys.jtstest.testbuilder.IconLoader;
-import com.revolsys.jtstest.testbuilder.geom.*;
+import com.revolsys.jtstest.testbuilder.geom.GeometryLocation;
 
 /**
  * @version 1.7

@@ -75,7 +75,7 @@ public class Key {
     env = new Envelope();
     computeKey(level, itemEnv);
     // MD - would be nice to have a non-iterative form of this algorithm
-    while (!env.contains(itemEnv)) {
+    while (!env.covers(itemEnv)) {
       level += 1;
       computeKey(level, itemEnv);
     }

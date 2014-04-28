@@ -1,10 +1,10 @@
 package com.revolsys.jtstest.testbuilder.geom;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 
 /**
@@ -29,8 +29,6 @@ public class GeometryPointLocater {
     private Coordinates nearestPt = null;
 
     private boolean isVertex = false;
-
-    private final LineSegment seg = new LineSegment();
 
     public NearestSegmentLocationFilter(final Coordinates testPt,
       final boolean vertexOnly, final double tolerance) {
@@ -64,11 +62,9 @@ public class GeometryPointLocater {
         return;
       }
 
-      seg.setP0(p0);
-      seg.setP1(p1);
-      final double segDist = seg.distance(testPt);
+      final double segDist = LineSegmentUtil.distance(p0, p1, testPt);
       if (segDist < tolerance) {
-        nearestPt = seg.closestPoint(testPt);
+        nearestPt = LineSegmentUtil.closestPoint(p0, p1, testPt);
         segIndex = i;
         isVertex = false;
       }

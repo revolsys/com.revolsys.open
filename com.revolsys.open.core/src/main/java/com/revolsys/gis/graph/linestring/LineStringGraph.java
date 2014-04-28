@@ -25,7 +25,7 @@ import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.NodeCoordinatesFilter;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -40,6 +40,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStringGraph extends Graph<LineSegment> {
@@ -94,7 +95,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   @Override
   protected LineSegment clone(final LineSegment object, final LineString line) {
-    return new LineSegment(line);
+    return new LineSegmentImpl(line);
   }
 
   @Override
@@ -103,7 +104,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     if (segment == null) {
       return null;
     } else {
-      return segment.getLine();
+      return segment.toLineString();
     }
   }
 
@@ -295,7 +296,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       Coordinates previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Coordinates nextPoint = points.get(i);
-        final LineSegment line1 = new LineSegment(previousPoint, nextPoint);
+        final LineSegment line1 = new LineSegmentImpl(previousPoint, nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
@@ -368,7 +369,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       final LineSegment line = edge.getObject();
       final EdgeObjectFilter<LineSegment> filter = new EdgeObjectFilter<LineSegment>(
         new LineSegmentIntersectingFilter(line));
-      final List<Edge<LineSegment>> edges = getEdges(filter, line.getEnvelope());
+      final List<Edge<LineSegment>> edges = getEdges(filter,
+        line.getBoundingBox());
       for (final Edge<LineSegment> edge2 : edges) {
         final LineSegment line2 = edge2.getObject();
         final CoordinatesList intersections = line.getIntersection(line2);
@@ -461,7 +463,8 @@ public class LineStringGraph extends Graph<LineSegment> {
     final Filter<LineSegment> lineFilter = new CrossingLineSegmentFilter(line1);
     final Filter<Edge<LineSegment>> filter = new EdgeObjectFilter<LineSegment>(
       lineFilter);
-    final List<Edge<LineSegment>> edges = getEdges(filter, line1.getEnvelope());
+    final List<Edge<LineSegment>> edges = getEdges(filter,
+      line1.getBoundingBox());
 
     if (!edges.isEmpty()) {
       final List<Coordinates> points = new ArrayList<Coordinates>();
@@ -501,7 +504,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       int i = 0;
       Coordinates previousPoint = fromNode;
       for (final Coordinates point : newPoints) {
-        final LineSegment lineSegment = new LineSegment(previousPoint, point);
+        final LineSegment lineSegment = new LineSegmentImpl(previousPoint,
+          point);
         final Edge<LineSegment> newEdge = addEdge(lineSegment, previousPoint,
           point);
         final List<Integer> newIndecies = new ArrayList<Integer>(index);

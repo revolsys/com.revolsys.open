@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.triangulate.quadedge;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.geom.Coordinate;
@@ -79,8 +78,8 @@ public class Vertex {
    * @param p1
    * @return the interpolated Z value
    */
-  public static double interpolateZ(final Coordinates p,
-    final Coordinates p0, final Coordinates p1) {
+  public static double interpolateZ(final Coordinates p, final Coordinates p0,
+    final Coordinates p1) {
     final double segLen = p0.distance(p1);
     final double ptLen = p.distance(p0);
     final double dz = p1.getZ() - p0.getZ();
@@ -379,10 +378,6 @@ public class Vertex {
 
   public final boolean rightOf(final QuadEdge e) {
     return isCCW(e.dest(), e.orig());
-  }
-
-  public void setZ(final double z) {
-    p.setZ(z);
   }
 
   /* and subtraction */

@@ -81,7 +81,7 @@ public class PlanarGraph {
 
   private final NodeMap nodes;
 
-  protected List edgeEndList = new ArrayList();
+  protected List<DirectedEdge> edgeEndList = new ArrayList<>();
 
   public PlanarGraph() {
     this(new NodeFactory());
@@ -91,7 +91,7 @@ public class PlanarGraph {
     this.nodes = new NodeMap(nodeFact);
   }
 
-  public void add(final EdgeEnd e) {
+  public void add(final DirectedEdge e) {
     nodes.add(e);
     edgeEndList.add(e);
   }
@@ -201,7 +201,7 @@ public class PlanarGraph {
     return null;
   }
 
-  public Collection getEdgeEnds() {
+  public Collection<DirectedEdge> getEdgeEnds() {
     return edgeEndList;
   }
 

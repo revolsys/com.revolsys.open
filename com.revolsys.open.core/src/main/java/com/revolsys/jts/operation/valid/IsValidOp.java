@@ -379,7 +379,7 @@ public class IsValidOp {
     // if point is on shell but not hole, check that the shell is inside the
     // hole
     if (shellPt != null) {
-      final boolean insideHole = CGAlgorithms.isPointInRing(shellPt, holePts);
+      final boolean insideHole = CGAlgorithms.isPointInRing(shellPt, hole);
       if (!insideHole) {
         return shellPt;
       }
@@ -388,7 +388,7 @@ public class IsValidOp {
     // if point is on hole but not shell, check that the hole is outside the
     // shell
     if (holePt != null) {
-      final boolean insideShell = CGAlgorithms.isPointInRing(holePt, shellPts);
+      final boolean insideShell = CGAlgorithms.isPointInRing(holePt, shell);
       if (insideShell) {
         return holePt;
       }
@@ -412,7 +412,6 @@ public class IsValidOp {
     final Coordinates[] shellPts = shell.getCoordinateArray();
     // test if shell is inside polygon shell
     final LinearRing polyShell = polygon.getExteriorRing();
-    final Coordinates[] polyPts = polyShell.getCoordinateArray();
     final Coordinates shellPt = findPtNotNode(shellPts, polyShell, graph);
     // if no point could be found, we can assume that the shell is outside the
     // polygon
@@ -420,7 +419,7 @@ public class IsValidOp {
       return true;
     } else {
       final boolean insidePolyShell = CGAlgorithms.isPointInRing(shellPt,
-        polyPts);
+        polyShell);
       if (!insidePolyShell) {
         return true;
       }

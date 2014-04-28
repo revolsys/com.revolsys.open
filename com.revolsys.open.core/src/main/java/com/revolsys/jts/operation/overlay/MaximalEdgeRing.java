@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -67,12 +66,12 @@ public class MaximalEdgeRing extends EdgeRing {
     super(start, geometryFactory);
   }
 
-  public List buildMinimalRings() {
-    final List minEdgeRings = new ArrayList();
+  public List<MinimalEdgeRing> buildMinimalRings() {
+    final List<MinimalEdgeRing> minEdgeRings = new ArrayList<>();
     DirectedEdge de = startDe;
     do {
       if (de.getMinEdgeRing() == null) {
-        final EdgeRing minEr = new MinimalEdgeRing(de, geometryFactory);
+        final MinimalEdgeRing minEr = new MinimalEdgeRing(de, geometryFactory);
         minEdgeRings.add(minEr);
       }
       de = de.getNext();

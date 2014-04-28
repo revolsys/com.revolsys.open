@@ -203,7 +203,7 @@ public class RobustLineIntersector extends LineIntersector {
     }
 
     if (precisionModel != null) {
-      precisionModel.makePrecise(intPt);
+      return precisionModel.getPreciseCoordinates(intPt);
     }
 
     return intPt;
@@ -238,7 +238,7 @@ public class RobustLineIntersector extends LineIntersector {
   private boolean isInSegmentBoundingBoxs(final Coordinates intPt) {
     final Envelope env0 = new Envelope(inputLines[0][0], inputLines[0][1]);
     final Envelope env1 = new Envelope(inputLines[1][0], inputLines[1][1]);
-    return env0.contains(intPt) && env1.contains(intPt);
+    return env0.covers(intPt) && env1.covers(intPt);
   }
 
   /**

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.noding.BasicSegmentString;
 import com.revolsys.jts.noding.FastNodingValidator;
 

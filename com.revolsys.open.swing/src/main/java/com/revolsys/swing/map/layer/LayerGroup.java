@@ -305,7 +305,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
 
   @Override
   public BoundingBox getBoundingBox() {
-    GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     BoundingBox boudingBox = new Envelope(geometryFactory);
     for (final Layer layer : this) {
       final BoundingBox layerBoundingBox = layer.getBoundingBox();
@@ -318,7 +318,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     BoundingBox boudingBox = new Envelope(geometryFactory);
     if (isExists() && (!visibleLayersOnly || isVisible())) {
       for (final Layer layer : this) {

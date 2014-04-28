@@ -1,16 +1,15 @@
 package com.revolsys.jtstest.testbuilder.ui.tools;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.Point2D;
 
 import com.revolsys.jts.awt.FontGlyphReader;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jtstest.*;
 import com.revolsys.jtstest.testbuilder.AppConstants;
-import com.revolsys.jtstest.testbuilder.model.*;
 
 public abstract class IndicatorTool extends BasicTool
 {

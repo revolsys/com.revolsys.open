@@ -33,10 +33,9 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -119,13 +118,12 @@ class LocationIndexOfPoint {
     int minSegmentIndex = 0;
     double minFrac = -1.0;
 
-    final LineSegment seg = new LineSegment();
     for (final LinearIterator it = new LinearIterator(linearGeom); it.hasNext(); it.next()) {
       if (!it.isEndOfLine()) {
-        seg.setP0(it.getSegmentStart());
-        seg.setP1(it.getSegmentEnd());
-        final double segDistance = seg.distance(inputPt);
-        final double segFrac = seg.segmentFraction(inputPt);
+        final Coordinates p0 = it.getSegmentStart();
+        final Coordinates p1 = it.getSegmentEnd();
+        final double segDistance = LineSegmentUtil.distance(p0, p1, inputPt);
+        final double segFrac = LineSegmentUtil.segmentFraction(p0, p1, inputPt);
 
         final int candidateComponentIndex = it.getComponentIndex();
         final int candidateSegmentIndex = it.getVertexIndex();
@@ -164,9 +162,9 @@ class LocationIndexOfPoint {
    * @return the fraction along the line segment the point occurs
    */
   /*
-   * // MD - no longer needed private static double segmentFraction( LineSegment
-   * seg, Coordinates inputPt) { double segFrac = seg.projectionFactor(inputPt);
-   * if (segFrac < 0.0) segFrac = 0.0; else if (segFrac > 1.0) segFrac = 1.0;
-   * return segFrac; }
+   * // MD - no longer needed private static double segmentFraction(
+   * LineSegment seg, Coordinates inputPt) { double segFrac =
+   * seg.projectionFactor(inputPt); if (segFrac < 0.0) segFrac = 0.0; else if
+   * (segFrac > 1.0) segFrac = 1.0; return segFrac; }
    */
 }

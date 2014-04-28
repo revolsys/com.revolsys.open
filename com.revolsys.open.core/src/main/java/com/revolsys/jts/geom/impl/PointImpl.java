@@ -32,14 +32,14 @@
  */
 package com.revolsys.jts.geom.impl;
 
-import java.util.Collections;
-
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
+import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
@@ -53,6 +53,8 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.PointVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.util.NumberUtil;
 import com.revolsys.util.MathUtil;
@@ -75,10 +77,15 @@ public class PointImpl extends AbstractGeometry implements Point {
     0
   };
 
+  /**
+  * The {@link GeometryFactory} used to create this Geometry
+  */
+  private final GeometryFactory geometryFactory;
+
   private double[] coordinates;
 
   public PointImpl(final GeometryFactory geometryFactory) {
-    super(geometryFactory);
+    this.geometryFactory = geometryFactory;
   }
 
   /**
@@ -87,7 +94,7 @@ public class PointImpl extends AbstractGeometry implements Point {
    */
   public PointImpl(final GeometryFactory geometryFactory,
     final double... coordinates) {
-    super(geometryFactory);
+    this.geometryFactory = geometryFactory;
     final int axisCount = geometryFactory.getAxisCount();
     this.coordinates = new double[axisCount];
     for (int i = 0; i < axisCount; i++) {
@@ -393,10 +400,9 @@ public class PointImpl extends AbstractGeometry implements Point {
     return 0;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V getGeometry() {
-    return (V)this;
+  public final GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   @Override
@@ -405,13 +411,8 @@ public class PointImpl extends AbstractGeometry implements Point {
   }
 
   @Override
-  public int getPartIndex() {
-    return -1;
-  }
-
-  @Override
-  public int getRingIndex() {
-    return -1;
+  public Segment getSegment(final int... segmentId) {
+    return null;
   }
 
   @Override
@@ -431,7 +432,7 @@ public class PointImpl extends AbstractGeometry implements Point {
     } else {
       if (vertexId.length == 1) {
         if (vertexId[0] == 0) {
-          return this;
+          return new PointVertex(this, vertexId);
         }
       }
       return null;
@@ -441,16 +442,6 @@ public class PointImpl extends AbstractGeometry implements Point {
   @Override
   public int getVertexCount() {
     return isEmpty() ? 0 : 1;
-  }
-
-  @Override
-  public int[] getVertexId() {
-    return VERTEX_ID;
-  }
-
-  @Override
-  public int getVertexIndex() {
-    return 0;
   }
 
   @Override
@@ -529,6 +520,11 @@ public class PointImpl extends AbstractGeometry implements Point {
   }
 
   @Override
+  public Reader<Segment> segments() {
+    return new IteratorReader<>();
+  }
+
+  @Override
   public void setCoordinate(final Coordinates other) {
     throw new IllegalArgumentException("Geometries cannot be modified");
   }
@@ -564,12 +560,8 @@ public class PointImpl extends AbstractGeometry implements Point {
   }
 
   @Override
-  public Point toPoint() {
-    return this;
-  }
-
-  @Override
-  public Iterable<Vertex> vertices() {
-    return Collections.<Vertex> singletonList(this);
+  public Reader<Vertex> vertices() {
+    final PointVertex vertex = new PointVertex(this, -1);
+    return vertex.reader();
   }
 }

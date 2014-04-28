@@ -1,11 +1,12 @@
 package com.revolsys.jtstest.testbuilder.ui.style;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 
 import com.revolsys.jts.awt.FontGlyphReader;
 import com.revolsys.jts.geomgraph.Quadrant;
-import com.revolsys.jts.noding.Octant;
 import com.revolsys.jtstest.testbuilder.Viewport;
 
 public class SegmentIndexStyle 

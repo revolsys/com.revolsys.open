@@ -8,69 +8,10 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.jts.LineSegment;
 
 public interface BoundingBox {
 
-  /**
-   * Computes the coordinate of the centre of this envelope (as long as it is non-null
-   *
-   * @return the centre coordinate of this envelope
-   * <code>null</code> if the envelope is null
-   */
-  Coordinates centre();
-
   BoundingBox clipToCoordinateSystem();
-
-  /**
-   * Tests if the <code>BoundingBox other</code>
-   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
-   * <p>
-   * Note that this is <b>not</b> the same definition as the SFS <tt>contains</tt>,
-   * which would exclude the envelope boundary.
-   *
-   *@param  other the <code>BoundingBox</code> to check
-   *@return true if <code>other</code> is contained in this <code>BoundingBox</code>
-   *
-   *@see #covers(BoundingBox)
-   */
-  boolean contains(BoundingBox other);
-
-  /**
-   * Tests if the given point lies in or on the envelope.
-   * <p>
-   * Note that this is <b>not</b> the same definition as the SFS <tt>contains</tt>,
-   * which would exclude the envelope boundary.
-   *
-   *@param  p  the point which this <code>BoundingBox</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>BoundingBox</code>.
-   *      
-   *@see #covers(Coordinates)
-   */
-  boolean contains(Coordinates p);
-
-  /**
-   * Tests if the given point lies in or on the envelope.
-   * <p>
-   * Note that this is <b>not</b> the same definition as the SFS <tt>contains</tt>,
-   * which would exclude the envelope boundary.
-   *
-   *@param  x  the x-coordinate of the point which this <code>BoundingBox</code> is
-   *      being checked for containing
-   *@param  y  the y-coordinate of the point which this <code>BoundingBox</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if <code>(x, y)</code> lies in the interior or
-   *      on the boundary of this <code>BoundingBox</code>.
-   *      
-   *@see #covers(double, double)
-   */
-  boolean contains(double x, double y);
-
-  boolean contains(Geometry geometry);
-
-  boolean contains(Point geometry);
 
   BoundingBox convert(GeometryFactory geometryFactory);
 
@@ -104,6 +45,10 @@ public interface BoundingBox {
    *      on the boundary of this <code>BoundingBox</code>.
    */
   boolean covers(double x, double y);
+
+  boolean covers(Geometry geometry);
+
+  boolean covers(Point geometry);
 
   /**
    * Computes the distance between this and another
@@ -145,9 +90,7 @@ public interface BoundingBox {
 
   double[] getBounds();
 
-  Coordinates getCentre();
-
-  Point getCentrePoint();
+  Point getCentre();
 
   double getCentreX();
 
@@ -159,8 +102,6 @@ public interface BoundingBox {
 
   CoordinatesList getCornerPoints();
 
-  LineSegment getEastLine();
-
   GeometryFactory getGeometryFactory();
 
   /**
@@ -171,8 +112,6 @@ public interface BoundingBox {
   double getHeight();
 
   Measure<Length> getHeightLength();
-
-  String getId();
 
   double getMax(int i);
 
@@ -220,15 +159,9 @@ public interface BoundingBox {
    */
   double getMinY();
 
-  LineSegment getNorthLine();
-
-  LineSegment getSouthLine();
-
   int getSrid();
 
   Point getTopLeftPoint();
-
-  LineSegment getWestLine();
 
   /**
    *  Returns the difference between the maximum and minimum x values.
@@ -279,21 +212,27 @@ public interface BoundingBox {
 
   boolean isEmpty();
 
-  /**
-   * Gets the maximum extent of this envelope across both dimensions.
-   * 
-   * @return the maximum extent of this envelope
-   */
-  double maxExtent();
-
-  /**
-   * Gets the minimum extent of this envelope across both dimensions.
-   * 
-   * @return the minimum extent of this envelope
-   */
-  double minExtent();
-
   BoundingBox move(double deltaX, double deltaY);
+
+  /**
+   * Creates a {@link Geometry} with the same extent as the given envelope.
+   * The Geometry returned is guaranteed to be valid.  
+   * To provide this behaviour, the following cases occur:
+   * <p>
+   * If the <code>Envelope</code> is:
+   * <ul>
+   * <li>null : returns an empty {@link Point}
+   * <li>a point : returns a non-empty {@link Point}
+   * <li>a line : returns a two-point {@link LineString}
+   * <li>a rectangle : returns a {@link Polygon}> whose points are (minx, miny),
+   *  (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny).
+   * </ul>
+   * 
+   *@param  envelope the <code>Envelope</code> to convert
+   *@return an empty <code>Point</code> (for null <code>Envelope</code>s), 
+   *  a <code>Point</code> (when min x = max x and min y = max y) or a
+   *      <code>Polygon</code> (in all other cases)
+   */
 
   Geometry toGeometry();
 

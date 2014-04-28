@@ -41,6 +41,7 @@ import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geomgraph.Position;
 
@@ -119,13 +120,13 @@ class OffsetSegmentGenerator {
 
   private Coordinates s0, s1, s2;
 
-  private final LineSegment seg0 = new LineSegment();
+  private final LineSegment seg0 = new LineSegmentImpl();
 
-  private final LineSegment seg1 = new LineSegment();
+  private final LineSegment seg1 = new LineSegmentImpl();
 
-  private final LineSegment offset0 = new LineSegment();
+  private final LineSegment offset0 = new LineSegmentImpl();
 
-  private final LineSegment offset1 = new LineSegment();
+  private final LineSegment offset1 = new LineSegmentImpl();
 
   private int side = 0;
 
@@ -406,7 +407,7 @@ class OffsetSegmentGenerator {
 
     // compute the mitre midline segment from the corner point to the bevel
     // segment midpoint
-    final LineSegment mitreMidLine = new LineSegment(basePt, bevelMidPt);
+    final LineSegment mitreMidLine = new LineSegmentImpl(basePt, bevelMidPt);
 
     // finally the bevel segment endpoints are computed as offsets from
     // the mitre midline
@@ -430,11 +431,11 @@ class OffsetSegmentGenerator {
    * Add an end cap around point p1, terminating a line segment coming from p0
    */
   public void addLineEndCap(final Coordinates p0, final Coordinates p1) {
-    final LineSegment seg = new LineSegment(p0, p1);
+    final LineSegment seg = new LineSegmentImpl(p0, p1);
 
-    final LineSegment offsetL = new LineSegment();
+    final LineSegment offsetL = new LineSegmentImpl();
     computeOffsetSegment(seg, Position.LEFT, distance, offsetL);
-    final LineSegment offsetR = new LineSegment();
+    final LineSegment offsetR = new LineSegmentImpl();
     computeOffsetSegment(seg, Position.RIGHT, distance, offsetR);
 
     final double dx = p1.getX() - p0.getX();

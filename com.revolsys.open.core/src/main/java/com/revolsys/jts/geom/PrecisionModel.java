@@ -463,26 +463,6 @@ public class PrecisionModel implements Serializable, Comparable {
     return internal;
   }
 
-  /**
-   *  Sets <code>internal</code> to the precise representation of <code>external</code>.
-   *
-   * @param external the original coordinate
-   * @param internal the coordinate whose values will be changed to the
-   *                 precise representation of <code>external</code>
-   * @deprecated use makePrecise instead
-   */
-  @Deprecated
-  public void toInternal(final Coordinates external, final Coordinates internal) {
-    if (isFloating()) {
-      internal.setX(external.getX());
-      internal.setY(external.getY());
-    } else {
-      internal.setX(makePrecise(external.getX()));
-      internal.setY(makePrecise(external.getY()));
-    }
-    internal.setZ(external.getZ());
-  }
-
   @Override
   public String toString() {
     String description = "UNKNOWN";

@@ -104,7 +104,7 @@ public class CreateShapeFunctions {
 
         final BoundingBox cellEnv = new Envelope(2, x, y, x + cellSizeX, y
           + cellSizeY);
-        geoms.add(geomFact.toGeometry(cellEnv));
+        geoms.add(cellEnv.toGeometry());
       }
     }
     return geomFact.buildGeometry(geoms);

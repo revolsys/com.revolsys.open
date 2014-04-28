@@ -125,7 +125,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
             geometryFactory, viewportGeometryFactory);
         }
 
-        if (point != null && viewport.getBoundingBox().contains(point)) {
+        if (point != null && viewport.getBoundingBox().covers(point)) {
           return new CoordinatesWithOrientation(point, orientation);
         }
       }
@@ -144,7 +144,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   public static void renderMarker(final Viewport2D viewport,
     final Graphics2D graphics, final Coordinates point,
     final MarkerStyle style, final double orientation) {
-    if (viewport.getBoundingBox().contains(point)) {
+    if (viewport.getBoundingBox().covers(point)) {
       final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
         graphics);
       final Paint paint = graphics.getPaint();

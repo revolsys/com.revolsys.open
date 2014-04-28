@@ -87,9 +87,9 @@ public class EdgeEndBundle extends EdgeEnd {
       }
     }
     if (isArea) {
-      label = new Label(Location.NONE, Location.NONE, Location.NONE);
+      setLabel(new Label(Location.NONE, Location.NONE, Location.NONE));
     } else {
-      label = new Label(Location.NONE);
+      setLabel(new Label(Location.NONE));
     }
 
     // compute the On label, and the side labels if present
@@ -144,7 +144,7 @@ public class EdgeEndBundle extends EdgeEnd {
     if (boundaryCount > 0) {
       loc = GeometryGraph.determineBoundary(boundaryNodeRule, boundaryCount);
     }
-    label.setLocation(geomIndex, loc);
+    getLabel().setLocation(geomIndex, loc);
 
   }
 
@@ -168,10 +168,10 @@ public class EdgeEndBundle extends EdgeEnd {
       if (e.getLabel().isArea()) {
         final Location loc = e.getLabel().getLocation(geomIndex, side);
         if (loc == Location.INTERIOR) {
-          label.setLocation(geomIndex, side, Location.INTERIOR);
+          getLabel().setLocation(geomIndex, side, Location.INTERIOR);
           return;
         } else if (loc == Location.EXTERIOR) {
-          label.setLocation(geomIndex, side, Location.EXTERIOR);
+          getLabel().setLocation(geomIndex, side, Location.EXTERIOR);
         }
       }
     }
@@ -189,11 +189,6 @@ public class EdgeEndBundle extends EdgeEnd {
     return edgeEnds;
   }
 
-  @Override
-  public Label getLabel() {
-    return label;
-  }
-
   public void insert(final EdgeEnd e) {
     // Assert: start point is the same
     // Assert: direction is the same
@@ -206,7 +201,7 @@ public class EdgeEndBundle extends EdgeEnd {
 
   @Override
   public void print(final PrintStream out) {
-    out.println("EdgeEndBundle--> Label: " + label);
+    out.println("EdgeEndBundle--> Label: " + getLabel());
     for (final Iterator it = iterator(); it.hasNext();) {
       final EdgeEnd ee = (EdgeEnd)it.next();
       ee.print(out);
@@ -218,6 +213,6 @@ public class EdgeEndBundle extends EdgeEnd {
    * Update the IM with the contribution for the computed label for the EdgeStubs.
    */
   void updateIM(final IntersectionMatrix im) {
-    Edge.updateIM(label, im);
+    Edge.updateIM(getLabel(), im);
   }
 }

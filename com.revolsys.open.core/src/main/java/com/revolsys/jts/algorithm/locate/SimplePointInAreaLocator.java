@@ -108,7 +108,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     if (!ring.getBoundingBox().intersects(p)) {
       return false;
     }
-    return CGAlgorithms.isPointInRing(p, ring.getCoordinateArray());
+    return CGAlgorithms.isPointInRing(p, ring);
   }
 
   /**

@@ -33,10 +33,10 @@
 
 package com.revolsys.jts.simplify;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.LineSegment;
 
 /**
  * Simplifies a linestring (sequence of points) using
@@ -58,8 +58,6 @@ class DouglasPeuckerLineSimplifier {
   private boolean[] usePt;
 
   private double distanceTolerance;
-
-  private final LineSegment seg = new LineSegment();
 
   public DouglasPeuckerLineSimplifier(final Coordinates[] pts) {
     this.pts = pts;
@@ -95,12 +93,12 @@ class DouglasPeuckerLineSimplifier {
     if ((i + 1) == j) {
       return;
     }
-    seg.setP0(pts[i]);
-    seg.setP1(pts[j]);
+    final Coordinates p0 = pts[i];
+    final Coordinates p1 = pts[j];
     double maxDistance = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
-      final double distance = seg.distance(pts[k]);
+      final double distance = LineSegmentUtil.distance(p0, p1, pts[k]);
       if (distance > maxDistance) {
         maxDistance = distance;
         maxIndex = k;

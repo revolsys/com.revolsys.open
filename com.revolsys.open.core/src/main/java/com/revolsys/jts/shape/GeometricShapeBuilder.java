@@ -40,6 +40,7 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 
 public abstract class GeometricShapeBuilder 
 {
@@ -64,7 +65,7 @@ public abstract class GeometricShapeBuilder
 	
 	public Coordinates getCentre()
 	{
-		return extent.centre();
+		return extent.getCentre();
 	}
 	
 	public double getDiameter()
@@ -84,7 +85,7 @@ public abstract class GeometricShapeBuilder
 		Coordinates centre = getCentre();
 		Coordinate p0 = new Coordinate((double)centre.getX() - radius, centre.getY() - radius, Coordinates.NULL_ORDINATE);
 		Coordinate p1 = new Coordinate((double)centre.getX() + radius, centre.getY() - radius, Coordinates.NULL_ORDINATE);
-		return new LineSegment(p0, p1);
+		return new LineSegmentImpl(p0, p1);
 	}
 	
 	public BoundingBox getSquareExtent()

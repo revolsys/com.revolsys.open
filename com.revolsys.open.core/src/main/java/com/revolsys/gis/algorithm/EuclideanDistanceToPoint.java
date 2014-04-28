@@ -38,19 +38,13 @@ import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.segment.Segment;
 
 /**
  * Computes the Euclidean distance (L2 metric) from a Point to a Geometry. Also
  * computes two points which are separated by the distance.
  */
 public class EuclideanDistanceToPoint {
-
-  // used for point-line distance calculation
-  private final LineSegment tempSegment = new LineSegment();
-
-  public EuclideanDistanceToPoint() {
-  }
-
   public void computeDistance(final Geometry geom, final Coordinates pt,
     final PointPairDistance ptDist) {
     if (geom instanceof LineString) {
@@ -76,11 +70,9 @@ public class EuclideanDistanceToPoint {
 
   public void computeDistance(final LineString line, final Coordinates pt,
     final PointPairDistance ptDist) {
-    final Coordinates[] coords = line.getCoordinateArray();
-    for (int i = 0; i < coords.length - 1; i++) {
-      tempSegment.setCoordinates(coords[i], coords[i + 1]);
+    for (final Segment segment : line.segments()) {
       // this is somewhat inefficient - could do better
-      final Coordinates closestPt = tempSegment.closestPoint(pt);
+      final Coordinates closestPt = segment.closestPoint(pt);
       ptDist.setMinimum(closestPt, pt);
     }
   }

@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.util.Assert;
@@ -199,12 +198,12 @@ public class SegmentNodeList {
     addEndpoints();
     addCollapsedNodes();
 
-    final Iterator it = iterator();
+    final Iterator<SegmentNode> it = iterator();
     // there should always be at least two entries in the list, since the
     // endpoints are nodes
-    SegmentNode eiPrev = (SegmentNode)it.next();
+    SegmentNode eiPrev = it.next();
     while (it.hasNext()) {
-      final SegmentNode ei = (SegmentNode)it.next();
+      final SegmentNode ei = it.next();
       final SegmentString newEdge = createSplitEdge(eiPrev, ei);
       /*
        * if (newEdge.size() < 2) throw new

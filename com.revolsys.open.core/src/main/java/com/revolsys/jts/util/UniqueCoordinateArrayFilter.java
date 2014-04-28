@@ -35,7 +35,6 @@ package com.revolsys.jts.util;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.Coordinates;
 

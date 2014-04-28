@@ -1,11 +1,13 @@
 package com.revolsys.jtstest.util;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.core.io.FileSystemResource;
+
+import com.revolsys.gis.data.io.GeometryReader;
+import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
@@ -13,7 +15,6 @@ import com.revolsys.jts.io.WKBHexFileReader;
 import com.revolsys.jts.io.WKBReader;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jtstest.testbuilder.io.shapefile.Shapefile;
 
 public class IOUtil {
   private static String cleanHex(final String hexStuff) {
@@ -24,28 +25,23 @@ public class IOUtil {
     final GeometryFactory geomFact) throws Exception, IOException {
     final String ext = FileUtil.extension(filename);
     if (ext.equalsIgnoreCase(".shp")) {
-      return readGeometriesFromShapefile(filename, geomFact);
+      try (
+        GeometryReader reader = AbstractGeometryReaderFactory.geometryReader(new FileSystemResource(
+          filename))) {
+        final List<Geometry> geometries = reader.read();
+        if (geometries.isEmpty()) {
+          return geomFact.geometryCollection();
+        } else {
+          final GeometryFactory geometryFactory = geometries.get(0)
+            .getGeometryFactory();
+          return geometryFactory.geometryCollection(geometries);
+        }
+      }
     }
     if (ext.equalsIgnoreCase(".wkb")) {
       return readGeometryFromWKBHexFile(filename, geomFact);
     }
     return readGeometriesFromWKTFile(filename, geomFact);
-  }
-
-  private static Geometry readGeometriesFromShapefile(final String filename,
-    final GeometryFactory geomFact) throws Exception {
-    final Shapefile shpfile = new Shapefile(new FileInputStream(filename));
-    shpfile.readStream(geomFact);
-    final List geomList = new ArrayList();
-    do {
-      final Geometry geom = shpfile.next();
-      if (geom == null) {
-        break;
-      }
-      geomList.add(geom);
-    } while (true);
-
-    return geomFact.geometryCollection(geomList);
   }
 
   public static Geometry readGeometriesFromWKBHexString(final String wkb,

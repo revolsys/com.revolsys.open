@@ -110,7 +110,7 @@ public class RectangleIntersectsPerfTest {
         final double baseY = env.getMinY() + j * dy;
         final BoundingBox envRect = new Envelope(2, baseX, baseY, baseX + dx,
           baseY + dy);
-        final Geometry rect = geometryFactory.toGeometry(envRect);
+        final Geometry rect = envRect.toGeometry();
         rectList.add(rect);
       }
     }

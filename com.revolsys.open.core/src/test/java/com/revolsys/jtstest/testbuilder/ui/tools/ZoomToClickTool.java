@@ -34,15 +34,16 @@
  */
 package com.revolsys.jtstest.testbuilder.ui.tools;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
 
 import javax.swing.SwingUtilities;
 
 import com.revolsys.jtstest.testbuilder.AppConstants;
 import com.revolsys.jtstest.testbuilder.GeometryEditPanel;
-import com.revolsys.jtstest.testbuilder.JTSTestBuilderFrame;
 
 
 /**

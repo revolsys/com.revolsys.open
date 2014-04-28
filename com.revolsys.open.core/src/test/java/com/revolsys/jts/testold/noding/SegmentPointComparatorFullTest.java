@@ -2,10 +2,10 @@ package com.revolsys.jts.testold.noding;
 
 import junit.framework.TestCase;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.Octant;
 import com.revolsys.jts.noding.SegmentPointComparator;
@@ -51,7 +51,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
   private void checkSegment(final double x, final double y) {
     final Coordinates seg0 = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
     final Coordinates seg1 = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
-    final LineSegment seg = new LineSegment(seg0, seg1);
+    final LineSegment seg = new LineSegmentImpl(seg0, seg1);
 
     for (int i = 0; i < 4; i++) {
       final double dist = i;

@@ -5,8 +5,9 @@ import java.util.Set;
 
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.visitor.AbstractEdgeListenerVisitor;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.LineSegment;
 
 public class LineSegmentIntersectionVisitor extends
   AbstractEdgeListenerVisitor<LineSegment> {
@@ -26,7 +27,7 @@ public class LineSegmentIntersectionVisitor extends
   @Override
   public boolean visit(final Edge<LineSegment> edge) {
     final LineSegment lineSegment = edge.getObject();
-    if (lineSegment.getEnvelope().intersects(querySeg.getEnvelope())) {
+    if (lineSegment.getBoundingBox().intersects(querySeg.getBoundingBox())) {
       final CoordinatesList intersection = querySeg.getIntersection(lineSegment);
       if (intersection != null && intersection.size() > 0) {
         intersections.add(intersection);

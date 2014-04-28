@@ -36,15 +36,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.vertex.MultiPointVertexIterable;
+import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.MultiPointVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
@@ -143,6 +146,21 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
   }
 
   @Override
+  public Segment getSegment(final int... vertexId) {
+    return null;
+  }
+
+  @Override
+  public Vertex getVertex(final int... vertexId) {
+    if (vertexId.length != 1 || vertexId[0] < 0
+      || vertexId[0] >= getGeometryCount()) {
+      return null;
+    } else {
+      return new MultiPointVertex(this, vertexId);
+    }
+  }
+
+  @Override
   public boolean isValid() {
     return true;
   }
@@ -164,12 +182,14 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
     }
   }
 
-  /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
   @Override
-  public Iterable<Vertex> vertices() {
-    return new MultiPointVertexIterable(this);
+  public IteratorReader<Segment> segments() {
+    return new IteratorReader<Segment>();
   }
 
+  @Override
+  public Reader<Vertex> vertices() {
+    final MultiPointVertex vertex = new MultiPointVertex(this, -1);
+    return vertex.reader();
+  }
 }

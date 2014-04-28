@@ -35,6 +35,7 @@ package com.revolsys.jts.algorithm;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -396,8 +397,13 @@ public class CGAlgorithms {
    * @see locatePointInRing
    */
   public static boolean isPointInRing(final Coordinates p,
-    final Coordinates[] ring) {
+    final Coordinates... ring) {
     return locatePointInRing(p, ring) != Location.EXTERIOR;
+  }
+
+  public static boolean isPointInRing(final Coordinates point,
+    final LineString ring) {
+    return locatePointInRing(point, ring) != Location.EXTERIOR;
   }
 
   /**
@@ -416,15 +422,12 @@ public class CGAlgorithms {
 
     double len = 0.0;
 
-    final Coordinates p = new Coordinate();
-    pts.getCoordinate(0, p);
-    double x0 = p.getX();
-    double y0 = p.getY();
+    double x0 = pts.getX(0);
+    double y0 = pts.getY(0);
 
     for (int i = 1; i < n; i++) {
-      pts.getCoordinate(i, p);
-      final double x1 = p.getX();
-      final double y1 = p.getY();
+      final double x1 = pts.getX(i);
+      final double y1 = pts.getY(i);
       final double dx = x1 - x0;
       final double dy = y1 - y0;
 
@@ -452,6 +455,11 @@ public class CGAlgorithms {
    */
   public static Location locatePointInRing(final Coordinates p,
     final Coordinates[] ring) {
+    return RayCrossingCounter.locatePointInRing(p, ring);
+  }
+
+  public static Location locatePointInRing(final Coordinates p,
+    final LineString ring) {
     return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
@@ -549,18 +557,16 @@ public class CGAlgorithms {
      * http://en.wikipedia.org/wiki/Shoelace_formula
      */
     final Coordinates p0 = new Coordinate();
-    final Coordinates p1 = new Coordinate();
-    final Coordinates p2 = new Coordinate();
-    ring.getCoordinate(0, p1);
-    ring.getCoordinate(1, p2);
+    final Coordinates p1 = ring.getCoordinate(0);
+    Coordinates p2 = ring.getCoordinate(1);
     final double x0 = p1.getX();
-    p2.setX(p2.getX() - x0);
+    p2.setX(p2.getX() - p1.getX());
     double sum = 0.0;
     for (int i = 1; i < n - 1; i++) {
       p0.setY(p1.getY());
       p1.setX(p2.getX());
       p1.setY(p2.getY());
-      ring.getCoordinate(i + 1, p2);
+      p2 = ring.getCoordinate(i + 1);
       p2.setX(p2.getX() - x0);
       sum += p1.getX() * (p0.getY() - p2.getY());
     }

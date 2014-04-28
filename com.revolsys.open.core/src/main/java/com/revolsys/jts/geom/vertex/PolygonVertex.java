@@ -1,19 +1,17 @@
 package com.revolsys.jts.geom.vertex;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 
-public class PolygonVertex extends AbstractVertex implements Iterable<Vertex>,
-  Iterator<Vertex> {
+public class PolygonVertex extends AbstractVertex {
   private int vertexIndex;
 
   private int ringIndex;
 
-  public PolygonVertex(final Polygon line, final int... vertexId) {
-    super(line);
+  public PolygonVertex(final Polygon polygon, final int... vertexId) {
+    super(polygon);
     setVertexId(vertexId);
   }
 
@@ -73,11 +71,6 @@ public class PolygonVertex extends AbstractVertex implements Iterable<Vertex>,
       }
       return false;
     }
-  }
-
-  @Override
-  public Iterator<Vertex> iterator() {
-    return this;
   }
 
   @Override

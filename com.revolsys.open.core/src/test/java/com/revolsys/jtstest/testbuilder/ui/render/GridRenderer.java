@@ -35,7 +35,6 @@ package com.revolsys.jtstest.testbuilder.ui.render;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -45,7 +44,6 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.PrecisionModel;
-import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jtstest.testbuilder.AppConstants;
 import com.revolsys.jtstest.testbuilder.Viewport;
 import com.revolsys.jtstest.testbuilder.model.DrawingGrid;
@@ -377,65 +375,6 @@ public class GridRenderer {
 
     drawGridLines(g, basePt10View.getX() - gridSize10View / 2, 0,
       gridSize10View / 2);
-  }
-
-  /**
-   * Not very pleasing
-   * 
-   * @param g
-   */
-  private void drawScaleMarks(final Graphics2D g) {
-    final BoundingBox viewEnv = viewport.getViewEnv();
-
-    int viewMag = maxVisibleMagnitude();
-    final double gridIncModel = Math.pow(10.0, viewMag);
-    double gridIncView = viewport.toView(gridIncModel);
-
-    // ensure at least 3 ticks are shown
-    if (3 * gridIncView > viewEnv.maxExtent()) {
-      gridIncView /= 10.0;
-      viewMag -= 1;
-    }
-
-    g.setColor(Color.BLACK);
-
-    // draw X axis ticks
-    double tickX = viewport.getWidthInView() - gridIncView;
-    final int viewHeight = (int)viewport.getHeightInView();
-    while (tickX > 0) {
-      g.draw(new Line2D.Double(tickX, viewHeight + 1, tickX, viewHeight
-        - TICK_LEN));
-      tickX -= gridIncView;
-    }
-
-    // draw Y axis ticks
-    double tickY = viewport.getHeightInView() - gridIncView;
-    final int viewWidth = (int)viewport.getWidthInView();
-    while (tickY > 0) {
-      g.draw(new Line2D.Double(viewWidth + 1, tickY, viewWidth - TICK_LEN,
-        tickY));
-      tickY -= gridIncView;
-    }
-
-    // draw Scale magnitude
-    g.drawString("10", viewWidth - 35, viewHeight - 1);
-    g.drawString(viewMag + "", viewWidth - 20, viewHeight - 8);
-  }
-
-  private boolean isResolvable() {
-    final Point2D p1 = viewport.toModel(new Point(0, 0));
-    final Point2D p2 = viewport.toModel(new Point(MIN_VIEW_GRID_SIZE, 0));
-    return grid.isResolvable(p1, p2);
-  }
-
-  private int maxVisibleMagnitude() {
-    final double visibleExtentModel = viewport.getModelEnv().maxExtent();
-    // if input is bogus then just return something reasonable
-    if (visibleExtentModel <= 0.0) {
-      return 1;
-    }
-    final double log10 = MathUtil.log10(visibleExtentModel);
-    return (int)log10;
   }
 
   public void paint(final Graphics2D g) {

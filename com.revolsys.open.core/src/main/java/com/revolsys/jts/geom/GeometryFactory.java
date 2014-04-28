@@ -1088,8 +1088,8 @@ public class GeometryFactory implements Serializable,
     return new LinearRingImpl(this, axisCount, coordinates);
   }
 
-  public LinearRing linearRing(final LinearRing linearRing) {
-    return linearRing(linearRing.getCoordinatesList());
+  public LinearRing linearRing(final LineString lineString) {
+    return linearRing(lineString.getCoordinatesList());
   }
 
   public LineString lineString() {
@@ -1459,57 +1459,6 @@ public class GeometryFactory implements Serializable,
    */
   public <G extends Geometry> G project(final G geometry) {
     return GeometryProjectionUtil.perform(geometry, this);
-  }
-
-  /**
-   * Creates a {@link Geometry} with the same extent as the given envelope.
-   * The Geometry returned is guaranteed to be valid.  
-   * To provide this behaviour, the following cases occur:
-   * <p>
-   * If the <code>Envelope</code> is:
-   * <ul>
-   * <li>null : returns an empty {@link Point}
-   * <li>a point : returns a non-empty {@link Point}
-   * <li>a line : returns a two-point {@link LineString}
-   * <li>a rectangle : returns a {@link Polygon}> whose points are (minx, miny),
-   *  (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny).
-   * </ul>
-   * 
-   *@param  envelope the <code>Envelope</code> to convert
-   *@return an empty <code>Point</code> (for null <code>Envelope</code>s), 
-   *	a <code>Point</code> (when min x = max x and min y = max y) or a
-   *      <code>Polygon</code> (in all other cases)
-   */
-  public Geometry toGeometry(final BoundingBox envelope) {
-    // null envelope - return empty point geometry
-    if (envelope.isEmpty()) {
-      return point();
-    }
-
-    // point?
-    if (envelope.getMinX() == envelope.getMaxX()
-      && envelope.getMinY() == envelope.getMaxY()) {
-      return point(new Coordinate(envelope.getMinX(), envelope.getMinY(),
-        Coordinates.NULL_ORDINATE));
-    }
-
-    // vertical or horizontal line?
-    if (envelope.getMinX() == envelope.getMaxX()
-      || envelope.getMinY() == envelope.getMaxY()) {
-      return lineString(new Coordinates[] {
-        new Coordinate(envelope.getMinX(), envelope.getMinY(),
-          Coordinates.NULL_ORDINATE),
-        new Coordinate(envelope.getMaxX(), envelope.getMaxY(),
-          Coordinates.NULL_ORDINATE)
-      });
-    }
-
-    // create a CW ring for the polygon
-    final LinearRing ring = linearRing(2, envelope.getMinX(),
-      envelope.getMinY(), envelope.getMinX(), envelope.getMaxY(),
-      envelope.getMaxX(), envelope.getMaxY(), envelope.getMaxX(),
-      envelope.getMinY(), envelope.getMinX(), envelope.getMinY());
-    return polygon(ring);
   }
 
   @Override

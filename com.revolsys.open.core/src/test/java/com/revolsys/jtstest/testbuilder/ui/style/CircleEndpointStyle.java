@@ -1,9 +1,11 @@
 package com.revolsys.jtstest.testbuilder.ui.style;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 
-import com.revolsys.jts.geom.*;
 import com.revolsys.jtstest.testbuilder.Viewport;
 
 public class CircleEndpointStyle 

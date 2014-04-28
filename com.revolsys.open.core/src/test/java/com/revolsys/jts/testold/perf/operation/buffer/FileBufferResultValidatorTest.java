@@ -39,7 +39,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;

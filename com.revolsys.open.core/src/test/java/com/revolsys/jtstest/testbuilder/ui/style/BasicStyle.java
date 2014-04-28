@@ -1,8 +1,9 @@
 package com.revolsys.jtstest.testbuilder.ui.style;
 
-import java.awt.*;
-import com.revolsys.jts.geom.*;
-import com.revolsys.jtstest.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testbuilder.Viewport;
 import com.revolsys.jtstest.testbuilder.ui.render.GeometryPainter;
 

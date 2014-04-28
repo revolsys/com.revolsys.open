@@ -24,6 +24,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
@@ -474,21 +475,21 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   private BoundingBox setBoundingBox(final BoundingBox boundingBox,
     final double scale) {
-    final Coordinates centre = boundingBox.getCentre();
+    final Point centre = boundingBox.getCentre();
     return setBoundingBox(centre, scale);
   }
 
-  private BoundingBox setBoundingBox(final Coordinates centre,
-    final double scale) {
+  private BoundingBox setBoundingBox(Coordinates centre, final double scale) {
     final double unitsPerPixel = getUnitsPerPixel(scale);
     final GeometryFactory geometryFactory = getGeometryFactory();
+    centre = new DoubleCoordinates(centre);
     final int viewWidthPixels = getViewWidthPixels();
     final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
     final double viewHeight = viewHeightPixels * unitsPerPixel;
     final SimpleCoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
       1 / unitsPerPixel);
-    precisionModel.makePrecise(centre);
+    centre = precisionModel.getPreciseCoordinates(centre);
     final double centreX = centre.getX();
     final double centreY = centre.getY();
 
@@ -506,8 +507,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double y1 = centreY - bottomOffset;
     final double x2 = centreX + rightOffset;
     final double y2 = centreY + topOffset;
-    final BoundingBox newBoundingBox = new Envelope(geometryFactory, 2, x1,
-      y1, x2, y2);
+    final BoundingBox newBoundingBox = new Envelope(geometryFactory, 2, x1, y1,
+      x2, y2);
     internalSetBoundingBox(newBoundingBox, unitsPerPixel);
     return newBoundingBox;
   }

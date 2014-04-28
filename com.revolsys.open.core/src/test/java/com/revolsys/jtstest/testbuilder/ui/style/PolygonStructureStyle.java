@@ -1,13 +1,13 @@
 package com.revolsys.jtstest.testbuilder.ui.style;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.Stroke;
 
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jtstest.testbuilder.Viewport;
-import com.revolsys.jtstest.testbuilder.ui.ColorUtil;
 import com.revolsys.jtstest.testbuilder.ui.render.GeometryPainter;
 
 /**

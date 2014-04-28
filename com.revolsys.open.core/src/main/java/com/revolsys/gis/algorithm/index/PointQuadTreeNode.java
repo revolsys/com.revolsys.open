@@ -67,7 +67,7 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    if (envelope.contains(x, y)) {
+    if (envelope.covers(x, y)) {
       final DoubleCoordinates coordinates = new DoubleCoordinates(x, y);
       results.add(new SimpleImmutableEntry<Coordinates, T>(coordinates, value));
     }
@@ -122,7 +122,7 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    if (envelope.contains(x, y)) {
+    if (envelope.covers(x, y)) {
       results.add(value);
     }
     final boolean minXLess = isLessThanX(minX);
@@ -239,7 +239,7 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    if (envelope.contains(x, y)) {
+    if (envelope.covers(x, y)) {
       if (!visitor.visit(value)) {
         return false;
       }

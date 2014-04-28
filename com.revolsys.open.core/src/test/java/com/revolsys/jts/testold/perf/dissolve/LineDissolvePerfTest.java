@@ -15,7 +15,6 @@ import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 import com.revolsys.jts.testold.perf.PerformanceTestCase;
 import com.revolsys.jts.testold.perf.PerformanceTestRunner;
-import com.revolsys.jts.util.Memory;
 
 public class LineDissolvePerfTest extends PerformanceTestCase {
   public static void main(final String args[]) {

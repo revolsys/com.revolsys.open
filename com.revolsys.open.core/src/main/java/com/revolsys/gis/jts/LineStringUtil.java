@@ -28,6 +28,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
@@ -45,15 +46,6 @@ public final class LineStringUtil {
   public static final String SEGMENT_DISTANCE = "segmentDistance";
 
   public static final String SEGMENT_INDEX = "segmentIndex";
-
-  public static void addElevation(final Coordinates coordinate,
-    final LineString line) {
-    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    final CoordinatesPrecisionModel precisionModel = geometryFactory.getCoordinatesPrecisionModel();
-    CoordinatesListUtil.addElevation(precisionModel, coordinate, coordinates);
-
-  }
 
   public static void addLineString(
     final com.revolsys.jts.geom.GeometryFactory geometryFactory,
@@ -602,7 +594,7 @@ public final class LineStringUtil {
     @SuppressWarnings("unchecked")
     final List<LineSegment> segments = index.query(envelope);
     for (final LineSegment lineSegment : segments) {
-      if (lineSegment.getEnvelope().intersects(envelope)) {
+      if (lineSegment.getBoundingBox().intersects(envelope)) {
         if (LineSegmentUtil.isPointOnLine(lineSegment.get(0),
           lineSegment.get(1), point, 2)) {
           return lineSegment;
@@ -610,6 +602,25 @@ public final class LineStringUtil {
       }
     }
     return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Collection<LineString> getMergedLines(
+    final MultiLineString multiLineString) {
+    final LineMerger merger = new LineMerger();
+    merger.add(multiLineString);
+    final Collection<LineString> lineStrings = merger.getMergedLineStrings();
+    return lineStrings;
+  }
+
+  public static LineString getMergeLine(final MultiLineString multiLineString) {
+    final Collection<LineString> lineStrings = getMergedLines(multiLineString);
+    final int numLines = lineStrings.size();
+    if (numLines == 1) {
+      return lineStrings.iterator().next();
+    } else {
+      return null;
+    }
   }
 
   public static Point getPoint(final LineString line, final int index) {
@@ -705,7 +716,7 @@ public final class LineStringUtil {
 
     for (final LineSegment segment : new CoordinatesListIndexLineSegmentIterator(
       factory, CoordinatesListUtil.get(line))) {
-      index.insert(segment.getEnvelope(), segment);
+      index.insert(segment.getBoundingBox(), segment);
       segments.add(segment);
     }
 
@@ -726,15 +737,15 @@ public final class LineStringUtil {
             }
           }
 
-          index.remove(matchedLineSegment.getEnvelope(), matchedLineSegment);
-          final LineSegment segment1 = new LineSegment(factory,
+          index.remove(matchedLineSegment.getBoundingBox(), matchedLineSegment);
+          final LineSegment segment1 = new LineSegmentImpl(factory,
             matchedLineSegment.get(0), point);
-          index.insert(segment1.getEnvelope(), segment1);
+          index.insert(segment1.getBoundingBox(), segment1);
           segmentIter.add(segment1);
 
-          final LineSegment segment2 = new LineSegment(factory, point,
+          final LineSegment segment2 = new LineSegmentImpl(factory, point,
             matchedLineSegment.get(1));
-          index.insert(segment2.getEnvelope(), segment2);
+          index.insert(segment2.getBoundingBox(), segment2);
           segmentIter.add(segment2);
         }
       }
@@ -1291,25 +1302,6 @@ public final class LineStringUtil {
   public static LineString subLineString(final LineString line,
     final int length, final Coordinates coordinate) {
     return subLineString(line, null, 0, length, coordinate);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static Collection<LineString> getMergedLines(
-    final MultiLineString multiLineString) {
-    final LineMerger merger = new LineMerger();
-    merger.add(multiLineString);
-    final Collection<LineString> lineStrings = merger.getMergedLineStrings();
-    return lineStrings;
-  }
-
-  public static LineString getMergeLine(final MultiLineString multiLineString) {
-    final Collection<LineString> lineStrings = getMergedLines(multiLineString);
-    final int numLines = lineStrings.size();
-    if (numLines == 1) {
-      return lineStrings.iterator().next();
-    } else {
-      return null;
-    }
   }
 
 }

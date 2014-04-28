@@ -173,7 +173,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       if (addTiePointFinish(event)) {
       } else if (SwingUtil.isLeftButtonAndAltDown(event)) {
         final Point mousePoint = getViewportPoint(event);
-        if (getImageBoundingBox().contains(mousePoint)) {
+        if (getImageBoundingBox().covers(mousePoint)) {
           this.addTiePointFirstPoint = mousePoint;
           event.consume();
           return true;
@@ -377,7 +377,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       return false;
     } else {
       final BoundingBox imageBoundingBox = getImageBoundingBox();
-      final boolean inImage = imageBoundingBox.contains(mousePoint);
+      final boolean inImage = imageBoundingBox.covers(mousePoint);
       return inImage;
     }
   }
@@ -791,10 +791,10 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         for (final MappedLocation tiePoint : tiePoints) {
           final Point targetPoint = tiePoint.getTargetPoint();
           final Point sourcePoint = filter.sourcePixelToTargetPoint(tiePoint);
-          if (hotSpot.contains(sourcePoint)) {
+          if (hotSpot.covers(sourcePoint)) {
             closeSourcePixelIndexes.add(i);
           }
-          if (hotSpot.contains(targetPoint)) {
+          if (hotSpot.covers(targetPoint)) {
             closeTargetPointIndexes.add(i);
           }
           i++;

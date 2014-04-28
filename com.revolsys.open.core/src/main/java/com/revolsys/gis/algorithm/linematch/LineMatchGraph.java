@@ -15,12 +15,13 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
 import com.revolsys.gis.graph.visitor.BoundingBoxIntersectsEdgeVisitor;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 
@@ -79,7 +80,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         final Coordinates coordinate0 = realSegment.project(from);
         final Coordinates coordinate1 = realSegment.project(to);
 
-        final LineSegment newSegment = new LineSegment(geometryFactory,
+        final LineSegment newSegment = new LineSegmentImpl(geometryFactory,
           coordinate0, coordinate1);
         newLineSegmentMatch.addSegment(newSegment, i);
       }
@@ -109,7 +110,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       Coordinates previousCoordinate = coordinate0;
       for (int i = 1; i < coords.size(); i++) {
         final Coordinates coordinate = coords.get(i);
-        final LineSegment segment = new LineSegment(geometryFactory,
+        final LineSegment segment = new LineSegmentImpl(geometryFactory,
           previousCoordinate, coordinate);
         if (segment.getLength() > 0) {
           add(previousCoordinate, coordinate, segment, index);
@@ -707,12 +708,12 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         final Coordinates projectedCoordinate = realSegment.project(coordinate);
 
         final Coordinates startCoordinate = realSegment.get(0);
-        final LineSegment segment1 = new LineSegment(geometryFactory,
+        final LineSegment segment1 = new LineSegmentImpl(geometryFactory,
           startCoordinate, projectedCoordinate);
         lineSegmentMatch1.addSegment(segment1, i);
 
         final Coordinates endCoordinate = realSegment.get(1);
-        final LineSegment segment2 = new LineSegment(geometryFactory,
+        final LineSegment segment2 = new LineSegmentImpl(geometryFactory,
           projectedCoordinate, endCoordinate);
         lineSegmentMatch2.addSegment(segment2, i);
       }

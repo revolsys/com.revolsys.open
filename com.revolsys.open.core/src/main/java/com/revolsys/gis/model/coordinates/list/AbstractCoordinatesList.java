@@ -143,7 +143,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   @Override
   public boolean equal(final int index, final CoordinatesList other,
     final int otherIndex, int axisCount) {
-    axisCount = Math.min(axisCount, Math.max(getAxisCount(), other.getAxisCount()));
+    axisCount = Math.min(axisCount,
+      Math.max(getAxisCount(), other.getAxisCount()));
     if (index < size() || otherIndex < other.size()) {
       for (int j = 0; j < axisCount; j++) {
         final double value1 = getValue(index, j);
@@ -232,18 +233,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   @Override
   public Coordinates getCoordinate(final int i) {
-    final Coordinates coordinate = new DoubleCoordinates(getAxisCount());
-    getCoordinate(i, coordinate);
-    return coordinate;
-  }
-
-  @Override
-  public void getCoordinate(final int index, final Coordinates coord) {
-    coord.setX(getX(index));
-    coord.setY(getY(index));
-    if (getAxisCount() > 2) {
-      coord.setZ(getZ(index));
+    final double[] values = new double[getAxisCount()];
+    for (int axisIndex = 0; axisIndex < values.length; axisIndex++) {
+      values[axisIndex] = getValue(i, axisIndex);
     }
+    return new DoubleCoordinates(values);
   }
 
   @Override
@@ -282,21 +276,14 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  @Deprecated
-  public int getAxisCount() {
-    return getAxisCount();
-  }
-
-  @Override
   public long getTime(final int index) {
     return (long)getM(index);
   }
 
-  @Override
-  @Deprecated
-  public double getValue(final int index, final int axisIndex) {
-    return getValue(index, axisIndex);
-  }
+  // @Override
+  // public double getValue(final int index, final int axisIndex) {
+  // return getValue(index, axisIndex);
+  // }
 
   @Override
   public double getX(final int index) {
@@ -395,7 +382,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   public boolean startsWith(final CoordinatesList coordinatesList,
     final int axisCount) {
     if (size() > 1 && coordinatesList.size() > 1) {
-      if (getAxisCount() >= axisCount && coordinatesList.getAxisCount() >= axisCount) {
+      if (getAxisCount() >= axisCount
+        && coordinatesList.getAxisCount() >= axisCount) {
         for (int i = 0; i < 2; i++) {
           for (int j = 0; j < axisCount; j++) {
             final double value1 = getValue(i, j);

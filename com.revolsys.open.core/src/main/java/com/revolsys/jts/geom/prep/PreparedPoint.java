@@ -35,7 +35,6 @@ package com.revolsys.jts.geom.prep;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Puntal;
 
-
 /**
  * A prepared version for {@link Puntal} geometries.
  * <p>
@@ -44,11 +43,9 @@ import com.revolsys.jts.geom.Puntal;
  * @author Martin Davis
  *
  */
-public class PreparedPoint
-  extends BasicPreparedGeometry
-{
-  public PreparedPoint(Puntal point) {
-    super((Geometry) point);
+public class PreparedPoint extends BasicPreparedGeometry {
+  public PreparedPoint(final Puntal point) {
+    super(point);
   }
 
   /**
@@ -57,13 +54,15 @@ public class PreparedPoint
    * The optimization here is that computing topology for the test geometry
    * is avoided.  This can be significant for large geometries.
    */
-  public boolean intersects(Geometry g)
-  {
-  	if (! envelopesIntersect(g)) return false;
-  	
-  	/**
-  	 * This avoids computing topology for the test geometry
-  	 */
-    return isAnyTargetComponentInTest(g);
-  }  
+  @Override
+  public boolean intersects(final Geometry geometry) {
+    if (envelopesIntersect(geometry)) {
+      /**
+       * This avoids computing topology for the test geometry
+       */
+      return isAnyTargetComponentInTest(geometry);
+    } else {
+      return false;
+    }
+  }
 }

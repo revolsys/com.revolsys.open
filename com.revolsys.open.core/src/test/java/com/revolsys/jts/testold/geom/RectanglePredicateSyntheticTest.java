@@ -14,7 +14,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.io.WKTReader;
 
 /**
  * Test spatial predicate optimizations for rectangles by
@@ -26,8 +25,6 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   public static void main(final String args[]) {
     TestRunner.run(RectanglePredicateSyntheticTest.class);
   }
-
-  private final WKTReader rdr = new WKTReader();
 
   private final GeometryFactory fact = GeometryFactory.getFactory();
 
@@ -46,7 +43,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   BoundingBox rectEnv = new Envelope(2, this.baseX, this.baseY, this.baseX
     + this.rectSize, this.baseY + this.rectSize);
 
-  Geometry rect = this.fact.toGeometry(this.rectEnv);
+  Geometry rect = this.rectEnv.toGeometry();
 
   public RectanglePredicateSyntheticTest(final String name) {
     super(name);

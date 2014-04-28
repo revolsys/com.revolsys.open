@@ -162,10 +162,12 @@ public class GeoNamesService {
       final double lat = ((Number)name.get("lat")).doubleValue();
       final double lon = ((Number)name.get("lng")).doubleValue();
 
-      final Coordinates coordinate = new DoubleCoordinates(lon, lat);
+      Coordinates coordinate = new DoubleCoordinates(lon, lat);
       final Number elevation = (Number)name.get("elevation");
-      if (elevation != null) {
-        coordinate.setZ(elevation.doubleValue());
+      if (elevation == null) {
+        coordinate = new DoubleCoordinates(lon, lat);
+      } else {
+        coordinate = new DoubleCoordinates(lon, lat, elevation.doubleValue());
       }
       dataObject.setGeometryValue(GeometryFactory.getFactory()
         .point(coordinate));

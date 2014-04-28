@@ -103,7 +103,7 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     final LineSegment baseLine = getSquareBaseLine();
     final Coordinates origin = baseLine.getCoordinate(0);
     final List<LinearRing> rings = new ArrayList<>();
-    final LinearRing shell = ((Polygon)geomFactory.toGeometry(getSquareExtent())).getExteriorRing();
+    final LinearRing shell = ((Polygon)getSquareExtent().toGeometry()).getExteriorRing();
     rings.add(shell);
     addHoles(level, origin.getX(), origin.getY(), getDiameter(), rings);
     return geomFactory.polygon(shell);

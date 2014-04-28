@@ -3,7 +3,6 @@ package com.revolsys.jts.testold.algorithm;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;

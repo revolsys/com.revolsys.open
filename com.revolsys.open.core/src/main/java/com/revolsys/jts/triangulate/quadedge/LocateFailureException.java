@@ -33,6 +33,7 @@
 package com.revolsys.jts.triangulate.quadedge;
 
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 
 public class LocateFailureException 
 	extends RuntimeException 
@@ -51,7 +52,7 @@ public class LocateFailureException
 
 	public LocateFailureException(String msg, LineSegment seg) {
 		super(msgWithSpatial(msg, seg));
-		this.seg = new LineSegment(seg);
+		this.seg = new LineSegmentImpl(seg);
 	}
 
 	public LocateFailureException(LineSegment seg) {
@@ -59,7 +60,7 @@ public class LocateFailureException
 				"Locate failed to converge (at edge: "
 						+ seg
 						+ ").  Possible causes include invalid Subdivision topology or very close sites");
-		this.seg = new LineSegment(seg);
+		this.seg = new LineSegmentImpl(seg);
 	}
 
 	public LineSegment getSegment() {

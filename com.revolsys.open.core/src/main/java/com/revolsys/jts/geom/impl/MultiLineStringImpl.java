@@ -37,14 +37,18 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.vertex.MultiLineStringVertexIterable;
+import com.revolsys.jts.geom.segment.MultiLineStringSegment;
+import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.MultiLineStringVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.BoundaryOp;
 
@@ -111,6 +115,11 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
   }
 
   @Override
+  public LineString getLineString(final int partIndex) {
+    return (LineString)getGeometry(partIndex);
+  }
+
+  @Override
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
@@ -169,12 +178,17 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
     return geometryFactory.multiLineString(revLines);
   }
 
-  /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
   @Override
-  public Iterable<Vertex> vertices() {
-    return new MultiLineStringVertexIterable(this);
+  public Reader<Segment> segments() {
+    final MultiLineStringSegment iterator = new MultiLineStringSegment(this, 0,
+      -1);
+    return new IteratorReader<Segment>(iterator);
+  }
+
+  @Override
+  public Reader<Vertex> vertices() {
+    final MultiLineStringVertex vertex = new MultiLineStringVertex(this, 0, -1);
+    return vertex.reader();
   }
 
 }

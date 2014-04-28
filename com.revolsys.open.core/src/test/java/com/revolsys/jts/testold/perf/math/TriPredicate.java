@@ -1,6 +1,5 @@
 package com.revolsys.jts.testold.perf.math;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.math.DD;

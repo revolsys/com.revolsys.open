@@ -33,12 +33,11 @@
 
 package com.revolsys.jts.operation.overlay.validate;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.MultiLineString;
@@ -64,8 +63,6 @@ public class FuzzyPointLocator {
   private final MultiLineString linework;
 
   private final PointLocator ptLocator = new PointLocator();
-
-  private final LineSegment seg = new LineSegment();
 
   public FuzzyPointLocator(final Geometry g,
     final double boundaryDistanceTolerance) {
@@ -106,13 +103,16 @@ public class FuzzyPointLocator {
   }
 
   private boolean isWithinToleranceOfBoundary(final Coordinates pt) {
+    final double x = pt.getX();
+    final double y = pt.getY();
     for (int i = 0; i < linework.getGeometryCount(); i++) {
       final LineString line = (LineString)linework.getGeometry(i);
-      final CoordinatesList seq = line.getCoordinatesList();
-      for (int j = 0; j < seq.size() - 1; j++) {
-        seq.getCoordinate(j, seg.getP0());
-        seq.getCoordinate(j + 1, seg.getP1());
-        final double dist = seg.distance(pt);
+      for (int j = 0; j < line.getVertexCount() - 1; j++) {
+        final double x1 = line.getX(j);
+        final double y1 = line.getY(j + 1);
+        final double x2 = line.getX(j);
+        final double y2 = line.getY(j + 1);
+        final double dist = LineSegmentUtil.distance(x1, y1, x2, y2, x, y);
         if (dist <= boundaryDistanceTolerance) {
           return true;
         }

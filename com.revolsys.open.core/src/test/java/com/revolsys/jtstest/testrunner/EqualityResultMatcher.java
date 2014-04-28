@@ -53,9 +53,6 @@ public class EqualityResultMatcher implements ResultMatcher {
     final Object[] args, final Result actualResult,
     final Result expectedResult, final double tolerance) {
     final boolean equals = actualResult.equals(expectedResult, tolerance);
-    if (!equals) {
-      System.err.println();
-    }
     return equals;
   }
 

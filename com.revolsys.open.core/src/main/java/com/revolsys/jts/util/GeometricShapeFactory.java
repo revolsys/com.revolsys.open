@@ -121,7 +121,7 @@ public class GeometricShapeFactory {
       this.width = env.getWidth();
       this.height = env.getHeight();
       this.base = new DoubleCoordinates(env.getMinX(), env.getMinY());
-      this.centre = env.centre().cloneCoordinates();
+      this.centre = env.getCentre().cloneCoordinates();
     }
 
     public void setHeight(final double height) {

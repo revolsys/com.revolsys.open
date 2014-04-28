@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -15,6 +15,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -233,9 +234,9 @@ public class Triangle extends AbstractCoordinatesList {
           if (coordIterator.hasNext()) {
             // TODO Too many intersect
           }
-          return new LineSegment(c1, c2);
+          return new LineSegmentImpl(c1, c2);
         } else {
-          return new LineSegment(c1, c1);
+          return new LineSegmentImpl(c1, c1);
         }
       } else {
         return null;

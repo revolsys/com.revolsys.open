@@ -10,7 +10,6 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -363,25 +362,20 @@ class LineStringNode extends GeometryNode {
 
   @Override
   protected void fillChildren() {
-    populateChildren(line.getCoordinateArray());
+    for (int i = 0; i < line.getVertexCount(); i++) {
+      double dist = Double.NaN;
+      final Coordinates point = line.getVertex(i);
+      if (i < line.getVertexCount() - 1) {
+        dist = point.distance(line.getVertex(i + 1));
+      }
+      final GeometricObjectNode node = CoordinateNode.create(point, i, dist);
+      children.add(node);
+    }
   }
 
   @Override
   public Geometry getGeometry() {
     return line;
-  }
-
-  private void populateChildren(final Coordinates[] pt) {
-    final BoundingBox env = line.getBoundingBox();
-
-    for (int i = 0; i < pt.length; i++) {
-      double dist = Double.NaN;
-      if (i < pt.length - 1) {
-        dist = pt[i].distance(pt[i + 1]);
-      }
-      final GeometricObjectNode node = CoordinateNode.create(pt[i], i, dist);
-      children.add(node);
-    }
   }
 }
 

@@ -1,10 +1,14 @@
 package com.revolsys.jtstest.testbuilder.ui.style;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 
 import com.revolsys.jtstest.testbuilder.Viewport;
-import com.revolsys.jtstest.testbuilder.ui.ColorUtil;
 
 public class ArrowLineStyle 
   extends SegmentStyle

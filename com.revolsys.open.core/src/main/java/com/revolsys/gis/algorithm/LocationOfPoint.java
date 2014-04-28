@@ -1,8 +1,9 @@
 package com.revolsys.gis.algorithm;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -19,9 +20,20 @@ public class LocationOfPoint {
     return locater.locate(inputPt);
   }
 
-  public static double segmentFraction(final LineSegment seg,
+  public static double segmentFraction(final Coordinates p0,
+    final Coordinates p1, final Coordinates inputPt) {
+    double segFrac = LineSegmentUtil.projectionFactor(p0, p1, inputPt);
+    if (segFrac < 0.0) {
+      segFrac = 0.0;
+    } else if (segFrac > 1.0) {
+      segFrac = 1.0;
+    }
+    return segFrac;
+  }
+
+  public static double segmentFraction(final Segment segment,
     final Coordinates inputPt) {
-    double segFrac = seg.projectionFactor(inputPt);
+    double segFrac = segment.projectionFactor(inputPt);
     if (segFrac < 0.0) {
       segFrac = 0.0;
     } else if (segFrac > 1.0) {
@@ -58,28 +70,21 @@ public class LocationOfPoint {
    * @return the location of the nearest point
    */
   public LineStringLocation locate(final Coordinates inputPt) {
-    // return locateAfter(inputPt, null);
-    final Coordinates[] pts = line.getCoordinateArray();
-
     double minDistance = Double.MAX_VALUE;
     int minIndex = 0;
     double minFrac = -1.0;
 
-    final LineSegment seg = new LineSegment();
-    int startIndex = 0;
-    startIndex = 0;
-
-    for (int i = startIndex; i < pts.length - 1; i++) {
-      seg.setP0(pts[i]);
-      seg.setP1(pts[i + 1]);
-      final double segDistance = seg.distance(inputPt);
-      final double segFrac = segmentFraction(seg, inputPt);
+    int i = 0;
+    for (final Segment segment : line.segments()) {
+      final double segDistance = segment.distance(inputPt);
+      final double segFrac = segmentFraction(segment, inputPt);
 
       if (segDistance < minDistance) {
         minIndex = i;
         minFrac = segFrac;
         minDistance = segDistance;
       }
+      i++;
     }
     return new LineStringLocation(line, minIndex, minFrac);
   }
@@ -102,38 +107,33 @@ public class LocationOfPoint {
       return locate(inputPt);
     }
 
-    final Coordinates[] pts = line.getCoordinateArray();
-
     // sanity check for minLocation at or past end of line
-    if (minLocation.getSegmentIndex() >= line.getVertexCount()) {
-      return new LineStringLocation(line, pts.length - 1, 1.0);
-    }
+    if (minLocation.getSegmentIndex() > line.getSegmentCount()) {
+      return new LineStringLocation(line, line.getSegmentCount(), 1.0);
+    } else {
+      final int startIndex = minLocation.getSegmentIndex();
+      final Segment segment = line.getSegment(startIndex - 1);
+      double minDistance = Double.MAX_VALUE;
+      LineStringLocation nextClosestLocation = minLocation;
+      int i = startIndex;
+      while (segment.hasNext()) {
+        segment.next();
+        final double segDistance = segment.distance(inputPt);
+        final double segFrac = segment.segmentFraction(inputPt);
 
-    double minDistance = Double.MAX_VALUE;
-    LineStringLocation nextClosestLocation = minLocation;
-
-    final LineSegment seg = new LineSegment();
-    int startIndex = 0;
-    startIndex = minLocation.getSegmentIndex();
-
-    for (int i = startIndex; i < pts.length - 1; i++) {
-      seg.setP0(pts[i]);
-      seg.setP1(pts[i + 1]);
-
-      final double segDistance = seg.distance(inputPt);
-      final double segFrac = segmentFraction(seg, inputPt);
-
-      if (segDistance < minDistance && isGreater(i, segFrac, minLocation)) {
-        nextClosestLocation = new LineStringLocation(line, i, segFrac);
-        minDistance = segDistance;
+        if (segDistance < minDistance && isGreater(i, segFrac, minLocation)) {
+          nextClosestLocation = new LineStringLocation(line, i, segFrac);
+          minDistance = segDistance;
+        }
+        i++;
       }
+      /**
+       * Return the minDistanceLocation found. This will not be null, since it was
+       * initialized to minLocation
+       */
+      Assert.isTrue(nextClosestLocation.compareTo(minLocation) >= 0,
+        "computed location is before specified minimum location");
+      return nextClosestLocation;
     }
-    /**
-     * Return the minDistanceLocation found. This will not be null, since it was
-     * initialized to minLocation
-     */
-    Assert.isTrue(nextClosestLocation.compareTo(minLocation) >= 0,
-      "computed location is before specified minimum location");
-    return nextClosestLocation;
   }
 }

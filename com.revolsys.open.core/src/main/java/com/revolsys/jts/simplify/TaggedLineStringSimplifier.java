@@ -36,10 +36,12 @@ package com.revolsys.jts.simplify;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 
 /**
  * Simplifies a TaggedLineString, preserving topology
@@ -90,14 +92,13 @@ public class TaggedLineStringSimplifier {
 
   private int findFurthestPoint(final Coordinates[] pts, final int i,
     final int j, final double[] maxDistance) {
-    final LineSegment seg = new LineSegment();
-    seg.setP0(pts[i]);
-    seg.setP1(pts[j]);
+    final Coordinates p0 = pts[i];
+    final Coordinates p1 = pts[j];
     double maxDist = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
       final Coordinates midPt = pts[k];
-      final double distance = seg.distance(midPt);
+      final double distance = LineSegmentUtil.distance(p0, p1, midPt);
       if (distance > maxDist) {
         maxDist = distance;
         maxIndex = k;
@@ -122,7 +123,7 @@ public class TaggedLineStringSimplifier {
     // make a new segment for the simplified geometry
     final Coordinates p0 = linePts[start];
     final Coordinates p1 = linePts[end];
-    final LineSegment newSeg = new LineSegment(p0, p1);
+    final LineSegment newSeg = new LineSegmentImpl(p0, p1);
     // update the indexes
     remove(line, start, end);
     outputIndex.add(newSeg);
@@ -168,7 +169,8 @@ public class TaggedLineStringSimplifier {
 
   private boolean hasInteriorIntersection(final LineSegment seg0,
     final LineSegment seg1) {
-    li.computeIntersection(seg0.getP0(), seg0.getP1(), seg1.getP0(), seg1.getP1());
+    li.computeIntersection(seg0.getP0(), seg0.getP1(), seg1.getP0(),
+      seg1.getP1());
     return li.isInteriorIntersection();
   }
 
@@ -242,9 +244,10 @@ public class TaggedLineStringSimplifier {
       isValidToSimplify = false;
     }
     // test if flattened section would cause intersection
-    final LineSegment candidateSeg = new LineSegment();
-    candidateSeg.setP0(linePts[i]);
-    candidateSeg.setP1(linePts[j]);
+    // final LineSegment candidateSeg = new LineSegmentImpl();
+    final Coordinates p0 = linePts[i];
+    final Coordinates p1 = linePts[j];
+    final LineSegment candidateSeg = new LineSegmentImpl(p0, p1);
     sectionIndex[0] = i;
     sectionIndex[1] = j;
     if (hasBadIntersection(line, sectionIndex, candidateSeg)) {

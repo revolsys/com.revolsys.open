@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 

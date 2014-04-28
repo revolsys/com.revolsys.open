@@ -50,7 +50,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
-import com.revolsys.jts.geomgraph.Label;
 import com.revolsys.jts.geomgraph.Node;
 import com.revolsys.jts.geomgraph.Position;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -74,7 +73,7 @@ class BufferSubgraph implements Comparable {
 
   private final List<DirectedEdge> dirEdgeList = new ArrayList<DirectedEdge>();
 
-  private final List nodes = new ArrayList();
+  private final List<Node> nodes = new ArrayList<>();
 
   private Coordinates rightMostCoord = null;
 
@@ -89,7 +88,7 @@ class BufferSubgraph implements Comparable {
    * @param node the node to add
    * @param nodeStack the current set of nodes being traversed
    */
-  private void add(final Node node, final Stack nodeStack) {
+  private void add(final Node node, final Stack<Node> nodeStack) {
     node.setVisited(true);
     nodes.add(node);
     for (final Iterator i = ((DirectedEdgeStar)node.getEdges()).iterator(); i.hasNext();) {
@@ -115,17 +114,16 @@ class BufferSubgraph implements Comparable {
    * @param node a node known to be in the subgraph
    */
   private void addReachable(final Node startNode) {
-    final Stack nodeStack = new Stack();
+    final Stack<Node> nodeStack = new Stack<>();
     nodeStack.add(startNode);
     while (!nodeStack.empty()) {
-      final Node node = (Node)nodeStack.pop();
+      final Node node = nodeStack.pop();
       add(node, nodeStack);
     }
   }
 
   private void clearVisitedEdges() {
-    for (final Iterator it = dirEdgeList.iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final DirectedEdge de : dirEdgeList) {
       de.setVisited(false);
     }
   }
@@ -157,8 +155,6 @@ class BufferSubgraph implements Comparable {
     clearVisitedEdges();
     // find an outside edge to assign depth to
     final DirectedEdge de = finder.getEdge();
-    final Node n = de.getNode();
-    final Label label = de.getLabel();
     // right side of line returned by finder is on the outside
     de.setEdgeDepths(Position.RIGHT, outsideDepth);
     copySymDepths(de);
@@ -174,8 +170,8 @@ class BufferSubgraph implements Comparable {
   // <FIX> MD - use iteration & queue rather than recursion, for speed and
   // robustness
   private void computeDepths(final DirectedEdge startEdge) {
-    final Set nodesVisited = new HashSet();
-    final LinkedList nodeQueue = new LinkedList();
+    final Set<Node> nodesVisited = new HashSet<Node>();
+    final LinkedList<Node> nodeQueue = new LinkedList<>();
 
     final Node startNode = startEdge.getNode();
     nodeQueue.addLast(startNode);
@@ -184,7 +180,7 @@ class BufferSubgraph implements Comparable {
 
     while (!nodeQueue.isEmpty()) {
       // System.out.println(nodes.size() + " queue: " + nodeQueue.size());
-      final Node n = (Node)nodeQueue.removeFirst();
+      final Node n = nodeQueue.removeFirst();
       nodesVisited.add(n);
       // compute depths around node, starting at this edge since it has depths
       // assigned
@@ -263,8 +259,7 @@ class BufferSubgraph implements Comparable {
    * They do not form part of the result area boundary.
    */
   public void findResultEdges() {
-    for (final Iterator it = dirEdgeList.iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final DirectedEdge de : dirEdgeList) {
       /**
        * Select edges which have an interior depth on the RHS
        * and an exterior depth on the LHS.
@@ -273,15 +268,20 @@ class BufferSubgraph implements Comparable {
        * count as "outside".
        */
       // <FIX> - handle negative depths
-      if (de.getDepth(Position.RIGHT) >= 1 && de.getDepth(Position.LEFT) <= 0
-        && !de.isInteriorAreaEdge()) {
-        de.setInResult(true);
-        // Debug.print("in result "); Debug.println(de);
+      final int depthRight = de.getDepth(Position.RIGHT);
+      if (depthRight >= 1) {
+        final int depthLeft = de.getDepth(Position.LEFT);
+        if (depthLeft <= 0) {
+          final boolean interiorAreaEdge = de.isInteriorAreaEdge();
+          if (!interiorAreaEdge) {
+            de.setInResult(true);
+          }
+        }
       }
     }
   }
 
-  public List getDirectedEdges() {
+  public List<DirectedEdge> getDirectedEdges() {
     return dirEdgeList;
   }
 
@@ -309,7 +309,7 @@ class BufferSubgraph implements Comparable {
     return env;
   }
 
-  public List getNodes() {
+  public List<Node> getNodes() {
     return nodes;
   }
 

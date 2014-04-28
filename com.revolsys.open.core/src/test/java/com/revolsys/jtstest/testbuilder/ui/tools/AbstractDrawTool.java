@@ -32,12 +32,11 @@
  */
 package com.revolsys.jtstest.testbuilder.ui.tools;
 
-import java.awt.*;
 import java.awt.event.MouseEvent;
 
 //import com.revolsys.jtstest.testbuilder.IconLoader;
 import com.revolsys.jtstest.testbuilder.AppCursors;
-import com.revolsys.jtstest.testbuilder.model.*;
+import com.revolsys.jtstest.testbuilder.model.GeometryType;
 
 /**
  * @version 1.7

@@ -101,21 +101,21 @@ class EdgeRing {
         continue;
       }
       // hole must be contained in shell
-      if (!tryShellEnv.contains(testEnv)) {
+      if (!tryShellEnv.covers(testEnv)) {
         continue;
       }
 
       testPt = CoordinateArrays.ptNotInList(testRing.getCoordinateArray(),
         tryShellRing.getCoordinateArray());
       boolean isContained = false;
-      if (CGAlgorithms.isPointInRing(testPt, tryShellRing.getCoordinateArray())) {
+      if (CGAlgorithms.isPointInRing(testPt, tryShellRing)) {
         isContained = true;
       }
 
       // check if this new containing ring is smaller than the current minimum
       // ring
       if (isContained) {
-        if (minShell == null || minShellEnv.contains(tryShellEnv)) {
+        if (minShell == null || minShellEnv.covers(tryShellEnv)) {
           minShell = tryShell;
           minShellEnv = minShell.getRing().getBoundingBox();
         }

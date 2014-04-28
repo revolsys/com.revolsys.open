@@ -8,11 +8,11 @@ import java.util.Map.Entry;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -21,6 +21,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.UrlUtil;
 
 public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
@@ -231,7 +232,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writeNetworkLink(final com.revolsys.jts.geom.BoundingBox envelope, final String name,
+  public void writeNetworkLink(
+    final com.revolsys.jts.geom.BoundingBox envelope, final String name,
     final Integer minLod, final Integer maxLod, final String href) {
 
     startTag(NETWORK_LINK);
@@ -262,8 +264,9 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writePlacemarkLineString(final com.revolsys.jts.geom.BoundingBox envelope,
-    final String name, final String styleUrl) {
+  public void writePlacemarkLineString(
+    final com.revolsys.jts.geom.BoundingBox envelope, final String name,
+    final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -337,8 +340,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   }
 
-  public void writePlacemarkPoint(final com.revolsys.jts.geom.BoundingBox envelope, final String name,
-    final String styleUrl) {
+  public void writePlacemarkPoint(final BoundingBox boundingBox,
+    final String name, final String styleUrl) {
 
     startTag(PLACEMARK);
     if (name != null) {
@@ -349,10 +352,11 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     }
     startTag(POINT);
     startTag(COORDINATES);
-    final Coordinates centre = envelope.centre();
-    write(Double.toString(centre.getX()));
+    final double x = boundingBox.getCentreX();
+    final double y = boundingBox.getCentreY();
+    write(MathUtil.toString(x));
     write(',');
-    write(Double.toString(centre.getY()));
+    write(MathUtil.toString(y));
 
     endTag();
     endTag();
@@ -395,8 +399,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writeRegion(final com.revolsys.jts.geom.BoundingBox envelope, final Integer minLod,
-    final Integer maxLod) {
+  public void writeRegion(final com.revolsys.jts.geom.BoundingBox envelope,
+    final Integer minLod, final Integer maxLod) {
     startTag(REGION);
 
     startTag(LAT_LON_ALT_BOX);
@@ -417,8 +421,9 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writeWmsGroundOverlay(final com.revolsys.jts.geom.BoundingBox envelope,
-    final String baseUrl, final String name) {
+  public void writeWmsGroundOverlay(
+    final com.revolsys.jts.geom.BoundingBox envelope, final String baseUrl,
+    final String name) {
 
     startTag(GROUND_OVERLAY);
     if (name != null) {

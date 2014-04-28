@@ -32,12 +32,12 @@
  */
 package com.revolsys.jts.precision;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Lineal;
 import com.revolsys.jts.geom.MultiPoint;
@@ -208,7 +208,7 @@ public class MinimumClearance {
     private void updatePts(final Coordinates p, final Coordinates seg0,
       final Coordinates seg1) {
       minPts[0] = p;
-      final LineSegment seg = new LineSegment(seg0, seg1);
+      final LineSegment seg = new LineSegmentImpl(seg0, seg1);
       minPts[1] = new Coordinate(seg.closestPoint(p));
     }
 

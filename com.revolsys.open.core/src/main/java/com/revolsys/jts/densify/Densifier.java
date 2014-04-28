@@ -32,16 +32,22 @@
  */
 package com.revolsys.jts.densify;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateList;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 
 /**
@@ -58,69 +64,107 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * 
  * @author Martin Davis
  */
-public class Densifier {
-  class DensifyTransformer extends GeometryTransformer {
-    /**
-     * Creates a valid area geometry from one that possibly has bad topology
-     * (i.e. self-intersections). Since buffer can handle invalid topology, but
-     * always returns valid geometry, constructing a 0-width buffer "corrects"
-     * the topology. Note this only works for area geometries, since buffer
-     * always returns areas. This also may return empty geometries, if the input
-     * has no actual area.
-     * 
-     * @param roughAreaGeom
-     *          an area geometry possibly containing self-intersections
-     * @return a valid area geometry
-     */
-    private Geometry createValidArea(final Geometry roughAreaGeom) {
-      return roughAreaGeom.buffer(0.0);
-    }
+public class Densifier extends GeometryTransformer {
 
-    @Override
-    protected CoordinatesList transformCoordinates(
-      final CoordinatesList coords, final Geometry parent) {
-      final Coordinates[] inputPts = coords.toCoordinateArray();
-      Coordinates[] newPts = Densifier.densifyPoints(inputPts,
-        distanceTolerance, parent.getPrecisionModel());
-      // prevent creation of invalid linestrings
-      if (parent instanceof LineString && newPts.length == 1) {
-        newPts = new Coordinates[0];
-      }
-      return factory.getCoordinateSequenceFactory().create(newPts);
+  private static GeometryCollection densify(
+    final GeometryCollection geometryCollection, final double distanceTolerance) {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final Geometry part : geometryCollection.geometries()) {
+      final Geometry newGeometry = densify(part, distanceTolerance);
+      geometries.add(newGeometry);
     }
+    final GeometryCollection newGeometry = geometryCollection.getGeometryFactory()
+      .geometryCollection(geometries);
+    return newGeometry;
+  }
 
-    @Override
-    protected Geometry transformMultiPolygon(final MultiPolygon geom,
-      final Geometry parent) {
-      final Geometry roughGeom = super.transformMultiPolygon(geom, parent);
-      return createValidArea(roughGeom);
-    }
+  private static LinearRing densify(final LinearRing line,
+    final double distanceTolerance) {
+    final List<Coordinates> points = densifyPoints(line, distanceTolerance);
+    final GeometryFactory geometryFactory = line.getGeometryFactory();
+    return geometryFactory.linearRing(points);
+  }
 
-    @Override
-    protected Geometry transformPolygon(final Polygon geom,
-      final Geometry parent) {
-      final Geometry roughGeom = super.transformPolygon(geom, parent);
-      // don't try and correct if the parent is going to do this
-      if (parent instanceof MultiPolygon) {
-        return roughGeom;
-      }
-      return createValidArea(roughGeom);
+  private static LineString densify(final LineString line,
+    final double distanceTolerance) {
+    final List<Coordinates> points = densifyPoints(line, distanceTolerance);
+    final GeometryFactory geometryFactory = line.getGeometryFactory();
+    return geometryFactory.lineString(points);
+  }
+
+  private static MultiLineString densify(final MultiLineString multiLineString,
+    final double distanceTolerance) {
+    final List<LineString> lines = new ArrayList<>();
+    for (final LineString line : multiLineString.getLineStrings()) {
+      final LineString newLine = densify(line, distanceTolerance);
+      lines.add(newLine);
     }
+    final GeometryFactory geometryFactory = multiLineString.getGeometryFactory();
+    return geometryFactory.multiLineString(lines);
+  }
+
+  private static MultiPolygon densify(final MultiPolygon multiPolygon,
+    final double distanceTolerance) {
+    final List<Polygon> polygons = new ArrayList<>();
+    for (final Polygon polygon : multiPolygon.getPolygons()) {
+      final Polygon newPolygon = densify(polygon, distanceTolerance);
+      polygons.add(newPolygon);
+    }
+    final GeometryFactory geometryFactory = multiPolygon.getGeometryFactory();
+    final MultiPolygon newMultiPolygon = geometryFactory.multiPolygon(polygons);
+    return (MultiPolygon)newMultiPolygon.buffer(0);
+  }
+
+  private static Polygon densify(final Polygon polygon,
+    final double distanceTolerance) {
+    // Attempt to fix invalid geometries
+    final GeometryFactory geometryFactory = polygon.getGeometryFactory();
+    final List<LinearRing> rings = new ArrayList<>();
+    for (final LinearRing ring : polygon.rings()) {
+      final LinearRing newRing = densify(ring, distanceTolerance);
+      rings.add(newRing);
+    }
+    final Polygon newPolygon = geometryFactory.polygon(rings);
+    return (Polygon)newPolygon.buffer(0);
   }
 
   /**
    * Densifies a geometry using a given distance tolerance,
    * and respecting the input geometry's {@link PrecisionModel}.
    * 
-   * @param geom the geometry to densify
+   * @param geometry the geometry to densify
    * @param distanceTolerance the distance tolerance to densify
    * @return the densified geometry
    */
-  public static Geometry densify(final Geometry geom,
+  @SuppressWarnings("unchecked")
+  public static <V extends Geometry> V densify(final V geometry,
     final double distanceTolerance) {
-    final Densifier densifier = new Densifier(geom);
-    densifier.setDistanceTolerance(distanceTolerance);
-    return densifier.getResultGeometry();
+    if (distanceTolerance <= 0.0) {
+      throw new IllegalArgumentException("Tolerance must be positive");
+    } else if (geometry == null || geometry.isEmpty()) {
+      return geometry;
+    } else {
+      if (geometry instanceof Point) {
+        return geometry;
+      } else if (geometry instanceof LinearRing) {
+        return (V)densify((LinearRing)geometry, distanceTolerance);
+      } else if (geometry instanceof LineString) {
+        return (V)densify((LineString)geometry, distanceTolerance);
+      } else if (geometry instanceof Polygon) {
+        return (V)densify((Polygon)geometry, distanceTolerance);
+      } else if (geometry instanceof MultiPoint) {
+        return geometry;
+      } else if (geometry instanceof MultiLineString) {
+        return (V)densify((MultiLineString)geometry, distanceTolerance);
+      } else if (geometry instanceof MultiPolygon) {
+        return (V)densify((MultiPolygon)geometry, distanceTolerance);
+      } else if (geometry instanceof GeometryCollection) {
+        return (V)densify((GeometryCollection)geometry, distanceTolerance);
+      } else {
+        throw new UnsupportedOperationException("Unknown geometry type "
+          + geometry.getClass());
+      }
+    }
   }
 
   /**
@@ -130,66 +174,31 @@ public class Densifier {
    * @param distanceTolerance
    * @return the densified coordinate sequence
    */
-  private static Coordinates[] densifyPoints(final Coordinates[] pts,
-    final double distanceTolerance, final PrecisionModel precModel) {
-    final LineSegment seg = new LineSegment();
-    final CoordinateList coordList = new CoordinateList();
-    for (int i = 0; i < pts.length - 1; i++) {
-      seg.setP0(pts[i]);
-      seg.setP1(pts[i + 1]);
-      coordList.add(seg.getP0(), false);
-      final double len = seg.getLength();
-      final int densifiedSegCount = (int)(len / distanceTolerance) + 1;
-      if (densifiedSegCount > 1) {
-        final double densifiedSegLen = len / densifiedSegCount;
-        for (int j = 1; j < densifiedSegCount; j++) {
-          final double segFract = (j * densifiedSegLen) / len;
-          final Coordinates p = seg.pointAlong(segFract);
-          precModel.makePrecise(p);
-          coordList.add(p, false);
+  private static List<Coordinates> densifyPoints(final LineString line,
+    final double distanceTolerance) {
+    final List<Coordinates> points = new ArrayList<Coordinates>();
+
+    for (final Segment segment : line.segments()) {
+      if (points.isEmpty()) {
+        points.add(segment.get(0).cloneCoordinates());
+      }
+      final double length = segment.getLength();
+      if (length > 0) {
+        final int densifiedSegCount = (int)(length / distanceTolerance) + 1;
+        if (densifiedSegCount > 1) {
+          final double densifiedSegLen = length / densifiedSegCount;
+          for (int j = 1; j < densifiedSegCount; j++) {
+            final double segFract = (j * densifiedSegLen) / length;
+            final Coordinates point = segment.pointAlong(segFract);
+            if (!segment.contains(point)) {
+              points.add(point.cloneCoordinates());
+            }
+          }
         }
+        points.add(segment.get(1).cloneCoordinates());
       }
     }
-    coordList.add(pts[pts.length - 1], false);
-    return coordList.toCoordinateArray();
-  }
-
-  private final Geometry inputGeom;
-
-  private double distanceTolerance;
-
-  /**
-   * Creates a new densifier instance.
-   * 
-   * @param inputGeom
-   */
-  public Densifier(final Geometry inputGeom) {
-    this.inputGeom = inputGeom;
-  }
-
-  /**
-   * Gets the densified geometry.
-   * 
-   * @return the densified geometry
-   */
-  public Geometry getResultGeometry() {
-    return (new DensifyTransformer()).transform(inputGeom);
-  }
-
-  /**
-   * Sets the distance tolerance for the densification. All line segments
-   * in the densified geometry will be no longer than the distance tolereance.
-   * simplified geometry will be within this distance of the original geometry.
-   * The distance tolerance must be positive.
-   * 
-   * @param distanceTolerance
-   *          the densification tolerance to use
-   */
-  public void setDistanceTolerance(final double distanceTolerance) {
-    if (distanceTolerance <= 0.0) {
-      throw new IllegalArgumentException("Tolerance must be positive");
-    }
-    this.distanceTolerance = distanceTolerance;
+    return points;
   }
 
 }

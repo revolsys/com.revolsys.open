@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.geom.util;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;

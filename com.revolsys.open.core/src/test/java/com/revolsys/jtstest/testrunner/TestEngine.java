@@ -33,6 +33,7 @@
 package com.revolsys.jtstest.testrunner;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -56,7 +57,7 @@ public class TestEngine implements Runnable {
     TestEngine.geometryFactory = geometryFactory;
   }
 
-  private List<File> testFiles;
+  private List<File> testFiles = new ArrayList<>();
 
   // default is to run all tests
   private int testCaseIndexToRun = -1;
@@ -85,6 +86,10 @@ public class TestEngine implements Runnable {
   public TestEngine() {
   }
 
+  public void addFile(final File file) {
+    this.testFiles.add(file);
+  }
+
   public void clearParsingProblems() {
     testReader.clearParsingProblems();
   }
@@ -97,7 +102,6 @@ public class TestEngine implements Runnable {
     int runIndex = 0;
     for (final File testFile : testFiles) {
       runIndex++;
-      System.out.println("Reading test file " + testFile.getAbsolutePath());
       final TestRun testRun;
       if (FileUtil.getFileNameExtension(testFile).equals("json")) {
         testRun = MapObjectFactoryRegistry.toObject(testFile);
@@ -209,7 +213,6 @@ public class TestEngine implements Runnable {
     start = new Date();
     clearParsingProblems();
     testRuns = createTestRuns();
-    System.out.println("Running tests...");
     for (final TestRun testRun : testRuns) {
       if (testCaseIndexToRun >= 0) {
         testRun.setTestCaseIndexToRun(testCaseIndexToRun);

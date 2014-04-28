@@ -37,6 +37,8 @@ import com.revolsys.jts.geom.Lineal;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.operation.BoundaryOp;
+import com.revolsys.jts.operation.IsSimpleOp;
+import com.revolsys.jts.operation.relate.RelateOp;
 
 /**
  * An interface for rules which determine whether node points

@@ -39,6 +39,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
@@ -261,8 +262,8 @@ public class Distance3DOp {
         if (dist < minDistance) {
           minDistance = dist;
           // TODO: compute closest pts in 3D
-          final LineSegment seg0 = new LineSegment(coord0[i], coord0[i + 1]);
-          final LineSegment seg1 = new LineSegment(coord1[j], coord1[j + 1]);
+          final LineSegment seg0 = new LineSegmentImpl(coord0[i], coord0[i + 1]);
+          final LineSegment seg1 = new LineSegmentImpl(coord1[j], coord1[j + 1]);
           final Coordinates[] closestPt = seg0.closestPoints(seg1);
           updateDistance(dist, new GeometryLocation(line0, i, closestPt[0]),
             new GeometryLocation(line1, j, closestPt[1]), flip);
@@ -283,7 +284,7 @@ public class Distance3DOp {
       final double dist = CGAlgorithms3D.distancePointSegment(coord,
         lineCoord[i], lineCoord[i + 1]);
       if (dist < minDistance) {
-        final LineSegment seg = new LineSegment(lineCoord[i], lineCoord[i + 1]);
+        final LineSegment seg = new LineSegmentImpl(lineCoord[i], lineCoord[i + 1]);
         final Coordinates segClosestPoint = seg.closestPoint(coord);
         updateDistance(dist, new GeometryLocation(line, i, segClosestPoint),
           new GeometryLocation(point, 0, coord), flip);
@@ -506,15 +507,13 @@ public class Distance3DOp {
     }
 
     // start point of line
-    final Coordinates p0 = new Coordinate();
-    seq.getCoordinate(0, p0);
+    Coordinates p0 = seq.getCoordinate(0);
     double d0 = poly.getPlane().orientedDistance(p0);
 
     // for each segment in the line
-    final Coordinates p1 = new Coordinate();
     for (int i = 0; i < seq.size() - 1; i++) {
-      seq.getCoordinate(i, p0);
-      seq.getCoordinate(i + 1, p1);
+      p0 = seq.getCoordinate(i);
+      final Coordinates p1 = seq.getCoordinate(i + 1);
       final double d1 = poly.getPlane().orientedDistance(p1);
 
       /**

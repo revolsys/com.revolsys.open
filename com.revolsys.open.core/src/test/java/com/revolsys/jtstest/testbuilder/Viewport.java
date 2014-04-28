@@ -132,7 +132,7 @@ public class Viewport implements PointTransformation {
   }
 
   public boolean containsInModel(final Coordinates p) {
-    return viewEnvInModel.contains(p);
+    return viewEnvInModel.covers(p);
   }
 
   /**

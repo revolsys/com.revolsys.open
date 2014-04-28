@@ -1,6 +1,8 @@
 package com.revolsys.jtstest.testbuilder.geom;
 
-import com.revolsys.jts.geom.*;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.Polygon;
 
 public class GeometryUtil {
 

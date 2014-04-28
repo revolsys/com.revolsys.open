@@ -40,16 +40,21 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.util.NoOp;
+import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeList;
 import com.revolsys.jts.geomgraph.Label;
@@ -190,6 +195,12 @@ public class Buffer {
     final PrecisionModel precisionModel, final Geometry geometry,
     final double distance, final BufferParameters parameters) {
 
+    if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      if (polygon.getRingCount() > 1) {
+        NoOp.noOp();
+      }
+    }
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
     final OffsetCurveBuilder curveBuilder = new OffsetCurveBuilder(
@@ -198,15 +209,16 @@ public class Buffer {
     final OffsetCurveSetBuilder curveSetBuilder = new OffsetCurveSetBuilder(
       geometry, distance, curveBuilder);
 
-    final List<SegmentString> bufferSegStrList = curveSetBuilder.getCurves();
+    final List<SegmentString> curves = curveSetBuilder.getCurves();
 
-    if (bufferSegStrList.size() <= 0) {
+    if (curves.size() == 0) {
       return geometryFactory.polygon();
     } else {
       final EdgeList edgeList = new EdgeList();
-      computeNodedEdges(noder, edgeList, bufferSegStrList);
+      computeNodedEdges(noder, edgeList, curves);
       final PlanarGraph graph = new PlanarGraph(new OverlayNodeFactory());
-      graph.addEdges(edgeList.getEdges());
+      final List<Edge> edges = edgeList.getEdges();
+      graph.addEdges(edges);
 
       final List<BufferSubgraph> subgraphList = createSubgraphs(graph);
       final PolygonBuilder polyBuilder = new PolygonBuilder(geometryFactory);
@@ -265,49 +277,29 @@ public class Buffer {
     final List<BufferSubgraph> processedGraphs = new ArrayList<>();
     for (final BufferSubgraph subgraph : subgraphList) {
       final Coordinates p = subgraph.getRightmostCoordinate();
-      // int outsideDepth = 0;
-      // if (polyBuilder.containsPoint(p))
-      // outsideDepth = 1;
-      final SubgraphDepthLocater locater = new SubgraphDepthLocater(
-        processedGraphs);
-      final int outsideDepth = locater.getDepth(p);
-      // try {
+      final int outsideDepth = getDepth(processedGraphs, p);
       subgraph.computeDepth(outsideDepth);
-      // }
-      // catch (RuntimeException ex) {
-      // // debugging only
-      // //subgraph.saveDirEdges();
-      // throw ex;
-      // }
       subgraph.findResultEdges();
       processedGraphs.add(subgraph);
-      polyBuilder.add(subgraph.getDirectedEdges(), subgraph.getNodes());
+      final List<DirectedEdge> edges = subgraph.getDirectedEdges();
+      final List<Node> nodes = subgraph.getNodes();
+      polyBuilder.add(edges, nodes);
     }
   }
 
   private static void computeNodedEdges(final Noder noder,
     final EdgeList edgeList, final List<SegmentString> bufferSegStrList) {
     noder.computeNodes(bufferSegStrList);
-    final Collection<SegmentString> nodedSegStrings = noder.getNodedSubstrings();
-    // DEBUGGING ONLY
-    // BufferDebug.saveEdges(nodedEdges, "run" + BufferDebug.runCount +
-    // "_nodedEdges");
-
-    for (final SegmentString segStr : nodedSegStrings) {
-      /**
-       * Discard edges which have zero length, 
-       * since they carry no information and cause problems with topology building
-       */
-      final Coordinates[] pts = segStr.getCoordinates();
-      if (pts.length == 2 && pts[0].equals2d(pts[1])) {
-        continue;
+    final Collection<SegmentString> segments = noder.getNodedSubstrings();
+    for (final SegmentString segment : segments) {
+      final Coordinates[] pts = segment.getCoordinates();
+      if (pts.length > 2 || !pts[0].equals2d(pts[1])) {
+        final Label oldLabel = (Label)segment.getData();
+        final Edge edge = new Edge(segment.getCoordinates(),
+          new Label(oldLabel));
+        insertUniqueEdge(edgeList, edge);
       }
-
-      final Label oldLabel = (Label)segStr.getData();
-      final Edge edge = new Edge(segStr.getCoordinates(), new Label(oldLabel));
-      insertUniqueEdge(edgeList, edge);
     }
-    // saveEdges(edgeList.getEdges(), "run" + runCount + "_collapsedEdges");
   }
 
   private static List<BufferSubgraph> createSubgraphs(final PlanarGraph graph) {
@@ -341,6 +333,103 @@ public class Buffer {
       return -1;
     }
     return 0;
+  }
+
+  /**
+   * Finds all non-horizontal segments intersecting the stabbing line.
+   * The stabbing line is the ray to the right of stabbingRayLeftPt.
+   *
+   * @param stabbingRayLeftPt the left-hand origin of the stabbing line
+   * @return a List of {@link DepthSegments} intersecting the stabbing line
+   */
+  private static List<DepthSegment> findStabbedSegments(
+    final Collection<BufferSubgraph> graphs, final Coordinates stabbingRayLeftPt) {
+    final List<DepthSegment> segments = new ArrayList<DepthSegment>();
+    for (final BufferSubgraph graph : graphs) {
+      final BoundingBox env = graph.getEnvelope();
+      if (stabbingRayLeftPt.getY() >= env.getMinY()
+        && stabbingRayLeftPt.getY() <= env.getMaxY()) {
+        final List<DirectedEdge> edges = graph.getDirectedEdges();
+        for (final DirectedEdge edge : edges) {
+          if (edge.isForward()) {
+            findStabbedSegments(graphs, stabbingRayLeftPt, edge, segments);
+          }
+        }
+      }
+    }
+    return segments;
+  }
+
+  /**
+   * Finds all non-horizontal segments intersecting the stabbing line
+   * in the input dirEdge.
+   * The stabbing line is the ray to the right of stabbingRayLeftPt.
+   *
+   * @param stabbingRayLeftPt the left-hand origin of the stabbing line
+   * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
+   */
+  private static void findStabbedSegments(
+    final Collection<BufferSubgraph> subgraphs,
+    final Coordinates stabbingRayLeftPt, final DirectedEdge dirEdge,
+    final List<DepthSegment> stabbedSegments) {
+    final Coordinates[] pts = dirEdge.getEdge().getCoordinates();
+    for (int i = 0; i < pts.length - 1; i++) {
+      LineSegment seg = new LineSegmentImpl(pts[i], pts[i + 1]);
+      double y1 = seg.getY(0);
+      double y2 = seg.getY(1);
+      // ensure segment always points upwards
+      if (y1 > y2) {
+        seg = seg.reverse();
+        y1 = seg.getY(0);
+        y2 = seg.getY(1);
+      }
+      final double x1 = seg.getX(0);
+      final double x2 = seg.getX(1);
+      // skip segment if it is left of the stabbing line
+      final double maxx = Math.max(x1, x2);
+      if (maxx < stabbingRayLeftPt.getX()) {
+        continue;
+      }
+
+      // skip horizontal segments (there will be a non-horizontal one carrying
+      // the same depth info
+      if (seg.isHorizontal()) {
+        continue;
+      }
+
+      // skip if segment is above or below stabbing line
+      if (stabbingRayLeftPt.getY() < y1 || stabbingRayLeftPt.getY() > y2) {
+        continue;
+      }
+
+      // skip if stabbing ray is right of the segment
+      if (CGAlgorithms.computeOrientation(seg.getP0(), seg.getP1(),
+        stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
+        continue;
+      }
+
+      // stabbing line cuts this segment, so record it
+      int depth = dirEdge.getDepth(Position.LEFT);
+      // if segment direction was flipped, use RHS depth instead
+      if (!seg.getP0().equals(pts[i])) {
+        depth = dirEdge.getDepth(Position.RIGHT);
+      }
+      final DepthSegment ds = new DepthSegment(seg, depth);
+      stabbedSegments.add(ds);
+    }
+  }
+
+  private static int getDepth(final Collection<BufferSubgraph> subgraphs,
+    final Coordinates p) {
+    final List<DepthSegment> stabbedSegments = findStabbedSegments(subgraphs, p);
+    // if no segments on stabbing line subgraph must be outside all others.
+    if (stabbedSegments.size() == 0) {
+      return 0;
+    } else {
+      Collections.sort(stabbedSegments);
+      final DepthSegment ds = stabbedSegments.get(0);
+      return ds.getLeftDepth();
+    }
   }
 
   /**

@@ -33,7 +33,6 @@
 package com.revolsys.jts.geomgraph;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
@@ -56,10 +55,13 @@ public abstract class EdgeRing {
 
   private int maxNodeDegree = -1;
 
-  private final List edges = new ArrayList(); // the DirectedEdges making up
-                                              // this EdgeRing
+  private final List<DirectedEdge> edges = new ArrayList<>(); // the
+                                                              // DirectedEdges
+                                                              // making up
 
-  private final List pts = new ArrayList();
+  // this EdgeRing
+
+  private final List<Coordinates> pts = new ArrayList<>();
 
   private final Label label = new Label(Location.NONE); // label stores the
                                                         // locations of each
@@ -74,8 +76,11 @@ public abstract class EdgeRing {
   private EdgeRing shell; // if non-null, the ring is a hole and this EdgeRing
                           // is its containing shell
 
-  private final ArrayList holes = new ArrayList(); // a list of EdgeRings which
-                                                   // are holes in this EdgeRing
+  private final List<EdgeRing> holes = new ArrayList<EdgeRing>(); // a list of
+                                                                  // EdgeRings
+                                                                  // which
+
+  // are holes in this EdgeRing
 
   protected GeometryFactory geometryFactory;
 
@@ -169,7 +174,7 @@ public abstract class EdgeRing {
     }
     final Coordinates[] coord = new Coordinates[pts.size()];
     for (int i = 0; i < pts.size(); i++) {
-      coord[i] = (Coordinates)pts.get(i);
+      coord[i] = pts.get(i);
     }
     ring = geometryFactory.linearRing(coord);
     isHole = CGAlgorithms.isCCW(ring.getCoordinateArray());
@@ -185,15 +190,14 @@ public abstract class EdgeRing {
   public boolean containsPoint(final Coordinates p) {
     final LinearRing shell = getLinearRing();
     final BoundingBox env = shell.getBoundingBox();
-    if (!env.contains(p)) {
+    if (!env.covers(p)) {
       return false;
     }
-    if (!CGAlgorithms.isPointInRing(p, shell.getCoordinateArray())) {
+    if (!CGAlgorithms.isPointInRing(p, shell)) {
       return false;
     }
 
-    for (final Iterator i = holes.iterator(); i.hasNext();) {
-      final EdgeRing hole = (EdgeRing)i.next();
+    for (final EdgeRing hole : holes) {
       if (hole.containsPoint(p)) {
         return false;
       }
@@ -202,13 +206,13 @@ public abstract class EdgeRing {
   }
 
   public Coordinates getCoordinate(final int i) {
-    return (Coordinates)pts.get(i);
+    return pts.get(i);
   }
 
   /**
    * Returns the list of DirectedEdges that make up this EdgeRing
    */
-  public List getEdges() {
+  public List<DirectedEdge> getEdges() {
     return edges;
   }
 
@@ -292,7 +296,7 @@ public abstract class EdgeRing {
     final List<LinearRing> rings = new ArrayList<>();
     rings.add(getLinearRing());
     for (int i = 0; i < holes.size(); i++) {
-      final LinearRing ring = ((EdgeRing)holes.get(i)).getLinearRing();
+      final LinearRing ring = holes.get(i).getLinearRing();
       rings.add(ring);
     }
     final Polygon poly = geometryFactory.polygon(rings);

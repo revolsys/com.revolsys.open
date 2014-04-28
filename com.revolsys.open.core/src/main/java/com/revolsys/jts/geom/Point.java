@@ -32,8 +32,6 @@
  */
 package com.revolsys.jts.geom;
 
-import com.revolsys.jts.geom.vertex.Vertex;
-
 /**
  * Represents a single point.
  *
@@ -45,7 +43,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * 
  *@version 1.7
  */
-public interface Point extends Geometry, Puntal, Vertex {
+public interface Point extends Geometry, Puntal, Coordinates {
   /**
    * Creates and returns a full copy of this {@link Point} object.
    * (including all coordinates contained by it).
@@ -67,6 +65,7 @@ public interface Point extends Geometry, Puntal, Vertex {
 
   CoordinatesList getCoordinatesList();
 
+  @Override
   Point move(double... deltas);
 
   @Override

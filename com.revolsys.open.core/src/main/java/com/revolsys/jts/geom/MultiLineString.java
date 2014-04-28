@@ -43,6 +43,8 @@ import java.util.List;
  */
 public interface MultiLineString extends GeometryCollection, Lineal {
 
+  public LineString getLineString(int partIndex);
+
   public <V extends LineString> List<V> getLineStrings();
 
   public boolean isClosed();

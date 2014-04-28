@@ -29,7 +29,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
     final Coordinates[] coords = new Coordinates[size];
     for (int i = 0; i < size; i++) {
       final double base = 2 * 1;
-      coords[i] = new Coordinate((double)base, base + 1, base + 2);
+      coords[i] = new Coordinate(base, base + 1, base + 2);
     }
     return coords;
   }
@@ -68,8 +68,6 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
       return false;
     }
 
-    final Coordinates p = new Coordinate();
-
     for (int i = 0; i < seq.size(); i++) {
       if (!coords[i].equals(seq.getCoordinate(i))) {
         return false;
@@ -95,14 +93,17 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
       }
 
       // Coordinates getter
-      seq.getCoordinate(i, p);
-      if (coords[i].getX() != p.getX()) {
+      final Coordinates p = seq.getCoordinate(i);
+      final double pX = p.getX();
+      if (coords[i].getX() != pX) {
         return false;
       }
-      if (coords[i].getY() != p.getY()) {
+      final double pY = p.getY();
+      if (coords[i].getY() != pY) {
         return false;
       }
-      if (coords[i].getZ() != p.getZ()) {
+      final double pZ = p.getZ();
+      if (coords[i].getZ() != pZ) {
         return false;
       }
 
@@ -133,7 +134,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
 
   public void testCreateByInitAndCopy() {
     final Coordinates[] coords = createArray(SIZE);
-    CoordinateSequenceFactory factory = getCSFactory();
+    final CoordinateSequenceFactory factory = getCSFactory();
     final CoordinatesList seq = factory.create(coords);
     final CoordinatesList seq2 = factory.create(seq);
     assertTrue(isEqual(seq2, coords));

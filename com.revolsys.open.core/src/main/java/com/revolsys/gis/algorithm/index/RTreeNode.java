@@ -14,7 +14,7 @@ public abstract class RTreeNode<T> {
   }
 
   public boolean contains(final BoundingBox boundingBox) {
-    return boundingBox.contains(boundingBox);
+    return boundingBox.covers(boundingBox);
   }
 
   public double getArea() {

@@ -33,7 +33,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.BoundingBox;
@@ -41,6 +41,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
@@ -361,8 +362,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final Coordinates c0, final Point p1) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    final Coordinates c1 = CoordinatesUtil.getInstance(p1);
-    final LineSegment line = new LineSegment(geometryFactory, c0, c1).convert(viewportGeometryFactory);
+    final LineSegment line = new LineSegmentImpl(geometryFactory, c0, p1).convert(viewportGeometryFactory);
     final double length = line.getLength();
     final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
     final Coordinates newC1 = line.pointAlongOffset((length - cursorRadius)
@@ -392,7 +392,6 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   public Point getClosestPoint(final GeometryFactory geometryFactory,
     final LineSegment closestSegment, final Point point,
     final double maxDistance) {
-    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
     final LineSegment segment = closestSegment.convert(geometryFactory);
     final Point fromPoint = segment.getPoint(0);
     final Point toPoint = segment.getPoint(1);
@@ -407,7 +406,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     } else if (toPointDistance <= maxDistance) {
       return toPoint;
     } else {
-      final Coordinates pointOnLine = segment.project(coordinates);
+      final Coordinates pointOnLine = segment.project(point);
       return geometryFactory.point(pointOnLine);
     }
   }
@@ -706,7 +705,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       // TODO make work with multi-part
       final Point fromPoint = this.addGeometry.getPoint();
       final boolean snapToFirst = !SwingUtil.isControlDown(event)
-        && boundingBox.contains(fromPoint);
+        && boundingBox.covers(fromPoint);
       if (snapToFirst
         || !updateAddMouseOverGeometry(event.getPoint(), boundingBox)) {
         if (snapToFirst) {
@@ -784,7 +783,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           final double deltaX = endPoint.getX() - startPoint.getX();
           final double deltaY = endPoint.getY() - startPoint.getY();
           if (deltaX != 0 || deltaY != 0) {
-            final Geometry newGeometry = (Geometry)location.getGeometry().move(deltaX, deltaY);
+            final Geometry newGeometry = location.getGeometry().move(deltaX,
+              deltaY);
             final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
             addUndo(geometryEdit);
           }

@@ -41,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.revolsys.jts.test.geometry.BoundingBoxTest;
 import com.revolsys.jts.testold.algorithm.AngleTest;
 import com.revolsys.jts.testold.algorithm.ConvexHullTest;
 import com.revolsys.jts.testold.algorithm.IsCCWTest;
@@ -51,7 +52,6 @@ import com.revolsys.jts.testold.geom.AreaLengthTest;
 import com.revolsys.jts.testold.geom.BasicCoordinateSequenceTest;
 import com.revolsys.jts.testold.geom.BidirectionalComparatorTest;
 import com.revolsys.jts.testold.geom.CoordinateArraysTest;
-import com.revolsys.jts.testold.geom.EnvelopeTest;
 import com.revolsys.jts.testold.geom.GeometryCollectionImplTest;
 import com.revolsys.jts.testold.geom.GeometryImplTest;
 import com.revolsys.jts.testold.geom.IntersectionMatrixTest;
@@ -97,7 +97,7 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
   CascadedPolygonUnionTest.class, OrientationIndexTest.class,
   ConformingDelaunayTest.class, ConvexHullTest.class,
   CoordinateArraysTest.class, DelaunayTest.class, DistanceTest.class,
-  EnvelopeTest.class, GeometryCollectionImplTest.class, GeometryImplTest.class,
+  GeometryCollectionImplTest.class, GeometryImplTest.class,
   IntersectionMatrixTest.class, IntervalTest.class, IsCCWTest.class,
   IsRectangleTest.class, IsValidTest.class, LengthIndexedLineTest.class,
   LineMergerTest.class, LineStringImplTest.class,
@@ -137,7 +137,7 @@ public class MasterTester extends TestCase {
     result.addTest(new TestSuite(CoordinateArraysTest.class));
     result.addTest(new TestSuite(DelaunayTest.class));
     result.addTest(new TestSuite(DistanceTest.class));
-    result.addTest(new TestSuite(EnvelopeTest.class));
+    result.addTest(new TestSuite(BoundingBoxTest.class));
     result.addTest(new TestSuite(GeometryCollectionImplTest.class));
     result.addTest(new TestSuite(GeometryImplTest.class));
     result.addTest(new TestSuite(IntersectionMatrixTest.class));

@@ -39,7 +39,6 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.model.DataObject;
@@ -47,7 +46,6 @@ import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.spring.InvokeMethodAfterCommit;
 import com.revolsys.ui.html.HtmlUtil;
-import com.revolsys.ui.html.decorator.CollapsibleBox;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.decorator.FieldLabelDecorator;
 import com.revolsys.ui.html.decorator.TableHeadingDecorator;
@@ -84,6 +82,7 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.Property;
@@ -214,31 +213,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     setTypeName(typeName);
     this.title = title;
     this.pluralTitle = pluralTitle;
-  }
-
-  public void addDataTable(final ElementContainer container,
-    final String builderName, final String pageName,
-    Map<String, Object> parameters) {
-    final HtmlUiBuilder<?> builder = getBuilder(builderName);
-    if (builder != null) {
-      parameters = new HashMap<String, Object>(parameters);
-      if (parameters.get("open") != Boolean.TRUE) {
-        parameters.put("deferLoading", 0);
-      }
-      final HttpServletRequest request = getRequest();
-      final Collection<Object> rows = Collections.emptyList();
-      final ElementContainer element = builder.createDataTable(request,
-        pageName, parameters, rows);
-      if (element != null) {
-        Boolean open = (Boolean)parameters.get("open");
-        if (open == null) {
-          open = true;
-        }
-        final String title = setPageTitle(request, pageName);
-        container.setDecorator(new CollapsibleBox(title, open));
-        container.add(element);
-      }
-    }
   }
 
   public void addKeySerializer(final KeySerializer keySerializer) {
@@ -755,8 +729,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final MenuElement actionMenuElement = new MenuElement(actionMenu,
       "actionMenu");
     final ElementContainer view = new ElementContainer(form, actionMenuElement);
-    view.setDecorator(new CollapsibleBox(title, true));
-    return view;
+    final TabElementContainer tabs = new TabElementContainer();
+    tabs.add(title, view);
+    return tabs;
   }
 
   public Element createObjectEditPage(final T object, final String prefix)
@@ -811,40 +786,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         "actionMenu");
       final ElementContainer view = new ElementContainer(form,
         actionMenuElement);
-      view.setDecorator(new CollapsibleBox(title, true));
-      return view;
-    }
-  }
-
-  public ElementContainer createObjectViewPage(final Object object,
-    final String prefix, final boolean collapsible)
-    throws NoSuchRequestHandlingMethodException {
-    if (object == null) {
-      throw new PageNotFoundException();
-    } else {
-
-      final String pageName = getName(prefix, "view");
-
-      final Page page = getPage(pageName);
-      if (page == null) {
-        log.error("Page not found " + pageName);
-        throw new PageNotFoundException();
-      } else {
-        final List<KeySerializer> serializers = getSerializers(pageName, "view");
-        final Element detailView = createDetailView(object, serializers);
-        final HttpServletRequest request = HttpServletUtils.getRequest();
-        setPageTitle(request, pageName);
-
-        final Menu actionMenu = new Menu();
-        addMenuItem(actionMenu, prefix, "edit", "Edit", "_top");
-
-        final ElementContainer view = new ElementContainer(detailView);
-        if (collapsible) {
-          view.setDecorator(new CollapsibleBox(title, true));
-        }
-        addMenuElement(view, actionMenu);
-        return view;
-      }
+      final TabElementContainer tabs = new TabElementContainer();
+      tabs.add(title, view);
+      return tabs;
     }
   }
 
@@ -1513,7 +1457,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
               } else {
                 final TypeSerializer typeSerializer = classSerializers.get(value.getClass());
                 if (typeSerializer == null) {
-                  final String stringValue = value.toString();
+                  final String stringValue;
+                  if (value instanceof Collection) {
+                    final Collection<?> collection = (Collection<?>)value;
+                    stringValue = CollectionUtil.toString(", ", collection);
+                  } else {
+                    stringValue = value.toString();
+                  }
                   if (stringValue.length() > 0) {
                     out.text(stringValue);
                     return;

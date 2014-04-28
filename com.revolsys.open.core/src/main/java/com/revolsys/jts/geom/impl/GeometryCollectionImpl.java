@@ -36,9 +36,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -53,12 +56,17 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection
   private static final long serialVersionUID = -5694727726395021467L;
 
   /**
+   * The {@link GeometryFactory} used to create this Geometry
+   */
+  private final GeometryFactory geometryFactory;
+
+  /**
    *  Internal representation of this <code>GeometryCollection</code>.
    */
   private Geometry[] geometries;
 
   public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
-    super(geometryFactory);
+    this.geometryFactory = geometryFactory;
   }
 
   /**
@@ -70,7 +78,7 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection
    */
   public GeometryCollectionImpl(final GeometryFactory geometryFactory,
     final Geometry[] geometries) {
-    super(geometryFactory);
+    this.geometryFactory = geometryFactory;
     if (geometries == null || geometries.length == 0) {
       this.geometries = null;
     } else if (hasNullElements(geometries)) {
@@ -124,6 +132,35 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection
     } else {
       return geometries.length;
     }
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
+  @Override
+  public Segment getSegment(final int... vertexId) {
+    throw new UnsupportedOperationException(
+      "Segments not currently implemented for geometry collections");
+  }
+
+  @Override
+  public Vertex getVertex(final int... vertexId) {
+    throw new UnsupportedOperationException(
+      "Vertices not currently implemented for geometry collections");
+  }
+
+  @Override
+  public Reader<Segment> segments() {
+    throw new UnsupportedOperationException(
+      "Segments not currently implemented for geometry collections");
+  }
+
+  @Override
+  public Reader<Vertex> vertices() {
+    throw new UnsupportedOperationException(
+      "Vertices not currently implemented for geometry collections");
   }
 
 }

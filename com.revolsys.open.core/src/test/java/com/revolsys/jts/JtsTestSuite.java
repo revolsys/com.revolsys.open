@@ -6,10 +6,11 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.revolsys.jts.test.geometry.GeometrySuite;
 import com.revolsys.jts.testold.junit.MasterTester;
+import com.revolsys.jtstest.testrunner.TopologyTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  GeometrySuite.class, MasterTester.class
+  GeometrySuite.class, MasterTester.class, TopologyTest.class
 })
 public class JtsTestSuite {
 

@@ -108,6 +108,8 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   Coordinates get(int i);
 
+  int getAxisCount();
+
   /**
    * Returns (possibly a copy of) the i'th coordinate in this sequence.
    * Whether or not the Coordinates returned is the actual underlying
@@ -122,15 +124,6 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    * @return the i'th coordinate in the sequence
    */
   Coordinates getCoordinate(int i);
-
-  /**
-   * Copies the i'th coordinate in the sequence to the supplied
-   * {@link Coordinates}.  Only the first two dimensions are copied.
-   *
-   * @param index the index of the coordinate to copy
-   * @param coord a {@link Coordinates} to receive the value
-   */
-  void getCoordinate(int index, Coordinates coord);
 
   /**
    * Returns a copy of the i'th coordinate in this sequence.
@@ -148,8 +141,6 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
   List<Coordinates> getList();
 
   double getM(int index);
-
-  int getAxisCount();
 
   long getTime(int index);
 

@@ -41,7 +41,6 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 
@@ -108,11 +107,8 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final Vertex[] tri, final Coordinates pt) {
-    final Coordinates[] ring = new Coordinates[] {
-      tri[0].getCoordinate(), tri[1].getCoordinate(), tri[2].getCoordinate(),
-      tri[0].getCoordinate()
-    };
-    return CGAlgorithms.isPointInRing(pt, ring);
+    return CGAlgorithms.isPointInRing(pt, tri[0].getCoordinate(),
+      tri[1].getCoordinate(), tri[2].getCoordinate(), tri[0].getCoordinate());
   }
 
   /**
@@ -257,12 +253,6 @@ public class QuadEdgeTriangle {
 
   public QuadEdge[] getEdges() {
     return edge;
-  }
-
-  public void getEdgeSegment(final int i, final LineSegment seg) {
-    seg.setP0(edge[i].orig().getCoordinate());
-    final int nexti = (i + 1) % 3;
-    seg.setP1(edge[nexti].orig().getCoordinate());
   }
 
   public Polygon getGeometry(final GeometryFactory fact) {

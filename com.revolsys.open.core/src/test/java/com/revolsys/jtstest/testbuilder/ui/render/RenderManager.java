@@ -1,15 +1,19 @@
 package com.revolsys.jtstest.testbuilder.ui.render;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import com.revolsys.jtstest.testbuilder.GeometryEditPanel;
-import com.revolsys.jtstest.testbuilder.ui.*;
+import com.revolsys.jtstest.testbuilder.ui.SwingWorker;
 
 public class RenderManager 
 {

@@ -6,7 +6,7 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.filter.LineSegmentCoordinateDistanceFilter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
@@ -15,6 +15,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
@@ -154,7 +155,7 @@ public class LineSegmentQuadTree {
     final int vertexIndex = GeometryEditUtil.getVertexIndex(index);
     final Coordinates p1 = points.get(vertexIndex);
     final Coordinates p2 = points.get(vertexIndex + 1);
-    return new LineSegment(GeometryFactory.getFactory(geometry), p1, p2);
+    return new LineSegmentImpl(GeometryFactory.getFactory(geometry), p1, p2);
   }
 
   public int getSize() {

@@ -42,7 +42,6 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;

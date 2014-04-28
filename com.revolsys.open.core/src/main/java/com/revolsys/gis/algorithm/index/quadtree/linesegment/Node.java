@@ -53,7 +53,7 @@ public class Node extends NodeBase {
     int level = computeQuadLevel(itemEnv);
     Envelope nodeEnvelope = computeKey(level, point, itemEnv);
     // MD - would be nice to have a non-iterative form of this algorithm
-    while (!nodeEnvelope.contains(itemEnv)) {
+    while (!nodeEnvelope.covers(itemEnv)) {
       level += 1;
       nodeEnvelope = computeKey(level, point, itemEnv);
     }

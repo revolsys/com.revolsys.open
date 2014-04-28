@@ -9,7 +9,7 @@ import com.revolsys.jts.geom.util.AffineTransformationFactory;
 
 public class AffineTransformationFunctions {
   private static Coordinates envelopeCentre(final Geometry g) {
-    return g.getBoundingBox().centre();
+    return g.getBoundingBox().getCentre();
   }
 
   private static Coordinates envelopeLowerLeft(final Geometry g) {

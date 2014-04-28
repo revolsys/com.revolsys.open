@@ -36,10 +36,10 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
@@ -304,8 +304,8 @@ public class DistanceOp {
           coord0[i + 1], coord1[j], coord1[j + 1]);
         if (dist < minDistance) {
           minDistance = dist;
-          final LineSegment seg0 = new LineSegment(coord0[i], coord0[i + 1]);
-          final LineSegment seg1 = new LineSegment(coord1[j], coord1[j + 1]);
+          final LineSegment seg0 = new LineSegmentImpl(coord0[i], coord0[i + 1]);
+          final LineSegment seg1 = new LineSegmentImpl(coord1[j], coord1[j + 1]);
           final Coordinates[] closestPt = seg0.closestPoints(seg1);
           locGeom[0] = new GeometryLocation(line0, i, closestPt[0]);
           locGeom[1] = new GeometryLocation(line1, j, closestPt[1]);
@@ -330,7 +330,7 @@ public class DistanceOp {
         coord0[i + 1]);
       if (dist < minDistance) {
         minDistance = dist;
-        final LineSegment seg = new LineSegment(coord0[i], coord0[i + 1]);
+        final LineSegment seg = new LineSegmentImpl(coord0[i], coord0[i + 1]);
         final Coordinates segClosestPoint = seg.closestPoint(coord);
         locGeom[0] = new GeometryLocation(line, i, segClosestPoint);
         locGeom[1] = new GeometryLocation(pt, 0, coord);

@@ -35,7 +35,6 @@ package com.revolsys.jts.testold.operation;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;

@@ -34,7 +34,7 @@ public class TopologyStretcher {
 
     @Override
     public void filter(final Coordinates coord) {
-      if (mask.contains(coord)) {
+      if (mask.covers(coord)) {
         count++;
       }
     }

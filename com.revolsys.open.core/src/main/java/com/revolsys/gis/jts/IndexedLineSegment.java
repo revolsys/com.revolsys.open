@@ -1,8 +1,9 @@
 package com.revolsys.gis.jts;
 
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 
-public class IndexedLineSegment extends LineSegment {
+public class IndexedLineSegment extends LineSegmentImpl {
 
   private final int[] index;
 

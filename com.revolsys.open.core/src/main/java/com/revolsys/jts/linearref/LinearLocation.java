@@ -37,6 +37,7 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 
@@ -306,11 +307,11 @@ public class LinearLocation implements Comparable {
   }
 
   /**
-   * Gets a {@link LineSegment} representing the segment of the 
+   * Gets a {@link LineSegmentImpl} representing the segment of the 
    * given linear {@link Geometry} which contains this location.
    *
    * @param linearGeom a linear geometry
-   * @return the <tt>LineSegment</tt> containing the location
+   * @return the <tt>LineSegmentImpl</tt> containing the location
    */
   public LineSegment getSegment(final Geometry linearGeom) {
     final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
@@ -318,10 +319,10 @@ public class LinearLocation implements Comparable {
     // check for endpoint - return last segment of the line if so
     if (segmentIndex >= lineComp.getVertexCount() - 1) {
       final Coordinates prev = lineComp.getCoordinate(lineComp.getVertexCount() - 2);
-      return new LineSegment(prev, p0);
+      return new LineSegmentImpl(prev, p0);
     }
     final Coordinates p1 = lineComp.getCoordinate(segmentIndex + 1);
-    return new LineSegment(p0, p1);
+    return new LineSegmentImpl(p0, p1);
   }
 
   /**

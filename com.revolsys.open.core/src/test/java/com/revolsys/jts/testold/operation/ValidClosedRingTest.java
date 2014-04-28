@@ -2,9 +2,7 @@ package com.revolsys.jts.testold.operation;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.WKTReader;
@@ -44,32 +42,6 @@ public class ValidClosedRingTest extends TestCase {
     return geom;
   }
 
-  public void testBadGeometryCollection() {
-    final GeometryCollection gc = (GeometryCollection)fromWKT("GEOMETRYCOLLECTION ( POLYGON ((0 0, 0 10, 10 10, 10 0, 0 0), (1 1, 2 1, 2 2, 1 2, 1 1) )), POINT(0 0) )");
-    final Polygon poly = gc.getGeometry(0);
-
-    updateNonClosedRing((LinearRing)poly.getInteriorRing(0));
-    checkIsValid(poly, false);
-  }
-
-  public void testBadLinearRing() {
-    final LinearRing ring = (LinearRing)fromWKT("LINEARRING (0 0, 0 10, 10 10, 10 0, 0 0)");
-    updateNonClosedRing(ring);
-    checkIsValid(ring, false);
-  }
-
-  public void testBadPolygonHole() {
-    final Polygon poly = (Polygon)fromWKT("POLYGON ((0 0, 0 10, 10 10, 10 0, 0 0), (1 1, 2 1, 2 2, 1 2, 1 1) ))");
-    updateNonClosedRing((LinearRing)poly.getInteriorRing(0));
-    checkIsValid(poly, false);
-  }
-
-  public void testBadPolygonShell() {
-    final Polygon poly = (Polygon)fromWKT("POLYGON ((0 0, 0 10, 10 10, 10 0, 0 0))");
-    updateNonClosedRing((LinearRing)poly.getExteriorRing());
-    checkIsValid(poly, false);
-  }
-
   public void testGoodLinearRing() {
     final LinearRing ring = (LinearRing)fromWKT("LINEARRING (0 0, 0 10, 10 10, 10 0, 0 0)");
     checkIsValid(ring, true);
@@ -80,8 +52,4 @@ public class ValidClosedRingTest extends TestCase {
     checkIsValid(poly, true);
   }
 
-  private void updateNonClosedRing(final LinearRing ring) {
-    final CoordinatesList points = ring.getCoordinatesList();
-    points.setX(0, points.getX(0) + 0.0001);
-  }
 }

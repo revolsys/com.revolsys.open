@@ -1,9 +1,10 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 
 public class PointInArea extends RayCrossingCounter implements
   Visitor<LineSegment> {

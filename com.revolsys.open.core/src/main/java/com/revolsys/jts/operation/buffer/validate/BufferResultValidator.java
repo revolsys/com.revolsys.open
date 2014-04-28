@@ -35,6 +35,7 @@ package com.revolsys.jts.operation.buffer.validate;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
 
@@ -156,10 +157,11 @@ public class BufferResultValidator {
 
     final BoundingBox bufEnv = result.getBoundingBox().expand(padding);
 
-    if (!bufEnv.contains(expectedEnv)) {
+    if (!bufEnv.covers(expectedEnv)) {
       isValid = false;
       errorMsg = "Buffer envelope is incorrect";
-      errorIndicator = input.getGeometryFactory().toGeometry(bufEnv);
+      GeometryFactory r = input.getGeometryFactory();
+      errorIndicator = bufEnv.toGeometry();
     }
     report("Envelope");
   }

@@ -32,12 +32,12 @@
  */
 package com.revolsys.jtstest.testrunner;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jtstest.testbuilder.AppStrings;
 import com.revolsys.util.ExceptionUtil;
 
 /**
@@ -86,7 +86,6 @@ public class SimpleReportWriter implements ReportWriter {
     if (test.getDescription().length() > 0) {
       id += ", " + test.getDescription();
     }
-    final String report = "";
     if (test.getException() != null) {
       reportBuf.write("Test Threw Exception ("
         + id
@@ -95,33 +94,33 @@ public class SimpleReportWriter implements ReportWriter {
         + (verbose ? StringUtil.getStackTrace(test.getException())
           : test.getException().toString()) + "\n");
     } else if (test.isPassed() && verbose) {
-      reportBuf.write("Test Passed (" + id + ")" + "\n");
+      reportBuf.write("  Test Passed (" + id + ")" + "\n");
     } else if (!test.isPassed()) {
-      reportBuf.write("Test Failed (" + id + ")" + "\n");
-      if (verbose) {
-        reportBuf.write("  Expected: "
-          + test.getExpectedResult().toFormattedString() + "\n");
-        try {
-          reportBuf.write("  Actual: "
-            + test.getActualResult().toFormattedString() + "\n");
-        } catch (final Exception e) {
-          ExceptionUtil.throwUncheckedException(e);
-        }
+      reportBuf.write("  Test Failed (" + id + ")" + "\n");
+      reportBuf.write("    Expected: "
+        + test.getExpectedResult().toFormattedString() + "\n");
+      try {
+        reportBuf.write("    Actual:   "
+          + test.getActualResult().toFormattedString() + "\n");
+      } catch (final Exception e) {
+        ExceptionUtil.throwUncheckedException(e);
       }
     }
   }
 
   private void reportOnTestCase(final TestCase testCase) {
-    if (areAllTestsPassed(testCase) && !verbose) {
-      return;
+    if (verbose || !areAllTestsPassed(testCase)) {
+      reportBuf.write("\n");
+      final File file = testCase.getTestRun().getTestFile();
+      reportBuf.write(file.toString());
+      reportBuf.write("\n");
+      final String description = testCase.getDescription();
+      if (description.length() > 0) {
+        reportBuf.write("  " + description);
+        reportBuf.write("\n");
+      }
+      reportOnTests(testCase.getTests());
     }
-    reportBuf.write("\n");
-    reportBuf.write(AppStrings.LABEL_TEST_CASE
-      + " "
-      + testCase.getTestRun().getTestFile().getName()
-      + (testCase.getDescription().length() > 0 ? ": "
-        + testCase.getDescription() : "") + "\n");
-    reportOnTests(testCase.getTests());
   }
 
   private void reportOnTestCases(final List testCases) {
@@ -144,9 +143,8 @@ public class SimpleReportWriter implements ReportWriter {
     }
   }
 
-  private void reportOnTests(final List tests) {
-    for (final Iterator i = tests.iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+  private void reportOnTests(final List<Test> tests) {
+    for (final Test test : tests) {
       reportOnTest(test);
     }
   }

@@ -49,7 +49,7 @@ public class SplitSegment {
    * reverse of the given segment. A fraction of <code>0.0</code> returns the end point of the
    * segment; a fraction of <code>1.0</code> returns the start point of the segment.
    * 
-   * @param seg the LineSegment
+   * @param seg the LineSegmentImpl
    * @param segmentLengthFraction the fraction of the segment length along the line
    * @return the point at that distance
    */

@@ -892,7 +892,7 @@ public final class ShapefileGeometryUtil {
         final Polygon polygon = (Polygon)part;
         final LineString exterior = polygon.getExteriorRing();
         CoordinatesList exteroirPoints = CoordinatesListUtil.get(exterior);
-        final boolean exteriorClockwise = !exterior.isCCW();
+        final boolean exteriorClockwise = !exterior.isCounterClockwise();
         if (exteriorClockwise != clockwise) {
           exteroirPoints = exteroirPoints.reverse();
         }
@@ -902,7 +902,7 @@ public final class ShapefileGeometryUtil {
         for (int j = 0; j < numHoles; j++) {
           final LineString interior = polygon.getInteriorRing(j);
           CoordinatesList interiorCoords = CoordinatesListUtil.get(interior);
-          final boolean interiorClockwise = !interior.isCCW();
+          final boolean interiorClockwise = !interior.isCounterClockwise();
           if (interiorClockwise == clockwise) {
             interiorCoords = interiorCoords.reverse();
           }

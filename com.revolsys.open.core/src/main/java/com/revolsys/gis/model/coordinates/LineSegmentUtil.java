@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.gis.jts.LineSegment;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -12,6 +11,7 @@ import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.MathUtil;
@@ -33,6 +33,20 @@ public class LineSegmentUtil {
     if (!MathUtil.isNanOrInfinite(z)) {
       point.setZ(precisionModel.makePrecise(z));
     }
+  }
+
+  public static Coordinates closestPoint(final Coordinates lineStart,
+    final Coordinates lineEnd, final Coordinates point) {
+    final double factor = projectionFactor(lineStart, lineEnd, point);
+    if (factor > 0 && factor < 1) {
+      return project(null, lineStart, lineEnd, point);
+    }
+    final double dist0 = lineStart.distance(point);
+    final double dist1 = lineEnd.distance(point);
+    if (dist0 < dist1) {
+      return lineStart;
+    }
+    return lineEnd;
   }
 
   static double det(final double a, final double b, final double c,
@@ -435,10 +449,10 @@ public class LineSegmentUtil {
       final double projectionFactor = projectionFactor(lineStart, lineEnd,
         point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-        final Coordinates projectedPoint = project(2, lineStart, lineEnd,
+        Coordinates projectedPoint = project(2, lineStart, lineEnd,
           projectionFactor);
         if (precisionModel != null) {
-          precisionModel.makePrecise(projectedPoint);
+          projectedPoint = precisionModel.getPreciseCoordinates(projectedPoint);
         }
         if (projectedPoint.equals2d(point)) {
           return true;
@@ -484,9 +498,9 @@ public class LineSegmentUtil {
       final double projectionFactor = projectionFactor(lineStart, lineEnd,
         point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-        final Coordinates projectedPoint = project(2, lineStart, lineEnd,
+        Coordinates projectedPoint = project(2, lineStart, lineEnd,
           projectionFactor);
-        precisionModel.makePrecise(projectedPoint);
+        projectedPoint = precisionModel.getPreciseCoordinates(projectedPoint);
         if (projectedPoint.equals2d(point)) {
           return true;
         }
@@ -530,6 +544,19 @@ public class LineSegmentUtil {
     return MathUtil.orientedAngleBetween(angle1, angle2);
   }
 
+  public static Coordinates pointAlong(final Coordinates p0,
+    final Coordinates p1, final double segmentLengthFraction) {
+    final double x1 = p0.getX();
+    final double x2 = p1.getX();
+    final double y1 = p0.getY();
+    final double y2 = p1.getY();
+    final double x = x1 + segmentLengthFraction * (x2 - x1);
+    final double y = y1 + segmentLengthFraction * (y2 - y1);
+    final Coordinates coord = new DoubleCoordinates(x, y,
+      Coordinates.NULL_ORDINATE);
+    return coord;
+  }
+
   public static Coordinates pointAlong(
     final CoordinatesPrecisionModel precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd,
@@ -552,10 +579,13 @@ public class LineSegmentUtil {
       return point.cloneCoordinates();
     } else {
       final double r = projectionFactor(lineStart, lineEnd, point);
-      final int axisCount = CoordinatesUtil.getAxisCount(point, lineStart, lineEnd);
-      final Coordinates projectedCoordinate = project(axisCount, lineStart,
-        lineEnd, r);
-      precisionModel.makePrecise(projectedCoordinate);
+      final int axisCount = CoordinatesUtil.getAxisCount(point, lineStart,
+        lineEnd);
+      Coordinates projectedCoordinate = project(axisCount, lineStart, lineEnd,
+        r);
+      if (precisionModel != null) {
+        projectedCoordinate = precisionModel.getPreciseCoordinates(projectedCoordinate);
+      }
       if (projectedCoordinate.equals2d(lineStart)) {
         return lineStart;
       } else if (projectedCoordinate.equals2d(lineEnd)) {
@@ -579,7 +609,7 @@ public class LineSegmentUtil {
     final int axisCount = CoordinatesUtil.getAxisCount(lineStart, lineEnd);
     final Coordinates point = project(axisCount, lineStart, lineEnd, r);
     if (precisionModel != null) {
-      precisionModel.makePrecise(point);
+      return precisionModel.getPreciseCoordinates(point);
     }
 
     return point;

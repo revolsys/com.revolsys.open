@@ -46,6 +46,7 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jtstest.testbuilder.JTSTestBuilder;
 
 /**
@@ -73,7 +74,8 @@ public abstract class BoxBandTool extends IndicatorTool {
   }
 
   protected Geometry getBox() {
-    return JTSTestBuilder.getGeometryFactory().toGeometry(getEnvelope());
+    GeometryFactory r = JTSTestBuilder.getGeometryFactory();
+    return getEnvelope().toGeometry();
   }
 
   /**

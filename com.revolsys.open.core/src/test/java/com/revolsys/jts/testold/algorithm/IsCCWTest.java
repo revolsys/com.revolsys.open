@@ -36,7 +36,6 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.ParseException;

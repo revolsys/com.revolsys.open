@@ -7,7 +7,6 @@ import java.text.NumberFormat;
 
 import javax.swing.Timer;
 
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.util.Stopwatch;
 import com.revolsys.jtstest.function.GeometryFunction;
 import com.revolsys.jtstest.testbuilder.JTSTestBuilder;

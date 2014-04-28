@@ -9,6 +9,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 
 /**
  * Locates the components of a Geometry
@@ -31,7 +32,8 @@ public class ComponentLocater {
 
   private Geometry createAOI(final Coordinates queryPt, final double tolerance) {
     final BoundingBox env = new Envelope(queryPt).expand(2 * tolerance);
-    return parentGeom.getGeometryFactory().toGeometry(env);
+    GeometryFactory r = parentGeom.getGeometryFactory();
+    return env.toGeometry();
   }
 
   private void findComponents(final Stack path, final Geometry geom,

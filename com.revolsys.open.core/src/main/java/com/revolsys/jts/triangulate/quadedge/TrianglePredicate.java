@@ -35,9 +35,7 @@ package com.revolsys.jts.triangulate.quadedge;
 
 import java.util.Arrays;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.math.DD;

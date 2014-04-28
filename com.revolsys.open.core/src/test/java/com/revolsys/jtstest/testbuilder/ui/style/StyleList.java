@@ -1,11 +1,12 @@
 package com.revolsys.jtstest.testbuilder.ui.style;
 
-import java.util.*;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testbuilder.Viewport;
-import com.revolsys.jtstest.testbuilder.ui.render.*;
 
 /**
  * Contains a list of styles and allows Geometrys

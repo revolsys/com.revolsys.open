@@ -40,6 +40,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 
 /**
@@ -172,7 +173,7 @@ public class SimpleMinimumClearance {
     if (candidateValue < minClearance) {
       minClearance = candidateValue;
       minClearancePts[0] = new Coordinate(p);
-      final LineSegment seg = new LineSegment(seg0, seg1);
+      final LineSegment seg = new LineSegmentImpl(seg0, seg1);
       minClearancePts[1] = new Coordinate(seg.closestPoint(p));
     }
   }

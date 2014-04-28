@@ -67,9 +67,9 @@ public class TestRun implements Runnable, MapSerializer {
 
   private GeometryFactory geometryFactory;
 
-  private GeometryOperation geometryOperation = null;
+  private GeometryOperation geometryOperation = TestReader.GEOMETRY_FUNCTION_OPERATION;
 
-  private ResultMatcher resultMatcher = null;
+  private ResultMatcher resultMatcher = TestReader.EQUALITY_RESULT_MATCHER;
 
   private int runIndex;
 
@@ -155,23 +155,16 @@ public class TestRun implements Runnable, MapSerializer {
   }
 
   public GeometryOperation getGeometryOperation() {
-    // use the main one if it was user-specified or this run does not have an op
-    // specified
-    if (TopologyTestApp.isGeometryOperationSpecified()
-      || geometryOperation == null) {
-      return TopologyTestApp.getGeometryOperation();
-    }
-
     return geometryOperation;
   }
 
-  public ResultMatcher getResultMatcher() {
-    // use the main one if it was user-specified or this run does not have an op
-    // specified
-    if (TopologyTestApp.isResultMatcherSpecified() || resultMatcher == null) {
-      return TopologyTestApp.getResultMatcher();
-    }
+  public Map<String, Object> getProperties() {
+    final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+    MapSerializerUtil.add(properties, "geometryFactory", geometryFactory);
+    return properties;
+  }
 
+  public ResultMatcher getResultMatcher() {
     return resultMatcher;
   }
 
@@ -227,12 +220,6 @@ public class TestRun implements Runnable, MapSerializer {
 
     MapSerializerUtil.add(map, "tests", testCases, Collections.emptyList());
     return map;
-  }
-
-  public Map<String, Object> getProperties() {
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>();
-    MapSerializerUtil.add(properties, "geometryFactory", geometryFactory);
-    return properties;
   }
 
   @Override

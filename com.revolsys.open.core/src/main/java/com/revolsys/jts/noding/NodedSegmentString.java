@@ -33,14 +33,13 @@
 package com.revolsys.jts.noding;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.GeometryFactory;
 
 /**
  * Represents a list of contiguous line segments,
@@ -61,8 +60,9 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segStrings a Collection of NodedSegmentStrings
    * @return a Collection of NodedSegmentStrings representing the substrings
    */
-  public static List getNodedSubstrings(final Collection segStrings) {
-    final List resultEdgelist = new ArrayList();
+  public static List<NodedSegmentString> getNodedSubstrings(
+    final Collection<NodedSegmentString> segStrings) {
+    final List<NodedSegmentString> resultEdgelist = new ArrayList<>();
     getNodedSubstrings(segStrings, resultEdgelist);
     return resultEdgelist;
   }
@@ -73,28 +73,28 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segStrings a Collection of NodedSegmentStrings
    * @param resultEdgelist a List which will collect the NodedSegmentStrings representing the substrings
    */
-  public static void getNodedSubstrings(final Collection segStrings,
-    final Collection resultEdgelist) {
-    for (final Iterator i = segStrings.iterator(); i.hasNext();) {
-      final NodedSegmentString ss = (NodedSegmentString)i.next();
+  public static void getNodedSubstrings(
+    final Collection<NodedSegmentString> segStrings,
+    final Collection<NodedSegmentString> resultEdgelist) {
+    for (final NodedSegmentString ss : segStrings) {
       ss.getNodeList().addSplitEdges(resultEdgelist);
     }
   }
 
   private final SegmentNodeList nodeList = new SegmentNodeList(this);
 
-  private final Coordinates[] pts;
+  private final Coordinates[] points;
 
   private Object data;
 
   /**
    * Creates a new segment string from a list of vertices.
    *
-   * @param pts the vertices of the segment string
+   * @param points the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
   public NodedSegmentString(final Coordinates[] pts, final Object data) {
-    this.pts = pts;
+    this.points = pts;
     this.data = data;
   }
 
@@ -136,8 +136,8 @@ public class NodedSegmentString implements NodableSegmentString {
     // Debug.println("edge intpt: " + intPt + " dist: " + dist);
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
-    if (nextSegIndex < pts.length) {
-      final Coordinates nextPt = pts[nextSegIndex];
+    if (nextSegIndex < points.length) {
+      final Coordinates nextPt = points[nextSegIndex];
       // Debug.println("next pt: " + nextPt);
 
       // Normalize segment index if intPt falls on vertex
@@ -167,12 +167,12 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public Coordinates getCoordinate(final int i) {
-    return pts[i];
+    return points[i];
   }
 
   @Override
   public Coordinates[] getCoordinates() {
-    return pts;
+    return points;
   }
 
   /**
@@ -197,7 +197,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @return the octant of the segment at the vertex
    */
   public int getSegmentOctant(final int index) {
-    if (index == pts.length - 1) {
+    if (index == points.length - 1) {
       return -1;
     }
     return safeOctant(getCoordinate(index), getCoordinate(index + 1));
@@ -206,7 +206,7 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public boolean isClosed() {
-    return pts[0].equals(pts[pts.length - 1]);
+    return points[0].equals(points[points.length - 1]);
   }
 
   private int safeOctant(final Coordinates p0, final Coordinates p1) {
@@ -228,11 +228,12 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public int size() {
-    return pts.length;
+    return points.length;
   }
 
   @Override
   public String toString() {
-    return Arrays.toString(pts);
+    return GeometryFactory.getFactory().lineString(points).toString() + "\t"
+      + data;
   }
 }

@@ -339,7 +339,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     try {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox queryBoundingBox = boundingBox.convert(geometryFactory);
-      if (this.boundingBox.contains(queryBoundingBox)) {
+      if (this.boundingBox.covers(queryBoundingBox)) {
         return (List)getIndex().queryIntersects(queryBoundingBox);
       } else {
         final List<LayerDataObject> readRecords = getRecordsFromDataStore(queryBoundingBox);
@@ -429,8 +429,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     } else {
       synchronized (this.sync) {
         final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
-        if (!this.boundingBox.contains(boundingBox)
-          && !this.loadingBoundingBox.contains(boundingBox)) {
+        if (!this.boundingBox.covers(boundingBox)
+          && !this.loadingBoundingBox.covers(boundingBox)) {
           if (this.loadingWorker != null) {
             this.loadingWorker.cancel(true);
           }
@@ -630,7 +630,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       index = getIndex();
     }
     List<LayerDataObject> queryObjects;
-    if (loadedBoundingBox.contains(boundingBox)) {
+    if (loadedBoundingBox.covers(boundingBox)) {
       queryObjects = (List)index.query(convertedBoundingBox);
     } else {
       queryObjects = getRecordsFromDataStore(convertedBoundingBox);

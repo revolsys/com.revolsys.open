@@ -587,16 +587,6 @@ public class TestBuilderModel {
     getGeometryEditModel().setTestCase(testCaseEdit);
   }
 
-  private Coordinates pickOffset(final Geometry a, final Geometry b) {
-    if (a != null && !a.isEmpty()) {
-      return a.getCoordinateArray()[0];
-    }
-    if (b != null && !b.isEmpty()) {
-      return b.getCoordinateArray()[0];
-    }
-    return null;
-  }
-
   public void prevCase() {
     // since current test case = tcListi.prev, to
     // display the case *before* the current one must move back twice

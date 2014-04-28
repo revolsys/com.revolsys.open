@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -36,18 +34,25 @@ package com.revolsys.jts.index.chain;
 
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
+
 /**
  * The action for the internal iterator for performing
  * envelope select queries on a MonotoneChain
  *
  * @version 1.7
  */
-public class MonotoneChainSelectAction
-{
+public class MonotoneChainSelectAction {
   // these envelopes are used during the MonotoneChain search process
   Envelope tempEnv1 = new Envelope();
 
-  LineSegment selectedSegment = new LineSegment();
+  /**
+   * This is a convenience method which can be overridden to obtain the actual
+   * line segment which is selected.
+   * 
+   * @param seg
+   */
+  public void select(final LineSegment seg) {
+  }
 
   /**
    * This method is overridden 
@@ -57,20 +62,9 @@ public class MonotoneChainSelectAction
    * @param mc the parent chain
    * @param startIndex the index of the start vertex of the segment being processed
    */
-  public void select(MonotoneChain mc, int startIndex)
-  {
-    mc.getLineSegment(startIndex, selectedSegment);
+  public void select(final MonotoneChain mc, final int startIndex) {
+    final LineSegment selectedSegment = mc.getLineSegment(startIndex);
     // call this routine in case select(segmenet) was overridden
     select(selectedSegment);
-  }
-
-  /**
-   * This is a convenience method which can be overridden to obtain the actual
-   * line segment which is selected.
-   * 
-   * @param seg
-   */
-  public void select(LineSegment seg)
-  {
   }
 }

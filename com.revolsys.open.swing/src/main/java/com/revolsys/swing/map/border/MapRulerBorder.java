@@ -28,9 +28,10 @@ import javax.swing.border.AbstractBorder;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.jts.LineSegment;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
@@ -244,15 +245,22 @@ public class MapRulerBorder extends AbstractBorder implements
     try {
       int textY;
       LineSegment line;
+
+      final double x1 = boundingBox.getMinX();
+      final double x2 = boundingBox.getMaxX();
+      double y0;
       if (top) {
         g.translate(this.rulerSize, 0);
         textY = this.labelHeight;
-        line = boundingBox.getNorthLine();
+        y0 = boundingBox.getMaxY();
       } else {
         g.translate(this.rulerSize, height - this.rulerSize);
         textY = this.rulerSize - 3;
-        line = boundingBox.getSouthLine();
+        y0 = boundingBox.getMinY();
       }
+      line = new LineSegmentImpl(boundingBox.getGeometryFactory(), 2, x1, y0,
+        x2, y0);
+
       line = line.convert(this.rulerGeometryFactory);
 
       g.setClip(0, 0, width - 2 * this.rulerSize, this.rulerSize);
@@ -345,15 +353,21 @@ public class MapRulerBorder extends AbstractBorder implements
     try {
       int textX;
       LineSegment line;
+      final double y1 = boundingBox.getMinY();
+      final double y2 = boundingBox.getMaxY();
+      double x0;
       if (left) {
         g.translate(0, -this.rulerSize);
         textX = this.labelHeight;
-        line = boundingBox.getWestLine();
+        x0 = boundingBox.getMinX();
       } else {
         g.translate(width - this.rulerSize, -this.rulerSize);
         textX = this.rulerSize - 3;
-        line = boundingBox.getEastLine();
+        x0 = boundingBox.getMaxX();
       }
+      line = new LineSegmentImpl(boundingBox.getGeometryFactory(), 2, x0, y1,
+        x0, y2);
+
       line = line.convert(this.rulerGeometryFactory);
 
       g.setClip(0, this.rulerSize * 2, this.rulerSize, height - 2

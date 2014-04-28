@@ -38,6 +38,7 @@ import junit.textui.TestRunner;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -74,7 +75,7 @@ public class LineSegmentTest extends TestCase {
   void checkOffset(final double x0, final double y0, final double x1,
     final double y1, final double segFrac, final double offset,
     final double expectedX, final double expectedY) {
-    final LineSegment seg = new LineSegment(x0, y0, x1, y1);
+    final LineSegment seg = new LineSegmentImpl(x0, y0, x1, y1);
     final Coordinates p = seg.pointAlongOffset(segFrac, offset);
 
     assertTrue(equalsTolerance(new Coordinate((double)expectedX, expectedY,
@@ -83,14 +84,14 @@ public class LineSegmentTest extends TestCase {
 
   void checkOrientationIndex(final double x0, final double y0, final double x1,
     final double y1, final double px, final double py, final int expectedOrient) {
-    final LineSegment seg = new LineSegment(x0, y0, x1, y1);
+    final LineSegment seg = new LineSegmentImpl(x0, y0, x1, y1);
     checkOrientationIndex(seg, px, py, expectedOrient);
   }
 
   void checkOrientationIndex(final LineSegment seg, final double s0x,
     final double s0y, final double s1x, final double s1y,
     final int expectedOrient) {
-    final LineSegment seg2 = new LineSegment(s0x, s0y, s1x, s1y);
+    final LineSegment seg2 = new LineSegmentImpl(s0x, s0y, s1x, s1y);
     final int orient = seg.orientationIndex(seg2);
     assertTrue(orient == expectedOrient);
   }
@@ -121,7 +122,7 @@ public class LineSegmentTest extends TestCase {
   }
 
   public void testOrientationIndexCoordinate() {
-    final LineSegment seg = new LineSegment(0, 0, 10, 10);
+    final LineSegment seg = new LineSegmentImpl(0, 0, 10, 10);
     checkOrientationIndex(seg, 10, 11, 1);
     checkOrientationIndex(seg, 10, 9, -1);
 
@@ -135,7 +136,7 @@ public class LineSegmentTest extends TestCase {
   }
 
   public void testOrientationIndexSegment() {
-    final LineSegment seg = new LineSegment(100, 100, 110, 110);
+    final LineSegment seg = new LineSegmentImpl(100, 100, 110, 110);
 
     checkOrientationIndex(seg, 100, 101, 105, 106, 1);
     checkOrientationIndex(seg, 100, 99, 105, 96, -1);
@@ -146,11 +147,11 @@ public class LineSegmentTest extends TestCase {
 
   public void testProjectionFactor() {
     // zero-length line
-    final LineSegment seg = new LineSegment(10, 0, 10, 0);
+    final LineSegment seg = new LineSegmentImpl(10, 0, 10, 0);
     assertTrue(Double.isNaN(seg.projectionFactor(new Coordinate((double)11.0, 0,
       Coordinates.NULL_ORDINATE))));
 
-    final LineSegment seg2 = new LineSegment(10, 0, 20, 0);
+    final LineSegment seg2 = new LineSegmentImpl(10, 0, 20, 0);
     assertTrue(seg2.projectionFactor(new Coordinate((double)11.0, 0,
       Coordinates.NULL_ORDINATE)) == 0.1);
 

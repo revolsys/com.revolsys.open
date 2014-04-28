@@ -59,13 +59,14 @@ import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
 public class VoronoiDiagramBuilder {
   private static Geometry clipGeometryCollection(final Geometry geom,
     final BoundingBox clipEnv) {
-    final Geometry clipPoly = geom.getGeometryFactory().toGeometry(clipEnv);
+    GeometryFactory r = geom.getGeometryFactory();
+    final Geometry clipPoly = clipEnv.toGeometry();
     final List<Geometry> clipped = new ArrayList<Geometry>();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry g = geom.getGeometry(i);
       Geometry result = null;
       // don't clip unless necessary
-      if (clipEnv.contains(g.getBoundingBox())) {
+      if (clipEnv.covers(g.getBoundingBox())) {
         result = g;
       } else if (clipEnv.intersects(g.getBoundingBox())) {
         result = clipPoly.intersection(g);

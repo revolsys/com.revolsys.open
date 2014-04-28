@@ -81,8 +81,9 @@ public class SplitCrossingEdgesVisitor<T> extends
         final Coordinates intersection = LineStringUtil.getCrossingIntersection(
           line, crossLine);
         if (intersection != null) {
-          graph.getPrecisionModel().makePrecise(intersection);
-          final Node<T> node = graph.getNode(intersection);
+          final Coordinates point = graph.getPrecisionModel()
+            .getPreciseCoordinates(intersection);
+          final Node<T> node = graph.getNode(point);
           splitEdgesCloseToNodeVisitor.visit(node);
         }
       }

@@ -35,7 +35,7 @@ package com.revolsys.jtstest.function;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.geom.util.GeometryMapper;
@@ -94,11 +94,11 @@ public class TriangleFunctions {
     final Coordinates cc = Triangle.circumcentre(pts[0], pts[1], pts[2]);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final LineString[] line = new LineString[3];
-    final Coordinates p0 = (new LineSegment(pts[1], pts[2])).closestPoint(cc);
+    final Coordinates p0 = (new LineSegmentImpl(pts[1], pts[2])).closestPoint(cc);
     line[0] = geomFact.lineString(p0, cc);
-    final Coordinates p1 = (new LineSegment(pts[0], pts[2])).closestPoint(cc);
+    final Coordinates p1 = (new LineSegmentImpl(pts[0], pts[2])).closestPoint(cc);
     line[1] = geomFact.lineString(p1, cc);
-    final Coordinates p2 = (new LineSegment(pts[0], pts[1])).closestPoint(cc);
+    final Coordinates p2 = (new LineSegmentImpl(pts[0], pts[1])).closestPoint(cc);
     line[2] = geomFact.lineString(p2, cc);
     return geomFact.multiLineString(line);
   }

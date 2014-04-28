@@ -33,10 +33,9 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -116,37 +115,39 @@ class LengthIndexOfPoint {
 
     double ptMeasure = minIndex;
     double segmentStartMeasure = 0.0;
-    final LineSegment seg = new LineSegment();
     final LinearIterator it = new LinearIterator(linearGeom);
     while (it.hasNext()) {
       if (!it.isEndOfLine()) {
-        seg.setP0(it.getSegmentStart());
-        seg.setP1(it.getSegmentEnd());
-        final double segDistance = seg.distance(inputPt);
-        final double segMeasureToPt = segmentNearestMeasure(seg, inputPt,
-          segmentStartMeasure);
+        final Coordinates p0 = it.getSegmentStart();
+        final Coordinates p1 = it.getSegmentEnd();
+        final double length = p0.distance(p1);
+
+        final double segDistance = LineSegmentUtil.distance(p0, p1, inputPt);
+        final double segMeasureToPt = segmentNearestMeasure(p0, p1, inputPt,
+          segmentStartMeasure, length);
         if (segDistance < minDistance && segMeasureToPt > minIndex) {
           ptMeasure = segMeasureToPt;
           minDistance = segDistance;
         }
-        segmentStartMeasure += seg.getLength();
+        segmentStartMeasure += length;
       }
       it.next();
     }
     return ptMeasure;
   }
 
-  private double segmentNearestMeasure(final LineSegment seg,
-    final Coordinates inputPt, final double segmentStartMeasure) {
+  private double segmentNearestMeasure(final Coordinates p0,
+    final Coordinates p1, final Coordinates inputPt,
+    final double segmentStartMeasure, final double length) {
     // found new minimum, so compute location distance of point
-    final double projFactor = seg.projectionFactor(inputPt);
+    final double projFactor = LineSegmentUtil.projectionFactor(p0, p1, inputPt);
     if (projFactor <= 0.0) {
       return segmentStartMeasure;
     }
     if (projFactor <= 1.0) {
-      return segmentStartMeasure + projFactor * seg.getLength();
+      return segmentStartMeasure + projFactor * length;
     }
     // projFactor > 1.0
-    return segmentStartMeasure + seg.getLength();
+    return segmentStartMeasure + length;
   }
 }

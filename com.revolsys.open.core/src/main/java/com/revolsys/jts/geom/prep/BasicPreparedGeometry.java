@@ -52,10 +52,10 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  */
 class BasicPreparedGeometry implements PreparedGeometry {
-  private final Geometry baseGeom;
+  private final Geometry geometry;
 
   public BasicPreparedGeometry(final Geometry geometry) {
-    this.baseGeom = geometry;
+    this.geometry = geometry;
   }
 
   /**
@@ -63,7 +63,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   @Override
   public boolean contains(final Geometry geometry) {
-    return baseGeom.contains(geometry);
+    return this.geometry.contains(geometry);
   }
 
   /**
@@ -74,13 +74,12 @@ class BasicPreparedGeometry implements PreparedGeometry {
     // since raw relate is used, provide some optimizations
 
     // short-circuit test
-    if (!baseGeom.getBoundingBox()
-      .contains(geometry.getBoundingBox())) {
+    if (!this.geometry.getBoundingBox().covers(geometry.getBoundingBox())) {
       return false;
     }
 
     // otherwise, compute using relate mask
-    return baseGeom.relate(geometry, "T**FF*FF*");
+    return this.geometry.relate(geometry, "T**FF*FF*");
   }
 
   /**
@@ -88,7 +87,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   @Override
   public boolean coveredBy(final Geometry geometry) {
-    return baseGeom.coveredBy(geometry);
+    return this.geometry.coveredBy(geometry);
   }
 
   /**
@@ -96,7 +95,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   @Override
   public boolean covers(final Geometry geometry) {
-    return baseGeom.covers(geometry);
+    return this.geometry.covers(geometry);
   }
 
   /**
@@ -104,7 +103,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   @Override
   public boolean crosses(final Geometry geometry) {
-    return baseGeom.crosses(geometry);
+    return this.geometry.crosses(geometry);
   }
 
   /**
@@ -125,7 +124,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * @return true if g is contained in this envelope
    */
   protected boolean envelopeCovers(final Geometry geometry) {
-    if (!baseGeom.getBoundingBox().covers(geometry.getBoundingBox())) {
+    if (!this.geometry.getBoundingBox().covers(geometry.getBoundingBox())) {
       return false;
     }
     return true;
@@ -139,8 +138,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * @return true if the envelopes intersect
    */
   protected boolean envelopesIntersect(final Geometry geometry) {
-    if (!baseGeom.getBoundingBox().intersects(
-      geometry.getBoundingBox())) {
+    if (!this.geometry.getBoundingBox().intersects(geometry.getBoundingBox())) {
       return false;
     }
     return true;
@@ -148,7 +146,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
 
   @Override
   public Geometry getGeometry() {
-    return baseGeom;
+    return geometry;
   }
 
   /**
@@ -162,7 +160,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   public List<Coordinates> getRepresentativePoints() {
     final List<Coordinates> points = new ArrayList<Coordinates>();
-    for (final Vertex vertex : baseGeom.vertices()) {
+    for (final Vertex vertex : geometry.vertices()) {
       points.add(vertex.cloneCoordinates());
     }
     return points;
@@ -173,7 +171,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   @Override
   public boolean intersects(final Geometry geometry) {
-    return baseGeom.intersects(geometry);
+    return geometry.intersects(geometry);
   }
 
   /**
@@ -187,7 +185,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   public boolean isAnyTargetComponentInTest(final Geometry testGeom) {
     final PointLocator locator = new PointLocator();
-    for (final Vertex vertex : baseGeom.vertices()) {
+    for (final Vertex vertex : geometry.vertices()) {
       if (locator.intersects(vertex, testGeom)) {
         return true;
       }
@@ -200,12 +198,12 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   @Override
   public boolean overlaps(final Geometry geometry) {
-    return baseGeom.overlaps(geometry);
+    return geometry.overlaps(geometry);
   }
 
   @Override
   public String toString() {
-    return baseGeom.toString();
+    return geometry.toString();
   }
 
   /**
@@ -213,7 +211,7 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   @Override
   public boolean touches(final Geometry geometry) {
-    return baseGeom.touches(geometry);
+    return geometry.touches(geometry);
   }
 
   /**
@@ -221,6 +219,6 @@ class BasicPreparedGeometry implements PreparedGeometry {
    */
   @Override
   public boolean within(final Geometry geometry) {
-    return baseGeom.within(geometry);
+    return geometry.within(geometry);
   }
 }
