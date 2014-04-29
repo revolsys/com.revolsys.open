@@ -10,7 +10,8 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 
 public class TestDirectory extends TestSuite {
 
-  public TestDirectory(final File directory, final String name) {
+  public TestDirectory(final File directory, final String name)
+    throws Throwable {
     super(name);
     final TestReader testReader = TopologyTest.getTestReader();
     int runIndex = 1;
@@ -30,4 +31,8 @@ public class TestDirectory extends TestSuite {
     }
   }
 
+  @Override
+  public String toString() {
+    return getName();
+  }
 }

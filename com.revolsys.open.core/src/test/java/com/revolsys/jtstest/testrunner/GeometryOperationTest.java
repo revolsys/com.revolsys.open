@@ -84,17 +84,6 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
 
   private final Exception exception = null;
 
-  // @SuppressWarnings("unchecked")
-  // public GeometryOperationTest(final TestCase testCase, final int testIndex,
-  // final Map<String, Object> map) {
-  // this.testCase = testCase;
-  // this.testIndex = testIndex;
-  // this.testDescription = (String)map.get("description");
-  // this.operation = (String)map.get("operation");
-  // this.geometryIndex = (String)map.get("geometryIndex");
-  // this.arguments = (List<String>)map.get("arguments");
-  // }
-
   /**
    *  Creates a Test with the given description. The given operation (e.g.
    *  "equals") will be performed, the expected result of which is <tt>expectedResult</tt>.
@@ -116,6 +105,17 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
     this.arguments = new ArrayList<>(arguments);
     this.testCase = testCase;
   }
+
+  // @SuppressWarnings("unchecked")
+  // public GeometryOperationTest(final TestCase testCase, final int testIndex,
+  // final Map<String, Object> map) {
+  // this.testCase = testCase;
+  // this.testIndex = testIndex;
+  // this.testDescription = (String)map.get("description");
+  // this.operation = (String)map.get("operation");
+  // this.geometryIndex = (String)map.get("geometryIndex");
+  // this.arguments = (List<String>)map.get("arguments");
+  // }
 
   public boolean computePassed() throws Exception {
     final Result actualResult = getActualResult();
@@ -237,7 +237,14 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
 
   @Override
   protected void runTest() throws Throwable {
-    passed = computePassed();
+    try {
+      passed = computePassed();
+    } catch (final Throwable e) {
+      System.err.println(testCase.getTestRun() + "\t" + testCase + "\t"
+        + getName());
+      e.printStackTrace();
+      throw e;
+    }
   }
 
   public void setArgument(final int i, final String value) {
@@ -280,7 +287,7 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
 
   @Override
   public String toString() {
-    return toMap().toString();
+    return getName() + "\n";
   }
 
   public String toXml() {

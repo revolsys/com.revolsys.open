@@ -186,7 +186,7 @@ public class TestCase extends junit.framework.TestSuite implements
 
   @Override
   public String toString() {
-    return toMap().toString();
+    return getName();
   }
 
   public String toXml() {

@@ -37,7 +37,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -72,12 +71,6 @@ public class TestReader {
   public static final GeometryFunctionOperation GEOMETRY_FUNCTION_OPERATION = new GeometryFunctionOperation(
     GEOMETRY_FUNCTION_REGISTRY);
 
-  private static final String TAG_geometryOperation = "geometryOperation";
-
-  private static final String TAG_resultMatcher = "resultMatcher";
-
-  private final List<String> parsingProblems = new ArrayList<>();
-
   private GeometryFactory geometryFactory;
 
   private WKTOrWKBReader wktorbReader;
@@ -105,10 +98,6 @@ public class TestReader {
     return absoluteWktFile;
   }
 
-  public void clearParsingProblems() {
-    parsingProblems.clear();
-  }
-
   private PrecisionModel createPrecisionModel(
     final Element precisionModelElement) throws TestParseException {
     final Attribute scaleAttribute = precisionModelElement.getAttribute("scale");
@@ -127,7 +116,8 @@ public class TestReader {
     return new PrecisionModel(scale);
   }
 
-  public TestFile createTestRun(final File testFile, final int runIndex) {
+  public TestFile createTestRun(final File testFile, final int runIndex)
+    throws Throwable {
     try {
       final SAXBuilder builder = new LineNumberSAXBuilder();
       final Document document = builder.build(new FileInputStream(testFile));
@@ -137,9 +127,10 @@ public class TestReader {
           + runElement.getName() + ">");
       }
       return parseTestRun(runElement, testFile, runIndex);
+    } catch (final IllegalArgumentException e) {
+      throw e;
     } catch (final Exception e) {
-      parsingProblems.add(testFile + "\tERROR=" + e.toString());
-      return null;
+      throw new IllegalArgumentException("Error parsing " + testFile, e);
     }
   }
 
@@ -166,10 +157,6 @@ public class TestReader {
       return null;
     }
     return o;
-  }
-
-  public List<String> getParsingProblems() {
-    return Collections.unmodifiableList(parsingProblems);
   }
 
   public boolean isBooleanFunction(final String name) {
@@ -203,7 +190,7 @@ public class TestReader {
    */
   private GeometryOperation parseGeometryOperation(final Element runElement)
     throws TestParseException {
-    final Element goElement = runElement.getChild(TAG_geometryOperation);
+    final Element goElement = runElement.getChild("geometryOperation");
     if (goElement == null) {
       return GEOMETRY_FUNCTION_OPERATION;
     }
@@ -262,7 +249,7 @@ public class TestReader {
    */
   private ResultMatcher parseResultMatcher(final Element runElement)
     throws TestParseException {
-    final Element goElement = runElement.getChild(TAG_resultMatcher);
+    final Element goElement = runElement.getChild("resultMatcher");
     if (goElement == null) {
       return EQUALITY_RESULT_MATCHER;
     }
@@ -281,7 +268,7 @@ public class TestReader {
    */
   private List<TestCase> parseTestCases(final List caseElements,
     final File testFile, final TestFile testRun, final double tolerance)
-    throws TestParseException {
+    throws Throwable {
     wktorbReader = new WKTOrWKBReader(geometryFactory);
     final Vector<TestCase> testCases = new Vector<>();
     int caseIndex = 0;
@@ -315,8 +302,9 @@ public class TestReader {
         }
         testCases.add(testCase);
       } catch (final Exception e) {
-        parsingProblems.add("An exception occurred while parsing <case> "
-          + caseIndex + " in " + testFile + ": " + e.toString());
+        throw new IllegalArgumentException(
+          "An exception occurred while parsing <case> " + caseIndex + " in "
+            + testFile, e);
       }
     }
     return testCases;
@@ -326,7 +314,7 @@ public class TestReader {
    *  Creates a TestRun from the <run> Element.
    */
   private TestFile parseTestRun(final Element runElement, final File testFile,
-    final int runIndex) throws TestParseException {
+    final int runIndex) throws Throwable {
 
     // ----------- <workspace> (optional) ------------------
     File workspace = null;
@@ -366,8 +354,8 @@ public class TestReader {
     // --------------- build TestRun ---------------------
     final String description = descElement != null ? descElement.getTextTrim()
       : "";
-    final TestFile testRun = new TestFile(description, runIndex, geometryFactory,
-      geomOp, resultMatcher, testFile);
+    final TestFile testRun = new TestFile(description, runIndex,
+      geometryFactory, geomOp, resultMatcher, testFile);
     testRun.setWorkspace(workspace);
     final List caseElements = runElement.getChildren("case");
     if (caseElements.size() == 0) {
@@ -385,7 +373,7 @@ public class TestReader {
    */
   private List<GeometryOperationTest> parseTests(final List testElements,
     final int caseIndex, final File testFile, final TestCase testCase,
-    final double tolerance) throws TestParseException {
+    final double tolerance) throws Throwable {
     final List<GeometryOperationTest> tests = new ArrayList<>();
     int testIndex = 0;
     for (final Iterator i = testElements.iterator(); i.hasNext();) {
@@ -430,9 +418,9 @@ public class TestReader {
 
         tests.add(test);
       } catch (final Exception e) {
-        parsingProblems.add("An exception occurred while parsing <test> "
-          + testIndex + " in <case> " + caseIndex + " in " + testFile + ": "
-          + e.toString() + "\n" + StringUtil.getStackTrace(e));
+        throw new IllegalArgumentException(
+          "An exception occurred while parsing <test> " + testIndex
+            + " in <case> " + caseIndex + " in " + testFile, e);
       }
     }
     return tests;

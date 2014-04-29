@@ -222,7 +222,6 @@ public class TestFile extends TestSuite implements MapSerializer {
 
   @Override
   public String toString() {
-    return toMap().toString();
+    return getName();
   }
-
 }
