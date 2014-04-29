@@ -461,6 +461,10 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
     return getX(0) == getX(1);
   }
 
+  public boolean isWithinDistance(final Coordinates point, final double distance) {
+    return distance(point) <= distance;
+  }
+
   /**
    * Computes the intersection point of the lines of infinite extent defined
    * by two line segments (if there is one).

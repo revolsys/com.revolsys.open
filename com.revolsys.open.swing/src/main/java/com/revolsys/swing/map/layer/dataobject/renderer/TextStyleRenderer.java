@@ -13,6 +13,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -228,8 +229,6 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
         try {
           graphics.setBackground(Color.BLACK);
           style.setTextStyle(viewport, graphics);
-          graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
 
           final double x = point.getX();
           final double y = point.getY();
@@ -270,7 +269,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {
-            dy -= maxHeight / 2 + 10;
+            dy -= maxHeight / 2;
           } else {
             dy -= maxHeight;
           }
@@ -327,11 +326,11 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             if (Math.abs(orientation) > 90) {
               graphics.rotate(Math.PI, maxWidth / 2, -height / 4);
             }
-            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-              RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
             final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
               style.getTextHaloRadius());
             if (textHaloRadius > 0) {
+              graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
               final Stroke savedStroke = graphics.getStroke();
               final Stroke outlineStroke = new BasicStroke(
                 (float)textHaloRadius, BasicStroke.CAP_BUTT,
@@ -349,11 +348,17 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
             final Color textBoxColor = style.getTextBoxColor();
             if (textBoxColor != null) {
-              graphics.setColor(textBoxColor);
-              graphics.fill(new Rectangle2D.Double(bounds.getX() - 2,
-                bounds.getY() - 1, width + 4, height + 2));
+              graphics.setPaint(textBoxColor);
+              final double cornerSize = Math.max(height / 2, 5);
+              final RoundRectangle2D.Double box = new RoundRectangle2D.Double(
+                bounds.getX() - 3, bounds.getY() - 1, width + 6, height + 2,
+                cornerSize, cornerSize);
+              graphics.fill(box);
             }
-
+            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+              RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+              RenderingHints.VALUE_ANTIALIAS_ON);
             graphics.setColor(style.getTextFill());
             graphics.drawString(line, (float)0, (float)0);
             graphics.setTransform(lineTransform);

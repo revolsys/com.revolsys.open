@@ -248,6 +248,7 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   public void setTextFaceName(final String textFaceName) {
     this.textFaceName = textFaceName;
+    this.font = null;
   }
 
   public void setTextFill(final Color fill) {
@@ -318,6 +319,7 @@ public class TextStyle implements MapSerializer, Cloneable {
   public void setTextSize(final Measure<Length> textSize) {
     this.textSizeMeasure = MarkerStyle.getWithDefault(textSize,
       MarkerStyle.TEN_PIXELS);
+    this.font = null;
   }
 
   public synchronized void setTextStyle(final Viewport2D viewport,
