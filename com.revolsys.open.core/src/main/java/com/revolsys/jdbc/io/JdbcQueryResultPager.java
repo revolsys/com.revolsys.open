@@ -131,7 +131,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
   @Override
   public int getEndIndex() {
     if (pageNumber == getNumPages()) {
-      return numResults;
+      return getNumResults();
     } else {
       return (pageNumber + 1) * pageSize;
     }
@@ -230,7 +230,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    */
   @Override
   public int getStartIndex() {
-    if (numResults == 0) {
+    if (getNumResults() == 0) {
       return 0;
     } else {
       return (pageNumber * pageSize) + 1;
@@ -298,6 +298,10 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     return pageNumber == getNumPages();
   }
 
+  protected void setNumResults(final int numResults) {
+    this.numResults = numResults;
+  }
+
   /**
    * Set the current page number.
    * 
@@ -315,6 +319,18 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     updateResults();
   }
 
+  @Override
+  public void setPageNumberAndSize(final int pageSize, final int pageNumber) {
+    if (pageNumber <= 0) {
+      this.pageNumber = 0;
+    } else {
+      this.pageNumber = pageNumber - 1;
+    }
+    this.pageSize = pageSize;
+    updateNumPages();
+    updateResults();
+  }
+
   /**
    * Set the number of objects per page.
    * 
@@ -325,6 +341,10 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     this.pageSize = pageSize;
     updateNumPages();
     updateResults();
+  }
+
+  protected void setResults(final List<DataObject> results) {
+    this.results = results;
   }
 
   protected void updateNumPages() {

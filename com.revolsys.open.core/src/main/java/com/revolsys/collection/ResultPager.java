@@ -31,7 +31,8 @@ import java.util.List;
  * @author Paul Austin
  * @param <T> The type of object to page.
  */
-public interface ResultPager<T> {
+public interface ResultPager<T> extends AutoCloseable {
+  @Override
   void close();
 
   /**
@@ -131,6 +132,8 @@ public interface ResultPager<T> {
    * @param pageNumber The current page number.
    */
   void setPageNumber(int pageNumber);
+
+  void setPageNumberAndSize(int pageSize, int pageNumber);
 
   /**
    * Set the number of objects per page.

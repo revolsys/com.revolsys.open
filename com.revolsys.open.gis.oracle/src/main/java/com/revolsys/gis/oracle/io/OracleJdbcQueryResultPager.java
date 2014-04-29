@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -22,87 +22,9 @@ import com.revolsys.jdbc.io.JdbcQueryResultPager;
 
 public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
-  private Integer numResults;
-
-  private List<DataObject> results = null;
-
   public OracleJdbcQueryResultPager(final JdbcDataObjectStore dataStore,
     final Map<String, Object> properties, final Query query) {
     super(dataStore, properties, query);
-  }
-
-  @Override
-  public List<DataObject> getList() {
-    synchronized (this) {
-      if (this.results == null) {
-        final ArrayList<DataObject> results = new ArrayList<DataObject>();
-        final int pageSize = getPageSize();
-        final int pageNumber = getPageNumber();
-        if (pageNumber != -1) {
-          String sql = getSql();
-
-          final int startRowNum = (pageNumber - 1) * pageSize + 1;
-          final int endRowNum = startRowNum + pageSize - 1;
-          sql = "SELECT * FROM ( SELECT  T2.*, ROWNUM TROWNUM FROM ( " + sql
-            + ") T2 ) WHERE TROWNUM BETWEEN " + startRowNum + " AND "
-            + endRowNum;
-
-          final DataSource dataSource = getDataSource();
-          Connection connection = getConnection();
-          if (dataSource != null) {
-            connection = JdbcUtils.getConnection(dataSource);
-          }
-          try {
-            final JdbcDataObjectStore dataStore = getDataStore();
-            final DataObjectFactory dataObjectFactory = getDataObjectFactory();
-            final DataObjectMetaData metaData = getMetaData();
-            final List<Attribute> attributes = metaData.getAttributes();
-
-            final PreparedStatement statement = connection.prepareStatement(sql);
-            try {
-              final ResultSet resultSet = JdbcQueryIterator.getResultSet(
-                metaData, statement, getQuery());
-              try {
-                if (resultSet.next()) {
-                  int i = 0;
-                  do {
-                    final DataObject object = JdbcQueryIterator.getNextObject(
-                      dataStore, metaData, attributes, dataObjectFactory,
-                      resultSet);
-                    results.add(object);
-                    i++;
-                  } while (resultSet.next() && i < pageSize);
-                }
-              } finally {
-                JdbcUtils.close(resultSet);
-              }
-            } finally {
-              JdbcUtils.close(statement);
-            }
-          } catch (final SQLException e) {
-            JdbcUtils.getException(dataSource, connection, "updateResults",
-              sql, e);
-          } finally {
-            if (dataSource != null) {
-              JdbcUtils.release(connection, dataSource);
-            }
-          }
-        }
-        this.results = results;
-      }
-      return this.results;
-    }
-  }
-
-  @Override
-  public int getNumResults() {
-    if (this.numResults == null) {
-      final JdbcDataObjectStore dataStore = getDataStore();
-      final Query query = getQuery();
-      this.numResults = dataStore.getRowCount(query);
-      updateNumPages();
-    }
-    return this.numResults;
   }
 
   /**
@@ -110,6 +32,67 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
    */
   @Override
   protected void updateResults() {
-    this.results = null;
+    synchronized (this) {
+      final JdbcDataObjectStore dataStore = getDataStore();
+      final Query query = getQuery();
+      setNumResults(dataStore.getRowCount(query));
+      updateNumPages();
+
+      final ArrayList<DataObject> results = new ArrayList<DataObject>();
+      final int pageSize = getPageSize();
+      final int pageNumber = getPageNumber();
+      if (pageNumber != -1) {
+        String sql = getSql();
+
+        final int startRowNum = (pageNumber - 1) * pageSize + 1;
+        final int endRowNum = startRowNum + pageSize - 1;
+        sql = "SELECT * FROM ( SELECT  T2.*, ROWNUM TROWNUM FROM ( " + sql
+          + ") T2 ) WHERE TROWNUM BETWEEN " + startRowNum + " AND " + endRowNum;
+
+        final Connection connection = getConnection();
+        try {
+          final DataObjectFactory dataObjectFactory = getDataObjectFactory();
+          final DataObjectMetaData metaData = getMetaData();
+          final List<Attribute> attributes = new ArrayList<>();
+
+          final List<String> attributeNames = query.getAttributeNames();
+          if (attributeNames.isEmpty()) {
+            attributes.addAll(metaData.getAttributes());
+          } else {
+            for (final String attributeName : attributeNames) {
+              if (attributeName.equals("*")) {
+                attributes.addAll(metaData.getAttributes());
+              } else {
+                final Attribute attribute = metaData.getAttribute(attributeName);
+                if (attribute != null) {
+                  attributes.add(attribute);
+                }
+              }
+            }
+          }
+          try (
+            final PreparedStatement statement = connection.prepareStatement(sql);
+            final ResultSet resultSet = JdbcQueryIterator.getResultSet(
+              metaData, statement, getQuery());) {
+            if (resultSet.next()) {
+              int i = 0;
+              do {
+                final DataObject object = JdbcQueryIterator.getNextObject(
+                  dataStore, metaData, attributes, dataObjectFactory, resultSet);
+                results.add(object);
+                i++;
+              } while (resultSet.next() && i < pageSize);
+            }
+          }
+        } catch (final SQLException e) {
+          JdbcUtils.getException(getDataSource(), connection, "updateResults",
+            sql, e);
+        } catch (final Throwable t) {
+          LoggerFactory.getLogger(getClass()).error("Error reading from pager",
+            t);
+        }
+        setResults(results);
+      }
+    }
   }
 }

@@ -144,7 +144,7 @@ public class LayerDataObject extends ArrayDataObject {
       return true;
     } else {
       final Attribute attribute = getMetaData().getAttribute(name);
-      if (attribute.isRequired()) {
+      if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
           && !StringUtils.hasText((String)value)) {

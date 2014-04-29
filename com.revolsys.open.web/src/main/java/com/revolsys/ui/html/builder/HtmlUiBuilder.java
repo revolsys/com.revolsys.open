@@ -582,20 +582,18 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final HttpServletRequest request,
     final ResultPager<? extends Object> pager, final String pageName) {
     try {
-      final int numRecords = pager.getNumResults();
       int pageSize = HttpServletUtils.getIntegerParameter(request,
         "iDisplayLength");
       if (pageSize < 0) {
-        pageSize = numRecords;
+        pageSize = defaultPageSize;
       } else if (pageSize == 0) {
         pageSize = defaultPageSize;
       }
-      pager.setPageSize(pageSize);
 
       final int recordNumber = HttpServletUtils.getIntegerParameter(request,
         "iDisplayStart");
       final int pageNumber = (int)Math.floor(recordNumber / (double)pageSize) + 1;
-      pager.setPageNumber(pageNumber);
+      pager.setPageNumberAndSize(pageSize, pageNumber);
 
       final List<KeySerializer> serializers = getSerializers(pageName, "list");
 
@@ -608,6 +606,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         }
         rows.add(row);
       }
+
+      final int numRecords = pager.getNumResults();
 
       final Map<String, Object> response = new LinkedHashMap<String, Object>();
       response.put("sEcho", request.getParameter("sEcho"));

@@ -77,6 +77,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
     setPageNumber(pageNumber);
   }
 
+  @Override
   public void close() {
   }
 
@@ -85,6 +86,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return The index of the last object in the current page.
    */
+  @Override
   public int getEndIndex() {
     if (pageNumber == numPages) {
       return numResults;
@@ -98,6 +100,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return The list of objects in the current page.
    */
+  @Override
   public List<T> getList() {
     if (results == null) {
       throw new IllegalStateException(
@@ -111,6 +114,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return Thepage number of the next page.
    */
+  @Override
   public int getNextPageNumber() {
     return pageNumber + 2;
   }
@@ -120,6 +124,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return The number of pages.
    */
+  @Override
   public int getNumPages() {
     return numPages + 1;
   }
@@ -129,6 +134,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return The total number of results returned.
    */
+  @Override
   public int getNumResults() {
     return numResults;
   }
@@ -138,6 +144,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return Thepage number of the current page.
    */
+  @Override
   public int getPageNumber() {
     return pageNumber + 1;
   }
@@ -147,6 +154,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return The number of objects to display in a page.
    */
+  @Override
   public int getPageSize() {
     return pageSize;
   }
@@ -156,6 +164,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return Thepage number of the previous page.
    */
+  @Override
   public int getPreviousPageNumber() {
     return pageNumber;
   }
@@ -165,6 +174,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return The index of the first object in the current page.
    */
+  @Override
   public int getStartIndex() {
     return (pageNumber * pageSize) + 1;
   }
@@ -174,6 +184,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return True if there is a next page.
    */
+  @Override
   public boolean hasNextPage() {
     return pageNumber < numPages;
   }
@@ -183,6 +194,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return True if there is a previous page.
    */
+  @Override
   public boolean hasPreviousPage() {
     return pageNumber > 0;
   }
@@ -192,6 +204,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return True if this is the first page.
    */
+  @Override
   public boolean isFirstPage() {
     return pageNumber == 0;
   }
@@ -201,6 +214,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @return True if this is the last page.
    */
+  @Override
   public boolean isLastPage() {
     return pageNumber == numPages;
   }
@@ -210,6 +224,7 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
    * 
    * @param pageNumber The current page number.
    */
+  @Override
   public void setPageNumber(final int pageNumber) {
     if (pageNumber - 1 > numPages) {
       this.pageNumber = numPages;
@@ -221,11 +236,18 @@ public class HibernateCriteriaPager<T> implements ResultPager<T> {
     updateResults();
   }
 
+  @Override
+  public void setPageNumberAndSize(final int pageSize, final int pageNumber) {
+    setPageSize(pageSize);
+    setPageNumber(pageNumber);
+  }
+
   /**
    * Set the number of objects per page.
    * 
    * @param pageSize The number of objects per page.
    */
+  @Override
   public void setPageSize(final int pageSize) {
     this.pageSize = pageSize;
     this.numPages = Math.max(0, ((numResults - 1) / pageSize));

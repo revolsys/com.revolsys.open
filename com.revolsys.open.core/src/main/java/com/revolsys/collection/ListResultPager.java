@@ -188,6 +188,12 @@ public class ListResultPager<T> implements ResultPager<T> {
     }
   }
 
+  @Override
+  public void setPageNumberAndSize(final int pageSize, final int pageNumber) {
+    setPageSize(pageSize);
+    setPageNumber(pageNumber);
+  }
+
   /**
    * Set the number of objects per page.
    * 

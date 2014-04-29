@@ -180,7 +180,7 @@ public class Value extends QueryValue {
       return StringConverterRegistry.toString(this.displayValue);
     } else if (this.displayValue instanceof Date) {
       final Date date = (Date)this.displayValue;
-      final String stringValue = DateUtil.format("yyyy-MM-dd ", date);
+      final String stringValue = DateUtil.format("yyyy-MM-dd", date);
       return "{d '" + stringValue + "'}";
     } else if (this.displayValue instanceof Time) {
       final Time time = (Time)this.displayValue;

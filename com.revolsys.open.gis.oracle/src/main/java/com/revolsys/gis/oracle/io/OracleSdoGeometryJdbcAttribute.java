@@ -92,31 +92,33 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int columnIndex, final DataObject object) throws SQLException {
     Geometry value;
     final int geometryType = resultSet.getInt(columnIndex);
-    final int axisCount = geometryType / 1000;
-    switch (geometryType % 1000) {
-      case 1:
-        value = toPoint(resultSet, columnIndex, axisCount);
-      break;
-      case 2:
-        value = toLineString(resultSet, columnIndex, axisCount);
-      break;
-      case 3:
-        value = toPolygon(resultSet, columnIndex, axisCount);
-      break;
-      case 5:
-        value = toMultiPoint(resultSet, columnIndex, axisCount);
-      break;
-      case 6:
-        value = toMultiLineString(resultSet, columnIndex, axisCount);
-      break;
-      case 7:
-        value = toMultiPolygon(resultSet, columnIndex, axisCount);
-      break;
-      default:
-        throw new IllegalArgumentException("Unsupported geometry type "
-          + geometryType);
+    if (!resultSet.wasNull()) {
+      final int axisCount = geometryType / 1000;
+      switch (geometryType % 1000) {
+        case 1:
+          value = toPoint(resultSet, columnIndex, axisCount);
+        break;
+        case 2:
+          value = toLineString(resultSet, columnIndex, axisCount);
+        break;
+        case 3:
+          value = toPolygon(resultSet, columnIndex, axisCount);
+        break;
+        case 5:
+          value = toMultiPoint(resultSet, columnIndex, axisCount);
+        break;
+        case 6:
+          value = toMultiLineString(resultSet, columnIndex, axisCount);
+        break;
+        case 7:
+          value = toMultiPolygon(resultSet, columnIndex, axisCount);
+        break;
+        default:
+          throw new IllegalArgumentException("Unsupported geometry type "
+            + geometryType);
+      }
+      object.setValue(getIndex(), value);
     }
-    object.setValue(getIndex(), value);
     return columnIndex + 6;
   }
 
@@ -412,8 +414,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int columnIndex, final int axisCount) throws SQLException {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    final CoordinatesList coordinatesList = new DoubleCoordinatesList(axisCount,
-      coordinates);
+    final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+      axisCount, coordinates);
     return this.geometryFactory.lineString(coordinatesList);
   }
 
@@ -456,8 +458,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
 
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    final CoordinatesList coordinatesList = new DoubleCoordinatesList(axisCount,
-      coordinates);
+    final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+      axisCount, coordinates);
 
     return this.geometryFactory.multiPoint(coordinatesList);
   }
@@ -572,7 +574,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
             }
           break;
           case 2003:
-            if (numInteriorRings == rings.size() - 1) {
+            if (numInteriorRings == rings.size()) {
               throw new IllegalArgumentException("Too many interior rings");
             } else {
               numInteriorRings++;
