@@ -215,7 +215,7 @@ public class GeometryMethodOperation implements GeometryOperation {
         return new BooleanResult((Boolean)method.invoke(geometry, args));
       }
       if (Geometry.class.isAssignableFrom(method.getReturnType())) {
-        Geometry resultGeometry = (Geometry)method.invoke(geometry, args);
+        final Geometry resultGeometry = (Geometry)method.invoke(geometry, args);
         return new GeometryResult(resultGeometry);
       }
       if (method.getReturnType() == double.class) {

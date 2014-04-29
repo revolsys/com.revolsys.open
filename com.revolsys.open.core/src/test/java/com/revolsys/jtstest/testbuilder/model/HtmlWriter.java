@@ -58,7 +58,7 @@ import com.revolsys.jtstest.testbuilder.BusyDialog;
 import com.revolsys.jtstest.testbuilder.GeometryEditPanel;
 import com.revolsys.jtstest.testrunner.BooleanResult;
 import com.revolsys.jtstest.testrunner.StringUtil;
-import com.revolsys.jtstest.testrunner.Test;
+import com.revolsys.jtstest.testrunner.GeometryOperationTest;
 import com.revolsys.jtstest.testrunner.TestCase;
 import com.revolsys.jtstest.util.FileUtil;
 
@@ -208,7 +208,7 @@ public class HtmlWriter {
     final TestRunnerTestCaseAdapter adapter = (TestRunnerTestCaseAdapter)testCaseEdit.getTestable();
     final TestCase trTestCase = adapter.getTestRunnerTestCase();
     for (final Iterator i = trTestCase.getTests().iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+      final GeometryOperationTest test = (GeometryOperationTest)i.next();
       if (test.getOperation().equalsIgnoreCase(opName)
         && test.getGeometryIndex().equalsIgnoreCase(first)
         && (test.getArgumentCount() == 0 || ((test.getArgument(0) != null && test.getArgument(
@@ -562,7 +562,7 @@ public class HtmlWriter {
       if (testable instanceof TestRunnerTestCaseAdapter) {
         final TestCase testRunnerTestCase = ((TestRunnerTestCaseAdapter)testable).getTestRunnerTestCase();
         String runDescription = testRunnerTestCase.getTestRun()
-          .getTestFile()
+          .getFile()
           .getName();
         runDescription = runDescription.indexOf(".") > -1 ? runDescription.substring(
           0, runDescription.indexOf(".")) : runDescription;

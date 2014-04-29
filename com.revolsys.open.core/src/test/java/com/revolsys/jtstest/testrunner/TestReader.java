@@ -91,14 +91,14 @@ public class TestReader {
   public TestReader() {
   }
 
-  private File absoluteWktFile(final File wktFile, final TestRun testRun) {
+  private File absoluteWktFile(final File wktFile, final TestFile testRun) {
     if (wktFile == null) {
       return null;
     }
     File absoluteWktFile = wktFile;
     if (!absoluteWktFile.isAbsolute()) {
       final File directory = testRun.getWorkspace() != null ? testRun.getWorkspace()
-        : testRun.getTestFile().getParentFile();
+        : testRun.getFile().getParentFile();
       absoluteWktFile = new File(directory + File.separator
         + absoluteWktFile.getName());
     }
@@ -127,7 +127,7 @@ public class TestReader {
     return new PrecisionModel(scale);
   }
 
-  public TestRun createTestRun(final File testFile, final int runIndex) {
+  public TestFile createTestRun(final File testFile, final int runIndex) {
     try {
       final SAXBuilder builder = new LineNumberSAXBuilder();
       final Document document = builder.build(new FileInputStream(testFile));
@@ -279,10 +279,11 @@ public class TestReader {
   /**
    *  Creates a List of TestCase's from the given <case> Element's.
    */
-  private List parseTestCases(final List caseElements, final File testFile,
-    final TestRun testRun, final double tolerance) throws TestParseException {
+  private List<TestCase> parseTestCases(final List caseElements,
+    final File testFile, final TestFile testRun, final double tolerance)
+    throws TestParseException {
     wktorbReader = new WKTOrWKBReader(geometryFactory);
-    final Vector testCases = new Vector();
+    final Vector<TestCase> testCases = new Vector<>();
     int caseIndex = 0;
     for (final Iterator i = caseElements.iterator(); i.hasNext();) {
       final Element caseElement = (Element)i.next();
@@ -307,10 +308,9 @@ public class TestReader {
         // if (testElements.size() == 0) {
         // throw new TestParseException("Missing <test> in <case>");
         // }
-        final List tests = parseTests(testElements, caseIndex, testFile,
-          testCase, tolerance);
-        for (final Iterator j = tests.iterator(); j.hasNext();) {
-          final Test test = (Test)j.next();
+        final List<GeometryOperationTest> tests = parseTests(testElements,
+          caseIndex, testFile, testCase, tolerance);
+        for (final GeometryOperationTest test : tests) {
           testCase.add(test);
         }
         testCases.add(testCase);
@@ -325,7 +325,7 @@ public class TestReader {
   /**
    *  Creates a TestRun from the <run> Element.
    */
-  private TestRun parseTestRun(final Element runElement, final File testFile,
+  private TestFile parseTestRun(final Element runElement, final File testFile,
     final int runIndex) throws TestParseException {
 
     // ----------- <workspace> (optional) ------------------
@@ -366,17 +366,16 @@ public class TestReader {
     // --------------- build TestRun ---------------------
     final String description = descElement != null ? descElement.getTextTrim()
       : "";
-    final TestRun testRun = new TestRun(description, runIndex, geometryFactory,
+    final TestFile testRun = new TestFile(description, runIndex, geometryFactory,
       geomOp, resultMatcher, testFile);
     testRun.setWorkspace(workspace);
     final List caseElements = runElement.getChildren("case");
     if (caseElements.size() == 0) {
       throw new TestParseException("Missing <case> in <run>");
     }
-    for (final Iterator i = parseTestCases(caseElements, testFile, testRun,
-      tolerance).iterator(); i.hasNext();) {
-      final TestCase testCase = (TestCase)i.next();
-      testRun.addTestCase(testCase);
+    for (final TestCase testCase : parseTestCases(caseElements, testFile,
+      testRun, tolerance)) {
+      testRun.addTest(testCase);
     }
     return testRun;
   }
@@ -384,10 +383,10 @@ public class TestReader {
   /**
    *  Creates a List of Test's from the given <test> Element's.
    */
-  private List parseTests(final List testElements, final int caseIndex,
-    final File testFile, final TestCase testCase, final double tolerance)
-    throws TestParseException {
-    final List tests = new ArrayList();
+  private List<GeometryOperationTest> parseTests(final List testElements,
+    final int caseIndex, final File testFile, final TestCase testCase,
+    final double tolerance) throws TestParseException {
+    final List<GeometryOperationTest> tests = new ArrayList<>();
     int testIndex = 0;
     for (final Iterator i = testElements.iterator(); i.hasNext();) {
       final Element testElement = (Element)i.next();
@@ -425,8 +424,8 @@ public class TestReader {
         }
         final Result result = toResult(opElement.getTextTrim(),
           nameAttribute.getValue().trim(), testCase.getTestRun());
-        final Test test = new Test(testCase, testIndex,
-          descElement != null ? descElement.getTextTrim() : "",
+        final GeometryOperationTest test = new GeometryOperationTest(testCase,
+          testIndex, descElement != null ? descElement.getTextTrim() : "",
           nameAttribute.getValue().trim(), arg1, arguments, result, tolerance);
 
         tests.add(test);
@@ -510,7 +509,7 @@ public class TestReader {
    */
 
   private GeometryResult toGeometryResult(final String value,
-    final TestRun testRun) throws com.revolsys.jts.io.ParseException {
+    final TestFile testRun) throws com.revolsys.jts.io.ParseException {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 2);
     final WKTOrWKBReader wktorbReader = new WKTOrWKBReader(geometryFactory);
     return new GeometryResult(wktorbReader.read(value));
@@ -527,7 +526,7 @@ public class TestReader {
   }
 
   private Result toResult(final String value, final String name,
-    final TestRun testRun) throws TestParseException,
+    final TestFile testRun) throws TestParseException,
     com.revolsys.jts.io.ParseException {
     if (isBooleanFunction(name)) {
       return toBooleanResult(value);
@@ -553,7 +552,7 @@ public class TestReader {
     return string;
   }
 
-  private File wktFile(final Element geometryElement, final TestRun testRun)
+  private File wktFile(final Element geometryElement, final TestFile testRun)
     throws TestParseException {
     if (geometryElement == null) {
       return null;

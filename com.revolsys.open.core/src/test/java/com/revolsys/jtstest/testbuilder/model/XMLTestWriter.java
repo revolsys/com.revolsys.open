@@ -60,7 +60,7 @@ public class XMLTestWriter {
         final TestRunnerTestCaseAdapter a = (TestRunnerTestCaseAdapter)tce.getTestable();
         final String description = a.getTestRunnerTestCase()
           .getTestRun()
-          .getDescription();
+          .getTestDescription();
         if (description != null && description.length() > 0) {
           return "  <desc>" + StringUtil.escapeHTML(description) + "</desc>"
             + StringUtil.newLine;

@@ -32,6 +32,8 @@
  */
 package com.revolsys.jtstest.testrunner;
 
+import junit.framework.Assert;
+
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -41,6 +43,7 @@ import com.revolsys.jts.geom.Geometry;
  * @author mbdavis
  *
  */
+@SuppressWarnings("deprecation")
 public class EqualityResultMatcher implements ResultMatcher {
   /**
    * Tests whether the two results are equal within the given
@@ -53,6 +56,10 @@ public class EqualityResultMatcher implements ResultMatcher {
     final Object[] args, final Result actualResult,
     final Result expectedResult, final double tolerance) {
     final boolean equals = actualResult.equals(expectedResult, tolerance);
+    if (!equals) {
+      Assert.failNotEquals(opName, expectedResult.getResult(),
+        actualResult.getResult());
+    }
     return equals;
   }
 

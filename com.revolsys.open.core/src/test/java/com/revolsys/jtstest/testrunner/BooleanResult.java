@@ -51,6 +51,10 @@ public class BooleanResult implements Result {
     return result == otherBooleanResult.result;
   }
 
+  public Boolean getResult() {
+    return result;
+  }
+
   @Override
   public String toFormattedString() {
     return toShortString();

@@ -55,7 +55,7 @@ public class SimpleReportWriter implements ReportWriter {
 
   private boolean areAllTestsPassed(final TestCase testCase) {
     for (final Iterator i = testCase.getTests().iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+      final GeometryOperationTest test = (GeometryOperationTest)i.next();
       if (!test.isPassed()) {
         return false;
       }
@@ -75,7 +75,7 @@ public class SimpleReportWriter implements ReportWriter {
     }
   }
 
-  public void reportOnTest(final Test test) {
+  public void reportOnTest(final GeometryOperationTest test) {
     String id = test.getGeometryIndex() + " " + test.getOperation();
     for (int i = 0; i < test.getArgumentCount(); i++) {
       id += " " + test.getArgument(i);
@@ -83,8 +83,8 @@ public class SimpleReportWriter implements ReportWriter {
     if (test.getExpectedResult() instanceof BooleanResult) {
       id += ", " + test.getExpectedResult().toShortString();
     }
-    if (test.getDescription().length() > 0) {
-      id += ", " + test.getDescription();
+    if (test.getTestDescription().length() > 0) {
+      id += ", " + test.getTestDescription();
     }
     if (test.getException() != null) {
       reportBuf.write("Test Threw Exception ("
@@ -111,10 +111,10 @@ public class SimpleReportWriter implements ReportWriter {
   private void reportOnTestCase(final TestCase testCase) {
     if (verbose || !areAllTestsPassed(testCase)) {
       reportBuf.write("\n");
-      final File file = testCase.getTestRun().getTestFile();
+      final File file = testCase.getTestRun().getFile();
       reportBuf.write(file.toString());
       reportBuf.write("\n");
-      final String description = testCase.getDescription();
+      final String description = testCase.getTestDescription();
       if (description.length() > 0) {
         reportBuf.write("  " + description);
         reportBuf.write("\n");
@@ -132,19 +132,19 @@ public class SimpleReportWriter implements ReportWriter {
     }
   }
 
-  private void reportOnTestRun(final TestRun testRun) {
+  private void reportOnTestRun(final TestFile testRun) {
     reportOnTestCases(testRun.getTestCases());
   }
 
   private void reportOnTestRuns(final List testRuns) {
     for (final Iterator i = testRuns.iterator(); i.hasNext();) {
-      final TestRun testRun = (TestRun)i.next();
+      final TestFile testRun = (TestFile)i.next();
       reportOnTestRun(testRun);
     }
   }
 
-  private void reportOnTests(final List<Test> tests) {
-    for (final Test test : tests) {
+  private void reportOnTests(final List<GeometryOperationTest> tests) {
+    for (final GeometryOperationTest test : tests) {
       reportOnTest(test);
     }
   }
@@ -164,7 +164,7 @@ public class SimpleReportWriter implements ReportWriter {
     reportBuf.write(message);
   }
 
-  public void reportSummary(final TestEngine engine) {
+  public void reportSummary(final TopologyTest engine) {
     if (engine.getParseExceptionCount() > 0) {
       reportBuf.write(engine.getParseExceptionCount() + " parsing exceptions\n");
     }
@@ -179,14 +179,14 @@ public class SimpleReportWriter implements ReportWriter {
     }
   }
 
-  public String write(final Test test) {
+  public String write(final GeometryOperationTest test) {
     reportBuf = new StringWriter();
     reportOnTest(test);
     return reportBuf.toString();
   }
 
   @Override
-  public String writeReport(final TestEngine engine) {
+  public String writeReport(final TopologyTest engine) {
     reportBuf = new StringWriter();
     reportOnParsingProblems(engine.getParsingProblems());
     reportOnTestRuns(engine.getTestRuns());

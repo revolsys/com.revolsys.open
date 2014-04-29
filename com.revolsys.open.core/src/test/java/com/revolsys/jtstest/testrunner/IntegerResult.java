@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,38 +32,43 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-
-
 /**
  * @version 1.7
  */
 public class IntegerResult implements Result {
-  private int value;
+  private final int value;
 
-  public IntegerResult(Integer value) {
+  public IntegerResult(final Integer value) {
     this.value = value.intValue();
   }
 
-  public boolean equals(Result other, double tolerance) {
+  @Override
+  public boolean equals(final Result other, final double tolerance) {
     if (!(other instanceof IntegerResult)) {
       return false;
     }
-    IntegerResult otherResult = (IntegerResult) other;
-    int otherValue = otherResult.value;
+    final IntegerResult otherResult = (IntegerResult)other;
+    final int otherValue = otherResult.value;
 
-    return Math.abs(value-otherValue) <= tolerance;
+    return Math.abs(value - otherValue) <= tolerance;
   }
 
-  public String toLongString() {
-    return Integer.toString(value);
+  public Integer getResult() {
+    return value;
   }
 
+  @Override
   public String toFormattedString() {
     return Integer.toString(value);
   }
 
+  @Override
+  public String toLongString() {
+    return Integer.toString(value);
+  }
+
+  @Override
   public String toShortString() {
     return Integer.toString(value);
   }
 }
-

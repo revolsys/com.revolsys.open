@@ -32,12 +32,10 @@
  */
 package com.revolsys.jtstest.testrunner;
 
-
-
 /**
  * @version 1.7
  */
 public interface ReportWriter {
 
-    String writeReport(TestEngine engine);
+  String writeReport(TopologyTest engine);
 }

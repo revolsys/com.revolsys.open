@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -40,11 +38,11 @@ package com.revolsys.jtstest.testrunner;
 public interface Result {
   boolean equals(Result other, double tolerance);
 
-  String toShortString();
+  public Object getResult();
+
+  String toFormattedString();
 
   String toLongString();
 
-  String toFormattedString();
+  String toShortString();
 }
-
-

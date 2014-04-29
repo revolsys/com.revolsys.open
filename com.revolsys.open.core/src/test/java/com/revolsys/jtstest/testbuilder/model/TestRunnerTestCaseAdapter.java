@@ -42,10 +42,10 @@ import com.revolsys.jts.util.Assert;
 import com.revolsys.jtstest.geomop.GeometryMethodOperation;
 import com.revolsys.jtstest.test.Testable;
 import com.revolsys.jtstest.testrunner.BooleanResult;
+import com.revolsys.jtstest.testrunner.GeometryOperationTest;
 import com.revolsys.jtstest.testrunner.GeometryResult;
 import com.revolsys.jtstest.testrunner.Result;
 import com.revolsys.jtstest.testrunner.SimpleReportWriter;
-import com.revolsys.jtstest.testrunner.Test;
 import com.revolsys.jtstest.testrunner.TestCase;
 
 /**
@@ -60,11 +60,11 @@ public class TestRunnerTestCaseAdapter implements Testable {
     this.testCase = testCase;
   }
 
-  private Test getABTest(final String opName) {
+  private GeometryOperationTest getABTest(final String opName) {
     Assert.isTrue(GeometryMethodOperation.isBooleanFunction(opName)
       || GeometryMethodOperation.isGeometryFunction(opName));
     for (final Iterator i = testCase.getTests().iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+      final GeometryOperationTest test = (GeometryOperationTest)i.next();
       if (test.getOperation().equalsIgnoreCase(opName)
         && ((!opName.equalsIgnoreCase("relate")) || test.getExpectedResult()
           .equals(new BooleanResult(true)))
@@ -91,7 +91,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
 
   @Override
   public String getDescription() {
-    return testCase.getDescription();
+    return testCase.getTestDescription();
   }
 
   @Override
@@ -116,7 +116,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
 
   @Override
   public String getExpectedIntersectionMatrix() {
-    final Test test = getABTest("relate");
+    final GeometryOperationTest test = getABTest("relate");
     if (test == null) {
       return null;
     }
@@ -139,7 +139,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
       return "";
     }
     for (final Iterator i = testCase.getTests().iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+      final GeometryOperationTest test = (GeometryOperationTest)i.next();
       if (!test.isPassed()) {
         final SimpleReportWriter reportWriter = new SimpleReportWriter(false);
         return reportWriter.write(test);
@@ -166,14 +166,15 @@ public class TestRunnerTestCaseAdapter implements Testable {
 
   @Override
   public String getName() {
-    return testCase.getDescription();
+    return testCase.getTestDescription();
   }
 
-  private Test getOrCreateABTest(final String opName) {
-    Test testToReturn = getABTest(opName);
+  private GeometryOperationTest getOrCreateABTest(final String opName) {
+    GeometryOperationTest testToReturn = getABTest(opName);
     if (testToReturn == null) {
-      testToReturn = new Test(testCase, maxTestIndex(testCase) + 1, null,
-        opName, "A", Arrays.asList(new String[] {
+      testToReturn = new GeometryOperationTest(testCase,
+        maxTestIndex(testCase) + 1, null, opName, "A",
+        Arrays.asList(new String[] {
           "B"
         }), getDefaultResult(opName), 0);
       testCase.add(testToReturn);
@@ -212,7 +213,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
       return false;
     }
     for (final Iterator i = testCase.getTests().iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+      final GeometryOperationTest test = (GeometryOperationTest)i.next();
       if (!test.isPassed()) {
         return true;
       }
@@ -226,7 +227,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
       return false;
     }
     for (final Iterator i = testCase.getTests().iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+      final GeometryOperationTest test = (GeometryOperationTest)i.next();
       if (!test.isPassed()) {
         return false;
       }
@@ -237,7 +238,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
   private int maxTestIndex(final TestCase testCase) {
     int maxTestIndex = -1;
     for (final Iterator i = testCase.getTests().iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+      final GeometryOperationTest test = (GeometryOperationTest)i.next();
       maxTestIndex = Math.max(maxTestIndex, test.getTestIndex());
     }
     return maxTestIndex;
@@ -246,7 +247,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
   @Override
   public void runTest() throws ParseException {
     ranAtLeastOnce = true;
-    testCase.run();
+    // testCase.run();
   }
 
   @Override
@@ -283,7 +284,7 @@ public class TestRunnerTestCaseAdapter implements Testable {
   private void setExpectedSpatialFunction(final String opName,
     final Geometry expectedGeometry) {
     if (expectedGeometry == null) {
-      getOrCreateABTest(opName).getTestCase().remove(getOrCreateABTest(opName));
+      // getOrCreateABTest(opName).getTestCase().remove(getOrCreateABTest(opName));
       return;
     }
     getOrCreateABTest(opName).setResult(new GeometryResult(expectedGeometry));
@@ -316,10 +317,10 @@ public class TestRunnerTestCaseAdapter implements Testable {
 
   @Override
   public void setName(final String name) {
-    testCase.setDescription(name);
+    testCase.setTestDescription(name);
   }
 
-  public Geometry toGeometry(final Test test) {
+  public Geometry toGeometry(final GeometryOperationTest test) {
     if (test == null) {
       return null;
     }

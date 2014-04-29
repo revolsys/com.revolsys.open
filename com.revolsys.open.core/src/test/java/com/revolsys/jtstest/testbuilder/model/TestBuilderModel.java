@@ -26,7 +26,7 @@ import com.revolsys.jtstest.testbuilder.ui.style.BasicStyle;
 import com.revolsys.jtstest.testrunner.StringUtil;
 import com.revolsys.jtstest.testrunner.TestCase;
 import com.revolsys.jtstest.testrunner.TestReader;
-import com.revolsys.jtstest.testrunner.TestRun;
+import com.revolsys.jtstest.testrunner.TestFile;
 import com.revolsys.jtstest.util.IOUtil;
 import com.revolsys.jtstest.util.MultiFormatReader;
 
@@ -212,7 +212,7 @@ public class TestBuilderModel {
 
   private TestCaseList createTestCaseList(final File xmlTestFile) {
     final TestReader testReader = new TestReader();
-    final TestRun testRun = testReader.createTestRun(xmlTestFile, 1);
+    final TestFile testRun = testReader.createTestRun(xmlTestFile, 1);
     parseErrors = testReader.getParsingProblems();
 
     final TestCaseList tcl = new TestCaseList();

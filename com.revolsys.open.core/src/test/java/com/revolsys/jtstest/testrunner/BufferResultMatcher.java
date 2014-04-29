@@ -32,6 +32,8 @@
  */
 package com.revolsys.jtstest.testrunner;
 
+import junit.framework.Assert;
+
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.jts.geom.Geometry;
 
@@ -44,6 +46,7 @@ import com.revolsys.jts.geom.Geometry;
  * @author mbdavis
  *
  */
+@SuppressWarnings("deprecation")
 public class BufferResultMatcher implements ResultMatcher {
   private final ResultMatcher defaultMatcher = new EqualityResultMatcher();
 
@@ -119,8 +122,14 @@ public class BufferResultMatcher implements ResultMatcher {
     }
 
     final double distance = Double.parseDouble((String)args[0]);
-    return isBufferResultMatch(((GeometryResult)actualResult).getGeometry(),
+    final boolean match = isBufferResultMatch(
+      ((GeometryResult)actualResult).getGeometry(),
       ((GeometryResult)expectedResult).getGeometry(), distance);
+    if (!match) {
+      Assert.failNotEquals(opName, expectedResult.getResult(),
+        actualResult.getResult());
+    }
+    return match;
   }
 
   public boolean isSymDiffAreaInTolerance(final Geometry actualBuffer,

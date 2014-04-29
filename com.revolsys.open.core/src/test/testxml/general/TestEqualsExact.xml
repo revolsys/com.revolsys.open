@@ -143,7 +143,7 @@ Tests of exact equality and exact equality with normalization
   <desc>mA - permuted</desc>
   <a>    MULTIPOLYGON (((50 100, 100 100, 100 50, 50 50, 50 100)), ((150 100, 200 100, 200 50, 150 50, 150 100)))  </a>
   <b>    MULTIPOLYGON (((150 100, 200 100, 200 50, 150 50, 150 100)), ((50 100, 100 100, 100 50, 50 50, 50 100)))  </b>
-<test><op name="equalsExact" arg1="A" arg2="B">    false  </op></test>
+<test><op name="equalsExact" arg1="A" arg2="B">    true  </op></test>
 <test><op name="equalsNorm"  arg1="A" arg2="B">    true  </op></test>
 </case>
 

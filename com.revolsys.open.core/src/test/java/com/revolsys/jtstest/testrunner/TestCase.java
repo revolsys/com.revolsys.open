@@ -33,17 +33,16 @@
 package com.revolsys.jtstest.testrunner;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+
+import junit.framework.Test;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
@@ -57,49 +56,34 @@ import com.revolsys.jts.geom.GeometryFactory;
  *
  * @version 1.7
  */
-public class TestCase implements Runnable, MapSerializer {
-  private String description;
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "testCase", "Test Case", TestCase.class, "create");
-
-  public static TestCase create(final Map<String, Object> map) {
-    return new TestCase(map);
-  }
-
-  private String aWkt;
-
-  private String bWkt;
+public class TestCase extends junit.framework.TestSuite implements
+  MapSerializer {
+  private String testDescription;
 
   private Geometry a;
 
   private Geometry b;
 
-  private final Vector<Test> tests = new Vector<Test>();
+  private final TestFile testRun;
 
-  private TestRun testRun;
+  private final int caseIndex;
 
-  private int caseIndex;
-
-  private boolean isRun = false;
+  private final boolean isRun = false;
 
   private GeometryFactory geometryFactory;
-
-  public TestCase(final Map<String, Object> map) {
-    this.description = (String)map.get("description");
-    this.aWkt = (String)map.get("a");
-    this.bWkt = (String)map.get("b");
-  }
 
   /**
    *  Creates a TestCase with the given description. The tests will be applied
    *  to a and b.
    */
   public TestCase(final String description, final Geometry a, final Geometry b,
-    final File aWktFile, final File bWktFile, final TestRun testRun,
+    final File aWktFile, final File bWktFile, final TestFile testRun,
     final int caseIndex, final int lineNumber) {
-    if (description != null) {
-      this.description = description.replaceAll("\\s+", " ");
+    if (StringUtils.hasText(description)) {
+      this.testDescription = description.replaceAll("\\s+", " ");
+      setName(testDescription);
+    } else {
+      setName(String.valueOf(caseIndex));
     }
     this.a = a;
     this.b = b;
@@ -107,28 +91,15 @@ public class TestCase implements Runnable, MapSerializer {
     this.caseIndex = caseIndex;
   }
 
-  public TestCase(final TestRun testRun, final int index,
-    final Map<String, Object> map) {
-    this.testRun = testRun;
-    this.caseIndex = index;
-    this.description = (String)map.get("description");
-    this.aWkt = (String)map.get("a");
-    this.bWkt = (String)map.get("b");
-  }
-
   /**
    *  Adds a Test to the TestCase.
    */
-  public void add(final Test test) {
-    tests.add(test);
+  public void add(final GeometryOperationTest test) {
+    addTest(test);
   }
 
   public int getCaseIndex() {
     return caseIndex;
-  }
-
-  public String getDescription() {
-    return description;
   }
 
   public Geometry getGeometryA() {
@@ -153,35 +124,28 @@ public class TestCase implements Runnable, MapSerializer {
    *@return    The testCount value
    */
   public int getTestCount() {
-    return tests.size();
+    return testCount();
   }
 
-  public TestRun getTestRun() {
+  public String getTestDescription() {
+    return testDescription;
+  }
+
+  public TestFile getTestRun() {
     return testRun;
   }
 
-  public List<Test> getTests() {
-    return Collections.unmodifiableList(tests);
+  public List<GeometryOperationTest> getTests() {
+    final List<GeometryOperationTest> testList = new ArrayList<>();
+    final Enumeration<Test> tests = tests();
+    while (tests.hasMoreElements()) {
+      testList.add((GeometryOperationTest)tests.nextElement());
+    }
+    return testList;
   }
 
   public boolean isRun() {
     return isRun;
-  }
-
-  public void remove(final Test test) {
-    tests.remove(test);
-  }
-
-  @Override
-  public void run() {
-    isRun = true;
-    for (final Test test : tests) {
-      test.run();
-    }
-  }
-
-  public void setDescription(final String description) {
-    this.description = StringUtils.trimWhitespace(description);
   }
 
   public void setGeometryA(final Geometry a) {
@@ -192,13 +156,17 @@ public class TestCase implements Runnable, MapSerializer {
     this.b = b;
   }
 
+  public void setTestDescription(final String description) {
+    this.testDescription = StringUtils.trimWhitespace(description);
+  }
+
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "test");
 
-    if (StringUtils.hasText(description)) {
-      map.put("description", description);
+    if (StringUtils.hasText(testDescription)) {
+      map.put("description", testDescription);
     }
     MapSerializerUtil.add(map, "geometryFactory", geometryFactory);
     final Map<String, Object> properties = new LinkedHashMap<String, Object>();
@@ -212,7 +180,7 @@ public class TestCase implements Runnable, MapSerializer {
       map.put("properties", properties);
     }
 
-    MapSerializerUtil.add(map, "tests", tests);
+    // MapSerializerUtil.add(map, "tests", tests);
     return map;
   }
 
@@ -224,14 +192,13 @@ public class TestCase implements Runnable, MapSerializer {
   public String toXml() {
     String xml = "";
     xml += "<case>" + StringUtil.newLine;
-    if (description != null && description.length() > 0) {
-      xml += "  <desc>" + StringUtil.escapeHTML(description) + "</desc>"
+    if (testDescription != null && testDescription.length() > 0) {
+      xml += "  <desc>" + StringUtil.escapeHTML(testDescription) + "</desc>"
         + StringUtil.newLine;
     }
     xml += xml("a", a) + StringUtil.newLine;
     xml += xml("b", b);
-    for (final Iterator i = tests.iterator(); i.hasNext();) {
-      final Test test = (Test)i.next();
+    for (final GeometryOperationTest test : getTests()) {
       xml += test.toXml();
     }
     xml += "</case>" + StringUtil.newLine;

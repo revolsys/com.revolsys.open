@@ -61,6 +61,10 @@ public class GeometryResult implements Result {
     return geometry;
   }
 
+  public Geometry getResult() {
+    return geometry;
+  }
+
   @Override
   public String toFormattedString() {
     return geometry.toWkt();

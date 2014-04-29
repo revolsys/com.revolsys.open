@@ -53,8 +53,9 @@ import com.revolsys.jtstest.geomop.GeometryOperation;
  *
  * @version 1.7
  */
-public class Test implements Runnable, MapSerializer {
-  private final String description;
+public class GeometryOperationTest extends junit.framework.TestCase implements
+  MapSerializer {
+  private String testDescription;
 
   private final String operation;
 
@@ -70,7 +71,7 @@ public class Test implements Runnable, MapSerializer {
 
   private boolean passed;
 
-  private double tolerance;
+  private final double tolerance;
 
   // cache for actual computed result
   private Geometry targetGeometry;
@@ -81,29 +82,33 @@ public class Test implements Runnable, MapSerializer {
 
   private Result actualResult = null;
 
-  private Exception exception = null;
+  private final Exception exception = null;
 
-  @SuppressWarnings("unchecked")
-  public Test(final TestCase testCase, final int testIndex,
-    final Map<String, Object> map) {
-    this.testCase = testCase;
-    this.testIndex = testIndex;
-    this.description = (String)map.get("description");
-    this.operation = (String)map.get("operation");
-    this.geometryIndex = (String)map.get("geometryIndex");
-    this.arguments = (List<String>)map.get("arguments");
-  }
+  // @SuppressWarnings("unchecked")
+  // public GeometryOperationTest(final TestCase testCase, final int testIndex,
+  // final Map<String, Object> map) {
+  // this.testCase = testCase;
+  // this.testIndex = testIndex;
+  // this.testDescription = (String)map.get("description");
+  // this.operation = (String)map.get("operation");
+  // this.geometryIndex = (String)map.get("geometryIndex");
+  // this.arguments = (List<String>)map.get("arguments");
+  // }
 
   /**
    *  Creates a Test with the given description. The given operation (e.g.
    *  "equals") will be performed, the expected result of which is <tt>expectedResult</tt>.
    */
-  public Test(final TestCase testCase, final int testIndex,
+  public GeometryOperationTest(final TestCase testCase, final int testIndex,
     final String description, final String operation,
     final String geometryIndex, final List<String> arguments,
     final Result expectedResult, final double tolerance) {
     this.tolerance = tolerance;
-    this.description = StringUtils.trimWhitespace(description);
+    this.testDescription = StringUtils.trimWhitespace(description);
+    if (!StringUtils.hasText(description)) {
+      this.testDescription = operation;
+    }
+    setName(testDescription);
     this.operation = operation;
     this.expectedResult = expectedResult;
     this.testIndex = testIndex;
@@ -175,10 +180,6 @@ public class Test implements Runnable, MapSerializer {
     return arguments.size();
   }
 
-  public String getDescription() {
-    return description;
-  }
-
   public Exception getException() {
     return exception;
   }
@@ -201,6 +202,10 @@ public class Test implements Runnable, MapSerializer {
 
   public TestCase getTestCase() {
     return testCase;
+  }
+
+  public String getTestDescription() {
+    return testDescription;
   }
 
   public int getTestIndex() {
@@ -231,13 +236,8 @@ public class Test implements Runnable, MapSerializer {
   }
 
   @Override
-  public void run() {
-    try {
-      exception = null;
-      passed = computePassed();
-    } catch (final Exception e) {
-      exception = e;
-    }
+  protected void runTest() throws Throwable {
+    passed = computePassed();
   }
 
   public void setArgument(final int i, final String value) {
@@ -252,7 +252,7 @@ public class Test implements Runnable, MapSerializer {
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "test");
-    MapSerializerUtil.add(map, "description", description);
+    MapSerializerUtil.add(map, "description", testDescription);
 
     map.put("propertyName", geometryIndex.toLowerCase());
     map.put("methodName", operation);
@@ -286,8 +286,8 @@ public class Test implements Runnable, MapSerializer {
   public String toXml() {
     String xml = "";
     xml += "<test>" + StringUtil.newLine;
-    if (description != null && description.length() > 0) {
-      xml += "  <desc>" + StringUtil.escapeHTML(description) + "</desc>"
+    if (testDescription != null && testDescription.length() > 0) {
+      xml += "  <desc>" + StringUtil.escapeHTML(testDescription) + "</desc>"
         + StringUtil.newLine;
     }
     xml += "  <op name=\"" + operation + "\"";
