@@ -21,6 +21,8 @@ public class PointTest implements TestConstants {
     Assert.assertEquals("Geometry Count", 1, point.getGeometryCount());
     Assert.assertNotNull("Not Null First Vertex", point.getVertex(0));
     Assert.assertEquals("Axis Count", coordinates.length, point.getAxisCount());
+    Assert.assertEquals("Vertex Count", coordinates.length,
+      point.getAxisCount());
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getValue(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
@@ -38,6 +40,8 @@ public class PointTest implements TestConstants {
     Assert.assertEquals("Is Empty", true, point.isEmpty());
     Assert.assertEquals("Geometry Count", 0, point.getGeometryCount());
     Assert.assertNull("Null First Vertex", point.getVertex(0));
+    Assert.assertNull("Null First Segment", point.getSegment(0));
+
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getValue(axisIndex);
       if (!Double.isNaN(value)) {

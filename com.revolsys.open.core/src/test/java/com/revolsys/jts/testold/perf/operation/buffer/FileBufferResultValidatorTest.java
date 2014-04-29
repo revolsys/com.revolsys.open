@@ -32,17 +32,15 @@
  */
 package com.revolsys.jts.testold.perf.operation.buffer;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
+import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
@@ -62,14 +60,15 @@ public class FileBufferResultValidatorTest extends TestCase {
 
   void runAll(final List geoms, final double dist) {
     final Stopwatch sw = new Stopwatch();
-  //  System.out.println("Geom count = " + geoms.size() + "   distance = " + dist);
+    // System.out.println("Geom count = " + geoms.size() + "   distance = " +
+    // dist);
     for (final Iterator i = geoms.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
       runBuffer(g, dist);
       runBuffer(g.reverse(), dist);
       System.out.print(".");
     }
-  //  System.out.println("  " + sw.getTimeString());
+    // System.out.println("  " + sw.getTimeString());
 
   }
 
@@ -81,20 +80,15 @@ public class FileBufferResultValidatorTest extends TestCase {
     if (!validator.isValid()) {
       final String msg = validator.getErrorMessage();
 
-    //  System.out.println(msg);
-    //  System.out.println(WktWriter.point(validator.getErrorLocation()));
-    //  System.out.println(g);
+      // System.out.println(msg);
+      // System.out.println(WktWriter.point(validator.getErrorLocation()));
+      // System.out.println(g);
     }
     assertTrue(validator.isValid());
   }
 
-  void runTest(final String resource) throws Exception {
-    final InputStream is = this.getClass().getResourceAsStream(resource);
-    runTest(new WKTFileReader(new InputStreamReader(is), this.rdr));
-  }
-
-  void runTest(final WKTFileReader fileRdr) throws Exception {
-    final List polys = fileRdr.read();
+  void runTest(final String file) throws Exception {
+    final List polys = InteriorPointTest.getTestGeometries(file);
 
     runAll(polys, 0.01);
     runAll(polys, 0.1);
@@ -106,7 +100,6 @@ public class FileBufferResultValidatorTest extends TestCase {
   }
 
   public void testAfrica() throws Exception {
-    // runTest(TestFiles.DATA_DIR + "world.wkt");
-    runTest("../../../../../data/africa.wkt");
+    runTest("africa.wkt");
   }
 }

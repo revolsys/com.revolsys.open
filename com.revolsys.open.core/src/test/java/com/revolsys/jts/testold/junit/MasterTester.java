@@ -44,6 +44,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.revolsys.jts.test.geometry.BoundingBoxTest;
 import com.revolsys.jts.testold.algorithm.AngleTest;
 import com.revolsys.jts.testold.algorithm.ConvexHullTest;
+import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.testold.algorithm.IsCCWTest;
 import com.revolsys.jts.testold.algorithm.NonRobustLineIntersectorTest;
 import com.revolsys.jts.testold.algorithm.OrientationIndexTest;
@@ -110,7 +111,7 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
   RelateBoundaryNodeRuleTest.class, RobustLineIntersectionTest.class,
   SimpleTest.class, SIRtreeTest.class, STRtreeTest.class, WKTReaderTest.class,
   WKBTest.class, UnaryUnionTest.class, ValidClosedRingTest.class,
-  ValidSelfTouchingRingFormingHoleTest.class,
+  ValidSelfTouchingRingFormingHoleTest.class, InteriorPointTest.class
 })
 public class MasterTester extends TestCase {
 

@@ -32,74 +32,42 @@
  */
 package com.revolsys.jts.testold.algorithm;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
-import junit.textui.TestRunner;
 
+import org.springframework.core.io.ClassPathResource;
+
+import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
+import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.io.ParseException;
-import com.revolsys.jts.io.WKTFileReader;
-import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.testold.TestFiles;
-import com.revolsys.jts.util.Stopwatch;
 
 public class InteriorPointTest extends TestCase {
-  public static void main(final String args[]) {
-    TestRunner.run(InteriorPointTest.class);
+  public static List<Geometry> getTestGeometries(final String file) {
+    final ClassPathResource resource = new ClassPathResource(
+      "/com/revolsys/jts/test/data/" + file);
+    try (
+      Reader<Geometry> reader = AbstractGeometryReaderFactory.geometryReader(resource)) {
+      return reader.read();
+    }
   }
-
-  WKTReader rdr = new WKTReader();
 
   public InteriorPointTest(final String name) {
     super(name);
   }
 
-  private void checkInteriorPoint(final Geometry g) {
-    final Point ip = g.getInteriorPoint();
-    assertTrue(g.contains(ip));
-  }
-
-  void checkInteriorPoint(final List geoms) {
-    final Stopwatch sw = new Stopwatch();
-    for (final Iterator i = geoms.iterator(); i.hasNext();) {
-      final Geometry g = (Geometry)i.next();
-      checkInteriorPoint(g);
-      // System.out.print(".");
+  private void checkInteriorPointFile(final String file) throws Exception {
+    final List<Geometry> geometries = getTestGeometries(file);
+    for (final Geometry g : geometries) {
+      final Point ip = g.getInteriorPoint();
+      assertTrue(g.contains(ip));
     }
-    // System.out.println();
-    // System.out.println("  " + sw.getTimeString());
-  }
-
-  void checkInteriorPointFile(final String file) throws Exception {
-    final WKTFileReader fileRdr = new WKTFileReader(new FileReader(file),
-      this.rdr);
-    checkInteriorPointFile(fileRdr);
-  }
-
-  private void checkInteriorPointFile(final WKTFileReader fileRdr)
-    throws IOException, ParseException {
-    final List polys = fileRdr.read();
-    checkInteriorPoint(polys);
-  }
-
-  void checkInteriorPointResource(final String resource) throws Exception {
-    final InputStream is = this.getClass().getResourceAsStream(resource);
-    final WKTFileReader fileRdr = new WKTFileReader(new InputStreamReader(is),
-      this.rdr);
-    checkInteriorPointFile(fileRdr);
   }
 
   public void testAll() throws Exception {
-    checkInteriorPointFile(TestFiles.DATA_DIR + "world.wkt");
-    checkInteriorPointFile(TestFiles.DATA_DIR + "africa.wkt");
-    // checkInteriorPointFile("../../../../../data/africa.wkt");
+    checkInteriorPointFile("world.wkt");
+    checkInteriorPointFile("africa.wkt");
   }
 
 }

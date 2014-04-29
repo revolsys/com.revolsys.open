@@ -12,7 +12,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.operation.linemerge.LineMerger;
-import com.revolsys.jts.testold.junit.GeometryUtils;
+import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.testold.perf.PerformanceTestCase;
 import com.revolsys.jts.testold.perf.PerformanceTestRunner;
 
@@ -41,7 +41,8 @@ public class LineDissolvePerfTest extends PerformanceTestCase {
     final LineMerger merger = new LineMerger();
     merger.add(dissolved);
     final Collection mergedColl = merger.getMergedLineStrings();
-    final Geometry merged = lines.getGeometryFactory().buildGeometry(mergedColl);
+    final Geometry merged = lines.getGeometryFactory()
+      .buildGeometry(mergedColl);
     return merged;
   }
 
@@ -60,21 +61,21 @@ public class LineDissolvePerfTest extends PerformanceTestCase {
 
   public void runBruteForce_World() {
     final Geometry result = dissolveLines(this.data);
-  //  System.out.println(Memory.allString());
+    // System.out.println(Memory.allString());
   }
 
   public void runDissolver_World() {
     final LineDissolver dis = new LineDissolver();
     dis.add(this.data);
     final Geometry result = dis.getResult();
-  //  System.out.println();
-  //  System.out.println(Memory.allString());
+    // System.out.println();
+    // System.out.println(Memory.allString());
   }
 
   @Override
   public void setUp() throws IOException, ParseException {
-  //  System.out.println("Loading data...");
-    this.data = GeometryUtils.readWKTFile("/Users/mdavis/myproj/jts/svn/jts-topo-suite/trunk/jts/testdata/world.wkt");
+    // System.out.println("Loading data...");
+    this.data = InteriorPointTest.getTestGeometries("world.wkt");
   }
 
 }

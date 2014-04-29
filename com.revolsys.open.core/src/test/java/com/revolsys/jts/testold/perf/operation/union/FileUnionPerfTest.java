@@ -3,9 +3,8 @@ package com.revolsys.jts.testold.perf.operation.union;
 import java.util.List;
 
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.testold.TestFiles;
+import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 
 public class FileUnionPerfTest {
   static final int MAX_ITER = 1;
@@ -32,23 +31,11 @@ public class FileUnionPerfTest {
   }
 
   public void test() throws Exception {
-
-    // test(TestFiles.DATA_DIR + "africa.wkt");
-    // test(TestFiles.DATA_DIR + "world.wkt");
-    // test(TestFiles.DATA_DIR + "bc-250k.wkt");
-    // test(TestFiles.DATA_DIR + "bc_20K.wkt");
-
-    // test("C:\\data\\martin\\proj\\jts\\data\\veg.wkt");
-
-    test(TestFiles.DATA_DIR + "africa.wkt");
-    // test(TestFiles.DATA_DIR + "world.wkt");
-    // test("C:\\proj\\JTS\\test\\union\\npsa_albers.wkt");
-
+    test("africa.wkt");
   }
 
-  public void test(final String filename) throws Exception {
-    final WKTFileReader fileRdr = new WKTFileReader(filename, wktRdr);
-    final List polys = fileRdr.read();
+  public void test(final String file) throws Exception {
+    final List polys = InteriorPointTest.getTestGeometries(file);
 
     final UnionPerfTester tester = new UnionPerfTester(polys);
     tester.runAll();

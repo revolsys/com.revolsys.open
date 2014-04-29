@@ -6,7 +6,6 @@ import com.revolsys.jts.densify.Densifier;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
@@ -14,6 +13,7 @@ import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance.DistanceOp;
 import com.revolsys.jts.operation.distance.IndexedFacetDistance;
+import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
@@ -119,7 +119,7 @@ public class TestPerfDistanceLinesPoints {
   }
 
   Geometry loadData(final String file) throws Exception {
-    final List geoms = loadWKT(file);
+    final List geoms = InteriorPointTest.getTestGeometries(file);
     return geomFact.buildGeometry(geoms);
   }
 
@@ -176,21 +176,6 @@ public class TestPerfDistanceLinesPoints {
     // Geometry lines = createLine(EXTENT, num);
     final Geometry target = createDiagonalCircles(EXTENT, NUM_TARGET_ITEMS);
     final Geometry[] pts = createPoints(target.getBoundingBox(), num);
-
-    /*
-     * Geometry target =
-     * loadData("C:\\data\\martin\\proj\\jts\\testing\\distance\\bc_coast.wkt");
-     * Envelope bcEnv_Albers = new Envelope(-45838, 1882064, 255756, 1733287);
-     * Geometry[] pts = createPoints(bcEnv_Albers, num);
-     */
-    test(pts, target);
-  }
-
-  public void xtest(final int num) throws Exception {
-    final Geometry target = loadData("C:\\proj\\JTS\\test\\g2e\\ffmwdec08.wkt");
-    final BoundingBox bcEnv_Albers = new Envelope(2, -45838, 255756, 1882064,
-      1733287);
-    final Geometry[] pts = createPoints(bcEnv_Albers, num);
 
     test(pts, target);
   }

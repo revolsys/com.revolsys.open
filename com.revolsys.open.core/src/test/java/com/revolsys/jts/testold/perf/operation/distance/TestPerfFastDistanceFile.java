@@ -5,6 +5,7 @@ import java.util.List;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
 
 public class TestPerfFastDistanceFile {
@@ -73,12 +74,7 @@ public class TestPerfFastDistanceFile {
   }
 
   public void test() throws Exception {
-
-    // List geoms =
-    // loadWKT("C:\\data\\martin\\proj\\jts\\sandbox\\jts\\testdata\\africa.wkt");
-    final List geoms = loadWKT("C:\\data\\martin\\proj\\jts\\sandbox\\jts\\testdata\\world.wkt");
-
-    // testAllDistances(geoms, 100);
+    final List geoms = InteriorPointTest.getTestGeometries("world.wkt");
 
     testAllDistances(geoms, 1);
     testAllDistances(geoms, 2);
