@@ -47,7 +47,6 @@ import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 
 /**
@@ -60,14 +59,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 public abstract class AbstractGeometryCollection extends AbstractGeometry
   implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
-
-  @Override
-  public void apply(final GeometryComponentFilter filter) {
-    filter.filter(this);
-    for (final Geometry geometry : geometries()) {
-      geometry.apply(filter);
-    }
-  }
 
   /**
    * Creates and returns a full copy of this {@link GeometryCollection} object.
@@ -256,11 +247,36 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
     return dimension;
   }
 
+  @Override
+  public <V extends Geometry> List<V> getGeometries(final Class<V> geometryClass) {
+    final List<V> geometries = super.getGeometries(geometryClass);
+    for (final Geometry geometry : geometries()) {
+      if (geometry != null) {
+        final List<V> partGeometries = geometry.getGeometries(geometryClass);
+        geometries.addAll(partGeometries);
+      }
+    }
+    return geometries;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
     final List<Geometry> geometries = getGeometries();
     return (V)geometries.get(partIndex);
+  }
+
+  @Override
+  public <V extends Geometry> List<V> getGeometryComponents(
+    final Class<V> geometryClass) {
+    final List<V> geometries = super.getGeometryComponents(geometryClass);
+    for (final Geometry geometry : geometries()) {
+      if (geometry != null) {
+        final List<V> partGeometries = geometry.getGeometryComponents(geometryClass);
+        geometries.addAll(partGeometries);
+      }
+    }
+    return geometries;
   }
 
   @Override

@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+
 /**
  * Utility functions for manipulating {@link CoordinatesList}s
  *
@@ -75,10 +77,10 @@ public class CoordinateSequences {
     }
   }
 
-  private static CoordinatesList createClosedRing(
-    final CoordinateSequenceFactory fact, final CoordinatesList seq,
+  private static CoordinatesList createClosedRing(final CoordinatesList seq,
     final int size) {
-    final CoordinatesList newseq = fact.create(size, seq.getAxisCount());
+    final CoordinatesList newseq = new DoubleCoordinatesList(size,
+      seq.getAxisCount());
     final int n = seq.size();
     copy(seq, 0, newseq, 0, n);
     // fill remaining coordinates with start point
@@ -95,13 +97,12 @@ public class CoordinateSequences {
    * without modification.
    * If the input sequence is too short or is not closed, 
    * it is extended with one or more copies of the start point.
-   * 
-   * @param fact the CoordinateSequenceFactory to use to create the new sequence
    * @param seq the sequence to test
+   * @param fact the CoordinateSequenceFactory to use to create the new sequence
+   * 
    * @return the original sequence, if it was a valid ring, or a new sequence which is valid.
    */
-  public static CoordinatesList ensureValidRing(
-    final CoordinateSequenceFactory fact, final CoordinatesList seq) {
+  public static CoordinatesList ensureValidRing(final CoordinatesList seq) {
     final int n = seq.size();
     // empty sequence is valid
     if (n == 0) {
@@ -109,7 +110,7 @@ public class CoordinateSequences {
     }
     // too short - make a new one
     if (n <= 3) {
-      return createClosedRing(fact, seq, 4);
+      return createClosedRing(seq, 4);
     }
 
     final boolean isClosed = seq.getValue(0, CoordinatesList.X) == seq.getValue(
@@ -120,12 +121,12 @@ public class CoordinateSequences {
       return seq;
     }
     // make a new closed ring
-    return createClosedRing(fact, seq, n + 1);
+    return createClosedRing(seq, n + 1);
   }
 
-  public static CoordinatesList extend(final CoordinateSequenceFactory fact,
-    final CoordinatesList seq, final int size) {
-    final CoordinatesList newseq = fact.create(size, seq.getAxisCount());
+  public static CoordinatesList extend(final CoordinatesList seq, final int size) {
+    final CoordinatesList newseq = new DoubleCoordinatesList(size,
+      seq.getAxisCount());
     final int n = seq.size();
     copy(seq, 0, newseq, 0, n);
     // fill remaining coordinates with end point, if it exists

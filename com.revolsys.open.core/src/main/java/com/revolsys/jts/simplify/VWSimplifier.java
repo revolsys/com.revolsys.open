@@ -33,6 +33,7 @@
 
 package com.revolsys.jts.simplify;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -105,7 +106,7 @@ public class VWSimplifier {
       } else {
         newPts = VWLineSimplifier.simplify(inputPts, distanceTolerance);
       }
-      return factory.getCoordinateSequenceFactory().create(newPts);
+      return new DoubleCoordinatesList(newPts);
     }
 
     /**
@@ -192,7 +193,7 @@ public class VWSimplifier {
   public Geometry getResultGeometry() {
     // empty input produces an empty result
     if (inputGeom.isEmpty()) {
-      return (Geometry)inputGeom.clone();
+      return inputGeom.clone();
     }
 
     return (new VWTransformer(isEnsureValidTopology)).transform(inputGeom);

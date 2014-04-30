@@ -12,7 +12,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PrecisionModel;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.noding.BasicSegmentString;
 import com.revolsys.jts.noding.FastNodingValidator;
 import com.revolsys.jts.noding.IntersectionAdder;
@@ -44,7 +43,7 @@ public class NodingFunctions {
 
   private static List createNodedSegmentStrings(final Geometry geom) {
     final List segs = new ArrayList();
-    final List lines = LinearComponentExtracter.getLines(geom);
+    final List lines = geom.getGeometries(LineString.class);
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
       segs.add(new NodedSegmentString(line.getCoordinateArray(), null));
@@ -54,7 +53,7 @@ public class NodingFunctions {
 
   private static List createSegmentStrings(final Geometry geom) {
     final List segs = new ArrayList();
-    final List lines = LinearComponentExtracter.getLines(geom);
+    final List lines = geom.getGeometries(LineString.class);
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
       segs.add(new BasicSegmentString(line.getCoordinateArray(), null));

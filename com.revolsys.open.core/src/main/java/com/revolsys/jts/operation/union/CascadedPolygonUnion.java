@@ -43,7 +43,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.util.GeometryCombiner;
-import com.revolsys.jts.geom.util.PolygonExtracter;
 import com.revolsys.jts.index.strtree.STRtree;
 
 /**
@@ -101,18 +100,20 @@ public class CascadedPolygonUnion {
    * A particular use case is to filter out non-polygonal components
    * returned from an overlay operation.  
    * 
-   * @param g the geometry to filter
+   * @param geometry the geometry to filter
    * @return a Polygonal geometry
    */
-  private static Geometry restrictToPolygons(final Geometry g) {
-    if (g instanceof Polygonal) {
-      return g;
+  private static Geometry restrictToPolygons(final Geometry geometry) {
+    if (geometry instanceof Polygonal) {
+      return geometry;
+    } else {
+      final List<Polygon> polygons = geometry.getGeometries(Polygon.class);
+      if (polygons.size() == 1) {
+        return polygons.get(0);
+      }
+      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+      return geometryFactory.multiPolygon(polygons);
     }
-    final List polygons = PolygonExtracter.getPolygons(g);
-    if (polygons.size() == 1) {
-      return (Polygon)polygons.get(0);
-    }
-    return g.getGeometryFactory().multiPolygon(polygons);
   }
 
   /**

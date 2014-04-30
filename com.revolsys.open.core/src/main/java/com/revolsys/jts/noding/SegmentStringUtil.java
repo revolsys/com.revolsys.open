@@ -40,7 +40,6 @@ import java.util.List;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 
 /**
  * Utility methods for processing {@link SegmentString}s.
@@ -59,7 +58,7 @@ public class SegmentStringUtil {
    */
   public static List extractSegmentStrings(final Geometry geom) {
     final List segStr = new ArrayList();
-    final List lines = LinearComponentExtracter.getLines(geom);
+    final List lines = geom.getGeometryComponents(LineString.class);
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
       final Coordinates[] pts = line.getCoordinateArray();

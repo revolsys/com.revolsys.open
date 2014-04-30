@@ -173,16 +173,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
     "Polygon", "MultiPolygon", "GeometryCollection"));
 
   /**
-   *  Performs an operation with or on this Geometry and its
-   *  component Geometry's.  Only GeometryCollections and
-   *  Polygons have component Geometry's; for Polygons they are the LinearRings
-   *  of the shell and holes.
-   *
-   *@param  filter  the filter to apply to this <code>Geometry</code>.
-   */
-  void apply(GeometryComponentFilter filter);
-
-  /**
    * Computes a buffer area around this geometry having the given width. The
    * buffer of a Geometry is the Minkowski sum or difference of the geometry
    * with a disc of radius <code>abs(distance)</code>.
@@ -738,17 +728,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   Iterable<Geometry> geometries();
 
   /**
-   * Notifies this geometry that its coordinates have been changed by an external
-   * party (for example, via a {@link CoordinateFilter}). 
-   * When this method is called the geometry will flush
-   * and/or update any derived information it has cached (such as its {@link Envelope} ).
-   * The operation is applied to all component Geometries.
-   */
-  void geometryChanged();
-
-  void geometryChangedAction();
-
-  /**
    *  Returns the area of this <code>Geometry</code>.
    *  Areal Geometries have a non-zero area.
    *  They override this function to compute the area.
@@ -900,6 +879,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   <V extends Geometry> List<V> getGeometries();
 
+  <V extends Geometry> List<V> getGeometries(Class<V> geometryClass);
+
   /**
    * Returns an element {@link Geometry} from a {@link GeometryCollection}
    * (or <code>this</code>, if the geometry is not a collection).
@@ -907,8 +888,17 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @param partIndex the index of the geometry element
    * @return the n'th geometry contained in this geometry
    */
-  @SuppressWarnings("unchecked")
   <V extends Geometry> V getGeometry(final int partIndex);
+
+  /**
+   * Differs from {@link #getGeometries(Class)} in that it will return matching {@link Polygon#rings()}
+   * 
+   * @param geometryClass
+   * @return
+   */
+
+  <V extends Geometry> List<V> getGeometryComponents(
+    final Class<V> geometryClass);
 
   /**
    * Returns the number of {@link Geometry}s in a {@link GeometryCollection}

@@ -49,7 +49,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
  * <p>
  * Implementing a custom coordinate storage structure
  * requires implementing the {@link CoordinatesList} and
- * {@link CoordinateSequenceFactory} interfaces. 
+ *interfaces. 
  * To use the custom CoordinatesList, create a
  * new {@link GeometryFactory} parameterized by the CoordinateSequenceFactory
  * The {@link GeometryFactory} can then be used to create new {@link Geometry}s.

@@ -45,7 +45,6 @@ import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.index.chain.MonotoneChain;
 import com.revolsys.jts.index.chain.MonotoneChainBuilder;
@@ -72,9 +71,8 @@ class MCIndexedGeometry {
   }
 
   private void init(final Geometry geom) {
-    final List lines = LinearComponentExtracter.getLines(geom);
-    for (final Iterator i = lines.iterator(); i.hasNext();) {
-      final LineString line = (LineString)i.next();
+    final List<LineString> lines = geom.getGeometryComponents(LineString.class);
+    for (final LineString line : lines) {
       final Coordinates[] pts = line.getCoordinateArray();
       addLine(pts);
     }

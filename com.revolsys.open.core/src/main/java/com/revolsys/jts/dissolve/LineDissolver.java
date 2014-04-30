@@ -12,7 +12,6 @@ import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
@@ -39,48 +38,35 @@ import com.revolsys.jts.geom.LineString;
  * @author Martin Davis
  *
  */
-public class LineDissolver 
-{
+public class LineDissolver {
   /**
    * Dissolves the linear components in a geometry.
    * 
    * @param g the geometry to dissolve
    * @return the dissolved lines
    */
-  public static Geometry dissolve(Geometry g)
-  {
-    LineDissolver d = new LineDissolver();
+  public static Geometry dissolve(final Geometry g) {
+    final LineDissolver d = new LineDissolver();
     d.add(g);
     return d.getResult();
   }
-  
-  private Geometry result;
-  private GeometryFactory factory;
-  private DissolveEdgeGraph graph;
-  private List lines = new ArrayList();
 
-  public LineDissolver()
-  {
+  private Geometry result;
+
+  private GeometryFactory factory;
+
+  private final DissolveEdgeGraph graph;
+
+  private final List lines = new ArrayList();
+
+  private final Stack nodeEdgeStack = new Stack();
+
+  private DissolveHalfEdge ringStartEdge;
+
+  public LineDissolver() {
     graph = new DissolveEdgeGraph();
   }
-  
-  /**
-   * Adds a {@link Geometry} to be dissolved. 
-   * Any number of geometries may be adde by calling this method multiple times.
-   * Any type of Geometry may be added.  The constituent linework will be
-   * extracted to be dissolved.
-   * 
-   * @param geometry geometry to be line-merged
-   */  
-  public void add(Geometry geometry) {
-    geometry.apply(new GeometryComponentFilter() {
-      public void filter(Geometry component) {
-        if (component instanceof LineString) {
-          add((LineString)component);
-        }
-      }      
-    });
-  }
+
   /**
    * Adds a collection of Geometries to be processed. May be called multiple times.
    * Any dimension of Geometry may be added; the constituent linework will be
@@ -88,62 +74,90 @@ public class LineDissolver
    * 
    * @param geometries the geometries to be line-merged
    */
-  public void add(Collection geometries) 
-  {
-    for (Iterator i = geometries.iterator(); i.hasNext(); ) {
-      Geometry geometry = (Geometry) i.next();
+  public void add(final Collection geometries) {
+    for (final Iterator i = geometries.iterator(); i.hasNext();) {
+      final Geometry geometry = (Geometry)i.next();
       add(geometry);
     }
   }
-  
-  private void add(LineString lineString) {
+
+  /**
+   * Adds a {@link Geometry} to be dissolved. 
+   * Any number of geometries may be added by calling this method multiple times.
+   * Any type of Geometry may be added.  The constituent linework will be
+   * extracted to be dissolved.
+   * 
+   * @param geometry geometry to be line-merged
+   */
+  public void add(final Geometry geometry) {
+    for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+      add(line);
+    }
+  }
+
+  private void add(final LineString lineString) {
     if (factory == null) {
       this.factory = lineString.getGeometryFactory();
     }
-    CoordinatesList seq = lineString.getCoordinatesList();
+    final CoordinatesList seq = lineString.getCoordinatesList();
     for (int i = 1; i < seq.size(); i++) {
-      DissolveHalfEdge e = (DissolveHalfEdge) graph.addEdge(seq.getCoordinate(i-1), seq.getCoordinate(i));
+      final DissolveHalfEdge e = (DissolveHalfEdge)graph.addEdge(
+        seq.getCoordinate(i - 1), seq.getCoordinate(i));
       /**
        * Record source initial segments, so that they can be reflected in output when needed
        * (i.e. during formation of isolated rings)
        */
-      if (i == 1)
+      if (i == 1) {
         e.setStart();
+      }
     }
   }
-  
+
+  private void addLine(final CoordinateList line) {
+    lines.add(factory.lineString(line.toCoordinateArray()));
+  }
+
   /**
-   * Gets the dissolved result as a MultiLineString.
+   * Builds a line starting from the given edge.
+   * The start edge origin is a node (valence = 1 or >= 3), 
+   * unless it is part of a pure ring.
+   * A pure ring has no other incident lines.
+   * In this case the start edge may occur anywhere on the ring.
    * 
-   * @return the dissolved lines
+   * The line is built up to the next node encountered,
+   * or until the start edge is re-encountered
+   * (which happens if the edges form a ring).
+   * 
+   * @param eStart
    */
-  public Geometry getResult()
-  {
-    if (result == null)
-      computeResult();
-    return result;
-  }
+  private void buildLine(final HalfEdge eStart) {
+    final CoordinateList line = new CoordinateList();
+    DissolveHalfEdge e = (DissolveHalfEdge)eStart;
+    ringStartEdge = null;
 
-  private void computeResult() {
-    Collection edges = graph.getVertexEdges();
-    for (Iterator i = edges.iterator(); i.hasNext(); ) {
-      HalfEdge e = (HalfEdge) i.next();
-      if (MarkHalfEdge.isMarked(e)) continue;
-      process(e);
+    MarkHalfEdge.markBoth(e);
+    line.add(e.orig().clone(), false);
+    // scan along the path until a node is found (if one exists)
+    while (e.sym().degree() == 2) {
+      updateRingStartEdge(e);
+      final DissolveHalfEdge eNext = (DissolveHalfEdge)e.next();
+      // check if edges form a ring - if so, we're done
+      if (eNext == eStart) {
+        buildRing(ringStartEdge);
+        return;
+      }
+      // add point to line, and move to next edge
+      line.add(eNext.orig().clone(), false);
+      e = eNext;
+      MarkHalfEdge.markBoth(e);
     }
-    result = factory.buildGeometry(lines);
-  }
+    // add final node
+    line.add(e.dest().clone(), false);
 
-  private Stack nodeEdgeStack = new Stack();
-  
-  private void process(HalfEdge e) {
-    HalfEdge eNode = e.prevNode();
-    // if edge is in a ring, just process this edge
-    if (eNode == null)
-      eNode = e;
-    stackEdges(eNode);
-    // extract lines from node edges in stack
-    buildLines();
+    // queue up the final node edges
+    stackEdges(e.sym());
+    // store the scanned line
+    addLine(line);
   }
 
   /**
@@ -152,16 +166,90 @@ public class LineDissolver
    * extracts the line it initiates.
    */
   private void buildLines() {
-    while (! nodeEdgeStack.empty()) {
-      HalfEdge e = (HalfEdge) nodeEdgeStack.pop();
-      if (MarkHalfEdge.isMarked(e))
+    while (!nodeEdgeStack.empty()) {
+      final HalfEdge e = (HalfEdge)nodeEdgeStack.pop();
+      if (MarkHalfEdge.isMarked(e)) {
         continue;
+      }
       buildLine(e);
     }
   }
-  
-  private DissolveHalfEdge ringStartEdge;
-  
+
+  private void buildRing(final HalfEdge eStartRing) {
+    final CoordinateList line = new CoordinateList();
+    HalfEdge e = eStartRing;
+
+    line.add(e.orig().clone(), false);
+    // scan along the path until a node is found (if one exists)
+    while (e.sym().degree() == 2) {
+      final HalfEdge eNext = e.next();
+      // check if edges form a ring - if so, we're done
+      if (eNext == eStartRing) {
+        break;
+      }
+
+      // add point to line, and move to next edge
+      line.add(eNext.orig().clone(), false);
+      e = eNext;
+    }
+    // add final node
+    line.add(e.dest().clone(), false);
+
+    // store the scanned line
+    addLine(line);
+  }
+
+  private void computeResult() {
+    final Collection edges = graph.getVertexEdges();
+    for (final Iterator i = edges.iterator(); i.hasNext();) {
+      final HalfEdge e = (HalfEdge)i.next();
+      if (MarkHalfEdge.isMarked(e)) {
+        continue;
+      }
+      process(e);
+    }
+    result = factory.buildGeometry(lines);
+  }
+
+  /**
+   * Gets the dissolved result as a MultiLineString.
+   * 
+   * @return the dissolved lines
+   */
+  public Geometry getResult() {
+    if (result == null) {
+      computeResult();
+    }
+    return result;
+  }
+
+  private void process(final HalfEdge e) {
+    HalfEdge eNode = e.prevNode();
+    // if edge is in a ring, just process this edge
+    if (eNode == null) {
+      eNode = e;
+    }
+    stackEdges(eNode);
+    // extract lines from node edges in stack
+    buildLines();
+  }
+
+  /**
+   * Adds edges around this node to the stack.
+   * 
+   * @param node
+   */
+  private void stackEdges(final HalfEdge node) {
+    HalfEdge e = node;
+    do {
+      if (!MarkHalfEdge.isMarked(e)) {
+        nodeEdgeStack.add(e);
+      }
+      e = e.oNext();
+    } while (e != node);
+
+  }
+
   /**
    * Updates the tracked ringStartEdge
    * if the given edge has a lower origin
@@ -177,11 +265,12 @@ public class LineDissolver
    * 
    * @param e
    */
-  private void updateRingStartEdge(DissolveHalfEdge e)
-  {
-    if (! e.isStart()) {
-      e = (DissolveHalfEdge) e.sym();
-      if (! e.isStart()) return;
+  private void updateRingStartEdge(DissolveHalfEdge e) {
+    if (!e.isStart()) {
+      e = (DissolveHalfEdge)e.sym();
+      if (!e.isStart()) {
+        return;
+      }
     }
     // here e is known to be a start edge
     if (ringStartEdge == null) {
@@ -191,91 +280,6 @@ public class LineDissolver
     if (e.orig().compareTo(ringStartEdge.orig()) < 0) {
       ringStartEdge = e;
     }
-  }
-  
-  /**
-   * Builds a line starting from the given edge.
-   * The start edge origin is a node (valence = 1 or >= 3), 
-   * unless it is part of a pure ring.
-   * A pure ring has no other incident lines.
-   * In this case the start edge may occur anywhere on the ring.
-   * 
-   * The line is built up to the next node encountered,
-   * or until the start edge is re-encountered
-   * (which happens if the edges form a ring).
-   * 
-   * @param eStart
-   */
-  private void buildLine(HalfEdge eStart) {
-    CoordinateList line = new CoordinateList();
-    DissolveHalfEdge e = (DissolveHalfEdge) eStart;
-    ringStartEdge = null;
-    
-    MarkHalfEdge.markBoth(e);
-    line.add(e.orig().clone(), false);
-    // scan along the path until a node is found (if one exists)
-    while (e.sym().degree() == 2) {
-      updateRingStartEdge(e);
-      DissolveHalfEdge eNext = (DissolveHalfEdge) e.next();
-      // check if edges form a ring - if so, we're done
-      if (eNext == eStart)  {
-        buildRing(ringStartEdge);
-        return;
-      }
-      // add point to line, and move to next edge
-      line.add(eNext.orig().clone(), false);
-      e = eNext;
-      MarkHalfEdge.markBoth(e);
-    }
-    // add final node
-    line.add(e.dest().clone(), false);
-    
-    // queue up the final node edges
-    stackEdges(e.sym());
-    // store the scanned line
-    addLine(line);
-  }
-
-  private void buildRing(HalfEdge eStartRing) {
-    CoordinateList line = new CoordinateList();
-    HalfEdge e = eStartRing;
-    
-    line.add(e.orig().clone(), false);
-    // scan along the path until a node is found (if one exists)
-    while (e.sym().degree() == 2) {
-      HalfEdge eNext = e.next();
-      // check if edges form a ring - if so, we're done
-      if (eNext == eStartRing)
-        break;
-      
-      // add point to line, and move to next edge
-      line.add(eNext.orig().clone(), false);
-      e = eNext;
-    }
-    // add final node
-    line.add(e.dest().clone(), false);
-    
-    // store the scanned line
-    addLine(line);
-  }
-
-  private void addLine(CoordinateList line) {
-    lines.add(factory.lineString(line.toCoordinateArray()));
-  }
-
-  /**
-   * Adds edges around this node to the stack.
-   * 
-   * @param node
-   */
-  private void stackEdges(HalfEdge node) {
-    HalfEdge e = node;
-    do {
-      if (! MarkHalfEdge.isMarked(e))
-        nodeEdgeStack.add(e);
-      e = e.oNext();
-    } while (e != node);
-
   }
 
 }

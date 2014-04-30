@@ -3,8 +3,8 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateSequenceFactory;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
@@ -33,8 +33,6 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
     }
     return coords;
   }
-
-  abstract CoordinateSequenceFactory getCSFactory();
 
   boolean isAllCoordsEqual(final CoordinatesList seq, final Coordinates coord) {
     for (int i = 0; i < seq.size(); i++) {
@@ -114,7 +112,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
   public void test2DZOrdinate() {
     final Coordinates[] coords = createArray(SIZE);
 
-    final CoordinatesList seq = getCSFactory().create(SIZE, 2);
+    final CoordinatesList seq = new DoubleCoordinatesList(SIZE, 2);
     for (int i = 0; i < seq.size(); i++) {
       seq.setValue(i, 0, coords[i].getX());
       seq.setValue(i, 1, coords[i].getY());
@@ -128,22 +126,14 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
 
   public void testCreateByInit() {
     final Coordinates[] coords = createArray(SIZE);
-    final CoordinatesList seq = getCSFactory().create(coords);
+    final CoordinatesList seq = new DoubleCoordinatesList(coords);
     assertTrue(isEqual(seq, coords));
-  }
-
-  public void testCreateByInitAndCopy() {
-    final Coordinates[] coords = createArray(SIZE);
-    final CoordinateSequenceFactory factory = getCSFactory();
-    final CoordinatesList seq = factory.create(coords);
-    final CoordinatesList seq2 = factory.create(seq);
-    assertTrue(isEqual(seq2, coords));
   }
 
   public void testCreateBySizeAndModify() {
     final Coordinates[] coords = createArray(SIZE);
 
-    final CoordinatesList seq = getCSFactory().create(SIZE, 3);
+    final CoordinatesList seq = new DoubleCoordinatesList(SIZE, 3);
     for (int i = 0; i < seq.size(); i++) {
       seq.setValue(i, 0, coords[i].getX());
       seq.setValue(i, 1, coords[i].getY());
@@ -154,10 +144,10 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
   }
 
   public void testZeroLength() {
-    final CoordinatesList seq = getCSFactory().create(0, 3);
+    final CoordinatesList seq = new DoubleCoordinatesList(0, 3);
     assertTrue(seq.size() == 0);
 
-    final CoordinatesList seq2 = getCSFactory().create((Coordinates[])null);
+    final CoordinatesList seq2 = new DoubleCoordinatesList(0);
     assertTrue(seq2.size() == 0);
   }
 }

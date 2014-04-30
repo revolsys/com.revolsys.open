@@ -41,7 +41,6 @@ import com.revolsys.jts.dissolve.LineDissolver;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.operation.linemerge.LineSequencer;
 
@@ -65,7 +64,7 @@ public class LineHandlingFunctions {
   }
 
   public static Geometry extractChains(final Geometry g, final int maxChainSize) {
-    final List lines = LinearComponentExtracter.getLines(g);
+    final List lines = g.getGeometries(LineString.class);
     final List chains = new ArrayList();
     for (final Iterator it = lines.iterator(); it.hasNext();) {
       final LineString line = (LineString)it.next();
@@ -78,12 +77,12 @@ public class LineHandlingFunctions {
   }
 
   public static Geometry extractLines(final Geometry g) {
-    final List lines = LinearComponentExtracter.getLines(g);
+    final List lines = g.getGeometries(LineString.class);
     return g.getGeometryFactory().buildGeometry(lines);
   }
 
   public static Geometry extractSegments(final Geometry g) {
-    final List lines = LinearComponentExtracter.getLines(g);
+    final List lines = g.getGeometries(LineString.class);
     final List segments = new ArrayList();
     for (final Iterator it = lines.iterator(); it.hasNext();) {
       final LineString line = (LineString)it.next();

@@ -1,35 +1,35 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.operation.overlay.validate;
 
@@ -41,7 +41,6 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 
 /**
  * Generates points offset by a given distance 
@@ -57,52 +56,15 @@ import com.revolsys.jts.geom.util.LinearComponentExtracter;
  * @author Martin Davis
  * @version 1.7
  */
-public class OffsetPointGenerator
-{
-  private Geometry g;
-  private boolean doLeft = true; 
+public class OffsetPointGenerator {
+  private final Geometry g;
+
+  private boolean doLeft = true;
+
   private boolean doRight = true;
-  
-  public OffsetPointGenerator(Geometry g)
-  {
+
+  public OffsetPointGenerator(final Geometry g) {
     this.g = g;
-  }
-
-  /**
-   * Set the sides on which to generate offset points.
-   * 
-   * @param doLeft
-   * @param doRight
-   */
-  public void setSidesToGenerate(boolean doLeft, boolean doRight)
-  {
-    this.doLeft = doLeft;
-    this.doRight = doRight;
-  }
-  
-  /**
-   * Gets the computed offset points.
-   *
-   * @return List<Coordinates>
-   */
-  public List getPoints(double offsetDistance)
-  {
-    List offsetPts = new ArrayList();
-    List lines = LinearComponentExtracter.getLines(g);
-    for (Iterator i = lines.iterator(); i.hasNext(); ) {
-      LineString line = (LineString) i.next();
-      extractPoints(line, offsetDistance, offsetPts);
-    }
-    //System.out.println(toMultiPoint(offsetPts));
-    return offsetPts;
-  }
-
-  private void extractPoints(LineString line, double offsetDistance, List offsetPts)
-  {
-    Coordinates[] pts = line.getCoordinateArray();
-    for (int i = 0; i < pts.length - 1; i++) {
-    	computeOffsetPoints(pts[i], pts[i + 1], offsetDistance, offsetPts);
-    }
   }
 
   /**
@@ -113,27 +75,65 @@ public class OffsetPointGenerator
    * @param p0 the first point of the segment to offset from
    * @param p1 the second point of the segment to offset from
    */
-  private void computeOffsetPoints(Coordinates p0, Coordinates p1, double offsetDistance, List offsetPts)
-  {
-    double dx = p1.getX() - p0.getX();
-    double dy = p1.getY() - p0.getY();
-    double len = Math.sqrt(dx * dx + dy * dy);
-    // u is the vector that is the length of the offset, in the direction of the segment
-    double ux = offsetDistance * dx / len;
-    double uy = offsetDistance * dy / len;
+  private void computeOffsetPoints(final Coordinates p0, final Coordinates p1,
+    final double offsetDistance, final List offsetPts) {
+    final double dx = p1.getX() - p0.getX();
+    final double dy = p1.getY() - p0.getY();
+    final double len = Math.sqrt(dx * dx + dy * dy);
+    // u is the vector that is the length of the offset, in the direction of the
+    // segment
+    final double ux = offsetDistance * dx / len;
+    final double uy = offsetDistance * dy / len;
 
-    double midX = (p1.getX() + p0.getX()) / 2;
-    double midY = (p1.getY() + p0.getY()) / 2;
+    final double midX = (p1.getX() + p0.getX()) / 2;
+    final double midY = (p1.getY() + p0.getY()) / 2;
 
     if (doLeft) {
-      Coordinates offsetLeft = new Coordinate((double)midX - uy, midY + ux, Coordinates.NULL_ORDINATE);
+      final Coordinates offsetLeft = new Coordinate(midX - uy, midY + ux,
+        Coordinates.NULL_ORDINATE);
       offsetPts.add(offsetLeft);
     }
-    
+
     if (doRight) {
-      Coordinates offsetRight = new Coordinate((double)midX + uy, midY - ux, Coordinates.NULL_ORDINATE);
+      final Coordinates offsetRight = new Coordinate(midX + uy, midY - ux,
+        Coordinates.NULL_ORDINATE);
       offsetPts.add(offsetRight);
     }
+  }
+
+  private void extractPoints(final LineString line,
+    final double offsetDistance, final List offsetPts) {
+    final Coordinates[] pts = line.getCoordinateArray();
+    for (int i = 0; i < pts.length - 1; i++) {
+      computeOffsetPoints(pts[i], pts[i + 1], offsetDistance, offsetPts);
+    }
+  }
+
+  /**
+   * Gets the computed offset points.
+   *
+   * @return List<Coordinates>
+   */
+  public List getPoints(final double offsetDistance) {
+    final List offsetPts = new ArrayList();
+    final List lines = g.getGeometryComponents(LineString.class);
+    for (final Iterator i = lines.iterator(); i.hasNext();) {
+      final LineString line = (LineString)i.next();
+      extractPoints(line, offsetDistance, offsetPts);
+    }
+    // System.out.println(toMultiPoint(offsetPts));
+    return offsetPts;
+  }
+
+  /**
+   * Set the sides on which to generate offset points.
+   * 
+   * @param doLeft
+   * @param doRight
+   */
+  public void setSidesToGenerate(final boolean doLeft, final boolean doRight) {
+    this.doLeft = doLeft;
+    this.doRight = doRight;
   }
 
 }

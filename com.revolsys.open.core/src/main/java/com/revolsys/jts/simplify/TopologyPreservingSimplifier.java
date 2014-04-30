@@ -1,46 +1,45 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.simplify;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.GeometryTransformer;
@@ -93,23 +92,66 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * @see DouglasPeuckerSimplifier
  *
  */
-public class TopologyPreservingSimplifier
-{
-  public static Geometry simplify(Geometry geom, double distanceTolerance)
-  {
-    TopologyPreservingSimplifier tss = new TopologyPreservingSimplifier(geom);
+public class TopologyPreservingSimplifier {
+
+  class LineStringTransformer extends GeometryTransformer {
+    @Override
+    protected CoordinatesList transformCoordinates(
+      final CoordinatesList coords, final Geometry parent) {
+      if (coords.size() == 0) {
+        return null;
+      }
+      // for linear components (including rings), simplify the linestring
+      if (parent instanceof LineString) {
+        final TaggedLineString taggedLine = linestringMap.get(parent);
+        return new DoubleCoordinatesList(taggedLine.getResultCoordinates());
+      }
+      // for anything else (e.g. points) just copy the coordinates
+      return super.transformCoordinates(coords, parent);
+    }
+  }
+
+  public static Geometry simplify(final Geometry geom,
+    final double distanceTolerance) {
+    final TopologyPreservingSimplifier tss = new TopologyPreservingSimplifier(
+      geom);
     tss.setDistanceTolerance(distanceTolerance);
     return tss.getResultGeometry();
   }
 
-  private Geometry inputGeom;
-  private TaggedLinesSimplifier lineSimplifier = new TaggedLinesSimplifier();
-  private Map linestringMap;
+  private final Geometry geometry;
 
-  public TopologyPreservingSimplifier(Geometry inputGeom)
-  {
-    this.inputGeom = inputGeom;
- }
+  private final TaggedLinesSimplifier lineSimplifier = new TaggedLinesSimplifier();
+
+  private Map<LineString, TaggedLineString> linestringMap;
+
+  public TopologyPreservingSimplifier(final Geometry geometry) {
+    this.geometry = geometry;
+  }
+
+  public Geometry getResultGeometry() {
+    // empty input produces an empty result
+    if (geometry.isEmpty()) {
+      return geometry.clone();
+    } else {
+
+      linestringMap = new HashMap<>();
+
+      for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+        // skip empty geometries
+        if (!line.isEmpty()) {
+          final int minSize = line.isClosed() ? 4 : 2;
+          final TaggedLineString taggedLine = new TaggedLineString(line,
+            minSize);
+          linestringMap.put(line, taggedLine);
+        }
+      }
+
+      lineSimplifier.simplify(linestringMap.values());
+      final Geometry result = (new LineStringTransformer()).transform(geometry);
+      return result;
+    }
+  }
 
   /**
    * Sets the distance tolerance for the simplification.
@@ -120,72 +162,11 @@ public class TopologyPreservingSimplifier
    *
    * @param distanceTolerance the approximation tolerance to use
    */
-  public void setDistanceTolerance(double distanceTolerance) {
-    if (distanceTolerance < 0.0)
+  public void setDistanceTolerance(final double distanceTolerance) {
+    if (distanceTolerance < 0.0) {
       throw new IllegalArgumentException("Tolerance must be non-negative");
+    }
     lineSimplifier.setDistanceTolerance(distanceTolerance);
   }
 
-  public Geometry getResultGeometry() 
-  {
-    // empty input produces an empty result
-    if (inputGeom.isEmpty()) return (Geometry) inputGeom.clone();
-    
-    linestringMap = new HashMap();
-    inputGeom.apply(new LineStringMapBuilderFilter());
-    lineSimplifier.simplify(linestringMap.values());
-    Geometry result = (new LineStringTransformer()).transform(inputGeom);
-    return result;
-  }
-
-  class LineStringTransformer
-      extends GeometryTransformer
-  {
-    protected CoordinatesList transformCoordinates(CoordinatesList coords, Geometry parent)
-    {
-      if (coords.size() == 0) return null;
-    	// for linear components (including rings), simplify the linestring
-      if (parent instanceof LineString) {
-        TaggedLineString taggedLine = (TaggedLineString) linestringMap.get(parent);
-        return createCoordinateSequence(taggedLine.getResultCoordinates());
-      }
-      // for anything else (e.g. points) just copy the coordinates
-      return super.transformCoordinates(coords, parent);
-    }
-  }
-
-  /**
-   * A filter to add linear geometries to the linestring map 
-   * with the appropriate minimum size constraint.
-   * Closed {@link LineString}s (including {@link LinearRing}s
-   * have a minimum output size constraint of 4, 
-   * to ensure the output is valid.
-   * For all other linestrings, the minimum size is 2 points.
-   * 
-   * @author Martin Davis
-   *
-   */
-  class LineStringMapBuilderFilter
-      implements GeometryComponentFilter
-  {
-    /**
-     * Filters linear geometries.
-     * 
-     * geom a geometry of any type 
-     */
-    public void filter(Geometry geom)
-    {
-      if (geom instanceof LineString) {
-        LineString line = (LineString) geom;
-        // skip empty geometries
-        if (line.isEmpty()) return;
-        
-        int minSize = ((LineString) line).isClosed() ? 4 : 2;
-        TaggedLineString taggedLine = new TaggedLineString((LineString) line, minSize);
-        linestringMap.put(line, taggedLine);
-      }
-    }
-  }
-
 }
-

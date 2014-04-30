@@ -1,35 +1,35 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.noding.snapround;
 
@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.PrecisionModel;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.noding.Noder;
 import com.revolsys.jts.noding.NodingValidator;
@@ -65,10 +64,11 @@ import com.revolsys.jts.noding.SegmentString;
  * 
  * 
  */
-public class GeometryNoder
-{
+public class GeometryNoder {
   private GeometryFactory geomFact;
-  private PrecisionModel pm;
+
+  private final PrecisionModel pm;
+
   private boolean isValidityChecked = false;
 
   /**
@@ -77,8 +77,43 @@ public class GeometryNoder
    * 
    * @param pm the precision model for the grid to snap-round to
    */
-  public GeometryNoder(PrecisionModel pm) {
+  public GeometryNoder(final PrecisionModel pm) {
     this.pm = pm;
+  }
+
+  private List<LineString> extractLines(final Collection<Geometry> geometries) {
+    final List<LineString> lines = new ArrayList<>();
+    for (final Geometry geometry : geometries) {
+      final List<LineString> geometryLines = geometry.getGeometryComponents(LineString.class);
+      lines.addAll(geometryLines);
+    }
+    return lines;
+  }
+
+  /**
+   * Nodes the linework of a set of Geometrys using SnapRounding. 
+   * 
+   * @param geoms a Collection of Geometrys of any type
+   * @return a List of LineStrings representing the noded linework of the input
+   */
+  public List node(final Collection geoms) {
+    // get geometry factory
+    final Geometry geom0 = (Geometry)geoms.iterator().next();
+    geomFact = geom0.getGeometryFactory();
+
+    final List segStrings = toSegmentStrings(extractLines(geoms));
+    // Noder sr = new SimpleSnapRounder(pm);
+    final Noder sr = new MCIndexSnapRounder(pm);
+    sr.computeNodes(segStrings);
+    final Collection nodedLines = sr.getNodedSubstrings();
+
+    // TODO: improve this to check for full snap-rounded correctness
+    if (isValidityChecked) {
+      final NodingValidator nv = new NodingValidator(nodedLines);
+      nv.checkValid();
+    }
+
+    return toLineStrings(nodedLines);
   }
 
   /**
@@ -86,67 +121,27 @@ public class GeometryNoder
    * 
    * @param isValidityChecked
    */
-  public void setValidate(boolean isValidityChecked)
-  {
-  	this.isValidityChecked = isValidityChecked;
-  }
-  
-  /**
-   * Nodes the linework of a set of Geometrys using SnapRounding. 
-   * 
-   * @param geoms a Collection of Geometrys of any type
-   * @return a List of LineStrings representing the noded linework of the input
-   */
-  public List node(Collection geoms)
-  {
-    // get geometry factory
-    Geometry geom0 = (Geometry) geoms.iterator().next();
-    geomFact = geom0.getGeometryFactory();
-
-    List segStrings = toSegmentStrings(extractLines(geoms));
-    //Noder sr = new SimpleSnapRounder(pm);
-    Noder sr = new MCIndexSnapRounder(pm);
-    sr.computeNodes(segStrings);
-    Collection nodedLines = sr.getNodedSubstrings();
-
-    //TODO: improve this to check for full snap-rounded correctness
-    if (isValidityChecked) {
-    	NodingValidator nv = new NodingValidator(nodedLines);
-    	nv.checkValid();
-    }
-
-    return toLineStrings(nodedLines);
+  public void setValidate(final boolean isValidityChecked) {
+    this.isValidityChecked = isValidityChecked;
   }
 
-  private List toLineStrings(Collection segStrings)
-  {
-    List lines = new ArrayList();
-    for (Iterator it = segStrings.iterator(); it.hasNext(); ) {
-      SegmentString ss = (SegmentString) it.next();
+  private List toLineStrings(final Collection segStrings) {
+    final List lines = new ArrayList();
+    for (final Iterator it = segStrings.iterator(); it.hasNext();) {
+      final SegmentString ss = (SegmentString)it.next();
       // skip collapsed lines
-      if (ss.size() < 2)
-      	continue;
+      if (ss.size() < 2) {
+        continue;
+      }
       lines.add(geomFact.lineString(ss.getCoordinates()));
     }
     return lines;
   }
 
-  private List extractLines(Collection geoms)
-  {
-    List lines = new ArrayList();
-    LinearComponentExtracter lce = new LinearComponentExtracter(lines);
-    for (Iterator it = geoms.iterator(); it.hasNext(); ) {
-      Geometry geom = (Geometry) it.next();
-      geom.apply(lce);
-    }
-    return lines;
-  }
-
-  private List toSegmentStrings(Collection lines)
-  {
-    List segStrings = new ArrayList();
-    for (Iterator it = lines.iterator(); it.hasNext(); ) {
-      LineString line = (LineString) it.next();
+  private List<NodedSegmentString> toSegmentStrings(
+    final Collection<LineString> lines) {
+    final List<NodedSegmentString> segStrings = new ArrayList<>();
+    for (final LineString line : lines) {
       segStrings.add(new NodedSegmentString(line.getCoordinateArray(), null));
     }
     return segStrings;

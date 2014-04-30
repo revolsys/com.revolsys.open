@@ -42,17 +42,6 @@ package com.revolsys.jts.geom;
  * (e.g. it may be a rectangle, a line, or a point).
  */
 public class OctagonalEnvelope {
-  private class BoundingOctagonComponentFilter implements
-    GeometryComponentFilter {
-    @Override
-    public void filter(final Geometry geom) {
-      if (geom instanceof LineString) {
-        expandToInclude(((LineString)geom).getCoordinatesList());
-      } else if (geom instanceof Point) {
-        expandToInclude((Coordinates)geom);
-      }
-    }
-  }
 
   private static double SQRT2 = Math.sqrt(2.0);
 
@@ -219,8 +208,13 @@ public class OctagonalEnvelope {
     return this;
   }
 
-  public void expandToInclude(final Geometry g) {
-    g.apply(new BoundingOctagonComponentFilter());
+  public void expandToInclude(final Geometry geometry) {
+    for (final Point point : geometry.getGeometries(Point.class)) {
+      expandToInclude((Coordinates)point);
+    }
+    for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+      expandToInclude(line.getCoordinatesList());
+    }
   }
 
   public OctagonalEnvelope expandToInclude(final OctagonalEnvelope oct) {

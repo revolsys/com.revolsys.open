@@ -36,6 +36,7 @@ package com.revolsys.jts.geom.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -130,18 +131,6 @@ public class GeometryTransformer {
    */
   protected final CoordinatesList copy(final CoordinatesList seq) {
     return seq.clone();
-  }
-
-  /**
-   * Convenience method which provides standard way of
-   * creating a {@link CoordinatesList}
-   *
-   * @param coords the coordinate array to copy
-   * @return a coordinate sequence for the array
-   */
-  protected final CoordinatesList createCoordinateSequence(
-    final Coordinates[] coords) {
-    return factory.getCoordinateSequenceFactory().create(coords);
   }
 
   /**

@@ -103,9 +103,9 @@ public class PointLocator {
         updateLocationInfo(locate(p, poly));
       }
     } else if (geom instanceof GeometryCollection) {
-      final Iterator geomi = new GeometryCollectionIterator(geom);
+      final Iterator<Geometry> geomi = new GeometryCollectionIterator(geom);
       while (geomi.hasNext()) {
-        final Geometry g2 = (Geometry)geomi.next();
+        final Geometry g2 = geomi.next();
         if (g2 != geom) {
           computeLocation(p, g2);
         }

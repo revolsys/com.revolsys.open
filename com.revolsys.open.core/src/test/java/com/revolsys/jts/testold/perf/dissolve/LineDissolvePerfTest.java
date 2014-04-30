@@ -9,7 +9,7 @@ import java.util.List;
 import com.revolsys.jts.dissolve.LineDissolver;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
@@ -54,7 +54,7 @@ public class LineDissolvePerfTest extends PerformanceTestCase {
       if (factory == null) {
         factory = g.getGeometryFactory();
       }
-      lines.addAll(LinearComponentExtracter.getLines(g));
+      lines.addAll(g.getGeometryComponents(LineString.class));
     }
     return factory.buildGeometry(geoms);
   }

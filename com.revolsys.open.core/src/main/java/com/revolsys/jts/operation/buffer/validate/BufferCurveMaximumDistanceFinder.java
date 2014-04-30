@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.operation.buffer.validate;
 
-import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.segment.Segment;

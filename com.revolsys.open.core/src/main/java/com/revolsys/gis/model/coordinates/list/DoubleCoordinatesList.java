@@ -13,9 +13,17 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
    */
   private static final long serialVersionUID = 7579865828939708871L;
 
-  double[] coordinates;
+ private double[] coordinates;
 
   private final byte axisCount;
+
+  public DoubleCoordinatesList(final Coordinates... coordinates) {
+    this(coordinates.length, 3);
+    for (int i = 0; i < coordinates.length; i++) {
+      final Coordinates coordinate = coordinates[i];
+      setCoordinate(i, coordinate);
+    }
+  }
 
   public DoubleCoordinatesList(final CoordinatesList coordinatesList) {
     this(coordinatesList.getAxisCount(), coordinatesList.getCoordinates());
@@ -72,15 +80,15 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
+  public int getAxisCount() {
+    return axisCount;
+  }
+
+  @Override
   public double[] getCoordinates() {
     final double[] coordinates = new double[this.coordinates.length];
     System.arraycopy(this.coordinates, 0, coordinates, 0, coordinates.length);
     return coordinates;
-  }
-
-  @Override
-  public int getAxisCount() {
-    return axisCount;
   }
 
   @Override

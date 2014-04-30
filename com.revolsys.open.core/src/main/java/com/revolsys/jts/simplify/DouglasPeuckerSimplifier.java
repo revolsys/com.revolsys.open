@@ -33,6 +33,7 @@
 
 package com.revolsys.jts.simplify;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -99,7 +100,7 @@ public class DouglasPeuckerSimplifier {
         newPts = DouglasPeuckerLineSimplifier.simplify(inputPts,
           distanceTolerance);
       }
-      return factory.getCoordinateSequenceFactory().create(newPts);
+      return new DoubleCoordinatesList(newPts);
     }
 
     /**
@@ -186,7 +187,7 @@ public class DouglasPeuckerSimplifier {
   public Geometry getResultGeometry() {
     // empty input produces an empty result
     if (inputGeom.isEmpty()) {
-      return (Geometry)inputGeom.clone();
+      return inputGeom.clone();
     }
 
     return (new DPTransformer(isEnsureValidTopology)).transform(inputGeom);

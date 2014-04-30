@@ -41,7 +41,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.util.GeometryMapper;
 import com.revolsys.jts.geom.util.GeometryMapper.MapOp;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.noding.SegmentString;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferInputLineSimplifier;
@@ -146,19 +145,18 @@ public class BufferFunctions {
     return Buffer.buffer(g, dist, bufParams);
   }
 
-  private static Geometry buildBufferLineSimplifiedSet(final Geometry g,
+  private static Geometry buildBufferLineSimplifiedSet(final Geometry geometry,
     final double distance) {
-    final List simpLines = new ArrayList();
+    final List<LineString> simpLines = new ArrayList<>();
 
-    final List lines = new ArrayList();
-    LinearComponentExtracter.getLines(g, lines);
-    for (final Iterator i = lines.iterator(); i.hasNext();) {
-      final LineString line = (LineString)i.next();
+    final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
+    for (final LineString line : lines) {
       final Coordinates[] pts = line.getCoordinateArray();
-      simpLines.add(g.getGeometryFactory().lineString(
+      simpLines.add(geometry.getGeometryFactory().lineString(
         BufferInputLineSimplifier.simplify(pts, distance)));
     }
-    final Geometry simpGeom = g.getGeometryFactory().buildGeometry(simpLines);
+    final Geometry simpGeom = geometry.getGeometryFactory().buildGeometry(
+      simpLines);
     return simpGeom;
   }
 

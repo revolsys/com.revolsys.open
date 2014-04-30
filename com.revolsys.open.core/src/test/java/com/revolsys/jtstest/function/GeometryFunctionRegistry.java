@@ -58,7 +58,6 @@ public class GeometryFunctionRegistry {
     funcRegistry.add(BufferFunctions.class);
     funcRegistry.add(BufferByUnionFunctions.class);
     funcRegistry.add(ConstructionFunctions.class);
-    funcRegistry.add(ConversionFunctions.class);
     funcRegistry.add(LinearReferencingFunctions.class);
     funcRegistry.add(LineHandlingFunctions.class);
     funcRegistry.add(NodingFunctions.class);

@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.LineString;
 
 /**
@@ -14,43 +13,19 @@ import com.revolsys.jts.geom.LineString;
  * @author mdavis
  *
  */
-public class EdgeGraphBuilder 
-{
-  public static EdgeGraph build(Collection geoms) {
-    EdgeGraphBuilder builder = new EdgeGraphBuilder();
+public class EdgeGraphBuilder {
+  public static EdgeGraph build(final Collection geoms) {
+    final EdgeGraphBuilder builder = new EdgeGraphBuilder();
     builder.add(geoms);
     return builder.getGraph();
   }
 
-  private EdgeGraph graph = new EdgeGraph();
+  private final EdgeGraph graph = new EdgeGraph();
 
-  public EdgeGraphBuilder()
-  {
-    
+  public EdgeGraphBuilder() {
+
   }
-  
-  public EdgeGraph getGraph()
-  {
-    return graph;
-  }
-  
-  /**
-   * Adds the edges of a Geometry to the graph. 
-   * May be called multiple times.
-   * Any dimension of Geometry may be added; the constituent edges are
-   * extracted.
-   * 
-   * @param geometry geometry to be added
-   */  
-  public void add(Geometry geometry) {
-    geometry.apply(new GeometryComponentFilter() {
-      public void filter(Geometry component) {
-        if (component instanceof LineString) {
-          add((LineString)component);
-        }
-      }      
-    });
-  }
+
   /**
    * Adds the edges in a collection of {@link Geometry}s to the graph. 
    * May be called multiple times.
@@ -58,20 +33,36 @@ public class EdgeGraphBuilder
    * 
    * @param geometries the geometries to be added
    */
-  public void add(Collection geometries) 
-  {
-    for (Iterator i = geometries.iterator(); i.hasNext(); ) {
-      Geometry geometry = (Geometry) i.next();
+  public void add(final Collection geometries) {
+    for (final Iterator i = geometries.iterator(); i.hasNext();) {
+      final Geometry geometry = (Geometry)i.next();
       add(geometry);
     }
   }
-  
-  private void add(LineString lineString) {
-    CoordinatesList seq = lineString.getCoordinatesList();
-    for (int i = 1; i < seq.size(); i++) {
-      graph.addEdge(seq.getCoordinate(i-1), seq.getCoordinate(i));
+
+  /**
+   * Adds the edges of a Geometry to the graph. 
+   * May be called multiple times.
+   * Any dimension of Geometry may be added; the constituent edges are
+   * extracted.
+   * 
+   * @param geometry geometry to be added
+   */
+  public void add(final Geometry geometry) {
+    for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+      add(line);
     }
   }
 
-  
+  private void add(final LineString lineString) {
+    final CoordinatesList seq = lineString.getCoordinatesList();
+    for (int i = 1; i < seq.size(); i++) {
+      graph.addEdge(seq.getCoordinate(i - 1), seq.getCoordinate(i));
+    }
+  }
+
+  public EdgeGraph getGraph() {
+    return graph;
+  }
+
 }

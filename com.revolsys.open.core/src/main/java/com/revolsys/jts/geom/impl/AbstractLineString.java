@@ -48,7 +48,6 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -80,11 +79,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   LineString {
 
   private static final long serialVersionUID = 3110669828065365560L;
-
-  @Override
-  public void apply(final GeometryComponentFilter filter) {
-    filter.filter(this);
-  }
 
   /**
    * Creates and returns a full copy of this {@link LineString} object.

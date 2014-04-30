@@ -3,8 +3,6 @@ package com.revolsys.jts.testold.geom;
 import junit.textui.TestRunner;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
-import com.revolsys.jts.geom.CoordinateSequenceFactory;
 
 /**
  * Test {@link DoubleCoordinatesList}
@@ -20,8 +18,4 @@ public class DoubleCoordinatesListTest extends CoordinateSequenceTestBase {
     super(name);
   }
 
-  @Override
-  CoordinateSequenceFactory getCSFactory() {
-    return new DoubleCoordinatesListFactory();
-  }
 }

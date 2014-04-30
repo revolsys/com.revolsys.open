@@ -44,7 +44,6 @@ import java.util.TreeSet;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -239,14 +238,9 @@ public class LineSequencer {
    * @param geometry the geometry to add
    */
   public void add(final Geometry geometry) {
-    geometry.apply(new GeometryComponentFilter() {
-      @Override
-      public void filter(final Geometry component) {
-        if (component instanceof LineString) {
-          addLine((LineString)component);
-        }
-      }
-    });
+    for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+      addLine(line);
+    }
   }
 
   private void addLine(final LineString lineString) {

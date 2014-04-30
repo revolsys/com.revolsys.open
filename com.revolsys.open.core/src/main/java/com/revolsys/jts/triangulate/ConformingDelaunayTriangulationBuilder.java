@@ -47,7 +47,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.jts.triangulate.quadedge.Vertex;
 
@@ -61,7 +60,7 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
  */
 public class ConformingDelaunayTriangulationBuilder {
   private static List createConstraintSegments(final Geometry geom) {
-    final List lines = LinearComponentExtracter.getLines(geom);
+    final List lines = geom.getGeometryComponents(LineString.class);
     final List constraintSegs = new ArrayList();
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();

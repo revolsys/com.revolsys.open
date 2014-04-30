@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -39,7 +38,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
@@ -64,32 +62,37 @@ import com.revolsys.jts.geom.Polygon;
  *
  * @version 1.7
  */
-public class Polygonizer
-{
+public class Polygonizer {
 
-  /**
-   * Adds every linear element in a {@link Geometry} into the polygonizer graph.
-   */
-  private class LineStringAdder
-      implements GeometryComponentFilter
-  {
-    public void filter(Geometry g) {
-      if (g instanceof LineString)
-        add((LineString) g);
+  private static void assignHolesToShells(final List holeList,
+    final List shellList) {
+    for (final Iterator i = holeList.iterator(); i.hasNext();) {
+      final EdgeRing holeER = (EdgeRing)i.next();
+      assignHoleToShell(holeER, shellList);
     }
   }
 
-  // default factory
-  private LineStringAdder lineStringAdder = new LineStringAdder();
+  private static void assignHoleToShell(final EdgeRing holeER,
+    final List shellList) {
+    final EdgeRing shell = EdgeRing.findEdgeRingContaining(holeER, shellList);
+    if (shell != null) {
+      shell.addHole(holeER.getRing());
+    }
+  }
 
   protected PolygonizeGraph graph;
+
   // initialize with empty collections, in case nothing is computed
   protected Collection dangles = new ArrayList();
+
   protected List cutEdges = new ArrayList();
+
   protected List invalidRingLines = new ArrayList();
 
   protected List holeList = null;
+
   protected List shellList = null;
+
   protected List polyList = null;
 
   private boolean isCheckingRingsValid = true;
@@ -98,8 +101,7 @@ public class Polygonizer
    * Create a polygonizer with the same {@link GeometryFactory}
    * as the input {@link Geometry}s
    */
-  public Polygonizer()
-  {
+  public Polygonizer() {
   }
 
   /**
@@ -110,10 +112,9 @@ public class Polygonizer
    *
    * @param geomList a list of {@link Geometry}s with linework to be polygonized
    */
-  public void add(Collection geomList)
-  {
-    for (Iterator i = geomList.iterator(); i.hasNext(); ) {
-      Geometry geometry = (Geometry) i.next();
+  public void add(final Collection geomList) {
+    for (final Iterator i = geomList.iterator(); i.hasNext();) {
+      final Geometry geometry = (Geometry)i.next();
       add(geometry);
     }
   }
@@ -124,11 +125,12 @@ public class Polygonizer
    * Any dimension of Geometry may be added;
    * the constituent linework will be extracted and used
    *
-   * @param g a {@link Geometry} with linework to be polygonized
+   * @param geometry a {@link Geometry} with linework to be polygonized
    */
-  public void add(Geometry g)
-  {
-    g.apply(lineStringAdder);
+  public void add(final Geometry geometry) {
+    for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+      add(line);
+    }
   }
 
   /**
@@ -136,12 +138,116 @@ public class Polygonizer
    *
    * @param line the {@link LineString} to add
    */
-  private void add(LineString line)
-  {
+  private void add(final LineString line) {
     // create a new graph using the factory from the input Geometry
-    if (graph == null)
+    if (graph == null) {
       graph = new PolygonizeGraph(line.getGeometryFactory());
+    }
     graph.addEdge(line);
+  }
+
+  private void findShellsAndHoles(final List edgeRingList) {
+    holeList = new ArrayList();
+    shellList = new ArrayList();
+    for (final Iterator i = edgeRingList.iterator(); i.hasNext();) {
+      final EdgeRing er = (EdgeRing)i.next();
+      if (er.isHole()) {
+        holeList.add(er);
+      } else {
+        shellList.add(er);
+      }
+
+    }
+  }
+
+  private void findValidRings(final List edgeRingList,
+    final List validEdgeRingList, final List invalidRingList) {
+    for (final Iterator i = edgeRingList.iterator(); i.hasNext();) {
+      final EdgeRing er = (EdgeRing)i.next();
+      if (er.isValid()) {
+        validEdgeRingList.add(er);
+      } else {
+        invalidRingList.add(er.getLineString());
+      }
+    }
+  }
+
+  /**
+   * Gets the list of cut edges found during polygonization.
+   * @return a collection of the input {@link LineString}s which are cut edges
+   */
+  public Collection getCutEdges() {
+    polygonize();
+    return cutEdges;
+  }
+
+  /**
+   * Gets the list of dangling lines found during polygonization.
+   * @return a collection of the input {@link LineString}s which are dangles
+   */
+  public Collection getDangles() {
+    polygonize();
+    return dangles;
+  }
+
+  /**
+   * Gets the list of lines forming invalid rings found during polygonization.
+   * @return a collection of the input {@link LineString}s which form invalid rings
+   */
+  public Collection getInvalidRingLines() {
+    polygonize();
+    return invalidRingLines;
+  }
+
+  /**
+   * Gets the list of polygons formed by the polygonization.
+   * @return a collection of {@link Polygon}s
+   */
+  public Collection getPolygons() {
+    polygonize();
+    return polyList;
+  }
+
+  /**
+   * Performs the polygonization, if it has not already been carried out.
+   */
+  private void polygonize() {
+    // check if already computed
+    if (polyList != null) {
+      return;
+    }
+    polyList = new ArrayList();
+
+    // if no geometries were supplied it's possible that graph is null
+    if (graph == null) {
+      return;
+    }
+
+    dangles = graph.deleteDangles();
+    cutEdges = graph.deleteCutEdges();
+    final List edgeRingList = graph.getEdgeRings();
+
+    // Debug.printTime("Build Edge Rings");
+
+    List validEdgeRingList = new ArrayList();
+    invalidRingLines = new ArrayList();
+    if (isCheckingRingsValid) {
+      findValidRings(edgeRingList, validEdgeRingList, invalidRingLines);
+    } else {
+      validEdgeRingList = edgeRingList;
+    }
+    // Debug.printTime("Validate Rings");
+
+    findShellsAndHoles(validEdgeRingList);
+    assignHolesToShells(holeList, shellList);
+
+    // Debug.printTime("Assign Holes");
+
+    polyList = new ArrayList();
+    for (final Iterator i = shellList.iterator(); i.hasNext();) {
+      final EdgeRing er = (EdgeRing)i.next();
+      polyList.add(er.getPolygon());
+    }
   }
 
   /**
@@ -152,130 +258,8 @@ public class Polygonizer
    * 
    * @param isCheckingRingsValid true if generated rings should be checked for validity
    */
-  public void setCheckRingsValid(boolean isCheckingRingsValid)
-  {
+  public void setCheckRingsValid(final boolean isCheckingRingsValid) {
     this.isCheckingRingsValid = isCheckingRingsValid;
   }
-  
-  /**
-   * Gets the list of polygons formed by the polygonization.
-   * @return a collection of {@link Polygon}s
-   */
-  public Collection getPolygons()
-  {
-    polygonize();
-    return polyList;
-  }
-
-  /**
-   * Gets the list of dangling lines found during polygonization.
-   * @return a collection of the input {@link LineString}s which are dangles
-   */
-  public Collection getDangles()
-  {
-    polygonize();
-    return dangles;
-  }
-
-  /**
-   * Gets the list of cut edges found during polygonization.
-   * @return a collection of the input {@link LineString}s which are cut edges
-   */
-  public Collection getCutEdges()
-  {
-    polygonize();
-    return cutEdges;
-  }
-
-  /**
-   * Gets the list of lines forming invalid rings found during polygonization.
-   * @return a collection of the input {@link LineString}s which form invalid rings
-   */
-  public Collection getInvalidRingLines()
-  {
-    polygonize();
-    return invalidRingLines;
-  }
-
-  /**
-   * Performs the polygonization, if it has not already been carried out.
-   */
-  private void polygonize()
-  {
-    // check if already computed
-    if (polyList != null) return;
-    polyList = new ArrayList();
-
-    // if no geometries were supplied it's possible that graph is null
-    if (graph == null) return;
-
-    dangles = graph.deleteDangles();
-    cutEdges = graph.deleteCutEdges();
-    List edgeRingList = graph.getEdgeRings();
-
-    //Debug.printTime("Build Edge Rings");
-
-    List validEdgeRingList = new ArrayList();
-    invalidRingLines = new ArrayList();
-    if (isCheckingRingsValid) {
-      findValidRings(edgeRingList, validEdgeRingList, invalidRingLines);
-    }
-    else {
-      validEdgeRingList = edgeRingList;
-    }
-    //Debug.printTime("Validate Rings");
-    
-    findShellsAndHoles(validEdgeRingList);
-    assignHolesToShells(holeList, shellList);
-
-    //Debug.printTime("Assign Holes");
-
-    polyList = new ArrayList();
-    for (Iterator i = shellList.iterator(); i.hasNext(); ) {
-      EdgeRing er = (EdgeRing) i.next();
-      polyList.add(er.getPolygon());
-    }
-  }
-
-  private void findValidRings(List edgeRingList, List validEdgeRingList, List invalidRingList)
-  {
-    for (Iterator i = edgeRingList.iterator(); i.hasNext(); ) {
-      EdgeRing er = (EdgeRing) i.next();
-      if (er.isValid())
-        validEdgeRingList.add(er);
-      else
-        invalidRingList.add(er.getLineString());
-    }
-  }
-
-  private void findShellsAndHoles(List edgeRingList)
-  {
-    holeList = new ArrayList();
-    shellList = new ArrayList();
-    for (Iterator i = edgeRingList.iterator(); i.hasNext(); ) {
-      EdgeRing er = (EdgeRing) i.next();
-      if (er.isHole())
-        holeList.add(er);
-      else
-        shellList.add(er);
-
-    }
-  }
-
-  private static void assignHolesToShells(List holeList, List shellList)
-  {
-    for (Iterator i = holeList.iterator(); i.hasNext(); ) {
-      EdgeRing holeER = (EdgeRing) i.next();
-      assignHoleToShell(holeER, shellList);
-    }
-  }
-
-  private static void assignHoleToShell(EdgeRing holeER, List shellList)
-  {
-    EdgeRing shell = EdgeRing.findEdgeRingContaining(holeER, shellList);
-    if (shell != null)
-      shell.addHole(holeER.getRing());
-  }
-
 
 }

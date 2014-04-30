@@ -45,7 +45,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.geom.util.ShortCircuitedGeometryVisitor;
 
 /**
@@ -348,7 +347,7 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
     // check segment intersections
     // get all lines from geometry component
     // (there may be more than one if it's a multi-ring polygon)
-    final List lines = LinearComponentExtracter.getLines(geom);
+    final List lines = geom.getGeometryComponents(LineString.class);
     checkIntersectionWithLineStrings(lines);
   }
 }

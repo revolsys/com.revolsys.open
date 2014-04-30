@@ -44,9 +44,6 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
-import com.revolsys.jts.geom.util.PointExtracter;
-import com.revolsys.jts.geom.util.PolygonExtracter;
 
 /**
  * Find two points on two {@link Geometry}s which lie
@@ -202,7 +199,7 @@ public class DistanceOp {
   private void computeContainmentDistance(final int polyGeomIndex,
     final GeometryLocation[] locPtPoly) {
     final int locationsIndex = 1 - polyGeomIndex;
-    final List polys = PolygonExtracter.getPolygons(geom[polyGeomIndex]);
+    final List polys = geom[polyGeomIndex].getGeometries(Polygon.class);
     if (polys.size() > 0) {
       final List insideLocs = ConnectedElementLocationFilter.getLocations(geom[locationsIndex]);
       computeContainmentDistance(insideLocs, polys, locPtPoly);
@@ -241,11 +238,11 @@ public class DistanceOp {
      * Geometries are not wholely inside, so compute distance from lines and points
      * of one to lines and points of the other
      */
-    final List lines0 = LinearComponentExtracter.getLines(geom[0]);
-    final List lines1 = LinearComponentExtracter.getLines(geom[1]);
+    final List<LineString> lines0 = geom[0].getGeometryComponents(LineString.class);
+    final List<LineString> lines1 = geom[1].getGeometryComponents(LineString.class);
 
-    final List pts0 = PointExtracter.getPoints(geom[0]);
-    final List pts1 = PointExtracter.getPoints(geom[1]);
+    final List<Point> pts0 = geom[0].getGeometries(Point.class);
+    final List<Point> pts1 = geom[1].getGeometries(Point.class);
 
     // exit whenever minDistance goes LE than terminateDistance
     computeMinDistanceLines(lines0, lines1, locGeom);

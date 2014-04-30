@@ -36,7 +36,6 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
@@ -140,11 +139,6 @@ public class LineStringImpl extends AbstractLineString implements LineString {
         }
       }
     }
-  }
-
-  @Override
-  public void apply(final GeometryComponentFilter filter) {
-    filter.filter(this);
   }
 
   /**

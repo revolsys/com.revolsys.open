@@ -41,7 +41,7 @@ import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geom.util.ComponentCoordinateExtracter;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * A base class for predicate operations on {@link PreparedPolygon}s.
@@ -72,11 +72,9 @@ abstract class PreparedPolygonPredicate {
    * @param geom a geometry to test
    * @return true if all componenta of the argument are contained in the target geometry
    */
-  protected boolean isAllTestComponentsInTarget(final Geometry testGeom) {
-    final List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
-    for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinates p = (Coordinates)i.next();
-      final Location loc = targetPointLocator.locate(p);
+  protected boolean isAllTestComponentsInTarget(final Geometry geometry) {
+    for (final Vertex vertex : geometry.vertices()) {
+      final Location loc = targetPointLocator.locate(vertex);
       if (loc == Location.EXTERIOR) {
         return false;
       }
@@ -92,11 +90,9 @@ abstract class PreparedPolygonPredicate {
    * @param geom a geometry to test
    * @return true if all componenta of the argument are contained in the target geometry interior
    */
-  protected boolean isAllTestComponentsInTargetInterior(final Geometry testGeom) {
-    final List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
-    for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinates p = (Coordinates)i.next();
-      final Location loc = targetPointLocator.locate(p);
+  protected boolean isAllTestComponentsInTargetInterior(final Geometry geometry) {
+    for (final Vertex vertex : geometry.vertices()) {
+      final Location loc = targetPointLocator.locate(vertex);
       if (loc != Location.INTERIOR) {
         return false;
       }
@@ -133,11 +129,9 @@ abstract class PreparedPolygonPredicate {
    * @param geom a geometry to test
    * @return true if any component of the argument intersects the prepared area geometry
    */
-  protected boolean isAnyTestComponentInTarget(final Geometry testGeom) {
-    final List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
-    for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinates p = (Coordinates)i.next();
-      final Location loc = targetPointLocator.locate(p);
+  protected boolean isAnyTestComponentInTarget(final Geometry geometry) {
+    for (final Vertex vertex : geometry.vertices()) {
+      final Location loc = targetPointLocator.locate(vertex);
       if (loc != Location.EXTERIOR) {
         return true;
       }
@@ -153,11 +147,9 @@ abstract class PreparedPolygonPredicate {
    * @param geom a geometry to test
    * @return true if any component of the argument intersects the prepared area geometry interior
    */
-  protected boolean isAnyTestComponentInTargetInterior(final Geometry testGeom) {
-    final List coords = ComponentCoordinateExtracter.getCoordinates(testGeom);
-    for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Coordinates p = (Coordinates)i.next();
-      final Location loc = targetPointLocator.locate(p);
+  protected boolean isAnyTestComponentInTargetInterior(final Geometry geometry) {
+    for (final Vertex vertex : geometry.vertices()) {
+      final Location loc = targetPointLocator.locate(vertex);
       if (loc == Location.INTERIOR) {
         return true;
       }

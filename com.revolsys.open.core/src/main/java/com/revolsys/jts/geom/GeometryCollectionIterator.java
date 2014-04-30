@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -49,26 +47,30 @@ import java.util.NoSuchElementException;
  *
  *@version 1.7
  */
-public class GeometryCollectionIterator implements Iterator {
+public class GeometryCollectionIterator implements Iterator<Geometry> {
 
   /**
    *  The <code>Geometry</code> being iterated over.
    */
-  private Geometry parent;
+  private final Geometry parent;
+
   /**
    *  Indicates whether or not the first element 
    *  (the root <code>GeometryCollection</code>) has been returned.
    */
   private boolean atStart;
+
   /**
    *  The number of <code>Geometry</code>s in the the <code>GeometryCollection</code>.
    */
-  private int max;
+  private final int max;
+
   /**
    *  The index of the <code>Geometry</code> that will be returned when <code>next</code>
    *  is called.
    */
   private int index;
+
   /**
    *  The iterator over a nested <code>Geometry</code>, or <code>null</code>
    *  if this <code>GeometryCollectionIterator</code> is not currently iterating
@@ -82,7 +84,7 @@ public class GeometryCollectionIterator implements Iterator {
    *@param  parent  the geometry over which to iterate; also, the first
    *      element returned by the iterator.
    */
-  public GeometryCollectionIterator(Geometry parent) {
+  public GeometryCollectionIterator(final Geometry parent) {
     this.parent = parent;
     atStart = true;
     index = 0;
@@ -94,6 +96,7 @@ public class GeometryCollectionIterator implements Iterator {
    * 
    * @return true if more geometry elements remain
    */
+  @Override
   public boolean hasNext() {
     if (atStart) {
       return true;
@@ -115,7 +118,8 @@ public class GeometryCollectionIterator implements Iterator {
    * 
    * @return the next geometry in the iteration
    */
-  public Object next() {
+  @Override
+  public Geometry next() {
     // the parent GeometryCollection is the first object returned
     if (atStart) {
       atStart = false;
@@ -124,17 +128,16 @@ public class GeometryCollectionIterator implements Iterator {
     if (subcollectionIterator != null) {
       if (subcollectionIterator.hasNext()) {
         return subcollectionIterator.next();
-      }
-      else {
+      } else {
         subcollectionIterator = null;
       }
     }
     if (index >= max) {
       throw new NoSuchElementException();
     }
-    Geometry obj = parent.getGeometry(index++);
+    final Geometry obj = parent.getGeometry(index++);
     if (obj instanceof GeometryCollection) {
-      subcollectionIterator = new GeometryCollectionIterator((GeometryCollection) obj);
+      subcollectionIterator = new GeometryCollectionIterator(obj);
       // there will always be at least one element in the sub-collection
       return subcollectionIterator.next();
     }
@@ -146,8 +149,8 @@ public class GeometryCollectionIterator implements Iterator {
    *
    * @throws  UnsupportedOperationException  This method is not implemented.
    */
+  @Override
   public void remove() {
     throw new UnsupportedOperationException(getClass().getName());
   }
 }
-

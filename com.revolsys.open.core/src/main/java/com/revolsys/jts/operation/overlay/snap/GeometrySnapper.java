@@ -36,6 +36,7 @@ package com.revolsys.jts.operation.overlay.snap;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -251,14 +252,13 @@ class SnapTransformer extends GeometryTransformer {
 
   private boolean isSelfSnap = false;
 
-  SnapTransformer(final double snapTolerance,
-    final Coordinates[] snapPts) {
+  SnapTransformer(final double snapTolerance, final Coordinates[] snapPts) {
     this.snapTolerance = snapTolerance;
     this.snapPts = snapPts;
   }
 
-  SnapTransformer(final double snapTolerance,
-    final Coordinates[] snapPts, final boolean isSelfSnap) {
+  SnapTransformer(final double snapTolerance, final Coordinates[] snapPts,
+    final boolean isSelfSnap) {
     this.snapTolerance = snapTolerance;
     this.snapPts = snapPts;
     this.isSelfSnap = isSelfSnap;
@@ -277,6 +277,6 @@ class SnapTransformer extends GeometryTransformer {
     final Geometry parent) {
     final Coordinates[] srcPts = coords.toCoordinateArray();
     final Coordinates[] newPts = snapLine(srcPts, snapPts);
-    return factory.getCoordinateSequenceFactory().create(newPts);
+    return new DoubleCoordinatesList(newPts);
   }
 }

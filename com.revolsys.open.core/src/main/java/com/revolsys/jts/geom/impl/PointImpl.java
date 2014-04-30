@@ -48,7 +48,6 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.Segment;
@@ -70,10 +69,6 @@ import com.revolsys.util.MathUtil;
  */
 public class PointImpl extends AbstractGeometry implements Point {
   private static final long serialVersionUID = 4902022702746614570L;
-
-  private static final int[] VERTEX_ID = new int[] {
-    0
-  };
 
   /**
   * The {@link GeometryFactory} used to create this Geometry
@@ -114,11 +109,6 @@ public class PointImpl extends AbstractGeometry implements Point {
   @Override
   public double angle2d(final Coordinates other) {
     return CoordinatesUtil.angle2d(this, other);
-  }
-
-  @Override
-  public void apply(final GeometryComponentFilter filter) {
-    filter.filter(this);
   }
 
   /**

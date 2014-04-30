@@ -43,7 +43,6 @@ import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.geom.util.LinearComponentExtracter;
 import com.revolsys.jts.index.ArrayListVisitor;
 import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.intervalrtree.SortedPackedIntervalRTree;
@@ -77,7 +76,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
 
     private void init(final Geometry geom) {
-      final List lines = LinearComponentExtracter.getLines(geom);
+      final List lines = geom.getGeometryComponents(LineString.class);
       for (final Iterator i = lines.iterator(); i.hasNext();) {
         final LineString line = (LineString)i.next();
         final Coordinates[] pts = line.getCoordinateArray();

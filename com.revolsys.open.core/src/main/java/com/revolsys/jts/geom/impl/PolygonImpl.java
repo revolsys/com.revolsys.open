@@ -48,7 +48,6 @@ import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
@@ -92,7 +91,7 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
 
   private static final long serialVersionUID = -3494792200821764533L;
 
-  protected LinearRing[] rings;
+  private LinearRing[] rings;
 
   public PolygonImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
@@ -127,14 +126,6 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
       } else {
         this.rings = rings;
       }
-    }
-  }
-
-  @Override
-  public void apply(final GeometryComponentFilter filter) {
-    filter.filter(this);
-    for (final LinearRing ring : rings()) {
-      ring.apply(filter);
     }
   }
 
@@ -334,6 +325,19 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
     } else {
       return getRing(0);
     }
+  }
+
+  @Override
+  public <V extends Geometry> List<V> getGeometryComponents(
+    final Class<V> geometryClass) {
+    final List<V> geometries = super.getGeometryComponents(geometryClass);
+    for (final LinearRing ring : rings()) {
+      if (ring != null) {
+        final List<V> ringGeometries = ring.getGeometries(geometryClass);
+        geometries.addAll(ringGeometries);
+      }
+    }
+    return geometries;
   }
 
   @Override

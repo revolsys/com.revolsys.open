@@ -61,7 +61,6 @@ import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesListFactory;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
@@ -320,8 +319,6 @@ public class GeometryFactory implements Serializable,
 
   private int axisCount = 2;
 
-  private final CoordinateSequenceFactory coordinateSequenceFactory;
-
   private final int srid;
 
   private final WktParser parser = new WktParser(this);
@@ -329,7 +326,6 @@ public class GeometryFactory implements Serializable,
   protected GeometryFactory(final CoordinateSystem coordinateSystem,
     final int axisCount, final double scaleXY, final double scaleZ) {
     this.precisionModel = PrecisionModelUtil.getPrecisionModel(scaleXY);
-    this.coordinateSequenceFactory = new DoubleCoordinatesListFactory();
     this.srid = coordinateSystem.getId();
 
     this.coordinateSystem = coordinateSystem;
@@ -341,7 +337,6 @@ public class GeometryFactory implements Serializable,
   protected GeometryFactory(final int srid, final int axisCount,
     final double scaleXY, final double scaleZ) {
     this.precisionModel = PrecisionModelUtil.getPrecisionModel(scaleXY);
-    this.coordinateSequenceFactory = new DoubleCoordinatesListFactory();
     this.srid = srid;
 
     this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
@@ -613,9 +608,6 @@ public class GeometryFactory implements Serializable,
 
   /**
    * Creates a deep copy of the input {@link Geometry}.
-   * The {@link CoordinateSequenceFactory} defined for this factory
-   * is used to copy the {@link CoordinatesList}s
-   * of the input geometry.
    * <p>
    * This is a convenient way to change the <tt>CoordinatesList</tt>
    * used to represent a geometry, or to change the 
@@ -749,10 +741,6 @@ public class GeometryFactory implements Serializable,
   public Coordinates getCoordinates(final Point point) {
     final Point convertedPoint = project(point);
     return convertedPoint;
-  }
-
-  public CoordinateSequenceFactory getCoordinateSequenceFactory() {
-    return coordinateSequenceFactory;
   }
 
   /**
@@ -959,9 +947,11 @@ public class GeometryFactory implements Serializable,
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    */
   public LinearRing linearRing(final Coordinates... coordinates) {
-    return linearRing(coordinates != null ? getCoordinateSequenceFactory().create(
-      coordinates)
-      : null);
+    if (coordinates == null) {
+      return linearRing();
+    } else {
+      return linearRing(new DoubleCoordinatesList(coordinates));
+    }
   }
 
   /**
@@ -1123,9 +1113,11 @@ public class GeometryFactory implements Serializable,
    * @return a MultiPoint object
    */
   public MultiPoint multiPoint(final Coordinates[] coordinates) {
-    return multiPoint(coordinates != null ? getCoordinateSequenceFactory().create(
-      coordinates)
-      : null);
+    if (coordinates == null || coordinates.length == 0) {
+      return multiPoint();
+    } else {
+      return multiPoint(new DoubleCoordinatesList(coordinates));
+    }
   }
 
   /**

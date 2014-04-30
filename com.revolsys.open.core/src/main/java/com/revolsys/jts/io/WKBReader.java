@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.CoordinateSequenceFactory;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.CoordinateSequences;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
@@ -109,8 +109,6 @@ public class WKBReader {
 
   private final GeometryFactory factory;
 
-  private final CoordinateSequenceFactory csFactory;
-
   private final PrecisionModel precisionModel;
 
   // default dimension - will be set on read
@@ -137,7 +135,6 @@ public class WKBReader {
   public WKBReader(final GeometryFactory geometryFactory) {
     this.factory = geometryFactory;
     precisionModel = factory.getPrecisionModel();
-    csFactory = factory.getCoordinateSequenceFactory();
   }
 
   /**
@@ -190,7 +187,7 @@ public class WKBReader {
 
   private CoordinatesList readCoordinateSequence(final int size)
     throws IOException {
-    final CoordinatesList seq = csFactory.create(size, inputDimension);
+    final CoordinatesList seq = new DoubleCoordinatesList(size, inputDimension);
     int targetDim = seq.getAxisCount();
     if (targetDim > inputDimension) {
       targetDim = inputDimension;
@@ -213,7 +210,7 @@ public class WKBReader {
     if (seq.size() == 0 || seq.size() >= 2) {
       return seq;
     }
-    return CoordinateSequences.extend(csFactory, seq, 2);
+    return CoordinateSequences.extend(seq, 2);
   }
 
   private CoordinatesList readCoordinateSequenceRing(final int size)
@@ -225,7 +222,7 @@ public class WKBReader {
     if (CoordinateSequences.isRing(seq)) {
       return seq;
     }
-    return CoordinateSequences.ensureValidRing(csFactory, seq);
+    return CoordinateSequences.ensureValidRing(seq);
   }
 
   private Geometry readGeometry() throws IOException, ParseException {

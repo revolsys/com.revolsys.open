@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.geom.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -48,14 +49,12 @@ import com.revolsys.jts.algorithm.InteriorPointArea;
 import com.revolsys.jts.algorithm.InteriorPointLine;
 import com.revolsys.jts.algorithm.InteriorPointPoint;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryComponentFilter;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.LineString;
@@ -201,13 +200,6 @@ public abstract class AbstractGeometry implements Geometry {
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
     "Polygon", "MultiPolygon", "GeometryCollection");
 
-  private final static GeometryComponentFilter geometryChangedFilter = new GeometryComponentFilter() {
-    @Override
-    public void filter(final Geometry geom) {
-      geom.geometryChangedAction();
-    }
-  };
-
   /**
    * Returns true if the array contains any non-empty <code>Geometry</code>s.
    *
@@ -251,17 +243,6 @@ public abstract class AbstractGeometry implements Geometry {
    * by the client.
    */
   private Object userData = null;
-
-  /**
-   *  Performs an operation with or on this Geometry and its
-   *  component Geometry's.  Only GeometryCollections and
-   *  Polygons have component Geometry's; for Polygons they are the LinearRings
-   *  of the shell and holes.
-   *
-   *@param  filter  the filter to apply to this <code>Geometry</code>.
-   */
-  @Override
-  public abstract void apply(GeometryComponentFilter filter);
 
   /**
    * Computes a buffer area around this geometry having the given width. The
@@ -1054,30 +1035,6 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   /**
-   * Notifies this geometry that its coordinates have been changed by an external
-   * party (for example, via a {@link CoordinateFilter}). 
-   * When this method is called the geometry will flush
-   * and/or update any derived information it has cached (such as its {@link Envelope} ).
-   * The operation is applied to all component Geometries.
-   */
-  @Override
-  public void geometryChanged() {
-    apply(geometryChangedFilter);
-  }
-
-  /**
-   * Notifies this Geometry that its Coordinates have been changed by an external
-   * party. When #geometryChanged is called, this method will be called for
-   * this Geometry and its component Geometries.
-   * 
-   * @see #apply(GeometryComponentFilter)
-   */
-  @Override
-  public void geometryChangedAction() {
-    boundingBox = null;
-  }
-
-  /**
    *  Returns the area of this <code>Geometry</code>.
    *  Areal Geometries have a non-zero area.
    *  They override this function to compute the area.
@@ -1170,6 +1127,16 @@ public abstract class AbstractGeometry implements Geometry {
     final String geometryType = getGeometryType();
     final int index = sortedGeometryTypes.indexOf(geometryType);
     return index;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
+    final List<V> geometries = new ArrayList<V>();
+    if (geometryClass.isAssignableFrom(getClass())) {
+      geometries.add((V)this);
+    }
+    return geometries;
   }
 
   /**
@@ -1278,6 +1245,16 @@ public abstract class AbstractGeometry implements Geometry {
   @SuppressWarnings("unchecked")
   public <V extends Geometry> List<V> getGeometries() {
     return (List<V>)Arrays.asList(this);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> List<V> getGeometries(final Class<V> geometryClass) {
+    final List<V> geometries = new ArrayList<V>();
+    if (geometryClass.isAssignableFrom(getClass())) {
+      geometries.add((V)this);
+    }
+    return geometries;
   }
 
   /**

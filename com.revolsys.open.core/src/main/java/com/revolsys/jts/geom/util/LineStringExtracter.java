@@ -42,17 +42,16 @@ import com.revolsys.jts.geom.LineString;
  * Extracts all the {@link LineString} elements from a {@link Geometry}.
  *
  * @version 1.7
- * @see GeometryExtracter
  */
 public class LineStringExtracter {
   /**
    * Extracts the {@link LineString} elements from a single {@link Geometry}
    * and returns them in a {@link List}.
    * 
-   * @param geom the geometry from which to extract
+   * @param geometry the geometry from which to extract
    */
-  public static List<LineString> getLines(final Geometry geom) {
-    return getLines(geom, new ArrayList<LineString>());
+  public static List<LineString> getLines(final Geometry geometry) {
+    return getLines(geometry, new ArrayList<LineString>());
   }
 
   /**
