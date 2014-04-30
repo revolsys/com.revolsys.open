@@ -41,9 +41,7 @@ import java.util.TreeSet;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
@@ -62,26 +60,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 public abstract class AbstractGeometryCollection extends AbstractGeometry
   implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
-
-  @Override
-  public void apply(final CoordinateFilter filter) {
-    for (final Geometry geometry : geometries()) {
-      geometry.apply(filter);
-    }
-  }
-
-  @Override
-  public void apply(final CoordinateSequenceFilter filter) {
-    for (final Geometry geometry : geometries()) {
-      geometry.apply(filter);
-      if (filter.isDone()) {
-        break;
-      }
-    }
-    if (filter.isGeometryChanged()) {
-      geometryChanged();
-    }
-  }
 
   @Override
   public void apply(final GeometryComponentFilter filter) {

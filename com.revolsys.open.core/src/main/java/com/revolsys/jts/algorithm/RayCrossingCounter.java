@@ -37,6 +37,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.segment.Segment;
 
 /**
  * Counts the number of segments crossed by a horizontal ray extending to the right
@@ -245,6 +246,10 @@ public class RayCrossingCounter {
         }
       }
     }
+  }
+
+  public void countSegment(final Segment segment) {
+    countSegment(segment.get(0), segment.get(1));
   }
 
   /**

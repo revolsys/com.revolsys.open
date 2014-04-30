@@ -69,10 +69,10 @@ public class MultiLineStringSegment extends AbstractSegment implements
     } else {
       final MultiLineString line = getMultiLineString();
       int partIndex = this.partIndex;
-      int segmentIndex = this.segmentIndex;
+      int segmentIndex = this.segmentIndex + 1;
       while (partIndex < line.getGeometryCount()) {
         final LineString part = line.getGeometry(partIndex);
-        if (segmentIndex + 1 < part.getSegmentCount()) {
+        if (segmentIndex < part.getSegmentCount()) {
           return true;
         } else {
           partIndex++;

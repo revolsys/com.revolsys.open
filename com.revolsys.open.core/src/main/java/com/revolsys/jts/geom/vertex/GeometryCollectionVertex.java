@@ -61,9 +61,13 @@ public class GeometryCollectionVertex extends AbstractVertex {
       final Geometry geometryCollection = getGeometryCollection();
       int partIndex = this.partIndex;
       Vertex vertex = this.vertex;
+      if (vertex != null && !vertex.hasNext()) {
+        partIndex++;
+        vertex = null;
+      }
       while (vertex == null
         && partIndex < geometryCollection.getGeometryCount()) {
-        if (partIndex > 0) {
+        if (partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(partIndex);
           if (part != null) {
             vertex = (Vertex)part.vertices().iterator();
@@ -78,7 +82,11 @@ public class GeometryCollectionVertex extends AbstractVertex {
           partIndex++;
         }
       }
-      return vertex.hasNext();
+      if (vertex == null) {
+        return false;
+      } else {
+        return vertex.hasNext();
+      }
     }
   }
 
@@ -88,10 +96,13 @@ public class GeometryCollectionVertex extends AbstractVertex {
       throw new NoSuchElementException();
     } else {
       final Geometry geometryCollection = getGeometryCollection();
-      Vertex vertex = this.vertex;
+      if (vertex != null && !vertex.hasNext()) {
+        partIndex++;
+        vertex = null;
+      }
       while (vertex == null
         && partIndex < geometryCollection.getGeometryCount()) {
-        if (partIndex > 0) {
+        if (partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(partIndex);
           if (part != null) {
             vertex = (Vertex)part.vertices().iterator();
@@ -106,7 +117,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
           this.partIndex++;
         }
       }
-      if (vertex.hasNext()) {
+      if (vertex != null && vertex.hasNext()) {
         return vertex.next();
       } else {
         throw new NoSuchElementException();

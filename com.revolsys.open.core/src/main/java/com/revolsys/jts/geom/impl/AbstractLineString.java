@@ -42,9 +42,7 @@ import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
@@ -82,32 +80,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   LineString {
 
   private static final long serialVersionUID = 3110669828065365560L;
-
-  @Override
-  public void apply(final CoordinateFilter filter) {
-    final int vertexCount = getVertexCount();
-    for (int i = 0; i < vertexCount; i++) {
-      final Coordinates point = getCoordinate(i);
-      filter.filter(point);
-    }
-  }
-
-  @Override
-  public void apply(final CoordinateSequenceFilter filter) {
-    if (!isEmpty()) {
-      final int vertexCount = getVertexCount();
-      final CoordinatesList points = getCoordinatesList();
-      for (int i = 0; i < vertexCount; i++) {
-        filter.filter(points, i);
-        if (filter.isDone()) {
-          break;
-        }
-      }
-      if (filter.isGeometryChanged()) {
-        geometryChanged();
-      }
-    }
-  }
 
   @Override
   public void apply(final GeometryComponentFilter filter) {
@@ -402,12 +374,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
-  public boolean isCounterClockwise() {
-    final CoordinatesList points = getCoordinatesList();
-    return CoordinatesListUtil.isCCW(points);
-  }
-
-  @Override
   public boolean isClockwise() {
     return !isCounterClockwise();
   }
@@ -428,6 +394,12 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       }
     }
     return false;
+  }
+
+  @Override
+  public boolean isCounterClockwise() {
+    final CoordinatesList points = getCoordinatesList();
+    return CoordinatesListUtil.isCCW(points);
   }
 
   @Override

@@ -172,18 +172,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
     "Polygon", "MultiPolygon", "GeometryCollection"));
 
-  void apply(CoordinateFilter filter);
-
-  /**
-   *  Performs an operation on the coordinates in this <code>Geometry</code>'s
-   *  {@link CoordinatesList}s. 
-   *  If the filter reports that a coordinate value has been changed, 
-   *  {@link #geometryChanged} will be called automatically.
-   *
-   *@param  filter  the filter to apply
-   */
-  void apply(CoordinateSequenceFilter filter);
-
   /**
    *  Performs an operation with or on this Geometry and its
    *  component Geometry's.  Only GeometryCollections and

@@ -42,9 +42,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
@@ -116,25 +114,6 @@ public class PointImpl extends AbstractGeometry implements Point {
   @Override
   public double angle2d(final Coordinates other) {
     return CoordinatesUtil.angle2d(this, other);
-  }
-
-  @Override
-  public void apply(final CoordinateFilter filter) {
-    if (isEmpty()) {
-      return;
-    }
-    filter.filter(getCoordinate());
-  }
-
-  @Override
-  public void apply(final CoordinateSequenceFilter filter) {
-    if (isEmpty()) {
-      return;
-    }
-    filter.filter(getCoordinatesList(), 0);
-    if (filter.isGeometryChanged()) {
-      geometryChanged();
-    }
   }
 
   @Override

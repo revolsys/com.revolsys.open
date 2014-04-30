@@ -63,9 +63,13 @@ public class GeometryCollectionSegment extends AbstractSegment {
       final Geometry geometryCollection = getGeometryCollection();
       int partIndex = this.partIndex;
       Segment segment = this.segment;
+      if (segment != null && !segment.hasNext()) {
+        partIndex++;
+        segment = null;
+      }
       while (segment == null
         && partIndex < geometryCollection.getGeometryCount()) {
-        if (partIndex > 0) {
+        if (partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(partIndex);
           if (part != null) {
             segment = (Segment)part.segments().iterator();
@@ -80,7 +84,11 @@ public class GeometryCollectionSegment extends AbstractSegment {
           partIndex++;
         }
       }
-      return segment.hasNext();
+      if (segment == null) {
+        return false;
+      } else {
+        return segment.hasNext();
+      }
     }
   }
 
@@ -90,10 +98,13 @@ public class GeometryCollectionSegment extends AbstractSegment {
       throw new NoSuchElementException();
     } else {
       final Geometry geometryCollection = getGeometryCollection();
-      Segment segment = this.segment;
+      if (segment != null && !segment.hasNext()) {
+        partIndex++;
+        segment = null;
+      }
       while (segment == null
         && partIndex < geometryCollection.getGeometryCount()) {
-        if (partIndex > 0) {
+        if (partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(partIndex);
           if (part != null) {
             segment = (Segment)part.segments().iterator();
@@ -108,7 +119,7 @@ public class GeometryCollectionSegment extends AbstractSegment {
           this.partIndex++;
         }
       }
-      if (segment.hasNext()) {
+      if (segment != null && segment.hasNext()) {
         return segment.next();
       } else {
         throw new NoSuchElementException();

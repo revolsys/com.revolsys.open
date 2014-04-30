@@ -75,13 +75,10 @@ public class GeometryFunctionRegistry {
     funcRegistry.add(CreateFractalShapeFunctions.class);
     funcRegistry.add(CreateRandomShapeFunctions.class);
     funcRegistry.add(JTSFunctions.class);
-    // funcRegistry.add(MemoryFunctions.class);
     funcRegistry.add(OffsetCurveFunctions.class);
     funcRegistry.add(CGAlgorithmFunctions.class);
     funcRegistry.add(OverlayFunctions.class);
     funcRegistry.add(OverlayNoSnapFunctions.class);
-    // funcRegistry.add(OverlayEnhancedPrecisionFunctions.class);
-    // funcRegistry.add(OverlayCommonBitsRemovedFunctions.class);
     funcRegistry.add(SnappingFunctions.class);
     funcRegistry.add(SortingFunctions.class);
     funcRegistry.add(TriangulationFunctions.class);

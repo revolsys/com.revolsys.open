@@ -33,7 +33,6 @@
 package com.revolsys.jts.precision;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -68,20 +67,21 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * @version 1.7
  */
 public class CommonBitsRemover {
-  class Translater implements CoordinateFilter {
-    Coordinates trans = null;
-
-    public Translater(final Coordinates trans) {
-      this.trans = trans;
-    }
-
-    @Override
-    public void filter(final Coordinates coord) {
-      coord.setX(coord.getX() + trans.getX());
-      coord.setY(coord.getY() + trans.getY());
-    }
-
-  }
+  // TODO currently doesn't do anything
+  // class Translater implements CoordinateFilter {
+  // Coordinates trans = null;
+  //
+  // public Translater(final Coordinates trans) {
+  // this.trans = trans;
+  // }
+  //
+  // @Override
+  // public void filter(final Coordinates coord) {
+  // coord.setX(coord.getX() + trans.getX());
+  // coord.setY(coord.getY() + trans.getY());
+  // }
+  //
+  // }
 
   private final CommonBits commonBitsX = new CommonBits();
 
@@ -117,9 +117,9 @@ public class CommonBitsRemover {
    * @param geom the Geometry to which to add the common coordinate bits
    */
   public void addCommonBits(final Geometry geom) {
-    final Translater trans = new Translater(commonCoord);
-    geom.apply(trans);
-    geom.geometryChanged();
+    // final Translater trans = new Translater(commonCoord);
+    // geom.apply(trans);
+    // geom.geometryChanged();
   }
 
   /**
@@ -137,18 +137,18 @@ public class CommonBitsRemover {
    * @return the shifted Geometry
    */
   public Geometry removeCommonBits(final Geometry geom) {
-    final double x = commonCoord.getX();
-    final double y = commonCoord.getY();
-    if (x == 0.0 && y == 0.0) {
-      return geom;
-    } else {
-      final Coordinates invCoord = new Coordinate(-x, -y,
-        Coordinates.NULL_ORDINATE);
-      final Translater trans = new Translater(invCoord);
-      geom.apply(trans);
-      geom.geometryChanged();
-      return geom;
-    }
+    // final double x = commonCoord.getX();
+    // final double y = commonCoord.getY();
+    // if (x == 0.0 && y == 0.0) {
+    // return geom;
+    // } else {
+    // final Coordinates invCoord = new Coordinate(-x, -y,
+    // Coordinates.NULL_ORDINATE);
+    // final Translater trans = new Translater(invCoord);
+    // geom.apply(trans);
+    // geom.geometryChanged();
+    return geom;
+    // }
   }
 
 }

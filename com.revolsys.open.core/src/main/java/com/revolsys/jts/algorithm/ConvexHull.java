@@ -136,12 +136,6 @@ public class ConvexHull {
 
   }
 
-  private static Coordinates[] extractCoordinates(final Geometry geom) {
-    final UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();
-    geom.apply(filter);
-    return filter.getCoordinates();
-  }
-
   private final GeometryFactory geomFactory;
 
   private final Coordinates[] inputPts;
@@ -150,7 +144,7 @@ public class ConvexHull {
    * Create a new convex hull construction for the input {@link Coordinates} array.
    */
   public ConvexHull(final Coordinates[] pts, final GeometryFactory geomFactory) {
-    inputPts = UniqueCoordinateArrayFilter.filterCoordinates(pts);
+    inputPts = UniqueCoordinateArrayFilter.getUniquePointsArray(Arrays.asList(pts));
     // inputPts = pts;
     this.geomFactory = geomFactory;
   }
@@ -159,7 +153,8 @@ public class ConvexHull {
    * Create a new convex hull construction for the input {@link Geometry}.
    */
   public ConvexHull(final Geometry geometry) {
-    this(extractCoordinates(geometry), geometry.getGeometryFactory());
+    this(UniqueCoordinateArrayFilter.getUniquePointsArray(geometry),
+      geometry.getGeometryFactory());
   }
 
   /**

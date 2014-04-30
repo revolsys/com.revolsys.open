@@ -44,9 +44,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
-import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -129,26 +127,6 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
       } else {
         this.rings = rings;
       }
-    }
-  }
-
-  @Override
-  public void apply(final CoordinateFilter filter) {
-    for (final LinearRing ring : rings()) {
-      ring.apply(filter);
-    }
-  }
-
-  @Override
-  public void apply(final CoordinateSequenceFilter filter) {
-    for (final LinearRing ring : rings()) {
-      ring.apply(filter);
-      if (filter.isDone()) {
-        break;
-      }
-    }
-    if (filter.isGeometryChanged()) {
-      geometryChanged();
     }
   }
 

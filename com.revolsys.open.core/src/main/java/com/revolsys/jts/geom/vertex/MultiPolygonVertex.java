@@ -74,14 +74,14 @@ public class MultiPolygonVertex extends AbstractVertex {
       final MultiPolygon multiPolygon = getMultiPolygon();
       int partIndex = this.partIndex;
       int ringIndex = this.ringIndex;
-      int vertexIndex = this.vertexIndex;
+      int vertexIndex = this.vertexIndex + 1;
 
       while (partIndex < multiPolygon.getGeometryCount()) {
         final Polygon polygon = multiPolygon.getPolygon(partIndex);
 
         while (ringIndex < polygon.getRingCount()) {
           final LinearRing ring = polygon.getRing(ringIndex);
-          if (vertexIndex + 1 < ring.getVertexCount()) {
+          if (vertexIndex < ring.getVertexCount()) {
             return true;
           } else {
             ringIndex++;
@@ -89,6 +89,8 @@ public class MultiPolygonVertex extends AbstractVertex {
           }
         }
         partIndex++;
+        ringIndex = 0;
+        vertexIndex = 0;
       }
       return false;
     }
@@ -110,6 +112,8 @@ public class MultiPolygonVertex extends AbstractVertex {
         }
       }
       partIndex++;
+      ringIndex = 0;
+      vertexIndex = 0;
     }
     throw new NoSuchElementException();
   }

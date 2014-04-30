@@ -50,7 +50,6 @@ import com.revolsys.jts.index.kdtree.KdTree;
 import com.revolsys.jts.triangulate.quadedge.LastFoundQuadEdgeLocator;
 import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.jts.triangulate.quadedge.Vertex;
-import com.revolsys.jts.util.Debug;
 
 /**
  * Computes a Conforming Delaunay Triangulation over a set of sites and a set of
@@ -215,16 +214,11 @@ public class ConformingDelaunayTriangulator {
       splits = enforceGabriel(segments);
 
       count++;
-      Debug.println("Iter: " + count + "   Splits: " + splits
-        + "   Current # segments = " + segments.size());
     } while (splits > 0 && count < MAX_SPLIT_ITER);
     if (count == MAX_SPLIT_ITER) {
-      Debug.println("ABORTED! Too many iterations while enforcing constraints");
-      if (!Debug.isDebugging()) {
-        throw new ConstraintEnforcementException(
-          "Too many splitting iterations while enforcing constraints.  Last split point was at: ",
-          splitPt);
-      }
+      throw new ConstraintEnforcementException(
+        "Too many splitting iterations while enforcing constraints.  Last split point was at: ",
+        splitPt);
     }
   }
 
@@ -273,7 +267,6 @@ public class ConformingDelaunayTriangulator {
        */
       final ConstraintVertex insertedVertex = insertSite(splitVertex);
       if (!insertedVertex.getCoordinate().equals2d(splitPt)) {
-        Debug.println("Split pt snapped to: " + insertedVertex);
         // throw new ConstraintEnforcementException("Split point snapped to
         // existing point
         // (tolerance too large or constraint interior narrow angle?)",
@@ -517,7 +510,6 @@ public class ConformingDelaunayTriangulator {
    * @param vertices a collection of ConstraintVertex
    */
   private void insertSites(final Collection vertices) {
-    Debug.println("Adding sites: " + vertices.size());
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
       final ConstraintVertex v = (ConstraintVertex)i.next();
       insertSite(v);

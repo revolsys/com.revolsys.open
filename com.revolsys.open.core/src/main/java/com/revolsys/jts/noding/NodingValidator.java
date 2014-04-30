@@ -38,7 +38,7 @@ import java.util.Iterator;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.util.Debug;
+import com.revolsys.jts.geom.GeometryFactory;
 
 /**
  * Validates that a collection of {@link SegmentString}s is correctly noded.
@@ -59,8 +59,11 @@ public class NodingValidator {
   private void checkCollapse(final Coordinates p0, final Coordinates p1,
     final Coordinates p2) {
     if (p0.equals(p2)) {
+      final Coordinates[] points = {
+        p0, p1, p2
+      };
       throw new RuntimeException("found non-noded collapse at "
-        + Debug.toLine(p0, p1, p2));
+        + GeometryFactory.getFactory().lineString(points));
     }
   }
 

@@ -194,7 +194,7 @@ public class MiscellaneousTest2 extends TestCase {
     final GeometryCollection polygonCollection = GeometryFactory.getFactory(0,
       2).geometryCollection(a, b);
     final Geometry union = polygonCollection.buffer(0);
-  //  System.out.println(union);
+    // System.out.println(union);
     assertEquals(
       "POLYGON((0 0,0 100,50 100,50 150,150 150,150 50,100 50,100 0,0 0))",
       union.toString());
@@ -202,15 +202,15 @@ public class MiscellaneousTest2 extends TestCase {
 
   public void testUniqueCoordinateArrayFilter() throws Exception {
     final Geometry g = this.reader.read("MULTIPOINT(10 10, 20 20, 30 30, 20 20, 10 10)");
-    final UniqueCoordinateArrayFilter f = new UniqueCoordinateArrayFilter();
-    g.apply(f);
-    assertEquals(3, f.getCoordinates().length);
+
+    final Coordinates[] coordinates = UniqueCoordinateArrayFilter.getUniquePointsArray(g);
+    assertEquals(3, coordinates.length);
     assertEquals(new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE),
-      f.getCoordinates()[0]);
+      coordinates[0]);
     assertEquals(new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE),
-      f.getCoordinates()[1]);
+      coordinates[1]);
     assertEquals(new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE),
-      f.getCoordinates()[2]);
+      coordinates[2]);
   }
 
   public void testZeroAreaPolygon() throws Exception {

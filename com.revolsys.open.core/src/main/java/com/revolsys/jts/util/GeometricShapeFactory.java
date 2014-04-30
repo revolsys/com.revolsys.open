@@ -87,12 +87,12 @@ public class GeometricShapeFactory {
 
     public BoundingBox getEnvelope() {
       if (base != null) {
-        return new Envelope(2, base.getX(), base.getY(),
-          base.getX() + width, base.getY() + height);
+        return new Envelope(2, base.getX(), base.getY(), base.getX() + width,
+          base.getY() + height);
       }
       if (centre != null) {
-        return new Envelope(2, centre.getX() - width / 2, centre.getY() - height
-            / 2, centre.getX() + width / 2, centre.getY() + height / 2);
+        return new Envelope(2, centre.getX() - width / 2, centre.getY()
+          - height / 2, centre.getX() + width / 2, centre.getY() + height / 2);
       }
       return new Envelope(2, 0, 0, width, height);
     }
@@ -418,7 +418,7 @@ public class GeometricShapeFactory {
     if (rotationAngle != 0.0) {
       final AffineTransformation trans = AffineTransformation.rotationInstance(
         rotationAngle, dim.getCentre().getX(), dim.getCentre().getY());
-      geom.apply(trans);
+      trans.transform(geom);
     }
     return geom;
   }

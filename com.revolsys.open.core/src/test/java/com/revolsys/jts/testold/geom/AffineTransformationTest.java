@@ -42,7 +42,7 @@ public class AffineTransformationTest extends TestCase {
    */
   void checkTransformation(final double x, final double y,
     final AffineTransformation trans, final double xp, final double yp) {
-    final Coordinates p = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
+    final Coordinates p = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
     final Coordinates p2 = new Coordinate();
     trans.transform(p, p2);
     assertEquals(xp, p2.getX(), .00005);
@@ -69,12 +69,10 @@ public class AffineTransformationTest extends TestCase {
     final Geometry geom = rdr.read(geomStr);
     final AffineTransformation trans = AffineTransformation.rotationInstance(Math.PI / 2);
     final AffineTransformation inv = trans.getInverse();
-    final Geometry transGeom = (Geometry)geom.clone();
-    transGeom.apply(trans);
-    // System.out.println(transGeom);
-    transGeom.apply(inv);
+    final Geometry transGeom = trans.transform(geom);
+    final Geometry invGeom = inv.transform(transGeom);
     // check if transformed geometry is equal to original
-    final boolean isEqual = geom.equalsExact(transGeom, 0.0005);
+    final boolean isEqual = geom.equalsExact(invGeom, 0.0005);
     assertTrue(isEqual);
   }
 

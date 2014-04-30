@@ -35,6 +35,7 @@ package com.revolsys.gis.algorithm;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * Implements algorithm for computing a distance metric which can be thought of
@@ -77,9 +78,16 @@ public class VertexHausdorffDistance {
 
   private void computeMaxPointDistance(final Geometry pointGeom,
     final Geometry geom, final PointPairDistance ptDist) {
-    final MaxPointDistanceFilter distFilter = new MaxPointDistanceFilter(geom);
-    pointGeom.apply(distFilter);
-    ptDist.setMaximum(distFilter.getMaxPointDistance());
+    ptDist.setMaximum(ptDist);
+    final EuclideanDistanceToPoint euclideanDist = new EuclideanDistanceToPoint();
+    final PointPairDistance maxPtDist = new PointPairDistance();
+    final PointPairDistance minPtDist = new PointPairDistance();
+    for (final Vertex vertex : pointGeom.vertices()) {
+      minPtDist.initialize();
+      euclideanDist.computeDistance(geom, vertex, minPtDist);
+      maxPtDist.setMaximum(minPtDist);
+    }
+    ptDist.setMaximum(maxPtDist);
   }
 
   /**

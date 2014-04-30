@@ -98,6 +98,17 @@ public class PointTest implements TestConstants {
 
   }
 
+  public static void assertVertices(final Point point, final int axisCount,
+    final double... coordinates) {
+    int vertexCount;
+    if (point.isEmpty()) {
+      vertexCount = 0;
+    } else {
+      vertexCount = coordinates.length / axisCount;
+    }
+    Assert.assertEquals("Vertex Count", vertexCount, point.getVertexCount());
+  }
+
   private void assertEquals(final double[] coordinates,
     final double[] coordinatesLessNaN, final Point pointCoordinatesListAllAxis,
     final Point pointCoordinatesListExtraAxis,
@@ -247,5 +258,10 @@ public class PointTest implements TestConstants {
   @Test
   public void testFromFile() {
     TestUtil.doTestGeometry(getClass(), "Point.csv");
+  }
+
+  @Test
+  public void testVertices() {
+
   }
 }

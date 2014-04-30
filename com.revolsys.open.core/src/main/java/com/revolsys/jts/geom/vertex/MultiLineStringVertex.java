@@ -59,12 +59,12 @@ public class MultiLineStringVertex extends AbstractVertex {
     } else {
       final MultiLineString multiLineString = getMultiLineString();
       int partIndex = this.partIndex;
-      int vertexIndex = this.vertexIndex;
+      int vertexIndex = this.vertexIndex + 1;
 
       while (partIndex < multiLineString.getGeometryCount()) {
         final LineString lineString = multiLineString.getLineString(partIndex);
 
-        if (vertexIndex + 1 < lineString.getVertexCount()) {
+        if (vertexIndex < lineString.getVertexCount()) {
           return true;
         } else {
           partIndex++;

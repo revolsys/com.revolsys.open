@@ -87,12 +87,12 @@ public class MultiPolygonSegment extends AbstractSegment implements
     } else {
       int partIndex = this.partIndex;
       int ringIndex = this.ringIndex;
-      int segmentIndex = this.segmentIndex;
+      int segmentIndex = this.segmentIndex + 1;
       while (partIndex < multiPolygon.getGeometryCount()) {
         final Polygon polygon = getPolygon();
         while (ringIndex < polygon.getRingCount()) {
           final LinearRing ring = polygon.getRing(ringIndex);
-          if (segmentIndex + 1 < ring.getSegmentCount()) {
+          if (segmentIndex < ring.getSegmentCount()) {
             return true;
           } else {
             ringIndex++;
@@ -100,6 +100,8 @@ public class MultiPolygonSegment extends AbstractSegment implements
           }
         }
         partIndex++;
+        ringIndex = 0;
+        segmentIndex = 0;
       }
       return false;
     }
@@ -121,6 +123,8 @@ public class MultiPolygonSegment extends AbstractSegment implements
         }
       }
       partIndex++;
+      ringIndex = 0;
+      segmentIndex = 0;
     }
     throw new NoSuchElementException();
   }

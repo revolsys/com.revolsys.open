@@ -34,8 +34,6 @@ package com.revolsys.jts.geom.impl;
 
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.CoordinateFilter;
-import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryComponentFilter;
@@ -140,32 +138,6 @@ public class LineStringImpl extends AbstractLineString implements LineString {
             this.coordinates[vertexIndex * axisCountThis + axisIndex] = value;
           }
         }
-      }
-    }
-  }
-
-  @Override
-  public void apply(final CoordinateFilter filter) {
-    final int vertexCount = getVertexCount();
-    for (int i = 0; i < vertexCount; i++) {
-      final Coordinates point = getCoordinate(i);
-      filter.filter(point);
-    }
-  }
-
-  @Override
-  public void apply(final CoordinateSequenceFilter filter) {
-    if (!isEmpty()) {
-      final int vertexCount = getVertexCount();
-      final CoordinatesList points = getCoordinatesList();
-      for (int i = 0; i < vertexCount; i++) {
-        filter.filter(points, i);
-        if (filter.isDone()) {
-          break;
-        }
-      }
-      if (filter.isGeometryChanged()) {
-        geometryChanged();
       }
     }
   }

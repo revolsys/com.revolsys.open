@@ -36,12 +36,8 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.MultiPoint;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -96,16 +92,4 @@ public class GeometryFactoryTest extends TestCase {
   // assertTrue(!g.equalsExact(g2));
   // }
 
-  public void testMultiPointCS() {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(3005, 4,
-      1, 1);
-    final CoordinatesList mpSeq = new DoubleCoordinatesList(2, 50, -2, 10, 20);
-
-    final MultiPoint mp = geometryFactory.multiPoint(mpSeq);
-    final CoordinatesList pSeq = ((Point)mp.getGeometry(0)).getCoordinatesList();
-    assertEquals(4, pSeq.getAxisCount());
-    for (int i = 0; i < 4; i++) {
-      assertEquals(mpSeq.getValue(0, i), pSeq.getValue(0, i));
-    }
-  }
 }

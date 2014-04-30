@@ -37,47 +37,18 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.testold.algorithm.PerturbedGridPolygonBuilder;
 
 public class SimpleRayCrossingStressTest extends TestCase {
 
   static class SimpleRayCrossingPointInAreaLocator implements
     PointOnGeometryLocator {
-    static class RayCrossingSegmentFilter implements CoordinateSequenceFilter {
-      private final RayCrossingCounter rcc;
-
-      public RayCrossingSegmentFilter(final RayCrossingCounter rcc) {
-        this.rcc = rcc;
-      }
-
-      @Override
-      public void filter(final CoordinatesList seq, final int i) {
-        if (i == 0) {
-          return;
-        }
-        final Coordinates p0 = seq.getCoordinate(i - 1);
-        final Coordinates p1 = seq.getCoordinate(i);
-        this.rcc.countSegment(p0, p1);
-      }
-
-      @Override
-      public boolean isDone() {
-        return this.rcc.isOnSegment();
-      }
-
-      @Override
-      public boolean isGeometryChanged() {
-        return false;
-      }
-    }
-
     private final Geometry geom;
 
     public SimpleRayCrossingPointInAreaLocator(final Geometry geom) {
@@ -87,8 +58,9 @@ public class SimpleRayCrossingStressTest extends TestCase {
     @Override
     public Location locate(final Coordinates p) {
       final RayCrossingCounter rcc = new RayCrossingCounter(p);
-      final RayCrossingSegmentFilter filter = new RayCrossingSegmentFilter(rcc);
-      this.geom.apply(filter);
+      for (final Segment segment : geom.segments()) {
+        rcc.countSegment(segment);
+      }
       return rcc.getLocation();
     }
   }

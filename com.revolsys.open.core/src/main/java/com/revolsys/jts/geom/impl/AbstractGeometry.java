@@ -50,7 +50,6 @@ import com.revolsys.jts.algorithm.InteriorPointPoint;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateFilter;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.CoordinateSequenceFilter;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
@@ -252,33 +251,6 @@ public abstract class AbstractGeometry implements Geometry {
    * by the client.
    */
   private Object userData = null;
-
-  /**
-   *  Performs an operation with or on this <code>Geometry</code>'s
-   *  coordinates. 
-   *  If this method modifies any coordinate values,
-   *  {@link #geometryChanged} must be called to update the geometry state. 
-   *  Note that you cannot use this method to
-   *  modify this Geometry if its underlying CoordinatesList's #get method
-   *  returns a copy of the Coordinate, rather than the actual Coordinates stored
-   *  (if it even stores Coordinates objects at all).
-   *
-   *@param  filter  the filter to apply to this <code>Geometry</code>'s
-   *      coordinates
-   */
-  @Override
-  public abstract void apply(CoordinateFilter filter);
-
-  /**
-   *  Performs an operation on the coordinates in this <code>Geometry</code>'s
-   *  {@link CoordinatesList}s. 
-   *  If the filter reports that a coordinate value has been changed, 
-   *  {@link #geometryChanged} will be called automatically.
-   *
-   *@param  filter  the filter to apply
-   */
-  @Override
-  public abstract void apply(CoordinateSequenceFilter filter);
 
   /**
    *  Performs an operation with or on this Geometry and its
