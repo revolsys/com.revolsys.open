@@ -37,6 +37,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.util.EnvelopeUtil;
 
@@ -218,33 +219,6 @@ public class CGAlgorithms {
   }
 
   /**
-   * Computes the distance from a point to a sequence of line segments.
-   * 
-   * @param p
-   *          a point
-   * @param line
-   *          a sequence of contiguous line segments defined by their vertices
-   * @return the minimum distance between the point and the line segments
-   */
-  public static double distancePointLine(final Coordinates p,
-    final Coordinates[] line) {
-    if (line.length == 0) {
-      throw new IllegalArgumentException(
-        "Line array must contain at least one vertex");
-    }
-    // this handles the case of length = 1
-    double minDistance = p.distance(line[0]);
-    for (int i = 0; i < line.length - 1; i++) {
-      final double dist = CGAlgorithms.distancePointLine(p, line[i],
-        line[i + 1]);
-      if (dist < minDistance) {
-        minDistance = dist;
-      }
-    }
-    return minDistance;
-  }
-
-  /**
    * Computes the perpendicular distance from a point p to the (infinite) line
    * containing the points AB
    * 
@@ -348,15 +322,15 @@ public class CGAlgorithms {
      * happen if the ring is valid, so don't check for it (Might want to assert
      * this)
      */
-    boolean isCCW = false;
+    boolean counterClockwise = false;
     if (disc == 0) {
       // poly is CCW if prev x is right of next x
-      isCCW = (prev.getX() > next.getX());
+      counterClockwise = (prev.getX() > next.getX());
     } else {
       // if area is positive, points are ordered CCW
-      isCCW = (disc > 0);
+      counterClockwise = (disc > 0);
     }
-    return isCCW;
+    return counterClockwise;
   }
 
   /**
@@ -366,39 +340,17 @@ public class CGAlgorithms {
    * @return true if the point is a vertex of the line or lies in the interior
    *         of a line segment in the linestring
    */
-  public static boolean isOnLine(final Coordinates p, final Coordinates[] pt) {
+  public static boolean isOnLine(final Coordinates p, final LineString line) {
     final LineIntersector lineIntersector = new RobustLineIntersector();
-    for (int i = 1; i < pt.length; i++) {
-      final Coordinates p0 = pt[i - 1];
-      final Coordinates p1 = pt[i];
+    for (final Segment segment : line.segments()) {
+      final Coordinates p0 = segment.get(0);
+      final Coordinates p1 = segment.get(1);
       lineIntersector.computeIntersection(p, p0, p1);
       if (lineIntersector.hasIntersection()) {
         return true;
       }
     }
     return false;
-  }
-
-  /**
-   * Tests whether a point lies inside or on a ring. The ring may be oriented in
-   * either direction. A point lying exactly on the ring boundary is considered
-   * to be inside the ring.
-   * <p>
-   * This method does <i>not</i> first check the point against the envelope of
-   * the ring.
-   * 
-   * @param p
-   *          point to check for ring inclusion
-   * @param ring
-   *          an array of coordinates representing the ring (which must have
-   *          first point identical to last point)
-   * @return true if p is inside ring
-   * 
-   * @see locatePointInRing
-   */
-  public static boolean isPointInRing(final Coordinates p,
-    final Coordinates... ring) {
-    return locatePointInRing(p, ring) != Location.EXTERIOR;
   }
 
   public static boolean isPointInRing(final Coordinates point,
@@ -437,25 +389,6 @@ public class CGAlgorithms {
       y0 = y1;
     }
     return len;
-  }
-
-  /**
-   * Determines whether a point lies in the interior, on the boundary, or in the
-   * exterior of a ring. The ring may be oriented in either direction.
-   * <p>
-   * This method does <i>not</i> first check the point against the envelope of
-   * the ring.
-   * 
-   * @param p
-   *          point to check for ring inclusion
-   * @param ring
-   *          an array of coordinates representing the ring (which must have
-   *          first point identical to last point)
-   * @return the {@link Location} of p relative to the ring
-   */
-  public static Location locatePointInRing(final Coordinates p,
-    final Coordinates[] ring) {
-    return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
   public static Location locatePointInRing(final Coordinates p,

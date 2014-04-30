@@ -2,6 +2,7 @@ package com.revolsys.gis.jts;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
@@ -857,18 +859,18 @@ public class GeometryEditUtil {
       return geometry;
     } else if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
-      if (LineStringUtil.isCCW(line)) {
+      if (line.isCounterClockwise()) {
         return geometry;
       } else {
-        return (G)LineStringUtil.reverse(line);
+        return (G)line.reverse();
       }
     } else if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
       boolean changed = false;
-      final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
-      for (int i = 0; i < pointsList.size(); i++) {
-        CoordinatesList points = pointsList.get(i);
-        final boolean counterClockwise = CoordinatesListUtil.isCCW(points);
+      final List<LinearRing> rings = new ArrayList<>();
+      int i = 0;
+      for (final LinearRing ring : polygon.rings()) {
+        final boolean counterClockwise = ring.isCounterClockwise();
         boolean pointsChanged;
         if (i == 0) {
           pointsChanged = !counterClockwise;
@@ -877,12 +879,15 @@ public class GeometryEditUtil {
         }
         if (pointsChanged) {
           changed = true;
-          points = points.reverse();
-          pointsList.set(i, points);
+          final LinearRing reverse = ring.reverse();
+          rings.add(reverse);
+        } else {
+          rings.add(ring);
         }
+        i++;
       }
       if (changed) {
-        return (G)GeometryFactory.getFactory(geometry).polygon(pointsList);
+        return (G)geometry.getGeometryFactory().polygon(rings);
       } else {
         return geometry;
       }

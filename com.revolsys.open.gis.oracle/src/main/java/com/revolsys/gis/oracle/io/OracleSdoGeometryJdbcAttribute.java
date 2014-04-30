@@ -185,7 +185,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   public double[] toClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(ring);
-    if (!CoordinatesListUtil.isCCW(coordinates)) {
+    if (!coordinates.isCounterClockwise()) {
       return toCoordinateArray(coordinates, dimension);
     } else {
       return toCoordinateArray(coordinates.reverse(), dimension);
@@ -245,7 +245,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   public double[] toCounterClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
     final CoordinatesList coordinates = CoordinatesListUtil.get(ring);
-    if (CoordinatesListUtil.isCCW(coordinates)) {
+    if (coordinates.isCounterClockwise()) {
       return toCoordinateArray(coordinates, dimension);
     } else {
       return toCoordinateArray(coordinates.reverse(), dimension);

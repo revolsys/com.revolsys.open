@@ -36,8 +36,8 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -65,10 +65,10 @@ public class PointInRingTest extends AbstractPointInRingTest {
       return;
     }
 
-    final Geometry geom = this.reader.read(wkt);
+    final Polygon geom = (Polygon)this.reader.read(wkt);
     final boolean expected = expectedLoc == Location.INTERIOR;
     assertEquals(expected,
-      CGAlgorithms.isPointInRing(pt, geom.getCoordinateArray()));
+      CGAlgorithms.isPointInRing(pt, geom.getExteriorRing()));
   }
 
 }

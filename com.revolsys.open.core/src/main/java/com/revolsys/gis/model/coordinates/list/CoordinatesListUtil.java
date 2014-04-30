@@ -474,7 +474,7 @@ public class CoordinatesListUtil {
               boolean partClockwise = clockwise;
               for (int j = 0; j < pointsList.size(); j++) {
                 CoordinatesList points = pointsList.get(j);
-                final boolean ringClockwise = !CoordinatesListUtil.isCCW(points);
+                final boolean ringClockwise = !points.isCounterClockwise();
                 if (ringClockwise != partClockwise) {
                   points = points.reverse();
                 }
@@ -560,71 +560,6 @@ public class CoordinatesListUtil {
       intersections.add(points);
     }
     return intersections;
-  }
-
-  public static boolean isCCW(final CoordinatesList ring) {
-    // # of points without closing endpoint
-    final int nPts = ring.size() - 1;
-
-    // find highest point
-    double hiPtX = ring.getX(0);
-    double hiPtY = ring.getY(0);
-    int hiIndex = 0;
-    for (int i = 1; i <= nPts; i++) {
-      final double x = ring.getX(i);
-      final double y = ring.getY(i);
-      if (y > hiPtY) {
-        hiPtX = x;
-        hiPtY = y;
-        hiIndex = i;
-      }
-    }
-
-    // find distinct point before highest point
-    int iPrev = hiIndex;
-    do {
-      iPrev = iPrev - 1;
-      if (iPrev < 0) {
-        iPrev = nPts;
-      }
-    } while (equals2dCoordinate(ring, iPrev, hiPtX, hiPtY) && iPrev != hiIndex);
-
-    // find distinct point after highest point
-    int iNext = hiIndex;
-    do {
-      iNext = (iNext + 1) % nPts;
-    } while (equals2dCoordinate(ring, iNext, hiPtX, hiPtY) && iNext != hiIndex);
-
-    /**
-     * This check catches cases where the ring contains an A-B-A configuration
-     * of points. This can happen if the ring does not contain 3 distinct points
-     * (including the case where the input array has fewer than 4 elements), or
-     * it contains coincident line segments.
-     */
-    if (equals2dCoordinate(ring, iPrev, hiPtX, hiPtY)
-      || equals2dCoordinate(ring, iNext, hiPtX, hiPtY)
-      || equals2dCoordinates(ring, iPrev, iNext)) {
-      return false;
-    }
-
-    final int disc = orientationIndex(ring, iPrev, hiIndex, iNext);
-
-    /**
-     * If disc is exactly 0, lines are collinear. There are two possible cases:
-     * (1) the lines lie along the x axis in opposite directions (2) the lines
-     * lie on top of one another (1) is handled by checking if next is left of
-     * prev ==> CCW (2) will never happen if the ring is valid, so don't check
-     * for it (Might want to assert this)
-     */
-    boolean isCCW = false;
-    if (disc == 0) {
-      // poly is CCW if prev x is right of next x
-      isCCW = (ring.getValue(iPrev, 0) > ring.getValue(iPrev, 1));
-    } else {
-      // if area is positive, points are ordered CCW
-      isCCW = (disc > 0);
-    }
-    return isCCW;
   }
 
   public static boolean isPointOnLine(final Coordinates coordinate,

@@ -45,7 +45,7 @@ import com.revolsys.jts.test.geometry.BoundingBoxTest;
 import com.revolsys.jts.testold.algorithm.AngleTest;
 import com.revolsys.jts.testold.algorithm.ConvexHullTest;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
-import com.revolsys.jts.testold.algorithm.IsCCWTest;
+import com.revolsys.jts.testold.algorithm.IsCounterClockWiseTest;
 import com.revolsys.jts.testold.algorithm.NonRobustLineIntersectorTest;
 import com.revolsys.jts.testold.algorithm.OrientationIndexTest;
 import com.revolsys.jts.testold.algorithm.RobustLineIntersectionTest;
@@ -99,7 +99,7 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
   ConformingDelaunayTest.class, ConvexHullTest.class,
   CoordinateArraysTest.class, DelaunayTest.class, DistanceTest.class,
   GeometryCollectionImplTest.class, GeometryImplTest.class,
-  IntersectionMatrixTest.class, IntervalTest.class, IsCCWTest.class,
+  IntersectionMatrixTest.class, IntervalTest.class, IsCounterClockWiseTest.class,
   IsRectangleTest.class, IsValidTest.class, LengthIndexedLineTest.class,
   LineMergerTest.class, LineStringImplTest.class,
   LocationIndexedLineTest.class, MiscellaneousTest.class,
@@ -144,7 +144,7 @@ public class MasterTester extends TestCase {
     result.addTest(new TestSuite(IntersectionMatrixTest.class));
     result.addTest(new TestSuite(IntervalTest.class));
     result.addTest(new TestSuite(
-      com.revolsys.jts.testold.algorithm.IsCCWTest.class));
+      com.revolsys.jts.testold.algorithm.IsCounterClockWiseTest.class));
     result.addTest(new TestSuite(IsRectangleTest.class));
     result.addTest(new TestSuite(IsValidTest.class));
     result.addTest(new TestSuite(LengthIndexedLineTest.class));

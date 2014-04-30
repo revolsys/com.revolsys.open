@@ -32,7 +32,6 @@
  */
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -103,16 +102,13 @@ public class GeometryFunctions {
   }
 
   public static boolean isCCW(final Geometry g) {
-    Coordinates[] pts = null;
     if (g instanceof Polygon) {
-      pts = ((Polygon)g).getExteriorRing().getCoordinateArray();
+      return ((Polygon)g).getExteriorRing().isCounterClockwise();
     } else if (g instanceof LineString && ((LineString)g).isClosed()) {
-      pts = g.getCoordinateArray();
-    }
-    if (pts == null) {
+      return ((LineString)g).isCounterClockwise();
+    } else {
       return false;
     }
-    return CGAlgorithms.isCCW(pts);
   }
 
   public static boolean isClosed(final Geometry g) {

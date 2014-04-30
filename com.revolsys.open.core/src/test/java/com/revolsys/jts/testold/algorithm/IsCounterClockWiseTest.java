@@ -35,41 +35,41 @@ package com.revolsys.jts.testold.algorithm;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
 /**
- * Tests CGAlgorithms.isCCW
+ * Tests {@link LineString#isCounterClockwise()}
  * @version 1.7
  */
-public class IsCCWTest extends TestCase {
+public class IsCounterClockWiseTest extends TestCase {
 
   public static void main(final String args[]) {
-    TestRunner.run(IsCCWTest.class);
+    TestRunner.run(IsCounterClockWiseTest.class);
   }
 
   private final WKTReader reader = new WKTReader();
 
-  public IsCCWTest(final String name) {
+  public IsCounterClockWiseTest(final String name) {
     super(name);
   }
 
-  private Coordinates[] getCoordinates(final String wkt) throws ParseException {
-    final Geometry geom = this.reader.read(wkt);
-    return geom.getCoordinateArray();
+  private LineString getLineString(final String wkt) throws ParseException {
+    final Polygon geom = (Polygon)this.reader.read(wkt);
+    return geom.getExteriorRing();
   }
 
-  public void testCCW() throws Exception {
-    final Coordinates[] pts = getCoordinates("POLYGON ((60 180, 140 240, 140 240, 140 240, 200 180, 120 120, 60 180))");
-    assertEquals(CGAlgorithms.isCCW(pts), false);
+  public void testCounterClockWise() throws Exception {
+    final LineString pts = getLineString("POLYGON ((60 180, 140 240, 140 240, 140 240, 200 180, 120 120, 60 180))");
+    assertEquals(pts.isCounterClockwise(), false);
 
-    final Coordinates[] pts2 = getCoordinates("POLYGON ((60 180, 140 120, 100 180, 140 240, 60 180))");
-    assertEquals(CGAlgorithms.isCCW(pts2), true);
-    // same pts list with duplicate top point - check that isCCW still works
-    final Coordinates[] pts2x = getCoordinates("POLYGON ((60 180, 140 120, 100 180, 140 240, 140 240, 60 180))");
-    assertEquals(CGAlgorithms.isCCW(pts2x), true);
+    final LineString pts2 = getLineString("POLYGON ((60 180, 140 120, 100 180, 140 240, 60 180))");
+    assertEquals(pts2.isCounterClockwise(), true);
+    // same pts list with duplicate top point - check that isCounterClockise
+    // still works
+    final LineString pts2x = getLineString("POLYGON ((60 180, 140 120, 100 180, 140 240, 140 240, 60 180))");
+    assertEquals(pts2x.isCounterClockwise(), true);
   }
 }

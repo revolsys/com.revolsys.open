@@ -60,9 +60,9 @@ public class LineBuilder {
 
   private final PointLocator ptLocator;
 
-  private final List lineEdgesList = new ArrayList();
+  private final List<LineString> lineEdgesList = new ArrayList<>();
 
-  private final List resultLineList = new ArrayList();
+  private final List<LineString> resultLineList = new ArrayList<>();
 
   public LineBuilder(final OverlayOp op, final GeometryFactory geometryFactory,
     final PointLocator ptLocator) {
@@ -74,7 +74,7 @@ public class LineBuilder {
   /**
    * @return a list of the LineStrings in the result of the specified overlay operation
    */
-  public List build(final int opCode) {
+  public List<LineString> build(final int opCode) {
     findCoveredLineEdges();
     collectLines(opCode);
     // labelIsolatedLines(lineEdgesList);

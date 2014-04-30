@@ -38,7 +38,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.algorithm.NonRobustCGAlgorithms;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -80,17 +79,10 @@ public class MiscellaneousTest2 extends TestCase {
   }
 
   public void test1() throws Exception {
-    final NonRobustCGAlgorithms algorithms = new NonRobustCGAlgorithms();
     assertTrue(CGAlgorithms.isOnLine(new Coordinate((double)10, 10,
-      Coordinates.NULL_ORDINATE), new Coordinates[] {
-      new Coordinate((double)0, 10, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)20, 10, Coordinates.NULL_ORDINATE)
-    }));
+      Coordinates.NULL_ORDINATE), geometryFactory.lineString(2, 0, 10, 20, 10)));
     assertTrue(!CGAlgorithms.isOnLine(new Coordinate((double)30, 10,
-      Coordinates.NULL_ORDINATE), new Coordinates[] {
-      new Coordinate((double)0, 10, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)20, 10, Coordinates.NULL_ORDINATE)
-    }));
+      Coordinates.NULL_ORDINATE), geometryFactory.lineString(2, 0, 10, 20, 10)));
   }
 
   public void testCoordinateHash() {

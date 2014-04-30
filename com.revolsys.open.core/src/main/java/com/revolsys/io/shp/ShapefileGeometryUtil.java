@@ -213,7 +213,7 @@ public final class ShapefileGeometryUtil {
     final List<Polygon> polygons = new ArrayList<Polygon>();
     final List<CoordinatesList> currentParts = new ArrayList<CoordinatesList>();
     for (final CoordinatesList ring : parts) {
-      final boolean ringClockwise = !CoordinatesListUtil.isCCW(ring);
+      final boolean ringClockwise = !ring.isCounterClockwise();
       if (ringClockwise == clockwise) {
         if (!currentParts.isEmpty()) {
           final Polygon polygon = geometryFactory.polygon(currentParts);

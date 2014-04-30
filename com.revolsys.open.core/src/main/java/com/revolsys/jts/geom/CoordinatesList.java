@@ -173,6 +173,8 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   double getZ(int index);
 
+  boolean isCounterClockwise();
+
   void makePrecise(CoordinatesPrecisionModel precisionModel);
 
   CoordinatesList reverse();

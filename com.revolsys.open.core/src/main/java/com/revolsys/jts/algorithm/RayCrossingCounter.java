@@ -249,7 +249,7 @@ public class RayCrossingCounter {
   }
 
   public void countSegment(final Segment segment) {
-    countSegment(segment.get(0), segment.get(1));
+    countSegment(segment.get(1), segment.get(0));
   }
 
   /**

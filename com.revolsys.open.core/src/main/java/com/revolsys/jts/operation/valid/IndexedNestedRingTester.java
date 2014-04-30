@@ -90,7 +90,6 @@ public class IndexedNestedRingTester {
 
     for (int i = 0; i < rings.size(); i++) {
       final LinearRing innerRing = (LinearRing)rings.get(i);
-      final Coordinates[] innerRingPts = innerRing.getCoordinateArray();
 
       final List results = index.query(innerRing.getBoundingBox());
       // System.out.println(results.size());
@@ -105,8 +104,8 @@ public class IndexedNestedRingTester {
           continue;
         }
 
-        final Coordinates innerRingPt = IsValidOp.findPtNotNode(innerRingPts,
-          searchRing, graph);
+        final Coordinates innerRingPt = IsValidOp.findPtNotNode(
+          innerRing.vertices(), searchRing, graph);
 
         /**
          * If no non-node pts can be found, this means

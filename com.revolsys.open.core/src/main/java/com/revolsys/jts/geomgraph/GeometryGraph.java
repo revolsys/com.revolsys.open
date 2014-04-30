@@ -34,12 +34,10 @@ package com.revolsys.jts.geomgraph;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
@@ -92,14 +90,14 @@ public class GeometryGraph extends PlanarGraph {
       : Location.INTERIOR;
   }
 
-  private final Geometry parentGeom;
+  private final Geometry geometry;
 
   /**
    * The lineEdgeMap is a map of the linestring components of the
    * parentGeometry to the edges which are derived from them.
    * This is used to efficiently perform findEdge queries
    */
-  private final Map lineEdgeMap = new HashMap();
+  private final Map<LineString, Edge> lineEdgeMap = new HashMap<>();
 
   private BoundaryNodeRule boundaryNodeRule = null;
 
@@ -123,56 +121,47 @@ public class GeometryGraph extends PlanarGraph {
   // for use if geometry is not Polygonal
   private final PointLocator ptLocator = new PointLocator();
 
-  public GeometryGraph(final int argIndex, final Geometry parentGeom) {
-    this(argIndex, parentGeom, BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE);
+  public GeometryGraph(final int argIndex, final Geometry geometry) {
+    this(argIndex, geometry, BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE);
   }
 
-  public GeometryGraph(final int argIndex, final Geometry parentGeom,
+  public GeometryGraph(final int argIndex, final Geometry geometry,
     final BoundaryNodeRule boundaryNodeRule) {
     this.argIndex = argIndex;
-    this.parentGeom = parentGeom;
+    this.geometry = geometry;
     this.boundaryNodeRule = boundaryNodeRule;
-    if (parentGeom != null) {
-      // precisionModel = parentGeom.getPrecisionModel();
-      // SRID = parentGeom.getSRID();
-      add(parentGeom);
+    if (geometry != null) {
+      add(geometry);
     }
   }
 
-  private void add(final Geometry g) {
-    if (g.isEmpty()) {
-      return;
-    }
-
-    // check if this Geometry should obey the Boundary Determination Rule
-    // all collections except MultiPolygons obey the rule
-    if (g instanceof MultiPolygon) {
-      useBoundaryDeterminationRule = false;
-    }
-
-    if (g instanceof Polygon) {
-      addPolygon((Polygon)g);
-    } else if (g instanceof LineString) {
-      addLineString((LineString)g);
-    } else if (g instanceof Point) {
-      addPoint((Point)g);
-    } else if (g instanceof MultiPoint) {
-      addCollection((MultiPoint)g);
-    } else if (g instanceof MultiLineString) {
-      addCollection((MultiLineString)g);
-    } else if (g instanceof MultiPolygon) {
-      addCollection((MultiPolygon)g);
-    } else if (g instanceof GeometryCollection) {
-      addCollection((GeometryCollection)g);
-    } else {
-      throw new UnsupportedOperationException(g.getClass().getName());
+  private void add(final Geometry geometry) {
+    if (!geometry.isEmpty()) {
+      if (geometry instanceof Polygon) {
+        addPolygon((Polygon)geometry);
+      } else if (geometry instanceof LineString) {
+        addLineString((LineString)geometry);
+      } else if (geometry instanceof Point) {
+        addPoint((Point)geometry);
+      } else if (geometry instanceof MultiPoint) {
+        addCollection((MultiPoint)geometry);
+      } else if (geometry instanceof MultiLineString) {
+        addCollection((MultiLineString)geometry);
+      } else if (geometry instanceof MultiPolygon) {
+        useBoundaryDeterminationRule = false;
+        addCollection((MultiPolygon)geometry);
+      } else if (geometry instanceof GeometryCollection) {
+        addCollection((GeometryCollection)geometry);
+      } else {
+        throw new UnsupportedOperationException(geometry.getClass().getName());
+      }
     }
   }
 
   private void addCollection(final GeometryCollection gc) {
     for (int i = 0; i < gc.getGeometryCount(); i++) {
-      final Geometry g = gc.getGeometry(i);
-      add(g);
+      final Geometry geometry = gc.getGeometry(i);
+      add(geometry);
     }
   }
 
@@ -267,7 +256,7 @@ public class GeometryGraph extends PlanarGraph {
 
     Location left = cwLeft;
     Location right = cwRight;
-    if (CGAlgorithms.isCCW(coord)) {
+    if (lr.isCounterClockwise()) {
       left = cwRight;
       right = cwLeft;
     }
@@ -300,11 +289,9 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private void addSelfIntersectionNodes(final int argIndex) {
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final Edge e = (Edge)i.next();
+    for (final Edge e : edges) {
       final Location eLoc = e.getLabel().getLocation(argIndex);
-      for (final Iterator eiIt = e.eiList.iterator(); eiIt.hasNext();) {
-        final EdgeIntersection ei = (EdgeIntersection)eiIt.next();
+      for (final EdgeIntersection ei : e.eiList) {
         addSelfIntersectionNode(argIndex, ei.coord, eLoc);
       }
     }
@@ -339,7 +326,7 @@ public class GeometryGraph extends PlanarGraph {
     final EdgeSetIntersector esi = createEdgeSetIntersector();
     // optimized test for Polygons and Rings
     if (!computeRingSelfNodes
-      && (parentGeom instanceof LinearRing || parentGeom instanceof Polygon || parentGeom instanceof MultiPolygon)) {
+      && (geometry instanceof LinearRing || geometry instanceof Polygon || geometry instanceof MultiPolygon)) {
       esi.computeIntersections(edges, si, false);
     } else {
       esi.computeIntersections(edges, si, true);
@@ -349,9 +336,8 @@ public class GeometryGraph extends PlanarGraph {
     return si;
   }
 
-  public void computeSplitEdges(final List edgelist) {
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final Edge e = (Edge)i.next();
+  public void computeSplitEdges(final List<Edge> edgelist) {
+    for (final Edge e : edges) {
       e.eiList.addSplitEdges(edgelist);
     }
   }
@@ -370,7 +356,7 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   public Edge findEdge(final LineString line) {
-    return (Edge)lineEdgeMap.get(line);
+    return lineEdgeMap.get(line);
   }
 
   public BoundaryNodeRule getBoundaryNodeRule() {
@@ -396,7 +382,7 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   public Geometry getGeometry() {
-    return parentGeom;
+    return geometry;
   }
 
   public Coordinates getInvalidPoint() {
@@ -470,13 +456,13 @@ public class GeometryGraph extends PlanarGraph {
    * @return the location of the point in the geometry
    */
   public Location locate(final Coordinates pt) {
-    if (parentGeom instanceof Polygonal && parentGeom.getGeometryCount() > 50) {
+    if (geometry instanceof Polygonal && geometry.getGeometryCount() > 50) {
       // lazily init point locator
       if (areaPtLocator == null) {
-        areaPtLocator = new IndexedPointInAreaLocator(parentGeom);
+        areaPtLocator = new IndexedPointInAreaLocator(geometry);
       }
       return areaPtLocator.locate(pt);
     }
-    return ptLocator.locate(pt, parentGeom);
+    return ptLocator.locate(pt, geometry);
   }
 }

@@ -135,7 +135,6 @@ public abstract class EdgeRing {
    * Collect all the points from the DirectedEdges of this ring into a contiguous list
    */
   protected void computePoints(final DirectedEdge start) {
-    // System.out.println("buildRing");
     startDe = start;
     DirectedEdge de = start;
     boolean isFirstEdge = true;
@@ -151,8 +150,6 @@ public abstract class EdgeRing {
       }
 
       edges.add(de);
-      // Debug.println(de);
-      // Debug.println(de.getEdge());
       final Label label = de.getLabel();
       Assert.isTrue(label.isArea());
       mergeLabel(label);
@@ -169,18 +166,10 @@ public abstract class EdgeRing {
    * accordingly.
    */
   public void computeRing() {
-    if (ring != null) {
-      return; // don't compute more than once
+    if (ring == null) {
+      ring = geometryFactory.linearRing(pts);
+      isHole = ring.isCounterClockwise();
     }
-    final Coordinates[] coord = new Coordinates[pts.size()];
-    for (int i = 0; i < pts.size(); i++) {
-      coord[i] = pts.get(i);
-    }
-    ring = geometryFactory.linearRing(coord);
-    isHole = CGAlgorithms.isCCW(ring.getCoordinateArray());
-    // Debug.println( (isHole ? "hole - " : "shell - ") +
-    // WKTWriter.toLineString(new
-    // CoordinateArraySequence(ring.getCoordinates())));
   }
 
   /**
@@ -301,6 +290,15 @@ public abstract class EdgeRing {
     }
     final Polygon poly = geometryFactory.polygon(rings);
     return poly;
+  }
+
+  @Override
+  public String toString() {
+    if (ring == null) {
+      return pts.toString();
+    } else {
+      return ring.toString();
+    }
   }
 
 }

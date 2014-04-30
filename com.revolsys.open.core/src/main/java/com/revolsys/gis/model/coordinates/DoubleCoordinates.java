@@ -54,16 +54,16 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   }
 
   @Override
+  public int getAxisCount() {
+    return (byte)coordinates.length;
+  }
+
+  @Override
   public double[] getCoordinates() {
     final double[] coordinates = new double[this.coordinates.length];
     System.arraycopy(this.coordinates, 0, coordinates, 0,
       this.coordinates.length);
     return coordinates;
-  }
-
-  @Override
-  public int getAxisCount() {
-    return (byte)coordinates.length;
   }
 
   @Override
@@ -79,22 +79,6 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   public void setValue(final int index, final double value) {
     if (index >= 0 && index < getAxisCount()) {
       coordinates[index] = value;
-    }
-  }
-
-  @Override
-  public String toString() {
-    final int axisCount = getAxisCount();
-    if (axisCount > 0) {
-      final StringBuffer s = new StringBuffer(String.valueOf(coordinates[0]));
-      for (int i = 1; i < axisCount; i++) {
-        final Double ordinate = coordinates[i];
-        s.append(',');
-        s.append(ordinate);
-      }
-      return s.toString();
-    } else {
-      return "";
     }
   }
 

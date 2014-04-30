@@ -547,7 +547,7 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
       System.arraycopy(uniqueCoordinates, 0, ringCoordinates, 0,
         uniqueCoordinates.length);
       ringCoordinates[uniqueCoordinates.length] = uniqueCoordinates[0];
-      if (CGAlgorithms.isCCW(ringCoordinates) == clockwise) {
+      if (ring.isCounterClockwise() == clockwise) {
         CoordinateArrays.reverse(ringCoordinates);
       }
       final GeometryFactory geometryFactory = getGeometryFactory();

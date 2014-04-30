@@ -41,6 +41,7 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 
@@ -89,10 +90,9 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final QuadEdge[] tri, final Coordinates pt) {
-    final Coordinates[] ring = new Coordinates[] {
+    final LineString ring = GeometryFactory.getFactory().lineString(
       tri[0].orig().getCoordinate(), tri[1].orig().getCoordinate(),
-      tri[2].orig().getCoordinate(), tri[0].orig().getCoordinate()
-    };
+      tri[2].orig().getCoordinate(), tri[0].orig().getCoordinate());
     return CGAlgorithms.isPointInRing(pt, ring);
   }
 
@@ -107,8 +107,10 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final Vertex[] tri, final Coordinates pt) {
-    return CGAlgorithms.isPointInRing(pt, tri[0].getCoordinate(),
-      tri[1].getCoordinate(), tri[2].getCoordinate(), tri[0].getCoordinate());
+    final LineString ring = GeometryFactory.getFactory().lineString(
+      tri[0].getCoordinate(), tri[1].getCoordinate(), tri[2].getCoordinate(),
+      tri[0].getCoordinate());
+    return CGAlgorithms.isPointInRing(pt, ring);
   }
 
   /**
@@ -179,8 +181,7 @@ public class QuadEdgeTriangle {
   }
 
   public boolean contains(final Coordinates pt) {
-    final Coordinates[] ring = getCoordinates();
-    return CGAlgorithms.isPointInRing(pt, ring);
+    return CGAlgorithms.isPointInRing(pt, getLine());
   }
 
   public QuadEdgeTriangle getAdjacentTriangleAcrossEdge(final int edgeIndex) {
@@ -259,6 +260,10 @@ public class QuadEdgeTriangle {
     final LinearRing ring = fact.linearRing(getCoordinates());
     final Polygon tri = fact.polygon(ring);
     return tri;
+  }
+
+  public LineString getLine() {
+    return GeometryFactory.getFactory().lineString(getCoordinates());
   }
 
   /**

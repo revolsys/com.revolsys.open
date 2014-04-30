@@ -22,13 +22,13 @@ public class CoordinateSequenceCoordinates extends AbstractCoordinates {
     return new CoordinateSequenceCoordinates(coordinates, index);
   }
 
-  public int getIndex() {
-    return index;
-  }
-
   @Override
   public int getAxisCount() {
     return (byte)coordinates.getAxisCount();
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   @Override
@@ -53,11 +53,6 @@ public class CoordinateSequenceCoordinates extends AbstractCoordinates {
 
   public int size() {
     return coordinates.size();
-  }
-
-  @Override
-  public String toString() {
-    return coordinates.getCoordinate(index).toString();
   }
 
 }

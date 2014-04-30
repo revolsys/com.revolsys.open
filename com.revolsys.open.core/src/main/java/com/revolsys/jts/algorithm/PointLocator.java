@@ -158,19 +158,18 @@ public class PointLocator {
     return Location.EXTERIOR;
   }
 
-  private Location locate(final Coordinates p, final LineString l) {
+  private Location locate(final Coordinates point, final LineString line) {
     // bounding-box check
-    if (!l.getBoundingBox().intersects(p)) {
+    if (!line.getBoundingBox().intersects(point)) {
       return Location.EXTERIOR;
     }
 
-    final Coordinates[] pt = l.getCoordinateArray();
-    if (!l.isClosed()) {
-      if (p.equals(pt[0]) || p.equals(pt[pt.length - 1])) {
+    if (!line.isClosed()) {
+      if (point.equals(line.getVertex(0)) || point.equals(line.getVertex(-1))) {
         return Location.BOUNDARY;
       }
     }
-    if (CGAlgorithms.isOnLine(p, pt)) {
+    if (CGAlgorithms.isOnLine(point, line)) {
       return Location.INTERIOR;
     }
     return Location.EXTERIOR;
@@ -221,7 +220,7 @@ public class PointLocator {
       return Location.EXTERIOR;
     }
 
-    return CGAlgorithms.locatePointInRing(p, ring.getCoordinateArray());
+    return CGAlgorithms.locatePointInRing(p, ring);
   }
 
   private void updateLocationInfo(final Location loc) {

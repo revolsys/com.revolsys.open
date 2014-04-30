@@ -106,7 +106,6 @@ public class PolygonBuilder {
           final MaximalEdgeRing er = new MaximalEdgeRing(de, geometryFactory);
           maxEdgeRings.add(er);
           er.setInResult();
-          // System.out.println("max node degree = " + er.getMaxDegree());
         }
       }
     }

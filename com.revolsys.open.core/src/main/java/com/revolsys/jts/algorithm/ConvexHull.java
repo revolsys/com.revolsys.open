@@ -48,6 +48,7 @@ import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.util.Assert;
@@ -458,7 +459,7 @@ public class ConvexHull {
      * are forced to be in the reduced set.
      */
     for (int i = 0; i < inputPts.length; i++) {
-      if (!CGAlgorithms.isPointInRing(inputPts[i], polyPts)) {
+      if (!ConvexHull.isPointInRing(inputPts[i], polyPts)) {
         reducedSet.add(inputPts[i]);
       }
     }
@@ -482,5 +483,28 @@ public class ConvexHull {
       coordinates[i] = coordinate;
     }
     return coordinates;
+  }
+
+  /**
+   * Tests whether a point lies inside or on a ring. The ring may be oriented in
+   * either direction. A point lying exactly on the ring boundary is considered
+   * to be inside the ring.
+   * <p>
+   * This method does <i>not</i> first check the point against the envelope of
+   * the ring.
+   * 
+   * @param p
+   *          point to check for ring inclusion
+   * @param ring
+   *          an array of coordinates representing the ring (which must have
+   *          first point identical to last point)
+   * @return true if p is inside ring
+   * 
+   * @see locatePointInRing
+   */
+  public static boolean isPointInRing(final Coordinates p,
+    final Coordinates... ring) {
+    Location location = RayCrossingCounter.locatePointInRing(p, ring);
+    return location != Location.EXTERIOR;
   }
 }

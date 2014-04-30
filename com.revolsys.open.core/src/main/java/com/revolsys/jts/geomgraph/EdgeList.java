@@ -48,7 +48,7 @@ import com.revolsys.jts.noding.OrientedCoordinateArray;
  * that are pointwise equals to a target edge.
  * @version 1.7
  */
-public class EdgeList {
+public class EdgeList implements Iterable<Edge> {
   private final List<Edge> edges = new ArrayList<>();
 
   /**
@@ -112,6 +112,7 @@ public class EdgeList {
     return edges;
   }
 
+  @Override
   public Iterator<Edge> iterator() {
     return edges.iterator();
   }

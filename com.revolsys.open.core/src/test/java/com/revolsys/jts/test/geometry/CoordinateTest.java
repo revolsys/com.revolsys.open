@@ -146,27 +146,8 @@ public class CoordinateTest extends TestCase {
     assertEquals(c.getValue(Coordinates.Z), 5266.3);
   }
 
-  public void testSetCoordinate() {
-    final Coordinates orig = new Coordinate(350.2, 4566.8, 5266.3);
-    final Coordinates c = new Coordinate(3);
-    c.setCoordinate(orig);
-    assertEquals(350.2, c.getX());
-    assertEquals(4566.8, c.getY());
-    assertEquals(5266.3, c.getZ());
-  }
-
-  public void testSetOrdinate() {
-    final Coordinates c = new Coordinate(3);
-    c.setValue(Coordinates.X, 111);
-    c.setValue(Coordinates.Y, 222);
-    c.setValue(Coordinates.Z, 333);
-    assertEquals(c.getValue(Coordinates.X), 111.0);
-    assertEquals(c.getValue(Coordinates.Y), 222.0);
-    assertEquals(c.getValue(Coordinates.Z), 333.0);
-  }
-
   public void testToString() {
-    final String expectedResult = "POINT(100.0 200.0 50.0)";
+    final String expectedResult = "POINT(100 200 50)";
     final String actualResult = new Coordinate(100.0, 200.0, 50.0).toString();
     assertEquals(expectedResult, actualResult);
   }

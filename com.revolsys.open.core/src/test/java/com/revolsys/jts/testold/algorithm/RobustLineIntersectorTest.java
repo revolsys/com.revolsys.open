@@ -37,7 +37,6 @@ import junit.framework.TestCase;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.algorithm.NonRobustCGAlgorithms;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -67,11 +66,16 @@ public class RobustLineIntersectorTest extends TestCase {
 
   public void test2Lines() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Coordinates p1 = new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE);
-    final Coordinates q1 = new Coordinate((double)20, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q2 = new Coordinate((double)10, 20, Coordinates.NULL_ORDINATE);
-    final Coordinates x = new Coordinate((double)15, 15, Coordinates.NULL_ORDINATE);
+    final Coordinates p1 = new Coordinate((double)10, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate((double)20, 20,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q1 = new Coordinate((double)20, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q2 = new Coordinate((double)10, 20,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates x = new Coordinate((double)15, 15,
+      Coordinates.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
     assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionNum());
     assertEquals(1, i.getIntersectionNum());
@@ -81,26 +85,33 @@ public class RobustLineIntersectorTest extends TestCase {
   }
 
   public void testA() {
-    final Coordinates p1 = new Coordinate((double)-123456789, -40, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate((double)381039468754763d, 123456789, Coordinates.NULL_ORDINATE);
-    final Coordinates q = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
-    final LineString l = GeometryFactory.getFactory().lineString(new Coordinates[] {
+    final Coordinates p1 = new Coordinate((double)-123456789, -40,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate(381039468754763d, 123456789,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q = new Coordinate((double)0, 0,
+      Coordinates.NULL_ORDINATE);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+    final LineString l = geometryFactory.lineString(new Coordinates[] {
       p1, p2
     });
-    final Point p = GeometryFactory.getFactory().point(q);
+    final Point p = geometryFactory.point(q);
     assertEquals(false, l.intersects(p));
-    assertEquals(false, CGAlgorithms.isOnLine(q, new Coordinates[] {
-      p1, p2
-    }));
+    assertEquals(false,
+      CGAlgorithms.isOnLine(q, geometryFactory.lineString(p1, p2)));
     assertEquals(-1, CGAlgorithms.computeOrientation(p1, p2, q));
   }
 
   public void testCollinear1() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Coordinates p1 = new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate((double)20, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q1 = new Coordinate((double)22, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q2 = new Coordinate((double)30, 10, Coordinates.NULL_ORDINATE);
+    final Coordinates p1 = new Coordinate((double)10, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate((double)20, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q1 = new Coordinate((double)22, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q2 = new Coordinate((double)30, 10,
+      Coordinates.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
     assertEquals(LineIntersector.NO_INTERSECTION, i.getIntersectionNum());
     assertTrue(!i.isProper());
@@ -109,10 +120,14 @@ public class RobustLineIntersectorTest extends TestCase {
 
   public void testCollinear2() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Coordinates p1 = new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate((double)20, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q1 = new Coordinate((double)20, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q2 = new Coordinate((double)30, 10, Coordinates.NULL_ORDINATE);
+    final Coordinates p1 = new Coordinate((double)10, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate((double)20, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q1 = new Coordinate((double)20, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q2 = new Coordinate((double)30, 10,
+      Coordinates.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
     assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionNum());
     assertTrue(!i.isProper());
@@ -121,10 +136,14 @@ public class RobustLineIntersectorTest extends TestCase {
 
   public void testCollinear3() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Coordinates p1 = new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate((double)20, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q1 = new Coordinate((double)15, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q2 = new Coordinate((double)30, 10, Coordinates.NULL_ORDINATE);
+    final Coordinates p1 = new Coordinate((double)10, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate((double)20, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q1 = new Coordinate((double)15, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q2 = new Coordinate((double)30, 10,
+      Coordinates.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
     assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionNum());
     assertTrue(!i.isProper());
@@ -133,63 +152,83 @@ public class RobustLineIntersectorTest extends TestCase {
 
   public void testCollinear4() {
     final RobustLineIntersector i = new RobustLineIntersector();
-    final Coordinates p1 = new Coordinate((double)30, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate((double)20, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q1 = new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE);
-    final Coordinates q2 = new Coordinate((double)30, 10, Coordinates.NULL_ORDINATE);
+    final Coordinates p1 = new Coordinate((double)30, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate((double)20, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q1 = new Coordinate((double)10, 10,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates q2 = new Coordinate((double)30, 10,
+      Coordinates.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
     assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionNum());
     assertTrue(i.hasIntersection());
   }
 
   public void testEndpointIntersection() {
-    this.i.computeIntersection(new Coordinate((double)100, 100, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)10, 100, Coordinates.NULL_ORDINATE), new Coordinate((double)100, 10, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)100, 100, Coordinates.NULL_ORDINATE));
+    this.i.computeIntersection(new Coordinate((double)100, 100,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)10, 100,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)100, 10,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)100, 100,
+      Coordinates.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(1, this.i.getIntersectionNum());
   }
 
   public void testEndpointIntersection2() {
-    this.i.computeIntersection(new Coordinate((double)190, 50, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)120, 100, Coordinates.NULL_ORDINATE), new Coordinate((double)120, 100, Coordinates.NULL_ORDINATE), new Coordinate((double)50,
-        150, Coordinates.NULL_ORDINATE));
+    this.i.computeIntersection(new Coordinate((double)190, 50,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)120, 100,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)120, 100,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)50, 150,
+      Coordinates.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(1, this.i.getIntersectionNum());
-    assertEquals(new Coordinate((double)120, 100, Coordinates.NULL_ORDINATE), this.i.getIntersection(1));
+    assertEquals(new Coordinate((double)120, 100, Coordinates.NULL_ORDINATE),
+      this.i.getIntersection(1));
   }
 
   public void testIsCCW() {
-    assertEquals(1, CGAlgorithms.computeOrientation(new Coordinate((double)-123456789,
-      -40, Coordinates.NULL_ORDINATE), new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), new Coordinate((double)381039468754763d, 123456789, Coordinates.NULL_ORDINATE)));
+    assertEquals(1, CGAlgorithms.computeOrientation(new Coordinate(
+      (double)-123456789, -40, Coordinates.NULL_ORDINATE), new Coordinate(
+      (double)0, 0, Coordinates.NULL_ORDINATE), new Coordinate(
+      381039468754763d, 123456789, Coordinates.NULL_ORDINATE)));
   }
 
   public void testIsCCW2() {
-    assertEquals(0, CGAlgorithms.computeOrientation(new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE), new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE)));
-    assertEquals(0, NonRobustCGAlgorithms.computeOrientation(new Coordinate((double)10,
-      10, Coordinates.NULL_ORDINATE), new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE), new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE)));
+    assertEquals(0, CGAlgorithms.computeOrientation(new Coordinate((double)10,
+      10, Coordinates.NULL_ORDINATE), new Coordinate((double)20, 20,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)0, 0,
+      Coordinates.NULL_ORDINATE)));
   }
 
   public void testIsProper1() {
-    this.i.computeIntersection(new Coordinate((double)30, 10, Coordinates.NULL_ORDINATE), new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE), new Coordinate((double)90, 11, Coordinates.NULL_ORDINATE));
+    this.i.computeIntersection(new Coordinate((double)30, 10,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)30, 30,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)10, 10,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)90, 11,
+      Coordinates.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(1, this.i.getIntersectionNum());
     assertTrue(this.i.isProper());
   }
 
   public void testIsProper2() {
-    this.i.computeIntersection(new Coordinate((double)10, 30, Coordinates.NULL_ORDINATE), new Coordinate((double)10, 0, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)11, 90, Coordinates.NULL_ORDINATE), new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE));
+    this.i.computeIntersection(new Coordinate((double)10, 30,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)10, 0,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)11, 90,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)10, 10,
+      Coordinates.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(1, this.i.getIntersectionNum());
     assertTrue(!this.i.isProper());
   }
 
   public void testOverlap() {
-    this.i.computeIntersection(new Coordinate((double)180, 200, Coordinates.NULL_ORDINATE), new Coordinate((double)160,
-      180, Coordinates.NULL_ORDINATE), new Coordinate((double)220, 240, Coordinates.NULL_ORDINATE), new Coordinate((double)140, 160, Coordinates.NULL_ORDINATE));
+    this.i.computeIntersection(new Coordinate((double)180, 200,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)160, 180,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)220, 240,
+      Coordinates.NULL_ORDINATE), new Coordinate((double)140, 160,
+      Coordinates.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
     assertEquals(2, this.i.getIntersectionNum());
   }

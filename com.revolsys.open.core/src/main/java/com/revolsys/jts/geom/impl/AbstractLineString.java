@@ -36,7 +36,6 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
@@ -393,7 +392,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   @Override
   public boolean isCounterClockwise() {
     final CoordinatesList points = getCoordinatesList();
-    return CoordinatesListUtil.isCCW(points);
+    final boolean counterClockwise = points.isCounterClockwise();
+    return counterClockwise;
   }
 
   @Override

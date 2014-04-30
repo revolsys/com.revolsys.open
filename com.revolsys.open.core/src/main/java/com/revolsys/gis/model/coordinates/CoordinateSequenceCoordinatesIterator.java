@@ -12,8 +12,7 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
 
   private int index = 0;
 
-  public CoordinateSequenceCoordinatesIterator(
-    final CoordinatesList coordinates) {
+  public CoordinateSequenceCoordinatesIterator(final CoordinatesList coordinates) {
     this.coordinates = coordinates;
   }
 
@@ -28,13 +27,13 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
     return new CoordinateSequenceCoordinatesIterator(coordinates, index);
   }
 
-  public int getIndex() {
-    return index;
-  }
-
   @Override
   public int getAxisCount() {
     return (byte)coordinates.getAxisCount();
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   @Override
@@ -102,8 +101,4 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
     return coordinates.size();
   }
 
-  @Override
-  public String toString() {
-    return coordinates.getCoordinate(index).toString();
-  }
 }

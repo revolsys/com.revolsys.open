@@ -155,23 +155,4 @@ public class Coordinate extends AbstractCoordinates {
     }
   }
 
-  /**
-   *  Returns a <code>String</code> of the form <I>POINT(x y z)</I> .
-   *
-   *@return    a <code>String</code> of the form <I>POINT(x y z)</I>
-   */
-  @Override
-  public String toString() {
-    final StringBuffer s = new StringBuffer("POINT(");
-    s.append(coordinates[0]);
-    final int axisCount = getAxisCount();
-    for (int i = 1; i < axisCount; i++) {
-      final Double ordinate = coordinates[i];
-      s.append(' ');
-      s.append(ordinate);
-    }
-    s.append(")");
-    return s.toString();
-  }
-
 }

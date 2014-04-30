@@ -867,15 +867,6 @@ public final class LineStringUtil {
     return false;
   }
 
-  public static boolean isCCW(final LineString line) {
-    if (line == null) {
-      return false;
-    } else {
-      final CoordinatesList points = CoordinatesListUtil.get(line);
-      return CoordinatesListUtil.isCCW(points);
-    }
-  }
-
   public static boolean isEndsWithinDistance(final LineString line,
     final Coordinates point, final double maxDistance) {
     final Coordinates fromPoint = getFromCoordinates(line);

@@ -3,7 +3,6 @@ package com.revolsys.gis.data.model.comparator;
 import java.util.Comparator;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Polygon;
 
 public class DataObjectGeometryAreaComparitor implements Comparator<DataObject> {
@@ -35,10 +34,8 @@ public class DataObjectGeometryAreaComparitor implements Comparator<DataObject> 
     if (compare == 0) {
       compare = geometry1.compareTo(geometry2);
       if (compare == 0) {
-        final boolean clockwise1 = !CGAlgorithms.isCCW(geometry1.getExteriorRing()
-          .getCoordinateArray());
-        final boolean clockwise2 = !CGAlgorithms.isCCW(geometry2.getExteriorRing()
-          .getCoordinateArray());
+        final boolean clockwise1 = geometry1.getExteriorRing().isClockwise();
+        final boolean clockwise2 = geometry2.getExteriorRing().isClockwise();
         if (clockwise1) {
           if (clockwise2) {
             return 0;

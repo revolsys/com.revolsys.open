@@ -22,13 +22,13 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     return new DoubleCoordinates(this);
   }
 
-  public int getIndex() {
-    return index;
-  }
-
   @Override
   public int getAxisCount() {
     return coordinates.getAxisCount();
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   @Override
@@ -57,27 +57,6 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
 
   public int size() {
     return coordinates.size();
-  }
-
-  @Override
-  public String toString() {
-    final int axisCount = getAxisCount();
-    if (axisCount > 0) {
-      final double x = coordinates.getX(index);
-      final StringBuffer s = new StringBuffer(String.valueOf(x));
-      final double y = coordinates.getY(index);
-      s.append(',');
-      s.append(y);
-
-      for (int i = 2; i < axisCount; i++) {
-        final Double ordinate = coordinates.getValue(index, i);
-        s.append(',');
-        s.append(ordinate);
-      }
-      return s.toString();
-    } else {
-      return "";
-    }
   }
 
 }

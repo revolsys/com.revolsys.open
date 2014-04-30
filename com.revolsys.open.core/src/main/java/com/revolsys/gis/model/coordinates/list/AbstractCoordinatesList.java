@@ -222,6 +222,11 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     }
   }
 
+  public boolean equals2dCoordinate(final int index, final double x,
+    final double y) {
+    return getX(index) == x && getY(index) == y;
+  }
+
   @Override
   public Coordinates get(final int i) {
     if (i >= 0 && i < size()) {
@@ -280,15 +285,15 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return (long)getM(index);
   }
 
-  // @Override
-  // public double getValue(final int index, final int axisIndex) {
-  // return getValue(index, axisIndex);
-  // }
-
   @Override
   public double getX(final int index) {
     return getValue(index, 0);
   }
+
+  // @Override
+  // public double getValue(final int index, final int axisIndex) {
+  // return getValue(index, axisIndex);
+  // }
 
   @Override
   public double getY(final int index) {
@@ -309,6 +314,75 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
       }
     }
     return h;
+  }
+
+  @Override
+  public boolean isCounterClockwise() {
+    // # of points without closing endpoint
+    final int nPts = size() - 1;
+
+    // find highest point
+    double hiPtX = getX(0);
+    double hiPtY = getY(0);
+    int hiIndex = 0;
+    for (int i = 1; i <= nPts; i++) {
+      final double x = getX(i);
+      final double y = getY(i);
+      if (y > hiPtY) {
+        hiPtX = x;
+        hiPtY = y;
+        hiIndex = i;
+      }
+    }
+
+    // find distinct point before highest point
+    int iPrev = hiIndex;
+    do {
+      iPrev = iPrev - 1;
+      if (iPrev < 0) {
+        iPrev = nPts;
+      }
+    } while (equals2dCoordinate(iPrev, hiPtX, hiPtY) && iPrev != hiIndex);
+
+    // find distinct point after highest point
+    int iNext = hiIndex;
+    do {
+      iNext = (iNext + 1) % nPts;
+    } while (equals2dCoordinate(iNext, hiPtX, hiPtY) && iNext != hiIndex);
+
+    /**
+     * This check catches cases where the ring contains an A-B-A configuration
+     * of points. This can happen if the ring does not contain 3 distinct points
+     * (including the case where the input array has fewer than 4 elements), or
+     * it contains coincident line segments.
+     */
+    if (equals2dCoordinate(iPrev, hiPtX, hiPtY)
+      || equals2dCoordinate(iNext, hiPtX, hiPtY)
+      || CoordinatesListUtil.equals2dCoordinates(this, iPrev, iNext)) {
+      return false;
+    }
+
+    final int disc = CoordinatesListUtil.orientationIndex(this, iPrev, hiIndex,
+      iNext);
+
+    /**
+     * If disc is exactly 0, lines are collinear. There are two possible cases:
+     * (1) the lines lie along the x axis in opposite directions (2) the lines
+     * lie on top of one another (1) is handled by checking if next is left of
+     * prev ==> CCW (2) will never happen if the ring is valid, so don't check
+     * for it (Might want to assert this)
+     */
+    boolean counterClockwise = false;
+    if (disc == 0) {
+      // poly is CCW if prev x is right of next x
+      final double prevX = getValue(iPrev, 0);
+      final double nextX = getValue(iNext, 0);
+      counterClockwise = (prevX > nextX);
+    } else {
+      // if area is positive, points are ordered CCW
+      counterClockwise = (disc > 0);
+    }
+    return counterClockwise;
   }
 
   @Override

@@ -77,7 +77,7 @@ public class PlanarGraph {
     }
   }
 
-  protected List edges = new ArrayList();
+  protected List<Edge> edges = new ArrayList<>();
 
   private final NodeMap nodes;
 
@@ -151,7 +151,7 @@ public class PlanarGraph {
    */
   public Edge findEdge(final Coordinates p0, final Coordinates p1) {
     for (int i = 0; i < edges.size(); i++) {
-      final Edge e = (Edge)edges.get(i);
+      final Edge e = edges.get(i);
       final Coordinates[] eCoord = e.getCoordinates();
       if (p0.equals(eCoord[0]) && p1.equals(eCoord[1])) {
         return e;
@@ -186,7 +186,7 @@ public class PlanarGraph {
    */
   public Edge findEdgeInSameDirection(final Coordinates p0, final Coordinates p1) {
     for (int i = 0; i < edges.size(); i++) {
-      final Edge e = (Edge)edges.get(i);
+      final Edge e = edges.get(i);
 
       final Coordinates[] eCoord = e.getCoordinates();
       if (matchInSameDirection(p0, p1, eCoord[0], eCoord[1])) {
@@ -209,7 +209,7 @@ public class PlanarGraph {
     return edges.iterator();
   }
 
-  public Iterator getNodeIterator() {
+  public Iterator<Node> getNodeIterator() {
     return nodes.iterator();
   }
 
@@ -283,7 +283,7 @@ public class PlanarGraph {
     out.println("Edges:");
     for (int i = 0; i < edges.size(); i++) {
       out.println("edge " + i + ":");
-      final Edge e = (Edge)edges.get(i);
+      final Edge e = edges.get(i);
       e.print(out);
       e.eiList.print(out);
     }

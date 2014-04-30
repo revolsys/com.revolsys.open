@@ -34,7 +34,6 @@
 package com.revolsys.jts.operation.polygonize;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
@@ -84,15 +83,14 @@ class EdgeRing {
    * or null if no containing EdgeRing is found
    */
   public static EdgeRing findEdgeRingContaining(final EdgeRing testEr,
-    final List shellList) {
+    final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getRing();
     final BoundingBox testEnv = testRing.getBoundingBox();
     Coordinates testPt = testRing.getCoordinate(0);
 
     EdgeRing minShell = null;
     BoundingBox minShellEnv = null;
-    for (final Iterator it = shellList.iterator(); it.hasNext();) {
-      final EdgeRing tryShell = (EdgeRing)it.next();
+    for (final EdgeRing tryShell : shellList) {
       final LinearRing tryShellRing = tryShell.getRing();
       final BoundingBox tryShellEnv = tryShellRing.getBoundingBox();
       // the hole envelope cannot equal the shell envelope
@@ -167,7 +165,7 @@ class EdgeRing {
 
   private final GeometryFactory factory;
 
-  private final List deList = new ArrayList();
+  private final List<DirectedEdge> deList = new ArrayList<DirectedEdge>();
 
   // cache the following data for efficiency
   private LinearRing ring = null;
@@ -194,7 +192,7 @@ class EdgeRing {
    */
   public void addHole(final LinearRing hole) {
     if (holes == null) {
-      holes = new ArrayList();
+      holes = new ArrayList<>();
     }
     holes.add(hole);
   }
@@ -208,8 +206,7 @@ class EdgeRing {
   private Coordinates[] getCoordinates() {
     if (ringPts == null) {
       final CoordinateList coordList = new CoordinateList();
-      for (final Iterator i = deList.iterator(); i.hasNext();) {
-        final DirectedEdge de = (DirectedEdge)i.next();
+      for (final DirectedEdge de : deList) {
         final PolygonizeEdge edge = (PolygonizeEdge)de.getEdge();
         addEdge(edge.getLine().getCoordinateArray(), de.getEdgeDirection(),
           coordList);
@@ -275,7 +272,7 @@ class EdgeRing {
    */
   public boolean isHole() {
     final LinearRing ring = getRing();
-    return CGAlgorithms.isCCW(ring.getCoordinateArray());
+    return ring.isCounterClockwise();
   }
 
   /**
@@ -290,5 +287,14 @@ class EdgeRing {
     }
     getRing();
     return ring.isValid();
+  }
+
+  @Override
+  public String toString() {
+    if (ring == null) {
+      return ringPts.toString();
+    } else {
+      return ring.toString();
+    }
   }
 }

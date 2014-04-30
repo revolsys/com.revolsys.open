@@ -52,7 +52,7 @@ public class PointBuilder {
 
   private final GeometryFactory geometryFactory;
 
-  private final List resultPointList = new ArrayList();
+  private final List<Point> resultPointList = new ArrayList<Point>();
 
   public PointBuilder(final OverlayOp op,
     final GeometryFactory geometryFactory, final PointLocator ptLocator) {
@@ -67,7 +67,7 @@ public class PointBuilder {
    *
    * @return a list of the Points objects in the result
    */
-  public List build(final int opCode) {
+  public List<Point> build(final int opCode) {
     extractNonCoveredResultNodes(opCode);
     /**
      * It can happen that connected result nodes are still covered by
