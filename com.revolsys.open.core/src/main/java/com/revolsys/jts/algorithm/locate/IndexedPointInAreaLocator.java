@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.algorithm.locate;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
@@ -43,6 +42,7 @@ import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.index.ArrayListVisitor;
 import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.intervalrtree.SortedPackedIntervalRTree;
@@ -66,21 +66,20 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
       init(geom);
     }
 
-    private void addLine(final Coordinates[] pts) {
-      for (int i = 1; i < pts.length; i++) {
-        final LineSegment seg = new LineSegmentImpl(pts[i - 1], pts[i]);
-        final double min = Math.min(seg.getP0().getY(), seg.getP1().getY());
-        final double max = Math.max(seg.getP0().getY(), seg.getP1().getY());
-        index.insert(min, max, seg);
+    private void addLine(final LineString line) {
+      for (final Segment segment : line.segments()) {
+        final double y1 = segment.getY(0);
+        final double y2 = segment.getY(1);
+        final double min = Math.min(y1, y2);
+        final double max = Math.max(y1, y2);
+        index.insert(min, max, new LineSegmentImpl(segment));
       }
     }
 
     private void init(final Geometry geom) {
-      final List lines = geom.getGeometryComponents(LineString.class);
-      for (final Iterator i = lines.iterator(); i.hasNext();) {
-        final LineString line = (LineString)i.next();
-        final Coordinates[] pts = line.getCoordinateArray();
-        addLine(pts);
+      final List<LineString> lines = geom.getGeometryComponents(LineString.class);
+      for (final LineString line : lines) {
+        addLine(line);
       }
     }
 

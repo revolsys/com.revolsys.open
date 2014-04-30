@@ -174,7 +174,7 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
     final Coordinates end = get(1);
     final Coordinates lineStart = line.get(0);
     final Coordinates lineEnd = line.get(1);
-    return LineSegmentUtil.distance(start, end, lineStart, lineEnd);
+    return CGAlgorithms.distanceLineLine(start, end, lineStart, lineEnd);
   }
 
   /**

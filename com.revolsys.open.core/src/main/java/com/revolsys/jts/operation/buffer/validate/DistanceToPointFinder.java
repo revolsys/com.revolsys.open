@@ -36,9 +36,9 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.segment.Segment;
 
 /**
  * Computes the Euclidean distance (L2 metric) from a Point to a Geometry.
@@ -71,12 +71,9 @@ public class DistanceToPointFinder {
 
   public static void computeDistance(final LineString line,
     final Coordinates pt, final PointPairDistance ptDist) {
-    final Coordinates[] coords = line.getCoordinateArray();
-    final LineSegment tempSegment = new LineSegmentImpl();
-    for (int i = 0; i < coords.length - 1; i++) {
-      tempSegment.setCoordinates(coords[i], coords[i + 1]);
+    for (final Segment segment : line.segments()) {
       // this is somewhat inefficient - could do better
-      final Coordinates closestPt = tempSegment.closestPoint(pt);
+      final Coordinates closestPt = segment.closestPoint(pt);
       ptDist.setMinimum(closestPt, pt);
     }
   }

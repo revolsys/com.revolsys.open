@@ -67,7 +67,7 @@ public class LineSegmentImpl extends AbstractLineSegment {
   }
 
   public LineSegmentImpl(final LineSegment ls) {
-    this(ls.getP0(), ls.getP1());
+    this(ls.getP0().cloneCoordinates(), ls.getP1().cloneCoordinates());
   }
 
   @Override

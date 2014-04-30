@@ -57,10 +57,9 @@ public class SegmentStringUtil {
    * @return a List of SegmentStrings
    */
   public static List extractSegmentStrings(final Geometry geom) {
-    final List segStr = new ArrayList();
-    final List lines = geom.getGeometryComponents(LineString.class);
-    for (final Iterator i = lines.iterator(); i.hasNext();) {
-      final LineString line = (LineString)i.next();
+    final List<NodedSegmentString> segStr = new ArrayList<>();
+    final List<LineString> lines = geom.getGeometryComponents(LineString.class);
+    for (final LineString line : lines) {
       final Coordinates[] pts = line.getCoordinateArray();
       segStr.add(new NodedSegmentString(pts, geom));
     }

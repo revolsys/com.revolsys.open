@@ -35,6 +35,7 @@ package com.revolsys.jts.testold.operation;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -65,15 +66,17 @@ public class DistanceTest extends TestCase {
   private void doNearestPointsTest(final String wkt0, final String wkt1,
     final double distance, final Coordinates p0, final Coordinates p1)
     throws ParseException {
-    final DistanceOp op = new DistanceOp(new WKTReader().read(wkt0),
-      new WKTReader().read(wkt1));
+    final Geometry geometry1 = new WKTReader().read(wkt0);
+    final Geometry geometry2 = new WKTReader().read(wkt1);
+    final DistanceOp op = new DistanceOp(geometry1, geometry2);
     final double tolerance = 1E-10;
-    assertEquals(distance,
-      op.nearestPoints()[0].distance(op.nearestPoints()[1]), tolerance);
-    assertEquals(p0.getX(), op.nearestPoints()[0].getX(), tolerance);
-    assertEquals(p0.getY(), op.nearestPoints()[0].getY(), tolerance);
-    assertEquals(p1.getX(), op.nearestPoints()[1].getX(), tolerance);
-    assertEquals(p1.getY(), op.nearestPoints()[1].getY(), tolerance);
+    final Coordinates[] nearestPoints = op.nearestPoints();
+    assertEquals(distance, nearestPoints[0].distance(nearestPoints[1]),
+      tolerance);
+    assertEquals(p0.getX(), nearestPoints[0].getX(), tolerance);
+    assertEquals(p0.getY(), nearestPoints[0].getY(), tolerance);
+    assertEquals(p1.getX(), nearestPoints[1].getX(), tolerance);
+    assertEquals(p1.getY(), nearestPoints[1].getY(), tolerance);
   }
 
   public void testClosestPoints1() throws Exception {
@@ -116,9 +119,8 @@ public class DistanceTest extends TestCase {
     doNearestPointsTest(
       "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
       "LINESTRING (153 204, 185 224, 209 207, 238 222, 254 186)",
-      13.788860460124573, new Coordinate(139.4956500724988, 206.78661188980183,
-        Coordinates.NULL_ORDINATE), new Coordinate((double)153, 204,
-        Coordinates.NULL_ORDINATE));
+      13.788860460124573, new DoubleCoordinates(139.4956500724988,
+        206.78661188980183), new DoubleCoordinates(153.0, 204));
   }
 
   public void testClosestPoints7() throws Exception {
