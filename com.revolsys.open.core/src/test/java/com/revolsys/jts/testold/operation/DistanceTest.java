@@ -116,11 +116,12 @@ public class DistanceTest extends TestCase {
   }
 
   public void testClosestPoints6() throws Exception {
-    doNearestPointsTest(
-      "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
-      "LINESTRING (153 204, 185 224, 209 207, 238 222, 254 186)",
-      13.788860460124573, new DoubleCoordinates(139.4956500724988,
-        206.78661188980183), new DoubleCoordinates(153.0, 204));
+    final DoubleCoordinates p1 = new DoubleCoordinates(139.4956500724988,
+      206.78661188980183);
+    final DoubleCoordinates p2 = new DoubleCoordinates(153.0, 204);
+    final String wkt1 = "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))";
+    final String wkt2 = "LINESTRING (153 204, 185 224, 209 207, 238 222, 254 186)";
+    doNearestPointsTest(wkt1, wkt2, 13.788860460124573, p1, p2);
   }
 
   public void testClosestPoints7() throws Exception {

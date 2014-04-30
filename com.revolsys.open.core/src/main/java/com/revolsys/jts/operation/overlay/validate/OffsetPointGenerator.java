@@ -41,6 +41,7 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.segment.Segment;
 
 /**
  * Generates points offset by a given distance 
@@ -75,37 +76,39 @@ public class OffsetPointGenerator {
    * @param p0 the first point of the segment to offset from
    * @param p1 the second point of the segment to offset from
    */
-  private void computeOffsetPoints(final Coordinates p0, final Coordinates p1,
-    final double offsetDistance, final List offsetPts) {
-    final double dx = p1.getX() - p0.getX();
-    final double dy = p1.getY() - p0.getY();
+  private void computeOffsetPoints(final double x1, final double y1,
+    final double x2, final double y2, final double offsetDistance,
+    final List<Coordinates> offsetPts) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
     final double len = Math.sqrt(dx * dx + dy * dy);
     // u is the vector that is the length of the offset, in the direction of the
     // segment
     final double ux = offsetDistance * dx / len;
     final double uy = offsetDistance * dy / len;
 
-    final double midX = (p1.getX() + p0.getX()) / 2;
-    final double midY = (p1.getY() + p0.getY()) / 2;
+    final double midX = (x2 + x1) / 2;
+    final double midY = (y2 + y1) / 2;
 
     if (doLeft) {
-      final Coordinates offsetLeft = new Coordinate(midX - uy, midY + ux,
-        Coordinates.NULL_ORDINATE);
+      final Coordinates offsetLeft = new Coordinate(midX - uy, midY + ux);
       offsetPts.add(offsetLeft);
     }
 
     if (doRight) {
-      final Coordinates offsetRight = new Coordinate(midX + uy, midY - ux,
-        Coordinates.NULL_ORDINATE);
+      final Coordinates offsetRight = new Coordinate(midX + uy, midY - ux);
       offsetPts.add(offsetRight);
     }
   }
 
   private void extractPoints(final LineString line,
-    final double offsetDistance, final List offsetPts) {
-    final Coordinates[] pts = line.getCoordinateArray();
-    for (int i = 0; i < pts.length - 1; i++) {
-      computeOffsetPoints(pts[i], pts[i + 1], offsetDistance, offsetPts);
+    final double offsetDistance, final List<Coordinates> offsetPts) {
+    for (final Segment segment : line.segments()) {
+      final double x1 = segment.getX(0);
+      final double y1 = segment.getY(0);
+      final double x2 = segment.getX(1);
+      final double y2 = segment.getY(1);
+      computeOffsetPoints(x1, y1, x2, y2, offsetDistance, offsetPts);
     }
   }
 

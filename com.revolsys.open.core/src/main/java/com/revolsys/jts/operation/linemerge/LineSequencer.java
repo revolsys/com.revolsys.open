@@ -41,7 +41,6 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -185,16 +184,6 @@ public class LineSequencer {
     return true;
   }
 
-  private static LineString reverse(final LineString line) {
-    final Coordinates[] pts = line.getCoordinateArray();
-    final Coordinates[] revPts = new Coordinates[pts.length];
-    final int len = pts.length;
-    for (int i = 0; i < len; i++) {
-      revPts[len - 1 - i] = new Coordinate(pts[i]);
-    }
-    return line.getGeometryFactory().lineString(revPts);
-  }
-
   public static Geometry sequence(final Geometry geom) {
     final LineSequencer sequencer = new LineSequencer();
     sequencer.add(geom);
@@ -295,7 +284,7 @@ public class LineSequencer {
 
         LineString lineToAdd = line;
         if (!de.getEdgeDirection() && !line.isClosed()) {
-          lineToAdd = reverse(line);
+          lineToAdd = line.reverse();
         }
 
         lines.add(lineToAdd);

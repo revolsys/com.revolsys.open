@@ -34,12 +34,9 @@ package com.revolsys.jts.operation.distance;
 
 import java.util.List;
 
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
@@ -154,34 +151,13 @@ public class DistanceOp {
     this.terminateDistance = terminateDistance;
   }
 
-  /**
-   * 
-   * @return a pair of {@link GeometryLocation}s for the nearest points
-   * @deprecated renamed to nearestLocations
-   */
-  @Deprecated
-  public GeometryLocation[] closestLocations() {
-    return nearestLocations();
-  }
-
-  /**
-   * 
-   * @return a pair of {@link Coordinates}s of the nearest points
-   * @deprecated renamed to nearestPoints
-   */
-  @Deprecated
-  public Coordinates[] closestPoints() {
-    return nearestPoints();
-  }
-
   private void computeContainmentDistance() {
     final GeometryLocation[] locPtPoly = new GeometryLocation[2];
     // test if either geometry has a vertex inside the other
     computeContainmentDistance(0, locPtPoly);
-    if (minDistance <= terminateDistance) {
-      return;
+    if (minDistance > terminateDistance) {
+      computeContainmentDistance(1, locPtPoly);
     }
-    computeContainmentDistance(1, locPtPoly);
   }
 
   private void computeContainmentDistance(final GeometryLocation ptLoc,
@@ -192,8 +168,6 @@ public class DistanceOp {
       minDistance = 0.0;
       locPtPoly[0] = ptLoc;
       locPtPoly[1] = new GeometryLocation(poly, pt);
-      ;
-      return;
     }
   }
 
@@ -214,9 +188,10 @@ public class DistanceOp {
     }
   }
 
-  private void computeContainmentDistance(final List<GeometryLocation> locs,
-    final List<Polygon> polygons, final GeometryLocation[] locPtPoly) {
-    for (final GeometryLocation loc : locs) {
+  private void computeContainmentDistance(
+    final List<GeometryLocation> locations, final List<Polygon> polygons,
+    final GeometryLocation[] locPtPoly) {
+    for (final GeometryLocation loc : locations) {
       for (final Polygon polygon : polygons) {
         computeContainmentDistance(loc, polygon, locPtPoly);
         if (minDistance <= terminateDistance) {
@@ -314,28 +289,26 @@ public class DistanceOp {
     }
   }
 
-  private void computeMinDistance(final LineString line, final Point pt,
+  private void computeMinDistance(final LineString line, final Point point,
     final GeometryLocation[] locGeom) {
-    if (line.getBoundingBox().distance(pt.getBoundingBox()) > minDistance) {
+    if (line.getBoundingBox().distance(point.getBoundingBox()) > minDistance) {
       return;
     }
-    final Coordinates[] coord0 = line.getCoordinateArray();
-    final Coordinates coord = pt.getCoordinate();
     // brute force approach!
-    for (int i = 0; i < coord0.length - 1; i++) {
-      final double dist = CGAlgorithms.distancePointLine(coord, coord0[i],
-        coord0[i + 1]);
-      if (dist < minDistance) {
-        minDistance = dist;
-        final LineSegment seg = new LineSegmentImpl(coord0[i], coord0[i + 1]);
-        final Coordinates segClosestPoint = seg.closestPoint(coord);
-        locGeom[0] = new GeometryLocation(line, i, segClosestPoint);
-        locGeom[1] = new GeometryLocation(pt, 0, coord);
+    int i = 0;
+    for (final Segment segment : line.segments()) {
+      final double distance = segment.distance(point);
+      if (distance < minDistance) {
+        minDistance = distance;
+        final Coordinates segClosestPoint = segment.closestPoint(point);
+        locGeom[0] = new GeometryLocation(line, i,
+          segClosestPoint.cloneCoordinates());
+        locGeom[1] = new GeometryLocation(point, 0, point);
       }
       if (minDistance <= terminateDistance) {
         return;
       }
-
+      i++;
     }
   }
 
@@ -354,8 +327,8 @@ public class DistanceOp {
   private void computeMinDistanceLinesPoints(final List<LineString> lines,
     final List<Point> points, final GeometryLocation[] locGeom) {
     for (final LineString line : lines) {
-      for (final Point pt : points) {
-        computeMinDistance(line, pt, locGeom);
+      for (final Point point : points) {
+        computeMinDistance(line, point, locGeom);
         if (minDistance <= terminateDistance) {
           return;
         }

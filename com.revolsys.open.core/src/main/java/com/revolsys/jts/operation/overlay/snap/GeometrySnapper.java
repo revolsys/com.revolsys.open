@@ -45,6 +45,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.GeometryTransformer;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * Snaps the vertices and segments of a {@link Geometry} 
@@ -189,15 +190,14 @@ public class GeometrySnapper {
     return snapTol;
   }
 
-  private Coordinates[] extractTargetCoordinates(final Geometry g) {
+  private Coordinates[] extractTargetCoordinates(final Geometry geometry) {
     // TODO: should do this more efficiently. Use CoordSeq filter to get points,
     // KDTree for uniqueness & queries
-    final Set ptSet = new TreeSet();
-    final Coordinates[] pts = g.getCoordinateArray();
-    for (int i = 0; i < pts.length; i++) {
-      ptSet.add(pts[i]);
+    final Set<Coordinates> points = new TreeSet<Coordinates>();
+    for (final Vertex vertex : geometry.vertices()) {
+      points.add(vertex.cloneCoordinates());
     }
-    return (Coordinates[])ptSet.toArray(new Coordinates[0]);
+    return points.toArray(new Coordinates[points.size()]);
   }
 
   /**

@@ -36,9 +36,9 @@ package com.revolsys.jts.operation.polygonize;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -103,8 +103,8 @@ class EdgeRing {
         continue;
       }
 
-      testPt = CoordinateArrays.ptNotInList(testRing.getCoordinateArray(),
-        tryShellRing.getCoordinateArray());
+      testPt = CoordinatesUtil.pointNotInList(testRing.vertices(),
+        tryShellRing.vertices());
       boolean isContained = false;
       if (CGAlgorithms.isPointInRing(testPt, tryShellRing)) {
         isContained = true;

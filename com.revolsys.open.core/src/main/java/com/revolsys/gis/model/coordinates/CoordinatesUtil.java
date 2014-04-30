@@ -544,4 +544,30 @@ public class CoordinatesUtil {
     final Coordinates newPoint = new DoubleCoordinates(newX, newY);
     return newPoint;
   }
+
+  /**
+   * Return the first point of points1 not in points2
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param points1
+   * @param points2
+   * @return
+   */
+  public static Coordinates pointNotInList(final Iterable<? extends Coordinates> points1,
+    final Iterable<? extends Coordinates> points2) {
+    for (Coordinates point : points1) {
+      if (contains(points2, point)) {
+        return point;
+      }
+    }
+    return null;
+  }
+
+  public static boolean contains(final Iterable<? extends Coordinates> points, Coordinates point) {
+    for (Coordinates point1 : points) {
+      if (point1.equals(point) ) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -34,12 +33,9 @@
 package com.revolsys.jts.operation.linemerge;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
@@ -50,54 +46,49 @@ import com.revolsys.jts.geom.LineString;
  * @version 1.7
  */
 public class EdgeString {
-  private GeometryFactory factory;
-  private List directedEdges = new ArrayList();
-  private Coordinates[] coordinates = null;
+  private final GeometryFactory factory;
+
+  private final List<LineMergeDirectedEdge> directedEdges = new ArrayList<>();
+
+  private LineString line = null;
+
   /**
    * Constructs an EdgeString with the given factory used to convert this EdgeString
    * to a LineString
    */
-  public EdgeString(GeometryFactory factory) {
+  public EdgeString(final GeometryFactory factory) {
     this.factory = factory;
   }
 
   /**
    * Adds a directed edge which is known to form part of this line.
    */
-  public void add(LineMergeDirectedEdge directedEdge) {
+  public void add(final LineMergeDirectedEdge directedEdge) {
     directedEdges.add(directedEdge);
-  }
-
-  private Coordinates[] getCoordinates() {
-    if (coordinates == null) {
-      int forwardDirectedEdges = 0;
-      int reverseDirectedEdges = 0;
-      CoordinateList coordinateList = new CoordinateList();
-      for (Iterator i = directedEdges.iterator(); i.hasNext();) {
-        LineMergeDirectedEdge directedEdge = (LineMergeDirectedEdge) i.next();
-        if (directedEdge.getEdgeDirection()) {
-          forwardDirectedEdges++;
-        }
-        else {
-          reverseDirectedEdges++;
-        }
-        coordinateList.add(((LineMergeEdge) directedEdge.getEdge()).getLine()
-                            .getCoordinateArray(), false,
-          directedEdge.getEdgeDirection());
-      }
-      coordinates = coordinateList.toCoordinateArray();
-      if (reverseDirectedEdges > forwardDirectedEdges) {
-        CoordinateArrays.reverse(coordinates);
-      }
-    }
-
-    return coordinates;
   }
 
   /**
    * Converts this EdgeString into a LineString.
    */
   public LineString toLineString() {
-    return factory.lineString(getCoordinates());
+    if (line == null) {
+      int forwardDirectedEdges = 0;
+      int reverseDirectedEdges = 0;
+      final CoordinateList coordinateList = new CoordinateList();
+      for (final LineMergeDirectedEdge directedEdge : directedEdges) {
+        if (directedEdge.getEdgeDirection()) {
+          forwardDirectedEdges++;
+        } else {
+          reverseDirectedEdges++;
+        }
+        coordinateList.add(((LineMergeEdge)directedEdge.getEdge()).getLine()
+          .getCoordinateArray(), false, directedEdge.getEdgeDirection());
+      }
+      line = factory.lineString(coordinateList);
+      if (reverseDirectedEdges > forwardDirectedEdges) {
+        line = line.reverse();
+      }
+    }
+    return line;
   }
 }
