@@ -41,6 +41,7 @@ import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
@@ -55,15 +56,15 @@ import com.revolsys.jts.planargraph.DirectedEdge;
  */
 class EdgeRing {
 
-  private static void addEdge(final Coordinates[] coords,
+  private static void addEdge(final CoordinatesList coords,
     final boolean isForward, final CoordinateList coordList) {
     if (isForward) {
-      for (int i = 0; i < coords.length; i++) {
-        coordList.add(coords[i], false);
+      for (int i = 0; i < coords.size(); i++) {
+        coordList.add(coords.get(i), false);
       }
     } else {
-      for (int i = coords.length - 1; i >= 0; i--) {
-        coordList.add(coords[i], false);
+      for (int i = coords.size() - 1; i >= 0; i--) {
+        coordList.add(coords.get(i), false);
       }
     }
   }
@@ -208,7 +209,7 @@ class EdgeRing {
       final CoordinateList coordList = new CoordinateList();
       for (final DirectedEdge de : deList) {
         final PolygonizeEdge edge = (PolygonizeEdge)de.getEdge();
-        addEdge(edge.getLine().getCoordinateArray(), de.getEdgeDirection(),
+        addEdge(edge.getLine().getCoordinatesList(), de.getEdgeDirection(),
           coordList);
       }
       ringPts = coordList.toCoordinateArray();

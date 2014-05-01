@@ -41,10 +41,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.planargraph.DirectedEdge;
 import com.revolsys.jts.planargraph.DirectedEdgeStar;
 import com.revolsys.jts.planargraph.Edge;
@@ -282,26 +282,26 @@ class PolygonizeGraph extends PlanarGraph {
    * Add a {@link LineString} forming an edge of the polygon graph.
    * @param line the line to add
    */
-  public void addEdge(final LineString line) {
+  public void addEdge(LineString line) {
+    line = CleanDuplicatePoints.clean(line);
     if (line.isEmpty()) {
       return;
     }
-    final Coordinates[] linePts = CoordinateArrays.removeRepeatedPoints(line.getCoordinateArray());
 
-    if (linePts.length < 2) {
+    if (line.getVertexCount() < 2) {
       return;
     }
 
-    final Coordinates startPt = linePts[0];
-    final Coordinates endPt = linePts[linePts.length - 1];
+    final Coordinates startPt = line.getVertex(0).cloneCoordinates();
+    final Coordinates endPt = line.getVertex(-1).cloneCoordinates();
 
     final Node nStart = getNode(startPt);
     final Node nEnd = getNode(endPt);
 
     final DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd,
-      linePts[1], true);
+      line.getVertex(1).cloneCoordinates(), true);
     final DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart,
-      linePts[linePts.length - 2], false);
+      line.getVertex(-2).cloneCoordinates(), false);
     final Edge edge = new PolygonizeEdge(line);
     edge.setDirectedEdges(de0, de1);
     add(edge);
