@@ -75,62 +75,6 @@ class ExtractLineByLocation {
    * @param end
    * @return a linear geometry
    */
-  private LineString computeLine(final LinearLocation start,
-    final LinearLocation end) {
-    final Coordinates[] coordinates = line.getCoordinateArray();
-    final CoordinateList newCoordinates = new CoordinateList();
-
-    int startSegmentIndex = start.getSegmentIndex();
-    if (start.getSegmentFraction() > 0.0) {
-      startSegmentIndex += 1;
-    }
-    int lastSegmentIndex = end.getSegmentIndex();
-    if (end.getSegmentFraction() == 1.0) {
-      lastSegmentIndex += 1;
-    }
-    if (lastSegmentIndex >= coordinates.length) {
-      lastSegmentIndex = coordinates.length - 1;
-      // not needed - LinearLocation values should always be correct
-      // Assert.isTrue(end.getSegmentFraction() <= 1.0,
-      // "invalid segment fraction value");
-    }
-
-    if (!start.isVertex()) {
-      newCoordinates.add(start.getCoordinate(line));
-    }
-    for (int i = startSegmentIndex; i <= lastSegmentIndex; i++) {
-      newCoordinates.add(coordinates[i]);
-    }
-    if (!end.isVertex()) {
-      newCoordinates.add(end.getCoordinate(line));
-    }
-
-    // ensure there is at least one coordinate in the result
-    if (newCoordinates.size() <= 0) {
-      newCoordinates.add(start.getCoordinate(line));
-    }
-
-    Coordinates[] newCoordinateArray = newCoordinates.toCoordinateArray();
-    /**
-     * Ensure there is enough coordinates to build a valid line.
-     * Make a 2-point line with duplicate coordinates, if necessary.
-     * There will always be at least one coordinate in the coordList.
-     */
-    if (newCoordinateArray.length <= 1) {
-      newCoordinateArray = new Coordinates[] {
-        newCoordinateArray[0], newCoordinateArray[0]
-      };
-    }
-    return line.getGeometryFactory().lineString(newCoordinateArray);
-  }
-
-  /**
-   * Assumes input is valid (e.g. start <= end)
-   *
-   * @param start
-   * @param end
-   * @return a linear geometry
-   */
   private Geometry computeLinear(final LinearLocation start,
     final LinearLocation end) {
     final LinearGeometryBuilder builder = new LinearGeometryBuilder(
