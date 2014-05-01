@@ -36,6 +36,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.util.MathUtil;
 
 public class CoordinatesListUtil {
@@ -450,6 +451,23 @@ public class CoordinatesListUtil {
       boundingBox = boundingBox.expand(point);
     }
     return boundingBox;
+  }
+
+  public static Coordinates[] getCoordinateArray(final Geometry geometry) {
+    return getCoordinates(geometry, geometry.getVertexCount());
+  }
+
+  public static Coordinates[] getCoordinates(final Geometry g,
+    final int vertexCount) {
+    final List<Coordinates> coordinates = new ArrayList<>();
+    final int i = 0;
+    for (final Vertex vertex : g.vertices()) {
+      if (i > vertexCount) {
+        break;
+      }
+      coordinates.add(vertex.cloneCoordinates());
+    }
+    return coordinates.toArray(new Coordinates[coordinates.size()]);
   }
 
   private static Set<Coordinates> getCoordinatesSet2d(

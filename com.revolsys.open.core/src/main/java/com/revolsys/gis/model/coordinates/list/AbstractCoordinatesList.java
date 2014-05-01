@@ -290,15 +290,15 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     return getValue(index, 0);
   }
 
-  // @Override
-  // public double getValue(final int index, final int axisIndex) {
-  // return getValue(index, axisIndex);
-  // }
-
   @Override
   public double getY(final int index) {
     return getValue(index, 1);
   }
+
+  // @Override
+  // public double getValue(final int index, final int axisIndex) {
+  // return getValue(index, axisIndex);
+  // }
 
   @Override
   public double getZ(final int index) {
@@ -505,6 +505,15 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
       coordinateArray[i] = getCoordinateCopy(i);
     }
     return coordinateArray;
+  }
+
+  @Override
+  public List<Coordinates> toList() {
+    final List<Coordinates> points = new ArrayList<>();
+    for (final Coordinates point : this) {
+      points.add(point.cloneCoordinates());
+    }
+    return points;
   }
 
   @Override

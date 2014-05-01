@@ -34,6 +34,7 @@ package com.revolsys.jts.geom;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A list of {@link Coordinates}s, which may
@@ -76,6 +77,11 @@ public class CoordinateList extends ArrayList<Coordinates> {
   public CoordinateList(final Coordinates[] coord, final boolean allowRepeated) {
     ensureCapacity(coord.length);
     add(coord, allowRepeated);
+  }
+
+  public CoordinateList(final CoordinatesList points) {
+    ensureCapacity(points.size());
+    add(points.toList(), true, true);
   }
 
   /**
@@ -178,6 +184,27 @@ public class CoordinateList extends ArrayList<Coordinates> {
       }
     }
     super.add(i, coord);
+  }
+
+  /** 
+   * Adds an array of coordinates to the list.
+   * @param coord The coordinates
+   * @param allowRepeated if set to false, repeated coordinates are collapsed
+   * @param direction if false, the array is added in reverse order
+   * @return true (as by general collection contract)
+   */
+  public boolean add(final List<Coordinates> coord,
+    final boolean allowRepeated, final boolean direction) {
+    if (direction) {
+      for (int i = 0; i < coord.size(); i++) {
+        add(coord.get(i), allowRepeated);
+      }
+    } else {
+      for (int i = coord.size() - 1; i >= 0; i--) {
+        add(coord.get(i), allowRepeated);
+      }
+    }
+    return true;
   }
 
   /** 

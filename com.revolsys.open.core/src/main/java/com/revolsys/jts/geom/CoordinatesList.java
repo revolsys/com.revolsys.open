@@ -230,4 +230,6 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    * @return a array of coordinates containing the point values in this sequence
    */
   Coordinates[] toCoordinateArray();
+
+  List<Coordinates> toList();
 }

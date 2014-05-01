@@ -106,7 +106,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *  contain constructed points which are not present in the input <code>Geometry</code>
  *  s. These new points arise from intersections between line segments in the
  *  edges of the input <code>Geometry</code>s. In the general case it is not
- *  possible to represent constructed points exactly. This is due to the fact
+ *  possible to represent constructed points exactly. This is due to the geometryFactory
  *  that the coordinates of an intersection point may contain twice as many bits
  *  of precision as the coordinates of the input line segments. In order to
  *  represent these constructed points explicitly, JTS must truncate them to fit

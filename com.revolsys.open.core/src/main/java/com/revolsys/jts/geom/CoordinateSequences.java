@@ -98,7 +98,7 @@ public class CoordinateSequences {
    * If the input sequence is too short or is not closed, 
    * it is extended with one or more copies of the start point.
    * @param seq the sequence to test
-   * @param fact the CoordinateSequenceFactory to use to create the new sequence
+   * @param geometryFactory the CoordinateSequenceFactory to use to create the new sequence
    * 
    * @return the original sequence, if it was a valid ring, or a new sequence which is valid.
    */
