@@ -33,15 +33,12 @@
 
 package com.revolsys.jts.testold.junit;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.revolsys.jts.test.geometry.BoundingBoxTest;
 import com.revolsys.jts.testold.algorithm.AngleTest;
 import com.revolsys.jts.testold.algorithm.ConvexHullTest;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
@@ -51,7 +48,6 @@ import com.revolsys.jts.testold.algorithm.OrientationIndexTest;
 import com.revolsys.jts.testold.algorithm.RobustLineIntersectionTest;
 import com.revolsys.jts.testold.geom.AreaLengthTest;
 import com.revolsys.jts.testold.geom.BasicCoordinateSequenceTest;
-import com.revolsys.jts.testold.geom.BidirectionalComparatorTest;
 import com.revolsys.jts.testold.geom.CoordinateArraysTest;
 import com.revolsys.jts.testold.geom.GeometryCollectionImplTest;
 import com.revolsys.jts.testold.geom.GeometryImplTest;
@@ -94,14 +90,13 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
 @RunWith(Suite.class)
 @SuiteClasses({
   AngleTest.class, AreaLengthTest.class, BasicCoordinateSequenceTest.class,
-  BidirectionalComparatorTest.class, BufferTest.class,
-  CascadedPolygonUnionTest.class, OrientationIndexTest.class,
+  BufferTest.class, CascadedPolygonUnionTest.class, OrientationIndexTest.class,
   ConformingDelaunayTest.class, ConvexHullTest.class,
   CoordinateArraysTest.class, DelaunayTest.class, DistanceTest.class,
   GeometryCollectionImplTest.class, GeometryImplTest.class,
-  IntersectionMatrixTest.class, IntervalTest.class, IsCounterClockWiseTest.class,
-  IsRectangleTest.class, IsValidTest.class, LengthIndexedLineTest.class,
-  LineMergerTest.class, LineStringImplTest.class,
+  IntersectionMatrixTest.class, IntervalTest.class,
+  IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,
+  LengthIndexedLineTest.class, LineMergerTest.class, LineStringImplTest.class,
   LocationIndexedLineTest.class, MiscellaneousTest.class,
   MiscellaneousTest2.class, MultiPointImplTest.class,
   NonRobustLineIntersectorTest.class, NormalizeTest.class, PointImplTest.class,
@@ -114,73 +109,4 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
   ValidSelfTouchingRingFormingHoleTest.class, InteriorPointTest.class
 })
 public class MasterTester extends TestCase {
-
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-    System.exit(0);
-  }
-
-  public static Test suite() {
-    final TestSuite result = new TestSuite();
-
-    result.addTest(new TestSuite(
-      com.revolsys.jts.testold.algorithm.AngleTest.class));
-    result.addTest(new TestSuite(AreaLengthTest.class));
-    result.addTest(new TestSuite(BasicCoordinateSequenceTest.class));
-    result.addTest(new TestSuite(BidirectionalComparatorTest.class));
-    result.addTest(new TestSuite(BufferTest.class));
-    result.addTest(new TestSuite(CascadedPolygonUnionTest.class));
-    result.addTest(new TestSuite(
-      com.revolsys.jts.testold.algorithm.OrientationIndexTest.class));
-    result.addTest(new TestSuite(ConformingDelaunayTest.class));
-    result.addTest(new TestSuite(
-      com.revolsys.jts.testold.algorithm.ConvexHullTest.class));
-    result.addTest(new TestSuite(CoordinateArraysTest.class));
-    result.addTest(new TestSuite(DelaunayTest.class));
-    result.addTest(new TestSuite(DistanceTest.class));
-    result.addTest(new TestSuite(BoundingBoxTest.class));
-    result.addTest(new TestSuite(GeometryCollectionImplTest.class));
-    result.addTest(new TestSuite(GeometryImplTest.class));
-    result.addTest(new TestSuite(IntersectionMatrixTest.class));
-    result.addTest(new TestSuite(IntervalTest.class));
-    result.addTest(new TestSuite(
-      com.revolsys.jts.testold.algorithm.IsCounterClockWiseTest.class));
-    result.addTest(new TestSuite(IsRectangleTest.class));
-    result.addTest(new TestSuite(IsValidTest.class));
-    result.addTest(new TestSuite(LengthIndexedLineTest.class));
-    result.addTest(new TestSuite(LineMergerTest.class));
-    result.addTest(new TestSuite(LineStringImplTest.class));
-    result.addTest(new TestSuite(LocationIndexedLineTest.class));
-    result.addTest(new TestSuite(MiscellaneousTest.class));
-    result.addTest(new TestSuite(MiscellaneousTest2.class));
-    result.addTest(new TestSuite(MultiPointImplTest.class));
-    result.addTest(new TestSuite(
-      com.revolsys.jts.testold.algorithm.NonRobustLineIntersectorTest.class));
-    result.addTest(new TestSuite(NormalizeTest.class));
-    result.addTest(new TestSuite(PointImplTest.class));
-    result.addTest(new TestSuite(PolygonizeTest.class));
-    result.addTest(new TestSuite(PredicateShortCircuitTest.class));
-    result.addTest(new TestSuite(PrecisionModelTest.class));
-    result.addTest(new TestSuite(QuadtreeTest.class));
-    result.addTest(new TestSuite(RectanglePredicateSyntheticTest.class));
-    result.addTest(new TestSuite(RectanglePredicateTest.class));
-    result.addTest(new TestSuite(RelateBoundaryNodeRuleTest.class));
-    result.addTest(new TestSuite(RobustLineIntersectionTest.class));
-    result.addTest(new TestSuite(SimpleTest.class));
-    result.addTest(new TestSuite(SIRtreeTest.class));
-    result.addTest(new TestSuite(STRtreeTest.class));
-    result.addTest(new TestSuite(WKTReaderTest.class));
-    result.addTest(new TestSuite(WKBTest.class));
-    result.addTest(new TestSuite(UnaryUnionTest.class));
-    result.addTest(new TestSuite(ValidClosedRingTest.class));
-    result.addTest(new TestSuite(ValidSelfTouchingRingFormingHoleTest.class));
-    // result.addTest(new TestSuite(VoronoiTest.class));
-
-    return result;
-  }
-
-  public MasterTester(final String name) {
-    super(name);
-  }
-
 }

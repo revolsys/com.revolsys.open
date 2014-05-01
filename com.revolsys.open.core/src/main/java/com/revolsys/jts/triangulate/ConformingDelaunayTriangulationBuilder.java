@@ -70,13 +70,10 @@ public class ConformingDelaunayTriangulationBuilder {
   }
 
   private static void createConstraintSegments(final LineString line,
-    final List constraintSegs) {
-    Coordinates previousPoint = line.getVertex(0);
-    final Coordinates[] coords = line.getCoordinateArray();
-    for (final com.revolsys.jts.geom.vertex.Vertex vertex : line.vertices()) {
-      final Coordinates point = vertex.cloneCoordinates();
-      constraintSegs.add(new Segment(previousPoint, point));
-      previousPoint = point;
+    final List<Segment> constraintSegs) {
+    for (final com.revolsys.jts.geom.segment.Segment segment : line.segments()) {
+      constraintSegs.add(new Segment(segment.get(0).cloneCoordinates(),
+        segment.get(1).cloneCoordinates()));
     }
   }
 

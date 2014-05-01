@@ -40,6 +40,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.segment.Segment;
 
 /**
  * Represents a {@link LineString} which can be modified to a simplified shape.  
@@ -126,10 +127,12 @@ class TaggedLineString {
   private void init() {
     final Coordinates[] pts = parentLine.getCoordinateArray();
     segs = new TaggedLineSegment[pts.length - 1];
-    for (int i = 0; i < pts.length - 1; i++) {
-      final TaggedLineSegment seg = new TaggedLineSegment(pts[i], pts[i + 1],
-        parentLine, i);
+    int i = 0;
+    for (final Segment segment : parentLine.segments()) {
+      final TaggedLineSegment seg = new TaggedLineSegment(segment.get(0)
+        .cloneCoordinates(), segment.get(1).cloneCoordinates(), parentLine, i);
       segs[i] = seg;
+      i++;
     }
   }
 

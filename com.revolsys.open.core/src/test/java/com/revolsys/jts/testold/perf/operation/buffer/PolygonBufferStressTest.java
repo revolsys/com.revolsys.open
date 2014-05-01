@@ -117,17 +117,17 @@ public class PolygonBufferStressTest {
 
     final Geometry g = getSampleGeometry();
 
-    // Geometry g = GeometricShapeFactory.createArc(fact, 0, 0, 200.0, 0.0, 6.0,
+    // Geometry g = GeometricShapeFactory.createArc(geometryFactory, 0, 0, 200.0, 0.0, 6.0,
     // 100);
 
-    // Geometry circle = GeometricShapeFactory.createCircle(fact, 0, 0, 200,
+    // Geometry circle = GeometricShapeFactory.createCircle(geometryFactory, 0, 0, 200,
     // 100);
     // Geometry g = circle;
 
-    // Geometry sq = GeometricShapeFactory.createBox(fact, 0, 0, 1, 120);
+    // Geometry sq = GeometricShapeFactory.createBox(geometryFactory, 0, 0, 1, 120);
     // Geometry g = sq.difference(circle);
 
-    // Geometry handle = GeometricShapeFactory.createRectangle(fact, 0, 0, 400,
+    // Geometry handle = GeometricShapeFactory.createRectangle(geometryFactory, 0, 0, 400,
     // 20, 1);
     // Geometry g = circle.union(handle);
 

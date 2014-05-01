@@ -48,8 +48,9 @@ public class OrientationIndexFailureTest extends TestCase {
     final double p0y, final double p1x, final double p1y, final double p2x,
     final double p2y) {
     final Coordinates[] pts = {
-      new Coordinate((double)p0x, p0y, Coordinates.NULL_ORDINATE), new Coordinate((double)p1x, p1y, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)p2x, p2y, Coordinates.NULL_ORDINATE)
+      new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE),
+      new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE),
+      new Coordinate(p2x, p2y, Coordinates.NULL_ORDINATE)
     };
     if (!isAllOrientationsEqualDD(pts)) {
       throw new IllegalStateException(
@@ -113,9 +114,12 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Coordinates[] pts = {
-      new Coordinate((double)1.4540766091864998, -7.989685402102996, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)23.131039116367354, -7.004368924503866, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)1.4540766091865, -7.989685402102996, Coordinates.NULL_ORDINATE),
+      new Coordinate(1.4540766091864998, -7.989685402102996,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(23.131039116367354, -7.004368924503866,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(1.4540766091865, -7.989685402102996,
+        Coordinates.NULL_ORDINATE),
     };
     checkOrientation(pts);
   }
@@ -123,9 +127,12 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW2() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Coordinates[] pts = {
-      new Coordinate((double)219.3649559090992, 140.84159161824724, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)168.9018919682399, -5.713787599646864, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)186.80814046338352, 46.28973405831556, Coordinates.NULL_ORDINATE),
+      new Coordinate(219.3649559090992, 140.84159161824724,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(168.9018919682399, -5.713787599646864,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(186.80814046338352, 46.28973405831556,
+        Coordinates.NULL_ORDINATE),
     };
     checkOrientation(pts);
   }
@@ -133,8 +140,10 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW3() throws Exception {
     // this case fails because subtraction of small from large loses precision
     final Coordinates[] pts = {
-      new Coordinate((double)279.56857838488514, -186.3790522565901, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)-20.43142161511487, 13.620947743409914, Coordinates.NULL_ORDINATE),
+      new Coordinate(279.56857838488514, -186.3790522565901,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(-20.43142161511487, 13.620947743409914,
+        Coordinates.NULL_ORDINATE),
       new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE)
     };
     checkOrientation(pts);
@@ -143,8 +152,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW4() throws Exception {
     // from JTS list - 5/15/2012 strange case for the GeometryNoder
     final Coordinates[] pts = {
-      new Coordinate((double)-26.2, 188.7, Coordinates.NULL_ORDINATE), new Coordinate((double)37.0, 290.7, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)21.2, 265.2, Coordinates.NULL_ORDINATE)
+      new Coordinate(-26.2, 188.7, Coordinates.NULL_ORDINATE),
+      new Coordinate(37.0, 290.7, Coordinates.NULL_ORDINATE),
+      new Coordinate(21.2, 265.2, Coordinates.NULL_ORDINATE)
     };
     checkOrientation(pts);
   }
@@ -152,8 +162,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW5() throws Exception {
     // from JTS list - 6/15/2012 another case from Tomas Fa
     final Coordinates[] pts = {
-      new Coordinate((double)-5.9, 163.1, Coordinates.NULL_ORDINATE), new Coordinate((double)76.1, 250.7, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)14.6, 185, Coordinates.NULL_ORDINATE)
+      new Coordinate(-5.9, 163.1, Coordinates.NULL_ORDINATE),
+      new Coordinate(76.1, 250.7, Coordinates.NULL_ORDINATE),
+      new Coordinate(14.6, 185, Coordinates.NULL_ORDINATE)
     // new Coordinate((double)96.6, 272.6)
     };
     checkOrientation(pts);
@@ -162,9 +173,12 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW6() throws Exception {
     // from JTS Convex Hull "Almost collinear" unit test
     final Coordinates[] pts = {
-      new Coordinate((double)-140.8859438214298, 140.88594382142983, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)-57.309236848216706, 57.30923684821671, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)-190.9188309203678, 190.91883092036784, Coordinates.NULL_ORDINATE)
+      new Coordinate(-140.8859438214298, 140.88594382142983,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(-57.309236848216706, 57.30923684821671,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(-190.9188309203678, 190.91883092036784,
+        Coordinates.NULL_ORDINATE)
     };
     checkOrientation(pts);
   }
@@ -172,8 +186,9 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW7() throws Exception {
     // from JTS list - 6/26/2012 another case from Tomas Fa
     final Coordinates[] pts = {
-      new Coordinate((double)-0.9575, 0.4511, Coordinates.NULL_ORDINATE), new Coordinate((double)-0.9295, 0.3291, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)-0.8945, 0.1766, Coordinates.NULL_ORDINATE)
+      new Coordinate(-0.9575, 0.4511, Coordinates.NULL_ORDINATE),
+      new Coordinate(-0.9295, 0.3291, Coordinates.NULL_ORDINATE),
+      new Coordinate(-0.8945, 0.1766, Coordinates.NULL_ORDINATE)
     };
     checkDD(pts, true);
     checkShewchuk(pts, false);
@@ -184,20 +199,13 @@ public class OrientationIndexFailureTest extends TestCase {
     // from JTS list - 6/26/2012 another case from Tomas Fa
     // scale to integers - all methods work on this
     final Coordinates[] pts = {
-      new Coordinate((double)-9575, 4511, Coordinates.NULL_ORDINATE), new Coordinate((double)-9295, 3291, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)-9575, 4511, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)-9295, 3291, Coordinates.NULL_ORDINATE),
       new Coordinate((double)-8945, 1766, Coordinates.NULL_ORDINATE)
     };
     checkDD(pts, true);
     checkShewchuk(pts, true);
     checkOriginalJTS(pts, true);
-  }
-
-  /**
-   * This is included to confirm this test is operating correctly
-   * @throws Exception
-   */
-  public void testSanity() throws Exception {
-    assertTrue(OrientationIndexTest.isAllOrientationsEqual(OrientationIndexTest.getCoordinates("LINESTRING ( 0 0, 0 1, 1 1)")));
   }
 
 }

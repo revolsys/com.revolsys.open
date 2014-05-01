@@ -32,6 +32,7 @@
  */
 package com.revolsys.jtstest.function;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -60,7 +61,7 @@ public class GeometryFunctions {
     }
     // TODO: ensure ring is valid
     final LinearRing ring = g.getGeometryFactory().linearRing(
-      g.getCoordinateArray());
+      CoordinatesListUtil.getCoordinateArray(g));
     return g.getGeometryFactory().polygon(ring);
   }
 
@@ -69,7 +70,7 @@ public class GeometryFunctions {
   }
 
   public static Geometry getCoordinates(final Geometry g) {
-    final Coordinates[] pts = g.getCoordinateArray();
+    final Coordinates[] pts = CoordinatesListUtil.getCoordinateArray(g);
     return g.getGeometryFactory().multiPoint(pts);
   }
 

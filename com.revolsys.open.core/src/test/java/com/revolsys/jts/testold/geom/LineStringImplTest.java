@@ -146,13 +146,6 @@ public class LineStringImplTest extends TestCase {
     assertTrue(closed);
   }
 
-  public void testGetCoordinates() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING(1.111 2.222, 5.555 6.666, 3.333 4.444)");
-    final Coordinates[] coordinates = l.getCoordinateArray();
-    assertEquals(new Coordinate(5.555, 6.666, Coordinates.NULL_ORDINATE),
-      coordinates[1]);
-  }
-
   public void testGetGeometryType() throws Exception {
     final LineString l = (LineString)this.reader.read("LINESTRING EMPTY");
     assertEquals("LineString", l.getGeometryType());

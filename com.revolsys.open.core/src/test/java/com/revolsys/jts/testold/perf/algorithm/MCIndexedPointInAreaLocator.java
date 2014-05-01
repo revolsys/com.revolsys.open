@@ -35,6 +35,7 @@ package com.revolsys.jts.testold.perf.algorithm;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
@@ -73,7 +74,7 @@ class MCIndexedGeometry {
   private void init(final Geometry geom) {
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      final Coordinates[] pts = line.getCoordinateArray();
+      final Coordinates[] pts = CoordinatesListUtil.getCoordinateArray(line);
       addLine(pts);
     }
   }

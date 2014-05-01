@@ -32,6 +32,7 @@
  */
 package com.revolsys.jtstest.function;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -104,7 +105,7 @@ public class TriangleFunctions {
   }
 
   private static Coordinates[] trianglePts(final Geometry g) {
-    final Coordinates[] pts = g.getCoordinateArray();
+    final Coordinates[] pts = CoordinatesListUtil.getCoordinates(g, 3);
     if (pts.length < 3) {
       throw new IllegalArgumentException(
         "Input geometry must have at least 3 points");

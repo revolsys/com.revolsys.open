@@ -1,5 +1,6 @@
 package com.revolsys.jtstest.function;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
@@ -42,8 +43,8 @@ public class JTSFunctions {
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(jTop, false);
-    coordList.add(jArc.reverse().getCoordinateArray(), false, 1,
-      jArc.getVertexCount() - 1);
+    coordList.add(CoordinatesListUtil.getCoordinateArray(jArc.reverse()),
+      false, 1, jArc.getVertexCount() - 1);
     coordList.add(jBottom, false);
 
     return gf.lineString(coordList.toCoordinateArray());
@@ -76,10 +77,10 @@ public class JTSFunctions {
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(top, false);
-    coordList.add(arcTop.getCoordinateArray(), false, 1,
+    coordList.add(CoordinatesListUtil.getCoordinateArray(arcTop), false, 1,
       arcTop.getVertexCount() - 1);
     coordList.add(new Coordinate(centreX, HEIGHT / 2));
-    coordList.add(arcBottom.getCoordinateArray(), false, 1,
+    coordList.add(CoordinatesListUtil.getCoordinateArray(arcBottom), false, 1,
       arcBottom.getVertexCount() - 1);
     coordList.add(bottom, false);
 

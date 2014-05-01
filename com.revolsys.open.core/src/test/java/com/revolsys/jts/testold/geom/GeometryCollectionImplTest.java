@@ -38,8 +38,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -77,17 +75,6 @@ public class GeometryCollectionImplTest extends TestCase {
     assertTrue(i.next() instanceof GeometryCollection);
     assertTrue(i.next() instanceof GeometryCollection);
     assertTrue(i.next() instanceof Point);
-  }
-
-  public void testGetCoordinates() throws Exception {
-    final GeometryCollection g = (GeometryCollection)this.reader.read("GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))");
-    final Coordinates[] coordinates = g.getCoordinateArray();
-    assertEquals(4, g.getVertexCount());
-    assertEquals(4, coordinates.length);
-    assertEquals(new Coordinate(10.0, 10, Coordinates.NULL_ORDINATE),
-      coordinates[0]);
-    assertEquals(new Coordinate(20.0, 20, Coordinates.NULL_ORDINATE),
-      coordinates[3]);
   }
 
   public void testGetDimension() throws Exception {

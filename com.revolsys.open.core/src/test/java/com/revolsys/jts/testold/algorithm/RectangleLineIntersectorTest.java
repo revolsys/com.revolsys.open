@@ -35,6 +35,7 @@ package com.revolsys.jts.testold.algorithm;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
@@ -96,10 +97,10 @@ class RectangleLineIntersectorValidator {
   }
 
   private Coordinates[] createTestPoints(final int nPts) {
-    final Point pt = this.geomFact.point(new Coordinate(this.baseX,
-      this.baseY, Coordinates.NULL_ORDINATE));
+    final Point pt = this.geomFact.point(new Coordinate(this.baseX, this.baseY,
+      Coordinates.NULL_ORDINATE));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
-    return circle.getCoordinateArray();
+    return CoordinatesListUtil.getCoordinateArray(circle);
   }
 
   public void init(final int nPts) {

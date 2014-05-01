@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
@@ -46,7 +47,7 @@ public class NodingFunctions {
     final List lines = geom.getGeometries(LineString.class);
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
-      segs.add(new NodedSegmentString(line.getCoordinateArray(), null));
+      segs.add(new NodedSegmentString(line.getCoordinatesList(), null));
     }
     return segs;
   }
@@ -56,7 +57,8 @@ public class NodingFunctions {
     final List lines = geom.getGeometries(LineString.class);
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
-      segs.add(new BasicSegmentString(line.getCoordinateArray(), null));
+      segs.add(new BasicSegmentString(
+        CoordinatesListUtil.getCoordinateArray(line), null));
     }
     return segs;
   }

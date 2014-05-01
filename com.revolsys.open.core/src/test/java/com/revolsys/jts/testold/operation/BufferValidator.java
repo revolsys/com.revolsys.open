@@ -85,9 +85,9 @@ public class BufferValidator {
 
   public static void main(final String[] args) throws Exception {
     final Geometry g = new WKTReader().read("MULTILINESTRING (( 635074.5418406526 6184832.4888257105, 635074.5681951842 6184832.571842485, 635074.6472587794 6184832.575795664 ), ( 635074.6657069515 6184832.53889932, 635074.6933792098 6184832.451929366, 635074.5642420045 6184832.474330718 ))");
-  //  System.out.println(g);
-  //  System.out.println(g.buffer(0.01, 100));
-  //  System.out.println("END");
+    // System.out.println(g);
+    // System.out.println(g.buffer(0.01, 100));
+    // System.out.println("END");
   }
 
   private Geometry original;
@@ -137,17 +137,19 @@ public class BufferValidator {
 
       @Override
       public void test() throws Exception {
-        if (getOriginal().getClass() == GeometryCollection.class) {
+        final Geometry original = getOriginal();
+        if (original.getClass() == GeometryCollection.class) {
           return;
         }
-        boolean valid = getOriginal().isValid();
+        final boolean valid = original.isValid();
         com.revolsys.jts.util.Assert.isTrue(valid);
+        final Geometry buffer = getBuffer();
         if (BufferValidator.this.bufferDistance > 0) {
           Assert.assertTrue(supplement("Expected buffer to contain original"),
-            contains(getBuffer(), getOriginal()));
+            contains(buffer, original));
         } else {
           Assert.assertTrue(supplement("Expected original to contain buffer"),
-            contains(getOriginal(), getBuffer()));
+            contains(original, buffer));
         }
       }
     });
@@ -160,10 +162,9 @@ public class BufferValidator {
 
   private Geometry getBuffer() throws ParseException {
     if (this.buffer == null) {
-      this.buffer = getOriginal().buffer(this.bufferDistance,
-        QUADRANT_SEGMENTS_1);
-      if (getBuffer().getClass() == GeometryCollection.class
-        && getBuffer().isEmpty()) {
+      final Geometry original = getOriginal();
+      this.buffer = original.buffer(this.bufferDistance, QUADRANT_SEGMENTS_1);
+      if (buffer.getClass() == GeometryCollection.class && buffer.isEmpty()) {
         try {
           // #contains doesn't work with GeometryCollections [Jon Aquino
           // 10/29/2003]

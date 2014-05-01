@@ -49,9 +49,57 @@ public class BufferTest extends TestCase {
     super(name);
   }
 
-  public void test1() throws Exception {
+  public void test01() throws Exception {
     new BufferValidator(0, "POINT (100 100)").setEmptyBufferExpected(true)
       .test();
+  }
+
+  public void test01a() throws Exception {
+    new BufferValidator(-1, "POINT (100 100)").setEmptyBufferExpected(true)
+      .test();
+  }
+
+  public void test02() throws Exception {
+    new BufferValidator(0, "LINESTRING (10 10, 100 100)").setEmptyBufferExpected(
+      true)
+      .test();
+  }
+
+  public void test03() throws Exception {
+    final BufferValidator bufferValidator = new BufferValidator(10,
+      "LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)");
+    bufferValidator.test();
+  }
+
+  public void test04() throws Exception {
+    new BufferValidator(50, "LINESTRING (40 40, 160 40, 100 180, 40 80)").test();
+  }
+
+  public void test05() throws Exception {
+    new BufferValidator(0,
+      "POLYGON ((80 300, 280 300, 280 300, 280 300, 280 80, 80 80, 80 300))").test();
+  }
+
+  public void test06() throws Exception {
+    new BufferValidator(10,
+      "POLYGON ((60 300, 60 160, 240 160, 240 300, 60 300))").test();
+  }
+
+  public void test07() throws Exception {
+    new BufferValidator(
+      10,
+      "POLYGON ((80 300, 280 300, 280 80, 80 80, 80 300), (260 280, 180 200, 100 280, 100 100, 260 100, 260 280))").test();
+  }
+
+  public void test08() throws Exception {
+    new BufferValidator(
+      200,
+      "POLYGON ((80 300, 280 300, 280 80, 80 80, 80 300), (260 280, 180 200, 100 280, 100 100, 260 100, 260 280))").test();
+  }
+
+  public void test09() throws Exception {
+    new BufferValidator(-10,
+      "POLYGON ((80 300, 280 300, 280 80, 80 80, 80 300))").test();
   }
 
   public void test10() throws Exception {
@@ -109,17 +157,6 @@ public class BufferTest extends TestCase {
       "POLYGON ((184 369, 181 368, 180 368, 179 367, 176 366, 185 357, 184 369 ))").test();
   }
 
-  public void test1a() throws Exception {
-    new BufferValidator(-1, "POINT (100 100)").setEmptyBufferExpected(true)
-      .test();
-  }
-
-  public void test2() throws Exception {
-    new BufferValidator(0, "LINESTRING (10 10, 100 100)").setEmptyBufferExpected(
-      true)
-      .test();
-  }
-
   public void test20() throws Exception {
     new BufferValidator(
       1000,
@@ -173,6 +210,26 @@ public class BufferTest extends TestCase {
       "LINESTRING (2330 1950, 2320 1950, 2310 1940, 2220 1880, 2260 1870, 2270 1870, 2290 1870, 2300 1860, 2320 1860, 2340 1850, 2360 1840, 2370 1830, 2380 1820, 2370 1840, 2360 1850, 2360 1860, 2350 1870, 2350 1880, 2340 1890, 2340 1910, 2340 1920, 2330 1930, 2330 1950 )").test();
   }
 
+  // Relate for geometry collections doesn't work
+  //
+  // public void test34() throws Exception {
+  // new BufferValidator(
+  // 1,
+  // "GEOMETRYCOLLECTION (POLYGON ((0 10, 10 0, 10 10, 0 10),  (4 8, 8 4, 8 8, 4 8)),   LINESTRING (6 6, 20 20))").test();
+  // }
+  //
+  // public void test35() throws Exception {
+  // new BufferValidator(
+  // 20,
+  // "GEOMETRYCOLLECTION (POINT (100 100), POLYGON ((400 260, 280 380, 240 220, 120 300, 120 100, 260 40, 200 160, 400 260)), LINESTRING (260 400, 220 280, 120 400, 20 280, 160 160, 60 40, 160 20, 360 140))").test();
+  // }
+  //
+  // public void test36() throws Exception {
+  // new BufferValidator(
+  // 20,
+  // "GEOMETRYCOLLECTION (POINT (100 100), POLYGON ((400 260, 120 300, 120 100, 400 260)), LINESTRING (20 280, 160 160, 60 40))").test();
+  // }
+
   public void test29() throws Exception {
     new BufferValidator(
       26,
@@ -183,11 +240,6 @@ public class BufferTest extends TestCase {
     new BufferValidator(-1, "LINESTRING (10 10, 100 100)").setEmptyBufferExpected(
       true)
       .test();
-  }
-
-  public void test3() throws Exception {
-    new BufferValidator(10,
-      "LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)").test();
   }
 
   public void test30() throws Exception {
@@ -225,26 +277,6 @@ public class BufferTest extends TestCase {
     // .test();
   }
 
-  // Relate for geometry collections doesn't work
-  //
-  // public void test34() throws Exception {
-  // new BufferValidator(
-  // 1,
-  // "GEOMETRYCOLLECTION (POLYGON ((0 10, 10 0, 10 10, 0 10),  (4 8, 8 4, 8 8, 4 8)),   LINESTRING (6 6, 20 20))").test();
-  // }
-  //
-  // public void test35() throws Exception {
-  // new BufferValidator(
-  // 20,
-  // "GEOMETRYCOLLECTION (POINT (100 100), POLYGON ((400 260, 280 380, 240 220, 120 300, 120 100, 260 40, 200 160, 400 260)), LINESTRING (260 400, 220 280, 120 400, 20 280, 160 160, 60 40, 160 20, 360 140))").test();
-  // }
-  //
-  // public void test36() throws Exception {
-  // new BufferValidator(
-  // 20,
-  // "GEOMETRYCOLLECTION (POINT (100 100), POLYGON ((400 260, 120 300, 120 100, 400 260)), LINESTRING (20 280, 160 160, 60 40))").test();
-  // }
-
   public void test37() throws Exception {
     new BufferValidator(
       300,
@@ -261,37 +293,6 @@ public class BufferTest extends TestCase {
     new BufferValidator(
       30,
       "MULTIPOLYGON (((0 400, 440 400, 440 0, 0 0, 0 400),(380 360, 160 120, 260 80, 380 360)), ((360 320, 200 120, 240 100, 360 320)))").test();
-  }
-
-  public void test4() throws Exception {
-    new BufferValidator(50, "LINESTRING (40 40, 160 40, 100 180, 40 80)").test();
-  }
-
-  public void test5() throws Exception {
-    new BufferValidator(0,
-      "POLYGON ((80 300, 280 300, 280 300, 280 300, 280 80, 80 80, 80 300))").test();
-  }
-
-  public void test6() throws Exception {
-    new BufferValidator(10,
-      "POLYGON ((60 300, 60 160, 240 160, 240 300, 60 300))").test();
-  }
-
-  public void test7() throws Exception {
-    new BufferValidator(
-      10,
-      "POLYGON ((80 300, 280 300, 280 80, 80 80, 80 300), (260 280, 180 200, 100 280, 100 100, 260 100, 260 280))").test();
-  }
-
-  public void test8() throws Exception {
-    new BufferValidator(
-      200,
-      "POLYGON ((80 300, 280 300, 280 80, 80 80, 80 300), (260 280, 180 200, 100 280, 100 100, 260 100, 260 280))").test();
-  }
-
-  public void test9() throws Exception {
-    new BufferValidator(-10,
-      "POLYGON ((80 300, 280 300, 280 80, 80 80, 80 300))").test();
   }
 
   /**

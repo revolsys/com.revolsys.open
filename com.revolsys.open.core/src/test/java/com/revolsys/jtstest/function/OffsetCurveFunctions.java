@@ -1,5 +1,6 @@
 package com.revolsys.jtstest.function;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.operation.buffer.BufferParameters;
@@ -11,8 +12,8 @@ public class OffsetCurveFunctions {
     final BufferParameters bufParams = new BufferParameters();
     final OffsetCurveBuilder ocb = new OffsetCurveBuilder(
       geom.getGeometryFactory().getPrecisionModel(), bufParams);
-    final Coordinates[] pts = ocb.getOffsetCurve(geom.getCoordinateArray(),
-      distance);
+    final Coordinates[] pts = ocb.getOffsetCurve(
+      CoordinatesListUtil.getCoordinateArray(geom), distance);
     final Geometry curve = geom.getGeometryFactory().lineString(pts);
     return curve;
   }

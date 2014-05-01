@@ -3,6 +3,7 @@ package com.revolsys.jtstest.function;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -133,7 +134,7 @@ public class CreateRandomShapeFunctions {
 
   public static Geometry randomPointsInTriangle(final Geometry g, final int nPts) {
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
-    final Coordinates[] gpts = g.getCoordinateArray();
+    final Coordinates[] gpts = CoordinatesListUtil.getCoordinateArray(g);
     final Coordinates tri0 = gpts[0];
     final Coordinates tri1 = gpts[1];
     final Coordinates tri2 = gpts[2];

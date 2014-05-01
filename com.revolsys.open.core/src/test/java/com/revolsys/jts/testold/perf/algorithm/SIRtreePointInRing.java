@@ -35,9 +35,9 @@ package com.revolsys.jts.testold.perf.algorithm;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.PointInRing;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
@@ -67,10 +67,9 @@ public class SIRtreePointInRing implements PointInRing {
   }
 
   private void buildIndex() {
-    final BoundingBox env = this.ring.getBoundingBox();
     this.sirTree = new SIRtree();
 
-    final Coordinates[] pts = this.ring.getCoordinateArray();
+    final Coordinates[] pts = CoordinatesListUtil.getCoordinateArray(this.ring);
     for (int i = 1; i < pts.length; i++) {
       if (pts[i - 1].equals(pts[i])) {
         continue;

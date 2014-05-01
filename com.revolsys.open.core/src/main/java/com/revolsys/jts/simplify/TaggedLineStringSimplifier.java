@@ -33,7 +33,6 @@
 
 package com.revolsys.jts.simplify;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -42,6 +41,7 @@ import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Simplifies a TaggedLineString, preserving topology
@@ -54,14 +54,14 @@ import com.revolsys.jts.geom.LineSegmentImpl;
 public class TaggedLineStringSimplifier {
   /**
    * Tests whether a segment is in a section of a TaggedLineString
-   * @param line
+   * @param taggedLine
    * @param sectionIndex
    * @param seg
    * @return
    */
   private static boolean isInLineSection(final TaggedLineString line,
     final int[] sectionIndex, final TaggedLineSegment seg) {
-    // not in this line
+    // not in this taggedLine
     if (seg.getParent() != line.getParent()) {
       return false;
     }
@@ -78,9 +78,9 @@ public class TaggedLineStringSimplifier {
 
   private LineSegmentIndex outputIndex = new LineSegmentIndex();
 
-  private TaggedLineString line;
+  private TaggedLineString taggedLine;
 
-  private Coordinates[] linePts;
+  private LineString line;
 
   private double distanceTolerance = 0.0;
 
@@ -90,14 +90,14 @@ public class TaggedLineStringSimplifier {
     this.outputIndex = outputIndex;
   }
 
-  private int findFurthestPoint(final Coordinates[] pts, final int i,
-    final int j, final double[] maxDistance) {
-    final Coordinates p0 = pts[i];
-    final Coordinates p1 = pts[j];
+  private int findFurthestPoint(final int i, final int j,
+    final double[] maxDistance) {
+    final Coordinates p0 = line.getVertex(i);
+    final Coordinates p1 = line.getVertex(j);
     double maxDist = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
-      final Coordinates midPt = pts[k];
+      final Coordinates midPt = line.getVertex(k);
       final double distance = LineSegmentUtil.distance(p0, p1, midPt);
       if (distance > maxDist) {
         maxDist = distance;
@@ -109,9 +109,9 @@ public class TaggedLineStringSimplifier {
   }
 
   /**
-   * Flattens a section of the line between
+   * Flattens a section of the taggedLine between
    * indexes <code>start</code> and <code>end</code>,
-   * replacing them with a line between the endpoints.
+   * replacing them with a taggedLine between the endpoints.
    * The input and output indexes are updated
    * to reflect this.
    * 
@@ -121,20 +121,19 @@ public class TaggedLineStringSimplifier {
    */
   private LineSegment flatten(final int start, final int end) {
     // make a new segment for the simplified geometry
-    final Coordinates p0 = linePts[start];
-    final Coordinates p1 = linePts[end];
+    final Coordinates p0 = line.getVertex(start).cloneCoordinates();
+    final Coordinates p1 = line.getVertex(end).cloneCoordinates();
     final LineSegment newSeg = new LineSegmentImpl(p0, p1);
     // update the indexes
-    remove(line, start, end);
+    remove(taggedLine, start, end);
     outputIndex.add(newSeg);
     return newSeg;
   }
 
   private boolean hasBadInputIntersection(final TaggedLineString parentLine,
     final int[] sectionIndex, final LineSegment candidateSeg) {
-    final List querySegs = inputIndex.query(candidateSeg);
-    for (final Iterator i = querySegs.iterator(); i.hasNext();) {
-      final TaggedLineSegment querySeg = (TaggedLineSegment)i.next();
+    final List<TaggedLineSegment> querySegs = inputIndex.query(candidateSeg);
+    for (final TaggedLineSegment querySeg : querySegs) {
       if (hasInteriorIntersection(querySeg, candidateSeg)) {
         if (isInLineSection(parentLine, sectionIndex, querySeg)) {
           continue;
@@ -157,9 +156,8 @@ public class TaggedLineStringSimplifier {
   }
 
   private boolean hasBadOutputIntersection(final LineSegment candidateSeg) {
-    final List querySegs = outputIndex.query(candidateSeg);
-    for (final Iterator i = querySegs.iterator(); i.hasNext();) {
-      final LineSegment querySeg = (LineSegment)i.next();
+    final List<TaggedLineSegment> querySegs = outputIndex.query(candidateSeg);
+    for (final TaggedLineSegment querySeg : querySegs) {
       if (hasInteriorIntersection(querySeg, candidateSeg)) {
         return true;
       }
@@ -175,8 +173,8 @@ public class TaggedLineStringSimplifier {
   }
 
   /**
-   * Remove the segs in the section of the line
-   * @param line
+   * Remove the segs in the section of the taggedLine
+   * @param taggedLine
    * @param pts
    * @param sectionStartIndex
    * @param sectionEndIndex
@@ -204,20 +202,20 @@ public class TaggedLineStringSimplifier {
    * Simplifies the given {@link TaggedLineString}
    * using the distance tolerance specified.
    * 
-   * @param line the linestring to simplify
+   * @param taggedLine the linestring to simplify
    */
-  void simplify(final TaggedLineString line) {
-    this.line = line;
-    linePts = line.getParentCoordinates();
-    simplifySection(0, linePts.length - 1, 0);
+  void simplify(final TaggedLineString taggedLine) {
+    this.taggedLine = taggedLine;
+    this.line = taggedLine.getParent();
+    simplifySection(0, line.getVertexCount() - 1, 0);
   }
 
   private void simplifySection(final int i, final int j, int depth) {
     depth += 1;
     final int[] sectionIndex = new int[2];
     if ((i + 1) == j) {
-      final LineSegment newSeg = line.getSegment(i);
-      line.addToResult(newSeg);
+      final LineSegment newSeg = taggedLine.getSegment(i);
+      taggedLine.addToResult(newSeg);
       // leave this segment in the input index, for efficiency
       return;
     }
@@ -225,38 +223,38 @@ public class TaggedLineStringSimplifier {
     boolean isValidToSimplify = true;
 
     /**
-     * Following logic ensures that there is enough points in the output line.
+     * Following logic ensures that there is enough points in the output taggedLine.
      * If there is already more points than the minimum, there's nothing to check.
      * Otherwise, if in the worst case there wouldn't be enough points,
      * don't flatten this segment (which avoids the worst case scenario)
      */
-    if (line.getResultSize() < line.getMinimumSize()) {
+    if (taggedLine.getResultSize() < taggedLine.getMinimumSize()) {
       final int worstCaseSize = depth + 1;
-      if (worstCaseSize < line.getMinimumSize()) {
+      if (worstCaseSize < taggedLine.getMinimumSize()) {
         isValidToSimplify = false;
       }
     }
 
     final double[] distance = new double[1];
-    final int furthestPtIndex = findFurthestPoint(linePts, i, j, distance);
+    final int furthestPtIndex = findFurthestPoint(i, j, distance);
     // flattening must be less than distanceTolerance
     if (distance[0] > distanceTolerance) {
       isValidToSimplify = false;
     }
     // test if flattened section would cause intersection
     // final LineSegment candidateSeg = new LineSegmentImpl();
-    final Coordinates p0 = linePts[i];
-    final Coordinates p1 = linePts[j];
+    final Coordinates p0 = line.getVertex(i).cloneCoordinates();
+    final Coordinates p1 = line.getVertex(j).cloneCoordinates();
     final LineSegment candidateSeg = new LineSegmentImpl(p0, p1);
     sectionIndex[0] = i;
     sectionIndex[1] = j;
-    if (hasBadIntersection(line, sectionIndex, candidateSeg)) {
+    if (hasBadIntersection(taggedLine, sectionIndex, candidateSeg)) {
       isValidToSimplify = false;
     }
 
     if (isValidToSimplify) {
       final LineSegment newSeg = flatten(i, j);
-      line.addToResult(newSeg);
+      taggedLine.addToResult(newSeg);
       return;
     }
     simplifySection(i, furthestPtIndex, depth);

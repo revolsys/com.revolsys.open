@@ -38,8 +38,6 @@ import junit.textui.TestRunner;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -51,12 +49,6 @@ public class OrientationIndexTest extends TestCase {
   private static WKTReader reader = new WKTReader();
 
   // private CGAlgorithms rcga = new CGAlgorithms();
-
-  public static Coordinates[] getCoordinates(final String wkt)
-    throws ParseException {
-    final Geometry geom = reader.read(wkt);
-    return geom.getCoordinateArray();
-  }
 
   /**
    * Tests whether the orientations around a triangle of points
@@ -77,8 +69,9 @@ public class OrientationIndexTest extends TestCase {
     final double p0y, final double p1x, final double p1y, final double p2x,
     final double p2y) {
     final Coordinates[] pts = {
-      new Coordinate((double)p0x, p0y, Coordinates.NULL_ORDINATE), new Coordinate((double)p1x, p1y, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)p2x, p2y, Coordinates.NULL_ORDINATE)
+      new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE),
+      new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE),
+      new Coordinate(p2x, p2y, Coordinates.NULL_ORDINATE)
     };
     return isAllOrientationsEqual(pts);
   }
@@ -91,16 +84,14 @@ public class OrientationIndexTest extends TestCase {
     super(name);
   }
 
-  public void testCCW() throws Exception {
-    assertTrue(isAllOrientationsEqual(getCoordinates("LINESTRING ( 0 0, 0 1, 1 1)")));
-  }
-
   public void testCCW2() throws Exception {
     // experimental case - can't make it fail
     final Coordinates[] pts2 = {
-      new Coordinate((double)1.0000000000004998, -7.989685402102996, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)10.0, -7.004368924503866, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)1.0000000000005, -7.989685402102996, Coordinates.NULL_ORDINATE),
+      new Coordinate(1.0000000000004998, -7.989685402102996,
+        Coordinates.NULL_ORDINATE),
+      new Coordinate(10.0, -7.004368924503866, Coordinates.NULL_ORDINATE),
+      new Coordinate(1.0000000000005, -7.989685402102996,
+        Coordinates.NULL_ORDINATE),
     };
     assertTrue(isAllOrientationsEqual(pts2));
   }

@@ -5,7 +5,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.SineStarFactory;
-import com.revolsys.jts.operation.distance.IndexedFacetDistance;
 import com.revolsys.jts.util.GeometricShapeFactory;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -31,11 +30,9 @@ public class TestPerfDistanceGeomPair {
   }
 
   void computeDistanceToAllPoints(final Geometry[] geom) {
-    final Coordinates[] pts = geom[1].getCoordinateArray();
     double dist = 0.0;
     final double dist2 = 0.0;
-    final IndexedFacetDistance fastDist = new IndexedFacetDistance(geom[0]);
-    for (final Coordinates p : pts) {
+    for (final Coordinates p : geom[1].vertices()) {
       // slow N^2 distance
       dist = geom[0].distance(geom[1].getGeometryFactory().point(p));
 
@@ -53,7 +50,8 @@ public class TestPerfDistanceGeomPair {
 
     final Polygon gRect = gsf.createCircle();
 
-    gsf.setCentre(new Coordinate((double)0, this.separationDist, Coordinates.NULL_ORDINATE));
+    gsf.setCentre(new Coordinate((double)0, this.separationDist,
+      Coordinates.NULL_ORDINATE));
 
     final Polygon gRect2 = gsf.createCircle();
 
@@ -71,7 +69,8 @@ public class TestPerfDistanceGeomPair {
 
     final Geometry g = gsf.createSineStar().getBoundary();
 
-    gsf.setCentre(new Coordinate((double)0, this.separationDist, Coordinates.NULL_ORDINATE));
+    gsf.setCentre(new Coordinate((double)0, this.separationDist,
+      Coordinates.NULL_ORDINATE));
 
     final Geometry g2 = gsf.createSineStar().getBoundary();
 
@@ -111,11 +110,11 @@ public class TestPerfDistanceGeomPair {
       computeDistanceToAllPoints(geom);
     }
     if (!this.verbose) {
-    //  System.out.println(sw.getTimeString());
+      // System.out.println(sw.getTimeString());
     }
     if (this.verbose) {
-    //  System.out.println("Finished in " + sw.getTimeString());
-    //  System.out.println("       (Distance = " + dist + ")");
+      // System.out.println("Finished in " + sw.getTimeString());
+      // System.out.println("       (Distance = " + dist + ")");
     }
   }
 
@@ -125,7 +124,7 @@ public class TestPerfDistanceGeomPair {
     final Geometry[] geom = createSineStars(nPts);
 
     if (this.verbose) {
-    //  System.out.println("Running with " + nPts + " points");
+      // System.out.println("Running with " + nPts + " points");
     }
     if (!this.verbose) {
       System.out.print(nPts + ": ");

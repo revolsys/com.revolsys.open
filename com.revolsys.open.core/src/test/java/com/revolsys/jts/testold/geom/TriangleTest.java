@@ -39,6 +39,8 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.io.WKTReader;
 
@@ -64,10 +66,8 @@ public class TriangleTest extends TestCase {
 
   public void checkAcute(final String wkt, final boolean expectedValue)
     throws Exception {
-    final Geometry g = this.reader.read(wkt);
-    final Coordinates[] pt = g.getCoordinateArray();
-
-    final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
+    final Polygon g = (Polygon)this.reader.read(wkt);
+    final Triangle t = createTriangle(g);
     final boolean isAcute = t.isAcute();
     // System.out.println("isAcute = " + isAcute);
     assertEquals(expectedValue, isAcute);
@@ -76,9 +76,8 @@ public class TriangleTest extends TestCase {
   public void checkArea(final String wkt, final double expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinates[] pt = g.getCoordinateArray();
 
-    final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
+    final Triangle t = createTriangle(g);
     final double signedArea = t.signedArea();
     // System.out.println("signed area = " + signedArea);
     assertEquals(expectedValue, signedArea, TOLERANCE);
@@ -91,8 +90,7 @@ public class TriangleTest extends TestCase {
   public void checkArea3D(final String wkt, final double expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinates[] pt = g.getCoordinateArray();
-    final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
+    final Triangle t = createTriangle(g);
     final double area3D = t.area3D();
     // System.out.println("area3D = " + area3D);
     assertEquals(expectedValue, area3D, TOLERANCE);
@@ -101,15 +99,14 @@ public class TriangleTest extends TestCase {
   public void checkCentroid(final String wkt, final Coordinates expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinates[] pt = g.getCoordinateArray();
 
-    Coordinates centroid = Triangle.centroid(pt[0], pt[1], pt[2]);
+    final Triangle t = createTriangle(g);
+    Coordinates centroid = Triangle.centroid(t.p0, t.p1, t.p2);
     // System.out.println("(Static) centroid = " + centroid);
     assertEquals(expectedValue.toString(), centroid.toString());
 
     // Test Instance version
     //
-    final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     centroid = t.centroid();
     // System.out.println("(Instance) centroid = " + centroid.toString());
     assertEquals(expectedValue.toString(), centroid.toString());
@@ -118,15 +115,14 @@ public class TriangleTest extends TestCase {
   public void checkCircumCentre(final String wkt,
     final Coordinates expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinates[] pt = g.getCoordinateArray();
 
-    Coordinates circumcentre = Triangle.circumcentre(pt[0], pt[1], pt[2]);
+    final Triangle t = createTriangle(g);
+    Coordinates circumcentre = Triangle.circumcentre(t.p0, t.p1, t.p2);
     // System.out.println("(Static) circumcentre = " + circumcentre);
     assertEquals(expectedValue.toString(), circumcentre.toString());
 
     // Test Instance version
     //
-    final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     circumcentre = t.circumcentre();
     // System.out.println("(Instance) circumcentre = " +
     // circumcentre.toString());
@@ -136,9 +132,8 @@ public class TriangleTest extends TestCase {
   public void checkInterpolateZ(final String wkt, final Coordinates p,
     final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinates[] pt = g.getCoordinateArray();
 
-    final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
+    final Triangle t = createTriangle(g);
     final double z = t.interpolateZ(p);
     // System.out.println("Z = " + z);
     assertEquals(expectedValue, z, 0.000001);
@@ -147,18 +142,42 @@ public class TriangleTest extends TestCase {
   public void checkLongestSideLength(final String wkt,
     final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
-    final Coordinates[] pt = g.getCoordinateArray();
 
-    double length = Triangle.longestSideLength(pt[0], pt[1], pt[2]);
+    final Triangle t = createTriangle(g);
+    double length = Triangle.longestSideLength(t.p0, t.p1, t.p2);
     // System.out.println("(Static) longestSideLength = " + length);
     assertEquals(expectedValue, length, 0.00000001);
 
     // Test Instance version
     //
-    final Triangle t = new Triangle(pt[0], pt[1], pt[2]);
     length = t.longestSideLength();
     // System.out.println("(Instance) longestSideLength = " + length);
     assertEquals(expectedValue, length, 0.00000001);
+  }
+
+  public Triangle createTriangle(final Geometry g) {
+    if (g instanceof Polygon) {
+      final Polygon polygon = (Polygon)g;
+      return createTriangle(polygon);
+    } else if (g instanceof LineString) {
+      final LineString line = (LineString)g;
+      return createTriangle(line);
+    } else {
+      return null;
+    }
+  }
+
+  public Triangle createTriangle(final LineString line) {
+    final Triangle t = new Triangle(line.getVertex(0).cloneCoordinates(),
+      line.getVertex(1).cloneCoordinates(), line.getVertex(2)
+        .cloneCoordinates());
+    return t;
+  }
+
+  public Triangle createTriangle(final Polygon g) {
+    final LineString line = g.getExteriorRing();
+    final Triangle t = createTriangle(line);
+    return t;
   }
 
   public void testAcute() throws Exception {

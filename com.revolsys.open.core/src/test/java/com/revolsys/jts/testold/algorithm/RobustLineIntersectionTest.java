@@ -3,6 +3,7 @@ package com.revolsys.jts.testold.algorithm;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
@@ -24,8 +25,8 @@ import com.revolsys.jts.io.WKTReader;
  *
  */
 public class RobustLineIntersectionTest extends TestCase {
-  public static boolean equals(final Coordinates p0,
-    final Coordinates p1, final double distanceTolerance) {
+  public static boolean equals(final Coordinates p0, final Coordinates p1,
+    final double distanceTolerance) {
     return p0.distance(p1) <= distanceTolerance;
   }
 
@@ -77,8 +78,8 @@ public class RobustLineIntersectionTest extends TestCase {
    * @param distanceTolerance tolerance to use for equality test
    */
   void checkIntersection(final Coordinates[] pt,
-    final int expectedIntersectionNum,
-    final Coordinates[] expectedIntPt, final double distanceTolerance) {
+    final int expectedIntersectionNum, final Coordinates[] expectedIntPt,
+    final double distanceTolerance) {
     final LineIntersector li = new RobustLineIntersector();
     li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
 
@@ -140,7 +141,7 @@ public class RobustLineIntersectionTest extends TestCase {
       l2.getCoordinate(1)
     };
     final Geometry g = this.reader.read(expectedWKT);
-    final Coordinates[] intPt = g.getCoordinateArray();
+    final Coordinates[] intPt = CoordinatesListUtil.getCoordinateArray(g);
     checkIntersection(pt, expectedIntersectionNum, intPt, distanceTolerance);
   }
 
@@ -155,8 +156,8 @@ public class RobustLineIntersectionTest extends TestCase {
     checkIntersection(pt, 0, null, 0);
   }
 
-  void checkIntPoints(final Coordinates expectedPt,
-    final Coordinates actualPt, final double distanceTolerance) {
+  void checkIntPoints(final Coordinates expectedPt, final Coordinates actualPt,
+    final double distanceTolerance) {
     final boolean isEqual = equals(expectedPt, actualPt, distanceTolerance);
     assertTrue(
       "Int Pts not equal - " + "expected " + WktWriter.point(expectedPt)

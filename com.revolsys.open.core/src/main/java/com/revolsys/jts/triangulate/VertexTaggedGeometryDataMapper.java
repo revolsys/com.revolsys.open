@@ -69,20 +69,21 @@ public class VertexTaggedGeometryDataMapper {
 
   public void loadSourceGeometries(final Collection<Geometry> geoms) {
     for (final Geometry geom : geoms) {
-      loadVertices(geom.getCoordinateArray(), geom.getUserData());
+      loadVertices(geom.vertices(), geom.getUserData());
     }
   }
 
   public void loadSourceGeometries(final Geometry geomColl) {
     for (int i = 0; i < geomColl.getGeometryCount(); i++) {
       final Geometry geom = geomColl.getGeometry(i);
-      loadVertices(geom.getCoordinateArray(), geom.getUserData());
+      loadVertices(geom.vertices(), geom.getUserData());
     }
   }
 
-  private void loadVertices(final Coordinates[] pts, final Object data) {
-    for (final Coordinates point : pts) {
-      coordDataMap.put(point, data);
+  private void loadVertices(final Iterable<? extends Coordinates> points,
+    final Object data) {
+    for (final Coordinates point : points) {
+      coordDataMap.put(point.cloneCoordinates(), data);
     }
   }
 

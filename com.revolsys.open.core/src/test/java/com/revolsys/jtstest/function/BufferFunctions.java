@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -151,7 +152,7 @@ public class BufferFunctions {
 
     final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      final Coordinates[] pts = line.getCoordinateArray();
+      final Coordinates[] pts = CoordinatesListUtil.getCoordinateArray(line);
       simpLines.add(geometry.getGeometryFactory().lineString(
         BufferInputLineSimplifier.simplify(pts, distance)));
     }
@@ -191,8 +192,8 @@ public class BufferFunctions {
     bufParam.setSingleSided(true);
     final OffsetCurveBuilder ocb = new OffsetCurveBuilder(
       geom.getGeometryFactory().getPrecisionModel(), bufParam);
-    final Coordinates[] pts = ocb.getLineCurve(geom.getCoordinateArray(),
-      distance);
+    final Coordinates[] pts = ocb.getLineCurve(
+      CoordinatesListUtil.getCoordinateArray(geom), distance);
     final Geometry curve = geom.getGeometryFactory().lineString(pts);
     return curve;
   }

@@ -1,5 +1,6 @@
 package com.revolsys.jtstest.function;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
@@ -13,7 +14,7 @@ public class CGAlgorithmFunctions {
       throw new IllegalArgumentException(
         "A must have two points and B must have one");
     }
-    final Coordinates[] segPt = segment.getCoordinateArray();
+    final Coordinates[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 
     final Coordinates p = ptGeom.getCoordinate();
     final int index = CGAlgorithms.orientationIndex(segPt[0], segPt[1], p);
@@ -26,7 +27,7 @@ public class CGAlgorithmFunctions {
       throw new IllegalArgumentException(
         "A must have two points and B must have one");
     }
-    final Coordinates[] segPt = segment.getCoordinateArray();
+    final Coordinates[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 
     final Coordinates p = ptGeom.getCoordinate();
     final int index = CGAlgorithmsDD.orientationIndex(segPt[0], segPt[1], p);
@@ -35,8 +36,8 @@ public class CGAlgorithmFunctions {
 
   public static Geometry segmentIntersection(final Geometry g1,
     final Geometry g2) {
-    final Coordinates[] pt1 = g1.getCoordinateArray();
-    final Coordinates[] pt2 = g2.getCoordinateArray();
+    final Coordinates[] pt1 = CoordinatesListUtil.getCoordinateArray(g1);
+    final Coordinates[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
     final RobustLineIntersector ri = new RobustLineIntersector();
     ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
     switch (ri.getIntersectionNum()) {
@@ -57,8 +58,8 @@ public class CGAlgorithmFunctions {
 
   public static Geometry segmentIntersectionDD(final Geometry g1,
     final Geometry g2) {
-    final Coordinates[] pt1 = g1.getCoordinateArray();
-    final Coordinates[] pt2 = g2.getCoordinateArray();
+    final Coordinates[] pt1 = CoordinatesListUtil.getCoordinateArray(g1);
+    final Coordinates[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
 
     // first check if there actually is an intersection
     final RobustLineIntersector ri = new RobustLineIntersector();
@@ -74,8 +75,8 @@ public class CGAlgorithmFunctions {
   }
 
   public static boolean segmentIntersects(final Geometry g1, final Geometry g2) {
-    final Coordinates[] pt1 = g1.getCoordinateArray();
-    final Coordinates[] pt2 = g2.getCoordinateArray();
+    final Coordinates[] pt1 = CoordinatesListUtil.getCoordinateArray(g1);
+    final Coordinates[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
     final RobustLineIntersector ri = new RobustLineIntersector();
     ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
     return ri.hasIntersection();

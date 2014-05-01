@@ -1,5 +1,6 @@
 package com.revolsys.jtstest.function;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -59,7 +60,7 @@ public class AffineTransformationFunctions {
     final Coordinates src0 = new Coordinate(env.getMinX(), env.getMinY());
     final Coordinates src1 = new Coordinate(env.getMaxX(), env.getMinY());
 
-    final Coordinates[] destPts = destBaseline.getCoordinateArray();
+    final Coordinates[] destPts = CoordinatesListUtil.getCoordinateArray(destBaseline);
     final Coordinates dest0 = destPts[0];
     final Coordinates dest1 = destPts[1];
     final AffineTransformation trans = AffineTransformationFactory.createFromBaseLines(
@@ -74,7 +75,7 @@ public class AffineTransformationFunctions {
     final Coordinates dest[] = new Coordinates[nControl];
     for (int i = 0; i < nControl; i++) {
       final Geometry contComp = control.getGeometry(i);
-      final Coordinates[] pts = contComp.getCoordinateArray();
+      final Coordinates[] pts = CoordinatesListUtil.getCoordinateArray(contComp);
       src[i] = pts[0];
       dest[i] = pts[1];
     }

@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.testold.perf.operation.buffer;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -51,7 +52,7 @@ public class OffsetCurveCorrectnessTest {
     final double distance) {
     final OffsetCurveBuilder ocb = new OffsetCurveBuilder(
       g.getGeometryFactory().getPrecisionModel(), new BufferParameters());
-    final Coordinates[] pts = g.getCoordinateArray();
+    final Coordinates[] pts = CoordinatesListUtil.getCoordinateArray(g);
     Coordinates[] curvePts = null;
     if (g instanceof Polygonal) {
       curvePts = ocb.getRingCurve(pts, 1, distance);
@@ -84,7 +85,7 @@ public class OffsetCurveCorrectnessTest {
     final String wkt = "MULTILINESTRING ((1335558.59524 631743.01449, 1335572.28215 631775.89056, 1335573.2578018496 631782.1915185435),  (1335573.2578018496 631782.1915185435, 1335576.62035 631803.90754),  (1335558.59524 631743.01449, 1335573.2578018496 631782.1915185435),  (1335573.2578018496 631782.1915185435, 1335580.70187 631802.08139))";
     final Geometry g = this.rdr.read(wkt);
     final Geometry curve = bufferOffsetCurve(g, 15);
-  //  System.out.println(curve);
+    // System.out.println(curve);
     // assert(curve.isValid());
   }
 

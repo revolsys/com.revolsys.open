@@ -193,18 +193,13 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(0, this.geometryFactory.multiLineString().getVertexCount());
     assertEquals(0, this.geometryFactory.multiPoint().getVertexCount());
 
-    assertEquals(0, this.geometryFactory.point().getCoordinateArray().length);
-    assertEquals(0,
-      this.geometryFactory.linearRing().getCoordinateArray().length);
-    assertEquals(0,
-      this.geometryFactory.lineString().getCoordinateArray().length);
-    assertEquals(0, this.geometryFactory.polygon().getCoordinateArray().length);
-    assertEquals(0,
-      this.geometryFactory.multiPolygon().getCoordinateArray().length);
-    assertEquals(0,
-      this.geometryFactory.multiLineString().getCoordinateArray().length);
-    assertEquals(0,
-      this.geometryFactory.multiPoint().getCoordinateArray().length);
+    assertEquals(0, this.geometryFactory.point().getVertexCount());
+    assertEquals(0, this.geometryFactory.linearRing().getVertexCount());
+    assertEquals(0, this.geometryFactory.lineString().getVertexCount());
+    assertEquals(0, this.geometryFactory.polygon().getVertexCount());
+    assertEquals(0, this.geometryFactory.multiPolygon().getVertexCount());
+    assertEquals(0, this.geometryFactory.multiLineString().getVertexCount());
+    assertEquals(0, this.geometryFactory.multiPoint().getVertexCount());
   }
 
   public void testEmptyGeometryCollection() throws Exception {
@@ -444,13 +439,7 @@ public class MiscellaneousTest extends TestCase {
   public void testPolygonGetCoordinates() throws Exception {
     final Polygon p = (Polygon)this.reader.read("POLYGON ( (0 0, 100 0, 100 100, 0 100, 0 0), "
       + "          (20 20, 20 80, 80 80, 80 20, 20 20)) ");
-    final Coordinates[] coordinates = p.getCoordinateArray();
     assertEquals(10, p.getVertexCount());
-    assertEquals(10, coordinates.length);
-    assertEquals(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
-      coordinates[0]);
-    assertEquals(new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE),
-      coordinates[9]);
   }
 
   public void testPolygonIsSimple() throws Exception {

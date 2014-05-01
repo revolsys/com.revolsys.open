@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
@@ -80,7 +81,7 @@ public class DelaunayTriangulationBuilder {
       return new CoordinateList();
     }
 
-    final Coordinates[] coords = geom.getCoordinateArray();
+    final Coordinates[] coords = CoordinatesListUtil.getCoordinateArray(geom);
     return unique(coords);
   }
 
