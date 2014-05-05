@@ -25,9 +25,9 @@ public class JdbcByteAttribute extends JdbcAttribute {
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final DataObject object) throws SQLException {
-    final byte longValue = resultSet.getByte(columnIndex);
+    final byte byteValue = resultSet.getByte(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), Byte.valueOf(longValue));
+      setValue(object, Byte.valueOf(byteValue));
     }
     return columnIndex + 1;
   }

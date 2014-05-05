@@ -435,6 +435,16 @@ public final class CollectionUtil {
     }
   }
 
+  public static <K1, K2, V> Map<K2, V> getTreeMap(
+    final Map<K1, Map<K2, V>> map, final K1 key) {
+    Map<K2, V> value = map.get(key);
+    if (value == null) {
+      value = new TreeMap<K2, V>();
+      map.put(key, value);
+    }
+    return value;
+  }
+
   public static <K, V> Set<V> getTreeSet(final Map<K, Set<V>> map, final K key) {
     Set<V> value = map.get(key);
     if (value == null) {

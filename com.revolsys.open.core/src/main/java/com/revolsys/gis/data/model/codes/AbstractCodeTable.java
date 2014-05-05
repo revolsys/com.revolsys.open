@@ -28,6 +28,8 @@ public abstract class AbstractCodeTable implements Closeable,
 
   private Map<Object, List<Object>> idValueCache = new LinkedHashMap<Object, List<Object>>();
 
+  private Map<Object, Object> idIdCache = new LinkedHashMap<>();
+
   private Map<List<Object>, Object> valueIdCache = new LinkedHashMap<List<Object>, Object>();
 
   private final Map<String, Object> stringIdMap = new HashMap<String, Object>();
@@ -55,6 +57,7 @@ public abstract class AbstractCodeTable implements Closeable,
       }
     }
     idValueCache.put(id, values);
+    idIdCache.put(id, id);
     valueIdCache.put(values, id);
     valueIdCache.put(getNormalizedValues(values), id);
     stringIdMap.put(id.toString().toLowerCase(), id);
@@ -79,8 +82,9 @@ public abstract class AbstractCodeTable implements Closeable,
   public AbstractCodeTable clone() {
     try {
       final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
-      clone.idValueCache = new LinkedHashMap<Object, List<Object>>(idValueCache);
-      clone.valueIdCache = new LinkedHashMap<List<Object>, Object>(valueIdCache);
+      clone.idValueCache = new LinkedHashMap<>(idValueCache);
+      clone.idIdCache = new LinkedHashMap<>(idIdCache);
+      clone.valueIdCache = new LinkedHashMap<>(valueIdCache);
       return clone;
     } catch (final CloneNotSupportedException e) {
       throw new RuntimeException(e);
@@ -92,6 +96,7 @@ public abstract class AbstractCodeTable implements Closeable,
   public void close() {
     propertyChangeSupport = null;
     idValueCache.clear();
+    idIdCache.clear();
     stringIdMap.clear();
     valueIdCache.clear();
     swingEditor = null;
@@ -118,12 +123,15 @@ public abstract class AbstractCodeTable implements Closeable,
       final Object id = values.get(0);
       if (id == null) {
         return null;
-      } else if (idValueCache.containsKey(id)) {
-        return (T)id;
       } else {
-        final String lowerId = id.toString().toLowerCase();
-        if (stringIdMap.containsKey(lowerId)) {
-          return (T)stringIdMap.get(lowerId);
+        final Object cachedId = idIdCache.get(id);
+        if (cachedId != null) {
+          return (T)cachedId;
+        } else {
+          final String lowerId = id.toString().toLowerCase();
+          if (stringIdMap.containsKey(lowerId)) {
+            return (T)stringIdMap.get(lowerId);
+          }
         }
       }
     }

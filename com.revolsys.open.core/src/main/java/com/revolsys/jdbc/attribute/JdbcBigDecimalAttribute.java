@@ -24,7 +24,7 @@ public class JdbcBigDecimalAttribute extends JdbcDecimalAttribute {
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final DataObject object) throws SQLException {
     final BigDecimal value = resultSet.getBigDecimal(columnIndex);
-    object.setValue(getIndex(), value);
+    setValue(object, value);
     return columnIndex + 1;
   }
 }

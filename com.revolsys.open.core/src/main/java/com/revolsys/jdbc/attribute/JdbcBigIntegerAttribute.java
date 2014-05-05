@@ -46,7 +46,7 @@ public class JdbcBigIntegerAttribute extends JdbcAttribute {
       }
     }
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), value);
+      setValue(object, value);
     }
     return columnIndex + 1;
   }

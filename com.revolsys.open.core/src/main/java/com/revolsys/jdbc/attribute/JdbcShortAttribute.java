@@ -27,7 +27,7 @@ public class JdbcShortAttribute extends JdbcAttribute {
     final int columnIndex, final DataObject object) throws SQLException {
     final short value = resultSet.getShort(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), Short.valueOf(value));
+      setValue(object, Short.valueOf(value));
     }
     return columnIndex + 1;
   }

@@ -100,7 +100,7 @@ public class JdbcAttribute extends Attribute {
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final DataObject object) throws SQLException {
     final Object value = resultSet.getObject(columnIndex);
-    object.setValue(getIndex(), value);
+    setValue(object, value);
     return columnIndex + 1;
   }
 

@@ -27,7 +27,7 @@ public class JdbcDateAttribute extends JdbcAttribute {
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final DataObject object) throws SQLException {
     final Date value = resultSet.getDate(columnIndex);
-    object.setValue(getIndex(), value);
+    setValue(object, value);
     return columnIndex + 1;
   }
 

@@ -16,6 +16,8 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   void delete();
 
+  String getAttributeTitle(String fieldName);
+
   Byte getByte(final CharSequence name);
 
   Double getDouble(final CharSequence name);

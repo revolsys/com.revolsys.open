@@ -27,7 +27,7 @@ public class JdbcFloatAttribute extends JdbcAttribute {
     final int columnIndex, final DataObject object) throws SQLException {
     final float longValue = resultSet.getFloat(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), Float.valueOf(longValue));
+      setValue(object, Float.valueOf(longValue));
     }
     return columnIndex + 1;
   }

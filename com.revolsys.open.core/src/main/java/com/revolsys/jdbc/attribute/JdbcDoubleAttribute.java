@@ -27,7 +27,7 @@ public class JdbcDoubleAttribute extends JdbcAttribute {
     final int columnIndex, final DataObject object) throws SQLException {
     final double longValue = resultSet.getDouble(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), Double.valueOf(longValue));
+      setValue(object, Double.valueOf(longValue));
     }
     return columnIndex + 1;
   }

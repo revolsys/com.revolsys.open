@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.AbstractObjectWithProperties;
@@ -42,6 +43,8 @@ public class Attribute extends AbstractObjectWithProperties implements
   }
 
   private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
+
+  private CodeTable codeTable;
 
   private Object defaultValue;
 
@@ -320,6 +323,10 @@ public class Attribute extends AbstractObjectWithProperties implements
     return allowedValues;
   }
 
+  public CodeTable getCodeTable() {
+    return codeTable;
+  }
+
   @SuppressWarnings("unchecked")
   public <T> T getDefaultValue() {
     return (T)defaultValue;
@@ -482,6 +489,10 @@ public class Attribute extends AbstractObjectWithProperties implements
     this.allowedValues.putAll(allowedValues);
   }
 
+  public void setCodeTable(final CodeTable codeTable) {
+    this.codeTable = codeTable;
+  }
+
   public void setDefaultValue(final Object defaultValue) {
     this.defaultValue = defaultValue;
   }
@@ -524,6 +535,20 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   public void setType(final DataType type) {
     this.type = type;
+  }
+
+  public void setValue(final DataObject record, Object value) {
+    if (record != null) {
+      final int index = getIndex();
+      if (value != null) {
+        final CodeTable codeTable = getCodeTable();
+        if (codeTable != null) {
+          value = codeTable.getId(value);
+        }
+      }
+      record.setValue(index, value);
+
+    }
   }
 
   @Override

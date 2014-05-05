@@ -132,6 +132,17 @@ public abstract class AbstractDataObjectStore extends
   public void addCodeTable(final String columnName, final CodeTable codeTable) {
     if (columnName != null && !columnName.equalsIgnoreCase("ID")) {
       this.columnToTableMap.put(columnName, codeTable);
+      for (final DataObjectStoreSchema schema : getSchemas()) {
+        for (final DataObjectMetaData metaData : schema.getTypes()) {
+          final String idFieldName = metaData.getIdAttributeName();
+          for (final Attribute attribute : metaData.getAttributes()) {
+            final String fieldName = attribute.getName();
+            if (fieldName.equals(columnName) && !fieldName.equals(idFieldName)) {
+              attribute.setCodeTable(codeTable);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -159,6 +170,16 @@ public abstract class AbstractDataObjectStore extends
     final String schemaName = PathUtil.getPath(typePath);
     final DataObjectStoreSchema schema = getSchema(schemaName);
     schema.addMetaData(metaData);
+    final String idFieldName = metaData.getIdAttributeName();
+    for (final Attribute attribute : metaData.getAttributes()) {
+      final String fieldName = attribute.getName();
+      if (!fieldName.equals(idFieldName)) {
+        final CodeTable codeTable = columnToTableMap.get(fieldName);
+        if (codeTable != null) {
+          attribute.setCodeTable(codeTable);
+        }
+      }
+    }
   }
 
   protected void addMetaDataProperties(final DataObjectMetaDataImpl metaData) {

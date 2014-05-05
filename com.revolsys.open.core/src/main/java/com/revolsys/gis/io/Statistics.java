@@ -61,12 +61,14 @@ public class Statistics {
     add(name, 1);
   }
 
-  public synchronized void add(final String name, final long count) {
+  public synchronized boolean add(final String name, final long count) {
     final Long oldCount = counts.get(name);
     if (oldCount == null) {
       counts.put(name, count);
+      return true;
     } else {
       counts.put(name, oldCount + count);
+      return false;
     }
   }
 

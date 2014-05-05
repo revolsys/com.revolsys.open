@@ -31,7 +31,7 @@ public class JdbcLongAttribute extends JdbcAttribute {
     final int columnIndex, final DataObject object) throws SQLException {
     final long longValue = resultSet.getLong(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), Long.valueOf(longValue));
+      setValue(object, Long.valueOf(longValue));
     }
     return columnIndex + 1;
   }

@@ -27,7 +27,7 @@ public class JdbcIntegerAttribute extends JdbcAttribute {
     final int columnIndex, final DataObject object) throws SQLException {
     final int value = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), Integer.valueOf(value));
+      setValue(object, Integer.valueOf(value));
     }
     return columnIndex + 1;
   }

@@ -27,7 +27,7 @@ public class JdbcBooleanAttribute extends JdbcAttribute {
     final int columnIndex, final DataObject object) throws SQLException {
     final boolean booleanValue = resultSet.getBoolean(columnIndex);
     if (!resultSet.wasNull()) {
-      object.setValue(getIndex(), booleanValue);
+      setValue(object, booleanValue);
     }
     return columnIndex + 1;
   }
