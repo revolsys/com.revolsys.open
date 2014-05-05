@@ -1,5 +1,6 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
+import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -13,7 +14,7 @@ import com.revolsys.jts.index.quadtree.DoubleBits;
  *
  * @version 1.7
  */
-public class Key {
+public class Key extends AbstractCoordinates {
 
   public static int computeQuadLevel(final BoundingBox env) {
     final double dx = env.getWidth();
@@ -23,13 +24,14 @@ public class Key {
     return level;
   }
 
-  // the fields which make up the key
-  private final Coordinates pt = new Coordinate();
-
   private int level = 0;
 
   // auxiliary data which is derived from the key for use in computation
   private BoundingBox env = null;
+
+  private double x;
+
+  private double y;
 
   public Key(final BoundingBox itemEnv) {
     computeKey(itemEnv);
@@ -39,38 +41,37 @@ public class Key {
    * return a square envelope containing the argument envelope,
    * whose extent is a power of two and which is based at a power of 2
    */
-  private void computeKey(final BoundingBox itemEnv) {
+  public void computeKey(final BoundingBox itemEnv) {
     level = computeQuadLevel(itemEnv);
-    env = new Envelope();
+    env = null;
     computeKey(level, itemEnv);
     // MD - would be nice to have a non-iterative form of this algorithm
-    while (!env.covers(itemEnv)) {
+    while (!getEnvelope().covers(itemEnv)) {
       level += 1;
+      env = null;
       computeKey(level, itemEnv);
     }
   }
 
   private void computeKey(final int level, final BoundingBox itemEnv) {
     final double quadSize = DoubleBits.powerOf2(level);
-    pt.setX(Math.floor(itemEnv.getMinX() / quadSize) * quadSize);
-    pt.setY(Math.floor(itemEnv.getMinY() / quadSize) * quadSize);
-    final double x1 = pt.getX();
-    final double y1 = pt.getY();
-    final double x2 = x1 + quadSize;
-    final double y2 = y1 + quadSize;
-    env = new Envelope(2, x1, y1, x2, y2);
+    this.x = Math.floor(itemEnv.getMinX() / quadSize) * quadSize;
+    this.y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
   }
 
   public Coordinates getCentre() {
-    final double minX = env.getMinX();
-    final double maxX = env.getMaxX();
-    final double minY = env.getMinY();
-    final double maxY = env.getMaxY();
-    return new Coordinate((minX + maxX) / 2, (minY + maxY) / 2,
-      Coordinates.NULL_ORDINATE);
+    final BoundingBox envelope = getEnvelope();
+    return new Coordinate((envelope.getMinX() + envelope.getMaxX()) / 2,
+      (envelope.getMinY() + envelope.getMaxY()) / 2);
   }
 
   public BoundingBox getEnvelope() {
+    if (env == null) {
+      final double quadSize = DoubleBits.powerOf2(level);
+      final double x2 = x + quadSize;
+      final double y2 = y + quadSize;
+      env = new Envelope(2, x, y, x2, y2);
+    }
     return env;
   }
 
@@ -79,6 +80,19 @@ public class Key {
   }
 
   public Coordinates getPoint() {
-    return pt;
+    return this;
   }
+
+  @Override
+  public double getValue(final int axisIndex) {
+    switch (axisIndex) {
+      case 0:
+        return x;
+      case 1:
+        return y;
+      default:
+        return Double.NaN;
+    }
+  }
+
 }

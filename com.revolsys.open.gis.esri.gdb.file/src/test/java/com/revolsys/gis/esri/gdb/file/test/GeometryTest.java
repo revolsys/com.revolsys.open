@@ -33,7 +33,7 @@ public class GeometryTest {
       for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
         for (final Coordinates point : new InPlaceIterator(points)) {
           if (Double.isNaN(point.getZ())) {
-            point.setZ(0);
+            // point.setZ(0);
           }
         }
       }

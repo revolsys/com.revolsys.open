@@ -85,10 +85,15 @@ public class Coordinate extends AbstractCoordinates {
 
   public Coordinate(final Coordinates point, final int axisCount) {
     this(axisCount);
-    final int count = Math.min(axisCount, point.getAxisCount());
-    for (int i = 0; i < count; i++) {
-      final double value = point.getValue(i);
-      setValue(i, value);
+    final int pointAxisCount = point.getAxisCount();
+    for (int i = 0; i < axisCount; i++) {
+      final double value;
+      if (i < pointAxisCount) {
+        value = point.getValue(i);
+      } else {
+        value = Double.NaN;
+      }
+      this.coordinates[i] = value;
     }
   }
 
@@ -135,23 +140,6 @@ public class Coordinate extends AbstractCoordinates {
       return coordinates[axisIndex];
     } else {
       return Double.NaN;
-    }
-  }
-
-  /**
-   * Sets the ordinate for the given index
-   * to a given value.
-   * The supported values for the index are 
-   * {@link #X}, {@link #Y}, and {@link #Z}.
-   * 
-   * @param axisIndex the ordinate index
-   * @param value the value to set
-   * @throws IllegalArgumentException if the index is not valid
-   */
-  @Override
-  public void setValue(final int axisIndex, final double value) {
-    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
-      coordinates[axisIndex] = value;
     }
   }
 

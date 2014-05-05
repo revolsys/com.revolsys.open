@@ -83,6 +83,17 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
     super(factory, polygons);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    final List<Polygon> polygons = new ArrayList<>();
+    for (final Polygon polygon : getPolygons()) {
+      final Polygon newPolygon = polygon.copy(geometryFactory);
+      polygons.add(newPolygon);
+    }
+    return (V)geometryFactory.multiPolygon(polygons);
+  }
+
   @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {

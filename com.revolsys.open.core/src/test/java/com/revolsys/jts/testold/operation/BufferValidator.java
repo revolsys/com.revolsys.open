@@ -114,7 +114,7 @@ public class BufferValidator {
   public BufferValidator(final double bufferDistance, final String wkt,
     final boolean addContainsTest) throws ParseException {
     // SRID = 888 is to test that SRID is preserved in computed buffers
-    setFactory(new PrecisionModel(), 888);
+    setFactory(new PrecisionModel(), 0);
     this.bufferDistance = bufferDistance;
     this.wkt = wkt;
     if (addContainsTest) {
@@ -126,13 +126,12 @@ public class BufferValidator {
   private void addContainsTest() {
     addTest(new Test("Contains Test") {
       private boolean contains(final Geometry a, final Geometry b) {
-        // JTS doesn't currently handle empty geometries correctly [Jon Aquino
-        // 10/29/2003]
         if (b.isEmpty()) {
           return true;
+        } else {
+          final boolean isContained = a.contains(b);
+          return isContained;
         }
-        final boolean isContained = a.contains(b);
-        return isContained;
       }
 
       @Override
@@ -239,7 +238,7 @@ public class BufferValidator {
 
   public BufferValidator setFactory(final PrecisionModel precisionModel,
     final int srid) {
-    this.wktReader = new WKTReader(GeometryFactory.getFactory(0,
+    this.wktReader = new WKTReader(GeometryFactory.getFactory(srid,
       precisionModel.getScale()));
     return this;
   }

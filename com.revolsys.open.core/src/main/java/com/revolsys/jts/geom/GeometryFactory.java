@@ -51,7 +51,6 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -350,7 +349,7 @@ public class GeometryFactory implements Serializable,
     if (geometry != null && !geometry.isEmpty()) {
       for (final Geometry part : geometry.geometries()) {
         if (part != null && !part.isEmpty()) {
-          geometryList.add(copy(part));
+          geometryList.add(part.copy(this));
         }
       }
     }
@@ -428,11 +427,6 @@ public class GeometryFactory implements Serializable,
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public <G extends Geometry> G copy(final G geometry) {
-    return (G)geometry(geometry);
-  }
-
   public double[] copyPrecise(final double[] values) {
     final double[] valuesPrecise = new double[values.length];
     makePrecise(values, valuesPrecise);
@@ -440,15 +434,15 @@ public class GeometryFactory implements Serializable,
   }
 
   public Coordinates createCoordinates(final Coordinates point) {
-    final Coordinates newPoint = new DoubleCoordinates(point, this.axisCount);
-    makePrecise(newPoint);
-    return newPoint;
+    return getPreciseCoordinates(point);
   }
 
   public Coordinates createCoordinates(final double... coordinates) {
+    for (int i = 0; i < coordinates.length; i++) {
+      coordinates[i] = makePrecise(i, coordinates[i]);
+    }
     final Coordinates newPoint = new DoubleCoordinates(this.axisCount,
       coordinates);
-    makePrecise(newPoint);
     return newPoint;
   }
 
@@ -458,8 +452,7 @@ public class GeometryFactory implements Serializable,
     } else {
       final int numPoints = points.size();
       final int axisCount = getAxisCount();
-      CoordinatesList coordinatesList = new DoubleCoordinatesList(numPoints,
-        axisCount);
+      final double[] coordinates = new double[numPoints * axisCount];
       int i = 0;
       for (final Object object : points) {
         Coordinates point;
@@ -468,27 +461,24 @@ public class GeometryFactory implements Serializable,
         } else if (object instanceof Coordinates) {
           point = (Coordinates)object;
         } else if (object instanceof Point) {
-          final Point projectedPoint = copy((Point)object);
+          final Point projectedPoint = ((Point)object).convert(this);
           point = projectedPoint;
         } else if (object instanceof double[]) {
           point = new DoubleCoordinates((double[])object);
         } else if (object instanceof CoordinatesList) {
-          final CoordinatesList coordinates = (CoordinatesList)object;
-          point = coordinates.get(0);
+          final CoordinatesList pointList = (CoordinatesList)object;
+          point = pointList.get(0);
         } else {
           throw new IllegalArgumentException("Unexepected data type: " + object);
         }
 
         if (point != null && point.getAxisCount() > 1) {
-          coordinatesList.setPoint(i, point);
+          CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, i,
+            point);
           i++;
         }
       }
-      if (i < coordinatesList.size()) {
-        coordinatesList = coordinatesList.subList(0, i);
-      }
-      makePrecise(coordinatesList);
-      return coordinatesList;
+      return new DoubleCoordinatesList(axisCount, i, coordinates);
     }
   }
 
@@ -511,14 +501,14 @@ public class GeometryFactory implements Serializable,
   public <V extends Geometry> V geometry(final Class<?> targetClass,
     Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
-      geometry = copy(geometry);
+      geometry = geometry.copy(this);
       if (geometry instanceof GeometryCollection) {
         if (geometry.getGeometryCount() == 1) {
           geometry = geometry.getGeometry(0);
         } else {
           geometry = geometry.union();
           // Union doesn't use this geometry factory
-          geometry = copy(geometry);
+          geometry = geometry.copy(this);
         }
       }
       final Class<?> geometryClass = geometry.getClass();
@@ -648,7 +638,7 @@ public class GeometryFactory implements Serializable,
           addGeometries(geometries, geometry);
           return geometryCollection(geometries);
         } else {
-          return GeometryProjectionUtil.performCopy(geometry, this);
+          return geometry.copy(this);
         }
       } else if (geometry instanceof MultiPoint) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
@@ -866,6 +856,15 @@ public class GeometryFactory implements Serializable,
     return polygons.toArray(new Polygon[polygons.size()]);
   }
 
+  public Coordinates[] getPrecise(final Coordinates... points) {
+    final Coordinates[] precisesPoints = new Coordinates[points.length];
+    for (int i = 0; i < points.length; i++) {
+      final Coordinates point = points[i];
+      precisesPoints[i] = getPreciseCoordinates(point);
+    }
+    return precisesPoints;
+  }
+
   @Override
   public Coordinates getPreciseCoordinates(final Coordinates point) {
     return coordinatesPrecisionModel.getPreciseCoordinates(point);
@@ -1019,22 +1018,7 @@ public class GeometryFactory implements Serializable,
     }
   }
 
-  @Override
-  public void makePrecise(final Coordinates point) {
-    coordinatesPrecisionModel.makePrecise(point);
-  }
-
-  public void makePrecise(final Coordinates... points) {
-    for (final Coordinates point : points) {
-      coordinatesPrecisionModel.makePrecise(point);
-    }
-  }
-
-  public void makePrecise(final CoordinatesList points) {
-    points.makePrecise(coordinatesPrecisionModel);
-  }
-
-  public void makePrecise(final double[] values) {
+  public void makePrecise(final double... values) {
     makePrecise(values, values);
   }
 
@@ -1058,12 +1042,6 @@ public class GeometryFactory implements Serializable,
   @Override
   public void makePrecise(final int axisCount, final double... coordinates) {
     coordinatesPrecisionModel.makePrecise(axisCount, coordinates);
-  }
-
-  public void makePrecise(final Iterable<Coordinates> points) {
-    for (final Coordinates point : points) {
-      coordinatesPrecisionModel.makePrecise(point);
-    }
   }
 
   @Override
@@ -1327,13 +1305,7 @@ public class GeometryFactory implements Serializable,
   }
 
   public Polygon polygon(final Polygon polygon) {
-    final List<LinearRing> rings = new ArrayList<LinearRing>();
-    for (final LinearRing ring : polygon.rings()) {
-      final LinearRing clone = ring.copy(this);
-      rings.add(clone);
-
-    }
-    return polygon(rings);
+    return polygon.copy(this);
   }
 
   /**
@@ -1343,7 +1315,7 @@ public class GeometryFactory implements Serializable,
    * @return
    */
   public <G extends Geometry> G project(final G geometry) {
-    return GeometryProjectionUtil.perform(geometry, this);
+    return geometry.convert(this);
   }
 
   @Override

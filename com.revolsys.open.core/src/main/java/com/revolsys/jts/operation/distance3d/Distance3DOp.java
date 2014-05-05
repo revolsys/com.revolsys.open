@@ -38,11 +38,10 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.operation.distance.GeometryLocation;
 
 /**
@@ -252,46 +251,53 @@ public class Distance3DOp {
 
   private void computeMinDistanceLineLine(final LineString line0,
     final LineString line1, final boolean flip) {
-    final Coordinates[] coord0 = line0.getCoordinateArray();
-    final Coordinates[] coord1 = line1.getCoordinateArray();
     // brute force approach!
-    for (int i = 0; i < coord0.length - 1; i++) {
-      for (int j = 0; j < coord1.length - 1; j++) {
-        final double dist = CGAlgorithms3D.distanceSegmentSegment(coord0[i],
-          coord0[i + 1], coord1[j], coord1[j + 1]);
-        if (dist < minDistance) {
-          minDistance = dist;
+    int i = 0;
+    for (final Segment segment1 : line0.segments()) {
+      int j = 0;
+      for (final Segment segment2 : line1.segments()) {
+        final Coordinates line1point1 = segment1.get(0);
+        final Coordinates line1Point2 = segment1.get(1);
+        final Coordinates line2Point1 = segment2.get(0);
+        final Coordinates line2Point2 = segment2.get(1);
+        final double distance = CGAlgorithms3D.distanceSegmentSegment(
+          line1point1, line1Point2, line2Point1, line2Point2);
+        if (distance < minDistance) {
+          minDistance = distance;
           // TODO: compute closest pts in 3D
-          final LineSegment seg0 = new LineSegmentImpl(coord0[i], coord0[i + 1]);
-          final LineSegment seg1 = new LineSegmentImpl(coord1[j], coord1[j + 1]);
-          final Coordinates[] closestPt = seg0.closestPoints(seg1);
-          updateDistance(dist, new GeometryLocation(line0, i, closestPt[0]),
-            new GeometryLocation(line1, j, closestPt[1]), flip);
+          final Coordinates[] closestPt = segment1.closestPoints(segment2);
+          updateDistance(distance,
+            new GeometryLocation(line0, i, closestPt[0].cloneCoordinates()),
+            new GeometryLocation(line1, j, closestPt[1].cloneCoordinates()),
+            flip);
         }
         if (isDone) {
           return;
         }
+        j++;
       }
+      i++;
     }
   }
 
   private void computeMinDistanceLinePoint(final LineString line,
     final Point point, final boolean flip) {
-    final Coordinates[] lineCoord = line.getCoordinateArray();
     final Coordinates coord = point.getCoordinate();
     // brute force approach!
-    for (int i = 0; i < lineCoord.length - 1; i++) {
+    int i = 0;
+    for (final Segment segment : line.segments()) {
       final double dist = CGAlgorithms3D.distancePointSegment(coord,
-        lineCoord[i], lineCoord[i + 1]);
+        segment.get(0), segment.get(1));
       if (dist < minDistance) {
-        final LineSegment seg = new LineSegmentImpl(lineCoord[i], lineCoord[i + 1]);
-        final Coordinates segClosestPoint = seg.closestPoint(coord);
-        updateDistance(dist, new GeometryLocation(line, i, segClosestPoint),
+        final Coordinates segClosestPoint = segment.closestPoint(coord);
+        updateDistance(dist,
+          new GeometryLocation(line, i, segClosestPoint.cloneCoordinates()),
           new GeometryLocation(point, 0, coord), flip);
       }
       if (isDone) {
         return;
       }
+      i++;
     }
   }
 

@@ -48,12 +48,12 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.cs.projection.CoordinatesListProjectionUtil;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.wkt.WktParser;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -323,10 +323,11 @@ public class Envelope implements Serializable, BoundingBox {
    *@return true if this <code>Envelope</code> covers the <code>other</code> 
    */
   @Override
-  public boolean covers(final BoundingBox other) {
+  public boolean covers(BoundingBox other) {
     if (other == null || isEmpty() || other.isEmpty()) {
       return false;
     } else {
+      other = other.convert(getGeometryFactory());
       final double minX = getMinX();
       final double minY = getMinY();
       final double maxX = getMaxX();
@@ -1145,55 +1146,50 @@ public class Envelope implements Serializable, BoundingBox {
         final double minY = getMinY();
         final double maxY = getMaxY();
         final int numCoordinates = 1 + 2 * (numX + numY);
-        CoordinatesList coordinates = new DoubleCoordinatesList(numCoordinates,
-          2);
+        final double[] coordinates = new double[numCoordinates * 2];
         int i = 0;
 
-        coordinates.setX(i, maxX);
-        coordinates.setY(i, minY);
+        CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY);
         i++;
         for (int j = 0; j < numX - 1; j++) {
-          coordinates.setX(i, maxX - j * xStep);
-          coordinates.setY(i, minY);
+          CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX - j
+            * xStep, minY);
           i++;
         }
-        coordinates.setX(i, minX);
-        coordinates.setY(i, minY);
+        CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, minY);
         i++;
 
         for (int j = 0; j < numY - 1; j++) {
-          coordinates.setX(i, minX);
-          coordinates.setY(i, minY + j * yStep);
+          CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, minY + j
+            * yStep);
           i++;
         }
-        coordinates.setX(i, minX);
-        coordinates.setY(i, maxY);
+        CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX, maxY);
         i++;
 
         for (int j = 0; j < numX - 1; j++) {
-          coordinates.setX(i, minX + j * xStep);
-          coordinates.setY(i, maxY);
+          CoordinatesListUtil.setCoordinates(coordinates, 2, i, minX + j
+            * xStep, maxY);
           i++;
         }
 
-        coordinates.setX(i, maxX);
-        coordinates.setY(i, maxY);
+        CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, maxY);
         i++;
 
         for (int j = 0; j < numY - 1; j++) {
-          coordinates.setX(i, maxX);
-          coordinates.setY(i, minY + (numY - j) * yStep);
+          CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY
+            + (numY - j) * yStep);
           i++;
         }
-        coordinates.setX(i, maxX);
-        coordinates.setY(i, minY);
+        CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY);
 
-        if (geometryFactory != factory && factory != null) {
-          coordinates = CoordinatesListProjectionUtil.perform(coordinates,
-            factory.getCoordinateSystem(), coordinateSystem);
+        final LinearRing ring = geometryFactory.linearRing(2, coordinates);
+        final Polygon polygon = geometryFactory.polygon(ring);
+        if (factory == null) {
+          return polygon;
+        } else {
+          return (Polygon)polygon.convert(factory);
         }
-        final Polygon polygon = geometryFactory.polygon(coordinates);
-        return polygon;
       } catch (final IllegalArgumentException e) {
         LoggerFactory.getLogger(getClass()).error(
           "Unable to convert to polygon: " + this, e);

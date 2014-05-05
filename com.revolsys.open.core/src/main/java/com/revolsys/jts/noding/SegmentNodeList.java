@@ -40,7 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.util.Assert;
 
@@ -216,31 +217,6 @@ public class SegmentNodeList {
   }
 
   /**
-   * Checks the correctness of the set of split edges corresponding to this edge.
-   *
-   * @param splitEdges the split edges for this edge (in order)
-   */
-  private void checkSplitEdgesCorrectness(final List splitEdges) {
-    final Coordinates[] edgePts = edge.getCoordinates();
-
-    // check that first and last points of split edges are same as endpoints of
-    // edge
-    final SegmentString split0 = (SegmentString)splitEdges.get(0);
-    final Coordinates pt0 = split0.getCoordinate(0);
-    if (!pt0.equals2d(edgePts[0])) {
-      throw new RuntimeException("bad split edge start point at " + pt0);
-    }
-
-    final SegmentString splitn = (SegmentString)splitEdges.get(splitEdges.size() - 1);
-    final Coordinates[] splitnPts = splitn.getCoordinates();
-    final Coordinates ptn = splitnPts[splitnPts.length - 1];
-    if (!ptn.equals2d(edgePts[edgePts.length - 1])) {
-      throw new RuntimeException("bad split edge end point at " + ptn);
-    }
-
-  }
-
-  /**
    * Create a new "split edge" with the section of points between
    * (and including) the two intersections.
    * The label for the new edge is the same as the label for the parent edge.
@@ -261,17 +237,23 @@ public class SegmentNodeList {
       npts--;
     }
 
-    final Coordinates[] pts = new Coordinates[npts];
+    final int axisCount = edge.getPoints().getAxisCount();
+    final double[] coordinates = new double[npts * axisCount];
+
     int ipt = 0;
-    pts[ipt++] = new Coordinate(ei0.coord);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei0.coord);
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
-      pts[ipt++] = edge.getCoordinate(i);
+      final Coordinates point = edge.getCoordinate(i);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, point);
     }
     if (useIntPt1) {
-      pts[ipt] = ei1.coord;
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++,
+        ei1.coord);
     }
 
-    return new NodedSegmentString(pts, edge.getData());
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(axisCount,
+      coordinates);
+    return new NodedSegmentString(points, edge.getData());
   }
 
   private boolean findCollapseIndex(final SegmentNode ei0,

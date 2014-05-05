@@ -33,7 +33,6 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.CoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -229,7 +228,9 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
     if (field.getFullName().equals(geometryPropertyName)) {
       final long recordIndex = out.getFilePointer();
       Geometry geometry = object.getGeometryValue();
-      geometry = GeometryProjectionUtil.performCopy(geometry, geometryFactory);
+      if (geometry != null) {
+        geometry = geometry.copy(geometryFactory);
+      }
       envelope.expandToInclude(geometry.getBoundingBox());
       if (geometry == null || geometry.isEmpty()) {
         writeNull(out);

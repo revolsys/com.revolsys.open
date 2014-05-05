@@ -88,11 +88,6 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   }
 
   @Override
-  public final void setValue(final int index, final double value) {
-    throw new UnsupportedOperationException("Cannot modify a geometry vertex");
-  }
-
-  @Override
   public Point toPoint() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.point(this);

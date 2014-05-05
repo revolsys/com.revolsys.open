@@ -88,8 +88,8 @@ public class MCIndexSegmentSetMutualIntersector implements
   }
 
   private void addToIndex(final SegmentString segStr) {
-    final List segChains = MonotoneChainBuilder.getChains(
-      segStr.getCoordinates(), segStr);
+    final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(),
+      segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
       index.insert(mc.getEnvelope(), mc);
@@ -97,8 +97,8 @@ public class MCIndexSegmentSetMutualIntersector implements
   }
 
   private void addToMonoChains(final SegmentString segStr, final List monoChains) {
-    final List segChains = MonotoneChainBuilder.getChains(
-      segStr.getCoordinates(), segStr);
+    final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(),
+      segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
       monoChains.add(mc);

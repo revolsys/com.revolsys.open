@@ -3,6 +3,7 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
@@ -112,11 +113,12 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
   public void test2DZOrdinate() {
     final Coordinates[] coords = createArray(SIZE);
 
-    final CoordinatesList seq = new DoubleCoordinatesList(SIZE, 2);
-    for (int i = 0; i < seq.size(); i++) {
-      seq.setValue(i, 0, coords[i].getX());
-      seq.setValue(i, 1, coords[i].getY());
+    final double[] coordinates = new double[SIZE * 2];
+    for (int i = 0; i < SIZE; i++) {
+      final Coordinates point = coords[i];
+      CoordinatesListUtil.setCoordinates(coordinates, 2, i, point);
     }
+    final CoordinatesList seq = new DoubleCoordinatesList(2, coordinates);
 
     for (int i = 0; i < seq.size(); i++) {
       final Coordinates p = seq.getCoordinate(i);
@@ -133,12 +135,12 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
   public void testCreateBySizeAndModify() {
     final Coordinates[] coords = createArray(SIZE);
 
-    final CoordinatesList seq = new DoubleCoordinatesList(SIZE, 3);
-    for (int i = 0; i < seq.size(); i++) {
-      seq.setValue(i, 0, coords[i].getX());
-      seq.setValue(i, 1, coords[i].getY());
-      seq.setValue(i, 2, coords[i].getZ());
+    final double[] coordinates = new double[SIZE * 3];
+    for (int i = 0; i < SIZE; i++) {
+      final Coordinates point = coords[i];
+      CoordinatesListUtil.setCoordinates(coordinates, 3, i, point);
     }
+    final CoordinatesList seq = new DoubleCoordinatesList(3, coordinates);
 
     assertTrue(isEqual(seq, coords));
   }

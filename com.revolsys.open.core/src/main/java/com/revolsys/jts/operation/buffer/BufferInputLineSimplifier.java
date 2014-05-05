@@ -32,9 +32,11 @@
  */
 package com.revolsys.jts.operation.buffer;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Simplifies a buffer input line to 
@@ -69,11 +71,7 @@ import com.revolsys.jts.geom.Coordinates;
  *
  */
 public class BufferInputLineSimplifier {
-  private static final int INIT = 0;
-
   private static final int DELETE = 1;
-
-  private static final int KEEP = 1;
 
   private static final int NUM_PTS_TO_CHECK = 10;
 
@@ -88,14 +86,14 @@ public class BufferInputLineSimplifier {
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public static Coordinates[] simplify(final Coordinates[] inputLine,
+  public static CoordinatesList simplify(final CoordinatesList inputLine,
     final double distanceTol) {
     final BufferInputLineSimplifier simp = new BufferInputLineSimplifier(
       inputLine);
     return simp.simplify(distanceTol);
   }
 
-  private final Coordinates[] inputLine;
+  private final CoordinatesList inputLine;
 
   private double distanceTol;
 
@@ -103,20 +101,25 @@ public class BufferInputLineSimplifier {
 
   private int angleOrientation = CGAlgorithms.COUNTERCLOCKWISE;
 
-  public BufferInputLineSimplifier(final Coordinates[] inputLine) {
+  private final int deleteCount = 0;
+
+  public BufferInputLineSimplifier(final CoordinatesList inputLine) {
     this.inputLine = inputLine;
   }
 
-  private Coordinates[] collapseLine() {
-    final CoordinateList coordList = new CoordinateList();
-    for (int i = 0; i < inputLine.length; i++) {
+  private CoordinatesList collapseLine() {
+    final int axisCount = inputLine.getAxisCount();
+    final int vertexCount = inputLine.size();
+    final double[] coordinates = new double[(vertexCount - deleteCount)
+      * axisCount];
+    int j = 0;
+    for (int i = 0; i < vertexCount; i++) {
       if (isDeleted[i] != DELETE) {
-        coordList.add(inputLine[i]);
+        final Coordinates point = inputLine.get(i);
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, point);
       }
     }
-    // if (coordList.size() < inputLine.length) System.out.println("Simplified "
-    // + (inputLine.length - coordList.size()) + " pts");
-    return coordList.toCoordinateArray();
+    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   /**
@@ -131,13 +134,12 @@ public class BufferInputLineSimplifier {
      * This ensures that end caps are generated consistently.
      */
     int index = 1;
-    final int maxIndex = inputLine.length - 1;
 
     int midIndex = findNextNonDeletedIndex(index);
     int lastIndex = findNextNonDeletedIndex(midIndex);
 
     boolean isChanged = false;
-    while (lastIndex < inputLine.length) {
+    while (lastIndex < inputLine.size()) {
       // test triple for shallow concavity
       boolean isMiddleVertexDeleted = false;
       if (isDeletable(index, midIndex, lastIndex, distanceTol)) {
@@ -166,7 +168,7 @@ public class BufferInputLineSimplifier {
    */
   private int findNextNonDeletedIndex(final int index) {
     int next = index + 1;
-    while (next < inputLine.length && isDeleted[next] == DELETE) {
+    while (next < inputLine.size() && isDeleted[next] == DELETE) {
       next++;
     }
     return next;
@@ -181,9 +183,9 @@ public class BufferInputLineSimplifier {
 
   private boolean isDeletable(final int i0, final int i1, final int i2,
     final double distanceTol) {
-    final Coordinates p0 = inputLine[i0];
-    final Coordinates p1 = inputLine[i1];
-    final Coordinates p2 = inputLine[i2];
+    final Coordinates p0 = inputLine.get(i0);
+    final Coordinates p1 = inputLine.get(i1);
+    final Coordinates p2 = inputLine.get(i2);
 
     if (!isConcave(p0, p1, p2)) {
       return false;
@@ -200,18 +202,6 @@ public class BufferInputLineSimplifier {
 
   private boolean isShallow(final Coordinates p0, final Coordinates p1,
     final Coordinates p2, final double distanceTol) {
-    final double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
-    return dist < distanceTol;
-  }
-
-  private boolean isShallowConcavity(final Coordinates p0,
-    final Coordinates p1, final Coordinates p2, final double distanceTol) {
-    final int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
-    final boolean isAngleToSimplify = (orientation == angleOrientation);
-    if (!isAngleToSimplify) {
-      return false;
-    }
-
     final double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
     return dist < distanceTol;
   }
@@ -237,7 +227,7 @@ public class BufferInputLineSimplifier {
     }
 
     for (int i = i0; i < i2; i += inc) {
-      if (!isShallow(p0, p2, inputLine[i], distanceTol)) {
+      if (!isShallow(p0, p2, inputLine.get(i), distanceTol)) {
         return false;
       }
     }
@@ -254,14 +244,14 @@ public class BufferInputLineSimplifier {
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public Coordinates[] simplify(final double distanceTol) {
+  public CoordinatesList simplify(final double distanceTol) {
     this.distanceTol = Math.abs(distanceTol);
     if (distanceTol < 0) {
       angleOrientation = CGAlgorithms.CLOCKWISE;
     }
 
     // rely on fact that boolean array is filled with false value
-    isDeleted = new byte[inputLine.length];
+    isDeleted = new byte[inputLine.size()];
 
     boolean isChanged = false;
     do {

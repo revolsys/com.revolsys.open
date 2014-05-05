@@ -35,7 +35,9 @@ package com.revolsys.jts.geom.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -46,12 +48,36 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.segment.Segment;
 
 /**
  * @version 1.7
  */
 public class CleanDuplicatePoints {
+
+  public static CoordinatesList clean(final CoordinatesList points) {
+    if (points.size() == 0) {
+      return points;
+    } else {
+      final int axisCount = points.getAxisCount();
+      final int vertexCount = points.size();
+      final double[] coordinates = new double[vertexCount * axisCount];
+      double previousX = points.getX(0);
+      double previousY = points.getY(0);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, points, 0);
+      int j = 1;
+      for (int i = 0; i < points.size(); i++) {
+        final double x = points.getX(i);
+        final double y = points.getY(i);
+        if (x != previousX || y != previousY) {
+          CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++,
+            points, i);
+        }
+        previousX = x;
+        previousY = y;
+      }
+      return new DoubleCoordinatesList(axisCount, j, coordinates);
+    }
+  }
 
   public static Geometry clean(final Geometry geometry) {
     if (geometry.isEmpty()) {
@@ -96,9 +122,13 @@ public class CleanDuplicatePoints {
     if (ring.isEmpty()) {
       return ring;
     } else {
-      final List<Coordinates> points = removeDuplicatePoints(ring);
+      final CoordinatesList points = clean(ring.getCoordinatesList());
       final GeometryFactory geometryFactory = ring.getGeometryFactory();
-      return geometryFactory.linearRing(points);
+      if (points.size() < 4) {
+        return geometryFactory.linearRing();
+      } else {
+        return geometryFactory.linearRing(points);
+      }
     }
   }
 
@@ -106,7 +136,7 @@ public class CleanDuplicatePoints {
     if (line.isEmpty()) {
       return line;
     } else {
-      final List<Coordinates> points = removeDuplicatePoints(line);
+      final CoordinatesList points = clean(line.getCoordinatesList());
       final GeometryFactory geometryFactory = line.getGeometryFactory();
       if (points.size() < 2) {
         return geometryFactory.lineString();
@@ -158,22 +188,6 @@ public class CleanDuplicatePoints {
       final GeometryFactory geometryFactory = polygon.getGeometryFactory();
       return geometryFactory.polygon(rings);
     }
-  }
-
-  private static List<Coordinates> removeDuplicatePoints(
-    final LineString geometry) {
-    final List<Coordinates> points = new ArrayList<>();
-    int i = 0;
-    for (final Segment segment : geometry.segments()) {
-      if (i == 0) {
-        points.add(segment.get(0).cloneCoordinates());
-      }
-      if (segment.getLength() > 0) {
-        points.add(segment.get(1).cloneCoordinates());
-      }
-      i++;
-    }
-    return points;
   }
 
 }

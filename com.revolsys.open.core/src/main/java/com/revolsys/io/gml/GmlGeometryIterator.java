@@ -3,6 +3,7 @@ package com.revolsys.io.gml;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -11,7 +12,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -24,9 +25,72 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.MathUtil;
 
 public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   GmlConstants {
+
+  public static final CoordinatesList parse(final String value,
+    final String separator, final int axisCount) {
+    final String[] values = value.split(separator);
+    final double[] coordinates = new double[values.length];
+    for (int i = 0; i < values.length; i++) {
+      final String string = values[i];
+      coordinates[i] = Double.parseDouble(string);
+    }
+    return new DoubleCoordinatesList(axisCount, coordinates);
+  }
+
+  public static CoordinatesList parse(final String value, final String decimal,
+    String coordSeperator, String toupleSeperator) {
+
+    toupleSeperator = toupleSeperator.replaceAll("\\\\", "\\\\\\\\");
+    toupleSeperator = toupleSeperator.replaceAll("\\.", "\\\\.");
+    final Pattern touplePattern = Pattern.compile("\\s*" + toupleSeperator
+      + "\\s*");
+    final String[] touples = touplePattern.split(value);
+
+    coordSeperator = coordSeperator.replaceAll("\\\\", "\\\\\\\\");
+    coordSeperator = coordSeperator.replaceAll("\\.", "\\\\.");
+    final Pattern coordinatePattern = Pattern.compile("\\s*" + coordSeperator
+      + "\\s*");
+
+    int axisCount = 0;
+    final List<double[]> listOfCoordinateArrays = new ArrayList<double[]>();
+    if (touples.length == 0) {
+      return null;
+    } else {
+      for (final String touple : touples) {
+        final String[] values = coordinatePattern.split(touple);
+        if (values.length > 0) {
+          final double[] coordinates = MathUtil.toDoubleArray(values);
+          axisCount = Math.max(axisCount, coordinates.length);
+          listOfCoordinateArrays.add(coordinates);
+        }
+      }
+    }
+
+    return toCoordinateList(axisCount, listOfCoordinateArrays);
+  }
+
+  public static CoordinatesList toCoordinateList(final int axisCount,
+    final List<double[]> listOfCoordinateArrays) {
+    final int vertexCount = listOfCoordinateArrays.size();
+    final double[] coordinates = new double[vertexCount * axisCount];
+    for (int i = 0; i < vertexCount; i++) {
+      final double[] coordinates2 = listOfCoordinateArrays.get(i);
+      for (int j = 0; j < axisCount; j++) {
+        final double value;
+        if (j < coordinates2.length) {
+          value = coordinates2[j];
+        } else {
+          value = Double.NaN;
+        }
+        coordinates[i * axisCount + j] = value;
+      }
+    }
+    return new DoubleCoordinatesList(axisCount, coordinates);
+  }
 
   private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
@@ -109,7 +173,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     }
     final String value = in.getElementText();
 
-    final CoordinatesList points = CoordinatesListUtil.parse(value, decimal,
+    final CoordinatesList points = GmlGeometryIterator.parse(value, decimal,
       coordSeperator, toupleSeperator);
     StaxUtils.skipToEndElement(in);
     return points;
@@ -275,7 +339,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     } else {
       final int axisCount = Integer.parseInt(dimension);
       final String value = in.getElementText();
-      final CoordinatesList points = CoordinatesListUtil.parse(value, "\\s+",
+      final CoordinatesList points = GmlGeometryIterator.parse(value, "\\s+",
         axisCount);
       StaxUtils.skipToEndElement(in);
       return points;

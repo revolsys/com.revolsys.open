@@ -67,19 +67,18 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
     final String coordinatesListString = StaxUtils.getElementText(in);
     final String[] coordinatesListArray = coordinatesListString.trim().split(
       "\\s+");
-    final CoordinatesList coordinatesList = new DoubleCoordinatesList(
-      coordinatesListArray.length, 3);
+    final double[] coordinates = new double[coordinatesListArray.length * 3];
     for (int i = 0; i < coordinatesListArray.length; i++) {
       final String coordinatesString = coordinatesListArray[i];
       final String[] coordinatesArray = coordinatesString.split(",");
       for (int ordinateIndex = 0; ordinateIndex < coordinatesArray.length
         && ordinateIndex < 3; ordinateIndex++) {
         final String coordinate = coordinatesArray[ordinateIndex];
-        coordinatesList.setValue(i, ordinateIndex, Double.valueOf(coordinate));
+        coordinates[i * 3 + ordinateIndex] = Double.valueOf(coordinate);
       }
     }
     StaxUtils.skipToEndElementByLocalName(in, COORDINATES);
-    return coordinatesList;
+    return new DoubleCoordinatesList(3, coordinates);
   }
 
   private Geometry parseGeometry() throws XMLStreamException {

@@ -34,6 +34,7 @@ package com.revolsys.jts.geom.impl;
 
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
@@ -117,24 +118,17 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
     return (LinearRingImpl)super.clone();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public LinearRing convert(final GeometryFactory geometryFactory) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (sourceGeometryFactory == geometryFactory) {
-      return this;
-    } else {
-      return copy(geometryFactory);
-    }
-  }
-
-  @Override
-  public LinearRing copy(final GeometryFactory geometryFactory) {
-    if (isEmpty()) {
-      return geometryFactory.linearRing();
+  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return (V)this.clone();
+    } else if (isEmpty()) {
+      return (V)geometryFactory.linearRing();
     } else {
       final double[] coordinates = convertCoordinates(geometryFactory);
       final int axisCount = getAxisCount();
-      return geometryFactory.linearRing(axisCount, coordinates);
+      return (V)geometryFactory.linearRing(axisCount, coordinates);
     }
   }
 

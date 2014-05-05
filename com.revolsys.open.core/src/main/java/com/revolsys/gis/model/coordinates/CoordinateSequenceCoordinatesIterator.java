@@ -83,20 +83,6 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
     this.index = index;
   }
 
-  @Override
-  public void setValue(final int axisIndex, final double value) {
-    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
-      coordinates.setValue(this.index, axisIndex, value);
-    }
-  }
-
-  public void setValue(final int relativeIndex, final int axisIndex,
-    final double value) {
-    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
-      coordinates.setValue(this.index + relativeIndex, axisIndex, value);
-    }
-  }
-
   public int size() {
     return coordinates.size();
   }

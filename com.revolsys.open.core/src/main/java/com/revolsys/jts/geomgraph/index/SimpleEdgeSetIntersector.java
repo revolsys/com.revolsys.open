@@ -1,6 +1,3 @@
-
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -38,7 +35,6 @@ package com.revolsys.jts.geomgraph.index;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Edge;
 
 /**
@@ -48,39 +44,39 @@ import com.revolsys.jts.geomgraph.Edge;
  * This algorithm is too slow for production use, but is useful for testing purposes.
  * @version 1.7
  */
-public class SimpleEdgeSetIntersector
-  extends EdgeSetIntersector
-{
+public class SimpleEdgeSetIntersector extends EdgeSetIntersector {
   // statistics information
   int nOverlaps;
 
   public SimpleEdgeSetIntersector() {
   }
 
-  public void computeIntersections(List edges, SegmentIntersector si, boolean testAllSegments)
-  {
+  @Override
+  public void computeIntersections(final List edges0, final List edges1,
+    final SegmentIntersector si) {
     nOverlaps = 0;
 
-    for (Iterator i0 = edges.iterator(); i0.hasNext(); ) {
-      Edge edge0 = (Edge) i0.next();
-      for (Iterator i1 = edges.iterator(); i1.hasNext(); ) {
-        Edge edge1 = (Edge) i1.next();
-        if (testAllSegments || edge0 != edge1)
-          computeIntersects(edge0, edge1, si);
+    for (final Iterator i0 = edges0.iterator(); i0.hasNext();) {
+      final Edge edge0 = (Edge)i0.next();
+      for (final Iterator i1 = edges1.iterator(); i1.hasNext();) {
+        final Edge edge1 = (Edge)i1.next();
+        computeIntersects(edge0, edge1, si);
       }
     }
   }
 
-
-  public void computeIntersections(List edges0, List edges1, SegmentIntersector si)
-  {
+  @Override
+  public void computeIntersections(final List edges,
+    final SegmentIntersector si, final boolean testAllSegments) {
     nOverlaps = 0;
 
-    for (Iterator i0 = edges0.iterator(); i0.hasNext(); ) {
-      Edge edge0 = (Edge) i0.next();
-      for (Iterator i1 = edges1.iterator(); i1.hasNext(); ) {
-        Edge edge1 = (Edge) i1.next();
-        computeIntersects(edge0, edge1, si);
+    for (final Iterator i0 = edges.iterator(); i0.hasNext();) {
+      final Edge edge0 = (Edge)i0.next();
+      for (final Iterator i1 = edges.iterator(); i1.hasNext();) {
+        final Edge edge1 = (Edge)i1.next();
+        if (testAllSegments || edge0 != edge1) {
+          computeIntersects(edge0, edge1, si);
+        }
       }
     }
   }
@@ -90,12 +86,10 @@ public class SimpleEdgeSetIntersector
    * This has n^2 performance, and is about 100 times slower than using
    * monotone chains.
    */
-  private void computeIntersects(Edge e0, Edge e1, SegmentIntersector si)
-  {
-   Coordinates[] pts0 = e0.getCoordinates();
-    Coordinates[] pts1 = e1.getCoordinates();
-    for (int i0 = 0; i0 < pts0.length - 1; i0++) {
-      for (int i1 = 0; i1 < pts1.length - 1; i1++) {
+  private void computeIntersects(final Edge e0, final Edge e1,
+    final SegmentIntersector si) {
+    for (int i0 = 0; i0 < e0.getNumPoints() - 1; i0++) {
+      for (int i1 = 0; i1 < e1.getNumPoints() - 1; i1++) {
         si.addIntersections(e0, i0, e1, i1);
       }
     }

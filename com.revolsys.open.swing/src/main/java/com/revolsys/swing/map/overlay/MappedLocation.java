@@ -81,7 +81,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
   public Coordinates getTargetPixel(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight) {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Coordinates targetPointCoordinates = CoordinatesUtil.getInstance(geometryFactory.copy(targetPoint));
+    final Coordinates targetPointCoordinates = CoordinatesUtil.getInstance((Point)targetPoint.copy(geometryFactory));
     return WarpAffineFilter.targetPointToPixel(boundingBox,
       targetPointCoordinates, imageWidth, imageHeight);
   }

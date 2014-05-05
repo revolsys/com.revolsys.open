@@ -56,14 +56,6 @@ import com.revolsys.jtstest.geomop.GeometryOperation;
  */
 public class TestFile extends TestSuite implements MapSerializer {
 
-  // public static final MapObjectFactory FACTORY = new
-  // InvokeMethodMapObjectFactory(
-  // "testRun", "Test Run", TestRun.class, "create");
-  //
-  // public static TestRun create(final Map<String, Object> map) {
-  // return new TestRun(map);
-  // }
-
   private String testDescription;
 
   private final GeometryFactory geometryFactory;
@@ -77,56 +69,6 @@ public class TestFile extends TestSuite implements MapSerializer {
   private final File file;
 
   private File workspace;
-
-  //
-  // @SuppressWarnings("unchecked")
-  // public TestRun(final Map<String, Object> map) {
-  // final GeometryFactory oldGeometryFactory =
-  // TopologyTest.getGeometryFactory();
-  // try {
-  // this.testDescription = (String)map.get("testDescription");
-  // final Map<String, Object> geometryFactoryDef = (Map<String,
-  // Object>)map.get("geometryFactory");
-  // if (geometryFactoryDef != null) {
-  // final GeometryFactory geometryFactory =
-  // MapObjectFactoryRegistry.toObject(geometryFactoryDef);
-  // this.geometryFactory = geometryFactory;
-  // TopologyTest.setGeometryFactory(geometryFactory);
-  // }
-  //
-  // final String geometryOperationClassName =
-  // (String)map.get("geometryOperation");
-  // if (StringUtils.hasText(geometryOperationClassName)) {
-  // try {
-  // this.geometryOperation = (GeometryOperation)Class.forName(
-  // geometryOperationClassName).newInstance();
-  // } catch (final Throwable e) {
-  // throw new RuntimeException("Unable to create geometry operation "
-  // + geometryOperationClassName, e);
-  // }
-  // }
-  // final String resultMatcherClassName = (String)map.get("resultMatcher");
-  // if (StringUtils.hasText(resultMatcherClassName)) {
-  // try {
-  // this.resultMatcher = (ResultMatcher)Class.forName(
-  // resultMatcherClassName).newInstance();
-  // } catch (final Throwable e) {
-  // throw new RuntimeException("Unable to create result matcher "
-  // + resultMatcherClassName, e);
-  // }
-  // }
-  // int caseIndex = 1;
-  // final List<Map<String, Object>> testCases = (List<Map<String,
-  // Object>>)map.get("testCases");
-  // for (final Map<String, Object> testCaseMap : testCases) {
-  // final TestCase testCase = new TestCase(this, caseIndex++, testCaseMap);
-  // addTest(testCase);
-  // }
-  // } finally {
-  // TopologyTest.setGeometryFactory(oldGeometryFactory);
-  // }
-  //
-  // }
 
   /**
    * 
@@ -216,7 +158,6 @@ public class TestFile extends TestSuite implements MapSerializer {
     final Map<String, Object> properties = getProperties();
     MapSerializerUtil.add(map, "properties", properties, Collections.emptyMap());
 
-    // MapSerializerUtil.add(map, "tests", getT, Collections.emptyList());
     return map;
   }
 

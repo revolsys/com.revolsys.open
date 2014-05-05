@@ -14,11 +14,14 @@ import com.revolsys.jts.geom.util.AffineTransformationFactory;
  * @author Martin Davis
  */
 public class AffineTransformationBuilderTest extends TestCase {
-  private final Coordinates ctl0 = new Coordinate((double)-10, -10, Coordinates.NULL_ORDINATE);
+  private final Coordinates ctl0 = new Coordinate((double)-10, -10,
+    Coordinates.NULL_ORDINATE);
 
-  private final Coordinates ctl1 = new Coordinate((double)10, 20, Coordinates.NULL_ORDINATE);
+  private final Coordinates ctl1 = new Coordinate((double)10, 20,
+    Coordinates.NULL_ORDINATE);
 
-  private final Coordinates ctl2 = new Coordinate((double)10, -20, Coordinates.NULL_ORDINATE);
+  private final Coordinates ctl2 = new Coordinate((double)10, -20,
+    Coordinates.NULL_ORDINATE);
 
   public AffineTransformationBuilderTest(final String name) {
     super(name);
@@ -31,67 +34,73 @@ public class AffineTransformationBuilderTest extends TestCase {
 
   void run(final double p0x, final double p0y, final double pp0x,
     final double pp0y) {
-    final Coordinates p0 = new Coordinate((double)p0x, p0y, Coordinates.NULL_ORDINATE);
+    final Coordinates p0 = new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE);
 
-    final Coordinates pp0 = new Coordinate((double)pp0x, pp0y, Coordinates.NULL_ORDINATE);
+    final Coordinates pp0 = new Coordinate(pp0x, pp0y,
+      Coordinates.NULL_ORDINATE);
 
     final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(
       p0, pp0);
 
-    final Coordinates dest = new Coordinate();
-    assertEqualPoint(pp0, trans.transform(p0, dest));
+    assertEqualPoint(pp0, trans.transform(p0));
   }
 
   void run(final double p0x, final double p0y, final double p1x,
     final double p1y, final double pp0x, final double pp0y, final double pp1x,
     final double pp1y) {
-    final Coordinates p0 = new Coordinate((double)p0x, p0y, Coordinates.NULL_ORDINATE);
-    final Coordinates p1 = new Coordinate((double)p1x, p1y, Coordinates.NULL_ORDINATE);
+    final Coordinates p0 = new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE);
+    final Coordinates p1 = new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE);
 
-    final Coordinates pp0 = new Coordinate((double)pp0x, pp0y, Coordinates.NULL_ORDINATE);
-    final Coordinates pp1 = new Coordinate((double)pp1x, pp1y, Coordinates.NULL_ORDINATE);
+    final Coordinates pp0 = new Coordinate(pp0x, pp0y,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates pp1 = new Coordinate(pp1x, pp1y,
+      Coordinates.NULL_ORDINATE);
 
     final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(
       p0, p1, pp0, pp1);
 
-    final Coordinates dest = new Coordinate();
-    assertEqualPoint(pp0, trans.transform(p0, dest));
-    assertEqualPoint(pp1, trans.transform(p1, dest));
+    assertEqualPoint(pp0, trans.transform(p0));
+    assertEqualPoint(pp1, trans.transform(p1));
   }
 
   void run(final double p0x, final double p0y, final double p1x,
     final double p1y, final double p2x, final double p2y, final double pp0x,
     final double pp0y, final double pp1x, final double pp1y, final double pp2x,
     final double pp2y) {
-    final Coordinates p0 = new Coordinate((double)p0x, p0y, Coordinates.NULL_ORDINATE);
-    final Coordinates p1 = new Coordinate((double)p1x, p1y, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate((double)p2x, p2y, Coordinates.NULL_ORDINATE);
+    final Coordinates p0 = new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE);
+    final Coordinates p1 = new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate(p2x, p2y, Coordinates.NULL_ORDINATE);
 
-    final Coordinates pp0 = new Coordinate((double)pp0x, pp0y, Coordinates.NULL_ORDINATE);
-    final Coordinates pp1 = new Coordinate((double)pp1x, pp1y, Coordinates.NULL_ORDINATE);
-    final Coordinates pp2 = new Coordinate((double)pp2x, pp2y, Coordinates.NULL_ORDINATE);
+    final Coordinates pp0 = new Coordinate(pp0x, pp0y,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates pp1 = new Coordinate(pp1x, pp1y,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates pp2 = new Coordinate(pp2x, pp2y,
+      Coordinates.NULL_ORDINATE);
 
     final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
       p1, p2, pp0, pp1, pp2);
     final AffineTransformation trans = atb.getTransformation();
 
-    final Coordinates dest = new Coordinate();
-    assertEqualPoint(pp0, trans.transform(p0, dest));
-    assertEqualPoint(pp1, trans.transform(p1, dest));
-    assertEqualPoint(pp2, trans.transform(p2, dest));
+    assertEqualPoint(pp0, trans.transform(p0));
+    assertEqualPoint(pp1, trans.transform(p1));
+    assertEqualPoint(pp2, trans.transform(p2));
   }
 
   void runSingular(final double p0x, final double p0y, final double p1x,
     final double p1y, final double p2x, final double p2y, final double pp0x,
     final double pp0y, final double pp1x, final double pp1y, final double pp2x,
     final double pp2y) {
-    final Coordinates p0 = new Coordinate((double)p0x, p0y, Coordinates.NULL_ORDINATE);
-    final Coordinates p1 = new Coordinate((double)p1x, p1y, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate((double)p2x, p2y, Coordinates.NULL_ORDINATE);
+    final Coordinates p0 = new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE);
+    final Coordinates p1 = new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE);
+    final Coordinates p2 = new Coordinate(p2x, p2y, Coordinates.NULL_ORDINATE);
 
-    final Coordinates pp0 = new Coordinate((double)pp0x, pp0y, Coordinates.NULL_ORDINATE);
-    final Coordinates pp1 = new Coordinate((double)pp1x, pp1y, Coordinates.NULL_ORDINATE);
-    final Coordinates pp2 = new Coordinate((double)pp2x, pp2y, Coordinates.NULL_ORDINATE);
+    final Coordinates pp0 = new Coordinate(pp0x, pp0y,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates pp1 = new Coordinate(pp1x, pp1y,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates pp2 = new Coordinate(pp2x, pp2y,
+      Coordinates.NULL_ORDINATE);
 
     final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
       p1, p2, pp0, pp1, pp2);
@@ -101,18 +110,17 @@ public class AffineTransformationBuilderTest extends TestCase {
 
   private void runTransform(final AffineTransformation trans,
     final Coordinates p0, final Coordinates p1, final Coordinates p2) {
-    final Coordinates pp0 = trans.transform(p0, new Coordinate());
-    final Coordinates pp1 = trans.transform(p1, new Coordinate());
-    final Coordinates pp2 = trans.transform(p2, new Coordinate());
+    final Coordinates pp0 = trans.transform(p0);
+    final Coordinates pp1 = trans.transform(p1);
+    final Coordinates pp2 = trans.transform(p2);
 
     final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
       p1, p2, pp0, pp1, pp2);
     final AffineTransformation atbTrans = atb.getTransformation();
 
-    final Coordinates dest = new Coordinate();
-    assertEqualPoint(pp0, atbTrans.transform(p0, dest));
-    assertEqualPoint(pp1, atbTrans.transform(p1, dest));
-    assertEqualPoint(pp2, atbTrans.transform(p2, dest));
+    assertEqualPoint(pp0, atbTrans.transform(p0));
+    assertEqualPoint(pp1, atbTrans.transform(p1));
+    assertEqualPoint(pp2, atbTrans.transform(p2));
   }
 
   public void testDualControl_General() {

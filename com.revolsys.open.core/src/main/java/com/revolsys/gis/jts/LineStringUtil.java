@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
@@ -17,24 +15,16 @@ import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.index.SpatialIndex;
-import com.revolsys.jts.index.quadtree.Quadtree;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.util.CollectionUtil;
 
@@ -47,8 +37,104 @@ public final class LineStringUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
-  public static void addLineString(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public static LineString addElevation(final LineString original,
+    final LineString update) {
+    final int axisCount = update.getAxisCount();
+    if (axisCount > 2) {
+      final double[] coordinates = update.getCoordinatesList().getCoordinates();
+
+      final Coordinates c0 = update.getCoordinate(0);
+      if (Double.isNaN(update.getZ(0))) {
+        final double z = CoordinatesUtil.getElevation(original, c0);
+        coordinates[2] = z;
+      }
+      final Coordinates cN = update.getCoordinate(update.getVertexCount() - 1);
+      if (Double.isNaN(cN.getZ())) {
+        final double z = CoordinatesUtil.getElevation(original, c0);
+        coordinates[update.getVertexCount() * axisCount + 2] = z;
+      }
+      return update.getGeometryFactory().lineString(axisCount, coordinates);
+    } else {
+      return update;
+    }
+  }
+
+  // public static LineString cleanShortSegments(final LineString line) {
+  // final GeometryFactory factory = GeometryFactory.getFactory(line);
+  // if (line.getLength() > 2) {
+  // final CoordinatesList points = CoordinatesListUtil.get(line);
+  // DoubleListCoordinatesList newPoints = null;
+  // int numRemoved = 0;
+  // for (int i = 1; i < points.size(); i++) {
+  // final double length = points.distance(i - 1, points, i);
+  // if (length < 2) {
+  // if (newPoints == null) {
+  // newPoints = new DoubleListCoordinatesList(points);
+  // }
+  // if (newPoints.size() > 2) {
+  // if (i == 1) {
+  // final Coordinates p1 = points.get(0);
+  // final Coordinates p2 = points.get(1);
+  // final Coordinates p3 = points.get(2);
+  // final double angle = CoordinatesUtil.angle(p1, p2, p3);
+  // if (angle > Math.toRadians(170)) {
+  // newPoints.remove(1);
+  // numRemoved++;
+  // }
+  // } else if (i == points.size() - 1) {
+  // final Coordinates p1 = points.get(i - 2);
+  // final Coordinates p2 = points.get(i - 1);
+  // final Coordinates p3 = points.get(i);
+  // final double angle = CoordinatesUtil.angle(p1, p2, p3);
+  // if (angle > Math.toRadians(170)) {
+  // newPoints.remove(points.size() - 2 - numRemoved);
+  // numRemoved++;
+  // }
+  // } else {
+  // final Coordinates p1 = points.get(i - 2);
+  // final Coordinates p2 = points.get(i - 1);
+  // final Coordinates p3 = points.get(i);
+  // final Coordinates p4 = points.get(i + 1);
+  // final double angle1 = CoordinatesUtil.angle(p1, p2, p3);
+  // final double angle2 = CoordinatesUtil.angle(p2, p3, p4);
+  // boolean removed = false;
+  // if (angle1 > angle2) {
+  // if (angle1 > Math.toRadians(170)) {
+  // if (i - 1 - numRemoved == 0) {
+  // newPoints.remove(i - numRemoved);
+  // } else {
+  // newPoints.remove(i - 1 - numRemoved);
+  //
+  // }
+  // removed = true;
+  // }
+  // } else if (angle2 > Math.toRadians(170)) {
+  // newPoints.remove(i - numRemoved);
+  // removed = true;
+  // }
+  // if (!removed) {
+  // final Coordinates midPoint = LineSegmentUtil.midPoint(factory,
+  // p2, p3);
+  // newPoints.setPoint(i - 1 - numRemoved, midPoint);
+  // newPoints.remove(i - numRemoved);
+  // }
+  // numRemoved++;
+  // }
+  //
+  // }
+  // }
+  // }
+  // if (newPoints == null) {
+  // return line;
+  // } else {
+  // return factory.lineString(newPoints);
+  // }
+  // } else {
+  // return line;
+  // }
+  // }
+
+  public static void addLineString(final GeometryFactory geometryFactory,
     final CoordinatesList points, final Coordinates startPoint,
     final int startIndex, final int endIndex, final Coordinates endPoint,
     final List<LineString> lines) {
@@ -60,81 +146,6 @@ public final class LineStringUtil {
       if (newLine.getLength() > 0) {
         lines.add(newLine);
       }
-    }
-  }
-
-  public static LineString cleanShortSegments(final LineString line) {
-    final GeometryFactory factory = GeometryFactory.getFactory(line);
-    if (line.getLength() > 2) {
-      final CoordinatesList points = CoordinatesListUtil.get(line);
-      DoubleListCoordinatesList newPoints = null;
-      int numRemoved = 0;
-      for (int i = 1; i < points.size(); i++) {
-        final double length = points.distance(i - 1, points, i);
-        if (length < 2) {
-          if (newPoints == null) {
-            newPoints = new DoubleListCoordinatesList(points);
-          }
-          if (newPoints.size() > 2) {
-            if (i == 1) {
-              final Coordinates p1 = points.get(0);
-              final Coordinates p2 = points.get(1);
-              final Coordinates p3 = points.get(2);
-              final double angle = CoordinatesUtil.angle(p1, p2, p3);
-              if (angle > Math.toRadians(170)) {
-                newPoints.remove(1);
-                numRemoved++;
-              }
-            } else if (i == points.size() - 1) {
-              final Coordinates p1 = points.get(i - 2);
-              final Coordinates p2 = points.get(i - 1);
-              final Coordinates p3 = points.get(i);
-              final double angle = CoordinatesUtil.angle(p1, p2, p3);
-              if (angle > Math.toRadians(170)) {
-                newPoints.remove(points.size() - 2 - numRemoved);
-                numRemoved++;
-              }
-            } else {
-              final Coordinates p1 = points.get(i - 2);
-              final Coordinates p2 = points.get(i - 1);
-              final Coordinates p3 = points.get(i);
-              final Coordinates p4 = points.get(i + 1);
-              final double angle1 = CoordinatesUtil.angle(p1, p2, p3);
-              final double angle2 = CoordinatesUtil.angle(p2, p3, p4);
-              boolean removed = false;
-              if (angle1 > angle2) {
-                if (angle1 > Math.toRadians(170)) {
-                  if (i - 1 - numRemoved == 0) {
-                    newPoints.remove(i - numRemoved);
-                  } else {
-                    newPoints.remove(i - 1 - numRemoved);
-
-                  }
-                  removed = true;
-                }
-              } else if (angle2 > Math.toRadians(170)) {
-                newPoints.remove(i - numRemoved);
-                removed = true;
-              }
-              if (!removed) {
-                final Coordinates midPoint = LineSegmentUtil.midPoint(factory,
-                  p2, p3);
-                newPoints.setPoint(i - 1 - numRemoved, midPoint);
-                newPoints.remove(i - numRemoved);
-              }
-              numRemoved++;
-            }
-
-          }
-        }
-      }
-      if (newPoints == null) {
-        return line;
-      } else {
-        return factory.lineString(newPoints);
-      }
-    } else {
-      return line;
     }
   }
 
@@ -587,23 +598,6 @@ public final class LineStringUtil {
     return length;
   }
 
-  private static LineSegment getLineSegment(final Coordinates point,
-    final SpatialIndex index) {
-    BoundingBox envelope = new Envelope(point);
-    envelope = envelope.expand(2);
-    @SuppressWarnings("unchecked")
-    final List<LineSegment> segments = index.query(envelope);
-    for (final LineSegment lineSegment : segments) {
-      if (lineSegment.getBoundingBox().intersects(envelope)) {
-        if (LineSegmentUtil.isPointOnLine(lineSegment.get(0),
-          lineSegment.get(1), point, 2)) {
-          return lineSegment;
-        }
-      }
-    }
-    return null;
-  }
-
   @SuppressWarnings("unchecked")
   public static Collection<LineString> getMergedLines(
     final MultiLineString multiLineString) {
@@ -625,7 +619,7 @@ public final class LineStringUtil {
 
   public static Point getPoint(final LineString line, final int index) {
     final Coordinates coordinates = getCoordinates(line, index);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.point(coordinates);
   }
 
@@ -636,7 +630,7 @@ public final class LineStringUtil {
 
   public static Point getToPoint(final LineString line) {
     final Coordinates coordinates = getToCoordinates(line);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.point(coordinates);
   }
 
@@ -672,97 +666,6 @@ public final class LineStringUtil {
     }
     return false;
 
-  }
-
-  /**
-   * Insert the coordinate at the specified index into the line, returning the
-   * new line.
-   * 
-   * @param line The line.
-   * @param index The index to insert the coordinate.
-   * @param coordinate The coordinate.
-   */
-  public static LineString insert(final LineString line, final int index,
-    final Coordinates point) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    final CoordinatesList newPoints = new DoubleCoordinatesList(
-      points.size() + 1, points.getAxisCount());
-    int j = 0;
-    for (int i = 0; i < newPoints.size(); i++) {
-      if (i == index) {
-        newPoints.setPoint(i, point);
-      } else {
-        newPoints.setPoint(i, points.get(j));
-        j++;
-      }
-    }
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
-    final LineString newLine = factory.lineString(newPoints);
-    return newLine;
-  }
-
-  /**
-   * Create a new line by inserting the list of coordinates into the line.
-   * 
-   * @param line The line to insert the coordinates into.
-   * @param coordinates The coordinates.
-   * @return The new line.
-   */
-  public static LineString insert(final LineString line,
-    final List<Coordinates> coordinates) {
-    final GeometryFactory factory = GeometryFactory.getFactory(line);
-    final SpatialIndex index = new Quadtree();
-    final List<LineSegment> segments = new LinkedList<LineSegment>();
-
-    for (final LineSegment segment : new CoordinatesListIndexLineSegmentIterator(
-      factory, CoordinatesListUtil.get(line))) {
-      index.insert(segment.getBoundingBox(), segment);
-      segments.add(segment);
-    }
-
-    for (final Coordinates point : coordinates) {
-      // TODO make sure every coordinate matches
-      LineSegment matchedLineSegment = null;
-      matchedLineSegment = getLineSegment(point, index);
-      if (matchedLineSegment != null) {
-        if (!matchedLineSegment.contains(point)) {
-          final ListIterator<LineSegment> segmentIter = segments.listIterator();
-          if (segmentIter.hasNext()) {
-            LineSegment segment = segmentIter.next();
-            while (segment != matchedLineSegment && segmentIter.hasNext()) {
-              segment = segmentIter.next();
-            }
-            if (segment == matchedLineSegment) {
-              segmentIter.remove();
-            }
-          }
-
-          index.remove(matchedLineSegment.getBoundingBox(), matchedLineSegment);
-          final LineSegment segment1 = new LineSegmentImpl(factory,
-            matchedLineSegment.get(0), point);
-          index.insert(segment1.getBoundingBox(), segment1);
-          segmentIter.add(segment1);
-
-          final LineSegment segment2 = new LineSegmentImpl(factory, point,
-            matchedLineSegment.get(1));
-          index.insert(segment2.getBoundingBox(), segment2);
-          segmentIter.add(segment2);
-        }
-      }
-    }
-    final int dimension = line.getCoordinatesList().getAxisCount();
-    final CoordinatesList newCoordinates = new DoubleCoordinatesList(
-      segments.size() + 1, dimension);
-    final LineSegment firstSegment = segments.get(0);
-    newCoordinates.setPoint(0, firstSegment.get(0));
-
-    int i = 1;
-    for (final LineSegment lineSegment : segments) {
-      newCoordinates.setPoint(i, lineSegment.get(1));
-      i++;
-    }
-    final LineString newLine = factory.lineString(newCoordinates);
-    return newLine;
   }
 
   /**
@@ -1009,7 +912,7 @@ public final class LineStringUtil {
     final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
     final CoordinatesList coordinates = CoordinatesListUtil.merge(point,
       coordinates1, coordinates2);
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
+    final GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.lineString(coordinates);
     GeometryProperties.copyUserData(line1, line);
     return line;
@@ -1031,7 +934,7 @@ public final class LineStringUtil {
     final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
     final CoordinatesList coordinates = CoordinatesListUtil.merge(coordinates1,
       coordinates2);
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line1);
+    final GeometryFactory factory = GeometryFactory.getFactory(line1);
     final LineString line = factory.lineString(coordinates);
     GeometryProperties.copyUserData(line1, line);
 
@@ -1070,7 +973,7 @@ public final class LineStringUtil {
   }
 
   public static LineString reverse(final LineString line) {
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinatesList coordinates = CoordinatesListUtil.get(line);
     final CoordinatesList reverseCoordinates = coordinates.reverse();
     final LineString newLine = factory.lineString(reverseCoordinates);
@@ -1078,8 +981,7 @@ public final class LineStringUtil {
     return newLine;
   }
 
-  public static List<LineString> split(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public static List<LineString> split(final GeometryFactory geometryFactory,
     final LineString line, final LineSegmentIndex index, final double tolerance) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Coordinates firstCoordinate = points.get(0);
@@ -1117,7 +1019,6 @@ public final class LineStringUtil {
                   startIndex = i - 1;
                   startCoordinate = null;
                 } else {
-                  geometryFactory.makePrecise(intersection);
                   addLineString(geometryFactory, points, startCoordinate,
                     startIndex, i - 1, intersection, newLines);
                   startIndex = i + 1;
@@ -1130,7 +1031,6 @@ public final class LineStringUtil {
                 startIndex = i;
                 startCoordinate = null;
               } else {
-                geometryFactory.makePrecise(intersection);
                 addLineString(geometryFactory, points, startCoordinate,
                   startIndex, i - 1, intersection, newLines);
                 startIndex = i;
@@ -1154,7 +1054,7 @@ public final class LineStringUtil {
 
   public static List<LineString> split(final LineString line,
     final Coordinates point) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Map<String, Number> result = findClosestSegmentAndCoordinate(line,
       point);
@@ -1228,39 +1128,49 @@ public final class LineStringUtil {
       coords1Size = segmentIndex + 2;
       coords2Size = points.size() - segmentIndex;
     }
-    final CoordinatesList points1 = new DoubleCoordinatesList(coords1Size,
-      axisCount);
-    points.copy(0, points1, 0, axisCount, segmentIndex + 1);
-
-    final CoordinatesList points2 = new DoubleCoordinatesList(coords2Size,
-      axisCount);
-    if (!containsPoint) {
-      points1.setPoint(coords1Size - 1, point);
-      points2.setPoint(0, point);
-      if (points1.getAxisCount() > 2) {
-        final Coordinates previous = points1.get(segmentIndex);
-        final Coordinates next = points.get(segmentIndex + 1);
-        final double z = getElevation(point, previous, next);
-        points1.setZ(coords1Size - 1, z);
-        points2.setZ(0, z);
-      }
-
-      points.copy(segmentIndex + 1, points2, 1, axisCount, points2.size() - 1);
-    } else {
-      points.copy(segmentIndex, points2, 0, axisCount, points2.size());
+    final double[] coordinates1 = new double[coords1Size * axisCount];
+    for (int i = 0; i < segmentIndex + 1; i++) {
+      CoordinatesListUtil.setCoordinates(coordinates1, axisCount, i,
+        points.get(i));
     }
 
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
+    final double[] coordinates2 = new double[coords2Size * axisCount];
+    if (containsPoint) {
+      for (int i = 0; i < segmentIndex + 1; i++) {
+        CoordinatesListUtil.setCoordinates(coordinates2, axisCount, i,
+          points.get(segmentIndex + i));
+      }
+    } else {
+      CoordinatesListUtil.setCoordinates(coordinates2, axisCount,
+        coords1Size - 1, point);
+      CoordinatesListUtil.setCoordinates(coordinates2, axisCount, 0, point);
+      if (axisCount > 2) {
+        final Coordinates previous = points.get(segmentIndex);
+        final Coordinates next = points.get(segmentIndex + 1);
+        final double z = getElevation(point, previous, next);
+        coordinates1[(coords1Size - 1) * axisCount + 2] = z;
+        coordinates2[2] = z;
+      }
+
+      for (int i = 1; i < coords2Size; i++) {
+        CoordinatesListUtil.setCoordinates(coordinates2, axisCount, i,
+          points.get(segmentIndex + i));
+      }
+    }
+
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
 
     if (coords1Size > 1) {
-      final LineString line1 = geometryFactory.lineString(points1);
+      final LineString line1 = geometryFactory.lineString(axisCount,
+        coordinates1);
       if (line1.getLength() > 0) {
         lines.add(line1);
       }
     }
 
     if (coords2Size > 1) {
-      final LineString line2 = geometryFactory.lineString(points2);
+      final LineString line2 = geometryFactory.lineString(axisCount,
+        coordinates2);
       if (line2.getLength() > 0) {
         lines.add(line2);
       }
@@ -1275,7 +1185,7 @@ public final class LineStringUtil {
     final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
       fromPoint, fromIndex, length, toPoint);
 
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
+    final GeometryFactory factory = GeometryFactory.getFactory(line);
     if (newPoints.size() < 2) {
       return null;
     } else {

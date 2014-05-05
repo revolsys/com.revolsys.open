@@ -105,11 +105,11 @@ public interface Coordinates extends Comparable<Object>, Cloneable,
    */
   boolean equals3d(Coordinates point);
 
+  int getAxisCount();
+
   double[] getCoordinates();
 
   double getM();
-
-  int getAxisCount();
 
   long getTime();
 
@@ -129,33 +129,4 @@ public interface Coordinates extends Comparable<Object>, Cloneable,
   double getY();
 
   double getZ();
-
-  /**
-   *  Sets this <code>Coordinate</code>s (x,y,z) values to that of <code>other</code>.
-   *
-   *@param  other  the <code>Coordinate</code> to copy
-   */
-  void setCoordinate(Coordinates other);
-
-  void setM(double m);
-
-  void setTime(long time);
-
-  /**
-   * Sets the ordinate for the given index
-   * to a given value.
-   * The supported values for the index are 
-   * {@link #X}, {@link #Y}, and {@link #Z}.
-   * 
-   * @param axisIndex the ordinate index
-   * @param value the value to set
-   * @throws IllegalArgumentException if the index is not valid
-   */
-  void setValue(int axisIndex, double value);
-
-  void setX(double x);
-
-  void setY(double y);
-
-  void setZ(double z);
 }

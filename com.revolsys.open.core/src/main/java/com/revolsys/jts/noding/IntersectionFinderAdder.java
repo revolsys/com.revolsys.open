@@ -96,10 +96,10 @@ public class IntersectionFinderAdder implements SegmentIntersector {
       return;
     }
 
-    final Coordinates p00 = e0.getCoordinates()[segIndex0];
-    final Coordinates p01 = e0.getCoordinates()[segIndex0 + 1];
-    final Coordinates p10 = e1.getCoordinates()[segIndex1];
-    final Coordinates p11 = e1.getCoordinates()[segIndex1 + 1];
+    final Coordinates p00 = e0.getCoordinate(segIndex0);
+    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
+    final Coordinates p10 = e1.getCoordinate(segIndex1);
+    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);

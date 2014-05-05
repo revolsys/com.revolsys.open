@@ -42,8 +42,8 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -55,6 +55,7 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.geomgraph.index.EdgeSetIntersector;
 import com.revolsys.jts.geomgraph.index.SegmentIntersector;
 import com.revolsys.jts.geomgraph.index.SimpleMCSweepLineIntersector;
@@ -169,26 +170,26 @@ public class GeometryGraph extends PlanarGraph {
    * Add an Edge computed externally.  The label on the Edge is assumed
    * to be correct.
    */
-  public void addEdge(final Edge e) {
-    insertEdge(e);
-    final Coordinates[] coord = e.getCoordinates();
+  public void addEdge(final Edge edge) {
+    insertEdge(edge);
     // insert the endpoint as a node, to mark that it is on the boundary
-    insertPoint(argIndex, coord[0], Location.BOUNDARY);
-    insertPoint(argIndex, coord[coord.length - 1], Location.BOUNDARY);
+    insertPoint(argIndex, edge.getCoordinate(0), Location.BOUNDARY);
+    insertPoint(argIndex, edge.getCoordinate(edge.getNumPoints() - 1),
+      Location.BOUNDARY);
   }
 
   private void addLineString(final LineString line) {
-    final Coordinates[] coord = CoordinateArrays.removeRepeatedPoints(line.getCoordinateArray());
+    final CoordinatesList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
 
-    if (coord.length < 2) {
+    if (points.size() < 2) {
       hasTooFewPoints = true;
-      invalidPoint = coord[0];
+      invalidPoint = points.get(0);
       return;
     }
 
     // add the edge for the LineString
     // line edges do not have locations for their left and right sides
-    final Edge e = new Edge(coord, new Label(argIndex, Location.INTERIOR));
+    final Edge e = new Edge(points, new Label(argIndex, Location.INTERIOR));
     lineEdgeMap.put(line, e);
     insertEdge(e);
     /**
@@ -196,9 +197,9 @@ public class GeometryGraph extends PlanarGraph {
      * Even if the LineString is closed, add both points as if they were endpoints.
      * This allows for the case that the node already exists and is a boundary point.
      */
-    Assert.isTrue(coord.length >= 2, "found LineString with single point");
-    insertBoundaryPoint(argIndex, coord[0]);
-    insertBoundaryPoint(argIndex, coord[coord.length - 1]);
+    Assert.isTrue(points.size() >= 2, "found LineString with single point");
+    insertBoundaryPoint(argIndex, points.get(0));
+    insertBoundaryPoint(argIndex, points.get(points.size() - 1));
 
   }
 
@@ -239,34 +240,33 @@ public class GeometryGraph extends PlanarGraph {
    * If the ring is in the opposite orientation,
    * the left and right locations must be interchanged.
    */
-  private void addPolygonRing(final LinearRing lr, final Location cwLeft,
+  private void addPolygonRing(final LinearRing ring, final Location cwLeft,
     final Location cwRight) {
     // don't bother adding empty holes
-    if (lr.isEmpty()) {
+    if (ring.isEmpty()) {
       return;
     }
+    final CoordinatesList coordinatesList = CleanDuplicatePoints.clean(ring.getCoordinatesList());
 
-    final Coordinates[] coord = CoordinateArrays.removeRepeatedPoints(lr.getCoordinateArray());
-
-    if (coord.length < 4) {
+    if (coordinatesList.size() < 4) {
       hasTooFewPoints = true;
-      invalidPoint = coord[0];
+      invalidPoint = coordinatesList.get(0);
       return;
     }
 
     Location left = cwLeft;
     Location right = cwRight;
-    if (lr.isCounterClockwise()) {
+    if (ring.isCounterClockwise()) {
       left = cwRight;
       right = cwLeft;
     }
-    final Edge e = new Edge(coord, new Label(argIndex, Location.BOUNDARY, left,
-      right));
-    lineEdgeMap.put(lr, e);
+    final Edge e = new Edge(coordinatesList, new Label(argIndex,
+      Location.BOUNDARY, left, right));
+    lineEdgeMap.put(ring, e);
 
     insertEdge(e);
     // insert the endpoint as a node, to mark that it is on the boundary
-    insertPoint(argIndex, coord[0], Location.BOUNDARY);
+    insertPoint(argIndex, coordinatesList.get(0), Location.BOUNDARY);
   }
 
   /**
@@ -291,7 +291,7 @@ public class GeometryGraph extends PlanarGraph {
   private void addSelfIntersectionNodes(final int argIndex) {
     for (final Edge e : edges) {
       final Location eLoc = e.getLabel().getLocation(argIndex);
-      for (final EdgeIntersection ei : e.eiList) {
+      for (final EdgeIntersection ei : e.getEdgeIntersectionList()) {
         addSelfIntersectionNode(argIndex, ei.coord, eLoc);
       }
     }
@@ -337,8 +337,9 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   public void computeSplitEdges(final List<Edge> edgelist) {
-    for (final Edge e : edges) {
-      e.eiList.addSplitEdges(edgelist);
+    for (final Edge edge : edges) {
+      final EdgeIntersectionList edgeIntersectionList = edge.getEdgeIntersectionList();
+      edgeIntersectionList.addSplitEdges(edgelist);
     }
   }
 

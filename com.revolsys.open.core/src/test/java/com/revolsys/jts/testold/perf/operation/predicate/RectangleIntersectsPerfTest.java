@@ -45,7 +45,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.precision.GeometryPrecisionReducer;
 import com.revolsys.jts.util.GeometricShapeFactory;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -163,13 +162,17 @@ public class RectangleIntersectsPerfTest {
     final Coordinates origin = new Coordinate((double)0, 0,
       Coordinates.NULL_ORDINATE);
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
+    GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
+    geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),
+      geometryFactory.getAxisCount(), new PrecisionModel(size / 10).getScale(),
+      geometryFactory.getScaleZ());
+    final Geometry newGeometry = sinePoly.convert(geometryFactory);
     /**
      * Make the geometry "crinkly" by rounding off the points.
      * This defeats the  MonotoneChain optimization in the full relate
      * algorithm, and provides a more realistic test.
      */
-    final Geometry sinePolyCrinkly = GeometryPrecisionReducer.reduce(sinePoly,
-      new PrecisionModel(size / 10));
+    final Geometry sinePolyCrinkly = newGeometry;
     final Geometry target = sinePolyCrinkly;
 
     final Geometry rect = createRectangle(origin, 5);

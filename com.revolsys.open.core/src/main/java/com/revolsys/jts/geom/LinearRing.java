@@ -58,12 +58,6 @@ public interface LinearRing extends LineString {
   LinearRing clone();
 
   @Override
-  LinearRing convert(GeometryFactory geometryFactory);
-
-  @Override
-  LinearRing copy(GeometryFactory geometryFactory);
-
-  @Override
   LinearRing move(double... deltas);
 
   @Override

@@ -37,7 +37,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.PrecisionModel;
 
@@ -56,11 +56,10 @@ public class PrecisionModelTest extends TestCase {
 
   private void preciseCoordinateTester(final PrecisionModel pm,
     final double x1, final double y1, final double x2, final double y2) {
-    final Coordinates p = new Coordinate((double)x1, y1, Coordinates.NULL_ORDINATE);
+    final Coordinates p = new DoubleCoordinates(pm.makePrecise(x1),
+      pm.makePrecise(y1));
 
-    pm.makePrecise(p);
-
-    final Coordinates pPrecise = new Coordinate((double)x2, y2, Coordinates.NULL_ORDINATE);
+    final Coordinates pPrecise = new DoubleCoordinates(x2, y2);
     assertTrue(p.equals2d(pPrecise));
   }
 

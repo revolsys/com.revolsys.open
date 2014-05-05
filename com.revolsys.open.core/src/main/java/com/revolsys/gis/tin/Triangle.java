@@ -53,7 +53,9 @@ public class Triangle extends AbstractCoordinatesList {
     }
     for (int i = 0; i < 3; i++) {
       final Coordinates point = points[i];
-      setPoint(i, point);
+      coordinates[i * 3] = point.getX();
+      coordinates[i * 3 + 1] = point.getY();
+      coordinates[i * 3 + 2] = point.getZ();
     }
   }
 
@@ -246,12 +248,6 @@ public class Triangle extends AbstractCoordinatesList {
 
   public boolean intersectsCircumCircle(final Coordinates point) {
     return getCircumcircle().contains(point);
-  }
-
-  @Override
-  public void setValue(final int index, final int axisIndex, final double value) {
-    final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
-    coordinates[coordinateIndex] = value;
   }
 
   @Override

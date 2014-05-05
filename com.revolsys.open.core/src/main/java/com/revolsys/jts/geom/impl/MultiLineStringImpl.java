@@ -76,6 +76,17 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
     super(factory, lineStrings);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    final List<LineString> lines = new ArrayList<LineString>();
+    for (final LineString line : getLineStrings()) {
+      final LineString newLine = line.copy(geometryFactory);
+      lines.add(newLine);
+    }
+    return (V)geometryFactory.multiLineString(lines);
+  }
+
   @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {

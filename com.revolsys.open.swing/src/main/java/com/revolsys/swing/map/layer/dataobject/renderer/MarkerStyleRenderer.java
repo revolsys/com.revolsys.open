@@ -102,7 +102,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
           }
         } else if ("center".equals(placement)) {
           if (geometry instanceof LineString && geometry.getVertexCount() > 1) {
-            final Geometry projectedGeometry = viewportGeometryFactory.copy(geometry);
+            final Geometry projectedGeometry = (Geometry)geometry.copy(viewportGeometryFactory);
             points = CoordinatesListUtil.get(projectedGeometry);
             final double totalLength = projectedGeometry.getLength();
             final double centreLength = totalLength / 2;

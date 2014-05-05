@@ -50,6 +50,7 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
+import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.Node;
 import com.revolsys.jts.geomgraph.Position;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -295,8 +296,8 @@ class BufferSubgraph implements Comparable {
     if (env == null) {
       double[] bounds = null;
       for (final DirectedEdge dirEdge : dirEdgeList) {
-        final Coordinates[] pts = dirEdge.getEdge().getCoordinates();
-        for (final Coordinates point : pts) {
+        final Edge edge = dirEdge.getEdge();
+        for (final Coordinates point : edge.getPoints()) {
           if (bounds == null) {
             bounds = EnvelopeUtil.createBounds(2, point);
           } else {
@@ -319,19 +320,4 @@ class BufferSubgraph implements Comparable {
   public Coordinates getRightmostCoordinate() {
     return rightMostCoord;
   }
-
-  /*
-   * // DEBUGGING only - comment out private static final String SAVE_DIREDGES =
-   * "saveDirEdges"; private static int saveCount = 0; public void
-   * saveDirEdges() { GeometryFactory fact = GeometryFactory.getFactory(); for
-   * (Iterator it = dirEdgeList.iterator(); it.hasNext(); ) { DirectedEdge de =
-   * (DirectedEdge) it.next(); double dx = de.getDx(); double dy = de.getDy();
-   * Coordinates p0 = de.getCoordinate(); double ang = Math.atan2(dy, dx);
-   * Coordinates p1 = new Coordinate((double) p0.x + .4 * Math.cos(ang), p0.y +
-   * .4 * Math.sin(ang)); // DebugFeature.add(SAVE_DIREDGES, //
-   * fact.createLineString(new Coordinates[] { p0, p1 } ), //
-   * de.getDepth(Position.LEFT) + "/" + de.getDepth(Position.RIGHT) // ); }
-   * String filepath = "x:\\jts\\testBuffer\\dirEdges" + saveCount++ + ".jml";
-   * DebugFeature.saveFeatures(SAVE_DIREDGES, filepath); }
-   */
 }

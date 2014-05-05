@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.BoundingBox;
@@ -17,6 +16,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
@@ -175,8 +175,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         }
         endTag();
       } else {
-        final Geometry geoGraphicsGeom = GeometryProjectionUtil.perform(
-          geometry, Kml22Constants.COORDINATE_SYSTEM_ID);
+        final Geometry geoGraphicsGeom = geometry.convert(GeometryFactory.getFactory(Kml22Constants.COORDINATE_SYSTEM_ID));
         if (geoGraphicsGeom instanceof Point) {
           final Point point = (Point)geoGraphicsGeom;
           writePoint(point);

@@ -364,7 +364,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       try {
         final GeometryFactory geometryFactory = getGeometryFactory();
 
-        final Geometry queryGeometry = geometryFactory.copy(geometry);
+        final Geometry queryGeometry = (Geometry)geometry.copy(geometryFactory);
         BoundingBox boundingBox = queryGeometry.getBoundingBox();
         boundingBox = boundingBox.expand(distance);
         final String typePath = getTypePath();

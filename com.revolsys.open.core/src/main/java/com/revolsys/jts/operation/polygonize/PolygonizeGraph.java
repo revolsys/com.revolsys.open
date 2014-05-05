@@ -282,26 +282,26 @@ class PolygonizeGraph extends PlanarGraph {
    * Add a {@link LineString} forming an edge of the polygon graph.
    * @param line the line to add
    */
-  public void addEdge(LineString line) {
-    line = CleanDuplicatePoints.clean(line);
-    if (line.isEmpty()) {
+  public void addEdge(final LineString line) {
+    final LineString cleanLine = CleanDuplicatePoints.clean(line);
+    if (cleanLine.isEmpty()) {
       return;
     }
 
-    if (line.getVertexCount() < 2) {
+    if (cleanLine.getVertexCount() < 2) {
       return;
     }
 
-    final Coordinates startPt = line.getVertex(0).cloneCoordinates();
-    final Coordinates endPt = line.getVertex(-1).cloneCoordinates();
+    final Coordinates startPt = cleanLine.getVertex(0).cloneCoordinates();
+    final Coordinates endPt = cleanLine.getVertex(-1).cloneCoordinates();
 
     final Node nStart = getNode(startPt);
     final Node nEnd = getNode(endPt);
 
     final DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd,
-      line.getVertex(1).cloneCoordinates(), true);
+      cleanLine.getVertex(1).cloneCoordinates(), true);
     final DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart,
-      line.getVertex(-2).cloneCoordinates(), false);
+      cleanLine.getVertex(-2).cloneCoordinates(), false);
     final Edge edge = new PolygonizeEdge(line);
     edge.setDirectedEdges(de0, de1);
     add(edge);

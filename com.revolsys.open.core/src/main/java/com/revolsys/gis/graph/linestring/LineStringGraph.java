@@ -34,7 +34,6 @@ import com.revolsys.gis.model.coordinates.filter.CrossingLineSegmentFilter;
 import com.revolsys.gis.model.coordinates.filter.PointOnLineSegment;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -110,8 +109,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public LineString getLine() {
     final Set<Edge<LineSegment>> processedEdges = new HashSet<Edge<LineSegment>>();
-    final DoubleListCoordinatesList newPoints = new DoubleListCoordinatesList(
-      points.getAxisCount());
+    final List<Coordinates> newPoints = new ArrayList<>();
     Node<LineSegment> previousNode = findNode(fromPoint);
     newPoints.add(previousNode);
     do {
@@ -138,7 +136,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       "INDEX");
     final List<LineString> lines = new ArrayList<LineString>();
     final int axisCount = geometryFactory.getAxisCount();
-    DoubleListCoordinatesList points = new DoubleListCoordinatesList(axisCount);
+    List<Coordinates> points = new ArrayList<>();
     Node<LineSegment> previousNode = null;
     for (final Edge<LineSegment> edge : getEdges(comparator)) {
       final LineSegment lineSegment = edge.getObject();
@@ -146,7 +144,8 @@ public class LineStringGraph extends Graph<LineSegment> {
         final Node<LineSegment> fromNode = edge.getFromNode();
         final Node<LineSegment> toNode = edge.getToNode();
         if (previousNode == null) {
-          points.addAll(lineSegment);
+          points.add(lineSegment.get(0));
+          points.add(lineSegment.get(1));
         } else if (fromNode == previousNode) {
           if (edge.getLength() > 0) {
             points.add(toNode);
@@ -156,15 +155,16 @@ public class LineStringGraph extends Graph<LineSegment> {
             final LineString line = geometryFactory.lineString(points);
             lines.add(line);
           }
-          points = new DoubleListCoordinatesList(axisCount);
-          points.addAll(lineSegment);
+          points = new ArrayList<>();
+          points.add(lineSegment.get(0));
+          points.add(lineSegment.get(1));
         }
         if (points.size() > 1) {
           final int toDegree = toNode.getDegree();
           if (toDegree != 2) {
             final LineString line = geometryFactory.lineString(points);
             lines.add(line);
-            points = new DoubleListCoordinatesList(axisCount);
+            points = new ArrayList<>();
             points.add(toNode);
           }
         }

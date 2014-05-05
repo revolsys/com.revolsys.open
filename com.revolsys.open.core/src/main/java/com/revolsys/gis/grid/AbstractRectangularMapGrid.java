@@ -1,7 +1,6 @@
 package com.revolsys.gis.grid;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
@@ -22,8 +21,7 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
 
   public String getMapTileName(final Geometry geometry) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
-    final Geometry projectedGeometry = GeometryProjectionUtil.perform(geometry,
-      coordinateSystem);
+    final Geometry projectedGeometry = geometry.convert(GeometryFactory.getFactory(coordinateSystem));
     final Point centroid = projectedGeometry.getCentroid();
     final Coordinates coordinate = centroid.getCoordinate();
     final String mapsheet = getMapTileName(coordinate.getX(), coordinate.getY());

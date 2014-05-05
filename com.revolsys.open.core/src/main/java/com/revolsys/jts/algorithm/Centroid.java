@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -82,18 +82,6 @@ public class Centroid {
   }
 
   /**
-   * Computes three times the centroid of the triangle p1-p2-p3.
-   * The factor of 3 is
-   * left in to permit division to be avoided until later.
-   */
-  private static void centroid3(final Coordinates p1, final Coordinates p2,
-    final Coordinates p3, final Coordinates c) {
-    c.setX(p1.getX() + p2.getX() + p3.getX());
-    c.setY(p1.getY() + p2.getY() + p3.getY());
-    return;
-  }
-
-  /**
    * Computes the centroid point of a geometry.
    * 
    * @param geom the geometry to use
@@ -106,15 +94,11 @@ public class Centroid {
 
   private Coordinates areaBasePt = null;// the point all triangles are based at
 
-  private final Coordinates triangleCent3 = new Coordinate();// temporary
-                                                             // variable to
-
-  // hold centroid of
-  // triangle
-
   private double areasum2 = 0; /* Partial area sum */
 
-  private final Coordinates cg3 = new Coordinate(); // partial centroid sum
+  private double cg3X;
+
+  private double cg3Y;
 
   // data for linear centroid computation, if needed
   private double lineCenterX = 0;
@@ -125,7 +109,9 @@ public class Centroid {
 
   private int ptCount = 0;
 
-  private final Coordinates ptCentSum = new Coordinate();
+  private double centSumX = 0;
+
+  private double centSumY = 0;
 
   /**
    * Creates a new instance for computing the centroid of a geometry
@@ -212,8 +198,8 @@ public class Centroid {
    */
   private void addPoint(final Coordinates pt) {
     ptCount += 1;
-    ptCentSum.setX(ptCentSum.getX() + pt.getX());
-    ptCentSum.setY(ptCentSum.getY() + pt.getY());
+    centSumX += pt.getX();
+    centSumY += pt.getY();
   }
 
   private void addShell(final LineString line) {
@@ -232,10 +218,13 @@ public class Centroid {
   private void addTriangle(final Coordinates p0, final Coordinates p1,
     final Coordinates p2, final boolean isPositiveArea) {
     final double sign = (isPositiveArea) ? 1.0 : -1.0;
-    centroid3(p0, p1, p2, triangleCent3);
+
+    final double triangleCent3X = p0.getX() + p1.getX() + p2.getX();
+    final double triangleCent3Y = p0.getY() + p1.getY() + p2.getY();
+
     final double area2 = area2(p0, p1, p2);
-    cg3.setX(cg3.getX() + sign * area2 * triangleCent3.getX());
-    cg3.setY(cg3.getY() + sign * area2 * triangleCent3.getY());
+    cg3X += sign * area2 * triangleCent3X;
+    cg3Y += sign * area2 * triangleCent3Y;
     areasum2 += sign * area2;
   }
 
@@ -251,29 +240,25 @@ public class Centroid {
      * Degenerate geometry are computed using their effective dimension
      * (e.g. areas may degenerate to lines or points)
      */
-    final Coordinates cent = new Coordinate();
     if (Math.abs(areasum2) > 0.0) {
       /**
        * Input contains areal geometry
        */
-      cent.setX(cg3.getX() / 3 / areasum2);
-      cent.setY(cg3.getY() / 3 / areasum2);
+      return new DoubleCoordinates(cg3X / 3 / areasum2, cg3Y / 3 / areasum2);
     } else if (totalLength > 0.0) {
       /**
        * Input contains lineal geometry
        */
-      cent.setX(lineCenterX / totalLength);
-      cent.setY(lineCenterY / totalLength);
+      return new DoubleCoordinates(lineCenterX / totalLength, lineCenterY
+        / totalLength);
     } else if (ptCount > 0) {
       /**
        * Input contains puntal geometry only
        */
-      cent.setX(ptCentSum.getX() / ptCount);
-      cent.setY(ptCentSum.getY() / ptCount);
+      return new DoubleCoordinates(centSumX / ptCount, centSumY / ptCount);
     } else {
       return null;
     }
-    return cent;
   }
 
   private void setBasePoint(final Coordinates basePt) {

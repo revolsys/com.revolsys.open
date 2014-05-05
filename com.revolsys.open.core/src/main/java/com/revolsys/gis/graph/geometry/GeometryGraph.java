@@ -19,7 +19,6 @@ import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -137,7 +136,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public Geometry getBoundaryIntersection(final LineString line) {
     final List<Point> pointIntersections = new ArrayList<Point>();
     final List<LineString> lineIntersections = new ArrayList<LineString>();
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);
     if (boundingBox.intersects(this.boundingBox)) {
       final CoordinatesList points = CoordinatesListUtil.get(line);
@@ -262,9 +261,9 @@ public class GeometryGraph extends Graph<LineSegment> {
     final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
       "geometryIndex", "partIndex", "segmentIndex");
     final List<Geometry> geometries = new ArrayList<Geometry>(points);
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = geometryFactory.getAxisCount();
-    DoubleListCoordinatesList points = new DoubleListCoordinatesList(axisCount);
+    List<Coordinates> points = new ArrayList<>();
     Node<LineSegment> previousNode = null;
     for (final Edge<LineSegment> edge : getEdges(comparator)) {
       final LineSegment lineSegment = edge.getObject();
@@ -272,7 +271,8 @@ public class GeometryGraph extends Graph<LineSegment> {
         final Node<LineSegment> fromNode = edge.getFromNode();
         final Node<LineSegment> toNode = edge.getToNode();
         if (previousNode == null) {
-          points.addAll(lineSegment);
+          points.add(lineSegment.get(0));
+          points.add(lineSegment.get(1));
         } else if (fromNode == previousNode) {
           if (edge.getLength() > 0) {
             points.add(toNode);
@@ -282,15 +282,16 @@ public class GeometryGraph extends Graph<LineSegment> {
             final LineString line = geometryFactory.lineString(points);
             geometries.add(line);
           }
-          points = new DoubleListCoordinatesList(axisCount);
-          points.addAll(lineSegment);
+          points = new ArrayList<>();
+          points.add(lineSegment.get(0));
+          points.add(lineSegment.get(1));
         }
         if (points.size() > 1) {
           final int toDegree = toNode.getDegree();
           if (toDegree != 2) {
             final LineString line = geometryFactory.lineString(points);
             geometries.add(line);
-            points = new DoubleListCoordinatesList(axisCount);
+            points = new ArrayList<>();
             points.add(toNode);
           }
         }

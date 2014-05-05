@@ -35,7 +35,6 @@ package com.revolsys.jts.noding.snapround;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
@@ -45,7 +44,6 @@ import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.noding.Noder;
 import com.revolsys.jts.noding.NodingValidator;
-import com.revolsys.jts.noding.SegmentString;
 
 /**
  * Nodes the linework in a list of {@link Geometry}s using Snap-Rounding
@@ -81,7 +79,8 @@ public class GeometryNoder {
     this.pm = pm;
   }
 
-  private List<LineString> extractLines(final Collection<Geometry> geometries) {
+  private List<LineString> extractLines(
+    final Collection<? extends Geometry> geometries) {
     final List<LineString> lines = new ArrayList<>();
     for (final Geometry geometry : geometries) {
       final List<LineString> geometryLines = geometry.getGeometryComponents(LineString.class);
@@ -93,19 +92,20 @@ public class GeometryNoder {
   /**
    * Nodes the linework of a set of Geometrys using SnapRounding. 
    * 
-   * @param geoms a Collection of Geometrys of any type
+   * @param geometries a Collection of Geometrys of any type
    * @return a List of LineStrings representing the noded linework of the input
    */
-  public List node(final Collection geoms) {
+  public List<LineString> node(final Collection<? extends Geometry> geometries) {
     // get geometry factory
-    final Geometry geom0 = (Geometry)geoms.iterator().next();
+    final Geometry geom0 = geometries.iterator().next();
     geomFact = geom0.getGeometryFactory();
 
-    final List segStrings = toSegmentStrings(extractLines(geoms));
+    final Collection<LineString> lines = extractLines(geometries);
+    final List<NodedSegmentString> segStrings = toSegmentStrings(lines);
     // Noder sr = new SimpleSnapRounder(pm);
     final Noder sr = new MCIndexSnapRounder(pm);
     sr.computeNodes(segStrings);
-    final Collection nodedLines = sr.getNodedSubstrings();
+    final Collection<NodedSegmentString> nodedLines = sr.getNodedSubstrings();
 
     // TODO: improve this to check for full snap-rounded correctness
     if (isValidityChecked) {
@@ -125,15 +125,13 @@ public class GeometryNoder {
     this.isValidityChecked = isValidityChecked;
   }
 
-  private List toLineStrings(final Collection segStrings) {
-    final List lines = new ArrayList();
-    for (final Iterator it = segStrings.iterator(); it.hasNext();) {
-      final SegmentString ss = (SegmentString)it.next();
-      // skip collapsed lines
-      if (ss.size() < 2) {
-        continue;
+  private List<LineString> toLineStrings(
+    final Collection<NodedSegmentString> segStrings) {
+    final List<LineString> lines = new ArrayList<>();
+    for (final NodedSegmentString ss : segStrings) {
+      if (ss.size() > 1) {
+        lines.add(geomFact.lineString(ss.getPoints()));
       }
-      lines.add(geomFact.lineString(ss.getCoordinates()));
     }
     return lines;
   }
@@ -142,7 +140,7 @@ public class GeometryNoder {
     final Collection<LineString> lines) {
     final List<NodedSegmentString> segStrings = new ArrayList<>();
     for (final LineString line : lines) {
-      segStrings.add(new NodedSegmentString(line.getCoordinateArray(), null));
+      segStrings.add(new NodedSegmentString(line.getCoordinatesList(), null));
     }
     return segStrings;
   }

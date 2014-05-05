@@ -92,15 +92,14 @@ public class DouglasPeuckerSimplifier {
     @Override
     protected CoordinatesList transformCoordinates(
       final CoordinatesList coords, final Geometry parent) {
-      final Coordinates[] inputPts = coords.toCoordinateArray();
-      Coordinates[] newPts = null;
-      if (inputPts.length == 0) {
-        newPts = new Coordinates[0];
+      if (coords.size() == 0) {
+        return coords;
       } else {
-        newPts = DouglasPeuckerLineSimplifier.simplify(inputPts,
-          distanceTolerance);
+        final Coordinates[] inputPts = coords.toCoordinateArray();
+        final Coordinates[] newPts = DouglasPeuckerLineSimplifier.simplify(
+          inputPts, distanceTolerance);
+        return new DoubleCoordinatesList(newPts);
       }
-      return new DoubleCoordinatesList(newPts);
     }
 
     /**

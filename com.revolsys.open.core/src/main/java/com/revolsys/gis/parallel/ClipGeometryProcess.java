@@ -2,8 +2,7 @@ package com.revolsys.gis.parallel;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
@@ -31,15 +30,9 @@ public class ClipGeometryProcess extends
       if (!intersection.isEmpty()
         && intersection.getClass() == geometry.getClass()) {
         if (intersection instanceof LineString) {
-          final LineString lineString = (LineString)intersection;
-          final Coordinates c0 = lineString.getCoordinate(0);
-          if (Double.isNaN(c0.getZ())) {
-            CoordinatesUtil.addElevation(c0, (LineString)geometry);
-          }
-          final Coordinates cN = lineString.getCoordinate(lineString.getVertexCount() - 1);
-          if (Double.isNaN(cN.getZ())) {
-            CoordinatesUtil.addElevation(cN, (LineString)geometry);
-          }
+          final LineString original = (LineString)geometry;
+          LineString lineString = (LineString)intersection;
+          lineString = LineStringUtil.addElevation(original, lineString);
         }
         GeometryProperties.copyUserData(geometry, intersection);
 

@@ -26,6 +26,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.FileUtil;
@@ -143,7 +144,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     try {
       return new SeConnection(server, instance, database, username, password);
     } catch (final SeException e) {
-      throw new RuntimeException("Unabel to create connection", e);
+      throw new RuntimeException("Unable to create connection", e);
     }
   }
 
@@ -152,18 +153,17 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     final int ringIndex, final int axisCount) {
     try {
       final int numCoords = shape.getNumPoints(partIndex + 1, ringIndex + 1);
-      final CoordinatesList coordinates = new DoubleCoordinatesList(numCoords,
-        axisCount);
+      final double[] coordinates = new double[numCoords * axisCount];
       for (int coordinateIndex = 0; coordinateIndex < numCoords; coordinateIndex++) {
 
         final double x = allCoordinates[partIndex][ringIndex][coordinateIndex
           * axisCount];
         final double y = allCoordinates[partIndex][ringIndex][coordinateIndex
           * axisCount + 1];
-        coordinates.setX(coordinateIndex, x);
-        coordinates.setY(coordinateIndex, y);
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+          coordinateIndex, x, y);
       }
-      return coordinates;
+      return new DoubleCoordinatesList(axisCount, coordinates);
     } catch (final SeException e) {
       throw new RuntimeException("Unable to get coordinates", e);
     }

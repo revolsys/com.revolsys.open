@@ -2,28 +2,16 @@ package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.quadtree.DoubleBits;
 
 public class Node extends NodeBase {
-  public static BoundingBox computeKey(final Coordinates point,
-    final int level, final BoundingBox itemEnv) {
-    final double quadSize = DoubleBits.powerOf2(level);
-    point.setX(Math.floor(itemEnv.getMinX() / quadSize) * quadSize);
-    point.setY(Math.floor(itemEnv.getMinY() / quadSize) * quadSize);
-    return new Envelope(2, point.getX(), point.getY(),
-      point.getX() + quadSize, point.getY() + quadSize);
-  }
 
-  public static Envelope computeKey(final int level, final Coordinates point,
-    final BoundingBox itemEnv) {
+  public static Envelope computeKey(final int level, final BoundingBox itemEnv) {
     final double quadSize = DoubleBits.powerOf2(level);
     final double x = Math.floor(itemEnv.getMinX() / quadSize) * quadSize;
     final double y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
-    point.setX(x);
-    point.setY(y);
     return new Envelope(2, x, y, x + quadSize, y + quadSize);
   }
 
@@ -49,13 +37,12 @@ public class Node extends NodeBase {
   }
 
   public static Node createNode(final BoundingBox itemEnv) {
-    final Coordinates point = new Coordinate();
     int level = computeQuadLevel(itemEnv);
-    Envelope nodeEnvelope = computeKey(level, point, itemEnv);
+    Envelope nodeEnvelope = computeKey(level, itemEnv);
     // MD - would be nice to have a non-iterative form of this algorithm
     while (!nodeEnvelope.covers(itemEnv)) {
       level += 1;
-      nodeEnvelope = computeKey(level, point, itemEnv);
+      nodeEnvelope = computeKey(level, itemEnv);
     }
 
     final Node node = new Node(nodeEnvelope, level);

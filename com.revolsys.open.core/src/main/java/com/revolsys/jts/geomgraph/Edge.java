@@ -32,12 +32,12 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import java.io.PrintStream;
-
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geomgraph.index.MonotoneChainEdge;
@@ -62,11 +62,11 @@ public class Edge extends GraphComponent {
     }
   }
 
-  Coordinates[] pts;
+  private final CoordinatesList points;
 
   private Envelope env;
 
-  EdgeIntersectionList eiList = new EdgeIntersectionList(this);
+  private final EdgeIntersectionList eiList = new EdgeIntersectionList(this);
 
   private String name;
 
@@ -79,12 +79,12 @@ public class Edge extends GraphComponent {
   private int depthDelta = 0; // the change in area depth from the R to L side
                               // of this edge
 
-  public Edge(final Coordinates[] pts) {
-    this(pts, null);
+  public Edge(final CoordinatesList points) {
+    this(points, null);
   }
 
-  public Edge(final Coordinates[] pts, final Label label) {
-    this.pts = pts;
+  public Edge(final CoordinatesList points, final Label label) {
+    this.points = points;
     this.label = label;
   }
 
@@ -98,17 +98,13 @@ public class Edge extends GraphComponent {
     final Coordinates intPt = new Coordinate(li.getIntersection(intIndex));
     int normalizedSegmentIndex = segmentIndex;
     double dist = li.getEdgeDistance(geomIndex, intIndex);
-    // Debug.println("edge intpt: " + intPt + " dist: " + dist);
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
-    if (nextSegIndex < pts.length) {
-      final Coordinates nextPt = pts[nextSegIndex];
-      // Debug.println("next pt: " + nextPt);
-
+    if (nextSegIndex < getNumPoints()) {
+      final Coordinates nextPt = getCoordinate(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
       if (intPt.equals2d(nextPt)) {
-        // Debug.println("normalized distance");
         normalizedSegmentIndex = nextSegIndex;
         dist = 0.0;
       }
@@ -116,9 +112,7 @@ public class Edge extends GraphComponent {
     /**
     * Add the intersection point to edge intersection list.
     */
-    final EdgeIntersection ei = eiList.add(intPt, normalizedSegmentIndex, dist);
-    // ei.print(System.out);
-
+    eiList.add(intPt, normalizedSegmentIndex, dist);
   }
 
   /**
@@ -155,18 +149,18 @@ public class Edge extends GraphComponent {
     }
     final Edge e = (Edge)o;
 
-    if (pts.length != e.pts.length) {
+    if (getNumPoints() != e.getNumPoints()) {
       return false;
     }
 
     boolean isEqualForward = true;
     boolean isEqualReverse = true;
-    int iRev = pts.length;
-    for (int i = 0; i < pts.length; i++) {
-      if (!pts[i].equals2d(e.pts[i])) {
+    int iRev = getNumPoints();
+    for (int i = 0; i < getNumPoints(); i++) {
+      if (!getCoordinate(i).equals2d(e.getCoordinate(i))) {
         isEqualForward = false;
       }
-      if (!pts[i].equals2d(e.pts[--iRev])) {
+      if (!getCoordinate(i).equals2d(e.getCoordinate(--iRev))) {
         isEqualReverse = false;
       }
       if (!isEqualForward && !isEqualReverse) {
@@ -177,27 +171,22 @@ public class Edge extends GraphComponent {
   }
 
   public Edge getCollapsedEdge() {
-    final Coordinates newPts[] = new Coordinates[2];
-    newPts[0] = pts[0];
-    newPts[1] = pts[1];
-    final Edge newe = new Edge(newPts, Label.toLineLabel(label));
-    return newe;
+    final CoordinatesList points = new DoubleCoordinatesList(getCoordinate(0),
+      getCoordinate(1));
+    final Edge edge = new Edge(points, Label.toLineLabel(label));
+    return edge;
   }
 
   @Override
   public Coordinates getCoordinate() {
-    if (pts.length > 0) {
-      return pts[0];
+    if (getNumPoints() > 0) {
+      return getCoordinate(0);
     }
     return null;
   }
 
   public Coordinates getCoordinate(final int i) {
-    return pts[i];
-  }
-
-  public Coordinates[] getCoordinates() {
-    return pts;
+    return points.get(i);
   }
 
   public Depth getDepth() {
@@ -218,13 +207,13 @@ public class Edge extends GraphComponent {
 
   public BoundingBox getEnvelope() {
     if (env == null) {
-      env = new Envelope(pts);
+      env = new Envelope(points);
     }
     return env;
   }
 
   public int getMaximumSegmentIndex() {
-    return pts.length - 1;
+    return getNumPoints() - 1;
   }
 
   public MonotoneChainEdge getMonotoneChainEdge() {
@@ -235,11 +224,15 @@ public class Edge extends GraphComponent {
   }
 
   public int getNumPoints() {
-    return pts.length;
+    return points.size();
+  }
+
+  public CoordinatesList getPoints() {
+    return points;
   }
 
   public boolean isClosed() {
-    return pts[0].equals(pts[pts.length - 1]);
+    return getCoordinate(0).equals(getCoordinate(getNumPoints() - 1));
   }
 
   /**
@@ -250,10 +243,10 @@ public class Edge extends GraphComponent {
     if (!label.isArea()) {
       return false;
     }
-    if (pts.length != 3) {
+    if (getNumPoints() != 3) {
       return false;
     }
-    if (pts[0].equals(pts[2])) {
+    if (getCoordinate(0).equals(getCoordinate(2))) {
       return true;
     }
     return false;
@@ -268,36 +261,16 @@ public class Edge extends GraphComponent {
    * @return true if the coordinate sequences of the Edges are identical
    */
   public boolean isPointwiseEqual(final Edge e) {
-    if (pts.length != e.pts.length) {
+    if (getNumPoints() != e.getNumPoints()) {
       return false;
     }
 
-    for (int i = 0; i < pts.length; i++) {
-      if (!pts[i].equals2d(e.pts[i])) {
+    for (int i = 0; i < getNumPoints(); i++) {
+      if (!getCoordinate(i).equals2d(e.getCoordinate(i))) {
         return false;
       }
     }
     return true;
-  }
-
-  public void print(final PrintStream out) {
-    out.print("edge " + name + ": ");
-    out.print("LINESTRING (");
-    for (int i = 0; i < pts.length; i++) {
-      if (i > 0) {
-        out.print(",");
-      }
-      out.print(pts[i].getX() + " " + pts[i].getY());
-    }
-    out.print(")  " + label + " " + depthDelta);
-  }
-
-  public void printReverse(final PrintStream out) {
-    out.print("edge " + name + ": ");
-    for (int i = pts.length - 1; i >= 0; i--) {
-      out.print(pts[i] + " ");
-    }
-    out.println("");
   }
 
   public void setDepthDelta(final int depthDelta) {
@@ -317,11 +290,11 @@ public class Edge extends GraphComponent {
     final StringBuffer buf = new StringBuffer();
     buf.append("edge " + name + ": ");
     buf.append("LINESTRING (");
-    for (int i = 0; i < pts.length; i++) {
+    for (int i = 0; i < getNumPoints(); i++) {
       if (i > 0) {
         buf.append(",");
       }
-      buf.append(pts[i].getX() + " " + pts[i].getY());
+      buf.append(getCoordinate(i).getX() + " " + getCoordinate(i).getY());
     }
     buf.append(")  " + label + " " + depthDelta);
     return buf.toString();

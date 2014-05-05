@@ -33,6 +33,7 @@
 
 package com.revolsys.jts.noding.snapround;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
@@ -61,12 +62,6 @@ public class HotPixel {
   private Coordinates pt;
 
   private final Coordinates originalPt;
-
-  private Coordinates ptScaled;
-
-  private Coordinates p0Scaled;
-
-  private Coordinates p1Scaled;
 
   private final double scaleFactor;
 
@@ -111,8 +106,6 @@ public class HotPixel {
     if (scaleFactor != 1.0) {
       this.pt = new Coordinate(scale(pt.getX()), scale(pt.getY()),
         Coordinates.NULL_ORDINATE);
-      p0Scaled = new Coordinate();
-      p1Scaled = new Coordinate();
     }
     initCorners(this.pt);
   }
@@ -140,11 +133,6 @@ public class HotPixel {
     return false;
   }
 
-  private void copyScaled(final Coordinates p, final Coordinates pScaled) {
-    pScaled.setX(scale(p.getX()));
-    pScaled.setY(scale(p.getY()));
-  }
-
   /**
    * Gets the coordinate this hot pixel is based at.
    * 
@@ -164,11 +152,15 @@ public class HotPixel {
   public BoundingBox getSafeEnvelope() {
     if (safeEnv == null) {
       final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / scaleFactor;
-      safeEnv = new Envelope(2,
-        originalPt.getX() - safeTolerance, originalPt.getY() - safeTolerance,
-        originalPt.getX() + safeTolerance, originalPt.getY() + safeTolerance);
+      safeEnv = new Envelope(2, originalPt.getX() - safeTolerance,
+        originalPt.getY() - safeTolerance, originalPt.getX() + safeTolerance,
+        originalPt.getY() + safeTolerance);
     }
     return safeEnv;
+  }
+
+  private Coordinates getScaled(final Coordinates p) {
+    return new DoubleCoordinates(scale(p.getX()), scale(p.getY()));
   }
 
   private void initCorners(final Coordinates pt) {
@@ -197,43 +189,7 @@ public class HotPixel {
       return intersectsScaled(p0, p1);
     }
 
-    copyScaled(p0, p0Scaled);
-    copyScaled(p1, p1Scaled);
-    return intersectsScaled(p0Scaled, p1Scaled);
-  }
-
-  /**
-   * Test whether the given segment intersects
-   * the closure of this hot pixel.
-   * This is NOT the test used in the standard snap-rounding
-   * algorithm, which uses the partially closed tolerance square
-   * instead.
-   * This routine is provided for testing purposes only.
-   *
-   * @param p0 the start point of a line segment
-   * @param p1 the end point of a line segment
-   * @return <code>true</code> if the segment intersects the closure of the pixel's tolerance square
-   */
-  private boolean intersectsPixelClosure(final Coordinates p0,
-    final Coordinates p1) {
-    li.computeIntersection(p0, p1, corner[0], corner[1]);
-    if (li.hasIntersection()) {
-      return true;
-    }
-    li.computeIntersection(p0, p1, corner[1], corner[2]);
-    if (li.hasIntersection()) {
-      return true;
-    }
-    li.computeIntersection(p0, p1, corner[2], corner[3]);
-    if (li.hasIntersection()) {
-      return true;
-    }
-    li.computeIntersection(p0, p1, corner[3], corner[0]);
-    if (li.hasIntersection()) {
-      return true;
-    }
-
-    return false;
+    return intersectsScaled(getScaled(p0), getScaled(p1));
   }
 
   private boolean intersectsScaled(final Coordinates p0, final Coordinates p1) {
@@ -248,29 +204,10 @@ public class HotPixel {
       return false;
     }
     final boolean intersects = intersectsToleranceSquare(p0, p1);
-    // boolean intersectsPixelClosure = intersectsPixelClosure(p0, p1);
-
-    // if (intersectsPixel != intersects) {
-    // Debug.println("Found hot pixel intersection mismatch at " + pt);
-    // Debug.println("Test segment: " + p0 + " " + p1);
-    // }
-
-    /*
-     * if (scaleFactor != 1.0) { boolean intersectsScaled =
-     * intersectsScaledTest(p0, p1); if (intersectsScaled != intersects) {
-     * intersectsScaledTest(p0, p1); //
-     * Debug.println("Found hot pixel scaled intersection mismatch at " + pt);
-     * // Debug.println("Test segment: " + p0 + " " + p1); } return
-     * intersectsScaled; }
-     */
 
     Assert.isTrue(!(isOutsidePixelEnv && intersects), "Found bad envelope test");
-    // if (isOutsideEnv && intersects) {
-    // Debug.println("Found bad envelope test");
-    // }
 
     return intersects;
-    // return intersectsPixelClosure;
   }
 
   /**

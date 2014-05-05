@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
-
 public class ChainedCoordinatesOperation implements CoordinatesOperation {
   private final List<CoordinatesOperation> operations;
 
@@ -15,16 +13,6 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
 
   public ChainedCoordinatesOperation(final List<CoordinatesOperation> operations) {
     this.operations = new ArrayList<CoordinatesOperation>(operations);
-  }
-
-  @Override
-  public void perform(final Coordinates from, final Coordinates to) {
-    Coordinates source = from;
-    final Coordinates target = to;
-    for (final CoordinatesOperation operation : operations) {
-      operation.perform(source, target);
-      source = target;
-    }
   }
 
   @Override

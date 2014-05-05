@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+
 /**
  * A Bounding Container which is in the shape of an octagon.
  * The OctagonalEnvelope of a geometric object
@@ -383,35 +385,26 @@ public class OctagonalEnvelope {
       return geomFactory.point((CoordinatesList)null);
     }
 
-    final Coordinates px00 = new Coordinate(minX, minA - minX,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates px01 = new Coordinate(minX, minX - minB,
-      Coordinates.NULL_ORDINATE);
-
-    final Coordinates px10 = new Coordinate(maxX, maxX - maxB,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates px11 = new Coordinate(maxX, maxA - maxX,
-      Coordinates.NULL_ORDINATE);
-
-    final Coordinates py00 = new Coordinate(minA - minY, minY,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates py01 = new Coordinate(minY + maxB, minY,
-      Coordinates.NULL_ORDINATE);
-
-    final Coordinates py10 = new Coordinate(maxY + minB, maxY,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates py11 = new Coordinate(maxA - maxY, maxY,
-      Coordinates.NULL_ORDINATE);
-
     final PrecisionModel pm = geomFactory.getPrecisionModel();
-    pm.makePrecise(px00);
-    pm.makePrecise(px01);
-    pm.makePrecise(px10);
-    pm.makePrecise(px11);
-    pm.makePrecise(py00);
-    pm.makePrecise(py01);
-    pm.makePrecise(py10);
-    pm.makePrecise(py11);
+    final Coordinates px00 = new DoubleCoordinates(pm.makePrecise(minX),
+      pm.makePrecise(minA - minX));
+    final Coordinates px01 = new DoubleCoordinates(pm.makePrecise(minX),
+      pm.makePrecise(minX - minB));
+
+    final Coordinates px10 = new DoubleCoordinates(pm.makePrecise(maxX),
+      pm.makePrecise(maxX - maxB));
+    final Coordinates px11 = new DoubleCoordinates(pm.makePrecise(maxX),
+      pm.makePrecise(maxA - maxX));
+
+    final Coordinates py00 = new DoubleCoordinates(pm.makePrecise(minA - minY),
+      pm.makePrecise(minY));
+    final Coordinates py01 = new DoubleCoordinates(pm.makePrecise(minY + maxB),
+      pm.makePrecise(minY));
+
+    final Coordinates py10 = new DoubleCoordinates(pm.makePrecise(maxY + minB),
+      pm.makePrecise(maxY));
+    final Coordinates py11 = new DoubleCoordinates(pm.makePrecise(maxA - maxY),
+      pm.makePrecise(maxY));
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(px00, false);
@@ -427,12 +420,10 @@ public class OctagonalEnvelope {
       return geomFactory.point(px00);
     }
     if (coordList.size() == 2) {
-      final Coordinates[] pts = coordList.toCoordinateArray();
-      return geomFactory.lineString(pts);
+      return geomFactory.lineString(coordList);
     }
     // must be a polygon, so add closing point
     coordList.add(px00, false);
-    final Coordinates[] pts = coordList.toCoordinateArray();
-    return geomFactory.polygon(geomFactory.linearRing(pts));
+    return geomFactory.polygon(geomFactory.linearRing(coordList));
   }
 }

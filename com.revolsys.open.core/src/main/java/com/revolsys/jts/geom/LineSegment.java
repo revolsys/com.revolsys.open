@@ -310,8 +310,6 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    */
   double segmentFraction(Coordinates point);
 
-  void setCoordinates(Coordinates p0, Coordinates p1);
-
   /**
    * Creates a LineString with the same coordinates as this segment
    * 

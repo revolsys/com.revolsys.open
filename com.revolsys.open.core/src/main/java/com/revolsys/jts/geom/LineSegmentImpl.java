@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+
 /**
  * Represents a line segment defined by two {@link Coordinates}s.
  * Provides methods to compute various geometric properties
@@ -47,54 +49,81 @@ package com.revolsys.jts.geom;
  */
 public class LineSegmentImpl extends AbstractLineSegment {
 
-  private final Coordinates p0;
-
-  private final Coordinates p1;
+  private double[] coordinates;
 
   public LineSegmentImpl() {
-    this(new Coordinate(), new Coordinate());
+    this.coordinates = null;
   }
 
-  public LineSegmentImpl(final Coordinates p0, final Coordinates p1) {
-    this.p0 = p0;
-    this.p1 = p1;
+  public LineSegmentImpl(final Coordinates point1, final Coordinates point2) {
+    final int axisCount = Math.max(point1.getAxisCount(), point2.getAxisCount());
+    coordinates = new double[axisCount * 2];
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, point1);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 1, point2);
   }
 
-  public LineSegmentImpl(final double x0, final double y0, final double x1,
-    final double y1) {
-    this(new Coordinate(x0, y0, Coordinates.NULL_ORDINATE), new Coordinate(x1,
-      y1, Coordinates.NULL_ORDINATE));
+  public LineSegmentImpl(final int axisCount, final double... coordinates) {
+    if (coordinates == null || coordinates.length == 0 || axisCount < 1) {
+      this.coordinates = null;
+    } else if (coordinates.length % axisCount == 0) {
+      this.coordinates = new double[axisCount * 2];
+      int i = 0;
+      final int axisCount2 = coordinates.length / 2;
+      for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
+        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+          double value;
+          if (axisIndex < axisCount2) {
+            value = coordinates[vertexIndex * axisCount2 + axisIndex];
+          } else {
+            value = Double.NaN;
+          }
+          this.coordinates[i++] = value;
+        }
+      }
+    } else {
+      throw new IllegalArgumentException("Expecting a multiple of " + axisCount
+        + " not " + coordinates.length);
+    }
   }
 
-  public LineSegmentImpl(final LineSegment ls) {
-    this(ls.getP0().cloneCoordinates(), ls.getP1().cloneCoordinates());
+  public LineSegmentImpl(final LineSegment line) {
+    this(line.get(0), line.get(1));
+  }
+
+  public LineSegmentImpl(final LineString line) {
+    this(line.getVertex(0), line.getVertex(-1));
   }
 
   @Override
   public LineSegmentImpl clone() {
-    return new LineSegmentImpl(get(0), get(1));
-  }
-
-  @Override
-  public Coordinates getP0() {
-    return p0;
-  }
-
-  @Override
-  public Coordinates getP1() {
-    return p1;
-  }
-
-  @Override
-  public double getValue(final int vertexIndex, final int axisIndex) {
-    if (vertexIndex == 0) {
-      return p0.getValue(axisIndex);
-    } else if (vertexIndex == 1) {
-      return p1.getValue(axisIndex);
+    final LineSegmentImpl clone = (LineSegmentImpl)super.clone();
+    if (clone.coordinates != null) {
+      clone.coordinates = clone.coordinates.clone();
     }
-    {
-      return Double.NaN;
+    return clone;
+  }
+
+  @Override
+  public int getAxisCount() {
+    return coordinates.length / 2;
+  }
+
+  @Override
+  public double getValue(final int index, final int axisIndex) {
+    final int axisCount = getAxisCount();
+    if (axisIndex >= 0 && axisIndex < axisCount) {
+      if (index >= 0 && index < 2) {
+        final int valueIndex = index * axisCount + axisIndex;
+        final double value = coordinates[valueIndex];
+        return value;
+      }
     }
+    return Double.NaN;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return coordinates == null;
   }
 
 }

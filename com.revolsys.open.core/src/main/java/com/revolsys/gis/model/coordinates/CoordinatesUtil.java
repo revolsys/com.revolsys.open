@@ -9,65 +9,12 @@ import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
 
 public class CoordinatesUtil {
-
-  public static Coordinates add(final Coordinates c1, final Coordinates c2) {
-    final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());
-    final Coordinates newPoint = new DoubleCoordinates(axisCount);
-    for (int i = 0; i < axisCount; i++) {
-      final double value1 = c1.getValue(i);
-      final double value2 = c2.getValue(i);
-      final double value = value1 + value2;
-      newPoint.setValue(i, value);
-    }
-    return newPoint;
-  }
-
-  public static Coordinates add(final Coordinates coordinates,
-    final double... deltas) {
-    final Coordinates newCoordinates = new DoubleCoordinates(coordinates);
-    for (int i = 0; i < deltas.length; i++) {
-      final double delta = deltas[i];
-      final double oldValue = coordinates.getValue(i);
-      final double newValue = oldValue + delta;
-      newCoordinates.setValue(i, newValue);
-    }
-    return null;
-  }
-
-  public static Point add(final Point c1, final Point c2) {
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
-    final Point p2 = (Point)factory.geometry(c2);
-    return factory.point(add(getInstance(c1), getInstance(p2)));
-  }
-
-  public static void addElevation(final Coordinates coordinate,
-    final LineString line) {
-    final CoordinatesList coordinates = line.getCoordinatesList();
-    Coordinates previousCoordinate = coordinates.getCoordinate(0);
-    for (int i = 1; i < coordinates.size(); i++) {
-      final Coordinates currentCoordinate = coordinates.getCoordinate(i);
-
-      if (LineSegmentUtil.distance(previousCoordinate, currentCoordinate,
-        coordinate) < 1) {
-        final CoordinatesPrecisionModel precisionModel = line.getGeometryFactory()
-          .getCoordinatesPrecisionModel();
-
-        LineSegmentUtil.addElevation(precisionModel, previousCoordinate,
-          currentCoordinate, coordinate);
-
-        return;
-      }
-      previousCoordinate = currentCoordinate;
-    }
-
-  }
 
   public static double angle(final Coordinates p1, final Coordinates p2,
     final Coordinates p3) {
@@ -126,7 +73,7 @@ public class CoordinatesUtil {
 
   public static Coordinates average(final Coordinates c1, final Coordinates c2) {
     final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());
-    final Coordinates newPoint = new DoubleCoordinates(axisCount);
+    final double[] coordinates = new double[axisCount];
     for (int i = 0; i < axisCount; i++) {
       final double value1 = c1.getValue(i);
       final double value2 = c2.getValue(i);
@@ -138,9 +85,9 @@ public class CoordinatesUtil {
       } else {
         value = MathUtil.avg(value1, value2);
       }
-      newPoint.setValue(i, value);
+      coordinates[i] = value;
     }
-    return newPoint;
+    return new DoubleCoordinates(coordinates);
   }
 
   public static Coordinates circumcentre(final double x1, final double y1,
@@ -190,6 +137,16 @@ public class CoordinatesUtil {
     }
   }
 
+  public static boolean contains(final Iterable<? extends Coordinates> points,
+    final Coordinates point) {
+    for (final Coordinates point1 : points) {
+      if (point1.equals(point)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Computes the 2-dimensional Euclidean distance to another location.
    * The Z-ordinate is ignored.
@@ -218,17 +175,6 @@ public class CoordinatesUtil {
     final double dy = point1.getY() - point2.getY();
     final double dz = point1.getZ() - point2.getZ();
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
-  }
-
-  public static Coordinates divide(final Coordinates c1, final double d) {
-    final int axisCount = c1.getAxisCount();
-    final Coordinates newPoint = new DoubleCoordinates(axisCount);
-    for (int i = 0; i < axisCount; i++) {
-      final double value1 = c1.getValue(i);
-      final double value = value1 / d;
-      newPoint.setValue(i, value);
-    }
-    return newPoint;
   }
 
   public static boolean equals(final Coordinates point,
@@ -317,6 +263,23 @@ public class CoordinatesUtil {
     return z;
   }
 
+  public static double getElevation(final LineString line,
+    final Coordinates coordinate) {
+    final CoordinatesList coordinates = line.getCoordinatesList();
+    Coordinates previousCoordinate = coordinates.getCoordinate(0);
+    for (int i = 1; i < coordinates.size(); i++) {
+      final Coordinates currentCoordinate = coordinates.getCoordinate(i);
+
+      if (LineSegmentUtil.distance(previousCoordinate, currentCoordinate,
+        coordinate) < 1) {
+        return LineSegmentUtil.getElevation(previousCoordinate,
+          currentCoordinate, coordinate);
+      }
+      previousCoordinate = currentCoordinate;
+    }
+    return Double.NaN;
+  }
+
   @Deprecated
   public static Coordinates getInstance(final Point point) {
     if (point == null || point.isEmpty()) {
@@ -366,17 +329,6 @@ public class CoordinatesUtil {
     final double y3 = point3.getY();
 
     return MathUtil.isAcute(x1, y1, x2, y2, x3, y3);
-  }
-
-  public static Coordinates multiply(final double d, final Coordinates c1) {
-    final int axisCount = c1.getAxisCount();
-    final Coordinates newPoint = new DoubleCoordinates(axisCount);
-    for (int i = 0; i < axisCount; i++) {
-      final double value1 = c1.getValue(i);
-      final double value = value1 * d;
-      newPoint.setValue(i, value);
-    }
-    return newPoint;
   }
 
   /**
@@ -487,6 +439,24 @@ public class CoordinatesUtil {
     return new HCoordinate(l1, l2);
   }
 
+  /**
+   * Return the first point of points1 not in points2
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param points1
+   * @param points2
+   * @return
+   */
+  public static Coordinates pointNotInList(
+    final Iterable<? extends Coordinates> points1,
+    final Iterable<? extends Coordinates> points2) {
+    for (final Coordinates point : points1) {
+      if (contains(points2, point)) {
+        return point;
+      }
+    }
+    return null;
+  }
+
   public static Coordinates setElevation(final Coordinates newLocation,
     final Coordinates originalLocation) {
     if (originalLocation.getAxisCount() > 2) {
@@ -502,24 +472,6 @@ public class CoordinatesUtil {
     } else {
       return newLocation;
     }
-  }
-
-  public static Coordinates subtract(final Coordinates c1, final Coordinates c2) {
-    final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());
-    final Coordinates newPoint = new DoubleCoordinates(axisCount);
-    for (int i = 0; i < axisCount; i++) {
-      final double value1 = c1.getValue(i);
-      final double value2 = c2.getValue(i);
-      final double value = value1 - value2;
-      newPoint.setValue(i, value);
-    }
-    return newPoint;
-  }
-
-  public static Point subtract(final Point c1, final Point c2) {
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(c1);
-    final Point p2 = (Point)factory.geometry(c2);
-    return factory.point(subtract(getInstance(c1), getInstance(p2)));
   }
 
   public static float[] toFloatArray(final CoordinatesList points,
@@ -543,31 +495,5 @@ public class CoordinatesUtil {
 
     final Coordinates newPoint = new DoubleCoordinates(newX, newY);
     return newPoint;
-  }
-
-  /**
-   * Return the first point of points1 not in points2
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @param points1
-   * @param points2
-   * @return
-   */
-  public static Coordinates pointNotInList(final Iterable<? extends Coordinates> points1,
-    final Iterable<? extends Coordinates> points2) {
-    for (Coordinates point : points1) {
-      if (contains(points2, point)) {
-        return point;
-      }
-    }
-    return null;
-  }
-
-  public static boolean contains(final Iterable<? extends Coordinates> points, Coordinates point) {
-    for (Coordinates point1 : points) {
-      if (point1.equals(point) ) {
-        return true;
-      }
-    }
-    return false;
   }
 }

@@ -33,7 +33,6 @@ import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.PointQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.IndexedLineSegment;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -200,7 +199,7 @@ public class AbstractOverlay extends JComponent implements
   protected void drawXorGeometry(final Graphics2D graphics) {
     Geometry geometry = this.xorGeometry;
     if (geometry != null) {
-      geometry = getViewport().getGeometryFactory().copy(geometry);
+      geometry = geometry.copy(getViewport().getGeometryFactory());
       final Paint paint = graphics.getPaint();
       try {
         graphics.setXORMode(Color.WHITE);
@@ -253,7 +252,7 @@ public class AbstractOverlay extends JComponent implements
     final Geometry geometry, final BoundingBox boundingBox) {
 
     final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
-    final Geometry convertedGeometry = viewportGeometryFactory.copy(geometry);
+    final Geometry convertedGeometry = geometry.copy(viewportGeometryFactory);
 
     final double maxDistance = getMaxDistance(boundingBox);
     final QuadTree<IndexedLineSegment> lineSegments = GeometryEditUtil.getLineSegmentQuadTree(convertedGeometry);
@@ -271,11 +270,9 @@ public class AbstractOverlay extends JComponent implements
         }
       }
       if (closestSegment != null) {
-        Coordinates pointOnLine = closestSegment.project(point);
-        final com.revolsys.jts.geom.GeometryFactory geometryFactory = layer.getGeometryFactory();
-        pointOnLine = ProjectionFactory.convert(pointOnLine,
-          viewportGeometryFactory, geometryFactory);
-        final Point closePoint = geometryFactory.point(pointOnLine);
+        final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
+        final GeometryFactory geometryFactory = layer.getGeometryFactory();
+        final Point closePoint = pointOnLine.convert(geometryFactory);
         return new CloseLocation(layer, object, geometry, null, closestSegment,
           closePoint);
       }
@@ -300,7 +297,7 @@ public class AbstractOverlay extends JComponent implements
         final Point vertex = GeometryEditUtil.getVertexPoint(geometry,
           vertexIndex);
         if (vertex != null) {
-          final double distance = geometryFactory.copy(vertex).distance(centre);
+          final double distance = ((Point)vertex.copy(geometryFactory)).distance(centre);
           if (distance < minDistance) {
             minDistance = distance;
             closestVertexIndex = vertexIndex;

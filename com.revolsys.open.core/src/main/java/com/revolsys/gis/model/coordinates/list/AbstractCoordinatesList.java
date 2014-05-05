@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -47,17 +46,6 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
       }
     }
     return false;
-  }
-
-  @Override
-  public void copy(final int sourceIndex, final CoordinatesList target,
-    final int targetIndex, final int axisCount, final int count) {
-    for (int i = 0; i < count; i++) {
-      for (int j = 0; j < axisCount; j++) {
-        final double coordinate = getValue(sourceIndex + i, j);
-        target.setValue(targetIndex + i, j, coordinate);
-      }
-    }
   }
 
   public CoordinatesList create(final int length, final int axisCount) {
@@ -391,65 +379,18 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public void makePrecise(final CoordinatesPrecisionModel precisionModel) {
-    final InPlaceIterator iterator = new InPlaceIterator(this);
-    for (final Coordinates point : iterator) {
-      precisionModel.makePrecise(point);
-    }
-  }
-
-  @Override
   public CoordinatesList reverse() {
-    return new ReverseCoordinatesList(this);
-  }
-
-  @Override
-  public void setCoordinate(final int i, final Coordinates coordinate) {
-    setValue(i, 0, coordinate.getX());
-    setValue(i, 1, coordinate.getY());
-    if (getAxisCount() > 2) {
-      setValue(i, 2, coordinate.getZ());
+    final int vertexCount = size();
+    final int axisCount = getAxisCount();
+    final double[] coordinates = new double[vertexCount * axisCount];
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        int coordinateIndex = (vertexCount - 1 - vertexIndex) * axisCount + axisIndex;
+        coordinates[coordinateIndex] = getValue(
+          vertexIndex, axisIndex);
+      }
     }
-  }
-
-  @Override
-  public void setM(final int index, final double m) {
-    setValue(index, 3, m);
-  }
-
-  @Override
-  public void setPoint(final int i, final Coordinates point) {
-    setX(i, point.getX());
-    setY(i, point.getY());
-    if (getAxisCount() > 2) {
-      setZ(i, point.getZ());
-    }
-  }
-
-  @Override
-  public void setTime(final int index, final long time) {
-    setM(index, time);
-  }
-
-  @Override
-  @Deprecated
-  public void setValue(final int index, final int axisIndex, final double value) {
-    setValue(index, axisIndex, value);
-  }
-
-  @Override
-  public void setX(final int index, final double x) {
-    setValue(index, 0, x);
-  }
-
-  @Override
-  public void setY(final int index, final double y) {
-    setValue(index, 1, y);
-  }
-
-  @Override
-  public void setZ(final int index, final double z) {
-    setValue(index, 2, z);
+    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   @Override
@@ -493,9 +434,13 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   public CoordinatesList subList(final int length, final int sourceIndex,
     final int targetIndex, final int count) {
     final int axisCount = getAxisCount();
-    final CoordinatesList target = create(length, axisCount);
-    copy(sourceIndex, target, targetIndex, axisCount, count);
-    return target;
+    final double[] coordinates = new double[length * axisCount];
+    for (int i = 0; i < count; i++) {
+      final Coordinates point = get(sourceIndex + i);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, targetIndex
+        + i, point);
+    }
+    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   @Override

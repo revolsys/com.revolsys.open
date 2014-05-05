@@ -32,7 +32,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final Coordinates p1, final int expectedPositionValue) {
     final int octant = Octant.octant(seg.getP0(), seg.getP1());
     final int posValue = SegmentPointComparator.compare(octant, p0, p1);
-  //  System.out.println(octant + " " + p0 + " " + p1 + " " + posValue);
+    // System.out.println(octant + " " + p0 + " " + p1 + " " + posValue);
     assertTrue(posValue == expectedPositionValue);
   }
 
@@ -49,8 +49,9 @@ public class SegmentPointComparatorFullTest extends TestCase {
   }
 
   private void checkSegment(final double x, final double y) {
-    final Coordinates seg0 = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
-    final Coordinates seg1 = new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
+    final Coordinates seg0 = new Coordinate((double)0, 0,
+      Coordinates.NULL_ORDINATE);
+    final Coordinates seg1 = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
     final LineSegment seg = new LineSegmentImpl(seg0, seg1);
 
     for (int i = 0; i < 4; i++) {
@@ -69,8 +70,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final double dx = seg.getP1().getX() - seg.getP0().getX();
     final double dy = seg.getP1().getY() - seg.getP0().getY();
     final double len = seg.getLength();
-    final Coordinates pt = new Coordinate((double)dist * dx / len, dist * dy / len, Coordinates.NULL_ORDINATE);
-    this.pm.makePrecise(pt);
+    final Coordinates pt = new Coordinate(pm.makePrecise(dist * dx / len),
+      pm.makePrecise(dist * dy / len));
     return pt;
   }
 

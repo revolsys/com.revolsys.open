@@ -1634,8 +1634,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  public final List<LayerDataObject> query(final BoundingBox boundingBox) {
+  public final List<LayerDataObject> query(BoundingBox boundingBox) {
     if (hasGeometryAttribute()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      boundingBox = boundingBox.convert(geometryFactory);
       final List<LayerDataObject> results = doQuery(boundingBox);
       final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
       return filterQueryResults(results, filter);
@@ -1666,9 +1668,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     return filterQueryResults(results, condition);
   }
 
-  public final List<LayerDataObject> queryBackground(
-    final BoundingBox boundingBox) {
+  public final List<LayerDataObject> queryBackground(BoundingBox boundingBox) {
     if (hasGeometryAttribute()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      boundingBox = boundingBox.convert(geometryFactory);
       final List<LayerDataObject> results = doQueryBackground(boundingBox);
       return results;
     } else {
@@ -2201,7 +2204,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final LineString line = (LineString)geometry;
       final int[] vertexIndex = mouseLocation.getVertexIndex();
       final Point point = mouseLocation.getPoint();
-      final Point convertedPoint = getGeometryFactory().copy(point);
+      final Point convertedPoint = (Point)point.copy(getGeometryFactory());
       final Coordinates coordinates = CoordinatesUtil.getInstance(convertedPoint);
       final LineString line1;
       final LineString line2;

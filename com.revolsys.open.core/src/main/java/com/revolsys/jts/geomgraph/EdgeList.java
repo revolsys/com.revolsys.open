@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -40,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.noding.OrientedCoordinateArray;
 
 /**
@@ -66,7 +64,7 @@ public class EdgeList implements Iterable<Edge> {
   public void add(final Edge edge) {
     edges.add(edge);
     final OrientedCoordinateArray oca = new OrientedCoordinateArray(
-      edge.getCoordinates());
+      edge.getPoints());
     ocaMap.put(oca, edge);
   }
 
@@ -82,10 +80,12 @@ public class EdgeList implements Iterable<Edge> {
    *          -1 otherwise
    */
   public int findEdgeIndex(final Edge e) {
-    for (int i = 0; i < edges.size(); i++) {
-      if (edges.get(i).equals(e)) {
+    int i = 0;
+    for (final Edge edge : edges) {
+      if (edge.equals(e)) {
         return i;
       }
+      i++;
     }
     return -1;
   }
@@ -98,7 +98,7 @@ public class EdgeList implements Iterable<Edge> {
    */
   public Edge findEqualEdge(final Edge e) {
     final OrientedCoordinateArray oca = new OrientedCoordinateArray(
-      e.getCoordinates());
+      e.getPoints());
     // will return null if no edge matches
     final Edge matchEdge = ocaMap.get(oca);
     return matchEdge;
@@ -115,26 +115,6 @@ public class EdgeList implements Iterable<Edge> {
   @Override
   public Iterator<Edge> iterator() {
     return edges.iterator();
-  }
-
-  public void print(final PrintStream out) {
-    out.print("MULTILINESTRING ( ");
-    for (int j = 0; j < edges.size(); j++) {
-      final Edge e = edges.get(j);
-      if (j > 0) {
-        out.print(",");
-      }
-      out.print("(");
-      final Coordinates[] pts = e.getCoordinates();
-      for (int i = 0; i < pts.length; i++) {
-        if (i > 0) {
-          out.print(",");
-        }
-        out.print(pts[i].getX() + " " + pts[i].getY());
-      }
-      out.println(")");
-    }
-    out.print(")  ");
   }
 
   @Override

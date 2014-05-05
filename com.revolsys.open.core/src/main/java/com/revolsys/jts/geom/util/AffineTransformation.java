@@ -33,8 +33,8 @@
 
 package com.revolsys.jts.geom.util;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.util.Assert;
 
@@ -1069,12 +1069,10 @@ public class AffineTransformation implements Cloneable
    * @param dest the coordinate to accept the results 
    * @return the <tt>dest</tt> coordinate
    */
-  public Coordinates transform(final Coordinates src, final Coordinates dest) {
+  public Coordinates transform(final Coordinates src) {
     final double xp = m00 * src.getX() + m01 * src.getY() + m02;
     final double yp = m10 * src.getX() + m11 * src.getY() + m12;
-    dest.setX(xp);
-    dest.setY(yp);
-    return dest;
+    return new DoubleCoordinates(xp, yp);
   }
 
   /**
@@ -1084,12 +1082,14 @@ public class AffineTransformation implements Cloneable
    *@param seq  a <code>CoordinatesList</code>
    *@param i the index of the coordinate to transform
    */
-  public void transform(final CoordinatesList seq, final int i) {
-    final double xp = m00 * seq.getValue(i, 0) + m01 * seq.getValue(i, 1) + m02;
-    final double yp = m10 * seq.getValue(i, 0) + m11 * seq.getValue(i, 1) + m12;
-    seq.setValue(i, 0, xp);
-    seq.setValue(i, 1, yp);
-  }
+  // public void transform(final CoordinatesList seq, final int i) {
+  // final double xp = m00 * seq.getValue(i, 0) + m01 * seq.getValue(i, 1) +
+  // m02;
+  // final double yp = m10 * seq.getValue(i, 0) + m11 * seq.getValue(i, 1) +
+  // m12;
+  // seq.setValue(i, 0, xp);
+  // seq.setValue(i, 1, yp);
+  // }
 
   /**
    * Cretaes a new @link Geometry which is the result

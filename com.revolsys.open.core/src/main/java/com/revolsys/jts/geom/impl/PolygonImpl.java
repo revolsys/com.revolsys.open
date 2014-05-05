@@ -40,12 +40,14 @@ import java.util.List;
 import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -83,6 +85,52 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *@version 1.7
  */
 public class PolygonImpl extends AbstractGeometry implements Polygon {
+
+  /**
+   *  Returns the minimum coordinate, using the usual lexicographic comparison.
+   *
+   *@param  coordinates  the array to search
+   *@return              the minimum coordinate in the array, found using <code>compareTo</code>
+   *@see Coordinate#compareTo(Object)
+   */
+  public static int minCoordinateIndex(final LinearRing ring) {
+    Coordinates minCoord = null;
+    int minIndex = 0;
+    for (final Vertex vertex : ring.vertices()) {
+      if (minCoord == null || minCoord.compareTo(vertex) > 0) {
+        minCoord = vertex.cloneCoordinates();
+        minIndex = vertex.getVertexIndex();
+      }
+    }
+    return minIndex;
+  }
+
+  /**
+   *  Shifts the positions of the coordinates until <code>firstCoordinate</code>
+   *  is first.
+   *
+   *@param  coordinates      the array to rearrange
+   *@param  firstCoordinate  the coordinate to make first
+   */
+  public static LinearRing scroll(final LinearRing ring, final int index) {
+    final CoordinatesList points = ring.getCoordinatesList();
+    final int vertexCount = ring.getVertexCount();
+    final int axisCount = ring.getAxisCount();
+    final double[] coordinates = new double[vertexCount * axisCount];
+    int newVertexIndex = 0;
+    for (int vertexIndex = index; vertexIndex < vertexCount - 1; vertexIndex++) {
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+        newVertexIndex++, points, vertexIndex);
+    }
+    for (int vertexIndex = 0; vertexIndex < index; vertexIndex++) {
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+        newVertexIndex++, points, vertexIndex);
+    }
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1,
+      points, index);
+    final GeometryFactory geometryFactory = ring.getGeometryFactory();
+    return geometryFactory.linearRing(axisCount, coordinates);
+  }
 
   /**
    * The {@link GeometryFactory} used to create this Geometry
@@ -199,6 +247,17 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
     return getExteriorRing().convexHull();
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    final List<LinearRing> rings = new ArrayList<>();
+    for (final LinearRing ring : rings()) {
+      final LinearRing newRing = ring.copy(geometryFactory);
+      rings.add(newRing);
+    }
+    return (V)geometryFactory.polygon(rings);
+  }
+
   @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {
@@ -291,21 +350,6 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
   @Override
   public Coordinates getCoordinate() {
     return getExteriorRing().getCoordinate();
-  }
-
-  @Override
-  public Coordinates[] getCoordinateArray() {
-    if (isEmpty()) {
-      return new Coordinates[0];
-    } else {
-      final Coordinates[] coordinates = new Coordinates[getVertexCount()];
-      int i = 0;
-      for (final Vertex vertex : vertices()) {
-        coordinates[i] = vertex.cloneCoordinates();
-        i++;
-      }
-      return coordinates;
-    }
   }
 
   @Override
@@ -534,24 +578,19 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
     }
   }
 
-  private LinearRing normalize(final LinearRing ring, final boolean clockwise) {
+  private LinearRing normalize(LinearRing ring, final boolean clockwise) {
     if (ring.isEmpty()) {
       return ring;
     } else {
-      final Coordinates[] ringCoordinates = ring.getCoordinateArray();
-      final Coordinates[] uniqueCoordinates = new Coordinates[ringCoordinates.length - 1];
-      System.arraycopy(ringCoordinates, 0, uniqueCoordinates, 0,
-        uniqueCoordinates.length);
-      final Coordinates minCoordinate = CoordinateArrays.minCoordinate(ringCoordinates);
-      CoordinateArrays.scroll(uniqueCoordinates, minCoordinate);
-      System.arraycopy(uniqueCoordinates, 0, ringCoordinates, 0,
-        uniqueCoordinates.length);
-      ringCoordinates[uniqueCoordinates.length] = uniqueCoordinates[0];
-      if (ring.isCounterClockwise() == clockwise) {
-        CoordinateArrays.reverse(ringCoordinates);
+      final int index = minCoordinateIndex(ring);
+      if (index > 0) {
+        ring = scroll(ring, index);
       }
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.linearRing(ringCoordinates);
+      if (ring.isCounterClockwise() == clockwise) {
+        return ring.reverse();
+      } else {
+        return ring;
+      }
     }
   }
 

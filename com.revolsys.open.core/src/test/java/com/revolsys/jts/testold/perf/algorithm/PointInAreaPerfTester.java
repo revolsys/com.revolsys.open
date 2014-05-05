@@ -1,12 +1,13 @@
 package com.revolsys.jts.testold.perf.algorithm;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
@@ -57,10 +58,12 @@ public class PointInAreaPerfTester {
       for (int j = 0; j < ptGridWidth; j++) {
 
         // compute test point
-        final double x = areaEnv.getMinX() + i * xStep;
-        final double y = areaEnv.getMinY() + j * yStep;
-        final Coordinates pt = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
-        this.geomFactory.getPrecisionModel().makePrecise(pt);
+        final PrecisionModel precisionModel = this.geomFactory.getPrecisionModel();
+        final double x = precisionModel.makePrecise(areaEnv.getMinX() + i
+          * xStep);
+        final double y = precisionModel.makePrecise(areaEnv.getMinY() + j
+          * yStep);
+        final Coordinates pt = new DoubleCoordinates(x, y);
 
         final Location loc = this.pia1.locate(pt);
         this.locationCount[loc.getIndex()]++;

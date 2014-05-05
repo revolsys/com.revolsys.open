@@ -38,7 +38,7 @@ import com.revolsys.visitor.AbstractVisitor;
 public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
   AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EqualTypeAndLineEdgeCleanupVisitor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LinearIntersectionNotEqualLineEdgeCleanupVisitor.class);
 
   private Set<String> equalExcludeAttributes = new HashSet<String>(
     Arrays.asList(DataObjectEquals.EXCLUDE_ID,

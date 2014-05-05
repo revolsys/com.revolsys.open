@@ -112,26 +112,6 @@ public class SimpleCoordinatesPrecisionModel implements
   }
 
   @Override
-  public void makePrecise(final Coordinates coordinates) {
-    if (scaleXY > 0) {
-      final double x = coordinates.getX();
-      final double newX = makeXyPrecise(x);
-      coordinates.setX(newX);
-
-      final double y = coordinates.getY();
-      final double newY = makeXyPrecise(y);
-      coordinates.setY(newY);
-    }
-    if (scaleZ > 0) {
-      if (coordinates.getAxisCount() > 2) {
-        final double z = coordinates.getZ();
-        final double newZ = makeZPrecise(z);
-        coordinates.setZ(newZ);
-      }
-    }
-  }
-
-  @Override
   public void makePrecise(final int axisCount, final double... coordinates) {
     final boolean hasXyScale = scaleXY > 0;
     final boolean hasZScale = scaleZ > 0;

@@ -132,16 +132,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     }
   }
 
-  @Override
-  public LineString convert(final GeometryFactory geometryFactory) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
-      return this;
-    } else {
-      return copy(geometryFactory);
-    }
-  }
-
   protected double[] convertCoordinates(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     final double[] coordinates = getCoordinates();
@@ -155,25 +145,25 @@ public abstract class AbstractLineString extends AbstractGeometry implements
         return coordinates;
       } else {
         final int sourceAxisCount = getAxisCount();
-        final int targetAxisCount = geometryFactory.getAxisCount();
-        targetCoordinates = new double[targetAxisCount * getVertexCount()];
+        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
         coordinatesOperation.perform(sourceAxisCount, coordinates,
-          targetAxisCount, targetCoordinates);
+          sourceAxisCount, targetCoordinates);
         return targetCoordinates;
       }
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public LineString copy(final GeometryFactory geometryFactory) {
+  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      return this.clone();
+      return (V)this.clone();
     } else if (isEmpty()) {
-      return geometryFactory.lineString();
+      return (V)geometryFactory.lineString();
     } else {
       final double[] coordinates = convertCoordinates(geometryFactory);
       final int axisCount = getAxisCount();
-      return geometryFactory.lineString(axisCount, coordinates);
+      return (V)geometryFactory.lineString(axisCount, coordinates);
     }
   }
 
@@ -245,11 +235,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     } else {
       return getCoordinate(0);
     }
-  }
-
-  @Override
-  public Coordinates[] getCoordinateArray() {
-    return getCoordinatesList().toCoordinateArray();
   }
 
   public abstract double[] getCoordinates();

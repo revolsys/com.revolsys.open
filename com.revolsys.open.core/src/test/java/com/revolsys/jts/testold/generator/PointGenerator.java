@@ -33,7 +33,6 @@
 package com.revolsys.jts.testold.generator;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 /**
@@ -58,12 +57,9 @@ public class PointGenerator extends GeometryGenerator {
     if (this.boundingBox == null || this.boundingBox.isEmpty()) {
       throw new NullPointerException("Bounding Box is not declared");
     }
-    GeometryFactory r = this.geometryFactory;
 
-    final Point p = this.boundingBox.toGeometry()
-      .getCentroid();
-    this.geometryFactory.getPrecisionModel().makePrecise(p.getCoordinate());
-    return p;
+    final Point p = this.boundingBox.toGeometry().getCentroid();
+    return this.geometryFactory.point(p);
   }
 
 }

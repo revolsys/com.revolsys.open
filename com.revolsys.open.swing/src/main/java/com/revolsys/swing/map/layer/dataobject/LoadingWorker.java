@@ -27,8 +27,8 @@ public class LoadingWorker extends
 
   @Override
   protected DataObjectQuadTree doInBackground() throws Exception {
-    final DataObjectQuadTree index = new DataObjectQuadTree();
     final GeometryFactory geometryFactory = this.layer.getGeometryFactory();
+    final DataObjectQuadTree index = new DataObjectQuadTree(geometryFactory);
     final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
     Query query = this.layer.getQuery();
     if (query != null) {

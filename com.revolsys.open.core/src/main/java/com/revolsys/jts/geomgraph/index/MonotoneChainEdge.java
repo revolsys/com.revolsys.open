@@ -56,19 +56,16 @@ import com.revolsys.jts.geomgraph.Edge;
  */
 public class MonotoneChainEdge {
 
-  Edge e;
-
-  Coordinates[] pts; // cache a reference to the coord array, for efficiency
+  private final Edge edge;
 
   // the lists of start/end indexes of the monotone chains.
   // Includes the end point of the edge as a sentinel
-  int[] startIndex;
+  private final int[] startIndex;
 
-  public MonotoneChainEdge(final Edge e) {
-    this.e = e;
-    pts = e.getCoordinates();
+  public MonotoneChainEdge(final Edge edge) {
+    this.edge = edge;
     final MonotoneChainIndexer mcb = new MonotoneChainIndexer();
-    startIndex = mcb.getChainStartIndices(pts);
+    startIndex = mcb.getChainStartIndices(edge);
   }
 
   public void computeIntersects(final MonotoneChainEdge mce,
@@ -83,14 +80,14 @@ public class MonotoneChainEdge {
   private void computeIntersectsForChain(final int start0, final int end0,
     final MonotoneChainEdge mce, final int start1, final int end1,
     final SegmentIntersector ei) {
-    final Coordinates p00 = pts[start0];
-    final Coordinates p01 = pts[end0];
-    final Coordinates p10 = mce.pts[start1];
-    final Coordinates p11 = mce.pts[end1];
+    final Coordinates p00 = edge.getCoordinate(start0);
+    final Coordinates p01 = edge.getCoordinate(end0);
+    final Coordinates p10 = mce.edge.getCoordinate(start1);
+    final Coordinates p11 = mce.edge.getCoordinate(end1);
     // Debug.println("computeIntersectsForChain:" + p00 + p01 + p10 + p11);
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {
-      ei.addIntersections(e, start0, mce.e, start1);
+      ei.addIntersections(edge, start0, mce.edge, start1);
       return;
     }
     // nothing to do if the envelopes of these chains don't overlap
@@ -132,19 +129,15 @@ public class MonotoneChainEdge {
       mce.startIndex[chainIndex1 + 1], si);
   }
 
-  public Coordinates[] getCoordinates() {
-    return pts;
-  }
-
   public double getMaxX(final int chainIndex) {
-    final double x1 = pts[startIndex[chainIndex]].getX();
-    final double x2 = pts[startIndex[chainIndex + 1]].getX();
+    final double x1 = edge.getCoordinate(startIndex[chainIndex]).getX();
+    final double x2 = edge.getCoordinate(startIndex[chainIndex + 1]).getX();
     return x1 > x2 ? x1 : x2;
   }
 
   public double getMinX(final int chainIndex) {
-    final double x1 = pts[startIndex[chainIndex]].getX();
-    final double x2 = pts[startIndex[chainIndex + 1]].getX();
+    final double x1 = edge.getCoordinate(startIndex[chainIndex]).getX();
+    final double x2 = edge.getCoordinate(startIndex[chainIndex + 1]).getX();
     return x1 < x2 ? x1 : x2;
   }
 

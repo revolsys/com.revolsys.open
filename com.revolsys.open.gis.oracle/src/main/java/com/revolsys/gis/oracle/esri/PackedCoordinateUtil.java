@@ -4,14 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.FileUtil;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -30,7 +29,7 @@ import com.revolsys.jts.geom.Polygon;
 public class PackedCoordinateUtil {
 
   @SuppressWarnings("unused")
-  private static CoordinatesList getCoordinatesList(final int numPoints,
+  private static CoordinatesList getCoordinatesList(final int vertexCount,
     final Double xOffset, final Double yOffset, final Double xyScale,
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale, final InputStream inputStream) {
@@ -54,25 +53,26 @@ public class PackedCoordinateUtil {
       } else {
         axisCount = 2;
       }
-      final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-        axisCount);
+      final double[] coordinates = new double[vertexCount * axisCount];
 
       double x = xOffset;
       double y = yOffset;
 
-      for (int i = 0; i < numPoints; i++) {
-        x = readOordinate(in, points, i, 0, x, xyScale);
-        y = readOordinate(in, points, i, 1, y, xyScale);
+      for (int i = 0; i < vertexCount; i++) {
+        x = readCoordinate(in, coordinates, i, axisCount, 0, x, xyScale);
+        y = readCoordinate(in, coordinates, i, axisCount, 1, y, xyScale);
       }
 
       if (hasZ) {
-        readOordinates(in, points, 2, zOffset, zScale);
+        readCoordinates(in, coordinates, axisCount, vertexCount, 2, zOffset,
+          zScale);
       }
       if (hasM) {
-        readOordinates(in, points, 3, mOffset, mScale);
+        readCoordinates(in, coordinates, axisCount, vertexCount, 3, mOffset,
+          mScale);
       }
 
-      return points;
+      return new DoubleCoordinatesList(axisCount, coordinates);
     } catch (final IOException e) {
       throw new RuntimeException("Error reading coordinates", e);
     } finally {
@@ -80,13 +80,13 @@ public class PackedCoordinateUtil {
     }
   }
 
-  private static List<CoordinatesList> getCoordinatesLists(final int numPoints,
-    final Double xOffset, final Double yOffset, final Double xyScale,
-    final Double zOffset, final Double zScale, final Double mOffset,
-    final Double mScale, final InputStream inputStream) {
+  private static List<CoordinatesList> getCoordinatesLists(
+    final int vertexCount, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale, final InputStream inputStream) {
 
     try {
-      final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+      final List<double[]> pointsList = new ArrayList<>();
       final PackedIntegerInputStream in = new PackedIntegerInputStream(
         inputStream);
 
@@ -105,33 +105,47 @@ public class PackedCoordinateUtil {
       } else {
         axisCount = 2;
       }
-      final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-        axisCount);
+      double[] coordinates = new double[vertexCount * axisCount];
 
       double x = xOffset;
       double y = yOffset;
 
       int j = 0;
-      for (int i = 0; i < numPoints; i++) {
-        x = readOordinate(in, points, j, 0, x, xyScale);
-        y = readOordinate(in, points, j, 1, y, xyScale);
+      for (int i = 0; i < vertexCount; i++) {
+        x = readCoordinate(in, coordinates, j, axisCount, 0, x, xyScale);
+        y = readCoordinate(in, coordinates, j, axisCount, 1, y, xyScale);
         if (x == -1 && y == 0) {
-          pointsList.add(points.subList(0, j));
+          final double[] subCoordinates = new double[j * axisCount];
+          System.arraycopy(coordinates, 0, subCoordinates, 0,
+            subCoordinates.length);
+          pointsList.add(subCoordinates);
+          coordinates = new double[(vertexCount - j) * axisCount];
           j = 0;
         } else {
           j++;
         }
       }
-      pointsList.add(points.subList(0, j));
+      if (coordinates.length == axisCount * j) {
+        pointsList.add(coordinates);
+      } else {
+        final double[] subCoordinates = new double[j * axisCount];
+        System.arraycopy(coordinates, 0, subCoordinates, 0,
+          subCoordinates.length);
+        pointsList.add(subCoordinates);
+      }
 
       if (hasZ) {
-        readOordinates(in, pointsList, 2, zOffset, zScale);
+        readCoordinates(in, pointsList, axisCount, 2, zOffset, zScale);
       }
       if (hasM) {
-        readOordinates(in, pointsList, 3, mOffset, mScale);
+        readCoordinates(in, pointsList, axisCount, 3, mOffset, mScale);
       }
 
-      return pointsList;
+      final List<CoordinatesList> lists = new ArrayList<>();
+      for (final double[] partCoordinates : pointsList) {
+        lists.add(new DoubleCoordinatesList(axisCount, partCoordinates));
+      }
+      return lists;
     } catch (final IOException e) {
       throw new RuntimeException("Error reading coordinates", e);
     } finally {
@@ -140,20 +154,20 @@ public class PackedCoordinateUtil {
   }
 
   public static Geometry getGeometry(final byte[] data,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int entity,
-    final int numPoints, final Double xOffset, final Double yOffset,
-    final Double xyScale, final Double zOffset, final Double zScale,
-    final Double mOffset, final Double mScale) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final int entity, final int numPoints, final Double xOffset,
+    final Double yOffset, final Double xyScale, final Double zOffset,
+    final Double zScale, final Double mOffset, final Double mScale) {
     final InputStream in = new ByteArrayInputStream(data);
     return getGeometry(in, geometryFactory, entity, numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale);
   }
 
   public static Geometry getGeometry(final InputStream pointsIn,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int geometryType,
-    final int numPoints, final Double xOffset, final Double yOffset,
-    final Double xyScale, final Double zOffset, final Double zScale,
-    final Double mOffset, final Double mScale) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final int geometryType, final int numPoints, final Double xOffset,
+    final Double yOffset, final Double xyScale, final Double zOffset,
+    final Double zScale, final Double mOffset, final Double mScale) {
     switch (geometryType) {
       case ArcSdeConstants.ST_GEOMETRY_POINT:
         return getPoint(pointsIn, geometryFactory, numPoints, xOffset, yOffset,
@@ -180,40 +194,40 @@ public class PackedCoordinateUtil {
   }
 
   private static LineString getLineString(final InputStream pointsIn,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
-    final Double xOffset, final Double yOffset, final Double xyScale,
-    final Double zOffset, final Double zScale, final Double mOffset,
-    final Double mScale) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale) {
     final CoordinatesList points = getCoordinatesList(numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
     return geometryFactory.lineString(points);
   }
 
   private static MultiLineString getMultiLineString(final InputStream pointsIn,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
-    final Double xOffset, final Double yOffset, final Double xyScale,
-    final Double zOffset, final Double zScale, final Double mOffset,
-    final Double mScale) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale) {
     final List<CoordinatesList> parts = getCoordinatesLists(numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
     return geometryFactory.multiLineString(parts);
   }
 
   private static MultiPoint getMultiPoint(final InputStream pointsIn,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
-    final Double xOffset, final Double yOffset, final Double xyScale,
-    final Double zOffset, final Double zScale, final Double mOffset,
-    final Double mScale) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale) {
     final List<CoordinatesList> parts = getCoordinatesLists(numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
     return geometryFactory.multiPoint(parts);
   }
 
   private static MultiPolygon getMultiPolygon(final InputStream pointsIn,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
-    final Double xOffset, final Double yOffset, final Double xyScale,
-    final Double zOffset, final Double zScale, final Double mOffset,
-    final Double mScale) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale) {
     final List<List<CoordinatesList>> pointsList = getMultiPolygonCoordinatesLists(
       numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale,
       pointsIn);
@@ -228,12 +242,12 @@ public class PackedCoordinateUtil {
   }
 
   private static List<List<CoordinatesList>> getMultiPolygonCoordinatesLists(
-    final int numPoints, final Double xOffset, final Double yOffset,
+    final int vertexCount, final Double xOffset, final Double yOffset,
     final Double xyScale, final Double zOffset, final Double zScale,
     final Double mOffset, final Double mScale, final InputStream inputStream) {
 
     try {
-      final List<List<CoordinatesList>> parts = new ArrayList<List<CoordinatesList>>();
+      final List<List<double[]>> parts = new ArrayList<>();
       final PackedIntegerInputStream in = new PackedIntegerInputStream(
         inputStream);
 
@@ -253,32 +267,38 @@ public class PackedCoordinateUtil {
         axisCount = 2;
       }
 
-      List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
-      final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-        axisCount);
+      List<double[]> pointsList = new ArrayList<>();
+      double[] coordinates = new double[vertexCount * axisCount];
 
       double x = xOffset;
       double y = yOffset;
 
       int j = 0;
-      for (int i = 0; i < numPoints; i++) {
-        x = readOordinate(in, points, j, 0, x, xyScale);
-        y = readOordinate(in, points, j, 1, y, xyScale);
+      for (int i = 0; i < vertexCount; i++) {
+        x = readCoordinate(in, coordinates, j, axisCount, 0, x, xyScale);
+        y = readCoordinate(in, coordinates, j, axisCount, 1, y, xyScale);
         if (x == -1 && y == 0) {
-          final CoordinatesList coordinates = points.subList(0, j + 1);
-          if (coordinates.size() > 2) {
-            pointsList.add(coordinates);
+          if (j > 2) {
+            final double[] subCoordinates = new double[j * axisCount];
+            System.arraycopy(coordinates, 0, subCoordinates, 0,
+              subCoordinates.length);
+            pointsList.add(subCoordinates);
           }
+          coordinates = new double[(vertexCount - j) * axisCount];
           if (!pointsList.isEmpty()) {
             parts.add(pointsList);
           }
-          pointsList = new ArrayList<CoordinatesList>();
-        } else if (j > 0 && i < numPoints - 1) {
-          if (points.equal(0, points, j)) {
-            final CoordinatesList coordinates = points.subList(0, j + 1);
-            if (coordinates.size() > 2) {
-              pointsList.add(coordinates);
+          pointsList = new ArrayList<>();
+        } else if (j > 0 && i < vertexCount - 1) {
+          if (coordinates[0] == coordinates[j * axisCount]
+            && coordinates[1] == coordinates[j * axisCount + 1]) {
+            if (j > 2) {
+              final double[] subCoordinates = new double[j * axisCount];
+              System.arraycopy(coordinates, 0, subCoordinates, 0,
+                subCoordinates.length);
+              pointsList.add(subCoordinates);
             }
+            coordinates = new double[(vertexCount - j) * axisCount];
             j = 0;
           } else {
             j++;
@@ -287,21 +307,35 @@ public class PackedCoordinateUtil {
           j++;
         }
       }
-      final CoordinatesList coordinates = points.subList(0, j);
-      if (coordinates.size() > 2) {
-        pointsList.add(coordinates);
+      if (j > 2) {
+        if (coordinates.length == axisCount * j) {
+          pointsList.add(coordinates);
+        } else {
+          final double[] subCoordinates = new double[j * axisCount];
+          System.arraycopy(coordinates, 0, subCoordinates, 0,
+            subCoordinates.length);
+          pointsList.add(subCoordinates);
+        }
       }
       if (!pointsList.isEmpty()) {
         parts.add(pointsList);
       }
       if (hasZ) {
-        readMultiPolygonOordinates(in, parts, 2, zOffset, zScale);
+        readMultiPolygonCoordinates(in, parts, axisCount, 2, zOffset, zScale);
       }
       if (hasM) {
-        readMultiPolygonOordinates(in, parts, 3, mOffset, mScale);
+        readMultiPolygonCoordinates(in, parts, axisCount, 3, mOffset, mScale);
       }
 
-      return parts;
+      final List<List<CoordinatesList>> lists = new ArrayList<>();
+      for (final List<double[]> part : parts) {
+        final List<CoordinatesList> list = new ArrayList<>();
+        lists.add(list);
+        for (final double[] partCoordinates : part) {
+          list.add(new DoubleCoordinatesList(axisCount, partCoordinates));
+        }
+      }
+      return lists;
     } catch (final IOException e) {
       throw new RuntimeException("Error reading coordinates", e);
     } finally {
@@ -379,20 +413,20 @@ public class PackedCoordinateUtil {
   }
 
   private static Point getPoint(final InputStream pointsIn,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
-    final Double xOffset, final Double yOffset, final Double xyScale,
-    final Double zOffset, final Double zScale, final Double mOffset,
-    final Double mScale) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale) {
     final CoordinatesList points = getCoordinatesList(numPoints, xOffset,
       yOffset, xyScale, zOffset, zScale, mOffset, mScale, pointsIn);
     return geometryFactory.point(points);
   }
 
   private static Polygon getPolygon(final InputStream pointsIn,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final int numPoints,
-    final Double xOffset, final Double yOffset, final Double xyScale,
-    final Double zOffset, final Double zScale, final Double mOffset,
-    final Double mScale) {
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final int numPoints, final Double xOffset, final Double yOffset,
+    final Double xyScale, final Double zOffset, final Double zScale,
+    final Double mOffset, final Double mScale) {
     final List<CoordinatesList> pointsList = getPolygonCoordinatesLists(
       numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale,
       pointsIn);
@@ -407,12 +441,12 @@ public class PackedCoordinateUtil {
   }
 
   private static List<CoordinatesList> getPolygonCoordinatesLists(
-    final int numPoints, final Double xOffset, final Double yOffset,
+    final int vertexCount, final Double xOffset, final Double yOffset,
     final Double xyScale, final Double zOffset, final Double zScale,
     final Double mOffset, final Double mScale, final InputStream inputStream) {
 
     try {
-      final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+      final List<double[]> pointsList = new ArrayList<>();
       final PackedIntegerInputStream in = new PackedIntegerInputStream(
         inputStream);
 
@@ -431,22 +465,25 @@ public class PackedCoordinateUtil {
       } else {
         axisCount = 2;
       }
-      final DoubleCoordinatesList points = new DoubleCoordinatesList(numPoints,
-        axisCount);
+      double[] coordinates = new double[vertexCount * axisCount];
 
       double x = xOffset;
       double y = yOffset;
 
       int j = 0;
-      for (int i = 0; i < numPoints; i++) {
-        x = readOordinate(in, points, j, 0, x, xyScale);
-        y = readOordinate(in, points, j, 1, y, xyScale);
-        if (j > 0 && i < numPoints - 1) {
-          if (points.equal(0, points, j)) {
-            final CoordinatesList coordinates = points.subList(0, j + 1);
-            if (coordinates.size() > 2) {
-              pointsList.add(coordinates);
+      for (int i = 0; i < vertexCount; i++) {
+        x = readCoordinate(in, coordinates, j, axisCount, 0, x, xyScale);
+        y = readCoordinate(in, coordinates, j, axisCount, 1, y, xyScale);
+        if (j > 0 && i < vertexCount - 1) {
+          if (coordinates[0] == coordinates[j * axisCount]
+            && coordinates[1] == coordinates[j * axisCount + 1]) {
+            if (j > 2) {
+              final double[] subCoordinates = new double[j * axisCount];
+              System.arraycopy(coordinates, 0, subCoordinates, 0,
+                subCoordinates.length);
+              pointsList.add(subCoordinates);
             }
+            coordinates = new double[(vertexCount - j) * axisCount];
             j = 0;
           } else {
             j++;
@@ -455,17 +492,23 @@ public class PackedCoordinateUtil {
           j++;
         }
       }
-      final CoordinatesList coordinates = points.subList(0, j);
-      if (coordinates.size() > 2) {
-        pointsList.add(coordinates);
+      if (j > 2) {
+        final double[] subCoordinates = new double[j * axisCount];
+        System.arraycopy(coordinates, 0, subCoordinates, 0,
+          subCoordinates.length);
+        pointsList.add(subCoordinates);
       }
       if (hasZ) {
-        readPolygonOordinates(in, pointsList, 2, zOffset, zScale);
+        readPolygonOordinates(in, pointsList, axisCount, 2, zOffset, zScale);
       }
       if (hasM) {
-        readPolygonOordinates(in, pointsList, 3, mOffset, mScale);
+        readPolygonOordinates(in, pointsList, axisCount, 3, mOffset, mScale);
       }
-      return pointsList;
+      final List<CoordinatesList> lists = new ArrayList<>();
+      for (final double[] partCoordinates : pointsList) {
+        lists.add(new DoubleCoordinatesList(axisCount, partCoordinates));
+      }
+      return lists;
     } catch (final IOException e) {
       throw new RuntimeException("Error reading coordinates", e);
     } finally {
@@ -473,38 +516,7 @@ public class PackedCoordinateUtil {
     }
   }
 
-  private static void readMultiPolygonOordinates(
-    final PackedIntegerInputStream in, final List<List<CoordinatesList>> parts,
-    final int axisIndex, final double offset, final double scale)
-    throws IOException {
-
-    double previousValue = offset;
-    boolean first = true;
-    for (final List<CoordinatesList> part : parts) {
-      if (first) {
-        first = false;
-      } else {
-        previousValue = readOordinate(in, previousValue, scale);
-      }
-      for (final CoordinatesList points : part) {
-        final int numPoints = points.size();
-        for (int i = 0; i < numPoints; i++) {
-          previousValue = readOordinate(in, points, i, axisIndex,
-            previousValue, scale);
-        }
-      }
-    }
-  }
-
-  private static double readOordinate(final PackedIntegerInputStream in,
-    final CoordinatesList points, final int index, final int axisIndex,
-    final double previousValue, final double scale) throws IOException {
-    final double value = readOordinate(in, previousValue, scale);
-    points.setValue(index, axisIndex, value);
-    return value;
-  }
-
-  private static double readOordinate(final PackedIntegerInputStream in,
+  private static double readCoordinate(final PackedIntegerInputStream in,
     final double previousValue, final double scale) throws IOException {
     final long deltaValueLong = in.readLong();
     final double deltaValue = deltaValueLong / scale;
@@ -513,46 +525,79 @@ public class PackedCoordinateUtil {
     return value;
   }
 
-  private static void readOordinates(final PackedIntegerInputStream in,
-    final CoordinatesList points, final int axisIndex, final double offset,
-    final double scale) throws IOException {
+  private static double readCoordinate(final PackedIntegerInputStream in,
+    final double[] coordinates, final int vertexIndex, final int axisCount,
+    final int axisIndex, final double previousValue, final double scale)
+    throws IOException {
+    final double value = readCoordinate(in, previousValue, scale);
+    coordinates[vertexIndex * axisCount + axisIndex] = value;
+    return value;
+  }
+
+  private static void readCoordinates(final PackedIntegerInputStream in,
+    final double[] coordinates, final int vertexCount, final int axisCount,
+    final int axisIndex, final double offset, final double scale)
+    throws IOException {
 
     double previousValue = offset;
-    final int numPoints = points.size();
-    for (int i = 0; i < numPoints; i++) {
-      previousValue = readOordinate(in, points, i, axisIndex, previousValue,
-        scale);
+    for (int i = 0; i < vertexCount; i++) {
+      previousValue = readCoordinate(in, coordinates, i, axisCount, axisIndex,
+        previousValue, scale);
     }
   }
 
-  private static void readOordinates(final PackedIntegerInputStream in,
-    final List<CoordinatesList> pointsList, final int axisIndex,
+  private static void readCoordinates(final PackedIntegerInputStream in,
+    final List<double[]> pointsList, final int axisCount, final int axisIndex,
     final double offset, final double scale) throws IOException {
 
     double previousValue = offset;
-    for (final Iterator<CoordinatesList> iterator = pointsList.iterator(); iterator.hasNext();) {
-      final CoordinatesList points = iterator.next();
-      final int numPoints = points.size();
-      for (int i = 0; i < numPoints; i++) {
-        previousValue = readOordinate(in, points, i, axisIndex, previousValue,
-          scale);
+    int j = 0;
+    for (final double[] coordinates : pointsList) {
+      if (j > 0) {
+        previousValue = readCoordinate(in, previousValue, scale);
       }
-      if (iterator.hasNext()) {
-        previousValue = readOordinate(in, previousValue, scale);
+      final int vertexCount = coordinates.length / axisCount;
+      for (int i = 0; i < vertexCount; i++) {
+        previousValue = readCoordinate(in, coordinates, i, axisCount,
+          axisIndex, previousValue, scale);
+      }
+      j++;
+    }
+  }
+
+  private static void readMultiPolygonCoordinates(
+    final PackedIntegerInputStream in, final List<List<double[]>> parts,
+    final int axisCount, final int axisIndex, final double offset,
+    final double scale) throws IOException {
+
+    double previousValue = offset;
+    boolean first = true;
+    for (final List<double[]> part : parts) {
+      if (first) {
+        first = false;
+      } else {
+        previousValue = readCoordinate(in, previousValue, scale);
+      }
+      for (final double[] points : part) {
+        final int numPoints = points.length / axisCount;
+        for (int i = 0; i < numPoints; i++) {
+          previousValue = readCoordinate(in, points, i, axisCount, axisIndex,
+            previousValue, scale);
+        }
       }
     }
   }
 
   private static void readPolygonOordinates(final PackedIntegerInputStream in,
-    final List<CoordinatesList> pointsList, final int axisIndex,
+    final List<double[]> pointsList, final int axisCount, final int axisIndex,
     final double offset, final double scale) throws IOException {
 
     double previousValue = offset;
-    for (final CoordinatesList points : pointsList) {
-      final int numPoints = points.size();
+    for (final double[] coordinates : pointsList) {
+      final int numPoints = coordinates.length / axisCount;
       for (int i = 0; i < numPoints; i++) {
-        previousValue = readOordinate(in, points, i, axisIndex, previousValue,
-          scale);
+        previousValue = readCoordinate(in, coordinates, i, axisCount,
+          axisIndex, previousValue, scale);
       }
     }
   }

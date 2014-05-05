@@ -49,7 +49,7 @@ import java.util.Collection;
  * <ul>
  * <li>the only intersection between any two linestrings occurs at their endpoints.
  * </ul>
- * Implementations can take advantage of this fact to optimize processing
+ * Implementations can take advantage of this geometryFactory to optimize processing
  * (i.e by avoiding testing for intersections between linestrings
  * belonging to the same set).
  *

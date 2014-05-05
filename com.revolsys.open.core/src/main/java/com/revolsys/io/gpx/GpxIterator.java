@@ -28,8 +28,8 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.gis.model.coordinates.list.DoubleListCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.Coordinates;
@@ -291,22 +291,18 @@ public class GpxIterator implements DataObjectIterator {
         parseAttribute(dataObject);
       }
     }
-    final CoordinatesList points = new DoubleCoordinatesList(
-      pointObjects.size(), axisCount);
-    for (int i = 0; i < points.size(); i++) {
+    final int vertexCount = pointObjects.size();
+    final double[] coordinates = new double[vertexCount * axisCount];
+    for (int i = 0; i < vertexCount; i++) {
       final DataObject pointObject = pointObjects.get(i);
       final Point point = pointObject.getGeometryValue();
-      final Coordinates coordinates = CoordinatesUtil.getInstance(point);
-      for (int j = 0; j < axisCount; j++) {
-        final double value = coordinates.getValue(j);
-        points.setValue(i, j, value);
-      }
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, point);
     }
     final LineString line;
-    if (points.size() > 1) {
-      line = geometryFactory.lineString(points);
+    if (vertexCount > 1) {
+      line = geometryFactory.lineString(axisCount, coordinates);
     } else {
-      line = geometryFactory.lineString((CoordinatesList)null);
+      line = geometryFactory.lineString();
     }
 
     dataObject.setGeometryValue(line);
@@ -344,20 +340,20 @@ public class GpxIterator implements DataObjectIterator {
     return dataObject;
   }
 
-  private int parseTrackPoint(final CoordinatesList points)
+  private int parseTrackPoint(final List<Double> points)
     throws XMLStreamException {
-    final int index = points.size();
-
     final String lonText = in.getAttributeValue("", "lon");
     final double lon = Double.parseDouble(lonText);
-    points.setX(index, lon);
+    points.add(lon);
 
     final String latText = in.getAttributeValue("", "lat");
     final double lat = Double.parseDouble(latText);
-    points.setY(index, lat);
+    points.add(lat);
 
     int axisCount = 2;
 
+    double z = Double.NaN;
+    double m = Double.NaN;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (in.getName().equals(GpxConstants.EXTENSION_ELEMENT)
         || in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
@@ -366,7 +362,7 @@ public class GpxIterator implements DataObjectIterator {
         if (in.getName().equals(GpxConstants.ELEVATION_ELEMENT)) {
           final String elevationText = StaxUtils.getElementText(in);
           final double elevation = Double.parseDouble(elevationText);
-          points.setZ(index, elevation);
+          z = elevation;
           if (axisCount < 3) {
             axisCount = 3;
           }
@@ -374,7 +370,7 @@ public class GpxIterator implements DataObjectIterator {
           final String dateText = StaxUtils.getElementText(in);
           final DateTime date = XML_DATE_TIME_FORMAT.parseDateTime(dateText);
           final long time = date.getMillis();
-          points.setTime(index, time);
+          m = time;
           if (axisCount < 4) {
             axisCount = 4;
           }
@@ -384,18 +380,19 @@ public class GpxIterator implements DataObjectIterator {
         }
       }
     }
-
+    points.add(z);
+    points.add(m);
     return axisCount;
   }
 
   private CoordinatesList parseTrackSegment() throws XMLStreamException {
-    final CoordinatesList points = new DoubleListCoordinatesList(4);
+    final List<Double> coordinates = new ArrayList<Double>();
     int axisCount = 2;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      final int pointAxisCount = parseTrackPoint(points);
+      final int pointAxisCount = parseTrackPoint(coordinates);
       axisCount = Math.max(axisCount, pointAxisCount);
     }
-    return new DoubleCoordinatesList(axisCount, points);
+    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   private DataObject parseWaypoint() throws XMLStreamException {

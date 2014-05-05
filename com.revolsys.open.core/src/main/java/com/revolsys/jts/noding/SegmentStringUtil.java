@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 
@@ -60,8 +59,7 @@ public class SegmentStringUtil {
     final List<NodedSegmentString> segStr = new ArrayList<>();
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      final Coordinates[] pts = line.getCoordinateArray();
-      segStr.add(new NodedSegmentString(pts, geom));
+      segStr.add(new NodedSegmentString(line.getCoordinatesList(), geom));
     }
     return segStr;
   }

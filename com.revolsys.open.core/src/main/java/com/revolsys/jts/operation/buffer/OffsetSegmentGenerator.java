@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.operation.buffer;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.HCoordinate;
@@ -40,6 +41,7 @@ import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.PrecisionModel;
@@ -81,11 +83,6 @@ class OffsetSegmentGenerator {
   private static final int MAX_CLOSING_SEG_LEN_FACTOR = 80;
 
   /**
-   * the max error of approximation (distance) between a quad segment and the true fillet curve
-   */
-  private double maxCurveSegmentError = 0.0;
-
-  /**
    * The angle quantum with which to approximate a fillet curve
    * (based on the input # of quadrant segments)
    */
@@ -118,15 +115,15 @@ class OffsetSegmentGenerator {
 
   private final LineIntersector li;
 
-  private Coordinates s0, s1, s2;
+  private Coordinates s0;
 
-  private final LineSegment seg0 = new LineSegmentImpl();
+  private Coordinates s1;
 
-  private final LineSegment seg1 = new LineSegmentImpl();
+  private Coordinates s2;
 
-  private final LineSegment offset0 = new LineSegmentImpl();
+  private LineSegment offset0;
 
-  private final LineSegment offset1 = new LineSegmentImpl();
+  private LineSegment offset1;
 
   private int side = 0;
 
@@ -195,7 +192,8 @@ class OffsetSegmentGenerator {
         }
         segList.addPt(offset1.getP0());
       } else {
-        addFillet(s1, offset0.getP1(), offset1.getP0(), CGAlgorithms.CLOCKWISE, distance);
+        addFillet(s1, offset0.getP1(), offset1.getP0(), CGAlgorithms.CLOCKWISE,
+          distance);
       }
     }
   }
@@ -261,12 +259,11 @@ class OffsetSegmentGenerator {
     currAngleInc = totalAngle / nSegs;
 
     double currAngle = initAngle;
-    final Coordinates pt = new Coordinate();
     while (currAngle < totalAngle) {
       final double angle = startAngle + directionFactor * currAngle;
-      pt.setX(p.getX() + radius * Math.cos(angle));
-      pt.setY(p.getY() + radius * Math.sin(angle));
-      segList.addPt(pt);
+      final double x = p.getX() + radius * Math.cos(angle);
+      final double y = p.getY() + radius * Math.sin(angle);
+      segList.addPt(x, y);
       currAngle += currAngleInc;
     }
   }
@@ -285,7 +282,8 @@ class OffsetSegmentGenerator {
     /**
      * add intersection point of offset segments (if any)
      */
-    li.computeIntersection(offset0.getP0(), offset0.getP1(), offset1.getP0(), offset1.getP1());
+    li.computeIntersection(offset0.getP0(), offset0.getP1(), offset1.getP0(),
+      offset1.getP1());
     if (li.hasIntersection()) {
       segList.addPt(li.getIntersection(0));
     } else {
@@ -318,7 +316,6 @@ class OffsetSegmentGenerator {
       * points
       */
       hasNarrowConcaveAngle = true;
-      // System.out.println("NARROW ANGLE - distance = " + distance);
       if (offset0.getP1().distance(offset1.getP0()) < distance
         * INSIDE_TURN_VERTEX_SNAP_DISTANCE_FACTOR) {
         segList.addPt(offset0.getP1());
@@ -377,13 +374,12 @@ class OffsetSegmentGenerator {
    */
   private void addLimitedMitreJoin(final LineSegment offset0,
     final LineSegment offset1, final double distance, final double mitreLimit) {
-    final Coordinates basePt = seg0.getP1();
+    final Coordinates basePt = s1;
 
-    final double ang0 = Angle.angle(basePt, seg0.getP0());
-    final double ang1 = Angle.angle(basePt, seg1.getP1());
+    final double ang0 = Angle.angle(basePt, s0);
 
     // oriented angle between segments
-    final double angDiff = Angle.angleBetweenOriented(seg0.getP0(), basePt, seg1.getP1());
+    final double angDiff = Angle.angleBetweenOriented(s0, basePt, s2);
     // half of the interior angle
     final double angDiffHalf = angDiff / 2;
 
@@ -433,42 +429,43 @@ class OffsetSegmentGenerator {
   public void addLineEndCap(final Coordinates p0, final Coordinates p1) {
     final LineSegment seg = new LineSegmentImpl(p0, p1);
 
-    final LineSegment offsetL = new LineSegmentImpl();
-    computeOffsetSegment(seg, Position.LEFT, distance, offsetL);
-    final LineSegment offsetR = new LineSegmentImpl();
-    computeOffsetSegment(seg, Position.RIGHT, distance, offsetR);
+    final LineSegment offsetL = createOffsetSegment(seg, Position.LEFT,
+      distance);
+    final LineSegment offsetR = createOffsetSegment(seg, Position.RIGHT,
+      distance);
 
     final double dx = p1.getX() - p0.getX();
     final double dy = p1.getY() - p0.getY();
     final double angle = Math.atan2(dy, dx);
 
+    Coordinates lp1 = offsetL.getP1();
+    Coordinates rp1 = offsetR.getP1();
     switch (bufParams.getEndCapStyle()) {
       case BufferParameters.CAP_ROUND:
         // add offset seg points with a fillet between them
-        segList.addPt(offsetL.getP1());
+        segList.addPt(lp1);
         addFillet(p1, angle + Math.PI / 2, angle - Math.PI / 2,
           CGAlgorithms.CLOCKWISE, distance);
-        segList.addPt(offsetR.getP1());
+        segList.addPt(rp1);
       break;
       case BufferParameters.CAP_FLAT:
         // only offset segment points are added
-        segList.addPt(offsetL.getP1());
-        segList.addPt(offsetR.getP1());
+        segList.addPt(lp1);
+        segList.addPt(rp1);
       break;
       case BufferParameters.CAP_SQUARE:
         // add a square defined by extensions of the offset segment endpoints
-        final Coordinates squareCapSideOffset = new Coordinate();
-        squareCapSideOffset.setX(Math.abs(distance) * Math.cos(angle));
-        squareCapSideOffset.setY(Math.abs(distance) * Math.sin(angle));
+        final Coordinates squareCapSideOffset = new DoubleCoordinates(
+          Math.abs(distance) * Math.cos(angle), Math.abs(distance)
+            * Math.sin(angle));
 
-        final Coordinates squareCapLOffset = new Coordinate(offsetL.getP1().getX()
-          + squareCapSideOffset.getX(), offsetL.getP1().getY()
-          + squareCapSideOffset.getY(), Coordinates.NULL_ORDINATE);
-        final Coordinates squareCapROffset = new Coordinate(offsetR.getP1().getX()
-          + squareCapSideOffset.getX(), offsetR.getP1().getY()
-          + squareCapSideOffset.getY(), Coordinates.NULL_ORDINATE);
-        segList.addPt(squareCapLOffset);
-        segList.addPt(squareCapROffset);
+        final double lx = lp1.getX() + squareCapSideOffset.getX();
+        final double ly = lp1.getY() + squareCapSideOffset.getY();
+        segList.addPt(lx, ly);
+
+        final double rx = rp1.getX() + squareCapSideOffset.getX();
+        final double ry = rp1.getY() + squareCapSideOffset.getY();
+        segList.addPt(rx, ry);
       break;
 
     }
@@ -493,8 +490,8 @@ class OffsetSegmentGenerator {
      * whether the offset segment endpoints are almost coincident
      */
     try {
-      intPt = HCoordinate.intersection(offset0.getP0(), offset0.getP1(), offset1.getP0(),
-        offset1.getP1());
+      intPt = HCoordinate.intersection(offset0.getP0(), offset0.getP1(),
+        offset1.getP0(), offset1.getP1());
 
       final double mitreRatio = distance <= 0.0 ? 1.0 : intPt.distance(p)
         / Math.abs(distance);
@@ -517,13 +514,11 @@ class OffsetSegmentGenerator {
 
   public void addNextSegment(final Coordinates p, final boolean addStartPoint) {
     // s0-s1-s2 are the coordinates of the previous segment and the current one
-    s0 = s1;
-    s1 = s2;
-    s2 = p;
-    seg0.setCoordinates(s0, s1);
-    computeOffsetSegment(seg0, side, distance, offset0);
-    seg1.setCoordinates(s1, s2);
-    computeOffsetSegment(seg1, side, distance, offset1);
+    this.s0 = this.s1;
+    this.s1 = this.s2;
+    this.s2 = p;
+    offset0 = createOffsetSegment(s0, s1, side, distance);
+    offset1 = createOffsetSegment(s1, s2, side, distance);
 
     // do nothing if points are equal
     if (s1.equals(s2)) {
@@ -578,8 +573,8 @@ class OffsetSegmentGenerator {
     }
   }
 
-  public void addSegments(final Coordinates[] pt, final boolean isForward) {
-    segList.addPts(pt, isForward);
+  public void addSegments(final CoordinatesList points, final boolean isForward) {
+    segList.addPts(points, isForward);
   }
 
   public void closeRing() {
@@ -587,60 +582,78 @@ class OffsetSegmentGenerator {
   }
 
   /**
-   * Compute an offset segment for an input segment on a given side and at a given distance.
-   * The offset points are computed in full double precision, for accuracy.
-   *
-   * @param seg the segment to offset
-   * @param side the side of the segment ({@link Position}) the offset lies on
-   * @param distance the offset distance
-   * @param offset the points computed for the offset segment
+   * Creates a CW circle around a point
    */
-  private void computeOffsetSegment(final LineSegment seg, final int side,
-    final double distance, final LineSegment offset) {
+  public void createCircle(final Coordinates point) {
+    // add start point
+    final double x = point.getX() + distance;
+    final double y = point.getY();
+    segList.addPt(x, y);
+    addFillet(point, 0.0, 2.0 * Math.PI, -1, distance);
+    segList.closeRing();
+  }
+
+  private LineSegment createOffsetSegment(final Coordinates p1,
+    final Coordinates p2, final int side, final double distance) {
     final int sideSign = side == Position.LEFT ? 1 : -1;
-    final double dx = seg.getP1().getX() - seg.getP0().getX();
-    final double dy = seg.getP1().getY() - seg.getP0().getY();
+    final double p1x = p1.getX();
+    final double p1y = p1.getY();
+    final double p2x = p2.getX();
+    final double p2Y = p2.getY();
+    final double dx = p2x - p1x;
+    final double dy = p2Y - p1y;
     final double len = Math.sqrt(dx * dx + dy * dy);
     // u is the vector that is the length of the offset, in the direction of the
     // segment
     final double ux = sideSign * distance * dx / len;
     final double uy = sideSign * distance * dy / len;
-    offset.getP0().setX(seg.getP0().getX() - uy);
-    offset.getP0().setY(seg.getP0().getY() + ux);
-    offset.getP1().setX(seg.getP1().getX() - uy);
-    offset.getP1().setY(seg.getP1().getY() + ux);
+    final double x1 = precisionModel.makePrecise(p1x - uy);
+    final double y1 = precisionModel.makePrecise(p1y + ux);
+    final double x2 = precisionModel.makePrecise(p2x - uy);
+    final double y2 = precisionModel.makePrecise(p2Y + ux);
+    final LineSegmentImpl line = new LineSegmentImpl(2, x1, y1, x2, y2);
+    return line;
   }
 
   /**
-   * Creates a CW circle around a point
-   */
-  public void createCircle(final Coordinates p) {
-    // add start point
-    final Coordinates pt = new Coordinate(p.getX() + distance, p.getY(),
-      Coordinates.NULL_ORDINATE);
-    segList.addPt(pt);
-    addFillet(p, 0.0, 2.0 * Math.PI, -1, distance);
-    segList.closeRing();
+    * Compute an offset segment for an input segment on a given side and at a given distance.
+    * The offset points are computed in full double precision, for accuracy.
+    *
+    * @param seg the segment to offset
+    * @param side the side of the segment ({@link Position}) the offset lies on
+    * @param distance the offset distance
+    * @param offset the points computed for the offset segment
+    */
+  private LineSegment createOffsetSegment(final LineSegment seg,
+    final int side, final double distance) {
+    final int sideSign = side == Position.LEFT ? 1 : -1;
+    final double dx = seg.getX(1) - seg.getX(0);
+    final double dy = seg.getY(1) - seg.getY(0);
+    final double len = Math.sqrt(dx * dx + dy * dy);
+    // u is the vector that is the length of the offset, in the direction of the
+    // segment
+    final double ux = sideSign * distance * dx / len;
+    final double uy = sideSign * distance * dy / len;
+    final double x1 = precisionModel.makePrecise(seg.getX(0) - uy);
+    final double y1 = precisionModel.makePrecise(seg.getY(0) + ux);
+    final double x2 = precisionModel.makePrecise(seg.getX(1) - uy);
+    final double y2 = precisionModel.makePrecise(seg.getY(1) + ux);
+    return new LineSegmentImpl(2, x1, y1, x2, y2);
   }
 
   /**
    * Creates a CW square around a point
    */
   public void createSquare(final Coordinates p) {
-    segList.addPt(new Coordinate(p.getX() + distance, p.getY() + distance,
-      Coordinates.NULL_ORDINATE));
-    segList.addPt(new Coordinate(p.getX() + distance, p.getY() - distance,
-      Coordinates.NULL_ORDINATE));
-    segList.addPt(new Coordinate(p.getX() - distance, p.getY() - distance,
-      Coordinates.NULL_ORDINATE));
-    segList.addPt(new Coordinate(p.getX() - distance, p.getY() + distance,
-      Coordinates.NULL_ORDINATE));
+    segList.addPt(p.getX() + distance, p.getY() + distance);
+    segList.addPt(p.getX() + distance, p.getY() - distance);
+    segList.addPt(p.getX() - distance, p.getY() - distance);
+    segList.addPt(p.getX() - distance, p.getY() + distance);
     segList.closeRing();
   }
 
-  public Coordinates[] getCoordinates() {
-    final Coordinates[] pts = segList.getCoordinates();
-    return pts;
+  public CoordinatesList getPoints() {
+    return segList.getPoints();
   }
 
   /**
@@ -661,7 +674,6 @@ class OffsetSegmentGenerator {
 
   private void init(final double distance) {
     this.distance = distance;
-    maxCurveSegmentError = distance * (1 - Math.cos(filletAngleQuantum / 2.0));
     segList = new OffsetSegmentString();
     segList.setPrecisionModel(precisionModel);
     /**
@@ -676,7 +688,11 @@ class OffsetSegmentGenerator {
     this.s1 = s1;
     this.s2 = s2;
     this.side = side;
-    seg1.setCoordinates(s1, s2);
-    computeOffsetSegment(seg1, side, distance, offset1);
+    offset1 = createOffsetSegment(s1, s2, side, distance);
+  }
+
+  @Override
+  public String toString() {
+    return segList.toString();
   }
 }

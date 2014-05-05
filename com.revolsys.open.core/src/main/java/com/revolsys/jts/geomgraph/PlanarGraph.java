@@ -35,7 +35,6 @@ package com.revolsys.jts.geomgraph;
 /**
  * @version 1.7
  */
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -152,8 +151,7 @@ public class PlanarGraph {
   public Edge findEdge(final Coordinates p0, final Coordinates p1) {
     for (int i = 0; i < edges.size(); i++) {
       final Edge e = edges.get(i);
-      final Coordinates[] eCoord = e.getCoordinates();
-      if (p0.equals(eCoord[0]) && p1.equals(eCoord[1])) {
+      if (p0.equals(e.getCoordinate(0)) && p1.equals(e.getCoordinate(1))) {
         return e;
       }
     }
@@ -188,13 +186,12 @@ public class PlanarGraph {
     for (int i = 0; i < edges.size(); i++) {
       final Edge e = edges.get(i);
 
-      final Coordinates[] eCoord = e.getCoordinates();
-      if (matchInSameDirection(p0, p1, eCoord[0], eCoord[1])) {
+      if (matchInSameDirection(p0, p1, e.getCoordinate(0), e.getCoordinate(1))) {
         return e;
       }
 
-      if (matchInSameDirection(p0, p1, eCoord[eCoord.length - 1],
-        eCoord[eCoord.length - 2])) {
+      if (matchInSameDirection(p0, p1, e.getCoordinate(e.getNumPoints() - 1),
+        e.getCoordinate(e.getNumPoints() - 2))) {
         return e;
       }
     }
@@ -277,16 +274,6 @@ public class PlanarGraph {
       return true;
     }
     return false;
-  }
-
-  public void printEdges(final PrintStream out) {
-    out.println("Edges:");
-    for (int i = 0; i < edges.size(); i++) {
-      out.println("edge " + i + ":");
-      final Edge e = edges.get(i);
-      e.print(out);
-      e.eiList.print(out);
-    }
   }
 
 }

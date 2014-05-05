@@ -97,22 +97,22 @@ public abstract class EdgeRing {
 
   protected void addPoints(final Edge edge, final boolean isForward,
     final boolean isFirstEdge) {
-    final Coordinates[] edgePts = edge.getCoordinates();
+    final int numPoints = edge.getNumPoints();
     if (isForward) {
       int startIndex = 1;
       if (isFirstEdge) {
         startIndex = 0;
       }
-      for (int i = startIndex; i < edgePts.length; i++) {
-        pts.add(edgePts[i]);
+      for (int i = startIndex; i < numPoints; i++) {
+        pts.add(edge.getCoordinate(i));
       }
     } else { // is backward
-      int startIndex = edgePts.length - 2;
+      int startIndex = numPoints - 2;
       if (isFirstEdge) {
-        startIndex = edgePts.length - 1;
+        startIndex = numPoints - 1;
       }
       for (int i = startIndex; i >= 0; i--) {
-        pts.add(edgePts[i]);
+        pts.add(edge.getCoordinate(i));
       }
     }
   }

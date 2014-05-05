@@ -76,6 +76,17 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
     super(geometryFactory, points);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    final List<Point> points = new ArrayList<>();
+    for (final Point point : getPoints()) {
+      final Point newPoint = point.copy(geometryFactory);
+      points.add(newPoint);
+    }
+    return (V)geometryFactory.multiPoint(points);
+  }
+
   @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {

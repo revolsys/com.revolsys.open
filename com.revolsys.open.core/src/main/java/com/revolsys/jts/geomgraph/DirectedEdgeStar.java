@@ -74,13 +74,8 @@ public class DirectedEdgeStar extends EdgeEndStar {
       startDepth);
     // compute the depths for the initial part of the array
     final int lastDepth = computeDepths(0, edgeIndex, nextDepth);
-    // Debug.print(lastDepth != targetLastDepth, this);
-    // Debug.print(lastDepth != targetLastDepth, "mismatch: " + lastDepth +
-    // " / " + targetLastDepth);
     if (lastDepth != targetLastDepth) {
       throw new TopologyException("depth mismatch at " + de.getCoordinate());
-      // Assert.isTrue(lastDepth == targetLastDepth, "depth mismatch at " +
-      // de.getCoordinate());
     }
   }
 

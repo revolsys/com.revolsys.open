@@ -54,17 +54,18 @@ import com.revolsys.jts.geom.Coordinates;
  */
 public class CentralEndpointIntersector {
   private static Coordinates average(final Coordinates[] pts) {
-    final Coordinates avg = new DoubleCoordinates();
+    double averageX = 0;
+    double averageY = 0;
     final int n = pts.length;
     for (int i = 0; i < pts.length; i++) {
-      avg.setX(avg.getX() + pts[i].getX());
-      avg.setY(avg.getY() + pts[i].getY());
+      averageX += pts[i].getX();
+      averageY += pts[i].getY();
     }
     if (n > 0) {
-      avg.setX(avg.getX() / n);
-      avg.setY(avg.getY() / n);
+      averageX /= n;
+      averageX /= n;
     }
-    return avg;
+    return new DoubleCoordinates(averageX, averageY);
   }
 
   public static Coordinates getIntersection(final Coordinates p00,

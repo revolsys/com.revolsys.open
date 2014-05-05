@@ -40,12 +40,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.gis.util.NoOp;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -64,6 +64,7 @@ import com.revolsys.jts.geomgraph.Position;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.noding.IntersectionAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
+import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.noding.Noder;
 import com.revolsys.jts.noding.ScaledNoder;
 import com.revolsys.jts.noding.SegmentString;
@@ -151,6 +152,7 @@ public class Buffer {
       } else {
         return bufferReducedPrecision(geometry, distance, parameters);
       }
+
     }
   }
 
@@ -194,23 +196,12 @@ public class Buffer {
   private static Geometry buffer(final Noder noder,
     final PrecisionModel precisionModel, final Geometry geometry,
     final double distance, final BufferParameters parameters) {
-
-    if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      if (polygon.getRingCount() > 1) {
-        NoOp.noOp();
-      }
-    }
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
-    final OffsetCurveBuilder curveBuilder = new OffsetCurveBuilder(
-      precisionModel, parameters);
-
     final OffsetCurveSetBuilder curveSetBuilder = new OffsetCurveSetBuilder(
-      geometry, distance, curveBuilder);
+      geometry, distance, precisionModel, parameters);
 
-    final List<SegmentString> curves = curveSetBuilder.getCurves();
-
+    final List<NodedSegmentString> curves = curveSetBuilder.getCurves();
     if (curves.size() == 0) {
       return geometryFactory.polygon();
     } else {
@@ -258,7 +249,10 @@ public class Buffer {
         return bufferFixedPrecision(precisionModel, geometry, distance,
           parameters);
       } catch (final TopologyException e) {
+
         saveException = e;
+        // TODO remove
+        // throw e;
       }
     }
     throw saveException;
@@ -288,16 +282,19 @@ public class Buffer {
   }
 
   private static void computeNodedEdges(final Noder noder,
-    final EdgeList edgeList, final List<SegmentString> bufferSegStrList) {
-    noder.computeNodes(bufferSegStrList);
-    final Collection<SegmentString> segments = noder.getNodedSubstrings();
-    for (final SegmentString segment : segments) {
-      final Coordinates[] pts = segment.getCoordinates();
-      if (pts.length > 2 || !pts[0].equals2d(pts[1])) {
+    final EdgeList edges, final List<NodedSegmentString> segments) {
+    noder.computeNodes(segments);
+    final Collection<NodedSegmentString> nodedSegments = noder.getNodedSubstrings();
+    for (final SegmentString segment : nodedSegments) {
+      final int vertexCount = segment.size();
+      if (vertexCount > 2
+        || (vertexCount == 2 && !segment.getCoordinate(0).equals2d(
+          segment.getCoordinate(1)))) {
         final Label oldLabel = (Label)segment.getData();
-        final Edge edge = new Edge(segment.getCoordinates(),
-          new Label(oldLabel));
-        insertUniqueEdge(edgeList, edge);
+        final Label label = new Label(oldLabel);
+        final CoordinatesList points = segment.getPoints();
+        final Edge edge = new Edge(points, label);
+        insertUniqueEdge(edges, edge);
       }
     }
   }
@@ -372,9 +369,10 @@ public class Buffer {
     final Collection<BufferSubgraph> subgraphs,
     final Coordinates stabbingRayLeftPt, final DirectedEdge dirEdge,
     final List<DepthSegment> stabbedSegments) {
-    final Coordinates[] pts = dirEdge.getEdge().getCoordinates();
-    for (int i = 0; i < pts.length - 1; i++) {
-      LineSegment seg = new LineSegmentImpl(pts[i], pts[i + 1]);
+    final Edge edge = dirEdge.getEdge();
+    for (int i = 0; i < edge.getNumPoints() - 1; i++) {
+      final Coordinates p1 = edge.getCoordinate(i);
+      LineSegment seg = new LineSegmentImpl(p1, edge.getCoordinate(i + 1));
       double y1 = seg.getY(0);
       double y2 = seg.getY(1);
       // ensure segment always points upwards
@@ -411,7 +409,7 @@ public class Buffer {
       // stabbing line cuts this segment, so record it
       int depth = dirEdge.getDepth(Position.LEFT);
       // if segment direction was flipped, use RHS depth instead
-      if (!seg.getP0().equals(pts[i])) {
+      if (!seg.getP0().equals(p1)) {
         depth = dirEdge.getDepth(Position.RIGHT);
       }
       final DepthSegment ds = new DepthSegment(seg, depth);

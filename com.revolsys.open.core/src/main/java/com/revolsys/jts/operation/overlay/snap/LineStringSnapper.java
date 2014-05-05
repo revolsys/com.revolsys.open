@@ -37,6 +37,7 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 
 /**
@@ -50,16 +51,16 @@ import com.revolsys.jts.geom.LineString;
  * @version 1.7
  */
 public class LineStringSnapper {
-  private static boolean isClosed(final Coordinates[] pts) {
-    if (pts.length <= 1) {
+  public static boolean isClosed(final CoordinatesList pts) {
+    if (pts.size() <= 1) {
       return false;
     }
-    return pts[0].equals2d(pts[pts.length - 1]);
+    return pts.get(0).equals2d(pts.get(pts.size() - 1));
   }
 
   private double snapTolerance = 0.0;
 
-  private final Coordinates[] srcPts;
+  private final CoordinatesList srcPts;
 
   private boolean allowSnappingToSourceVertices = false;
 
@@ -72,7 +73,7 @@ public class LineStringSnapper {
    * @param srcPts the points to snap 
    * @param snapTolerance the snap tolerance to use
    */
-  public LineStringSnapper(final Coordinates[] srcPts,
+  public LineStringSnapper(final CoordinatesList srcPts,
     final double snapTolerance) {
     this.srcPts = srcPts;
     isClosed = isClosed(srcPts);
@@ -87,7 +88,7 @@ public class LineStringSnapper {
    * @param snapTolerance the snap tolerance to use
    */
   public LineStringSnapper(final LineString srcLine, final double snapTolerance) {
-    this(srcLine.getCoordinateArray(), snapTolerance);
+    this(srcLine.getCoordinatesList(), snapTolerance);
   }
 
   /**

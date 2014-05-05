@@ -163,23 +163,14 @@ public class PointImpl extends AbstractGeometry implements Point {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Point convert(final GeometryFactory geometryFactory) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
-      return this;
-    } else {
-      return copy(geometryFactory);
-    }
-  }
-
-  @Override
-  public Point copy(GeometryFactory geometryFactory) {
+  public <V extends Geometry> V copy(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
-      return this.clone();
+      return (V)this.clone();
     } else if (isEmpty()) {
-      return geometryFactory.point();
+      return (V)geometryFactory.point();
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       double[] targetCoordinates;
@@ -194,7 +185,7 @@ public class PointImpl extends AbstractGeometry implements Point {
           targetAxisCount, targetCoordinates);
       }
 
-      return geometryFactory.point(targetCoordinates);
+      return (V)geometryFactory.point(targetCoordinates);
     }
   }
 
@@ -334,17 +325,6 @@ public class PointImpl extends AbstractGeometry implements Point {
       } else {
         return Double.NaN;
       }
-    }
-  }
-
-  @Override
-  public Coordinates[] getCoordinateArray() {
-    if (isEmpty()) {
-      return new Coordinates[0];
-    } else {
-      return new Coordinates[] {
-        getCoordinate()
-      };
     }
   }
 
@@ -491,41 +471,6 @@ public class PointImpl extends AbstractGeometry implements Point {
   @Override
   public Reader<Segment> segments() {
     return new IteratorReader<>();
-  }
-
-  @Override
-  public void setCoordinate(final Coordinates other) {
-    throw new IllegalArgumentException("Geometries cannot be modified");
-  }
-
-  @Override
-  public void setM(final double m) {
-    throw new IllegalArgumentException("Geometries cannot be modified");
-  }
-
-  @Override
-  public void setTime(final long time) {
-    throw new IllegalArgumentException("Geometries cannot be modified");
-  }
-
-  @Override
-  public void setValue(final int index, final double value) {
-    throw new IllegalArgumentException("Geometries cannot be modified");
-  }
-
-  @Override
-  public void setX(final double x) {
-    throw new IllegalArgumentException("Geometries cannot be modified");
-  }
-
-  @Override
-  public void setY(final double y) {
-    throw new IllegalArgumentException("Geometries cannot be modified");
-  }
-
-  @Override
-  public void setZ(final double z) {
-    throw new IllegalArgumentException("Geometries cannot be modified");
   }
 
   @Override

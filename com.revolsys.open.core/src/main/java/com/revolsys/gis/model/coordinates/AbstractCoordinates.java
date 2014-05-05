@@ -180,6 +180,11 @@ public abstract class AbstractCoordinates implements Coordinates {
     return CoordinatesUtil.equals3d(this, point);
   }
 
+  @Override
+  public int getAxisCount() {
+    return 2;
+  }
+
   public BoundingBox getBoundingBox() {
     return new Envelope(this);
   }
@@ -196,11 +201,6 @@ public abstract class AbstractCoordinates implements Coordinates {
   @Override
   public double getM() {
     return getValue(3);
-  }
-
-  @Override
-  public int getAxisCount() {
-    return 2;
   }
 
   public int getSrid() {
@@ -230,44 +230,6 @@ public abstract class AbstractCoordinates implements Coordinates {
   @Override
   public int hashCode() {
     return CoordinatesUtil.hashCode(this);
-  }
-
-  /**
-   *  Sets this <code>Coordinate</code>s (x,y,z) values to that of <code>other</code>.
-   *
-   *@param  other  the <code>Coordinate</code> to copy
-   */
-  @Override
-  public void setCoordinate(final Coordinates other) {
-    for (int i = 0; i < getAxisCount(); i++) {
-      final double value = other.getValue(i);
-      setValue(i, value);
-    }
-  }
-
-  @Override
-  public void setM(final double m) {
-    setValue(3, m);
-  }
-
-  @Override
-  public void setTime(final long time) {
-    setM(time);
-  }
-
-  @Override
-  public void setX(final double x) {
-    setValue(X, x);
-  }
-
-  @Override
-  public void setY(final double y) {
-    setValue(Y, y);
-  }
-
-  @Override
-  public void setZ(final double z) {
-    setValue(Z, z);
   }
 
   @Override

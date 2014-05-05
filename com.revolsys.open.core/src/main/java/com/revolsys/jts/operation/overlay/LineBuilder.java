@@ -60,7 +60,7 @@ public class LineBuilder {
 
   private final PointLocator ptLocator;
 
-  private final List<LineString> lineEdgesList = new ArrayList<>();
+  private final List<Edge> lineEdgesList = new ArrayList<>();
 
   private final List<LineString> resultLineList = new ArrayList<>();
 
@@ -83,10 +83,8 @@ public class LineBuilder {
   }
 
   private void buildLines(final int opCode) {
-    for (final Iterator it = lineEdgesList.iterator(); it.hasNext();) {
-      final Edge e = (Edge)it.next();
-      final Label label = e.getLabel();
-      final LineString line = geometryFactory.lineString(e.getCoordinates());
+    for (final Edge e : lineEdgesList) {
+      final LineString line = geometryFactory.lineString(e.getPoints());
       resultLineList.add(line);
       e.setInResult(true);
     }
@@ -103,7 +101,7 @@ public class LineBuilder {
    * </ul>
    */
   private void collectBoundaryTouchEdge(final DirectedEdge de,
-    final int opCode, final List edges) {
+    final int opCode, final List<Edge> edges) {
     final Label label = de.getLabel();
     if (de.isLineEdge()) {
       return; // only interested in area edges
@@ -142,7 +140,7 @@ public class LineBuilder {
    * @param edges the list of included line edges
    */
   private void collectLineEdge(final DirectedEdge de, final int opCode,
-    final List edges) {
+    final List<Edge> edges) {
     final Label label = de.getLabel();
     final Edge e = de.getEdge();
     // include L edges which are in the result

@@ -381,7 +381,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @param geometryFactory The geometry factory to convert the geometry to.
    * @return The converted geometry
    */
-  Geometry convert(GeometryFactory geometryFactory);
+  <V extends Geometry> V convert(GeometryFactory geometryFactory);
 
   /**
    *  Computes the smallest convex <code>Polygon</code> that contains all the
@@ -423,7 +423,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @param geometryFactory The geometry factory to convert the geometry to.
    * @return The converted geometry
    */
-  Geometry copy(GeometryFactory geometryFactory);
+  <V extends Geometry> V copy(GeometryFactory geometryFactory);
 
   /**
    * Tests whether this geometry is covered by the
@@ -803,26 +803,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *@return null if this Geometry is empty
    */
   Coordinates getCoordinate();
-
-  /**
-   *  Returns an array containing the values of all the vertices for 
-   *  this geometry.
-   *  If the geometry is a composite, the array will contain all the vertices
-   *  for the components, in the order in which the components occur in the geometry.
-   *  <p>
-   *  In general, the array cannot be assumed to be the actual internal 
-   *  storage for the vertices.  Thus modifying the array
-   *  may not modify the geometry itself. 
-   *  Use the {@link CoordinatesList#setOrdinate} method
-   *  (possibly on the components) to modify the underlying data.
-   *  If the coordinates are modified, 
-   *  {@link #geometryChanged} must be called afterwards.
-   *
-   *@return    the vertices of this <code>Geometry</code>
-   *@see #geometryChanged
-   *@see CoordinatesList#setOrdinate
-   */
-  Coordinates[] getCoordinateArray();
 
   /**
    * 

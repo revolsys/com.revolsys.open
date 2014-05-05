@@ -105,7 +105,8 @@ public class MCIndexSnapRounder implements Noder {
   }
 
   @Override
-  public void computeNodes(final Collection inputSegmentStrings) {
+  public void computeNodes(
+    final Collection<NodedSegmentString> inputSegmentStrings) {
     this.nodedSegStrings = inputSegmentStrings;
     noder = new MCIndexNoder();
     pointSnapper = new MCIndexPointSnapper(noder.getIndex());
@@ -129,14 +130,14 @@ public class MCIndexSnapRounder implements Noder {
   /**
    * Snaps segments to the vertices of a Segment String.  
    */
-  private void computeVertexSnaps(final NodedSegmentString e) {
-    final Coordinates[] pts0 = e.getCoordinates();
-    for (int i = 0; i < pts0.length; i++) {
-      final HotPixel hotPixel = new HotPixel(pts0[i], scaleFactor, li);
-      final boolean isNodeAdded = pointSnapper.snap(hotPixel, e, i);
+  private void computeVertexSnaps(final NodedSegmentString segment) {
+    final int i = 0;
+    for (final Coordinates point : segment.getPoints()) {
+      final HotPixel hotPixel = new HotPixel(point, scaleFactor, li);
+      final boolean isNodeAdded = pointSnapper.snap(hotPixel, segment, i);
       // if a node is created for a vertex, that vertex must be noded too
       if (isNodeAdded) {
-        e.addIntersection(pts0[i], i);
+        segment.addIntersection(point, i);
       }
     }
   }
@@ -159,7 +160,7 @@ public class MCIndexSnapRounder implements Noder {
   }
 
   @Override
-  public Collection getNodedSubstrings() {
+  public Collection<NodedSegmentString> getNodedSubstrings() {
     return NodedSegmentString.getNodedSubstrings(nodedSegStrings);
   }
 

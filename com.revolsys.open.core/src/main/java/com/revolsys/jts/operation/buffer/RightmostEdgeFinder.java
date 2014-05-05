@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -36,7 +35,6 @@ package com.revolsys.jts.operation.buffer;
 /**
  * @version 1.7
  */
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
@@ -73,32 +71,31 @@ class RightmostEdgeFinder {
   }
 
   private void checkForRightmostCoordinate(final DirectedEdge de) {
-    final Coordinates[] coord = de.getEdge().getCoordinates();
-    for (int i = 0; i < coord.length - 1; i++) {
+    final Edge edge = de.getEdge();
+    for (int i = 0; i < edge.getNumPoints() - 1; i++) {
       // only check vertices which are the start or end point of a
       // non-horizontal segment
       // <FIX> MD 19 Sep 03 - NO! we can test all vertices, since the rightmost
       // must have a non-horiz segment adjacent to it
-      if (minCoord == null || coord[i].getX() > minCoord.getX()) {
+      final Coordinates point = edge.getCoordinate(i);
+      if (minCoord == null || point.getX() > minCoord.getX()) {
         minDe = de;
         minIndex = i;
-        minCoord = coord[i];
+        minCoord = point;
       }
       // }
     }
   }
 
-  public void findEdge(final List dirEdgeList) {
+  public void findEdge(final List<DirectedEdge> dirEdgeList) {
     /**
      * Check all forward DirectedEdges only.  This is still general,
      * because each edge has a forward DirectedEdge.
      */
-    for (final Iterator i = dirEdgeList.iterator(); i.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)i.next();
-      if (!de.isForward()) {
-        continue;
+    for (final DirectedEdge de : dirEdgeList) {
+      if (de.isForward()) {
+        checkForRightmostCoordinate(de);
       }
-      checkForRightmostCoordinate(de);
     }
 
     /**
@@ -131,7 +128,7 @@ class RightmostEdgeFinder {
     // necessarily in the forward direction. Use the sym edge if it isn't.
     if (!minDe.isForward()) {
       minDe = minDe.getSym();
-      minIndex = minDe.getEdge().getCoordinates().length - 1;
+      minIndex = minDe.getEdge().getNumPoints() - 1;
     }
   }
 
@@ -141,11 +138,11 @@ class RightmostEdgeFinder {
      * If these segments are both above or below the rightmost point, we need to
      * determine their relative orientation to decide which is rightmost.
      */
-    final Coordinates[] pts = minDe.getEdge().getCoordinates();
-    Assert.isTrue(minIndex > 0 && minIndex < pts.length,
+    final Edge edge = minDe.getEdge();
+    Assert.isTrue(minIndex > 0 && minIndex < edge.getNumPoints(),
       "rightmost point expected to be interior vertex of edge");
-    final Coordinates pPrev = pts[minIndex - 1];
-    final Coordinates pNext = pts[minIndex + 1];
+    final Coordinates pPrev = edge.getCoordinate(minIndex - 1);
+    final Coordinates pNext = edge.getCoordinate(minIndex + 1);
     final int orientation = CGAlgorithms.computeOrientation(minCoord, pNext,
       pPrev);
     boolean usePrev = false;
@@ -189,18 +186,18 @@ class RightmostEdgeFinder {
   }
 
   private int getRightmostSideOfSegment(final DirectedEdge de, final int i) {
-    final Edge e = de.getEdge();
-    final Coordinates coord[] = e.getCoordinates();
-
-    if (i < 0 || i + 1 >= coord.length) {
+    final Edge edge = de.getEdge();
+    if (i < 0 || i + 1 >= edge.getNumPoints()) {
       return -1;
     }
-    if (coord[i].getY() == coord[i + 1].getY()) {
+    final Coordinates p1 = edge.getCoordinate(i);
+    final Coordinates p2 = edge.getCoordinate(i + 1);
+    if (p1.getY() == p2.getY()) {
       return -1; // indicates edge is parallel to x-axis
     }
 
     int pos = Position.LEFT;
-    if (coord[i].getY() < coord[i + 1].getY()) {
+    if (p1.getY() < p2.getY()) {
       pos = Position.RIGHT;
     }
     return pos;

@@ -169,8 +169,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         try {
           setXorGeometry(null);
           if (this.addCompleteAction != null) {
-            final Geometry geometry = this.addLayer.getGeometryFactory().copy(
-              this.addGeometry);
+            final Geometry geometry = (Geometry)this.addGeometry.copy(this.addLayer.getGeometryFactory());
             this.addCompleteAction.addComplete(this, geometry);
             clearAddGeometry();
           }
@@ -368,7 +367,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final Coordinates newC1 = line.pointAlongOffset((length - cursorRadius)
       / length, 0);
     Point point = viewportGeometryFactory.point(newC1);
-    point = geometryFactory.copy(point);
+    point = (Point)point.copy(geometryFactory);
     return geometryFactory.lineString(c0, point);
   }
 
@@ -671,7 +670,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           }
           final com.revolsys.jts.geom.GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
 
-          point = geometryFactory.copy(point);
+          point = (Point)point.copy(geometryFactory);
           if (this.addGeometry.isEmpty()) {
             setAddGeometry(appendVertex(point));
           } else {
@@ -777,8 +776,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (clearOverlayAction(ACTION_MOVE_GEOMETRY)) {
         for (final CloseLocation location : moveGeometryLocations) {
           final com.revolsys.jts.geom.GeometryFactory geometryFactory = location.getGeometryFactory();
-          final Point startPoint = geometryFactory.copy(getViewportPoint(this.moveGeometryStart));
-          final Point endPoint = geometryFactory.copy(getViewportPoint(event));
+          final Point startPoint = (Point)getViewportPoint(this.moveGeometryStart).copy(geometryFactory);
+          final Point endPoint = (Point)getViewportPoint(event).copy(geometryFactory);
 
           final double deltaX = endPoint.getX() - startPoint.getX();
           final double deltaY = endPoint.getY() - startPoint.getY();
@@ -1104,7 +1103,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           if (getSnapPoint() == null) {
             point = getPoint(geometryFactory, event);
           } else {
-            point = geometryFactory.copy(getSnapPoint());
+            point = (Point)getSnapPoint().copy(geometryFactory);
           }
           final int[] vertexIndex = location.getVertexIndex();
           Geometry newGeometry;

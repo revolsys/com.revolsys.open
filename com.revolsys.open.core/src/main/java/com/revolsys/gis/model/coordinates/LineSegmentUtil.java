@@ -1,6 +1,5 @@
 package com.revolsys.gis.model.coordinates;
 
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,29 +10,10 @@ import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.MathUtil;
 
 public class LineSegmentUtil {
-  public static void addElevation(
-    final CoordinatesPrecisionModel precisionModel,
-    final Coordinates lineStart, final Coordinates lineEnd,
-    final Coordinates point) {
-    final double z = getElevation(lineStart, lineEnd, point);
-    point.setZ(z);
-    precisionModel.makePrecise(point);
-  }
-
-  public static void addElevation(final PrecisionModel precisionModel,
-    final Coordinates lineStart, final Coordinates lineEnd,
-    final Coordinates point) {
-    final double z = getElevation(lineStart, lineEnd, point);
-    if (!MathUtil.isNanOrInfinite(z)) {
-      point.setZ(precisionModel.makePrecise(z));
-    }
-  }
 
   public static Coordinates closestPoint(final Coordinates lineStart,
     final Coordinates lineEnd, final Coordinates point) {
@@ -273,7 +253,7 @@ public class LineSegmentUtil {
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     final int axisCount = geometryFactory.getAxisCount();
-    final Coordinates newPoint = geometryFactory.createCoordinates(point);
+    final double[] coordinates = point.getCoordinates();
     if (axisCount > 2) {
       final double fraction = point.distance(lineStart)
         / lineStart.distance(lineEnd);
@@ -286,10 +266,11 @@ public class LineSegmentUtil {
         z2 = 0;
       }
       final double z = z1 + (z2 - z1) * (fraction);
-      newPoint.setZ(z);
+      coordinates[2] = z;
+      return geometryFactory.point(coordinates);
+    } else {
+      return point;
     }
-    geometryFactory.makePrecise(newPoint);
-    return newPoint;
   }
 
   public static double getElevation(final Coordinates lineStart,
@@ -388,7 +369,6 @@ public class LineSegmentUtil {
               intersection);
             final DoubleCoordinatesList points = new DoubleCoordinatesList(
               geometryFactory.getAxisCount(), intersection);
-            geometryFactory.makePrecise(points);
             return points;
           }
         }
@@ -594,7 +574,9 @@ public class LineSegmentUtil {
         if (axisCount > 2) {
           final double z = projectedCoordinate.getZ();
           if (MathUtil.isNanOrInfinite(z) || z == 0) {
-            projectedCoordinate.setZ(point.getZ());
+            final double[] coordinates = projectedCoordinate.getCoordinates();
+            coordinates[2] = point.getZ();
+            return new DoubleCoordinates(coordinates);
           }
         }
 
@@ -699,17 +681,4 @@ public class LineSegmentUtil {
     }
   }
 
-  public static CoordinatesList toCoordinatesList(final int axisCount,
-    final List<LineSegment> lineSegments) {
-    final CoordinatesList points = new DoubleCoordinatesList(
-      lineSegments.size() + 1, axisCount);
-
-    for (int i = 0; i < lineSegments.size(); i++) {
-      final LineSegment lineSegment = lineSegments.get(i);
-      points.setPoint(i, lineSegment.get(0));
-    }
-    final LineSegment lineSegment = lineSegments.get(lineSegments.size() - 1);
-    points.setPoint(lineSegments.size(), lineSegment.get(1));
-    return points;
-  }
 }

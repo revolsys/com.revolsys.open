@@ -50,13 +50,10 @@ public class WarpPolynomialFilter extends WholeImageFilter {
     final double pixelWidth = this.boundingBox.getWidth() / imageWidth;
     final double pixelHeight = this.boundingBox.getHeight() / imageHeight;
 
-    final Coordinates dest = new DoubleCoordinates(2);
     for (int i = 0; i < imageWidth; i++) {
       final double destX = minX + i * pixelWidth;
-      dest.setX(destX);
       for (int j = 0; j < imageHeight; j++) {
         final double destY = maxY - j * pixelHeight;
-        dest.setY(destY);
         final Coordinates source = toSourcePoint(destX, destY);
 
         final double imageX = source.getX();

@@ -35,8 +35,11 @@ package com.revolsys.jts.operation.buffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.PrecisionModel;
@@ -52,7 +55,7 @@ import com.revolsys.jts.geom.PrecisionModel;
 class OffsetSegmentString {
   private static final Coordinates[] COORDINATE_ARRAY_TYPE = new Coordinates[0];
 
-  private final List<Coordinates> ptList = new ArrayList<>();
+  private final List<Coordinates> points = new ArrayList<>();
 
   private PrecisionModel precisionModel = null;
 
@@ -63,54 +66,51 @@ class OffsetSegmentString {
    */
   private double minimimVertexDistance = 0.0;
 
-  public void addPt(final Coordinates pt) {
-    final Coordinates bufPt = new Coordinate(pt);
-    precisionModel.makePrecise(bufPt);
-    // don't add duplicate (or near-duplicate) points
-    if (isRedundant(bufPt)) {
-      return;
-    }
-    ptList.add(bufPt);
-    // System.out.println(bufPt);
+  public void addPt(final Coordinates point) {
+    addPt(point.getX(), point.getY());
   }
 
-  public void addPts(final Coordinates[] pt, final boolean isForward) {
+  public void addPt(final double... coordinates) {
+    if (!precisionModel.isFloating()) {
+      coordinates[0] = precisionModel.makePrecise(coordinates[0]);
+      coordinates[1] = precisionModel.makePrecise(coordinates[1]);
+    }
+    final Coordinates bufPt = new DoubleCoordinates(coordinates);
+    if (!isRedundant(bufPt)) {
+      points.add(bufPt);
+    }
+  }
+
+  public void addPts(final CoordinatesList points, final boolean isForward) {
     if (isForward) {
-      for (int i = 0; i < pt.length; i++) {
-        addPt(pt[i]);
+      for (int i = 0; i < points.size(); i++) {
+        addPt(points.get(i));
       }
     } else {
-      for (int i = pt.length - 1; i >= 0; i--) {
-        addPt(pt[i]);
+      for (int i = points.size() - 1; i >= 0; i--) {
+        addPt(points.get(i));
       }
     }
   }
 
   public void closeRing() {
-    if (ptList.size() < 1) {
+    if (points.size() < 1) {
       return;
     }
-    final Coordinates startPt = new Coordinate(ptList.get(0));
-    final Coordinates lastPt = ptList.get(ptList.size() - 1);
+    final Coordinates startPt = new Coordinate(points.get(0));
+    final Coordinates lastPt = points.get(points.size() - 1);
     Coordinates last2Pt = null;
-    if (ptList.size() >= 2) {
-      last2Pt = ptList.get(ptList.size() - 2);
+    if (points.size() >= 2) {
+      last2Pt = points.get(points.size() - 2);
     }
     if (startPt.equals(lastPt)) {
       return;
     }
-    ptList.add(startPt);
+    points.add(startPt);
   }
 
-  public Coordinates[] getCoordinates() {
-    /*
-     * // check that points are a ring - add the startpoint again if they are
-     * not if (ptList.size() > 1) { Coordinates start = (Coordinates)
-     * ptList.get(0); Coordinates end = (Coordinates) ptList.get(ptList.size() -
-     * 1); if (! start.equals(end) ) addPt(start); }
-     */
-    final Coordinates[] coord = ptList.toArray(COORDINATE_ARRAY_TYPE);
-    return coord;
+  public CoordinatesList getPoints() {
+    return new DoubleCoordinatesList(2, points);
   }
 
   /**
@@ -122,10 +122,11 @@ class OffsetSegmentString {
    * @return true if the point is redundant
    */
   private boolean isRedundant(final Coordinates pt) {
-    if (ptList.size() < 1) {
+    if (points.size() < 1) {
       return false;
     }
-    final Coordinates lastPt = ptList.get(ptList.size() - 1);
+    // return points.get(points.size() - 1).equals(pt);
+    final Coordinates lastPt = points.get(points.size() - 1);
     final double ptDist = pt.distance(lastPt);
     if (ptDist < minimimVertexDistance) {
       return true;
@@ -147,8 +148,13 @@ class OffsetSegmentString {
 
   @Override
   public String toString() {
-    final GeometryFactory fact = GeometryFactory.getFactory();
-    final LineString line = fact.lineString(getCoordinates());
-    return line.toString();
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+    final CoordinatesList points = getPoints();
+    if (points.size() == 1) {
+      return geometryFactory.point(points).toString();
+    } else {
+      final LineString line = geometryFactory.lineString(points);
+      return line.toString();
+    }
   }
 }

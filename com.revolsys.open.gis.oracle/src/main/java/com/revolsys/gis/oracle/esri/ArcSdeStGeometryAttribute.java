@@ -10,7 +10,6 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
@@ -102,8 +101,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
-      geometry = GeometryProjectionUtil.performCopy(geometry,
-        this.geometryFactory);
+      geometry = geometry.copy(this.geometryFactory);
 
       final int sdeSrid = this.spatialReference.getEsriSrid();
       final Double xOffset = this.spatialReference.getXOffset();

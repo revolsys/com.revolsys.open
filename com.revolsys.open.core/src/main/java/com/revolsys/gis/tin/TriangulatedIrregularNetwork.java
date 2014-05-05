@@ -196,8 +196,8 @@ public class TriangulatedIrregularNetwork {
     final double y2 = lc1.getY();
     final double z1 = breakline.getElevation(lc0);
     final double z2 = breakline.getElevation(lc1);
-    final LineSegment lineSegment = new LineSegmentImpl(geometryFactory,
-      3, x1, y1, z1, x2, y2, z2);
+    final LineSegment lineSegment = new LineSegmentImpl(geometryFactory, 3, x1,
+      y1, z1, x2, y2, z2);
     addBreaklineIntersect(triangle, lineSegment);
   }
 
@@ -415,8 +415,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public double getElevation(final Coordinates coordinate) {
-    final DoubleCoordinates point = new DoubleCoordinates(coordinate);
-    geometryFactory.makePrecise(point);
+    final Coordinates point = geometryFactory.createCoordinates(coordinate);
     final List<Triangle> triangles = getTriangles(coordinate);
     for (final Triangle triangle : triangles) {
       final Coordinates t0 = triangle.getP0();
@@ -613,8 +612,8 @@ public class TriangulatedIrregularNetwork {
 
   public void insertNode(final Coordinates coordinate) {
     if (boundingBox.covers(coordinate)) {
-      final Coordinates point = new DoubleCoordinates(coordinate, 3);
-      geometryFactory.makePrecise(point);
+      final Coordinates point = new DoubleCoordinates(
+        geometryFactory.createCoordinates(coordinate), 3);
       if (!nodes.contains(point)) {
         final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);
         if (!triangles.isEmpty()) {

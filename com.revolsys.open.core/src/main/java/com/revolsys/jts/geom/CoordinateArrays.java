@@ -238,33 +238,6 @@ public class CoordinateArrays {
   }
 
   /**
-   * Determines which orientation of the {@link Coordinates} array
-   * is (overall) increasing.
-   * In other words, determines which end of the array is "smaller"
-   * (using the standard ordering on {@link Coordinates}).
-   * Returns an integer indicating the increasing direction.
-   * If the sequence is a palindrome, it is defined to be
-   * oriented in a positive direction.
-   *
-   * @param pts the array of Coordinates to test
-   * @return <code>1</code> if the array is smaller at the start
-   * or is a palindrome,
-   * <code>-1</code> if smaller at the end
-   */
-  public static int increasingDirection(final Coordinates[] pts) {
-    for (int i = 0; i < pts.length / 2; i++) {
-      final int j = pts.length - 1 - i;
-      // skip equal points on both ends
-      final int comp = pts[i].compareTo(pts[j]);
-      if (comp != 0) {
-        return comp;
-      }
-    }
-    // array must be a palindrome - defined to be in positive direction
-    return 1;
-  }
-
-  /**
    *  Returns the index of <code>coordinate</code> in <code>coordinates</code>.
    *  The first position is 0; the second, 1; etc.
    *
@@ -319,23 +292,6 @@ public class CoordinateArrays {
       return false;
     }
     return true;
-  }
-
-  /**
-   *  Returns the minimum coordinate, using the usual lexicographic comparison.
-   *
-   *@param  coordinates  the array to search
-   *@return              the minimum coordinate in the array, found using <code>compareTo</code>
-   *@see Coordinate#compareTo(Object)
-   */
-  public static Coordinates minCoordinate(final Coordinates[] coordinates) {
-    Coordinates minCoord = null;
-    for (int i = 0; i < coordinates.length; i++) {
-      if (minCoord == null || minCoord.compareTo(coordinates[i]) > 0) {
-        minCoord = coordinates[i];
-      }
-    }
-    return minCoord;
   }
 
   /**
@@ -409,25 +365,6 @@ public class CoordinateArrays {
       coord[i] = coord[last - i];
       coord[last - i] = tmp;
     }
-  }
-
-  /**
-   *  Shifts the positions of the coordinates until <code>firstCoordinate</code>
-   *  is first.
-   *
-   *@param  coordinates      the array to rearrange
-   *@param  firstCoordinate  the coordinate to make first
-   */
-  public static void scroll(final Coordinates[] coordinates,
-    final Coordinates firstCoordinate) {
-    final int i = indexOf(firstCoordinate, coordinates);
-    if (i < 0) {
-      return;
-    }
-    final Coordinates[] newCoordinates = new Coordinates[coordinates.length];
-    System.arraycopy(coordinates, i, newCoordinates, 0, coordinates.length - i);
-    System.arraycopy(coordinates, 0, newCoordinates, coordinates.length - i, i);
-    System.arraycopy(newCoordinates, 0, coordinates, 0, coordinates.length);
   }
 
   /**

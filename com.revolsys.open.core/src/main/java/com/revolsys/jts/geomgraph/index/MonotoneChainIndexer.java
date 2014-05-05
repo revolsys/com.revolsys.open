@@ -1,6 +1,3 @@
-
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -38,8 +35,9 @@ package com.revolsys.jts.geomgraph.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.Quadrant;
+
 /**
  * MonotoneChains are a way of partitioning the segments of an edge to
  * allow for fast searching of intersections.
@@ -64,11 +62,10 @@ import com.revolsys.jts.geomgraph.Quadrant;
  */
 public class MonotoneChainIndexer {
 
-  public static int[] toIntArray(List list)
-  {
-    int[] array = new int[list.size()];
+  public static int[] toIntArray(final List<Integer> list) {
+    final int[] array = new int[list.size()];
     for (int i = 0; i < array.length; i++) {
-      array[i] = ((Integer) list.get(i)).intValue();
+      array[i] = list.get(i);
     }
     return array;
   }
@@ -76,39 +73,40 @@ public class MonotoneChainIndexer {
   public MonotoneChainIndexer() {
   }
 
-  public int[] getChainStartIndices(Coordinates[] pts)
-  {
-    // find the startpoint (and endpoints) of all monotone chains in this edge
-    int start = 0;
-    List startIndexList = new ArrayList();
-    startIndexList.add(new Integer(start));
-    do {
-      int last = findChainEnd(pts, start);
-      startIndexList.add(new Integer(last));
-      start = last;
-    } while (start < pts.length - 1);
-    // copy list to an array of ints, for efficiency
-    int[] startIndex = toIntArray(startIndexList);
-    return startIndex;
-  }
-
   /**
    * @return the index of the last point in the monotone chain
    */
-  private int findChainEnd(Coordinates[] pts, int start)
-  {
+  private int findChainEnd(final Edge edge, final int start) {
     // determine quadrant for chain
-    int chainQuad = Quadrant.quadrant(pts[start], pts[start + 1]);
+    final int chainQuad = Quadrant.quadrant(edge.getCoordinate(start),
+      edge.getCoordinate(start + 1));
     int last = start + 1;
-    while (last < pts.length) {
+    while (last < edge.getNumPoints()) {
       // compute quadrant for next possible segment in chain
-      int quad = Quadrant.quadrant(pts[last - 1], pts[last]);
-      if (quad != chainQuad) break;
+      final int quad = Quadrant.quadrant(edge.getCoordinate(last - 1),
+        edge.getCoordinate(last));
+      if (quad != chainQuad) {
+        break;
+      }
       last++;
     }
     return last - 1;
   }
 
-
+  public int[] getChainStartIndices(final Edge edge) {
+    // find the startpoint (and endpoints) of all monotone chains in this edge
+    int start = 0;
+    final List<Integer> startIndexList = new ArrayList<>();
+    startIndexList.add(start);
+    final int numPoints = edge.getNumPoints();
+    do {
+      final int last = findChainEnd(edge, start);
+      startIndexList.add(last);
+      start = last;
+    } while (start < numPoints - 1);
+    // copy list to an array of ints, for efficiency
+    final int[] startIndex = toIntArray(startIndexList);
+    return startIndex;
+  }
 
 }

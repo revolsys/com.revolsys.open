@@ -163,16 +163,16 @@ public class LineStringImpl extends AbstractLineString implements LineString {
       return this.coordinates;
     } else {
       geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      double[] targetCoordinates;
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory.getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
         return this.coordinates;
       } else {
         final int sourceAxisCount = getAxisCount();
-        final int targetAxisCount = geometryFactory.getAxisCount();
-        targetCoordinates = new double[targetAxisCount * getVertexCount()];
+        final int vertexCount = getVertexCount();
+        final double[] targetCoordinates = new double[sourceAxisCount
+          * vertexCount];
         coordinatesOperation.perform(sourceAxisCount, this.coordinates,
-          targetAxisCount, targetCoordinates);
+          sourceAxisCount, targetCoordinates);
         return targetCoordinates;
       }
     }

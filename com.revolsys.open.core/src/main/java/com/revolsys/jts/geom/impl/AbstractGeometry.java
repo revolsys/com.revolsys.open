@@ -51,7 +51,6 @@ import com.revolsys.jts.algorithm.InteriorPointPoint;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -594,14 +593,14 @@ public abstract class AbstractGeometry implements Geometry {
     return relate(g).isContains();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Geometry convert(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return this;
-    } else if (getGeometryFactory() == geometryFactory) {
-      return this;
+  public <V extends Geometry> V convert(final GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
+      return (V)this;
     } else {
-      return geometryFactory.geometry(this);
+      return (V)copy(geometryFactory);
     }
   }
 
@@ -639,11 +638,6 @@ public abstract class AbstractGeometry implements Geometry {
   public Geometry convexHull() {
     final ConvexHull convexHull = new ConvexHull(this);
     return convexHull.getConvexHull();
-  }
-
-  @Override
-  public Geometry copy(final GeometryFactory geometryFactory) {
-    return geometryFactory.copy(this);
   }
 
   /**
@@ -726,12 +720,6 @@ public abstract class AbstractGeometry implements Geometry {
       return true;
     }
     return relate(g).isCovers();
-  }
-
-  private Point createPointFromInternalCoord(final Coordinates coord,
-    final Geometry exemplar) {
-    exemplar.getPrecisionModel().makePrecise(coord);
-    return exemplar.getGeometryFactory().point(coord);
   }
 
   /**
@@ -1119,7 +1107,7 @@ public abstract class AbstractGeometry implements Geometry {
       return getGeometryFactory().point();
     }
     final Coordinates centPt = Centroid.getCentroid(this);
-    return createPointFromInternalCoord(centPt, this);
+    return getGeometryFactory().point(centPt);
   }
 
   @Override
@@ -1127,16 +1115,6 @@ public abstract class AbstractGeometry implements Geometry {
     final String geometryType = getGeometryType();
     final int index = sortedGeometryTypes.indexOf(geometryType);
     return index;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
-    final List<V> geometries = new ArrayList<V>();
-    if (geometryClass.isAssignableFrom(getClass())) {
-      geometries.add((V)this);
-    }
-    return geometries;
   }
 
   /**
@@ -1151,27 +1129,6 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public abstract Coordinates getCoordinate();
-
-  /**
-   *  Returns an array containing the values of all the vertices for 
-   *  this geometry.
-   *  If the geometry is a composite, the array will contain all the vertices
-   *  for the components, in the order in which the components occur in the geometry.
-   *  <p>
-   *  In general, the array cannot be assumed to be the actual internal 
-   *  storage for the vertices.  Thus modifying the array
-   *  may not modify the geometry itself. 
-   *  Use the {@link CoordinatesList#setOrdinate} method
-   *  (possibly on the components) to modify the underlying data.
-   *  If the coordinates are modified, 
-   *  {@link #geometryChanged} must be called afterwards.
-   *
-   *@return    the vertices of this <code>Geometry</code>
-   *@see #geometryChanged
-   *@see CoordinatesList#setOrdinate
-   */
-  @Override
-  public abstract Coordinates[] getCoordinateArray();
 
   /**
    * 
@@ -1270,6 +1227,17 @@ public abstract class AbstractGeometry implements Geometry {
     return (V)this;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> List<V> getGeometryComponents(
+    final Class<V> geometryClass) {
+    final List<V> geometries = new ArrayList<V>();
+    if (geometryClass.isAssignableFrom(getClass())) {
+      geometries.add((V)this);
+    }
+    return geometries;
+  }
+
   /**
    * Returns the number of {@link Geometry}s in a {@link GeometryCollection}
    * (or 1, if the geometry is not a collection).
@@ -1322,7 +1290,7 @@ public abstract class AbstractGeometry implements Geometry {
       final InteriorPointArea intPt = new InteriorPointArea(this);
       interiorPt = intPt.getInteriorPoint();
     }
-    return createPointFromInternalCoord(interiorPt, this);
+    return getGeometryFactory().point(interiorPt);
   }
 
   /**

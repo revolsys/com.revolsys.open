@@ -23,7 +23,6 @@ import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -54,21 +53,22 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
 
   public boolean fixMissingZValues(final LineString line1,
     final LineString line2) {
-    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList points2 = CoordinatesListUtil.get(line2);
-    if (points1.getAxisCount() > 2) {
-      final int numPoints = points1.size();
+    final CoordinatesList points1 = line1.getCoordinatesList();
+    final CoordinatesList points2 = line2.getCoordinatesList();
+    final int axisCount = points1.getAxisCount();
+    if (axisCount > 2) {
+      final int vertexCount = points1.size();
       final boolean reverse = isReverse(points1, points2);
       if (reverse) {
-        int j = numPoints - 1;
-        for (int i = 0; i < numPoints; i++) {
+        int j = vertexCount - 1;
+        for (int i = 0; i < vertexCount; i++) {
           if (!fixZValues(points1, j, points2, i)) {
             return false;
           }
           j--;
         }
       } else {
-        for (int i = 0; i < numPoints; i++) {
+        for (int i = 0; i < vertexCount; i++) {
           if (!fixZValues(points1, i, points2, i)) {
             return false;
           }
@@ -82,21 +82,22 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
 
   public boolean fixZValues(final CoordinatesList points1, final int index1,
     final CoordinatesList points2, final int index2) {
-    final double z1 = points1.getZ(index2);
-    final double z2 = points2.getZ(index1);
-    if (Double.isNaN(z1) || z1 == 0) {
-      if (!Double.isNaN(z2)) {
-        points1.setZ(index2, z2);
-      }
-      return true;
-    } else if (Double.isNaN(z2) || z2 == 0) {
-      if (!Double.isNaN(z1)) {
-        points2.setZ(index1, z1);
-      }
-      return true;
-    } else {
-      return z1 == z2;
-    }
+    // TODO
+    // final double z1 = points1.getZ(index2);
+    // final double z2 = points2.getZ(index1);
+    // if (Double.isNaN(z1) || z1 == 0) {
+    // if (!Double.isNaN(z2)) {
+    // points1.setValue(index2, 2, z2);
+    // }
+    // return true;
+    // } else if (Double.isNaN(z2) || z2 == 0) {
+    // if (!Double.isNaN(z1)) {
+    // points2.setValue(index1, 2, z1);
+    // }
+    return true;
+    // } else {
+    // return z1 == z2;
+    // }
   }
 
   public Set<String> getEqualExcludeAttributes() {

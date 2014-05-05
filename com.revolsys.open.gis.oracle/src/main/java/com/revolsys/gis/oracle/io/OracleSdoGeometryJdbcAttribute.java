@@ -14,7 +14,6 @@ import oracle.spatial.geometry.JGeometry;
 import oracle.sql.ARRAY;
 import oracle.sql.STRUCT;
 
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
@@ -256,8 +255,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int dimension) throws SQLException {
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
-      geometry = GeometryProjectionUtil.performCopy(geometry,
-        this.geometryFactory);
+      geometry = geometry.copy(this.geometryFactory);
       // TODO direct convert to SDO Geometry from JTS Geometry
       JGeometry jGeometry = null;
       if (object instanceof Polygon) {

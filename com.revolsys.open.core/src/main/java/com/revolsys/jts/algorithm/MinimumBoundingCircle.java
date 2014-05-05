@@ -34,6 +34,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
@@ -202,9 +203,8 @@ public class MinimumBoundingCircle {
       return;
     }
     if (input.getVertexCount() == 1) {
-      final Coordinates[] pts = input.getCoordinateArray();
       extremalPts = new Coordinates[] {
-        new Coordinate(pts[0])
+        input.getCoordinate()
       };
       return;
     }
@@ -215,7 +215,7 @@ public class MinimumBoundingCircle {
      */
     final Geometry convexHull = input.convexHull();
 
-    final Coordinates[] hullPts = convexHull.getCoordinateArray();
+    final Coordinates[] hullPts = CoordinatesListUtil.getCoordinateArray(convexHull);
 
     // strip duplicate final point, if any
     Coordinates[] pts = hullPts;

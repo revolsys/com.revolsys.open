@@ -116,16 +116,6 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
   }
 
   @Override
-  public GeometryCollection convert(final GeometryFactory geometryFactory) {
-    return (GeometryCollection)super.convert(geometryFactory);
-  }
-
-  @Override
-  public GeometryCollection copy(final GeometryFactory geometryFactory) {
-    return (GeometryCollection)super.copy(geometryFactory);
-  }
-
-  @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {
       return false;
@@ -208,29 +198,6 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
     } else {
       return getGeometry(0).getCoordinate();
     }
-  }
-
-  /**
-   * Collects all coordinates of all subgeometries into an Array.
-   *
-   * Note that while changes to the coordinate objects themselves
-   * may modify the Geometries in place, the returned Array as such
-   * is only a temporary container which is not synchronized back.
-   *
-   * @return the collected coordinates
-   *    */
-  @Override
-  public Coordinates[] getCoordinateArray() {
-    final Coordinates[] coordinates = new Coordinates[getVertexCount()];
-    int k = -1;
-    for (final Geometry geometry : geometries()) {
-      final Coordinates[] childCoordinates = geometry.getCoordinateArray();
-      for (int j = 0; j < childCoordinates.length; j++) {
-        k++;
-        coordinates[k] = childCoordinates[j];
-      }
-    }
-    return coordinates;
   }
 
   @Override

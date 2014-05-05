@@ -36,12 +36,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+
 /**
  * Specifies the precision model of the {@link Coordinates}s in a {@link Geometry}.
  * In other words, specifies the grid of allowable
  *  points for all <code>Geometry</code>s.
  * <p>
- * The {@link #makePrecise(Coordinates)} method allows rounding a coordinate to
+ * The method allows rounding a coordinate to
  * a "precise" value; that is, one whose
  *  precision is known exactly.
  *<p>
@@ -338,6 +340,17 @@ public class PrecisionModel implements Serializable, Comparable {
     return 0;
   }
 
+  public Coordinates getPrecise(final Coordinates point) {
+    if (modelType == FLOATING) {
+      return point;
+    } else {
+      final double[] coordinates = point.getCoordinates();
+      coordinates[0] = makePrecise(coordinates[0]);
+      coordinates[1] = makePrecise(coordinates[1]);
+      return new DoubleCoordinates(coordinates);
+    }
+  }
+
   /**
    * Returns the scale factor used to specify a fixed precision model.
    * The number of decimal places of precision is 
@@ -367,20 +380,6 @@ public class PrecisionModel implements Serializable, Comparable {
    */
   public boolean isFloating() {
     return modelType == FLOATING || modelType == FLOATING_SINGLE;
-  }
-
-  /**
-   * Rounds a Coordinates to the PrecisionModel grid.
-   */
-  public void makePrecise(final Coordinates coord) {
-    // optimization for full precision
-    if (modelType == FLOATING) {
-      return;
-    }
-
-    coord.setX(makePrecise(coord.getX()));
-    coord.setY(makePrecise(coord.getY()));
-    // MD says it's OK that we're not makePrecise'ing the z [Jon Aquino]
   }
 
   /**
@@ -418,49 +417,6 @@ public class PrecisionModel implements Serializable, Comparable {
    */
   private void setScale(final double scale) {
     this.scale = Math.abs(scale);
-  }
-
-  /**
-   *  Returns the external representation of <code>internal</code>.
-   *
-   *@param  internal  the original coordinate
-   *@return           the coordinate whose values will be changed to the
-   *      external representation of <code>internal</code>
-   * @deprecated no longer needed, since internal representation is same as external representation
-   */
-  @Deprecated
-  public Coordinates toExternal(final Coordinates internal) {
-    final Coordinates external = new Coordinate(internal);
-    return external;
-  }
-
-  /**
-   *  Sets <code>external</code> to the external representation of <code>internal</code>.
-   *
-   *@param  internal  the original coordinate
-   *@param  external  the coordinate whose values will be changed to the
-   *      external representation of <code>internal</code>
-   * @deprecated no longer needed, since internal representation is same as external representation
-   */
-  @Deprecated
-  public void toExternal(final Coordinates internal, final Coordinates external) {
-    external.setX(internal.getX());
-    external.setY(internal.getY());
-  }
-
-  /**
-   *  Returns the precise representation of <code>external</code>.
-   *
-   *@param  external  the original coordinate
-   *@return           the coordinate whose values will be changed to the precise
-   *      representation of <code>external</code>
-   * @deprecated use makePrecise instead
-   */
-  @Deprecated
-  public Coordinates toInternal(final Coordinates external) {
-    final Coordinates internal = new Coordinate(external);
-    makePrecise(internal);
-    return internal;
   }
 
   @Override

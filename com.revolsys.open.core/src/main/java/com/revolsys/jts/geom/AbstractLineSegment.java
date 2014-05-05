@@ -1,6 +1,7 @@
 package com.revolsys.jts.geom;
 
 import com.revolsys.gis.cs.projection.ProjectionFactory;
+import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
@@ -218,6 +219,14 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
   public boolean equalsTopo(final LineSegment other) {
     return getP0().equals(other.getP0()) && getP1().equals(other.getP1())
       || getP0().equals(other.getP1()) && getP1().equals(other.getP0());
+  }
+
+  public LineSegment extend(final double startDistance, final double endDistance) {
+    final double angle = angle();
+    final Coordinates c1 = CoordinatesUtil.offset(get(0), angle, -startDistance);
+    final Coordinates c2 = CoordinatesUtil.offset(get(1), angle, endDistance);
+    return new LineSegmentImpl(getGeometryFactory(), c1, c2);
+
   }
 
   @Override
@@ -769,14 +778,6 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
       segFrac = 1.0;
     }
     return segFrac;
-  }
-
-  @Override
-  public void setCoordinates(final Coordinates p0, final Coordinates p1) {
-    this.getP0().setX(p0.getX());
-    this.getP0().setY(p0.getY());
-    this.getP1().setX(p1.getX());
-    this.getP1().setY(p1.getY());
   }
 
   @Override

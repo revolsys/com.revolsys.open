@@ -1,5 +1,6 @@
 package com.revolsys.gis.model.coordinates.list;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,20 +14,16 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
    */
   private static final long serialVersionUID = 7579865828939708871L;
 
- private double[] coordinates;
+  private double[] coordinates;
 
   private final byte axisCount;
 
   public DoubleCoordinatesList(final Coordinates... coordinates) {
-    this(coordinates.length, 3);
-    for (int i = 0; i < coordinates.length; i++) {
-      final Coordinates coordinate = coordinates[i];
-      setCoordinate(i, coordinate);
-    }
+    this(3, coordinates);
   }
 
   public DoubleCoordinatesList(final CoordinatesList coordinatesList) {
-    this(coordinatesList.getAxisCount(), coordinatesList.getCoordinates());
+    this(coordinatesList.getAxisCount(), coordinatesList);
   }
 
   public DoubleCoordinatesList(final int axisCount) {
@@ -38,22 +35,22 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     this(points.size(), axisCount);
     int i = 0;
     for (final Coordinates point : points) {
-      setPoint(i++, point);
+      CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, i++,
+        point);
     }
   }
 
   public DoubleCoordinatesList(final int axisCount, final Coordinates... points) {
-    this(points.length, axisCount);
-    for (int i = 0; i < points.length; i++) {
-      final Coordinates point = points[i];
-      setPoint(i, point);
-    }
+    this(axisCount, Arrays.asList(points));
   }
 
-  public DoubleCoordinatesList(final int axisCount,
-    final CoordinatesList coordinatesList) {
-    this(coordinatesList.size(), axisCount);
-    coordinatesList.copy(0, this, 0, axisCount, coordinatesList.size());
+  public DoubleCoordinatesList(final int axisCount, final CoordinatesList points) {
+    this(points.size(), axisCount);
+    int i = 0;
+    for (final Coordinates point : points) {
+      CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, i++,
+        point);
+    }
   }
 
   public DoubleCoordinatesList(final int axisCount, final double... coordinates) {
@@ -67,6 +64,26 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     assert size >= 0;
     this.coordinates = new double[size * axisCount];
     this.axisCount = (byte)axisCount;
+  }
+
+  public DoubleCoordinatesList(final int axisCount, final int vertexCount,
+    final double... coordinates) {
+    assert axisCount > 2;
+    this.axisCount = (byte)axisCount;
+    final int coordinateCount = vertexCount * axisCount;
+    if (coordinates.length % axisCount != 0) {
+      throw new IllegalArgumentException("coordinates.length="
+        + coordinates.length + " must be a multiple of axisCount=" + axisCount);
+    } else if (coordinateCount == coordinates.length) {
+      this.coordinates = coordinates;
+    } else if (coordinateCount > coordinates.length) {
+      throw new IllegalArgumentException("axisCount=" + axisCount
+        + " * vertexCount=" + vertexCount + " > coordinates.length="
+        + coordinates.length);
+    } else {
+      this.coordinates = new double[coordinateCount];
+      System.arraycopy(coordinates, 0, this.coordinates, 0, coordinateCount);
+    }
   }
 
   public DoubleCoordinatesList(final int axisCount,
@@ -98,14 +115,6 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
       return coordinates[index * axisCount + axisIndex];
     } else {
       return Double.NaN;
-    }
-  }
-
-  @Override
-  public void setValue(final int index, final int axisIndex, final double value) {
-    final int axisCount = getAxisCount();
-    if (axisIndex < axisCount) {
-      coordinates[index * axisCount + axisIndex] = value;
     }
   }
 

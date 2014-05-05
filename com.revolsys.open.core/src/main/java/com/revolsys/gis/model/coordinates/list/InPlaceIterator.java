@@ -27,13 +27,13 @@ public class InPlaceIterator extends AbstractCoordinates implements
     return new InPlaceIterator(coordinates, index);
   }
 
-  public int getIndex() {
-    return index;
-  }
-
   @Override
   public int getAxisCount() {
     return coordinates.getAxisCount();
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   @Override
@@ -81,20 +81,6 @@ public class InPlaceIterator extends AbstractCoordinates implements
 
   public void setIndex(final int index) {
     this.index = index;
-  }
-
-  @Override
-  public void setValue(final int axisIndex, final double value) {
-    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
-      coordinates.setValue(this.index, axisIndex, value);
-    }
-  }
-
-  public void setValue(final int relativeIndex, final int axisIndex,
-    final double value) {
-    if (axisIndex >= 0 && axisIndex < getAxisCount()) {
-      coordinates.setValue(this.index + relativeIndex, axisIndex, value);
-    }
   }
 
   @Override

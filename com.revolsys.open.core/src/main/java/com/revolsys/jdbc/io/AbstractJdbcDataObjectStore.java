@@ -31,7 +31,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreExtension;
@@ -904,7 +903,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final DataObjectMetaData metaData = getMetaData(typePath);
     final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
     final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-    geometry = ProjectionFactory.convert(geometry, geometryFactory);
+    geometry = geometry.convert(geometryFactory);
 
     final SqlFunction intersectsFunction = geometryAttribute.getProperty(JdbcConstants.FUNCTION_INTERSECTS);
     final StringBuffer qArg = new StringBuffer();

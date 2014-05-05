@@ -3,8 +3,6 @@ package com.revolsys.gis.cs.projection;
 import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
 
-import com.revolsys.jts.geom.Coordinates;
-
 public class UnitConverstionOperation implements CoordinatesOperation {
   private final UnitConverter converter;
 
@@ -26,22 +24,6 @@ public class UnitConverstionOperation implements CoordinatesOperation {
     this.targetUnit = targetUnit;
     this.axisCount = axisCount;
     converter = sourceUnit.getConverterTo(targetUnit);
-  }
-
-  @Override
-  public void perform(final Coordinates from, final Coordinates to) {
-    final int axisCount = Math.min(from.getAxisCount(), to.getAxisCount());
-
-    for (int i = 0; i < axisCount; i++) {
-      final double value = from.getValue(i);
-      if (i < this.axisCount) {
-        final double convertedValue = converter.convert(value);
-        to.setValue(i, convertedValue);
-      } else {
-        to.setValue(i, value);
-      }
-    }
-
   }
 
   @Override

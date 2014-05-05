@@ -8,8 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
@@ -27,6 +25,7 @@ import com.revolsys.io.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.io.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.io.shp.ShapefileGeometryUtil;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class GeometryAttribute extends AbstractFileGdbAttribute {
 
@@ -90,8 +89,8 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
           final int srid = geometryFactory.getSrid();
           final double scaleXY = geometryFactory.getScaleXY();
           final double scaleZ = geometryFactory.getScaleZ();
-          geometryFactory = GeometryFactory.getFactory(srid, axisCount, scaleXY,
-            scaleZ);
+          geometryFactory = GeometryFactory.getFactory(srid, axisCount,
+            scaleXY, scaleZ);
         }
         setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
 
@@ -119,7 +118,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbDataObjectStore dataStore = getDataStore();
+    final CapiFileGdbDataObjectStore dataStore = getDataStore();
     if (dataStore.isNull(row, name)) {
       return null;
     } else {
@@ -160,8 +159,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       return null;
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
-      final Geometry projectedGeometry = ProjectionFactory.convert(geometry,
-        geometryFactory);
+      final Geometry projectedGeometry = geometry.convert(geometryFactory);
       final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       final EndianOutput out = new EndianOutputStream(byteOut);
       SHP_UTIL.write(writeMethod, out, projectedGeometry);

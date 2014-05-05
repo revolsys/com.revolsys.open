@@ -11,8 +11,6 @@ import javax.swing.SwingWorker;
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
-import com.revolsys.gis.cs.projection.GeometryOperation;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
@@ -74,17 +72,8 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
           }
         }
       }
-      Polygon polygon = boundingBox.toPolygon();
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final GeometryFactory bboxGeometryFactory = boundingBox.getGeometryFactory();
-      if (geometryFactory != null
-        && !geometryFactory.equals(bboxGeometryFactory)) {
-        final GeometryOperation operation = ProjectionFactory.getGeometryOperation(
-          bboxGeometryFactory, geometryFactory);
-        if (operation != null) {
-          polygon = operation.perform(polygon);
-        }
-      }
+      final Polygon polygon = boundingBox.toPolygon(geometryFactory);
       return (List)getIndex().queryIntersects(polygon);
     }
   }

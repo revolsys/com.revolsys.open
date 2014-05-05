@@ -44,6 +44,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeRing;
@@ -70,11 +71,11 @@ import com.revolsys.jts.util.Assert;
  */
 public class ConnectedInteriorTester {
 
-  public static Coordinates findDifferentPoint(final Coordinates[] coord,
-    final Coordinates pt) {
-    for (int i = 0; i < coord.length; i++) {
-      if (!coord[i].equals(pt)) {
-        return coord[i];
+  public static Coordinates findDifferentPoint(final LineString line,
+    final Coordinates point) {
+    for (final Vertex vertex : line.vertices()) {
+      if (!vertex.equals(point)) {
+        return vertex.cloneCoordinates();
       }
     }
     return null;
@@ -198,13 +199,12 @@ public class ConnectedInteriorTester {
   }
 
   private void visitInteriorRing(final LineString ring, final PlanarGraph graph) {
-    final Coordinates[] pts = ring.getCoordinateArray();
-    final Coordinates pt0 = pts[0];
+    final Coordinates pt0 = ring.getVertex(0).cloneCoordinates();
     /**
      * Find first point in coord list different to initial point.
      * Need special check since the first point may be repeated.
      */
-    final Coordinates pt1 = findDifferentPoint(pts, pt0);
+    final Coordinates pt1 = findDifferentPoint(ring, pt0);
     final Edge e = graph.findEdgeInSameDirection(pt0, pt1);
     final DirectedEdge de = (DirectedEdge)graph.findEdgeEnd(e);
     DirectedEdge intDe = null;

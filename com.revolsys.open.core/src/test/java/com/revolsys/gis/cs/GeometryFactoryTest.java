@@ -38,14 +38,13 @@ public class GeometryFactoryTest {
   public static void assertCopyGeometry(final Geometry geometry,
     final CoordinatesList... pointsList) {
     assertCoordinatesListEqual(geometry, pointsList);
-    final Geometry copy = GEOMETRY_FACTORY.copy(geometry);
+    final Geometry copy = (Geometry)geometry.copy(GEOMETRY_FACTORY);
     final Class<? extends Geometry> geometryClass = geometry.getClass();
     Assert.assertEquals("Geometry class", geometryClass, copy.getClass());
     Assert.assertEquals("Geometry", geometry, copy);
     assertCoordinatesListEqual(copy, pointsList);
 
-    final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass,
-      geometry);
+    final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass, geometry);
     Assert.assertEquals("Geometry class", geometryClass, copy2.getClass());
     Assert.assertEquals("Geometry", geometry, copy2);
     assertCoordinatesListEqual(copy2, pointsList);
@@ -59,8 +58,7 @@ public class GeometryFactoryTest {
         final Geometry part = geometry.getGeometry(0);
         final Class<? extends Geometry> geometryClass = geometry.getClass();
 
-        final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass,
-          part);
+        final Geometry copy2 = GEOMETRY_FACTORY.geometry(geometryClass, part);
         Assert.assertEquals("Geometry class", geometryClass, copy2.getClass());
         Assert.assertEquals("Geometry", geometry, copy2);
         assertCoordinatesListEqual(copy2, pointsList);
@@ -87,14 +85,14 @@ public class GeometryFactoryTest {
   }
 
   private static void testCreateGeometry() {
-    final CoordinatesList pointPoints = new DoubleCoordinatesList(2, 0, 0);
-    final CoordinatesList point2Points = new DoubleCoordinatesList(2, 20, 20);
-    final CoordinatesList ringPoints = new DoubleCoordinatesList(2, 0, 0, 0,
+    final CoordinatesList pointPoints = new DoubleCoordinatesList(2, 0.0, 0);
+    final CoordinatesList point2Points = new DoubleCoordinatesList(2, 20.0, 20);
+    final CoordinatesList ringPoints = new DoubleCoordinatesList(2, 0.0, 0, 0,
       100, 100, 100, 100, 0, 0, 0);
-    final CoordinatesList ring2Points = new DoubleCoordinatesList(2, 20, 20,
+    final CoordinatesList ring2Points = new DoubleCoordinatesList(2, 20.0, 20,
       20, 80, 80, 80, 80, 20, 20, 20);
-    final CoordinatesList ring3Points = new DoubleCoordinatesList(2, 120, 120,
-      120, 180, 180, 180, 180, 120, 120, 120);
+    final CoordinatesList ring3Points = new DoubleCoordinatesList(2, 120.0,
+      120, 120, 180, 180, 180, 180, 120, 120, 120);
 
     final Point point = GEOMETRY_FACTORY.point(pointPoints);
     assertCopyGeometry(point, pointPoints);
@@ -114,8 +112,8 @@ public class GeometryFactoryTest {
     final MultiPoint multiPoint = GEOMETRY_FACTORY.multiPoint(pointPoints);
     assertCopyGeometry(multiPoint, pointPoints);
 
-    final MultiPoint multiPoint2 = GEOMETRY_FACTORY.multiPoint(
-      pointPoints, point2Points);
+    final MultiPoint multiPoint2 = GEOMETRY_FACTORY.multiPoint(pointPoints,
+      point2Points);
     assertCopyGeometry(multiPoint2, pointPoints, point2Points);
 
     final MultiLineString multiLineString = GEOMETRY_FACTORY.multiLineString(ringPoints);

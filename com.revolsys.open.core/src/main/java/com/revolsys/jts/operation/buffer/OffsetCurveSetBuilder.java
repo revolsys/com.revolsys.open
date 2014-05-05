@@ -40,8 +40,8 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -52,7 +52,9 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.Triangle;
+import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.geomgraph.Label;
 import com.revolsys.jts.geomgraph.Position;
 import com.revolsys.jts.noding.NodedSegmentString;
@@ -72,7 +74,7 @@ public class OffsetCurveSetBuilder {
 
   private final OffsetCurveBuilder curveBuilder;
 
-  private final List<SegmentString> curveList = new ArrayList<>();
+  private final List<NodedSegmentString> curveList = new ArrayList<>();
 
   public OffsetCurveSetBuilder(final Geometry inputGeom, final double distance,
     final OffsetCurveBuilder curveBuilder) {
@@ -81,12 +83,17 @@ public class OffsetCurveSetBuilder {
     this.curveBuilder = curveBuilder;
   }
 
+  public OffsetCurveSetBuilder(final Geometry inputGeom, final double distance,
+    final PrecisionModel precisionModel, final BufferParameters parameters) {
+    this.geometry = inputGeom;
+    this.distance = distance;
+    this.curveBuilder = new OffsetCurveBuilder(precisionModel, parameters);
+  }
+
   private void add(final Geometry g) {
     if (g.isEmpty()) {
       return;
-    }
-
-    if (g instanceof Polygon) {
+    } else if (g instanceof Polygon) {
       addPolygon((Polygon)g);
     } else if (g instanceof LineString) {
       addLineString((LineString)g);
@@ -121,12 +128,12 @@ public class OffsetCurveSetBuilder {
    * <br>Left: Location.EXTERIOR
    * <br>Right: Location.INTERIOR
    */
-  private void addCurve(final Coordinates[] coord, final Location leftLoc,
+  private void addCurve(final CoordinatesList points, final Location leftLoc,
     final Location rightLoc) {
-    if (coord != null && coord.length >= 2) {
+    if (points != null && points.size() >= 2) {
       final Label label = new Label(0, Location.BOUNDARY, leftLoc, rightLoc);
-      final SegmentString e = new NodedSegmentString(coord, label);
-      curveList.add(e);
+      final NodedSegmentString segment = new NodedSegmentString(points, label);
+      curveList.add(segment);
     }
   }
 
@@ -134,14 +141,11 @@ public class OffsetCurveSetBuilder {
     // a zero or negative width buffer of a line/point is empty
     if (distance <= 0.0 && !curveBuilder.getBufferParameters().isSingleSided()) {
       return;
+    } else {
+      final CoordinatesList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
+      final CoordinatesList curve = curveBuilder.getLineCurve(points, distance);
+      addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
-    final Coordinates[] coord = CoordinateArrays.removeRepeatedPoints(line.getCoordinateArray());
-    final Coordinates[] curve = curveBuilder.getLineCurve(coord, distance);
-    addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
-
-    // TESTING
-    // Coordinates[] curveTrim = BufferCurveLoopPruner.prune(curve);
-    // addCurve(curveTrim, Location.EXTERIOR, Location.INTERIOR);
   }
 
   /**
@@ -149,12 +153,11 @@ public class OffsetCurveSetBuilder {
    */
   private void addPoint(final Point p) {
     // a zero or negative width buffer of a line/point is empty
-    if (distance <= 0.0) {
-      return;
+    if (distance > 0.0) {
+      final CoordinatesList coord = p.getCoordinatesList();
+      final CoordinatesList curve = curveBuilder.getLineCurve(coord, distance);
+      addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
-    final Coordinates[] coord = p.getCoordinateArray();
-    final Coordinates[] curve = curveBuilder.getLineCurve(coord, distance);
-    addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
   }
 
   private void addPolygon(final Polygon p) {
@@ -167,14 +170,14 @@ public class OffsetCurveSetBuilder {
 
     final LinearRing shell = p.getExteriorRing();
     final boolean shellClockwise = shell.isClockwise();
-    final Coordinates[] shellCoord = CoordinateArrays.removeRepeatedPoints(shell.getCoordinateArray());
+    final CoordinatesList shellCoord = CleanDuplicatePoints.clean(shell.getCoordinatesList());
     // optimization - don't bother computing buffer
     // if the polygon would be completely eroded
     if (distance < 0.0 && isErodedCompletely(shell, distance)) {
       return;
     }
     // don't attempt to buffer a polygon with too few distinct vertices
-    if (distance <= 0.0 && shellCoord.length < 3) {
+    if (distance <= 0.0 && shellCoord.size() < 3) {
       return;
     }
 
@@ -182,10 +185,9 @@ public class OffsetCurveSetBuilder {
       Location.EXTERIOR, Location.INTERIOR);
 
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
-
       final LinearRing hole = p.getInteriorRing(i);
       final boolean holeClockwise = hole.isClockwise();
-      final Coordinates[] holeCoord = CoordinateArrays.removeRepeatedPoints(hole.getCoordinateArray());
+      final CoordinatesList holeCoord = CleanDuplicatePoints.clean(hole.getCoordinatesList());
 
       // optimization - don't bother computing buffer for this hole
       // if the hole would be completely covered
@@ -207,28 +209,28 @@ public class OffsetCurveSetBuilder {
    * If the ring is in the opposite orientation,
    * the left and right locations must be interchanged and the side flipped.
    *
-   * @param coord the coordinates of the ring (must not contain repeated points)
+   * @param points the coordinates of the ring (must not contain repeated points)
    * @param offsetDistance the distance at which to create the buffer
    * @param side the side of the ring on which to construct the buffer line
    * @param cwLeftLoc the location on the L side of the ring (if it is CW)
    * @param cwRightLoc the location on the R side of the ring (if it is CW)
    */
-  private void addPolygonRing(final Coordinates[] coord,
+  private void addPolygonRing(final CoordinatesList points,
     final boolean clockwise, final double offsetDistance, int side,
     final Location cwLeftLoc, final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
-    if (offsetDistance == 0.0 && coord.length < LinearRing.MINIMUM_VALID_SIZE) {
+    if (offsetDistance == 0.0 && points.size() < LinearRing.MINIMUM_VALID_SIZE) {
       return;
     }
 
     Location leftLoc = cwLeftLoc;
     Location rightLoc = cwRightLoc;
-    if (coord.length >= LinearRing.MINIMUM_VALID_SIZE && !clockwise) {
+    if (points.size() >= LinearRing.MINIMUM_VALID_SIZE && !clockwise) {
       leftLoc = cwRightLoc;
       rightLoc = cwLeftLoc;
       side = Position.opposite(side);
     }
-    final Coordinates[] curve = curveBuilder.getRingCurve(coord, side,
+    final CoordinatesList curve = curveBuilder.getRingCurve(points, side,
       offsetDistance);
     addCurve(curve, leftLoc, rightLoc);
   }
@@ -240,7 +242,7 @@ public class OffsetCurveSetBuilder {
    *
    * @return a Collection of SegmentStrings representing the raw buffer curves
    */
-  public List<SegmentString> getCurves() {
+  public List<NodedSegmentString> getCurves() {
     add(geometry);
     return curveList;
   }
@@ -256,16 +258,15 @@ public class OffsetCurveSetBuilder {
    */
   private boolean isErodedCompletely(final LinearRing ring,
     final double bufferDistance) {
-    final Coordinates[] ringCoord = ring.getCoordinateArray();
     // degenerate ring has no area
-    if (ringCoord.length < 4) {
+    if (ring.getVertexCount() < 4) {
       return bufferDistance < 0;
     }
 
     // important test to eliminate inverted triangle bug
     // also optimizes erosion test for triangles
-    if (ringCoord.length == 4) {
-      return isTriangleErodedCompletely(ringCoord, bufferDistance);
+    if (ring.getVertexCount() == 4) {
+      return isTriangleErodedCompletely(ring, bufferDistance);
     }
 
     // if envelope is narrower than twice the buffer distance, ring is eroded
@@ -295,10 +296,10 @@ public class OffsetCurveSetBuilder {
    * @param bufferDistance
    * @return
    */
-  private boolean isTriangleErodedCompletely(final Coordinates[] triangleCoord,
+  private boolean isTriangleErodedCompletely(final LinearRing triangleCoord,
     final double bufferDistance) {
-    final Triangle tri = new Triangle(triangleCoord[0], triangleCoord[1],
-      triangleCoord[2]);
+    final Triangle tri = new Triangle(triangleCoord.getVertex(0),
+      triangleCoord.getVertex(1), triangleCoord.getVertex(2));
     final Coordinates inCentre = tri.inCentre();
     final double distToCentre = CGAlgorithms.distancePointLine(inCentre,
       tri.p0, tri.p1);

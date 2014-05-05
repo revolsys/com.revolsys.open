@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -210,26 +209,11 @@ public class DirectedEdge extends EdgeEnd {
     }
   }
 
-  public void printEdge(final PrintStream out) {
-    print(out);
-    out.print(" ");
-    if (isForward) {
-      edge.print(out);
-    } else {
-      edge.printReverse(out);
-    }
-  }
-
   public void setDepth(final int position, final int depthVal) {
     if (depth[position] != -999) {
-      // if (depth[position] != depthVal) {
-      // Debug.print(this);
-      // }
       if (depth[position] != depthVal) {
         throw new TopologyException("assigned depths do not match",
           getCoordinate());
-        // Assert.isTrue(depth[position] == depthVal,
-        // "assigned depths do not match at " + getCoordinate());
       }
     }
     depth[position] = depthVal;

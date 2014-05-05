@@ -18,13 +18,11 @@ import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -57,7 +55,8 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     final Number angle = object.getValue(MoepConstants.ANGLE);
     if (angle != null) {
       final double orientation = getAngle(angle.doubleValue());
-      GeometryProperties.setGeometryProperty(geometry, "orientation", orientation);
+      GeometryProperties.setGeometryProperty(geometry, "orientation",
+        orientation);
     }
     GeometryProperties.setGeometryProperty(object.getGeometryValue(),
       MoepConstants.TEXT_GROUP, object.getValue(MoepConstants.TEXT_GROUP));
@@ -65,10 +64,10 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       MoepConstants.TEXT_INDEX, object.getValue(MoepConstants.TEXT_INDEX));
     GeometryProperties.setGeometryProperty(object.getGeometryValue(), "text",
       object.getValue(MoepConstants.TEXT));
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "textType",
-      SaifConstants.TEXT_LINE);
-    GeometryProperties.setGeometryProperty(object.getGeometryValue(), "fontName",
-      object.getValue(MoepConstants.FONT_NAME));
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
+      "textType", SaifConstants.TEXT_LINE);
+    GeometryProperties.setGeometryProperty(object.getGeometryValue(),
+      "fontName", object.getValue(MoepConstants.FONT_NAME));
     GeometryProperties.setGeometryProperty(object.getGeometryValue(),
       "characterHeight", object.getValue(MoepConstants.FONT_SIZE));
     GeometryProperties.setGeometryProperty(object.getGeometryValue(), "other",
@@ -345,15 +344,15 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   }
 
   private LineString readContourLine(final int numCoords) throws IOException {
-    final CoordinatesList coords = new DoubleCoordinatesList(numCoords, 2);
+    final double[] coords = new double[numCoords * 2];
     for (int i = 0; i < numCoords; i++) {
-      readCoordinate(in, coords, i);
+      readCoordinate(in, coords, i, 2);
     }
-    return factory.lineString(coords);
+    return factory.lineString(2, coords);
   }
 
-  private void readCoordinate(final InputStream in,
-    final CoordinatesList coords, final int index) throws IOException {
+  private void readCoordinate(final InputStream in, final double[] coords,
+    final int index, final int axisCount) throws IOException {
     for (int i = 0; i < 2; i++) {
       int coordinate;
       if (coordinateBytes == 2) {
@@ -361,11 +360,11 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       } else {
         coordinate = readLEInt(in);
       }
-      coords.setValue(index, i, center.getValue(i) + coordinate);
+      coords[index * 3 + i] = center.getValue(i) + coordinate;
     }
-    if (coords.getAxisCount() > 2) {
+    if (axisCount > 2) {
       final int z = readLEShort(in);
-      coords.setValue(index, 2, z);
+      coords[index * 3 + 2] = z;
     }
   }
 
@@ -415,17 +414,17 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   }
 
   private Point readPoint(final InputStream in) throws IOException {
-    final CoordinatesList coords = new DoubleCoordinatesList(1, 3);
-    readCoordinate(in, coords, 0);
+    final double[] coords = new double[3];
+    readCoordinate(in, coords, 0, 3);
     return factory.point(coords);
   }
 
   private LineString readSimpleLine(final int numCoords) throws IOException {
-    final CoordinatesList coords = new DoubleCoordinatesList(numCoords, 3);
+    final double[] coords = new double[numCoords * 3];
     for (int i = 0; i < numCoords; i++) {
-      readCoordinate(in, coords, i);
+      readCoordinate(in, coords, i, 3);
     }
-    return factory.lineString(coords);
+    return factory.lineString(3, coords);
   }
 
   private String readString(final int length) throws IOException {

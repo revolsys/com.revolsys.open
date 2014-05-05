@@ -15,8 +15,6 @@ public interface CoordinatesPrecisionModel {
 
   boolean isFloating();
 
-  void makePrecise(Coordinates coordinates);
-
   void makePrecise(int axisCount, double... coordinates);
 
   double makeXyPrecise(final double value);

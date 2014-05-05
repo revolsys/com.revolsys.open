@@ -108,6 +108,16 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection
 
   @SuppressWarnings("unchecked")
   @Override
+  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    final List<Geometry> geometries = new ArrayList<Geometry>();
+    for (final Geometry geometry : geometries()) {
+      geometries.add(geometry.copy(geometryFactory));
+    }
+    return (V)geometryFactory.geometryCollection(geometries);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
   public <V extends Geometry> List<V> getGeometries() {
     if (geometries == null) {
       return new ArrayList<V>();

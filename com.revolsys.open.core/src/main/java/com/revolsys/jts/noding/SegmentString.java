@@ -33,6 +33,7 @@
 package com.revolsys.jts.noding;
 
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * An interface for classes which represent a sequence of contiguous line segments.
@@ -42,25 +43,25 @@ import com.revolsys.jts.geom.Coordinates;
  * @version 1.7
  */
 public interface SegmentString {
-  public Coordinates getCoordinate(int i);
-
-  public Coordinates[] getCoordinates();
+  Coordinates getCoordinate(int i);
 
   /**
    * Gets the user-defined data for this segment string.
    *
    * @return the user-defined data
    */
-  public Object getData();
+  Object getData();
 
-  public boolean isClosed();
+  CoordinatesList getPoints();
+
+  boolean isClosed();
 
   /**
-   * Sets the user-defined data for this segment string.
-   *
-   * @param data an Object containing user-defined data
-   */
-  public void setData(Object data);
+  * Sets the user-defined data for this segment string.
+  *
+  * @param data an Object containing user-defined data
+  */
+  void setData(Object data);
 
-  public int size();
+  int size();
 }

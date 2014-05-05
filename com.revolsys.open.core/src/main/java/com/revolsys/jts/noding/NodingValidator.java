@@ -33,11 +33,11 @@
 package com.revolsys.jts.noding;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 
 /**
@@ -50,20 +50,17 @@ public class NodingValidator {
 
   private final LineIntersector li = new RobustLineIntersector();
 
-  private final Collection segStrings;
+  private final Collection<NodedSegmentString> segStrings;
 
-  public NodingValidator(final Collection segStrings) {
+  public NodingValidator(final Collection<NodedSegmentString> segStrings) {
     this.segStrings = segStrings;
   }
 
   private void checkCollapse(final Coordinates p0, final Coordinates p1,
     final Coordinates p2) {
     if (p0.equals(p2)) {
-      final Coordinates[] points = {
-        p0, p1, p2
-      };
       throw new RuntimeException("found non-noded collapse at "
-        + GeometryFactory.getFactory().lineString(points));
+        + GeometryFactory.getFactory().lineString(p0, p1, p2));
     }
   }
 
@@ -71,16 +68,15 @@ public class NodingValidator {
    * Checks if a segment string contains a segment pattern a-b-a (which implies a self-intersection)
    */
   private void checkCollapses() {
-    for (final Iterator i = segStrings.iterator(); i.hasNext();) {
-      final SegmentString ss = (SegmentString)i.next();
-      checkCollapses(ss);
+    for (final NodedSegmentString segment : segStrings) {
+      checkCollapses(segment);
     }
   }
 
-  private void checkCollapses(final SegmentString ss) {
-    final Coordinates[] pts = ss.getCoordinates();
-    for (int i = 0; i < pts.length - 2; i++) {
-      checkCollapse(pts[i], pts[i + 1], pts[i + 2]);
+  private void checkCollapses(final NodedSegmentString ss) {
+    final CoordinatesList points = ss.getPoints();
+    for (int i = 0; i < points.size() - 2; i++) {
+      checkCollapse(points.get(i), points.get(i + 1), points.get(i + 2));
     }
   }
 
@@ -89,21 +85,18 @@ public class NodingValidator {
    * and an interior vertex of another segment string
    */
   private void checkEndPtVertexIntersections() {
-    for (final Iterator i = segStrings.iterator(); i.hasNext();) {
-      final SegmentString ss = (SegmentString)i.next();
-      final Coordinates[] pts = ss.getCoordinates();
-      checkEndPtVertexIntersections(pts[0], segStrings);
-      checkEndPtVertexIntersections(pts[pts.length - 1], segStrings);
+    for (final NodedSegmentString ss : segStrings) {
+      checkEndPtVertexIntersections(ss.getCoordinate(0), segStrings);
+      checkEndPtVertexIntersections(ss.getCoordinate(ss.size() - 1), segStrings);
     }
   }
 
   private void checkEndPtVertexIntersections(final Coordinates testPt,
-    final Collection segStrings) {
-    for (final Iterator i = segStrings.iterator(); i.hasNext();) {
-      final SegmentString ss = (SegmentString)i.next();
-      final Coordinates[] pts = ss.getCoordinates();
-      for (int j = 1; j < pts.length - 1; j++) {
-        if (pts[j].equals(testPt)) {
+    final Collection<NodedSegmentString> segStrings) {
+    for (final NodedSegmentString ss : segStrings) {
+      final CoordinatesList pts = ss.getPoints();
+      for (int j = 1; j < pts.size() - 1; j++) {
+        if (pts.get(j).equals(testPt)) {
           throw new RuntimeException(
             "found endpt/interior pt intersection at index " + j + " :pt "
               + testPt);
@@ -116,26 +109,23 @@ public class NodingValidator {
    * Checks all pairs of segments for intersections at an interior point of a segment
    */
   private void checkInteriorIntersections() {
-    for (final Iterator i = segStrings.iterator(); i.hasNext();) {
-      final SegmentString ss0 = (SegmentString)i.next();
-      for (final Iterator j = segStrings.iterator(); j.hasNext();) {
-        final SegmentString ss1 = (SegmentString)j.next();
-
+    for (final NodedSegmentString ss0 : segStrings) {
+      for (final NodedSegmentString ss1 : segStrings) {
         checkInteriorIntersections(ss0, ss1);
       }
     }
   }
 
-  private void checkInteriorIntersections(final SegmentString e0,
+  private void checkInteriorIntersections(final NodedSegmentString e0,
     final int segIndex0, final SegmentString e1, final int segIndex1) {
     if (e0 == e1 && segIndex0 == segIndex1) {
       return;
     }
     // numTests++;
-    final Coordinates p00 = e0.getCoordinates()[segIndex0];
-    final Coordinates p01 = e0.getCoordinates()[segIndex0 + 1];
-    final Coordinates p10 = e1.getCoordinates()[segIndex1];
-    final Coordinates p11 = e1.getCoordinates()[segIndex1 + 1];
+    final Coordinates p00 = e0.getCoordinate(segIndex0);
+    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
+    final Coordinates p10 = e1.getCoordinate(segIndex1);
+    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
     if (li.hasIntersection()) {
@@ -148,12 +138,10 @@ public class NodingValidator {
     }
   }
 
-  private void checkInteriorIntersections(final SegmentString ss0,
+  private void checkInteriorIntersections(final NodedSegmentString ss0,
     final SegmentString ss1) {
-    final Coordinates[] pts0 = ss0.getCoordinates();
-    final Coordinates[] pts1 = ss1.getCoordinates();
-    for (int i0 = 0; i0 < pts0.length - 1; i0++) {
-      for (int i1 = 0; i1 < pts1.length - 1; i1++) {
+    for (int i0 = 0; i0 < ss0.size() - 1; i0++) {
+      for (int i1 = 0; i1 < ss1.size() - 1; i1++) {
         checkInteriorIntersections(ss0, i0, ss1, i1);
       }
     }

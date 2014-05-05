@@ -223,7 +223,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
   private void writeLookAt(final Geometry geometry) {
     if (geometry != null) {
       final GeometryFactory geometryFactory = GeometryFactory.wgs84();
-      final Geometry projectedGeometry = geometryFactory.copy(geometry);
+      final Geometry projectedGeometry = geometry.convert(geometryFactory);
       final BoundingBox boundingBox = projectedGeometry.getBoundingBox();
       final Point centre = geometryFactory.point(boundingBox.getCentreX(),
         boundingBox.getCentreY());
@@ -254,7 +254,7 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
     }
 
     writer.startTag(LOOK_AT);
-    point = GeometryFactory.wgs84().copy(point);
+    point = (Point)point.convert(GeometryFactory.wgs84());
     writer.element(LONGITUDE, point.getX());
     writer.element(LATITUDE, point.getY());
     writer.element(ALTITUDE, 0);

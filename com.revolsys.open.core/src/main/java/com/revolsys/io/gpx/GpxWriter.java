@@ -12,15 +12,8 @@ import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.cs.projection.CoordinateProjectionUtil;
-import com.revolsys.gis.cs.projection.CoordinatesOperation;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.Coordinates;
@@ -139,23 +132,18 @@ public class GpxWriter extends AbstractWriter<DataObject> {
 
   private void writeTrack(final DataObject object) throws IOException {
     out.startTag(GpxConstants.TRACK_ELEMENT);
-    final LineString line = object.getGeometryValue();
-    final int srid = line.getSrid();
-    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-    final CoordinatesOperation inverseCoordinatesOperation = ProjectionFactory.getToGeographicsCoordinatesOperation(coordinateSystem);
+    LineString line = object.getGeometryValue();
+    line = line.convert(GpxConstants.GEOMETRY_FACTORY);
     final CoordinatesList coordinatesList = CoordinatesListUtil.get(line);
     writeAttributes(object);
     out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
-    final DoubleCoordinates geoCoordinates = new DoubleCoordinates(
-      coordinatesList.getAxisCount());
 
-    for (final Coordinates coordinates : new InPlaceIterator(coordinatesList)) {
-      inverseCoordinatesOperation.perform(coordinates, geoCoordinates);
+    for (final Coordinates coordinates : line.vertices()) {
       out.startTag(GpxConstants.TRACK_POINT_ELEMENT);
-      out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinates.getX());
-      out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinates.getY());
+      out.attribute(GpxConstants.LON_ATTRIBUTE, coordinates.getX());
+      out.attribute(GpxConstants.LAT_ATTRIBUTE, coordinates.getY());
       if (coordinatesList.getAxisCount() > 2) {
-        final double elevation = geoCoordinates.getValue(2);
+        final double elevation = coordinates.getValue(2);
         if (!Double.isNaN(elevation)) {
           out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
         }
@@ -169,11 +157,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
   private void writeWaypoint(final DataObject wayPoint) throws IOException {
     out.startTag(GpxConstants.WAYPOINT_ELEMENT);
     final Point point = wayPoint.getGeometryValue();
-    final Coordinates coordinate = point.getCoordinate();
-    final CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(point.getSrid());
-    final CoordinatesOperation inverseCoordinatesOperation = ProjectionFactory.getToGeographicsCoordinatesOperation(coordinateSystem);
-    final Coordinates geoCoordinate = CoordinateProjectionUtil.perform(
-      inverseCoordinatesOperation, coordinate);
+    final Point geoCoordinate = point.convert(GpxConstants.GEOMETRY_FACTORY);
     out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.getX());
     out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.getY());
     if (point.getAxisCount() > 2) {

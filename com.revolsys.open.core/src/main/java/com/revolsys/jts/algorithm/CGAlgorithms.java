@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
@@ -489,19 +488,20 @@ public class CGAlgorithms {
      * Based on the Shoelace formula.
      * http://en.wikipedia.org/wiki/Shoelace_formula
      */
-    final Coordinates p0 = new Coordinate();
-    final Coordinates p1 = ring.getCoordinate(0);
-    Coordinates p2 = ring.getCoordinate(1);
-    final double x0 = p1.getX();
-    p2.setX(p2.getX() - p1.getX());
+    double p1x = ring.getX(0);
+    double p1y = ring.getY(0);
+
+    final double x0 = p1x;
+    double p2x = ring.getX(1) - x0;
+    double p2y = ring.getY(1);
     double sum = 0.0;
     for (int i = 1; i < n - 1; i++) {
-      p0.setY(p1.getY());
-      p1.setX(p2.getX());
-      p1.setY(p2.getY());
-      p2 = ring.getCoordinate(i + 1);
-      p2.setX(p2.getX() - x0);
-      sum += p1.getX() * (p0.getY() - p2.getY());
+      final double p0y = p1y;
+      p1x = p2x;
+      p1y = p2y;
+      p2x = ring.getX(i + 1) - x0;
+      p2y = ring.getY(i + 1);
+      sum += p1x * (p0y - p2y);
     }
     return sum / 2.0;
   }

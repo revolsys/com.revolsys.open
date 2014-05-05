@@ -50,7 +50,7 @@ public class BasicCoordinateSequenceTest extends TestCase {
   }
 
   public void testClone() {
-    final CoordinatesList s1 = new DoubleCoordinatesList(2, 1, 2, 3, 4);
+    final CoordinatesList s1 = new DoubleCoordinatesList(2, 1.0, 2.0, 3.0, 4.0);
     final CoordinatesList s2 = s1.clone();
     assertTrue(s1.getCoordinate(0).equals(s2.getCoordinate(0)));
     assertTrue(s1.getCoordinate(0) != s2.getCoordinate(0));

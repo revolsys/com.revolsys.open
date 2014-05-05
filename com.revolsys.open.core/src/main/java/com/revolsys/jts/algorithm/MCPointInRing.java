@@ -37,11 +37,12 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.index.bintree.Bintree;
 import com.revolsys.jts.index.bintree.Interval;
 import com.revolsys.jts.index.chain.MonotoneChain;
@@ -89,8 +90,8 @@ public class MCPointInRing implements PointInRing {
     // Envelope env = ring.getEnvelopeInternal();
     tree = new Bintree();
 
-    final Coordinates[] pts = CoordinateArrays.removeRepeatedPoints(ring.getCoordinateArray());
-    final List<MonotoneChain> mcList = MonotoneChainBuilder.getChains(pts);
+    final CoordinatesList points = CleanDuplicatePoints.clean(ring.getCoordinatesList());
+    final List<MonotoneChain> mcList = MonotoneChainBuilder.getChains(points);
 
     for (int i = 0; i < mcList.size(); i++) {
       final MonotoneChain mc = mcList.get(i);
@@ -106,9 +107,9 @@ public class MCPointInRing implements PointInRing {
     crossings = 0;
 
     // test all segments intersected by ray from pt in positive x direction
-    double y = pt.getY();
-    final BoundingBox rayEnv = new Envelope(2,
-      Double.NEGATIVE_INFINITY, y, Double.POSITIVE_INFINITY, y);
+    final double y = pt.getY();
+    final BoundingBox rayEnv = new Envelope(2, Double.NEGATIVE_INFINITY, y,
+      Double.POSITIVE_INFINITY, y);
 
     interval.min = y;
     interval.max = y;

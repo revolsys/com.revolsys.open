@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
@@ -49,8 +50,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Polygon;
@@ -227,8 +226,6 @@ public class QuadEdgeSubdivision {
   private Envelope frameEnv;
 
   private QuadEdgeLocator locator = null;
-
-  private final LineSegment seg = new LineSegmentImpl();
 
   /**
    * The quadedges forming a single triangle.
@@ -798,13 +795,14 @@ public class QuadEdgeSubdivision {
    * 
    * @param e
    *          a QuadEdge
-   * @param p
+   * @param point
    *          a point
    * @return true if the vertex lies on the edge
    */
-  public boolean isOnEdge(final QuadEdge e, final Coordinates p) {
-    seg.setCoordinates(e.orig().getCoordinate(), e.dest().getCoordinate());
-    final double dist = seg.distance(p);
+  public boolean isOnEdge(final QuadEdge e, final Coordinates point) {
+    final Coordinates p1 = e.orig().getCoordinate();
+    final Coordinates p2 = e.dest().getCoordinate();
+    final double dist = LineSegmentUtil.distance(p1, p2, point);
     // heuristic (hack?)
     return dist < edgeCoincidenceTolerance;
   }

@@ -211,17 +211,46 @@ public class RobustLineIntersector extends LineIntersector {
 
   private Coordinates intersectionWithNormalization(final Coordinates p1,
     final Coordinates p2, final Coordinates q1, final Coordinates q2) {
-    final Coordinates n1 = new DoubleCoordinates(p1);
-    final Coordinates n2 = new DoubleCoordinates(p2);
-    final Coordinates n3 = new DoubleCoordinates(q1);
-    final Coordinates n4 = new DoubleCoordinates(q2);
-    final Coordinates normPt = new DoubleCoordinates(2);
-    normalizeToEnvCentre(n1, n2, n3, n4, normPt);
+
+    final double minX0 = p1.getX() < p2.getX() ? p1.getX() : p2.getX();
+    final double minY0 = p1.getY() < p2.getY() ? p1.getY() : p2.getY();
+    final double maxX0 = p1.getX() > p2.getX() ? p1.getX() : p2.getX();
+    final double maxY0 = p1.getY() > p2.getY() ? p1.getY() : p2.getY();
+
+    final double minX1 = q1.getX() < q2.getX() ? q1.getX() : q2.getX();
+    final double minY1 = q1.getY() < q2.getY() ? q1.getY() : q2.getY();
+    final double maxX1 = q1.getX() > q2.getX() ? q1.getX() : q2.getX();
+    final double maxY1 = q1.getY() > q2.getY() ? q1.getY() : q2.getY();
+
+    final double intMinX = minX0 > minX1 ? minX0 : minX1;
+    final double intMaxX = maxX0 < maxX1 ? maxX0 : maxX1;
+    final double intMinY = minY0 > minY1 ? minY0 : minY1;
+    final double intMaxY = maxY0 < maxY1 ? maxY0 : maxY1;
+
+    final double normX = (intMinX + intMaxX) / 2.0;
+    final double normY = (intMinY + intMaxY) / 2.0;
+
+    /*
+     * // equilavalent code using more modular but slower method BoundingBox
+     * env0 = new Envelope(n00, n01); BoundingBox env1 = new Envelope(n10, n11);
+     * BoundingBox intEnv = env0.intersection(env1); Coordinates intMidPt =
+     * intEnv.centre(); normPt.getX() = intMidPt.getX(); normPt.getY() =
+     * intMidPt.getY();
+     */
+
+    final Coordinates n1 = new DoubleCoordinates(p1.getX() - normX, p1.getY()
+      - normY);
+    final Coordinates n2 = new DoubleCoordinates(p2.getX() - normX, p2.getY()
+      - normY);
+    final Coordinates n3 = new DoubleCoordinates(q1.getX() - normX, q1.getY()
+      - normY);
+    final Coordinates n4 = new DoubleCoordinates(q2.getX() - normX, q2.getY()
+      - normY);
 
     final Coordinates intPt = safeHCoordinatesIntersection(n1, n2, n3, n4);
 
-    final double x = intPt.getX() + normPt.getX();
-    final double y = intPt.getY() + normPt.getY();
+    final double x = intPt.getX() + normX;
+    final double y = intPt.getY() + normY;
 
     return new Coordinate(x, y);
   }
@@ -239,82 +268,6 @@ public class RobustLineIntersector extends LineIntersector {
     final Envelope env0 = new Envelope(inputLines[0][0], inputLines[0][1]);
     final Envelope env1 = new Envelope(inputLines[1][0], inputLines[1][1]);
     return env0.covers(intPt) && env1.covers(intPt);
-  }
-
-  /**
-   * Normalize the supplied coordinates to so that the midpoint of their
-   * intersection envelope lies at the origin.
-   * 
-   * @param n00
-   * @param n01
-   * @param n10
-   * @param n11
-   * @param normPt
-   */
-  private void normalizeToEnvCentre(final Coordinates n00,
-    final Coordinates n01, final Coordinates n10, final Coordinates n11,
-    final Coordinates normPt) {
-    final double minX0 = n00.getX() < n01.getX() ? n00.getX() : n01.getX();
-    final double minY0 = n00.getY() < n01.getY() ? n00.getY() : n01.getY();
-    final double maxX0 = n00.getX() > n01.getX() ? n00.getX() : n01.getX();
-    final double maxY0 = n00.getY() > n01.getY() ? n00.getY() : n01.getY();
-
-    final double minX1 = n10.getX() < n11.getX() ? n10.getX() : n11.getX();
-    final double minY1 = n10.getY() < n11.getY() ? n10.getY() : n11.getY();
-    final double maxX1 = n10.getX() > n11.getX() ? n10.getX() : n11.getX();
-    final double maxY1 = n10.getY() > n11.getY() ? n10.getY() : n11.getY();
-
-    final double intMinX = minX0 > minX1 ? minX0 : minX1;
-    final double intMaxX = maxX0 < maxX1 ? maxX0 : maxX1;
-    final double intMinY = minY0 > minY1 ? minY0 : minY1;
-    final double intMaxY = maxY0 < maxY1 ? maxY0 : maxY1;
-
-    final double intMidX = (intMinX + intMaxX) / 2.0;
-    final double intMidY = (intMinY + intMaxY) / 2.0;
-    normPt.setX(intMidX);
-    normPt.setY(intMidY);
-
-    /*
-     * // equilavalent code using more modular but slower method BoundingBox
-     * env0 = new Envelope(n00, n01); BoundingBox env1 = new Envelope(n10, n11);
-     * BoundingBox intEnv = env0.intersection(env1); Coordinates intMidPt =
-     * intEnv.centre(); normPt.getX() = intMidPt.getX(); normPt.getY() =
-     * intMidPt.getY();
-     */
-
-    n00.setX(n00.getX() - normPt.getX());
-    n00.setY(n00.getY() - normPt.getY());
-    n01.setX(n01.getX() - normPt.getX());
-    n01.setY(n01.getY() - normPt.getY());
-    n10.setX(n10.getX() - normPt.getX());
-    n10.setY(n10.getY() - normPt.getY());
-    n11.setX(n11.getX() - normPt.getX());
-    n11.setY(n11.getY() - normPt.getY());
-  }
-
-  /**
-   * Normalize the supplied coordinates so that their minimum ordinate values
-   * lie at the origin. NOTE: this normalization technique appears to cause
-   * large errors in the position of the intersection point for some cases.
-   * 
-   * @param n1
-   * @param n2
-   * @param n3
-   * @param n4
-   * @param normPt
-   */
-  private void normalizeToMinimum(final Coordinates n1, final Coordinates n2,
-    final Coordinates n3, final Coordinates n4, final Coordinates normPt) {
-    normPt.setX(smallestInAbsValue(n1.getX(), n2.getX(), n3.getX(), n4.getX()));
-    normPt.setY(smallestInAbsValue(n1.getY(), n2.getY(), n3.getY(), n4.getY()));
-    n1.setX(n1.getX() - normPt.getX());
-    n1.setY(n1.getY() - normPt.getY());
-    n2.setX(n2.getX() - normPt.getX());
-    n2.setY(n2.getY() - normPt.getY());
-    n3.setX(n3.getX() - normPt.getX());
-    n3.setY(n3.getY() - normPt.getY());
-    n4.setX(n4.getX() - normPt.getX());
-    n4.setY(n4.getY() - normPt.getY());
   }
 
   /**
@@ -341,24 +294,6 @@ public class RobustLineIntersector extends LineIntersector {
       // System.out.println("Snapped to " + intPt);
     }
     return intPt;
-  }
-
-  private double smallestInAbsValue(final double x1, final double x2,
-    final double x3, final double x4) {
-    double x = x1;
-    double xabs = Math.abs(x);
-    if (Math.abs(x2) < xabs) {
-      x = x2;
-      xabs = Math.abs(x2);
-    }
-    if (Math.abs(x3) < xabs) {
-      x = x3;
-      xabs = Math.abs(x3);
-    }
-    if (Math.abs(x4) < xabs) {
-      x = x4;
-    }
-    return x;
   }
 
 }

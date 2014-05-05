@@ -74,58 +74,58 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     throw new NoSuchElementException();
   }
 
-  private CoordinatesList readCoordinatesList() {
+  private CoordinatesList readCoordinatesList(final boolean cogo,
+    final boolean ring) {
+    final List<Double> coordinates = new ArrayList<>();
+    final int axisCount = readCoordinatesList(coordinates);
+    if (cogo) {
+      final int vertexCount = coordinates.size() / axisCount;
+      if (vertexCount > 0) {
+        final double firstX = coordinates.get(0);
+        final double firstY = coordinates.get(1);
+        double previousX = firstX;
+        double previousY = firstY;
+        for (int i = 1; i < vertexCount; i++) {
+          final double distance = coordinates.get(i * axisCount);
+          final double angleDegrees = coordinates.get(i * axisCount + 1);
+          final double angle = Math.toRadians((450 - angleDegrees) % 360);
+          final double x = previousX + distance * Math.cos(angle);
+          final double y = previousY + distance * Math.sin(angle);
+
+          coordinates.set(i * axisCount, x);
+          coordinates.set(i * axisCount + 1, y);
+          previousX = x;
+          previousY = y;
+        }
+        if (ring) {
+          coordinates.set((vertexCount - 1) * axisCount, firstX);
+          coordinates.set((vertexCount - 1) * axisCount + 1, firstY);
+        }
+      }
+    }
+    return new DoubleCoordinatesList(axisCount, coordinates);
+  }
+
+  private int readCoordinatesList(final List<Double> coordinates) {
+    int axisCount = 0;
     if (in.getEvent() == EventType.startArray || in.hasNext()
       && in.next() == EventType.startArray) {
       EventType event = in.next();
-      final List<Number> values = new ArrayList<Number>();
-      int dimension = 0;
       if (event != EventType.endArray) {
         do {
-          dimension = Math.max(dimension,
-            readCoordinatesListCoordinates(values));
+          axisCount = Math.max(axisCount,
+            readCoordinatesListCoordinates(coordinates));
           event = in.next();
         } while (event == EventType.comma);
       }
       if (event != EventType.endArray) {
         throw new IllegalStateException("Exepecting end array, not: " + event);
       }
-      return new DoubleCoordinatesList(dimension, values);
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
         + in.getEvent());
     }
-  }
-
-  private CoordinatesList readCoordinatesList(final boolean cogo,
-    final boolean ring) {
-    final CoordinatesList points = readCoordinatesList();
-    if (cogo) {
-      final int numPoints = points.size();
-      if (numPoints > 0) {
-        final double firstX = points.getX(0);
-        final double firstY = points.getY(0);
-        double previousX = firstX;
-        double previousY = firstY;
-        for (int i = 1; i < numPoints; i++) {
-          final double distance = points.getX(i);
-          final double angleDegrees = points.getY(i);
-          final double angle = Math.toRadians((450 - angleDegrees) % 360);
-          final double x = previousX + distance * Math.cos(angle);
-          final double y = previousY + distance * Math.sin(angle);
-
-          points.setX(i, x);
-          points.setY(i, y);
-          previousX = x;
-          previousY = y;
-        }
-        if (ring) {
-          points.setX(numPoints - 1, firstX);
-          points.setY(numPoints - 1, firstY);
-        }
-      }
-    }
-    return points;
+    return axisCount;
   }
 
   /**
@@ -134,8 +134,8 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
    * @param values The list to add the points coordinates to.
    * @return The dimension of the coordinate read.
    */
-  private int readCoordinatesListCoordinates(final List<Number> values) {
-    int dimension = 0;
+  private int readCoordinatesListCoordinates(final List<Double> values) {
+    int numAxis = 0;
     if (in.getEvent() == EventType.startArray || in.hasNext()
       && in.next() == EventType.startArray) {
       EventType event = in.getEvent();
@@ -144,8 +144,8 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
         if (value instanceof EventType) {
           event = (EventType)value;
         } else if (value instanceof Number) {
-          values.add((Number)value);
-          dimension++;
+          values.add(((Number)value).doubleValue());
+          numAxis++;
           event = in.next();
         } else {
           throw new IllegalArgumentException("Expecting number, not: " + value);
@@ -155,7 +155,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
         throw new IllegalStateException("Exepecting end array, not: " + event);
       }
 
-      return dimension;
+      return numAxis;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
         + in.getEvent());
@@ -301,7 +301,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
-        points = readCoordinatesList();
+        points = readCoordinatesList(cogo, false);
       } else if (CRS.equals(attributeName)) {
         factory = readCoordinateSystem();
       }

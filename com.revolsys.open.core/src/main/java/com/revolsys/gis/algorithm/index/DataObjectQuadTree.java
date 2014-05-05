@@ -121,7 +121,7 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
   public List<DataObject> queryIntersects(Geometry geometry) {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
-      geometry = geometryFactory.copy(geometry);
+      geometry = geometry.convert(geometryFactory);
     }
     final DataObjectGeometryIntersectsFilter filter = new DataObjectGeometryIntersectsFilter(
       geometry);

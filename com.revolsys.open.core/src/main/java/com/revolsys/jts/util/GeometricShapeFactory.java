@@ -172,9 +172,9 @@ public class GeometricShapeFactory {
   }
 
   protected Coordinates coord(final double x, final double y) {
-    final Coordinates pt = new DoubleCoordinates(x, y);
-    precModel.makePrecise(pt);
-    return pt;
+    final Coordinates point = new DoubleCoordinates(precModel.makePrecise(x),
+      precModel.makePrecise(y));
+    return point;
   }
 
   protected Coordinates coordTrans(final double x, final double y,

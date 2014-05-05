@@ -152,12 +152,6 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public void setValue(final int index, final int ordinateIndex,
-    final double value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public int size() {
     return seq.size();
   }

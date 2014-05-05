@@ -264,7 +264,7 @@ class SnapTransformer extends GeometryTransformer {
     this.isSelfSnap = isSelfSnap;
   }
 
-  private Coordinates[] snapLine(final Coordinates[] srcPts,
+  private Coordinates[] snapLine(final CoordinatesList srcPts,
     final Coordinates[] snapPts) {
     final LineStringSnapper snapper = new LineStringSnapper(srcPts,
       snapTolerance);
@@ -275,8 +275,7 @@ class SnapTransformer extends GeometryTransformer {
   @Override
   protected CoordinatesList transformCoordinates(final CoordinatesList coords,
     final Geometry parent) {
-    final Coordinates[] srcPts = coords.toCoordinateArray();
-    final Coordinates[] newPts = snapLine(srcPts, snapPts);
+    final Coordinates[] newPts = snapLine(coords, snapPts);
     return new DoubleCoordinatesList(newPts);
   }
 }

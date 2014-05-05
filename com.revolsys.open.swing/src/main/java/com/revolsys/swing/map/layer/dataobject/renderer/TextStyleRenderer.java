@@ -165,7 +165,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
         }
         if (point == null) {
           PointUtil.getPointWithin(geometry);
-          point = CoordinatesUtil.getInstance(geometryFactory.copy(geometry.getCentroid()));
+          point = CoordinatesUtil.getInstance((Point)geometry.getCentroid().copy(geometryFactory));
           if (!viewport.getBoundingBox().covers(point)) {
             final Geometry clippedGeometry = viewport.getBoundingBox()
               .toPolygon()

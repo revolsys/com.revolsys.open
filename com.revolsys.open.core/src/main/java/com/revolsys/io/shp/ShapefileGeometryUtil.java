@@ -17,6 +17,7 @@ import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
@@ -109,7 +110,7 @@ public final class ShapefileGeometryUtil {
 
   public static int getShapeType(final Geometry geometry) {
     if (geometry != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
       final int axisCount = geometryFactory.getAxisCount();
       final boolean hasZ = axisCount > 2;
       final boolean hasM = axisCount > 3;
@@ -157,7 +158,7 @@ public final class ShapefileGeometryUtil {
   }
 
   public static Method getWriteMethod(final Geometry geometry) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
     final int axisCount = geometryFactory.getAxisCount();
     final boolean hasZ = axisCount > 2;
     final boolean hasM = axisCount > 3;
@@ -194,25 +195,24 @@ public final class ShapefileGeometryUtil {
     this.writeLength = writeLength;
   }
 
-  public List<CoordinatesList> createCoordinatesLists(final int[] partIndex,
+  public List<double[]> createCoordinatesLists(final int[] partIndex,
     final int axisCount) {
-    final List<CoordinatesList> parts = new ArrayList<CoordinatesList>(
-      partIndex.length);
+    final List<double[]> parts = new ArrayList<>(partIndex.length);
     for (int i = 0; i < partIndex.length; i++) {
       final int partNumPoints = partIndex[i];
-      final DoubleCoordinatesList points = new DoubleCoordinatesList(
-        partNumPoints, axisCount);
+      final double[] points = new double[partNumPoints * axisCount];
       parts.add(points);
     }
     return parts;
   }
 
   public Geometry createPolygonGeometryFromParts(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final List<CoordinatesList> parts) {
+    final GeometryFactory geometryFactory, final List<double[]> parts,
+    final int axisCount) {
     final List<Polygon> polygons = new ArrayList<Polygon>();
-    final List<CoordinatesList> currentParts = new ArrayList<CoordinatesList>();
-    for (final CoordinatesList ring : parts) {
+    final List<LinearRing> currentParts = new ArrayList<>();
+    for (final double[] coordinates : parts) {
+      final LinearRing ring = geometryFactory.linearRing(axisCount, coordinates);
       final boolean ringClockwise = !ring.isCounterClockwise();
       if (ringClockwise == clockwise) {
         if (!currentParts.isEmpty()) {
@@ -235,8 +235,7 @@ public final class ShapefileGeometryUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends Geometry> V read(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public <V extends Geometry> V read(final GeometryFactory geometryFactory,
     final EndianInput in, final int shapeType) throws IOException {
     switch (shapeType) {
       case ShapefileConstants.NULL_SHAPE:
@@ -284,33 +283,26 @@ public final class ShapefileGeometryUtil {
 
   @SuppressWarnings("unchecked")
   public <V extends Geometry> V read(final Method method,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final EndianInput in) {
+    final GeometryFactory geometryFactory, final EndianInput in) {
     return (V)JavaBeanUtil.method(method, this, geometryFactory, in);
   }
 
-  public void readCoordinates(final EndianInput in,
-    final CoordinatesList points, final int ordinate) throws IOException {
-    final int size = points.size();
-    readCoordinates(in, points, size, ordinate);
-  }
-
-  public void readCoordinates(final EndianInput in,
-    final CoordinatesList points, final int size, final int ordinate)
+  public void readCoordinates(final EndianInput in, final int vertexCount,
+    final int axisCount, final double[] points, final int axisIndex)
     throws IOException {
-    for (int j = 0; j < size; j++) {
+    for (int j = 0; j < vertexCount; j++) {
       final double d = in.readLEDouble();
-      points.setValue(j, ordinate, d);
+      points[j * axisCount + axisIndex] = d;
     }
   }
 
   public void readCoordinates(final EndianInput in, final int[] partIndex,
-    final List<CoordinatesList> coordinateLists, final int ordinate)
-    throws IOException {
+    final List<double[]> coordinateLists, final int ordinate,
+    final int vertexCount, final int axisCount) throws IOException {
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     for (int i = 0; i < partIndex.length; i++) {
-      final CoordinatesList coordinates = coordinateLists.get(i);
-      readCoordinates(in, coordinates, ordinate);
+      final double[] coordinates = coordinateLists.get(i);
+      readCoordinates(in, vertexCount, axisCount, coordinates, ordinate);
     }
   }
 
@@ -324,52 +316,48 @@ public final class ShapefileGeometryUtil {
     return values;
   }
 
-  public MultiPoint readMultipoint(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public MultiPoint readMultipoint(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
-    final int numPoints = in.readLEInt();
-    final CoordinatesList points = readXYCoordinates(in, numPoints, 2);
+    final int vertexCount = in.readLEInt();
+    final double[] points = readXYCoordinates(in, vertexCount, 2);
     return geometryFactory.multiPoint(points);
   }
 
-  public MultiPoint readMultipointM(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public MultiPoint readMultipointM(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
-    final int numPoints = in.readLEInt();
-    final CoordinatesList points = readXYCoordinates(in, numPoints, 4);
+    final int vertexCount = in.readLEInt();
+    final double[] points = readXYCoordinates(in, vertexCount, 4);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-    readCoordinates(in, points, 3);
-    return geometryFactory.multiPoint(points);
+    readCoordinates(in, vertexCount, 4, points, 3);
+    return geometryFactory.multiPoint(new DoubleCoordinatesList(4, points));
   }
 
-  public MultiPoint readMultipointZ(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public MultiPoint readMultipointZ(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
-    final int numPoints = in.readLEInt();
-    final CoordinatesList points = readXYCoordinates(in, numPoints, 3);
+    final int vertexCount = in.readLEInt();
+    final double[] points = readXYCoordinates(in, vertexCount, 3);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-    readCoordinates(in, points, 2);
-    return geometryFactory.multiPoint(points);
+    readCoordinates(in, vertexCount, 3, points, 2);
+    return geometryFactory.multiPoint(new DoubleCoordinatesList(3, points));
   }
 
-  public MultiPoint readMultipointZM(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public MultiPoint readMultipointZM(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
-    final int numPoints = in.readLEInt();
-    final CoordinatesList points = readXYCoordinates(in, numPoints, 4);
+    final int vertexCount = in.readLEInt();
+    final double[] points = readXYCoordinates(in, vertexCount, 4);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-    readCoordinates(in, points, 2);
+    readCoordinates(in, vertexCount, 4, points, 2);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-    readCoordinates(in, points, 3);
-    return geometryFactory.multiPoint(points);
+    readCoordinates(in, vertexCount, 4, points, 3);
+    return geometryFactory.multiPoint(new DoubleCoordinatesList(4, points));
   }
 
   public int[] readPartIndex(final EndianInput in, final int numParts,
-    final int numPoints) throws IOException {
+    final int vertexCount) throws IOException {
     final int[] partIndex = new int[numParts];
     if (numParts > 0) {
       int startIndex = in.readLEInt();
@@ -378,20 +366,18 @@ public final class ShapefileGeometryUtil {
         partIndex[i - 1] = index - startIndex;
         startIndex = index;
       }
-      partIndex[partIndex.length - 1] = numPoints - startIndex;
+      partIndex[partIndex.length - 1] = vertexCount - startIndex;
     }
     return partIndex;
   }
 
-  public Point readPoint(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point readPoint(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
-    final CoordinatesList points = readXYCoordinates(in, 1, 2);
+    final double[] points = readXYCoordinates(in, 1, 2);
     return geometryFactory.point(points);
   }
 
-  public Point readPointM(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point readPointM(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
@@ -403,15 +389,15 @@ public final class ShapefileGeometryUtil {
   }
 
   public void readPoints(final EndianInput in, final int[] partIndex,
-    final List<CoordinatesList> coordinateLists) throws IOException {
+    final List<double[]> coordinateLists, final int vertexCount,
+    final int axisCount) throws IOException {
     for (int i = 0; i < partIndex.length; i++) {
-      final CoordinatesList coordinates = coordinateLists.get(i);
-      readXYCoordinates(in, coordinates);
+      final double[] coordinates = coordinateLists.get(i);
+      readXYCoordinates(in, vertexCount, axisCount, coordinates);
     }
   }
 
-  public Point readPointZ(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point readPointZ(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
@@ -420,8 +406,7 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.point(points);
   }
 
-  public Point readPointZM(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point readPointZM(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
@@ -432,227 +417,231 @@ public final class ShapefileGeometryUtil {
     return geometryFactory.point(points);
   }
 
-  public Geometry readPolygon(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Geometry readPolygon(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
-    final int numPoints = in.readLEInt();
-    final int[] partIndex = readPartIndex(in, numParts, numPoints);
+    final int vertexCount = in.readLEInt();
+    final int[] partIndex = readPartIndex(in, numParts, vertexCount);
 
-    final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 2);
+    final List<double[]> parts = createCoordinatesLists(partIndex, 2);
 
-    readPoints(in, partIndex, parts);
+    readPoints(in, partIndex, parts, vertexCount, 2);
 
-    return createPolygonGeometryFromParts(geometryFactory, parts);
+    return createPolygonGeometryFromParts(geometryFactory, parts, 2);
 
   }
 
-  public Geometry readPolygonM(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Geometry readPolygonM(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
-    final int numPoints = in.readLEInt();
-    final int[] partIndex = readPartIndex(in, numParts, numPoints);
+    final int vertexCount = in.readLEInt();
+    final int[] partIndex = readPartIndex(in, numParts, vertexCount);
 
-    final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 4);
-    readPoints(in, partIndex, parts);
-    readCoordinates(in, partIndex, parts, 3);
-    return createPolygonGeometryFromParts(geometryFactory, parts);
+    final List<double[]> parts = createCoordinatesLists(partIndex, 4);
+    readPoints(in, partIndex, parts, vertexCount, 4);
+    readCoordinates(in, partIndex, parts, 3, vertexCount, 4);
+    return createPolygonGeometryFromParts(geometryFactory, parts, 4);
 
   }
 
-  public Geometry readPolygonZ(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Geometry readPolygonZ(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
-    final int numPoints = in.readLEInt();
-    final int[] partIndex = readPartIndex(in, numParts, numPoints);
+    final int vertexCount = in.readLEInt();
+    final int[] partIndex = readPartIndex(in, numParts, vertexCount);
 
-    final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 3);
-    readPoints(in, partIndex, parts);
-    readCoordinates(in, partIndex, parts, 2);
-    return createPolygonGeometryFromParts(geometryFactory, parts);
+    final List<double[]> parts = createCoordinatesLists(partIndex, 3);
+    readPoints(in, partIndex, parts, vertexCount, 3);
+    readCoordinates(in, partIndex, parts, 2, vertexCount, 3);
+    return createPolygonGeometryFromParts(geometryFactory, parts, 3);
   }
 
-  public Geometry readPolygonZM(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Geometry readPolygonZM(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
-    final int numPoints = in.readLEInt();
-    final int[] partIndex = readPartIndex(in, numParts, numPoints);
+    final int vertexCount = in.readLEInt();
+    final int[] partIndex = readPartIndex(in, numParts, vertexCount);
 
-    final List<CoordinatesList> parts = createCoordinatesLists(partIndex, 4);
-    readPoints(in, partIndex, parts);
-    readCoordinates(in, partIndex, parts, 2);
-    readCoordinates(in, partIndex, parts, 3);
-    return createPolygonGeometryFromParts(geometryFactory, parts);
+    final List<double[]> parts = createCoordinatesLists(partIndex, 4);
+    readPoints(in, partIndex, parts, vertexCount, 4);
+    readCoordinates(in, partIndex, parts, 2, vertexCount, 4);
+    readCoordinates(in, partIndex, parts, 3, vertexCount, 4);
+    return createPolygonGeometryFromParts(geometryFactory, parts, 4);
   }
 
-  public Geometry readPolyline(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Geometry readPolyline(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
-    final int numPoints = in.readLEInt();
+    final int vertexCount = in.readLEInt();
     final int axisCount = 2;
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = readXYCoordinates(in, numPoints, axisCount);
+      final double[] points = readXYCoordinates(in, vertexCount, axisCount);
 
-      return geometryFactory.lineString(points);
+      return geometryFactory.lineString(2, points);
     } else {
       final int[] partIndex = new int[numParts + 1];
-      partIndex[numParts] = numPoints;
+      partIndex[numParts] = vertexCount;
       for (int i = 0; i < partIndex.length - 1; i++) {
         partIndex[i] = in.readLEInt();
 
       }
-      final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+      final List<LineString> lines = new ArrayList<>();
       for (int i = 0; i < partIndex.length - 1; i++) {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
-        pointsList.add(points);
+        final double[] coordinates = readXYCoordinates(in, numCoords, axisCount);
+        lines.add(geometryFactory.lineString(2, coordinates));
       }
-      return geometryFactory.multiLineString(pointsList);
+      return geometryFactory.multiLineString(lines);
     }
   }
 
-  public Geometry readPolylineM(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Geometry readPolylineM(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
-    final int numPoints = in.readLEInt();
+    final int vertexCount = in.readLEInt();
     final int axisCount = 4;
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = readXYCoordinates(in, numPoints, axisCount);
+      final double[] points = readXYCoordinates(in, vertexCount, axisCount);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-      readCoordinates(in, points, 3);
-      return geometryFactory.lineString(points);
+      readCoordinates(in, vertexCount, 3, points, 3);
+      return geometryFactory.lineString(3, points);
     } else {
       final int[] partIndex = new int[numParts + 1];
-      partIndex[numParts] = numPoints;
+      partIndex[numParts] = vertexCount;
       for (int i = 0; i < partIndex.length - 1; i++) {
         partIndex[i] = in.readLEInt();
       }
-      final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+      final List<double[]> pointsList = new ArrayList<>();
       for (int i = 0; i < partIndex.length - 1; i++) {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
-        pointsList.add(points);
+        final double[] coordinates = readXYCoordinates(in, numCoords, axisCount);
+        pointsList.add(coordinates);
       }
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       for (int i = 0; i < partIndex.length - 1; i++) {
-        final CoordinatesList points = pointsList.get(i);
-        readCoordinates(in, points, points.size(), 3);
+        final double[] points = pointsList.get(i);
+        readCoordinates(in, vertexCount, 4, points, 3);
       }
-      return geometryFactory.multiLineString(pointsList);
+      final List<LineString> lines = new ArrayList<>();
+      for (final double[] coordinates : pointsList) {
+        lines.add(geometryFactory.lineString(4, coordinates));
+      }
+      return geometryFactory.multiLineString(lines);
     }
   }
 
-  public Geometry readPolylineZ(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Geometry readPolylineZ(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
-    final int numPoints = in.readLEInt();
+    final int vertexCount = in.readLEInt();
     final int axisCount = 3;
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = readXYCoordinates(in, numPoints, axisCount);
+      final double[] points = readXYCoordinates(in, vertexCount, axisCount);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-      readCoordinates(in, points, 2);
-      return geometryFactory.lineString(points);
+      readCoordinates(in, vertexCount, 3, points, 2);
+      return geometryFactory.lineString(3, points);
     } else {
       final int[] partIndex = new int[numParts + 1];
-      partIndex[numParts] = numPoints;
+      partIndex[numParts] = vertexCount;
       for (int i = 0; i < partIndex.length - 1; i++) {
         partIndex[i] = in.readLEInt();
       }
-      final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+      final List<double[]> pointsList = new ArrayList<>();
       for (int i = 0; i < partIndex.length - 1; i++) {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
+        final double[] points = readXYCoordinates(in, numCoords, axisCount);
         pointsList.add(points);
       }
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       for (int i = 0; i < partIndex.length - 1; i++) {
-        final CoordinatesList points = pointsList.get(i);
-        readCoordinates(in, points, points.size(), 2);
+        final double[] points = pointsList.get(i);
+        readCoordinates(in, vertexCount, 3, points, 2);
       }
-      return geometryFactory.multiLineString(pointsList);
+      final List<LineString> lines = new ArrayList<>();
+      for (final double[] coordinates : pointsList) {
+        lines.add(geometryFactory.lineString(3, coordinates));
+      }
+      return geometryFactory.multiLineString(lines);
     }
   }
 
-  public Geometry readPolylineZM(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Geometry readPolylineZM(final GeometryFactory geometryFactory,
     final EndianInput in) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int numParts = in.readLEInt();
-    final int numPoints = in.readLEInt();
+    final int vertexCount = in.readLEInt();
     final int axisCount = 4;
     if (numParts == 1) {
       in.readLEInt();
-      final CoordinatesList points = readXYCoordinates(in, numPoints, axisCount);
+      final double[] points = readXYCoordinates(in, vertexCount, axisCount);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-      readCoordinates(in, points, 2);
+      readCoordinates(in, vertexCount, 4, points, 2);
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
-      readCoordinates(in, points, 3);
-      return geometryFactory.lineString(points);
+      readCoordinates(in, vertexCount, 4, points, 3);
+      return geometryFactory.lineString(4, points);
     } else {
       final int[] partIndex = new int[numParts + 1];
-      partIndex[numParts] = numPoints;
+      partIndex[numParts] = vertexCount;
       for (int i = 0; i < partIndex.length - 1; i++) {
         partIndex[i] = in.readLEInt();
       }
-      final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+      final List<double[]> pointsList = new ArrayList<>();
       for (int i = 0; i < partIndex.length - 1; i++) {
         final int startIndex = partIndex[i];
         final int endIndex = partIndex[i + 1];
         final int numCoords = endIndex - startIndex;
-        final CoordinatesList points = readXYCoordinates(in, numCoords, axisCount);
+        final double[] points = readXYCoordinates(in, numCoords, axisCount);
         pointsList.add(points);
       }
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       for (int i = 0; i < partIndex.length - 1; i++) {
-        final CoordinatesList points = pointsList.get(i);
-        readCoordinates(in, points, points.size(), 2);
+        final double[] points = pointsList.get(i);
+        readCoordinates(in, vertexCount, 4, points, 2);
       }
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       for (int i = 0; i < partIndex.length - 1; i++) {
-        final CoordinatesList points = pointsList.get(i);
-        readCoordinates(in, points, points.size(), 3);
+        final double[] points = pointsList.get(i);
+        readCoordinates(in, vertexCount, 4, points, 3);
       }
-      return geometryFactory.multiLineString(pointsList);
+      final List<LineString> lines = new ArrayList<>();
+      for (final double[] coordinates : pointsList) {
+        lines.add(geometryFactory.lineString(4, coordinates));
+      }
+      return geometryFactory.multiLineString(lines);
     }
   }
 
-  public void readXYCoordinates(final EndianInput in,
-    final CoordinatesList points) throws IOException {
-    for (int j = 0; j < points.size(); j++) {
+  public double[] readXYCoordinates(final EndianInput in,
+    final int vertexCount, final int axisCount) throws IOException {
+    final double[] coordinates = new double[vertexCount * axisCount];
+    readXYCoordinates(in, axisCount, vertexCount, coordinates);
+    return coordinates;
+  }
+
+  public void readXYCoordinates(final EndianInput in, final int axisCount,
+    final int vertexCount, final double[] points) throws IOException {
+    for (int j = 0; j < vertexCount; j++) {
       final double x = in.readLEDouble();
       final double y = in.readLEDouble();
-      points.setX(j, x);
-      points.setY(j, y);
+      points[j * axisCount] = x;
+      points[j * axisCount + 1] = y;
     }
-  }
-
-  public CoordinatesList readXYCoordinates(final EndianInput in,
-    final int numPoints, final int axisCount) throws IOException {
-    final CoordinatesList points = new DoubleCoordinatesList(numPoints, axisCount);
-    readXYCoordinates(in, points);
-    return points;
   }
 
   public void write(final Method method, final EndianOutput out,
@@ -761,17 +750,17 @@ public final class ShapefileGeometryUtil {
   private void writeMultipoint(final EndianOutput out, final Geometry geometry,
     final int shapeType, final int wordsPerPoint) throws IOException {
     if (geometry instanceof MultiPoint || geometry instanceof Point) {
-      final int numPoints = geometry.getVertexCount();
+      final int vertexCount = geometry.getVertexCount();
       if (writeLength) {
-        final int recordLength = 20 + wordsPerPoint * numPoints;
+        final int recordLength = 20 + wordsPerPoint * vertexCount;
         // (BYTES_IN_INT + 4 * BYTES_IN_DOUBLE + BYTES_IN_INT +
-        // (numPoints * 2 * BYTES_IN_DOUBLE)) / BYTES_IN_SHORT;
+        // (vertexCount * 2 * BYTES_IN_DOUBLE)) / BYTES_IN_SHORT;
         out.writeInt(recordLength);
       }
       final BoundingBox envelope = geometry.getBoundingBox();
       out.writeLEInt(shapeType);
       writeEnvelope(out, envelope);
-      out.writeLEInt(numPoints);
+      out.writeLEInt(vertexCount);
       writeXYCoordinates(out, geometry);
     } else {
       throw new IllegalArgumentException("Expecting " + MultiPoint.class
@@ -883,7 +872,7 @@ public final class ShapefileGeometryUtil {
     final Geometry geometry, final int shapeType, final int headerOverhead,
     final int wordsPerPoint) throws IOException {
 
-    int numPoints = 0;
+    int vertexCount = 0;
 
     final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
     for (int i = 0; i < geometry.getGeometryCount(); i++) {
@@ -897,7 +886,7 @@ public final class ShapefileGeometryUtil {
           exteroirPoints = exteroirPoints.reverse();
         }
         rings.add(exteroirPoints);
-        numPoints += exteroirPoints.size();
+        vertexCount += exteroirPoints.size();
         final int numHoles = polygon.getNumInteriorRing();
         for (int j = 0; j < numHoles; j++) {
           final LineString interior = polygon.getInteriorRing(j);
@@ -907,7 +896,7 @@ public final class ShapefileGeometryUtil {
             interiorCoords = interiorCoords.reverse();
           }
           rings.add(interiorCoords);
-          numPoints += interiorCoords.size();
+          vertexCount += interiorCoords.size();
         }
       } else {
         throw new IllegalArgumentException("Expecting " + Polygon.class
@@ -918,7 +907,7 @@ public final class ShapefileGeometryUtil {
 
     if (writeLength) {
       final int recordLength = 22 + headerOverhead + 2 * numParts
-        + wordsPerPoint * numPoints;
+        + wordsPerPoint * vertexCount;
 
       out.writeInt(recordLength);
     }
@@ -926,7 +915,7 @@ public final class ShapefileGeometryUtil {
     final BoundingBox envelope = geometry.getBoundingBox();
     writeEnvelope(out, envelope);
     out.writeLEInt(numParts);
-    out.writeLEInt(numPoints);
+    out.writeLEInt(vertexCount);
 
     int partIndex = 0;
     for (final CoordinatesList ring : rings) {

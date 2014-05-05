@@ -32,9 +32,8 @@
  */
 package com.revolsys.jts.noding;
 
-import java.util.Arrays;
-
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Represents a list of contiguous line segments,
@@ -49,29 +48,24 @@ import com.revolsys.jts.geom.Coordinates;
  * @version 1.7
  */
 public class BasicSegmentString implements SegmentString {
-  private final Coordinates[] pts;
+  private final CoordinatesList points;
 
   private Object data;
 
   /**
    * Creates a new segment string from a list of vertices.
    *
-   * @param pts the vertices of the segment string
+   * @param points the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public BasicSegmentString(final Coordinates[] pts, final Object data) {
-    this.pts = pts;
+  public BasicSegmentString(final CoordinatesList points, final Object data) {
+    this.points = points;
     this.data = data;
   }
 
   @Override
   public Coordinates getCoordinate(final int i) {
-    return pts[i];
-  }
-
-  @Override
-  public Coordinates[] getCoordinates() {
-    return pts;
+    return points.get(i);
   }
 
   /**
@@ -84,6 +78,11 @@ public class BasicSegmentString implements SegmentString {
     return data;
   }
 
+  @Override
+  public CoordinatesList getPoints() {
+    return points;
+  }
+
   /**
    * Gets the octant of the segment starting at vertex <code>index</code>.
    *
@@ -92,7 +91,7 @@ public class BasicSegmentString implements SegmentString {
    * @return the octant of the segment at the vertex
    */
   public int getSegmentOctant(final int index) {
-    if (index == pts.length - 1) {
+    if (index == points.size() - 1) {
       return -1;
     }
     return Octant.octant(getCoordinate(index), getCoordinate(index + 1));
@@ -100,7 +99,7 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public boolean isClosed() {
-    return pts[0].equals(pts[pts.length - 1]);
+    return points.get(0).equals(points.get(points.size() - 1));
   }
 
   /**
@@ -115,11 +114,11 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public int size() {
-    return pts.length;
+    return points.size();
   }
 
   @Override
   public String toString() {
-    return Arrays.toString(pts);
+    return points.toString();
   }
 }

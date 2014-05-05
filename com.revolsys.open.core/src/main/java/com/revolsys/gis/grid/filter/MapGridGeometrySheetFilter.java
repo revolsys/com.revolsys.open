@@ -1,11 +1,11 @@
 package com.revolsys.gis.grid.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 /**
  * The MapGridGeometrySheetFilter will compare the centroid of the Geometry for
@@ -27,11 +27,11 @@ public class MapGridGeometrySheetFilter implements Filter<DataObject> {
     if (sheet != null && grid != null) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
-        final Geometry geographicsGeometry = GeometryProjectionUtil.perform(
-          geometry, 4326);
+        final Geometry geographicsGeometry = geometry.convert(GeometryFactory.getFactory(4326));
         final Coordinates centroid = geographicsGeometry.getCentroid()
           .getCoordinate();
-        final String geometrySheet = grid.getMapTileName(centroid.getX(), centroid.getY());
+        final String geometrySheet = grid.getMapTileName(centroid.getX(),
+          centroid.getY());
         if (geometrySheet != null) {
           if (sheet.equals(geometrySheet) == !inverse) {
             return true;

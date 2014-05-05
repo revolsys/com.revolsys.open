@@ -48,13 +48,6 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
     this.index = index;
   }
 
-  @Override
-  public void setValue(final int index, final double value) {
-    if (index >= 0 && index < coordinates.getAxisCount()) {
-      coordinates.setValue(this.index, index, value);
-    }
-  }
-
   public int size() {
     return coordinates.size();
   }

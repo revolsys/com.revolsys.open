@@ -10,7 +10,7 @@ import com.revolsys.gis.graph.event.EdgeEvent;
 import com.revolsys.gis.graph.event.EdgeEventListenerList;
 import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinatesIterator;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -132,20 +132,19 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
         y1 = y2;
       }
       if (!removeIndicies.isEmpty()) {
-        final int dimension = coordinates.getAxisCount();
-        final CoordinatesList newCoordinates = new DoubleCoordinatesList(
-          numCoordinates - removeIndicies.size(), dimension);
+        final int axisCount = coordinates.getAxisCount();
+        final double[] newCoordinates = new double[(numCoordinates - removeIndicies.size())
+          * axisCount];
         int k = 0;
         for (int j = 0; j < numCoordinates; j++) {
           if (!removeIndicies.contains(j)) {
-            for (int d = 0; d < dimension; d++) {
-              final double ordinate = coordinates.getValue(j, d);
-              newCoordinates.setValue(k, d, ordinate);
-            }
+            CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, k,
+              coordinates, j);
             k++;
           }
         }
-        final LineString newLine = geometryFactory.lineString(newCoordinates);
+        final LineString newLine = geometryFactory.lineString(axisCount,
+          newCoordinates);
         final Edge<T> newEdge = graph.replaceEdge(edge, newLine);
         edgeListeners.edgeEvent(newEdge, "Edge close indicies",
           EdgeEvent.EDGE_CHANGED, null);

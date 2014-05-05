@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geomgraph.Quadrant;
 
 /**
@@ -55,26 +56,29 @@ public class MonotoneChainBuilder {
    * @return the index of the last point in the monotone chain 
    * starting at <code>start</code>.
    */
-  private static int findChainEnd(final Coordinates[] pts, final int start) {
+  private static int findChainEnd(final CoordinatesList points, final int start) {
     int safeStart = start;
     // skip any zero-length segments at the start of the sequence
     // (since they cannot be used to establish a quadrant)
-    while (safeStart < pts.length - 1
-      && pts[safeStart].equals2d(pts[safeStart + 1])) {
+    final int size = points.size();
+    while (safeStart < size - 1
+      && points.get(safeStart).equals2d(points.get(safeStart + 1))) {
       safeStart++;
     }
     // check if there are NO non-zero-length segments
-    if (safeStart >= pts.length - 1) {
-      return pts.length - 1;
+    if (safeStart >= size - 1) {
+      return size - 1;
     }
     // determine overall quadrant for chain (which is the starting quadrant)
-    final int chainQuad = Quadrant.quadrant(pts[safeStart], pts[safeStart + 1]);
+    final int chainQuad = Quadrant.quadrant(points.get(safeStart),
+      points.get(safeStart + 1));
     int last = start + 1;
-    while (last < pts.length) {
+    while (last < size) {
       // skip zero-length segments, but include them in the chain
-      if (!pts[last - 1].equals2d(pts[last])) {
+      if (!points.get(last - 1).equals2d(points.get(last))) {
         // compute quadrant for next possible segment in chain
-        final int quad = Quadrant.quadrant(pts[last - 1], pts[last]);
+        final int quad = Quadrant.quadrant(points.get(last - 1),
+          points.get(last));
         if (quad != chainQuad) {
           break;
         }
@@ -84,7 +88,7 @@ public class MonotoneChainBuilder {
     return last - 1;
   }
 
-  public static List<MonotoneChain> getChains(final Coordinates[] pts) {
+  public static List<MonotoneChain> getChains(final CoordinatesList pts) {
     return getChains(pts, null);
   }
 
@@ -92,14 +96,17 @@ public class MonotoneChainBuilder {
    * Return a list of the {@link MonotoneChain}s
    * for the given list of coordinates.
    */
-  public static List<MonotoneChain> getChains(final Coordinates[] pts,
+  public static List<MonotoneChain> getChains(final CoordinatesList points,
     final Object context) {
     final List<MonotoneChain> mcList = new ArrayList<>();
-    final int[] startIndex = getChainStartIndices(pts);
-    for (int i = 0; i < startIndex.length - 1; i++) {
-      final MonotoneChain mc = new MonotoneChain(pts, startIndex[i],
-        startIndex[i + 1], context);
-      mcList.add(mc);
+    final List<Integer> indices = getChainStartIndices(points);
+    int startIndex = indices.get(0);
+    for (int i = 1; i < indices.size(); i++) {
+      final int endIndex = indices.get(i);
+      final MonotoneChain chain = new MonotoneChain(points, startIndex,
+        endIndex, context);
+      mcList.add(chain);
+      startIndex = endIndex;
     }
     return mcList;
   }
@@ -110,25 +117,24 @@ public class MonotoneChainBuilder {
    * The last entry in the array points to the end point of the point array,
    * for use as a sentinel.
    */
-  public static int[] getChainStartIndices(final Coordinates[] pts) {
+  public static List<Integer> getChainStartIndices(final CoordinatesList points) {
     // find the startpoint (and endpoints) of all monotone chains in this edge
     int start = 0;
-    final List startIndexList = new ArrayList();
-    startIndexList.add(new Integer(start));
+    final List<Integer> startIndexList = new ArrayList<>();
+    startIndexList.add(start);
     do {
-      final int last = findChainEnd(pts, start);
-      startIndexList.add(new Integer(last));
+      final int last = findChainEnd(points, start);
+      startIndexList.add(last);
       start = last;
-    } while (start < pts.length - 1);
+    } while (start < points.size() - 1);
     // copy list to an array of ints, for efficiency
-    final int[] startIndex = toIntArray(startIndexList);
-    return startIndex;
+    return startIndexList;
   }
 
-  public static int[] toIntArray(final List list) {
+  private static int[] toIntArray(final List<Integer> list) {
     final int[] array = new int[list.size()];
     for (int i = 0; i < array.length; i++) {
-      array[i] = ((Integer)list.get(i)).intValue();
+      array[i] = list.get(i).intValue();
     }
     return array;
   }

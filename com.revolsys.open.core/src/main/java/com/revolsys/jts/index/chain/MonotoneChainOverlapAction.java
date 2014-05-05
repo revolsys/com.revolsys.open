@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,7 +32,6 @@
  */
 package com.revolsys.jts.index.chain;
 
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 
 /**
@@ -43,10 +41,6 @@ import com.revolsys.jts.geom.LineSegment;
  * @version 1.7
  */
 public class MonotoneChainOverlapAction {
-  // these envelopes are used during the MonotoneChain search process
-  Envelope tempEnv1 = new Envelope();
-
-  Envelope tempEnv2 = new Envelope();
 
   /**
    * This is a convenience function which can be overridden to obtain the actual

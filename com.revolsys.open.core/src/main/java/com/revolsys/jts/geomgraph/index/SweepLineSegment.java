@@ -1,6 +1,3 @@
-
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -35,40 +32,37 @@
  */
 package com.revolsys.jts.geomgraph.index;
 
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geomgraph.Edge;
-
 
 /**
  * @version 1.7
  */
 public class SweepLineSegment {
 
-  Edge edge;
-  Coordinates[] pts;
-  int ptIndex;
+  private final Edge edge;
 
-  public SweepLineSegment(Edge edge,  int ptIndex) {
+  private final int ptIndex;
+
+  public SweepLineSegment(final Edge edge, final int ptIndex) {
     this.edge = edge;
     this.ptIndex = ptIndex;
-    pts = edge.getCoordinates();
   }
 
-  public double getMinX()
-  {
-    double x1 = pts[ptIndex].getX();
-    double x2 = pts[ptIndex + 1].getX();
-    return x1 < x2 ? x1 : x2;
+  public void computeIntersections(final SweepLineSegment ss,
+    final SegmentIntersector si) {
+    si.addIntersections(edge, ptIndex, ss.edge, ss.ptIndex);
   }
-  public double getMaxX()
-  {
-    double x1 = pts[ptIndex].getX();
-    double x2 = pts[ptIndex + 1].getX();
+
+  public double getMaxX() {
+    final double x1 = edge.getCoordinate(ptIndex).getX();
+    final double x2 = edge.getCoordinate(ptIndex + 1).getX();
     return x1 > x2 ? x1 : x2;
   }
-  public void computeIntersections(SweepLineSegment ss, SegmentIntersector si)
-  {
-    si.addIntersections(edge, ptIndex, ss.edge, ss.ptIndex);
+
+  public double getMinX() {
+    final double x1 = edge.getCoordinate(ptIndex).getX();
+    final double x2 = edge.getCoordinate(ptIndex + 1).getX();
+    return x1 < x2 ? x1 : x2;
   }
 
 }

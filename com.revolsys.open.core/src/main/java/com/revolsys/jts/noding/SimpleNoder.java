@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -36,8 +35,6 @@ package com.revolsys.jts.noding;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Coordinates;
-
 /**
  * Nodes a set of {@link SegmentString}s by
  * performing a brute-force comparison of every segment to every other one.
@@ -46,41 +43,36 @@ import com.revolsys.jts.geom.Coordinates;
  *
  * @version 1.7
  */
-public class SimpleNoder
-    extends SinglePassNoder
-{
+public class SimpleNoder extends SinglePassNoder {
 
-  private Collection nodedSegStrings;
+  private Collection<? extends SegmentString> nodedSegStrings;
 
   public SimpleNoder() {
   }
 
-  public Collection getNodedSubstrings()
-  {
-    return  NodedSegmentString.getNodedSubstrings(nodedSegStrings);
+  private void computeIntersects(final SegmentString e0, final SegmentString e1) {
+    for (int i0 = 0; i0 < e0.size() - 1; i0++) {
+      for (int i1 = 0; i1 < e1.size() - 1; i1++) {
+        segInt.processIntersections(e0, i0, e1, i1);
+      }
+    }
   }
 
-  public void computeNodes(Collection inputSegStrings)
-  {
+  @Override
+  public void computeNodes(final Collection<NodedSegmentString> inputSegStrings) {
     this.nodedSegStrings = inputSegStrings;
-    for (Iterator i0 = inputSegStrings.iterator(); i0.hasNext(); ) {
-      SegmentString edge0 = (SegmentString) i0.next();
-      for (Iterator i1 = inputSegStrings.iterator(); i1.hasNext(); ) {
-        SegmentString edge1 = (SegmentString) i1.next();
+    for (final Iterator i0 = inputSegStrings.iterator(); i0.hasNext();) {
+      final SegmentString edge0 = (SegmentString)i0.next();
+      for (final Iterator i1 = inputSegStrings.iterator(); i1.hasNext();) {
+        final SegmentString edge1 = (SegmentString)i1.next();
         computeIntersects(edge0, edge1);
       }
     }
   }
 
-  private void computeIntersects(SegmentString e0, SegmentString e1)
-  {
-    Coordinates[] pts0 = e0.getCoordinates();
-    Coordinates[] pts1 = e1.getCoordinates();
-    for (int i0 = 0; i0 < pts0.length - 1; i0++) {
-      for (int i1 = 0; i1 < pts1.length - 1; i1++) {
-        segInt.processIntersections(e0, i0, e1, i1);
-      }
-    }
+  @Override
+  public Collection<NodedSegmentString> getNodedSubstrings() {
+    return NodedSegmentString.getNodedSubstrings((Collection)nodedSegStrings);
   }
 
 }

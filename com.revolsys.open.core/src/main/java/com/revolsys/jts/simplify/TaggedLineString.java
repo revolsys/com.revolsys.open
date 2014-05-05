@@ -51,11 +51,11 @@ import com.revolsys.jts.geom.segment.Segment;
  */
 class TaggedLineString {
 
-  private static Coordinates[] extractCoordinates(final List segs) {
+  private static Coordinates[] extractCoordinates(final List<LineSegment> segs) {
     final Coordinates[] pts = new Coordinates[segs.size() + 1];
     LineSegment seg = null;
     for (int i = 0; i < segs.size(); i++) {
-      seg = (LineSegment)segs.get(i);
+      seg = segs.get(i);
       pts[i] = seg.getP0();
     }
     // add last point
@@ -103,10 +103,6 @@ class TaggedLineString {
     return parentLine;
   }
 
-  public Coordinates[] getParentCoordinates() {
-    return parentLine.getCoordinateArray();
-  }
-
   public Coordinates[] getResultCoordinates() {
     return extractCoordinates(resultSegs);
   }
@@ -125,8 +121,7 @@ class TaggedLineString {
   }
 
   private void init() {
-    final Coordinates[] pts = parentLine.getCoordinateArray();
-    segs = new TaggedLineSegment[pts.length - 1];
+    segs = new TaggedLineSegment[parentLine.getVertexCount() - 1];
     int i = 0;
     for (final Segment segment : parentLine.segments()) {
       final TaggedLineSegment seg = new TaggedLineSegment(segment.get(0)

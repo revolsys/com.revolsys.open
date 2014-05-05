@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
@@ -21,9 +20,7 @@ import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.noding.Noder;
 import com.revolsys.jts.noding.ScaledNoder;
 import com.revolsys.jts.noding.SegmentString;
-import com.revolsys.jts.noding.snapround.GeometryNoder;
 import com.revolsys.jts.noding.snapround.MCIndexSnapRounder;
-import com.revolsys.jts.precision.GeometryPrecisionReducer;
 
 public class NodingFunctions {
 
@@ -42,23 +39,21 @@ public class NodingFunctions {
     return FunctionsUtil.getFactoryOrDefault(null).multiPoint(pts);
   }
 
-  private static List createNodedSegmentStrings(final Geometry geom) {
-    final List segs = new ArrayList();
-    final List lines = geom.getGeometries(LineString.class);
-    for (final Iterator i = lines.iterator(); i.hasNext();) {
-      final LineString line = (LineString)i.next();
+  private static List<NodedSegmentString> createNodedSegmentStrings(
+    final Geometry geom) {
+    final List<NodedSegmentString> segs = new ArrayList<>();
+    final List<LineString> lines = geom.getGeometries(LineString.class);
+    for (final LineString line : lines) {
       segs.add(new NodedSegmentString(line.getCoordinatesList(), null));
     }
     return segs;
   }
 
-  private static List createSegmentStrings(final Geometry geom) {
-    final List segs = new ArrayList();
-    final List lines = geom.getGeometries(LineString.class);
-    for (final Iterator i = lines.iterator(); i.hasNext();) {
-      final LineString line = (LineString)i.next();
-      segs.add(new BasicSegmentString(
-        CoordinatesListUtil.getCoordinateArray(line), null));
+  private static List<SegmentString> createSegmentStrings(final Geometry geom) {
+    final List<SegmentString> segs = new ArrayList<>();
+    final List<LineString> lines = geom.getGeometries(LineString.class);
+    for (final LineString line : lines) {
+      segs.add(new BasicSegmentString(line.getCoordinatesList(), null));
     }
     return segs;
   }
@@ -69,7 +64,7 @@ public class NodingFunctions {
     for (final Iterator i = segStrings.iterator(); i.hasNext();) {
       final SegmentString ss = (SegmentString)i.next();
       final LineString line = FunctionsUtil.getFactoryOrDefault(null)
-        .lineString(ss.getCoordinates());
+        .lineString(ss.getPoints());
       lines[index++] = line;
     }
     return FunctionsUtil.getFactoryOrDefault(null).multiLineString(lines);
@@ -115,33 +110,6 @@ public class NodingFunctions {
     noder.computeNodes(segs);
     final Collection nodedSegStrings = noder.getNodedSubstrings();
     return fromSegmentStrings(nodedSegStrings);
-  }
-
-  /**
-   * Reduces precision pointwise, then snap-rounds.
-   * Note that output set may not contain non-unique linework
-   * (and thus cannot be used as input to Polygonizer directly).
-   * UnaryUnion is one way to make the linework unique.
-   * 
-   * 
-   * @param geom a geometry containing linework to node
-   * @param scaleFactor the precision model scale factor to use
-   * @return the noded, snap-rounded linework
-   */
-  public static Geometry snapRoundWithPointwisePrecisionReduction(
-    final Geometry geom, final double scaleFactor) {
-    final PrecisionModel pm = new PrecisionModel(scaleFactor);
-
-    final Geometry roundedGeom = GeometryPrecisionReducer.reducePointwise(geom,
-      pm);
-
-    final List geomList = new ArrayList();
-    geomList.add(roundedGeom);
-
-    final GeometryNoder noder = new GeometryNoder(pm);
-    final List lines = noder.node(geomList);
-
-    return FunctionsUtil.getFactoryOrDefault(geom).buildGeometry(lines);
   }
 
 }

@@ -96,7 +96,8 @@ public class SimpleSnapRounder implements Noder {
    * @param inputSegmentStrings a Collection of NodedSegmentStrings
    */
   @Override
-  public void computeNodes(final Collection inputSegmentStrings) {
+  public void computeNodes(
+    final Collection<NodedSegmentString> inputSegmentStrings) {
     this.nodedSegStrings = inputSegmentStrings;
     snapRound(inputSegmentStrings, li);
 
@@ -146,25 +147,24 @@ public class SimpleSnapRounder implements Noder {
    * Performs a brute-force comparison of every segment in each {@link SegmentString}.
    * This has n^2 performance.
    */
-  private void computeVertexSnaps(final NodedSegmentString e0,
-    final NodedSegmentString e1) {
-    final Coordinates[] pts0 = e0.getCoordinates();
-    final Coordinates[] pts1 = e1.getCoordinates();
-    for (int i0 = 0; i0 < pts0.length - 1; i0++) {
-      final HotPixel hotPixel = new HotPixel(pts0[i0], scaleFactor, li);
-      for (int i1 = 0; i1 < pts1.length - 1; i1++) {
+  private void computeVertexSnaps(final NodedSegmentString segment1,
+    final NodedSegmentString segment2) {
+    for (int i0 = 0; i0 < segment1.size() - 1; i0++) {
+      final Coordinates point1 = segment1.getCoordinate(i0);
+      final HotPixel hotPixel = new HotPixel(point1, scaleFactor, li);
+      for (int i1 = 0; i1 < segment2.size() - 1; i1++) {
         // don't snap a vertex to itself
-        if (e0 == e1) {
+        if (segment1 == segment2) {
           if (i0 == i1) {
             continue;
           }
         }
         // System.out.println("trying " + pts0[i0] + " against " + pts1[i1] +
         // pts1[i1 + 1]);
-        final boolean isNodeAdded = hotPixel.addSnappedNode(e1, i1);
+        final boolean isNodeAdded = hotPixel.addSnappedNode(segment2, i1);
         // if a node is created for a vertex, that vertex must be noded too
         if (isNodeAdded) {
-          e0.addIntersection(pts0[i0], i0);
+          segment1.addIntersection(point1, i0);
         }
       }
     }
@@ -193,7 +193,7 @@ public class SimpleSnapRounder implements Noder {
    * 
    */
   @Override
-  public Collection getNodedSubstrings() {
+  public Collection<NodedSegmentString> getNodedSubstrings() {
     return NodedSegmentString.getNodedSubstrings(nodedSegStrings);
   }
 

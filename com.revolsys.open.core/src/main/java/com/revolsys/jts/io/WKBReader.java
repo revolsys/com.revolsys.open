@@ -36,8 +36,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.CoordinateSequences;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -74,6 +74,69 @@ import com.revolsys.jts.geom.PrecisionModel;
 public class WKBReader {
   private static final String INVALID_GEOM_TYPE_MSG = "Invalid geometry type encountered in ";
 
+  public static CoordinatesList createClosedRing(final CoordinatesList seq,
+    final int size) {
+    final int axisCount = seq.getAxisCount();
+    final double[] coordinates = new double[size * axisCount];
+    final int n = seq.size();
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, seq, 0, n);
+    // fill remaining coordinates with start point
+    for (int i = n; i < size; i++) {
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq, 0, 1);
+    }
+    return new DoubleCoordinatesList(axisCount, coordinates);
+  }
+
+  /**
+   * Ensures that a CoordinatesList forms a valid ring, 
+   * returning a new closed sequence of the correct length if required.
+   * If the input sequence is already a valid ring, it is returned 
+   * without modification.
+   * If the input sequence is too short or is not closed, 
+   * it is extended with one or more copies of the start point.
+   * @param seq the sequence to test
+   * @param geometryFactory the CoordinateSequenceFactory to use to create the new sequence
+   * 
+   * @return the original sequence, if it was a valid ring, or a new sequence which is valid.
+   */
+  public static CoordinatesList ensureValidRing(final CoordinatesList seq) {
+    final int n = seq.size();
+    // empty sequence is valid
+    if (n == 0) {
+      return seq;
+    }
+    // too short - make a new one
+    if (n <= 3) {
+      return createClosedRing(seq, 4);
+    }
+
+    final boolean isClosed = seq.getValue(0, CoordinatesList.X) == seq.getValue(
+      n - 1, CoordinatesList.X)
+      && seq.getValue(0, CoordinatesList.Y) == seq.getValue(n - 1,
+        CoordinatesList.Y);
+    if (isClosed) {
+      return seq;
+    }
+    // make a new closed ring
+    return createClosedRing(seq, n + 1);
+  }
+
+  public static CoordinatesList extend(final CoordinatesList seq, final int size) {
+    final int axisCount = seq.getAxisCount();
+    final double[] coordinates = new double[size * axisCount];
+    final int n = seq.size();
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, seq, 0, n);
+
+    // fill remaining coordinates with end point, if it exists
+    if (n > 0) {
+      for (int i = n; i < size; i++) {
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq,
+          n - 1, 1);
+      }
+    }
+    return new DoubleCoordinatesList(axisCount, coordinates);
+  }
+
   /**
    * Converts a hexadecimal string to a byte array.
    * The hexadecimal digit symbols are case-insensitive.
@@ -105,6 +168,69 @@ public class WKBReader {
       throw new IllegalArgumentException("Invalid hex digit: '" + hex + "'");
     }
     return nib;
+  }
+
+  /**
+   * Tests whether two {@link CoordinatesList}s are equal.
+   * To be equal, the sequences must be the same length.
+   * They do not need to be of the same dimension, 
+   * but the ordinate values for the smallest dimension of the two
+   * must be equal.
+   * Two <code>NaN</code> ordinates values are considered to be equal. 
+   * 
+   * @param cs1 a CoordinatesList
+   * @param cs2 a CoordinatesList
+   * @return true if the sequences are equal in the common dimensions
+   */
+  public static boolean isEqual(final CoordinatesList cs1,
+    final CoordinatesList cs2) {
+    final int cs1Size = cs1.size();
+    final int cs2Size = cs2.size();
+    if (cs1Size != cs2Size) {
+      return false;
+    }
+    final int dim = Math.min(cs1.getAxisCount(), cs2.getAxisCount());
+    for (int i = 0; i < cs1Size; i++) {
+      for (int d = 0; d < dim; d++) {
+        final double v1 = cs1.getValue(i, d);
+        final double v2 = cs2.getValue(i, d);
+        if (cs1.getValue(i, d) == cs2.getValue(i, d)) {
+          continue;
+        }
+        // special check for NaNs
+        if (Double.isNaN(v1) && Double.isNaN(v2)) {
+          continue;
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Tests whether a {@link CoordinatesList} forms a valid {@link LinearRing},
+   * by checking the sequence length and closure
+   * (whether the first and last points are identical in 2D). 
+   * Self-intersection is not checked.
+   * 
+   * @param seq the sequence to test
+   * @return true if the sequence is a ring
+   * @see LinearRing
+   */
+  public static boolean isRing(final CoordinatesList seq) {
+    final int n = seq.size();
+    if (n == 0) {
+      return true;
+    }
+    // too few points
+    if (n <= 3) {
+      return false;
+    }
+    // test if closed
+    return seq.getValue(0, CoordinatesList.X) == seq.getValue(n - 1,
+      CoordinatesList.X)
+      && seq.getValue(0, CoordinatesList.Y) == seq.getValue(n - 1,
+        CoordinatesList.Y);
   }
 
   private final GeometryFactory factory;
@@ -187,18 +313,15 @@ public class WKBReader {
 
   private CoordinatesList readCoordinateSequence(final int size)
     throws IOException {
-    final CoordinatesList seq = new DoubleCoordinatesList(size, inputDimension);
-    int targetDim = seq.getAxisCount();
-    if (targetDim > inputDimension) {
-      targetDim = inputDimension;
-    }
+    final double[] coordinates = new double[size * inputDimension];
+
     for (int i = 0; i < size; i++) {
       readCoordinate();
-      for (int j = 0; j < targetDim; j++) {
-        seq.setValue(i, j, ordValues[j]);
+      for (int j = 0; j < inputDimension; j++) {
+        coordinates[i * inputDimension + j] = ordValues[j];
       }
     }
-    return seq;
+    return new DoubleCoordinatesList(inputDimension, coordinates);
   }
 
   private CoordinatesList readCoordinateSequenceLineString(final int size)
@@ -210,7 +333,7 @@ public class WKBReader {
     if (seq.size() == 0 || seq.size() >= 2) {
       return seq;
     }
-    return CoordinateSequences.extend(seq, 2);
+    return WKBReader.extend(seq, 2);
   }
 
   private CoordinatesList readCoordinateSequenceRing(final int size)
@@ -219,10 +342,10 @@ public class WKBReader {
     if (isStrict) {
       return seq;
     }
-    if (CoordinateSequences.isRing(seq)) {
+    if (isRing(seq)) {
       return seq;
     }
-    return CoordinateSequences.ensureValidRing(seq);
+    return WKBReader.ensureValidRing(seq);
   }
 
   private Geometry readGeometry() throws IOException, ParseException {

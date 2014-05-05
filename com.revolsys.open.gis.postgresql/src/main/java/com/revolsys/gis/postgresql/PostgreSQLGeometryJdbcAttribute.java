@@ -23,7 +23,6 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -59,7 +58,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     } else {
       if (object instanceof com.revolsys.jts.geom.Geometry) {
         final com.revolsys.jts.geom.Geometry geometry = (com.revolsys.jts.geom.Geometry)object;
-        object = geometryFactory.copy(geometry);
+        object = geometry.convert(geometryFactory);
       }
       Geometry geometry = null;
 
@@ -191,20 +190,19 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     final com.revolsys.jts.geom.GeometryFactory factory,
     final LineString lineString) {
     final Point[] points = lineString.getPoints();
-    final CoordinatesList coordinates = new DoubleCoordinatesList(
-      points.length, axisCount);
+    final double[] coordinates = new double[points.length * axisCount];
     for (int i = 0; i < points.length; i++) {
       final Point point = points[i];
-      coordinates.setX(i, point.x);
-      coordinates.setY(i, point.y);
+      coordinates[i * axisCount] = point.x;
+      coordinates[i * axisCount + 1] = point.y;
       if (axisCount > 2) {
-        coordinates.setZ(i, point.z);
+        coordinates[i * axisCount + 2] = point.z;
         if (axisCount > 3) {
-          coordinates.setValue(i, 3, point.m);
+          coordinates[i * axisCount + 3] = point.m;
         }
       }
     }
-    return factory.lineString(coordinates);
+    return factory.lineString(axisCount, coordinates);
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiLineString(
@@ -273,24 +271,23 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private com.revolsys.jts.geom.Polygon toJtsPolygon(
     final com.revolsys.jts.geom.GeometryFactory factory, final Polygon polygon) {
-    final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
+    final List<com.revolsys.jts.geom.LinearRing> rings = new ArrayList<>();
     for (int ringIndex = 0; ringIndex < polygon.numRings(); ringIndex++) {
       final LinearRing ring = polygon.getRing(ringIndex);
       final Point[] points = ring.getPoints();
-      final CoordinatesList coordinates = new DoubleCoordinatesList(
-        points.length, axisCount);
+      final double[] coordinates = new double[points.length * axisCount];
       for (int i = 0; i < points.length; i++) {
         final Point point = points[i];
-        coordinates.setValue(i, 0, point.x);
-        coordinates.setValue(i, 1, point.y);
+        coordinates[i * axisCount + 0] = point.x;
+        coordinates[i * axisCount + 1] = point.y;
         if (axisCount > 2) {
-          coordinates.setValue(i, 2, point.z);
+          coordinates[i * axisCount + 2] = point.z;
           if (axisCount > 3) {
-            coordinates.setValue(i, 3, point.m);
+            coordinates[i * axisCount + 3] = point.m;
           }
         }
       }
-      rings.add(coordinates);
+      rings.add(factory.linearRing(axisCount, coordinates));
     }
     return factory.polygon(rings);
   }

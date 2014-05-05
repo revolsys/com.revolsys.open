@@ -37,9 +37,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.CoordinateArrays;
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Wraps a {@link Noder} and transforms its input
@@ -79,8 +80,8 @@ public class ScaledNoder implements Noder {
   }
 
   @Override
-  public void computeNodes(final Collection inputSegStrings) {
-    Collection intSegStrings = inputSegStrings;
+  public void computeNodes(final Collection<NodedSegmentString> inputSegStrings) {
+    Collection<NodedSegmentString> intSegStrings = inputSegStrings;
     if (isScaled) {
       intSegStrings = scale(inputSegStrings);
     }
@@ -88,70 +89,81 @@ public class ScaledNoder implements Noder {
   }
 
   @Override
-  public Collection getNodedSubstrings() {
-    final Collection splitSS = noder.getNodedSubstrings();
+  public Collection<NodedSegmentString> getNodedSubstrings() {
+    final Collection<NodedSegmentString> segments = noder.getNodedSubstrings();
     if (isScaled) {
-      rescale(splitSS);
+      return rescale(segments);
     }
-    return splitSS;
+    return segments;
   }
 
   public boolean isIntegerPrecision() {
     return scaleFactor == 1.0;
   }
 
-  private void rescale(final Collection<SegmentString> segStrings) {
-    for (final SegmentString ss : segStrings) {
-      rescale(ss.getCoordinates());
+  private Collection<NodedSegmentString> rescale(
+    final Collection<NodedSegmentString> segments) {
+    final List<NodedSegmentString> newSegments = new ArrayList<NodedSegmentString>();
+    for (final NodedSegmentString segment : segments) {
+      final NodedSegmentString newSegment = rescale(segment);
+      newSegments.add(newSegment);
     }
+    return newSegments;
   }
 
-  private void rescale(final Coordinates[] pts) {
-    Coordinates p0 = null;
-    Coordinates p1 = null;
-
-    if (pts.length == 2) {
-      p0 = new Coordinate(pts[0]);
-      p1 = new Coordinate(pts[1]);
+  private NodedSegmentString rescale(final NodedSegmentString segment) {
+    final CoordinatesList points = segment.getPoints();
+    final int axisCount = points.getAxisCount();
+    final int vertexCount = points.size();
+    final double[] coordinates = new double[vertexCount * axisCount];
+    for (int i = 0; i < vertexCount; i++) {
+      final double x = points.getX(i) / scaleFactor + offsetX;
+      final double y = points.getY(i) / scaleFactor + offsetY;
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, x, y);
+      for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+        final double value = points.getValue(i, axisIndex);
+        coordinates[i * axisCount + axisIndex] = value;
+      }
     }
-
-    for (int i = 0; i < pts.length; i++) {
-      pts[i].setX(pts[i].getX() / scaleFactor + offsetX);
-      pts[i].setY(pts[i].getY() / scaleFactor + offsetY);
-    }
-
-    if (pts.length == 2 && pts[0].equals2d(pts[1])) {
-      System.out.println(pts);
-    }
+    final DoubleCoordinatesList newPoints = new DoubleCoordinatesList(
+      axisCount, coordinates);
+    final Object data = segment.getData();
+    return new NodedSegmentString(newPoints, data);
   }
 
-  // private double scale(double val) { return (double) Math.round(val *
-  // scaleFactor); }
-
-  private Collection<SegmentString> scale(
-    final Collection<SegmentString> segStrings) {
-    final List<SegmentString> result = new ArrayList<>();
-    for (final SegmentString ss : segStrings) {
-      Coordinates[] coordinates = ss.getCoordinates();
-      Object data = ss.getData();
-      Coordinates[] scale = scale(coordinates);
-      NodedSegmentString nodedSegmentString = new NodedSegmentString(scale,
-        data);
+  private Collection<NodedSegmentString> scale(
+    final Collection<NodedSegmentString> segments) {
+    final List<NodedSegmentString> result = new ArrayList<>();
+    for (final NodedSegmentString segment : segments) {
+      final Object data = segment.getData();
+      final CoordinatesList scale = scale(segment);
+      final NodedSegmentString nodedSegmentString = new NodedSegmentString(
+        scale, data);
       result.add(nodedSegmentString);
     }
     return result;
   }
 
-  private Coordinates[] scale(final Coordinates[] pts) {
-    final Coordinates[] roundPts = new Coordinates[pts.length];
-    for (int i = 0; i < pts.length; i++) {
-      roundPts[i] = new Coordinate(Math.round((pts[i].getX() - offsetX)
-        * scaleFactor), Math.round((pts[i].getY() - offsetY) * scaleFactor),
-        pts[i].getZ());
+  private CoordinatesList scale(final NodedSegmentString segment) {
+    final int vertexCount = segment.size();
+    final int axisCount = segment.getPoints().getAxisCount();
+    final double[] coordinates = new double[vertexCount * axisCount];
+    double previousX = Double.NaN;
+    double previousY = Double.NaN;
+    int j = 0;
+    for (int i = 0; i < vertexCount; i++) {
+      final Coordinates point = segment.getCoordinate(i);
+      final double x = Math.round((point.getX() - offsetX) * scaleFactor);
+      final double y = Math.round((point.getY() - offsetY) * scaleFactor);
+      final double z = point.getZ();
+      if (i == 0 || x != previousX && y != previousY) {
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, x, y, z);
+      }
+      previousX = x;
+      previousY = y;
     }
-    final Coordinates[] roundPtsNoDup = CoordinateArrays.removeRepeatedPoints(roundPts);
-    return roundPtsNoDup;
+    final CoordinatesList points = new DoubleCoordinatesList(axisCount, j,
+      coordinates);
+    return points;
   }
-
-  // private double rescale(double val) { return val / scaleFactor; }
 }

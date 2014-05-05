@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 
@@ -79,9 +80,9 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    * Adds entries for the first and last points of the edge to the list
    */
   public void addEndpoints() {
-    final int maxSegIndex = edge.pts.length - 1;
-    add(edge.pts[0], 0, 0.0);
-    add(edge.pts[maxSegIndex], maxSegIndex, 0.0);
+    final int maxSegIndex = edge.getNumPoints() - 1;
+    add(edge.getCoordinate(0), 0, 0.0);
+    add(edge.getCoordinate(maxSegIndex), maxSegIndex, 0.0);
   }
 
   /**
@@ -117,7 +118,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
 
-    final Coordinates lastSegStartPt = edge.pts[ei1.segmentIndex];
+    final Coordinates lastSegStartPt = edge.getCoordinate(ei1.segmentIndex);
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally
@@ -133,12 +134,13 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     int ipt = 0;
     pts[ipt++] = new Coordinate(ei0.coord);
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
-      pts[ipt++] = edge.pts[i];
+      pts[ipt++] = edge.getCoordinate(i);
     }
     if (useIntPt1) {
       pts[ipt] = ei1.coord;
     }
-    return new Edge(pts, new Label(edge.label));
+    final DoubleCoordinatesList points = new DoubleCoordinatesList(pts);
+    return new Edge(points, new Label(edge.label));
   }
 
   /**

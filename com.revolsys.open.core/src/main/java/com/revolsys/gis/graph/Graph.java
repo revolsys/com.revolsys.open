@@ -44,6 +44,7 @@ import com.revolsys.gis.graph.visitor.EdgeWithinDistance;
 import com.revolsys.gis.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
+import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
@@ -52,6 +53,7 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.jts.geom.BoundingBox;
@@ -1215,8 +1217,10 @@ public class Graph<T> {
 
               final CoordinatesList newPoints;
               if (startIndex > index) {
-                newPoints = CoordinatesListUtil.create(points.getAxisCount(),
-                  startPoint, point);
+                Coordinates[] coordinateArray = {
+                  startPoint, point
+                };
+                newPoints = new DoubleCoordinatesList(points.getAxisCount(), coordinateArray);
               } else {
                 newPoints = CoordinatesListUtil.subList(points, startPoint,
                   startIndex, index - startIndex + 1, point);
@@ -1284,7 +1288,8 @@ public class Graph<T> {
             if (CoordinatesUtil.isAcute(c1, c0, point)) {
               lines = LineStringUtil.split(line, 0, point);
             } else if (edge.getFromNode().getDegree() == 1) {
-              final LineString newLine = LineStringUtil.insert(line, 0, point);
+              final LineString newLine = GeometryEditUtil.insertVertex(line, 0,
+                point);
               lines = Collections.singletonList(newLine);
             } else {
               return Collections.singletonList(edge);
@@ -1306,7 +1311,7 @@ public class Graph<T> {
             if (CoordinatesUtil.isAcute(cn1, cn, point)) {
               lines = LineStringUtil.split(line, segmentIndex, point);
             } else if (edge.getToNode().getDegree() == 1) {
-              final LineString newLine = LineStringUtil.insert(line,
+              final LineString newLine = GeometryEditUtil.insertVertex(line,
                 line.getVertexCount(), point);
               lines = Collections.singletonList(newLine);
             } else {

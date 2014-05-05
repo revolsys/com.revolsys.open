@@ -23,10 +23,15 @@ public class DoubleCoordinates extends AbstractCoordinates implements
 
   public DoubleCoordinates(final Coordinates point, final int axisCount) {
     this(axisCount);
-    final int count = Math.min(axisCount, point.getAxisCount());
-    for (int i = 0; i < count; i++) {
-      final double value = point.getValue(i);
-      setValue(i, value);
+    final int pointAxisCount = point.getAxisCount();
+    for (int i = 0; i < axisCount; i++) {
+      final double value;
+      if (i < pointAxisCount) {
+        value = point.getValue(i);
+      } else {
+        value = Double.NaN;
+      }
+      this.coordinates[i] = value;
     }
   }
 
@@ -72,13 +77,6 @@ public class DoubleCoordinates extends AbstractCoordinates implements
       return coordinates[index];
     } else {
       return Double.NaN;
-    }
-  }
-
-  @Override
-  public void setValue(final int index, final double value) {
-    if (index >= 0 && index < getAxisCount()) {
-      coordinates[index] = value;
     }
   }
 

@@ -234,7 +234,7 @@ public class BoundingBoxTest implements TestConstants {
     // Different number of axis and values
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
-        final Coordinates[] points = new Coordinates[valueCount];
+        Coordinates[] points = new Coordinates[valueCount];
         final double[] bounds = EnvelopeUtil.createBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];
@@ -263,7 +263,7 @@ public class BoundingBoxTest implements TestConstants {
         final GeometryFactory gfFixed = GeometryFactory.getFactory(4326,
           axisCount, 10, 10);
 
-        gfFixed.makePrecise(points);
+        points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
         assertEnvelope(new Envelope(gfFixed, points), gfFixed, false,
           axisCount, boundsPrecise);
@@ -385,7 +385,6 @@ public class BoundingBoxTest implements TestConstants {
         final GeometryFactory gfFixed = GeometryFactory.getFactory(4326,
           axisCount, 10, 10);
 
-        gfFixed.makePrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
         assertEnvelope(new Envelope(gfFixed, points), gfFixed, false,
           axisCount, boundsPrecise);

@@ -38,15 +38,16 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.GeometryMapper;
 import com.revolsys.jts.geom.util.GeometryMapper.MapOp;
 import com.revolsys.jts.noding.SegmentString;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferInputLineSimplifier;
 import com.revolsys.jts.operation.buffer.BufferParameters;
-import com.revolsys.jts.operation.buffer.OffsetCurveBuilder;
 import com.revolsys.jts.operation.buffer.OffsetCurveSetBuilder;
 import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 
@@ -153,29 +154,32 @@ public class BufferFunctions {
     final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
       final Coordinates[] pts = CoordinatesListUtil.getCoordinateArray(line);
-      simpLines.add(geometry.getGeometryFactory().lineString(
-        BufferInputLineSimplifier.simplify(pts, distance)));
+      simpLines.add(geometry.getGeometryFactory()
+        .lineString(
+          BufferInputLineSimplifier.simplify(line.getCoordinatesList(),
+            distance)));
     }
     final Geometry simpGeom = geometry.getGeometryFactory().buildGeometry(
       simpLines);
     return simpGeom;
   }
 
-  private static Geometry buildCurveSet(final Geometry g, final double dist,
-    final BufferParameters bufParams) {
+  private static Geometry buildCurveSet(final Geometry geometry,
+    final double dist, final BufferParameters bufParams) {
     // --- now construct curve
-    final OffsetCurveBuilder ocb = new OffsetCurveBuilder(
-      g.getGeometryFactory().getPrecisionModel(), bufParams);
-    final OffsetCurveSetBuilder ocsb = new OffsetCurveSetBuilder(g, dist, ocb);
-    final List curves = ocsb.getCurves();
+    final PrecisionModel precisionModel = geometry.getGeometryFactory()
+      .getPrecisionModel();
+    final OffsetCurveSetBuilder curveBuilder = new OffsetCurveSetBuilder(
+      geometry, dist, precisionModel, bufParams);
+    final List curves = curveBuilder.getCurves();
 
-    final List lines = new ArrayList();
+    final List<LineString> lines = new ArrayList<LineString>();
     for (final Iterator i = curves.iterator(); i.hasNext();) {
       final SegmentString ss = (SegmentString)i.next();
-      final Coordinates[] pts = ss.getCoordinates();
-      lines.add(g.getGeometryFactory().lineString(pts));
+      final CoordinatesList points = ss.getPoints();
+      lines.add(geometry.getGeometryFactory().lineString(points));
     }
-    final Geometry curve = g.getGeometryFactory().buildGeometry(lines);
+    final Geometry curve = geometry.getGeometryFactory().geometry(lines);
     return curve;
   }
 
@@ -184,18 +188,6 @@ public class BufferFunctions {
     final BufferParameters bufParams = new BufferParameters();
     bufParams.setSingleSided(true);
     return Buffer.buffer(geom, distance, bufParams);
-  }
-
-  public static Geometry singleSidedBufferCurve(final Geometry geom,
-    final double distance) {
-    final BufferParameters bufParam = new BufferParameters();
-    bufParam.setSingleSided(true);
-    final OffsetCurveBuilder ocb = new OffsetCurveBuilder(
-      geom.getGeometryFactory().getPrecisionModel(), bufParam);
-    final Coordinates[] pts = ocb.getLineCurve(
-      CoordinatesListUtil.getCoordinateArray(geom), distance);
-    final Geometry curve = geom.getGeometryFactory().lineString(pts);
-    return curve;
   }
 
 }

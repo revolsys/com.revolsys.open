@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 /**
  *@version 1.7
  */
@@ -97,22 +98,22 @@ public class NonRobustLineIntersector extends LineIntersector {
 
     // check for single point intersection
     if (q4 == p1) {
-      pa.setCoordinate(p1);
+      pa = p1.cloneCoordinates();
       return POINT_INTERSECTION;
     }
     if (q3 == p2) {
-      pa.setCoordinate(p2);
+      pa = p2.cloneCoordinates();
       return POINT_INTERSECTION;
     }
 
     // intersection MUST be a segment - compute endpoints
-    pa.setCoordinate(p1);
+    pa = p1.cloneCoordinates();
     if (t3 > r1) {
-      pa.setCoordinate(q3);
+      pa = q3.cloneCoordinates();
     }
-    pb.setCoordinate(p2);
+    pb = p2.cloneCoordinates();
     if (t4 < r2) {
-      pb.setCoordinate(q4);
+      pb = q4.cloneCoordinates();
     }
     return COLLINEAR_INTERSECTION;
   }
@@ -197,7 +198,6 @@ public class NonRobustLineIntersector extends LineIntersector {
       return computeCollinearIntersection(p1, p2, p3, p4);
     }
     final double numX = b1 * c2 - b2 * c1;
-    pa.setX(numX / denom);
     /*
      * TESTING ONLY double valX = (( num < 0 ? num - offset : num + offset ) /
      * denom); double valXInt = (int) (( num < 0 ? num - offset : num + offset )
@@ -205,7 +205,7 @@ public class NonRobustLineIntersector extends LineIntersector {
      * " - int: " + valInt + ", floor: " + pa.x);
      */
     final double numY = a2 * c1 - a1 * c2;
-    pa.setY(numY / denom);
+    pa = new DoubleCoordinates(numX / denom, numY / denom);
 
     // check if this is a proper intersection BEFORE truncating values,
     // to avoid spurious equality comparisons with endpoints
@@ -217,7 +217,7 @@ public class NonRobustLineIntersector extends LineIntersector {
     // truncate computed point to precision grid
     // TESTING - don't force coord to be precise
     if (precisionModel != null) {
-      precisionModel.makePrecise(pa);
+      pa = precisionModel.getPrecise(pa);
     }
     return POINT_INTERSECTION;
   }

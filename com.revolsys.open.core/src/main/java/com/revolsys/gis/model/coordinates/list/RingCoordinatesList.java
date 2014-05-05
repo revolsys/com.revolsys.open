@@ -32,11 +32,6 @@ public class RingCoordinatesList extends DoubleCoordinatesList {
   }
 
   @Override
-  public void setValue(final int index, final int axisIndex, final double value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public int size() {
     return super.size() + 1;
   }

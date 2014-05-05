@@ -1,6 +1,5 @@
 package com.revolsys.gis.cs.parallel;
 
-import com.revolsys.gis.cs.projection.GeometryProjectionUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -21,8 +20,7 @@ public class GeometryProjection extends
     final Geometry geometry = object.getGeometryValue();
 
     if (geometry != null) {
-      final Geometry projectedGeometry = GeometryProjectionUtil.performCopy(
-        geometry, geometryFactory);
+      final Geometry projectedGeometry = geometry.copy(geometryFactory);
       if (geometry != projectedGeometry) {
         object.setGeometryValue(projectedGeometry);
       }

@@ -35,8 +35,6 @@ package com.revolsys.jts.geom;
 import java.io.Serializable;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
-
 /**
  * The internal representation of a list of coordinates inside a Geometry.
  * <p>
@@ -84,9 +82,6 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
   CoordinatesList clone();
 
   boolean contains(Coordinates point);
-
-  void copy(int sourceIndex, CoordinatesList target, int targetIndex,
-    int axisCount, int count);
 
   double distance(int index, Coordinates point);
 
@@ -175,37 +170,12 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
 
   boolean isCounterClockwise();
 
-  void makePrecise(CoordinatesPrecisionModel precisionModel);
-
   CoordinatesList reverse();
 
-  void setCoordinate(int i, Coordinates coordinate);
-
-  void setM(int index, double m);
-
-  void setPoint(int i, Coordinates point);
-
-  void setTime(int index, long time);
-
   /**
-   * Sets the value for a given ordinate of a coordinate in this sequence.
-   *
-   * @param index  the coordinate index in the sequence
-   * @param ordinateIndex the ordinate index in the coordinate (in range [0, dimension-1])
-   * @param value  the new ordinate value
-   */
-  void setValue(int index, int axisIndex, double value);
-
-  void setX(int index, double x);
-
-  void setY(int index, double y);
-
-  void setZ(int index, double z);
-
-  /**
-   * Returns the number of coordinates in this sequence.
-   * @return the size of the sequence
-   */
+     * Returns the number of coordinates in this sequence.
+     * @return the size of the sequence
+     */
   int size();
 
   boolean startsWith(CoordinatesList coordinatesList, int axisCount);

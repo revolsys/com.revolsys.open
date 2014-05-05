@@ -71,19 +71,22 @@ public class DistanceTest extends TestCase {
     final DistanceOp op = new DistanceOp(geometry1, geometry2);
     final double tolerance = 1E-10;
     final Coordinates[] nearestPoints = op.nearestPoints();
-    assertEquals(distance, nearestPoints[0].distance(nearestPoints[1]),
-      tolerance);
-    assertEquals(p0.getX(), nearestPoints[0].getX(), tolerance);
-    assertEquals(p0.getY(), nearestPoints[0].getY(), tolerance);
-    assertEquals(p1.getX(), nearestPoints[1].getX(), tolerance);
-    assertEquals(p1.getY(), nearestPoints[1].getY(), tolerance);
+    final Coordinates nearestPoint1 = nearestPoints[0];
+    final Coordinates nearestPoint2 = nearestPoints[1];
+    final double p1p2Distance = nearestPoint1.distance(nearestPoint2);
+    assertEquals(distance, p1p2Distance, tolerance);
+    assertEquals(p0.getX(), nearestPoint1.getX(), tolerance);
+    assertEquals(p0.getY(), nearestPoint1.getY(), tolerance);
+    assertEquals(p1.getX(), nearestPoint2.getX(), tolerance);
+    assertEquals(p1.getY(), nearestPoint2.getY(), tolerance);
   }
 
   public void testClosestPoints1() throws Exception {
-    doNearestPointsTest("POLYGON ((200 180, 60 140, 60 260, 200 180))",
-      "POINT (140 280)", 57.05597791103589, new Coordinate(111.6923076923077,
-        230.46153846153845, Coordinates.NULL_ORDINATE), new Coordinate(
-        (double)140, 280, Coordinates.NULL_ORDINATE));
+    final String wkt1 = "POLYGON ((200 180, 60 140, 60 260, 200 180))";
+    final String wkt2 = "POINT (140 280)";
+    final Coordinate p1 = new Coordinate(111.6923076923077, 230.46153846153845);
+    final Coordinate p2 = new Coordinate(140.0, 280);
+    doNearestPointsTest(wkt1, wkt2, 57.05597791103589, p1, p2);
   }
 
   public void testClosestPoints2() throws Exception {
@@ -103,9 +106,8 @@ public class DistanceTest extends TestCase {
 
   public void testClosestPoints4() throws Exception {
     doNearestPointsTest("LINESTRING (100 100, 200 200)",
-      "LINESTRING (100 200, 200 100)", 0.0, new Coordinate((double)150, 150,
-        Coordinates.NULL_ORDINATE), new Coordinate((double)150, 150,
-        Coordinates.NULL_ORDINATE));
+      "LINESTRING (100 200, 200 100)", 0.0,
+      new DoubleCoordinates(150.0, 150.0), new DoubleCoordinates(150.0, 150.0));
   }
 
   public void testClosestPoints5() throws Exception {

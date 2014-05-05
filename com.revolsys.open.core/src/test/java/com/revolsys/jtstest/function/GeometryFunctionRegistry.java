@@ -74,7 +74,6 @@ public class GeometryFunctionRegistry {
     funcRegistry.add(CreateFractalShapeFunctions.class);
     funcRegistry.add(CreateRandomShapeFunctions.class);
     funcRegistry.add(JTSFunctions.class);
-    funcRegistry.add(OffsetCurveFunctions.class);
     funcRegistry.add(CGAlgorithmFunctions.class);
     funcRegistry.add(OverlayFunctions.class);
     funcRegistry.add(OverlayNoSnapFunctions.class);

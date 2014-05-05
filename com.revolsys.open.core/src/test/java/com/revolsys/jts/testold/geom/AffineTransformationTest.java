@@ -43,16 +43,16 @@ public class AffineTransformationTest extends TestCase {
   void checkTransformation(final double x, final double y,
     final AffineTransformation trans, final double xp, final double yp) {
     final Coordinates p = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate();
-    trans.transform(p, p2);
+    final Coordinates p2 = trans.transform(p);
+
     assertEquals(xp, p2.getX(), .00005);
     assertEquals(yp, p2.getY(), .00005);
 
     // if the transformation is invertible, test the inverse
     try {
       final AffineTransformation invTrans = trans.getInverse();
-      final Coordinates pInv = new Coordinate();
-      invTrans.transform(p2, pInv);
+      final Coordinates pInv = invTrans.transform(p2);
+
       assertEquals(x, pInv.getX(), .00005);
       assertEquals(y, pInv.getY(), .00005);
 

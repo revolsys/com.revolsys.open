@@ -34,9 +34,11 @@ package com.revolsys.jts.index.chain;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.util.EnvelopeUtil;
 
 /**
  * Monotone Chains are a way of partitioning the segments of a linestring to
@@ -82,7 +84,7 @@ import com.revolsys.jts.geom.LineSegmentImpl;
  */
 public class MonotoneChain {
 
-  private final Coordinates[] pts;
+  private final CoordinatesList points;
 
   private final int start, end;
 
@@ -92,9 +94,9 @@ public class MonotoneChain {
 
   private int id;// useful for optimizing chain comparisons
 
-  public MonotoneChain(final Coordinates[] pts, final int start, final int end,
-    final Object context) {
-    this.pts = pts;
+  public MonotoneChain(final CoordinatesList pts, final int start,
+    final int end, final Object context) {
+    this.points = pts;
     this.start = start;
     this.end = end;
     this.context = context;
@@ -103,43 +105,39 @@ public class MonotoneChain {
   private void computeOverlaps(final int start0, final int end0,
     final MonotoneChain mc, final int start1, final int end1,
     final MonotoneChainOverlapAction mco) {
-    final Coordinates p00 = pts[start0];
-    final Coordinates p01 = pts[end0];
-    final Coordinates p10 = mc.pts[start1];
-    final Coordinates p11 = mc.pts[end1];
-    // Debug.println("computeIntersectsForChain:" + p00 + p01 + p10 + p11);
+    final Coordinates p00 = points.get(start0);
+    final Coordinates p01 = points.get(end0);
+    final Coordinates p10 = mc.points.get(start1);
+    final Coordinates p11 = mc.points.get(end1);
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {
       mco.overlap(this, start0, mc, start1);
       return;
     }
     // nothing to do if the envelopes of these chains don't overlap
-    mco.tempEnv1 = new Envelope(p00, p01);
-    mco.tempEnv2 = new Envelope(p10, p11);
-    if (!mco.tempEnv1.intersects(mco.tempEnv2)) {
-      return;
-    }
+    if (EnvelopeUtil.intersects(p00, p01, p10, p11)) {
 
-    // the chains overlap, so split each in half and iterate (binary search)
-    final int mid0 = (start0 + end0) / 2;
-    final int mid1 = (start1 + end1) / 2;
+      // the chains overlap, so split each in half and iterate (binary search)
+      final int mid0 = (start0 + end0) / 2;
+      final int mid1 = (start1 + end1) / 2;
 
-    // Assert: mid != start or end (since we checked above for end - start <= 1)
-    // check terminating conditions before recursing
-    if (start0 < mid0) {
-      if (start1 < mid1) {
-        computeOverlaps(start0, mid0, mc, start1, mid1, mco);
+      // mid != start or end (since we checked above for end - start <= 1)
+      // check terminating conditions before recursing
+      if (start0 < mid0) {
+        if (start1 < mid1) {
+          computeOverlaps(start0, mid0, mc, start1, mid1, mco);
+        }
+        if (mid1 < end1) {
+          computeOverlaps(start0, mid0, mc, mid1, end1, mco);
+        }
       }
-      if (mid1 < end1) {
-        computeOverlaps(start0, mid0, mc, mid1, end1, mco);
-      }
-    }
-    if (mid0 < end0) {
-      if (start1 < mid1) {
-        computeOverlaps(mid0, end0, mc, start1, mid1, mco);
-      }
-      if (mid1 < end1) {
-        computeOverlaps(mid0, end0, mc, mid1, end1, mco);
+      if (mid0 < end0) {
+        if (start1 < mid1) {
+          computeOverlaps(mid0, end0, mc, start1, mid1, mco);
+        }
+        if (mid1 < end1) {
+          computeOverlaps(mid0, end0, mc, mid1, end1, mco);
+        }
       }
     }
   }
@@ -165,8 +163,8 @@ public class MonotoneChain {
 
   private void computeSelect(final BoundingBox searchEnv, final int start0,
     final int end0, final MonotoneChainSelectAction mcs) {
-    final Coordinates p0 = pts[start0];
-    final Coordinates p1 = pts[end0];
+    final Coordinates p0 = points.get(start0);
+    final Coordinates p1 = points.get(end0);
     mcs.tempEnv1 = new Envelope(p0, p1);
 
     // Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
@@ -206,7 +204,7 @@ public class MonotoneChain {
     final Coordinates coord[] = new Coordinates[end - start + 1];
     int index = 0;
     for (int i = start; i <= end; i++) {
-      coord[index++] = pts[i];
+      coord[index++] = points.get(i);
     }
     return coord;
   }
@@ -217,8 +215,8 @@ public class MonotoneChain {
 
   public Envelope getEnvelope() {
     if (env == null) {
-      final Coordinates p0 = pts[start];
-      final Coordinates p1 = pts[end];
+      final Coordinates p0 = points.get(start);
+      final Coordinates p1 = points.get(end);
       env = new Envelope(p0, p1);
     }
     return env;
@@ -235,7 +233,7 @@ public class MonotoneChain {
    * @param ls line segment to extract into
    */
   public LineSegment getLineSegment(final int index) {
-    return new LineSegmentImpl(pts[index], pts[index + 1]);
+    return new LineSegmentImpl(points.get(index), points.get(index + 1));
   }
 
   public int getStartIndex() {

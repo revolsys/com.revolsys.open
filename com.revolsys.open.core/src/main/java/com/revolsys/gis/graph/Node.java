@@ -533,18 +533,6 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
   }
 
   @Override
-  public void setValue(final int index, final double value) {
-    switch (index) {
-      case 0:
-        x = value;
-      break;
-      case 1:
-        y = value;
-      break;
-    }
-  }
-
-  @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("Node: ");
     sb.append(' ');
