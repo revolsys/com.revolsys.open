@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
@@ -676,7 +678,11 @@ public class GeometryFactory implements Serializable,
 
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T geometry(final String wkt) {
-    return (T)parser.parseGeometry(wkt);
+    if (StringUtils.hasText(wkt)) {
+      return (T)parser.parseGeometry(wkt);
+    } else {
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")

@@ -69,7 +69,6 @@ import com.revolsys.jts.testold.io.WKBTest;
 import com.revolsys.jts.testold.io.WKTReaderTest;
 import com.revolsys.jts.testold.linearref.LengthIndexedLineTest;
 import com.revolsys.jts.testold.linearref.LocationIndexedLineTest;
-import com.revolsys.jts.testold.operation.BufferTest;
 import com.revolsys.jts.testold.operation.CascadedPolygonUnionTest;
 import com.revolsys.jts.testold.operation.DistanceTest;
 import com.revolsys.jts.testold.operation.IsValidTest;
@@ -90,7 +89,7 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
 @RunWith(Suite.class)
 @SuiteClasses({
   AngleTest.class, AreaLengthTest.class, BasicCoordinateSequenceTest.class,
-  BufferTest.class, CascadedPolygonUnionTest.class, OrientationIndexTest.class,
+  CascadedPolygonUnionTest.class, OrientationIndexTest.class,
   ConformingDelaunayTest.class, ConvexHullTest.class,
   CoordinateArraysTest.class, DelaunayTest.class, DistanceTest.class,
   GeometryCollectionImplTest.class, GeometryImplTest.class,
