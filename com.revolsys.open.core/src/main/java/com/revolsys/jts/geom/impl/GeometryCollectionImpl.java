@@ -51,8 +51,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public class GeometryCollectionImpl extends AbstractGeometryCollection
-  implements GeometryCollection {
+public class GeometryCollectionImpl extends AbstractGeometryCollection {
   // With contributions from Markus Schaber [schabios@logi-track.com] 2004-03-26
   private static final long serialVersionUID = -5694727726395021467L;
 

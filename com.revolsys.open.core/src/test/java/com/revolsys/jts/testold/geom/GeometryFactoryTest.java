@@ -64,7 +64,7 @@ public class GeometryFactoryTest extends TestCase {
   private void checkCreateGeometryExact(final String wkt) throws ParseException {
     final Geometry g = geometryFactory.geometry(wkt);
     final Geometry g2 = this.geometryFactory.geometry(g);
-    if (!g.equalsExact(g2)) {
+    if (!g.equalsExact2d(g2)) {
       failNotEquals("Geometry not equal exact", g, g2);
     }
   }

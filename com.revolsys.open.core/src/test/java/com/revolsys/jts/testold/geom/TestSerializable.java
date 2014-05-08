@@ -74,7 +74,7 @@ public class TestSerializable {
         matched = true;
       }
     } else if (o1 instanceof Geometry) {
-      if (!((Geometry)o1).equalsExact((Geometry)o2)) {
+      if (!((Geometry)o1).equalsExact2d((Geometry)o2)) {
         // System.out.println("expected " + o1 + ", found " + o2);
       } else {
         matched = true;

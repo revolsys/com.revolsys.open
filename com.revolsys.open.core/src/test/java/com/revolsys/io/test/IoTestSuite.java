@@ -97,6 +97,7 @@ public class IoTestSuite {
     final String geometryTypeString = dataType.toString();
     final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
       geometryTypeString);
+    metaData.addAttribute("ID", DataTypes.INT, true);
     metaData.addAttribute("GEOMETRY", dataType, true);
     metaData.setGeometryFactory(geometryFactory);
     final File file = new File("/tmp/revolsystest/io/" + fileExtension + "/"
@@ -112,6 +113,7 @@ public class IoTestSuite {
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
       final ArrayDataObject record = new ArrayDataObject(metaData);
+      record.setValue("ID", 1);
       record.setGeometryValue(geometry);
       writer.write(record);
     }

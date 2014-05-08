@@ -59,7 +59,7 @@ public class TestUtil {
       System.err.println(i + "\tEquals Srid\t" + expectedSrid + "\t"
         + actualSrid);
       return false;
-    } else if (actualGeometry.equalsExact(expectedGeometry)) {
+    } else if (actualGeometry.equalsExact2d(expectedGeometry)) {
       return true;
     } else {
       System.err.println(i + "\tEquals Exact\t" + expectedGeometry + "\t"

@@ -259,6 +259,24 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
   }
 
   @Override
+  protected boolean doEqualsExact(final Geometry geometry) {
+    final Polygon polygon = (Polygon)geometry;
+    final int ringCount = getRingCount();
+    if (ringCount != polygon.getRingCount()) {
+      return false;
+    } else {
+      for (int i = 0; i < ringCount; i++) {
+        final LinearRing ring = getRing(i);
+        final LinearRing otherRing = polygon.getRing(i);
+        if (!ring.equalsExact(otherRing)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {
       return false;

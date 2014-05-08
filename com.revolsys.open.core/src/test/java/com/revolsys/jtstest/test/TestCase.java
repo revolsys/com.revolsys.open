@@ -136,7 +136,7 @@ public class TestCase implements Testable {
   void assertEqualsExact(final Geometry g1, final Geometry g2, final String msg) {
     final Geometry g1Clone = g1.normalize();
     final Geometry g2Clone = g2.normalize();
-    assertTrue(g1Clone.equalsExact(g2Clone), msg);
+    assertTrue(g1Clone.equalsExact2d(g2Clone), msg);
   }
 
   void assertTrue(final boolean val, final String msg) {

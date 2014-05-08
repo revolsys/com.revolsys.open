@@ -39,6 +39,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
@@ -214,6 +215,19 @@ public class PointImpl extends AbstractGeometry implements Point {
   }
 
   @Override
+  protected boolean doEqualsExact(final Geometry geometry) {
+    final Point point = (Point)geometry;
+    for (int i = 0; i < getAxisCount(); i++) {
+      final double value = getValue(i);
+      final double otherValue = point.getValue(i);
+      if (!NumberEquals.equal(value, otherValue)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public boolean equals(final double... coordinates) {
     return CoordinatesUtil.equals(this, coordinates);
   }
@@ -222,7 +236,7 @@ public class PointImpl extends AbstractGeometry implements Point {
   public boolean equals(final Object other) {
     if (other instanceof Point) {
       final Point point = (Point)other;
-      return equalsExact(point);
+      return equalsExact2d(point);
     } else if (other instanceof Coordinates) {
       final Coordinates coordinates = (Coordinates)other;
       return equals2d(coordinates);

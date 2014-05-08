@@ -82,8 +82,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
         final String coordinatesString = coordinatesListArray[i];
         final String[] coordinatesArray = coordinatesString.split(",");
         final double[] coordinates = new double[coordinatesArray.length];
-        for (int axisIndex = 0; axisIndex < coordinatesArray.length
-          && axisIndex < 3; axisIndex++) {
+        for (int axisIndex = 0; axisIndex < coordinatesArray.length; axisIndex++) {
           final String coordinate = coordinatesArray[axisIndex];
           coordinates[axisIndex] = Double.valueOf(coordinate);
         }

@@ -150,7 +150,7 @@ public class BufferTest extends TestCase {
       Assert.assertEquals(message("Area", actual), expectedArea, area, 0);
     }
     if (expected != null) {
-      if (!actual.equalsExact(expected)) {
+      if (!actual.equalsExact2d(expected)) {
         TestUtil.failNotEquals(message("Geometry Equal", actual), expected,
           actual);
       }

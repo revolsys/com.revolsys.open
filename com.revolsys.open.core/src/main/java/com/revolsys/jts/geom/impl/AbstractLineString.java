@@ -168,6 +168,26 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
+  protected boolean doEqualsExact(final Geometry geometry) {
+    final LineString line = (LineString)geometry;
+    final int vertexCount = getVertexCount();
+    if (vertexCount == line.getVertexCount()) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+        for (int axisIndex = 0; axisIndex < getAxisCount(); axisIndex++) {
+          final double value = getCoordinate(vertexIndex, axisIndex);
+          final double otherValue = line.getCoordinate(vertexIndex, axisIndex);
+          if (!NumberEquals.equal(value, otherValue)) {
+            return false;
+          }
+        }
+      }
+    } else {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {
       return false;

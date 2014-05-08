@@ -71,7 +71,7 @@ public class NormalizeTest extends TestCase {
   private void assertEqualsExact(final Geometry expectedValue,
     final Geometry actualValue) {
     assertTrue("Expected " + expectedValue + " but encountered " + actualValue,
-      actualValue.equalsExact(expectedValue));
+      actualValue.equalsExact2d(expectedValue));
   }
 
   public void testCompareEmptyPoint() throws Exception {
@@ -161,7 +161,7 @@ public class NormalizeTest extends TestCase {
     final MultiPoint expectedValue = (MultiPoint)this.reader.read("MULTIPOINT(10 10, 20 10, 20 20, 30 20, 30 30)");
     assertEqualsExact(expectedValue, m);
     final MultiPoint unexpectedValue = (MultiPoint)this.reader.read("MULTIPOINT(20 10, 20 20, 30 20, 30 30, 10 10)");
-    assertTrue(!m.equalsExact(unexpectedValue));
+    assertTrue(!m.equalsExact2d(unexpectedValue));
   }
 
   public void testNormalizeMultiPolygon() throws Exception {

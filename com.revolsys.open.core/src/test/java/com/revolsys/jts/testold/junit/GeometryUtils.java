@@ -19,7 +19,7 @@ public class GeometryUtils {
   public static boolean isEqual(final Geometry a, final Geometry b) {
     final Geometry a2 = normalize(a);
     final Geometry b2 = normalize(b);
-    return a2.equalsExact(b2);
+    return a2.equalsExact2d(b2);
   }
 
   public static Geometry normalize(final Geometry g) {

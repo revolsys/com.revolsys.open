@@ -116,6 +116,24 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
   }
 
   @Override
+  protected boolean doEqualsExact(final Geometry geometry) {
+    final GeometryCollection collection = (GeometryCollection)geometry;
+    final int geometryCount = getGeometryCount();
+    if (geometryCount != collection.getGeometryCount()) {
+      return false;
+    } else {
+      for (int i = 0; i < geometryCount; i++) {
+        final Geometry part = getGeometry(i);
+        final Geometry otherPart = collection.getGeometry(i);
+        if (!part.equalsExact(otherPart)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {
       return false;

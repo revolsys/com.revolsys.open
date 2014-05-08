@@ -75,10 +75,6 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private final Resource resource;
 
-  private final double zMax = 0; // Double.MIN_VALUE;
-
-  private final double zMin = 0; // Double.MAX_VALUE;
-
   private int shapeType = ShapefileConstants.NULL_SHAPE;
 
   private DataType geometryDataType;
@@ -140,6 +136,15 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
           writer.close();
         }
       }
+    }
+  }
+
+  private void doubleNotNaN(final ResourceEndianOutput out, final double value)
+    throws IOException {
+    if (MathUtil.isNanOrInfinite(value)) {
+      out.writeLEDouble(0);
+    } else {
+      out.writeLEDouble(value);
     }
   }
 
@@ -207,26 +212,14 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
       out.writeInt(sizeInShorts);
       out.seek(32);
       out.writeLEInt(shapeType);
-      out.writeLEDouble(envelope.getMinX());
-      out.writeLEDouble(envelope.getMinY());
-      out.writeLEDouble(envelope.getMaxX());
-      out.writeLEDouble(envelope.getMaxY());
-      switch (shapeType) {
-        case ShapefileConstants.POINT_ZM_SHAPE:
-        case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
-        case ShapefileConstants.POLYLINE_ZM_SHAPE:
-        case ShapefileConstants.POLYGON_ZM_SHAPE:
-          out.writeLEDouble(zMin);
-          out.writeLEDouble(zMax);
-        break;
-
-        default:
-          out.writeLEDouble(0.0);
-          out.writeLEDouble(0.0);
-        break;
-      }
-      out.writeLEDouble(0.0);
-      out.writeLEDouble(0.0);
+      doubleNotNaN(out, envelope.getMinX());
+      doubleNotNaN(out, envelope.getMinY());
+      doubleNotNaN(out, envelope.getMaxX());
+      doubleNotNaN(out, envelope.getMaxY());
+      doubleNotNaN(out, envelope.getMin(2));
+      doubleNotNaN(out, envelope.getMax(2));
+      doubleNotNaN(out, envelope.getMin(3));
+      doubleNotNaN(out, envelope.getMax(3));
       out.close();
     }
   }

@@ -82,7 +82,7 @@ public class GeometryImplTest extends TestCase {
     final boolean equalsExact, final boolean equalsHash) {
     assertEquals(equalsGeometry, a.equals(b));
     assertEquals(equalsObject, a.equals((Object)b));
-    assertEquals(equalsExact, a.equalsExact(b));
+    assertEquals(equalsExact, a.equalsExact2d(b));
     assertEquals(equalsHash, a.hashCode() == b.hashCode());
   }
 
@@ -98,15 +98,15 @@ public class GeometryImplTest extends TestCase {
       differentClass = this.reader.read("POINT(2351 1563)");
     }
 
-    assertTrue(x.equalsExact(x));
-    assertTrue(x.equalsExact(somethingExactlyEqual));
-    assertTrue(somethingExactlyEqual.equalsExact(x));
+    assertTrue(x.equalsExact2d(x));
+    assertTrue(x.equalsExact2d(somethingExactlyEqual));
+    assertTrue(somethingExactlyEqual.equalsExact2d(x));
     // assertTrue(!x.equalsExact(somethingEqualButNotExactly));
     // assertTrue(!somethingEqualButNotExactly.equalsExact(x));
     // assertTrue(!x.equalsExact(somethingEqualButNotExactly));
     // assertTrue(!somethingEqualButNotExactly.equalsExact(x));
-    assertTrue(!x.equalsExact(differentClass));
-    assertTrue(!differentClass.equalsExact(x));
+    assertTrue(!x.equalsExact2d(differentClass));
+    assertTrue(!differentClass.equalsExact2d(x));
   }
 
   private void doTestEqualsExact(final Geometry x,

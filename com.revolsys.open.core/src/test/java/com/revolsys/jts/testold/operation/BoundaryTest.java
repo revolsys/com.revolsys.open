@@ -70,7 +70,7 @@ public class BoundaryTest extends TestCase {
     Geometry boundary = op.getBoundary();
     boundary = boundary.normalize();
     // System.out.println("Computed Boundary = " + boundary);
-    assertTrue(boundary.equalsExact(expected));
+    assertTrue(boundary.equalsExact2d(expected));
   }
 
   /**
