@@ -609,6 +609,11 @@ SWIGINTERN void FileGDBAPI_Row_setGeometry(FileGDBAPI::Row *self,char *byteArray
     shape.inUseLength = length;
     checkResult(self->SetGeometry(shape));
   }
+SWIGINTERN void FileGDBAPI_Row_setEmptyPoint(FileGDBAPI::Row *self){
+    FileGDBAPI::PointShapeBuffer shape;
+    shape.SetEmpty();
+    checkResult(self->SetGeometry(shape));
+  }
 SWIGINTERN std::vector< FileGDBAPI::FieldDef > FileGDBAPI_Row_getFields(FileGDBAPI::Row *self){
     std::vector<FileGDBAPI::FieldDef> value;
     checkResult(self->GetFields(value));
@@ -4565,6 +4570,23 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
     jenv->ReleaseByteArrayElements(jarg2, (jbyte *)arg2, 0);
   }
   
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Row_1setEmptyPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(FileGDBAPI::Row **)&jarg1; 
+  {
+    try {
+      FileGDBAPI_Row_setEmptyPoint(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleRuntimeError(jenv, e);
+    }
+  }
 }
 
 

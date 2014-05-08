@@ -28,8 +28,8 @@ public class GeometryTestUtil {
     double y;
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     if (coordinateSystem == null || geometryFactory.isGeographics()) {
-      x = -123.1234567;
-      y = 52.1234567;
+      x = -123.123456;
+      y = 52.123456;
     } else {
       final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
       x = Math.round(areaBoundingBox.getCentreX());

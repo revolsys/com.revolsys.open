@@ -7,7 +7,8 @@ public class WktlIoTest {
 
   public static Test suite() {
     final TestSuite suite = new TestSuite("WKT Geometry");
-    IoTestSuite.addWriteReadTestSuites(suite, "wkt");
+    IoTestSuite.addGeometryTestSuites(suite, "WKT", IoTestSuite.class,
+      "doWriteReadTest", "wkt");
     return suite;
   }
 }

@@ -3,7 +3,7 @@
 #/usr/lib/libFileGDBAPI.so
 
 
-ifeq "$(shell uname)" "Darwin"
+ifeq "$(shell uname)" "Darwin" jh
   OS=macosx
 else 
   OS=linux

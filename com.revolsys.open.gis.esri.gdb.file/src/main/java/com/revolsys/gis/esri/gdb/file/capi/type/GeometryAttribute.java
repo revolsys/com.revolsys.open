@@ -23,6 +23,7 @@ import com.revolsys.io.esri.gdb.xml.model.Field;
 import com.revolsys.io.esri.gdb.xml.model.GeometryDef;
 import com.revolsys.io.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.io.esri.gdb.xml.model.enums.GeometryType;
+import com.revolsys.io.shp.ShapefileConstants;
 import com.revolsys.io.shp.ShapefileGeometryUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -131,7 +132,22 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       try {
         final int type = in.readLEInt();
         if (type == 0) {
-          return null;
+          final DataType dataType = getType();
+          if (DataTypes.POINT.equals(dataType)) {
+            return geometryFactory.point();
+          } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+            return geometryFactory.multiPoint();
+          } else if (DataTypes.LINE_STRING.equals(dataType)) {
+            return geometryFactory.lineString();
+          } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
+            return geometryFactory.multiLineString();
+          } else if (DataTypes.POLYGON.equals(dataType)) {
+            return geometryFactory.polygon();
+          } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
+            return geometryFactory.multiPolygon();
+          } else {
+            return null;
+          }
         } else {
           final Geometry geometry = SHP_UTIL.read(readMethod, geometryFactory,
             in, -1);
@@ -162,7 +178,14 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
       final Geometry projectedGeometry = geometry.convert(geometryFactory);
       final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       final EndianOutput out = new EndianOutputStream(byteOut);
-      SHP_UTIL.write(writeMethod, out, projectedGeometry);
+      if (geometry.isEmpty()) {
+        try {
+          out.writeLEInt(ShapefileConstants.NULL_SHAPE);
+        } catch (final IOException e) {
+        }
+      } else {
+        SHP_UTIL.write(writeMethod, out, projectedGeometry);
+      }
       final byte[] bytes = byteOut.toByteArray();
       synchronized (getDataStore()) {
         row.setGeometry(bytes);

@@ -1,6 +1,7 @@
 package com.revolsys.io.test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,13 +37,14 @@ import com.revolsys.junit.InvokeMethodTestCase;
 })
 public class IoTestSuite {
 
-  public static void addWriteReadTestSuites(final TestSuite suite,
-    final String fileExtension) {
+  public static void addGeometryTestSuites(final TestSuite suite,
+    final String namePrefix, final Object methodObject,
+    final String methodName, final Object... extraParameters) {
     final List<DataType> geometryDataTypes = Arrays.asList(DataTypes.POINT,
       DataTypes.LINE_STRING, DataTypes.POLYGON, DataTypes.MULTI_POINT,
       DataTypes.MULTI_LINE_STRING, DataTypes.MULTI_POLYGON);
     for (final DataType dataType : geometryDataTypes) {
-      final TestSuite dataTypeSuite = new TestSuite(fileExtension + " "
+      final TestSuite dataTypeSuite = new TestSuite(namePrefix + " "
         + dataType.toString());
       suite.addTest(dataTypeSuite);
       for (int axisCount = 2; axisCount < 5; axisCount++) {
@@ -73,7 +75,7 @@ public class IoTestSuite {
               final Geometry geometry = GeometryTestUtil.geometry(
                 geometryFactory, dataType, geometryCount, ringCount,
                 vertexCount, delta);
-              String name = fileExtension + " " + dataType + " A=" + axisCount
+              String name = namePrefix + " " + dataType + " A=" + axisCount
                 + " G=" + geometryCount;
               if (maxVertexCount > 2) {
                 name += " V=" + vertexCount;
@@ -81,9 +83,15 @@ public class IoTestSuite {
               if (maxRingCount > 2) {
                 name += " R=" + ringCount;
               }
+              final List<Object> parameters = new ArrayList<>();
+              parameters.add(geometryFactory);
+              parameters.add(dataType);
+              parameters.add(geometry);
+              for (final Object parameter : extraParameters) {
+                parameters.add(parameter);
+              }
               final TestCase testCase = new InvokeMethodTestCase(name,
-                IoTestSuite.class, "doWriteReadTest", geometryFactory,
-                dataType, geometry, fileExtension);
+                methodObject, methodName, parameters);
               dataTypeSuite.addTest(testCase);
             }
           }

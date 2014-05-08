@@ -77,16 +77,16 @@ public class SpatialReference {
             if (this instanceof ProjectedCoordinateSystem) {
               xYScale = 1000;
             } else {
-              xYScale = 1000000;
+              xYScale = 10000000;
             }
           }
           zOrigin = -100000;
           zScale = geometryFactory.getScaleZ();
           if (zScale == 0) {
-            zScale = 1000;
+            zScale = 10000000;
           }
           mOrigin = -100000;
-          mScale = 1000;
+          mScale = 10000000;
           xYTolerance = 1.0 / xYScale;
           zTolerance = 1.0 / zScale;
           mTolerance = 1.0 / mScale;

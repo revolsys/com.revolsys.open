@@ -7,7 +7,10 @@ public class ShapefileIoTest {
 
   public static Test suite() {
     final TestSuite suite = new TestSuite("Shapefile Geometry");
-    IoTestSuite.addWriteReadTestSuites(suite, "shp");
+    IoTestSuite.addGeometryTestSuites(suite, "Shapefile", IoTestSuite.class,
+      "doWriteReadTest", "shp");
+    IoTestSuite.addGeometryTestSuites(suite, "Shapefile Zip",
+      IoTestSuite.class, "doWriteReadTest", "shpz");
     return suite;
   }
 }

@@ -6,6 +6,7 @@ ESRI_FILE_GBD_HOME=/opt/EsriFileGdb/1.3/${OS}/${ARCH}
 ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb/1.3/${OS}/${ARCH}/include
 
 CFG=Release
+CXX=g++-4.9
 
 include ${ESRI_FILE_GBD_INCLUDE}/make.include
 TARGET_OBJ=target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
@@ -24,7 +25,8 @@ ${TARGET_OBJ}: src/main/cxx/EsriFileGdb_wrap.cxx
 		${CXXFLAGS} \
 		-I${ESRI_FILE_GBD_INCLUDE} \
 		-I$JAVA_HOME/include/ \
-		-I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers/ \
+    -I/Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/include \
+    -I/Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home/include/darwin \
 		-c src/main/cxx/EsriFileGdb_wrap.cxx \
 		-o ${TARGET_OBJ}
 	
