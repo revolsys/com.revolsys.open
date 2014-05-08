@@ -62,6 +62,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private boolean loading = false;
 
+  private boolean loadMissingCodes = true;
+
   public CodeTableProperty() {
   }
 
@@ -258,6 +260,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
   @Override
   protected synchronized Object loadId(final List<Object> values,
     final boolean createId) {
+    if (loadAll && !loadMissingCodes && !isEmpty()) {
+      return null;
+    }
     Object id = null;
     if (createId && loadAll) {
       loadAll();
@@ -341,6 +346,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   public void setLoadAll(final boolean loadAll) {
     this.loadAll = loadAll;
+  }
+
+  public void setLoadMissingCodes(final boolean loadMissingCodes) {
+    this.loadMissingCodes = loadMissingCodes;
   }
 
   @Override

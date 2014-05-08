@@ -32,6 +32,9 @@ public class GmlFieldTypeRegistry {
     addFieldType(new GmlGeometryFieldType(DataTypes.POINT));
     addFieldType(new GmlGeometryFieldType(DataTypes.LINE_STRING));
     addFieldType(new GmlGeometryFieldType(DataTypes.POLYGON));
+    addFieldType(new GmlGeometryFieldType(DataTypes.MULTI_POINT));
+    addFieldType(new GmlGeometryFieldType(DataTypes.MULTI_LINE_STRING));
+    addFieldType(new GmlGeometryFieldType(DataTypes.MULTI_POLYGON));
   }
 
   public void addFieldType(final DataType dataType, final GmlFieldType fieldType) {

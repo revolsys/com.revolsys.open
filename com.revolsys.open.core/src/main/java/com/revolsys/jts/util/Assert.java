@@ -1,5 +1,3 @@
-
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -34,7 +32,6 @@
  */
 package com.revolsys.jts.util;
 
-
 /**
  *  A utility for making programming assertions.
  *
@@ -43,44 +40,14 @@ package com.revolsys.jts.util;
 public class Assert {
 
   /**
-   *  Throws an <code>AssertionFailedException</code> if the given assertion is
-   *  not true.
-   *
-   *@param  assertion                  a condition that is supposed to be true
-   *@throws  AssertionFailedException  if the condition is false
-   */
-  public static void isTrue(boolean assertion) {
-    isTrue(assertion, null);
-  }
-
-  /**
-   *  Throws an <code>AssertionFailedException</code> with the given message if
-   *  the given assertion is not true.
-   *
-   *@param  assertion                  a condition that is supposed to be true
-   *@param  message                    a description of the assertion
-   *@throws  AssertionFailedException  if the condition is false
-   */
-  public static void isTrue(boolean assertion, String message) {
-    if (!assertion) {
-      if (message == null) {
-        throw new AssertionFailedException();
-      }
-      else {
-        throw new AssertionFailedException(message);
-      }
-    }
-  }
-
-  /**
    *  Throws an <code>AssertionFailedException</code> if the given objects are
    *  not equal, according to the <code>equals</code> method.
    *
    *@param  expectedValue              the correct value
    *@param  actualValue                the value being checked
-   *@throws  AssertionFailedException  if the two objects are not equal
+   *@throws  AssertionError  if the two objects are not equal
    */
-  public static void equals(Object expectedValue, Object actualValue) {
+  public static void equals(final Object expectedValue, final Object actualValue) {
     equals(expectedValue, actualValue, null);
   }
 
@@ -92,19 +59,50 @@ public class Assert {
    *@param  expectedValue              the correct value
    *@param  actualValue                the value being checked
    *@param  message                    a description of the assertion
-   *@throws  AssertionFailedException  if the two objects are not equal
+   *@throws  AssertionError  if the two objects are not equal
    */
-  public static void equals(Object expectedValue, Object actualValue, String message) {
+  public static void equals(final Object expectedValue,
+    final Object actualValue, final String message) {
     if (!actualValue.equals(expectedValue)) {
-      throw new AssertionFailedException("Expected " + expectedValue + " but encountered "
-           + actualValue + (message != null ? ": " + message : ""));
+      throw new AssertionError("Expected " + expectedValue
+        + " but encountered " + actualValue
+        + (message != null ? ": " + message : ""));
+    }
+  }
+
+  /**
+   *  Throws an <code>AssertionFailedException</code> if the given assertion is
+   *  not true.
+   *
+   *@param  assertion                  a condition that is supposed to be true
+   *@throws  AssertionError  if the condition is false
+   */
+  public static void isTrue(final boolean assertion) {
+    isTrue(assertion, null);
+  }
+
+  /**
+   *  Throws an <code>AssertionFailedException</code> with the given message if
+   *  the given assertion is not true.
+   *
+   *@param  assertion                  a condition that is supposed to be true
+   *@param  message                    a description of the assertion
+   *@throws  AssertionError  if the condition is false
+   */
+  public static void isTrue(final boolean assertion, final String message) {
+    if (!assertion) {
+      if (message == null) {
+        throw new AssertionError();
+      } else {
+        throw new AssertionError(message);
+      }
     }
   }
 
   /**
    *  Always throws an <code>AssertionFailedException</code>.
    *
-   *@throws  AssertionFailedException  thrown always
+   *@throws  AssertionError  thrown always
    */
   public static void shouldNeverReachHere() {
     shouldNeverReachHere(null);
@@ -115,11 +113,10 @@ public class Assert {
    *  message.
    *
    *@param  message                    a description of the assertion
-   *@throws  AssertionFailedException  thrown always
+   *@throws  AssertionError  thrown always
    */
-  public static void shouldNeverReachHere(String message) {
-    throw new AssertionFailedException("Should never reach here"
-         + (message != null ? ": " + message : ""));
+  public static void shouldNeverReachHere(final String message) {
+    throw new AssertionError("Should never reach here"
+      + (message != null ? ": " + message : ""));
   }
 }
-

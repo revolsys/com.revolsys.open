@@ -10,10 +10,13 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.xml.StaxUtils;
+import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -51,11 +54,16 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   @Override
   protected Geometry getNext() {
     try {
-      final Geometry geometry = parseGeometry();
-      if (geometry == null) {
-        throw new NoSuchElementException();
+      if (StaxUtils.skipToChildStartElements(in, MULTI_GEOMETRY, POINT,
+        LINE_STRING, POLYGON)) {
+        final Geometry geometry = parseGeometry();
+        if (geometry == null) {
+          throw new NoSuchElementException();
+        } else {
+          return geometry;
+        }
       } else {
-        return geometry;
+        throw new NoSuchElementException();
       }
     } catch (final XMLStreamException e) {
       throw new RuntimeException(e.getMessage(), e);
@@ -65,161 +73,151 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   private CoordinatesList parseCoordinates() throws XMLStreamException {
     StaxUtils.requireLocalName(in, COORDINATES);
     final String coordinatesListString = StaxUtils.getElementText(in);
-    final String[] coordinatesListArray = coordinatesListString.trim().split(
-      "\\s+");
-    final double[] coordinates = new double[coordinatesListArray.length * 3];
-    for (int i = 0; i < coordinatesListArray.length; i++) {
-      final String coordinatesString = coordinatesListArray[i];
-      final String[] coordinatesArray = coordinatesString.split(",");
-      for (int ordinateIndex = 0; ordinateIndex < coordinatesArray.length
-        && ordinateIndex < 3; ordinateIndex++) {
-        final String coordinate = coordinatesArray[ordinateIndex];
-        coordinates[i * 3 + ordinateIndex] = Double.valueOf(coordinate);
+    if (StringUtils.hasText(coordinatesListString)) {
+      int axisCount = 2;
+      final String[] coordinatesListArray = coordinatesListString.trim().split(
+        "\\s+");
+      final List<Coordinates> points = new ArrayList<>();
+      for (int i = 0; i < coordinatesListArray.length; i++) {
+        final String coordinatesString = coordinatesListArray[i];
+        final String[] coordinatesArray = coordinatesString.split(",");
+        final double[] coordinates = new double[coordinatesArray.length];
+        for (int axisIndex = 0; axisIndex < coordinatesArray.length
+          && axisIndex < 3; axisIndex++) {
+          final String coordinate = coordinatesArray[axisIndex];
+          coordinates[axisIndex] = Double.valueOf(coordinate);
+        }
+        axisCount = Math.max(axisCount, coordinates.length);
+        points.add(new DoubleCoordinates(coordinates));
       }
+      StaxUtils.skipToEndElement(in);
+      return new DoubleCoordinatesList(axisCount, points);
+    } else {
+      return null;
     }
-    StaxUtils.skipToEndElementByLocalName(in, COORDINATES);
-    return new DoubleCoordinatesList(3, coordinates);
   }
 
   private Geometry parseGeometry() throws XMLStreamException {
-    if (in.getEventType() != XMLStreamConstants.START_ELEMENT) {
-      StaxUtils.skipToStartElement(in);
+    if (StaxUtils.matchElementLocalName(in, MULTI_GEOMETRY)) {
+      return parseMultiGeometry();
+    } else if (StaxUtils.matchElementLocalName(in, POINT)) {
+      return parsePoint();
+    } else if (StaxUtils.matchElementLocalName(in, LINE_STRING)) {
+      return parseLineString();
+    } else if (StaxUtils.matchElementLocalName(in, POLYGON)) {
+      return parsePolygon();
+    } else {
+      return null;
     }
-    while (in.getEventType() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, MULTI_GEOMETRY)) {
-        return parseMultiGeometry();
-      } else if (StaxUtils.matchElementLocalName(in, POINT)) {
-        return parsePoint();
-      } else if (StaxUtils.matchElementLocalName(in, LINE_STRING)) {
-        return parseLineString();
-      } else if (StaxUtils.matchElementLocalName(in, POLYGON)) {
-        return parsePolygon();
-      } else {
-        while (in.next() != XMLStreamConstants.START_ELEMENT
-          && in.getEventType() != XMLStreamConstants.END_DOCUMENT) {
-
-        }
-      }
-    }
-    return null;
-  }
-
-  private LinearRing parseInnerBoundary() throws XMLStreamException {
-    LinearRing ring = null;
-    StaxUtils.requireLocalName(in, INNER_BOUNDARY_IS);
-    while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (ring == null && StaxUtils.matchElementLocalName(in, LINEAR_RING)) {
-        ring = parseLinearRing();
-      } else {
-        StaxUtils.skipSubTree(in);
-      }
-    }
-    StaxUtils.skipToEndElementByLocalName(in, INNER_BOUNDARY_IS);
-    return ring;
   }
 
   private LinearRing parseLinearRing() throws XMLStreamException {
     StaxUtils.requireLocalName(in, LINEAR_RING);
-    CoordinatesList cooordinatesList = null;
-    while (!StaxUtils.isEndElementLocalName(in, LINEAR_RING)
-      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(in, COORDINATES)) {
-        cooordinatesList = parseCoordinates();
-      } else {
-        StaxUtils.skipSubTree(in);
-      }
+    CoordinatesList points = null;
+    if (StaxUtils.skipToChildStartElements(in, COORDINATES)) {
+      points = parseCoordinates();
+      StaxUtils.skipToEndElement(in);
+    } else {
+      StaxUtils.skipToEndElement(in, LINEAR_RING);
     }
-    StaxUtils.skipToEndElementByLocalName(in, LINEAR_RING);
-    final LinearRing ring = geometryFactory.linearRing(cooordinatesList);
-    return ring;
+
+    if (points == null) {
+      return this.geometryFactory.linearRing();
+    } else {
+      final int axisCount = points.getAxisCount();
+      final GeometryFactory geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
+      return geometryFactory.linearRing(points);
+    }
   }
 
   private LineString parseLineString() throws XMLStreamException {
     StaxUtils.requireLocalName(in, LINE_STRING);
-    CoordinatesList cooordinatesList = null;
+    CoordinatesList points = null;
     while (!StaxUtils.isEndElementLocalName(in, LINE_STRING)
       && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (StaxUtils.matchElementLocalName(in, COORDINATES)) {
-        cooordinatesList = parseCoordinates();
+        points = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    final LineString lineString = geometryFactory.lineString(cooordinatesList);
     StaxUtils.skipToEndElementByLocalName(in, LINE_STRING);
-    return lineString;
+    if (points == null) {
+      return this.geometryFactory.lineString();
+    } else {
+      final int axisCount = points.getAxisCount();
+      final GeometryFactory geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
+      return geometryFactory.lineString(points);
+    }
   }
 
   private Geometry parseMultiGeometry() throws XMLStreamException {
-    StaxUtils.requireLocalName(in, MULTI_GEOMETRY);
+    int axisCount = 2;
     final List<Geometry> geometries = new ArrayList<Geometry>();
-    while (!StaxUtils.isEndElementLocalName(in, MULTI_GEOMETRY)
-      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
+    while (StaxUtils.skipToChildStartElements(in, POINT, LINE_STRING, POLYGON)) {
       final Geometry geometry = parseGeometry();
       if (geometry != null) {
+        axisCount = Math.max(axisCount, geometry.getAxisCount());
         geometries.add(geometry);
       }
     }
+    final GeometryFactory geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
     final Geometry geometryCollection = geometryFactory.geometry(geometries);
-    StaxUtils.skipToEndElementByLocalName(in, MULTI_GEOMETRY);
-    return geometryCollection;
-  }
 
-  private LinearRing parseOuterBoundary() throws XMLStreamException {
-    StaxUtils.requireLocalName(in, OUTER_BOUNDARY_IS);
-    LinearRing ring = null;
-    while (!StaxUtils.isEndElementLocalName(in, OUTER_BOUNDARY_IS)
-      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (ring == null && StaxUtils.matchElementLocalName(in, LINEAR_RING)) {
-        ring = parseLinearRing();
-      } else {
-        StaxUtils.skipSubTree(in);
-      }
-    }
-    StaxUtils.skipToEndElementByLocalName(in, OUTER_BOUNDARY_IS);
-    return ring;
+    return geometryCollection;
   }
 
   private Point parsePoint() throws XMLStreamException {
     StaxUtils.requireLocalName(in, POINT);
-    CoordinatesList cooordinatesList = null;
+    CoordinatesList points = null;
     while (!StaxUtils.isEndElementLocalName(in, POINT)
       && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (cooordinatesList == null
-        && StaxUtils.matchElementLocalName(in, COORDINATES)) {
-        cooordinatesList = parseCoordinates();
+      if (points == null && StaxUtils.matchElementLocalName(in, COORDINATES)) {
+        points = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(in);
       }
     }
-    final Point point = geometryFactory.point(cooordinatesList);
     StaxUtils.skipToEndElementByLocalName(in, POINT);
-    return point;
+    if (points == null) {
+      return geometryFactory.point();
+    } else {
+      final int axisCount = points.getAxisCount();
+      final GeometryFactory geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
+      return geometryFactory.point(points);
+    }
   }
 
   private Polygon parsePolygon() throws XMLStreamException {
     StaxUtils.requireLocalName(in, POLYGON);
     final List<LinearRing> rings = new ArrayList<LinearRing>();
-    while (!StaxUtils.isEndElementLocalName(in, POLYGON)
-      && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (rings.isEmpty()) {
-        if (StaxUtils.matchElementLocalName(in, OUTER_BOUNDARY_IS)) {
-          rings.add(parseOuterBoundary());
-        } else {
-          StaxUtils.skipSubTree(in);
-        }
-      } else if (StaxUtils.matchElementLocalName(in, INNER_BOUNDARY_IS)) {
-        final LinearRing innerRing = parseInnerBoundary();
-        if (innerRing != null) {
-          rings.add(innerRing);
-        }
-      } else {
-        StaxUtils.skipSubTree(in);
+    int axisCount = 2;
+
+    if (StaxUtils.skipToChildStartElements(in, OUTER_BOUNDARY_IS)) {
+      final LinearRing exteriorRing = parseRing();
+      axisCount = Math.max(axisCount, exteriorRing.getAxisCount());
+      rings.add(exteriorRing);
+      StaxUtils.skipToEndElement(in, OUTER_BOUNDARY_IS);
+      while (StaxUtils.skipToChildStartElements(in, INNER_BOUNDARY_IS)) {
+        final LinearRing interiorRing = parseRing();
+        axisCount = Math.max(axisCount, interiorRing.getAxisCount());
+        rings.add(interiorRing);
+        StaxUtils.skipToEndElement(in, INNER_BOUNDARY_IS);
       }
     }
+    final GeometryFactory geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
     final Polygon polygon = geometryFactory.polygon(rings);
-    StaxUtils.skipToEndElementByLocalName(in, POLYGON);
     return polygon;
+  }
+
+  private LinearRing parseRing() throws XMLStreamException {
+    if (StaxUtils.skipToChildStartElements(in, LINEAR_RING)) {
+      final LinearRing ring = parseLinearRing();
+      return ring;
+    } else {
+      StaxUtils.skipToEndElement(in);
+      return null;
+    }
   }
 
   @Override

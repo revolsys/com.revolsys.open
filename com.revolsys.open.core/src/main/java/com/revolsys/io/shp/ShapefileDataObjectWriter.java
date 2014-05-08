@@ -44,6 +44,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.xbase.FieldDefinition;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -56,7 +57,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
-  private final Envelope envelope = new Envelope();
+  private BoundingBox envelope = new Envelope();
 
   private GeometryFactory geometryFactory;
 
@@ -79,6 +80,8 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   private final double zMin = 0; // Double.MAX_VALUE;
 
   private int shapeType = ShapefileConstants.NULL_SHAPE;
+
+  private DataType geometryDataType;
 
   public ShapefileDataObjectWriter(final DataObjectMetaData metaData,
     final Resource resource) {
@@ -116,11 +119,6 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
       out = null;
       indexOut = null;
     }
-  }
-
-  private void createGeometryWriter(final Geometry geometry) {
-    geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(geometry);
-    shapeType = ShapefileGeometryUtil.getShapeType(geometry);
   }
 
   private void createPrjFile(
@@ -168,6 +166,10 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
           writeHeader(indexOut);
         }
         geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+        final Object geometryType = getProperty(IoConstants.GEOMETRY_TYPE);
+        if (geometryType != null) {
+          this.geometryDataType = DataTypes.getType(geometryType.toString());
+        }
       }
     }
   }
@@ -175,13 +177,20 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   @Override
   protected void preFirstWrite(final DataObject object) throws IOException {
     if (geometryPropertyName != null) {
-      if (geometryFactory == null) {
-        final Geometry geometry = object.getGeometryValue();
-        if (geometry != null) {
-          geometryFactory = GeometryFactory.getFactory(geometry);
+      final Geometry geometry = object.getGeometryValue();
+      if (geometry != null) {
+        if (geometryFactory == null) {
+          this.geometryFactory = geometry.getGeometryFactory();
         }
+        if (this.geometryDataType == null) {
+          this.geometryDataType = geometry.getDataType();
+        }
+        shapeType = ShapefileGeometryUtil.SHP_INSTANCE.getShapeType(
+          this.geometryFactory, this.geometryDataType);
+        geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(
+          this.geometryFactory, this.geometryDataType);
       }
-      createPrjFile(geometryFactory);
+      createPrjFile(this.geometryFactory);
     }
   }
 
@@ -229,26 +238,21 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
       final long recordIndex = out.getFilePointer();
       Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
-        geometry = geometry.copy(geometryFactory);
+        geometry = geometry.convert(geometryFactory);
       }
-      envelope.expandToInclude(geometry.getBoundingBox());
+      envelope = envelope.expandToInclude(geometry.getBoundingBox());
+      out.writeInt(recordNumber++);
       if (geometry == null || geometry.isEmpty()) {
         writeNull(out);
       } else {
-        if (geometryWriteMethod == null) {
-          createGeometryWriter(geometry);
-        }
-        out.writeInt(recordNumber);
         SHP_WRITER.write(geometryWriteMethod, out, geometry);
-
-        recordNumber++;
-        if (indexOut != null) {
-          final long recordLength = out.getFilePointer() - recordIndex;
-          final int offsetShort = (int)(recordIndex / MathUtil.BYTES_IN_SHORT);
-          indexOut.writeInt(offsetShort);
-          final int lengthShort = (int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4;
-          indexOut.writeInt(lengthShort);
-        }
+      }
+      if (indexOut != null) {
+        final long recordLength = out.getFilePointer() - recordIndex;
+        final int offsetShort = (int)(recordIndex / MathUtil.BYTES_IN_SHORT);
+        indexOut.writeInt(offsetShort);
+        final int lengthShort = (int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4;
+        indexOut.writeInt(lengthShort);
       }
       return true;
     } else {

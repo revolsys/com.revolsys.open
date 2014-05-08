@@ -49,7 +49,7 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
 
   @Override
   protected void doInit() {
-    com.revolsys.jts.geom.GeometryFactory geometryFactory;
+    GeometryFactory geometryFactory;
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute == null) {
       geometryFactory = GeometryFactory.getFactory();

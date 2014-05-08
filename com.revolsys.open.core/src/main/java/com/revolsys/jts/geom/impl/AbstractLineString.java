@@ -204,6 +204,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
           }
         }
       }
+      return true;
     }
     return false;
   }

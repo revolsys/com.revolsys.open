@@ -217,8 +217,8 @@ public class WktParser {
         geometry = parseLineString(geometryFactory,
           useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "POLYGON")) {
-        geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory,
-          text);
+        geometry = parsePolygon(geometryFactory,
+          useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "MULTIPOINT")) {
         geometry = parseMultiPoint(geometryFactory,
           useAxisCountFromGeometryFactory, text);
@@ -234,8 +234,8 @@ public class WktParser {
       if (this.geometryFactory.getSrid() == 0) {
         final int srid = geometry.getSrid();
         if (useAxisCountFromGeometryFactory) {
-          geometryFactory = GeometryFactory.getFactory(srid, axisCount, scaleXY,
-            scaleZ);
+          geometryFactory = GeometryFactory.getFactory(srid, axisCount,
+            scaleXY, scaleZ);
           return (T)geometryFactory.geometry(geometry);
         } else {
           return (T)geometry;
@@ -252,7 +252,7 @@ public class WktParser {
 
   private LineString parseLineString(GeometryFactory geometryFactory,
     final boolean useAxisCountFromGeometryFactory, final StringBuffer text) {
-    int axisCount = getAxisCount(text);
+    final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getSrid();
@@ -261,8 +261,6 @@ public class WktParser {
         geometryFactory = GeometryFactory.getFactory(srid, axisCount, scaleXY,
           scaleZ);
       }
-    } else {
-      axisCount = geometryFactory.getAxisCount();
     }
     if (isEmpty(text)) {
       return geometryFactory.lineString();
@@ -422,7 +420,7 @@ public class WktParser {
 
   private Polygon parsePolygon(GeometryFactory geometryFactory,
     final boolean useAxisCountFromGeometryFactory, final StringBuffer text) {
-    int axisCount = getAxisCount(text);
+    final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getSrid();
@@ -431,8 +429,6 @@ public class WktParser {
         geometryFactory = GeometryFactory.getFactory(srid, axisCount, scaleXY,
           scaleZ);
       }
-    } else {
-      axisCount = geometryFactory.getAxisCount();
     }
 
     final List<CoordinatesList> parts;

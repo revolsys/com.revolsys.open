@@ -123,6 +123,7 @@ public class BufferTest extends TestCase {
     this.expectedHoles = expectedHoles;
     this.expectedContains = expectedContains;
     this.expectedArea = expectedArea;
+    setName(index + " " + source.getDataType() + " " + distance);
   }
 
   private boolean contains(final Geometry a, final Geometry b) {

@@ -176,7 +176,12 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
         }
       }
       if (geometry != null) {
-        writer.writeGeometry(geometry);
+        GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+        if (geometryFactory == null) {
+          geometryFactory = geometry.getGeometryFactory();
+        }
+        int axisCount = geometryFactory.getAxisCount();
+        writer.writeGeometry(geometry, axisCount);
       }
     }
     writer.endTag();

@@ -43,7 +43,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   }
 
   private static final ShapefileGeometryUtil SHP_UTIL = new ShapefileGeometryUtil(
-    true);
+    false);
 
   private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
@@ -134,7 +134,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
           return null;
         } else {
           final Geometry geometry = SHP_UTIL.read(readMethod, geometryFactory,
-            in);
+            in, -1);
           return geometry;
         }
       } catch (final IOException e) {

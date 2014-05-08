@@ -57,6 +57,7 @@ public class ShapefileConstants {
 
   public static final int POINT_SHAPE = 1;
 
+  /** Only used for FGDB. */
   public static final int POINT_Z_SHAPE = 9;
 
   public static final int POINT_ZM_SHAPE = 11;

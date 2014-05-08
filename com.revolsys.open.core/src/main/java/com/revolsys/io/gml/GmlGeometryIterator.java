@@ -120,7 +120,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   }
 
   private com.revolsys.jts.geom.GeometryFactory getGeometryFactory(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactory) {
     final String srsName = in.getAttributeValue(SRS_NAME.getNamespaceURI(),
       SRS_NAME.getLocalPart());
     if (srsName == null) {
@@ -128,11 +128,11 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     } else {
       if (srsName.startsWith("urn:ogc:def:crs:EPSG:6.6:")) {
         final int srid = Integer.parseInt(srsName.substring("urn:ogc:def:crs:EPSG:6.6:".length()));
-        final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(srid);
+        final GeometryFactory factory = GeometryFactory.getFactory(srid);
         return factory;
       } else if (srsName.startsWith("EPSG:")) {
         final int srid = Integer.parseInt(srsName.substring("EPSG:".length()));
-        final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(srid);
+        final GeometryFactory factory = GeometryFactory.getFactory(srid);
         return factory;
       } else {
         return geometryFactory;
@@ -179,8 +179,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return points;
   }
 
-  private Geometry readGeometry(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+  private Geometry readGeometry(final GeometryFactory geometryFactory)
     throws XMLStreamException {
     final QName typeName = in.getName();
     if (typeName.equals(POINT)) {
@@ -202,10 +201,9 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     }
   }
 
-  private LinearRing readLinearRing(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+  private LinearRing readLinearRing(final GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
     CoordinatesList points = null;
     if (StaxUtils.skipToChildStartElements(in, POS_LIST, COORDINATES)) {
       final QName elementName = in.getName();
@@ -218,116 +216,130 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     } else {
       StaxUtils.skipToEndElement(in, LINEAR_RING);
     }
-    return factory.linearRing(points);
+    if (points == null) {
+      return factory.linearRing();
+    } else {
+      final int axisCount = points.getAxisCount();
+      return factory.convertAxisCount(axisCount).linearRing(points);
+    }
   }
 
-  private LineString readLineString(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+  private LineString readLineString(final GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
     CoordinatesList points = null;
-    if (StaxUtils.skipToChildStartElements(in, POS_LIST)) {
-      points = readPosList();
-      StaxUtils.skipToEndElement(in, LINE_STRING);
-    } else if (StaxUtils.skipToChildStartElements(in, COORDINATES)) {
-      points = readCoordinates();
-      StaxUtils.skipToEndElement(in, LINE_STRING);
+    if (StaxUtils.skipToChildStartElements(in, POS_LIST, COORDINATES)) {
+      if (in.getName().equals(POS)) {
+        points = readPosList();
+      } else if (in.getName().equals(COORDINATES)) {
+        points = readCoordinates();
+      }
     } else {
       StaxUtils.skipToEndElement(in, LINE_STRING);
     }
-    return factory.lineString(points);
+    if (points == null) {
+      return factory.lineString();
+    } else {
+      final int axisCount = points.getAxisCount();
+      return factory.convertAxisCount(axisCount).lineString(points);
+    }
   }
 
-  private Geometry readMultiGeometry(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+  private Geometry readMultiGeometry(final GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<Geometry> geometries = new ArrayList<Geometry>();
     StaxUtils.skipSubTree(in);
     return factory.geometry(geometries);
   }
 
   private MultiLineString readMultiLineString(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
-    throws XMLStreamException {
-    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final GeometryFactory geometryFactory) throws XMLStreamException {
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
+    int axisCount = 2;
     final List<LineString> lines = new ArrayList<LineString>();
     while (StaxUtils.skipToChildStartElements(in, LINE_STRING)) {
       final LineString line = readLineString(factory);
       if (line != null) {
+        axisCount = Math.max(axisCount, line.getAxisCount());
         lines.add(line);
       }
     }
     StaxUtils.skipToEndElement(in, MULTI_LINE_STRING);
-    return factory.multiLineString(lines);
+    return factory.convertAxisCount(axisCount).multiLineString(lines);
   }
 
-  private MultiPoint readMultiPoint(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+  private MultiPoint readMultiPoint(final GeometryFactory geometryFactory)
     throws XMLStreamException {
+    int axisCount = 2;
     final List<Point> points = new ArrayList<Point>();
-    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
     while (StaxUtils.skipToChildStartElements(in, POINT)) {
       final Point point = readPoint(factory);
       if (point != null) {
+        axisCount = Math.max(axisCount, point.getAxisCount());
         points.add(point);
       }
     }
     StaxUtils.skipToEndElement(in, MULTI_POINT);
-    return factory.multiPoint(points);
+    return factory.convertAxisCount(axisCount).multiPoint(points);
   }
 
-  private MultiPolygon readMultiPolygon(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+  private MultiPolygon readMultiPolygon(final GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
+    int axisCount = 2;
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<Polygon> polygons = new ArrayList<Polygon>();
     while (StaxUtils.skipToChildStartElements(in, POLYGON)) {
       final Polygon polygon = readPolygon(factory);
       if (polygon != null) {
+        axisCount = Math.max(axisCount, polygon.getAxisCount());
         polygons.add(polygon);
       }
     }
     StaxUtils.skipToEndElement(in, MULTI_POLYGON);
-    return factory.multiPolygon(polygons);
+    return factory.convertAxisCount(axisCount).multiPolygon(polygons);
   }
 
-  private Point readPoint(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+  private Point readPoint(final GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
     CoordinatesList points = null;
-    if (StaxUtils.skipToChildStartElements(in, POS)) {
-      points = readPosList();
-      StaxUtils.skipToEndElement(in, POINT);
-    } else if (StaxUtils.skipToChildStartElements(in, COORDINATES)) {
-      points = readCoordinates();
-      StaxUtils.skipToEndElement(in, POINT);
+    if (StaxUtils.skipToChildStartElements(in, POS, COORDINATES)) {
+      if (in.getName().equals(POS)) {
+        points = readPosList();
+      } else if (in.getName().equals(COORDINATES)) {
+        points = readCoordinates();
+      }
     } else {
       StaxUtils.skipToEndElement(in, POINT);
     }
-    return factory.point(points);
+    if (points == null) {
+      return factory.point();
+    } else {
+      final int axisCount = points.getAxisCount();
+      return factory.convertAxisCount(axisCount).point(points);
+    }
   }
 
-  private Polygon readPolygon(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+  private Polygon readPolygon(final GeometryFactory geometryFactory)
     throws XMLStreamException {
-    final com.revolsys.jts.geom.GeometryFactory factory = getGeometryFactory(geometryFactory);
+    int axisCount = 0;
+    final GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<LinearRing> rings = new ArrayList<LinearRing>();
     if (StaxUtils.skipToChildStartElements(in, OUTER_BOUNDARY_IS)) {
       final LinearRing exteriorRing = readLinearRing(factory);
+      axisCount = Math.max(axisCount, exteriorRing.getAxisCount());
       rings.add(exteriorRing);
       StaxUtils.skipToEndElement(in, OUTER_BOUNDARY_IS);
       while (StaxUtils.skipToChildStartElements(in, INNER_BOUNDARY_IS)) {
         final LinearRing interiorRing = readLinearRing(factory);
+        axisCount = Math.max(axisCount, interiorRing.getAxisCount());
         rings.add(interiorRing);
         StaxUtils.skipToEndElement(in, INNER_BOUNDARY_IS);
       }
-      StaxUtils.skipToEndElement(in, POLYGON);
-    } else {
-      StaxUtils.skipSubTree(in);
     }
-    final Polygon polygon = factory.polygon(rings);
+    final Polygon polygon = factory.convertAxisCount(axisCount).polygon(rings);
     return polygon;
   }
 

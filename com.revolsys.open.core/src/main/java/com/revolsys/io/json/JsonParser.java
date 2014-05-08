@@ -75,6 +75,8 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
       }
 
       return MathUtil.toDoubleArray(list);
+    } else if (parser.getEvent() == EventType.nullValue) {
+      return null;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
         + parser.getEvent());

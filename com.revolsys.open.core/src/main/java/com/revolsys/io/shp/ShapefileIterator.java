@@ -40,7 +40,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
 
   private DataObjectFactory dataObjectFactory;
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private EndianInput in;
 
@@ -115,14 +115,25 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
         loadHeader();
         int axisCount = 3;
         int srid = 0;
-        if (shapeType < 10) {
-          axisCount = 2;
-        } else if (shapeType < 20) {
-          axisCount = 3;
-        } else if (shapeType < 30) {
-          axisCount = 4;
-        } else {
-          axisCount = 4;
+        switch (shapeType) {
+          case ShapefileConstants.POINT_Z_SHAPE:
+            axisCount = 4;
+          break;
+          case ShapefileConstants.POINT_M_SHAPE:
+          case ShapefileConstants.POINT_ZM_SHAPE:
+            axisCount = 4;
+          break;
+          default:
+            if (shapeType < 10) {
+              axisCount = 2;
+            } else if (shapeType < 20) {
+              axisCount = 3;
+            } else if (shapeType < 30) {
+              axisCount = 4;
+            } else {
+              axisCount = 4;
+            }
+          break;
         }
         geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         final Resource projResource = this.resource.createRelative(name
@@ -253,8 +264,76 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
     final int recordNumber = in.readInt();
     final int recordLength = in.readInt();
     final int shapeType = in.readLEInt();
-    return ShapefileGeometryUtil.SHP_INSTANCE.read(geometryFactory, in,
-      shapeType);
+    final ShapefileGeometryUtil util = ShapefileGeometryUtil.SHP_INSTANCE;
+    switch (shapeType) {
+      case ShapefileConstants.NULL_SHAPE:
+        switch (this.shapeType) {
+          case ShapefileConstants.POINT_SHAPE:
+          case ShapefileConstants.POINT_M_SHAPE:
+          case ShapefileConstants.POINT_Z_SHAPE:
+          case ShapefileConstants.POINT_ZM_SHAPE:
+            return geometryFactory.point();
+
+          case ShapefileConstants.MULTI_POINT_SHAPE:
+          case ShapefileConstants.MULTI_POINT_M_SHAPE:
+          case ShapefileConstants.MULTI_POINT_Z_SHAPE:
+          case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
+            return geometryFactory.multiPoint();
+
+          case ShapefileConstants.POLYLINE_SHAPE:
+          case ShapefileConstants.POLYLINE_M_SHAPE:
+          case ShapefileConstants.POLYLINE_Z_SHAPE:
+          case ShapefileConstants.POLYLINE_ZM_SHAPE:
+            return geometryFactory.multiLineString();
+
+          case ShapefileConstants.POLYGON_SHAPE:
+          case ShapefileConstants.POLYGON_M_SHAPE:
+          case ShapefileConstants.POLYGON_Z_SHAPE:
+          case ShapefileConstants.POLYGON_ZM_SHAPE:
+            return geometryFactory.multiPolygon();
+          default:
+            throw new IllegalArgumentException(
+              "Shapefile shape type not supported: " + shapeType);
+        }
+      case ShapefileConstants.POINT_SHAPE:
+        return util.readPoint(geometryFactory, in, recordLength);
+      case ShapefileConstants.POINT_M_SHAPE:
+        return util.readPointM(geometryFactory, in, recordLength);
+      case ShapefileConstants.POINT_Z_SHAPE:
+        return util.readPointZ(geometryFactory, in, recordLength);
+      case ShapefileConstants.POINT_ZM_SHAPE:
+        return util.readPointZM(geometryFactory, in, recordLength);
+
+      case ShapefileConstants.MULTI_POINT_SHAPE:
+        return util.readMultipoint(geometryFactory, in, recordLength);
+      case ShapefileConstants.MULTI_POINT_M_SHAPE:
+        return util.readMultipointM(geometryFactory, in, recordLength);
+      case ShapefileConstants.MULTI_POINT_Z_SHAPE:
+        return util.readMultipointZ(geometryFactory, in, recordLength);
+      case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
+        return util.readMultipointZM(geometryFactory, in, recordLength);
+
+      case ShapefileConstants.POLYLINE_SHAPE:
+        return util.readPolyline(geometryFactory, in, recordLength);
+      case ShapefileConstants.POLYLINE_M_SHAPE:
+        return util.readPolylineM(geometryFactory, in, recordLength);
+      case ShapefileConstants.POLYLINE_Z_SHAPE:
+        return util.readPolylineZ(geometryFactory, in, recordLength);
+      case ShapefileConstants.POLYLINE_ZM_SHAPE:
+        return util.readPolylineZM(geometryFactory, in, recordLength);
+
+      case ShapefileConstants.POLYGON_SHAPE:
+        return util.readPolygon(geometryFactory, in, recordLength);
+      case ShapefileConstants.POLYGON_M_SHAPE:
+        return util.readPolygonM(geometryFactory, in, recordLength);
+      case ShapefileConstants.POLYGON_Z_SHAPE:
+        return util.readPolygonZ(geometryFactory, in, recordLength);
+      case ShapefileConstants.POLYGON_ZM_SHAPE:
+        return util.readPolygonZM(geometryFactory, in, recordLength);
+      default:
+        throw new IllegalArgumentException(
+          "Shapefile shape type not supported: " + shapeType);
+    }
   }
 
   public void setCloseFile(final boolean closeFile) {

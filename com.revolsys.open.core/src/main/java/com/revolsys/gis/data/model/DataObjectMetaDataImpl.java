@@ -32,7 +32,6 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.util.AssertionFailedException;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -221,7 +220,6 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   /**
    * Adds an attribute with the given case-sensitive name.
    * 
-   * @throws AssertionFailedException if a second Geometry is being added
    */
   public Attribute addAttribute(final String attributeName, final DataType type) {
     return addAttribute(attributeName, type, false);

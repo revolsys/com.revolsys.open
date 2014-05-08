@@ -286,6 +286,10 @@ public abstract class AbstractCodeTable implements Closeable,
     return capitalizeWords;
   }
 
+  public boolean isEmpty() {
+    return idIdCache.isEmpty();
+  }
+
   protected Object loadId(final List<Object> values, final boolean createId) {
     return null;
   }

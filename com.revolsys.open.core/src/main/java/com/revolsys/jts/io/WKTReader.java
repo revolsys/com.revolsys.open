@@ -52,8 +52,6 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.PrecisionModel;
-import com.revolsys.jts.util.Assert;
-import com.revolsys.jts.util.AssertionFailedException;
 
 /**
  * Converts a geometry in Well-Known Text format to a {@link Geometry}.
@@ -375,15 +373,14 @@ public class WKTReader {
    *
    * @param expected a description of what was expected
    * @throws ParseException
-   * @throws AssertionFailedException if an invalid token is encountered
-   */
+    */
   private void parseErrorExpected(final String expected) throws ParseException {
     // throws Asserts for tokens that should never be seen
     if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
-      Assert.shouldNeverReachHere("Unexpected NUMBER token");
+      throw new IllegalStateException("Unexpected NUMBER token");
     }
     if (tokenizer.ttype == StreamTokenizer.TT_EOL) {
-      Assert.shouldNeverReachHere("Unexpected EOL token");
+      throw new IllegalStateException("Unexpected EOL token");
     }
 
     final String tokenStr = tokenString();

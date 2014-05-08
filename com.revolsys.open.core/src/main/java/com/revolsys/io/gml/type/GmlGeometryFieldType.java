@@ -27,18 +27,12 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   private void coordinates(final XmlWriter out, final Coordinates point) {
     out.startTag(GmlConstants.COORDINATES);
     final int axisCount = point.getAxisCount();
-    final double x = point.getX();
-    out.text(x);
-    final double y = point.getY();
-    out.text(",");
-    out.text(y);
-    if (axisCount > 2) {
-      final double z = point.getZ();
-      if (Double.isNaN(z)) {
-        out.text(0);
-      } else {
-        out.text(z);
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      if (axisIndex > 0) {
+        out.text(",");
       }
+      final double value = point.getValue(axisIndex);
+      number(out, value);
     }
     out.endTag(GmlConstants.COORDINATES);
   }
@@ -53,18 +47,12 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
       } else {
         out.text(" ");
       }
-      final double x = points.getX(i);
-      out.text(x);
-      final double y = points.getY(i);
-      out.text(",");
-      out.text(y);
-      if (axisCount > 2) {
-        final double z = points.getZ(i);
-        if (Double.isNaN(z)) {
-          out.text(0);
-        } else {
-          out.text(z);
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        if (axisIndex > 0) {
+          out.text(",");
         }
+        final double value = points.getValue(i, axisIndex);
+        number(out, value);
       }
     }
     out.endTag(GmlConstants.COORDINATES);
@@ -128,8 +116,10 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     final boolean writeSrsName) {
     out.startTag(LINE_STRING);
     srsName(out, line, writeSrsName);
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    coordinates(out, points);
+    if (!line.isEmpty()) {
+      final CoordinatesList points = line.getCoordinatesList();
+      coordinates(out, points);
+    }
     out.endTag(LINE_STRING);
   }
 
@@ -150,11 +140,27 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
       writeSrsName);
   }
 
+  public void number(final XmlWriter out, final double value) {
+    if (Double.isInfinite(value)) {
+      if (value < 0) {
+        out.text("-INF");
+      } else {
+        out.text("INF");
+      }
+    } else if (Double.isNaN(value)) {
+      out.text("NaN");
+    } else {
+      out.text(value);
+    }
+  }
+
   private void point(final XmlWriter out, final Point point,
     final boolean writeSrsName) {
     out.startTag(POINT);
     srsName(out, point, writeSrsName);
-    coordinates(out, point);
+    if (!point.isEmpty()) {
+      coordinates(out, point);
+    }
     out.endTag(POINT);
   }
 
@@ -162,19 +168,19 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     final boolean writeSrsName) {
     out.startTag(POLYGON);
     srsName(out, polygon, writeSrsName);
+    if (!polygon.isEmpty()) {
+      final LineString exteriorRing = polygon.getExteriorRing();
+      out.startTag(OUTER_BOUNDARY_IS);
+      linearRing(out, exteriorRing, false);
+      out.endTag(OUTER_BOUNDARY_IS);
 
-    final LineString exteriorRing = polygon.getExteriorRing();
-    out.startTag(OUTER_BOUNDARY_IS);
-    linearRing(out, exteriorRing, false);
-    out.endTag(OUTER_BOUNDARY_IS);
-
-    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString interiorRing = polygon.getInteriorRing(i);
-      out.startTag(INNER_BOUNDARY_IS);
-      linearRing(out, interiorRing, false);
-      out.endTag(INNER_BOUNDARY_IS);
+      for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+        final LineString interiorRing = polygon.getInteriorRing(i);
+        out.startTag(INNER_BOUNDARY_IS);
+        linearRing(out, interiorRing, false);
+        out.endTag(INNER_BOUNDARY_IS);
+      }
     }
-
     out.endTag(POLYGON);
   }
 

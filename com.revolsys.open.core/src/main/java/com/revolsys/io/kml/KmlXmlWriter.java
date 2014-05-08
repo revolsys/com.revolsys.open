@@ -12,7 +12,6 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -29,7 +28,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     final KmlXmlWriter writer = new KmlXmlWriter(
       new StringBufferWriter(buffer), false);
 
-    writer.writeGeometry(geometry);
+    writer.writeGeometry(geometry, 2);
     writer.close();
   }
 
@@ -92,42 +91,35 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     super(out, useNamespaces);
   }
 
-  public void write(final CoordinatesList coordinateSequence) {
+  public void write(final CoordinatesList points) {
     startTag(Kml22Constants.COORDINATES);
-    final boolean hasZ = coordinateSequence.getAxisCount() > 2;
-    for (int i = 0; i < coordinateSequence.size(); i++) {
-      write(String.valueOf(coordinateSequence.getX(i)));
-      write(',');
-      write(String.valueOf(coordinateSequence.getY(i)));
-      if (hasZ) {
-        final double z = coordinateSequence.getValue(i, 2);
-        if (!Double.isNaN(z)) {
-          write(',');
-          write(String.valueOf(z));
-        }
+    final int vertexCount = points.size();
+    final int axisCount = points.getAxisCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      if (vertexIndex > 0) {
+        write(' ');
       }
-      write(' ');
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        if (axisIndex > 0) {
+          write(',');
+        }
+        write(String.valueOf(points.getValue(vertexIndex, axisIndex)));
+      }
     }
     endTag();
   }
 
-  public void writeCoordinates(final Coordinates point) {
+  public void writeCoordinates(final Point point) {
     startTag(Kml22Constants.COORDINATES);
-    if (point != null) {
-      final boolean hasZ = point.getAxisCount() > 2;
-      write(String.valueOf(point.getX()));
-      write(',');
-      write(String.valueOf(point.getY()));
-      if (hasZ) {
-        final double z = point.getZ();
-        if (!Double.isNaN(z)) {
+    if (point != null && !point.isEmpty()) {
+      for (int axisIndex = 0; axisIndex < point.getAxisCount(); axisIndex++) {
+        if (axisIndex > 0) {
           write(',');
-          write(String.valueOf(z));
         }
+        write(String.valueOf(point.getValue(axisIndex)));
       }
-      write(' ');
     }
-    endTag();
+    endTag(Kml22Constants.COORDINATES);
   }
 
   public void writeData(final String name, final Object value) {
@@ -165,17 +157,18 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     }
   }
 
-  public void writeGeometry(final Geometry geometry) {
+  public void writeGeometry(final Geometry geometry, final int axisCount) {
     if (geometry != null) {
       final int numGeometries = geometry.getGeometryCount();
       if (numGeometries > 1) {
         startTag(Kml22Constants.MULTI_GEOMETRY);
         for (int i = 0; i < numGeometries; i++) {
-          writeGeometry(geometry.getGeometry(i));
+          writeGeometry(geometry.getGeometry(i), axisCount);
         }
         endTag();
       } else {
-        final Geometry geoGraphicsGeom = geometry.convert(GeometryFactory.getFactory(Kml22Constants.COORDINATE_SYSTEM_ID));
+        final Geometry geoGraphicsGeom = geometry.convert(GeometryFactory.getFactory(
+          Kml22Constants.COORDINATE_SYSTEM_ID, axisCount));
         if (geoGraphicsGeom instanceof Point) {
           final Point point = (Point)geoGraphicsGeom;
           writePoint(point);
@@ -190,7 +183,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
           writePolygon(polygon);
         } else if (geoGraphicsGeom instanceof GeometryCollection) {
           final GeometryCollection collection = (GeometryCollection)geoGraphicsGeom;
-          writeMultiGeometry(collection);
+          writeMultiGeometry(collection, axisCount);
         }
       }
     }
@@ -221,11 +214,12 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writeMultiGeometry(final GeometryCollection collection) {
+  public void writeMultiGeometry(final GeometryCollection collection,
+    final int axisCount) {
     startTag(Kml22Constants.MULTI_GEOMETRY);
     for (int i = 0; i < collection.getGeometryCount(); i++) {
       final Geometry geometry = collection.getGeometry(i);
-      writeGeometry(geometry);
+      writeGeometry(geometry, axisCount);
     }
     endTag(Kml22Constants.MULTI_GEOMETRY);
 
@@ -258,7 +252,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     if (styleUrl != null) {
       element(STYLE_URL, styleUrl);
     }
-    writeGeometry(geometry);
+    writeGeometry(geometry, 2);
 
     endTag();
   }
@@ -381,19 +375,21 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
   public void writePoint(final Point point) {
     startTag(Kml22Constants.POINT);
     writeCoordinates(point);
-    endTag();
+    endTag(Kml22Constants.POINT);
   }
 
   public void writePolygon(final Polygon polygon) {
     startTag(Kml22Constants.POLYGON);
-    startTag(Kml22Constants.OUTER_BOUNDARY_IS);
-    writeLinearRing(polygon.getExteriorRing());
-    endTag();
-    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      startTag(Kml22Constants.INNER_BOUNDARY_IS);
-      final LineString ring = polygon.getInteriorRing(i);
-      writeLinearRing(ring);
+    if (!polygon.isEmpty()) {
+      startTag(Kml22Constants.OUTER_BOUNDARY_IS);
+      writeLinearRing(polygon.getExteriorRing());
       endTag();
+      for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+        startTag(Kml22Constants.INNER_BOUNDARY_IS);
+        final LineString ring = polygon.getInteriorRing(i);
+        writeLinearRing(ring);
+        endTag();
+      }
     }
     endTag();
   }

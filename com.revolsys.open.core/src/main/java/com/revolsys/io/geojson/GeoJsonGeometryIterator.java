@@ -207,7 +207,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private com.revolsys.jts.geom.GeometryFactory readCoordinateSystem() {
-    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (PROPERTIES.equals(attributeName)) {
@@ -259,7 +259,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry readGeometryCollection() {
     List<Geometry> geometries = new ArrayList<Geometry>();
-    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (GEOMETRIES.equals(attributeName)) {
@@ -297,7 +297,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private LineString readLineString(final boolean cogo) {
     CoordinatesList points = null;
-    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -307,13 +307,19 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
-    final LineString lineString = factory.lineString(points);
-    return lineString;
+
+    if (points == null) {
+      return factory.lineString();
+    } else {
+      final int axisCount = points.getAxisCount();
+      final GeometryFactory geometryFactory = factory.convertAxisCount(axisCount);
+      return geometryFactory.lineString(points);
+    }
   }
 
   private Geometry readMultiLineString(final boolean cogo) {
     List<CoordinatesList> lineStrings = null;
-    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -323,28 +329,38 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
+    int axisCount = 2;
+    for (final CoordinatesList points : lineStrings) {
+      axisCount = Math.max(axisCount, points.getAxisCount());
+    }
+    factory = factory.convertAxisCount(axisCount);
     return factory.multiLineString(lineStrings);
   }
 
   private Geometry readMultiPoint() {
-    List<CoordinatesList> points = null;
-    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+    List<CoordinatesList> pointsList = null;
+    GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
-        points = readPointCoordinatesListList();
+        pointsList = readPointCoordinatesListList();
       } else if (CRS.equals(attributeName)) {
         factory = readCoordinateSystem();
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
-    return factory.multiPoint(points);
+    int axisCount = 2;
+    for (final CoordinatesList points : pointsList) {
+      axisCount = Math.max(axisCount, points.getAxisCount());
+    }
+    factory = factory.convertAxisCount(axisCount);
+    return factory.multiPoint(pointsList);
   }
 
   private Geometry readMultiPolygon(final boolean cogo) {
     final List<Polygon> polygons = new ArrayList<Polygon>();
     List<List<CoordinatesList>> polygonRings = null;
-    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -354,8 +370,14 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
+    int axisCount = 2;
     if (polygonRings != null) {
       for (final List<CoordinatesList> rings : polygonRings) {
+        for (final CoordinatesList points : rings) {
+          axisCount = Math.max(axisCount, points.getAxisCount());
+        }
+        factory = factory.convertAxisCount(axisCount);
+
         final Polygon polygon = factory.polygon(rings);
         polygons.add(polygon);
       }
@@ -365,7 +387,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Point readPoint() {
     CoordinatesList coordinates = null;
-    com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
@@ -375,13 +397,22 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
-    final Point point = factory.point(coordinates);
-    return point;
+    if (coordinates == null) {
+      return factory.point();
+    } else {
+      final int axisCount = coordinates.getAxisCount();
+      final GeometryFactory geometryFactory = factory.convertAxisCount(axisCount);
+      return geometryFactory.point(coordinates);
+    }
   }
 
   private CoordinatesList readPointCoordinatesList() {
     final double[] values = JsonParser.getDoubleArray(in);
-    return new DoubleCoordinatesList(values.length, values);
+    if (values == null) {
+      return null;
+    } else {
+      return new DoubleCoordinatesList(values.length, values);
+    }
   }
 
   private List<CoordinatesList> readPointCoordinatesListList() {
@@ -407,14 +438,21 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Polygon readPolygon(final boolean cogo) {
     List<CoordinatesList> rings = null;
-    final com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
       if (COORDINATES.equals(attributeName)) {
         rings = readCoordinatesListList(cogo, true);
+      } else if (CRS.equals(attributeName)) {
+        factory = readCoordinateSystem();
       }
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
+    int axisCount = 2;
+    for (final CoordinatesList points : rings) {
+      axisCount = Math.max(axisCount, points.getAxisCount());
+    }
+    factory = factory.convertAxisCount(axisCount);
     return factory.polygon(rings);
   }
 }

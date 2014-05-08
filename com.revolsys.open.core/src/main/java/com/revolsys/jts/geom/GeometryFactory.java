@@ -429,6 +429,17 @@ public class GeometryFactory implements Serializable,
     }
   }
 
+  public GeometryFactory convertAxisCount(final int axisCount) {
+    if (axisCount == this.axisCount) {
+      return this;
+    } else {
+      final int srid = getSrid();
+      final double scaleXy = getScaleXY();
+      final double scaleZ = getScaleZ();
+      return GeometryFactory.getFactory(srid, axisCount, scaleXy, scaleZ);
+    }
+  }
+
   public double[] copyPrecise(final double[] values) {
     final double[] valuesPrecise = new double[values.length];
     makePrecise(values, valuesPrecise);
@@ -928,6 +939,14 @@ public class GeometryFactory implements Serializable,
   @Override
   public boolean isFloating() {
     return coordinatesPrecisionModel.isFloating();
+  }
+
+  public boolean isGeographics() {
+    return coordinateSystem instanceof GeographicCoordinateSystem;
+  }
+
+  public boolean isProjected() {
+    return coordinateSystem instanceof ProjectedCoordinateSystem;
   }
 
   public LinearRing linearRing() {

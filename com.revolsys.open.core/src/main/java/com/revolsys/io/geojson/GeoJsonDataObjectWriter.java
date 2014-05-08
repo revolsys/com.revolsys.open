@@ -5,12 +5,10 @@ import java.io.Writer;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonWriter;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -62,64 +60,49 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   private void coordinate(final Coordinates coordinates) {
-    final double x = coordinates.getX();
-    final double y = coordinates.getY();
-
     out.print('[');
-    out.value(x);
-
-    out.print(',');
-    out.value(y);
-
-    final double z = coordinates.getZ();
-    if (!Double.isNaN(z)) {
-      out.print(',');
-      out.value(z);
+    for (int axisIndex = 0; axisIndex < coordinates.getAxisCount(); axisIndex++) {
+      if (axisIndex > 0) {
+        out.print(',');
+      }
+      final double value = coordinates.getValue(axisIndex);
+      out.value(value);
     }
     out.print(']');
-  }
-
-  private void coordinate(final CoordinatesList coordinates, final int i) {
-    double x = coordinates.getX(i);
-    double y = coordinates.getY(i);
-
-    if (cogo && i > 0) {
-      final double currentX = x;
-      final double previousX = coordinates.getX(i - 1);
-      final double previousY = coordinates.getY(i - 1);
-      x = MathUtil.distance(previousX, previousY, currentX, y);
-      y = MathUtil.angleNorthDegrees(previousX, previousY, currentX, y);
-    }
-
-    out.print('[');
-    out.value(x);
-
-    out.print(',');
-    out.value(y);
-
-    final double z = coordinates.getZ(i);
-    if (!Double.isNaN(z)) {
-      out.print(',');
-      out.value(z);
-    }
-    out.print(']');
-  }
-
-  private void coordinates(final CoordinatesList coordinates) {
-    out.startList(false);
-    out.indent();
-    coordinate(coordinates, 0);
-    for (int i = 1; i < coordinates.size(); i++) {
-      out.endAttribute();
-      out.indent();
-      coordinate(coordinates, i);
-    }
-    out.endList();
   }
 
   private void coordinates(final LineString line) {
-    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
-    coordinates(coordinates);
+    out.startList(false);
+    out.indent();
+    for (int i = 0; i < line.getVertexCount(); i++) {
+      if (i > 0) {
+        out.endAttribute();
+        out.indent();
+      }
+      double x = line.getX(i);
+      double y = line.getY(i);
+
+      if (cogo && i > 0) {
+        final double currentX = x;
+        final double previousX = line.getX(i - 1);
+        final double previousY = line.getY(i - 1);
+        x = MathUtil.distance(previousX, previousY, currentX, y);
+        y = MathUtil.angleNorthDegrees(previousX, previousY, currentX, y);
+      }
+
+      out.print('[');
+      out.value(x);
+      out.print(',');
+      out.value(y);
+
+      for (int axisIndex = 2; axisIndex < line.getAxisCount(); axisIndex++) {
+        out.print(',');
+        final double value = line.getCoordinate(i, axisIndex);
+        out.value(value);
+      }
+      out.print(']');
+    }
+    out.endList();
   }
 
   public void coordinates(final Point point) {
@@ -204,7 +187,12 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     }
     out.endAttribute();
     out.label(COORDINATES);
-    coordinates(line);
+    if (line.isEmpty()) {
+      out.startList();
+      out.endList();
+    } else {
+      coordinates(line);
+    }
   }
 
   private void multiLineString(final MultiLineString multiLineString) {
@@ -279,7 +267,12 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     type(POINT);
     out.endAttribute();
     out.label(COORDINATES);
-    coordinates(point);
+    if (point.isEmpty()) {
+      out.startList();
+      out.endList();
+    } else {
+      coordinates(point);
+    }
   }
 
   private void polygon(final Polygon polygon) {
@@ -291,7 +284,12 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
 
     out.endAttribute();
     out.label(COORDINATES);
-    coordinates(polygon);
+    if (polygon.isEmpty()) {
+      out.startList();
+      out.endList();
+    } else {
+      coordinates(polygon);
+    }
   }
 
   private void srid(final int srid) {
@@ -323,7 +321,11 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     }
     out.startObject();
     type(FEATURE);
-    final Geometry mainGeometry = object.getGeometryValue();
+    Geometry mainGeometry = object.getGeometryValue();
+    final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+    if (geometryFactory != null) {
+      mainGeometry = mainGeometry.convert(geometryFactory);
+    }
     writeSrid(mainGeometry);
     final DataObjectMetaData metaData = object.getMetaData();
     final int geometryIndex = metaData.getGeometryAttributeIndex();

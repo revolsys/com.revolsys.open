@@ -62,7 +62,7 @@ public class KmlMapWriter extends AbstractMapWriter {
     }
 
     out.endTag();
-    out.writeGeometry(multiGeometry);
+    out.writeGeometry(multiGeometry, 2);
     out.endTag();
   }
 

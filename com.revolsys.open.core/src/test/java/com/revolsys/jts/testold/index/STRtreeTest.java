@@ -48,7 +48,6 @@ import com.revolsys.jts.index.strtree.AbstractNode;
 import com.revolsys.jts.index.strtree.ItemBoundable;
 import com.revolsys.jts.index.strtree.STRtree;
 import com.revolsys.jts.testold.util.SerializationUtil;
-import com.revolsys.jts.util.AssertionFailedException;
 
 /**
  * @version 1.7
@@ -98,7 +97,8 @@ public class STRtreeTest extends TestCase {
   private List itemWrappers(final int size) {
     final ArrayList itemWrappers = new ArrayList();
     for (int i = 0; i < size; i++) {
-      itemWrappers.add(new ItemBoundable(new Envelope(2, 0, 0, 0, 0), new Object()));
+      itemWrappers.add(new ItemBoundable(new Envelope(2, 0, 0, 0, 0),
+        new Object()));
     }
     return itemWrappers;
   }
@@ -117,7 +117,7 @@ public class STRtreeTest extends TestCase {
     try {
       t.insert(new Envelope(2, 0, 0, 0, 0), new Object());
       assertTrue(false);
-    } catch (final AssertionFailedException e) {
+    } catch (final AssertionError e) {
       assertTrue(true);
     }
   }
@@ -141,13 +141,16 @@ public class STRtreeTest extends TestCase {
   public void testQuery() throws Throwable {
     final ArrayList geometries = new ArrayList();
     geometries.add(this.factory.lineString(new Coordinates[] {
-      new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE), new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE)
     }));
     geometries.add(this.factory.lineString(new Coordinates[] {
-      new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE), new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE)
     }));
     geometries.add(this.factory.lineString(new Coordinates[] {
-      new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE), new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE)
+      new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE),
+      new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE)
     }));
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(4);
     for (final Iterator i = geometries.iterator(); i.hasNext();) {

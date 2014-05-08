@@ -378,6 +378,9 @@ public final class StaxUtils {
     while (!parser.isEndElement()
       || !parser.getName().getLocalPart().equals(name.getLocalPart())) {
       next(parser);
+      if (parser.getEventType() == XMLStreamConstants.START_ELEMENT
+        || parser.getEventType() == XMLStreamConstants.END_ELEMENT) {
+      }
     }
     skipWhitespace(parser);
   }

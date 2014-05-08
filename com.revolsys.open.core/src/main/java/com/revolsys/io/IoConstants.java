@@ -23,4 +23,7 @@ public interface IoConstants {
   String TITLE_PROPERTY = "java:" + IoConstants.class.getName() + ".title";
 
   String WRAP_PROPERTY = "java:" + IoConstants.class.getName() + ".wrap";
+
+  String GEOMETRY_TYPE = "java:" + IoConstants.class.getName()
+    + ".geometryType";
 }
