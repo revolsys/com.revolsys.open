@@ -8,6 +8,7 @@ import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public interface CoordinateSystem extends Serializable {
   Area getArea();
@@ -17,6 +18,8 @@ public interface CoordinateSystem extends Serializable {
   Authority getAuthority();
 
   List<Axis> getAxis();
+
+  GeometryFactory getGeometryFactory();
 
   int getId();
 

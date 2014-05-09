@@ -13,7 +13,6 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
@@ -78,7 +77,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
         final Object value = e.getItem();
         final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
         if (coordinateSystem != null) {
-          map.setGeometryFactory(GeometryFactory.getFactory(coordinateSystem));
+          map.setGeometryFactory(coordinateSystem.getGeometryFactory());
         }
       }
     }

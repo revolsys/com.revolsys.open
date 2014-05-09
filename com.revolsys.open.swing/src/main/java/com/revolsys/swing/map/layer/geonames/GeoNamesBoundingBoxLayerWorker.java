@@ -65,7 +65,7 @@ public class GeoNamesBoundingBoxLayerWorker extends
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       final GeographicCoordinateSystem geoCs = projCs.getGeographicCoordinateSystem();
-      geometryFactory = GeometryFactory.getFactory(geoCs);
+      geometryFactory = geoCs.getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
     }
     final List<DataObject> results = this.geoNamesService.getNames(boundingBox);

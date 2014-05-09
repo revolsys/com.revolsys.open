@@ -21,7 +21,7 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
 
   public String getMapTileName(final Geometry geometry) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
-    final Geometry projectedGeometry = geometry.convert(GeometryFactory.getFactory(coordinateSystem));
+    final Geometry projectedGeometry = geometry.convert(coordinateSystem.getGeometryFactory());
     final Point centroid = projectedGeometry.getCentroid();
     final Coordinates coordinate = centroid.getCoordinate();
     final String mapsheet = getMapTileName(coordinate.getX(), coordinate.getY());
@@ -59,7 +59,7 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
   @Override
   public Polygon getPolygon(final String mapTileName,
     final CoordinateSystem coordinateSystem) {
-    return getPolygon(mapTileName, GeometryFactory.getFactory(coordinateSystem));
+    return getPolygon(mapTileName, coordinateSystem.getGeometryFactory());
   }
 
   public void setName(final String name) {

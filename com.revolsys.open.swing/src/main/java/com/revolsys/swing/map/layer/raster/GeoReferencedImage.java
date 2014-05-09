@@ -633,7 +633,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
   }
 
   public void setCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    setGeometryFactory(GeometryFactory.getFactory(coordinateSystem));
+    setGeometryFactory(coordinateSystem.getGeometryFactory());
   }
 
   public void setDpi(final int... dpi) {

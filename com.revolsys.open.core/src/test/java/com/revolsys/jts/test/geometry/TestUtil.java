@@ -35,7 +35,7 @@ public class TestUtil {
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
           otherGeometryFactory = GeometryFactory.getFactory(
-            projectedCoordinateSystem, axisCount, scaleXy, scaleZ);
+            projectedCoordinateSystem.getId(), axisCount, scaleXy, scaleZ);
         } else {
           otherGeometryFactory = GeometryFactory.getFactory(3005, axisCount,
             scaleXy, scaleZ);

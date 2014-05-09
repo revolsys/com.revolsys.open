@@ -67,7 +67,8 @@ public class WikipediaBoundingBoxLayerWorker extends
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
-      geometryFactory = GeometryFactory.getFactory(projCs.getGeographicCoordinateSystem());
+      geometryFactory = projCs.getGeographicCoordinateSystem()
+        .getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
     }
     final List<DataObject> results = this.geoNamesService.getWikipediaArticles(boundingBox);
