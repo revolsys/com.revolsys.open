@@ -26,7 +26,6 @@ import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.NodeCoordinatesFilter;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.gis.jts.LineSegmentImpl;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
@@ -209,7 +208,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public Geometry getSelfIntersections() {
-    final CoordinatesPrecisionModel precisionModel = getPrecisionModel();
+    final GeometryFactory precisionModel = getPrecisionModel();
     final Set<Coordinates> intersectionPoints = new HashSet<Coordinates>();
     for (final Coordinates point : points) {
       final Node<LineSegment> node = getNode(point);
@@ -265,7 +264,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public boolean hasTouchingEdges(final Node<LineSegment> node) {
-    final CoordinatesPrecisionModel precisionModel = getPrecisionModel();
+    final GeometryFactory precisionModel = getPrecisionModel();
     final List<Edge<LineSegment>> edges = findEdges(node,
       precisionModel.getScaleXY());
     for (final Edge<LineSegment> edge : edges) {

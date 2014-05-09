@@ -39,7 +39,6 @@ import java.util.List;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;
@@ -67,7 +66,6 @@ import com.revolsys.jts.noding.SinglePassNoder;
  * @version 1.7
  */
 public class SimpleSnapRounder implements Noder {
-  private final PrecisionModel pm;
 
   private final LineIntersector li;
 
@@ -75,11 +73,9 @@ public class SimpleSnapRounder implements Noder {
 
   private Collection nodedSegStrings;
 
-  public SimpleSnapRounder(final PrecisionModel pm) {
-    this.pm = pm;
-    li = new RobustLineIntersector();
-    li.setPrecisionModel(pm);
-    scaleFactor = pm.getScale();
+  public SimpleSnapRounder(final double scale) {
+    scaleFactor = scale;
+    li = new RobustLineIntersector(scaleFactor);
   }
 
   private void checkCorrectness(final Collection inputSegmentStrings) {

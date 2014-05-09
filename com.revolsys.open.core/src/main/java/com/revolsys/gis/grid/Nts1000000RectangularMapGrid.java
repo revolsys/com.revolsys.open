@@ -12,7 +12,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.util.MathUtil;
 
 public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
@@ -21,7 +21,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   private static final Pattern NAME_PATTERN = Pattern.compile("^"
     + NtsConstants.REGEX_1000000 + ".*");
 
-  private PrecisionModel precisionModel = new PrecisionModel(1);
+  private double precisionScale = 1;
 
   private final double tileHeight;
 
@@ -112,8 +112,8 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     final int north) {
     final double sourceLon = getLongitude(sheet);
     final double sourceLat = getLatitude(sheet);
-    final double lon = precisionModel.makePrecise(sourceLon + east
-      * getTileWidth());
+    final double lon = MathUtil.makePrecise(precisionScale, sourceLon
+      + east * getTileWidth());
     final double lat = sourceLat + north * getTileHeight();
     return getMapTileName(lon, lat);
   }
@@ -129,10 +129,6 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     }
     throw new IllegalArgumentException(mapTileName
       + " does not start with a valid NTS block");
-  }
-
-  public PrecisionModel getPrecisionModel() {
-    return precisionModel;
   }
 
   @Override
@@ -199,7 +195,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     return tileWidth;
   }
 
-  public void setPrecisionModel(final PrecisionModel precisionModel) {
-    this.precisionModel = precisionModel;
+  public void setPrecisionScale(final double precisionScale) {
+    this.precisionScale = precisionScale;
   }
 }

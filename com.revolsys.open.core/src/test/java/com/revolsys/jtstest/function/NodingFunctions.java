@@ -11,7 +11,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.BasicSegmentString;
 import com.revolsys.jts.noding.FastNodingValidator;
 import com.revolsys.jts.noding.IntersectionAdder;
@@ -82,10 +81,8 @@ public class NodingFunctions {
   public static Geometry MCIndexNodingWithPrecision(final Geometry geom,
     final double scaleFactor) {
     final List segs = createNodedSegmentStrings(geom);
-    final PrecisionModel fixedPM = new PrecisionModel(scaleFactor);
 
-    final LineIntersector li = new RobustLineIntersector();
-    li.setPrecisionModel(fixedPM);
+    final LineIntersector li = new RobustLineIntersector(scaleFactor);
 
     final Noder noder = new MCIndexNoder(new IntersectionAdder(li));
     noder.computeNodes(segs);
@@ -104,9 +101,8 @@ public class NodingFunctions {
   public static Geometry scaledNoding(final Geometry geom,
     final double scaleFactor) {
     final List segs = createSegmentStrings(geom);
-    final PrecisionModel fixedPM = new PrecisionModel(scaleFactor);
-    final Noder noder = new ScaledNoder(new MCIndexSnapRounder(
-      new PrecisionModel(1.0)), fixedPM.getScale());
+    final Noder noder = new ScaledNoder(new MCIndexSnapRounder(1.0),
+      scaleFactor);
     noder.computeNodes(segs);
     final Collection nodedSegStrings = noder.getNodedSubstrings();
     return fromSegmentStrings(nodedSegStrings);

@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -51,7 +50,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 
 /**
  * Converts a geometry in Well-Known Text format to a {@link Geometry}.
@@ -150,8 +148,6 @@ public class WKTReader {
 
   private final GeometryFactory geometryFactory;
 
-  private final PrecisionModel precisionModel;
-
   private StreamTokenizer tokenizer;
 
   private static final boolean ALLOW_OLD_JTS_MULTIPOINT_SYNTAX = true;
@@ -171,7 +167,6 @@ public class WKTReader {
    */
   public WKTReader(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-    precisionModel = geometryFactory.getPrecisionModel();
   }
 
   /**
@@ -334,14 +329,14 @@ public class WKTReader {
   }
 
   private Coordinates getPreciseCoordinate() throws IOException, ParseException {
-    final double x = precisionModel.makePrecise(getNextNumber());
-    final double y = precisionModel.makePrecise(getNextNumber());
+    final double x = geometryFactory.makePrecise(0, getNextNumber());
+    final double y = geometryFactory.makePrecise(1, getNextNumber());
     final Coordinates coord;
     if (isNumberNext()) {
       final double z = getNextNumber();
       coord = new DoubleCoordinates(x, y, z);
     } else {
-      coord = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+      coord = new DoubleCoordinates(x, y);
     }
     return coord;
   }

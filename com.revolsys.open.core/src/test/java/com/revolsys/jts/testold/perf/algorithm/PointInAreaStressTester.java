@@ -40,7 +40,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
@@ -101,10 +100,9 @@ public class PointInAreaStressTester {
       for (int j = 0; j < ptGridWidth; j++) {
 
         // compute test point
-        final PrecisionModel precisionModel = this.geomFactory.getPrecisionModel();
-        final double x = precisionModel.makePrecise(areaEnv.getMinX() + i
+        final double x = this.geomFactory.makePrecise(0, areaEnv.getMinX() + i
           * xStep);
-        final double y = precisionModel.makePrecise(areaEnv.getMinY() + j
+        final double y = this.geomFactory.makePrecise(1, areaEnv.getMinY() + j
           * yStep);
         final Coordinates pt = new DoubleCoordinates(x, y);
 

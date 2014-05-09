@@ -9,7 +9,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.util.MathUtil;
 
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
@@ -22,8 +22,6 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public static final double MIN_LAT = -80;
 
   public static final double MIN_LON = -180;
-
-  private PrecisionModel precisionModel = new PrecisionModel(1);
 
   private final double tileHeight = 8;
 
@@ -112,8 +110,8 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
    */
   public String getMapTileName(final String sheet, final int east,
     final int north) {
-    final double lon = precisionModel.makePrecise(getLongitude(sheet) + east
-      * getTileHeight());
+    final double lon = MathUtil.makePrecise(1.0, getLongitude(sheet)
+      + east * getTileHeight());
     final double lat = getLatitude(sheet) + north * getTileHeight();
     return getMapTileName(lon, lat);
   }
@@ -154,10 +152,6 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
       throw new IllegalArgumentException("UTM Zone " + sheet
         + " is not in North America");
     }
-  }
-
-  public PrecisionModel getPrecisionModel() {
-    return precisionModel;
   }
 
   @Override
@@ -224,7 +218,4 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return Character.toLowerCase(sheet.charAt(sheet.length() - 1));
   }
 
-  public void setPrecisionModel(final PrecisionModel precisionModel) {
-    this.precisionModel = precisionModel;
-  }
 }

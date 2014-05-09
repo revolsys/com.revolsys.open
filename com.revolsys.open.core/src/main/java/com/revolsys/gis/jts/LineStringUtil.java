@@ -11,7 +11,6 @@ import java.util.Map;
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.algorithm.linematch.LineMatchGraph;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
@@ -411,7 +410,7 @@ public final class LineStringUtil {
   }
 
   public static Coordinates getClosestCoordinateOnLineString(
-    final CoordinatesPrecisionModel precisionModel, final LineString line,
+    final GeometryFactory precisionModel, final LineString line,
     final Coordinates point, final double tolerance) {
     final Map<String, Number> result = LineStringUtil.findClosestSegmentAndCoordinate(
       line, point);
@@ -823,7 +822,7 @@ public final class LineStringUtil {
    * @param line The line.
    * @param point The point.
    * @return True if the point is on the line, false otherwise.
-   * @see LineSegmentUtil#isPointOnLine(CoordinatesPrecisionModel, Coordinates,
+   * @see LineSegmentUtil#isPointOnLine(GeometryFactory, Coordinates,
    *      Coordinates, Coordinates)
    */
   public static boolean isPointOnLine(final LineString line,

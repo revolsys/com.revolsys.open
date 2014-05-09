@@ -46,7 +46,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 
@@ -57,7 +56,7 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * than the given distance tolerance.
  * Densified polygonal geometries are guaranteed to be topologically correct.
  * The coordinates created during densification respect the input geometry's
- * {@link PrecisionModel}.
+ * scale.
  * <p>
  * <b>Note:</b> At some future point this class will
  * offer a variety of densification strategies.
@@ -130,7 +129,7 @@ public class Densifier extends GeometryTransformer {
 
   /**
    * Densifies a geometry using a given distance tolerance,
-   * and respecting the input geometry's {@link PrecisionModel}.
+   * and respecting the input geometry's scale.
    * 
    * @param geometry the geometry to densify
    * @param distanceTolerance the distance tolerance to densify

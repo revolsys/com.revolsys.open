@@ -41,7 +41,6 @@ import java.util.List;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.Centroid;
 import com.revolsys.jts.algorithm.ConvexHull;
@@ -60,7 +59,6 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geom.util.GeometryCollectionMapper;
 import com.revolsys.jts.geom.util.GeometryMapper;
@@ -1160,16 +1158,6 @@ public abstract class AbstractGeometry implements Geometry {
    * @return
    */
   @Override
-  public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
-    return getGeometryFactory().getCoordinatesPrecisionModel();
-  }
-
-  /**
-   * 
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @return
-   */
-  @Override
   public CoordinateSystem getCoordinateSystem() {
     return getGeometryFactory().getCoordinateSystem();
   }
@@ -1278,6 +1266,16 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   /**
+   * 
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @return
+   */
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return getGeometryFactory();
+  }
+
+  /**
    * Returns the name of this Geometry's actual class.
    *
    *@return the name of this <code>Geometry</code>s actual class
@@ -1358,17 +1356,6 @@ public abstract class AbstractGeometry implements Geometry {
       final Coordinates point = getCoordinate();
       return geometryFactory.point(point);
     }
-  }
-
-  /**
-   *  Returns the <code>PrecisionModel</code> used by the <code>Geometry</code>.
-   *
-   *@return    the specification of the grid of allowable points, for this
-   *      <code>Geometry</code> and all other <code>Geometry</code>s
-   */
-  @Override
-  public PrecisionModel getPrecisionModel() {
-    return getGeometryFactory().getPrecisionModel();
   }
 
   /**

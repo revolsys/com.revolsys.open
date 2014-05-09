@@ -49,7 +49,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 
 /**
  * Reads a {@link Geometry}from a byte stream in Well-Known Binary format.
@@ -235,7 +234,7 @@ public class WKBReader {
 
   private final GeometryFactory factory;
 
-  private final PrecisionModel precisionModel;
+  // private final PrecisionModel precisionModel;
 
   // default dimension - will be set on read
   private int inputDimension = 2;
@@ -260,7 +259,6 @@ public class WKBReader {
 
   public WKBReader(final GeometryFactory geometryFactory) {
     this.factory = geometryFactory;
-    precisionModel = factory.getPrecisionModel();
   }
 
   /**
@@ -302,12 +300,7 @@ public class WKBReader {
    */
   private void readCoordinate() throws IOException {
     for (int i = 0; i < inputDimension; i++) {
-      if (i <= 1) {
-        ordValues[i] = precisionModel.makePrecise(dis.readDouble());
-      } else {
-        ordValues[i] = dis.readDouble();
-      }
-
+      ordValues[i] = factory.makePrecise(i, dis.readDouble());
     }
   }
 

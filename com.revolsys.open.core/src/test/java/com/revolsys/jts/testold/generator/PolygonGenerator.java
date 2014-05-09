@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.operation.valid.IsValidOp;
 
 /**
@@ -61,15 +60,14 @@ public class PolygonGenerator extends GeometryGenerator {
 
     final double theta = 360 / npoints;
 
-    final PrecisionModel precisionModel = gf.getPrecisionModel();
     for (int i = 0; i < npoints; i++) {
       final double angle = Math.toRadians(theta * i);
 
       final double fx = Math.sin(angle) * radius; // may be neg.
       final double fy = Math.cos(angle) * radius; // may be neg.
 
-      coords[i] = new DoubleCoordinates(precisionModel.makePrecise(cx + fx),
-        precisionModel.makePrecise(cy + fy));
+      coords[i] = new DoubleCoordinates(gf.makePrecise(0, cx + fx),
+        gf.makePrecise(1, cy + fy));
     }
 
     coords[npoints] = coords[0].cloneCoordinates();
@@ -84,9 +82,8 @@ public class PolygonGenerator extends GeometryGenerator {
     final int ptsPerSide = npoints / 4;
     int rPtsPerSide = npoints % 4;
     final Coordinates[] coords = new Coordinates[npoints + 1];
-    final PrecisionModel precisionModel = gf.getPrecisionModel();
-    coords[0] = new DoubleCoordinates(precisionModel.makePrecise(x),
-      precisionModel.makePrecise(y)); // start
+    coords[0] = new DoubleCoordinates(gf.makePrecise(0, x),
+      gf.makePrecise(1, y)); // start
 
     final int cindex = 1;
     for (int i = 0; i < 4; i++) { // sides
@@ -102,9 +99,8 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sy = coords[cindex - 1].getY();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new DoubleCoordinates(
-            precisionModel.makePrecise(tx), precisionModel.makePrecise(sy
-              + (j + 1) * cy));
+          coords[cindex] = new DoubleCoordinates(gf.makePrecise(0, tx),
+            gf.makePrecise(1, sy + (j + 1) * cy));
         }
       } else { // even horz
         double cx = dx / npts;
@@ -115,13 +111,13 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sx = coords[cindex - 1].getX();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new Coordinate(precisionModel.makePrecise(sx
-            + (j + 1) * cx), precisionModel.makePrecise(ty));
+          coords[cindex] = new Coordinate(gf.makePrecise(0, sx + (j + 1) * cx),
+            gf.makePrecise(1, ty));
         }
       }
     }
-    coords[npoints] = new DoubleCoordinates(precisionModel.makePrecise(x),
-      precisionModel.makePrecise(y)); // end
+    coords[npoints] = new DoubleCoordinates(gf.makePrecise(0, x),
+      gf.makePrecise(1, y)); // end
 
     return gf.linearRing(coords);
   }
@@ -237,13 +233,10 @@ public class PolygonGenerator extends GeometryGenerator {
     fx2 = Math.sin(angle) * radius; // may be neg.
     fy2 = Math.cos(angle) * radius; // may be neg.
 
-    final PrecisionModel precisionModel = gf.getPrecisionModel();
-    final double cxp = precisionModel.makePrecise(cx);
-    final double cyp = precisionModel.makePrecise(cy);
-    return gf.linearRing(2, cxp, cyp, precisionModel.makePrecise(cx + fx1),
-      precisionModel.makePrecise(cy + fy1),
-      precisionModel.makePrecise(cx + fx2),
-      precisionModel.makePrecise(cy + fy2), cxp, cyp);
+    final double cxp = gf.makePrecise(0, cx);
+    final double cyp = gf.makePrecise(1, cy);
+    return gf.linearRing(2, cxp, cyp, cx + fx1, cy + fy1, cx + fx2, cy + fy2,
+      cxp, cyp);
   }
 
   /**

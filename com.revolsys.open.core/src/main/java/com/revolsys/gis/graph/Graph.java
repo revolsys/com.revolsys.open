@@ -46,11 +46,9 @@ import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -110,7 +108,7 @@ public class Graph<T> {
 
   private final Map<Edge<T>, Integer> edgeIds = new TreeMap<Edge<T>, Integer>();
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory();
+  private GeometryFactory geometryFactory = GeometryFactory.getFactory();
 
   private int nextEdgeId;
 
@@ -124,7 +122,7 @@ public class Graph<T> {
 
   private Map<Integer, Node<T>> nodesById = new IntHashMap<Node<T>>();
 
-  private CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel();
+  private GeometryFactory precisionModel = GeometryFactory.getFactory();
 
   public Graph() {
     this(true);
@@ -720,7 +718,7 @@ public class Graph<T> {
     return objects;
   }
 
-  public CoordinatesPrecisionModel getPrecisionModel() {
+  public GeometryFactory getPrecisionModel() {
     return precisionModel;
   }
 
@@ -845,7 +843,7 @@ public class Graph<T> {
 
     final Graph<DataObject> graph = node1.getGraph();
     final Coordinates midPoint = LineSegmentUtil.midPoint(
-      new SimpleCoordinatesPrecisionModel(1000, 1), node2, node1);
+      GeometryFactory.getFactory(0, 3, 1000.0, 1.0), node2, node1);
     final double x = midPoint.getX();
     final double y = midPoint.getY();
     final double z1 = point1.getZ();
@@ -913,7 +911,7 @@ public class Graph<T> {
 
   public void moveToMidpoint(final Map<Coordinates, Coordinates> movedNodes,
     final Graph<T> graph1, final Node<T> node1, final Node<T> node2) {
-    final CoordinatesPrecisionModel precisionModel = graph1.getPrecisionModel();
+    final GeometryFactory precisionModel = graph1.getPrecisionModel();
     final Coordinates midPoint = LineSegmentUtil.midPoint(precisionModel,
       node1, node2);
     if (!node1.equals2d(midPoint)) {
@@ -1089,7 +1087,7 @@ public class Graph<T> {
     nodeAttributes.putAll(attributes);
   }
 
-  public void setPrecisionModel(final CoordinatesPrecisionModel precisionModel) {
+  public void setPrecisionModel(final GeometryFactory precisionModel) {
     this.precisionModel = precisionModel;
   }
 
@@ -1217,10 +1215,11 @@ public class Graph<T> {
 
               final CoordinatesList newPoints;
               if (startIndex > index) {
-                Coordinates[] coordinateArray = {
+                final Coordinates[] coordinateArray = {
                   startPoint, point
                 };
-                newPoints = new DoubleCoordinatesList(points.getAxisCount(), coordinateArray);
+                newPoints = new DoubleCoordinatesList(points.getAxisCount(),
+                  coordinateArray);
               } else {
                 newPoints = CoordinatesListUtil.subList(points, startPoint,
                   startIndex, index - startIndex + 1, point);

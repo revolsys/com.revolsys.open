@@ -568,6 +568,11 @@ public final class FileUtil {
     }
   }
 
+  public static String getCanonicalPath(final String fileName) {
+    final File file = new File(fileName);
+    return getCanonicalPath(file);
+  }
+
   public static File getCurrentDirectory() {
     return getFile(System.getProperty("user.dir"));
   }

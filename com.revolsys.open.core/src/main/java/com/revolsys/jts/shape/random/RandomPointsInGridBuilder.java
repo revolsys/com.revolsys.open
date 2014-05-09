@@ -1,35 +1,35 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.shape.random;
 
@@ -48,18 +48,33 @@ import com.revolsys.jts.shape.GeometricShapeBuilder;
  * @author mbdavis
  *
  */
-public class RandomPointsInGridBuilder 
-extends GeometricShapeBuilder
-{
-	private boolean isConstrainedToCircle = false;
-	private double gutterFraction = 0;
-	
+public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
+  private static Coordinates randomPointInCircle(final double orgX,
+    final double orgY, final double width, final double height) {
+    final double centreX = orgX + width / 2;
+    final double centreY = orgY + height / 2;
+
+    final double rndAng = 2 * Math.PI * Math.random();
+    final double rndRadius = Math.random();
+    // use square root of radius, since area is proportional to square of radius
+    final double rndRadius2 = Math.sqrt(rndRadius);
+    final double rndX = width / 2 * rndRadius2 * Math.cos(rndAng);
+    final double rndY = height / 2 * rndRadius2 * Math.sin(rndAng);
+
+    final double x0 = centreX + rndX;
+    final double y0 = centreY + rndY;
+    return new Coordinate(x0, y0, Coordinates.NULL_ORDINATE);
+  }
+
+  private boolean isConstrainedToCircle = false;
+
+  private double gutterFraction = 0;
+
   /**
    * Create a builder which will create shapes using the default
    * {@link GeometryFactory}.
    */
-  public RandomPointsInGridBuilder()
-  {
+  public RandomPointsInGridBuilder() {
     super(GeometryFactory.getFactory());
   }
 
@@ -69,9 +84,58 @@ extends GeometricShapeBuilder
    *
    * @param geomFact the factory to use
    */
-  public RandomPointsInGridBuilder(GeometryFactory geomFact)
-  {
-  	super(geomFact);
+  public RandomPointsInGridBuilder(final GeometryFactory geomFact) {
+    super(geomFact);
+  }
+
+  /**
+   * Gets the {@link MultiPoint} containing the generated point
+   * 
+   * @return a MultiPoint
+   */
+  @Override
+  public Geometry getGeometry() {
+    int nCells = (int)Math.sqrt(numPts);
+    // ensure that at least numPts points are generated
+    if (nCells * nCells < numPts) {
+      nCells += 1;
+    }
+
+    final double gridDX = getExtent().getWidth() / nCells;
+    final double gridDY = getExtent().getHeight() / nCells;
+
+    final double gutterFrac = MathUtil.clamp(gutterFraction, 0.0, 1.0);
+    final double gutterOffsetX = gridDX * gutterFrac / 2;
+    final double gutterOffsetY = gridDY * gutterFrac / 2;
+    final double cellFrac = 1.0 - gutterFrac;
+    final double cellDX = cellFrac * gridDX;
+    final double cellDY = cellFrac * gridDY;
+
+    final Coordinates[] pts = new Coordinates[nCells * nCells];
+    int index = 0;
+    for (int i = 0; i < nCells; i++) {
+      for (int j = 0; j < nCells; j++) {
+        final double orgX = getExtent().getMinX() + i * gridDX + gutterOffsetX;
+        final double orgY = getExtent().getMinY() + j * gridDY + gutterOffsetY;
+        pts[index++] = randomPointInCell(orgX, orgY, cellDX, cellDY);
+      }
+    }
+    return geometryFactory.multiPoint(pts);
+  }
+
+  private Coordinates randomPointInCell(final double orgX, final double orgY,
+    final double xLen, final double yLen) {
+    if (isConstrainedToCircle) {
+      return randomPointInCircle(orgX, orgY, xLen, yLen);
+    }
+    return randomPointInGridCell(orgX, orgY, xLen, yLen);
+  }
+
+  private Coordinates randomPointInGridCell(final double orgX,
+    final double orgY, final double xLen, final double yLen) {
+    final double x = orgX + xLen * Math.random();
+    final double y = orgY + yLen * Math.random();
+    return createCoord(x, y);
   }
 
   /**
@@ -83,11 +147,10 @@ extends GeometricShapeBuilder
    * The default is to not be constrained to a circle.
    * @param isConstrainedToCircle
    */
-  public void setConstrainedToCircle(boolean isConstrainedToCircle)
-  {
-  	this.isConstrainedToCircle = isConstrainedToCircle;
+  public void setConstrainedToCircle(final boolean isConstrainedToCircle) {
+    this.isConstrainedToCircle = isConstrainedToCircle;
   }
-  
+
   /**
    * Sets the fraction of the grid cell side which will be treated as
    * a gutter, in which no points will be created.
@@ -95,78 +158,8 @@ extends GeometricShapeBuilder
    * 
    * @param gutterFraction
    */
-  public void setGutterFraction(double gutterFraction)
-  {
-  	this.gutterFraction = gutterFraction;
-  }
-  
-  /**
-   * Gets the {@link MultiPoint} containing the generated point
-   * 
-   * @return a MultiPoint
-   */
-  public Geometry getGeometry()
-  {
-    int nCells = (int) Math.sqrt(numPts);
-    // ensure that at least numPts points are generated
-    if (nCells * nCells < numPts)
-      nCells += 1;
-
-    double gridDX = getExtent().getWidth() / nCells;
-    double gridDY = getExtent().getHeight() / nCells;
-
-    double gutterFrac = MathUtil.clamp(gutterFraction, 0.0, 1.0);
-    double gutterOffsetX = gridDX * gutterFrac/2;
-    double gutterOffsetY = gridDY * gutterFrac/2;
-    double cellFrac = 1.0 - gutterFrac;
-    double cellDX = cellFrac * gridDX;
-    double cellDY = cellFrac * gridDY;
-    	
-    Coordinates[] pts = new Coordinates[nCells * nCells];
-    int index = 0;
-    for (int i = 0; i < nCells; i++) {
-      for (int j = 0; j < nCells; j++) {
-      	double orgX = getExtent().getMinX() + i * gridDX + gutterOffsetX;
-      	double orgY = getExtent().getMinY() + j * gridDY + gutterOffsetY;
-        pts[index++] = randomPointInCell(orgX, orgY, cellDX, cellDY);
-      }
-    }
-    return geomFactory.multiPoint(pts);
-  }
-  
-  private Coordinates randomPointInCell(double orgX, double orgY, double xLen, double yLen)
-  {
-  	if (isConstrainedToCircle) {
-  		return randomPointInCircle(
-  				orgX, 
-  				orgY, 
-  				xLen, yLen);
-  	}
-  	return randomPointInGridCell(orgX, orgY, xLen, yLen);
-  }
-  
-  private Coordinates randomPointInGridCell(double orgX, double orgY, double xLen, double yLen)
-  {
-    double x = orgX + xLen * Math.random();
-    double y = orgY + yLen * Math.random();
-    return createCoord(x, y);
-  }
-
-  private static Coordinates randomPointInCircle(double orgX, double orgY, double width, double height)
-  {
-  	double centreX = orgX + width/2;
-  	double centreY = orgY + height/2;
-  		
-  	double rndAng = 2 * Math.PI * Math.random();
-  	double rndRadius = Math.random();
-    // use square root of radius, since area is proportional to square of radius
-    double rndRadius2 = Math.sqrt(rndRadius);
-  	double rndX = width/2 * rndRadius2 * Math.cos(rndAng); 
-  	double rndY = height/2 * rndRadius2 * Math.sin(rndAng); 
-  	
-    double x0 = centreX + rndX;
-    double y0 = centreY + rndY;
-    return new Coordinate((double)x0, y0, Coordinates.NULL_ORDINATE);    
+  public void setGutterFraction(final double gutterFraction) {
+    this.gutterFraction = gutterFraction;
   }
 
 }

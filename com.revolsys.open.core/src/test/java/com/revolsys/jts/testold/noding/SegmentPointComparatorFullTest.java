@@ -6,9 +6,9 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.Octant;
 import com.revolsys.jts.noding.SegmentPointComparator;
+import com.revolsys.util.MathUtil;
 
 /**
  * Test IntersectionSegment#compareNodePosition using an exhaustive set
@@ -21,8 +21,6 @@ public class SegmentPointComparatorFullTest extends TestCase {
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(SegmentPointComparatorFullTest.class);
   }
-
-  private final PrecisionModel pm = new PrecisionModel(1.0);
 
   public SegmentPointComparatorFullTest(final String name) {
     super(name);
@@ -57,7 +55,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
     for (int i = 0; i < 4; i++) {
       final double dist = i;
 
-      final double gridSize = 1 / this.pm.getScale();
+      final double gridSize = 1;
 
       checkPointsAtDistance(seg, dist, dist + 1.0 * gridSize);
       checkPointsAtDistance(seg, dist, dist + 2.0 * gridSize);
@@ -70,8 +68,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final double dx = seg.getP1().getX() - seg.getP0().getX();
     final double dy = seg.getP1().getY() - seg.getP0().getY();
     final double len = seg.getLength();
-    final Coordinates pt = new Coordinate(pm.makePrecise(dist * dx / len),
-      pm.makePrecise(dist * dy / len));
+    final Coordinates pt = new Coordinate(MathUtil.makePrecise(1.0, dist
+      * dx / len), MathUtil.makePrecise(1.0, dist * dy / len));
     return pt;
   }
 

@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 
 /**
  * A dynamic list of the vertices in a constructed offset curve.
@@ -53,11 +52,10 @@ import com.revolsys.jts.geom.PrecisionModel;
  *
  */
 class OffsetSegmentString {
-  private static final Coordinates[] COORDINATE_ARRAY_TYPE = new Coordinates[0];
 
   private final List<Coordinates> points = new ArrayList<>();
 
-  private PrecisionModel precisionModel = null;
+  private GeometryFactory precisionModel = null;
 
   /**
    * The distance below which two adjacent points on the curve 
@@ -72,8 +70,8 @@ class OffsetSegmentString {
 
   public void addPt(final double... coordinates) {
     if (!precisionModel.isFloating()) {
-      coordinates[0] = precisionModel.makePrecise(coordinates[0]);
-      coordinates[1] = precisionModel.makePrecise(coordinates[1]);
+      coordinates[0] = precisionModel.makePrecise(0, coordinates[0]);
+      coordinates[1] = precisionModel.makePrecise(1, coordinates[1]);
     }
     final Coordinates bufPt = new DoubleCoordinates(coordinates);
     if (!isRedundant(bufPt)) {
@@ -142,7 +140,7 @@ class OffsetSegmentString {
     this.minimimVertexDistance = minimimVertexDistance;
   }
 
-  public void setPrecisionModel(final PrecisionModel precisionModel) {
+  public void setPrecisionModel(final GeometryFactory precisionModel) {
     this.precisionModel = precisionModel;
   }
 

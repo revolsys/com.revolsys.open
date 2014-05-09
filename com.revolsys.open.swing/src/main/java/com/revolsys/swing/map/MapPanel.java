@@ -36,7 +36,6 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
@@ -82,17 +81,14 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     500L, 250L, 100L, 50L, 25L, 10L, 5L);
 
   public static final BoundingBox BC_ENVELOPE = new Envelope(
-    GeometryFactory.getFactory(3005, 3, 1000, 1000), 2, 25000, 340000,
-    1900000, 1750000);
+    GeometryFactory.getFactory(3005, 3, 1000, 1000), 2, 25000, 340000, 1900000,
+    1750000);
 
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
 
   public static final String MAP_PANEL = "mapPanel";
 
   public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
-
-  private static final PrecisionModel SCALE_PRECISION_MODEL = new PrecisionModel(
-    10);
 
   public static MapPanel get(final Layer layer) {
     if (layer == null) {
@@ -740,7 +736,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     if (!settingScale && !Double.isNaN(scale) && !Double.isInfinite(scale)) {
       try {
         settingScale = true;
-        scale = SCALE_PRECISION_MODEL.makePrecise(scale);
+        scale = MathUtil.makePrecise(10.0, scale);
         if (scale >= 0.1) {
           final double oldValue = this.scale;
           final double oldUnitsPerPixel = getUnitsPerPixel();
@@ -776,7 +772,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void setUnitsPerPixel(final double unitsPerPixel) {
     if (viewport != null) {
       double scale = viewport.getScaleForUnitsPerPixel(unitsPerPixel);
-      scale = SCALE_PRECISION_MODEL.makePrecise(scale);
+      scale = MathUtil.makePrecise(10.0, scale);
       final double oldUnitsPerPixel = getUnitsPerPixel();
       if (!MathUtil.precisionEqual(unitsPerPixel, oldUnitsPerPixel, 10000000.0)) {
         setScale(scale);
@@ -899,7 +895,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void zoomTo(final Geometry geometry) {
     if (geometry != null) {
-      final Geometry convertedGeometry = (Geometry)geometry.copy(getGeometryFactory());
+      final Geometry convertedGeometry = geometry.copy(getGeometryFactory());
       final BoundingBox boudingBox = convertedGeometry.getBoundingBox();
       zoomTo(boudingBox);
     }

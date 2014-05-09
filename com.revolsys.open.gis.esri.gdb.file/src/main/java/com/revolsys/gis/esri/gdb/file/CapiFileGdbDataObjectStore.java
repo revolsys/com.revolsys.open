@@ -398,7 +398,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   @PreDestroy
   public void close() {
-    FileGdbDataObjectStoreFactory.release(fileName);
+    if (!FileGdbDataObjectStoreFactory.release(fileName)) {
+      doClose();
+    }
   }
 
   protected void closeEnumRows() {

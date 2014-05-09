@@ -49,7 +49,6 @@ import org.jdom.input.SAXBuilder;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jtstest.function.GeometryFunctionRegistry;
 import com.revolsys.jtstest.function.TestCaseGeometryFunctions;
 import com.revolsys.jtstest.geomop.GeometryFunctionOperation;
@@ -98,8 +97,8 @@ public class TestReader {
     return absoluteWktFile;
   }
 
-  private PrecisionModel createPrecisionModel(
-    final Element precisionModelElement) throws TestParseException {
+  private double createPrecisionModel(final Element precisionModelElement)
+    throws TestParseException {
     final Attribute scaleAttribute = precisionModelElement.getAttribute("scale");
     if (scaleAttribute == null) {
       throw new TestParseException(
@@ -113,7 +112,7 @@ public class TestReader {
         "Could not convert scale attribute to double: "
           + scaleAttribute.getValue());
     }
-    return new PrecisionModel(scale);
+    return scale;
   }
 
   public TestFile createTestRun(final File testFile, final int runIndex)
@@ -212,12 +211,11 @@ public class TestReader {
    * @return a PrecisionModel instance (default if not specified)
    * @throws TestParseException
    */
-  private PrecisionModel parsePrecisionModel(final Element runElement)
+  private double parsePrecisionModel(final Element runElement)
     throws TestParseException {
-    PrecisionModel precisionModel = new PrecisionModel();
     final Element precisionModelElement = runElement.getChild("precisionModel");
     if (precisionModelElement == null) {
-      return precisionModel;
+      return 0;
     }
     final Attribute typeAttribute = precisionModelElement.getAttribute("type");
     final Attribute scaleAttribute = precisionModelElement.getAttribute("scale");
@@ -233,9 +231,9 @@ public class TestReader {
         throw new TestParseException(
           "scale attribute not allowed in floating <precisionModel>");
       }
-      precisionModel = createPrecisionModel(precisionModelElement);
+      return createPrecisionModel(precisionModelElement);
     }
-    return precisionModel;
+    return 0;
   }
 
   /**
@@ -347,9 +345,8 @@ public class TestReader {
     resultMatcher = parseResultMatcher(runElement);
 
     // ----------- <precisionModel> (optional) ----------------
-    final PrecisionModel precisionModel = parsePrecisionModel(runElement);
-    this.geometryFactory = GeometryFactory.getFactory(0,
-      precisionModel.getScale());
+    final double scale = parsePrecisionModel(runElement);
+    this.geometryFactory = GeometryFactory.getFactory(0, scale);
 
     // --------------- build TestRun ---------------------
     final String description = descElement != null ? descElement.getTextTrim()

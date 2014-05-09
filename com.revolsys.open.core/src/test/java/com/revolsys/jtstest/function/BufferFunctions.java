@@ -40,8 +40,8 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.GeometryMapper;
 import com.revolsys.jts.geom.util.GeometryMapper.MapOp;
 import com.revolsys.jts.noding.SegmentString;
@@ -167,8 +167,7 @@ public class BufferFunctions {
   private static Geometry buildCurveSet(final Geometry geometry,
     final double dist, final BufferParameters bufParams) {
     // --- now construct curve
-    final PrecisionModel precisionModel = geometry.getGeometryFactory()
-      .getPrecisionModel();
+    final GeometryFactory precisionModel = geometry.getGeometryFactory();
     final OffsetCurveSetBuilder curveBuilder = new OffsetCurveSetBuilder(
       geometry, dist, precisionModel, bufParams);
     final List curves = curveBuilder.getCurves();

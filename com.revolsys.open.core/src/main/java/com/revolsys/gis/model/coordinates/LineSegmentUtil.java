@@ -418,7 +418,7 @@ public class LineSegmentUtil {
    * @return True if the point is on the line.
    */
   public static boolean isPointOnLine(
-    final CoordinatesPrecisionModel precisionModel,
+    final GeometryFactory precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     if (lineStart.equals2d(point)) {
@@ -467,7 +467,7 @@ public class LineSegmentUtil {
   }
 
   public static boolean isPointOnLineMiddle(
-    final CoordinatesPrecisionModel precisionModel,
+    final GeometryFactory precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     if (point.equals2d(lineStart)) {
@@ -495,7 +495,7 @@ public class LineSegmentUtil {
   }
 
   public static Coordinates midPoint(
-    final CoordinatesPrecisionModel precisionModel,
+    final GeometryFactory precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd) {
     return project(precisionModel, lineStart, lineEnd, 0.5);
   }
@@ -538,7 +538,7 @@ public class LineSegmentUtil {
   }
 
   public static Coordinates pointAlong(
-    final CoordinatesPrecisionModel precisionModel,
+    final GeometryFactory precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
@@ -552,7 +552,7 @@ public class LineSegmentUtil {
   }
 
   public static Coordinates project(
-    final CoordinatesPrecisionModel precisionModel,
+    final GeometryFactory precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd,
     final Coordinates point) {
     if (point.equals2d(lineStart) || point.equals2d(lineEnd)) {
@@ -586,7 +586,7 @@ public class LineSegmentUtil {
   }
 
   public static Coordinates project(
-    final CoordinatesPrecisionModel precisionModel,
+    final GeometryFactory precisionModel,
     final Coordinates lineStart, final Coordinates lineEnd, final double r) {
     final int axisCount = CoordinatesUtil.getAxisCount(lineStart, lineEnd);
     final Coordinates point = project(axisCount, lineStart, lineEnd, r);

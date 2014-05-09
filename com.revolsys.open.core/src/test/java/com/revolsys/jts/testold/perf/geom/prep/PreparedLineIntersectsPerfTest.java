@@ -38,7 +38,6 @@ import java.util.List;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.util.Stopwatch;
@@ -52,9 +51,7 @@ public class PreparedLineIntersectsPerfTest {
 
   static final int NUM_LINE_PTS = 10;
 
-  static PrecisionModel pm = new PrecisionModel();
-
-  static GeometryFactory fact = GeometryFactory.getFactory(0, 2);
+  static GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 2);
 
   public static void main(final String[] args) {
     final PreparedLineIntersectsPerfTest test = new PreparedLineIntersectsPerfTest();

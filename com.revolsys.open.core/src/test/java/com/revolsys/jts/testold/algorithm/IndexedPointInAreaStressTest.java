@@ -39,7 +39,6 @@ import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.testold.perf.algorithm.PointInAreaStressTester;
 
 public class IndexedPointInAreaStressTest extends TestCase {
@@ -47,8 +46,6 @@ public class IndexedPointInAreaStressTest extends TestCase {
   public static void main(final String args[]) {
     TestRunner.run(IndexedPointInAreaStressTest.class);
   }
-
-  PrecisionModel pmFixed_1 = new PrecisionModel(1.0);
 
   public IndexedPointInAreaStressTest(final String name) {
     super(name);

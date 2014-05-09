@@ -1,17 +1,15 @@
 package com.revolsys.gis.oracle.esri;
 
-import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeSpatialReference {
   private String csWkt;
 
   private int esriSrid;
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
   private Double mOffset;
-
-  private PrecisionModel mPrecisionModel;
 
   private Double mScale;
 
@@ -27,11 +25,9 @@ public class ArcSdeSpatialReference {
 
   private Double zOffset;
 
-  private PrecisionModel zPrecisionModel;
-
   private Double zScale;
 
-  public ArcSdeSpatialReference(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public ArcSdeSpatialReference(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
@@ -43,16 +39,12 @@ public class ArcSdeSpatialReference {
     return this.esriSrid;
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 
   public Double getMOffset() {
     return this.mOffset;
-  }
-
-  public PrecisionModel getMPrecisionModel() {
-    return this.mPrecisionModel;
   }
 
   public Double getMScale() {
@@ -71,10 +63,6 @@ public class ArcSdeSpatialReference {
     return this.xOffset;
   }
 
-  public PrecisionModel getXyPrecisionModel() {
-    return this.geometryFactory.getPrecisionModel();
-  }
-
   public Double getXyScale() {
     return this.xyScale;
   }
@@ -85,10 +73,6 @@ public class ArcSdeSpatialReference {
 
   public Double getZOffset() {
     return this.zOffset;
-  }
-
-  public PrecisionModel getZPrecisionModel() {
-    return this.zPrecisionModel;
   }
 
   public Double getZScale() {
@@ -117,15 +101,11 @@ public class ArcSdeSpatialReference {
 
   public void setMScale(final Double mScale) {
     this.mScale = mScale;
-    if (mScale != null) {
-      this.mPrecisionModel = new PrecisionModel(mScale);
-    }
   }
 
   public void setMScale(final Number mScale) {
     if (mScale == null) {
       this.mScale = null;
-      this.mPrecisionModel = new PrecisionModel(this.mPrecisionModel);
     } else {
       setMScale(mScale.doubleValue());
     }
@@ -189,15 +169,11 @@ public class ArcSdeSpatialReference {
 
   public void setZScale(final Double zScale) {
     this.zScale = zScale;
-    if (zScale != null) {
-      this.zPrecisionModel = new PrecisionModel(zScale);
-    }
   }
 
   public void setZScale(final Number zScale) {
     if (zScale == null) {
       this.zScale = null;
-      this.zPrecisionModel = null;
     } else {
       setZScale(zScale.doubleValue());
     }

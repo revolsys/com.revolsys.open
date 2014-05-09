@@ -40,14 +40,13 @@ import java.util.List;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.noding.Noder;
 import com.revolsys.jts.noding.NodingValidator;
 
 /**
  * Nodes the linework in a list of {@link Geometry}s using Snap-Rounding
- * to a given {@link PrecisionModel}.
+ * to a given scale.
  * <p>
  * The input coordinates are expected to be rounded
  * to the given precision model.
@@ -65,18 +64,18 @@ import com.revolsys.jts.noding.NodingValidator;
 public class GeometryNoder {
   private GeometryFactory geomFact;
 
-  private final PrecisionModel pm;
+  private final double scale;
 
   private boolean isValidityChecked = false;
 
   /**
    * Creates a new noder which snap-rounds to a grid specified
-   * by the given {@link PrecisionModel}.
+   * by the given scale.
    * 
    * @param pm the precision model for the grid to snap-round to
    */
-  public GeometryNoder(final PrecisionModel pm) {
-    this.pm = pm;
+  public GeometryNoder(final double scale) {
+    this.scale = scale;
   }
 
   private List<LineString> extractLines(
@@ -103,7 +102,7 @@ public class GeometryNoder {
     final Collection<LineString> lines = extractLines(geometries);
     final List<NodedSegmentString> segStrings = toSegmentStrings(lines);
     // Noder sr = new SimpleSnapRounder(pm);
-    final Noder sr = new MCIndexSnapRounder(pm);
+    final Noder sr = new MCIndexSnapRounder(scale);
     sr.computeNodes(segStrings);
     final Collection<NodedSegmentString> nodedLines = sr.getNodedSubstrings();
 

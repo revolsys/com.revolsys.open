@@ -496,4 +496,16 @@ public class CoordinatesUtil {
     final Coordinates newPoint = new DoubleCoordinates(newX, newY);
     return newPoint;
   }
+
+  public static Coordinates getPrecise(final double scale,
+    final Coordinates point) {
+    if (scale <= 0) {
+      return point;
+    } else {
+      final double[] coordinates = point.getCoordinates();
+      coordinates[0] = MathUtil.makePrecise(scale, coordinates[0]);
+      coordinates[1] = MathUtil.makePrecise(scale, coordinates[1]);
+      return new DoubleCoordinates(coordinates);
+    }
+  }
 }

@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,7 +36,6 @@ import java.util.Collection;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.TopologyException;
 
 /**
@@ -53,21 +51,74 @@ import com.revolsys.jts.geom.TopologyException;
  *
  * @version 1.7
  */
-public class IteratedNoder
-    implements Noder
-{
+public class IteratedNoder implements Noder {
   public static final int MAX_ITER = 5;
 
-  private PrecisionModel pm;
-  private LineIntersector li;
+  private final LineIntersector li;
+
   private Collection nodedSegStrings;
+
   private int maxIter = MAX_ITER;
 
-  public IteratedNoder(PrecisionModel pm)
-  {
-    li = new RobustLineIntersector();
-    this.pm = pm;
-    li.setPrecisionModel(pm);
+  public IteratedNoder(final double scale) {
+    li = new RobustLineIntersector(scale);
+  }
+
+  /**
+   * Fully nodes a list of {@link SegmentString}s, i.e. peforms noding iteratively
+   * until no intersections are found between segments.
+   * Maintains labelling of edges correctly through
+   * the noding.
+   *
+   * @param segStrings a collection of SegmentStrings to be noded
+   * @throws TopologyException if the iterated noding fails to converge.
+   */
+  @Override
+  public void computeNodes(final Collection<NodedSegmentString> segStrings)
+    throws TopologyException {
+    final int[] numInteriorIntersections = new int[1];
+    nodedSegStrings = segStrings;
+    int nodingIterationCount = 0;
+    int lastNodesCreated = -1;
+    do {
+      node(nodedSegStrings, numInteriorIntersections);
+      nodingIterationCount++;
+      final int nodesCreated = numInteriorIntersections[0];
+
+      /**
+       * Fail if the number of nodes created is not declining.
+       * However, allow a few iterations at least before doing this
+       */
+      // System.out.println("# nodes created: " + nodesCreated);
+      if (lastNodesCreated > 0 && nodesCreated >= lastNodesCreated
+        && nodingIterationCount > maxIter) {
+        throw new TopologyException("Iterated noding failed to converge after "
+          + nodingIterationCount + " iterations");
+      }
+      lastNodesCreated = nodesCreated;
+
+    } while (lastNodesCreated > 0);
+    // System.out.println("# nodings = " + nodingIterationCount);
+  }
+
+  @Override
+  public Collection<NodedSegmentString> getNodedSubstrings() {
+    return nodedSegStrings;
+  }
+
+  /**
+   * Node the input segment strings once
+   * and create the split edges between the nodes
+   */
+  private void node(final Collection segStrings,
+    final int[] numInteriorIntersections) {
+    final IntersectionAdder si = new IntersectionAdder(li);
+    final MCIndexNoder noder = new MCIndexNoder();
+    noder.setSegmentIntersector(si);
+    noder.computeNodes(segStrings);
+    nodedSegStrings = noder.getNodedSubstrings();
+    numInteriorIntersections[0] = si.numInteriorIntersections;
+    // System.out.println("# intersection tests: " + si.numTests);
   }
 
   /**
@@ -79,65 +130,8 @@ public class IteratedNoder
    *
    * @param maxIter the maximum number of iterations to perform
    */
-  public void setMaximumIterations(int maxIter)
-  {
+  public void setMaximumIterations(final int maxIter) {
     this.maxIter = maxIter;
-  }
-
-  public Collection<NodedSegmentString> getNodedSubstrings()  {    return nodedSegStrings;  }
-
-  /**
-   * Fully nodes a list of {@link SegmentString}s, i.e. peforms noding iteratively
-   * until no intersections are found between segments.
-   * Maintains labelling of edges correctly through
-   * the noding.
-   *
-   * @param segStrings a collection of SegmentStrings to be noded
-   * @throws TopologyException if the iterated noding fails to converge.
-   */
-  public void computeNodes(Collection<NodedSegmentString> segStrings)
-    throws TopologyException
-  {
-    int[] numInteriorIntersections = new int[1];
-    nodedSegStrings = segStrings;
-    int nodingIterationCount = 0;
-    int lastNodesCreated = -1;
-    do {
-      node(nodedSegStrings, numInteriorIntersections);
-      nodingIterationCount++;
-      int nodesCreated = numInteriorIntersections[0];
-
-      /**
-       * Fail if the number of nodes created is not declining.
-       * However, allow a few iterations at least before doing this
-       */
-//System.out.println("# nodes created: " + nodesCreated);
-      if (lastNodesCreated > 0
-          && nodesCreated >= lastNodesCreated
-          && nodingIterationCount > maxIter) {
-        throw new TopologyException("Iterated noding failed to converge after "
-                                    + nodingIterationCount + " iterations");
-      }
-      lastNodesCreated = nodesCreated;
-
-    } while (lastNodesCreated > 0);
-//System.out.println("# nodings = " + nodingIterationCount);
-  }
-
-
-/**
- * Node the input segment strings once
- * and create the split edges between the nodes
- */
-  private void node(Collection segStrings, int[] numInteriorIntersections)
-  {
-    IntersectionAdder si = new IntersectionAdder(li);
-    MCIndexNoder noder = new MCIndexNoder();
-    noder.setSegmentIntersector(si);
-    noder.computeNodes(segStrings);
-    nodedSegStrings = noder.getNodedSubstrings();
-    numInteriorIntersections[0] = si.numInteriorIntersections;
-//System.out.println("# intersection tests: " + si.numTests);
   }
 
 }

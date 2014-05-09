@@ -41,7 +41,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.testold.algorithm.PerturbedGridPolygonBuilder;
 
@@ -68,8 +67,6 @@ public class SimpleRayCrossingStressTest extends TestCase {
   public static void main(final String args[]) {
     TestRunner.run(SimpleRayCrossingStressTest.class);
   }
-
-  PrecisionModel pmFixed_1 = new PrecisionModel(1.0);
 
   public SimpleRayCrossingStressTest(final String name) {
     super(name);

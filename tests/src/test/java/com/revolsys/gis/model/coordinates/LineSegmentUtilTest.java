@@ -37,7 +37,7 @@ public class LineSegmentUtilTest {
       Coordinates line1C2 = getCoordinates(testCase, "line1", "2");
       Coordinates line2C1 = getCoordinates(testCase, "line2", "1");
       Coordinates line2C2 = getCoordinates(testCase, "line2", "2");
-      final CoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
+      final GeometryFactory precisionModel = new SimpleGeometryFactory(
         1, 1);
       List<Coordinates> expectedResult = getResults(testCase);
       List<Coordinates> reverseExpectedResult = new ArrayList<Coordinates>(expectedResult);

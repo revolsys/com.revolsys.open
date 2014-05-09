@@ -1,6 +1,5 @@
 package com.revolsys.jts.geom;
 
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 
@@ -91,8 +90,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
   CoordinatesList getIntersection(final Coordinates point1,
     final Coordinates point2);
 
-  CoordinatesList getIntersection(
-    final CoordinatesPrecisionModel precisionModel,
+  CoordinatesList getIntersection(final GeometryFactory precisionModel,
     final LineSegment lineSegment2);
 
   CoordinatesList getIntersection(LineSegment lineSegment2);

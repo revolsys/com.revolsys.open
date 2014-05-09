@@ -82,7 +82,7 @@ public class GridGenerator extends GeometryGenerator {
    */
   @Override
   public Geometry create() {
-    GeometryFactory r = this.geometryFactory;
+    final GeometryFactory r = this.geometryFactory;
     return createEnv().toGeometry();
   }
 
@@ -125,11 +125,10 @@ public class GridGenerator extends GeometryGenerator {
     minx = x + col * sx;
     miny = y + row * sy;
 
-    final BoundingBox box = new Envelope(
-      2,
-      this.geometryFactory.getPrecisionModel().makePrecise(minx),
-      this.geometryFactory.getPrecisionModel().makePrecise(miny),
-      this.geometryFactory.getPrecisionModel().makePrecise(minx + sx), this.geometryFactory.getPrecisionModel().makePrecise(miny + sy));
+    final BoundingBox box = new Envelope(2, this.geometryFactory.makePrecise(0,
+      minx), this.geometryFactory.makePrecise(1, miny),
+      this.geometryFactory.makePrecise(0, minx + sx),
+      this.geometryFactory.makePrecise(1, miny + sy));
 
     this.index++;
     return box;

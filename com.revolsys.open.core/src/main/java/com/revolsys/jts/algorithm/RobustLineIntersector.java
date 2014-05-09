@@ -37,6 +37,7 @@ package com.revolsys.jts.algorithm;
  */
 
 import com.revolsys.gis.model.coordinates.CentralEndpointIntersector;
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
@@ -95,6 +96,10 @@ public class RobustLineIntersector extends LineIntersector {
   }
 
   public RobustLineIntersector() {
+  }
+
+  public RobustLineIntersector(final double scale) {
+    super(scale);
   }
 
   private int computeCollinearIntersection(final Coordinates p1,
@@ -293,10 +298,7 @@ public class RobustLineIntersector extends LineIntersector {
       // System.out.println("Snapped to " + intPt);
       // checkDD(p1, p2, q1, q2, intPt);
     }
-    if (precisionModel != null) {
-      return precisionModel.getPrecise(intPt);
-    }
-    return intPt;
+    return CoordinatesUtil.getPrecise(getScale(), intPt);
   }
 
   private Coordinates intersectionWithNormalization(final Coordinates p1,

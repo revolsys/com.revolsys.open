@@ -10,7 +10,6 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
@@ -18,8 +17,6 @@ public class SplitGeometryProcess extends
   BaseInOutProcess<DataObject, DataObject> {
   /** The statistics to record the number new observations created. */
   private Statistics createdStatistics;
-
-  private PrecisionModel elevationPrecisionModel;
 
   private Geometry geometry;
 
@@ -47,10 +44,6 @@ public class SplitGeometryProcess extends
       createdStatistics = new Statistics("Created");
     }
     return createdStatistics;
-  }
-
-  public PrecisionModel getElevationPrecisionModel() {
-    return elevationPrecisionModel;
   }
 
   public Geometry getGeometry() {
@@ -132,18 +125,14 @@ public class SplitGeometryProcess extends
     this.createdStatistics = createdStatistics;
   }
 
-  public void setElevationPrecisionModel(
-    final PrecisionModel elevationPrecisionModel) {
-    this.elevationPrecisionModel = elevationPrecisionModel;
-  }
-
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
     index = new LineSegmentIndex();
     index.insert(geometry);
   }
 
-  public void setGeometryFactory(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public void setGeometryFactory(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 

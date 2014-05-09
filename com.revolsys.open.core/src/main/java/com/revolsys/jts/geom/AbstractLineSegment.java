@@ -2,7 +2,6 @@ package com.revolsys.jts.geom;
 
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.jts.LineSegmentImpl;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -320,8 +319,7 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
   }
 
   @Override
-  public CoordinatesList getIntersection(
-    final CoordinatesPrecisionModel precisionModel,
+  public CoordinatesList getIntersection(final GeometryFactory precisionModel,
     final LineSegment lineSegment2) {
     return LineSegmentUtil.getIntersection(getGeometryFactory(), get(0),
       get(1), lineSegment2.get(0), lineSegment2.get(1));

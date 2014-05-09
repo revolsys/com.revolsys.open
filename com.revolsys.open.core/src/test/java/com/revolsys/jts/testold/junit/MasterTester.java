@@ -57,7 +57,6 @@ import com.revolsys.jts.testold.geom.LineStringImplTest;
 import com.revolsys.jts.testold.geom.MultiPointImplTest;
 import com.revolsys.jts.testold.geom.NormalizeTest;
 import com.revolsys.jts.testold.geom.PointImplTest;
-import com.revolsys.jts.testold.geom.PrecisionModelTest;
 import com.revolsys.jts.testold.geom.PredicateShortCircuitTest;
 import com.revolsys.jts.testold.geom.RectanglePredicateSyntheticTest;
 import com.revolsys.jts.testold.geom.RectanglePredicateTest;
@@ -99,8 +98,7 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
   LocationIndexedLineTest.class, MiscellaneousTest.class,
   MiscellaneousTest2.class, MultiPointImplTest.class,
   NonRobustLineIntersectorTest.class, NormalizeTest.class, PointImplTest.class,
-  PolygonizeTest.class, PredicateShortCircuitTest.class,
-  PrecisionModelTest.class, QuadtreeTest.class,
+  PolygonizeTest.class, PredicateShortCircuitTest.class, QuadtreeTest.class,
   RectanglePredicateSyntheticTest.class, RectanglePredicateTest.class,
   RelateBoundaryNodeRuleTest.class, RobustLineIntersectionTest.class,
   SimpleTest.class, SIRtreeTest.class, STRtreeTest.class, WKTReaderTest.class,

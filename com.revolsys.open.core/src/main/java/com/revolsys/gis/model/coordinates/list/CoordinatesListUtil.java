@@ -18,7 +18,6 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
@@ -528,8 +527,7 @@ public class CoordinatesListUtil {
     return false;
   }
 
-  public static boolean isPointOnLine(
-    final CoordinatesPrecisionModel precisionModel,
+  public static boolean isPointOnLine(final GeometryFactory precisionModel,
     final CoordinatesList points, final Coordinates point) {
     final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
       points);
@@ -695,7 +693,7 @@ public class CoordinatesListUtil {
     if (nodes2.size() == 1) {
       final Node<T> node2 = nodes2.get(0);
       if (graph1.findNode(node2) == null) {
-        final CoordinatesPrecisionModel precisionModel = graph1.getPrecisionModel();
+        final GeometryFactory precisionModel = graph1.getPrecisionModel();
         final Coordinates midPoint = LineSegmentUtil.midPoint(precisionModel,
           node1, node2);
         if (!node1.equals2d(midPoint)) {

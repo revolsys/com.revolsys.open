@@ -380,31 +380,30 @@ public class OctagonalEnvelope {
     minX = Double.NaN;
   }
 
-  public Geometry toGeometry(final GeometryFactory geomFactory) {
+  public Geometry toGeometry(final GeometryFactory geometryFactory) {
     if (isNull()) {
-      return geomFactory.point((CoordinatesList)null);
+      return geometryFactory.point((CoordinatesList)null);
     }
 
-    final PrecisionModel pm = geomFactory.getPrecisionModel();
-    final Coordinates px00 = new DoubleCoordinates(pm.makePrecise(minX),
-      pm.makePrecise(minA - minX));
-    final Coordinates px01 = new DoubleCoordinates(pm.makePrecise(minX),
-      pm.makePrecise(minX - minB));
+    final Coordinates px00 = new DoubleCoordinates(geometryFactory.makePrecise(
+      0, minX), geometryFactory.makePrecise(1, minA - minX));
+    final Coordinates px01 = new DoubleCoordinates(geometryFactory.makePrecise(
+      0, minX), geometryFactory.makePrecise(1, minX - minB));
 
-    final Coordinates px10 = new DoubleCoordinates(pm.makePrecise(maxX),
-      pm.makePrecise(maxX - maxB));
-    final Coordinates px11 = new DoubleCoordinates(pm.makePrecise(maxX),
-      pm.makePrecise(maxA - maxX));
+    final Coordinates px10 = new DoubleCoordinates(geometryFactory.makePrecise(
+      0, maxX), geometryFactory.makePrecise(1, maxX - maxB));
+    final Coordinates px11 = new DoubleCoordinates(geometryFactory.makePrecise(
+      0, maxX), geometryFactory.makePrecise(1, maxA - maxX));
 
-    final Coordinates py00 = new DoubleCoordinates(pm.makePrecise(minA - minY),
-      pm.makePrecise(minY));
-    final Coordinates py01 = new DoubleCoordinates(pm.makePrecise(minY + maxB),
-      pm.makePrecise(minY));
+    final Coordinates py00 = new DoubleCoordinates(geometryFactory.makePrecise(
+      0, minA - minY), geometryFactory.makePrecise(1, minY));
+    final Coordinates py01 = new DoubleCoordinates(geometryFactory.makePrecise(
+      0, minY + maxB), geometryFactory.makePrecise(1, minY));
 
-    final Coordinates py10 = new DoubleCoordinates(pm.makePrecise(maxY + minB),
-      pm.makePrecise(maxY));
-    final Coordinates py11 = new DoubleCoordinates(pm.makePrecise(maxA - maxY),
-      pm.makePrecise(maxY));
+    final Coordinates py10 = new DoubleCoordinates(geometryFactory.makePrecise(
+      0, maxY + minB), geometryFactory.makePrecise(1, maxY));
+    final Coordinates py11 = new DoubleCoordinates(geometryFactory.makePrecise(
+      0, maxA - maxY), geometryFactory.makePrecise(1, maxY));
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(px00, false);
@@ -417,13 +416,13 @@ public class OctagonalEnvelope {
     coordList.add(py00, false);
 
     if (coordList.size() == 1) {
-      return geomFactory.point(px00);
+      return geometryFactory.point(px00);
     }
     if (coordList.size() == 2) {
-      return geomFactory.lineString(coordList);
+      return geometryFactory.lineString(coordList);
     }
     // must be a polygon, so add closing point
     coordList.add(px00, false);
-    return geomFactory.polygon(geomFactory.linearRing(coordList));
+    return geometryFactory.polygon(geometryFactory.linearRing(coordList));
   }
 }

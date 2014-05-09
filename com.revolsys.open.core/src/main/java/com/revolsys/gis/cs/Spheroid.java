@@ -3,7 +3,7 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.util.MathUtil;
 
 public class Spheroid implements Serializable {
   /**
@@ -64,8 +64,9 @@ public class Spheroid implements Serializable {
   public boolean equals(final Object object) {
     if (object instanceof Spheroid) {
       final Spheroid spheroid = (Spheroid)object;
-      final PrecisionModel precision = new PrecisionModel(1000000);
-      if (Double.doubleToLongBits(precision.makePrecise(inverseFlattening)) != Double.doubleToLongBits(precision.makePrecise(spheroid.inverseFlattening))) {
+      if (Double.doubleToLongBits(MathUtil.makePrecise(1000000.0,
+        inverseFlattening)) != Double.doubleToLongBits(MathUtil.makePrecise(
+        1000000.0, spheroid.inverseFlattening))) {
         return false;
       } else if (Double.doubleToLongBits(semiMajorAxis) != Double.doubleToLongBits(spheroid.semiMajorAxis)) {
         return false;
@@ -128,8 +129,8 @@ public class Spheroid implements Serializable {
     final int prime = 31;
     int result = 1;
     long temp;
-    final PrecisionModel precision = new PrecisionModel(1000000);
-    temp = Double.doubleToLongBits(precision.makePrecise(inverseFlattening));
+    temp = Double.doubleToLongBits(MathUtil.makePrecise(1000000.0,
+      inverseFlattening));
     result = prime * result + (int)(temp ^ (temp >>> 32));
     temp = Double.doubleToLongBits(semiMajorAxis);
     result = prime * result + (int)(temp ^ (temp >>> 32));

@@ -40,7 +40,6 @@ import java.util.List;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataTypeProxy;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -811,13 +810,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return
    */
-  CoordinatesPrecisionModel getCoordinatesPrecisionModel();
-
-  /**
-   * 
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @return
-   */
   CoordinateSystem getCoordinateSystem();
 
   /**
@@ -929,14 +921,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   double getLength();
 
   Point getPoint();
-
-  /**
-   *  Returns the <code>PrecisionModel</code> used by the <code>Geometry</code>.
-   *
-   *@return    the specification of the grid of allowable points, for this
-   *      <code>Geometry</code> and all other <code>Geometry</code>s
-   */
-  PrecisionModel getPrecisionModel();
 
   /**
    * <p>Get the {@link Segment} at the specified vertexId (see {@link Segment#getSegmentId()}).</p>

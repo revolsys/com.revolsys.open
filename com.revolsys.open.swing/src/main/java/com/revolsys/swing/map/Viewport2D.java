@@ -25,7 +25,6 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
@@ -487,8 +486,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
     final double viewHeight = viewHeightPixels * unitsPerPixel;
-    final SimpleCoordinatesPrecisionModel precisionModel = new SimpleCoordinatesPrecisionModel(
-      1 / unitsPerPixel);
+    final GeometryFactory precisionModel = GeometryFactory.getFactory(1 / unitsPerPixel);
     centre = precisionModel.getPreciseCoordinates(centre);
     final double centreX = centre.getX();
     final double centreY = centre.getY();

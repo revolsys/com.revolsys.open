@@ -32,15 +32,12 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 
 public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private final int axisCount;
 
   private final GeometryFactory geometryFactory;
-
-  private final PrecisionModel[] precisionModels;
 
   public OracleSdoGeometryJdbcAttribute(final String name, final DataType type,
     final int sqlType, final boolean required, final String description,
@@ -49,17 +46,6 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     super(name, type, sqlType, 0, 0, required, description, properties);
     this.geometryFactory = geometryFactory;
     this.axisCount = axisCount;
-    this.precisionModels = new PrecisionModel[axisCount];
-    final PrecisionModel precisionModel = geometryFactory.getPrecisionModel();
-    if (precisionModel != null) {
-      this.precisionModels[0] = precisionModel;
-      this.precisionModels[1] = precisionModel;
-    }
-    for (int i = 0; i < this.precisionModels.length; i++) {
-      if (this.precisionModels[i] == null) {
-        this.precisionModels[i] = new PrecisionModel();
-      }
-    }
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
   }
 
@@ -210,8 +196,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
           if (Double.isNaN(ordinate)) {
             ordinates[ordinateIndex++] = 0;
           } else {
-            final PrecisionModel precisionModel = this.precisionModels[j];
-            ordinates[ordinateIndex++] = precisionModel.makePrecise(ordinate);
+            ordinates[ordinateIndex++] = geometryFactory.makePrecise(j,
+              ordinate);
           }
         }
       }

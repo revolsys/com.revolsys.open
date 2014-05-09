@@ -83,7 +83,8 @@ public class TestCase extends junit.framework.TestSuite implements
       this.testDescription = description.replaceAll("\\s+", " ");
       setName(testDescription);
     } else {
-      setName(String.valueOf(caseIndex));
+      setName(testRun.getName() + "_" + String.valueOf(caseIndex));
+
     }
     this.a = a;
     this.b = b;

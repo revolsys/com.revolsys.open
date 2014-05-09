@@ -52,7 +52,6 @@ import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.Edge;
@@ -138,19 +137,19 @@ public class Buffer {
    */
   public static Geometry buffer(final Geometry geometry, final double distance,
     final BufferParameters parameters) {
-    final PrecisionModel precisionModel = geometry.getPrecisionModel();
+    final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     try {
       final MCIndexNoder noder = new MCIndexNoder();
-      final LineIntersector li = new RobustLineIntersector();
-      li.setPrecisionModel(precisionModel);
+      final LineIntersector li = new RobustLineIntersector(
+        geometryFactory.getScaleXY());
       noder.setSegmentIntersector(new IntersectionAdder(li));
-      return buffer(noder, precisionModel, geometry, distance, parameters);
+      return buffer(noder, geometryFactory, geometry, distance, parameters);
     } catch (final RuntimeException e) {
-      if (precisionModel.getType() == PrecisionModel.FIXED) {
-        return bufferFixedPrecision(precisionModel, geometry, distance,
-          parameters);
-      } else {
+      if (geometryFactory.isFloating()) {
         return bufferReducedPrecision(geometry, distance, parameters);
+      } else {
+        return bufferFixedPrecision(geometryFactory, geometry, distance,
+          parameters);
       }
 
     }
@@ -194,7 +193,7 @@ public class Buffer {
   }
 
   private static Geometry buffer(final Noder noder,
-    final PrecisionModel precisionModel, final Geometry geometry,
+    final GeometryFactory precisionModel, final Geometry geometry,
     final double distance, final BufferParameters parameters) {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
@@ -226,12 +225,10 @@ public class Buffer {
   }
 
   private static Geometry bufferFixedPrecision(
-    final PrecisionModel precisionModel, final Geometry geometry,
+    final GeometryFactory precisionModel, final Geometry geometry,
     final double distance, final BufferParameters parameters) {
-    final PrecisionModel rounderPrecisionModel = new PrecisionModel(1.0);
-    final MCIndexSnapRounder rounder = new MCIndexSnapRounder(
-      rounderPrecisionModel);
-    final double scale = precisionModel.getScale();
+    final MCIndexSnapRounder rounder = new MCIndexSnapRounder(1.0);
+    final double scale = precisionModel.getScale(0);
     final Noder noder = new ScaledNoder(rounder, scale);
     return Buffer.buffer(noder, precisionModel, geometry, distance, parameters);
   }
@@ -244,8 +241,8 @@ public class Buffer {
       try {
         final double sizeBasedScaleFactor = precisionScaleFactor(geometry,
           distance, precDigits);
-        final PrecisionModel precisionModel = new PrecisionModel(
-          sizeBasedScaleFactor);
+        final GeometryFactory precisionModel = geometry.getGeometryFactory()
+          .convertScales(sizeBasedScaleFactor);
         return bufferFixedPrecision(precisionModel, geometry, distance,
           parameters);
       } catch (final TopologyException e) {

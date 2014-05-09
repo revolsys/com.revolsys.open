@@ -14,13 +14,18 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory;
+import com.revolsys.gis.util.NoOp;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.test.IoTestSuite;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.test.geometry.TestUtil;
 
 public class FileGdbIoTest {
@@ -35,9 +40,18 @@ public class FileGdbIoTest {
 
     geometry = geometry.convert(geometryFactory);
     final String geometryTypeString = dataType.toString();
-    final File file = new File("/tmp/revolsystest/io/gdb/" + geometryTypeString
-      + "_" + geometryFactory.getAxisCount() + "_" + geometry.getVertexCount()
-      + ".gdb");
+    String name = "/tmp/revolsystest/io/gdb/" + geometryTypeString + "_"
+      + geometryFactory.getAxisCount();
+    if (geometry instanceof GeometryCollection) {
+      name += "_" + geometry.getGeometryCount();
+    }
+    if (geometry instanceof MultiPolygon) {
+      NoOp.noOp();
+    }
+    if (geometry instanceof Polygonal) {
+      name += "_" + geometry.getGeometryComponents(LinearRing.class).size();
+    }
+    final File file = new File(name + "_" + geometry.getVertexCount() + ".gdb");
     FileUtil.deleteDirectory(file);
     file.getParentFile().mkdirs();
     try (

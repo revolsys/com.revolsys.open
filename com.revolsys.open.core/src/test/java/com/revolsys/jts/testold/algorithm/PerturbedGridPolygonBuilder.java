@@ -79,8 +79,7 @@ public class PerturbedGridPolygonBuilder {
 
   private double getRandOrdinate() {
     final double randNum = getRand();
-    final double ord = this.geomFactory.getPrecisionModel().makePrecise(
-      randNum * this.gridWidth);
+    final double ord = this.geomFactory.makePrecise(0, randNum * this.gridWidth);
     return ord;
   }
 

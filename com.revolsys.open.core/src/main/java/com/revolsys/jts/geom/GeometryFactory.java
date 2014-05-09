@@ -56,10 +56,7 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.gis.model.coordinates.PrecisionModelUtil;
-import com.revolsys.gis.model.coordinates.SimpleCoordinatesPrecisionModel;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
@@ -76,6 +73,7 @@ import com.revolsys.jts.geom.impl.PointImpl;
 import com.revolsys.jts.geom.impl.PolygonImpl;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.MathUtil;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
@@ -88,8 +86,7 @@ import com.revolsys.util.CollectionUtil;
  *
  * @version 1.7
  */
-public class GeometryFactory implements Serializable,
-  CoordinatesPrecisionModel, MapSerializer {
+public class GeometryFactory implements Serializable, MapSerializer {
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "geometryFactory", "Geometry Factory", GeometryFactory.class, "create");
 
@@ -253,12 +250,14 @@ public class GeometryFactory implements Serializable,
    * @return The geometry factory.
    */
   public static GeometryFactory getFactory(final int srid, final int axisCount,
-    final double scaleXY, final double scaleZ) {
+    double... scales) {
     synchronized (factories) {
-      final String key = srid + "-" + axisCount + "-" + scaleXY + "-" + scaleZ;
+      scales = getScales(axisCount, scales);
+      final String key = srid + "-" + axisCount + "-"
+        + CollectionUtil.toString("_", Arrays.asList(scales));
       GeometryFactory factory = factories.get(key);
       if (factory == null) {
-        factory = new GeometryFactory(srid, axisCount, scaleXY, scaleZ);
+        factory = new GeometryFactory(srid, axisCount, scales);
         factories.put(key, factory);
       }
       return factory;
@@ -304,6 +303,24 @@ public class GeometryFactory implements Serializable,
     }
   }
 
+  public static double[] getScales(final int axisCount, final double... scales) {
+    final double[] newScales = new double[Math.max(2, axisCount)];
+    for (int i = 0; i < newScales.length; i++) {
+      int scaleIndex = i;
+      if (i > 0) {
+        scaleIndex--;
+      }
+      double scale = 0;
+      if (scaleIndex < scales.length) {
+        scale = scales[scaleIndex];
+      }
+      if (scale > 0) {
+        newScales[i] = scale;
+      }
+    }
+    return newScales;
+  }
+
   public static GeometryFactory wgs84() {
     return getFactory(4326);
   }
@@ -311,10 +328,6 @@ public class GeometryFactory implements Serializable,
   public static GeometryFactory worldMercator() {
     return getFactory(3857);
   }
-
-  private final PrecisionModel precisionModel;
-
-  private final CoordinatesPrecisionModel coordinatesPrecisionModel;
 
   private final CoordinateSystem coordinateSystem;
 
@@ -324,26 +337,20 @@ public class GeometryFactory implements Serializable,
 
   private final WktParser parser = new WktParser(this);
 
-  protected GeometryFactory(final CoordinateSystem coordinateSystem,
-    final int axisCount, final double scaleXY, final double scaleZ) {
-    this.precisionModel = PrecisionModelUtil.getPrecisionModel(scaleXY);
-    this.srid = coordinateSystem.getId();
+  private double[] scales;
 
+  protected GeometryFactory(final CoordinateSystem coordinateSystem,
+    final int axisCount, final double... scales) {
+    this.srid = coordinateSystem.getId();
     this.coordinateSystem = coordinateSystem;
-    this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
-      scaleXY, scaleZ);
-    this.axisCount = Math.max(axisCount, 2);
+    init(axisCount, scales);
   }
 
   protected GeometryFactory(final int srid, final int axisCount,
-    final double scaleXY, final double scaleZ) {
-    this.precisionModel = PrecisionModelUtil.getPrecisionModel(scaleXY);
+    final double... scales) {
     this.srid = srid;
-
     this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
-    this.coordinatesPrecisionModel = new SimpleCoordinatesPrecisionModel(
-      scaleXY, scaleZ);
-    this.axisCount = Math.max(axisCount, 2);
+    init(axisCount, scales);
   }
 
   public void addGeometries(final List<Geometry> geometryList,
@@ -430,14 +437,20 @@ public class GeometryFactory implements Serializable,
   }
 
   public GeometryFactory convertAxisCount(final int axisCount) {
-    if (axisCount == this.axisCount) {
+    if (axisCount == getAxisCount()) {
       return this;
     } else {
       final int srid = getSrid();
-      final double scaleXy = getScaleXY();
-      final double scaleZ = getScaleZ();
-      return GeometryFactory.getFactory(srid, axisCount, scaleXy, scaleZ);
+      final double[] scales = new double[this.scales.length - 1];
+      System.arraycopy(this.scales, 1, scales, 0, scales.length);
+      return GeometryFactory.getFactory(srid, axisCount, scales);
     }
+  }
+
+  public GeometryFactory convertScales(final double... scales) {
+    final int srid = getSrid();
+    final int axisCount = getAxisCount();
+    return GeometryFactory.getFactory(srid, axisCount, scales);
   }
 
   public double[] copyPrecise(final double[] values) {
@@ -766,10 +779,6 @@ public class GeometryFactory implements Serializable,
       otherCoordinateSystem);
   }
 
-  public CoordinatesPrecisionModel getCoordinatesPrecisionModel() {
-    return coordinatesPrecisionModel;
-  }
-
   public CoordinateSystem getCoordinateSystem() {
     return coordinateSystem;
   }
@@ -839,6 +848,37 @@ public class GeometryFactory implements Serializable,
     return lineStrings.toArray(new LineString[lineStrings.size()]);
   }
 
+  /**
+   * Returns the maximum number of significant digits provided by this
+   * precision model.
+   * Intended for use by routines which need to print out 
+   * decimal representations of precise values .
+   * <p>
+   * This method would be more correctly called
+   * <tt>getMinimumDecimalPlaces</tt>, 
+   * since it actually computes the number of decimal places
+   * that is required to correctly display the full
+   * precision of an ordinate value.
+   * <p>
+   * Since it is difficult to compute the required number of
+   * decimal places for scale factors which are not powers of 10,
+   * the algorithm uses a very rough approximation in this case.
+   * This has the side effect that for scale factors which are
+   * powers of 10 the value returned is 1 greater than the true value.
+   * 
+   *
+   * @return the maximum number of decimal places provided by this precision model
+   */
+  public int getMaximumSignificantDigits() {
+    int maxSigDigits = 16;
+    if (isFloating()) {
+      maxSigDigits = 16;
+    } else {
+      maxSigDigits = 1 + (int)Math.ceil(Math.log(getScale(0)) / Math.log(10));
+    }
+    return maxSigDigits;
+  }
+
   public Point[] getPointArray(final Collection<?> pointsList) {
     final List<Point> points = new ArrayList<Point>();
     for (final Object object : pointsList) {
@@ -882,41 +922,53 @@ public class GeometryFactory implements Serializable,
     return precisesPoints;
   }
 
-  @Override
   public Coordinates getPreciseCoordinates(final Coordinates point) {
-    return coordinatesPrecisionModel.getPreciseCoordinates(point);
+    final double[] coordinates = point.getCoordinates();
+    makePrecise(coordinates.length, coordinates);
+    return new DoubleCoordinates(coordinates);
   }
 
-  /**
-   * Returns the PrecisionModel that Geometries created by this factory
-   * will be associated with.
-   * 
-   * @return the PrecisionModel for this factory
-   */
-  public PrecisionModel getPrecisionModel() {
-    return precisionModel;
+  public double getResolution(final int axisIndex) {
+    final double scale = getScale(axisIndex);
+    if (scale <= 0) {
+      return 0;
+    } else {
+      return 1 / scale;
+    }
   }
 
-  @Override
   public double getResolutionXy() {
-    return coordinatesPrecisionModel.getResolutionXy();
+    final double scaleXy = getScaleXY();
+    if (scaleXy <= 0) {
+      return 0;
+    } else {
+      return 1 / scaleXy;
+    }
   }
 
-  @Override
   public double getResolutionZ() {
-    return coordinatesPrecisionModel.getResolutionZ();
+    final double scaleZ = getScaleZ();
+    if (scaleZ <= 0) {
+      return 0;
+    } else {
+      return 1 / scaleZ;
+    }
   }
 
-  @Override
+  public double getScale(final int axisIndex) {
+    if (axisIndex < 0 || axisIndex >= scales.length) {
+      return 0;
+    } else {
+      return scales[0];
+    }
+  }
+
   public double getScaleXY() {
-    final CoordinatesPrecisionModel precisionModel = getCoordinatesPrecisionModel();
-    return precisionModel.getScaleXY();
+    return getScale(0);
   }
 
-  @Override
   public double getScaleZ() {
-    final CoordinatesPrecisionModel precisionModel = getCoordinatesPrecisionModel();
-    return precisionModel.getScaleZ();
+    return getScale(2);
   }
 
   /**
@@ -936,9 +988,13 @@ public class GeometryFactory implements Serializable,
     return axisCount > 2;
   }
 
-  @Override
+  protected void init(final int axisCount, final double... scales) {
+    this.axisCount = Math.max(axisCount, 2);
+    this.scales = getScales(axisCount, scales);
+  }
+
   public boolean isFloating() {
-    return coordinatesPrecisionModel.isFloating();
+    return getScale(0) == 0;
   }
 
   public boolean isGeographics() {
@@ -1055,28 +1111,25 @@ public class GeometryFactory implements Serializable,
   }
 
   public double makePrecise(final int axisIndex, final double value) {
-    if (axisIndex < 2) {
-      return makeXyPrecise(value);
-    } else if (axisIndex == 2) {
-      return makeZPrecise(value);
-    } else {
-      return value;
+    final double scale = getScale(axisIndex);
+    return MathUtil.makePrecise(scale, value);
+  }
+
+  public void makePrecise(final int axisCount, final double... coordinates) {
+    for (int i = 0; i < coordinates.length; i++) {
+      final double value = coordinates[i];
+      final int axisIndex = i % axisCount;
+      final double scale = getScale(axisIndex);
+      coordinates[i] = MathUtil.makePrecise(scale, value);
     }
   }
 
-  @Override
-  public void makePrecise(final int axisCount, final double... coordinates) {
-    coordinatesPrecisionModel.makePrecise(axisCount, coordinates);
-  }
-
-  @Override
   public double makeXyPrecise(final double value) {
-    return coordinatesPrecisionModel.makeXyPrecise(value);
+    return makePrecise(0, value);
   }
 
-  @Override
   public double makeZPrecise(final double value) {
-    return coordinatesPrecisionModel.makeZPrecise(value);
+    return makePrecise(2, value);
   }
 
   public MultiLineString multiLineString(final Collection<?> lines) {
@@ -1375,22 +1428,8 @@ public class GeometryFactory implements Serializable,
     string.append(srid);
     string.append(", axisCount=");
     string.append(axisCount);
-    final double scaleXY = coordinatesPrecisionModel.getScaleXY();
-    string.append(", scaleXy=");
-    if (scaleXY <= 0) {
-      string.append("floating");
-    } else {
-      string.append(scaleXY);
-    }
-    if (hasZ()) {
-      final double scaleZ = coordinatesPrecisionModel.getScaleZ();
-      string.append(", scaleZ=");
-      if (scaleZ <= 0) {
-        string.append("floating");
-      } else {
-        string.append(scaleZ);
-      }
-    }
+    string.append(", scales=");
+    string.append(Arrays.toString(scales));
     return string.toString();
   }
 }

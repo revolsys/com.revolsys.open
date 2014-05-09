@@ -46,7 +46,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -74,8 +73,6 @@ public class ConvexHullTest extends TestCase {
   public static Test suite() {
     return new TestSuite(ConvexHullTest.class);
   }
-
-  PrecisionModel precisionModel = new PrecisionModel(1000);
 
   GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 1000.0);
 

@@ -41,9 +41,9 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 import com.revolsys.jts.geom.vertex.Vertex;
 
@@ -87,9 +87,9 @@ public class GeometrySnapper {
      * the distance from a corner of a precision grid cell
      * to the centre point of the cell.  
      */
-    final PrecisionModel pm = g.getPrecisionModel();
-    if (pm.getType() == PrecisionModel.FIXED) {
-      final double fixedSnapTol = (1 / pm.getScale()) * 2 / 1.415;
+    final GeometryFactory geometryFactory = g.getGeometryFactory();
+    if (!geometryFactory.isFloating()) {
+      final double fixedSnapTol = (1 / geometryFactory.getScale(0)) * 2 / 1.415;
       if (fixedSnapTol > snapTolerance) {
         snapTolerance = fixedSnapTol;
       }

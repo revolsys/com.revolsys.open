@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.GeometricShapeFactory;
@@ -164,8 +163,7 @@ public class RectangleIntersectsPerfTest {
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
     geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),
-      geometryFactory.getAxisCount(), new PrecisionModel(size / 10).getScale(),
-      geometryFactory.getScaleZ());
+      geometryFactory.getAxisCount(), size / 10, geometryFactory.getScaleZ());
     final Geometry newGeometry = sinePoly.convert(geometryFactory);
     /**
      * Make the geometry "crinkly" by rounding off the points.

@@ -42,6 +42,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
@@ -49,7 +50,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -84,7 +84,7 @@ public class WKTWriter {
    *      s without scientific notation.
    */
   private static DecimalFormat createFormatter(
-    final PrecisionModel precisionModel) {
+    final GeometryFactory precisionModel) {
     // the default number of decimal places is 16, which is sufficient
     // to accomodate the maximum precision of a double.
     final int decimalPlaces = precisionModel.getMaximumSignificantDigits();
@@ -265,8 +265,7 @@ public class WKTWriter {
 
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      appendPointTaggedText(point.getCoordinate(), level, writer,
-        point.getPrecisionModel());
+      appendPointTaggedText(point.getCoordinate(), level, writer);
     } else if (geometry instanceof LinearRing) {
       appendLinearRingTaggedText((LinearRing)geometry, level, writer);
     } else if (geometry instanceof LineString) {
@@ -473,15 +472,12 @@ public class WKTWriter {
    *  then appends it to the writer.
    *
    *@param  coordinate      the <code>Coordinate</code> to process
-   *@param  writer          the output writer to append to
-   *@param  precisionModel  the <code>PrecisionModel</code> to use to convert
-   *      from a precise coordinate to an external coordinate
+   * @param  writer          the output writer to append to
    */
   private void appendPointTaggedText(final Coordinates coordinate,
-    final int level, final Writer writer, final PrecisionModel precisionModel)
-    throws IOException {
+    final int level, final Writer writer) throws IOException {
     writer.write("POINT ");
-    appendPointText(coordinate, level, writer, precisionModel);
+    appendPointText(coordinate, level, writer);
   }
 
   /**
@@ -489,13 +485,10 @@ public class WKTWriter {
    *  appends it to the writer.
    *
    *@param  coordinate      the <code>Coordinate</code> to process
-   *@param  writer          the output writer to append to
-   *@param  precisionModel  the <code>PrecisionModel</code> to use to convert
-   *      from a precise coordinate to an external coordinate
+   * @param  writer          the output writer to append to
    */
   private void appendPointText(final Coordinates coordinate, final int level,
-    final Writer writer, final PrecisionModel precisionModel)
-    throws IOException {
+    final Writer writer) throws IOException {
     if (coordinate == null) {
       writer.write("EMPTY");
     } else {
@@ -661,7 +654,7 @@ public class WKTWriter {
   private void writeFormatted(final Geometry geometry,
     final boolean useFormatting, final Writer writer) throws IOException {
     this.useFormatting = useFormatting;
-    formatter = createFormatter(geometry.getPrecisionModel());
+    formatter = createFormatter(geometry.getGeometryFactory());
     appendGeometryTaggedText(geometry, 0, writer);
   }
 

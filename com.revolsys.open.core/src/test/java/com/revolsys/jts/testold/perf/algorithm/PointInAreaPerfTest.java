@@ -35,7 +35,6 @@ package com.revolsys.jts.testold.perf.algorithm;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -45,8 +44,6 @@ public class PointInAreaPerfTest {
     final PointInAreaPerfTest test = new PointInAreaPerfTest();
     test.run();
   }
-
-  PrecisionModel pmFixed_1 = new PrecisionModel(1.0);
 
   public PointInAreaPerfTest() {
   }
@@ -61,7 +58,7 @@ public class PointInAreaPerfTest {
     ssFact.setNumArms(100);
 
     final Geometry area = ssFact.createSineStar();
-  //  System.out.println(area);
+    // System.out.println(area);
 
     final Stopwatch sw = new Stopwatch();
 
@@ -75,6 +72,6 @@ public class PointInAreaPerfTest {
     perfTester.setPIA(pia);
     perfTester.run();
 
-  //  System.out.println("Overall time: " + sw.getTimeString());
+    // System.out.println("Overall time: " + sw.getTimeString());
   }
 }

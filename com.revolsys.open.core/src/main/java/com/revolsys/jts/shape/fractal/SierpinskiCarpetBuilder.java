@@ -94,7 +94,7 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
       new Coordinate(x, y + width, Coordinates.NULL_ORDINATE),
       new Coordinate(x, y, Coordinates.NULL_ORDINATE)
     };
-    return geomFactory.linearRing(pts);
+    return geometryFactory.linearRing(pts);
   }
 
   @Override
@@ -106,7 +106,7 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     final LinearRing shell = ((Polygon)getSquareExtent().toGeometry()).getExteriorRing();
     rings.add(shell);
     addHoles(level, origin.getX(), origin.getY(), getDiameter(), rings);
-    return geomFactory.polygon(shell);
+    return geometryFactory.polygon(shell);
   }
 
 }

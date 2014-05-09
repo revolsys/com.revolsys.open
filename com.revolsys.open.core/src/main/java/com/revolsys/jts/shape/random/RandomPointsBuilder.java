@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 /**
@@ -77,9 +76,8 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
 
   @Override
   protected Coordinates createCoord(final double x, final double y) {
-    final PrecisionModel precisionModel = geomFactory.getPrecisionModel();
-    return new DoubleCoordinates(precisionModel.makePrecise(x),
-      precisionModel.makePrecise(y));
+    return new DoubleCoordinates(geometryFactory.makePrecise(0, x),
+      geometryFactory.makePrecise(1, y));
   }
 
   protected Coordinates createRandomCoord(final BoundingBox env) {
@@ -99,7 +97,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
       }
       pts[i++] = p;
     }
-    return geomFactory.multiPoint(pts);
+    return geometryFactory.multiPoint(pts);
   }
 
   protected boolean isInExtent(final Coordinates p) {

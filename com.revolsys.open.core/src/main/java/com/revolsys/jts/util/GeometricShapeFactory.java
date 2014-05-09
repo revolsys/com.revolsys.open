@@ -42,7 +42,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.util.AffineTransformation;
 
 /**
@@ -141,8 +140,6 @@ public class GeometricShapeFactory {
 
   protected GeometryFactory geomFact;
 
-  protected PrecisionModel precModel = null;
-
   protected Dimensions dim = new Dimensions();
 
   protected int nPts = 100;
@@ -168,12 +165,11 @@ public class GeometricShapeFactory {
    */
   public GeometricShapeFactory(final GeometryFactory geomFact) {
     this.geomFact = geomFact;
-    precModel = geomFact.getPrecisionModel();
   }
 
   protected Coordinates coord(final double x, final double y) {
-    final Coordinates point = new DoubleCoordinates(precModel.makePrecise(x),
-      precModel.makePrecise(y));
+    final Coordinates point = new DoubleCoordinates(geomFact.makePrecise(0, x),
+      geomFact.makePrecise(1, y));
     return point;
   }
 

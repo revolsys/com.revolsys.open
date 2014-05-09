@@ -11,7 +11,6 @@ import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -47,8 +46,7 @@ public class RobustLineIntersectionTest extends TestCase {
       savePt[i] = new Coordinate(pt[i]);
     }
 
-    final LineIntersector li = new RobustLineIntersector();
-    li.setPrecisionModel(new PrecisionModel(scaleFactor));
+    final LineIntersector li = new RobustLineIntersector(scaleFactor);
     li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
 
     // check that input points are unchanged

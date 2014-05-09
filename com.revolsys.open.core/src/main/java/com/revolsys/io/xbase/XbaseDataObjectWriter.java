@@ -25,10 +25,10 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
+import com.revolsys.util.MathUtil;
 
 public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   private static final Logger log = Logger.getLogger(XbaseDataObjectWriter.class);
@@ -283,8 +283,9 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
               } else if ((number instanceof Double)
                 || (number instanceof Float)) {
                 final double doubleValue = number.doubleValue();
-                final PrecisionModel precisionModel = field.getPrecisionModel();
-                number = precisionModel.makePrecise(doubleValue);
+                final double precisionScale = field.getPrecisionScale();
+                number = MathUtil.makePrecise(precisionScale,
+                  doubleValue);
               }
             }
             numString = numberFormat.format(number);

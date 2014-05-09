@@ -44,6 +44,7 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Location;
@@ -52,7 +53,6 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.geomgraph.Label;
@@ -77,17 +77,17 @@ public class OffsetCurveSetBuilder {
   private final List<NodedSegmentString> curveList = new ArrayList<>();
 
   public OffsetCurveSetBuilder(final Geometry inputGeom, final double distance,
+    final GeometryFactory precisionModel, final BufferParameters parameters) {
+    this.geometry = inputGeom;
+    this.distance = distance;
+    this.curveBuilder = new OffsetCurveBuilder(precisionModel, parameters);
+  }
+
+  public OffsetCurveSetBuilder(final Geometry inputGeom, final double distance,
     final OffsetCurveBuilder curveBuilder) {
     this.geometry = inputGeom;
     this.distance = distance;
     this.curveBuilder = curveBuilder;
-  }
-
-  public OffsetCurveSetBuilder(final Geometry inputGeom, final double distance,
-    final PrecisionModel precisionModel, final BufferParameters parameters) {
-    this.geometry = inputGeom;
-    this.distance = distance;
-    this.curveBuilder = new OffsetCurveBuilder(precisionModel, parameters);
   }
 
   private void add(final Geometry g) {

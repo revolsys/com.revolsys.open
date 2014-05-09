@@ -42,23 +42,21 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
-import com.revolsys.jts.geom.PrecisionModel;
 
 public abstract class GeometricShapeBuilder {
   protected BoundingBox extent = new Envelope(2, 0, 0, 1, 1);
 
   protected int numPts = 0;
 
-  protected GeometryFactory geomFactory;
+  protected GeometryFactory geometryFactory;
 
   public GeometricShapeBuilder(final GeometryFactory geomFactory) {
-    this.geomFactory = geomFactory;
+    this.geometryFactory = geomFactory;
   }
 
   protected Coordinates createCoord(final double x, final double y) {
-    final PrecisionModel precisionModel = geomFactory.getPrecisionModel();
-    return (Coordinates)new DoubleCoordinates(precisionModel.makePrecise(x),
-      precisionModel.makePrecise(y));
+    return new DoubleCoordinates(geometryFactory.makePrecise(0, x),
+      geometryFactory.makePrecise(1, y));
   }
 
   public Coordinates getCentre() {

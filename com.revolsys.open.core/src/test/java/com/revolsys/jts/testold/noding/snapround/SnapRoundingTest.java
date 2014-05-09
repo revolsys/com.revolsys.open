@@ -10,7 +10,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.noding.snapround.GeometryNoder;
 
@@ -91,8 +90,7 @@ public class SnapRoundingTest extends TestCase {
 
   void runRounding(final String[] wkt) {
     final List geoms = fromWKT(wkt);
-    final PrecisionModel pm = new PrecisionModel(SNAP_TOLERANCE);
-    final GeometryNoder noder = new GeometryNoder(pm);
+    final GeometryNoder noder = new GeometryNoder(SNAP_TOLERANCE);
     noder.setValidate(true);
     final List nodedLines = noder.node(geoms);
     /*

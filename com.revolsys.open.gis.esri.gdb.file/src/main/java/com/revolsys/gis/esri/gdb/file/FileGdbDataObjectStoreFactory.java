@@ -25,12 +25,13 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
 
   private static final Map<String, CapiFileGdbDataObjectStore> DATA_STORES = new HashMap<String, CapiFileGdbDataObjectStore>();
 
-  public static CapiFileGdbDataObjectStore create(final File file) {
+  public static CapiFileGdbDataObjectStore create(File file) {
     if (file == null) {
       return null;
     } else {
       synchronized (COUNTS) {
         final String fileName = FileUtil.getCanonicalPath(file);
+        file = new File(fileName);
         final AtomicInteger count = CollectionUtil.get(COUNTS, fileName,
           new AtomicInteger());
         count.incrementAndGet();
@@ -45,19 +46,27 @@ public class FileGdbDataObjectStoreFactory implements DataObjectStoreFactory {
     }
   }
 
-  static void release(final String fileName) {
-    if (fileName != null) {
+  static boolean release(String fileName) {
+    if (fileName == null) {
+      return false;
+    } else {
       synchronized (COUNTS) {
+        fileName = FileUtil.getCanonicalPath(fileName);
         final AtomicInteger countHolder = CollectionUtil.get(COUNTS, fileName,
           new AtomicInteger());
         final int count = countHolder.decrementAndGet();
         if (count <= 0) {
           COUNTS.remove(fileName);
           final CapiFileGdbDataObjectStore dataStore = DATA_STORES.remove(fileName);
-          if (dataStore != null) {
+          if (dataStore == null) {
+            return false;
+          } else {
             dataStore.doClose();
           }
           COUNTS.remove(fileName);
+          return true;
+        } else {
+          return true;
         }
       }
     }

@@ -42,9 +42,9 @@ import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.geomgraph.Position;
 
 /**
@@ -109,7 +109,7 @@ class OffsetSegmentGenerator {
 
   private double distance = 0.0;
 
-  private final PrecisionModel precisionModel;
+  private final GeometryFactory precisionModel;
 
   private final BufferParameters bufParams;
 
@@ -129,7 +129,7 @@ class OffsetSegmentGenerator {
 
   private boolean hasNarrowConcaveAngle = false;
 
-  public OffsetSegmentGenerator(final PrecisionModel precisionModel,
+  public OffsetSegmentGenerator(final GeometryFactory precisionModel,
     final BufferParameters bufParams, final double distance) {
     this.precisionModel = precisionModel;
     this.bufParams = bufParams;
@@ -438,8 +438,8 @@ class OffsetSegmentGenerator {
     final double dy = p1.getY() - p0.getY();
     final double angle = Math.atan2(dy, dx);
 
-    Coordinates lp1 = offsetL.getP1();
-    Coordinates rp1 = offsetR.getP1();
+    final Coordinates lp1 = offsetL.getP1();
+    final Coordinates rp1 = offsetR.getP1();
     switch (bufParams.getEndCapStyle()) {
       case BufferParameters.CAP_ROUND:
         // add offset seg points with a fillet between them
@@ -607,10 +607,10 @@ class OffsetSegmentGenerator {
     // segment
     final double ux = sideSign * distance * dx / len;
     final double uy = sideSign * distance * dy / len;
-    final double x1 = precisionModel.makePrecise(p1x - uy);
-    final double y1 = precisionModel.makePrecise(p1y + ux);
-    final double x2 = precisionModel.makePrecise(p2x - uy);
-    final double y2 = precisionModel.makePrecise(p2Y + ux);
+    final double x1 = precisionModel.makePrecise(0, p1x - uy);
+    final double y1 = precisionModel.makePrecise(1, p1y + ux);
+    final double x2 = precisionModel.makePrecise(0, p2x - uy);
+    final double y2 = precisionModel.makePrecise(1, p2Y + ux);
     final LineSegmentImpl line = new LineSegmentImpl(2, x1, y1, x2, y2);
     return line;
   }
@@ -634,10 +634,10 @@ class OffsetSegmentGenerator {
     // segment
     final double ux = sideSign * distance * dx / len;
     final double uy = sideSign * distance * dy / len;
-    final double x1 = precisionModel.makePrecise(seg.getX(0) - uy);
-    final double y1 = precisionModel.makePrecise(seg.getY(0) + ux);
-    final double x2 = precisionModel.makePrecise(seg.getX(1) - uy);
-    final double y2 = precisionModel.makePrecise(seg.getY(1) + ux);
+    final double x1 = precisionModel.makePrecise(0, seg.getX(0) - uy);
+    final double y1 = precisionModel.makePrecise(1, seg.getY(0) + ux);
+    final double x2 = precisionModel.makePrecise(0, seg.getX(1) - uy);
+    final double y2 = precisionModel.makePrecise(1, seg.getY(1) + ux);
     return new LineSegmentImpl(2, x1, y1, x2, y2);
   }
 

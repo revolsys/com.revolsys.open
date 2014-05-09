@@ -38,7 +38,6 @@ package com.revolsys.jts.algorithm;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -60,7 +59,7 @@ import com.revolsys.jts.util.Assert;
  * <p>
  * The intersection point(s) may be computed in a precise or non-precise manner.
  * Computing an intersection point precisely involves rounding it 
- * via a supplied {@link PrecisionModel}.  
+ * via a supplied scale.  
  * <p>
  * LineIntersectors do not perform an initial envelope intersection test 
  * to determine if the segments are disjoint.
@@ -175,11 +174,7 @@ public abstract class LineIntersector {
 
   protected Coordinates pb;
 
-  /**
-   * If makePrecise is true, computed intersection coordinates will be made precise
-   * using Coordinate#makePrecise
-   */
-  protected PrecisionModel precisionModel = null;
+  private double scale;
 
   // public int numIntersects = 0;
 
@@ -190,6 +185,10 @@ public abstract class LineIntersector {
     pa = intPt[0];
     pb = intPt[1];
     result = 0;
+  }
+
+  public LineIntersector(final double scale) {
+    this.scale = scale;
   }
 
   protected abstract int computeIntersect(Coordinates p1, Coordinates p2,
@@ -264,12 +263,6 @@ public abstract class LineIntersector {
     return inputLines[segmentIndex][ptIndex];
   }
 
-  /*
-   * public String toString() { String str = inputLines[0][0] + "-" +
-   * inputLines[0][1] + " " + inputLines[1][0] + "-" + inputLines[1][1] + " : "
-   * + getTopologySummary(); return str; }
-   */
-
   /**
    * Computes the index (order) of the intIndex'th intersection point in the direction of
    * a specified input line segment
@@ -295,6 +288,12 @@ public abstract class LineIntersector {
     return intPt[intIndex];
   }
 
+  /*
+   * public String toString() { String str = inputLines[0][0] + "-" +
+   * inputLines[0][1] + " " + inputLines[1][0] + "-" + inputLines[1][1] + " : "
+   * + getTopologySummary(); return str; }
+   */
+
   /**
    * Computes the intIndex'th intersection point in the direction of
    * a specified input line segment
@@ -318,6 +317,10 @@ public abstract class LineIntersector {
    */
   public int getIntersectionNum() {
     return result;
+  }
+
+  public double getScale() {
+    return scale;
   }
 
   private String getTopologySummary() {
@@ -416,23 +419,8 @@ public abstract class LineIntersector {
     return hasIntersection() && isProper;
   }
 
-  /**
-   * Force computed intersection to be rounded to a given precision model
-   * @param precisionModel
-   * @deprecated use <code>setPrecisionModel</code> instead
-   */
-  @Deprecated
-  public void setMakePrecise(final PrecisionModel precisionModel) {
-    this.precisionModel = precisionModel;
-  }
-
-  /**
-   * Force computed intersection to be rounded to a given precision model.
-   * No getter is provided, because the precision model is not required to be specified.
-   * @param precisionModel
-   */
-  public void setPrecisionModel(final PrecisionModel precisionModel) {
-    this.precisionModel = precisionModel;
+  public void setScale(final double scale) {
+    this.scale = scale;
   }
 
   @Override

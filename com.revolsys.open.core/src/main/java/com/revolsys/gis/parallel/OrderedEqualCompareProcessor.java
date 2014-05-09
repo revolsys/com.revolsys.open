@@ -17,12 +17,12 @@ import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInProcess;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.MathUtil;
 
 public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> {
 
@@ -39,8 +39,6 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
   private String otherName = "Other";
 
   private List<String> equalExclude = new ArrayList<String>();
-
-  private final PrecisionModel precisionModel = new PrecisionModel(1000);
 
   private DataObjectMetaData metaData1;
 
@@ -80,8 +78,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
                 for (int k = 0; k < points1.getAxisCount(); k++) {
                   double value1 = points1.getValue(j, k);
                   double value2 = points2.getValue(j, k);
-                  value1 = precisionModel.makePrecise(value1);
-                  value2 = precisionModel.makePrecise(value2);
+                  value1 = MathUtil.makePrecise(1000.0, value1);
+                  value2 = MathUtil.makePrecise(1000.0, value2);
                   if (Double.compare(value1, value2) != 0) {
                     return false;
                   }

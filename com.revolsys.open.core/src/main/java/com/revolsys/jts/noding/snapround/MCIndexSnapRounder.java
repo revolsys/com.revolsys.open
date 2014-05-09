@@ -38,7 +38,6 @@ import java.util.List;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinates;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;
@@ -65,7 +64,6 @@ import com.revolsys.jts.noding.SegmentString;
  * @version 1.7
  */
 public class MCIndexSnapRounder implements Noder {
-  private final PrecisionModel pm;
 
   private final LineIntersector li;
 
@@ -77,11 +75,9 @@ public class MCIndexSnapRounder implements Noder {
 
   private Collection nodedSegStrings;
 
-  public MCIndexSnapRounder(final PrecisionModel pm) {
-    this.pm = pm;
-    li = new RobustLineIntersector();
-    li.setPrecisionModel(pm);
-    scaleFactor = pm.getScale();
+  public MCIndexSnapRounder(final double scale) {
+    li = new RobustLineIntersector(scale);
+    scaleFactor = scale;
   }
 
   private void checkCorrectness(final Collection inputSegmentStrings) {

@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 /**
  *@version 1.7
@@ -214,11 +215,7 @@ public class NonRobustLineIntersector extends LineIntersector {
       isProper = false;
     }
 
-    // truncate computed point to precision grid
-    // TESTING - don't force coord to be precise
-    if (precisionModel != null) {
-      pa = precisionModel.getPrecise(pa);
-    }
+    pa = CoordinatesUtil.getPrecise(getScale(), pa);
     return POINT_INTERSECTION;
   }
 

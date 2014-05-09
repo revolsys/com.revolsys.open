@@ -1,6 +1,7 @@
 package com.revolsys.gis.model.coordinates;
 
 import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -126,7 +127,7 @@ public abstract class LineIntersector {
    * If makePrecise is true, computed intersection coordinates will be made
    * precise using Coordinates#makePrecise
    */
-  protected CoordinatesPrecisionModel precisionModel = null;
+  protected GeometryFactory precisionModel = null;
 
   // public int numIntersects = 0;
 
@@ -368,7 +369,7 @@ public abstract class LineIntersector {
    * 
    * @param precisionModel
    */
-  public void setPrecisionModel(final CoordinatesPrecisionModel precisionModel) {
+  public void setPrecisionModel(final GeometryFactory precisionModel) {
     this.precisionModel = precisionModel;
   }
 

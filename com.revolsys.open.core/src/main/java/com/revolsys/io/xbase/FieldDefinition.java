@@ -26,7 +26,6 @@ import java.util.Map;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.jts.geom.PrecisionModel;
 
 public class FieldDefinition {
   public static final char CHARACTER_TYPE = 'C';
@@ -70,7 +69,7 @@ public class FieldDefinition {
 
   private final char type;
 
-  private PrecisionModel precisionModel;
+  private double precisionScale;
 
   public FieldDefinition(final String name, final String fullName,
     final char type, final int length) {
@@ -92,14 +91,14 @@ public class FieldDefinition {
         for (int i = 0; i < decimalPlaces; i++) {
           format.append("#");
         }
-        precisionModel = new PrecisionModel(Math.pow(10, decimalPlaces));
+        precisionScale = Math.pow(10, decimalPlaces);
       } else if (decimalPlaces == -1 && length > 2) {
         format.append(".");
         for (int i = 0; i < length - 2; i++) {
           format.append("#");
         }
       } else {
-        precisionModel = new PrecisionModel(1);
+        precisionScale = 1;
       }
       numberFormat = new DecimalFormat(format.toString());
     }
@@ -129,16 +128,12 @@ public class FieldDefinition {
     return numberFormat;
   }
 
-  public PrecisionModel getPrecisionModel() {
-    return precisionModel;
+  public double getPrecisionScale() {
+    return precisionScale;
   }
 
   public char getType() {
     return type;
-  }
-
-  public void setPrecisionModel(final PrecisionModel precisionModel) {
-    this.precisionModel = precisionModel;
   }
 
   @Override

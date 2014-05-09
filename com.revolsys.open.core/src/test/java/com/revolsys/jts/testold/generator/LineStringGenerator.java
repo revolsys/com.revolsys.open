@@ -37,7 +37,6 @@ import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PrecisionModel;
 import com.revolsys.jts.operation.valid.IsValidOp;
 
 /**
@@ -63,15 +62,14 @@ public class LineStringGenerator extends GeometryGenerator {
     final double cx = x + dx / 2; // center
     final double cy = y + dy / 2; // center
 
-    final PrecisionModel precisionModel = gf.getPrecisionModel();
     for (int i = 0; i < coords.length; i++) {
       final double angle = Math.toRadians(start + theta * i);
 
       final double fx = Math.sin(angle) * radius; // may be neg.
       final double fy = Math.cos(angle) * radius; // may be neg.
 
-      coords[i] = new DoubleCoordinates(precisionModel.makePrecise(cx + fx),
-        precisionModel.makePrecise(cy + fy));
+      coords[i] = new DoubleCoordinates(gf.makePrecise(0, cx + fx),
+        gf.makePrecise(1, cy + fy));
     }
   }
 
@@ -79,33 +77,31 @@ public class LineStringGenerator extends GeometryGenerator {
     final double dy, final Coordinates[] coords, final GeometryFactory gf) {
     final double fy = y + Math.random() * dy;
     double rx = dx; // remainder of x distance
-    final PrecisionModel precisionModel = gf.getPrecisionModel();
-    coords[0] = new DoubleCoordinates(precisionModel.makePrecise(x),
-      precisionModel.makePrecise(fy));
+    coords[0] = new DoubleCoordinates(gf.makePrecise(0, x), gf.makePrecise(1,
+      fy));
     for (int i = 1; i < coords.length - 1; i++) {
       rx -= Math.random() * rx;
-      coords[i] = new DoubleCoordinates(
-        precisionModel.makePrecise(x + dx - rx), precisionModel.makePrecise(fy));
+      coords[i] = new DoubleCoordinates(gf.makePrecise(0, x + dx - rx),
+        gf.makePrecise(1, fy));
     }
     coords[coords.length - 1] = new DoubleCoordinates(
-      precisionModel.makePrecise(x + dx), precisionModel.makePrecise(fy));
+      gf.makePrecise(0, x + dx), gf.makePrecise(1, fy));
   }
 
   private static void fillVert(final double x, final double dx, final double y,
     final double dy, final Coordinates[] coords, final GeometryFactory gf) {
     final double fx = x + Math.random() * dx;
     double ry = dy; // remainder of y distance
-    final PrecisionModel precisionModel = gf.getPrecisionModel();
 
-    coords[0] = new DoubleCoordinates(precisionModel.makePrecise(fx),
-      precisionModel.makePrecise(y));
+    coords[0] = new DoubleCoordinates(gf.makePrecise(0, fx), gf.makePrecise(1,
+      y));
     for (int i = 1; i < coords.length - 1; i++) {
       ry -= Math.random() * ry;
-      coords[i] = new DoubleCoordinates(precisionModel.makePrecise(fx),
-        precisionModel.makePrecise(y + dy - ry));
+      coords[i] = new DoubleCoordinates(gf.makePrecise(0, fx), gf.makePrecise(
+        1, y + dy - ry));
     }
-    coords[coords.length - 1] = new DoubleCoordinates(
-      precisionModel.makePrecise(fx), precisionModel.makePrecise(y + dy));
+    coords[coords.length - 1] = new DoubleCoordinates(gf.makePrecise(0, fx),
+      gf.makePrecise(1, y + dy));
   }
 
   protected int numberPoints = 2;

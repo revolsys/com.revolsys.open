@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
-import com.revolsys.gis.model.coordinates.CoordinatesPrecisionModel;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
@@ -21,11 +21,11 @@ public class GraphProcessor extends BaseInOutProcess<DataObject, DataObject> {
 
   private DataObjectGraph graph;
 
-  private CoordinatesPrecisionModel precisionModel;
+  private GeometryFactory precisionModel;
 
   private List<ObjectProcessor<DataObjectGraph>> processors = new ArrayList<ObjectProcessor<DataObjectGraph>>();
 
-  public CoordinatesPrecisionModel getPrecisionModel() {
+  public GeometryFactory getPrecisionModel() {
     return precisionModel;
   }
 
@@ -77,7 +77,7 @@ public class GraphProcessor extends BaseInOutProcess<DataObject, DataObject> {
     }
   }
 
-  public void setPrecisionModel(final CoordinatesPrecisionModel precisionModel) {
+  public void setPrecisionModel(final GeometryFactory precisionModel) {
     this.precisionModel = precisionModel;
   }
 

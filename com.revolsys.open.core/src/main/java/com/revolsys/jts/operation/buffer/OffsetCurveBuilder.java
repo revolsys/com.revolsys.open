@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.buffer;
 import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.PrecisionModel;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geomgraph.Position;
 
 /**
@@ -46,14 +46,14 @@ import com.revolsys.jts.geomgraph.Position;
  * The final buffer polygon is computed by forming a topological graph
  * of all the noded raw curves and tracing outside contours.
  * The points in the raw curve are rounded 
- * to a given {@link PrecisionModel}.
+ * to a given scale.
  *
  * @version 1.7
  */
 public class OffsetCurveBuilder {
   private double distance = 0.0;
 
-  private final PrecisionModel precisionModel;
+  private final GeometryFactory precisionModel;
 
   private final BufferParameters bufParams;
 
@@ -77,7 +77,7 @@ public class OffsetCurveBuilder {
     return bufDistance / SIMPLIFY_FACTOR;
   }
 
-  public OffsetCurveBuilder(final PrecisionModel precisionModel,
+  public OffsetCurveBuilder(final GeometryFactory precisionModel,
     final BufferParameters bufParams) {
     this.precisionModel = precisionModel;
     this.bufParams = bufParams;
@@ -97,7 +97,7 @@ public class OffsetCurveBuilder {
     final int n1 = simp1.size() - 1;
     segGen.initSideSegments(simp1.get(0), simp1.get(1), Position.LEFT);
     for (int i = 2; i <= n1; i++) {
-      Coordinates point = simp1.get(i);
+      final Coordinates point = simp1.get(i);
       segGen.addNextSegment(point, true);
     }
     segGen.addLastSegment();
@@ -116,7 +116,7 @@ public class OffsetCurveBuilder {
     // LEFT
     segGen.initSideSegments(simp2.get(n2), simp2.get(n2 - 1), Position.LEFT);
     for (int i = n2 - 2; i >= 0; i--) {
-      Coordinates point = simp2.get(i);
+      final Coordinates point = simp2.get(i);
       segGen.addNextSegment(point, true);
     }
     segGen.addLastSegment();
