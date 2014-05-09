@@ -254,7 +254,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     synchronized (factories) {
       scales = getScales(axisCount, scales);
       final String key = srid + "-" + axisCount + "-"
-        + CollectionUtil.toString("_", Arrays.asList(scales));
+        + CollectionUtil.toString("-", CollectionUtil.toList(scales));
       GeometryFactory factory = factories.get(key);
       if (factory == null) {
         factory = new GeometryFactory(srid, axisCount, scales);
