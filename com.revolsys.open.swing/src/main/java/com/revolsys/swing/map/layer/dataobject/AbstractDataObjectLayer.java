@@ -66,7 +66,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
@@ -2205,7 +2204,6 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final int[] vertexIndex = mouseLocation.getVertexIndex();
       final Point point = mouseLocation.getPoint();
       final Point convertedPoint = (Point)point.copy(getGeometryFactory());
-      final Coordinates coordinates = CoordinatesUtil.getInstance(convertedPoint);
       final LineString line1;
       final LineString line2;
 
@@ -2213,9 +2211,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (vertexIndex == null) {
         final int pointIndex = mouseLocation.getSegmentIndex()[0];
         line1 = LineStringUtil.subLineString(line, null, 0, pointIndex + 1,
-          coordinates);
-        line2 = LineStringUtil.subLineString(line, coordinates, pointIndex + 1,
-          numPoints - pointIndex - 1, null);
+          convertedPoint);
+        line2 = LineStringUtil.subLineString(line, convertedPoint,
+          pointIndex + 1, numPoints - pointIndex - 1, null);
       } else {
         final int pointIndex = vertexIndex[0];
         if (numPoints - pointIndex < 2) {
@@ -2231,7 +2229,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         return Collections.singletonList(record);
       }
 
-      return splitRecord(record, line, coordinates, line1, line2);
+      return splitRecord(record, line, convertedPoint, line1, line2);
     }
     return Arrays.asList(record);
   }
@@ -2262,12 +2260,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public List<LayerDataObject> splitRecord(final LayerDataObject record,
     final Point point) {
     final LineString line = record.getGeometryValue();
-    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
-    final List<LineString> lines = LineStringUtil.split(line, coordinates);
+    final List<LineString> lines = LineStringUtil.split(line, point);
     if (lines.size() == 2) {
       final LineString line1 = lines.get(0);
       final LineString line2 = lines.get(1);
-      return splitRecord(record, line, coordinates, line1, line2);
+      return splitRecord(record, line, point, line1, line2);
     } else {
       return Collections.singletonList(record);
     }

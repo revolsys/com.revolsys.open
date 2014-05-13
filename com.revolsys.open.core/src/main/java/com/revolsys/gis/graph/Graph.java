@@ -775,7 +775,7 @@ public class Graph<T> {
       final LineString line1 = edge1.getLine();
       final LineString line2 = edge2.getLine();
 
-      final LineString newLine = LineStringUtil.merge(node, line1, line2);
+      final LineString newLine = line1.merge(node, line2);
 
       final T mergedObject = clone(object1, newLine);
       final Edge<T> newEdge = addEdge(mergedObject, newLine);
@@ -804,7 +804,7 @@ public class Graph<T> {
     final LineString line1 = edge1.getLine();
     final LineString line2 = edge2.getLine();
 
-    final LineString newLine = LineStringUtil.merge(line1, line2);
+    final LineString newLine = line1.merge(line2);
     final Edge<T> newEdge = replaceEdge(edge1, newLine);
     remove(edge2);
     return newEdge;

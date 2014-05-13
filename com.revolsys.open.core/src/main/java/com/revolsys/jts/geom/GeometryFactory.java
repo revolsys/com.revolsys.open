@@ -1069,6 +1069,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return new LineStringImpl(this, axisCount, coordinates);
   }
 
+  public LineString lineString(final int axisCount, final int vertexCount,
+    final double... coordinates) {
+    return new LineStringImpl(this, axisCount, vertexCount, coordinates);
+  }
+
   public LineString lineString(final LineString lineString) {
     if (lineString == null || lineString.isEmpty()) {
       return lineString();

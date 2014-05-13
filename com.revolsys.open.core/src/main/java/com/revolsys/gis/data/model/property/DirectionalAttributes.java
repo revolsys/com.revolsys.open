@@ -606,24 +606,24 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       line2 = object2.getGeometryValue();
       startObject = object2;
       endObject = object1;
-      newLine = LineStringUtil.merge(point, line1, line2);
+      newLine = line1.merge(point, line2);
     } else if (points1.equal(lastPoint1, points2, lastPoint2)
       && points1.equal2d(lastPoint1, point)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object1;
       endObject = object2;
-      newLine = LineStringUtil.merge(point, line1, line2);
+      newLine = line1.merge(point, line2);
     } else if (points1.equal(lastPoint1, points2, 0)
       && points1.equal2d(lastPoint1, point)) {
       startObject = object1;
       endObject = object2;
-      newLine = LineStringUtil.merge(point, line1, line2);
+      newLine = line1.merge(point, line2);
     } else if (points1.equal(0, points2, lastPoint2)
       && points1.equal2d(0, point)) {
       startObject = object2;
       endObject = object1;
-      newLine = LineStringUtil.merge(point, line2, line1);
+      newLine = line2.merge(point, line1);
     } else {
       throw new IllegalArgumentException("Lines for objects don't touch");
     }
@@ -667,24 +667,24 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       line2 = object2.getGeometryValue();
       startObject = object2;
       endObject = object1;
-      newLine = LineStringUtil.merge(point, line1, line2);
+      newLine = line1.merge(point, line2);
     } else if (points1.equal(lastPoint1, points2, lastPoint2)
       && points1.equal2d(lastPoint1, point)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object1;
       endObject = object2;
-      newLine = LineStringUtil.merge(point, line1, line2);
+      newLine = line1.merge(point, line2);
     } else if (points1.equal(lastPoint1, points2, 0)
       && points1.equal2d(lastPoint1, point)) {
       startObject = object1;
       endObject = object2;
-      newLine = LineStringUtil.merge(point, line1, line2);
+      newLine = line1.merge(point, line2);
     } else if (points1.equal(0, points2, lastPoint2)
       && points1.equal2d(0, point)) {
       startObject = object2;
       endObject = object1;
-      newLine = LineStringUtil.merge(point, line2, line1);
+      newLine = line2.merge(point, line1);
     } else {
       throw new IllegalArgumentException("Lines for objects don't touch");
     }
@@ -727,21 +727,21 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       line2 = object2.getGeometryValue();
       startObject = object2;
       endObject = object1;
-      newLine = LineStringUtil.merge(line1, line2);
+      newLine = line1.merge(line2);
     } else if (points1.equal(points1.size() - 1, points2, points2.size() - 1)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object1;
       endObject = object2;
-      newLine = LineStringUtil.merge(line1, line2);
+      newLine = line1.merge(line2);
     } else if (points1.equal(points1.size() - 1, points2, 0)) {
       startObject = object1;
       endObject = object2;
-      newLine = LineStringUtil.merge(line1, line2);
+      newLine = line1.merge(line2);
     } else if (points1.equal(0, points2, points2.size() - 1)) {
       startObject = object2;
       endObject = object1;
-      newLine = LineStringUtil.merge(line2, line1);
+      newLine = line2.merge(line1);
     } else {
       throw new IllegalArgumentException("Lines for objects don't touch");
     }

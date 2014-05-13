@@ -905,41 +905,6 @@ public final class LineStringUtil {
     }
   }
 
-  public static LineString merge(final Coordinates point,
-    final LineString line1, final LineString line2) {
-    final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
-    final CoordinatesList coordinates = CoordinatesListUtil.merge(point,
-      coordinates1, coordinates2);
-    final GeometryFactory factory = GeometryFactory.getFactory(line1);
-    final LineString line = factory.lineString(coordinates);
-    GeometryProperties.copyUserData(line1, line);
-    return line;
-  }
-
-  /**
-   * Merge two lines that share common coordinates at either the start or end.
-   * If the lines touch only at their start coordinates, the line2 will be
-   * reversed and joined before the start of line1. If the two lines touch only
-   * at their end coordinates, the line2 will be reversed and joined after the
-   * end of line1.
-   * 
-   * @param line1 The first line.
-   * @param line2 The second line.
-   * @return The new line string
-   */
-  public static LineString merge(final LineString line1, final LineString line2) {
-    final CoordinatesList coordinates1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
-    final CoordinatesList coordinates = CoordinatesListUtil.merge(coordinates1,
-      coordinates2);
-    final GeometryFactory factory = GeometryFactory.getFactory(line1);
-    final LineString line = factory.lineString(coordinates);
-    GeometryProperties.copyUserData(line1, line);
-
-    return line;
-  }
-
   public static Point midPoint(final LineString line) {
     if (line.isEmpty()) {
       return null;
@@ -1202,6 +1167,20 @@ public final class LineStringUtil {
   public static LineString subLineString(final LineString line,
     final int length, final Coordinates coordinate) {
     return subLineString(line, null, 0, length, coordinate);
+  }
+
+  public static LineString merge(final List<LineString> lines) {
+    final Iterator<LineString> iterator = lines.iterator();
+    if (!iterator.hasNext()) {
+      return null;
+    } else {
+      LineString line = iterator.next();
+      while (iterator.hasNext()) {
+        final LineString nextLine = iterator.next();
+        line = line.merge(nextLine);
+      }
+      return line;
+    }
   }
 
 }

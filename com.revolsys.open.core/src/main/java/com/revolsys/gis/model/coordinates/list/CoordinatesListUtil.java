@@ -90,27 +90,26 @@ public class CoordinatesListUtil {
     }
   }
 
-  public static int append(final CoordinatesList src,
-    final double[] coordinates, final int vertexCount, final int axisCount,
-    final int startIndex) {
-    int coordIndex = startIndex;
-    final int srcSize = src.size();
+  public static int append(final int axisCount, final LineString source,
+    final int sourceIndex, final double[] targetCoordinates,
+    final int targetIndex, final int vertexCount) {
+    int coordIndex = targetIndex;
     double previousX;
     double previousY;
-    if (startIndex == 0) {
+    if (targetIndex == 0) {
       previousX = Double.NaN;
       previousY = Double.NaN;
     } else {
-      previousX = coordinates[(startIndex - 1) * axisCount];
-      previousY = coordinates[(startIndex - 1) * axisCount];
+      previousX = targetCoordinates[(targetIndex - 1) * axisCount];
+      previousY = targetCoordinates[(targetIndex - 1) * axisCount + 1];
     }
-    for (int vertexIndex = 0; vertexIndex < srcSize && coordIndex < vertexCount; vertexIndex++) {
-      final double x = src.getX(vertexIndex);
-      final double y = src.getY(vertexIndex);
+    for (int i = 0; i < vertexCount; i++) {
+      final double x = source.getX(sourceIndex + i);
+      final double y = source.getY(sourceIndex + i);
       if (x != previousX || y != previousY) {
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          final double coordinate = src.getValue(vertexIndex, axisIndex);
-          coordinates[coordIndex * axisCount + axisIndex] = coordinate;
+          final double coordinate = source.getCoordinate(i, axisIndex);
+          targetCoordinates[coordIndex * axisCount + axisIndex] = coordinate;
         }
         coordIndex++;
       }
@@ -120,28 +119,28 @@ public class CoordinatesListUtil {
     return coordIndex;
   }
 
-  public static int appendReverse(final CoordinatesList src,
-    final double[] coordinates, final int vertexCount, final int axisCount,
-    final int startIndex) {
-    int coordIndex = startIndex;
-    final int srcSize = src.size();
+  public static int appendReverse(final int axisCount, final LineString source,
+    final int sourceStartIndex, final double[] targetCoordinates,
+    final int targetStartIndex, final int vertexCount) {
+    int coordIndex = targetStartIndex;
+    final int sourceVertexCount = source.getVertexCount();
     double previousX;
     double previousY;
-    if (startIndex == 0) {
+    if (targetStartIndex == 0) {
       previousX = Double.NaN;
       previousY = Double.NaN;
     } else {
-      previousX = coordinates[(startIndex - 1) * axisCount];
-      previousY = coordinates[(startIndex - 1) * axisCount];
+      previousX = targetCoordinates[(targetStartIndex - 1) * axisCount];
+      previousY = targetCoordinates[(targetStartIndex - 1) * axisCount + 1];
     }
-    for (int vertexIndex = srcSize - 1; vertexIndex > -1
-      && coordIndex < vertexCount; vertexIndex--) {
-      final double x = src.getX(vertexIndex);
-      final double y = src.getY(vertexIndex);
+    for (int i = 0; i < vertexCount; i++) {
+      final int sourceIndex = sourceVertexCount - (sourceStartIndex + i);
+      final double x = source.getX(sourceIndex);
+      final double y = source.getY(sourceIndex);
       if (x != previousX || y != previousY) {
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          final double coordinate = src.getValue(vertexIndex, axisIndex);
-          coordinates[coordIndex * axisCount + axisIndex] = coordinate;
+          final double coordinate = source.getCoordinate(i, axisIndex);
+          targetCoordinates[coordIndex * axisCount + axisIndex] = coordinate;
         }
         coordIndex++;
       }
@@ -471,7 +470,7 @@ public class CoordinatesListUtil {
       endPoint = movedNodes.get(endPoint);
     }
     final List<CoordinatesList> intersections = new ArrayList<CoordinatesList>();
-    final List<Coordinates> currentCoordinates = new ArrayList();
+    final List<Coordinates> currentCoordinates = new ArrayList<>();
     Node<LineSegment> previousNode = graph1.getNode(startPoint);
     do {
       final List<Edge<LineSegment>> outEdges = previousNode.getOutEdges();
@@ -576,105 +575,6 @@ public class CoordinatesListUtil {
       }
     }
     return length;
-  }
-
-  public static CoordinatesList merge(final Coordinates point,
-    final CoordinatesList coordinates1, final CoordinatesList coordinates2) {
-    final int axisCount = Math.max(coordinates1.getAxisCount(),
-      coordinates2.getAxisCount());
-    final int vertexCount = coordinates1.size() + coordinates2.size();
-    final double[] coordinates = new double[vertexCount * axisCount];
-
-    int numCoords = 0;
-    final Coordinates coordinates1Start = coordinates1.get(0);
-    final Coordinates coordinates1End = coordinates1.get(coordinates1.size() - 1);
-    final Coordinates coordinates2Start = coordinates2.get(0);
-    final Coordinates coordinates2End = coordinates2.get(coordinates2.size() - 1);
-    if (coordinates1Start.equals2d(coordinates2End)
-      && coordinates1Start.equals2d(point)) {
-      numCoords = append(coordinates2, coordinates, vertexCount, axisCount,
-        numCoords);
-      numCoords = append(coordinates1, coordinates, vertexCount, axisCount,
-        numCoords);
-    } else if (coordinates2Start.equals2d(coordinates1End)
-      && coordinates2Start.equals2d(point)) {
-      numCoords = append(coordinates1, coordinates, vertexCount, axisCount,
-        numCoords);
-      numCoords = append(coordinates2, coordinates, vertexCount, axisCount,
-        numCoords);
-    } else if (coordinates1Start.equals2d(coordinates2Start)
-      && coordinates1Start.equals2d(point)) {
-      numCoords = appendReverse(coordinates2, coordinates, vertexCount,
-        axisCount, numCoords);
-      numCoords = append(coordinates1, coordinates, vertexCount, axisCount,
-        numCoords);
-    } else if (coordinates1End.equals2d(coordinates2End)
-      && coordinates1End.equals2d(point)) {
-      numCoords = append(coordinates1, coordinates, vertexCount, axisCount,
-        numCoords);
-      numCoords = appendReverse(coordinates2, coordinates, vertexCount,
-        axisCount, numCoords);
-    } else {
-      throw new IllegalArgumentException("lines don't touch\n" + coordinates1
-        + "\n" + coordinates2);
-
-    }
-    return new DoubleCoordinatesList(axisCount, vertexCount, coordinates);
-  }
-
-  public static CoordinatesList merge(final CoordinatesList coordinates1,
-    final CoordinatesList coordinates2) {
-    final int axisCount = Math.max(coordinates1.getAxisCount(),
-      coordinates2.getAxisCount());
-    final int vertexCount = coordinates1.size() + coordinates2.size();
-    final double[] coordinates = new double[vertexCount * axisCount];
-
-    int numCoords = 0;
-    final Coordinates coordinates1Start = coordinates1.get(0);
-    final Coordinates coordinates1End = coordinates1.get(coordinates1.size() - 1);
-    final Coordinates coordinates2Start = coordinates2.get(0);
-    final Coordinates coordinates2End = coordinates2.get(coordinates2.size() - 1);
-    if (coordinates1Start.equals2d(coordinates2End)) {
-      numCoords = append(coordinates2, coordinates, vertexCount, axisCount,
-        numCoords);
-      numCoords = append(coordinates1, coordinates, vertexCount, axisCount,
-        numCoords);
-    } else if (coordinates2Start.equals2d(coordinates1End)) {
-      numCoords = append(coordinates1, coordinates, vertexCount, axisCount,
-        numCoords);
-      numCoords = append(coordinates2, coordinates, vertexCount, axisCount,
-        numCoords);
-    } else if (coordinates1Start.equals2d(coordinates2Start)) {
-      numCoords = appendReverse(coordinates2, coordinates, vertexCount,
-        axisCount, numCoords);
-      numCoords = append(coordinates1, coordinates, vertexCount, axisCount,
-        numCoords);
-    } else if (coordinates1End.equals2d(coordinates2End)) {
-      numCoords = append(coordinates1, coordinates, vertexCount, axisCount,
-        numCoords);
-      numCoords = appendReverse(coordinates2, coordinates, vertexCount,
-        axisCount, numCoords);
-    } else {
-      throw new IllegalArgumentException("lines don't touch\n" + coordinates1
-        + "\n" + coordinates2);
-
-    }
-    return new DoubleCoordinatesList(axisCount, vertexCount, coordinates);
-  }
-
-  public static CoordinatesList merge(
-    final List<CoordinatesList> coordinatesList) {
-    final Iterator<CoordinatesList> iterator = coordinatesList.iterator();
-    if (!iterator.hasNext()) {
-      return null;
-    } else {
-      CoordinatesList coordinates = iterator.next();
-      while (iterator.hasNext()) {
-        final CoordinatesList nextCoordinates = iterator.next();
-        coordinates = merge(coordinates, nextCoordinates);
-      }
-      return coordinates;
-    }
   }
 
   /**

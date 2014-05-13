@@ -81,13 +81,28 @@ public interface LineString extends Lineal {
 
   double getZ(int vertexIndex);
 
-  boolean isCounterClockwise();
-
   boolean isClockwise();
 
   boolean isClosed();
 
+  boolean isCounterClockwise();
+
   boolean isRing();
+
+  LineString merge(Coordinates point, LineString line);
+
+  /**
+   * Merge two lines that share common coordinates at either the start or end.
+   * If the lines touch only at their start coordinates, the line2 will be
+   * reversed and joined before the start of line1. If the two lines touch only
+   * at their end coordinates, the line2 will be reversed and joined after the
+   * end of line1.
+   * 
+   * @param line1 The first line.
+   * @param line2 The second line.
+   * @return The new line string
+   */
+  LineString merge(LineString line);
 
   @Override
   LineString move(final double... deltas);

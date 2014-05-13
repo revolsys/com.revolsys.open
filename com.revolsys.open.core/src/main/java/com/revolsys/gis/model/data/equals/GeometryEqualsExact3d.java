@@ -31,7 +31,7 @@ public class GeometryEqualsExact3d implements Equals<Geometry> {
   @Override
   public boolean equals(final Geometry geometry1, final Geometry geometry2,
     final Collection<String> exclude) {
-    if (!geometry1.equalsExact3d(geometry2)) {
+    if (!geometry1.equalsExact(geometry2)) {
       return false;
     }
     final boolean userDataEquals = !exclude.contains("userData");
