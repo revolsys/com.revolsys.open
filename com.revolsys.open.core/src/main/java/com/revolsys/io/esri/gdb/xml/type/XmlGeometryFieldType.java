@@ -1,13 +1,10 @@
 package com.revolsys.io.esri.gdb.xml.type;
 
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -38,8 +35,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   }
 
   private void writeLineString(final XmlWriter out, final LineString line) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
-    final boolean hasZ = points.getAxisCount() > 2;
+    final boolean hasZ = line.getAxisCount() > 2;
     out.element(HAS_ID, false);
     out.element(HAS_Z, hasZ);
     out.element(HAS_M, false);
@@ -47,7 +43,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.startTag(PATH_ARRAY);
     out.attribute(XsiConstants.TYPE, PATH_ARRAY_TYPE);
 
-    writePath(out, points, hasZ);
+    writePath(out, line, hasZ);
 
     out.endTag(PATH_ARRAY);
   }
@@ -69,20 +65,24 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.attribute(XsiConstants.TYPE, PATH_ARRAY_TYPE);
     for (int i = 0; i < multiLine.getGeometryCount(); i++) {
       final LineString line = (LineString)multiLine.getGeometry(i);
-      final CoordinatesList points = CoordinatesListUtil.get(line);
-      writePath(out, points, hasZ);
+      writePath(out, line, hasZ);
     }
     out.endTag(PATH_ARRAY);
   }
 
-  public void writePath(final XmlWriter out, final CoordinatesList points,
+  public void writePath(final XmlWriter out, final LineString line,
     final boolean hasZ) {
     out.startTag(PATH);
     out.attribute(XsiConstants.TYPE, PATH_TYPE);
 
-    writePointArray(out, points, hasZ);
+    writePointArray(out, line, hasZ);
 
     out.endTag(PATH);
+  }
+
+  private void writePoint(final XmlWriter out, final Point point) {
+    final boolean hasZ = point.getAxisCount() > 2;
+    writePoint(out, point, hasZ);
   }
 
   public void writePoint(final XmlWriter out, final Point coordinates,
@@ -94,18 +94,12 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     }
   }
 
-  private void writePoint(final XmlWriter out, final Point point) {
-    final Point coordinates = CoordinatesUtil.getInstance(point);
-    final boolean hasZ = coordinates.getAxisCount() > 2;
-    writePoint(out, coordinates, hasZ);
-  }
-
-  public void writePointArray(final XmlWriter out,
-    final CoordinatesList points, final boolean hasZ) {
+  public void writePointArray(final XmlWriter out, final LineString line,
+    final boolean hasZ) {
     out.startTag(POINT_ARRAY);
     out.attribute(XsiConstants.TYPE, POINT_ARRAY_TYPE);
 
-    for (final Point point : new InPlaceIterator(points)) {
+    for (final Point point : line.vertices()) {
       out.startTag(POINT);
       out.attribute(XsiConstants.TYPE, POINT_N_TYPE);
       writePoint(out, point, hasZ);
@@ -141,9 +135,8 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     final boolean hasZ) {
     out.startTag(RING);
     out.attribute(XsiConstants.TYPE, RING_TYPE);
-    final CoordinatesList points = CoordinatesListUtil.get(line);
 
-    writePointArray(out, points, hasZ);
+    writePointArray(out, line, hasZ);
 
     out.endTag(RING);
   }

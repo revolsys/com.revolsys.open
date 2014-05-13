@@ -29,11 +29,6 @@ public class GeometryFilter {
     return new LineContainsWithinToleranceFilter(line, maxDistance);
   }
 
-  public static Filter<LineString> lineEqualWithinTolerance(
-    final LineString line, final double maxDistance) {
-    return new LineEqualWithinToleranceFilter(line, maxDistance);
-  }
-
   public static Filter<LineString> lineWithinDistance(final LineString line,
     final double maxDistance) {
     return new LineStringLessThanDistanceFilter(line, maxDistance);

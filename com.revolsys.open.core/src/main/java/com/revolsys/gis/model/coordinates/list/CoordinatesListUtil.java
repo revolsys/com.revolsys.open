@@ -23,7 +23,6 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -212,46 +211,6 @@ public class CoordinatesListUtil {
       && coordinates.getY(index1) == coordinates.getValue(index2, 1);
   }
 
-  public static boolean equalWithinTolerance(final CoordinatesList points1,
-    final CoordinatesList points2, final double tolerance) {
-    final Set<Point> pointSet1 = getCoordinatesSet2d(points1);
-    final Set<Point> pointSet2 = new TreeSet<Point>();
-    for (int i = 0; i < points2.size() - 1; i++) {
-      final Point point2 = points2.get(i);
-      if (pointSet1.contains(point2)) {
-        pointSet1.remove(point2);
-      } else if (isWithinDistanceOfPoints(point2, points1, tolerance)) {
-        pointSet1.remove(point2);
-      } else {
-        pointSet2.add(new DoubleCoordinates(point2, 2));
-      }
-    }
-    for (final Iterator<Point> iterator1 = pointSet1.iterator(); iterator1.hasNext();) {
-      final Point point1 = iterator1.next();
-      if (isWithinDistanceOfPoints(point1, points2, tolerance)) {
-        iterator1.remove();
-        pointSet2.remove(point1);
-      }
-    }
-    for (final Iterator<Point> iterator1 = pointSet1.iterator(); iterator1.hasNext();) {
-      final Point point1 = iterator1.next();
-      if (isPointOnLine(point1, points2, tolerance)) {
-        iterator1.remove();
-      } else {
-        return false;
-      }
-    }
-    for (final Iterator<Point> iterator2 = pointSet2.iterator(); iterator2.hasNext();) {
-      final Point point2 = iterator2.next();
-      if (isPointOnLine(point2, points1, tolerance)) {
-        iterator2.remove();
-      } else {
-        return false;
-      }
-    }
-    return true;
-  }
-
   public static Map<String, Number> findClosestSegmentAndCoordinate(
     final CoordinatesList points, final Point point) {
     final Map<String, Number> result = new HashMap<String, Number>();
@@ -386,8 +345,7 @@ public class CoordinatesListUtil {
     return getCoordinates(geometry, geometry.getVertexCount());
   }
 
-  public static Point[] getCoordinates(final Geometry g,
-    final int vertexCount) {
+  public static Point[] getCoordinates(final Geometry g, final int vertexCount) {
     final List<Point> coordinates = new ArrayList<>();
     final int i = 0;
     for (final Vertex vertex : g.vertices()) {
@@ -397,15 +355,6 @@ public class CoordinatesListUtil {
       coordinates.add(vertex.cloneCoordinates());
     }
     return coordinates.toArray(new Point[coordinates.size()]);
-  }
-
-  private static Set<Point> getCoordinatesSet2d(
-    final CoordinatesList points) {
-    final Set<Point> pointSet = new TreeSet<Point>();
-    for (final Point point : new InPlaceIterator(points)) {
-      pointSet.add(new DoubleCoordinates(point, 2));
-    }
-    return pointSet;
   }
 
   public static List<List<CoordinatesList>> getParts(final Geometry geometry,
@@ -508,24 +457,6 @@ public class CoordinatesListUtil {
     return intersections;
   }
 
-  public static boolean isPointOnLine(final Point coordinate,
-    final CoordinatesList points, final double tolerance) {
-    final CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
-      points, 0);
-    final CoordinatesListCoordinates currentCoordinate = new CoordinatesListCoordinates(
-      points, 0);
-    for (int i = 1; i < points.size(); i++) {
-      currentCoordinate.next();
-
-      if (LineSegmentUtil.isPointOnLine(previousCoordinate, currentCoordinate,
-        coordinate, tolerance)) {
-        return true;
-      }
-      previousCoordinate.next();
-    }
-    return false;
-  }
-
   public static boolean isPointOnLine(final GeometryFactory precisionModel,
     final CoordinatesList points, final Point point) {
     final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
@@ -550,12 +481,20 @@ public class CoordinatesListUtil {
     return false;
   }
 
-  public static boolean isWithinDistanceOfPoints(final Point point,
-    final CoordinatesList points, final double maxDistance) {
-    for (final Point point2 : new InPlaceIterator(points)) {
-      if (point.distance(point2) < maxDistance) {
+  public static boolean isPointOnLine(final Point coordinate,
+    final CoordinatesList points, final double tolerance) {
+    final CoordinatesListCoordinates previousCoordinate = new CoordinatesListCoordinates(
+      points, 0);
+    final CoordinatesListCoordinates currentCoordinate = new CoordinatesListCoordinates(
+      points, 0);
+    for (int i = 1; i < points.size(); i++) {
+      currentCoordinate.next();
+
+      if (LineSegmentUtil.isPointOnLine(previousCoordinate, currentCoordinate,
+        coordinate, tolerance)) {
         return true;
       }
+      previousCoordinate.next();
     }
     return false;
   }
@@ -594,8 +533,8 @@ public class CoordinatesListUtil {
       final Node<T> node2 = nodes2.get(0);
       if (graph1.findNode(node2) == null) {
         final GeometryFactory precisionModel = graph1.getPrecisionModel();
-        final Point midPoint = LineSegmentUtil.midPoint(precisionModel,
-          node1, node2);
+        final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1,
+          node2);
         if (!node1.equals2d(midPoint)) {
           if (movedNodes != null) {
             movedNodes.put(node1.cloneCoordinates(), midPoint);
@@ -670,14 +609,6 @@ public class CoordinatesListUtil {
   }
 
   public static void setCoordinates(final double[] coordinates,
-    final int axisCount, final int i, final Point point) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = point.getCoordinate(axisIndex);
-      coordinates[i * axisCount + axisIndex] = value;
-    }
-  }
-
-  public static void setCoordinates(final double[] coordinates,
     final int axisCount, final int i, final CoordinatesList points, final int j) {
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       final double value = points.getValue(j, axisIndex);
@@ -702,6 +633,14 @@ public class CoordinatesListUtil {
       } else {
         value = Double.NaN;
       }
+      coordinates[i * axisCount + axisIndex] = value;
+    }
+  }
+
+  public static void setCoordinates(final double[] coordinates,
+    final int axisCount, final int i, final Point point) {
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double value = point.getCoordinate(axisIndex);
       coordinates[i * axisCount + axisIndex] = value;
     }
   }
@@ -735,8 +674,8 @@ public class CoordinatesListUtil {
     }
   }
 
-  public static <V extends Point> List<LineString> split(
-    final LineString line, Collection<V> splitPoints, final double maxDistance) {
+  public static <V extends Point> List<LineString> split(final LineString line,
+    Collection<V> splitPoints, final double maxDistance) {
     splitPoints = new ArrayList<V>(splitPoints);
     final List<LineString> lines = new ArrayList<LineString>();
     final CoordinatesList points = CoordinatesListUtil.get(line);

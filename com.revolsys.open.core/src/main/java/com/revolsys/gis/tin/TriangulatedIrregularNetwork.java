@@ -1,6 +1,5 @@
 package com.revolsys.gis.tin;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,7 +15,6 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.comparator.AngleFromPointComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinatesList;
@@ -643,21 +641,16 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  public void insertNodes(final Collection<Point> points) {
+  public void insertNodes(final Iterable<Point> points) {
     for (final Point point : points) {
       insertNode(point);
     }
   }
 
-  public void insertNodes(final CoordinatesList points) {
-    for (final Point point : new InPlaceIterator(points)) {
+  public void insertNodes(final LineString line) {
+    for (final Point point : line.vertices()) {
       insertNode(point);
     }
-  }
-
-  public void insertNodes(final LineString nodes) {
-    final CoordinatesList coordinates = CoordinatesListUtil.get(nodes);
-    insertNodes(coordinates);
   }
 
   private void removeTriangle(final Triangle triangle) {

@@ -11,14 +11,11 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.io.FileUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 
 public class GeometryTest {
   public static void createTestFile(final GeometryFactory geometryFactory,
@@ -30,11 +27,9 @@ public class GeometryTest {
     String name = "/" + geometryDataType.getName();
     if (geometryFactory.hasZ()) {
       name += "Z";
-      for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
-        for (final Point point : new InPlaceIterator(points)) {
-          if (Double.isNaN(point.getZ())) {
-            // point.setZ(0);
-          }
+      for (final Point point : geometry.vertices()) {
+        if (Double.isNaN(point.getZ())) {
+          // point.setZ(0);
         }
       }
     }
