@@ -17,7 +17,7 @@ public class PointVertex extends AbstractVertex {
   }
 
   @Override
-  public double getValue(final int vertexIndex) {
+  public double getCoordinate(final int vertexIndex) {
     final Point point = getPoint();
     return point.getCoordinate(vertexIndex);
   }

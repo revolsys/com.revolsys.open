@@ -45,7 +45,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geomgraph.DirectedEdge;
@@ -76,7 +76,7 @@ class BufferSubgraph implements Comparable {
 
   private final List<Node> nodes = new ArrayList<>();
 
-  private Coordinates rightMostCoord = null;
+  private Point rightMostCoord = null;
 
   private BoundingBox env = null;
 
@@ -297,7 +297,7 @@ class BufferSubgraph implements Comparable {
       double[] bounds = null;
       for (final DirectedEdge dirEdge : dirEdgeList) {
         final Edge edge = dirEdge.getEdge();
-        for (final Coordinates point : edge.getPoints()) {
+        for (final Point point : edge.getPoints()) {
           if (bounds == null) {
             bounds = EnvelopeUtil.createBounds(2, point);
           } else {
@@ -317,7 +317,7 @@ class BufferSubgraph implements Comparable {
   /**
    * Gets the rightmost coordinate in the edges of the subgraph
    */
-  public Coordinates getRightmostCoordinate() {
+  public Point getRightmostCoordinate() {
     return rightMostCoord;
   }
 }

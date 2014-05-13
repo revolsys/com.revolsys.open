@@ -5,7 +5,7 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
@@ -79,8 +79,8 @@ public class OverlayNodingStressTest extends TestCase {
     final double angle2) {
     final RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
     final double basex = angle2 * MAX_DISPLACEMENT - MAX_DISPLACEMENT / 2;
-    final Coordinates base = new Coordinate(basex, basex,
-      Coordinates.NULL_ORDINATE);
+    final Point base = new Coordinate(basex, basex,
+      Point.NULL_ORDINATE);
     final Polygon rr1 = rrFact.createRectangle(100, 20, angle1, base);
 
     // limit size of accumulated star
@@ -153,11 +153,11 @@ class RotatedRectangleFactory {
   public Polygon createRectangle(final double length, final double width,
     final double angle) {
     return createRectangle(length, width, angle, new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE));
   }
 
   public Polygon createRectangle(final double length, final double width,
-    final double angle, final Coordinates base) {
+    final double angle, final Point base) {
     final double posx = length / 2 * Math.cos(angle);
     final double posy = length / 2 * Math.sin(angle);
     final double negx = -posx;
@@ -165,16 +165,16 @@ class RotatedRectangleFactory {
     final double widthOffsetx = width / 2 * Math.cos(angle + PI_OVER_2);
     final double widthOffsety = width / 2 * Math.sin(angle + PI_OVER_2);
 
-    final Coordinates[] pts = new Coordinates[] {
+    final Point[] pts = new Point[] {
       new Coordinate(base.getX() + posx + widthOffsetx, base.getY() + posy
-        + widthOffsety, Coordinates.NULL_ORDINATE),
+        + widthOffsety, Point.NULL_ORDINATE),
       new Coordinate(base.getX() + posx - widthOffsetx, base.getY() + posy
-        - widthOffsety, Coordinates.NULL_ORDINATE),
+        - widthOffsety, Point.NULL_ORDINATE),
       new Coordinate(base.getX() + negx - widthOffsetx, base.getY() + negy
-        - widthOffsety, Coordinates.NULL_ORDINATE),
+        - widthOffsety, Point.NULL_ORDINATE),
       new Coordinate(base.getX() + negx + widthOffsetx, base.getY() + negy
-        + widthOffsety, Coordinates.NULL_ORDINATE),
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
+        + widthOffsety, Point.NULL_ORDINATE),
+      new Coordinate(0.0, 0, Point.NULL_ORDINATE),
     };
     // close polygon
     pts[4] = new Coordinate(pts[0]);

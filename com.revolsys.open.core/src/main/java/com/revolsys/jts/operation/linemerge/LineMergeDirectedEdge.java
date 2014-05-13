@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.operation.linemerge;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.planargraph.DirectedEdge;
 import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.util.Assert;
@@ -56,7 +56,7 @@ public class LineMergeDirectedEdge extends DirectedEdge {
    *                  opposite to that of the parent Edge (if any)
    */
   public LineMergeDirectedEdge(final Node from, final Node to,
-    final Coordinates directionPt, final boolean edgeDirection) {
+    final Point directionPt, final boolean edgeDirection) {
     super(from, to, directionPt, edgeDirection);
   }
 

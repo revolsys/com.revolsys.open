@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Represents a directed graph which is embeddable in a planar surface.
@@ -146,7 +146,7 @@ public abstract class PlanarGraph {
    * @return the node found
    * or <code>null</code> if this graph contains no node at the location
    */
-  public Node findNode(final Coordinates pt) {
+  public Node findNode(final Point pt) {
     return (Node)nodeMap.find(pt);
   }
 

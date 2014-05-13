@@ -9,7 +9,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -19,11 +19,11 @@ import com.revolsys.util.CollectionUtil;
 
 public class MappedLocation extends AbstractPropertyChangeObject implements
   MapSerializer {
-  private Coordinates sourcePixel;
+  private Point sourcePixel;
 
   private Point targetPoint;
 
-  public MappedLocation(final Coordinates sourcePixel, final Point targetPoint) {
+  public MappedLocation(final Point sourcePixel, final Point targetPoint) {
     this.sourcePixel = sourcePixel;
     this.targetPoint = targetPoint;
   }
@@ -36,7 +36,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       (String)map.get("target"));
   }
 
-  public Coordinates getSourcePixel() {
+  public Point getSourcePixel() {
     return sourcePixel;
   }
 
@@ -45,8 +45,8 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
     if (filter == null) {
       return null;
     } else {
-      final Coordinates sourcePixel = getSourcePixel();
-      final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(
+      final Point sourcePixel = getSourcePixel();
+      final Point sourcePoint = filter.sourcePixelToTargetPoint(
         boundingBox, sourcePixel);
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
       return geometryFactory.point(sourcePoint);
@@ -58,7 +58,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       return null;
     } else {
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
-      final Coordinates sourcePixel = getSourcePixel();
+      final Point sourcePixel = getSourcePixel();
       final Point sourcePoint = filter.sourcePixelToTargetPoint(sourcePixel);
       final Point targetPoint = getTargetPoint();
       return geometryFactory.lineString(sourcePoint, targetPoint);
@@ -70,18 +70,18 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
     if (filter == null) {
       return null;
     } else {
-      final Coordinates sourcePixel = getSourcePixel();
-      final Coordinates sourcePoint = filter.sourcePixelToTargetPoint(
+      final Point sourcePixel = getSourcePixel();
+      final Point sourcePoint = filter.sourcePixelToTargetPoint(
         boundingBox, sourcePixel);
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
       return geometryFactory.lineString(sourcePoint, getTargetPoint());
     }
   }
 
-  public Coordinates getTargetPixel(final BoundingBox boundingBox,
+  public Point getTargetPixel(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight) {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Coordinates targetPointCoordinates = CoordinatesUtil.getInstance((Point)targetPoint.copy(geometryFactory));
+    final Point targetPointCoordinates = CoordinatesUtil.getInstance((Point)targetPoint.copy(geometryFactory));
     return WarpAffineFilter.targetPointToPixel(boundingBox,
       targetPointCoordinates, imageWidth, imageHeight);
   }
@@ -90,7 +90,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
     return targetPoint;
   }
 
-  public void setSourcePixel(final Coordinates sourcePixel) {
+  public void setSourcePixel(final Point sourcePixel) {
     final Object oldValue = this.sourcePixel;
     this.sourcePixel = sourcePixel;
     firePropertyChange("sourcePixel", oldValue, sourcePixel);

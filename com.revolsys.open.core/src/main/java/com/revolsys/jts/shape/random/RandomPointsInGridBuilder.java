@@ -34,7 +34,7 @@
 package com.revolsys.jts.shape.random;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
@@ -49,7 +49,7 @@ import com.revolsys.jts.shape.GeometricShapeBuilder;
  *
  */
 public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
-  private static Coordinates randomPointInCircle(final double orgX,
+  private static Point randomPointInCircle(final double orgX,
     final double orgY, final double width, final double height) {
     final double centreX = orgX + width / 2;
     final double centreY = orgY + height / 2;
@@ -63,7 +63,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
 
     final double x0 = centreX + rndX;
     final double y0 = centreY + rndY;
-    return new Coordinate(x0, y0, Coordinates.NULL_ORDINATE);
+    return new Coordinate(x0, y0, Point.NULL_ORDINATE);
   }
 
   private boolean isConstrainedToCircle = false;
@@ -111,7 +111,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
     final double cellDX = cellFrac * gridDX;
     final double cellDY = cellFrac * gridDY;
 
-    final Coordinates[] pts = new Coordinates[nCells * nCells];
+    final Point[] pts = new Point[nCells * nCells];
     int index = 0;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
@@ -123,7 +123,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
     return geometryFactory.multiPoint(pts);
   }
 
-  private Coordinates randomPointInCell(final double orgX, final double orgY,
+  private Point randomPointInCell(final double orgX, final double orgY,
     final double xLen, final double yLen) {
     if (isConstrainedToCircle) {
       return randomPointInCircle(orgX, orgY, xLen, yLen);
@@ -131,7 +131,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
     return randomPointInGridCell(orgX, orgY, xLen, yLen);
   }
 
-  private Coordinates randomPointInGridCell(final double orgX,
+  private Point randomPointInGridCell(final double orgX,
     final double orgY, final double xLen, final double yLen) {
     final double x = orgX + xLen * Math.random();
     final double y = orgY + yLen * Math.random();

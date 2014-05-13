@@ -15,7 +15,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.io.FileUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -31,7 +31,7 @@ public class GeometryTest {
     if (geometryFactory.hasZ()) {
       name += "Z";
       for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
-        for (final Coordinates point : new InPlaceIterator(points)) {
+        for (final Point point : new InPlaceIterator(points)) {
           if (Double.isNaN(point.getZ())) {
             // point.setZ(0);
           }

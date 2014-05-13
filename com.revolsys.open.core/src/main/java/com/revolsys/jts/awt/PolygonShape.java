@@ -42,7 +42,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A {@link Shape} which represents a polygon which may contain holes.
@@ -61,15 +61,15 @@ public class PolygonShape implements Shape
      * Creates a new polygon {@link Shape}.
      * 
      * @param shellVertices the vertices of the shell 
-     * @param holeVerticesCollection a collection of Coordinates[] for each hole
+     * @param holeVerticesCollection a collection of Point[] for each hole
      */
-    public PolygonShape(Coordinates[] shellVertices,
+    public PolygonShape(Point[] shellVertices,
         Collection holeVerticesCollection) 
     {
         polygonPath = toPath(shellVertices);
 
         for (Iterator i = holeVerticesCollection.iterator(); i.hasNext();) {
-            Coordinates[] holeVertices = (Coordinates[]) i.next();
+            Point[] holeVertices = (Point[]) i.next();
             polygonPath.append(toPath(holeVertices), false);
         }
     }
@@ -109,7 +109,7 @@ public class PolygonShape implements Shape
      * @param coordinates a coordinate sequence
      * @return the path for the coordinate sequence
      */
-    private GeneralPath toPath(Coordinates[] coordinates) {
+    private GeneralPath toPath(Point[] coordinates) {
       GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD, coordinates.length);
 
       if (coordinates.length > 0) {

@@ -26,11 +26,11 @@ public class GeometryCollectionVertex extends AbstractVertex {
   }
 
   @Override
-  public double getValue(final int axisIndex) {
+  public double getCoordinate(final int axisIndex) {
     if (vertex == null) {
       return Double.NaN;
     } else {
-      return vertex.getValue(axisIndex);
+      return vertex.getCoordinate(axisIndex);
     }
   }
 

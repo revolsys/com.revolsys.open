@@ -27,16 +27,6 @@ public interface BoundingBox {
   /**
    * Tests if the given point lies in or on the envelope.
    *
-   *@param  p  the point which this <code>BoundingBox</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>BoundingBox</code>.
-   */
-  boolean covers(Coordinates p);
-
-  /**
-   * Tests if the given point lies in or on the envelope.
-   *
    *@param  x  the x-coordinate of the point which this <code>BoundingBox</code> is
    *      being checked for containing
    *@param  y  the y-coordinate of the point which this <code>BoundingBox</code> is
@@ -48,7 +38,15 @@ public interface BoundingBox {
 
   boolean covers(Geometry geometry);
 
-  boolean covers(Point geometry);
+  /**
+   * Tests if the given point lies in or on the envelope.
+   *
+   *@param  p  the point which this <code>BoundingBox</code> is
+   *      being checked for containing
+   *@return    <code>true</code> if the point lies in the interior or
+   *      on the boundary of this <code>BoundingBox</code>.
+   */
+  boolean covers(Point point);
 
   /**
    * Computes the distance between this and another
@@ -60,11 +58,11 @@ public interface BoundingBox {
 
   double distance(Geometry point);
 
-  BoundingBox expand(Coordinates point);
-
   BoundingBox expand(double maxDistance);
 
   BoundingBox expand(final double deltaX, final double deltaY);
+
+  BoundingBox expand(Point point);
 
   BoundingBox expandPercent(double d);
 
@@ -98,7 +96,7 @@ public interface BoundingBox {
 
   CoordinateSystem getCoordinateSystem();
 
-  Coordinates getCornerPoint(int i);
+  Point getCornerPoint(int i);
 
   CoordinatesList getCornerPoints();
 
@@ -192,15 +190,6 @@ public interface BoundingBox {
   boolean intersects(BoundingBox other);
 
   /**
-   *  Check if the point <code>p</code>
-   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
-   *
-   *@param  p  the <code>Coordinate</code> to be tested
-   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
-   */
-  boolean intersects(Coordinates p);
-
-  /**
    *  Check if the point <code>(x, y)</code>
    *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
    *
@@ -209,6 +198,15 @@ public interface BoundingBox {
    *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
    */
   boolean intersects(double x, double y);
+
+  /**
+   *  Check if the point <code>p</code>
+   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
+   *
+   *@param  p  the <code>Coordinate</code> to be tested
+   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
+   */
+  boolean intersects(Point p);
 
   boolean isEmpty();
 

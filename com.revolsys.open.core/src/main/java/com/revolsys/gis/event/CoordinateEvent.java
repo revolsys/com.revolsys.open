@@ -2,7 +2,7 @@ package com.revolsys.gis.event;
 
 import java.util.EventObject;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 public class CoordinateEvent extends EventObject {
   /**
@@ -24,18 +24,18 @@ public class CoordinateEvent extends EventObject {
 
   private String typePath;
 
-  public CoordinateEvent(final Coordinates coordinate) {
+  public CoordinateEvent(final Point coordinate) {
     super(coordinate);
   }
 
-  public CoordinateEvent(final Coordinates coordinate, final String ruleName,
+  public CoordinateEvent(final Point coordinate, final String ruleName,
     final String action) {
     super(coordinate);
     this.ruleName = ruleName;
     this.action = action;
   }
 
-  public CoordinateEvent(final Coordinates coordinate, final String path,
+  public CoordinateEvent(final Point coordinate, final String path,
     final String ruleName, final String action, final String notes) {
     super(coordinate);
     this.typePath = path;
@@ -48,8 +48,8 @@ public class CoordinateEvent extends EventObject {
     return action;
   }
 
-  public Coordinates getCoordinate() {
-    return (Coordinates)getSource();
+  public Point getCoordinate() {
+    return (Point)getSource();
   }
 
   public String getNotes() {

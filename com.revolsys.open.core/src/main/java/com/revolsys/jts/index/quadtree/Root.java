@@ -34,7 +34,7 @@ package com.revolsys.jts.index.quadtree;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -46,8 +46,8 @@ import com.revolsys.jts.util.Assert;
 public class Root extends NodeBase {
 
   // the singleton root quad is centred at the origin.
-  private static final Coordinates origin = new Coordinate(0.0, 0.0,
-    Coordinates.NULL_ORDINATE);
+  private static final Point origin = new Coordinate(0.0, 0.0,
+    Point.NULL_ORDINATE);
 
   public Root() {
   }

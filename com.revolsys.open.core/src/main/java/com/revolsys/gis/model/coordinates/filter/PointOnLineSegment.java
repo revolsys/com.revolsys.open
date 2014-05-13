@@ -2,10 +2,10 @@ package com.revolsys.gis.model.coordinates.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 
-public class PointOnLineSegment implements Filter<Coordinates> {
+public class PointOnLineSegment implements Filter<Point> {
 
   private final LineSegment lineSegment;
 
@@ -18,9 +18,9 @@ public class PointOnLineSegment implements Filter<Coordinates> {
   }
 
   @Override
-  public boolean accept(final Coordinates point) {
-    final Coordinates start = lineSegment.get(0);
-    final Coordinates end = lineSegment.get(1);
+  public boolean accept(final Point point) {
+    final Point start = lineSegment.get(0);
+    final Point end = lineSegment.get(1);
     final boolean onLine = LineSegmentUtil.isPointOnLine(start, end, point,
       maxDistance);
     return onLine;

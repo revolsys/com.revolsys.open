@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.operation.linemerge;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
@@ -65,8 +65,8 @@ public class LineMergeGraph extends PlanarGraph {
     final CoordinatesList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
     final int vertexCount = points.size();
     if (vertexCount > 1) {
-      final Coordinates startCoordinate = points.get(0).cloneCoordinates();
-      final Coordinates endCoordinate = points.get(vertexCount - 1)
+      final Point startCoordinate = points.get(0).cloneCoordinates();
+      final Point endCoordinate = points.get(vertexCount - 1)
         .cloneCoordinates();
       final Node startNode = getNode(startCoordinate);
       final Node endNode = getNode(endCoordinate);
@@ -80,7 +80,7 @@ public class LineMergeGraph extends PlanarGraph {
     }
   }
 
-  private Node getNode(final Coordinates coordinate) {
+  private Node getNode(final Point coordinate) {
     Node node = findNode(coordinate);
     if (node == null) {
       node = new Node(coordinate);

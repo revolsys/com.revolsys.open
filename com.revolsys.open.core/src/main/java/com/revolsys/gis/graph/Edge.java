@@ -21,7 +21,7 @@ import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 
@@ -57,7 +57,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     }
     final HashSet<Edge<T>> edges = new HashSet<Edge<T>>();
     if (edge.isForwards(node)) {
-      line = LineStringUtil.reverse(line);
+      line = line.reverse();
     }
     edges.add(edge);
     lineEdgeMap.put(line, edges);
@@ -253,7 +253,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     }
   }
 
-  public double distance(final Coordinates point) {
+  public double distance(final Point point) {
     return LineStringUtil.distance(point, getLine());
   }
 
@@ -262,7 +262,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   }
 
   public double distance(final Node<T> node) {
-    final Coordinates point = node;
+    final Point point = node;
     return distance(point);
   }
 
@@ -457,13 +457,13 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
       + " is not part of the edge.");
   }
 
-  public boolean isLessThanDistance(final Coordinates point,
+  public boolean isLessThanDistance(final Point point,
     final double distance) {
     return LineStringUtil.distance(point, getLine(), distance) < distance;
   }
 
   public boolean isLessThanDistance(final Node<T> node, final double distance) {
-    final Coordinates point = node;
+    final Point point = node;
     return isLessThanDistance(point, distance);
   }
 
@@ -471,12 +471,12 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     return graph == null;
   }
 
-  public boolean isWithinDistance(final Coordinates point, final double distance) {
+  public boolean isWithinDistance(final Point point, final double distance) {
     return LineStringUtil.distance(point, getLine(), distance) <= distance;
   }
 
   public boolean isWithinDistance(final Node<T> node, final double distance) {
-    final Coordinates point = node;
+    final Point point = node;
     return isWithinDistance(point, distance);
   }
 
@@ -530,21 +530,21 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     graph.setEdgeAttributes(id, attributes);
   }
 
-  public <V extends Coordinates> List<Edge<T>> split(
+  public <V extends Point> List<Edge<T>> split(
     final Collection<V> splitPoints) {
     return graph.splitEdge(this, splitPoints);
   }
 
-  public <V extends Coordinates> List<Edge<T>> split(
+  public <V extends Point> List<Edge<T>> split(
     final Collection<V> points, final double maxDistance) {
     return graph.splitEdge(this, points, maxDistance);
   }
 
-  public List<Edge<T>> split(final Coordinates... points) {
+  public List<Edge<T>> split(final Point... points) {
     return split(Arrays.asList(points));
   }
 
-  public List<Edge<T>> split(final List<Coordinates> points) {
+  public List<Edge<T>> split(final List<Point> points) {
     final Graph<T> graph = getGraph();
     return graph.splitEdge(this, points);
 

@@ -6,7 +6,7 @@ import junit.textui.TestRunner;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -26,8 +26,8 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
     super(name);
   }
 
-  Coordinates[] createArray(final int size) {
-    final Coordinates[] coords = new Coordinates[size];
+  Point[] createArray(final int size) {
+    final Point[] coords = new Point[size];
     for (int i = 0; i < size; i++) {
       final double base = 2 * 1;
       coords[i] = new Coordinate(base, base + 1, base + 2);
@@ -35,7 +35,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
     return coords;
   }
 
-  boolean isAllCoordsEqual(final CoordinatesList seq, final Coordinates coord) {
+  boolean isAllCoordsEqual(final CoordinatesList seq, final Point coord) {
     for (int i = 0; i < seq.size(); i++) {
       if (!coord.equals(seq.getCoordinate(i))) {
         return false;
@@ -62,7 +62,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
    * @param coords
    * @return
    */
-  boolean isEqual(final CoordinatesList seq, final Coordinates[] coords) {
+  boolean isEqual(final CoordinatesList seq, final Point[] coords) {
     if (seq.size() != coords.length) {
       return false;
     }
@@ -91,8 +91,8 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
         return false;
       }
 
-      // Coordinates getter
-      final Coordinates p = seq.getCoordinate(i);
+      // Point getter
+      final Point p = seq.getCoordinate(i);
       final double pX = p.getX();
       if (coords[i].getX() != pX) {
         return false;
@@ -111,33 +111,33 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
   }
 
   public void test2DZOrdinate() {
-    final Coordinates[] coords = createArray(SIZE);
+    final Point[] coords = createArray(SIZE);
 
     final double[] coordinates = new double[SIZE * 2];
     for (int i = 0; i < SIZE; i++) {
-      final Coordinates point = coords[i];
+      final Point point = coords[i];
       CoordinatesListUtil.setCoordinates(coordinates, 2, i, point);
     }
     final CoordinatesList seq = new DoubleCoordinatesList(2, coordinates);
 
     for (int i = 0; i < seq.size(); i++) {
-      final Coordinates p = seq.getCoordinate(i);
+      final Point p = seq.getCoordinate(i);
       assertTrue(Double.isNaN(p.getZ()));
     }
   }
 
   public void testCreateByInit() {
-    final Coordinates[] coords = createArray(SIZE);
+    final Point[] coords = createArray(SIZE);
     final CoordinatesList seq = new DoubleCoordinatesList(coords);
     assertTrue(isEqual(seq, coords));
   }
 
   public void testCreateBySizeAndModify() {
-    final Coordinates[] coords = createArray(SIZE);
+    final Point[] coords = createArray(SIZE);
 
     final double[] coordinates = new double[SIZE * 3];
     for (int i = 0; i < SIZE; i++) {
-      final Coordinates point = coords[i];
+      final Point point = coords[i];
       CoordinatesListUtil.setCoordinates(coordinates, 3, i, point);
     }
     final CoordinatesList seq = new DoubleCoordinatesList(3, coordinates);

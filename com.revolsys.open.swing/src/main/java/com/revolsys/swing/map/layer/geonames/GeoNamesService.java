@@ -19,7 +19,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.UrlUtil;
 
@@ -162,7 +162,7 @@ public class GeoNamesService {
       final double lat = ((Number)name.get("lat")).doubleValue();
       final double lon = ((Number)name.get("lng")).doubleValue();
 
-      Coordinates coordinate = new DoubleCoordinates(lon, lat);
+      Point coordinate = new DoubleCoordinates(lon, lat);
       final Number elevation = (Number)name.get("elevation");
       if (elevation == null) {
         coordinate = new DoubleCoordinates(lon, lat);

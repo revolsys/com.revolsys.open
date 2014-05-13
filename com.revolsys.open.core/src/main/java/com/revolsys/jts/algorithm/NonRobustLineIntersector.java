@@ -37,7 +37,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 /**
  *@version 1.7
  */
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A non-robust version of {@link LineIntersector}.
@@ -66,14 +66,14 @@ public class NonRobustLineIntersector extends LineIntersector {
    * the same direction as p1-p2 DO_INTERSECT : the inputLines intersect in a
    * single point only, pa
    */
-  private int computeCollinearIntersection(final Coordinates p1,
-    final Coordinates p2, final Coordinates p3, final Coordinates p4) {
+  private int computeCollinearIntersection(final Point p1,
+    final Point p2, final Point p3, final Point p4) {
     double r1;
     double r2;
     double r3;
     double r4;
-    Coordinates q3;
-    Coordinates q4;
+    Point q3;
+    Point q4;
     double t3;
     double t4;
     r1 = 0;
@@ -120,8 +120,8 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  protected int computeIntersect(final Coordinates p1, final Coordinates p2,
-    final Coordinates p3, final Coordinates p4) {
+  protected int computeIntersect(final Point p1, final Point p2,
+    final Point p3, final Point p4) {
     double a1;
     double b1;
     double c1;
@@ -220,8 +220,8 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  public void computeIntersection(final Coordinates p, final Coordinates p1,
-    final Coordinates p2) {
+  public void computeIntersection(final Point p, final Point p1,
+    final Point p2) {
     double a1;
     double b1;
     double c1;
@@ -274,8 +274,8 @@ public class NonRobustLineIntersector extends LineIntersector {
    *  of the line from p1 to p2.
    *  This is equal to the 'distance' of p along p1-p2
    */
-  private double rParameter(final Coordinates p1, final Coordinates p2,
-    final Coordinates p) {
+  private double rParameter(final Point p1, final Point p2,
+    final Point p) {
     double r;
     // compute maximum delta, for numerical stability
     // also handle case of p1-p2 being vertical or horizontal

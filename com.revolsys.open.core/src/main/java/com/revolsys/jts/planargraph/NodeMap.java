@@ -38,7 +38,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A map of {@link Node}s, indexed by the coordinate of the node.
@@ -69,7 +69,7 @@ public class NodeMap
   /**
    * Returns the Node at the given location, or null if no Node was there.
    */
-  public Node find(final Coordinates coord) {
+  public Node find(final Point coord) {
     return (Node)nodeMap.get(coord);
   }
 
@@ -84,7 +84,7 @@ public class NodeMap
   /**
    * Removes the Node at the given location, and returns it (or null if no Node was there).
    */
-  public Node remove(final Coordinates pt) {
+  public Node remove(final Point pt) {
     return (Node)nodeMap.remove(pt);
   }
 

@@ -46,7 +46,7 @@ import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -85,7 +85,6 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *@version 1.7
  */
 public class PolygonImpl extends AbstractGeometry implements Polygon {
-
   /**
    *  Returns the minimum coordinate, using the usual lexicographic comparison.
    *
@@ -94,7 +93,7 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
    *@see Coordinate#compareTo(Object)
    */
   public static int minCoordinateIndex(final LinearRing ring) {
-    Coordinates minCoord = null;
+    Point minCoord = null;
     int minIndex = 0;
     for (final Vertex vertex : ring.vertices()) {
       if (minCoord == null || minCoord.compareTo(vertex) > 0) {
@@ -366,7 +365,7 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
   }
 
   @Override
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return getExteriorRing().getCoordinate();
   }
 
@@ -518,6 +517,11 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
   @Override
   public boolean isEmpty() {
     return rings == null;
+  }
+
+  @Override
+  protected boolean isEquivalentClass(final Geometry other) {
+    return other instanceof Polygon;
   }
 
   @Override

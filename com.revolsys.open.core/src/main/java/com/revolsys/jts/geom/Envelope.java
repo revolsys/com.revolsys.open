@@ -164,10 +164,6 @@ public class Envelope implements Serializable, BoundingBox {
     this.bounds = null;
   }
 
-  public Envelope(final Coordinates... points) {
-    this(null, points);
-  }
-
   /**
    * Construct a new Bounding Box.
    * 
@@ -176,11 +172,6 @@ public class Envelope implements Serializable, BoundingBox {
   public Envelope(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     this.bounds = null;
-  }
-
-  public Envelope(final GeometryFactory geometryFactory,
-    final Coordinates... points) {
-    this(geometryFactory, CollectionUtil.toList(points));
   }
 
   public Envelope(final GeometryFactory geometryFactory, final int axisCount,
@@ -198,11 +189,11 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   public Envelope(final GeometryFactory geometryFactory,
-    final Iterable<? extends Coordinates> points) {
+    final Iterable<? extends Point> points) {
     this.geometryFactory = geometryFactory;
     double[] bounds = null;
     if (points != null) {
-      for (final Coordinates point : points) {
+      for (final Point point : points) {
         if (point != null) {
           if (bounds == null) {
             bounds = EnvelopeUtil.createBounds(geometryFactory, point);
@@ -215,11 +206,19 @@ public class Envelope implements Serializable, BoundingBox {
     this.bounds = bounds;
   }
 
+  public Envelope(final GeometryFactory geometryFactory, final Point... points) {
+    this(geometryFactory, CollectionUtil.toList(points));
+  }
+
   public Envelope(final int axisCount, final double... bounds) {
     this(null, axisCount, bounds);
   }
 
-  public Envelope(final Iterable<? extends Coordinates> points) {
+  public Envelope(final Iterable<? extends Point> points) {
+    this(null, points);
+  }
+
+  public Envelope(final Point... points) {
     this(null, points);
   }
 
@@ -341,21 +340,6 @@ public class Envelope implements Serializable, BoundingBox {
   /**
    * Tests if the given point lies in or on the envelope.
    *
-   *@param  p  the point which this <code>Envelope</code> is
-   *      being checked for containing
-   *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>Envelope</code>.
-   */
-  @Override
-  public boolean covers(final Coordinates p) {
-    final double x = p.getX();
-    final double y = p.getY();
-    return covers(x, y);
-  }
-
-  /**
-   * Tests if the given point lies in or on the envelope.
-   *
    *@param  x  the x-coordinate of the point which this <code>Envelope</code> is
    *      being checked for containing
    *@param  y  the y-coordinate of the point which this <code>Envelope</code> is
@@ -387,12 +371,21 @@ public class Envelope implements Serializable, BoundingBox {
     }
   }
 
+  /**
+   * Tests if the given point lies in or on the envelope.
+   *
+   *@param  p  the point which this <code>Envelope</code> is
+   *      being checked for containing
+   *@return    <code>true</code> if the point lies in the interior or
+   *      on the boundary of this <code>Envelope</code>.
+   */
   @Override
   public boolean covers(final Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Point projectedPoint = point.convert(geometryFactory);
-    final boolean contains = covers((Coordinates)projectedPoint);
-    return contains;
+    final double x = projectedPoint.getX();
+    final double y = projectedPoint.getY();
+    return covers(x, y);
   }
 
   /**
@@ -468,36 +461,6 @@ public class Envelope implements Serializable, BoundingBox {
     return false;
   }
 
-  @Override
-  public BoundingBox expand(final Coordinates coordinates) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (isEmpty()) {
-      return new Envelope(geometryFactory, coordinates);
-    } else {
-      final double x = coordinates.getX();
-      final double y = coordinates.getY();
-
-      double minX = getMinX();
-      double maxX = getMaxX();
-      double minY = getMinY();
-      double maxY = getMaxY();
-
-      if (x < minX) {
-        minX = x;
-      }
-      if (x > maxX) {
-        maxX = x;
-      }
-      if (y < minY) {
-        minY = y;
-      }
-      if (y > maxY) {
-        maxY = y;
-      }
-      return new Envelope(geometryFactory, 2, minX, minY, maxX, maxY);
-    }
-  }
-
   /**
    * Return a new bounding box expanded by delta.
    * 
@@ -540,6 +503,36 @@ public class Envelope implements Serializable, BoundingBox {
 
     operation.perform(2, from, 2, to);
     EnvelopeUtil.expand(geometryFactory, bounds, to);
+  }
+
+  @Override
+  public BoundingBox expand(final Point coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (isEmpty()) {
+      return new Envelope(geometryFactory, coordinates);
+    } else {
+      final double x = coordinates.getX();
+      final double y = coordinates.getY();
+
+      double minX = getMinX();
+      double maxX = getMaxX();
+      double minY = getMinY();
+      double maxY = getMaxY();
+
+      if (x < minX) {
+        minX = x;
+      }
+      if (x > maxX) {
+        maxX = x;
+      }
+      if (y < minY) {
+        minY = y;
+      }
+      if (y > maxY) {
+        maxY = y;
+      }
+      return new Envelope(geometryFactory, 2, minX, minY, maxX, maxY);
+    }
   }
 
   @Override
@@ -697,7 +690,7 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   @Override
-  public Coordinates getCornerPoint(int index) {
+  public Point getCornerPoint(int index) {
     final double minX = getMinX();
     final double maxX = getMaxX();
     final double minY = getMinY();
@@ -973,24 +966,6 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   /**
-   *  Check if the point <code>p</code>
-   *  overlaps (lies inside) the region of this <code>Envelope</code>.
-   *
-   *@param  p  the <code>Coordinate</code> to be tested
-   *@return        <code>true</code> if the point overlaps this <code>Envelope</code>
-   */
-  @Override
-  public boolean intersects(final Coordinates point) {
-    if (point == null) {
-      return false;
-    } else {
-      final double x = point.getX();
-      final double y = point.getY();
-      return this.intersects(x, y);
-    }
-  }
-
-  /**
    *  Check if the point <code>(x, y)</code>
    *  overlaps (lies inside) the region of this <code>Envelope</code>.
    *
@@ -1014,6 +989,24 @@ public class Envelope implements Serializable, BoundingBox {
   public boolean intersects(final Geometry geometry) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     return intersects(boundingBox);
+  }
+
+  /**
+   *  Check if the point <code>p</code>
+   *  overlaps (lies inside) the region of this <code>Envelope</code>.
+   *
+   *@param  p  the <code>Coordinate</code> to be tested
+   *@return        <code>true</code> if the point overlaps this <code>Envelope</code>
+   */
+  @Override
+  public boolean intersects(final Point point) {
+    if (point == null) {
+      return false;
+    } else {
+      final double x = point.getX();
+      final double y = point.getY();
+      return this.intersects(x, y);
+    }
   }
 
   @Override

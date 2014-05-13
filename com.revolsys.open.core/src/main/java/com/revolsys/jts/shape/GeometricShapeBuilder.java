@@ -36,7 +36,7 @@ package com.revolsys.jts.shape;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -54,12 +54,12 @@ public abstract class GeometricShapeBuilder {
     this.geometryFactory = geomFactory;
   }
 
-  protected Coordinates createCoord(final double x, final double y) {
+  protected Point createCoord(final double x, final double y) {
     return new DoubleCoordinates(geometryFactory.makePrecise(0, x),
       geometryFactory.makePrecise(1, y));
   }
 
-  public Coordinates getCentre() {
+  public Point getCentre() {
     return extent.getCentre();
   }
 
@@ -80,18 +80,18 @@ public abstract class GeometricShapeBuilder {
   public LineSegment getSquareBaseLine() {
     final double radius = getRadius();
 
-    final Coordinates centre = getCentre();
+    final Point centre = getCentre();
     final Coordinate p0 = new Coordinate(centre.getX() - radius, centre.getY()
-      - radius, Coordinates.NULL_ORDINATE);
+      - radius, Point.NULL_ORDINATE);
     final Coordinate p1 = new Coordinate(centre.getX() + radius, centre.getY()
-      - radius, Coordinates.NULL_ORDINATE);
+      - radius, Point.NULL_ORDINATE);
     return new LineSegmentImpl(p0, p1);
   }
 
   public BoundingBox getSquareExtent() {
     final double radius = getRadius();
 
-    final Coordinates centre = getCentre();
+    final Point centre = getCentre();
     return new Envelope(2, centre.getX() - radius, centre.getY() - radius,
       centre.getX() + radius, centre.getY() + radius);
   }

@@ -35,7 +35,7 @@ package com.revolsys.jts.geomgraph;
 import java.io.PrintStream;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.Location;
 
@@ -43,11 +43,11 @@ import com.revolsys.jts.geom.Location;
  * @version 1.7
  */
 public class Node extends GraphComponent {
-  protected Coordinates coord; // only non-null if this node is precise
+  protected Point coord; // only non-null if this node is precise
 
   protected EdgeEndStar edges;
 
-  public Node(final Coordinates coord, final EdgeEndStar edges) {
+  public Node(final Point coord, final EdgeEndStar edges) {
     this.coord = coord;
     this.edges = edges;
     label = new Label(0, Location.NONE);
@@ -89,7 +89,7 @@ public class Node extends GraphComponent {
   }
 
   @Override
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return coord;
   }
 

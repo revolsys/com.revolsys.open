@@ -34,7 +34,7 @@
 package com.revolsys.jts.linearref;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.util.Assert;
 
@@ -47,13 +47,13 @@ import com.revolsys.jts.util.Assert;
  */
 class LocationIndexOfPoint {
   public static LinearLocation indexOf(final Geometry linearGeom,
-    final Coordinates inputPt) {
+    final Point inputPt) {
     final LocationIndexOfPoint locater = new LocationIndexOfPoint(linearGeom);
     return locater.indexOf(inputPt);
   }
 
   public static LinearLocation indexOfAfter(final Geometry linearGeom,
-    final Coordinates inputPt, final LinearLocation minIndex) {
+    final Point inputPt, final LinearLocation minIndex) {
     final LocationIndexOfPoint locater = new LocationIndexOfPoint(linearGeom);
     return locater.indexOfAfter(inputPt, minIndex);
   }
@@ -70,7 +70,7 @@ class LocationIndexOfPoint {
    * @param inputPt the coordinate to locate
    * @return the location of the nearest point
    */
-  public LinearLocation indexOf(final Coordinates inputPt) {
+  public LinearLocation indexOf(final Point inputPt) {
     return indexOfFromStart(inputPt, null);
   }
 
@@ -89,7 +89,7 @@ class LocationIndexOfPoint {
    * @param minIndex the minimum location for the point location
    * @return the location of the nearest point
    */
-  public LinearLocation indexOfAfter(final Coordinates inputPt,
+  public LinearLocation indexOfAfter(final Point inputPt,
     final LinearLocation minIndex) {
     if (minIndex == null) {
       return indexOf(inputPt);
@@ -111,7 +111,7 @@ class LocationIndexOfPoint {
     return closestAfter;
   }
 
-  private LinearLocation indexOfFromStart(final Coordinates inputPt,
+  private LinearLocation indexOfFromStart(final Point inputPt,
     final LinearLocation minIndex) {
     double minDistance = Double.MAX_VALUE;
     int minComponentIndex = 0;
@@ -120,8 +120,8 @@ class LocationIndexOfPoint {
 
     for (final LinearIterator it = new LinearIterator(linearGeom); it.hasNext(); it.next()) {
       if (!it.isEndOfLine()) {
-        final Coordinates p0 = it.getSegmentStart();
-        final Coordinates p1 = it.getSegmentEnd();
+        final Point p0 = it.getSegmentStart();
+        final Point p1 = it.getSegmentEnd();
         final double segDistance = LineSegmentUtil.distance(p0, p1, inputPt);
         final double segFrac = LineSegmentUtil.segmentFraction(p0, p1, inputPt);
 
@@ -163,7 +163,7 @@ class LocationIndexOfPoint {
    */
   /*
    * // MD - no longer needed private static double segmentFraction(
-   * LineSegment seg, Coordinates inputPt) { double segFrac =
+   * LineSegment seg, Point inputPt) { double segFrac =
    * seg.projectionFactor(inputPt); if (segFrac < 0.0) segFrac = 0.0; else if
    * (segFrac > 1.0) segFrac = 1.0; return segFrac; }
    */

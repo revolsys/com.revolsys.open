@@ -38,7 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.segment.Segment;
@@ -78,7 +78,7 @@ public class OffsetPointGenerator {
    */
   private void computeOffsetPoints(final double x1, final double y1,
     final double x2, final double y2, final double offsetDistance,
-    final List<Coordinates> offsetPts) {
+    final List<Point> offsetPts) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
     final double len = Math.sqrt(dx * dx + dy * dy);
@@ -91,18 +91,18 @@ public class OffsetPointGenerator {
     final double midY = (y2 + y1) / 2;
 
     if (doLeft) {
-      final Coordinates offsetLeft = new Coordinate(midX - uy, midY + ux);
+      final Point offsetLeft = new Coordinate(midX - uy, midY + ux);
       offsetPts.add(offsetLeft);
     }
 
     if (doRight) {
-      final Coordinates offsetRight = new Coordinate(midX + uy, midY - ux);
+      final Point offsetRight = new Coordinate(midX + uy, midY - ux);
       offsetPts.add(offsetRight);
     }
   }
 
   private void extractPoints(final LineString line,
-    final double offsetDistance, final List<Coordinates> offsetPts) {
+    final double offsetDistance, final List<Point> offsetPts) {
     for (final Segment segment : line.segments()) {
       final double x1 = segment.getX(0);
       final double y1 = segment.getY(0);
@@ -115,7 +115,7 @@ public class OffsetPointGenerator {
   /**
    * Gets the computed offset points.
    *
-   * @return List<Coordinates>
+   * @return List<Point>
    */
   public List getPoints(final double offsetDistance) {
     final List offsetPts = new ArrayList();

@@ -45,7 +45,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.io.xml.DomUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -432,7 +432,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
               && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
-              final Coordinates sourcePixel = new DoubleCoordinates(imageX,
+              final Point sourcePixel = new DoubleCoordinates(imageX,
                 imageY);
 
               final double x = targetControlPoints.get(i);

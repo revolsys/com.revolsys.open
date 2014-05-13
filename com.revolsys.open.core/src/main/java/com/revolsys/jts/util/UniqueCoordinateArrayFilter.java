@@ -6,23 +6,23 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.io.Reader;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class UniqueCoordinateArrayFilter {
-  public static List<Coordinates> getUniquePoints(final Geometry geometry) {
+  public static List<Point> getUniquePoints(final Geometry geometry) {
     final Reader<Vertex> vertices = geometry.vertices();
     return getUniquePoints(vertices);
   }
 
-  public static List<Coordinates> getUniquePoints(
-    final Iterable<? extends Coordinates> coordinates) {
-    final Set<Coordinates> set = new TreeSet<>();
-    final List<Coordinates> points = new ArrayList<>();
-    for (final Coordinates point : coordinates) {
+  public static List<Point> getUniquePoints(
+    final Iterable<? extends Point> coordinates) {
+    final Set<Point> set = new TreeSet<>();
+    final List<Point> points = new ArrayList<>();
+    for (final Point point : coordinates) {
       if (!set.contains(point)) {
-        final Coordinates clone = point.cloneCoordinates();
+        final Point clone = point.cloneCoordinates();
         points.add(clone);
         set.add(clone);
       }
@@ -30,15 +30,15 @@ public class UniqueCoordinateArrayFilter {
     return points;
   }
 
-  public static Coordinates[] getUniquePointsArray(final Geometry geometry) {
-    final List<Coordinates> points = getUniquePoints(geometry);
-    return points.toArray(new Coordinates[points.size()]);
+  public static Point[] getUniquePointsArray(final Geometry geometry) {
+    final List<Point> points = getUniquePoints(geometry);
+    return points.toArray(new Point[points.size()]);
   }
 
-  public static Coordinates[] getUniquePointsArray(
-    final Iterable<? extends Coordinates> coordinates) {
-    final List<Coordinates> points = getUniquePoints(coordinates);
-    return points.toArray(new Coordinates[points.size()]);
+  public static Point[] getUniquePointsArray(
+    final Iterable<? extends Point> coordinates) {
+    final List<Point> points = getUniquePoints(coordinates);
+    return points.toArray(new Point[points.size()]);
   }
 
 }

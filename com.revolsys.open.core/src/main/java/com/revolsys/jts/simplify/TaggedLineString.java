@@ -36,7 +36,7 @@ package com.revolsys.jts.simplify;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
@@ -51,8 +51,8 @@ import com.revolsys.jts.geom.segment.Segment;
  */
 class TaggedLineString {
 
-  private static Coordinates[] extractCoordinates(final List<LineSegment> segs) {
-    final Coordinates[] pts = new Coordinates[segs.size() + 1];
+  private static Point[] extractCoordinates(final List<LineSegment> segs) {
+    final Point[] pts = new Point[segs.size() + 1];
     LineSegment seg = null;
     for (int i = 0; i < segs.size(); i++) {
       seg = segs.get(i);
@@ -103,7 +103,7 @@ class TaggedLineString {
     return parentLine;
   }
 
-  public Coordinates[] getResultCoordinates() {
+  public Point[] getResultCoordinates() {
     return extractCoordinates(resultSegs);
   }
 

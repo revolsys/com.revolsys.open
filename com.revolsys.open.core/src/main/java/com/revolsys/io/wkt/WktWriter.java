@@ -36,7 +36,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -52,20 +51,20 @@ import com.revolsys.util.MathUtil;
 public class WktWriter {
 
   public static void append(final StringBuffer wkt, final int axisCount,
-    final Coordinates point) {
+    final Point point) {
     for (int i = 0; i < axisCount; i++) {
       if (i > 0) {
         wkt.append(" ");
       }
-      MathUtil.append(wkt, point.getValue(i));
+      MathUtil.append(wkt, point.getCoordinate(i));
     }
   }
 
   public static void appendLineString(final StringBuffer wkt,
-    final Coordinates... points) {
+    final Point... points) {
     wkt.append("LINESTRING");
     int axisCount = 2;
-    for (final Coordinates point : points) {
+    for (final Point point : points) {
       axisCount = Math.max(axisCount, point.getAxisCount());
     }
     if (axisCount > 3) {
@@ -74,7 +73,7 @@ public class WktWriter {
       wkt.append(" Z");
     }
     boolean first = true;
-    for (final Coordinates point : points) {
+    for (final Point point : points) {
       if (first) {
         first = false;
       } else {
@@ -85,7 +84,7 @@ public class WktWriter {
     wkt.append(")");
   }
 
-  public static void appendPoint(final StringBuffer wkt, final Coordinates point) {
+  public static void appendPoint(final StringBuffer wkt, final Point point) {
     wkt.append("POINT");
     final int axisCount = point.getAxisCount();
     if (axisCount > 3) {
@@ -106,7 +105,7 @@ public class WktWriter {
    *
    * @return the WKT
    */
-  public static String lineString(final Coordinates... points) {
+  public static String lineString(final Point... points) {
     final StringBuffer wkt = new StringBuffer();
     appendLineString(wkt, points);
     return wkt.toString();
@@ -120,7 +119,7 @@ public class WktWriter {
    *
    * @return the WKT
    */
-  public static String point(final Coordinates point) {
+  public static String point(final Point point) {
     final StringBuffer wkt = new StringBuffer();
     appendPoint(wkt, point);
     return wkt.toString();
@@ -148,15 +147,6 @@ public class WktWriter {
     write(writer, geometry);
     writer.flush();
     return out.toString();
-  }
-
-  private static void write(final PrintWriter out, final Coordinates point,
-    final int axisCount) {
-    writeOrdinate(out, point, 0);
-    for (int j = 1; j < axisCount; j++) {
-      out.print(' ');
-      writeOrdinate(out, point, j);
-    }
   }
 
   public static void write(final PrintWriter out,
@@ -339,13 +329,13 @@ public class WktWriter {
     if (multiPoint.isEmpty()) {
       out.print(" EMPTY");
     } else {
-      Coordinates point = multiPoint.getPoint(0);
+      Point point = multiPoint.getPoint(0);
       out.print("((");
-      write(out, point, axisCount);
+      writeCoordinates(out, point, axisCount);
       for (int i = 1; i < multiPoint.getGeometryCount(); i++) {
         out.print("),(");
         point = multiPoint.getPoint(i);
-        write(out, point, axisCount);
+        writeCoordinates(out, point, axisCount);
       }
       out.print("))");
     }
@@ -388,7 +378,7 @@ public class WktWriter {
       out.print(" EMPTY");
     } else {
       out.print("(");
-      write(out, (Coordinates)point, axisCount);
+      writeCoordinates(out, point, axisCount);
       out.print(')');
     }
   }
@@ -416,20 +406,19 @@ public class WktWriter {
     }
   }
 
+  private static void writeCoordinates(final PrintWriter out,
+    final Point point, final int axisCount) {
+    writeOrdinate(out, point, 0);
+    for (int j = 1; j < axisCount; j++) {
+      out.print(' ');
+      writeOrdinate(out, point, j);
+    }
+  }
+
   private static void writeGeometryType(final PrintWriter out,
     final String geometryType, final int axisCount) {
     out.print(geometryType);
     writeAxis(out, axisCount);
-  }
-
-  private static void writeOrdinate(final PrintWriter out,
-    final Coordinates coordinates, final int ordinateIndex) {
-    if (ordinateIndex > coordinates.getAxisCount()) {
-      out.print(0);
-    } else {
-      final double ordinate = coordinates.getValue(ordinateIndex);
-      out.print(MathUtil.toString(ordinate));
-    }
   }
 
   private static void writeOrdinate(final PrintWriter out,
@@ -443,6 +432,16 @@ public class WktWriter {
       } else {
         out.print(MathUtil.toString(ordinate));
       }
+    }
+  }
+
+  private static void writeOrdinate(final PrintWriter out,
+    final Point coordinates, final int ordinateIndex) {
+    if (ordinateIndex > coordinates.getAxisCount()) {
+      out.print(0);
+    } else {
+      final double ordinate = coordinates.getCoordinate(ordinateIndex);
+      out.print(MathUtil.toString(ordinate));
     }
   }
 

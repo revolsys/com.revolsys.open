@@ -1,7 +1,7 @@
 package com.revolsys.jts.testold.perf.operation.distance;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.SineStarFactory;
@@ -32,7 +32,7 @@ public class TestPerfDistanceGeomPair {
   void computeDistanceToAllPoints(final Geometry[] geom) {
     double dist = 0.0;
     final double dist2 = 0.0;
-    for (final Coordinates p : geom[1].vertices()) {
+    for (final Point p : geom[1].vertices()) {
       // slow N^2 distance
       dist = geom[0].distance(geom[1].getGeometryFactory().point(p));
 
@@ -44,14 +44,14 @@ public class TestPerfDistanceGeomPair {
 
   Geometry[] createCircles(final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
-    gsf.setCentre(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
+    gsf.setCentre(new Coordinate((double)0, 0, Point.NULL_ORDINATE));
     gsf.setSize(100);
     gsf.setNumPoints(nPts);
 
     final Polygon gRect = gsf.createCircle();
 
     gsf.setCentre(new Coordinate((double)0, this.separationDist,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE));
 
     final Polygon gRect2 = gsf.createCircle();
 
@@ -63,14 +63,14 @@ public class TestPerfDistanceGeomPair {
 
   Geometry[] createSineStars(final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
-    gsf.setCentre(new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE));
+    gsf.setCentre(new Coordinate((double)0, 0, Point.NULL_ORDINATE));
     gsf.setSize(100);
     gsf.setNumPoints(nPts);
 
     final Geometry g = gsf.createSineStar().getBoundary();
 
     gsf.setCentre(new Coordinate((double)0, this.separationDist,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE));
 
     final Geometry g2 = gsf.createSineStar().getBoundary();
 

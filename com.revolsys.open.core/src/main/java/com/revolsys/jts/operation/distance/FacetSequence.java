@@ -36,7 +36,7 @@ package com.revolsys.jts.operation.distance;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -56,19 +56,19 @@ public class FacetSequence {
 
   private final int end;
 
-  // temporary Coordinates to materialize points from the CoordinatesList
-  private Coordinates pt = new Coordinate();
+  // temporary Point to materialize points from the CoordinatesList
+  private Point pt = new Coordinate();
 
-  private Coordinates seqPt = new Coordinate();
+  private Point seqPt = new Coordinate();
 
-  // temporary Coordinates to materialize points from the CoordinatesList
-  private Coordinates p0 = new Coordinate();
+  // temporary Point to materialize points from the CoordinatesList
+  private Point p0 = new Coordinate();
 
-  private Coordinates p1 = new Coordinate();
+  private Point p1 = new Coordinate();
 
-  private Coordinates q0 = new Coordinate();
+  private Point q0 = new Coordinate();
 
-  private Coordinates q1 = new Coordinate();
+  private Point q1 = new Coordinate();
 
   /**
    * Creates a new sequence for a single point from a CoordinatesList.
@@ -118,7 +118,7 @@ public class FacetSequence {
     return minDistance;
   }
 
-  private double computePointLineDistance(final Coordinates pt,
+  private double computePointLineDistance(final Point pt,
     final FacetSequence facetSeq) {
     double minDistance = Double.MAX_VALUE;
 
@@ -155,7 +155,7 @@ public class FacetSequence {
 
   }
 
-  public Coordinates getCoordinate(final int index) {
+  public Point getCoordinate(final int index) {
     return pts.getCoordinate(start + index);
   }
 

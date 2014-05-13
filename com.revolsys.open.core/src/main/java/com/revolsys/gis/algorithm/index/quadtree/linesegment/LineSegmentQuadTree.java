@@ -10,7 +10,7 @@ import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.filter.LineSegmentCoordinateDistanceFilter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -153,8 +153,8 @@ public class LineSegmentQuadTree {
   protected LineSegment getLineSegment(final int[] index) {
     final CoordinatesList points = GeometryEditUtil.getPoints(geometry, index);
     final int vertexIndex = GeometryEditUtil.getVertexIndex(index);
-    final Coordinates p1 = points.get(vertexIndex);
-    final Coordinates p2 = points.get(vertexIndex + 1);
+    final Point p1 = points.get(vertexIndex);
+    final Point p2 = points.get(vertexIndex + 1);
     return new LineSegmentImpl(GeometryFactory.getFactory(geometry), p1, p2);
   }
 
@@ -170,7 +170,7 @@ public class LineSegmentQuadTree {
     return visitor.getList();
   }
 
-  public List<LineSegment> getWithinDistance(final Coordinates point,
+  public List<LineSegment> getWithinDistance(final Point point,
     final double maxDistance) {
     BoundingBox boundingBox = new Envelope(point);
     boundingBox = boundingBox.expand(maxDistance);

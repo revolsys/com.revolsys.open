@@ -38,7 +38,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -119,7 +119,7 @@ public class GeometryImplTest extends TestCase {
     if (x instanceof Point) {
       emptyDifferentClass = this.geometryFactory.geometryCollection();
     } else {
-      emptyDifferentClass = this.geometryFactory.point((Coordinates)null);
+      emptyDifferentClass = this.geometryFactory.point((Point)null);
     }
 
     final Geometry somethingEqualButNotExactly = this.geometryFactory.geometryCollection(Arrays.asList(x));
@@ -252,7 +252,7 @@ public class GeometryImplTest extends TestCase {
       sameClassButEmpty, anotherSameClassButEmpty, collectionFactory);
 
     // LineString somethingEqualButNotExactly =
-    // geometryFactory.createLineString(new Coordinates[] {
+    // geometryFactory.createLineString(new Point[] {
     // new Coordinate((double)0, 0), new Coordinate((double)100, 0), new
     // Coordinate((double)100, 100),
     // new Coordinate((double)0, 0) });
@@ -296,8 +296,8 @@ public class GeometryImplTest extends TestCase {
     final Point somethingExactlyEqual = this.geometryFactory.point(100.0, 100);
     final Point somethingNotEqualButSameClass = this.geometryFactory.point(
       999.0, 100);
-    final Point sameClassButEmpty = this.geometryFactory.point((Coordinates)null);
-    final Point anotherSameClassButEmpty = this.geometryFactory.point((Coordinates)null);
+    final Point sameClassButEmpty = this.geometryFactory.point((Point)null);
+    final Point anotherSameClassButEmpty = this.geometryFactory.point((Point)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
@@ -339,7 +339,7 @@ public class GeometryImplTest extends TestCase {
   // assertEquals(new Envelope(0, 50, 0, 50), g.getEnvelopeInternal());
   // g.apply(new CoordinateFilter() {
   // @Override
-  // public void filter(final Coordinates coord) {
+  // public void filter(final Point coord) {
   // coord.setX(coord.getX() + 1);
   // coord.setY(coord.getY() + 1);
   // }

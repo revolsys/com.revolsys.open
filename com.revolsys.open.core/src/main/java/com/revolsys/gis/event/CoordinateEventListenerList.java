@@ -2,7 +2,7 @@ package com.revolsys.gis.event;
 
 import java.util.LinkedHashSet;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 public class CoordinateEventListenerList extends
   LinkedHashSet<CoordinateEventListener> implements CoordinateEventListener {
@@ -19,7 +19,7 @@ public class CoordinateEventListenerList extends
     }
   }
 
-  public void coordinateEvent(final Coordinates coordinate,
+  public void coordinateEvent(final Point coordinate,
     final String typePath, final String ruleName, final String action,
     final String notes) {
     coordinateEvent(new CoordinateEvent(coordinate, typePath, ruleName, action,

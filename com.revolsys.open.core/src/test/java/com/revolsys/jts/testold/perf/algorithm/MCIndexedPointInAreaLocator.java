@@ -38,7 +38,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -143,7 +143,7 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
    * @return the location of the point in the geometry  
    */
   @Override
-  public Location locate(final Coordinates p) {
+  public Location locate(final Point p) {
     final RayCrossingCounter rcc = new RayCrossingCounter(p);
     final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
     final Envelope rayEnv = new Envelope(2, p.getX(), p.getY(),

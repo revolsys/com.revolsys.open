@@ -21,10 +21,8 @@ import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 
 public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
@@ -78,8 +76,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
       } else if (object instanceof com.revolsys.jts.geom.Point) {
         final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)object;
         geometry = toPgPoint(point);
-      } else if (object instanceof Coordinates) {
-        final Coordinates coordinates = (Coordinates)object;
+      } else if (object instanceof Point) {
+        final Point coordinates = (Point)object;
         final com.revolsys.jts.geom.Point point = geometryFactory.point(coordinates);
         geometry = toPgPoint(point);
       } else if (object instanceof com.revolsys.jts.geom.MultiPoint) {
@@ -158,8 +156,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   public Object toJdbc(final Object object) throws SQLException {
     Geometry geometry = null;
-    if (object instanceof Coordinates) {
-      final Coordinates coordinates = (Coordinates)object;
+    if (object instanceof Point) {
+      final Point coordinates = (Point)object;
       final com.revolsys.jts.geom.Point point = geometryFactory.point(coordinates);
       geometry = toPgPoint(point);
     } else if (object instanceof com.revolsys.jts.geom.Point) {
@@ -254,19 +252,14 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private com.revolsys.jts.geom.Point toJtsPoint(
     final com.revolsys.jts.geom.GeometryFactory factory, final Point point) {
-    final Coordinates coordinate;
     switch (axisCount) {
       case 3:
-        coordinate = new DoubleCoordinates(point.x, point.y, point.z);
-      break;
+        return factory.point(point.x, point.y, point.z);
       case 4:
-        coordinate = new DoubleCoordinates(point.x, point.y, point.z, point.m);
-      break;
+        return factory.point(point.x, point.y, point.z, point.m);
       default:
-        coordinate = new DoubleCoordinates(point.x, point.y);
-      break;
+        return factory.point(point.x, point.y);
     }
-    return factory.point(coordinate);
   }
 
   private com.revolsys.jts.geom.Polygon toJtsPolygon(
@@ -370,7 +363,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
         final Point pgPoint = toPgPoint(point);
         pgPoints.add(pgPoint);
       } else {
-        throw new RuntimeException("Geometry must contain only Points not a "
+        throw new RuntimeException("Geometry must contain only Point not a "
           + subGeometry.getClass());
       }
     }

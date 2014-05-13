@@ -8,7 +8,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -23,7 +23,7 @@ public class LineStringTest {
     Assert.assertNotNull("Not Null First Vertex", point.getVertex(0));
     Assert.assertEquals("Axis Count", coordinates.length, point.getAxisCount());
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
-      final double value = point.getValue(axisIndex);
+      final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
         if (!Double.isNaN(value)) {
           Assert.failNotEquals("Value NaN", Double.NaN, value);
@@ -124,15 +124,15 @@ public class LineStringTest {
       final LineString pointEmpty = geometryFactory.lineString();
       assertEmpty(pointEmpty);
 
-      // Coordinates[] Constructor
+      // Point[] Constructor
 
-      final LineString pointCoordinatesArrayNull = geometryFactory.lineString((Coordinates[])null);
+      final LineString pointCoordinatesArrayNull = geometryFactory.lineString((Point[])null);
       assertEmpty(pointCoordinatesArrayNull);
 
-      final LineString pointCoordinatesArraySize0 = geometryFactory.lineString(new Coordinates[0]);
+      final LineString pointCoordinatesArraySize0 = geometryFactory.lineString(new Point[0]);
       assertEmpty(pointCoordinatesArraySize0);
 
-      final LineString pointCoordinatesNull = geometryFactory.lineString((Coordinates)null);
+      final LineString pointCoordinatesNull = geometryFactory.lineString((Point)null);
       assertEmpty(pointCoordinatesNull);
 
       final LineString pointCoordinatesSize0 = geometryFactory.lineString(new DoubleCoordinates(

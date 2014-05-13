@@ -2,7 +2,7 @@ package com.revolsys.jts.edgegraph;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Quadrant;
 import com.revolsys.jts.util.Assert;
 import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
@@ -40,7 +40,7 @@ public class HalfEdge {
    * @param p1 a vertex coordinate
    * @return the HalfEdge with origin at p0
    */
-  public static HalfEdge create(final Coordinates p0, final Coordinates p1) {
+  public static HalfEdge create(final Point p0, final Point p1) {
     final HalfEdge e0 = new HalfEdge(p0);
     final HalfEdge e1 = new HalfEdge(p1);
     e0.init(e1);
@@ -69,7 +69,7 @@ public class HalfEdge {
     return e0;
   }
 
-  private final Coordinates orig;
+  private final Point orig;
 
   private HalfEdge sym;
 
@@ -80,7 +80,7 @@ public class HalfEdge {
    * 
    * @param orig the origin coordinate
    */
-  public HalfEdge(final Coordinates orig) {
+  public HalfEdge(final Point orig) {
     this.orig = orig;
   }
 
@@ -186,7 +186,7 @@ public class HalfEdge {
    * 
    * @return the destination coordinate
    */
-  public Coordinates dest() {
+  public Point dest() {
     return sym.orig;
   }
 
@@ -197,7 +197,7 @@ public class HalfEdge {
    * @param p1 the destination vertex to test
    * @return true if the vertices are equal to the ones of this edge
    */
-  public boolean equals(final Coordinates p0, final Coordinates p1) {
+  public boolean equals(final Point p0, final Point p1) {
     return orig.equals2d(p0) && sym.orig.equals(p1);
   }
 
@@ -210,7 +210,7 @@ public class HalfEdge {
    * @return the edge with the required dest vertex, if it exists,
    * or null
    */
-  public HalfEdge find(final Coordinates dest) {
+  public HalfEdge find(final Point dest) {
     HalfEdge oNext = this;
     do {
       if (oNext == null) {
@@ -296,7 +296,7 @@ public class HalfEdge {
    * 
    * @return the origin coordinate
    */
-  public Coordinates orig() {
+  public Point orig() {
     return orig;
   }
 

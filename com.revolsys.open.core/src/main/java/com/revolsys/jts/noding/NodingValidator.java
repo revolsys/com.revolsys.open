@@ -36,7 +36,7 @@ import java.util.Collection;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -56,8 +56,8 @@ public class NodingValidator {
     this.segStrings = segStrings;
   }
 
-  private void checkCollapse(final Coordinates p0, final Coordinates p1,
-    final Coordinates p2) {
+  private void checkCollapse(final Point p0, final Point p1,
+    final Point p2) {
     if (p0.equals(p2)) {
       throw new RuntimeException("found non-noded collapse at "
         + GeometryFactory.getFactory().lineString(p0, p1, p2));
@@ -91,7 +91,7 @@ public class NodingValidator {
     }
   }
 
-  private void checkEndPtVertexIntersections(final Coordinates testPt,
+  private void checkEndPtVertexIntersections(final Point testPt,
     final Collection<NodedSegmentString> segStrings) {
     for (final NodedSegmentString ss : segStrings) {
       final CoordinatesList pts = ss.getPoints();
@@ -122,10 +122,10 @@ public class NodingValidator {
       return;
     }
     // numTests++;
-    final Coordinates p00 = e0.getCoordinate(segIndex0);
-    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    final Coordinates p10 = e1.getCoordinate(segIndex1);
-    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+    final Point p00 = e0.getCoordinate(segIndex0);
+    final Point p01 = e0.getCoordinate(segIndex0 + 1);
+    final Point p10 = e1.getCoordinate(segIndex1);
+    final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
     if (li.hasIntersection()) {
@@ -159,9 +159,9 @@ public class NodingValidator {
    *@return true if there is an intersection point which is not an endpoint of the segment p0-p1
    */
   private boolean hasInteriorIntersection(final LineIntersector li,
-    final Coordinates p0, final Coordinates p1) {
+    final Point p0, final Point p1) {
     for (int i = 0; i < li.getIntersectionNum(); i++) {
-      final Coordinates intPt = li.getIntersection(i);
+      final Point intPt = li.getIntersection(i);
       if (!(intPt.equals(p0) || intPt.equals(p1))) {
         return true;
       }

@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.WKTReader;
@@ -62,16 +62,16 @@ public class IsValidTest extends TestCase {
   }
 
   public void testInvalidCoordinate() throws Exception {
-    final Coordinates badCoord = new Coordinate(1.0, Double.NaN,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates[] pts = {
-      new Coordinate(0.0, 0.0, Coordinates.NULL_ORDINATE), badCoord
+    final Point badCoord = new Coordinate(1.0, Double.NaN,
+      Point.NULL_ORDINATE);
+    final Point[] pts = {
+      new Coordinate(0.0, 0.0, Point.NULL_ORDINATE), badCoord
     };
     final Geometry line = this.geometryFactory.lineString(pts);
     final IsValidOp isValidOp = new IsValidOp(line);
     final boolean valid = isValidOp.isValid();
     final TopologyValidationError err = isValidOp.getValidationError();
-    final Coordinates errCoord = err.getCoordinate();
+    final Point errCoord = err.getCoordinate();
 
     assertEquals(TopologyValidationError.INVALID_COORDINATE, err.getErrorType());
     assertTrue(Double.isNaN(errCoord.getY()));

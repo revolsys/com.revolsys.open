@@ -32,7 +32,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -257,7 +257,7 @@ public class GpxIterator implements DataObjectIterator {
       }
     }
 
-    Coordinates coord = null;
+    Point coord = null;
     if (Double.isNaN(elevation)) {
       coord = new DoubleCoordinates(lon, lat);
     } else {
@@ -285,7 +285,7 @@ public class GpxIterator implements DataObjectIterator {
         final DataObject pointObject = parseRoutPoint(pointIndex);
         pointObjects.add(pointObject);
         final Point point = pointObject.getGeometryValue();
-        final Coordinates coordinates = CoordinatesUtil.getInstance(point);
+        final Point coordinates = CoordinatesUtil.getInstance(point);
         axisCount = Math.max(axisCount, coordinates.getAxisCount());
       } else {
         parseAttribute(dataObject);

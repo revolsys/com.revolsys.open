@@ -7,7 +7,7 @@ import com.revolsys.gis.model.coordinates.list.InPlaceIterator;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -85,7 +85,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(PATH);
   }
 
-  public void writePoint(final XmlWriter out, final Coordinates coordinates,
+  public void writePoint(final XmlWriter out, final Point coordinates,
     final boolean hasZ) {
     out.element(X, coordinates.getX());
     out.element(Y, coordinates.getY());
@@ -95,7 +95,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   }
 
   private void writePoint(final XmlWriter out, final Point point) {
-    final Coordinates coordinates = CoordinatesUtil.getInstance(point);
+    final Point coordinates = CoordinatesUtil.getInstance(point);
     final boolean hasZ = coordinates.getAxisCount() > 2;
     writePoint(out, coordinates, hasZ);
   }
@@ -105,7 +105,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.startTag(POINT_ARRAY);
     out.attribute(XsiConstants.TYPE, POINT_ARRAY_TYPE);
 
-    for (final Coordinates point : new InPlaceIterator(points)) {
+    for (final Point point : new InPlaceIterator(points)) {
       out.startTag(POINT);
       out.attribute(XsiConstants.TYPE, POINT_N_TYPE);
       writePoint(out, point, hasZ);

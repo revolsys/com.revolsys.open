@@ -1,7 +1,7 @@
 package com.revolsys.jts.testold.perf.operation.distance;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.SineStarFactory;
@@ -64,10 +64,10 @@ public class TestPerfDistanceGeomSet {
     return geoms;
   }
 
-  Coordinates randomLocation() {
+  Point randomLocation() {
     final double x = Math.random() * MAX_X;
     final double y = Math.random() * MAX_X;
-    return new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
+    return new Coordinate((double)x, y, Point.NULL_ORDINATE);
   }
 
   public void test() {

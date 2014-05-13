@@ -16,7 +16,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -95,8 +95,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
     final int parameterIndex, Object value) throws SQLException {
     int index = parameterIndex;
 
-    if (value instanceof Coordinates) {
-      final Coordinates coordinates = (Coordinates)value;
+    if (value instanceof Point) {
+      final Point coordinates = (Point)value;
       value = this.geometryFactory.point(coordinates);
     }
     if (value instanceof Geometry) {

@@ -40,7 +40,7 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A list of edge intersections along an {@link Edge}.
@@ -64,7 +64,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    * The input segmentIndex and dist are expected to be normalized.
    * @return the EdgeIntersection found or added
    */
-  public EdgeIntersection add(final Coordinates intPt, final int segmentIndex,
+  public EdgeIntersection add(final Point intPt, final int segmentIndex,
     final double dist) {
     final EdgeIntersection eiNew = new EdgeIntersection(intPt, segmentIndex,
       dist);
@@ -118,7 +118,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
 
-    final Coordinates lastSegStartPt = edge.getCoordinate(ei1.segmentIndex);
+    final Point lastSegStartPt = edge.getCoordinate(ei1.segmentIndex);
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally
@@ -130,7 +130,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
       npts--;
     }
 
-    final Coordinates[] pts = new Coordinates[npts];
+    final Point[] pts = new Point[npts];
     int ipt = 0;
     pts[ipt++] = new Coordinate(ei0.coord);
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
@@ -149,7 +149,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    * @param pt the point to test
    * @return true if the point is an intersection
    */
-  public boolean isIntersection(final Coordinates pt) {
+  public boolean isIntersection(final Point pt) {
     for (final Iterator it = iterator(); it.hasNext();) {
       final EdgeIntersection ei = (EdgeIntersection)it.next();
       if (ei.coord.equals(pt)) {

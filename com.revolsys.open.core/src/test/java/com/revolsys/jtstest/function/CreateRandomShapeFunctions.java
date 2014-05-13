@@ -6,7 +6,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.shape.random.RandomPointsBuilder;
@@ -37,7 +37,7 @@ public class CreateRandomShapeFunctions {
   public static Geometry haltonPointsWithBases(final Geometry g,
     final int nPts, final int basei, final int basej) {
     final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
-    final Coordinates[] pts = new Coordinates[nPts];
+    final Point[] pts = new Point[nPts];
     final double baseX = env.getMinX();
     final double baseY = env.getMinY();
 
@@ -45,7 +45,7 @@ public class CreateRandomShapeFunctions {
     while (i < nPts) {
       final double x = baseX + env.getWidth() * haltonOrdinate(i + 1, basei);
       final double y = baseY + env.getHeight() * haltonOrdinate(i + 1, basej);
-      final Coordinates p = new Coordinate(x, y);
+      final Point p = new Coordinate(x, y);
       if (!env.covers(p)) {
         continue;
       }
@@ -60,7 +60,7 @@ public class CreateRandomShapeFunctions {
     final double width = env.getWidth();
     final double hgt = env.getHeight();
 
-    final Coordinates[] pts = new Coordinates[nPts];
+    final Point[] pts = new Point[nPts];
 
     for (int i = 0; i < nPts; i++) {
       final double xLen = width * Math.random();
@@ -70,8 +70,8 @@ public class CreateRandomShapeFunctions {
     return geomFact.lineString(pts);
   }
 
-  private static Coordinates randomPointInTriangle(final Coordinates p0,
-    final Coordinates p1, final Coordinates p2) {
+  private static Point randomPointInTriangle(final Point p0,
+    final Point p1, final Point p2) {
     double s = Math.random();
     double t = Math.random();
     if (s + t > 1) {
@@ -134,10 +134,10 @@ public class CreateRandomShapeFunctions {
 
   public static Geometry randomPointsInTriangle(final Geometry g, final int nPts) {
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
-    final Coordinates[] gpts = CoordinatesListUtil.getCoordinateArray(g);
-    final Coordinates tri0 = gpts[0];
-    final Coordinates tri1 = gpts[1];
-    final Coordinates tri2 = gpts[2];
+    final Point[] gpts = CoordinatesListUtil.getCoordinateArray(g);
+    final Point tri0 = gpts[0];
+    final Point tri1 = gpts[1];
+    final Point tri2 = gpts[2];
 
     final List pts = new ArrayList();
 
@@ -147,8 +147,8 @@ public class CreateRandomShapeFunctions {
     return geomFact.buildGeometry(pts);
   }
 
-  private static Coordinates randomPtInRectangleAround(
-    final Coordinates centre, final double width, final double height) {
+  private static Point randomPtInRectangleAround(
+    final Point centre, final double width, final double height) {
     final double x0 = centre.getX() + width * (Math.random() - 0.5);
     final double y0 = centre.getY() + height * (Math.random() - 0.5);
     return new Coordinate(x0, y0);
@@ -198,11 +198,11 @@ public class CreateRandomShapeFunctions {
     final double xLen = env.getWidth();
     final double yLen = env.getHeight();
 
-    final Coordinates[] pts = new Coordinates[nPts];
+    final Point[] pts = new Point[nPts];
 
     boolean xory = true;
     for (int i = 0; i < nPts; i++) {
-      Coordinates pt = null;
+      Point pt = null;
       if (i == 0) {
         pt = randomPtInRectangleAround(env.getCentre(), xLen, yLen);
       } else {
@@ -236,7 +236,7 @@ public class CreateRandomShapeFunctions {
       final double y0 = env.getMinY() + yLen * Math.random();
       final double x1 = env.getMinX() + xLen * Math.random();
       final double y1 = env.getMinY() + yLen * Math.random();
-      lines.add(geomFact.lineString(new Coordinates[] {
+      lines.add(geomFact.lineString(new Point[] {
         new Coordinate(x0, y0), new Coordinate(x1, y1)
       }));
     }
@@ -260,7 +260,7 @@ public class CreateRandomShapeFunctions {
         final double y0 = env.getMinY() + j * yLen + yLen * Math.random();
         final double x1 = env.getMinX() + i * xLen + xLen * Math.random();
         final double y1 = env.getMinY() + j * yLen + yLen * Math.random();
-        lines.add(geomFact.lineString(new Coordinates[] {
+        lines.add(geomFact.lineString(new Point[] {
           new Coordinate(x0, y0), new Coordinate(x1, y1)
         }));
       }

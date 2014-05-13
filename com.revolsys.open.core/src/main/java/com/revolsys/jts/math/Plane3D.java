@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.math;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Models a plane in 3-dimensional Cartesian space.
@@ -51,9 +51,9 @@ public class Plane3D {
 	public static final int XZ_PLANE = 3;
 	
 	private Vector3D normal;
-	private Coordinates basePt;
+	private Point basePt;
 
-	public Plane3D(Vector3D normal, Coordinates basePt)
+	public Plane3D(Vector3D normal, Point basePt)
 	{
 		this.normal = normal;
 		this.basePt = basePt;
@@ -71,11 +71,11 @@ public class Plane3D {
 	 * @param p the point to compute the distance for
 	 * @return the oriented distance to the plane
 	 */
-	public double orientedDistance(Coordinates p) {
+	public double orientedDistance(Point p) {
 		Vector3D pb = new Vector3D(p, basePt);
 		double pbdDotNormal = pb.dot(normal);
 		if (Double.isNaN(pbdDotNormal)) 
-			throw new IllegalArgumentException("3D Coordinates has NaN ordinate");
+			throw new IllegalArgumentException("3D Point has NaN ordinate");
 		double d = pbdDotNormal / normal.length();
 		return d;
 	}

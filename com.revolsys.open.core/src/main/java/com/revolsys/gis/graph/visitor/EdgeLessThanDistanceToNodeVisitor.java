@@ -7,7 +7,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
@@ -17,7 +17,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Node<T> node, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    final Coordinates point = node;
+    final Point point = node;
     BoundingBox env = new Envelope(point);
     env = env.expand(maxDistance);
     graph.getEdgeIndex().visit(env,
@@ -37,7 +37,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
     super(matchVisitor);
     this.node = node;
     this.maxDistance = maxDistance;
-    final Coordinates point = node;
+    final Point point = node;
     this.envelope = new Envelope(point);
     this.envelope = this.envelope.expand(maxDistance);
   }

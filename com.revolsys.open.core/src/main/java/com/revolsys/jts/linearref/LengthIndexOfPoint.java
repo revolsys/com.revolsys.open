@@ -34,7 +34,7 @@
 package com.revolsys.jts.linearref;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.util.Assert;
 
@@ -47,13 +47,13 @@ import com.revolsys.jts.util.Assert;
  */
 class LengthIndexOfPoint {
   public static double indexOf(final Geometry linearGeom,
-    final Coordinates inputPt) {
+    final Point inputPt) {
     final LengthIndexOfPoint locater = new LengthIndexOfPoint(linearGeom);
     return locater.indexOf(inputPt);
   }
 
   public static double indexOfAfter(final Geometry linearGeom,
-    final Coordinates inputPt, final double minIndex) {
+    final Point inputPt, final double minIndex) {
     final LengthIndexOfPoint locater = new LengthIndexOfPoint(linearGeom);
     return locater.indexOfAfter(inputPt, minIndex);
   }
@@ -70,7 +70,7 @@ class LengthIndexOfPoint {
    * @param inputPt the coordinate to locate
    * @return the location of the nearest point
    */
-  public double indexOf(final Coordinates inputPt) {
+  public double indexOf(final Point inputPt) {
     return indexOfFromStart(inputPt, -1.0);
   }
 
@@ -89,7 +89,7 @@ class LengthIndexOfPoint {
    * @param minIndex the minimum location for the point location
    * @return the location of the nearest point
    */
-  public double indexOfAfter(final Coordinates inputPt, final double minIndex) {
+  public double indexOfAfter(final Point inputPt, final double minIndex) {
     if (minIndex < 0.0) {
       return indexOf(inputPt);
     }
@@ -109,7 +109,7 @@ class LengthIndexOfPoint {
     return closestAfter;
   }
 
-  private double indexOfFromStart(final Coordinates inputPt,
+  private double indexOfFromStart(final Point inputPt,
     final double minIndex) {
     double minDistance = Double.MAX_VALUE;
 
@@ -118,8 +118,8 @@ class LengthIndexOfPoint {
     final LinearIterator it = new LinearIterator(linearGeom);
     while (it.hasNext()) {
       if (!it.isEndOfLine()) {
-        final Coordinates p0 = it.getSegmentStart();
-        final Coordinates p1 = it.getSegmentEnd();
+        final Point p0 = it.getSegmentStart();
+        final Point p1 = it.getSegmentEnd();
         final double length = p0.distance(p1);
 
         final double segDistance = LineSegmentUtil.distance(p0, p1, inputPt);
@@ -136,8 +136,8 @@ class LengthIndexOfPoint {
     return ptMeasure;
   }
 
-  private double segmentNearestMeasure(final Coordinates p0,
-    final Coordinates p1, final Coordinates inputPt,
+  private double segmentNearestMeasure(final Point p0,
+    final Point p1, final Point inputPt,
     final double segmentStartMeasure, final double length) {
     // found new minimum, so compute location distance of point
     final double projFactor = LineSegmentUtil.projectionFactor(p0, p1, inputPt);

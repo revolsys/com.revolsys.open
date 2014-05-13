@@ -36,7 +36,7 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.IntersectionMatrix;
@@ -95,13 +95,13 @@ public class Edge extends GraphComponent {
    */
   public void addIntersection(final LineIntersector li, final int segmentIndex,
     final int geomIndex, final int intIndex) {
-    final Coordinates intPt = new Coordinate(li.getIntersection(intIndex));
+    final Point intPt = new Coordinate(li.getIntersection(intIndex));
     int normalizedSegmentIndex = segmentIndex;
     double dist = li.getEdgeDistance(geomIndex, intIndex);
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < getNumPoints()) {
-      final Coordinates nextPt = getCoordinate(nextSegIndex);
+      final Point nextPt = getCoordinate(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
       if (intPt.equals2d(nextPt)) {
@@ -178,14 +178,14 @@ public class Edge extends GraphComponent {
   }
 
   @Override
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     if (getNumPoints() > 0) {
       return getCoordinate(0);
     }
     return null;
   }
 
-  public Coordinates getCoordinate(final int i) {
+  public Point getCoordinate(final int i) {
     return points.get(i);
   }
 

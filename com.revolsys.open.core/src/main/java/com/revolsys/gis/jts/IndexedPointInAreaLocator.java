@@ -4,7 +4,7 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.jts.locator.SortedPackedIntervalRTree;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.PointInArea;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -86,7 +86,7 @@ public class IndexedPointInAreaLocator {
     return index;
   }
 
-  public Location locate(final Coordinates coordinates) {
+  public Location locate(final Point coordinates) {
     final double x = coordinates.getX();
     final double y = coordinates.getY();
     return locate(x, y);

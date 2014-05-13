@@ -115,8 +115,8 @@ public class TestReader {
     return scale;
   }
 
-  public TestFile createTestRun(final File testFile, final int runIndex)
-    throws Throwable {
+  public TestFile createTestRun(final TestDirectory parent,
+    final File testFile, final int runIndex) throws Throwable {
     try {
       final SAXBuilder builder = new LineNumberSAXBuilder();
       final Document document = builder.build(new FileInputStream(testFile));
@@ -125,7 +125,7 @@ public class TestReader {
         throw new TestParseException("Expected <run> but encountered <"
           + runElement.getName() + ">");
       }
-      return parseTestRun(runElement, testFile, runIndex);
+      return parseTestRun(parent, runElement, testFile, runIndex);
     } catch (final IllegalArgumentException e) {
       throw e;
     } catch (final Exception e) {
@@ -310,9 +310,11 @@ public class TestReader {
 
   /**
    *  Creates a TestRun from the <run> Element.
+   * @param parent 
    */
-  private TestFile parseTestRun(final Element runElement, final File testFile,
-    final int runIndex) throws Throwable {
+  private TestFile parseTestRun(final TestDirectory parent,
+    final Element runElement, final File testFile, final int runIndex)
+    throws Throwable {
 
     // ----------- <workspace> (optional) ------------------
     File workspace = null;
@@ -351,7 +353,7 @@ public class TestReader {
     // --------------- build TestRun ---------------------
     final String description = descElement != null ? descElement.getTextTrim()
       : "";
-    final TestFile testRun = new TestFile(description, runIndex,
+    final TestFile testRun = new TestFile(parent, description, runIndex,
       geometryFactory, geomOp, resultMatcher, testFile);
     testRun.setWorkspace(workspace);
     final List caseElements = runElement.getChildren("case");

@@ -31,7 +31,7 @@ public class MultiLineStringVertex extends AbstractVertex {
   }
 
   @Override
-  public double getValue(final int index) {
+  public double getCoordinate(final int index) {
     final LineString lineString = getLineString();
     if (lineString == null) {
       return Double.NaN;

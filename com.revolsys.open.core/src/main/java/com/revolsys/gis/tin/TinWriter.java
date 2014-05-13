@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.spring.SpringUtil;
 
 public class TinWriter {
@@ -45,11 +45,11 @@ public class TinWriter {
     out.println("TCOL 255 255 255");
 
     int nodeIndex = 0;
-    final Map<Coordinates, Integer> nodeMap = new HashMap<Coordinates, Integer>();
-    final Set<Coordinates> nodes = tin.getNodes();
+    final Map<Point, Integer> nodeMap = new HashMap<Point, Integer>();
+    final Set<Point> nodes = tin.getNodes();
     out.print("VERT ");
     out.println(nodes.size());
-    for (final Coordinates point : nodes) {
+    for (final Point point : nodes) {
       nodeMap.put(point, ++nodeIndex);
       out.print(point.getX());
       out.print(' ');
@@ -66,7 +66,7 @@ public class TinWriter {
         if (i > 0) {
           out.print(' ');
         }
-        final Coordinates point = triangle.get(i);
+        final Point point = triangle.get(i);
         final Integer index = nodeMap.get(point);
         if (index == null) {
           System.out.println(point);

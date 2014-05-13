@@ -11,7 +11,7 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -24,8 +24,8 @@ import com.revolsys.util.MathUtil;
 public class Triangle extends AbstractCoordinatesList {
   private static final long serialVersionUID = -4513931832875328029L;
 
-  public static Triangle createClockwiseTriangle(final Coordinates c0,
-    final Coordinates c1, final Coordinates c2) {
+  public static Triangle createClockwiseTriangle(final Point c0,
+    final Point c1, final Point c2) {
     try {
       if (CoordinatesUtil.orientationIndex(c0, c1, c2) == CGAlgorithms.CLOCKWISE) {
         return new Triangle(c0, c1, c2);
@@ -46,13 +46,13 @@ public class Triangle extends AbstractCoordinatesList {
   public Triangle() {
   }
 
-  public Triangle(final Coordinates... points) {
+  public Triangle(final Point... points) {
     if (points.length > 3) {
       throw new IllegalArgumentException(
         "A traingle must have exeactly 3 points not " + size());
     }
     for (int i = 0; i < 3; i++) {
-      final Coordinates point = points[i];
+      final Point point = points[i];
       coordinates[i * 3] = point.getX();
       coordinates[i * 3 + 1] = point.getY();
       coordinates[i * 3 + 2] = point.getZ();
@@ -60,12 +60,12 @@ public class Triangle extends AbstractCoordinatesList {
   }
 
   private void addIntersection(final GeometryFactory geometryFactory,
-    final Set<Coordinates> coordinates, final Coordinates line1Start,
-    final Coordinates line1End, final Coordinates line2Start,
-    final Coordinates line2End) {
+    final Set<Point> coordinates, final Point line1Start,
+    final Point line1End, final Point line2Start,
+    final Point line2End) {
     final CoordinatesList intersections = LineSegmentUtil.getIntersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
-    for (final Coordinates point : intersections) {
+    for (final Point point : intersections) {
       coordinates.add(point);
     }
   }
@@ -77,7 +77,7 @@ public class Triangle extends AbstractCoordinatesList {
    * @return True if the coordinate lies inside or on the edge of the Triangle.
    */
   @Override
-  public boolean contains(final Coordinates coordinate) {
+  public boolean contains(final Point coordinate) {
     final int triangleOrientation = CoordinatesUtil.orientationIndex(getP0(),
       getP1(), getP2());
     final int p0p1Orientation = CoordinatesUtil.orientationIndex(getP0(),
@@ -102,7 +102,7 @@ public class Triangle extends AbstractCoordinatesList {
   }
 
   public boolean equals(final Triangle triangle) {
-    final HashSet<Coordinates> coords = new HashSet<Coordinates>();
+    final HashSet<Point> coords = new HashSet<Point>();
     coords.add(triangle.getP0());
     coords.add(triangle.getP1());
     coords.add(triangle.getP2());
@@ -131,7 +131,7 @@ public class Triangle extends AbstractCoordinatesList {
     final double x3 = getX(2);
     final double y3 = getY(2);
 
-    final Coordinates centre = CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3,
+    final Point centre = CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3,
       y3);
     final double angleB = MathUtil.angle(x1, y1, x2, y2, x3, y3);
     final double radius = MathUtil.distance(x1, y1, x3, y3) / Math.sin(angleB)
@@ -170,10 +170,10 @@ public class Triangle extends AbstractCoordinatesList {
     return new Envelope(2, bounds);
   }
 
-  public Coordinates getInCentre() {
-    final Coordinates a = get(0);
-    final Coordinates b = get(1);
-    final Coordinates c = get(2);
+  public Point getInCentre() {
+    final Point a = get(0);
+    final Point b = get(1);
+    final Point c = get(2);
     // the lengths of the sides, labelled by their opposite vertex
     final double len0 = b.distance(c);
     final double len1 = a.distance(c);
@@ -189,15 +189,15 @@ public class Triangle extends AbstractCoordinatesList {
     return new DoubleCoordinates(inCentreX, inCentreY);
   }
 
-  public Coordinates getP0() {
+  public Point getP0() {
     return get(0);
   }
 
-  public Coordinates getP1() {
+  public Point getP1() {
     return get(1);
   }
 
-  public Coordinates getP2() {
+  public Point getP2() {
     return get(2);
   }
 
@@ -216,23 +216,23 @@ public class Triangle extends AbstractCoordinatesList {
 
   public LineSegment intersection(final GeometryFactory geometryFactory,
     final LineSegment line) {
-    final Coordinates lc0 = line.get(0);
-    final Coordinates lc1 = line.get(1);
+    final Point lc0 = line.get(0);
+    final Point lc1 = line.get(1);
     final boolean lc0Contains = contains(lc0);
     final boolean lc1Contains = contains(lc1);
     if (lc0Contains && lc1Contains) {
       return line;
     } else {
-      final Set<Coordinates> coordinates = new HashSet<Coordinates>();
+      final Set<Point> coordinates = new HashSet<Point>();
       addIntersection(geometryFactory, coordinates, lc0, lc1, getP0(), getP1());
       addIntersection(geometryFactory, coordinates, lc0, lc1, getP1(), getP2());
       addIntersection(geometryFactory, coordinates, lc0, lc1, getP2(), getP0());
 
-      final Iterator<Coordinates> coordIterator = coordinates.iterator();
+      final Iterator<Point> coordIterator = coordinates.iterator();
       if (coordIterator.hasNext()) {
-        final Coordinates c1 = coordIterator.next();
+        final Point c1 = coordIterator.next();
         if (coordIterator.hasNext()) {
-          final Coordinates c2 = coordIterator.next();
+          final Point c2 = coordIterator.next();
           if (coordIterator.hasNext()) {
             // TODO Too many intersect
           }
@@ -246,7 +246,7 @@ public class Triangle extends AbstractCoordinatesList {
     }
   }
 
-  public boolean intersectsCircumCircle(final Coordinates point) {
+  public boolean intersectsCircumCircle(final Point point) {
     return getCircumcircle().contains(point);
   }
 

@@ -34,7 +34,7 @@
 package com.revolsys.jts.algorithm.distance;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -136,7 +136,7 @@ public class DiscreteHausdorffDistance {
         for (int i = 0; i < numSubSegs; i++) {
           final double x = x1 + i * delx;
           final double y = y1 + i * dely;
-          final Coordinates pt = new Coordinate(x, y);
+          final Point pt = new Coordinate(x, y);
           minPtDist.initialize();
           DistanceToPoint.computeDistance(geom, pt, minPtDist);
           maxPtDist.setMaximum(minPtDist);
@@ -153,7 +153,7 @@ public class DiscreteHausdorffDistance {
     return ptDist.getDistance();
   }
 
-  public Coordinates[] getCoordinates() {
+  public Point[] getCoordinates() {
     return ptDist.getCoordinates();
   }
 

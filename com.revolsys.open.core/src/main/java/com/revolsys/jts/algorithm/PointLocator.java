@@ -34,7 +34,7 @@ package com.revolsys.jts.algorithm;
 
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
@@ -82,7 +82,7 @@ public class PointLocator {
     this.boundaryRule = boundaryRule;
   }
 
-  private void computeLocation(final Coordinates p, final Geometry geom) {
+  private void computeLocation(final Point p, final Geometry geom) {
     if (geom instanceof Point) {
       updateLocationInfo(locate(p, (Point)geom));
     }
@@ -120,7 +120,7 @@ public class PointLocator {
    * @param geom the Geometry to test
    * @return <code>true</code> if the point is in the interior or boundary of the Geometry
    */
-  public boolean intersects(final Coordinates p, final Geometry geom) {
+  public boolean intersects(final Point p, final Geometry geom) {
     return locate(p, geom) != Location.EXTERIOR;
   }
 
@@ -134,7 +134,7 @@ public class PointLocator {
    *
    * @return the {@link Location} of the point relative to the input Geometry
    */
-  public Location locate(final Coordinates p, final Geometry geom) {
+  public Location locate(final Point p, final Geometry geom) {
     if (geom.isEmpty()) {
       return Location.EXTERIOR;
     }
@@ -158,7 +158,7 @@ public class PointLocator {
     return Location.EXTERIOR;
   }
 
-  private Location locate(final Coordinates point, final LineString line) {
+  private Location locate(final Point point, final LineString line) {
     // bounding-box check
     if (!line.getBoundingBox().intersects(point)) {
       return Location.EXTERIOR;
@@ -175,17 +175,17 @@ public class PointLocator {
     return Location.EXTERIOR;
   }
 
-  private Location locate(final Coordinates p, final Point pt) {
+  private Location locate(final Point p, final Point pt) {
     // no point in doing envelope test, since equality test is just as fast
 
-    final Coordinates ptCoord = pt.getCoordinate();
+    final Point ptCoord = pt.getCoordinate();
     if (ptCoord.equals2d(p)) {
       return Location.INTERIOR;
     }
     return Location.EXTERIOR;
   }
 
-  private Location locate(final Coordinates p, final Polygon poly) {
+  private Location locate(final Point p, final Polygon poly) {
     if (poly.isEmpty()) {
       return Location.EXTERIOR;
     }
@@ -213,7 +213,7 @@ public class PointLocator {
     return Location.INTERIOR;
   }
 
-  private Location locateInPolygonRing(final Coordinates p,
+  private Location locateInPolygonRing(final Point p,
     final LinearRing ring) {
     // bounding-box check
     if (!ring.getBoundingBox().intersects(p)) {

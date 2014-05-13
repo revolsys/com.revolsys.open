@@ -6,7 +6,7 @@ import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -16,8 +16,8 @@ import com.revolsys.util.Trig;
 
 public class CoordinatesUtil {
 
-  public static double angle(final Coordinates p1, final Coordinates p2,
-    final Coordinates p3) {
+  public static double angle(final Point p1, final Point p2,
+    final Point p3) {
     final double x1 = p1.getX();
     final double y1 = p1.getY();
     final double x2 = p2.getX();
@@ -35,8 +35,8 @@ public class CoordinatesUtil {
     return angle;
   }
 
-  public static double angle2d(final Coordinates point1,
-    final Coordinates point2) {
+  public static double angle2d(final Point point1,
+    final Point point2) {
     final double x1 = point1.getX();
     final double y1 = point1.getY();
     final double x2 = point2.getX();
@@ -55,8 +55,8 @@ public class CoordinatesUtil {
    * @param tip2 the tip of v2
    * @return the angle between v1 and v2, relative to v1
    */
-  public static double angleBetweenOriented(final Coordinates tip1,
-    final Coordinates tail, final Coordinates tip2) {
+  public static double angleBetweenOriented(final Point tip1,
+    final Point tail, final Point tip2) {
     final double a1 = tail.angle2d(tip1);
     final double a2 = tail.angle2d(tip2);
     final double angDel = a2 - a1;
@@ -71,12 +71,12 @@ public class CoordinatesUtil {
     }
   }
 
-  public static Coordinates average(final Coordinates c1, final Coordinates c2) {
+  public static Point average(final Point c1, final Point c2) {
     final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());
     final double[] coordinates = new double[axisCount];
     for (int i = 0; i < axisCount; i++) {
-      final double value1 = c1.getValue(i);
-      final double value2 = c2.getValue(i);
+      final double value1 = c1.getCoordinate(i);
+      final double value2 = c2.getCoordinate(i);
       double value;
       if (Double.isNaN(value1) || Double.isNaN(value1)) {
         value = value2;
@@ -90,7 +90,7 @@ public class CoordinatesUtil {
     return new DoubleCoordinates(coordinates);
   }
 
-  public static Coordinates circumcentre(final double x1, final double y1,
+  public static Point circumcentre(final double x1, final double y1,
     final double x2, final double y2, final double x3, final double y3) {
     // compute the perpendicular bisector of chord ab
     final HCoordinate cab = perpendicularBisector(x1, y1, x2, y2);
@@ -98,7 +98,7 @@ public class CoordinatesUtil {
     final HCoordinate cbc = perpendicularBisector(x2, y2, x3, y3);
     // compute the intersection of the bisectors (circle radii)
     final HCoordinate hcc = new HCoordinate(cab, cbc);
-    Coordinates cc = null;
+    Point cc = null;
     try {
       cc = new DoubleCoordinates(hcc.getX(), hcc.getY());
     } catch (final NotRepresentableException ex) {
@@ -111,7 +111,8 @@ public class CoordinatesUtil {
     return cc;
   }
 
-  public static int compareTo(final Coordinates point1, final Coordinates point2) {
+  public static int compareToOrigin(final Point point1,
+    final Point point2) {
     final double x = point1.getX();
     final double y = point1.getY();
     final double distance = MathUtil.distance(0, 0, x, y);
@@ -128,18 +129,39 @@ public class CoordinatesUtil {
     }
   }
 
-  public static int compareTo(final Coordinates point1, final Object other) {
-    if (other instanceof Coordinates) {
-      final Coordinates point2 = (Coordinates)other;
-      return compareTo(point1, point2);
+  public static int compareToOrigin(final Point point1, final Object other) {
+    if (other instanceof Point) {
+      final Point point2 = (Point)other;
+      return compareToOrigin(point1, point2);
     } else {
       return -1;
     }
   }
 
-  public static boolean contains(final Iterable<? extends Coordinates> points,
-    final Coordinates point) {
-    for (final Coordinates point1 : points) {
+  public static int compareToXY(final Point point1,
+    final Point point2) {
+    final double x = point1.getX();
+    final double otherX = point2.getX();
+    if (x < otherX) {
+      return -1;
+    } else if (x > otherX) {
+      return 1;
+    } else {
+      final double y = point1.getY();
+      final double otherY = point2.getY();
+      if (y < otherY) {
+        return -1;
+      } else if (y > otherY) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  }
+
+  public static boolean contains(final Iterable<? extends Point> points,
+    final Point point) {
+    for (final Point point1 : points) {
       if (point1.equals(point)) {
         return true;
       }
@@ -154,8 +176,8 @@ public class CoordinatesUtil {
    * @param c a point
    * @return the 2-dimensional Euclidean distance between the locations
    */
-  public static double distance(final Coordinates point1,
-    final Coordinates point2) {
+  public static double distance(final Point point1,
+    final Point point2) {
     final double x1 = point1.getX();
     final double y1 = point1.getY();
     final double x2 = point2.getX();
@@ -169,19 +191,19 @@ public class CoordinatesUtil {
    * @param c a coordinate
    * @return the 3-dimensional Euclidean distance between the locations
    */
-  public static double distance3d(final Coordinates point1,
-    final Coordinates point2) {
+  public static double distance3d(final Point point1,
+    final Point point2) {
     final double dx = point1.getX() - point2.getX();
     final double dy = point1.getY() - point2.getY();
     final double dz = point1.getZ() - point2.getZ();
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
-  public static boolean equals(final Coordinates point,
+  public static boolean equals(final Point point,
     final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       final double coordinate = coordinates[i];
-      if (coordinate != point.getValue(i)) {
+      if (coordinate != point.getCoordinate(i)) {
         return false;
       }
     }
@@ -193,8 +215,8 @@ public class CoordinatesUtil {
     return x1 == x2 && y1 == y2;
   }
 
-  public static boolean equals2d(final Coordinates point1,
-    final Coordinates point2) {
+  public static boolean equals2d(final Point point1,
+    final Point point2) {
     if (NumberEquals.equal(point1.getX(), point2.getX())) {
       if (NumberEquals.equal(point1.getY(), point2.getY())) {
         return true;
@@ -203,8 +225,8 @@ public class CoordinatesUtil {
     return false;
   }
 
-  public static boolean equals3d(final Coordinates point1,
-    final Coordinates point2) {
+  public static boolean equals3d(final Point point1,
+    final Point point2) {
     if (equals2d(point1, point2)) {
       if (NumberEquals.equal(point1.getZ(), point2.getZ())) {
         return true;
@@ -213,7 +235,7 @@ public class CoordinatesUtil {
     return false;
   }
 
-  public static Coordinates get(final Coordinates coordinate) {
+  public static Point get(final Point coordinate) {
     if (Double.isNaN(coordinate.getZ())) {
       return new DoubleCoordinates(coordinate.getX(), coordinate.getY());
     } else {
@@ -222,7 +244,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static Coordinates get(final Geometry geometry) {
+  public static Point get(final Geometry geometry) {
     if (geometry == null || geometry.isEmpty()) {
       return null;
     } else {
@@ -231,44 +253,44 @@ public class CoordinatesUtil {
     }
   }
 
-  public static Coordinates get2d(final Geometry geometry) {
+  public static Point get2d(final Geometry geometry) {
     if (geometry.isEmpty()) {
       return null;
     } else {
-      final Coordinates point = get(geometry);
+      final Point point = get(geometry);
       return new DoubleCoordinates(point, 2);
     }
   }
 
-  public static int getAxisCount(final Coordinates... points) {
+  public static int getAxisCount(final Point... points) {
     int axisCount = 2;
-    for (final Coordinates point : points) {
+    for (final Point point : points) {
       axisCount = Math.max(axisCount, point.getAxisCount());
     }
     return axisCount;
   }
 
-  public static double[] getCoordinates(final Coordinates point) {
+  public static double[] getCoordinates(final Point point) {
     final double[] coordinates = new double[point.getAxisCount()];
     for (int i = 0; i < coordinates.length; i++) {
-      coordinates[i] = point.getValue(i);
+      coordinates[i] = point.getCoordinate(i);
     }
     return coordinates;
   }
 
-  public static double getElevation(final Coordinates coordinate,
-    final Coordinates c0, final Coordinates c1) {
+  public static double getElevation(final Point coordinate,
+    final Point c0, final Point c1) {
     final double fraction = coordinate.distance(c0) / c0.distance(c1);
     final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * (fraction);
     return z;
   }
 
   public static double getElevation(final LineString line,
-    final Coordinates coordinate) {
+    final Point coordinate) {
     final CoordinatesList coordinates = line.getCoordinatesList();
-    Coordinates previousCoordinate = coordinates.getCoordinate(0);
+    Point previousCoordinate = coordinates.getCoordinate(0);
     for (int i = 1; i < coordinates.size(); i++) {
-      final Coordinates currentCoordinate = coordinates.getCoordinate(i);
+      final Point currentCoordinate = coordinates.getCoordinate(i);
 
       if (LineSegmentUtil.distance(previousCoordinate, currentCoordinate,
         coordinate) < 1) {
@@ -281,7 +303,7 @@ public class CoordinatesUtil {
   }
 
   @Deprecated
-  public static Coordinates getInstance(final Point point) {
+  public static Point getInstance(final Point point) {
     if (point == null || point.isEmpty()) {
       return null;
     } else {
@@ -289,7 +311,19 @@ public class CoordinatesUtil {
     }
   }
 
-  public static double getX(final Coordinates point) {
+  public static Point getPrecise(final double scale,
+    final Point point) {
+    if (scale <= 0) {
+      return point;
+    } else {
+      final double[] coordinates = point.getCoordinates();
+      coordinates[0] = MathUtil.makePrecise(scale, coordinates[0]);
+      coordinates[1] = MathUtil.makePrecise(scale, coordinates[1]);
+      return new DoubleCoordinates(coordinates);
+    }
+  }
+
+  public static double getX(final Point point) {
     if (point == null) {
       return Double.NaN;
     } else {
@@ -297,7 +331,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static double getY(final Coordinates point) {
+  public static double getY(final Point point) {
     if (point == null) {
       return Double.NaN;
     } else {
@@ -305,7 +339,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static int hashCode(final Coordinates point) {
+  public static int hashCode(final Point point) {
     int result = 17;
     final double x = point.getX();
     result = 37 * result + hashCode(x);
@@ -319,8 +353,8 @@ public class CoordinatesUtil {
     return (int)(f ^ (f >>> 32));
   }
 
-  public static boolean isAcute(final Coordinates point1,
-    final Coordinates point2, final Coordinates point3) {
+  public static boolean isAcute(final Point point1,
+    final Point point2, final Point point3) {
     final double x1 = point1.getX();
     final double y1 = point1.getY();
     final double x2 = point2.getX();
@@ -334,7 +368,7 @@ public class CoordinatesUtil {
   /**
    * Returns the octant of a directed line segment from p0 to p1.
    */
-  public static int octant(final Coordinates p0, final Coordinates p1) {
+  public static int octant(final Point p0, final Point p1) {
     final double dx = p1.getX() - p0.getX();
     final double dy = p1.getY() - p0.getY();
     if (dx == 0.0 && dy == 0.0) {
@@ -402,17 +436,17 @@ public class CoordinatesUtil {
     }
   }
 
-  public static Coordinates offset(final Coordinates coordinate,
+  public static Point offset(final Point coordinate,
     final double angle, final double distance) {
     final double newX = coordinate.getX() + distance * Math.cos(angle);
     final double newY = coordinate.getY() + distance * Math.sin(angle);
-    final Coordinates newCoordinate = new DoubleCoordinates(newX, newY);
+    final Point newCoordinate = new DoubleCoordinates(newX, newY);
     return newCoordinate;
 
   }
 
-  public static int orientationIndex(final Coordinates p1,
-    final Coordinates p2, final Coordinates q) {
+  public static int orientationIndex(final Point p1,
+    final Point p2, final Point q) {
     // travelling along p1->p2, turn counter clockwise to get to q return 1,
     // travelling along p1->p2, turn clockwise to get to q return -1,
     // p1, p2 and q are colinear return 0.
@@ -446,10 +480,10 @@ public class CoordinatesUtil {
    * @param points2
    * @return
    */
-  public static Coordinates pointNotInList(
-    final Iterable<? extends Coordinates> points1,
-    final Iterable<? extends Coordinates> points2) {
-    for (final Coordinates point : points1) {
+  public static Point pointNotInList(
+    final Iterable<? extends Point> points1,
+    final Iterable<? extends Point> points2) {
+    for (final Point point : points1) {
       if (contains(points2, point)) {
         return point;
       }
@@ -457,8 +491,8 @@ public class CoordinatesUtil {
     return null;
   }
 
-  public static Coordinates setElevation(final Coordinates newLocation,
-    final Coordinates originalLocation) {
+  public static Point setElevation(final Point newLocation,
+    final Point originalLocation) {
     if (originalLocation.getAxisCount() > 2) {
       final double z = originalLocation.getZ();
       if (Double.isNaN(z)) {
@@ -466,7 +500,7 @@ public class CoordinatesUtil {
       } else {
         final double[] points = originalLocation.getCoordinates();
         points[2] = z;
-        final Coordinates newCoordinates = new DoubleCoordinates(points);
+        final Point newCoordinates = new DoubleCoordinates(points);
         return newCoordinates;
       }
     } else {
@@ -485,7 +519,7 @@ public class CoordinatesUtil {
     return coordinates;
   }
 
-  public static Coordinates translate(final Coordinates point,
+  public static Point translate(final Point point,
     final Double angle, final double length) {
     final double x = point.getX();
     final double y = point.getY();
@@ -493,19 +527,7 @@ public class CoordinatesUtil {
     final double newX = Trig.adjacent(x, angle, length);
     final double newY = Trig.opposite(y, angle, length);
 
-    final Coordinates newPoint = new DoubleCoordinates(newX, newY);
+    final Point newPoint = new DoubleCoordinates(newX, newY);
     return newPoint;
-  }
-
-  public static Coordinates getPrecise(final double scale,
-    final Coordinates point) {
-    if (scale <= 0) {
-      return point;
-    } else {
-      final double[] coordinates = point.getCoordinates();
-      coordinates[0] = MathUtil.makePrecise(scale, coordinates[0]);
-      coordinates[1] = MathUtil.makePrecise(scale, coordinates[1]);
-      return new DoubleCoordinates(coordinates);
-    }
   }
 }

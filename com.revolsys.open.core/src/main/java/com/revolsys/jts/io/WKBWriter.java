@@ -36,7 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -66,7 +66,7 @@ import com.revolsys.jts.util.Assert;
  * by setting the third bit of the <tt>wkbType</tt> word.
  * EWKB format is upward compatible with the original SFS WKB format.
  * <p>
- * Empty Points cannot be represented in WKB; an
+ * Empty Point cannot be represented in WKB; an
  * {@link IllegalArgumentException} will be thrown if one is
  * written. 
  * <p>
@@ -372,7 +372,7 @@ public class WKBWriter {
     if (outputDimension >= 3) {
       // if 3rd dim is requested, only write it if the CoordinatesList provides
       // it
-      double ordVal = Coordinates.NULL_ORDINATE;
+      double ordVal = Point.NULL_ORDINATE;
       if (seq.getAxisCount() >= 3) {
         ordVal = seq.getValue(index, 2);
       }
@@ -381,7 +381,7 @@ public class WKBWriter {
     }
   }
 
-  private void writeCoordinates(final Coordinates seq, final boolean writeSize,
+  private void writeCoordinates(final Point seq, final boolean writeSize,
     final OutStream os) throws IOException {
     ByteOrderValues.putDouble(seq.getX(), buf, byteOrder);
     os.write(buf, 8);
@@ -392,9 +392,9 @@ public class WKBWriter {
     if (outputDimension >= 3) {
       // if 3rd dim is requested, only write it if the CoordinatesList provides
       // it
-      double ordVal = Coordinates.NULL_ORDINATE;
+      double ordVal = Point.NULL_ORDINATE;
       if (seq.getAxisCount() >= 3) {
-        ordVal = seq.getValue(2);
+        ordVal = seq.getCoordinate(2);
       }
       ByteOrderValues.putDouble(ordVal, buf, byteOrder);
       os.write(buf, 8);
@@ -450,7 +450,7 @@ public class WKBWriter {
     throws IOException {
     if (point.isEmpty()) {
       throw new IllegalArgumentException(
-        "Empty Points cannot be represented in WKB");
+        "Empty Point cannot be represented in WKB");
     }
     writeByteOrder(os);
     writeGeometryType(WKBConstants.wkbPoint, point, os);

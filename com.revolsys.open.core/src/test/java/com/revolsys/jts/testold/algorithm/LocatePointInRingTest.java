@@ -35,7 +35,7 @@ package com.revolsys.jts.testold.algorithm;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.WKTReader;
@@ -58,7 +58,7 @@ public class LocatePointInRingTest extends AbstractPointInRingTest {
   }
 
   @Override
-  protected void runPtInRing(final Location expectedLoc, final Coordinates pt,
+  protected void runPtInRing(final Location expectedLoc, final Point pt,
     final String wkt) throws Exception {
     final Polygon geom = (Polygon)this.reader.read(wkt);
     assertEquals(expectedLoc,

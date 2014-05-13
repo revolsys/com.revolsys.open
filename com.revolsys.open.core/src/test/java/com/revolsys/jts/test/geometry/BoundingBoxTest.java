@@ -16,10 +16,10 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.TestConstants;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
@@ -31,12 +31,12 @@ import com.revolsys.util.MathUtil;
 //covers(Point)
 //convert(GeometryFactory)
 //covers(BoundingBox)
-//covers(Coordinates)
+//covers(Point)
 //covers(double, double)
 //distance(BoundingBox)
 //distance(Geometry)
 //equals(Object)
-//expand(Coordinates)
+//expand(Point)
 //expand(double)
 //expand(double, double)
 //expandPercent(double)
@@ -57,7 +57,7 @@ import com.revolsys.util.MathUtil;
 //hashCode()
 //intersection(BoundingBox)
 //intersects(BoundingBox)
-//intersects(Coordinates)
+//intersects(Point)
 //intersects(double, double)
 //intersects(Geometry)
 //move(double, double)
@@ -222,19 +222,19 @@ public class BoundingBoxTest implements TestConstants {
 
   @Test
   public void testConstructorCoordinatesArray() {
-    final BoundingBox emptyNull = new Envelope((Coordinates[])null);
+    final BoundingBox emptyNull = new Envelope((Point[])null);
     assertEnvelope(emptyNull, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyList = new Envelope(new Coordinates[0]);
+    final BoundingBox emptyList = new Envelope(new Point[0]);
     assertEnvelope(emptyList, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyListWithNulls = new Envelope((Coordinates)null);
+    final BoundingBox emptyListWithNulls = new Envelope((Point)null);
     assertEnvelope(emptyListWithNulls, null, true, 0, NULL_BOUNDS);
 
     // Different number of axis and values
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
-        Coordinates[] points = new Coordinates[valueCount];
+        Point[] points = new Point[valueCount];
         final double[] bounds = EnvelopeUtil.createBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];
@@ -335,14 +335,14 @@ public class BoundingBoxTest implements TestConstants {
 
   @Test
   public void testConstructorIterable() {
-    final BoundingBox emptyNull = new Envelope((Iterable<Coordinates>)null);
+    final BoundingBox emptyNull = new Envelope((Iterable<Point>)null);
     assertEnvelope(emptyNull, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyList = new Envelope(new ArrayList<Coordinates>());
+    final BoundingBox emptyList = new Envelope(new ArrayList<Point>());
     assertEnvelope(emptyList, null, true, 0, NULL_BOUNDS);
 
     final BoundingBox emptyListWithNulls = new Envelope(
-      Collections.<Coordinates> singleton(null));
+      Collections.<Point> singleton(null));
     assertEnvelope(emptyListWithNulls, null, true, 0, NULL_BOUNDS);
 
     final BoundingBox emptyNullCoordinatesList = new Envelope(
@@ -356,7 +356,7 @@ public class BoundingBoxTest implements TestConstants {
     // Different number of axis and values
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
-        final List<Coordinates> points = new ArrayList<>();
+        final List<Point> points = new ArrayList<>();
         final double[] bounds = EnvelopeUtil.createBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];

@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.operation.buffer;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -92,12 +92,12 @@ public class OffsetCurveBuilder {
     final CoordinatesList simp1 = BufferInputLineSimplifier.simplify(points,
       distTol);
     // MD - used for testing only (to eliminate simplification)
-    // Coordinates[] simp1 = inputPts;
+    // Point[] simp1 = inputPts;
 
     final int n1 = simp1.size() - 1;
     segGen.initSideSegments(simp1.get(0), simp1.get(1), Position.LEFT);
     for (int i = 2; i <= n1; i++) {
-      final Coordinates point = simp1.get(i);
+      final Point point = simp1.get(i);
       segGen.addNextSegment(point, true);
     }
     segGen.addLastSegment();
@@ -109,14 +109,14 @@ public class OffsetCurveBuilder {
     final CoordinatesList simp2 = BufferInputLineSimplifier.simplify(points,
       -distTol);
     // MD - used for testing only (to eliminate simplification)
-    // Coordinates[] simp2 = inputPts;
+    // Point[] simp2 = inputPts;
     final int n2 = simp2.size() - 1;
 
     // since we are traversing line in opposite order, offset position is still
     // LEFT
     segGen.initSideSegments(simp2.get(n2), simp2.get(n2 - 1), Position.LEFT);
     for (int i = n2 - 2; i >= 0; i--) {
-      final Coordinates point = simp2.get(i);
+      final Point point = simp2.get(i);
       segGen.addNextSegment(point, true);
     }
     segGen.addLastSegment();
@@ -136,7 +136,7 @@ public class OffsetCurveBuilder {
       final CoordinatesList simp2 = BufferInputLineSimplifier.simplify(points,
         -distTol);
       // MD - used for testing only (to eliminate simplification)
-      // Coordinates[] simp2 = inputPts;
+      // Point[] simp2 = inputPts;
       final int n2 = simp2.size() - 1;
 
       // since we are traversing line in opposite order, offset position is
@@ -152,7 +152,7 @@ public class OffsetCurveBuilder {
       final CoordinatesList simp1 = BufferInputLineSimplifier.simplify(points,
         distTol);
       // MD - used for testing only (to eliminate simplification)
-      // Coordinates[] simp1 = inputPts;
+      // Point[] simp1 = inputPts;
 
       final int n1 = simp1.size() - 1;
       segGen.initSideSegments(simp1.get(0), simp1.get(1), Position.LEFT);
@@ -164,7 +164,7 @@ public class OffsetCurveBuilder {
     segGen.addLastSegment();
   }
 
-  private void computePointCurve(final Coordinates point,
+  private void computePointCurve(final Point point,
     final OffsetSegmentGenerator segGen) {
     switch (bufParams.getEndCapStyle()) {
       case BufferParameters.CAP_ROUND:
@@ -187,7 +187,7 @@ public class OffsetCurveBuilder {
     }
     final CoordinatesList simp = BufferInputLineSimplifier.simplify(inputPts,
       distTol);
-    // Coordinates[] simp = inputPts;
+    // Point[] simp = inputPts;
 
     final int n = simp.size() - 1;
     segGen.initSideSegments(simp.get(n - 1), simp.get(0), side);
@@ -211,7 +211,7 @@ public class OffsetCurveBuilder {
       final CoordinatesList simp2 = BufferInputLineSimplifier.simplify(
         inputPts, -distTol);
       // MD - used for testing only (to eliminate simplification)
-      // Coordinates[] simp2 = inputPts;
+      // Point[] simp2 = inputPts;
       final int n2 = simp2.size() - 1;
 
       // since we are traversing line in opposite order, offset position is
@@ -230,7 +230,7 @@ public class OffsetCurveBuilder {
       final CoordinatesList simp1 = BufferInputLineSimplifier.simplify(
         inputPts, distTol);
       // MD - used for testing only (to eliminate simplification)
-      // Coordinates[] simp1 = inputPts;
+      // Point[] simp1 = inputPts;
 
       final int n1 = simp1.size() - 1;
       segGen.initSideSegments(simp1.get(0), simp1.get(1), Position.LEFT);
@@ -260,7 +260,7 @@ public class OffsetCurveBuilder {
    * @param inputPts the vertices of the line to offset
    * @param distance the offset distance
    * 
-   * @return a Coordinates array representing the curve
+   * @return a Point array representing the curve
    * or null if the curve is empty
    */
   public CoordinatesList getLineCurve(final CoordinatesList inputPts,
@@ -321,7 +321,7 @@ public class OffsetCurveBuilder {
    * This method handles the degenerate cases of single points and lines,
    * as well as rings.
    *
-   * @return a Coordinates array representing the curve
+   * @return a Point array representing the curve
    * or null if the curve is empty
    */
   public CoordinatesList getRingCurve(final CoordinatesList points,

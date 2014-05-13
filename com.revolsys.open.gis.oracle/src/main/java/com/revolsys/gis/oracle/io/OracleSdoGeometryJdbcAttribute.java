@@ -21,7 +21,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -253,8 +253,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       } else if (object instanceof Point) {
         final Point point = (Point)geometry;
         jGeometry = toJGeometry(point, dimension);
-      } else if (object instanceof Coordinates) {
-        final Coordinates coordinates = (Coordinates)object;
+      } else if (object instanceof Point) {
+        final Point coordinates = (Point)object;
         final Point point = this.geometryFactory.point(coordinates);
         jGeometry = toJGeometry(point, dimension);
       } else if (object instanceof MultiPoint) {
@@ -308,9 +308,9 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     int k = 0;
     for (int i = 0; i < numPoints; i++) {
       final Point point = (Point)multiPoint.getGeometry(i);
-      final Coordinates coordinates = CoordinatesUtil.getInstance(point);
+      final Point coordinates = CoordinatesUtil.getInstance(point);
       for (int j = 0; j < axisCount; j++) {
-        final double value = coordinates.getValue(j);
+        final double value = coordinates.getCoordinate(j);
         if (Double.isNaN(value)) {
           points[k] = 0;
         } else {

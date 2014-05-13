@@ -7,7 +7,7 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.kdtree.KdNode;
 import com.revolsys.jts.index.kdtree.KdTree;
@@ -24,9 +24,9 @@ public class KdTreeTest extends TestCase {
   public void testSinglePoint() {
     final KdTree index = new KdTree(.001);
 
-    final KdNode node1 = index.insert(new Coordinate((double)1, 1, Coordinates.NULL_ORDINATE));
+    final KdNode node1 = index.insert(new Coordinate((double)1, 1, Point.NULL_ORDINATE));
 
-    final KdNode node2 = index.insert(new Coordinate((double)1, 1, Coordinates.NULL_ORDINATE));
+    final KdNode node2 = index.insert(new Coordinate((double)1, 1, Point.NULL_ORDINATE));
 
     assertTrue("Inserting 2 identical points should create one node",
       node1 == node2);

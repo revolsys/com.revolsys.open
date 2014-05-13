@@ -41,7 +41,7 @@ import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -81,7 +81,7 @@ class RectangleLineIntersectorValidator {
 
   private BoundingBox rectEnv;
 
-  private Coordinates[] pts;
+  private Point[] pts;
 
   private boolean isValid = true;
 
@@ -91,14 +91,14 @@ class RectangleLineIntersectorValidator {
 
   private BoundingBox createRectangle() {
     final BoundingBox rectEnv = new Envelope(new Coordinate(this.baseX,
-      this.baseY, Coordinates.NULL_ORDINATE), new Coordinate(this.baseX
-      + this.rectSize, this.baseY + this.rectSize, Coordinates.NULL_ORDINATE));
+      this.baseY, Point.NULL_ORDINATE), new Coordinate(this.baseX
+      + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
     return rectEnv;
   }
 
-  private Coordinates[] createTestPoints(final int nPts) {
+  private Point[] createTestPoints(final int nPts) {
     final Point pt = this.geomFact.point(new Coordinate(this.baseX, this.baseY,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return CoordinatesListUtil.getCoordinateArray(circle);
   }
@@ -157,7 +157,7 @@ class SimpleRectangleIntersector {
    *  10
    *  23
    */
-  private final Coordinates[] corner = new Coordinates[4];
+  private final Point[] corner = new Point[4];
 
   public SimpleRectangleIntersector(final BoundingBox rectEnv) {
     this.rectEnv = rectEnv;
@@ -166,16 +166,16 @@ class SimpleRectangleIntersector {
 
   private void initCorners(final BoundingBox rectEnv) {
     this.corner[0] = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
     this.corner[1] = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
     this.corner[2] = new Coordinate(rectEnv.getMinX(), rectEnv.getMinY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
     this.corner[3] = new Coordinate(rectEnv.getMaxX(), rectEnv.getMinY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
   }
 
-  public boolean intersects(final Coordinates p0, final Coordinates p1) {
+  public boolean intersects(final Point p0, final Point p1) {
     final Envelope segEnv = new Envelope(p0, p1);
     if (!this.rectEnv.intersects(segEnv)) {
       return false;

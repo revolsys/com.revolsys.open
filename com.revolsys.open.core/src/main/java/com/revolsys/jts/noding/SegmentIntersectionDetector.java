@@ -34,7 +34,7 @@ package com.revolsys.jts.noding;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Detects and records an intersection between two {@link SegmentString}s,
@@ -59,9 +59,9 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
 
   private boolean hasNonProperIntersection = false;
 
-  private Coordinates intPt = null;
+  private Point intPt = null;
 
-  private Coordinates[] intSegments = null;
+  private Point[] intSegments = null;
 
   /**
    * Creates an intersection finder using a {@link RobustLineIntersector}.
@@ -85,7 +85,7 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
    * 
    * @return the coordinate for the intersection location
    */
-  public Coordinates getIntersection() {
+  public Point getIntersection() {
     return intPt;
   }
 
@@ -94,7 +94,7 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
    * 
    * @return an array of the segment endpoints (p00, p01, p10, p11)
    */
-  public Coordinates[] getIntersectionSegments() {
+  public Point[] getIntersectionSegments() {
     return intSegments;
   }
 
@@ -167,10 +167,10 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
       return;
     }
 
-    final Coordinates p00 = e0.getCoordinate(segIndex0);
-    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    final Coordinates p10 = e1.getCoordinate(segIndex1);
-    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+    final Point p00 = e0.getCoordinate(segIndex0);
+    final Point p01 = e0.getCoordinate(segIndex0 + 1);
+    final Point p10 = e1.getCoordinate(segIndex1);
+    final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
@@ -205,7 +205,7 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
         intPt = li.getIntersection(0);
 
         // record intersecting segments
-        intSegments = new Coordinates[4];
+        intSegments = new Point[4];
         intSegments[0] = p00;
         intSegments[1] = p01;
         intSegments[2] = p10;

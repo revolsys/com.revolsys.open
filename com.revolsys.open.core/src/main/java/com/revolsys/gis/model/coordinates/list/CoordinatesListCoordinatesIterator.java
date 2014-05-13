@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -14,7 +14,7 @@ import com.revolsys.jts.geom.CoordinatesList;
  * @author Paul Austin
  */
 public class CoordinatesListCoordinatesIterator implements
-  Iterator<Coordinates> {
+  Iterator<Point> {
   /** The coordinates list. */
   private final CoordinatesList coordinatesList;
 
@@ -39,7 +39,7 @@ public class CoordinatesListCoordinatesIterator implements
   }
 
   @Override
-  public Coordinates next() {
+  public Point next() {
     if (hasNext()) {
       final CoordinatesListCoordinates coordinates = new CoordinatesListCoordinates(
         coordinatesList, index);

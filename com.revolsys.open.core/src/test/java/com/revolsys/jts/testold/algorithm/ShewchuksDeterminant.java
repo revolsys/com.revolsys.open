@@ -1,6 +1,6 @@
 package com.revolsys.jts.testold.algorithm;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * This implementation is a port of Shewchuks original implementation in c
@@ -348,8 +348,8 @@ public class ShewchuksDeterminant {
     return y;
   }
 
-  private static double orient2d(final Coordinates pa, final Coordinates pb,
-    final Coordinates pc) {
+  private static double orient2d(final Point pa, final Point pb,
+    final Point pc) {
     double detsum;
 
     final double detleft = (pa.getX() - pc.getX()) * (pb.getY() - pc.getY());
@@ -400,8 +400,8 @@ public class ShewchuksDeterminant {
   /*                                                                           */
   /*****************************************************************************/
 
-  private static double orient2dadapt(final Coordinates pa, final Coordinates pb,
-    final Coordinates pc, final double detsum) {
+  private static double orient2dadapt(final Point pa, final Point pb,
+    final Point pc, final double detsum) {
 
     final double acx = pa.getX() - pc.getX();
     final double bcx = pb.getX() - pc.getX();
@@ -506,8 +506,8 @@ public class ShewchuksDeterminant {
    * -1 if q is clockwise (right) from p1-p2;
    * 0 if q is collinear with p1-p2
    */
-  public static int orientationIndex(final Coordinates p1, final Coordinates p2,
-    final Coordinates q) {
+  public static int orientationIndex(final Point p1, final Point p2,
+    final Point q) {
     final double orientation = orient2d(p1, p2, q);
     if (orientation > 0.0) {
       return 1;
@@ -533,8 +533,8 @@ public class ShewchuksDeterminant {
    * @return the orientation index if it can be computed safely, or
    * i > 1 if the orientation index cannot be computed safely
    */
-  public static int orientationIndexFilter(final Coordinates pa,
-    final Coordinates pb, final Coordinates pc) {
+  public static int orientationIndexFilter(final Point pa,
+    final Point pb, final Point pc) {
     double detsum;
 
     final double detleft = (pa.getX() - pc.getX()) * (pb.getY() - pc.getY());

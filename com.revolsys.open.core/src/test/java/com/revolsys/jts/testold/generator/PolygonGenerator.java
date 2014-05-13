@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -56,7 +56,7 @@ public class PolygonGenerator extends GeometryGenerator {
   private static LinearRing createArc(final double cx, final double cy,
     final double radius, final int npoints, final GeometryFactory gf) {
 
-    final Coordinates[] coords = new Coordinates[npoints + 1];
+    final Point[] coords = new Point[npoints + 1];
 
     final double theta = 360 / npoints;
 
@@ -81,7 +81,7 @@ public class PolygonGenerator extends GeometryGenerator {
     // figure out the number of points per side
     final int ptsPerSide = npoints / 4;
     int rPtsPerSide = npoints % 4;
-    final Coordinates[] coords = new Coordinates[npoints + 1];
+    final Point[] coords = new Point[npoints + 1];
     coords[0] = new DoubleCoordinates(gf.makePrecise(0, x),
       gf.makePrecise(1, y)); // start
 
@@ -221,7 +221,7 @@ public class PolygonGenerator extends GeometryGenerator {
     final int startAngle, final int endAngle, final double radius,
     final GeometryFactory gf) {
 
-    final Coordinates[] coords = new Coordinates[4];
+    final Point[] coords = new Point[4];
 
     double fx1, fx2, fy1, fy2;
 

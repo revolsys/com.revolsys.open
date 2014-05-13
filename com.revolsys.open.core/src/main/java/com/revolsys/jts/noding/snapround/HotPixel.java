@@ -37,7 +37,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.util.Assert;
@@ -59,9 +59,9 @@ public class HotPixel {
 
   private final LineIntersector li;
 
-  private Coordinates pt;
+  private Point pt;
 
-  private final Coordinates originalPt;
+  private final Point originalPt;
 
   private final double scaleFactor;
 
@@ -78,7 +78,7 @@ public class HotPixel {
    *  10
    *  23
    */
-  private final Coordinates[] corner = new Coordinates[4];
+  private final Point[] corner = new Point[4];
 
   private BoundingBox safeEnv = null;
 
@@ -93,7 +93,7 @@ public class HotPixel {
    * @param li the intersector to use for testing intersection with line segments
    * 
    */
-  public HotPixel(final Coordinates pt, final double scaleFactor,
+  public HotPixel(final Point pt, final double scaleFactor,
     final LineIntersector li) {
     originalPt = pt;
     this.pt = pt;
@@ -105,7 +105,7 @@ public class HotPixel {
     }
     if (scaleFactor != 1.0) {
       this.pt = new Coordinate(scale(pt.getX()), scale(pt.getY()),
-        Coordinates.NULL_ORDINATE);
+        Point.NULL_ORDINATE);
     }
     initCorners(this.pt);
   }
@@ -120,8 +120,8 @@ public class HotPixel {
    */
   public boolean addSnappedNode(final NodedSegmentString segStr,
     final int segIndex) {
-    final Coordinates p0 = segStr.getCoordinate(segIndex);
-    final Coordinates p1 = segStr.getCoordinate(segIndex + 1);
+    final Point p0 = segStr.getCoordinate(segIndex);
+    final Point p1 = segStr.getCoordinate(segIndex + 1);
 
     if (intersects(p0, p1)) {
       // System.out.println("snapped: " + snapPt);
@@ -138,7 +138,7 @@ public class HotPixel {
    * 
    * @return the coordinate of the pixel
    */
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return originalPt;
   }
 
@@ -159,21 +159,21 @@ public class HotPixel {
     return safeEnv;
   }
 
-  private Coordinates getScaled(final Coordinates p) {
+  private Point getScaled(final Point p) {
     return new DoubleCoordinates(scale(p.getX()), scale(p.getY()));
   }
 
-  private void initCorners(final Coordinates pt) {
+  private void initCorners(final Point pt) {
     final double tolerance = 0.5;
     minx = pt.getX() - tolerance;
     maxx = pt.getX() + tolerance;
     miny = pt.getY() - tolerance;
     maxy = pt.getY() + tolerance;
 
-    corner[0] = new Coordinate(maxx, maxy, Coordinates.NULL_ORDINATE);
-    corner[1] = new Coordinate(minx, maxy, Coordinates.NULL_ORDINATE);
-    corner[2] = new Coordinate(minx, miny, Coordinates.NULL_ORDINATE);
-    corner[3] = new Coordinate(maxx, miny, Coordinates.NULL_ORDINATE);
+    corner[0] = new Coordinate(maxx, maxy, Point.NULL_ORDINATE);
+    corner[1] = new Coordinate(minx, maxy, Point.NULL_ORDINATE);
+    corner[2] = new Coordinate(minx, miny, Point.NULL_ORDINATE);
+    corner[3] = new Coordinate(maxx, miny, Point.NULL_ORDINATE);
   }
 
   /**
@@ -184,7 +184,7 @@ public class HotPixel {
    * @param p1 the second coordinate of the line segment to test
    * @return true if the line segment intersects this hot pixel
    */
-  public boolean intersects(final Coordinates p0, final Coordinates p1) {
+  public boolean intersects(final Point p0, final Point p1) {
     if (scaleFactor == 1.0) {
       return intersectsScaled(p0, p1);
     }
@@ -192,7 +192,7 @@ public class HotPixel {
     return intersectsScaled(getScaled(p0), getScaled(p1));
   }
 
-  private boolean intersectsScaled(final Coordinates p0, final Coordinates p1) {
+  private boolean intersectsScaled(final Point p0, final Point p1) {
     final double segMinx = Math.min(p0.getX(), p1.getX());
     final double segMaxx = Math.max(p0.getX(), p1.getX());
     final double segMiny = Math.min(p0.getY(), p1.getY());
@@ -229,8 +229,8 @@ public class HotPixel {
    * @param p1
    * @return
    */
-  private boolean intersectsToleranceSquare(final Coordinates p0,
-    final Coordinates p1) {
+  private boolean intersectsToleranceSquare(final Point p0,
+    final Point p1) {
     boolean intersectsLeft = false;
     boolean intersectsBottom = false;
 

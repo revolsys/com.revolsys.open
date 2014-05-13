@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geomgraph.GeometryGraph;
@@ -60,7 +60,7 @@ public class IndexedNestedRingTester {
 
   private SpatialIndex index;
 
-  private Coordinates nestedPt;
+  private Point nestedPt;
 
   public IndexedNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;
@@ -81,7 +81,7 @@ public class IndexedNestedRingTester {
     }
   }
 
-  public Coordinates getNestedPoint() {
+  public Point getNestedPoint() {
     return nestedPt;
   }
 
@@ -104,7 +104,7 @@ public class IndexedNestedRingTester {
           continue;
         }
 
-        final Coordinates innerRingPt = IsValidOp.findPtNotNode(
+        final Point innerRingPt = IsValidOp.findPtNotNode(
           innerRing.vertices(), searchRing, graph);
 
         /**

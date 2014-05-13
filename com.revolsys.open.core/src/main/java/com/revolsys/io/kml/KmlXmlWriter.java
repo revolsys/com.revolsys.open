@@ -116,7 +116,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         if (axisIndex > 0) {
           write(',');
         }
-        write(String.valueOf(point.getValue(axisIndex)));
+        write(String.valueOf(point.getCoordinate(axisIndex)));
       }
     }
     endTag(Kml22Constants.COORDINATES);

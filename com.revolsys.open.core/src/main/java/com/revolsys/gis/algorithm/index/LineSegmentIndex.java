@@ -7,7 +7,7 @@ import com.revolsys.gis.algorithm.index.visitor.LineSegmentIntersectionVisitor;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -39,7 +39,7 @@ public class LineSegmentIndex extends Quadtree {
     }
   }
 
-  public boolean isWithinDistance(final Coordinates point) {
+  public boolean isWithinDistance(final Point point) {
     BoundingBox envelope = new Envelope(point);
     envelope = envelope.expand(1);
     @SuppressWarnings("unchecked")
@@ -53,8 +53,8 @@ public class LineSegmentIndex extends Quadtree {
     return false;
   }
 
-  public List<CoordinatesList> queryIntersections(final Coordinates c0,
-    final Coordinates c1) {
+  public List<CoordinatesList> queryIntersections(final Point c0,
+    final Point c1) {
     return queryIntersections(new LineSegmentImpl(c0, c1));
   }
 

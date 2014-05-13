@@ -33,7 +33,7 @@
 package com.revolsys.jtstest.function;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegmentImpl;
@@ -44,8 +44,8 @@ import com.revolsys.jts.geom.util.GeometryMapper;
 public class TriangleFunctions {
 
   public static Geometry angleBisectors(final Geometry g) {
-    final Coordinates[] pts = trianglePts(g);
-    final Coordinates cc = Triangle.inCentre(pts[0], pts[1], pts[2]);
+    final Point[] pts = trianglePts(g);
+    final Point cc = Triangle.inCentre(pts[0], pts[1], pts[2]);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final LineString[] line = new LineString[3];
     line[0] = geomFact.lineString(pts[0], cc);
@@ -58,8 +58,8 @@ public class TriangleFunctions {
     return GeometryMapper.map(g, new GeometryMapper.MapOp() {
       @Override
       public Geometry map(final Geometry g) {
-        final Coordinates[] pts = trianglePts(g);
-        final Coordinates cc = Triangle.centroid(pts[0], pts[1], pts[2]);
+        final Point[] pts = trianglePts(g);
+        final Point cc = Triangle.centroid(pts[0], pts[1], pts[2]);
         final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
         return geomFact.point(cc);
       }
@@ -70,8 +70,8 @@ public class TriangleFunctions {
     return GeometryMapper.map(g, new GeometryMapper.MapOp() {
       @Override
       public Geometry map(final Geometry g) {
-        final Coordinates[] pts = trianglePts(g);
-        final Coordinates cc = Triangle.circumcentre(pts[0], pts[1], pts[2]);
+        final Point[] pts = trianglePts(g);
+        final Point cc = Triangle.circumcentre(pts[0], pts[1], pts[2]);
         final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
         return geomFact.point(cc);
       }
@@ -82,8 +82,8 @@ public class TriangleFunctions {
     return GeometryMapper.map(g, new GeometryMapper.MapOp() {
       @Override
       public Geometry map(final Geometry g) {
-        final Coordinates[] pts = trianglePts(g);
-        final Coordinates cc = Triangle.inCentre(pts[0], pts[1], pts[2]);
+        final Point[] pts = trianglePts(g);
+        final Point cc = Triangle.inCentre(pts[0], pts[1], pts[2]);
         final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
         return geomFact.point(cc);
       }
@@ -91,21 +91,21 @@ public class TriangleFunctions {
   }
 
   public static Geometry perpendicularBisectors(final Geometry g) {
-    final Coordinates[] pts = trianglePts(g);
-    final Coordinates cc = Triangle.circumcentre(pts[0], pts[1], pts[2]);
+    final Point[] pts = trianglePts(g);
+    final Point cc = Triangle.circumcentre(pts[0], pts[1], pts[2]);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final LineString[] line = new LineString[3];
-    final Coordinates p0 = (new LineSegmentImpl(pts[1], pts[2])).closestPoint(cc);
+    final Point p0 = (new LineSegmentImpl(pts[1], pts[2])).closestPoint(cc);
     line[0] = geomFact.lineString(p0, cc);
-    final Coordinates p1 = (new LineSegmentImpl(pts[0], pts[2])).closestPoint(cc);
+    final Point p1 = (new LineSegmentImpl(pts[0], pts[2])).closestPoint(cc);
     line[1] = geomFact.lineString(p1, cc);
-    final Coordinates p2 = (new LineSegmentImpl(pts[0], pts[1])).closestPoint(cc);
+    final Point p2 = (new LineSegmentImpl(pts[0], pts[1])).closestPoint(cc);
     line[2] = geomFact.lineString(p2, cc);
     return geomFact.multiLineString(line);
   }
 
-  private static Coordinates[] trianglePts(final Geometry g) {
-    final Coordinates[] pts = CoordinatesListUtil.getCoordinates(g, 3);
+  private static Point[] trianglePts(final Geometry g) {
+    final Point[] pts = CoordinatesListUtil.getCoordinates(g, 3);
     if (pts.length < 3) {
       throw new IllegalArgumentException(
         "Input geometry must have at least 3 points");

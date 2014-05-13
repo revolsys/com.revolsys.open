@@ -38,7 +38,7 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -182,7 +182,7 @@ public class WKTWriter {
    *@param  coordinate      the <code>Coordinate</code> to process
    *@param  writer          the output writer to append to
    */
-  private void appendCoordinate(final Coordinates coordinate,
+  private void appendCoordinate(final Point coordinate,
     final Writer writer) throws IOException {
     writer.write(writeNumber(coordinate.getX()) + " "
       + writeNumber(coordinate.getY()));
@@ -474,7 +474,7 @@ public class WKTWriter {
    *@param  coordinate      the <code>Coordinate</code> to process
    * @param  writer          the output writer to append to
    */
-  private void appendPointTaggedText(final Coordinates coordinate,
+  private void appendPointTaggedText(final Point coordinate,
     final int level, final Writer writer) throws IOException {
     writer.write("POINT ");
     appendPointText(coordinate, level, writer);
@@ -487,7 +487,7 @@ public class WKTWriter {
    *@param  coordinate      the <code>Coordinate</code> to process
    * @param  writer          the output writer to append to
    */
-  private void appendPointText(final Coordinates coordinate, final int level,
+  private void appendPointText(final Point coordinate, final int level,
     final Writer writer) throws IOException {
     if (coordinate == null) {
       writer.write("EMPTY");

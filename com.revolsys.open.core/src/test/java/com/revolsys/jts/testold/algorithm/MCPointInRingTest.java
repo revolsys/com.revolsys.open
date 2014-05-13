@@ -35,7 +35,7 @@ package com.revolsys.jts.testold.algorithm;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.MCPointInRing;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Location;
@@ -60,7 +60,7 @@ public class MCPointInRingTest extends AbstractPointInRingTest {
   }
 
   @Override
-  protected void runPtInRing(final Location expectedLoc, final Coordinates pt,
+  protected void runPtInRing(final Location expectedLoc, final Point pt,
     final String wkt) throws Exception {
     // isPointInRing is not defined for pts on boundary
     if (expectedLoc == Location.BOUNDARY) {

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.esri.map.rest.AbstractMapWrapper;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.util.CollectionUtil;
 
@@ -62,7 +62,7 @@ public class TileInfo extends AbstractMapWrapper {
     return getModelValue(zoomLevel, getWidth());
   }
 
-  public Coordinates getOrigin() {
+  public Point getOrigin() {
     final Map<String, Object> origin = getValue("origin");
     if (origin == null) {
       return null;
@@ -75,7 +75,7 @@ public class TileInfo extends AbstractMapWrapper {
 
   public Point getOriginPoint() {
     final com.revolsys.jts.geom.GeometryFactory spatialReference = getSpatialReference();
-    final Coordinates origin = getOrigin();
+    final Point origin = getOrigin();
     return spatialReference.point(origin);
   }
 

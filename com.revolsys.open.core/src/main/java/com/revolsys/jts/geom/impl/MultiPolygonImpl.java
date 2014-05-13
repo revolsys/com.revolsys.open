@@ -196,6 +196,11 @@ public class MultiPolygonImpl extends GeometryCollectionImpl implements
   }
 
   @Override
+  protected boolean isEquivalentClass(final Geometry other) {
+    return other instanceof MultiPolygon;
+  }
+
+  @Override
   public MultiPolygon normalize() {
     if (isEmpty()) {
       return this;

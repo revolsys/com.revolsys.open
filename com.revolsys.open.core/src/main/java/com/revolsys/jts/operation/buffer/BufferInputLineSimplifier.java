@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.buffer;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -115,7 +115,7 @@ public class BufferInputLineSimplifier {
     int j = 0;
     for (int i = 0; i < vertexCount; i++) {
       if (isDeleted[i] != DELETE) {
-        final Coordinates point = inputLine.get(i);
+        final Point point = inputLine.get(i);
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, point);
       }
     }
@@ -174,8 +174,8 @@ public class BufferInputLineSimplifier {
     return next;
   }
 
-  private boolean isConcave(final Coordinates p0, final Coordinates p1,
-    final Coordinates p2) {
+  private boolean isConcave(final Point p0, final Point p1,
+    final Point p2) {
     final int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
     final boolean isConcave = (orientation == angleOrientation);
     return isConcave;
@@ -183,9 +183,9 @@ public class BufferInputLineSimplifier {
 
   private boolean isDeletable(final int i0, final int i1, final int i2,
     final double distanceTol) {
-    final Coordinates p0 = inputLine.get(i0);
-    final Coordinates p1 = inputLine.get(i1);
-    final Coordinates p2 = inputLine.get(i2);
+    final Point p0 = inputLine.get(i0);
+    final Point p1 = inputLine.get(i1);
+    final Point p2 = inputLine.get(i2);
 
     if (!isConcave(p0, p1, p2)) {
       return false;
@@ -200,8 +200,8 @@ public class BufferInputLineSimplifier {
     return isShallowSampled(p0, p1, i0, i2, distanceTol);
   }
 
-  private boolean isShallow(final Coordinates p0, final Coordinates p1,
-    final Coordinates p2, final double distanceTol) {
+  private boolean isShallow(final Point p0, final Point p1,
+    final Point p2, final double distanceTol) {
     final double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
     return dist < distanceTol;
   }
@@ -218,7 +218,7 @@ public class BufferInputLineSimplifier {
    * @param distanceTol distance tolerance
    * @return
    */
-  private boolean isShallowSampled(final Coordinates p0, final Coordinates p2,
+  private boolean isShallowSampled(final Point p0, final Point p2,
     final int i0, final int i2, final double distanceTol) {
     // check every n'th point to see if it is within tolerance
     int inc = (i2 - i0) / NUM_PTS_TO_CHECK;

@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.operation.distance;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -59,7 +59,7 @@ public class GeometryLocation {
 
   private final int segIndex;
 
-  private Coordinates pt = null;
+  private Point pt = null;
 
   /**
    * Constructs a GeometryLocation specifying a point inside an area geometry.
@@ -67,7 +67,7 @@ public class GeometryLocation {
    * @param component the component of the geometry containing the point
    * @param pt the coordinate of the location
    */
-  public GeometryLocation(final Geometry component, final Coordinates pt) {
+  public GeometryLocation(final Geometry component, final Point pt) {
     this(component, INSIDE_AREA, pt);
   }
 
@@ -81,7 +81,7 @@ public class GeometryLocation {
    * @param pt the coordinate of the location
    */
   public GeometryLocation(final Geometry component, final int segIndex,
-    final Coordinates pt) {
+    final Point pt) {
     this.component = component;
     this.segIndex = segIndex;
     this.pt = pt;
@@ -90,7 +90,7 @@ public class GeometryLocation {
   /**
    * Returns the {@link Coordinates} of this location.
    */
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return pt;
   }
 

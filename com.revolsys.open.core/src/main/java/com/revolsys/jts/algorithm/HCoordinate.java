@@ -34,7 +34,7 @@ package com.revolsys.jts.algorithm;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Represents a homogeneous coordinate in a 2-D coordinate space.
@@ -56,8 +56,8 @@ public class HCoordinate {
    * to increase the precision of the calculation input points should be normalized
    * before passing them to this routine.
    */
-  public static Coordinates intersection(final Coordinates p1,
-    final Coordinates p2, final Coordinates q1, final Coordinates q2)
+  public static Point intersection(final Point p1,
+    final Point p2, final Point q1, final Point q2)
     throws NotRepresentableException {
     // unrolled computation
     final double px = p1.getY() - p2.getY();
@@ -80,15 +80,15 @@ public class HCoordinate {
       throw new NotRepresentableException();
     }
 
-    return new Coordinate(xInt, yInt, Coordinates.NULL_ORDINATE);
+    return new Coordinate(xInt, yInt, Point.NULL_ORDINATE);
   }
 
   /*
-   * public static Coordinates OLDintersection( Coordinates p1, Coordinates p2,
-   * Coordinates q1, Coordinates q2) throws NotRepresentableException {
+   * public static Point OLDintersection( Point p1, Point p2,
+   * Point q1, Point q2) throws NotRepresentableException {
    * HCoordinate l1 = new HCoordinate(p1, p2); HCoordinate l2 = new
    * HCoordinate(q1, q2); HCoordinate intHCoord = new HCoordinate(l1, l2);
-   * Coordinates intPt = intHCoord.getCoordinate(); return intPt; }
+   * Point intPt = intHCoord.getCoordinate(); return intPt; }
    */
 
   public double x, y, w;
@@ -99,7 +99,7 @@ public class HCoordinate {
     w = 1.0;
   }
 
-  public HCoordinate(final Coordinates p) {
+  public HCoordinate(final Point p) {
     x = p.getX();
     y = p.getY();
     w = 1.0;
@@ -113,15 +113,15 @@ public class HCoordinate {
    * @param p1
    * @param p2
    */
-  public HCoordinate(final Coordinates p1, final Coordinates p2) {
+  public HCoordinate(final Point p1, final Point p2) {
     // optimization when it is known that w = 1
     x = p1.getY() - p2.getY();
     y = p2.getX() - p1.getX();
     w = p1.getX() * p2.getY() - p2.getX() * p1.getY();
   }
 
-  public HCoordinate(final Coordinates p1, final Coordinates p2,
-    final Coordinates q1, final Coordinates q2) {
+  public HCoordinate(final Point p1, final Point p2,
+    final Point q1, final Point q2) {
     // unrolled computation
     final double px = p1.getY() - p2.getY();
     final double py = p2.getX() - p1.getX();
@@ -154,7 +154,7 @@ public class HCoordinate {
     w = p1.x * p2.y - p2.x * p1.y;
   }
 
-  public Coordinates getCoordinate() throws NotRepresentableException {
+  public Point getCoordinate() throws NotRepresentableException {
     return new DoubleCoordinates(getX(), getY());
   }
 

@@ -7,7 +7,7 @@ import java.util.List;
 import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Point;
 
@@ -54,7 +54,7 @@ public class WarpPolynomialFilter extends WholeImageFilter {
       final double destX = minX + i * pixelWidth;
       for (int j = 0; j < imageHeight; j++) {
         final double destY = maxY - j * pixelHeight;
-        final Coordinates source = toSourcePoint(destX, destY);
+        final Point source = toSourcePoint(destX, destY);
 
         final double imageX = source.getX();
         final double imageY = source.getY();
@@ -74,7 +74,7 @@ public class WarpPolynomialFilter extends WholeImageFilter {
     return outPixels;
   }
 
-  public Coordinates toSourcePoint(final double destX, final double destY) {
+  public Point toSourcePoint(final double destX, final double destY) {
     final double sourceX = 0.0;
     final double sourceY = 0.0;
     int count = 0;

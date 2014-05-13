@@ -41,7 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Location;
 
 /**
@@ -115,7 +115,7 @@ public class PlanarGraph {
     }
   }
 
-  public Node addNode(final Coordinates coord) {
+  public Node addNode(final Point coord) {
     return nodes.addNode(coord);
   }
 
@@ -138,7 +138,7 @@ public class PlanarGraph {
   /**
    * @return the node if found; null otherwise
    */
-  public Node find(final Coordinates coord) {
+  public Node find(final Point coord) {
     return nodes.find(coord);
   }
 
@@ -148,7 +148,7 @@ public class PlanarGraph {
    * @return the edge, if found
    *    <code>null</code> if the edge was not found
    */
-  public Edge findEdge(final Coordinates p0, final Coordinates p1) {
+  public Edge findEdge(final Point p0, final Point p1) {
     for (int i = 0; i < edges.size(); i++) {
       final Edge e = edges.get(i);
       if (p0.equals(e.getCoordinate(0)) && p1.equals(e.getCoordinate(1))) {
@@ -182,7 +182,7 @@ public class PlanarGraph {
    * @return the edge, if found
    *    <code>null</code> if the edge was not found
    */
-  public Edge findEdgeInSameDirection(final Coordinates p0, final Coordinates p1) {
+  public Edge findEdgeInSameDirection(final Point p0, final Point p1) {
     for (int i = 0; i < edges.size(); i++) {
       final Edge e = edges.get(i);
 
@@ -222,7 +222,7 @@ public class PlanarGraph {
     edges.add(e);
   }
 
-  public boolean isBoundaryNode(final int geomIndex, final Coordinates coord) {
+  public boolean isBoundaryNode(final int geomIndex, final Point coord) {
     final Node node = nodes.find(coord);
     if (node == null) {
       return false;
@@ -263,8 +263,8 @@ public class PlanarGraph {
    * E.g. the segments are parallel and in the same quadrant
    * (as opposed to parallel and opposite!).
    */
-  private boolean matchInSameDirection(final Coordinates p0,
-    final Coordinates p1, final Coordinates ep0, final Coordinates ep1) {
+  private boolean matchInSameDirection(final Point p0,
+    final Point p1, final Point ep0, final Point ep1) {
     if (!p0.equals(ep0)) {
       return false;
     }

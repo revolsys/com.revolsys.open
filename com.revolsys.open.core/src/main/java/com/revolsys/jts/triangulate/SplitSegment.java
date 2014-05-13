@@ -34,7 +34,7 @@
 package com.revolsys.jts.triangulate;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 
 /**
@@ -53,13 +53,13 @@ public class SplitSegment {
    * @param segmentLengthFraction the fraction of the segment length along the line
    * @return the point at that distance
    */
-  private static Coordinates pointAlongReverse(final LineSegment seg,
+  private static Point pointAlongReverse(final LineSegment seg,
     final double segmentLengthFraction) {
     final double x = seg.getP1().getX() - segmentLengthFraction
       * (seg.getP1().getX() - seg.getP0().getX());
     final double y = seg.getP1().getY() - segmentLengthFraction
       * (seg.getP1().getY() - seg.getP0().getY());
-    final Coordinates coord = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+    final Point coord = new Coordinate(x, y, Point.NULL_ORDINATE);
     return coord;
   }
 
@@ -67,7 +67,7 @@ public class SplitSegment {
 
   private final double segLen;
 
-  private Coordinates splitPt;
+  private Point splitPt;
 
   private double minimumLen = 0.0;
 
@@ -83,7 +83,7 @@ public class SplitSegment {
     return len;
   }
 
-  public Coordinates getSplitPoint() {
+  public Point getSplitPoint() {
     return splitPt;
   }
 
@@ -91,7 +91,7 @@ public class SplitSegment {
     minimumLen = minLen;
   }
 
-  public void splitAt(final Coordinates pt) {
+  public void splitAt(final Point pt) {
     // check that given pt doesn't violate min length
     final double minFrac = minimumLen / segLen;
     if (pt.distance(seg.getP0()) < minimumLen) {
@@ -106,7 +106,7 @@ public class SplitSegment {
     splitPt = pt;
   }
 
-  public void splitAt(final double length, final Coordinates endPt) {
+  public void splitAt(final double length, final Point endPt) {
     final double actualLen = getConstrainedLength(length);
     final double frac = actualLen / segLen;
     if (endPt.equals2d(seg.getP0())) {

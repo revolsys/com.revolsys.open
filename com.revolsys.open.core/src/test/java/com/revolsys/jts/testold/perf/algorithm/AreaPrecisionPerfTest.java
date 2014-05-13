@@ -1,13 +1,13 @@
 package com.revolsys.jts.testold.perf.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 
 public class AreaPrecisionPerfTest {
-  public static double accurateSignedArea(final Coordinates[] ring) {
+  public static double accurateSignedArea(final Point[] ring) {
     if (ring.length < 3) {
       return 0.0;
     }
@@ -30,14 +30,14 @@ public class AreaPrecisionPerfTest {
     final long start = System.currentTimeMillis();
 
     for (int nrVertices = 4; nrVertices <= 1000000; nrVertices *= 2) {
-      final Coordinates[] coordinates = new Coordinates[nrVertices + 1];
+      final Point[] coordinates = new Point[nrVertices + 1];
 
-      Coordinates vertex;
+      Point vertex;
       for (int i = 0; i <= nrVertices; i++) {
         vertex = new Coordinate(originX
           + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)), originY
           + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)),
-          Coordinates.NULL_ORDINATE);
+          Point.NULL_ORDINATE);
         coordinates[i] = vertex;
       }
       // close ring
@@ -63,7 +63,7 @@ public class AreaPrecisionPerfTest {
     // 1000.0);
   }
 
-  public static double originalSignedArea(final Coordinates[] ring) {
+  public static double originalSignedArea(final Point[] ring) {
     if (ring.length < 3) {
       return 0.0;
     }

@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Finds an interior intersection in a set of {@link SegmentString}s,
@@ -51,9 +51,9 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
 
   private final LineIntersector li;
 
-  private Coordinates interiorIntersection = null;
+  private Point interiorIntersection = null;
 
-  private Coordinates[] intSegments = null;
+  private Point[] intSegments = null;
 
   private final List intersections = new ArrayList();
 
@@ -74,7 +74,7 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
    * 
    * @return the coordinate for the intersection location
    */
-  public Coordinates getInteriorIntersection() {
+  public Point getInteriorIntersection() {
     return interiorIntersection;
   }
 
@@ -87,7 +87,7 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
    * 
    * @return an array of the segment endpoints (p00, p01, p10, p11)
    */
-  public Coordinates[] getIntersectionSegments() {
+  public Point[] getIntersectionSegments() {
     return intSegments;
   }
 
@@ -159,16 +159,16 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
       }
     }
 
-    final Coordinates p00 = e0.getCoordinate(segIndex0);
-    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    final Coordinates p10 = e1.getCoordinate(segIndex1);
-    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+    final Point p00 = e0.getCoordinate(segIndex0);
+    final Point p01 = e0.getCoordinate(segIndex0 + 1);
+    final Point p10 = e1.getCoordinate(segIndex1);
+    final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
 
     if (li.hasIntersection()) {
       if (li.isInteriorIntersection()) {
-        intSegments = new Coordinates[4];
+        intSegments = new Point[4];
         intSegments[0] = p00;
         intSegments[1] = p01;
         intSegments[2] = p10;

@@ -81,7 +81,7 @@ import com.revolsys.util.MathUtil;
  * <p>
  * Note that the factory constructor methods do <b>not</b> change the input coordinates in any way.
  * In particular, they are not rounded to the supplied <tt>PrecisionModel</tt>.
- * It is assumed that input Coordinates meet the given precision.
+ * It is assumed that input Point meet the given precision.
  *
  *
  * @version 1.7
@@ -437,17 +437,16 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return valuesPrecise;
   }
 
-  public Coordinates createCoordinates(final Coordinates point) {
-    return getPreciseCoordinates(point);
-  }
-
-  public Coordinates createCoordinates(final double... coordinates) {
+  public Point createCoordinates(final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       coordinates[i] = makePrecise(i, coordinates[i]);
     }
-    final Coordinates newPoint = new DoubleCoordinates(this.axisCount,
-      coordinates);
+    final Point newPoint = new DoubleCoordinates(this.axisCount, coordinates);
     return newPoint;
+  }
+
+  public Point createCoordinates(final Point point) {
+    return getPreciseCoordinates(point);
   }
 
   public CoordinatesList createCoordinatesList(final Collection<?> points) {
@@ -459,11 +458,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
       final double[] coordinates = new double[numPoints * axisCount];
       int i = 0;
       for (final Object object : points) {
-        Coordinates point;
+        Point point;
         if (object == null) {
           point = null;
-        } else if (object instanceof Coordinates) {
-          point = (Coordinates)object;
+        } else if (object instanceof Point) {
+          point = (Point)object;
         } else if (object instanceof Point) {
           final Point projectedPoint = ((Point)object).convert(this);
           point = projectedPoint;
@@ -736,7 +735,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return axisCount;
   }
 
-  public Coordinates getCoordinates(final Point point) {
+  public Point getCoordinates(final Point point) {
     final Point convertedPoint = project(point);
     return convertedPoint;
   }
@@ -891,16 +890,16 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return polygons.toArray(new Polygon[polygons.size()]);
   }
 
-  public Coordinates[] getPrecise(final Coordinates... points) {
-    final Coordinates[] precisesPoints = new Coordinates[points.length];
+  public Point[] getPrecise(final Point... points) {
+    final Point[] precisesPoints = new Point[points.length];
     for (int i = 0; i < points.length; i++) {
-      final Coordinates point = points[i];
+      final Point point = points[i];
       precisesPoints[i] = getPreciseCoordinates(point);
     }
     return precisesPoints;
   }
 
-  public Coordinates getPreciseCoordinates(final Coordinates point) {
+  public Point getPreciseCoordinates(final Point point) {
     final double[] coordinates = point.getCoordinates();
     makePrecise(coordinates.length, coordinates);
     return new DoubleCoordinates(coordinates);
@@ -997,22 +996,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   /**
-   * Creates a {@link LinearRing} using the given {@link Coordinates}s.
-   * A null or empty array creates an empty LinearRing. 
-   * The points must form a closed and simple linestring. 
-   * @param coordinates an array without null elements, or an empty array, or null
-   * @return the created LinearRing
-   * @throws IllegalArgumentException if the ring is not closed, or has too few points
-   */
-  public LinearRing linearRing(final Coordinates... coordinates) {
-    if (coordinates == null) {
-      return linearRing();
-    } else {
-      return linearRing(new DoubleCoordinatesList(coordinates));
-    }
-  }
-
-  /**
    * Creates a {@link LinearRing} using the given {@link CoordinatesList}. 
    * A null or empty array creates an empty LinearRing. 
    * The points must form a closed and simple linestring. 
@@ -1033,6 +1016,22 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return linearRing(lineString.getCoordinatesList());
   }
 
+  /**
+   * Creates a {@link LinearRing} using the given {@link Coordinates}s.
+   * A null or empty array creates an empty LinearRing. 
+   * The points must form a closed and simple linestring. 
+   * @param coordinates an array without null elements, or an empty array, or null
+   * @return the created LinearRing
+   * @throws IllegalArgumentException if the ring is not closed, or has too few points
+   */
+  public LinearRing linearRing(final Point... coordinates) {
+    if (coordinates == null) {
+      return linearRing();
+    } else {
+      return linearRing(new DoubleCoordinatesList(coordinates));
+    }
+  }
+
   public LineString lineString() {
     return new LineStringImpl(this);
   }
@@ -1043,15 +1042,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
     } else {
       final CoordinatesList coordinatesList = createCoordinatesList(points);
       return lineString(coordinatesList);
-    }
-  }
-
-  public LineString lineString(final Coordinates... points) {
-    if (points == null) {
-      return lineString();
-    } else {
-      final List<Coordinates> pointList = Arrays.asList(points);
-      return lineString(pointList);
     }
   }
 
@@ -1079,6 +1069,15 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return lineString();
     } else {
       return new LineStringImpl(this, lineString.getCoordinatesList());
+    }
+  }
+
+  public LineString lineString(final Point... points) {
+    if (points == null) {
+      return lineString();
+    } else {
+      final List<Point> pointList = Arrays.asList(points);
+      return lineString(pointList);
     }
   }
 
@@ -1145,21 +1144,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   /**
-   * Creates a {@link MultiPoint} using the given {@link Coordinates}s.
-   * A null or empty array will create an empty MultiPoint.
-   *
-   * @param coordinates an array (without null elements), or an empty array, or <code>null</code>
-   * @return a MultiPoint object
-   */
-  public MultiPoint multiPoint(final Coordinates[] coordinates) {
-    if (coordinates == null || coordinates.length == 0) {
-      return multiPoint();
-    } else {
-      return multiPoint(new DoubleCoordinatesList(coordinates));
-    }
-  }
-
-  /**
    * Creates a {@link MultiPoint} using the 
    * points in the given {@link CoordinatesList}.
    * A <code>null</code> or empty CoordinatesList creates an empty MultiPoint.
@@ -1173,7 +1157,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     } else {
       final Point[] points = new Point[coordinatesList.size()];
       for (int i = 0; i < points.length; i++) {
-        final Coordinates coordinates = coordinatesList.get(i);
+        final Point coordinates = coordinatesList.get(i);
         final Point point = point(coordinates);
         points[i] = point;
       }
@@ -1189,11 +1173,15 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * Creates a {@link MultiPoint} using the given {@link Point}s.
    * A null or empty array will create an empty MultiPoint.
    *
-   * @param point an array of Points (without null elements), or an empty array, or <code>null</code>
+   * @param coordinates an array (without null elements), or an empty array, or <code>null</code>
    * @return a MultiPoint object
    */
-  public MultiPoint multiPoint(final Point[] point) {
-    return new MultiPointImpl(this, point);
+  public MultiPoint multiPoint(final Point... points) {
+    if (points == null || points.length == 0) {
+      return multiPoint();
+    } else {
+      return new MultiPointImpl(this, points);
+    }
   }
 
   public MultiPolygon multiPolygon(final Collection<?> polygons) {
@@ -1227,24 +1215,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
    */
   public Point point() {
     return new PointImpl(this);
-  }
-
-  /**
-   * <p>Create a new {@link Point} from the specified point ({@link Coordinates}).
-   * If the point is null or has {@link Coordinates#getAxisCount()} &lt; 2 an empty
-   * point will be returned. The result point will have the same  {@link #getAxisCount()} from this
-   * factory. Additional axis in the point will be ignored. If the point has a smaller
-   * {@link Point#getAxisCount()} then {@link Double#NaN} will be used for that axis.</p>
-   * 
-   * @param point The coordinates to create the point from.
-   * @return The point.
-   */
-  public Point point(final Coordinates point) {
-    if (point == null) {
-      return point();
-    } else {
-      return point(point.getCoordinates());
-    }
   }
 
   /**
@@ -1299,7 +1269,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * <ul>
    *   <li><code>null</code> using {@link #point()}</li>
    *   <li>Instances of {@link Point} using {@link Point#copy(GeometryFactory)}</li>
-   *   <li>Instances of {@link Coordinates} using {@link #point(Coordinates)}</li>
+   *   <li>Instances of {@link Coordinates} using {@link #point(Point)}</li>
    *   <li>Instances of {@link CoordinatesList} using {@link #point(CoordinatesList)}</li>
    *   <li>Instances of {@link double[]} using {@link #point(double[])}</li>
    *   <li>Instances of any other class throws {@link IllegalArgumentException}.<li>
@@ -1317,13 +1287,31 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return point.copy(this);
     } else if (object instanceof double[]) {
       return point((double[])object);
-    } else if (object instanceof Coordinates) {
-      return point((Coordinates)object);
+    } else if (object instanceof Point) {
+      return point((Point)object);
     } else if (object instanceof CoordinatesList) {
       return point((CoordinatesList)object);
     } else {
       throw new IllegalArgumentException("Cannot create a point from "
         + object.getClass());
+    }
+  }
+
+  /**
+   * <p>Create a new {@link Point} from the specified point ({@link Coordinates}).
+   * If the point is null or has {@link Coordinates#getAxisCount()} &lt; 2 an empty
+   * point will be returned. The result point will have the same  {@link #getAxisCount()} from this
+   * factory. Additional axis in the point will be ignored. If the point has a smaller
+   * {@link Point#getAxisCount()} then {@link Double#NaN} will be used for that axis.</p>
+   * 
+   * @param point The coordinates to create the point from.
+   * @return The point.
+   */
+  public Point point(final Point point) {
+    if (point == null) {
+      return point();
+    } else {
+      return point(point.getCoordinates());
     }
   }
 

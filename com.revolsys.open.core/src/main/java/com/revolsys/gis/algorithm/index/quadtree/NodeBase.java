@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 public abstract class NodeBase<T> {
   public static int getSubnodeIndex(final BoundingBox envelope,
-    final Coordinates centre) {
+    final Point centre) {
     int subnodeIndex = -1;
     final double minX = envelope.getMinX();
     final double minY = envelope.getMinY();

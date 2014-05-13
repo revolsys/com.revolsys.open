@@ -3,7 +3,7 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.util.AffineTransformation;
 import com.revolsys.jts.geom.util.AffineTransformationBuilder;
 import com.revolsys.jts.geom.util.AffineTransformationFactory;
@@ -14,30 +14,30 @@ import com.revolsys.jts.geom.util.AffineTransformationFactory;
  * @author Martin Davis
  */
 public class AffineTransformationBuilderTest extends TestCase {
-  private final Coordinates ctl0 = new Coordinate((double)-10, -10,
-    Coordinates.NULL_ORDINATE);
+  private final Point ctl0 = new Coordinate((double)-10, -10,
+    Point.NULL_ORDINATE);
 
-  private final Coordinates ctl1 = new Coordinate((double)10, 20,
-    Coordinates.NULL_ORDINATE);
+  private final Point ctl1 = new Coordinate((double)10, 20,
+    Point.NULL_ORDINATE);
 
-  private final Coordinates ctl2 = new Coordinate((double)10, -20,
-    Coordinates.NULL_ORDINATE);
+  private final Point ctl2 = new Coordinate((double)10, -20,
+    Point.NULL_ORDINATE);
 
   public AffineTransformationBuilderTest(final String name) {
     super(name);
   }
 
-  private void assertEqualPoint(final Coordinates p, final Coordinates q) {
+  private void assertEqualPoint(final Point p, final Point q) {
     assertEquals(p.getX(), q.getX(), 0.00005);
     assertEquals(p.getY(), q.getY(), 0.00005);
   }
 
   void run(final double p0x, final double p0y, final double pp0x,
     final double pp0y) {
-    final Coordinates p0 = new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE);
+    final Point p0 = new Coordinate(p0x, p0y, Point.NULL_ORDINATE);
 
-    final Coordinates pp0 = new Coordinate(pp0x, pp0y,
-      Coordinates.NULL_ORDINATE);
+    final Point pp0 = new Coordinate(pp0x, pp0y,
+      Point.NULL_ORDINATE);
 
     final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(
       p0, pp0);
@@ -48,13 +48,13 @@ public class AffineTransformationBuilderTest extends TestCase {
   void run(final double p0x, final double p0y, final double p1x,
     final double p1y, final double pp0x, final double pp0y, final double pp1x,
     final double pp1y) {
-    final Coordinates p0 = new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE);
-    final Coordinates p1 = new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE);
+    final Point p0 = new Coordinate(p0x, p0y, Point.NULL_ORDINATE);
+    final Point p1 = new Coordinate(p1x, p1y, Point.NULL_ORDINATE);
 
-    final Coordinates pp0 = new Coordinate(pp0x, pp0y,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates pp1 = new Coordinate(pp1x, pp1y,
-      Coordinates.NULL_ORDINATE);
+    final Point pp0 = new Coordinate(pp0x, pp0y,
+      Point.NULL_ORDINATE);
+    final Point pp1 = new Coordinate(pp1x, pp1y,
+      Point.NULL_ORDINATE);
 
     final AffineTransformation trans = AffineTransformationFactory.createFromControlVectors(
       p0, p1, pp0, pp1);
@@ -67,16 +67,16 @@ public class AffineTransformationBuilderTest extends TestCase {
     final double p1y, final double p2x, final double p2y, final double pp0x,
     final double pp0y, final double pp1x, final double pp1y, final double pp2x,
     final double pp2y) {
-    final Coordinates p0 = new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE);
-    final Coordinates p1 = new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate(p2x, p2y, Coordinates.NULL_ORDINATE);
+    final Point p0 = new Coordinate(p0x, p0y, Point.NULL_ORDINATE);
+    final Point p1 = new Coordinate(p1x, p1y, Point.NULL_ORDINATE);
+    final Point p2 = new Coordinate(p2x, p2y, Point.NULL_ORDINATE);
 
-    final Coordinates pp0 = new Coordinate(pp0x, pp0y,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates pp1 = new Coordinate(pp1x, pp1y,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates pp2 = new Coordinate(pp2x, pp2y,
-      Coordinates.NULL_ORDINATE);
+    final Point pp0 = new Coordinate(pp0x, pp0y,
+      Point.NULL_ORDINATE);
+    final Point pp1 = new Coordinate(pp1x, pp1y,
+      Point.NULL_ORDINATE);
+    final Point pp2 = new Coordinate(pp2x, pp2y,
+      Point.NULL_ORDINATE);
 
     final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
       p1, p2, pp0, pp1, pp2);
@@ -91,16 +91,16 @@ public class AffineTransformationBuilderTest extends TestCase {
     final double p1y, final double p2x, final double p2y, final double pp0x,
     final double pp0y, final double pp1x, final double pp1y, final double pp2x,
     final double pp2y) {
-    final Coordinates p0 = new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE);
-    final Coordinates p1 = new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate(p2x, p2y, Coordinates.NULL_ORDINATE);
+    final Point p0 = new Coordinate(p0x, p0y, Point.NULL_ORDINATE);
+    final Point p1 = new Coordinate(p1x, p1y, Point.NULL_ORDINATE);
+    final Point p2 = new Coordinate(p2x, p2y, Point.NULL_ORDINATE);
 
-    final Coordinates pp0 = new Coordinate(pp0x, pp0y,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates pp1 = new Coordinate(pp1x, pp1y,
-      Coordinates.NULL_ORDINATE);
-    final Coordinates pp2 = new Coordinate(pp2x, pp2y,
-      Coordinates.NULL_ORDINATE);
+    final Point pp0 = new Coordinate(pp0x, pp0y,
+      Point.NULL_ORDINATE);
+    final Point pp1 = new Coordinate(pp1x, pp1y,
+      Point.NULL_ORDINATE);
+    final Point pp2 = new Coordinate(pp2x, pp2y,
+      Point.NULL_ORDINATE);
 
     final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
       p1, p2, pp0, pp1, pp2);
@@ -109,10 +109,10 @@ public class AffineTransformationBuilderTest extends TestCase {
   }
 
   private void runTransform(final AffineTransformation trans,
-    final Coordinates p0, final Coordinates p1, final Coordinates p2) {
-    final Coordinates pp0 = trans.transform(p0);
-    final Coordinates pp1 = trans.transform(p1);
-    final Coordinates pp2 = trans.transform(p2);
+    final Point p0, final Point p1, final Point p2) {
+    final Point pp0 = trans.transform(p0);
+    final Point pp1 = trans.transform(p1);
+    final Point pp2 = trans.transform(p2);
 
     final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0,
       p1, p2, pp0, pp1, pp2);

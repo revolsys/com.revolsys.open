@@ -88,14 +88,14 @@ public class OctagonalEnvelope {
   /**
    * Creates a new null bounding octagon bounding a {@link Coordinates}
    */
-  public OctagonalEnvelope(final Coordinates p) {
+  public OctagonalEnvelope(final Point p) {
     expandToInclude(p);
   }
 
   /**
    * Creates a new null bounding octagon bounding a pair of {@link Coordinates}s
    */
-  public OctagonalEnvelope(final Coordinates p0, final Coordinates p1) {
+  public OctagonalEnvelope(final Point p0, final Point p1) {
     expandToInclude(p0);
     expandToInclude(p1);
   }
@@ -154,7 +154,7 @@ public class OctagonalEnvelope {
     return this;
   }
 
-  public OctagonalEnvelope expandToInclude(final Coordinates p) {
+  public OctagonalEnvelope expandToInclude(final Point p) {
     expandToInclude(p.getX(), p.getY());
     return this;
   }
@@ -212,7 +212,7 @@ public class OctagonalEnvelope {
 
   public void expandToInclude(final Geometry geometry) {
     for (final Point point : geometry.getGeometries(Point.class)) {
-      expandToInclude((Coordinates)point);
+      expandToInclude((Point)point);
     }
     for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
       expandToInclude(line.getCoordinatesList());
@@ -294,7 +294,7 @@ public class OctagonalEnvelope {
     return minY;
   }
 
-  public boolean intersects(final Coordinates p) {
+  public boolean intersects(final Point p) {
     if (minX > p.getX()) {
       return false;
     }
@@ -385,24 +385,24 @@ public class OctagonalEnvelope {
       return geometryFactory.point((CoordinatesList)null);
     }
 
-    final Coordinates px00 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point px00 = new DoubleCoordinates(geometryFactory.makePrecise(
       0, minX), geometryFactory.makePrecise(1, minA - minX));
-    final Coordinates px01 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point px01 = new DoubleCoordinates(geometryFactory.makePrecise(
       0, minX), geometryFactory.makePrecise(1, minX - minB));
 
-    final Coordinates px10 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point px10 = new DoubleCoordinates(geometryFactory.makePrecise(
       0, maxX), geometryFactory.makePrecise(1, maxX - maxB));
-    final Coordinates px11 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point px11 = new DoubleCoordinates(geometryFactory.makePrecise(
       0, maxX), geometryFactory.makePrecise(1, maxA - maxX));
 
-    final Coordinates py00 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point py00 = new DoubleCoordinates(geometryFactory.makePrecise(
       0, minA - minY), geometryFactory.makePrecise(1, minY));
-    final Coordinates py01 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point py01 = new DoubleCoordinates(geometryFactory.makePrecise(
       0, minY + maxB), geometryFactory.makePrecise(1, minY));
 
-    final Coordinates py10 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point py10 = new DoubleCoordinates(geometryFactory.makePrecise(
       0, maxY + minB), geometryFactory.makePrecise(1, maxY));
-    final Coordinates py11 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point py11 = new DoubleCoordinates(geometryFactory.makePrecise(
       0, maxA - maxY), geometryFactory.makePrecise(1, maxY));
 
     final CoordinateList coordList = new CoordinateList();

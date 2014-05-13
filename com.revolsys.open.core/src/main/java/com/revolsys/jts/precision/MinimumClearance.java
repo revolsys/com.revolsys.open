@@ -34,7 +34,7 @@ package com.revolsys.jts.precision;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
@@ -147,7 +147,7 @@ public class MinimumClearance {
   private static class MinClearanceDistance implements ItemDistance {
     private double minDist = Double.MAX_VALUE;
 
-    private final Coordinates[] minPts = new Coordinates[2];
+    private final Point[] minPts = new Point[2];
 
     public double distance(final FacetSequence fs1, final FacetSequence fs2) {
 
@@ -176,7 +176,7 @@ public class MinimumClearance {
       return distance(fs1, fs2);
     }
 
-    public Coordinates[] getCoordinates() {
+    public Point[] getCoordinates() {
       return minPts;
     }
 
@@ -185,10 +185,10 @@ public class MinimumClearance {
       for (int i1 = 0; i1 < fs1.size(); i1++) {
         for (int i2 = 1; i2 < fs2.size(); i2++) {
 
-          final Coordinates p = fs1.getCoordinate(i1);
+          final Point p = fs1.getCoordinate(i1);
 
-          final Coordinates seg0 = fs2.getCoordinate(i2 - 1);
-          final Coordinates seg1 = fs2.getCoordinate(i2);
+          final Point seg0 = fs2.getCoordinate(i2 - 1);
+          final Point seg1 = fs2.getCoordinate(i2);
 
           if (!(p.equals2d(seg0) || p.equals2d(seg1))) {
             final double d = CGAlgorithms.distancePointLine(p, seg0, seg1);
@@ -205,8 +205,8 @@ public class MinimumClearance {
       return minDist;
     }
 
-    private void updatePts(final Coordinates p, final Coordinates seg0,
-      final Coordinates seg1) {
+    private void updatePts(final Point p, final Point seg0,
+      final Point seg1) {
       minPts[0] = p;
       final LineSegment seg = new LineSegmentImpl(seg0, seg1);
       minPts[1] = new Coordinate(seg.closestPoint(p));
@@ -216,8 +216,8 @@ public class MinimumClearance {
       final FacetSequence fs2) {
       for (int i1 = 0; i1 < fs1.size(); i1++) {
         for (int i2 = 0; i2 < fs2.size(); i2++) {
-          final Coordinates p1 = fs1.getCoordinate(i1);
-          final Coordinates p2 = fs2.getCoordinate(i2);
+          final Point p1 = fs1.getCoordinate(i1);
+          final Point p2 = fs2.getCoordinate(i2);
           if (!p1.equals2d(p2)) {
             final double d = p1.distance(p2);
             if (d < minDist) {
@@ -266,7 +266,7 @@ public class MinimumClearance {
 
   private double minClearance;
 
-  private Coordinates[] minClearancePts;
+  private Point[] minClearancePts;
 
   /**
    * Creates an object to compute the Minimum Clearance
@@ -285,7 +285,7 @@ public class MinimumClearance {
     }
 
     // initialize to "No Distance Exists" state
-    minClearancePts = new Coordinates[2];
+    minClearancePts = new Point[2];
     minClearance = Double.MAX_VALUE;
 
     // handle empty geometries
@@ -333,7 +333,7 @@ public class MinimumClearance {
     // return empty line string if no min pts where found
     if (minClearancePts == null || minClearancePts[0] == null) {
       return inputGeom.getGeometryFactory().lineString(
-        (Coordinates[])null);
+        (Point[])null);
     }
     return inputGeom.getGeometryFactory().lineString(minClearancePts);
   }

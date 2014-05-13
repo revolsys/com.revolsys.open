@@ -34,7 +34,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.math.Vector3D;
 
 /**
@@ -46,7 +46,7 @@ import com.revolsys.jts.math.Vector3D;
  */
 public class CGAlgorithms3D 
 {
-	public static double distance(Coordinates p0, Coordinates p1)
+	public static double distance(Point p0, Point p1)
 	{
 		// default to 2D distance if either Z is not set
 		if (Double.isNaN(p0.getZ()) || Double.isNaN(p1.getZ()))
@@ -58,8 +58,8 @@ public class CGAlgorithms3D
 	    return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
 
-	public static double distancePointSegment(Coordinates p,
-			Coordinates A, Coordinates B) {
+	public static double distancePointSegment(Point p,
+			Point A, Point B) {
 	    // if start = end, then just compute distance to one of the endpoints
 	    if (A.equals3d(B))
 	      return distance(p, A);
@@ -111,7 +111,7 @@ public class CGAlgorithms3D
 	 * @return the distance between the segments
 	 */
 	public static double distanceSegmentSegment(
-			Coordinates A, Coordinates B, Coordinates C, Coordinates D) 
+			Point A, Point B, Point C, Point D) 
 	{
 		/**
 		 * This calculation is susceptible to roundoff errors when 

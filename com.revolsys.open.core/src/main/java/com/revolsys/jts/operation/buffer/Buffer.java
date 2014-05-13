@@ -44,7 +44,7 @@ import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -267,7 +267,7 @@ public class Buffer {
     final PolygonBuilder polyBuilder) {
     final List<BufferSubgraph> processedGraphs = new ArrayList<>();
     for (final BufferSubgraph subgraph : subgraphList) {
-      final Coordinates p = subgraph.getRightmostCoordinate();
+      final Point p = subgraph.getRightmostCoordinate();
       final int outsideDepth = getDepth(processedGraphs, p);
       subgraph.computeDepth(outsideDepth);
       subgraph.findResultEdges();
@@ -337,7 +337,7 @@ public class Buffer {
    * @return a List of {@link DepthSegments} intersecting the stabbing line
    */
   private static List<DepthSegment> findStabbedSegments(
-    final Collection<BufferSubgraph> graphs, final Coordinates stabbingRayLeftPt) {
+    final Collection<BufferSubgraph> graphs, final Point stabbingRayLeftPt) {
     final List<DepthSegment> segments = new ArrayList<DepthSegment>();
     for (final BufferSubgraph graph : graphs) {
       final BoundingBox env = graph.getEnvelope();
@@ -364,11 +364,11 @@ public class Buffer {
    */
   private static void findStabbedSegments(
     final Collection<BufferSubgraph> subgraphs,
-    final Coordinates stabbingRayLeftPt, final DirectedEdge dirEdge,
+    final Point stabbingRayLeftPt, final DirectedEdge dirEdge,
     final List<DepthSegment> stabbedSegments) {
     final Edge edge = dirEdge.getEdge();
     for (int i = 0; i < edge.getNumPoints() - 1; i++) {
-      final Coordinates p1 = edge.getCoordinate(i);
+      final Point p1 = edge.getCoordinate(i);
       LineSegment seg = new LineSegmentImpl(p1, edge.getCoordinate(i + 1));
       double y1 = seg.getY(0);
       double y2 = seg.getY(1);
@@ -415,7 +415,7 @@ public class Buffer {
   }
 
   private static int getDepth(final Collection<BufferSubgraph> subgraphs,
-    final Coordinates p) {
+    final Point p) {
     final List<DepthSegment> stabbedSegments = findStabbedSegments(subgraphs, p);
     // if no segments on stabbing line subgraph must be outside all others.
     if (stabbedSegments.size() == 0) {

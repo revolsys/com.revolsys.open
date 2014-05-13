@@ -1,8 +1,9 @@
 package com.revolsys.gis.model.coordinates;
 
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.impl.AbstractPoint;
 
-public class CoordinatesListCoordinates extends AbstractCoordinates {
+public class CoordinatesListCoordinates extends AbstractPoint {
   private final CoordinatesList coordinates;
 
   private int index = 0;
@@ -18,26 +19,21 @@ public class CoordinatesListCoordinates extends AbstractCoordinates {
   }
 
   @Override
-  public DoubleCoordinates cloneCoordinates() {
-    return new DoubleCoordinates(this);
-  }
-
-  @Override
   public int getAxisCount() {
     return coordinates.getAxisCount();
   }
 
-  public int getIndex() {
-    return index;
-  }
-
   @Override
-  public double getValue(final int index) {
+  public double getCoordinate(final int index) {
     if (index >= 0 && index < coordinates.getAxisCount()) {
       return coordinates.getValue(this.index, index);
     } else {
       return 0;
     }
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   public void next() {

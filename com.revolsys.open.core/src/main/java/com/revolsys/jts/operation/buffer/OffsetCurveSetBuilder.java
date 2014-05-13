@@ -40,7 +40,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -300,7 +300,7 @@ public class OffsetCurveSetBuilder {
     final double bufferDistance) {
     final Triangle tri = new Triangle(triangleCoord.getVertex(0),
       triangleCoord.getVertex(1), triangleCoord.getVertex(2));
-    final Coordinates inCentre = tri.inCentre();
+    final Point inCentre = tri.inCentre();
     final double distToCentre = CGAlgorithms.distancePointLine(inCentre,
       tri.p0, tri.p1);
     return distToCentre < Math.abs(bufferDistance);

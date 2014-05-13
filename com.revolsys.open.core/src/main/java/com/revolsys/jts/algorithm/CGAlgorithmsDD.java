@@ -33,7 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.math.DD;
 
 /**
@@ -56,7 +56,7 @@ public class CGAlgorithmsDD
    * @return -1 if q is clockwise (right) from p1-p2
    * @return 0 if q is collinear with p1-p2
    */
-  public static int orientationIndex(Coordinates p1, Coordinates p2, Coordinates q)
+  public static int orientationIndex(Point p1, Point p2, Point q)
   {
     // fast filter for orientation index
     // avoids use of slow extended-precision arithmetic in many cases
@@ -113,7 +113,7 @@ public class CGAlgorithmsDD
    * @return the orientation index if it can be computed safely
    * @return i > 1 if the orientation index cannot be computed safely
    */
-  private static int orientationIndexFilter(Coordinates pa, Coordinates pb, Coordinates pc)
+  private static int orientationIndexFilter(Point pa, Point pb, Point pc)
   {
     double detsum;
 
@@ -167,9 +167,9 @@ public class CGAlgorithmsDD
    * @param q2
    * @return
    */
-  public static Coordinates intersection(
-      Coordinates p1, Coordinates p2,
-      Coordinates q1, Coordinates q2)
+  public static Point intersection(
+      Point p1, Point p2,
+      Point q1, Point q2)
   {
     DD denom1 = DD.valueOf(q2.getY()).selfSubtract(q1.getY())
     .selfMultiply(DD.valueOf(p2.getX()).selfSubtract(p1.getX()));
@@ -202,6 +202,6 @@ public class CGAlgorithmsDD
     
     double y = DD.valueOf(q1.getY()).selfAdd(DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(fracQ)).doubleValue();
 
-    return new Coordinate((double)x,y, Coordinates.NULL_ORDINATE);
+    return new Coordinate((double)x,y, Point.NULL_ORDINATE);
   }
 }

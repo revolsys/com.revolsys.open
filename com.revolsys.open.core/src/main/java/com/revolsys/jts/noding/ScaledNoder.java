@@ -39,7 +39,7 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -152,7 +152,7 @@ public class ScaledNoder implements Noder {
     double previousY = Double.NaN;
     int j = 0;
     for (int i = 0; i < vertexCount; i++) {
-      final Coordinates point = segment.getCoordinate(i);
+      final Point point = segment.getCoordinate(i);
       final double x = Math.round((point.getX() - offsetX) * scaleFactor);
       final double y = Math.round((point.getY() - offsetY) * scaleFactor);
       final double z = point.getZ();

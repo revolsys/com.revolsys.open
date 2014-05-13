@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
@@ -91,8 +91,8 @@ public class CGAlgorithms {
    * or -1 if q is clockwise from p1-p2,
    * or 0 if q is collinear with p1-p2
    */
-  public static int computeOrientation(final Coordinates p1,
-    final Coordinates p2, final Coordinates q) {
+  public static int computeOrientation(final Point p1,
+    final Point p2, final Point q) {
     return orientationIndex(p1, p2, q);
   }
 
@@ -110,8 +110,8 @@ public class CGAlgorithms {
    * @param D
    *          another point of the line (must be different to A)
    */
-  public static double distanceLineLine(final Coordinates A,
-    final Coordinates B, final Coordinates C, final Coordinates D) {
+  public static double distanceLineLine(final Point A,
+    final Point B, final Point C, final Point D) {
     // check for zero-length segments
     if (A.equals(B)) {
       return distancePointLine(A, C, D);
@@ -179,8 +179,8 @@ public class CGAlgorithms {
    *          another point of the line (must be different to A)
    * @return the distance from p to line segment AB
    */
-  public static double distancePointLine(final Coordinates p,
-    final Coordinates A, final Coordinates B) {
+  public static double distancePointLine(final Point p,
+    final Point A, final Point B) {
     // if start = end, then just compute distance to one of the endpoints
     if (A.getX() == B.getX() && A.getY() == B.getY()) {
       return p.distance(A);
@@ -229,8 +229,8 @@ public class CGAlgorithms {
    *          another point of the line (must be different to A)
    * @return the distance from p to line AB
    */
-  public static double distancePointLinePerpendicular(final Coordinates p,
-    final Coordinates A, final Coordinates B) {
+  public static double distancePointLinePerpendicular(final Point p,
+    final Point A, final Point B) {
     // use comp.graphics.algorithms Frequently Asked Questions method
     /*
      * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2
@@ -257,12 +257,12 @@ public class CGAlgorithms {
    * be correct.
    * 
    * @param ring
-   *          an array of Coordinates forming a ring
+   *          an array of Point forming a ring
    * @return true if the ring is oriented counter-clockwise.
    * @throws IllegalArgumentException
    *           if there are too few points to determine orientation (< 4)
    */
-  public static boolean isCCW(final Coordinates[] ring) {
+  public static boolean isCCW(final Point[] ring) {
     // # of points without closing endpoint
     final int nPts = ring.length - 1;
     // sanity check
@@ -272,10 +272,10 @@ public class CGAlgorithms {
     }
 
     // find highest point
-    Coordinates hiPt = ring[0];
+    Point hiPt = ring[0];
     int hiIndex = 0;
     for (int i = 1; i <= nPts; i++) {
-      final Coordinates p = ring[i];
+      final Point p = ring[i];
       if (p.getY() > hiPt.getY()) {
         hiPt = p;
         hiIndex = i;
@@ -297,8 +297,8 @@ public class CGAlgorithms {
       iNext = (iNext + 1) % nPts;
     } while (ring[iNext].equals2d(hiPt) && iNext != hiIndex);
 
-    final Coordinates prev = ring[iPrev];
-    final Coordinates next = ring[iNext];
+    final Point prev = ring[iPrev];
+    final Point next = ring[iNext];
 
     /**
      * This check catches cases where the ring contains an A-B-A configuration
@@ -339,11 +339,11 @@ public class CGAlgorithms {
    * @return true if the point is a vertex of the line or lies in the interior
    *         of a line segment in the linestring
    */
-  public static boolean isOnLine(final Coordinates p, final LineString line) {
+  public static boolean isOnLine(final Point p, final LineString line) {
     final LineIntersector lineIntersector = new RobustLineIntersector();
     for (final Segment segment : line.segments()) {
-      final Coordinates p0 = segment.get(0);
-      final Coordinates p1 = segment.get(1);
+      final Point p0 = segment.get(0);
+      final Point p1 = segment.get(1);
       lineIntersector.computeIntersection(p, p0, p1);
       if (lineIntersector.hasIntersection()) {
         return true;
@@ -352,7 +352,7 @@ public class CGAlgorithms {
     return false;
   }
 
-  public static boolean isPointInRing(final Coordinates point,
+  public static boolean isPointInRing(final Point point,
     final LineString ring) {
     return locatePointInRing(point, ring) != Location.EXTERIOR;
   }
@@ -390,7 +390,7 @@ public class CGAlgorithms {
     return len;
   }
 
-  public static Location locatePointInRing(final Coordinates p,
+  public static Location locatePointInRing(final Point p,
     final LineString ring) {
     return RayCrossingCounter.locatePointInRing(p, ring);
   }
@@ -407,8 +407,8 @@ public class CGAlgorithms {
    * @return -1 if q is clockwise (right) from p1-p2
    * @return 0 if q is collinear with p1-p2
    */
-  public static int orientationIndex(final Coordinates p1,
-    final Coordinates p2, final Coordinates q) {
+  public static int orientationIndex(final Point p1,
+    final Point p2, final Point q) {
     /**
      * MD - 9 Aug 2010 It seems that the basic algorithm is slightly orientation
      * dependent, when computing the orientation of a point very close to a
@@ -418,10 +418,10 @@ public class CGAlgorithms {
      * For instance, the following situation produces identical results in spite
      * of the inverse orientation of the line segment:
      * 
-     * Coordinates p0 = new Coordinate((double)219.3649559090992, 140.84159161824724);
-     * Coordinates p1 = new Coordinate((double)168.9018919682399, -5.713787599646864);
+     * Point p0 = new Coordinate((double)219.3649559090992, 140.84159161824724);
+     * Point p1 = new Coordinate((double)168.9018919682399, -5.713787599646864);
      * 
-     * Coordinates p = new Coordinate((double)186.80814046338352, 46.28973405831556); int
+     * Point p = new Coordinate((double)186.80814046338352, 46.28973405831556); int
      * orient = orientationIndex(p0, p1, p); int orientInv =
      * orientationIndex(p1, p0, p);
      * 
@@ -448,7 +448,7 @@ public class CGAlgorithms {
    *          the coordinates forming the ring
    * @return the signed area of the ring
    */
-  public static double signedArea(final Coordinates[] ring) {
+  public static double signedArea(final Point[] ring) {
     if (ring.length < 3) {
       return 0.0;
     }

@@ -33,7 +33,7 @@
 package com.revolsys.jts.triangulate;
 
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.triangulate.quadedge.Vertex;
 
 /**
@@ -52,7 +52,7 @@ public class ConstraintVertex extends Vertex {
      * 
      * @param p the location of the vertex
      */
-    public ConstraintVertex(Coordinates p) {
+    public ConstraintVertex(Point p) {
         super(p);
     }
 

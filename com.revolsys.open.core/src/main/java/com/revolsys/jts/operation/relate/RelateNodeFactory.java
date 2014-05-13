@@ -33,7 +33,7 @@
  */
 package com.revolsys.jts.operation.relate;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Node;
 import com.revolsys.jts.geomgraph.NodeFactory;
 import com.revolsys.jts.geomgraph.NodeMap;
@@ -44,7 +44,7 @@ import com.revolsys.jts.geomgraph.NodeMap;
  * @version 1.7
  */
 public class RelateNodeFactory extends NodeFactory {
-  public Node createNode(final Coordinates coord) {
+  public Node createNode(final Point coord) {
     return new RelateNode(coord, new EdgeEndBundleStar());
   }
 }

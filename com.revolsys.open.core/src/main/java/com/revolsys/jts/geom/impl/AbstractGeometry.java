@@ -49,7 +49,7 @@ import com.revolsys.jts.algorithm.InteriorPointLine;
 import com.revolsys.jts.algorithm.InteriorPointPoint;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -125,7 +125,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *  spatial analysis methods must be subjected to a line-dissolve process to
  *  ensure that the results are simple.
  *
- *  <H4> Constructed Points And The Precision Model </H4>
+ *  <H4> Constructed Point And The Precision Model </H4>
  *
  *  The results computed by the set-theoretic methods may
  *  contain constructed points which are not present in the input <code>Geometry</code>
@@ -828,12 +828,13 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   @Override
-  public boolean equal(final Coordinates a, final Coordinates b,
+  public boolean equal(final Point a, final Point b,
     final double tolerance) {
     if (tolerance == 0) {
       return a.equals(b);
+    } else {
+      return a.distance(b) <= tolerance;
     }
-    return a.distance(b) <= tolerance;
   }
 
   /**
@@ -1128,7 +1129,7 @@ public abstract class AbstractGeometry implements Geometry {
     if (isEmpty()) {
       return getGeometryFactory().point();
     }
-    final Coordinates centPt = Centroid.getCentroid(this);
+    final Point centPt = Centroid.getCentroid(this);
     return getGeometryFactory().point(centPt);
   }
 
@@ -1143,14 +1144,14 @@ public abstract class AbstractGeometry implements Geometry {
    *  Returns a vertex of this <code>Geometry</code>
    *  (usually, but not necessarily, the first one).
    *  The returned coordinate should not be assumed
-   *  to be an actual Coordinates object used in
+   *  to be an actual Point object used in
    *  the internal representation.
    *
    *@return    a {@link Coordinates} which is a vertex of this <code>Geometry</code>.
    *@return null if this Geometry is empty
    */
   @Override
-  public abstract Coordinates getCoordinate();
+  public abstract Point getCoordinate();
 
   /**
    * 
@@ -1300,7 +1301,7 @@ public abstract class AbstractGeometry implements Geometry {
     if (isEmpty()) {
       return getGeometryFactory().point();
     }
-    Coordinates interiorPt = null;
+    Point interiorPt = null;
     final int dim = getDimension();
     if (dim == 0) {
       final InteriorPointPoint intPt = new InteriorPointPoint(this);
@@ -1353,7 +1354,7 @@ public abstract class AbstractGeometry implements Geometry {
     if (isEmpty()) {
       return geometryFactory.point();
     } else {
-      final Coordinates point = getCoordinate();
+      final Point point = getCoordinate();
       return geometryFactory.point(point);
     }
   }
@@ -1712,7 +1713,7 @@ public abstract class AbstractGeometry implements Geometry {
 
   /**
    * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Coordinates Reference System.
+   * An example use might be to add an object representing a Point Reference System.
    * <p>
    * Note that user data objects are not present in geometries created by
    * construction methods.

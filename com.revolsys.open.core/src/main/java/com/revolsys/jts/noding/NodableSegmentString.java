@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * An interface for classes which support adding nodes to
@@ -48,5 +48,5 @@ public interface NodableSegmentString extends SegmentString {
    * @param intPt the location of the intersection
    * @param segmentIndex the index of the segment containing the intersection
    */
-  public void addIntersection(Coordinates intPt, int segmentIndex);
+  public void addIntersection(Point intPt, int segmentIndex);
 }

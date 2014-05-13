@@ -41,7 +41,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Quadrant;
 
 /**
@@ -73,7 +73,7 @@ public class DirectedEdge
   protected Edge parentEdge;
   protected Node from;
   protected Node to;
-  protected Coordinates p0, p1;
+  protected Point p0, p1;
   protected DirectedEdge sym = null;  // optional
   protected boolean edgeDirection;
   protected int quadrant;
@@ -91,7 +91,7 @@ public class DirectedEdge
    *   whether this DirectedEdge's direction is the same as or
    *   opposite to that of the parent Edge (if any)
    */
-  public DirectedEdge(Node from, Node to, Coordinates directionPt, boolean edgeDirection)
+  public DirectedEdge(Node from, Node to, Point directionPt, boolean edgeDirection)
   {
     this.from = from;
     this.to = to;
@@ -123,7 +123,7 @@ public class DirectedEdge
    * Returns a point to which an imaginary line is drawn from the from-node to
    * specify this DirectedEdge's orientation.
    */
-  public Coordinates getDirectionPt() { return p1; }
+  public Point getDirectionPt() { return p1; }
   /**
    * Returns whether the direction of the parent Edge (if any) is the same as that
    * of this Directed Edge.
@@ -140,7 +140,7 @@ public class DirectedEdge
   /**
    * Returns the coordinate of the from-node.
    */
-  public Coordinates getCoordinate() { return from.getCoordinate(); }
+  public Point getCoordinate() { return from.getCoordinate(); }
   /**
    * Returns the angle that the start of this DirectedEdge makes with the
    * positive x-axis, in radians.

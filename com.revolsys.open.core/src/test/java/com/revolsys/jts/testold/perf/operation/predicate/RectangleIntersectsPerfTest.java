@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -73,7 +73,7 @@ public class RectangleIntersectsPerfTest {
   public RectangleIntersectsPerfTest() {
   }
 
-  Geometry createRectangle(final Coordinates origin, final double size) {
+  Geometry createRectangle(final Point origin, final double size) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -115,7 +115,7 @@ public class RectangleIntersectsPerfTest {
     return rectList;
   }
 
-  Geometry createSineStar(final Coordinates origin, final double size,
+  Geometry createSineStar(final Point origin, final double size,
     final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
@@ -158,8 +158,8 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Coordinates origin = new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE);
+    final Point origin = new Coordinate((double)0, 0,
+      Point.NULL_ORDINATE);
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
     geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),

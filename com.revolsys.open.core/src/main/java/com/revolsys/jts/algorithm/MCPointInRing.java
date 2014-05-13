@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
@@ -61,9 +61,9 @@ import com.revolsys.jts.index.chain.MonotoneChainSelectAction;
 public class MCPointInRing implements PointInRing {
 
   class MCSelecter extends MonotoneChainSelectAction {
-    Coordinates p;
+    Point p;
 
-    public MCSelecter(final Coordinates p) {
+    public MCSelecter(final Point p) {
       this.p = p;
     }
 
@@ -103,7 +103,7 @@ public class MCPointInRing implements PointInRing {
   }
 
   @Override
-  public boolean isInside(final Coordinates pt) {
+  public boolean isInside(final Point pt) {
     crossings = 0;
 
     // test all segments intersected by ray from pt in positive x direction
@@ -131,7 +131,7 @@ public class MCPointInRing implements PointInRing {
     return false;
   }
 
-  private void testLineSegment(final Coordinates p, final LineSegment seg) {
+  private void testLineSegment(final Point p, final LineSegment seg) {
     double xInt; // x intersection of segment with ray
     double x1; // translated coordinates
     double y1;
@@ -141,8 +141,8 @@ public class MCPointInRing implements PointInRing {
     /*
      * Test if segment crosses ray from test point in positive x direction.
      */
-    final Coordinates p1 = seg.getP0();
-    final Coordinates p2 = seg.getP1();
+    final Point p1 = seg.getP0();
+    final Point p2 = seg.getP1();
     x1 = p1.getX() - p.getX();
     y1 = p1.getY() - p.getY();
     x2 = p2.getX() - p.getX();

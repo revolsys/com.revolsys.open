@@ -10,7 +10,7 @@ import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.saif.SaifConstants;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -39,7 +39,7 @@ public class ArcConverter implements OsnConverter {
     LineString geometry = null;
     while (attributeName != null) {
       if (attributeName.equals("pointList")) {
-        final List<Coordinates> coordinates = new ArrayList<Coordinates>();
+        final List<Point> coordinates = new ArrayList<Point>();
         while (iterator.next() != OsnIterator.END_LIST) {
           final String pointName = iterator.nextObjectName();
           if (!pointName.equals("/Point")) {

@@ -40,7 +40,7 @@ import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.Reader;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -53,7 +53,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
 /**
  * Models a collection of {@link Point}s.
  * <p>
- * Any collection of Points is a valid MultiPoint.
+ * Any collection of Point is a valid MultiPoint.
  *
  *@version 1.7
  */
@@ -120,7 +120,7 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
    *      at 0
    *@return    the <code>n</code>th <code>Coordinate</code>
    */
-  protected Coordinates getCoordinate(final int n) {
+  protected Point getCoordinate(final int n) {
     return getPoint(n);
   }
 
@@ -169,6 +169,11 @@ public class MultiPointImpl extends GeometryCollectionImpl implements
     } else {
       return new MultiPointVertex(this, vertexId);
     }
+  }
+
+  @Override
+  protected boolean isEquivalentClass(final Geometry other) {
+    return other instanceof MultiPoint;
   }
 
   @Override

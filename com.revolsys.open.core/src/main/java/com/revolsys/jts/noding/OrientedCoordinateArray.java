@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -84,7 +84,7 @@ public class OrientedCoordinateArray implements
    * If the sequence is a palindrome, it is defined to be
    * oriented in a positive direction.
    *
-   * @param points the array of Coordinates to test
+   * @param points the array of Point to test
    * @return <code>1</code> if the array is smaller at the start
    * or is a palindrome,
    * <code>-1</code> if smaller at the end

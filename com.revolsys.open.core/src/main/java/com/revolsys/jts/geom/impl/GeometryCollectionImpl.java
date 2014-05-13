@@ -160,6 +160,11 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
   }
 
   @Override
+  protected boolean isEquivalentClass(final Geometry other) {
+    return other instanceof GeometryCollection;
+  }
+
+  @Override
   public Reader<Segment> segments() {
     final GeometryCollectionSegment iterator = new GeometryCollectionSegment(
       this, -1);

@@ -60,7 +60,7 @@ import java.util.List;
  *
  * @version 1.7
  */
-public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
+public interface CoordinatesList extends Cloneable, Iterable<Point>,
   Serializable {
   /**
    * Standard ordinate index values
@@ -81,59 +81,59 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
    */
   CoordinatesList clone();
 
-  boolean contains(Coordinates point);
+  boolean contains(Point point);
 
-  double distance(int index, Coordinates point);
+  double distance(int index, Point point);
 
   double distance(int index, CoordinatesList other, int otherIndex);
 
-  boolean equal(int i, Coordinates point);
+  boolean equal(int i, Point point);
 
-  boolean equal(int i, Coordinates point, int axisCount);
+  boolean equal(int i, Point point, int axisCount);
 
   boolean equal(int index, CoordinatesList other, int otherIndex);
 
   boolean equal(int index, CoordinatesList other, int otherIndex, int axisCount);
 
-  boolean equal2d(int index, Coordinates point);
+  boolean equal2d(int index, Point point);
 
   boolean equals(CoordinatesList coordinatesList);
 
   boolean equals(CoordinatesList coordinatesList, int axisCount);
 
-  Coordinates get(int i);
+  Point get(int i);
 
   int getAxisCount();
 
   /**
    * Returns (possibly a copy of) the i'th coordinate in this sequence.
-   * Whether or not the Coordinates returned is the actual underlying
-   * Coordinates or merely a copy depends on the implementation.
+   * Whether or not the Point returned is the actual underlying
+   * Point or merely a copy depends on the implementation.
    * <p>
    * Note that in the future the semantics of this method may change
-   * to guarantee that the Coordinates returned is always a copy.
+   * to guarantee that the Point returned is always a copy.
    * Callers should not to assume that they can modify a CoordinatesList by
    * modifying the object returned by this method.
    *
    * @param i the index of the coordinate to retrieve
    * @return the i'th coordinate in the sequence
    */
-  Coordinates getCoordinate(int i);
+  Point getCoordinate(int i);
 
   /**
    * Returns a copy of the i'th coordinate in this sequence.
    * This method optimizes the situation where the caller is
    * going to make a copy anyway - if the implementation
-   * has already created a new Coordinates object, no further copy is needed.
+   * has already created a new Point object, no further copy is needed.
    *
    * @param i the index of the coordinate to retrieve
    * @return a copy of the i'th coordinate in the sequence
    */
-  Coordinates getCoordinateCopy(int i);
+  Point getCoordinateCopy(int i);
 
   double[] getCoordinates();
 
-  List<Coordinates> getList();
+  List<Point> getList();
 
   double getM(int index);
 
@@ -190,16 +190,16 @@ public interface CoordinatesList extends Cloneable, Iterable<Coordinates>,
     int count);
 
   /**
-   * Returns (possibly copies of) the Coordinates in this collection.
-   * Whether or not the Coordinates returned are the actual underlying
-   * Coordinates or merely copies depends on the implementation. Note that
+   * Returns (possibly copies of) the Point in this collection.
+   * Whether or not the Point returned are the actual underlying
+   * Point or merely copies depends on the implementation. Note that
    * if this implementation does not store its data as an array of Coordinates,
    * this method will incur a performance penalty because the array needs to
    * be built from scratch.
    *
    * @return a array of coordinates containing the point values in this sequence
    */
-  Coordinates[] toCoordinateArray();
+  Point[] toCoordinateArray();
 
-  List<Coordinates> toList();
+  List<Point> toList();
 }

@@ -34,7 +34,7 @@
 package com.revolsys.jts.simplify;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LinearRing;
@@ -95,8 +95,8 @@ public class DouglasPeuckerSimplifier {
       if (coords.size() == 0) {
         return coords;
       } else {
-        final Coordinates[] inputPts = coords.toCoordinateArray();
-        final Coordinates[] newPts = DouglasPeuckerLineSimplifier.simplify(
+        final Point[] inputPts = coords.toCoordinateArray();
+        final Point[] newPts = DouglasPeuckerLineSimplifier.simplify(
           inputPts, distanceTolerance);
         return new DoubleCoordinatesList(newPts);
       }

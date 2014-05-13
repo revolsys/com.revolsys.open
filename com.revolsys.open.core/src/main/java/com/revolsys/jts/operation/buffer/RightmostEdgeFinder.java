@@ -38,7 +38,7 @@ package com.revolsys.jts.operation.buffer;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
 import com.revolsys.jts.geomgraph.Edge;
@@ -54,10 +54,10 @@ import com.revolsys.jts.util.Assert;
  */
 class RightmostEdgeFinder {
 
-  // private Coordinates extremeCoord;
+  // private Point extremeCoord;
   private int minIndex = -1;
 
-  private Coordinates minCoord = null;
+  private Point minCoord = null;
 
   private DirectedEdge minDe = null;
 
@@ -77,7 +77,7 @@ class RightmostEdgeFinder {
       // non-horizontal segment
       // <FIX> MD 19 Sep 03 - NO! we can test all vertices, since the rightmost
       // must have a non-horiz segment adjacent to it
-      final Coordinates point = edge.getCoordinate(i);
+      final Point point = edge.getCoordinate(i);
       if (minCoord == null || point.getX() > minCoord.getX()) {
         minDe = de;
         minIndex = i;
@@ -141,8 +141,8 @@ class RightmostEdgeFinder {
     final Edge edge = minDe.getEdge();
     Assert.isTrue(minIndex > 0 && minIndex < edge.getNumPoints(),
       "rightmost point expected to be interior vertex of edge");
-    final Coordinates pPrev = edge.getCoordinate(minIndex - 1);
-    final Coordinates pNext = edge.getCoordinate(minIndex + 1);
+    final Point pPrev = edge.getCoordinate(minIndex - 1);
+    final Point pNext = edge.getCoordinate(minIndex + 1);
     final int orientation = CGAlgorithms.computeOrientation(minCoord, pNext,
       pPrev);
     boolean usePrev = false;
@@ -161,7 +161,7 @@ class RightmostEdgeFinder {
     }
   }
 
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return minCoord;
   }
 
@@ -190,8 +190,8 @@ class RightmostEdgeFinder {
     if (i < 0 || i + 1 >= edge.getNumPoints()) {
       return -1;
     }
-    final Coordinates p1 = edge.getCoordinate(i);
-    final Coordinates p2 = edge.getCoordinate(i + 1);
+    final Point p1 = edge.getCoordinate(i);
+    final Point p2 = edge.getCoordinate(i + 1);
     if (p1.getY() == p2.getY()) {
       return -1; // indicates edge is parallel to x-axis
     }

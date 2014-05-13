@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;
@@ -93,8 +93,8 @@ public class MCIndexSnapRounder implements Noder {
   /**
    * Snaps segments to nodes created by segment intersections.
    */
-  private void computeIntersectionSnaps(final Collection<Coordinates> snapPts) {
-    for (final Coordinates snapPt : snapPts) {
+  private void computeIntersectionSnaps(final Collection<Point> snapPts) {
+    for (final Point snapPt : snapPts) {
       final HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
       pointSnapper.snap(hotPixel);
     }
@@ -128,7 +128,7 @@ public class MCIndexSnapRounder implements Noder {
    */
   private void computeVertexSnaps(final NodedSegmentString segment) {
     final int i = 0;
-    for (final Coordinates point : segment.getPoints()) {
+    for (final Point point : segment.getPoints()) {
       final HotPixel hotPixel = new HotPixel(point, scaleFactor, li);
       final boolean isNodeAdded = pointSnapper.snap(hotPixel, segment, i);
       // if a node is created for a vertex, that vertex must be noded too
@@ -144,7 +144,7 @@ public class MCIndexSnapRounder implements Noder {
    *
    * Does NOT node the segStrings.
    *
-   * @return a list of Coordinates for the intersections
+   * @return a list of Point for the intersections
    */
   private List findInteriorIntersections(final Collection segStrings,
     final LineIntersector li) {

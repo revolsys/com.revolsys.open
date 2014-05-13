@@ -36,7 +36,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -92,7 +92,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     if (viewportGeometryFactory != null) {
       final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
 
-      Coordinates point = null;
+      Point point = null;
 
       double orientation = style.getTextOrientation();
       final String placementType = style.getTextPlacementType();
@@ -122,7 +122,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             }
             point = ProjectionFactory.convert(points.get(index),
               geometryFactory, viewportGeometryFactory);
-            final Coordinates p2 = ProjectionFactory.convert(
+            final Point p2 = ProjectionFactory.convert(
               points.get(index - 1), geometryFactory, viewportGeometryFactory);
             final double angle = Math.toDegrees(p2.angle2d(point));
             orientation += angle;
@@ -133,7 +133,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             }
             point = ProjectionFactory.convert(points.get(index),
               geometryFactory, viewportGeometryFactory);
-            final Coordinates p2 = ProjectionFactory.convert(
+            final Point p2 = ProjectionFactory.convert(
               points.get(index + 1), geometryFactory, viewportGeometryFactory);
             final double angle = Math.toDegrees(point.angle2d(p2));
             orientation += angle;
@@ -145,8 +145,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             final double centreLength = totalLength / 2;
             double currentLength = 0;
             for (int i = 1; i < numPoints && currentLength < centreLength; i++) {
-              Coordinates p1 = points.get(i - 1);
-              Coordinates p2 = points.get(i);
+              Point p1 = points.get(i - 1);
+              Point p2 = points.get(i);
               final double segmentLength = p1.distance(p2);
               if (segmentLength + currentLength >= centreLength) {
                 p1 = ProjectionFactory.convert(p1, geometryFactory,

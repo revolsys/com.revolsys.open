@@ -34,7 +34,7 @@
 package com.revolsys.jts.index.kdtree;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A node of a {@link KdTree}, which represents one or more points in the same location.
@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.Coordinates;
  */
 public class KdNode {
 
-  private Coordinates p = null;
+  private Point p = null;
 
   private final Object data;
 
@@ -59,7 +59,7 @@ public class KdNode {
    * @param p point location of new node
    * @param data a data objects to associate with this node
    */
-  public KdNode(final Coordinates p, final Object data) {
+  public KdNode(final Point p, final Object data) {
     this.p = new Coordinate(p);
     left = null;
     right = null;
@@ -75,7 +75,7 @@ public class KdNode {
    * @param data a data objects to associate with this node
    */
   public KdNode(final double _x, final double _y, final Object data) {
-    p = new Coordinate(_x, _y, Coordinates.NULL_ORDINATE);
+    p = new Coordinate(_x, _y, Point.NULL_ORDINATE);
     left = null;
     right = null;
     count = 1;
@@ -87,7 +87,7 @@ public class KdNode {
    * 
    * @return p location of this node
    */
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return p;
   }
 

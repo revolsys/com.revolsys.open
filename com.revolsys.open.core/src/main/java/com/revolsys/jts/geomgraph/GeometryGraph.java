@@ -42,7 +42,6 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -115,7 +114,7 @@ public class GeometryGraph extends PlanarGraph {
 
   private boolean hasTooFewPoints = false;
 
-  private Coordinates invalidPoint = null;
+  private Point invalidPoint = null;
 
   private PointOnGeometryLocator areaPtLocator = null;
 
@@ -207,16 +206,8 @@ public class GeometryGraph extends PlanarGraph {
    * Add a point computed externally.  The point is assumed to be a
    * Point Geometry part, which has a location of INTERIOR.
    */
-  public void addPoint(final Coordinates pt) {
+  public void addPoint(final Point pt) {
     insertPoint(argIndex, pt, Location.INTERIOR);
-  }
-
-  /**
-   * Add a Point to the graph.
-   */
-  private void addPoint(final Point p) {
-    final Coordinates coord = p.getCoordinate();
-    insertPoint(argIndex, coord, Location.INTERIOR);
   }
 
   private void addPolygon(final Polygon p) {
@@ -275,8 +266,8 @@ public class GeometryGraph extends PlanarGraph {
    * is a boundary) then insert it as a potential boundary node.
    * Otherwise, just add it as a regular node.
    */
-  private void addSelfIntersectionNode(final int argIndex,
-    final Coordinates coord, final Location loc) {
+  private void addSelfIntersectionNode(final int argIndex, final Point coord,
+    final Location loc) {
     // if this node is already a boundary node, don't change it
     if (isBoundaryNode(argIndex, coord)) {
       return;
@@ -372,9 +363,9 @@ public class GeometryGraph extends PlanarGraph {
     return boundaryNodes;
   }
 
-  public Coordinates[] getBoundaryPoints() {
+  public Point[] getBoundaryPoints() {
     final Collection<Node> nodes = getBoundaryNodes();
-    final Coordinates[] points = new Coordinates[nodes.size()];
+    final Point[] points = new Point[nodes.size()];
     int i = 0;
     for (final Node node : nodes) {
       points[i++] = node.getCoordinate().cloneCoordinates();
@@ -386,7 +377,7 @@ public class GeometryGraph extends PlanarGraph {
     return geometry;
   }
 
-  public Coordinates getInvalidPoint() {
+  public Point getInvalidPoint() {
     return invalidPoint;
   }
 
@@ -416,7 +407,7 @@ public class GeometryGraph extends PlanarGraph {
    * This is used to add the boundary
    * points of dim-1 geometries (Curves/MultiCurves).
    */
-  private void insertBoundaryPoint(final int argIndex, final Coordinates coord) {
+  private void insertBoundaryPoint(final int argIndex, final Point coord) {
     final NodeMap nodes = getNodeMap();
     final Node n = nodes.addNode(coord);
     // nodes always have labels
@@ -436,7 +427,7 @@ public class GeometryGraph extends PlanarGraph {
     lbl.setLocation(argIndex, newLoc);
   }
 
-  private void insertPoint(final int argIndex, final Coordinates coord,
+  private void insertPoint(final int argIndex, final Point coord,
     final Location onLocation) {
     final NodeMap nodes = getNodeMap();
     final Node n = nodes.addNode(coord);
@@ -456,7 +447,7 @@ public class GeometryGraph extends PlanarGraph {
    * @param p the point to test
    * @return the location of the point in the geometry
    */
-  public Location locate(final Coordinates pt) {
+  public Location locate(final Point pt) {
     if (geometry instanceof Polygonal && geometry.getGeometryCount() > 50) {
       // lazily init point locator
       if (areaPtLocator == null) {

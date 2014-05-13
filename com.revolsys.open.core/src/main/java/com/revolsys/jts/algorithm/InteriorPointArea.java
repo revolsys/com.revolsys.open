@@ -35,7 +35,7 @@ package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -76,7 +76,7 @@ public class InteriorPointArea {
   }
 
   private GeometryFactory factory;
-  private Coordinates interiorPoint = null;
+  private Point interiorPoint = null;
   private double maxWidth = 0.0;
 
   /**
@@ -96,7 +96,7 @@ public class InteriorPointArea {
    * 
    * @return the coordinate of an interior point
    */
-  public Coordinates getInteriorPoint()
+  public Point getInteriorPoint()
   {
     return interiorPoint;
   }
@@ -129,7 +129,7 @@ public class InteriorPointArea {
     if (geometry.isEmpty())
       return;
     
-    Coordinates intPt;
+    Point intPt;
     double width = 0;
     
     LineString bisector = horizontalBisector(geometry);
@@ -185,9 +185,9 @@ public class InteriorPointArea {
     //double avgY = avg(envelope.getMinY(), envelope.getMaxY());
     
     double bisectY = SafeBisectorFinder.getBisectorY((Polygon) geometry);
-    return factory.lineString(new Coordinates[] {
-            new Coordinate((double)envelope.getMinX(), bisectY, Coordinates.NULL_ORDINATE),
-            new Coordinate((double)envelope.getMaxX(), bisectY, Coordinates.NULL_ORDINATE)
+    return factory.lineString(new Point[] {
+            new Coordinate((double)envelope.getMinX(), bisectY, Point.NULL_ORDINATE),
+            new Coordinate((double)envelope.getMaxX(), bisectY, Point.NULL_ORDINATE)
         });
   }
 
@@ -196,10 +196,10 @@ public class InteriorPointArea {
    * @param envelope the envelope to analyze
    * @return the centre of the envelope
    */
-  public static Coordinates centre(BoundingBox envelope) {
+  public static Point centre(BoundingBox envelope) {
       return new Coordinate((double)avg(envelope.getMinX(),
               envelope.getMaxX()),
-          avg(envelope.getMinY(), envelope.getMaxY()), Coordinates.NULL_ORDINATE);
+          avg(envelope.getMinY(), envelope.getMaxY()), Point.NULL_ORDINATE);
   }
 
   /**

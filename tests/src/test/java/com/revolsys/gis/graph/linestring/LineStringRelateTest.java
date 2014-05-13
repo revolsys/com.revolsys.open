@@ -7,7 +7,7 @@ import org.junit.Test;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.gis.model.coordinates.SimpleGeometryFactory;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.wkt.WktParser;

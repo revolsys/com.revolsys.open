@@ -35,7 +35,7 @@ package com.revolsys.jts.densify;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -79,14 +79,14 @@ public class Densifier extends GeometryTransformer {
 
   private static LinearRing densify(final LinearRing line,
     final double distanceTolerance) {
-    final List<Coordinates> points = densifyPoints(line, distanceTolerance);
+    final List<Point> points = densifyPoints(line, distanceTolerance);
     final GeometryFactory geometryFactory = line.getGeometryFactory();
     return geometryFactory.linearRing(points);
   }
 
   private static LineString densify(final LineString line,
     final double distanceTolerance) {
-    final List<Coordinates> points = densifyPoints(line, distanceTolerance);
+    final List<Point> points = densifyPoints(line, distanceTolerance);
     final GeometryFactory geometryFactory = line.getGeometryFactory();
     return geometryFactory.lineString(points);
   }
@@ -173,9 +173,9 @@ public class Densifier extends GeometryTransformer {
    * @param distanceTolerance
    * @return the densified coordinate sequence
    */
-  private static List<Coordinates> densifyPoints(final LineString line,
+  private static List<Point> densifyPoints(final LineString line,
     final double distanceTolerance) {
-    final List<Coordinates> points = new ArrayList<Coordinates>();
+    final List<Point> points = new ArrayList<Point>();
 
     for (final Segment segment : line.segments()) {
       if (points.isEmpty()) {
@@ -188,7 +188,7 @@ public class Densifier extends GeometryTransformer {
           final double densifiedSegLen = length / densifiedSegCount;
           for (int j = 1; j < densifiedSegCount; j++) {
             final double segFract = (j * densifiedSegLen) / length;
-            final Coordinates point = segment.pointAlong(segFract);
+            final Point point = segment.pointAlong(segFract);
             if (!segment.contains(point)) {
               points.add(point.cloneCoordinates());
             }

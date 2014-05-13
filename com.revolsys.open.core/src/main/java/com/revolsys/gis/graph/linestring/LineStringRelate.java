@@ -10,7 +10,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -24,15 +24,15 @@ public class LineStringRelate {
 
   private final LineStringGraph graph1;
 
-  private final Coordinates fromPoint1;
+  private final Point fromPoint1;
 
-  private final Coordinates fromPoint2;
+  private final Point fromPoint2;
 
   private final LineStringGraph graph2;
 
-  private final Coordinates toPoint1;
+  private final Point toPoint1;
 
-  private final Coordinates toPoint2;
+  private final Point toPoint2;
 
   public LineStringRelate(final LineString line1, final LineString line2) {
     this(line1, line2, 1);
@@ -46,7 +46,7 @@ public class LineStringRelate {
     graph1 = new LineStringGraph(geometryFactory, line1);
     graph2 = new LineStringGraph(geometryFactory, line2);
 
-    final Map<Coordinates, Coordinates> movedNodes = new HashMap<Coordinates, Coordinates>();
+    final Map<Point, Point> movedNodes = new HashMap<Point, Point>();
     final InvokeMethodVisitor<Node<LineSegment>> moveNodesVisitor1 = new InvokeMethodVisitor<Node<LineSegment>>(
       graph2, "movePointsWithinTolerance", movedNodes, tolerance);
     graph1.visitNodes(moveNodesVisitor1);
@@ -77,10 +77,10 @@ public class LineStringRelate {
     return line2;
   }
 
-  public Coordinates getMovedCoordinate(
-    final Map<Coordinates, Coordinates> movedNodes, final LineString line,
+  public Point getMovedCoordinate(
+    final Map<Point, Point> movedNodes, final LineString line,
     final int i) {
-    final Coordinates coordinates = CoordinatesListUtil.get(line, i);
+    final Point coordinates = CoordinatesListUtil.get(line, i);
     if (movedNodes.containsKey(coordinates)) {
       return movedNodes.get(coordinates);
     } else {
@@ -89,9 +89,9 @@ public class LineStringRelate {
   }
 
   public MultiLineString getOverlap() {
-    final List<List<Coordinates>> intersections = new ArrayList<>();
+    final List<List<Point>> intersections = new ArrayList<>();
     final CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    final List<Coordinates> currentCoordinates = new ArrayList<>();
+    final List<Point> currentCoordinates = new ArrayList<>();
     Node<LineSegment> previousNode = graph1.getNode(fromPoint1);
     do {
       final List<Edge<LineSegment>> outEdges = previousNode.getOutEdges();
@@ -113,7 +113,7 @@ public class LineStringRelate {
           currentCoordinates.add(line.get(1));
         } else {
           if (currentCoordinates.size() > 0) {
-            final List<Coordinates> points = new ArrayList<>();
+            final List<Point> points = new ArrayList<>();
             intersections.add(points);
             currentCoordinates.clear();
           }
@@ -123,7 +123,7 @@ public class LineStringRelate {
 
     } while (previousNode != null && !previousNode.equals2d(fromPoint1));
     if (currentCoordinates.size() > 0) {
-      final List<Coordinates> points = new ArrayList<>();
+      final List<Point> points = new ArrayList<>();
       intersections.add(points);
     }
     final GeometryFactory factory = GeometryFactory.getFactory(line1);
@@ -216,8 +216,8 @@ public class LineStringRelate {
   }
 
   private boolean isWithin(final LineStringGraph graph,
-    final Coordinates fromPoint, final Coordinates toPoint,
-    final Coordinates point, final double maxDistance) {
+    final Point fromPoint, final Point toPoint,
+    final Point point, final double maxDistance) {
     if (point.distance(fromPoint) < maxDistance) {
       return false;
     } else if (point.distance(toPoint) < maxDistance) {
@@ -238,11 +238,11 @@ public class LineStringRelate {
     return false;
   }
 
-  public boolean isWithin1(final Coordinates point, final double maxDistance) {
+  public boolean isWithin1(final Point point, final double maxDistance) {
     return isWithin(graph1, fromPoint1, toPoint1, point, maxDistance);
   }
 
-  public boolean isWithin2(final Coordinates point, final double maxDistance) {
+  public boolean isWithin2(final Point point, final double maxDistance) {
     return isWithin(graph2, fromPoint2, toPoint2, point, maxDistance);
   }
 

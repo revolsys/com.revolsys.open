@@ -34,7 +34,7 @@
 package com.revolsys.jts.geom.util;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.util.Assert;
 
@@ -302,9 +302,9 @@ public class AffineTransformation implements Cloneable
    * @param dest2 the mapped point for source point 2
    * 
    */
-  public AffineTransformation(final Coordinates src0, final Coordinates src1,
-    final Coordinates src2, final Coordinates dest0, final Coordinates dest1,
-    final Coordinates dest2) {
+  public AffineTransformation(final Point src0, final Point src1,
+    final Point src2, final Point dest0, final Point dest1,
+    final Point dest2) {
   }
 
   /**
@@ -1069,7 +1069,7 @@ public class AffineTransformation implements Cloneable
    * @param dest the coordinate to accept the results 
    * @return the <tt>dest</tt> coordinate
    */
-  public Coordinates transform(final Coordinates src) {
+  public Point transform(final Point src) {
     final double xp = m00 * src.getX() + m01 * src.getY() + m02;
     final double yp = m10 * src.getX() + m11 * src.getY() + m12;
     return new DoubleCoordinates(xp, yp);

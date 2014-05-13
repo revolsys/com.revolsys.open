@@ -35,7 +35,7 @@ package com.revolsys.jts.util;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -64,22 +64,22 @@ import com.revolsys.jts.geom.util.AffineTransformation;
  */
 public class GeometricShapeFactory {
   protected class Dimensions {
-    public Coordinates base;
+    public Point base;
 
-    public Coordinates centre;
+    public Point centre;
 
     public double width;
 
     public double height;
 
-    public Coordinates getBase() {
+    public Point getBase() {
       return base;
     }
 
-    public Coordinates getCentre() {
+    public Point getCentre() {
       if (centre == null) {
         centre = new Coordinate(base.getX() + width / 2, base.getY() + height
-          / 2, Coordinates.NULL_ORDINATE);
+          / 2, Point.NULL_ORDINATE);
       }
       return centre;
     }
@@ -108,11 +108,11 @@ public class GeometricShapeFactory {
       return width;
     }
 
-    public void setBase(final Coordinates base) {
+    public void setBase(final Point base) {
       this.base = base;
     }
 
-    public void setCentre(final Coordinates centre) {
+    public void setCentre(final Point centre) {
       this.centre = centre;
     }
 
@@ -167,14 +167,14 @@ public class GeometricShapeFactory {
     this.geomFact = geomFact;
   }
 
-  protected Coordinates coord(final double x, final double y) {
-    final Coordinates point = new DoubleCoordinates(geomFact.makePrecise(0, x),
+  protected Point coord(final double x, final double y) {
+    final Point point = new DoubleCoordinates(geomFact.makePrecise(0, x),
       geomFact.makePrecise(1, y));
     return point;
   }
 
-  protected Coordinates coordTrans(final double x, final double y,
-    final Coordinates trans) {
+  protected Point coordTrans(final double x, final double y,
+    final Point trans) {
     return coord(x + trans.getX(), y + trans.getY());
   }
 
@@ -202,7 +202,7 @@ public class GeometricShapeFactory {
     }
     final double angInc = angSize / (nPts - 1);
 
-    final Coordinates[] pts = new Coordinates[nPts];
+    final Point[] pts = new Point[nPts];
     int iPt = 0;
     for (int i = 0; i < nPts; i++) {
       final double ang = startAng + i * angInc;
@@ -239,7 +239,7 @@ public class GeometricShapeFactory {
     // double check = angInc * nPts;
     // double checkEndAng = startAng + check;
 
-    final Coordinates[] pts = new Coordinates[nPts + 2];
+    final Point[] pts = new Point[nPts + 2];
 
     int iPt = 0;
     pts[iPt++] = coord(centreX, centreY);
@@ -282,7 +282,7 @@ public class GeometricShapeFactory {
     final double centreX = env.getMinX() + xRadius;
     final double centreY = env.getMinY() + yRadius;
 
-    final Coordinates[] pts = new Coordinates[nPts + 1];
+    final Point[] pts = new Point[nPts + 1];
     int iPt = 0;
     for (int i = 0; i < nPts; i++) {
       final double ang = i * (2 * Math.PI / nPts);
@@ -313,7 +313,7 @@ public class GeometricShapeFactory {
     final double XsegLen = dim.getEnvelope().getWidth() / nSide;
     final double YsegLen = dim.getEnvelope().getHeight() / nSide;
 
-    final Coordinates[] pts = new Coordinates[4 * nSide + 1];
+    final Point[] pts = new Point[4 * nSide + 1];
     final BoundingBox env = dim.getEnvelope();
 
     // double maxx = env.getMinX() + nSide * XsegLen;
@@ -371,7 +371,7 @@ public class GeometricShapeFactory {
     final double recipPow = 1.0 / power;
 
     final double radius = dim.getMinSize() / 2;
-    final Coordinates centre = dim.getCentre();
+    final Point centre = dim.getCentre();
 
     final double r4 = Math.pow(radius, power);
     final double y0 = radius;
@@ -380,7 +380,7 @@ public class GeometricShapeFactory {
 
     final int nSegsInOct = nPts / 8;
     final int totPts = nSegsInOct * 8 + 1;
-    final Coordinates[] pts = new Coordinates[totPts];
+    final Point[] pts = new Point[totPts];
     final double xInc = xyInt / nSegsInOct;
 
     for (int i = 0; i <= nSegsInOct; i++) {
@@ -426,7 +426,7 @@ public class GeometricShapeFactory {
    *
    * @param base the base coordinate of the shape
    */
-  public void setBase(final Coordinates base) {
+  public void setBase(final Point base) {
     dim.setBase(base);
   }
 
@@ -436,7 +436,7 @@ public class GeometricShapeFactory {
    *
    * @param centre the centre coordinate of the shape
    */
-  public void setCentre(final Coordinates centre) {
+  public void setCentre(final Point centre) {
     dim.setCentre(centre);
   }
 

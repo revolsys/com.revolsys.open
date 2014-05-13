@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Label;
@@ -65,7 +65,7 @@ public class PointBuilder {
    * Computes the Point geometries which will appear in the result,
    * given the specified overlay operation.
    *
-   * @return a list of the Points objects in the result
+   * @return a list of the Point objects in the result
    */
   public List<Point> build(final int opCode) {
     extractNonCoveredResultNodes(opCode);
@@ -127,7 +127,7 @@ public class PointBuilder {
    * @param n the node to test
    */
   private void filterCoveredNodeToPoint(final Node n) {
-    final Coordinates coord = n.getCoordinate();
+    final Point coord = n.getCoordinate();
     if (!op.isCoveredByLA(coord)) {
       final Point pt = geometryFactory.point(coord);
       resultPointList.add(pt);

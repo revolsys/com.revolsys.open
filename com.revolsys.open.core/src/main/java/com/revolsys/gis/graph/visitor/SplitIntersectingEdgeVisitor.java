@@ -19,7 +19,7 @@ import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -46,17 +46,17 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
   private List<LineString> getSplitLines(
     final LineMatchGraph<LineSegmentMatch> graph, final LineString line,
     final int index) {
-    final Coordinates startCoordinate = CoordinatesUtil.get(line);
+    final Point startCoordinate = CoordinatesUtil.get(line);
     Node<LineSegmentMatch> currentNode = graph.findNode(startCoordinate);
     final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
     boolean started = false;
     boolean matched = false;
-    final List<Coordinates> coordinates = new ArrayList<Coordinates>();
+    final List<Point> coordinates = new ArrayList<Point>();
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
     final List<LineString> lines = new ArrayList<LineString>();
 
     while (currentNode != null) {
-      final Coordinates coordinate = currentNode;
+      final Point coordinate = currentNode;
       coordinates.add(coordinate);
       final Edge<LineSegmentMatch> edge = graph.getUnprocessedEdgeWithSegment(
         currentNode, index, processedEdges);

@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
@@ -140,7 +140,7 @@ public class PolygonBuilder {
    * Checks the current set of shells (with their associated holes) to
    * see if any of them contain the point.
    */
-  public boolean containsPoint(final Coordinates point) {
+  public boolean containsPoint(final Point point) {
     for (final EdgeRing shell : shellList) {
       if (shell.containsPoint(point)) {
         return true;
@@ -167,7 +167,7 @@ public class PolygonBuilder {
     final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getLinearRing();
     final BoundingBox testEnv = testRing.getBoundingBox();
-    final Coordinates testPt = testRing.getCoordinate(0);
+    final Point testPt = testRing.getCoordinate(0);
 
     EdgeRing minShell = null;
     BoundingBox minEnv = null;

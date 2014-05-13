@@ -33,7 +33,7 @@
  */
 package com.revolsys.jts.operation.polygonize;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.planargraph.DirectedEdge;
 import com.revolsys.jts.planargraph.Node;
 
@@ -63,7 +63,7 @@ class PolygonizeDirectedEdge
    *                  whether this DirectedEdge's direction is the same as or
    *                  opposite to that of the parent Edge (if any)
    */
-  public PolygonizeDirectedEdge(Node from, Node to, Coordinates directionPt,
+  public PolygonizeDirectedEdge(Node from, Node to, Point directionPt,
       boolean edgeDirection)
   {
     super(from, to, directionPt, edgeDirection);

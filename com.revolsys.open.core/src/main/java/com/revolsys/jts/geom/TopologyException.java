@@ -39,25 +39,25 @@ package com.revolsys.jts.geom;
  * @version 1.7
  */
 public class TopologyException extends RuntimeException {
-  private static String msgWithCoord(final String msg, final Coordinates pt) {
+  private static String msgWithCoord(final String msg, final Point pt) {
     if (pt != null) {
       return msg + " [ " + pt + " ]";
     }
     return msg;
   }
 
-  private Coordinates pt = null;
+  private Point pt = null;
 
   public TopologyException(final String msg) {
     super(msg);
   }
 
-  public TopologyException(final String msg, final Coordinates pt) {
+  public TopologyException(final String msg, final Point pt) {
     super(msgWithCoord(msg, pt));
     this.pt = new Coordinate(pt);
   }
 
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return pt;
   }
 

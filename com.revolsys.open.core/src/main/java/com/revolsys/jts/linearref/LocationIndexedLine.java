@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
@@ -97,9 +97,9 @@ public class LocationIndexedLine {
    * the Z-ordinates of the line segment containing it, if they exist.
    *
    * @param index the index of the desired point
-   * @return the Coordinates at the given index
+   * @return the Point at the given index
    */
-  public Coordinates extractPoint(final LinearLocation index) {
+  public Point extractPoint(final LinearLocation index) {
     return index.getCoordinate(linearGeom);
   }
 
@@ -117,9 +117,9 @@ public class LocationIndexedLine {
    * @param index the index of the desired point
    * @param offsetDistance the distance the point is offset from the segment
    *    (positive is to the left, negative is to the right)
-   * @return the Coordinates at the given index
+   * @return the Point at the given index
    */
-  public Coordinates extractPoint(final LinearLocation index,
+  public Point extractPoint(final LinearLocation index,
     final double offsetDistance) {
     final LinearLocation indexLow = index.toLowest(linearGeom);
     return indexLow.getSegment(linearGeom).pointAlongOffset(
@@ -153,9 +153,9 @@ public class LocationIndexedLine {
    *
    * @param pt a point on the line
    * @return the index of the point
-   * @see #project(Coordinates)
+   * @see #project(Point)
    */
-  public LinearLocation indexOf(final Coordinates pt) {
+  public LinearLocation indexOf(final Point pt) {
     return LocationIndexOfPoint.indexOf(linearGeom, pt);
   }
 
@@ -179,9 +179,9 @@ public class LocationIndexedLine {
    * @param minIndex the value the returned index must be greater than
    * @return the index of the point greater than the given minimum index
    *
-   * @see #project(Coordinates)
+   * @see #project(Point)
    */
-  public LinearLocation indexOfAfter(final Coordinates pt,
+  public LinearLocation indexOfAfter(final Point pt,
     final LinearLocation minIndex) {
     return LocationIndexOfPoint.indexOfAfter(linearGeom, pt, minIndex);
   }
@@ -218,7 +218,7 @@ public class LocationIndexedLine {
    * @param pt a point on the line
    * @return the index of the point
    */
-  public LinearLocation project(final Coordinates pt) {
+  public LinearLocation project(final Point pt) {
     return LocationIndexOfPoint.indexOf(linearGeom, pt);
   }
 }

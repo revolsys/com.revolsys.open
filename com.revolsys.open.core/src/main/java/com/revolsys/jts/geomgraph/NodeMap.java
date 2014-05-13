@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Location;
 
 /**
@@ -48,7 +48,7 @@ import com.revolsys.jts.geom.Location;
  */
 public class NodeMap implements Iterable<Node> {
   // Map nodeMap = new HashMap();
-  Map<Coordinates, Node> nodeMap = new TreeMap<>();
+  Map<Point, Node> nodeMap = new TreeMap<>();
 
   NodeFactory nodeFact;
 
@@ -62,7 +62,7 @@ public class NodeMap implements Iterable<Node> {
    * Adds the EdgeEnd to the (possibly new) node.
    */
   public void add(final EdgeEnd e) {
-    final Coordinates p = e.getCoordinate();
+    final Point p = e.getCoordinate();
     final Node n = addNode(p);
     n.add(e);
   }
@@ -71,12 +71,12 @@ public class NodeMap implements Iterable<Node> {
    * Factory function - subclasses can override to create their own types of nodes
    */
   /*
-   * protected Node createNode(Coordinates coord) { return new Node(coord); }
+   * protected Node createNode(Point coord) { return new Node(coord); }
    */
   /**
    * This method expects that a node has a coordinate value.
    */
-  public Node addNode(final Coordinates coord) {
+  public Node addNode(final Point coord) {
     Node node = nodeMap.get(coord);
     if (node == null) {
       node = nodeFact.createNode(coord);
@@ -98,7 +98,7 @@ public class NodeMap implements Iterable<Node> {
   /**
    * @return the node if found; null otherwise
    */
-  public Node find(final Coordinates coord) {
+  public Node find(final Point coord) {
     return nodeMap.get(coord);
   }
 

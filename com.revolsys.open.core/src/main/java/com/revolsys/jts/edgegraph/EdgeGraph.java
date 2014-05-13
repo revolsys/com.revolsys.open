@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A graph comprised of {@link HalfEdge}s.
@@ -14,9 +14,9 @@ import com.revolsys.jts.geom.Coordinates;
  * <p>
  * This class may be subclassed to use a 
  * different subclass of HalfEdge,
- * by overriding {@link #createEdge(Coordinates)}.
+ * by overriding {@link #createEdge(Point)}.
  * If additional logic is required to initialize
- * edges then {@link EdgeGraph#addEdge(Coordinates, Coordinates)}
+ * edges then {@link EdgeGraph#addEdge(Coordinates, Point)}
  * can be overridden as well.
  * 
  * @author Martin Davis
@@ -36,7 +36,7 @@ public class EdgeGraph {
    * @param dest the edge destination location.
    * @return the created edge
    */
-  public HalfEdge addEdge(final Coordinates orig, final Coordinates dest) {
+  public HalfEdge addEdge(final Point orig, final Point dest) {
     final int cmp = dest.compareTo(orig);
     // ignore zero-length edges
     if (cmp == 0) {
@@ -61,7 +61,7 @@ public class EdgeGraph {
     return e;
   }
 
-  private HalfEdge create(final Coordinates p0, final Coordinates p1) {
+  private HalfEdge create(final Point p0, final Point p1) {
     final HalfEdge e0 = createEdge(p0);
     final HalfEdge e1 = createEdge(p1);
     HalfEdge.init(e0, e1);
@@ -75,7 +75,7 @@ public class EdgeGraph {
    * @param orig the origin location
    * @return a new HalfEdge with the given origin
    */
-  protected HalfEdge createEdge(final Coordinates orig) {
+  protected HalfEdge createEdge(final Point orig) {
     return new HalfEdge(orig);
   }
 
@@ -87,7 +87,7 @@ public class EdgeGraph {
    * @param dest the destination location.
    * @return an edge with the given orig and dest, or null if none exists
    */
-  public HalfEdge findEdge(final Coordinates orig, final Coordinates dest) {
+  public HalfEdge findEdge(final Point orig, final Point dest) {
     final HalfEdge e = (HalfEdge)vertexMap.get(orig);
     if (e == null) {
       return null;
@@ -107,7 +107,7 @@ public class EdgeGraph {
    * @param eAdj an existing edge with same orig (if any)
    * @return the created edge
    */
-  private HalfEdge insert(final Coordinates orig, final Coordinates dest,
+  private HalfEdge insert(final Point orig, final Point dest,
     final HalfEdge eAdj) {
     // edge does not exist, so create it and insert in graph
     final HalfEdge e = create(orig, dest);

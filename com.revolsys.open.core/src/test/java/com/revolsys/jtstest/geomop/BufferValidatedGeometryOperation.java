@@ -33,7 +33,7 @@
 package com.revolsys.jtstest.geomop;
 
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 import com.revolsys.jts.util.Assert;
@@ -109,7 +109,7 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
       distance, buffer);
     if (!bufValidator.isValid()) {
       final String errorMsg = bufValidator.getErrorMessage();
-      final Coordinates errorLoc = bufValidator.getErrorLocation();
+      final Point errorLoc = bufValidator.getErrorLocation();
       reportError(errorMsg, errorLoc);
     }
   }
@@ -195,7 +195,7 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
     }
   }
 
-  private void reportError(final String msg, final Coordinates loc) {
+  private void reportError(final String msg, final Point loc) {
     String locStr = "";
     if (loc != null) {
       locStr = " at " + WktWriter.point(loc);

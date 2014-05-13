@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -95,7 +95,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segmentIndex the index of the segment containing the intersection
    */
   @Override
-  public void addIntersection(final Coordinates point, final int segmentIndex) {
+  public void addIntersection(final Point point, final int segmentIndex) {
     addIntersectionNode(point, segmentIndex);
   }
 
@@ -107,7 +107,7 @@ public class NodedSegmentString implements NodableSegmentString {
    */
   public void addIntersection(final LineIntersector li, final int segmentIndex,
     final int geomIndex, final int intIndex) {
-    final Coordinates point = new Coordinate(li.getIntersection(intIndex));
+    final Point point = new Coordinate(li.getIntersection(intIndex));
     addIntersection(point, segmentIndex);
   }
 
@@ -120,13 +120,13 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param segmentIndex the index of the segment containing the intersection
    * @return the intersection node for the point
    */
-  public SegmentNode addIntersectionNode(final Coordinates point,
+  public SegmentNode addIntersectionNode(final Point point,
     final int segmentIndex) {
     int normalizedSegmentIndex = segmentIndex;
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < size()) {
-      final Coordinates nextPt = getCoordinate(nextSegIndex);
+      final Point nextPt = getCoordinate(nextSegIndex);
 
       // Normalize segment index if point falls on vertex
       // The check for point equality is 2D only - Z values are ignored
@@ -153,7 +153,7 @@ public class NodedSegmentString implements NodableSegmentString {
   }
 
   @Override
-  public Coordinates getCoordinate(final int i) {
+  public Point getCoordinate(final int i) {
     return points.get(i);
   }
 
@@ -196,7 +196,7 @@ public class NodedSegmentString implements NodableSegmentString {
     return getCoordinate(0).equals(getCoordinate(size() - 1));
   }
 
-  private int safeOctant(final Coordinates p0, final Coordinates p1) {
+  private int safeOctant(final Point p0, final Point p1) {
     if (p0.equals2d(p1)) {
       return 0;
     }

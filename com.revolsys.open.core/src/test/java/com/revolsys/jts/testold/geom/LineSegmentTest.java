@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.io.WKTReader;
@@ -49,8 +49,8 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class LineSegmentTest extends TestCase {
 
-  public static boolean equalsTolerance(final Coordinates p0,
-    final Coordinates p1, final double tolerance) {
+  public static boolean equalsTolerance(final Point p0,
+    final Point p1, final double tolerance) {
     if (Math.abs(p0.getX() - p1.getX()) > tolerance) {
       return false;
     }
@@ -76,10 +76,10 @@ public class LineSegmentTest extends TestCase {
     final double y1, final double segFrac, final double offset,
     final double expectedX, final double expectedY) {
     final LineSegment seg = new LineSegmentImpl(2, x0, y0, x1, y1);
-    final Coordinates p = seg.pointAlongOffset(segFrac, offset);
+    final Point p = seg.pointAlongOffset(segFrac, offset);
 
     assertTrue(equalsTolerance(new Coordinate((double)expectedX, expectedY,
-      Coordinates.NULL_ORDINATE), p, 0.000001));
+      Point.NULL_ORDINATE), p, 0.000001));
   }
 
   void checkOrientationIndex(final double x0, final double y0, final double x1,
@@ -98,7 +98,7 @@ public class LineSegmentTest extends TestCase {
 
   void checkOrientationIndex(final LineSegment seg, final double px,
     final double py, final int expectedOrient) {
-    final Coordinates p = new Coordinate((double)px, py, Coordinates.NULL_ORDINATE);
+    final Point p = new Coordinate((double)px, py, Point.NULL_ORDINATE);
     final int orient = seg.orientationIndex(p);
     assertTrue(orient == expectedOrient);
   }
@@ -149,11 +149,11 @@ public class LineSegmentTest extends TestCase {
     // zero-length line
     final LineSegment seg = new LineSegmentImpl(2, 10, 0, 10, 0);
     assertTrue(Double.isNaN(seg.projectionFactor(new Coordinate((double)11.0, 0,
-      Coordinates.NULL_ORDINATE))));
+      Point.NULL_ORDINATE))));
 
     final LineSegment seg2 = new LineSegmentImpl(2, 10, 0, 20, 0);
     assertTrue(seg2.projectionFactor(new Coordinate((double)11.0, 0,
-      Coordinates.NULL_ORDINATE)) == 0.1);
+      Point.NULL_ORDINATE)) == 0.1);
 
   }
 

@@ -1,7 +1,7 @@
 package com.revolsys.jts.testold.perf.operation.buffer;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -40,9 +40,9 @@ public class RandomOffsetLineStringGenerator {
 
   private int exponent2 = 5;
 
-  private Coordinates[] pts;
+  private Point[] pts;
 
-  private Coordinates endPoint;
+  private Point endPoint;
 
   public RandomOffsetLineStringGenerator(final double maxSegLen,
     final int numPts) {
@@ -57,8 +57,8 @@ public class RandomOffsetLineStringGenerator {
     this.numPts = pow2(this.exponent2) + 1;
   }
 
-  private Coordinates computeRandomOffset(final Coordinates p0,
-    final Coordinates p1, final double segFrac) {
+  private Point computeRandomOffset(final Point p0,
+    final Point p1, final double segFrac) {
     final double len = p0.distance(p1);
     final double len2 = len / 2;
     final double offsetLen = len * Math.random() - len2;
@@ -72,7 +72,7 @@ public class RandomOffsetLineStringGenerator {
       final int midIndex = i + inc2;
       final int endIndex = i + inc;
 
-      Coordinates segEndPoint;
+      Point segEndPoint;
 
       double segFrac = 0.5 + randomFractionPerturbation();
 
@@ -98,13 +98,13 @@ public class RandomOffsetLineStringGenerator {
   }
 
   public Geometry generate(final GeometryFactory fact) {
-    this.pts = new Coordinates[this.numPts];
+    this.pts = new Point[this.numPts];
 
     this.pts[0] = new Coordinate();
 
     final double ang = Math.PI * Math.random();
     this.endPoint = new Coordinate(this.maxSegLen * Math.cos(ang),
-      this.maxSegLen * Math.sin(ang), Coordinates.NULL_ORDINATE);
+      this.maxSegLen * Math.sin(ang), Point.NULL_ORDINATE);
     this.pts[this.numPts - 1] = this.endPoint;
 
     int interval = this.numPts / 2;

@@ -36,7 +36,7 @@ package com.revolsys.jts.geomgraph;
 import java.io.PrintStream;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Represents a point on an
@@ -50,7 +50,7 @@ import com.revolsys.jts.geom.Coordinates;
  */
 public class EdgeIntersection implements Comparable {
 
-  public Coordinates coord; // the point of intersection
+  public Point coord; // the point of intersection
 
   public int segmentIndex; // the index of the containing line segment in the
                            // parent edge
@@ -58,7 +58,7 @@ public class EdgeIntersection implements Comparable {
   public double dist; // the edge distance of this point along the containing
                       // line segment
 
-  public EdgeIntersection(final Coordinates coord, final int segmentIndex,
+  public EdgeIntersection(final Point coord, final int segmentIndex,
     final double dist) {
     this.coord = new Coordinate(coord);
     this.segmentIndex = segmentIndex;
@@ -92,7 +92,7 @@ public class EdgeIntersection implements Comparable {
     return compare(other.segmentIndex, other.dist);
   }
 
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return coord;
   }
 

@@ -33,7 +33,7 @@
 package com.revolsys.jtstest.function;
 
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.operation.distance.DistanceOp;
 
@@ -83,7 +83,7 @@ public class DistanceFunctions {
   }
 
   public static Geometry nearestPoints(final Geometry a, final Geometry b) {
-    final Coordinates[] pts = DistanceOp.nearestPoints(a, b);
+    final Point[] pts = DistanceOp.nearestPoints(a, b);
     return a.getGeometryFactory().lineString(pts);
   }
 

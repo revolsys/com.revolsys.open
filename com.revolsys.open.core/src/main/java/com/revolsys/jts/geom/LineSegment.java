@@ -17,17 +17,17 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
   /**
    * Computes the closest point on this line segment to another point.
    * @param p the point to find the closest point to
-   * @return a Coordinates which is the closest point on the line segment to the point p
+   * @return a Point which is the closest point on the line segment to the point p
    */
-  Coordinates closestPoint(Coordinates p);
+  Point closestPoint(Point p);
 
   /**
    * Computes the closest points on two line segments.
    * 
    * @param line the segment to find the closest point to
-   * @return a pair of Coordinates which are the closest points on the line segments
+   * @return a pair of Point which are the closest points on the line segments
    */
-  Coordinates[] closestPoints(LineSegment line);
+  Point[] closestPoints(LineSegment line);
 
   /**
    *  Compares this object with the specified object for order.
@@ -48,7 +48,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    *
    * @return the distance from this segment to the given point
    */
-  double distance(Coordinates p);
+  double distance(Point p);
 
   /**
    * Computes the distance between this line segment and another segment.
@@ -63,7 +63,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    *
    * @return the perpendicular distance between the defined line and the given point
    */
-  double distancePerpendicular(Coordinates p);
+  double distancePerpendicular(Point p);
 
   /**
    *  Returns <code>true</code> if <code>other</code> is
@@ -79,16 +79,16 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
   BoundingBox getBoundingBox();
 
   @Override
-  Coordinates getCoordinate(int i);
+  Point getCoordinate(int i);
 
-  double getElevation(Coordinates point);
+  double getElevation(Point point);
 
   GeometryFactory getGeometryFactory();
 
   LineSegment getIntersection(BoundingBox boundingBox);
 
-  CoordinatesList getIntersection(final Coordinates point1,
-    final Coordinates point2);
+  CoordinatesList getIntersection(final Point point1,
+    final Point point2);
 
   CoordinatesList getIntersection(final GeometryFactory precisionModel,
     final LineSegment lineSegment2);
@@ -101,9 +101,9 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    */
   double getLength();
 
-  Coordinates getP0();
+  Point getP0();
 
-  Coordinates getP1();
+  Point getP1();
 
   Point getPoint(int vertexIndex);
 
@@ -121,11 +121,11 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    * 
    * @see RobustLineIntersector
    */
-  Coordinates intersection(LineSegment line);
+  Point intersection(LineSegment line);
 
   boolean intersects(BoundingBox boundingBox);
 
-  boolean intersects(Coordinates point, double maxDistance);
+  boolean intersects(Point point, double maxDistance);
 
   boolean isEmpty();
 
@@ -136,7 +136,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    */
   boolean isHorizontal();
 
-  boolean isPointOnLineMiddle(Coordinates point, final double maxDistance);
+  boolean isPointOnLineMiddle(Point point, final double maxDistance);
 
   /**
    * Tests whether the segment is vertical.
@@ -162,14 +162,14 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    * 
    * @see RobustLineIntersector
    */
-  Coordinates lineIntersection(LineSegment line);
+  Point lineIntersection(LineSegment line);
 
   /**
    * Computes the midpoint of the segment
    *
    * @return the midpoint of the segment
    */
-  Coordinates midPoint();
+  Point midPoint();
 
   /**
    * Puts the line segment into a normalized form.
@@ -193,7 +193,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    * 
    * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
    */
-  int orientationIndex(Coordinates p);
+  int orientationIndex(Point p);
 
   /**
    * Determines the orientation of a LineSegment relative to this segment.
@@ -227,7 +227,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    * @param segmentLengthFraction the fraction of the segment length along the line
    * @return the point at that distance
    */
-  Coordinates pointAlong(double segmentLengthFraction);
+  Point pointAlong(double segmentLengthFraction);
 
   /**
    * Computes the {@link Coordinates} that lies a given
@@ -245,7 +245,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    * 
    * @throws IllegalStateException if the segment has zero length
    */
-  Coordinates pointAlongOffset(double segmentLengthFraction,
+  Point pointAlongOffset(double segmentLengthFraction,
     double offsetDistance);
 
   /**
@@ -256,7 +256,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    * may lie outside the line segment.  If this is the case,
    * the projection factor will lie outside the range [0.0, 1.0].
    */
-  Coordinates project(Coordinates p);
+  Point project(Point p);
 
   /**
    * Project a line segment onto this line segment and return the resulting
@@ -285,7 +285,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    * @param p the point to compute the factor for
    * @return the projection factor for the point
    */
-  double projectionFactor(Coordinates p);
+  double projectionFactor(Point p);
 
   /**
    * Reverses the direction of the line segment.
@@ -306,7 +306,7 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
    * @param point the point
    * @return the fraction along the line segment the projection of the point occurs
    */
-  double segmentFraction(Coordinates point);
+  double segmentFraction(Point point);
 
   /**
    * Creates a LineString with the same coordinates as this segment

@@ -7,7 +7,7 @@ import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.overlay.MappedLocation;
@@ -59,8 +59,8 @@ public abstract class WarpFilter extends WholeImageFilter {
     final double[] coordinates = new double[numPoints * 2];
     int j = 0;
     for (int i = 0; i < numPoints; i++) {
-      final Coordinates modelPoint = points.get(i);
-      final Coordinates imagePoint = toImagePoint(boundingBox, modelPoint,
+      final Point modelPoint = points.get(i);
+      final Point imagePoint = toImagePoint(boundingBox, modelPoint,
         imageWidth, imageHeight);
       coordinates[j++] = imagePoint.getX();
       coordinates[j++] = imagePoint.getY();
@@ -68,13 +68,13 @@ public abstract class WarpFilter extends WholeImageFilter {
     return new DoubleCoordinatesList(2, coordinates);
   }
 
-  public static Coordinates targetPointToPixel(final BoundingBox boundingBox,
-    final Coordinates point, final int imageWidth, final int imageHeight) {
+  public static Point targetPointToPixel(final BoundingBox boundingBox,
+    final Point point, final int imageWidth, final int imageHeight) {
     return toImagePoint(boundingBox, point, imageWidth, imageHeight);
   }
 
-  public static Coordinates toImagePoint(final BoundingBox boundingBox,
-    final Coordinates modelPoint, final int imageWidth, final int imageHeight) {
+  public static Point toImagePoint(final BoundingBox boundingBox,
+    final Point modelPoint, final int imageWidth, final int imageHeight) {
     final double modelX = modelPoint.getX();
     final double modelY = modelPoint.getY();
     final double modelDeltaX = modelX - boundingBox.getMinX();
@@ -91,7 +91,7 @@ public abstract class WarpFilter extends WholeImageFilter {
     return new DoubleCoordinates(imageX, imageY);
   }
 
-  public static Coordinates toModelPoint(final BoundingBox boundingBox,
+  public static Point toModelPoint(final BoundingBox boundingBox,
     final double imageX, final double imageY, final int imageWidth,
     final int imageHeight) {
     final double xPercent = imageX / imageWidth;
@@ -143,27 +143,27 @@ public abstract class WarpFilter extends WholeImageFilter {
     return this.imageWidth;
   }
 
-  public Coordinates sourcePixelToTargetPixel(final Coordinates sourcePixel) {
+  public Point sourcePixelToTargetPixel(final Point sourcePixel) {
     final double x = sourcePixel.getX();
     final double y = sourcePixel.getY();
     return sourcePixelToTargetPixel(x, y);
   }
 
-  public abstract Coordinates sourcePixelToTargetPixel(final double sourceX,
+  public abstract Point sourcePixelToTargetPixel(final double sourceX,
     final double sourceY);
 
-  public Coordinates sourcePixelToTargetPoint(final BoundingBox boundingBox,
-    final Coordinates sourcePixel) {
-    final Coordinates targetImagePoint = sourcePixelToTargetPixel(sourcePixel);
+  public Point sourcePixelToTargetPoint(final BoundingBox boundingBox,
+    final Point sourcePixel) {
+    final Point targetImagePoint = sourcePixelToTargetPixel(sourcePixel);
     final double targetPixelX = targetImagePoint.getX();
     final double targetPixelY = targetImagePoint.getY();
-    final Coordinates targetPoint = toModelPoint(boundingBox, targetPixelX,
+    final Point targetPoint = toModelPoint(boundingBox, targetPixelX,
       targetPixelY, this.imageWidth, this.imageHeight);
     return targetPoint;
   }
 
-  public Point sourcePixelToTargetPoint(final Coordinates sourcePixel) {
-    final Coordinates targetImagePoint = sourcePixelToTargetPixel(sourcePixel);
+  public Point sourcePixelToTargetPoint(final Point sourcePixel) {
+    final Point targetImagePoint = sourcePixelToTargetPixel(sourcePixel);
     final double targetPixelX = targetImagePoint.getX();
     final double targetPixelY = targetImagePoint.getY();
     return targetPixelToPoint(targetPixelX, targetPixelY);
@@ -175,34 +175,34 @@ public abstract class WarpFilter extends WholeImageFilter {
   }
 
   public Point sourcePixelToTargetPoint(final MappedLocation tiePoint) {
-    final Coordinates sourcePixel = tiePoint.getSourcePixel();
+    final Point sourcePixel = tiePoint.getSourcePixel();
     return sourcePixelToTargetPoint(sourcePixel);
   }
 
   public Point targetPixelToPoint(final double targetPixelX,
     final double targetPixelY) {
-    final Coordinates targetPoint = toModelPoint(this.boundingBox,
+    final Point targetPoint = toModelPoint(this.boundingBox,
       targetPixelX, targetPixelY, this.imageWidth, this.imageHeight);
     return getGeometryFactory().point(targetPoint);
   }
 
-  public Coordinates targetPixelToSourcePixel(final Coordinates point) {
+  public Point targetPixelToSourcePixel(final Point point) {
     final double x = point.getX();
     final double y = point.getY();
     return targetPixelToSourcePixel(x, y);
   }
 
-  public abstract Coordinates targetPixelToSourcePixel(final double targetX,
+  public abstract Point targetPixelToSourcePixel(final double targetX,
     final double targetY);
 
-  public Coordinates targetPointToPixel(final Coordinates targetPoint) {
+  public Point targetPointToPixel(final Point targetPoint) {
     return toImagePoint(this.boundingBox, targetPoint, this.imageWidth,
       this.imageHeight);
   }
 
-  public Coordinates targetPointToSourcePixel(final Coordinates targetPoint) {
-    final Coordinates targetPixel = targetPointToPixel(targetPoint);
-    final Coordinates sourcePixel = targetPixelToSourcePixel(targetPixel);
+  public Point targetPointToSourcePixel(final Point targetPoint) {
+    final Point targetPixel = targetPointToPixel(targetPoint);
+    final Point sourcePixel = targetPixelToSourcePixel(targetPixel);
     return sourcePixel;
   }
 

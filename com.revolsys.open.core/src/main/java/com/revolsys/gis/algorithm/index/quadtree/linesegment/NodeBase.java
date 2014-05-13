@@ -6,12 +6,12 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 
 public abstract class NodeBase {
   public static int getSubnodeIndex(
-    final com.revolsys.jts.geom.BoundingBox envelope, final Coordinates centre) {
+    final com.revolsys.jts.geom.BoundingBox envelope, final Point centre) {
     int subnodeIndex = -1;
     final double minX = envelope.getMinX();
     final double minY = envelope.getMinY();

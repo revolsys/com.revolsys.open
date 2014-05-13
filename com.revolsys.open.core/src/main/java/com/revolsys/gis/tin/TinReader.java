@@ -9,7 +9,7 @@ import com.revolsys.collection.IntHashMap;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
@@ -70,7 +70,7 @@ public class TinReader {
   }
 
   public TriangulatedIrregularNetwork read() {
-    final IntHashMap<Coordinates> nodeIdMap = new IntHashMap<Coordinates>();
+    final IntHashMap<Point> nodeIdMap = new IntHashMap<Point>();
     String line = readLine();
     if (!"BEGT".equals(line)) {
       throw new IllegalArgumentException("Expecting BEGT not " + line);
@@ -91,7 +91,7 @@ public class TinReader {
     for (int i = 1; i <= numNodes; i++) {
       line = readLine();
       final double[] coordinates = MathUtil.toDoubleArraySplit(line, " ");
-      final Coordinates point = new DoubleCoordinates(3, coordinates);
+      final Point point = new DoubleCoordinates(3, coordinates);
       boundingBox = boundingBox.expand(point);
       nodeIdMap.put(i, point);
     }
@@ -114,7 +114,7 @@ public class TinReader {
         line = readLine();
         final double[] indexes = MathUtil.toDoubleArraySplit(line, " ");
 
-        final Coordinates[] points = new Coordinates[3];
+        final Point[] points = new Point[3];
         for (int j = 0; j < 3; j++) {
           final int index = (int)indexes[j];
           points[j] = nodeIdMap.get(index);

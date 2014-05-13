@@ -2,14 +2,14 @@ package com.revolsys.gis.model.coordinates.comparator;
 
 import java.util.Comparator;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Compare the coordinates, lowest Y first if equal then X comparison.
  */
-public class LowestLeftComparator implements Comparator<Coordinates> {
-  public static int compareCoordinates(final Coordinates point1,
-    final Coordinates point2) {
+public class LowestLeftComparator implements Comparator<Point> {
+  public static int compareCoordinates(final Point point1,
+    final Point point2) {
     final Double x1 = point1.getX();
     final Double y1 = point1.getY();
     final Double x2 = point2.getX();
@@ -27,7 +27,7 @@ public class LowestLeftComparator implements Comparator<Coordinates> {
   }
 
   @Override
-  public int compare(final Coordinates point1, final Coordinates point2) {
+  public int compare(final Point point1, final Point point2) {
     return compareCoordinates(point1, point2);
   }
 }

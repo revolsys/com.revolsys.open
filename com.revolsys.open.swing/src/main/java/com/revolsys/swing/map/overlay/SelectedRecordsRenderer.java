@@ -10,7 +10,7 @@ import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -148,7 +148,7 @@ public class SelectedRecordsRenderer {
       if (validOp.isValid()) {
         final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
         if (!simpleOp.isSimple()) {
-          for (final Coordinates coordinates : simpleOp.getNonSimplePoints()) {
+          for (final Point coordinates : simpleOp.getNonSimplePoints()) {
             final Point point = viewportGeometryFactory.point(coordinates);
             MarkerStyleRenderer.renderMarker(viewport, graphics, point,
               erroStyle);

@@ -41,7 +41,7 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -153,12 +153,12 @@ public class LineSequencer {
     // the nodes in all subgraphs which have been completely scanned
     final Set prevSubgraphNodes = new TreeSet();
 
-    Coordinates lastNode = null;
+    Point lastNode = null;
     final List currNodes = new ArrayList();
     for (int i = 0; i < mls.getGeometryCount(); i++) {
       final LineString line = (LineString)mls.getGeometry(i);
-      final Coordinates startNode = line.getCoordinate(0);
-      final Coordinates endNode = line.getCoordinate(line.getVertexCount() - 1);
+      final Point startNode = line.getCoordinate(0);
+      final Point endNode = line.getCoordinate(line.getVertexCount() - 1);
 
       /**
        * If this linestring is connected to a previous subgraph, geom is not sequenced

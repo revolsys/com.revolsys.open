@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -71,8 +71,8 @@ import com.revolsys.jts.util.Assert;
  */
 public class ConnectedInteriorTester {
 
-  public static Coordinates findDifferentPoint(final LineString line,
-    final Coordinates point) {
+  public static Point findDifferentPoint(final LineString line,
+    final Point point) {
     for (final Vertex vertex : line.vertices()) {
       if (!vertex.equals(point)) {
         return vertex.cloneCoordinates();
@@ -88,7 +88,7 @@ public class ConnectedInteriorTester {
   // save a coordinate for any disconnected interior found
   // the coordinate will be somewhere on the ring surrounding the disconnected
   // interior
-  private Coordinates disconnectedRingcoord;
+  private Point disconnectedRingcoord;
 
   public ConnectedInteriorTester(final GeometryGraph geomGraph) {
     this.geomGraph = geomGraph;
@@ -115,7 +115,7 @@ public class ConnectedInteriorTester {
     return edgeRings;
   }
 
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return disconnectedRingcoord;
   }
 
@@ -199,12 +199,12 @@ public class ConnectedInteriorTester {
   }
 
   private void visitInteriorRing(final LineString ring, final PlanarGraph graph) {
-    final Coordinates pt0 = ring.getVertex(0).cloneCoordinates();
+    final Point pt0 = ring.getVertex(0).cloneCoordinates();
     /**
      * Find first point in coord list different to initial point.
      * Need special check since the first point may be repeated.
      */
-    final Coordinates pt1 = findDifferentPoint(ring, pt0);
+    final Point pt1 = findDifferentPoint(ring, pt0);
     final Edge e = graph.findEdgeInSameDirection(pt0, pt1);
     final DirectedEdge de = (DirectedEdge)graph.findEdgeEnd(e);
     DirectedEdge intDe = null;

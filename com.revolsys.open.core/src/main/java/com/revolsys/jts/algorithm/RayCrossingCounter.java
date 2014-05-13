@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
@@ -71,16 +71,16 @@ public class RayCrossingCounter {
    * This method is an exemplar of how to use this class.
    * 
    * @param p the point to test
-   * @param ring an array of Coordinates forming a ring 
+   * @param ring an array of Point forming a ring 
    * @return the location of the point in the ring
    */
-  public static Location locatePointInRing(final Coordinates p,
-    final Coordinates[] ring) {
+  public static Location locatePointInRing(final Point p,
+    final Point[] ring) {
     final RayCrossingCounter counter = new RayCrossingCounter(p);
 
     for (int i = 1; i < ring.length; i++) {
-      final Coordinates p1 = ring[i];
-      final Coordinates p2 = ring[i - 1];
+      final Point p1 = ring[i];
+      final Point p2 = ring[i - 1];
       counter.countSegment(p1, p2);
       if (counter.isOnSegment()) {
         return counter.getLocation();
@@ -98,7 +98,7 @@ public class RayCrossingCounter {
   *            a coordinate sequence forming a ring
   * @return the location of the point in the ring
   */
-  public static Location locatePointInRing(final Coordinates coordinates,
+  public static Location locatePointInRing(final Point coordinates,
     final CoordinatesList ring) {
     final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
 
@@ -126,7 +126,7 @@ public class RayCrossingCounter {
   *            a coordinate sequence forming a ring
   * @return the location of the point in the ring
   */
-  public static Location locatePointInRing(final Coordinates coordinates,
+  public static Location locatePointInRing(final Point coordinates,
     final LineString ring) {
     final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
 
@@ -154,7 +154,7 @@ public class RayCrossingCounter {
   // true if the test point lies on an input segment
   private boolean pointOnSegment = false;
 
-  public RayCrossingCounter(final Coordinates point) {
+  public RayCrossingCounter(final Point point) {
     this(point.getX(), point.getY());
   }
 
@@ -170,7 +170,7 @@ public class RayCrossingCounter {
    * @param p1 an endpoint of the segment
    * @param p2 another endpoint of the segment
    */
-  public void countSegment(final Coordinates p1, final Coordinates p2) {
+  public void countSegment(final Point p1, final Point p2) {
 
     final double x1 = p1.getX();
     final double y1 = p1.getY();

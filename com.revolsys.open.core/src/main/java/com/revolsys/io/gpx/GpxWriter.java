@@ -16,7 +16,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -138,12 +138,12 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     writeAttributes(object);
     out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
 
-    for (final Coordinates coordinates : line.vertices()) {
+    for (final Point coordinates : line.vertices()) {
       out.startTag(GpxConstants.TRACK_POINT_ELEMENT);
       out.attribute(GpxConstants.LON_ATTRIBUTE, coordinates.getX());
       out.attribute(GpxConstants.LAT_ATTRIBUTE, coordinates.getY());
       if (coordinatesList.getAxisCount() > 2) {
-        final double elevation = coordinates.getValue(2);
+        final double elevation = coordinates.getCoordinate(2);
         if (!Double.isNaN(elevation)) {
           out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
         }

@@ -36,7 +36,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
@@ -104,7 +104,7 @@ public class PointInAreaStressTester {
           * xStep);
         final double y = this.geomFactory.makePrecise(1, areaEnv.getMinY() + j
           * yStep);
-        final Coordinates pt = new DoubleCoordinates(x, y);
+        final Point pt = new DoubleCoordinates(x, y);
 
         final boolean isEqual = testPIA(pt);
         if (!isEqual) {
@@ -138,7 +138,7 @@ public class PointInAreaStressTester {
    * @param p
    * @return true if the point location is determined to be the same by both PIA locaters
    */
-  private boolean testPIA(final Coordinates p) {
+  private boolean testPIA(final Point p) {
     // System.out.println(WKTWriter.toPoint(p));
 
     final Location loc1 = this.pia1.locate(p);

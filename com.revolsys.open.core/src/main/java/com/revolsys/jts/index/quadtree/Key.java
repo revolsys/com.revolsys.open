@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.index.quadtree;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.AbstractPoint;
 
 /**
  * A Key is a unique identifier for a node in a quadtree.
@@ -45,7 +45,7 @@ import com.revolsys.jts.geom.Envelope;
  *
  * @version 1.7
  */
-public class Key extends AbstractCoordinates {
+public class Key extends AbstractPoint {
 
   public static int computeQuadLevel(final BoundingBox env) {
     final double dx = env.getWidth();
@@ -76,7 +76,7 @@ public class Key extends AbstractCoordinates {
     env = null;
     computeKey(level, itemEnv);
     // MD - would be nice to have a non-iterative form of this algorithm
-    while (!getEnvelope().covers(itemEnv)) {
+    while (!getKeyEnvelope().covers(itemEnv)) {
       level += 1;
       env = null;
       computeKey(level, itemEnv);
@@ -89,13 +89,25 @@ public class Key extends AbstractCoordinates {
     this.y = Math.floor(itemEnv.getMinY() / quadSize) * quadSize;
   }
 
-  public Coordinates getCentre() {
-    final BoundingBox envelope = getEnvelope();
+  public Point getCentre() {
+    final BoundingBox envelope = getKeyEnvelope();
     return new Coordinate((envelope.getMinX() + envelope.getMaxX()) / 2,
       (envelope.getMinY() + envelope.getMaxY()) / 2);
   }
 
-  public BoundingBox getEnvelope() {
+  @Override
+  public double getCoordinate(final int axisIndex) {
+    switch (axisIndex) {
+      case 0:
+        return x;
+      case 1:
+        return y;
+      default:
+        return Double.NaN;
+    }
+  }
+
+  public BoundingBox getKeyEnvelope() {
     if (env == null) {
       final double quadSize = DoubleBits.powerOf2(level);
       final double x2 = x + quadSize;
@@ -107,22 +119,6 @@ public class Key extends AbstractCoordinates {
 
   public int getLevel() {
     return level;
-  }
-
-  public Coordinates getPoint() {
-    return this;
-  }
-
-  @Override
-  public double getValue(final int axisIndex) {
-    switch (axisIndex) {
-      case 0:
-        return x;
-      case 1:
-        return y;
-      default:
-        return Double.NaN;
-    }
   }
 
 }

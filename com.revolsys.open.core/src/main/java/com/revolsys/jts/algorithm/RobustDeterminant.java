@@ -34,7 +34,7 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * @version 1.7
@@ -393,7 +393,7 @@ public class RobustDeterminant {
     * @return -1 if q is clockwise (right) from p1-p2
     * @return 0 if q is collinear with p1-p2
     */
-   public static int orientationIndex(Coordinates p1, Coordinates p2, Coordinates q)
+   public static int orientationIndex(Point p1, Point p2, Point q)
    {
      /**
       * MD - 9 Aug 2010 It seems that the basic algorithm is slightly orientation
@@ -404,10 +404,10 @@ public class RobustDeterminant {
       * For instance, the following situation produces identical results in spite
       * of the inverse orientation of the line segment:
       * 
-      * Coordinates p0 = new Coordinate((double)219.3649559090992, 140.84159161824724);
-      * Coordinates p1 = new Coordinate((double)168.9018919682399, -5.713787599646864);
+      * Point p0 = new Coordinate((double)219.3649559090992, 140.84159161824724);
+      * Point p1 = new Coordinate((double)168.9018919682399, -5.713787599646864);
       * 
-      * Coordinates p = new Coordinate((double)186.80814046338352, 46.28973405831556); int
+      * Point p = new Coordinate((double)186.80814046338352, 46.28973405831556); int
       * orient = orientationIndex(p0, p1, p); int orientInv =
       * orientationIndex(p1, p0, p);
       * 

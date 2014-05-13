@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * An implementation of a 2-D KD-Tree. KD-trees provide fast range searching on
@@ -71,7 +71,7 @@ public class KdTree {
 
   /**
    * Creates a new instance of a KdTree, specifying a snapping distance tolerance.
-   * Points which lie closer than the tolerance to a point already 
+   * Point which lie closer than the tolerance to a point already 
    * in the tree will be treated as identical to the existing point.
    * 
    * @param tolerance
@@ -88,7 +88,7 @@ public class KdTree {
    *          the point to insert
    * @return the kdnode containing the point
    */
-  public KdNode insert(final Coordinates p) {
+  public KdNode insert(final Point p) {
     return insert(p, null);
   }
 
@@ -103,7 +103,7 @@ public class KdTree {
    *         node is returned with its counter incremented. This can be checked
    *         by testing returnedNode.getCount() > 1.
    */
-  public KdNode insert(final Coordinates p, final Object data) {
+  public KdNode insert(final Point p, final Object data) {
     if (root == null) {
       root = new KdNode(p, data);
       return root;

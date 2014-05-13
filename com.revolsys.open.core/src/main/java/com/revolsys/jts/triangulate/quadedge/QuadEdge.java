@@ -34,7 +34,7 @@
 package com.revolsys.jts.triangulate.quadedge;
 
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 
@@ -433,8 +433,8 @@ public class QuadEdge {
    */
   @Override
   public String toString() {
-    final Coordinates p0 = vertex.getCoordinate();
-    final Coordinates p1 = dest().getCoordinate();
+    final Point p0 = vertex.getCoordinate();
+    final Point p1 = dest().getCoordinate();
     return WktWriter.lineString(p0, p1);
   }
 }

@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.Node;
 
@@ -63,7 +63,7 @@ public class SegmentIntersector {
   private boolean hasProperInterior = false;
 
   // the proper intersection point found
-  private Coordinates properIntersectionPoint = null;
+  private Point properIntersectionPoint = null;
 
   private final LineIntersector li;
 
@@ -103,10 +103,10 @@ public class SegmentIntersector {
       return;
     }
     numTests++;
-    final Coordinates p00 = e0.getCoordinate(segIndex0);
-    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    final Coordinates p10 = e1.getCoordinate(segIndex1);
-    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+    final Point p00 = e0.getCoordinate(segIndex0);
+    final Point p01 = e0.getCoordinate(segIndex0 + 1);
+    final Point p10 = e1.getCoordinate(segIndex1);
+    final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
@@ -133,7 +133,7 @@ public class SegmentIntersector {
           e1.addIntersections(li, segIndex1, 1);
         }
         if (li.isProper()) {
-          properIntersectionPoint = (Coordinates)li.getIntersection(0).clone();
+          properIntersectionPoint = (Point)li.getIntersection(0).clone();
           hasProper = true;
           if (!isBoundaryPoint(li, bdyNodes)) {
             hasProperInterior = true;
@@ -148,7 +148,7 @@ public class SegmentIntersector {
   /**
    * @return the proper intersection point, or <code>null</code> if none was found
    */
-  public Coordinates getProperIntersectionPoint() {
+  public Point getProperIntersectionPoint() {
     return properIntersectionPoint;
   }
 
@@ -179,7 +179,7 @@ public class SegmentIntersector {
     final Collection bdyNodes) {
     for (final Iterator i = bdyNodes.iterator(); i.hasNext();) {
       final Node node = (Node)i.next();
-      final Coordinates pt = node.getCoordinate();
+      final Point pt = node.getCoordinate();
       if (li.isIntersection(pt)) {
         return true;
       }

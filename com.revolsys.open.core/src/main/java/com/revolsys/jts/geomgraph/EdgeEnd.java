@@ -37,7 +37,7 @@ import java.io.PrintStream;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -57,7 +57,7 @@ public class EdgeEnd implements Comparable {
 
   private Node node; // the node this edge end originates at
 
-  private Coordinates p0, p1; // points of initial line segment
+  private Point p0, p1; // points of initial line segment
 
   private double dx, dy; // the direction vector for this edge from its starting
                          // point
@@ -68,11 +68,11 @@ public class EdgeEnd implements Comparable {
     this.edge = edge;
   }
 
-  public EdgeEnd(final Edge edge, final Coordinates p0, final Coordinates p1) {
+  public EdgeEnd(final Edge edge, final Point p0, final Point p1) {
     this(edge, p0, p1, null);
   }
 
-  public EdgeEnd(final Edge edge, final Coordinates p0, final Coordinates p1,
+  public EdgeEnd(final Edge edge, final Point p0, final Point p1,
     final Label label) {
     this(edge);
     init(p0, p1);
@@ -120,11 +120,11 @@ public class EdgeEnd implements Comparable {
     // subclasses should override this if they are using labels
   }
 
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return p0;
   }
 
-  public Coordinates getDirectedCoordinate() {
+  public Point getDirectedCoordinate() {
     return p1;
   }
 
@@ -152,7 +152,7 @@ public class EdgeEnd implements Comparable {
     return quadrant;
   }
 
-  protected void init(final Coordinates p0, final Coordinates p1) {
+  protected void init(final Point p0, final Point p1) {
     this.p0 = p0;
     this.p1 = p1;
     dx = p1.getX() - p0.getX();

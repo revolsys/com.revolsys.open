@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.util.ExceptionUtil;
 
@@ -76,14 +76,14 @@ public class WarpAffineFilter extends WarpFilter {
 
     for (int j = 0; j < numRow / 2; ++j) {
       final MappedLocation mappedLocation = mappings.get(j);
-      final Coordinates sourcePoint = mappedLocation.getSourcePixel();
+      final Point sourcePoint = mappedLocation.getSourcePixel();
       A.setRowValues(j, sourcePoint.getX(), sourcePoint.getY(), 1.0D, 0.0D,
         0.0D, 0.0D);
     }
 
     for (int j = numRow / 2; j < numRow; ++j) {
       final MappedLocation mappedLocation = mappings.get(j - (numRow / 2));
-      final Coordinates sourcePoint = mappedLocation.getSourcePixel();
+      final Point sourcePoint = mappedLocation.getSourcePixel();
       A.setRowValues(j, 0.0D, 0.0D, 0.0D, sourcePoint.getX(),
         sourcePoint.getY(), 1.0D);
     }
@@ -108,7 +108,7 @@ public class WarpAffineFilter extends WarpFilter {
 
     for (int j = 0; j < numRow / 2; ++j) {
       final MappedLocation mappedLocation = mappings.get(j);
-      final Coordinates targetPixel = mappedLocation.getTargetPixel(
+      final Point targetPixel = mappedLocation.getTargetPixel(
         boundingBox, imageWidth, imageHeight);
       final double x = targetPixel.getX();
       X.setElement(j, 0, x);
@@ -116,7 +116,7 @@ public class WarpAffineFilter extends WarpFilter {
 
     for (int j = numRow / 2; j < numRow; ++j) {
       final MappedLocation mappedLocation = mappings.get(j - (numRow / 2));
-      final Coordinates targetPixel = mappedLocation.getTargetPixel(
+      final Point targetPixel = mappedLocation.getTargetPixel(
         boundingBox, imageWidth, imageHeight);
       final double y = targetPixel.getY();
       X.setElement(j, 0, y);
@@ -239,7 +239,7 @@ public class WarpAffineFilter extends WarpFilter {
     for (int targetX = 0; targetX < targetWidth; targetX++) {
       for (int targetY = 0; targetY < targetHeight; targetY++) {
 
-        final Coordinates sourcePixel = targetPixelToSourcePixel(targetX,
+        final Point sourcePixel = targetPixelToSourcePixel(targetX,
           targetHeight - targetY);
 
         final int souceX = (int)sourcePixel.getX();
@@ -277,7 +277,7 @@ public class WarpAffineFilter extends WarpFilter {
   }
 
   @Override
-  public Coordinates sourcePixelToTargetPixel(final double sourceX,
+  public Point sourcePixelToTargetPixel(final double sourceX,
     final double sourceY) {
     if (this.hasInverse) {
       final double destX = transformX(sourceX, sourceY, inverseTranslateX,
@@ -291,7 +291,7 @@ public class WarpAffineFilter extends WarpFilter {
   }
 
   @Override
-  public Coordinates targetPixelToSourcePixel(final double destX,
+  public Point targetPixelToSourcePixel(final double destX,
     final double destY) {
     final double sourceX = transformX(destX, destY, translateX, scaleX, shearX);
     final double sourceY = transformY(destX, destY, translateY, scaleY, shearY);

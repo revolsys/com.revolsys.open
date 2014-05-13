@@ -14,7 +14,7 @@ import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -114,8 +114,8 @@ public class DataObjectGraph extends Graph<DataObject> {
 
   public boolean hasEdge(final DataObject object) {
     final LineString line = object.getGeometryValue();
-    final Coordinates fromPoint = LineStringUtil.getFromCoordinates(line);
-    final Coordinates toPoint = LineStringUtil.getToCoordinates(line);
+    final Point fromPoint = LineStringUtil.getFromCoordinates(line);
+    final Point toPoint = LineStringUtil.getToCoordinates(line);
     final Node<DataObject> fromNode = findNode(fromPoint);
     final Node<DataObject> toNode = findNode(toPoint);
     if (fromNode != null && toNode != null) {
@@ -144,7 +144,7 @@ public class DataObjectGraph extends Graph<DataObject> {
     return mergedEdge;
   }
 
-  public List<Edge<DataObject>> splitEdges(final Coordinates point,
+  public List<Edge<DataObject>> splitEdges(final Point point,
     final double distance) {
     final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
     for (final Edge<DataObject> edge : findEdges(point, distance)) {

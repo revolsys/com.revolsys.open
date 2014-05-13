@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm;
 
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 
@@ -48,17 +48,17 @@ public class MaximalNearestSubline {
     if (!end.isVertex()) {
       newCoordinates.add(end.getCoordinate(), false);
     }
-    if (Double.isNaN(((Coordinates)newCoordinates.get(0)).getX())) {
+    if (Double.isNaN(((Point)newCoordinates.get(0)).getX())) {
       newCoordinates.remove(0);
     }
-    Coordinates[] newCoordinateArray = newCoordinates.toCoordinateArray();
+    Point[] newCoordinateArray = newCoordinates.toCoordinateArray();
     /**
      * Ensure there is enough coordinates to build a valid line. Make a 2-point
      * line with duplicate coordinates, if necessary There will always be at
      * least one coordinate in the coordList.
      */
     if (newCoordinateArray.length <= 1) {
-      newCoordinateArray = new Coordinates[] {
+      newCoordinateArray = new Point[] {
         newCoordinateArray[0], newCoordinateArray[0]
       };
     }
@@ -96,7 +96,7 @@ public class MaximalNearestSubline {
     }
   }
 
-  private void findNearestOnA(final Coordinates bPt) {
+  private void findNearestOnA(final Point bPt) {
     final LineStringLocation nearestLocationOnA = aPtLocator.locate(bPt);
     expandInterval(nearestLocationOnA);
   }
@@ -131,7 +131,7 @@ public class MaximalNearestSubline {
     for (int ia = 0; ia < aCoords.size(); ia++) {
       if (isOutsideInterval(ia)) {
         final LineStringLocation bLoc = bPtLocator.locate(aCoords.getCoordinate(ia));
-        final Coordinates bPt = bLoc.getCoordinate();
+        final Point bPt = bLoc.getCoordinate();
         findNearestOnA(bPt);
       }
     }

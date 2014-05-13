@@ -37,7 +37,7 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -72,7 +72,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     super(name);
   }
 
-  Geometry createCircle(final Coordinates origin, final double size,
+  Geometry createCircle(final Point origin, final double size,
     final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
@@ -84,7 +84,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     return circle;
   }
 
-  Geometry createSineStar(final Coordinates origin, final double size,
+  Geometry createSineStar(final Point origin, final double size,
     final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
@@ -101,13 +101,13 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Coordinates basePt = new Coordinate(env.getMinX() + xOffset,
-      env.getMinY() + yOffset, Coordinates.NULL_ORDINATE);
+    final Point basePt = new Coordinate(env.getMinX() + xOffset,
+      env.getMinY() + yOffset, Point.NULL_ORDINATE);
     final LineString line = createTestLine(basePt, size, nPts);
     return line;
   }
 
-  LineString createTestLine(final Coordinates base, final double size,
+  LineString createTestLine(final Point base, final double size,
     final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
@@ -121,7 +121,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
   public void run(final int nPts) {
     // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
     final Geometry poly = createSineStar(new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE), 100, nPts);
+      Point.NULL_ORDINATE), 100, nPts);
     // System.out.println(poly);
     //
     // System.out.println();

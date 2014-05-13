@@ -39,7 +39,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -165,7 +165,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
 
     // test each corner of rectangle for inclusion
     for (int i = 0; i < 4; i++) {
-      final Coordinates rectPt = rectSeq.getCoordinate(i);
+      final Point rectPt = rectSeq.getCoordinate(i);
       if (!elementEnv.covers(rectPt)) {
         continue;
       }
@@ -307,8 +307,8 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
   private void checkIntersectionWithSegments(final LineString testLine) {
     final CoordinatesList seq1 = testLine.getCoordinatesList();
     for (int j = 1; j < seq1.size(); j++) {
-      final Coordinates p0 = seq1.getCoordinate(j - 1);
-      final Coordinates p1 = seq1.getCoordinate(j);
+      final Point p0 = seq1.getCoordinate(j - 1);
+      final Point p1 = seq1.getCoordinate(j);
 
       if (rectIntersector.intersects(p0, p1)) {
         hasIntersection = true;

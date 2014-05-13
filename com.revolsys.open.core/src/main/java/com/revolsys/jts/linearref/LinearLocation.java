@@ -34,7 +34,7 @@
 package com.revolsys.jts.linearref;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
@@ -118,8 +118,8 @@ public class LinearLocation implements Comparable {
    * @param frac the length to the desired point
    * @return the <tt>Coordinate</tt> of the desired point
    */
-  public static Coordinates pointAlongSegmentByFraction(final Coordinates p0,
-    final Coordinates p1, final double frac) {
+  public static Point pointAlongSegmentByFraction(final Point p0,
+    final Point p1, final double frac) {
     if (frac <= 0.0) {
       return p0;
     }
@@ -296,13 +296,13 @@ public class LinearLocation implements Comparable {
    * @param linearGeom the linear geometry referenced by this location
    * @return the <tt>Coordinate</tt> at the location
    */
-  public Coordinates getCoordinate(final Geometry linearGeom) {
+  public Point getCoordinate(final Geometry linearGeom) {
     final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    final Coordinates p0 = lineComp.getCoordinate(segmentIndex);
+    final Point p0 = lineComp.getCoordinate(segmentIndex);
     if (segmentIndex >= lineComp.getVertexCount() - 1) {
       return p0;
     }
-    final Coordinates p1 = lineComp.getCoordinate(segmentIndex + 1);
+    final Point p1 = lineComp.getCoordinate(segmentIndex + 1);
     return pointAlongSegmentByFraction(p0, p1, segmentFraction);
   }
 
@@ -315,13 +315,13 @@ public class LinearLocation implements Comparable {
    */
   public LineSegment getSegment(final Geometry linearGeom) {
     final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    final Coordinates p0 = lineComp.getCoordinate(segmentIndex);
+    final Point p0 = lineComp.getCoordinate(segmentIndex);
     // check for endpoint - return last segment of the line if so
     if (segmentIndex >= lineComp.getVertexCount() - 1) {
-      final Coordinates prev = lineComp.getCoordinate(lineComp.getVertexCount() - 2);
+      final Point prev = lineComp.getCoordinate(lineComp.getVertexCount() - 2);
       return new LineSegmentImpl(prev, p0);
     }
-    final Coordinates p1 = lineComp.getCoordinate(segmentIndex + 1);
+    final Point p1 = lineComp.getCoordinate(segmentIndex + 1);
     return new LineSegmentImpl(p0, p1);
   }
 
@@ -359,8 +359,8 @@ public class LinearLocation implements Comparable {
       segIndex = lineComp.getVertexCount() - 2;
     }
 
-    final Coordinates p0 = lineComp.getCoordinate(segIndex);
-    final Coordinates p1 = lineComp.getCoordinate(segIndex + 1);
+    final Point p0 = lineComp.getCoordinate(segIndex);
+    final Point p1 = lineComp.getCoordinate(segIndex + 1);
     return p0.distance(p1);
   }
 

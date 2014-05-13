@@ -5,7 +5,7 @@ import org.junit.Test;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -36,9 +36,9 @@ public class LineSegmentTest {
 
   private final DoubleCoordinates c_0_100_1 = c(0, 100, 1);
 
-  public void assertIntersection3d(final Coordinates line1Start,
-    final Coordinates line1End, final Coordinates line2Start,
-    final Coordinates line2End, final Coordinates... expectedIntersection) {
+  public void assertIntersection3d(final Point line1Start,
+    final Point line1End, final Point line2Start,
+    final Point line2End, final Point... expectedIntersection) {
     final LineSegment line1 = new LineSegmentImpl(GEOMETRY_FACTORY_3D, line1Start,
       line1End);
     final LineSegment line2 = new LineSegmentImpl(GEOMETRY_FACTORY_3D, line2Start,

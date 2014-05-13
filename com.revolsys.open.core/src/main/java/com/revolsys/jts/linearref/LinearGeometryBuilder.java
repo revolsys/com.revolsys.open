@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -60,7 +60,7 @@ public class LinearGeometryBuilder {
 
   private boolean fixInvalidLines = false;
 
-  private Coordinates lastPt = null;
+  private Point lastPt = null;
 
   public LinearGeometryBuilder(final GeometryFactory geomFact) {
     this.geomFact = geomFact;
@@ -69,18 +69,18 @@ public class LinearGeometryBuilder {
   /**
    * Adds a point to the current line.
    *
-   * @param pt the Coordinates to add
+   * @param pt the Point to add
    */
-  public void add(final Coordinates pt) {
+  public void add(final Point pt) {
     add(pt, true);
   }
 
   /**
    * Adds a point to the current line.
    *
-   * @param pt the Coordinates to add
+   * @param pt the Point to add
    */
-  public void add(final Coordinates pt, final boolean allowRepeatedPoints) {
+  public void add(final Point pt, final boolean allowRepeatedPoints) {
     if (coordList == null) {
       coordList = new CoordinateList();
     }
@@ -99,8 +99,8 @@ public class LinearGeometryBuilder {
       coordList = null;
       return;
     }
-    final Coordinates[] rawPts = coordList.toCoordinateArray();
-    Coordinates[] pts = rawPts;
+    final Point[] rawPts = coordList.toCoordinateArray();
+    Point[] pts = rawPts;
     if (fixInvalidLines) {
       pts = validCoordinateSequence(rawPts);
     }
@@ -128,7 +128,7 @@ public class LinearGeometryBuilder {
     return geomFact.buildGeometry(lines);
   }
 
-  public Coordinates getLastCoordinate() {
+  public Point getLastCoordinate() {
     return lastPt;
   }
 
@@ -152,11 +152,11 @@ public class LinearGeometryBuilder {
     this.ignoreInvalidLines = ignoreInvalidLines;
   }
 
-  private Coordinates[] validCoordinateSequence(final Coordinates[] pts) {
+  private Point[] validCoordinateSequence(final Point[] pts) {
     if (pts.length >= 2) {
       return pts;
     }
-    final Coordinates[] validPts = new Coordinates[] {
+    final Point[] validPts = new Point[] {
       pts[0], pts[0]
     };
     return validPts;

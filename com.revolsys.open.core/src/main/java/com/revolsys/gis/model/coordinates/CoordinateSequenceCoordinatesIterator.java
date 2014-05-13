@@ -3,11 +3,12 @@ package com.revolsys.gis.model.coordinates;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.impl.AbstractPoint;
 
-public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
-  implements Iterator<Coordinates>, Iterable<Coordinates> {
+public class CoordinateSequenceCoordinatesIterator extends AbstractPoint
+  implements Iterator<Point>, Iterable<Point> {
   private final CoordinatesList coordinates;
 
   private int index = 0;
@@ -32,17 +33,17 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
     return (byte)coordinates.getAxisCount();
   }
 
-  public int getIndex() {
-    return index;
-  }
-
   @Override
-  public double getValue(final int axisIndex) {
+  public double getCoordinate(final int axisIndex) {
     if (axisIndex >= 0 && axisIndex < getAxisCount()) {
       return coordinates.getValue(this.index, axisIndex);
     } else {
       return 0;
     }
+  }
+
+  public int getIndex() {
+    return index;
   }
 
   public double getValue(final int relativeIndex, final int axisIndex) {
@@ -59,12 +60,12 @@ public class CoordinateSequenceCoordinatesIterator extends AbstractCoordinates
   }
 
   @Override
-  public Iterator<Coordinates> iterator() {
+  public Iterator<Point> iterator() {
     return this;
   }
 
   @Override
-  public Coordinates next() {
+  public Point next() {
     if (hasNext()) {
       index++;
       return this;

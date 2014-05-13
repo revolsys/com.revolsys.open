@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.util.Assert;
@@ -15,13 +15,13 @@ import com.revolsys.jts.util.Assert;
 public class LocationOfPoint {
 
   public static LineStringLocation locate(final LineString line,
-    final Coordinates inputPt) {
+    final Point inputPt) {
     final LocationOfPoint locater = new LocationOfPoint(line);
     return locater.locate(inputPt);
   }
 
-  public static double segmentFraction(final Coordinates p0,
-    final Coordinates p1, final Coordinates inputPt) {
+  public static double segmentFraction(final Point p0,
+    final Point p1, final Point inputPt) {
     double segFrac = LineSegmentUtil.projectionFactor(p0, p1, inputPt);
     if (segFrac < 0.0) {
       segFrac = 0.0;
@@ -32,7 +32,7 @@ public class LocationOfPoint {
   }
 
   public static double segmentFraction(final Segment segment,
-    final Coordinates inputPt) {
+    final Point inputPt) {
     double segFrac = segment.projectionFactor(inputPt);
     if (segFrac < 0.0) {
       segFrac = 0.0;
@@ -69,7 +69,7 @@ public class LocationOfPoint {
    * @param inputPt the coordinate to locate
    * @return the location of the nearest point
    */
-  public LineStringLocation locate(final Coordinates inputPt) {
+  public LineStringLocation locate(final Point inputPt) {
     double minDistance = Double.MAX_VALUE;
     int minIndex = 0;
     double minFrac = -1.0;
@@ -101,7 +101,7 @@ public class LocationOfPoint {
    * @param minLocation the minimum location for the point location
    * @return the location of the nearest point
    */
-  public LineStringLocation locateAfter(final Coordinates inputPt,
+  public LineStringLocation locateAfter(final Point inputPt,
     final LineStringLocation minLocation) {
     if (minLocation == null) {
       return locate(inputPt);

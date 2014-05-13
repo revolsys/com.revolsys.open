@@ -36,7 +36,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -49,10 +49,10 @@ public class Vector2D {
   /**
    * Creates a vector from a {@link Coordinates}. 
    * 
-   * @param coord the Coordinates to copy
+   * @param coord the Point to copy
    * @return a new vector
    */
-  public static Vector2D create(final Coordinates coord) {
+  public static Vector2D create(final Point coord) {
     return new Vector2D(coord);
   }
 
@@ -65,7 +65,7 @@ public class Vector2D {
    * @param to the destination Coordinate
    * @return a new vector
    */
-  public static Vector2D create(final Coordinates from, final Coordinates to) {
+  public static Vector2D create(final Point from, final Point to) {
     return new Vector2D(from, to);
   }
 
@@ -104,12 +104,12 @@ public class Vector2D {
     this(0.0, 0.0);
   }
 
-  public Vector2D(final Coordinates v) {
+  public Vector2D(final Point v) {
     x = v.getX();
     y = v.getY();
   }
 
-  public Vector2D(final Coordinates from, final Coordinates to) {
+  public Vector2D(final Point from, final Point to) {
     x = to.getX() - from.getX();
     y = to.getY() - from.getY();
   }
@@ -317,8 +317,8 @@ public class Vector2D {
     return create(x - v.x, y - v.y);
   }
 
-  public Coordinates toCoordinate() {
-    return new Coordinate((double)x, y, Coordinates.NULL_ORDINATE);
+  public Point toCoordinate() {
+    return new Coordinate((double)x, y, Point.NULL_ORDINATE);
   }
 
   /**
@@ -331,9 +331,9 @@ public class Vector2D {
     return "[" + x + ", " + y + "]";
   }
 
-  public Coordinates translate(final Coordinates coord) {
+  public Point translate(final Point coord) {
     return new Coordinate((double)x + coord.getX(), y + coord.getY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
   }
 
   /**

@@ -69,7 +69,7 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -996,7 +996,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
    * @param record2
    * @return
    */
-  public DataObject getMergedRecord(final Coordinates point,
+  public DataObject getMergedRecord(final Point point,
     final DataObject record1, final DataObject record2) {
     if (record1 == record2) {
       return record1;
@@ -2236,7 +2236,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   /** Perform the actual split. */
   protected List<LayerDataObject> splitRecord(final LayerDataObject record,
-    final LineString line, final Coordinates point, final LineString line1,
+    final LineString line, final Point point, final LineString line1,
     final LineString line2) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
 

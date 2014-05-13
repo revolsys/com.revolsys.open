@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -16,7 +16,7 @@ public class LineSegmentMatch {
   private final List<LineSegment> segments = new ArrayList<LineSegment>();
 
   public LineSegmentMatch(final GeometryFactory geometryFactory,
-    final Coordinates start, final Coordinates end) {
+    final Point start, final Point end) {
     this(new LineSegmentImpl(geometryFactory, start, end));
   }
 

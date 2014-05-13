@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;
@@ -114,8 +114,8 @@ public class SimpleSnapRounder implements Noder {
   }
 
   private void computeSnaps(final NodedSegmentString ss,
-    final Collection<Coordinates> snapPts) {
-    for (final Coordinates snapPt : snapPts) {
+    final Collection<Point> snapPts) {
+    for (final Point snapPt : snapPts) {
       final HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
       for (int i = 0; i < ss.size() - 1; i++) {
         hotPixel.addSnappedNode(ss, i);
@@ -146,7 +146,7 @@ public class SimpleSnapRounder implements Noder {
   private void computeVertexSnaps(final NodedSegmentString segment1,
     final NodedSegmentString segment2) {
     for (int i0 = 0; i0 < segment1.size() - 1; i0++) {
-      final Coordinates point1 = segment1.getCoordinate(i0);
+      final Point point1 = segment1.getCoordinate(i0);
       final HotPixel hotPixel = new HotPixel(point1, scaleFactor, li);
       for (int i1 = 0; i1 < segment2.size() - 1; i1++) {
         // don't snap a vertex to itself
@@ -172,7 +172,7 @@ public class SimpleSnapRounder implements Noder {
    *
    * Does NOT node the segStrings.
    *
-   * @return a list of Coordinates for the intersections
+   * @return a list of Point for the intersections
    */
   private List findInteriorIntersections(final Collection segStrings,
     final LineIntersector li) {

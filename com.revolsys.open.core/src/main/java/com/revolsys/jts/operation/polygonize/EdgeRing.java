@@ -40,7 +40,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -87,7 +87,7 @@ class EdgeRing {
     final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getRing();
     final BoundingBox testEnv = testRing.getBoundingBox();
-    Coordinates testPt = testRing.getCoordinate(0);
+    Point testPt = testRing.getCoordinate(0);
 
     EdgeRing minShell = null;
     BoundingBox minShellEnv = null;
@@ -134,7 +134,7 @@ class EdgeRing {
    * @deprecated
    */
   @Deprecated
-  public static boolean isInList(final Coordinates pt, final Coordinates[] pts) {
+  public static boolean isInList(final Point pt, final Point[] pts) {
     for (int i = 0; i < pts.length; i++) {
       if (pt.equals(pts[i])) {
         return true;
@@ -153,10 +153,10 @@ class EdgeRing {
    * @deprecated Use CoordinateArrays.ptNotInList instead
    */
   @Deprecated
-  public static Coordinates ptNotInList(final Coordinates[] testPts,
-    final Coordinates[] pts) {
+  public static Point ptNotInList(final Point[] testPts,
+    final Point[] pts) {
     for (int i = 0; i < testPts.length; i++) {
-      final Coordinates testPt = testPts[i];
+      final Point testPt = testPts[i];
       if (!isInList(testPt, pts)) {
         return testPt;
       }
@@ -171,7 +171,7 @@ class EdgeRing {
   // cache the following data for efficiency
   private LinearRing ring = null;
 
-  private Coordinates[] ringPts = null;
+  private Point[] ringPts = null;
 
   private List<LinearRing> holes;
 
@@ -204,7 +204,7 @@ class EdgeRing {
    *
    * @return an array of the {@link Coordinates}s in this ring
    */
-  private Coordinates[] getCoordinates() {
+  private Point[] getCoordinates() {
     if (ringPts == null) {
       final CoordinateList coordList = new CoordinateList();
       for (final DirectedEdge de : deList) {

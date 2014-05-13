@@ -1,7 +1,7 @@
 package com.revolsys.jts.testold.perf.geom.prep;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
@@ -33,7 +33,7 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
 
   }
 
-  Geometry createSineStar(final Coordinates origin, final double size,
+  Geometry createSineStar(final Point origin, final double size,
     final int nPts) {
     final SineStarFactory gsf = new SineStarFactory(this.factory);
     gsf.setCentre(origin);
@@ -63,9 +63,9 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
   @Override
   public void setup() {
     final Geometry sinePoly = createSineStar(new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE), 100000.0, this.nPts);
+      Point.NULL_ORDINATE), 100000.0, this.nPts);
     this.pg = PreparedGeometryFactory.prepare(sinePoly);
     this.g = createSineStar(new Coordinate((double)10, 10,
-      Coordinates.NULL_ORDINATE), 100000.0, 100);
+      Point.NULL_ORDINATE), 100000.0, 100);
   }
 }

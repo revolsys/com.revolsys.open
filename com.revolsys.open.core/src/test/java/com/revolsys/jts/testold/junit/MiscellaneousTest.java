@@ -38,7 +38,7 @@ import junit.textui.TestRunner;
 
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -78,7 +78,7 @@ public class MiscellaneousTest extends TestCase {
       DataTypes.GEOMETRY_COLLECTION);
     Assert.equals(this.geometryFactory.linearRing().getBoundary().getClass(),
       MultiPointImpl.class);
-    Assert.equals(this.geometryFactory.lineString(new Coordinates[] {})
+    Assert.equals(this.geometryFactory.lineString(new Point[] {})
       .getBoundary()
       .getClass(), MultiPointImpl.class);
     Assert.equals(this.geometryFactory.polygon().getBoundary().getClass(),
@@ -99,13 +99,13 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testCoordinateNaN() {
-    final Coordinates c1 = new Coordinate();
+    final Point c1 = new Coordinate();
     assertTrue(!Double.isNaN(c1.getX()));
     assertTrue(!Double.isNaN(c1.getY()));
     assertTrue(Double.isNaN(c1.getZ()));
 
-    final Coordinates c2 = new Coordinate((double)3, 4,
-      Coordinates.NULL_ORDINATE);
+    final Point c2 = new Coordinate((double)3, 4,
+      Point.NULL_ORDINATE);
     assertEquals(3, c2.getX(), 1E-10);
     assertEquals(4, c2.getY(), 1E-10);
     assertTrue(Double.isNaN(c2.getZ()));
@@ -114,9 +114,9 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(c2, c2);
     assertTrue(!c1.equals(c2));
     assertEquals(new Coordinate(), new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE));
-    assertEquals(new Coordinate((double)3, 5, Coordinates.NULL_ORDINATE),
-      new Coordinate((double)3, 5, Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE));
+    assertEquals(new Coordinate((double)3, 5, Point.NULL_ORDINATE),
+      new Coordinate((double)3, 5, Point.NULL_ORDINATE));
     assertEquals(new Coordinate((double)3, 5, Double.NaN), new Coordinate(
       (double)3, 5, Double.NaN));
     assertTrue(new Coordinate((double)3, 5, 0).equals(new Coordinate((double)3,
@@ -124,9 +124,9 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testCreateEmptyGeometry() throws Exception {
-    assertTrue(this.geometryFactory.point((Coordinates)null).isEmpty());
-    assertTrue(this.geometryFactory.linearRing(new Coordinates[] {}).isEmpty());
-    assertTrue(this.geometryFactory.lineString(new Coordinates[] {}).isEmpty());
+    assertTrue(this.geometryFactory.point((Point)null).isEmpty());
+    assertTrue(this.geometryFactory.linearRing(new Point[] {}).isEmpty());
+    assertTrue(this.geometryFactory.lineString(new Point[] {}).isEmpty());
     assertTrue(this.geometryFactory.polygon().isEmpty());
     assertTrue(this.geometryFactory.multiPolygon(new Polygon[] {}).isEmpty());
     assertTrue(this.geometryFactory.multiLineString(new LineString[] {})
@@ -134,27 +134,27 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.multiPoint(new Point[] {}).isEmpty());
 
     assertTrue(this.geometryFactory.point().isSimple());
-    assertTrue(this.geometryFactory.linearRing(new Coordinates[] {}).isSimple());
+    assertTrue(this.geometryFactory.linearRing(new Point[] {}).isSimple());
     /**
      * @todo Enable when #isSimple implemented
      */
-    // assertTrue(geometryFactory.createLineString(new Coordinates[] {
+    // assertTrue(geometryFactory.createLineString(new Point[] {
     // }).isSimple());
     // assertTrue(geometryFactory.createPolygon(geometryFactory.createLinearRing(new
-    // Coordinates[] { }), new LinearRing[] { }).isSimple());
+    // Point[] { }), new LinearRing[] { }).isSimple());
     // assertTrue(geometryFactory.multiPolygon(new Polygon[] {
     // }).isSimple());
     // assertTrue(geometryFactory.multiLineString(new LineString[] {
     // }).isSimple());
     // assertTrue(geometryFactory.multiPoint(new Point[] { }).isSimple());
 
-    assertTrue(this.geometryFactory.point((Coordinates)null)
+    assertTrue(this.geometryFactory.point((Point)null)
       .getBoundary()
       .isEmpty());
-    assertTrue(this.geometryFactory.linearRing(new Coordinates[] {})
+    assertTrue(this.geometryFactory.linearRing(new Point[] {})
       .getBoundary()
       .isEmpty());
-    assertTrue(this.geometryFactory.lineString(new Coordinates[] {})
+    assertTrue(this.geometryFactory.lineString(new Point[] {})
       .getBoundary()
       .isEmpty());
     assertTrue(this.geometryFactory.polygon().getBoundary().isEmpty());
@@ -175,7 +175,7 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.multiLineString().isEmpty());
     assertTrue(this.geometryFactory.multiPoint().isEmpty());
 
-    assertEquals(-1, this.geometryFactory.point((Coordinates)null)
+    assertEquals(-1, this.geometryFactory.point((Point)null)
       .getBoundaryDimension());
     assertEquals(-1, this.geometryFactory.linearRing().getBoundaryDimension());
     assertEquals(0, this.geometryFactory.lineString().getBoundaryDimension());
@@ -263,7 +263,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyPoint() throws Exception {
-    final Point p = this.geometryFactory.point((Coordinates)null);
+    final Point p = this.geometryFactory.point((Point)null);
     assertEquals(0, p.getDimension());
     assertEquals(new Envelope(), p.getBoundingBox());
     assertTrue(p.isSimple());
@@ -293,7 +293,7 @@ public class MiscellaneousTest extends TestCase {
   // }
 
   public void testLinearRingIsSimple() throws Exception {
-    final Coordinates[] coordinates = {
+    final Point[] coordinates = {
       new Coordinate((double)10, 10, 0), new Coordinate((double)10, 20, 0),
       new Coordinate((double)20, 20, 0), new Coordinate((double)20, 15, 0),
       new Coordinate((double)10, 10, 0)
@@ -478,9 +478,9 @@ public class MiscellaneousTest extends TestCase {
   // }
 
   public void testPredicatesReturnFalseForEmptyGeometries() {
-    final Point p1 = GeometryFactory.getFactory().point((Coordinates)null);
+    final Point p1 = GeometryFactory.getFactory().point((Point)null);
     final Point p2 = GeometryFactory.getFactory().point(
-      new Coordinate((double)5, 5, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)5, 5, Point.NULL_ORDINATE));
     assertEquals(false, p1.equals(p2));
     assertEquals(true, p1.disjoint(p2));
     assertEquals(false, p1.intersects(p2));

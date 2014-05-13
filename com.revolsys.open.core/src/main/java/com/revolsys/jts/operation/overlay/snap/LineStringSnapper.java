@@ -36,7 +36,7 @@ package com.revolsys.jts.operation.overlay.snap;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineString;
 
@@ -110,13 +110,13 @@ public class LineStringSnapper {
    * @return the index of the snapped segment
    * or -1 if no segment snaps to the snap point
    */
-  private int findSegmentIndexToSnap(final Coordinates snapPt,
+  private int findSegmentIndexToSnap(final Point snapPt,
     final CoordinateList srcCoords) {
     double minDist = Double.MAX_VALUE;
     int snapIndex = -1;
     for (int i = 0; i < srcCoords.size() - 1; i++) {
-      final Coordinates p0 = srcCoords.get(i);
-      final Coordinates p1 = srcCoords.get(i + 1);
+      final Point p0 = srcCoords.get(i);
+      final Point p1 = srcCoords.get(i + 1);
 
       /**
        * Check if the snap pt is equal to one of the segment endpoints.
@@ -140,8 +140,8 @@ public class LineStringSnapper {
     return snapIndex;
   }
 
-  private Coordinates findSnapForVertex(final Coordinates pt,
-    final Coordinates[] snapPts) {
+  private Point findSnapForVertex(final Point pt,
+    final Point[] snapPts) {
     for (int i = 0; i < snapPts.length; i++) {
       // if point is already equal to a src pt, don't snap
       if (pt.equals2d(snapPts[i])) {
@@ -174,7 +174,7 @@ public class LineStringSnapper {
    * @param snapPts the target snap vertices
    */
   private void snapSegments(final CoordinateList srcCoords,
-    final Coordinates[] snapPts) {
+    final Point[] snapPts) {
     // guard against empty input
     if (snapPts.length == 0) {
       return;
@@ -190,7 +190,7 @@ public class LineStringSnapper {
     }
 
     for (int i = 0; i < distinctPtCount; i++) {
-      final Coordinates snapPt = snapPts[i];
+      final Point snapPt = snapPts[i];
       final int index = findSegmentIndexToSnap(snapPt, srcCoords);
       /**
        * If a segment to snap to was found, "crack" it at the snap pt.
@@ -211,13 +211,13 @@ public class LineStringSnapper {
    * @param snapPts the vertices to snap to
    * @return a list of the snapped points
    */
-  public Coordinates[] snapTo(final Coordinates[] snapPts) {
+  public Point[] snapTo(final Point[] snapPts) {
     final CoordinateList coordList = new CoordinateList(srcPts);
 
     snapVertices(coordList, snapPts);
     snapSegments(coordList, snapPts);
 
-    final Coordinates[] newPts = coordList.toCoordinateArray();
+    final Point[] newPts = coordList.toCoordinateArray();
     return newPts;
   }
 
@@ -228,13 +228,13 @@ public class LineStringSnapper {
    * @param snapPts the points to snap to
    */
   private void snapVertices(final CoordinateList srcCoords,
-    final Coordinates[] snapPts) {
+    final Point[] snapPts) {
     // try snapping vertices
     // if src is a ring then don't snap final vertex
     final int end = isClosed ? srcCoords.size() - 1 : srcCoords.size();
     for (int i = 0; i < end; i++) {
-      final Coordinates srcPt = srcCoords.get(i);
-      final Coordinates snapVert = findSnapForVertex(srcPt, snapPts);
+      final Point srcPt = srcCoords.get(i);
+      final Point snapVert = findSnapForVertex(srcPt, snapPts);
       if (snapVert != null) {
         // update src with snap pt
         srcCoords.set(i, new Coordinate(snapVert));

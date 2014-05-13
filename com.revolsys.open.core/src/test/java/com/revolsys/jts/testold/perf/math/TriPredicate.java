@@ -1,6 +1,6 @@
 package com.revolsys.jts.testold.perf.math;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.math.DD;
 
@@ -27,8 +27,8 @@ public class TriPredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircle(final Coordinates a, final Coordinates b,
-    final Coordinates c, final Coordinates p) {
+  public static boolean isInCircle(final Point a, final Point b,
+    final Point c, final Point p) {
     final boolean isInCircle = (a.getX() * a.getX() + a.getY() * a.getY()) * triArea(b, c, p)
       - (b.getX() * b.getX() + b.getY() * b.getY()) * triArea(a, c, p) + (c.getX() * c.getX() + c.getY() * c.getY())
       * triArea(a, b, p) - (p.getX() * p.getX() + p.getY() * p.getY()) * triArea(a, b, c) > 0;
@@ -55,9 +55,9 @@ public class TriPredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleCC(final Coordinates a, final Coordinates b,
-    final Coordinates c, final Coordinates p) {
-    final Coordinates cc = Triangle.circumcentre(a, b, c);
+  public static boolean isInCircleCC(final Point a, final Point b,
+    final Point c, final Point p) {
+    final Point cc = Triangle.circumcentre(a, b, c);
     final double ccRadius = a.distance(cc);
     final double pRadiusDiff = p.distance(cc) - ccRadius;
     return pRadiusDiff <= 0;
@@ -73,8 +73,8 @@ public class TriPredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleDD(final Coordinates a, final Coordinates b,
-    final Coordinates c, final Coordinates p) {
+  public static boolean isInCircleDD(final Point a, final Point b,
+    final Point c, final Point p) {
     final DD px = new DD(p.getX());
     final DD py = new DD(p.getY());
     final DD ax = new DD(a.getX());
@@ -103,8 +103,8 @@ public class TriPredicate {
     return isInCircle;
   }
 
-  public static boolean isInCircleDD2(final Coordinates a, final Coordinates b,
-    final Coordinates c, final Coordinates p) {
+  public static boolean isInCircleDD2(final Point a, final Point b,
+    final Point c, final Point p) {
     final DD aTerm = DD.sqr(a.getX())
       .selfAdd(DD.sqr(a.getY()))
       .selfMultiply(triAreaDD2(b, c, p));
@@ -124,8 +124,8 @@ public class TriPredicate {
     return isInCircle;
   }
 
-  public static boolean isInCircleDD3(final Coordinates a, final Coordinates b,
-    final Coordinates c, final Coordinates p) {
+  public static boolean isInCircleDD3(final Point a, final Point b,
+    final Point c, final Point p) {
     final DD adx = DD.valueOf(a.getX()).selfSubtract(p.getX());
     final DD ady = DD.valueOf(a.getY()).selfSubtract(p.getY());
     final DD bdx = DD.valueOf(b.getX()).selfSubtract(p.getX());
@@ -159,8 +159,8 @@ public class TriPredicate {
    * @param p the point to test
    * @return true if this point is inside the circle defined by the points a, b, c
    */
-  public static boolean isInCircleRobust(final Coordinates a,
-    final Coordinates b, final Coordinates c, final Coordinates p) {
+  public static boolean isInCircleRobust(final Point a,
+    final Point b, final Point c, final Point p) {
     // checkRobustInCircle(a, b, c, p);
     return isInCircleDD(a, b, c, p);
   }
@@ -173,8 +173,8 @@ public class TriPredicate {
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
    */
-  private static double triArea(final Coordinates a, final Coordinates b,
-    final Coordinates c) {
+  private static double triArea(final Point a, final Point b,
+    final Point c) {
     return (b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX());
   }
 
@@ -197,8 +197,8 @@ public class TriPredicate {
       .subtract(by.subtract(ay).multiply(cx.subtract(ax)));
   }
 
-  public static DD triAreaDD2(final Coordinates a, final Coordinates b,
-    final Coordinates c) {
+  public static DD triAreaDD2(final Point a, final Point b,
+    final Point c) {
 
     final DD t1 = DD.valueOf(b.getX())
       .selfSubtract(a.getX())

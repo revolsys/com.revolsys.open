@@ -9,7 +9,7 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -49,7 +49,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     super(name);
   }
 
-  public Geometry createAngle(final Coordinates base, final double size,
+  public Geometry createAngle(final Point base, final double size,
     final int quadrant) {
     final int[][] factor = {
       {
@@ -66,12 +66,12 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final int xFac = factor[quadrant][0];
     final int yFac = factor[quadrant][1];
 
-    final Coordinates p0 = new Coordinate(base.getX() + xFac * size,
-      base.getY() + yFac * size, Coordinates.NULL_ORDINATE);
-    final Coordinates p2 = new Coordinate(base.getX() + yFac * size,
-      base.getY() + -xFac * size, Coordinates.NULL_ORDINATE);
+    final Point p0 = new Coordinate(base.getX() + xFac * size,
+      base.getY() + yFac * size, Point.NULL_ORDINATE);
+    final Point p2 = new Coordinate(base.getX() + yFac * size,
+      base.getY() + -xFac * size, Point.NULL_ORDINATE);
 
-    return this.fact.lineString(new Coordinates[] {
+    return this.fact.lineString(new Point[] {
       p0, base, p2
     });
   }
@@ -82,7 +82,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
     for (double y = env.getMinY(); y <= env.getMaxY(); y += inc) {
       for (double x = env.getMinX(); x <= env.getMaxX(); x += inc) {
-        final Coordinates base = new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+        final Point base = new Coordinate(x, y, Point.NULL_ORDINATE);
         testGeoms.add(createAngle(base, size, 0));
         testGeoms.add(createAngle(base, size, 1));
         testGeoms.add(createAngle(base, size, 2));

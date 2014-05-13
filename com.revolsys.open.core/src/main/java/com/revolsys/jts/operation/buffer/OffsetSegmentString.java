@@ -38,7 +38,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -53,7 +53,7 @@ import com.revolsys.jts.geom.LineString;
  */
 class OffsetSegmentString {
 
-  private final List<Coordinates> points = new ArrayList<>();
+  private final List<Point> points = new ArrayList<>();
 
   private GeometryFactory precisionModel = null;
 
@@ -64,7 +64,7 @@ class OffsetSegmentString {
    */
   private double minimimVertexDistance = 0.0;
 
-  public void addPt(final Coordinates point) {
+  public void addPt(final Point point) {
     addPt(point.getX(), point.getY());
   }
 
@@ -73,7 +73,7 @@ class OffsetSegmentString {
       coordinates[0] = precisionModel.makePrecise(0, coordinates[0]);
       coordinates[1] = precisionModel.makePrecise(1, coordinates[1]);
     }
-    final Coordinates bufPt = new DoubleCoordinates(coordinates);
+    final Point bufPt = new DoubleCoordinates(coordinates);
     if (!isRedundant(bufPt)) {
       points.add(bufPt);
     }
@@ -95,9 +95,9 @@ class OffsetSegmentString {
     if (points.size() < 1) {
       return;
     }
-    final Coordinates startPt = new Coordinate(points.get(0));
-    final Coordinates lastPt = points.get(points.size() - 1);
-    Coordinates last2Pt = null;
+    final Point startPt = new Coordinate(points.get(0));
+    final Point lastPt = points.get(points.size() - 1);
+    Point last2Pt = null;
     if (points.size() >= 2) {
       last2Pt = points.get(points.size() - 2);
     }
@@ -119,12 +119,12 @@ class OffsetSegmentString {
    * @param pt
    * @return true if the point is redundant
    */
-  private boolean isRedundant(final Coordinates pt) {
+  private boolean isRedundant(final Point pt) {
     if (points.size() < 1) {
       return false;
     }
     // return points.get(points.size() - 1).equals(pt);
-    final Coordinates lastPt = points.get(points.size() - 1);
+    final Point lastPt = points.get(points.size() - 1);
     final double ptDist = pt.distance(lastPt);
     if (ptDist < minimimVertexDistance) {
       return true;

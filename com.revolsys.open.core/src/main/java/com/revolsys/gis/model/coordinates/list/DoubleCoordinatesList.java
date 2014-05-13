@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.util.MathUtil;
 
@@ -18,7 +18,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
 
   private final byte axisCount;
 
-  public DoubleCoordinatesList(final Coordinates... coordinates) {
+  public DoubleCoordinatesList(final Point... coordinates) {
     this(3, coordinates);
   }
 
@@ -31,23 +31,23 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   }
 
   public DoubleCoordinatesList(final int axisCount,
-    final Collection<Coordinates> points) {
+    final Collection<Point> points) {
     this(points.size(), axisCount);
     int i = 0;
-    for (final Coordinates point : points) {
+    for (final Point point : points) {
       CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, i++,
         point);
     }
   }
 
-  public DoubleCoordinatesList(final int axisCount, final Coordinates... points) {
+  public DoubleCoordinatesList(final int axisCount, final Point... points) {
     this(axisCount, Arrays.asList(points));
   }
 
   public DoubleCoordinatesList(final int axisCount, final CoordinatesList points) {
     this(points.size(), axisCount);
     int i = 0;
-    for (final Coordinates point : points) {
+    for (final Point point : points) {
       CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, i++,
         point);
     }

@@ -17,7 +17,7 @@ public class LineStringVertex extends AbstractVertex {
   }
 
   @Override
-  public double getValue(final int index) {
+  public double getCoordinate(final int index) {
     final LineString line = getGeometry();
     return line.getCoordinate(vertexIndex, index);
   }

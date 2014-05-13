@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Models a collection of {@link Point}s.
  * <p>
- * Any collection of Points is a valid MultiPoint.
+ * Any collection of Point is a valid MultiPoint.
  *
  *@version 1.7
  */

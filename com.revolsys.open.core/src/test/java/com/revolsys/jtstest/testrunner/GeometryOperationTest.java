@@ -97,7 +97,7 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
     if (!StringUtils.hasText(description)) {
       this.testDescription = operation;
     }
-    setName(testDescription);
+    setName(testCase.getId() + "." + testIndex + "." + testDescription);
     this.operation = operation;
     this.expectedResult = expectedResult;
     this.testIndex = testIndex;

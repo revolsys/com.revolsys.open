@@ -41,7 +41,7 @@ import java.util.TreeMap;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.util.Assert;
@@ -189,7 +189,7 @@ abstract public class EdgeEndStar {
           if (hasDimensionalCollapseEdge[geomi]) {
             loc = Location.EXTERIOR;
           } else {
-            final Coordinates p = e.getCoordinate();
+            final Point p = e.getCoordinate();
             loc = getLocation(geomi, p, geomGraph);
           }
           label.setAllLocationsIfNull(geomi, loc);
@@ -215,7 +215,7 @@ abstract public class EdgeEndStar {
   /**
    * @return the coordinate for the node this star is based at
    */
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     final Iterator it = iterator();
     if (!it.hasNext()) {
       return null;
@@ -235,7 +235,7 @@ abstract public class EdgeEndStar {
     return edgeList;
   }
 
-  private Location getLocation(final int geomIndex, final Coordinates p,
+  private Location getLocation(final int geomIndex, final Point p,
     final GeometryGraph[] geom) {
     // compute location only on demand
     if (ptInAreaLocation[geomIndex] == Location.NONE) {

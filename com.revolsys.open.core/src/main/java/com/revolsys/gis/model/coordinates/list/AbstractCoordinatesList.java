@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCoordinatesList implements CoordinatesList,
@@ -39,7 +39,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public boolean contains(final Coordinates point) {
+  public boolean contains(final Point point) {
     for (int i = 0; i < size(); i++) {
       if (equal(i, point, 2)) {
         return true;
@@ -50,19 +50,6 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
 
   public CoordinatesList create(final int length, final int axisCount) {
     return new DoubleCoordinatesList(length, axisCount);
-  }
-
-  @Override
-  public double distance(final int index, final Coordinates point) {
-    if (index < size()) {
-      final double x1 = getX(index);
-      final double y1 = getY(index);
-      final double x2 = point.getX();
-      final double y2 = point.getY();
-      return MathUtil.distance(x1, y1, x2, y2);
-    } else {
-      return Double.NaN;
-    }
   }
 
   @Override
@@ -80,33 +67,15 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public boolean equal(final int index, final Coordinates point) {
-    final int axisCount = Math.max(getAxisCount(), point.getAxisCount());
-    return equal(index, point, axisCount);
-  }
-
-  @Override
-  public boolean equal(final int index, final Coordinates point,
-    final int axisCount) {
-    int maxAxis = Math.max(getAxisCount(), point.getAxisCount());
-    if (maxAxis > axisCount) {
-      maxAxis = axisCount;
-    }
-    if (getAxisCount() < maxAxis) {
-      return false;
-    } else if (point.getAxisCount() < maxAxis) {
-      return false;
-    } else if (index < size()) {
-      for (int j = 0; j < maxAxis; j++) {
-        final double value1 = getValue(index, j);
-        final double value2 = point.getValue(j);
-        if (Double.compare(value1, value2) != 0) {
-          return false;
-        }
-      }
-      return true;
+  public double distance(final int index, final Point point) {
+    if (index < size()) {
+      final double x1 = getX(index);
+      final double y1 = getY(index);
+      final double x2 = point.getX();
+      final double y2 = point.getY();
+      return MathUtil.distance(x1, y1, x2, y2);
     } else {
-      return false;
+      return Double.NaN;
     }
   }
 
@@ -148,7 +117,37 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public boolean equal2d(final int index, final Coordinates point) {
+  public boolean equal(final int index, final Point point) {
+    final int axisCount = Math.max(getAxisCount(), point.getAxisCount());
+    return equal(index, point, axisCount);
+  }
+
+  @Override
+  public boolean equal(final int index, final Point point, final int axisCount) {
+    int maxAxis = Math.max(getAxisCount(), point.getAxisCount());
+    if (maxAxis > axisCount) {
+      maxAxis = axisCount;
+    }
+    if (getAxisCount() < maxAxis) {
+      return false;
+    } else if (point.getAxisCount() < maxAxis) {
+      return false;
+    } else if (index < size()) {
+      for (int j = 0; j < maxAxis; j++) {
+        final double value1 = getValue(index, j);
+        final double value2 = point.getCoordinate(j);
+        if (Double.compare(value1, value2) != 0) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean equal2d(final int index, final Point point) {
     return equal(index, point, 2);
   }
 
@@ -216,7 +215,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Coordinates get(final int i) {
+  public Point get(final int i) {
     if (i >= 0 && i < size()) {
       return new CoordinatesListCoordinates(this, i);
     } else {
@@ -225,7 +224,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Coordinates getCoordinate(final int i) {
+  public Point getCoordinate(final int i) {
     final double[] values = new double[getAxisCount()];
     for (int axisIndex = 0; axisIndex < values.length; axisIndex++) {
       values[axisIndex] = getValue(i, axisIndex);
@@ -234,7 +233,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Coordinates getCoordinateCopy(final int i) {
+  public Point getCoordinateCopy(final int i) {
     return getCoordinate(i);
   }
 
@@ -255,9 +254,9 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public List<Coordinates> getList() {
-    final List<Coordinates> points = new ArrayList<Coordinates>();
-    for (final Coordinates point : this) {
+  public List<Point> getList() {
+    final List<Point> points = new ArrayList<Point>();
+    for (final Point point : this) {
       points.add(point);
     }
     return points;
@@ -374,7 +373,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Iterator<Coordinates> iterator() {
+  public Iterator<Point> iterator() {
     return new CoordinatesListCoordinatesIterator(this);
   }
 
@@ -385,9 +384,9 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     final double[] coordinates = new double[vertexCount * axisCount];
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        int coordinateIndex = (vertexCount - 1 - vertexIndex) * axisCount + axisIndex;
-        coordinates[coordinateIndex] = getValue(
-          vertexIndex, axisIndex);
+        final int coordinateIndex = (vertexCount - 1 - vertexIndex) * axisCount
+          + axisIndex;
+        coordinates[coordinateIndex] = getValue(vertexIndex, axisIndex);
       }
     }
     return new DoubleCoordinatesList(axisCount, coordinates);
@@ -436,7 +435,7 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
     final int axisCount = getAxisCount();
     final double[] coordinates = new double[length * axisCount];
     for (int i = 0; i < count; i++) {
-      final Coordinates point = get(sourceIndex + i);
+      final Point point = get(sourceIndex + i);
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, targetIndex
         + i, point);
     }
@@ -444,8 +443,8 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public Coordinates[] toCoordinateArray() {
-    final Coordinates[] coordinateArray = new Coordinates[size()];
+  public Point[] toCoordinateArray() {
+    final Point[] coordinateArray = new Point[size()];
     for (int i = 0; i < coordinateArray.length; i++) {
       coordinateArray[i] = getCoordinateCopy(i);
     }
@@ -453,9 +452,9 @@ public abstract class AbstractCoordinatesList implements CoordinatesList,
   }
 
   @Override
-  public List<Coordinates> toList() {
-    final List<Coordinates> points = new ArrayList<>();
-    for (final Coordinates point : this) {
+  public List<Point> toList() {
+    final List<Point> points = new ArrayList<>();
+    for (final Point point : this) {
       points.add(point.cloneCoordinates());
     }
     return points;

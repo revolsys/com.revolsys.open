@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.revolsys.gis.algorithm.index.AbstractIdObjectPointQuadTree;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.visitor.CreateListVisitor;
 
@@ -19,7 +19,7 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   }
 
   @Override
-  public Coordinates getCoordinates(final Node<T> node) {
+  public Point getCoordinates(final Node<T> node) {
     return node;
   }
 

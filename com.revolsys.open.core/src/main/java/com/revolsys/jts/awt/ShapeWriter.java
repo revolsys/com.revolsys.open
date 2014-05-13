@@ -36,7 +36,7 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -259,7 +259,7 @@ public class ShapeWriter {
   private GeneralPath toShape(final LineString lineString) {
     final GeneralPath shape = new GeneralPath();
 
-    Coordinates prev = lineString.getCoordinate(0);
+    Point prev = lineString.getCoordinate(0);
     transformPoint(prev, transPoint);
     shape.moveTo((float)transPoint.getX(), (float)transPoint.getY());
 
@@ -269,7 +269,7 @@ public class ShapeWriter {
     final int n = lineString.getVertexCount() - 1;
     // int count = 0;
     for (int i = 1; i <= n; i++) {
-      final Coordinates currentCoord = lineString.getCoordinate(i);
+      final Point currentCoord = lineString.getCoordinate(i);
       if (decimationDistance > 0.0) {
         final boolean isDecimated = prev != null
           && Math.abs(currentCoord.getX() - prev.getX()) < decimationDistance
@@ -322,11 +322,11 @@ public class ShapeWriter {
     return polygonShape;
   }
 
-  private Point2D transformPoint(final Coordinates model) {
+  private Point2D transformPoint(final Point model) {
     return transformPoint(model, new Point2D.Double());
   }
 
-  private Point2D transformPoint(final Coordinates model, final Point2D view) {
+  private Point2D transformPoint(final Point model, final Point2D view) {
     pointTransformer.transform(model, view);
     return view;
   }

@@ -16,7 +16,7 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -77,7 +77,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
       int axisCount = 2;
       final String[] coordinatesListArray = coordinatesListString.trim().split(
         "\\s+");
-      final List<Coordinates> points = new ArrayList<>();
+      final List<Point> points = new ArrayList<>();
       for (int i = 0; i < coordinatesListArray.length; i++) {
         final String coordinatesString = coordinatesListArray[i];
         final String[] coordinatesArray = coordinatesString.split(",");

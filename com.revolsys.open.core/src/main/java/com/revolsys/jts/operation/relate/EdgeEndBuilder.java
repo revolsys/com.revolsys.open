@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeEnd;
 import com.revolsys.jts.geomgraph.EdgeIntersection;
@@ -122,7 +122,7 @@ public class EdgeEndBuilder {
       return;
     }
 
-    Coordinates pNext = edge.getCoordinate(iNext);
+    Point pNext = edge.getCoordinate(iNext);
 
     // if the next intersection is in the same segment as the current, use it as
     // the endpoint
@@ -155,7 +155,7 @@ public class EdgeEndBuilder {
       }
       iPrev--;
     }
-    Coordinates pPrev = edge.getCoordinate(iPrev);
+    Point pPrev = edge.getCoordinate(iPrev);
     // if prev intersection is past the previous vertex, use it instead
     if (eiPrev != null && eiPrev.segmentIndex >= iPrev) {
       pPrev = eiPrev.coord;

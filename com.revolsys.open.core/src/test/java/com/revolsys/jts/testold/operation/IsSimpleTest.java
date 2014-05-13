@@ -37,7 +37,7 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
@@ -71,13 +71,13 @@ public class IsSimpleTest extends TestCase {
   }
 
   private void runIsSimpleTest(final String wkt, final BoundaryNodeRule bnRule,
-    final boolean expectedResult, final Coordinates expectedLocation)
+    final boolean expectedResult, final Point expectedLocation)
     throws ParseException {
     final Geometry g = this.rdr.read(wkt);
     final IsSimpleOp op = new IsSimpleOp(g, bnRule);
     boolean isSimple = false;
     isSimple = op.isSimple();
-    final Coordinates nonSimpleLoc = op.getNonSimpleLocation();
+    final Point nonSimpleLoc = op.getNonSimpleLocation();
 
     // if geom is not simple, should have a valid location
     assertTrue(isSimple || nonSimpleLoc != null);
@@ -96,9 +96,9 @@ public class IsSimpleTest extends TestCase {
   public void test2TouchAtEndpoint() throws Exception {
     final String a = "MULTILINESTRING((0 1, 1 1, 2 1), (0 0, 1 0, 2 1))";
     runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, true,
-      new Coordinate((double)2, 1, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)2, 1, Point.NULL_ORDINATE));
     runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, true,
-      new Coordinate((double)2, 1, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)2, 1, Point.NULL_ORDINATE));
   }
 
   /**
@@ -111,17 +111,17 @@ public class IsSimpleTest extends TestCase {
 
     // rings are simple under all rules
     runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, true,
-      new Coordinate((double)2, 1, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)2, 1, Point.NULL_ORDINATE));
     runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, true,
-      new Coordinate((double)2, 1, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)2, 1, Point.NULL_ORDINATE));
   }
 
   public void testCross() throws Exception {
     final String a = "MULTILINESTRING ((20 120, 120 20), (20 20, 120 120))";
     runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, false,
-      new Coordinate((double)70, 70, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)70, 70, Point.NULL_ORDINATE));
     runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, false,
-      new Coordinate((double)70, 70, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)70, 70, Point.NULL_ORDINATE));
   }
 
   public void testMultiLineStringWithRingTouchAtEndpoint() throws Exception {
@@ -130,7 +130,7 @@ public class IsSimpleTest extends TestCase {
     // under Mod-2, the ring has no boundary, so the line intersects the
     // interior ==> not simple
     runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, false,
-      new Coordinate((double)100, 100, Coordinates.NULL_ORDINATE));
+      new Coordinate((double)100, 100, Point.NULL_ORDINATE));
     // under Endpoint, the ring has a boundary point, so the line does NOT
     // intersect the interior ==> simple
     runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, true);

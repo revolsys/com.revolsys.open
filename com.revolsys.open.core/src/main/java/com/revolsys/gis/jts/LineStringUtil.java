@@ -16,14 +16,13 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.util.CollectionUtil;
 
@@ -42,12 +41,12 @@ public final class LineStringUtil {
     if (axisCount > 2) {
       final double[] coordinates = update.getCoordinatesList().getCoordinates();
 
-      final Coordinates c0 = update.getCoordinate(0);
+      final Point c0 = update.getCoordinate(0);
       if (Double.isNaN(update.getZ(0))) {
         final double z = CoordinatesUtil.getElevation(original, c0);
         coordinates[2] = z;
       }
-      final Coordinates cN = update.getCoordinate(update.getVertexCount() - 1);
+      final Point cN = update.getCoordinate(update.getVertexCount() - 1);
       if (Double.isNaN(cN.getZ())) {
         final double z = CoordinatesUtil.getElevation(original, c0);
         coordinates[update.getVertexCount() * axisCount + 2] = z;
@@ -72,28 +71,28 @@ public final class LineStringUtil {
   // }
   // if (newPoints.size() > 2) {
   // if (i == 1) {
-  // final Coordinates p1 = points.get(0);
-  // final Coordinates p2 = points.get(1);
-  // final Coordinates p3 = points.get(2);
+  // final Point p1 = points.get(0);
+  // final Point p2 = points.get(1);
+  // final Point p3 = points.get(2);
   // final double angle = CoordinatesUtil.angle(p1, p2, p3);
   // if (angle > Math.toRadians(170)) {
   // newPoints.remove(1);
   // numRemoved++;
   // }
   // } else if (i == points.size() - 1) {
-  // final Coordinates p1 = points.get(i - 2);
-  // final Coordinates p2 = points.get(i - 1);
-  // final Coordinates p3 = points.get(i);
+  // final Point p1 = points.get(i - 2);
+  // final Point p2 = points.get(i - 1);
+  // final Point p3 = points.get(i);
   // final double angle = CoordinatesUtil.angle(p1, p2, p3);
   // if (angle > Math.toRadians(170)) {
   // newPoints.remove(points.size() - 2 - numRemoved);
   // numRemoved++;
   // }
   // } else {
-  // final Coordinates p1 = points.get(i - 2);
-  // final Coordinates p2 = points.get(i - 1);
-  // final Coordinates p3 = points.get(i);
-  // final Coordinates p4 = points.get(i + 1);
+  // final Point p1 = points.get(i - 2);
+  // final Point p2 = points.get(i - 1);
+  // final Point p3 = points.get(i);
+  // final Point p4 = points.get(i + 1);
   // final double angle1 = CoordinatesUtil.angle(p1, p2, p3);
   // final double angle2 = CoordinatesUtil.angle(p2, p3, p4);
   // boolean removed = false;
@@ -112,7 +111,7 @@ public final class LineStringUtil {
   // removed = true;
   // }
   // if (!removed) {
-  // final Coordinates midPoint = LineSegmentUtil.midPoint(factory,
+  // final Point midPoint = LineSegmentUtil.midPoint(factory,
   // p2, p3);
   // newPoints.setPoint(i - 1 - numRemoved, midPoint);
   // newPoints.remove(i - numRemoved);
@@ -134,8 +133,8 @@ public final class LineStringUtil {
   // }
 
   public static void addLineString(final GeometryFactory geometryFactory,
-    final CoordinatesList points, final Coordinates startPoint,
-    final int startIndex, final int endIndex, final Coordinates endPoint,
+    final CoordinatesList points, final Point startPoint,
+    final int startIndex, final int endIndex, final Point endPoint,
     final List<LineString> lines) {
     final int length = endIndex - startIndex + 1;
     final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
@@ -148,27 +147,27 @@ public final class LineStringUtil {
     }
   }
 
-  public static double distance(final Coordinates point,
+  public static double distance(final Point point,
     final Geometry geometry, final double tolerance) {
     final double x = point.getX();
     final double y = point.getY();
     return distance(x, y, geometry, tolerance);
   }
 
-  public static double distance(final Coordinates point, final LineString line) {
+  public static double distance(final Point point, final LineString line) {
     return distance(point, line, 0.0);
   }
 
-  public static double distance(final Coordinates point, final LineString line,
+  public static double distance(final Point point, final LineString line,
     final double tolerance) {
     final double x = point.getX();
     final double y = point.getY();
     return distance(x, y, line, tolerance);
   }
 
-  public static double distance(final Coordinates point, final LineString line,
+  public static double distance(final Point point, final LineString line,
     final int index, final double maxDistance) {
-    final Coordinates point2 = CoordinatesListUtil.get(line, index);
+    final Point point2 = CoordinatesListUtil.get(line, index);
     return point.distance(point2);
   }
 
@@ -385,33 +384,14 @@ public final class LineStringUtil {
   }
 
   public static Map<String, Number> findClosestSegmentAndCoordinate(
-    final LineString line, final Coordinates point) {
+    final LineString line, final Point point) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     return CoordinatesListUtil.findClosestSegmentAndCoordinate(points, point);
   }
 
-  public static List<LineString> getAll(final Geometry geometry) {
-    final List<LineString> lines = new ArrayList<LineString>();
-    for (int partIndex = 0; partIndex < geometry.getGeometryCount(); partIndex++) {
-      final Geometry part = geometry.getGeometry(partIndex);
-      if (part instanceof LineString) {
-        final LineString line = (LineString)part;
-        lines.add(line);
-      } else if (part instanceof Polygon) {
-        final Polygon polygon = (Polygon)part;
-        lines.add(polygon.getExteriorRing());
-        for (int ringIndex = 0; ringIndex < polygon.getNumInteriorRing(); ringIndex++) {
-          final LineString ring = polygon.getInteriorRing(ringIndex);
-          lines.add(ring);
-        }
-      }
-    }
-    return lines;
-  }
-
-  public static Coordinates getClosestCoordinateOnLineString(
+  public static Point getClosestCoordinateOnLineString(
     final GeometryFactory precisionModel, final LineString line,
-    final Coordinates point, final double tolerance) {
+    final Point point, final double tolerance) {
     final Map<String, Number> result = LineStringUtil.findClosestSegmentAndCoordinate(
       line, point);
     final int segmentIndex = result.get(SEGMENT_INDEX).intValue();
@@ -422,13 +402,13 @@ public final class LineStringUtil {
         .doubleValue();
       final double segmentDistance = result.get(SEGMENT_DISTANCE).doubleValue();
       if (coordinateIndex == 0) {
-        final Coordinates c0 = coordinates.get(0);
+        final Point c0 = coordinates.get(0);
         if (coordinateDistance < tolerance) {
           return c0;
         } else if (segmentDistance == 0) {
           return point;
         } else {
-          Coordinates c1;
+          Point c1;
           int i = 1;
           do {
             c1 = coordinates.get(i);
@@ -441,13 +421,13 @@ public final class LineStringUtil {
           }
         }
       } else if (coordinateIndex == line.getVertexCount() - 1) {
-        final Coordinates cn = coordinates.get(coordinates.size() - 1);
+        final Point cn = coordinates.get(coordinates.size() - 1);
         if (coordinateDistance == 0) {
           return cn;
         } else if (segmentDistance == 0) {
           return point;
         } else {
-          Coordinates cn1;
+          Point cn1;
           int i = line.getVertexCount() - 2;
           do {
             cn1 = coordinates.get(i);
@@ -460,9 +440,9 @@ public final class LineStringUtil {
           }
         }
       } else {
-        final Coordinates cn1 = coordinates.get(coordinateIndex - 1);
+        final Point cn1 = coordinates.get(coordinateIndex - 1);
         final double cn1Distance = point.distance(cn1);
-        final Coordinates cn2 = coordinates.get(coordinateIndex);
+        final Point cn2 = coordinates.get(coordinateIndex);
         final double cn2Distance = point.distance(cn2);
         if (cn1Distance < cn2Distance) {
           if (cn1Distance < tolerance) {
@@ -477,10 +457,10 @@ public final class LineStringUtil {
     return null;
   }
 
-  public static Coordinates getClosestEndsCoordinates(final LineString line,
-    final Coordinates coordinates) {
-    final Coordinates fromCoordinates = getFromCoordinates(line);
-    final Coordinates toCoordinates = getToCoordinates(line);
+  public static Point getClosestEndsCoordinates(final LineString line,
+    final Point coordinates) {
+    final Point fromCoordinates = getFromCoordinates(line);
+    final Point toCoordinates = getToCoordinates(line);
     if (fromCoordinates.distance(coordinates) <= toCoordinates.distance(coordinates)) {
       return fromCoordinates;
     } else {
@@ -488,7 +468,7 @@ public final class LineStringUtil {
     }
   }
 
-  public static Coordinates getCoordinates(final LineString line, final int i) {
+  public static Point getCoordinates(final LineString line, final int i) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     return points.get(i);
   }
@@ -500,7 +480,7 @@ public final class LineStringUtil {
    * @param line2 The second line
    * @return The coordinate or null if they don't cross
    */
-  public static Coordinates getCrossingIntersection(final LineString line1,
+  public static Point getCrossingIntersection(final LineString line1,
     final LineString line2) {
     final RobustLineIntersector intersector = new RobustLineIntersector();
 
@@ -508,28 +488,28 @@ public final class LineStringUtil {
     final CoordinatesList coordinates2 = CoordinatesListUtil.get(line2);
     final int numCoordinates1 = coordinates1.size();
     final int numCoordinates2 = coordinates2.size();
-    final Coordinates firstCoord1 = coordinates1.getCoordinate(0);
-    final Coordinates firstCoord2 = coordinates2.getCoordinate(0);
-    final Coordinates lastCoord1 = coordinates1.getCoordinate(numCoordinates1 - 1);
-    final Coordinates lastCoord2 = coordinates2.getCoordinate(numCoordinates2 - 2);
+    final Point firstCoord1 = coordinates1.getCoordinate(0);
+    final Point firstCoord2 = coordinates2.getCoordinate(0);
+    final Point lastCoord1 = coordinates1.getCoordinate(numCoordinates1 - 1);
+    final Point lastCoord2 = coordinates2.getCoordinate(numCoordinates2 - 2);
 
-    Coordinates previousCoord1 = firstCoord1;
+    Point previousCoord1 = firstCoord1;
     for (int i1 = 1; i1 < numCoordinates1; i1++) {
-      final Coordinates currentCoord1 = coordinates1.getCoordinate(i1);
-      Coordinates previousCoord2 = firstCoord2;
+      final Point currentCoord1 = coordinates1.getCoordinate(i1);
+      Point previousCoord2 = firstCoord2;
 
       for (int i2 = 1; i2 < numCoordinates2; i2++) {
-        final Coordinates currentCoord2 = coordinates2.getCoordinate(i2);
+        final Point currentCoord2 = coordinates2.getCoordinate(i2);
 
         intersector.computeIntersection(previousCoord1, currentCoord1,
           previousCoord2, currentCoord2);
         final int numIntersections = intersector.getIntersectionNum();
         if (intersector.hasIntersection()) {
           if (intersector.isProper()) {
-            final Coordinates intersection = intersector.getIntersection(0);
+            final Point intersection = intersector.getIntersection(0);
             return CoordinatesUtil.get(intersection);
           } else if (numIntersections == 1) {
-            final Coordinates intersection = intersector.getIntersection(0);
+            final Point intersection = intersector.getIntersection(0);
             if (i1 == 1 || i2 == 1 || i1 == numCoordinates1 - 1
               || i2 == numCoordinates2 - 1) {
               if (!((intersection.equals2d(firstCoord1) || intersection.equals2d(lastCoord1)) && (intersection.equals2d(firstCoord2) || intersection.equals2d(lastCoord2)))) {
@@ -540,7 +520,7 @@ public final class LineStringUtil {
             }
           } else if (intersector.isInteriorIntersection()) {
             for (int i = 0; i < numIntersections; i++) {
-              final Coordinates intersection = intersector.getIntersection(i);
+              final Point intersection = intersector.getIntersection(i);
               if (!Arrays.asList(currentCoord1, previousCoord1, currentCoord2,
                 previousCoord2).contains(intersection)) {
                 return CoordinatesUtil.get(intersection);
@@ -558,8 +538,8 @@ public final class LineStringUtil {
 
   }
 
-  public static double getElevation(final Coordinates point,
-    final Coordinates point1, final Coordinates point2) {
+  public static double getElevation(final Point point,
+    final Point point1, final Point point2) {
     final double z1 = point1.getZ();
     final double z2 = point2.getZ();
     final double fraction;
@@ -580,7 +560,7 @@ public final class LineStringUtil {
     }
   }
 
-  public static Coordinates getFromCoordinates(final LineString line) {
+  public static Point getFromCoordinates(final LineString line) {
     return getCoordinates(line, 0);
   }
 
@@ -617,18 +597,18 @@ public final class LineStringUtil {
   }
 
   public static Point getPoint(final LineString line, final int index) {
-    final Coordinates coordinates = getCoordinates(line, index);
+    final Point coordinates = getCoordinates(line, index);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.point(coordinates);
   }
 
-  public static Coordinates getToCoordinates(final LineString line) {
+  public static Point getToCoordinates(final LineString line) {
     final int index = line.getVertexCount() - 1;
     return getCoordinates(line, index);
   }
 
   public static Point getToPoint(final LineString line) {
-    final Coordinates coordinates = getToCoordinates(line);
+    final Point coordinates = getToCoordinates(line);
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     return geometryFactory.point(coordinates);
   }
@@ -678,39 +658,39 @@ public final class LineStringUtil {
    * @param line The line to intersect.
    * @return The geometry of the intersection.
    */
-  public static Geometry intersection(final Coordinates lineStart,
-    final Coordinates lineEnd, final LineString line) {
+  public static Geometry intersection(final Point lineStart,
+    final Point lineEnd, final LineString line) {
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final List<CoordinatesList> intersections = new ArrayList<CoordinatesList>();
     final CoordinatesList points = CoordinatesListUtil.get(line);
-    final Iterator<Coordinates> iterator = points.iterator();
-    Coordinates previousPoint = iterator.next();
+    final Iterator<Point> iterator = points.iterator();
+    Point previousPoint = iterator.next();
     while (iterator.hasNext()) {
-      final Coordinates nextPoint = iterator.next();
+      final Point nextPoint = iterator.next();
       final CoordinatesList intersectionPoints = LineSegmentUtil.getIntersection(
         factory, lineStart, lineEnd, previousPoint, nextPoint);
       if (intersectionPoints.size() > 0) {
         if (intersectionPoints.size() == 1 && !intersections.isEmpty()) {
-          final Coordinates point = intersectionPoints.get(0);
+          final Point point = intersectionPoints.get(0);
           final CoordinatesList lastIntersection = intersections.get(intersections.size() - 1);
           if (!lastIntersection.contains(point)) {
             intersections.add(intersectionPoints);
 
           }
         } else if (intersectionPoints.size() == 2 && !intersections.isEmpty()) {
-          final Coordinates start = intersectionPoints.get(0);
-          final Coordinates end = intersectionPoints.get(1);
+          final Point start = intersectionPoints.get(0);
+          final Point end = intersectionPoints.get(1);
           CoordinatesList lastIntersection = intersections.get(intersections.size() - 1);
           if (lastIntersection.size() == 1) {
-            final Coordinates point = lastIntersection.get(0);
+            final Point point = lastIntersection.get(0);
             if (start.equals2d(point) || end.equals2d(point)) {
               intersections.set(intersections.size() - 1, intersectionPoints);
             } else {
               intersections.add(intersectionPoints);
             }
           } else {
-            final Coordinates lastStart = lastIntersection.get(0);
-            final Coordinates lastEnd = lastIntersection.get(lastIntersection.size() - 1);
+            final Point lastStart = lastIntersection.get(0);
+            final Point lastEnd = lastIntersection.get(lastIntersection.size() - 1);
             if (start.equals2d(lastEnd)) {
               lastIntersection = CoordinatesListUtil.subList(
                 intersectionPoints, null, 0, lastIntersection.size(), end);
@@ -735,7 +715,7 @@ public final class LineStringUtil {
     } else if (intersections.size() == 1) {
       final CoordinatesList intersectionPoints = intersections.get(0);
       if (intersectionPoints.size() == 1) {
-        final Coordinates point = intersectionPoints.get(0);
+        final Point point = intersectionPoints.get(0);
         return factory.point(point);
       } else {
         return factory.lineString(intersectionPoints);
@@ -744,7 +724,7 @@ public final class LineStringUtil {
       final Collection<Geometry> geometries = new ArrayList<Geometry>();
       for (final CoordinatesList intersection : intersections) {
         if (intersection.size() == 1) {
-          final Coordinates point = intersection.get(0);
+          final Point point = intersection.get(0);
           geometries.add(factory.point(point));
         } else {
           geometries.add(factory.lineString(intersection));
@@ -770,12 +750,12 @@ public final class LineStringUtil {
   }
 
   public static boolean isEndsWithinDistance(final LineString line,
-    final Coordinates point, final double maxDistance) {
-    final Coordinates fromPoint = getFromCoordinates(line);
+    final Point point, final double maxDistance) {
+    final Point fromPoint = getFromCoordinates(line);
     if (fromPoint.distance(point) < maxDistance) {
       return true;
     } else {
-      final Coordinates toPoint = getToCoordinates(line);
+      final Point toPoint = getToCoordinates(line);
       if (toPoint.distance(point) < maxDistance) {
         return true;
       } else {
@@ -786,11 +766,11 @@ public final class LineStringUtil {
 
   public static boolean isEndsWithinDistance(final LineString line1,
     final LineString line2, final double maxDistance) {
-    final Coordinates fromPoint = getFromCoordinates(line1);
+    final Point fromPoint = getFromCoordinates(line1);
     if (isEndsWithinDistance(line2, fromPoint, maxDistance)) {
       return true;
     } else {
-      final Coordinates toPoint = getToCoordinates(line1);
+      final Point toPoint = getToCoordinates(line1);
       if (isEndsWithinDistance(line2, toPoint, maxDistance)) {
         return true;
       } else {
@@ -801,9 +781,9 @@ public final class LineStringUtil {
 
   public static boolean isEndsWithinDistanceOfEnds(final LineString line1,
     final LineString line2, final double maxDistance) {
-    final Coordinates fromPoint = getFromCoordinates(line1);
+    final Point fromPoint = getFromCoordinates(line1);
     if (isWithinDistanceOfEnds(fromPoint, line2, maxDistance)) {
-      final Coordinates toPoint = getToCoordinates(line1);
+      final Point toPoint = getToCoordinates(line1);
       return isWithinDistanceOfEnds(toPoint, line2, maxDistance);
     } else {
       return false;
@@ -811,8 +791,8 @@ public final class LineStringUtil {
   }
 
   public static boolean isFromPoint(final LineString line,
-    final Coordinates point) {
-    final Coordinates fromPoint = getFromCoordinates(line);
+    final Point point) {
+    final Point fromPoint = getFromCoordinates(line);
     return fromPoint.equals(point);
   }
 
@@ -823,10 +803,10 @@ public final class LineStringUtil {
    * @param point The point.
    * @return True if the point is on the line, false otherwise.
    * @see LineSegmentUtil#isPointOnLine(GeometryFactory, Coordinates,
-   *      Coordinates, Coordinates)
+   *      Coordinates, Point)
    */
   public static boolean isPointOnLine(final LineString line,
-    final Coordinates point) {
+    final Point point) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final GeometryFactory factory = GeometryFactory.getFactory(line);
     final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
@@ -861,7 +841,7 @@ public final class LineStringUtil {
    *      double)
    */
   public static boolean isPointOnLine(final LineString line,
-    final Coordinates point, final double maxDistance) {
+    final Point point, final double maxDistance) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final CoordinatesListCoordinates lineStart = new CoordinatesListCoordinates(
       points);
@@ -884,24 +864,38 @@ public final class LineStringUtil {
     return false;
   }
 
-  public static boolean isToPoint(final LineString line, final Coordinates point) {
-    final Coordinates toPoint = getToCoordinates(line);
+  public static boolean isToPoint(final LineString line, final Point point) {
+    final Point toPoint = getToCoordinates(line);
     return toPoint.equals(point);
   }
 
-  public static boolean isWithinDistance(final Coordinates point,
+  public static boolean isWithinDistance(final Point point,
     final LineString line, final int index, final double maxDistance) {
-    final Coordinates point2 = CoordinatesListUtil.get(line, index);
+    final Point point2 = CoordinatesListUtil.get(line, index);
     return point.distance(point2) < maxDistance;
   }
 
-  public static boolean isWithinDistanceOfEnds(final Coordinates point,
+  public static boolean isWithinDistanceOfEnds(final Point point,
     final LineString line, final double maxDistance) {
     if (isWithinDistance(point, line, 0, maxDistance)) {
       return true;
     } else {
       return isWithinDistance(point, line, line.getVertexCount() - 1,
         maxDistance);
+    }
+  }
+
+  public static LineString merge(final List<LineString> lines) {
+    final Iterator<LineString> iterator = lines.iterator();
+    if (!iterator.hasNext()) {
+      return null;
+    } else {
+      LineString line = iterator.next();
+      while (iterator.hasNext()) {
+        final LineString nextLine = iterator.next();
+        line = line.merge(nextLine);
+      }
+      return line;
     }
   }
 
@@ -916,12 +910,12 @@ public final class LineStringUtil {
         final double midPointLength = totalLength / 2;
         double currentLength = 0;
         for (int i = 1; i < numPoints && currentLength < midPointLength; i++) {
-          final Coordinates p1 = points.get(i - 1);
-          final Coordinates p2 = points.get(i);
+          final Point p1 = points.get(i - 1);
+          final Point p2 = points.get(i);
           final double segmentLength = p1.distance(p2);
           if (segmentLength + currentLength >= midPointLength) {
             final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-            final Coordinates midPoint = LineSegmentUtil.project(
+            final Point midPoint = LineSegmentUtil.project(
               geometryFactory, p1, p2, (midPointLength - currentLength)
                 / segmentLength);
             return geometryFactory.point(midPoint);
@@ -936,31 +930,22 @@ public final class LineStringUtil {
     }
   }
 
-  public static LineString reverse(final LineString line) {
-    final GeometryFactory factory = GeometryFactory.getFactory(line);
-    final CoordinatesList coordinates = CoordinatesListUtil.get(line);
-    final CoordinatesList reverseCoordinates = coordinates.reverse();
-    final LineString newLine = factory.lineString(reverseCoordinates);
-    GeometryProperties.copyUserData(line, newLine);
-    return newLine;
-  }
-
   public static List<LineString> split(final GeometryFactory geometryFactory,
     final LineString line, final LineSegmentIndex index, final double tolerance) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
-    final Coordinates firstCoordinate = points.get(0);
+    final Point firstCoordinate = points.get(0);
     final int lastIndex = points.size() - 1;
-    final Coordinates lastCoordinate = points.get(lastIndex);
+    final Point lastCoordinate = points.get(lastIndex);
     int startIndex = 0;
     final List<LineString> newLines = new ArrayList<LineString>();
-    Coordinates startCoordinate = null;
-    Coordinates c0 = points.get(0);
+    Point startCoordinate = null;
+    Point c0 = points.get(0);
     for (int i = 1; i < points.size(); i++) {
-      final Coordinates c1 = points.get(i);
+      final Point c1 = points.get(i);
 
       final List<CoordinatesList> intersectionPoints = index.queryIntersections(
         c0, c1);
-      final List<Coordinates> intersections = new ArrayList<Coordinates>();
+      final List<Point> intersections = new ArrayList<Point>();
       for (final CoordinatesList coordinatesList : intersectionPoints) {
         intersections.addAll(coordinatesList.getList());
       }
@@ -968,7 +953,7 @@ public final class LineStringUtil {
         if (intersections.size() > 1) {
           Collections.sort(intersections, new CoordinatesDistanceComparator(c0));
         }
-        for (final Coordinates intersection : intersections) {
+        for (final Point intersection : intersections) {
           if (!(index.isWithinDistance(c0) && index.isWithinDistance(c1))) {
             if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
             } else if (i == lastIndex
@@ -1017,7 +1002,7 @@ public final class LineStringUtil {
   }
 
   public static List<LineString> split(final LineString line,
-    final Coordinates point) {
+    final Point point) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final Map<String, Number> result = findClosestSegmentAndCoordinate(line,
@@ -1037,8 +1022,8 @@ public final class LineStringUtil {
         } else if (segmentDistance == 0) {
           lines = split(line, segmentIndex, point);
         } else {
-          final Coordinates c0 = points.get(0);
-          Coordinates c1;
+          final Point c0 = points.get(0);
+          Point c1;
           int i = 1;
           do {
             c1 = points.get(i);
@@ -1056,8 +1041,8 @@ public final class LineStringUtil {
         } else if (segmentDistance == 0) {
           lines = split(line, segmentIndex, point);
         } else {
-          final Coordinates cn = points.get(points.size() - 1);
-          Coordinates cn1;
+          final Point cn = points.get(points.size() - 1);
+          Point cn1;
           int i = points.size() - 2;
           do {
             cn1 = points.get(i);
@@ -1078,7 +1063,7 @@ public final class LineStringUtil {
   }
 
   public static List<LineString> split(final LineString line,
-    final int segmentIndex, final Coordinates point) {
+    final int segmentIndex, final Point point) {
     final List<LineString> lines = new ArrayList<LineString>();
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final boolean containsPoint = point.equals(points.get(segmentIndex));
@@ -1109,8 +1094,8 @@ public final class LineStringUtil {
         coords1Size - 1, point);
       CoordinatesListUtil.setCoordinates(coordinates2, axisCount, 0, point);
       if (axisCount > 2) {
-        final Coordinates previous = points.get(segmentIndex);
-        final Coordinates next = points.get(segmentIndex + 1);
+        final Point previous = points.get(segmentIndex);
+        final Point next = points.get(segmentIndex + 1);
         final double z = getElevation(point, previous, next);
         coordinates1[(coords1Size - 1) * axisCount + 2] = z;
         coordinates2[2] = z;
@@ -1143,8 +1128,8 @@ public final class LineStringUtil {
   }
 
   public static LineString subLineString(final LineString line,
-    final Coordinates fromPoint, final int fromIndex, final int length,
-    final Coordinates toPoint) {
+    final Point fromPoint, final int fromIndex, final int length,
+    final Point toPoint) {
     final CoordinatesList points = CoordinatesListUtil.get(line);
     final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
       fromPoint, fromIndex, length, toPoint);
@@ -1161,26 +1146,12 @@ public final class LineStringUtil {
   }
 
   public static LineString subLineString(final LineString line, final int length) {
-    return subLineString(line, (Coordinates)null, 0, length, null);
+    return subLineString(line, (Point)null, 0, length, null);
   }
 
   public static LineString subLineString(final LineString line,
-    final int length, final Coordinates coordinate) {
+    final int length, final Point coordinate) {
     return subLineString(line, null, 0, length, coordinate);
-  }
-
-  public static LineString merge(final List<LineString> lines) {
-    final Iterator<LineString> iterator = lines.iterator();
-    if (!iterator.hasNext()) {
-      return null;
-    } else {
-      LineString line = iterator.next();
-      while (iterator.hasNext()) {
-        final LineString nextLine = iterator.next();
-        line = line.merge(nextLine);
-      }
-      return line;
-    }
   }
 
 }

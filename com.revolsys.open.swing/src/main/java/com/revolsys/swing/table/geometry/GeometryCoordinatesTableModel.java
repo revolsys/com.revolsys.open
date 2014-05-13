@@ -11,7 +11,7 @@ import java.util.Map;
 import javax.swing.table.AbstractTableModel;
 
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -40,7 +40,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   private int columnCount = 0;
 
-  private Map<int[], Coordinates> vertexIndexMap = Collections.emptyMap();
+  private Map<int[], Point> vertexIndexMap = Collections.emptyMap();
 
   private List<int[]> vertexIndices = Collections.emptyList();
 
@@ -77,7 +77,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return this.axisNames.get(column);
   }
 
-  private Coordinates getCoordinates(final int rowIndex) {
+  private Point getCoordinates(final int rowIndex) {
     final int[] vertexIndex = getVertexIndex(rowIndex);
     if (vertexIndex == null) {
       return null;
@@ -120,9 +120,9 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       return vertexIndex[vertexIndex.length - 1] + " \u2193";
     } else {
       final int axisIndex = columnIndex - this.numIndexItems;
-      final Coordinates point = getCoordinates(rowIndex);
+      final Point point = getCoordinates(rowIndex);
       if (point != null) {
-        final double coordinate = point.getValue(axisIndex);
+        final double coordinate = point.getCoordinate(axisIndex);
         if (!Double.isNaN(coordinate)) {
           return coordinate;
         }

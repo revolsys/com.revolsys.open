@@ -99,7 +99,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *  spatial analysis methods must be subjected to a line-dissolve process to
  *  ensure that the results are simple.
  *
- *  <H4> Constructed Points And The Precision Model </H4>
+ *  <H4> Constructed Point And The Precision Model </H4>
  *
  *  The results computed by the set-theoretic methods may
  *  contain constructed points which are not present in the input <code>Geometry</code>
@@ -567,7 +567,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   double distance(final Geometry geometry);
 
-  boolean equal(final Coordinates a, final Coordinates b, final double tolerance);
+  boolean equal(final Point a, final Point b, final double tolerance);
 
   /**
   * Tests whether this geometry is 
@@ -797,13 +797,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *  Returns a vertex of this <code>Geometry</code>
    *  (usually, but not necessarily, the first one).
    *  The returned coordinate should not be assumed
-   *  to be an actual Coordinates object used in
+   *  to be an actual Point object used in
    *  the internal representation.
    *
    *@return    a {@link Coordinates} which is a vertex of this <code>Geometry</code>.
    *@return null if this Geometry is empty
    */
-  Coordinates getCoordinate();
+  Point getCoordinate();
 
   /**
    * 
@@ -1172,7 +1172,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   /**
    * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Coordinates Reference System.
+   * An example use might be to add an object representing a Point Reference System.
    * <p>
    * Note that user data objects are not present in geometries created by
    * construction methods.

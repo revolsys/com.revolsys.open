@@ -39,7 +39,7 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -181,10 +181,10 @@ public class LineStringImplTest extends TestCase {
   public void testLinearRingConstructor() throws Exception {
     try {
       final LinearRing ring = GeometryFactory.getFactory().linearRing(
-        new Coordinates[] {
-          new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
-          new Coordinate(10.0, 10, Coordinates.NULL_ORDINATE),
-          new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE)
+        new Point[] {
+          new Coordinate(0.0, 0, Point.NULL_ORDINATE),
+          new Coordinate(10.0, 10, Point.NULL_ORDINATE),
+          new Coordinate(0.0, 0, Point.NULL_ORDINATE)
         });
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
@@ -194,11 +194,11 @@ public class LineStringImplTest extends TestCase {
 
   public void testUnclosedLinearRing() {
     try {
-      this.geometryFactory.linearRing(new Coordinates[] {
-        new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
-        new Coordinate(1.0, 0, Coordinates.NULL_ORDINATE),
-        new Coordinate(1.0, 1, Coordinates.NULL_ORDINATE),
-        new Coordinate(2.0, 1, Coordinates.NULL_ORDINATE)
+      this.geometryFactory.linearRing(new Point[] {
+        new Coordinate(0.0, 0, Point.NULL_ORDINATE),
+        new Coordinate(1.0, 0, Point.NULL_ORDINATE),
+        new Coordinate(1.0, 1, Point.NULL_ORDINATE),
+        new Coordinate(2.0, 1, Point.NULL_ORDINATE)
       });
       assertTrue(false);
     } catch (final Exception e) {

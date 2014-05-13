@@ -18,23 +18,23 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.AbstractPoint;
 
-public class Node<T> extends AbstractCoordinates implements AttributedObject,
+public class Node<T> extends AbstractPoint implements AttributedObject,
   Externalizable {
-  public static List<Coordinates> getCoordinates(
+  public static List<Point> getCoordinates(
     final Collection<Node<DataObject>> nodes) {
-    final List<Coordinates> points = new ArrayList<Coordinates>(nodes.size());
+    final List<Point> points = new ArrayList<Point>(nodes.size());
     for (final Node<DataObject> node : nodes) {
-      final Coordinates point = node.cloneCoordinates();
+      final Point point = node.cloneCoordinates();
       points.add(point);
     }
     return points;
@@ -131,7 +131,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
   public Node() {
   }
 
-  protected Node(final int nodeId, final Graph<T> graph, final Coordinates point) {
+  protected Node(final int nodeId, final Graph<T> graph, final Point point) {
     this.id = nodeId;
     this.graph = graph;
     this.x = point.getX();
@@ -163,7 +163,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
   }
 
   public int compareTo(final Node<T> node) {
-    return compareTo((Coordinates)node);
+    return compareTo((Point)node);
   }
 
   public boolean equalsCoordinate(final double x, final double y) {
@@ -178,16 +178,16 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
     super.finalize();
   }
 
-  public Coordinates get3dCoordinates(final String typePath) {
+  public Point get3dCoordinates(final String typePath) {
     if (!isRemoved()) {
 
       final List<Edge<T>> edges = NodeAttributes.getEdgesByType(this, typePath);
       if (!edges.isEmpty()) {
-        Coordinates coordinates = null;
+        Point coordinates = null;
         for (final Edge<T> edge : edges) {
           final LineString line = edge.getLine();
           final CoordinatesList points = CoordinatesListUtil.get(line);
-          Coordinates point = null;
+          Point point = null;
           if (edge.getFromNode() == this) {
             point = points.get(0);
           } else if (edge.getToNode() == this) {
@@ -218,6 +218,19 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
   @Override
   public Map<String, Object> getAttributes() {
     return graph.getNodeAttributes(id);
+  }
+
+  @Override
+  public double getCoordinate(final int index) {
+    switch (index) {
+      case 0:
+        return x;
+      case 1:
+        return y;
+
+      default:
+        return Double.NaN;
+    }
   }
 
   public int getDegree() {
@@ -374,23 +387,11 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
     return edges;
   }
 
+  @Override
   public Point getPoint() {
     final Graph<T> graph = getGraph();
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = graph.getGeometryFactory();
     return geometryFactory.point(this);
-  }
-
-  @Override
-  public double getValue(final int index) {
-    switch (index) {
-      case 0:
-        return x;
-      case 1:
-        return y;
-
-      default:
-        return Double.NaN;
-    }
   }
 
   public boolean hasAttribute(final String name) {
@@ -446,7 +447,7 @@ public class Node<T> extends AbstractCoordinates implements AttributedObject,
     return graph == null;
   }
 
-  public boolean move(final Coordinates newCoordinates) {
+  public boolean move(final Point newCoordinates) {
     if (isRemoved()) {
       return false;
     } else {

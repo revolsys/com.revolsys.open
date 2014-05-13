@@ -33,7 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -53,11 +53,11 @@ import com.revolsys.util.MathUtil;
  */
 public class InteriorPointLine {
 
-  private final Coordinates centroid;
+  private final Point centroid;
 
   private double minDistance = Double.MAX_VALUE;
 
-  private Coordinates interiorPoint = null;
+  private Point interiorPoint = null;
 
   public InteriorPointLine(final Geometry g) {
     centroid = g.getCentroid();
@@ -122,7 +122,7 @@ public class InteriorPointLine {
     }
   }
 
-  public Coordinates getInteriorPoint() {
+  public Point getInteriorPoint() {
     return interiorPoint;
   }
 

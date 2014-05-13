@@ -33,7 +33,7 @@
 package com.revolsys.jts.index.chain;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
@@ -105,10 +105,10 @@ public class MonotoneChain {
   private void computeOverlaps(final int start0, final int end0,
     final MonotoneChain mc, final int start1, final int end1,
     final MonotoneChainOverlapAction mco) {
-    final Coordinates p00 = points.get(start0);
-    final Coordinates p01 = points.get(end0);
-    final Coordinates p10 = mc.points.get(start1);
-    final Coordinates p11 = mc.points.get(end1);
+    final Point p00 = points.get(start0);
+    final Point p01 = points.get(end0);
+    final Point p10 = mc.points.get(start1);
+    final Point p11 = mc.points.get(end1);
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {
       mco.overlap(this, start0, mc, start1);
@@ -163,8 +163,8 @@ public class MonotoneChain {
 
   private void computeSelect(final BoundingBox searchEnv, final int start0,
     final int end0, final MonotoneChainSelectAction mcs) {
-    final Coordinates p0 = points.get(start0);
-    final Coordinates p1 = points.get(end0);
+    final Point p0 = points.get(start0);
+    final Point p1 = points.get(end0);
     mcs.tempEnv1 = new Envelope(p0, p1);
 
     // Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
@@ -200,8 +200,8 @@ public class MonotoneChain {
    * Return the subsequence of coordinates forming this chain.
    * Allocates a new array to hold the Coordinates
    */
-  public Coordinates[] getCoordinates() {
-    final Coordinates coord[] = new Coordinates[end - start + 1];
+  public Point[] getCoordinates() {
+    final Point coord[] = new Point[end - start + 1];
     int index = 0;
     for (int i = start; i <= end; i++) {
       coord[index++] = points.get(i);
@@ -215,8 +215,8 @@ public class MonotoneChain {
 
   public Envelope getEnvelope() {
     if (env == null) {
-      final Coordinates p0 = points.get(start);
-      final Coordinates p1 = points.get(end);
+      final Point p0 = points.get(start);
+      final Point p1 = points.get(end);
       env = new Envelope(p0, p1);
     }
     return env;

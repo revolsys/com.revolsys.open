@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.operation.buffer.validate;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -66,7 +66,7 @@ public class BufferCurveMaximumDistanceFinder {
 
     final PointPairDistance minPtDist = new PointPairDistance();
     for (final Segment segment : curve.segments()) {
-      final Coordinates midPoint = segment.midPoint();
+      final Point midPoint = segment.midPoint();
       minPtDist.initialize();
       DistanceToPointFinder.computeDistance(inputGeom, midPoint, minPtDist);
       maxPtDist.setMaximum(minPtDist);

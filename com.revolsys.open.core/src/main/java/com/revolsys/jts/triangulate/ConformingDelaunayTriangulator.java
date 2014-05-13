@@ -41,7 +41,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -122,7 +122,7 @@ public class ConformingDelaunayTriangulator {
   private BoundingBox computeAreaEnv;
 
   // records the last split point computed, for error reporting
-  private Coordinates splitPt = null;
+  private Point splitPt = null;
 
   private final double tolerance; // defines if two sites are the same.
 
@@ -165,12 +165,12 @@ public class ConformingDelaunayTriangulator {
 
   private void computeConvexHull() {
     final GeometryFactory fact = GeometryFactory.getFactory();
-    final Coordinates[] coords = getPointArray();
+    final Point[] coords = getPointArray();
     final ConvexHull hull = new ConvexHull(coords, fact);
     convexHull = hull.getConvexHull();
   }
 
-  private ConstraintVertex createVertex(final Coordinates p) {
+  private ConstraintVertex createVertex(final Point p) {
     ConstraintVertex v = null;
     if (vertexFactory != null) {
       v = vertexFactory.createVertex(p, null);
@@ -187,7 +187,7 @@ public class ConformingDelaunayTriangulator {
    * @param seg the constraint segment it lies on
    * @return the new constraint vertex
    */
-  private ConstraintVertex createVertex(final Coordinates p, final Segment seg) {
+  private ConstraintVertex createVertex(final Point p, final Segment seg) {
     ConstraintVertex v = null;
     if (vertexFactory != null) {
       v = vertexFactory.createVertex(p, seg);
@@ -237,7 +237,7 @@ public class ConformingDelaunayTriangulator {
       final Segment seg = (Segment)i.next();
       // System.out.println(seg);
 
-      final Coordinates encroachPt = findNonGabrielPoint(seg);
+      final Point encroachPt = findNonGabrielPoint(seg);
       // no encroachment found - segment must already be in subdivision
       if (encroachPt == null) {
         continue;
@@ -307,12 +307,12 @@ public class ConformingDelaunayTriangulator {
    * @return a point which is non-Gabriel
    * or null if no point is non-Gabriel
    */
-  private Coordinates findNonGabrielPoint(final Segment seg) {
-    final Coordinates p = seg.getStart();
-    final Coordinates q = seg.getEnd();
+  private Point findNonGabrielPoint(final Segment seg) {
+    final Point p = seg.getStart();
+    final Point q = seg.getEnd();
     // Find the mid point on the line and compute the radius of enclosing circle
-    final Coordinates midPt = new Coordinate((p.getX() + q.getX()) / 2.0,
-      (p.getY() + q.getY()) / 2.0, Coordinates.NULL_ORDINATE);
+    final Point midPt = new Coordinate((p.getX() + q.getX()) / 2.0,
+      (p.getY() + q.getY()) / 2.0, Point.NULL_ORDINATE);
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle
@@ -322,11 +322,11 @@ public class ConformingDelaunayTriangulator {
 
     // For each point found, test if it falls strictly in the circle
     // find closest point
-    Coordinates closestNonGabriel = null;
+    Point closestNonGabriel = null;
     double minDist = Double.MAX_VALUE;
     for (final Iterator i = result.iterator(); i.hasNext();) {
       final KdNode nextNode = (KdNode)i.next();
-      final Coordinates testPt = nextNode.getCoordinate();
+      final Point testPt = nextNode.getCoordinate();
       // ignore segment endpoints
       if (testPt.equals2d(p) || testPt.equals2d(q)) {
         continue;
@@ -390,7 +390,7 @@ public class ConformingDelaunayTriangulator {
   // hull segment
   // */
   // private void addConvexHullToConstraints(Object convexHullSegmentData) {
-  // Coordinates[] coords = convexHull.getCoordinates();
+  // Point[] coords = convexHull.getCoordinates();
   // for (int i = 1; i < coords.length; i++) {
   // Segment s = new Segment(coords[i - 1], coords[i], convexHullSegmentData);
   // addConstraintIfUnique(s);
@@ -430,8 +430,8 @@ public class ConformingDelaunayTriangulator {
     return kdt;
   }
 
-  private Coordinates[] getPointArray() {
-    final Coordinates[] pts = new Coordinates[initialVertices.size()
+  private Point[] getPointArray() {
+    final Point[] pts = new Point[initialVertices.size()
       + segVertices.size()];
     int index = 0;
     for (final Iterator i = initialVertices.iterator(); i.hasNext();) {
@@ -500,7 +500,7 @@ public class ConformingDelaunayTriangulator {
    * 
    * @param p the location of the site to insert
    */
-  public void insertSite(final Coordinates p) {
+  public void insertSite(final Point p) {
     insertSite(createVertex(p));
   }
 

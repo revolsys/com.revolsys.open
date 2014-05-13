@@ -39,7 +39,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.comparator.GeometryDistanceComparator;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -455,7 +455,7 @@ public class AbstractOverlay extends JComponent implements
 
     final java.awt.Point eventPoint = event.getPoint();
     snapEventPoint = eventPoint;
-    new TreeMap<Coordinates, List<CloseLocation>>();
+    new TreeMap<Point, List<CloseLocation>>();
     final Point point = boundingBox.getCentre();
     final List<AbstractDataObjectLayer> layers = getSnapLayers();
     final TreeMap<Point, Set<CloseLocation>> snapLocations = new TreeMap<Point, Set<CloseLocation>>(

@@ -34,7 +34,7 @@ package com.revolsys.jts.geom;
 
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
+import com.revolsys.jts.geom.impl.AbstractPoint;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -56,7 +56,7 @@ import com.revolsys.util.MathUtil;
  *
  *@version 1.7
  */
-public class Coordinate extends AbstractCoordinates {
+public class Coordinate extends AbstractPoint {
   private static final long serialVersionUID = 6683108902428366910L;
 
   private final double[] coordinates;
@@ -65,7 +65,7 @@ public class Coordinate extends AbstractCoordinates {
    *  Constructs a <code>Coordinate</code> at (0,0,NaN).
    */
   public Coordinate() {
-    this(0.0, 0.0, Coordinates.NULL_ORDINATE);
+    this(0.0, 0.0, Point.NULL_ORDINATE);
   }
 
   /**
@@ -74,22 +74,22 @@ public class Coordinate extends AbstractCoordinates {
    *
    *@param  c  the <code>Coordinate</code> to copy.
    */
-  public Coordinate(final Coordinates point) {
+  public Coordinate(final Point point) {
     final int axisCount = point.getAxisCount();
     this.coordinates = new double[axisCount];
     for (int i = 0; i < axisCount; i++) {
-      final double value = point.getValue(i);
+      final double value = point.getCoordinate(i);
       this.coordinates[i] = value;
     }
   }
 
-  public Coordinate(final Coordinates point, final int axisCount) {
+  public Coordinate(final Point point, final int axisCount) {
     this(axisCount);
     final int pointAxisCount = point.getAxisCount();
     for (int i = 0; i < axisCount; i++) {
       final double value;
       if (i < pointAxisCount) {
-        value = point.getValue(i);
+        value = point.getCoordinate(i);
       } else {
         value = Double.NaN;
       }
@@ -116,11 +116,6 @@ public class Coordinate extends AbstractCoordinates {
   }
 
   @Override
-  public Coordinate cloneCoordinates() {
-    return (Coordinate)super.cloneCoordinates();
-  }
-
-  @Override
   public int getAxisCount() {
     return (byte)coordinates.length;
   }
@@ -135,7 +130,7 @@ public class Coordinate extends AbstractCoordinates {
    * @throws IllegalArgumentException if the index is not valid
    */
   @Override
-  public double getValue(final int axisIndex) {
+  public double getCoordinate(final int axisIndex) {
     if (axisIndex >= 0 && axisIndex < getAxisCount()) {
       return coordinates[axisIndex];
     } else {

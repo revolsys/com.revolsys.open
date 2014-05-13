@@ -13,7 +13,6 @@ import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.parallel.channel.Channel;
@@ -22,7 +21,7 @@ public class PointDataObjectMap {
 
   private Comparator<DataObject> comparator;
 
-  private Map<Coordinates, List<DataObject>> objectMap = new HashMap<Coordinates, List<DataObject>>();
+  private Map<Point, List<DataObject>> objectMap = new HashMap<Point, List<DataObject>>();
 
   private int size = 0;
 
@@ -44,7 +43,7 @@ public class PointDataObjectMap {
    */
   public void add(final DataObject object) {
     final Point point = object.getGeometryValue();
-    final Coordinates coordinates = new DoubleCoordinates(point, 2);
+    final Point coordinates = new DoubleCoordinates(point, 2);
     final List<DataObject> objects = getObjectInternal(coordinates);
     objects.add(object);
     if (comparator != null) {
@@ -55,7 +54,7 @@ public class PointDataObjectMap {
 
   public void clear() {
     size = 0;
-    objectMap = new HashMap<Coordinates, List<DataObject>>();
+    objectMap = new HashMap<Point, List<DataObject>>();
   }
 
   public boolean containsKey(final Point point) {
@@ -71,7 +70,7 @@ public class PointDataObjectMap {
     return objects;
   }
 
-  public Set<Coordinates> getCoordinates() {
+  public Set<Point> getCoordinates() {
     return Collections.unmodifiableSet(objectMap.keySet());
   }
 
@@ -104,24 +103,15 @@ public class PointDataObjectMap {
     return filteredObjects;
   }
 
-  protected List<DataObject> getObjectInternal(final Coordinates coordinates) {
+  protected List<DataObject> getObjectInternal(final Point coordinates) {
     List<DataObject> objects = objectMap.get(coordinates);
     if (objects == null) {
       objects = new ArrayList<DataObject>(1);
-      final Coordinates indexCoordinates = new DoubleCoordinates(
-        coordinates.getX(), coordinates.getY());
+      final Point indexCoordinates = new DoubleCoordinates(coordinates.getX(),
+        coordinates.getY());
       objectMap.put(indexCoordinates, objects);
     }
     return objects;
-  }
-
-  public List<DataObject> getObjects(final Coordinates coordinates) {
-    final List<DataObject> objects = objectMap.get(coordinates);
-    if (objects == null) {
-      return Collections.emptyList();
-    } else {
-      return new ArrayList<DataObject>(objects);
-    }
   }
 
   public List<DataObject> getObjects(final DataObject object) {
@@ -131,14 +121,18 @@ public class PointDataObjectMap {
   }
 
   public List<DataObject> getObjects(final Point point) {
-    final Coordinates coordinates = new DoubleCoordinates(point, 2);
+    final Point coordinates = new DoubleCoordinates(point, 2);
     final List<DataObject> objects = getObjects(coordinates);
-    return objects;
+    if (objects == null) {
+      return Collections.emptyList();
+    } else {
+      return new ArrayList<DataObject>(objects);
+    }
   }
 
   public void initialize(final Point point) {
     if (!isRemoveEmptyLists()) {
-      final Coordinates coordinates = new DoubleCoordinates(point, 2);
+      final Point coordinates = new DoubleCoordinates(point, 2);
       getObjectInternal(coordinates);
     }
   }
@@ -149,7 +143,7 @@ public class PointDataObjectMap {
 
   public void remove(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    final Coordinates coordinates = CoordinatesUtil.get(geometry);
+    final Point coordinates = CoordinatesUtil.get(geometry);
     final List<DataObject> objects = objectMap.get(coordinates);
     if (objects != null) {
       objects.remove(object);
@@ -175,7 +169,7 @@ public class PointDataObjectMap {
   public void sort(final DataObject object) {
     if (comparator != null) {
       final Geometry geometry = object.getGeometryValue();
-      final Coordinates coordinate = geometry.getCoordinate();
+      final Point coordinate = geometry.getCoordinate();
       final List<DataObject> objects = objectMap.get(coordinate);
       if (objects != null) {
         Collections.sort(objects, comparator);
@@ -185,7 +179,7 @@ public class PointDataObjectMap {
 
   public void write(final Channel<DataObject> out) {
     if (out != null) {
-      for (final Coordinates coordinates : getCoordinates()) {
+      for (final Point coordinates : getCoordinates()) {
         final List<DataObject> objects = getObjects(coordinates);
         for (final DataObject object : objects) {
           out.write(object);

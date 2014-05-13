@@ -34,7 +34,7 @@ package com.revolsys.jts.testold.geom.prep;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
@@ -56,7 +56,7 @@ public abstract class StressTestHarness {
 
   public abstract boolean checkResult(Geometry target, Geometry test);
 
-  Geometry createCircle(final Coordinates origin, final double size,
+  Geometry createCircle(final Point origin, final double size,
     final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
@@ -73,8 +73,8 @@ public abstract class StressTestHarness {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Coordinates basePt = new Coordinate(env.getMinX() + xOffset,
-      env.getMinY() + yOffset, Coordinates.NULL_ORDINATE);
+    final Point basePt = new Coordinate(env.getMinX() + xOffset,
+      env.getMinY() + yOffset, Point.NULL_ORDINATE);
     Geometry test = createTestCircle(basePt, size, nPts);
     if (test instanceof Polygon && Math.random() > 0.5) {
       test = test.getBoundary();
@@ -82,7 +82,7 @@ public abstract class StressTestHarness {
     return test;
   }
 
-  Geometry createSineStar(final Coordinates origin, final double size,
+  Geometry createSineStar(final Point origin, final double size,
     final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
@@ -94,7 +94,7 @@ public abstract class StressTestHarness {
     return poly;
   }
 
-  Geometry createTestCircle(final Coordinates base, final double size,
+  Geometry createTestCircle(final Point base, final double size,
     final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
@@ -109,7 +109,7 @@ public abstract class StressTestHarness {
     // System.out.println("Running " + nIter + " tests");
     // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
     final Geometry poly = createSineStar(new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE), 100, this.numTargetPts);
+      Point.NULL_ORDINATE), 100, this.numTargetPts);
     // System.out.println(poly);
 
     // System.out.println();

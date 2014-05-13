@@ -10,7 +10,7 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
@@ -31,7 +31,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   }
 
   public static List<Edge<LineSegment>> getEdges(final LineStringGraph graph,
-    final Coordinates fromPoint, final Coordinates toPoint,
+    final Point fromPoint, final Point toPoint,
     final double maxDistance) {
     final LineSegment lineSegment = new LineSegmentImpl(fromPoint, toPoint);
     return getEdges(graph, lineSegment, maxDistance);

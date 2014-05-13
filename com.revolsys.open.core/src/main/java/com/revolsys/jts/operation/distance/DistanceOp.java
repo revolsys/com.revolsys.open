@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.distance;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
@@ -72,7 +72,7 @@ public class DistanceOp {
    * @deprecated renamed to nearestPoints
    */
   @Deprecated
-  public static Coordinates[] closestPoints(final Geometry g0, final Geometry g1) {
+  public static Point[] closestPoints(final Geometry g0, final Geometry g1) {
     final DistanceOp distOp = new DistanceOp(g0, g1);
     return distOp.nearestPoints();
   }
@@ -109,7 +109,7 @@ public class DistanceOp {
    * @param g1 another {@link Geometry}
    * @return the nearest points in the geometries
    */
-  public static Coordinates[] nearestPoints(final Geometry g0, final Geometry g1) {
+  public static Point[] nearestPoints(final Geometry g0, final Geometry g1) {
     final DistanceOp distOp = new DistanceOp(g0, g1);
     return distOp.nearestPoints();
   }
@@ -162,7 +162,7 @@ public class DistanceOp {
 
   private void computeContainmentDistance(final GeometryLocation ptLoc,
     final Polygon poly, final GeometryLocation[] locPtPoly) {
-    final Coordinates pt = ptLoc.getCoordinate();
+    final Point pt = ptLoc.getCoordinate();
     // if pt is not in exterior, distance to geom is 0
     if (Location.EXTERIOR != ptLocator.locate(pt, poly)) {
       minDistance = 0.0;
@@ -273,7 +273,7 @@ public class DistanceOp {
           final double dist = segment1.distance(segment2);
           if (dist < minDistance) {
             minDistance = dist;
-            final Coordinates[] closestPt = segment1.closestPoints(segment2);
+            final Point[] closestPt = segment1.closestPoints(segment2);
             locGeom[0] = new GeometryLocation(line1, i,
               closestPt[0].cloneCoordinates());
             locGeom[1] = new GeometryLocation(line2, j,
@@ -300,7 +300,7 @@ public class DistanceOp {
       final double distance = segment.distance(point);
       if (distance < minDistance) {
         minDistance = distance;
-        final Coordinates segClosestPoint = segment.closestPoint(point);
+        final Point segClosestPoint = segment.closestPoint(point);
         locGeom[0] = new GeometryLocation(line, i,
           segClosestPoint.cloneCoordinates());
         locGeom[1] = new GeometryLocation(point, 0, point);
@@ -340,7 +340,7 @@ public class DistanceOp {
     final List<Point> points1, final GeometryLocation[] locGeom) {
     for (final Point pt0 : points0) {
       for (final Point pt1 : points1) {
-        final double dist = pt0.distance((Coordinates)pt1);
+        final double dist = pt0.distance((Point)pt1);
         if (dist < minDistance) {
           minDistance = dist;
           locGeom[0] = new GeometryLocation(pt0, 0, pt0);
@@ -389,9 +389,9 @@ public class DistanceOp {
    *
    * @return a pair of {@link Coordinates}s of the nearest points
    */
-  public Coordinates[] nearestPoints() {
+  public Point[] nearestPoints() {
     computeMinDistance();
-    final Coordinates[] nearestPts = new Coordinates[] {
+    final Point[] nearestPts = new Point[] {
       minDistanceLocation[0].getCoordinate(),
       minDistanceLocation[1].getCoordinate()
     };

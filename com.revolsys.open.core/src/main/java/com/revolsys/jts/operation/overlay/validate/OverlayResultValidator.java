@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.overlay.validate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.operation.overlay.OverlayOp;
@@ -90,11 +90,11 @@ public class OverlayResultValidator {
 
   private final Location[] location = new Location[3];
 
-  private Coordinates invalidLocation = null;
+  private Point invalidLocation = null;
 
   private double boundaryDistanceTolerance = TOLERANCE;
 
-  private final List<Coordinates> testCoords = new ArrayList<>();
+  private final List<Point> testCoords = new ArrayList<>();
 
   public OverlayResultValidator(final Geometry a, final Geometry b,
     final Geometry result) {
@@ -120,7 +120,7 @@ public class OverlayResultValidator {
 
   private boolean checkValid(final int overlayOp) {
     for (int i = 0; i < testCoords.size(); i++) {
-      final Coordinates pt = testCoords.get(i);
+      final Point pt = testCoords.get(i);
       if (!checkValid(overlayOp, pt)) {
         invalidLocation = pt;
         return false;
@@ -129,7 +129,7 @@ public class OverlayResultValidator {
     return true;
   }
 
-  private boolean checkValid(final int overlayOp, final Coordinates pt) {
+  private boolean checkValid(final int overlayOp, final Point pt) {
     location[0] = locFinder[0].getLocation(pt);
     location[1] = locFinder[1].getLocation(pt);
     location[2] = locFinder[2].getLocation(pt);
@@ -144,7 +144,7 @@ public class OverlayResultValidator {
     return isValidResult(overlayOp, location);
   }
 
-  public Coordinates getInvalidLocation() {
+  public Point getInvalidLocation() {
     return invalidLocation;
   }
 

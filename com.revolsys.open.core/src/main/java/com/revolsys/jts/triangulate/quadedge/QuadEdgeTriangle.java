@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -89,7 +89,7 @@ public class QuadEdgeTriangle {
    *          the point to test
    * @return true if the point is contained in the triangle
    */
-  public static boolean contains(final QuadEdge[] tri, final Coordinates pt) {
+  public static boolean contains(final QuadEdge[] tri, final Point pt) {
     final LineString ring = GeometryFactory.getFactory().lineString(
       tri[0].orig().getCoordinate(), tri[1].orig().getCoordinate(),
       tri[2].orig().getCoordinate(), tri[0].orig().getCoordinate());
@@ -106,7 +106,7 @@ public class QuadEdgeTriangle {
    *          the point to test
    * @return true if the point is contained in the triangle
    */
-  public static boolean contains(final Vertex[] tri, final Coordinates pt) {
+  public static boolean contains(final Vertex[] tri, final Point pt) {
     final LineString ring = GeometryFactory.getFactory().lineString(
       tri[0].getCoordinate(), tri[1].getCoordinate(), tri[2].getCoordinate(),
       tri[0].getCoordinate());
@@ -142,7 +142,7 @@ public class QuadEdgeTriangle {
   }
 
   public static Geometry toPolygon(final QuadEdge[] e) {
-    final Coordinates[] ringPts = new Coordinates[] {
+    final Point[] ringPts = new Point[] {
       e[0].orig().getCoordinate(), e[1].orig().getCoordinate(),
       e[2].orig().getCoordinate(), e[0].orig().getCoordinate()
     };
@@ -153,7 +153,7 @@ public class QuadEdgeTriangle {
   }
 
   public static Geometry toPolygon(final Vertex[] v) {
-    final Coordinates[] ringPts = new Coordinates[] {
+    final Point[] ringPts = new Point[] {
       v[0].getCoordinate(), v[1].getCoordinate(), v[2].getCoordinate(),
       v[0].getCoordinate()
     };
@@ -180,7 +180,7 @@ public class QuadEdgeTriangle {
     }
   }
 
-  public boolean contains(final Coordinates pt) {
+  public boolean contains(final Point pt) {
     return CGAlgorithms.isPointInRing(pt, getLine());
   }
 
@@ -192,12 +192,12 @@ public class QuadEdgeTriangle {
     return getAdjacentTriangleAcrossEdge(i).getEdgeIndex(getEdge(i).sym());
   }
 
-  public Coordinates getCoordinate(final int i) {
+  public Point getCoordinate(final int i) {
     return edge[i].orig().getCoordinate();
   }
 
-  public Coordinates[] getCoordinates() {
-    final Coordinates[] pts = new Coordinates[4];
+  public Point[] getCoordinates() {
+    final Point[] pts = new Point[4];
     for (int i = 0; i < 3; i++) {
       pts[i] = edge[i].orig().getCoordinate();
     }

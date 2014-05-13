@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 public abstract class AbstractIdObjectPointQuadTree<T> extends
   AbstractPointSpatialIndex<T> implements IdObjectIndex<T> {
@@ -20,28 +20,28 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
 
   @Override
   public T add(final T object) {
-    final Coordinates point = getCoordinates(object);
+    final Point point = getCoordinates(object);
     put(point, object);
     return object;
   }
 
-  public abstract Coordinates getCoordinates(T object);
+  public abstract Point getCoordinates(T object);
 
   @Override
-  public void put(final Coordinates point, final T object) {
+  public void put(final Point point, final T object) {
     final int id = getId(object);
     index.put(point, id);
   }
 
   @Override
-  public boolean remove(final Coordinates point, final T object) {
+  public boolean remove(final Point point, final T object) {
     final int id = getId(object);
     return index.remove(point, id);
   }
 
   @Override
   public boolean remove(final T object) {
-    final Coordinates point = getCoordinates(object);
+    final Point point = getCoordinates(object);
     return remove(point, object);
   }
 

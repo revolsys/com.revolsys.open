@@ -38,7 +38,7 @@ import java.util.Comparator;
 import com.revolsys.jts.math.MathUtil;
 
 /**
- * Useful utility functions for handling Coordinates arrays
+ * Useful utility functions for handling Point arrays
  *
  * @version 1.7
  */
@@ -52,22 +52,22 @@ public class CoordinateArrays {
   public static class ForwardComparator implements Comparator {
     @Override
     public int compare(final Object o1, final Object o2) {
-      final Coordinates[] pts1 = (Coordinates[])o1;
-      final Coordinates[] pts2 = (Coordinates[])o2;
+      final Point[] pts1 = (Point[])o1;
+      final Point[] pts2 = (Point[])o2;
 
       return CoordinateArrays.compare(pts1, pts2);
     }
   }
 
-  private final static Coordinates[] coordArrayType = new Coordinates[0];
+  private final static Point[] coordArrayType = new Point[0];
 
   /**
    * Returns either the given coordinate array if its length is greater than the
    * given amount, or an empty coordinate array.
    */
-  public static Coordinates[] atLeastNCoordinatesOrNothing(final int n,
-    final Coordinates[] c) {
-    return c.length >= n ? c : new Coordinates[] {};
+  public static Point[] atLeastNCoordinatesOrNothing(final int n,
+    final Point[] c) {
+    return c.length >= n ? c : new Point[] {};
   }
 
   /**
@@ -79,7 +79,7 @@ public class CoordinateArrays {
    * @param pts2
    * @return an integer indicating the order
    */
-  public static int compare(final Coordinates[] pts1, final Coordinates[] pts2) {
+  public static int compare(final Point[] pts1, final Point[] pts2) {
     int i = 0;
     while (i < pts1.length && i < pts2.length) {
       final int compare = pts1[i].compareTo(pts2[i]);
@@ -105,8 +105,8 @@ public class CoordinateArrays {
    * @param coordinates an array of Coordinates
    * @return a deep copy of the input
    */
-  public static Coordinates[] copyDeep(final Coordinates[] coordinates) {
-    final Coordinates[] copy = new Coordinates[coordinates.length];
+  public static Point[] copyDeep(final Point[] coordinates) {
+    final Point[] copy = new Point[coordinates.length];
     for (int i = 0; i < coordinates.length; i++) {
       copy[i] = new Coordinate(coordinates[i]);
     }
@@ -115,7 +115,7 @@ public class CoordinateArrays {
 
   /**
    * Creates a deep copy of a given section of a source {@link Coordinates} array
-   * into a destination Coordinates array.
+   * into a destination Point array.
    * The destination array must be an appropriate size to receive
    * the copied coordinates.
    *
@@ -125,8 +125,8 @@ public class CoordinateArrays {
    * @param destStart the destination index to start copying to
    * @param length the number of items to copy
    */
-  public static void copyDeep(final Coordinates[] src, final int srcStart,
-    final Coordinates[] dest, final int destStart, final int length) {
+  public static void copyDeep(final Point[] src, final int srcStart,
+    final Point[] dest, final int destStart, final int length) {
     for (int i = 0; i < length; i++) {
       dest[destStart + i] = new Coordinate(src[srcStart + i]);
     }
@@ -137,8 +137,8 @@ public class CoordinateArrays {
    * equal (as compared using Coordinate#equals)
    * @see Coordinate#equals(Object)
    */
-  public static boolean equals(final Coordinates[] coord1,
-    final Coordinates[] coord2) {
+  public static boolean equals(final Point[] coord1,
+    final Point[] coord2) {
     if (coord1 == coord2) {
       return true;
     }
@@ -164,8 +164,8 @@ public class CoordinateArrays {
    * @param coord2 an array of Coordinates
    * @param coordinateComparator a Comparator for Coordinates
    */
-  public static boolean equals(final Coordinates[] coord1,
-    final Coordinates[] coord2, final Comparator coordinateComparator) {
+  public static boolean equals(final Point[] coord1,
+    final Point[] coord2, final Comparator coordinateComparator) {
     if (coord1 == coord2) {
       return true;
     }
@@ -196,7 +196,7 @@ public class CoordinateArrays {
    * @param end the index of the end of the subsequence to extract
    * @return a subsequence of the input array
    */
-  public static Coordinates[] extract(final Coordinates[] pts, int start,
+  public static Point[] extract(final Point[] pts, int start,
     int end) {
     start = MathUtil.clamp(start, 0, pts.length);
     end = MathUtil.clamp(end, -1, pts.length);
@@ -212,7 +212,7 @@ public class CoordinateArrays {
       npts = 0;
     }
 
-    final Coordinates[] extractPts = new Coordinates[npts];
+    final Point[] extractPts = new Point[npts];
     if (npts == 0) {
       return extractPts;
     }
@@ -228,7 +228,7 @@ public class CoordinateArrays {
    * Returns whether #equals returns true for any two consecutive Coordinates
    * in the given array.
    */
-  public static boolean hasRepeatedPoints(final Coordinates[] coord) {
+  public static boolean hasRepeatedPoints(final Point[] coord) {
     for (int i = 1; i < coord.length; i++) {
       if (coord[i - 1].equals(coord[i])) {
         return true;
@@ -246,8 +246,8 @@ public class CoordinateArrays {
    *@return              the position of <code>coordinate</code>, or -1 if it is
    *      not found
    */
-  public static int indexOf(final Coordinates coordinate,
-    final Coordinates[] coordinates) {
+  public static int indexOf(final Point coordinate,
+    final Point[] coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       if (coordinate.equals(coordinates[i])) {
         return i;
@@ -264,11 +264,11 @@ public class CoordinateArrays {
    * @param pts2
    * @return <code>true</code> if the two arrays are equal in opposite directions.
    */
-  private static boolean isEqualReversed(final Coordinates[] pts1,
-    final Coordinates[] pts2) {
+  private static boolean isEqualReversed(final Point[] pts1,
+    final Point[] pts2) {
     for (int i = 0; i < pts1.length; i++) {
-      final Coordinates p1 = pts1[i];
-      final Coordinates p2 = pts2[pts1.length - i - 1];
+      final Point p1 = pts1[i];
+      final Point p2 = pts2[pts1.length - i - 1];
       if (p1.compareTo(p2) != 0) {
         return false;
       }
@@ -284,7 +284,7 @@ public class CoordinateArrays {
    * @param pts an array of Coordinates
    * @return true if the coordinate form a ring.
    */
-  public static boolean isRing(final Coordinates[] pts) {
+  public static boolean isRing(final Point[] pts) {
     if (pts.length < 4) {
       return false;
     }
@@ -301,10 +301,10 @@ public class CoordinateArrays {
    * @return a {@link Coordinates} from <code>testPts</code> which is not in <code>pts</code>, '
    * or <code>null</code>
    */
-  public static Coordinates ptNotInList(final Coordinates[] testPts,
-    final Coordinates[] pts) {
+  public static Point ptNotInList(final Point[] testPts,
+    final Point[] pts) {
     for (int i = 0; i < testPts.length; i++) {
-      final Coordinates testPt = testPts[i];
+      final Point testPt = testPts[i];
       if (CoordinateArrays.indexOf(testPt, pts) < 0) {
         return testPt;
       }
@@ -318,14 +318,14 @@ public class CoordinateArrays {
    * @param coord the coordinate array to collapse
    * @return an array containing only non-null elements
    */
-  public static Coordinates[] removeNull(final Coordinates[] coord) {
+  public static Point[] removeNull(final Point[] coord) {
     int nonNull = 0;
     for (int i = 0; i < coord.length; i++) {
       if (coord[i] != null) {
         nonNull++;
       }
     }
-    final Coordinates[] newCoord = new Coordinates[nonNull];
+    final Point[] newCoord = new Point[nonNull];
     // empty case
     if (nonNull == 0) {
       return newCoord;
@@ -344,9 +344,9 @@ public class CoordinateArrays {
    * If the coordinate array argument has repeated points,
    * constructs a new array containing no repeated points.
    * Otherwise, returns the argument.
-   * @see #hasRepeatedPoints(Coordinates[])
+   * @see #hasRepeatedPoints(Point[])
    */
-  public static Coordinates[] removeRepeatedPoints(final Coordinates[] coord) {
+  public static Point[] removeRepeatedPoints(final Point[] coord) {
     if (!hasRepeatedPoints(coord)) {
       return coord;
     }
@@ -357,21 +357,21 @@ public class CoordinateArrays {
   /**
    * Reverses the coordinates in an array in-place.
    */
-  public static void reverse(final Coordinates[] coord) {
+  public static void reverse(final Point[] coord) {
     final int last = coord.length - 1;
     final int mid = last / 2;
     for (int i = 0; i <= mid; i++) {
-      final Coordinates tmp = coord[i];
+      final Point tmp = coord[i];
       coord[i] = coord[last - i];
       coord[last - i] = tmp;
     }
   }
 
   /**
-   * Converts the given Collection of Coordinates into a Coordinates array.
+   * Converts the given Collection of Point into a Point array.
    */
-  public static Coordinates[] toCoordinateArray(final Collection coordList) {
-    return (Coordinates[])coordList.toArray(coordArrayType);
+  public static Point[] toCoordinateArray(final Collection coordList) {
+    return (Point[])coordList.toArray(coordArrayType);
   }
 
 }

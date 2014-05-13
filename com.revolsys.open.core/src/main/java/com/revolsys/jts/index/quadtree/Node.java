@@ -60,7 +60,7 @@ public class Node extends NodeBase {
 
   public static Node createNode(final BoundingBox env) {
     final Key key = new Key(env);
-    final Node node = new Node(key.getEnvelope(), key.getLevel());
+    final Node node = new Node(key.getKeyEnvelope(), key.getLevel());
     return node;
   }
 

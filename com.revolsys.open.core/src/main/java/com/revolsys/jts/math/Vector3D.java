@@ -34,7 +34,7 @@
 package com.revolsys.jts.math;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Represents a vector in 3-dimensional Cartesian space.
@@ -53,7 +53,7 @@ public class Vector3D {
 	 * @param D
 	 * @return the dot product
 	 */
-	public static double dot(Coordinates A, Coordinates B, Coordinates C, Coordinates D)
+	public static double dot(Point A, Point B, Point C, Point D)
 	{
 		double ABx = B.getX() - A.getX();
 		double ABy = B.getY() - A.getY();
@@ -83,14 +83,14 @@ public class Vector3D {
 	 * Creates a vector from a {@link Coordinates}.
 	 * 
 	 * @param coord
-	 *            the Coordinates to copy
+	 *            the Point to copy
 	 * @return a new vector
 	 */
-	public static Vector3D create(Coordinates coord) {
+	public static Vector3D create(Point coord) {
 		return new Vector3D(coord);
 	}
 
-	public Vector3D(Coordinates v) {
+	public Vector3D(Point v) {
 		x = v.getX();
 		y = v.getY();
 		z = v.getZ();
@@ -103,7 +103,7 @@ public class Vector3D {
    * @param v2 the second vector
 	 * @return the dot product of the vectors
 	 */
-	public static double dot(Coordinates v1, Coordinates v2) {
+	public static double dot(Point v1, Point v2) {
 		return v1.getX() * v2.getX() + v1.getY() * v2.getY() + v1.getZ() * v2.getZ();
 	}
 
@@ -111,7 +111,7 @@ public class Vector3D {
 	private double y;
 	private double z;
 
-	public Vector3D(Coordinates from, Coordinates to) {
+	public Vector3D(Point from, Point to) {
 		x = to.getX() - from.getX();
 		y = to.getY() - from.getY();
 		z = to.getZ() - from.getZ();
@@ -151,7 +151,7 @@ public class Vector3D {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 
-	public static double length(Coordinates v) {
+	public static double length(Point v) {
 		return Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY() + v.getZ() * v.getZ());
 	}
 
@@ -166,7 +166,7 @@ public class Vector3D {
 		return create(x / d, y / d, z / d);
 	}
 
-	public static Coordinates normalize(Coordinates v) {
+	public static Point normalize(Point v) {
 		double len = length(v);
 		return new Coordinate((double)v.getX() / len, v.getY() / len, v.getZ() / len);
 	}

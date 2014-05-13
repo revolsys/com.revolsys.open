@@ -34,7 +34,7 @@ package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 
 /**
@@ -58,13 +58,13 @@ public class RectangleLineIntersector {
 
   private final BoundingBox rectEnv;
 
-  private final Coordinates diagUp0;
+  private final Point diagUp0;
 
-  private final Coordinates diagUp1;
+  private final Point diagUp1;
 
-  private final Coordinates diagDown0;
+  private final Point diagDown0;
 
-  private final Coordinates diagDown1;
+  private final Point diagDown1;
 
   /**
    * Creates a new intersector for the given query rectangle,
@@ -82,13 +82,13 @@ public class RectangleLineIntersector {
      * Index 0 is the left side, 1 is the right side.
      */
     diagUp0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMinY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
     diagUp1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
     diagDown0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
     diagDown1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMinY(),
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
   }
 
   /**
@@ -99,7 +99,7 @@ public class RectangleLineIntersector {
    * @param p1 the second endpoint of the segment
    * @return true if the rectangle intersects the segment
    */
-  public boolean intersects(Coordinates p0, Coordinates p1) {
+  public boolean intersects(Point p0, Point p1) {
     // TODO: confirm that checking envelopes first is faster
 
     /**
@@ -129,7 +129,7 @@ public class RectangleLineIntersector {
      * or vertically upwards.
      */
     if (p0.compareTo(p1) > 0) {
-      final Coordinates tmp = p0;
+      final Point tmp = p0;
       p0 = p1;
       p1 = tmp;
     }

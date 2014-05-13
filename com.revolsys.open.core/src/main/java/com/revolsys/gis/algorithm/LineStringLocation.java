@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
 
 /**
@@ -41,8 +41,8 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
    * @param length the length to the desired point
    * @return the {@link Coordinates} of the desired point
    */
-  public static Coordinates pointAlongSegmentByFraction(final Coordinates p0,
-    final Coordinates p1, final double frac) {
+  public static Point pointAlongSegmentByFraction(final Point p0,
+    final Point p1, final double frac) {
     if (frac <= 0.0) {
       return p0;
     }
@@ -51,7 +51,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     }
     final double x = (p1.getX() - p0.getX()) * frac + p0.getX();
     final double y = (p1.getY() - p0.getY()) * frac + p0.getY();
-    return new Coordinate(x, y, Coordinates.NULL_ORDINATE);
+    return new Coordinate(x, y, Point.NULL_ORDINATE);
   }
 
   private final LineString line;
@@ -102,9 +102,9 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     return 0;
   }
 
-  public Coordinates getCoordinate() {
-    final Coordinates p0 = line.getCoordinate(segmentIndex);
-    final Coordinates p1 = line.getCoordinate(segmentIndex + 1);
+  public Point getCoordinate() {
+    final Point p0 = line.getCoordinate(segmentIndex);
+    final Point p1 = line.getCoordinate(segmentIndex + 1);
     return pointAlongSegmentByFraction(p0, p1, segmentFraction);
   }
 

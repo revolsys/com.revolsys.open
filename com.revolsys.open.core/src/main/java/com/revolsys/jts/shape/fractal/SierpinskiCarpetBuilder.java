@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -87,12 +87,12 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
 
   private LinearRing createSquareHole(final double x, final double y,
     final double width) {
-    final Coordinates[] pts = new Coordinates[] {
-      new Coordinate(x, y, Coordinates.NULL_ORDINATE),
-      new Coordinate(x + width, y, Coordinates.NULL_ORDINATE),
-      new Coordinate(x + width, y + width, Coordinates.NULL_ORDINATE),
-      new Coordinate(x, y + width, Coordinates.NULL_ORDINATE),
-      new Coordinate(x, y, Coordinates.NULL_ORDINATE)
+    final Point[] pts = new Point[] {
+      new Coordinate(x, y, Point.NULL_ORDINATE),
+      new Coordinate(x + width, y, Point.NULL_ORDINATE),
+      new Coordinate(x + width, y + width, Point.NULL_ORDINATE),
+      new Coordinate(x, y + width, Point.NULL_ORDINATE),
+      new Coordinate(x, y, Point.NULL_ORDINATE)
     };
     return geometryFactory.linearRing(pts);
   }
@@ -101,7 +101,7 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
   public Geometry getGeometry() {
     final int level = recursionLevelForSize(numPts);
     final LineSegment baseLine = getSquareBaseLine();
-    final Coordinates origin = baseLine.getCoordinate(0);
+    final Point origin = baseLine.getCoordinate(0);
     final List<LinearRing> rings = new ArrayList<>();
     final LinearRing shell = ((Polygon)getSquareExtent().toGeometry()).getExteriorRing();
     rings.add(shell);

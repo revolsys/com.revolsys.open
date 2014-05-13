@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Location;
@@ -61,7 +61,7 @@ public abstract class EdgeRing {
 
   // this EdgeRing
 
-  private final List<Coordinates> pts = new ArrayList<>();
+  private final List<Point> pts = new ArrayList<>();
 
   private final Label label = new Label(Location.NONE); // label stores the
                                                         // locations of each
@@ -176,7 +176,7 @@ public abstract class EdgeRing {
    * This method will cause the ring to be computed.
    * It will also check any holes, if they have been assigned.
    */
-  public boolean containsPoint(final Coordinates p) {
+  public boolean containsPoint(final Point p) {
     final LinearRing shell = getLinearRing();
     final BoundingBox env = shell.getBoundingBox();
     if (!env.covers(p)) {
@@ -194,7 +194,7 @@ public abstract class EdgeRing {
     return true;
   }
 
-  public Coordinates getCoordinate(final int i) {
+  public Point getCoordinate(final int i) {
     return pts.get(i);
   }
 

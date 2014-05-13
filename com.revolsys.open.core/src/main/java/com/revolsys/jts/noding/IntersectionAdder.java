@@ -33,7 +33,7 @@
 package com.revolsys.jts.noding;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Computes the possible intersections between two line segments in {@link NodedSegmentString}s
@@ -60,7 +60,7 @@ public class IntersectionAdder implements SegmentIntersector {
   private boolean hasInterior = false;
 
   // the proper intersection point found
-  private final Coordinates properIntersectionPoint = null;
+  private final Point properIntersectionPoint = null;
 
   private final LineIntersector li;
 
@@ -87,7 +87,7 @@ public class IntersectionAdder implements SegmentIntersector {
   /**
    * @return the proper intersection point, or <code>null</code> if none was found
    */
-  public Coordinates getProperIntersectionPoint() {
+  public Point getProperIntersectionPoint() {
     return properIntersectionPoint;
   }
 
@@ -172,10 +172,10 @@ public class IntersectionAdder implements SegmentIntersector {
       return;
     }
     numTests++;
-    final Coordinates p00 = e0.getCoordinate(segIndex0);
-    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    final Coordinates p10 = e1.getCoordinate(segIndex1);
-    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+    final Point p00 = e0.getCoordinate(segIndex0);
+    final Point p01 = e0.getCoordinate(segIndex0 + 1);
+    final Point p10 = e1.getCoordinate(segIndex1);
+    final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);

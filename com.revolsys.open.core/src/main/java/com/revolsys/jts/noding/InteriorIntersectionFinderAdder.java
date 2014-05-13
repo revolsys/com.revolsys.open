@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Finds <b>interior</b> intersections between line segments in {@link NodedSegmentString}s,
@@ -94,10 +94,10 @@ public class InteriorIntersectionFinderAdder implements SegmentIntersector {
       return;
     }
 
-    final Coordinates p00 = e0.getCoordinate(segIndex0);
-    final Coordinates p01 = e0.getCoordinate(segIndex0 + 1);
-    final Coordinates p10 = e1.getCoordinate(segIndex1);
-    final Coordinates p11 = e1.getCoordinate(segIndex1 + 1);
+    final Point p00 = e0.getCoordinate(segIndex0);
+    final Point p01 = e0.getCoordinate(segIndex0 + 1);
+    final Point p10 = e1.getCoordinate(segIndex1);
+    final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
     li.computeIntersection(p00, p01, p10, p11);
 

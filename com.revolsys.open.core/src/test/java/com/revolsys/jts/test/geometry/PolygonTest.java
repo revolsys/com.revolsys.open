@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -18,12 +18,12 @@ public class PolygonTest {
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
     4326, 2);
 
-  private static final List<Coordinates> EXTERIOR_1 = Arrays.<Coordinates> asList(
+  private static final List<Point> EXTERIOR_1 = Arrays.<Point> asList(
     new DoubleCoordinates(0.0, 0.0), new DoubleCoordinates(10.0, 0.0),
     new DoubleCoordinates(10.0, 10.0), new DoubleCoordinates(0.0, 10.0),
     new DoubleCoordinates(0.0, 0));
 
-  private static final List<Coordinates> INTERIOR_2 = Arrays.<Coordinates> asList(
+  private static final List<Point> INTERIOR_2 = Arrays.<Point> asList(
     new DoubleCoordinates(2.0, 2.0), new DoubleCoordinates(8.0, 2.0),
     new DoubleCoordinates(8.0, 8.0), new DoubleCoordinates(2.0, 8.0),
     new DoubleCoordinates(2.0, 2.0));
@@ -40,13 +40,13 @@ public class PolygonTest {
   @Test
   public void testVertices() {
 
-    final List<Coordinates> allCoordinates = new ArrayList<>();
+    final List<Point> allCoordinates = new ArrayList<>();
     allCoordinates.addAll(EXTERIOR_1);
     allCoordinates.addAll(INTERIOR_2);
     final Polygon polygon = WITH_HOLE;
     int i = 0;
     for (final Vertex vertex : polygon.vertices()) {
-      final Coordinates point = allCoordinates.get(i);
+      final Point point = allCoordinates.get(i);
       Assert.assertEquals(point, vertex);
       i++;
     }

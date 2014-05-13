@@ -1,7 +1,7 @@
 package com.revolsys.jts.dissolve;
 
 import com.revolsys.jts.edgegraph.MarkHalfEdge;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A HalfEdge which carries information
@@ -13,7 +13,7 @@ import com.revolsys.jts.geom.Coordinates;
 class DissolveHalfEdge extends MarkHalfEdge {
   private boolean isStart = false;
 
-  public DissolveHalfEdge(final Coordinates orig) {
+  public DissolveHalfEdge(final Point orig) {
     super(orig);
   }
 

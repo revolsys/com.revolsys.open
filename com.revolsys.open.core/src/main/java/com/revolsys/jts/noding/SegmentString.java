@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.CoordinatesList;
  * @version 1.7
  */
 public interface SegmentString {
-  Coordinates getCoordinate(int i);
+  Point getCoordinate(int i);
 
   /**
    * Gets the user-defined data for this segment string.

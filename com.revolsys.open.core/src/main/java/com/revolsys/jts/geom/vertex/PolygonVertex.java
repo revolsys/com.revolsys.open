@@ -30,7 +30,7 @@ public class PolygonVertex extends AbstractVertex {
   }
 
   @Override
-  public double getValue(final int index) {
+  public double getCoordinate(final int index) {
     final Polygon polygon = getPolygon();
     final LinearRing ring = polygon.getRing(ringIndex);
     if (ring == null) {

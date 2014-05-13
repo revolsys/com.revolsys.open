@@ -17,7 +17,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public final class ProjectionFactory {
@@ -45,7 +45,7 @@ public final class ProjectionFactory {
       LambertConicConformal.class);
   }
 
-  public static Coordinates convert(final Coordinates point,
+  public static Point convert(final Point point,
     final GeometryFactory sourceGeometryFactory,
     final GeometryFactory targetGeometryFactory) {
 

@@ -33,7 +33,7 @@
 package com.revolsys.jts.geomgraph.index;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geomgraph.Edge;
 
@@ -80,10 +80,10 @@ public class MonotoneChainEdge {
   private void computeIntersectsForChain(final int start0, final int end0,
     final MonotoneChainEdge mce, final int start1, final int end1,
     final SegmentIntersector ei) {
-    final Coordinates p00 = edge.getCoordinate(start0);
-    final Coordinates p01 = edge.getCoordinate(end0);
-    final Coordinates p10 = mce.edge.getCoordinate(start1);
-    final Coordinates p11 = mce.edge.getCoordinate(end1);
+    final Point p00 = edge.getCoordinate(start0);
+    final Point p01 = edge.getCoordinate(end0);
+    final Point p10 = mce.edge.getCoordinate(start1);
+    final Point p11 = mce.edge.getCoordinate(end1);
     // Debug.println("computeIntersectsForChain:" + p00 + p01 + p10 + p11);
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {

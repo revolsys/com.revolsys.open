@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * @version 1.7
@@ -41,7 +41,7 @@ public class NodeFactory {
   /**
    * The basic node constructor does not allow for incident edges
    */
-  public Node createNode(final Coordinates coord) {
+  public Node createNode(final Point coord) {
     return new Node(coord, null);
   }
 }

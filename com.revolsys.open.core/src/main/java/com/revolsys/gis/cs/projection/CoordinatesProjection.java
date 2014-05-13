@@ -1,6 +1,6 @@
 package com.revolsys.gis.cs.projection;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 public interface CoordinatesProjection {
   void inverse(final double x, double y, final double[] targetCoordinates,

@@ -2,18 +2,18 @@ package com.revolsys.gis.model.coordinates.comparator;
 
 import java.util.Comparator;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
-public class AngleFromPointComparator implements Comparator<Coordinates> {
+public class AngleFromPointComparator implements Comparator<Point> {
 
-  private final Coordinates point;
+  private final Point point;
 
-  public AngleFromPointComparator(final Coordinates point) {
+  public AngleFromPointComparator(final Point point) {
     this.point = point;
   }
 
   @Override
-  public int compare(final Coordinates c1, final Coordinates c2) {
+  public int compare(final Point c1, final Point c2) {
     final double angleC1 = point.angle2d(c1);
     final double angleC2 = point.angle2d(c2);
     if (angleC1 < angleC2) {

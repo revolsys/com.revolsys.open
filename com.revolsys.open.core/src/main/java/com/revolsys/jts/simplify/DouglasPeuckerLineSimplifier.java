@@ -36,7 +36,7 @@ package com.revolsys.jts.simplify;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Simplifies a linestring (sequence of points) using
@@ -45,7 +45,7 @@ import com.revolsys.jts.geom.Coordinates;
  * @version 1.7
  */
 class DouglasPeuckerLineSimplifier {
-  public static Coordinates[] simplify(final Coordinates[] pts,
+  public static Point[] simplify(final Point[] pts,
     final double distanceTolerance) {
     final DouglasPeuckerLineSimplifier simp = new DouglasPeuckerLineSimplifier(
       pts);
@@ -53,13 +53,13 @@ class DouglasPeuckerLineSimplifier {
     return simp.simplify();
   }
 
-  private final Coordinates[] pts;
+  private final Point[] pts;
 
   private boolean[] usePt;
 
   private double distanceTolerance;
 
-  public DouglasPeuckerLineSimplifier(final Coordinates[] pts) {
+  public DouglasPeuckerLineSimplifier(final Point[] pts) {
     this.pts = pts;
   }
 
@@ -74,7 +74,7 @@ class DouglasPeuckerLineSimplifier {
     this.distanceTolerance = distanceTolerance;
   }
 
-  public Coordinates[] simplify() {
+  public Point[] simplify() {
     usePt = new boolean[pts.length];
     for (int i = 0; i < pts.length; i++) {
       usePt[i] = true;
@@ -93,8 +93,8 @@ class DouglasPeuckerLineSimplifier {
     if ((i + 1) == j) {
       return;
     }
-    final Coordinates p0 = pts[i];
-    final Coordinates p1 = pts[j];
+    final Point p0 = pts[i];
+    final Point p1 = pts[j];
     double maxDistance = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {

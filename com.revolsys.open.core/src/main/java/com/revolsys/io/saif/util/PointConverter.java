@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.saif.SaifConstants;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 
@@ -37,7 +37,7 @@ public class PointConverter implements OsnConverter {
     String attributeName = iterator.nextAttributeName();
     while (attributeName != null) {
       if (attributeName.equals("coords")) {
-        Coordinates coordinate = null;
+        Point coordinate = null;
         final String coordTypeName = iterator.nextObjectName();
         if (coordTypeName.equals("/Coord3D")) {
           final double x = iterator.nextDoubleAttribute("c1");

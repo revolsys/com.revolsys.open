@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -57,13 +57,13 @@ import com.revolsys.jts.geom.Geometry;
  *
  */
 public class VertexTaggedGeometryDataMapper {
-  private final Map<Coordinates, Object> coordDataMap = new TreeMap<>();
+  private final Map<Point, Object> coordDataMap = new TreeMap<>();
 
   public VertexTaggedGeometryDataMapper() {
 
   }
 
-  public List<Coordinates> getCoordinates() {
+  public List<Point> getCoordinates() {
     return new ArrayList<>(coordDataMap.keySet());
   }
 
@@ -80,9 +80,9 @@ public class VertexTaggedGeometryDataMapper {
     }
   }
 
-  private void loadVertices(final Iterable<? extends Coordinates> points,
+  private void loadVertices(final Iterable<? extends Point> points,
     final Object data) {
-    for (final Coordinates point : points) {
+    for (final Point point : points) {
       coordDataMap.put(point.cloneCoordinates(), data);
     }
   }
@@ -90,8 +90,8 @@ public class VertexTaggedGeometryDataMapper {
   /**
    * Input is assumed to be a multiGeometry
    * in which every component has its userData
-   * set to be a Coordinates which is the key to the output data.
-   * The Coordinates is used to determine
+   * set to be a Point which is the key to the output data.
+   * The Point is used to determine
    * the output data object to be written back into the component. 
    * 
    * @param targetGeom
@@ -99,7 +99,7 @@ public class VertexTaggedGeometryDataMapper {
   public void transferData(final Geometry targetGeom) {
     for (int i = 0; i < targetGeom.getGeometryCount(); i++) {
       final Geometry geom = targetGeom.getGeometry(i);
-      final Coordinates vertexKey = (Coordinates)geom.getUserData();
+      final Point vertexKey = (Point)geom.getUserData();
       if (vertexKey == null) {
         continue;
       }

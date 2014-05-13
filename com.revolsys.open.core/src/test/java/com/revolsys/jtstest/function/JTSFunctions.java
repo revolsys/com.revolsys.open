@@ -3,7 +3,7 @@ package com.revolsys.jtstest.function;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -27,11 +27,11 @@ public class JTSFunctions {
   private static Geometry create_J(final Geometry g) {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
-    final Coordinates[] jTop = new Coordinates[] {
+    final Point[] jTop = new Point[] {
       new Coordinate(0, HEIGHT), new Coordinate(J_WIDTH, HEIGHT),
       new Coordinate(J_WIDTH, J_RADIUS)
     };
-    final Coordinates[] jBottom = new Coordinates[] {
+    final Point[] jBottom = new Point[] {
       new Coordinate(J_WIDTH - J_RADIUS, 0), new Coordinate(0, 0)
     };
 
@@ -55,10 +55,10 @@ public class JTSFunctions {
 
     final double centreX = WIDTH - S_RADIUS;
 
-    final Coordinates[] top = new Coordinates[] {
+    final Point[] top = new Point[] {
       new Coordinate(WIDTH, HEIGHT), new Coordinate(centreX, HEIGHT)
     };
-    final Coordinates[] bottom = new Coordinates[] {
+    final Point[] bottom = new Point[] {
       new Coordinate(centreX, 0), new Coordinate(WIDTH - 2 * S_RADIUS, 0)
     };
 
@@ -90,11 +90,11 @@ public class JTSFunctions {
   private static Geometry create_T(final Geometry g) {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
-    final Coordinates[] tTop = new Coordinates[] {
+    final Point[] tTop = new Point[] {
       new Coordinate(J_WIDTH, HEIGHT),
       new Coordinate(WIDTH - S_RADIUS - 5, HEIGHT)
     };
-    final Coordinates[] tBottom = new Coordinates[] {
+    final Point[] tBottom = new Point[] {
       new Coordinate(J_WIDTH + 0.5 * T_WIDTH, HEIGHT),
       new Coordinate(J_WIDTH + 0.5 * T_WIDTH, 0)
     };

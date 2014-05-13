@@ -38,7 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A node in a {@link PlanarGraph}is a location where 0 or more {@link Edge}s
@@ -62,7 +62,7 @@ public class Node extends GraphComponent {
   }
 
   /** The location of this Node */
-  protected Coordinates pt;
+  protected Point pt;
 
   /** The collection of DirectedEdges that leave this Node */
   protected DirectedEdgeStar deStar;
@@ -70,14 +70,14 @@ public class Node extends GraphComponent {
   /**
    * Constructs a Node with the given location.
    */
-  public Node(final Coordinates pt) {
+  public Node(final Point pt) {
     this(pt, new DirectedEdgeStar());
   }
 
   /**
    * Constructs a Node with the given location and collection of outgoing DirectedEdges.
    */
-  public Node(final Coordinates pt, final DirectedEdgeStar deStar) {
+  public Node(final Point pt, final DirectedEdgeStar deStar) {
     this.pt = pt;
     this.deStar = deStar;
   }
@@ -92,7 +92,7 @@ public class Node extends GraphComponent {
   /**
    * Returns the location of this Node.
    */
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return pt;
   }
 

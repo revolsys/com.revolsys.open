@@ -8,7 +8,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonWriter;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -59,13 +59,13 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
     }
   }
 
-  private void coordinate(final Coordinates coordinates) {
+  private void coordinate(final Point coordinates) {
     out.print('[');
     for (int axisIndex = 0; axisIndex < coordinates.getAxisCount(); axisIndex++) {
       if (axisIndex > 0) {
         out.print(',');
       }
-      final double value = coordinates.getValue(axisIndex);
+      final double value = coordinates.getCoordinate(axisIndex);
       out.value(value);
     }
     out.print(']');

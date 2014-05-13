@@ -1,14 +1,9 @@
 package com.revolsys.jts.util;
 
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 
 public class EnvelopeUtil {
-  public static double[] createBounds(final Coordinates point) {
-    final int axisCount = point.getAxisCount();
-    return createBounds(axisCount, point);
-  }
-
   public static double[] createBounds(final double... bounds) {
     final int axisCount = bounds.length;
     final double[] newBounds = new double[axisCount * 2];
@@ -18,12 +13,6 @@ public class EnvelopeUtil {
       newBounds[axisCount + axisCount] = value;
     }
     return newBounds;
-  }
-
-  public static double[] createBounds(final GeometryFactory geometryFactory,
-    final Coordinates point) {
-    final int axisCount = point.getAxisCount();
-    return createBounds(geometryFactory, axisCount, point);
   }
 
   public static double[] createBounds(final GeometryFactory geometryFactory,
@@ -42,10 +31,10 @@ public class EnvelopeUtil {
   }
 
   public static double[] createBounds(final GeometryFactory geometryFactory,
-    final int axisCount, final Coordinates point) {
+    final int axisCount, final Point point) {
     final double[] bounds = new double[axisCount * 2];
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      double value = point.getValue(axisIndex);
+      double value = point.getCoordinate(axisIndex);
       if (geometryFactory != null) {
         value = geometryFactory.makePrecise(axisIndex, value);
       }
@@ -53,6 +42,12 @@ public class EnvelopeUtil {
       bounds[axisCount + axisIndex] = value;
     }
     return bounds;
+  }
+
+  public static double[] createBounds(final GeometryFactory geometryFactory,
+    final Point point) {
+    final int axisCount = point.getAxisCount();
+    return createBounds(geometryFactory, axisCount, point);
   }
 
   public static double[] createBounds(final int axisCount) {
@@ -63,23 +58,19 @@ public class EnvelopeUtil {
     return newBounds;
   }
 
-  public static double[] createBounds(final int axisCount,
-    final Coordinates point) {
+  public static double[] createBounds(final int axisCount, final Point point) {
     final double[] bounds = new double[axisCount * 2];
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = point.getValue(axisIndex);
+      final double value = point.getCoordinate(axisIndex);
       bounds[axisIndex] = value;
       bounds[axisCount + axisIndex] = value;
     }
     return bounds;
   }
 
-  public static void expand(final double[] bounds, final int axisCount,
-    final Coordinates point) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = point.getValue(axisIndex);
-      expand(bounds, axisCount, axisIndex, value);
-    }
+  public static double[] createBounds(final Point point) {
+    final int axisCount = point.getAxisCount();
+    return createBounds(axisCount, point);
   }
 
   public static void expand(final double[] bounds, final int axisCount,
@@ -94,13 +85,11 @@ public class EnvelopeUtil {
     }
   }
 
-  public static void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, final Coordinates point) {
-    final int axisCount = bounds.length / 2;
-    final int count = Math.min(axisCount, point.getAxisCount());
-    for (int axisIndex = 0; axisIndex < count; axisIndex++) {
-      final double value = point.getValue(axisIndex);
-      expand(geometryFactory, bounds, axisCount, axisIndex, value);
+  public static void expand(final double[] bounds, final int axisCount,
+    final Point point) {
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double value = point.getCoordinate(axisIndex);
+      expand(bounds, axisCount, axisIndex, value);
     }
   }
 
@@ -145,6 +134,16 @@ public class EnvelopeUtil {
       if (value > max || Double.isNaN(max)) {
         bounds[axisCount + axisIndex] = value;
       }
+    }
+  }
+
+  public static void expand(final GeometryFactory geometryFactory,
+    final double[] bounds, final Point point) {
+    final int axisCount = bounds.length / 2;
+    final int count = Math.min(axisCount, point.getAxisCount());
+    for (int axisIndex = 0; axisIndex < count; axisIndex++) {
+      final double value = point.getCoordinate(axisIndex);
+      expand(geometryFactory, bounds, axisCount, axisIndex, value);
     }
   }
 
@@ -199,53 +198,6 @@ public class EnvelopeUtil {
    * @param point
    * @return
    */
-  public static boolean intersects(final Coordinates lineStart,
-    final Coordinates lineEnd, final Coordinates point) {
-    final double x1 = lineStart.getX();
-    final double y1 = lineStart.getY();
-    final double x2 = lineEnd.getX();
-    final double y2 = lineEnd.getY();
-
-    final double x = point.getX();
-    final double y = point.getY();
-    return intersects(x1, y1, x2, y2, x, y);
-  }
-
-  /**
-   * Tests whether the envelope defined by p1-p2
-   * and the envelope defined by q1-q2
-   * intersect.
-   * 
-   * @param p1 one extremal point of the envelope P
-   * @param p2 another extremal point of the envelope P
-   * @param q1 one extremal point of the envelope Q
-   * @param q2 another extremal point of the envelope Q
-   * @return <code>true</code> if Q intersects P
-   */
-  public static boolean intersects(final Coordinates line1Start,
-    final Coordinates line1End, final Coordinates line2Start,
-    final Coordinates line2End) {
-    final double line1x1 = line1Start.getX();
-    final double line1y1 = line1Start.getY();
-    final double line1x2 = line1End.getX();
-    final double line1y2 = line1End.getY();
-
-    final double line2x1 = line2Start.getX();
-    final double line2y1 = line2Start.getY();
-    final double line2x2 = line2End.getX();
-    final double line2y2 = line2End.getY();
-    return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
-      line2x2, line2y2);
-  }
-
-  /**
-   * Point intersects the bounding box of the line.
-   * 
-   * @param lineStart
-   * @param lineEnd
-   * @param point
-   * @return
-   */
   public static boolean intersects(final double p1X, final double p1Y,
     final double p2X, final double p2Y, final double qX, final double qY) {
     if (((qX >= (p1X < p2X ? p1X : p2X)) && (qX <= (p1X > p2X ? p1X : p2X)))
@@ -284,5 +236,51 @@ public class EnvelopeUtil {
         }
       }
     }
+  }
+
+  /**
+   * Point intersects the bounding box of the line.
+   * 
+   * @param lineStart
+   * @param lineEnd
+   * @param point
+   * @return
+   */
+  public static boolean intersects(final Point lineStart, final Point lineEnd,
+    final Point point) {
+    final double x1 = lineStart.getX();
+    final double y1 = lineStart.getY();
+    final double x2 = lineEnd.getX();
+    final double y2 = lineEnd.getY();
+
+    final double x = point.getX();
+    final double y = point.getY();
+    return intersects(x1, y1, x2, y2, x, y);
+  }
+
+  /**
+   * Tests whether the envelope defined by p1-p2
+   * and the envelope defined by q1-q2
+   * intersect.
+   * 
+   * @param p1 one extremal point of the envelope P
+   * @param p2 another extremal point of the envelope P
+   * @param q1 one extremal point of the envelope Q
+   * @param q2 another extremal point of the envelope Q
+   * @return <code>true</code> if Q intersects P
+   */
+  public static boolean intersects(final Point line1Start,
+    final Point line1End, final Point line2Start, final Point line2End) {
+    final double line1x1 = line1Start.getX();
+    final double line1y1 = line1Start.getY();
+    final double line1x2 = line1End.getX();
+    final double line1y2 = line1End.getY();
+
+    final double line2x1 = line2Start.getX();
+    final double line2y1 = line2Start.getY();
+    final double line2x2 = line2End.getX();
+    final double line2y2 = line2End.getY();
+    return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      line2x2, line2y2);
   }
 }

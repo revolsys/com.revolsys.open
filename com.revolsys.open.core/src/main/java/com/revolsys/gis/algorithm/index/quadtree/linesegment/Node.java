@@ -2,7 +2,7 @@ package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.index.quadtree.DoubleBits;
 
@@ -51,7 +51,7 @@ public class Node extends NodeBase {
 
   private final BoundingBox env;
 
-  private final Coordinates centre;
+  private final Point centre;
 
   private final int level;
 

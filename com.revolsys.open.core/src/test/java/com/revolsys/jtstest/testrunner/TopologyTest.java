@@ -32,7 +32,8 @@ public class TopologyTest {
   public static junit.framework.Test suite() throws Throwable {
     // return testReader.createTestRun(new File("src/test/testxml/Quick.xml"),
     // 1);
-    return new TestDirectory(new File("src/test/testxml/"), "Topology Tests");
+    return new TestDirectory(null, 0, new File("src/test/testxml/"),
+      "Topology Tests");
   }
 
   public TopologyTest() {

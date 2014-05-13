@@ -2,7 +2,7 @@ package com.revolsys.gis.algorithm.index.quadtree;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 
 public class Node<T> extends NodeBase<T> {
@@ -22,13 +22,13 @@ public class Node<T> extends NodeBase<T> {
 
   public static <V> Node<V> createNode(final BoundingBox env) {
     final Key key = new Key(env);
-    final Node<V> node = new Node<V>(key.getEnvelope(), key.getLevel());
+    final Node<V> node = new Node<V>(key.getKeyEnvelope(), key.getLevel());
     return node;
   }
 
   private final BoundingBox env;
 
-  private final Coordinates centre;
+  private final Point centre;
 
   private final int level;
 

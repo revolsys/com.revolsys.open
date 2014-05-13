@@ -35,7 +35,7 @@ package com.revolsys.jts.geom.util;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -99,7 +99,7 @@ public class SineStarFactory extends GeometricShapeFactory {
     final double centreX = env.getMinX() + radius;
     final double centreY = env.getMinY() + radius;
 
-    final Coordinates[] pts = new Coordinates[nPts + 1];
+    final Point[] pts = new Point[nPts + 1];
     int iPt = 0;
     for (int i = 0; i < nPts; i++) {
       // the fraction of the way thru the current arm - in [0,1]

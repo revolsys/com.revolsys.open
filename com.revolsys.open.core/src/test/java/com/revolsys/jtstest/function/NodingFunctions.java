@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -31,7 +31,7 @@ public class NodingFunctions {
     final List intPts = nv.getIntersections();
     final Point[] pts = new Point[intPts.size()];
     for (int i = 0; i < intPts.size(); i++) {
-      final Coordinates coord = (Coordinates)intPts.get(i);
+      final Point coord = (Point)intPts.get(i);
       // use default factory in case intersections are not fixed
       pts[i] = FunctionsUtil.getFactoryOrDefault(null).point(coord);
     }

@@ -35,7 +35,7 @@ package com.revolsys.jts.testold.algorithm;
 import junit.framework.TestCase;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Location;
 
 /**
@@ -53,54 +53,54 @@ public abstract class AbstractPointInRingTest extends TestCase {
     super(name);
   }
 
-  abstract protected void runPtInRing(Location expectedLoc, Coordinates pt,
+  abstract protected void runPtInRing(Location expectedLoc, Point pt,
     String wkt) throws Exception;
 
   public void testBox() throws Exception {
     runPtInRing(Location.INTERIOR, new Coordinate(10.0, 10.0,
-      Coordinates.NULL_ORDINATE), "POLYGON ((0 0, 0 20, 20 20, 20 0, 0 0))");
+      Point.NULL_ORDINATE), "POLYGON ((0 0, 0 20, 20 20, 20 0, 0 0))");
   }
 
   public void testComb() throws Exception {
     runPtInRing(Location.BOUNDARY, new Coordinate(0.0, 0.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     runPtInRing(Location.BOUNDARY, new Coordinate(0.0, 1.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     // at vertex
     runPtInRing(Location.BOUNDARY, new Coordinate(4.0, 5.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     runPtInRing(Location.BOUNDARY, new Coordinate(8.0, 5.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
 
     // on horizontal segment
     runPtInRing(Location.BOUNDARY, new Coordinate(11.0, 5.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     // on vertical segment
     runPtInRing(Location.BOUNDARY, new Coordinate(30.0, 5.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     // on angled segment
     runPtInRing(Location.BOUNDARY, new Coordinate(22.0, 7.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
 
     runPtInRing(Location.INTERIOR, new Coordinate(1.0, 5.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     runPtInRing(Location.INTERIOR, new Coordinate(5.0, 5.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     runPtInRing(Location.INTERIOR, new Coordinate(1.0, 7.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
 
     runPtInRing(Location.EXTERIOR, new Coordinate(12.0, 10.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     runPtInRing(Location.EXTERIOR, new Coordinate(16.0, 5.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
     runPtInRing(Location.EXTERIOR, new Coordinate(35.0, 5.0,
-      Coordinates.NULL_ORDINATE), comb);
+      Point.NULL_ORDINATE), comb);
   }
 
   public void testComplexRing() throws Exception {
     runPtInRing(
       Location.INTERIOR,
-      new Coordinate(0.0, 0, Coordinates.NULL_ORDINATE),
+      new Coordinate(0.0, 0, Point.NULL_ORDINATE),
       "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
   }
 
@@ -110,22 +110,22 @@ public abstract class AbstractPointInRingTest extends TestCase {
    */
   public void testRepeatedPts() throws Exception {
     runPtInRing(Location.BOUNDARY, new Coordinate(0.0, 0,
-      Coordinates.NULL_ORDINATE), repeatedPts);
+      Point.NULL_ORDINATE), repeatedPts);
     runPtInRing(Location.BOUNDARY, new Coordinate(0.0, 1,
-      Coordinates.NULL_ORDINATE), repeatedPts);
+      Point.NULL_ORDINATE), repeatedPts);
 
     // at vertex
     runPtInRing(Location.BOUNDARY, new Coordinate(2.0, 5,
-      Coordinates.NULL_ORDINATE), repeatedPts);
+      Point.NULL_ORDINATE), repeatedPts);
     runPtInRing(Location.BOUNDARY, new Coordinate(8.0, 5,
-      Coordinates.NULL_ORDINATE), repeatedPts);
+      Point.NULL_ORDINATE), repeatedPts);
     runPtInRing(Location.BOUNDARY, new Coordinate(10.0, 5,
-      Coordinates.NULL_ORDINATE), repeatedPts);
+      Point.NULL_ORDINATE), repeatedPts);
 
     runPtInRing(Location.INTERIOR, new Coordinate(1.0, 5,
-      Coordinates.NULL_ORDINATE), repeatedPts);
+      Point.NULL_ORDINATE), repeatedPts);
     runPtInRing(Location.INTERIOR, new Coordinate(3.0, 5,
-      Coordinates.NULL_ORDINATE), repeatedPts);
+      Point.NULL_ORDINATE), repeatedPts);
 
   }
 

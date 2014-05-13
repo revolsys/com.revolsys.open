@@ -33,7 +33,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -49,7 +49,7 @@ import com.revolsys.jts.geom.segment.Segment;
  * having zero length or area), 
  * the centroid will be computed as for the equivalent lower-dimension geometry.
  * If the input geometry is empty, a
- * <code>null</code> Coordinates is returned.
+ * <code>null</code> Point is returned.
  * 
  * <h2>Algorithm</h2>
  * <ul>
@@ -75,8 +75,8 @@ public class Centroid {
    * Returns twice the signed area of the triangle p1-p2-p3.
    * The area is positive if the triangle is oriented CCW, and negative if CW.
    */
-  private static double area2(final Coordinates p1, final Coordinates p2,
-    final Coordinates p3) {
+  private static double area2(final Point p1, final Point p2,
+    final Point p3) {
     return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY())
       - (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
   }
@@ -87,12 +87,12 @@ public class Centroid {
    * @param geom the geometry to use
    * @return the centroid point, or null if the geometry is empty
    */
-  public static Coordinates getCentroid(final Geometry geom) {
+  public static Point getCentroid(final Geometry geom) {
     final Centroid cent = new Centroid(geom);
     return cent.getCentroid();
   }
 
-  private Coordinates areaBasePt = null;// the point all triangles are based at
+  private Point areaBasePt = null;// the point all triangles are based at
 
   private double areasum2 = 0; /* Partial area sum */
 
@@ -155,8 +155,8 @@ public class Centroid {
   private void addHole(final LineString line) {
     final boolean isPositiveArea = line.isCounterClockwise();
     for (final Segment segment : line.segments()) {
-      final Coordinates point1 = segment.get(0);
-      final Coordinates point2 = segment.get(1);
+      final Point point1 = segment.get(0);
+      final Point point2 = segment.get(1);
       addTriangle(areaBasePt, point1, point2, isPositiveArea);
     }
     addLineSegments(line);
@@ -196,7 +196,7 @@ public class Centroid {
    * Adds a point to the point centroid accumulator.
    * @param pt a {@link Coordinates}
    */
-  private void addPoint(final Coordinates pt) {
+  private void addPoint(final Point pt) {
     ptCount += 1;
     centSumX += pt.getX();
     centSumY += pt.getY();
@@ -208,15 +208,15 @@ public class Centroid {
     }
     final boolean isPositiveArea = line.isClockwise();
     for (final Segment segment : line.segments()) {
-      final Coordinates point1 = segment.get(0);
-      final Coordinates point2 = segment.get(1);
+      final Point point1 = segment.get(0);
+      final Point point2 = segment.get(1);
       addTriangle(areaBasePt, point1, point2, isPositiveArea);
     }
     addLineSegments(line);
   }
 
-  private void addTriangle(final Coordinates p0, final Coordinates p1,
-    final Coordinates p2, final boolean isPositiveArea) {
+  private void addTriangle(final Point p0, final Point p1,
+    final Point p2, final boolean isPositiveArea) {
     final double sign = (isPositiveArea) ? 1.0 : -1.0;
 
     final double triangleCent3X = p0.getX() + p1.getX() + p2.getX();
@@ -233,7 +233,7 @@ public class Centroid {
    * 
    * @return the computed centroid, or null if the input is empty
    */
-  public Coordinates getCentroid() {
+  public Point getCentroid() {
     /**
      * The centroid is computed from the highest dimension components present in the input.
      * I.e. areas dominate lineal geometry, which dominates points.
@@ -261,7 +261,7 @@ public class Centroid {
     }
   }
 
-  private void setBasePoint(final Coordinates basePt) {
+  private void setBasePoint(final Point basePt) {
     if (this.areaBasePt == null) {
       this.areaBasePt = basePt;
     }

@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.util.Assert;
 
@@ -59,8 +59,8 @@ public abstract class LineIntersector {
    * result of <b>rounding</b> points which lie on the line, but not safe to use
    * for <b>truncated</b> points.
    */
-  public static double computeEdgeDistance(final Coordinates p,
-    final Coordinates p0, final Coordinates p1) {
+  public static double computeEdgeDistance(final Point p,
+    final Point p0, final Point p1) {
     final double dx = Math.abs(p1.getX() - p0.getX());
     final double dy = Math.abs(p1.getY() - p0.getY());
 
@@ -95,8 +95,8 @@ public abstract class LineIntersector {
    * This function is non-robust, since it may compute the square of large
    * numbers. Currently not sure how to improve this.
    */
-  public static double nonRobustComputeEdgeDistance(final Coordinates p,
-    final Coordinates p1, final Coordinates p2) {
+  public static double nonRobustComputeEdgeDistance(final Point p,
+    final Point p1, final Point p2) {
     final double dx = p.getX() - p1.getX();
     final double dy = p.getY() - p1.getY();
     final double dist = Math.sqrt(dx * dx + dy * dy); // dummy value
@@ -107,9 +107,9 @@ public abstract class LineIntersector {
 
   protected int result;
 
-  protected Coordinates[][] inputLines = new Coordinates[2][2];
+  protected Point[][] inputLines = new Point[2][2];
 
-  protected Coordinates[] intPt = new Coordinates[2];
+  protected Point[] intPt = new Point[2];
 
   /**
    * The indexes of the endpoints of the intersection lines, in order along the
@@ -119,9 +119,9 @@ public abstract class LineIntersector {
 
   protected boolean isProper;
 
-  protected Coordinates pa;
+  protected Point pa;
 
-  protected Coordinates pb;
+  protected Point pb;
 
   /**
    * If makePrecise is true, computed intersection coordinates will be made
@@ -140,24 +140,24 @@ public abstract class LineIntersector {
     result = 0;
   }
 
-  protected abstract int computeIntersect(Coordinates p1, Coordinates p2,
-    Coordinates q1, Coordinates q2);
+  protected abstract int computeIntersect(Point p1, Point p2,
+    Point q1, Point q2);
 
   /**
    * Compute the intersection of a point p and the line p1-p2. This function
    * computes the boolean value of the hasIntersection test. The actual value of
    * the intersection (if there is one) is equal to the value of <code>p</code>.
    */
-  public abstract void computeIntersection(Coordinates p, Coordinates p1,
-    Coordinates p2);
+  public abstract void computeIntersection(Point p, Point p1,
+    Point p2);
 
   /**
    * Computes the intersection of the lines p1-p2 and p3-p4. This function
    * computes both the boolean value of the hasIntersection test and the
    * (approximate) value of the intersection point itself (if there is one).
    */
-  public void computeIntersection(final Coordinates p1, final Coordinates p2,
-    final Coordinates p3, final Coordinates p4) {
+  public void computeIntersection(final Point p1, final Point p2,
+    final Point p3, final Point p4) {
     inputLines[0][0] = p1;
     inputLines[0][1] = p2;
     inputLines[1][0] = p3;
@@ -213,7 +213,7 @@ public abstract class LineIntersector {
    * @param ptIndex the index of the endpoint (0 or 1)
    * @return the specified endpoint
    */
-  public Coordinates getEndpoint(final int segmentIndex, final int ptIndex) {
+  public Point getEndpoint(final int segmentIndex, final int ptIndex) {
     return inputLines[segmentIndex][ptIndex];
   }
 
@@ -237,7 +237,7 @@ public abstract class LineIntersector {
    * @param intIndex is 0 or 1
    * @return the intIndex'th intersection point
    */
-  public Coordinates getIntersection(final int intIndex) {
+  public Point getIntersection(final int intIndex) {
     return intPt[intIndex];
   }
 
@@ -250,7 +250,7 @@ public abstract class LineIntersector {
    * @return the intIndex'th intersection point in the direction of the
    *         specified input line segment
    */
-  public Coordinates getIntersectionAlongSegment(final int segmentIndex,
+  public Point getIntersectionAlongSegment(final int segmentIndex,
     final int intIndex) {
     // lazily compute int line array
     computeIntLineIndex();
@@ -337,7 +337,7 @@ public abstract class LineIntersector {
    * 
    * @return true if the input point is one of the intersection points.
    */
-  public boolean isIntersection(final Coordinates pt) {
+  public boolean isIntersection(final Point pt) {
     for (int i = 0; i < result; i++) {
       if (intPt[i].equals2d(pt)) {
         return true;

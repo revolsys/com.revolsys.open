@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -181,23 +181,23 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    *@throws  ParseException  if an unexpected token was encountered
    */
-  private Coordinates[] getCoordinates() throws IOException, ParseException {
+  private Point[] getCoordinates() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return new Coordinates[] {};
+      return new Point[] {};
     }
-    final List<Coordinates> coordinates = new ArrayList<Coordinates>();
+    final List<Point> coordinates = new ArrayList<Point>();
     coordinates.add(getPreciseCoordinate());
     nextToken = getNextCloserOrComma();
     while (nextToken.equals(COMMA)) {
       coordinates.add(getPreciseCoordinate());
       nextToken = getNextCloserOrComma();
     }
-    final Coordinates[] array = new Coordinates[coordinates.size()];
+    final Point[] array = new Point[coordinates.size()];
     return coordinates.toArray(array);
   }
 
-  private Coordinates[] getCoordinatesNoLeftParen() throws IOException,
+  private Point[] getCoordinatesNoLeftParen() throws IOException,
     ParseException {
     String nextToken = null;
     final ArrayList coordinates = new ArrayList();
@@ -207,8 +207,8 @@ public class WKTReader {
       coordinates.add(getPreciseCoordinate());
       nextToken = getNextCloserOrComma();
     }
-    final Coordinates[] array = new Coordinates[coordinates.size()];
-    return (Coordinates[])coordinates.toArray(array);
+    final Point[] array = new Point[coordinates.size()];
+    return (Point[])coordinates.toArray(array);
   }
 
   /**
@@ -328,10 +328,10 @@ public class WKTReader {
     return null;
   }
 
-  private Coordinates getPreciseCoordinate() throws IOException, ParseException {
+  private Point getPreciseCoordinate() throws IOException, ParseException {
     final double x = geometryFactory.makePrecise(0, getNextNumber());
     final double y = geometryFactory.makePrecise(1, getNextNumber());
-    final Coordinates coord;
+    final Point coord;
     if (isNumberNext()) {
       final double z = getNextNumber();
       coord = new DoubleCoordinates(x, y, z);
@@ -659,7 +659,7 @@ public class WKTReader {
   private Point readPointText() throws IOException, ParseException {
     final String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.point((Coordinates)null);
+      return geometryFactory.point((Point)null);
     }
     final Point point = geometryFactory.point(getPreciseCoordinate());
     getNextCloser();
@@ -723,7 +723,7 @@ public class WKTReader {
    *@return              <code>Point</code>s created using this <code>WKTReader</code>
    *      s <code>GeometryFactory</code>
    */
-  private Point[] toPoints(final Coordinates[] coordinates) {
+  private Point[] toPoints(final Point[] coordinates) {
     final ArrayList points = new ArrayList();
     for (int i = 0; i < coordinates.length; i++) {
       points.add(geometryFactory.point(coordinates[i]));

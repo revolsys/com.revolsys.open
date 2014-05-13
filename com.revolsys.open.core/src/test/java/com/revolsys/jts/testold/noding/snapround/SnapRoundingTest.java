@@ -6,7 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
@@ -44,8 +44,8 @@ public class SnapRoundingTest extends TestCase {
     return geomList;
   }
 
-  private boolean isSnapped(final Coordinates v, final Coordinates p0,
-    final Coordinates p1) {
+  private boolean isSnapped(final Point v, final Point p0,
+    final Point p1) {
     if (v.equals2d(p0)) {
       return true;
     }
@@ -60,12 +60,12 @@ public class SnapRoundingTest extends TestCase {
     return true;
   }
 
-  private boolean isSnapped(final Coordinates v, final List lines) {
+  private boolean isSnapped(final Point v, final List lines) {
     for (int i = 0; i < lines.size(); i++) {
       final LineString line = (LineString)lines.get(i);
       for (int j = 0; j < line.getVertexCount() - 1; j++) {
-        final Coordinates p0 = line.getCoordinate(j);
-        final Coordinates p1 = line.getCoordinate(j + 1);
+        final Point p0 = line.getCoordinate(j);
+        final Point p1 = line.getCoordinate(j + 1);
         if (!isSnapped(v, p0, p1)) {
           return false;
         }
@@ -78,7 +78,7 @@ public class SnapRoundingTest extends TestCase {
     for (int i = 0; i < lines.size(); i++) {
       final LineString line = (LineString)lines.get(i);
       for (int j = 0; j < line.getVertexCount(); j++) {
-        final Coordinates v = line.getCoordinate(j);
+        final Point v = line.getCoordinate(j);
         if (!isSnapped(v, lines)) {
           return false;
         }

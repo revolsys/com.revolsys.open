@@ -40,7 +40,7 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -115,11 +115,11 @@ class OffsetSegmentGenerator {
 
   private final LineIntersector li;
 
-  private Coordinates s0;
+  private Point s0;
 
-  private Coordinates s1;
+  private Point s1;
 
-  private Coordinates s2;
+  private Point s2;
 
   private LineSegment offset0;
 
@@ -208,8 +208,8 @@ class OffsetSegmentGenerator {
    * @param direction the orientation of the fillet
    * @param radius the radius of the fillet
    */
-  private void addFillet(final Coordinates p, final Coordinates p0,
-    final Coordinates p1, final int direction, final double radius) {
+  private void addFillet(final Point p, final Point p0,
+    final Point p1, final int direction, final double radius) {
     final double dx0 = p0.getX() - p.getX();
     final double dy0 = p0.getY() - p.getY();
     double startAngle = Math.atan2(dy0, dx0);
@@ -240,7 +240,7 @@ class OffsetSegmentGenerator {
    * @param direction is -1 for a CW angle, 1 for a CCW angle
    * @param radius the radius of the fillet
    */
-  private void addFillet(final Coordinates p, final double startAngle,
+  private void addFillet(final Point p, final double startAngle,
     final double endAngle, final int direction, final double radius) {
     final int directionFactor = direction == CGAlgorithms.CLOCKWISE ? -1 : 1;
 
@@ -327,17 +327,17 @@ class OffsetSegmentGenerator {
          * Add "closing segment" of required length.
          */
         if (closingSegLengthFactor > 0) {
-          final Coordinates mid0 = new Coordinate((closingSegLengthFactor
+          final Point mid0 = new Coordinate((closingSegLengthFactor
             * offset0.getP1().getX() + s1.getX())
             / (closingSegLengthFactor + 1), (closingSegLengthFactor
             * offset0.getP1().getY() + s1.getY())
-            / (closingSegLengthFactor + 1), Coordinates.NULL_ORDINATE);
+            / (closingSegLengthFactor + 1), Point.NULL_ORDINATE);
           segList.addPt(mid0);
-          final Coordinates mid1 = new Coordinate((closingSegLengthFactor
+          final Point mid1 = new Coordinate((closingSegLengthFactor
             * offset1.getP0().getX() + s1.getX())
             / (closingSegLengthFactor + 1), (closingSegLengthFactor
             * offset1.getP0().getY() + s1.getY())
-            / (closingSegLengthFactor + 1), Coordinates.NULL_ORDINATE);
+            / (closingSegLengthFactor + 1), Point.NULL_ORDINATE);
           segList.addPt(mid1);
         } else {
           /**
@@ -374,7 +374,7 @@ class OffsetSegmentGenerator {
    */
   private void addLimitedMitreJoin(final LineSegment offset0,
     final LineSegment offset1, final double distance, final double mitreLimit) {
-    final Coordinates basePt = s1;
+    final Point basePt = s1;
 
     final double ang0 = Angle.angle(basePt, s0);
 
@@ -398,8 +398,8 @@ class OffsetSegmentGenerator {
     // compute the midpoint of the bevel segment
     final double bevelMidX = basePt.getX() + mitreDist * Math.cos(mitreMidAng);
     final double bevelMidY = basePt.getY() + mitreDist * Math.sin(mitreMidAng);
-    final Coordinates bevelMidPt = new Coordinate(bevelMidX, bevelMidY,
-      Coordinates.NULL_ORDINATE);
+    final Point bevelMidPt = new Coordinate(bevelMidX, bevelMidY,
+      Point.NULL_ORDINATE);
 
     // compute the mitre midline segment from the corner point to the bevel
     // segment midpoint
@@ -407,9 +407,9 @@ class OffsetSegmentGenerator {
 
     // finally the bevel segment endpoints are computed as offsets from
     // the mitre midline
-    final Coordinates bevelEndLeft = mitreMidLine.pointAlongOffset(1.0,
+    final Point bevelEndLeft = mitreMidLine.pointAlongOffset(1.0,
       bevelHalfLen);
-    final Coordinates bevelEndRight = mitreMidLine.pointAlongOffset(1.0,
+    final Point bevelEndRight = mitreMidLine.pointAlongOffset(1.0,
       -bevelHalfLen);
 
     if (side == Position.LEFT) {
@@ -426,7 +426,7 @@ class OffsetSegmentGenerator {
   /**
    * Add an end cap around point p1, terminating a line segment coming from p0
    */
-  public void addLineEndCap(final Coordinates p0, final Coordinates p1) {
+  public void addLineEndCap(final Point p0, final Point p1) {
     final LineSegment seg = new LineSegmentImpl(p0, p1);
 
     final LineSegment offsetL = createOffsetSegment(seg, Position.LEFT,
@@ -438,8 +438,8 @@ class OffsetSegmentGenerator {
     final double dy = p1.getY() - p0.getY();
     final double angle = Math.atan2(dy, dx);
 
-    final Coordinates lp1 = offsetL.getP1();
-    final Coordinates rp1 = offsetR.getP1();
+    final Point lp1 = offsetL.getP1();
+    final Point rp1 = offsetR.getP1();
     switch (bufParams.getEndCapStyle()) {
       case BufferParameters.CAP_ROUND:
         // add offset seg points with a fillet between them
@@ -455,7 +455,7 @@ class OffsetSegmentGenerator {
       break;
       case BufferParameters.CAP_SQUARE:
         // add a square defined by extensions of the offset segment endpoints
-        final Coordinates squareCapSideOffset = new DoubleCoordinates(
+        final Point squareCapSideOffset = new DoubleCoordinates(
           Math.abs(distance) * Math.cos(angle), Math.abs(distance)
             * Math.sin(angle));
 
@@ -479,10 +479,10 @@ class OffsetSegmentGenerator {
    * @param offset1 the second offset segment
    * @param distance the offset distance
    */
-  private void addMitreJoin(final Coordinates p, final LineSegment offset0,
+  private void addMitreJoin(final Point p, final LineSegment offset0,
     final LineSegment offset1, final double distance) {
     boolean isMitreWithinLimit = true;
-    Coordinates intPt = null;
+    Point intPt = null;
 
     /**
      * This computation is unstable if the offset segments are nearly collinear.
@@ -500,7 +500,7 @@ class OffsetSegmentGenerator {
         isMitreWithinLimit = false;
       }
     } catch (final NotRepresentableException ex) {
-      intPt = new Coordinate(0.0, 0.0, Coordinates.NULL_ORDINATE);
+      intPt = new Coordinate(0.0, 0.0, Point.NULL_ORDINATE);
       isMitreWithinLimit = false;
     }
 
@@ -512,7 +512,7 @@ class OffsetSegmentGenerator {
     }
   }
 
-  public void addNextSegment(final Coordinates p, final boolean addStartPoint) {
+  public void addNextSegment(final Point p, final boolean addStartPoint) {
     // s0-s1-s2 are the coordinates of the previous segment and the current one
     this.s0 = this.s1;
     this.s1 = this.s2;
@@ -584,7 +584,7 @@ class OffsetSegmentGenerator {
   /**
    * Creates a CW circle around a point
    */
-  public void createCircle(final Coordinates point) {
+  public void createCircle(final Point point) {
     // add start point
     final double x = point.getX() + distance;
     final double y = point.getY();
@@ -593,8 +593,8 @@ class OffsetSegmentGenerator {
     segList.closeRing();
   }
 
-  private LineSegment createOffsetSegment(final Coordinates p1,
-    final Coordinates p2, final int side, final double distance) {
+  private LineSegment createOffsetSegment(final Point p1,
+    final Point p2, final int side, final double distance) {
     final int sideSign = side == Position.LEFT ? 1 : -1;
     final double p1x = p1.getX();
     final double p1y = p1.getY();
@@ -644,7 +644,7 @@ class OffsetSegmentGenerator {
   /**
    * Creates a CW square around a point
    */
-  public void createSquare(final Coordinates p) {
+  public void createSquare(final Point p) {
     segList.addPt(p.getX() + distance, p.getY() + distance);
     segList.addPt(p.getX() + distance, p.getY() - distance);
     segList.addPt(p.getX() - distance, p.getY() - distance);
@@ -683,7 +683,7 @@ class OffsetSegmentGenerator {
       * CURVE_VERTEX_SNAP_DISTANCE_FACTOR);
   }
 
-  public void initSideSegments(final Coordinates s1, final Coordinates s2,
+  public void initSideSegments(final Point s1, final Point s2,
     final int side) {
     this.s1 = s1;
     this.s2 = s2;

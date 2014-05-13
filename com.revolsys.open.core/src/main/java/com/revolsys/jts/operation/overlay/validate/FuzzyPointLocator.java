@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.overlay.validate;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -87,7 +87,7 @@ public class FuzzyPointLocator {
     }
   }
 
-  public Location getLocation(final Coordinates pt) {
+  public Location getLocation(final Point pt) {
     if (isWithinToleranceOfBoundary(pt)) {
       return Location.BOUNDARY;
       /*
@@ -102,7 +102,7 @@ public class FuzzyPointLocator {
     return ptLocator.locate(pt, g);
   }
 
-  private boolean isWithinToleranceOfBoundary(final Coordinates pt) {
+  private boolean isWithinToleranceOfBoundary(final Point pt) {
     final double x = pt.getX();
     final double y = pt.getY();
     for (int i = 0; i < linework.getGeometryCount(); i++) {

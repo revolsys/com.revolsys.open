@@ -38,7 +38,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
@@ -92,12 +92,12 @@ public class TaggedLineStringSimplifier {
 
   private int findFurthestPoint(final int i, final int j,
     final double[] maxDistance) {
-    final Coordinates p0 = line.getVertex(i);
-    final Coordinates p1 = line.getVertex(j);
+    final Point p0 = line.getVertex(i);
+    final Point p1 = line.getVertex(j);
     double maxDist = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
-      final Coordinates midPt = line.getVertex(k);
+      final Point midPt = line.getVertex(k);
       final double distance = LineSegmentUtil.distance(p0, p1, midPt);
       if (distance > maxDist) {
         maxDist = distance;
@@ -121,8 +121,8 @@ public class TaggedLineStringSimplifier {
    */
   private LineSegment flatten(final int start, final int end) {
     // make a new segment for the simplified geometry
-    final Coordinates p0 = line.getVertex(start).cloneCoordinates();
-    final Coordinates p1 = line.getVertex(end).cloneCoordinates();
+    final Point p0 = line.getVertex(start).cloneCoordinates();
+    final Point p1 = line.getVertex(end).cloneCoordinates();
     final LineSegment newSeg = new LineSegmentImpl(p0, p1);
     // update the indexes
     remove(taggedLine, start, end);
@@ -243,8 +243,8 @@ public class TaggedLineStringSimplifier {
     }
     // test if flattened section would cause intersection
     // final LineSegment candidateSeg = new LineSegmentImpl();
-    final Coordinates p0 = line.getVertex(i).cloneCoordinates();
-    final Coordinates p1 = line.getVertex(j).cloneCoordinates();
+    final Point p0 = line.getVertex(i).cloneCoordinates();
+    final Point p1 = line.getVertex(j).cloneCoordinates();
     final LineSegment candidateSeg = new LineSegmentImpl(p0, p1);
     sectionIndex[0] = i;
     sectionIndex[1] = j;

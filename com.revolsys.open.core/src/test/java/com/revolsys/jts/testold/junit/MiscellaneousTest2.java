@@ -37,10 +37,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -72,58 +73,58 @@ public class MiscellaneousTest2 extends TestCase {
     super(Name_);
   }
 
-  private void doTestCoordinateHash(final boolean equal, final Coordinates a,
-    final Coordinates b) {
+  private void doTestCoordinateHash(final boolean equal, final Point a,
+    final Point b) {
     assertEquals(equal, a.equals(b));
     assertEquals(equal, a.hashCode() == b.hashCode());
   }
 
   public void test1() throws Exception {
-    assertTrue(CGAlgorithms.isOnLine(new Coordinate((double)10, 10,
-      Coordinates.NULL_ORDINATE), geometryFactory.lineString(2, 0, 10, 20, 10)));
-    assertTrue(!CGAlgorithms.isOnLine(new Coordinate((double)30, 10,
-      Coordinates.NULL_ORDINATE), geometryFactory.lineString(2, 0, 10, 20, 10)));
+    assertTrue(CGAlgorithms.isOnLine(new DoubleCoordinates(10, 10),
+      geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)));
+    assertTrue(!CGAlgorithms.isOnLine(new DoubleCoordinates(30, 10),
+      geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)));
   }
 
   public void testCoordinateHash() {
     doTestCoordinateHash(true, new Coordinate((double)1, 2,
-      Coordinates.NULL_ORDINATE), new Coordinate((double)1, 2,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new Coordinate((double)1, 2,
+      Point.NULL_ORDINATE));
     doTestCoordinateHash(false, new Coordinate((double)1, 2,
-      Coordinates.NULL_ORDINATE), new Coordinate((double)3, 4,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new Coordinate((double)3, 4,
+      Point.NULL_ORDINATE));
     doTestCoordinateHash(false, new Coordinate((double)1, 2,
-      Coordinates.NULL_ORDINATE), new Coordinate((double)1, 4,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new Coordinate((double)1, 4,
+      Point.NULL_ORDINATE));
     doTestCoordinateHash(false, new Coordinate((double)1, 2,
-      Coordinates.NULL_ORDINATE), new Coordinate((double)3, 2,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new Coordinate((double)3, 2,
+      Point.NULL_ORDINATE));
     doTestCoordinateHash(false, new Coordinate((double)1, 2,
-      Coordinates.NULL_ORDINATE), new Coordinate((double)2, 1,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new Coordinate((double)2, 1,
+      Point.NULL_ORDINATE));
   }
 
   public void testDirectedEdgeComparator() {
     final DirectedEdge d1 = new DirectedEdge(new Node(new Coordinate((double)0,
-      0, Coordinates.NULL_ORDINATE)), new Node(new Coordinate((double)10, 10,
-      Coordinates.NULL_ORDINATE)), new Coordinate((double)10, 10,
-      Coordinates.NULL_ORDINATE), true);
+      0, Point.NULL_ORDINATE)), new Node(new Coordinate((double)10, 10,
+      Point.NULL_ORDINATE)), new Coordinate((double)10, 10,
+      Point.NULL_ORDINATE), true);
     final DirectedEdge d2 = new DirectedEdge(new Node(new Coordinate((double)0,
-      0, Coordinates.NULL_ORDINATE)), new Node(new Coordinate((double)20, 20,
-      Coordinates.NULL_ORDINATE)), new Coordinate((double)20, 20,
-      Coordinates.NULL_ORDINATE), false);
+      0, Point.NULL_ORDINATE)), new Node(new Coordinate((double)20, 20,
+      Point.NULL_ORDINATE)), new Coordinate((double)20, 20,
+      Point.NULL_ORDINATE), false);
     assertEquals(0, d2.compareTo(d1));
   }
 
   public void testDirectedEdgeToEdges() {
     final DirectedEdge d1 = new DirectedEdge(new Node(new Coordinate((double)0,
-      0, Coordinates.NULL_ORDINATE)), new Node(new Coordinate((double)10, 10,
-      Coordinates.NULL_ORDINATE)), new Coordinate((double)10, 10,
-      Coordinates.NULL_ORDINATE), true);
+      0, Point.NULL_ORDINATE)), new Node(new Coordinate((double)10, 10,
+      Point.NULL_ORDINATE)), new Coordinate((double)10, 10,
+      Point.NULL_ORDINATE), true);
     final DirectedEdge d2 = new DirectedEdge(new Node(new Coordinate(
-      (double)20, 0, Coordinates.NULL_ORDINATE)), new Node(new Coordinate(
-      (double)20, 10, Coordinates.NULL_ORDINATE)), new Coordinate((double)20,
-      10, Coordinates.NULL_ORDINATE), false);
+      (double)20, 0, Point.NULL_ORDINATE)), new Node(new Coordinate(
+      (double)20, 10, Point.NULL_ORDINATE)), new Coordinate((double)20,
+      10, Point.NULL_ORDINATE), false);
     final List edges = DirectedEdge.toEdges(Arrays.asList(new Object[] {
       d1, d2
     }));
@@ -164,20 +165,20 @@ public class MiscellaneousTest2 extends TestCase {
     final PointLocator pointLocator = new PointLocator();
     final Geometry polygon = this.reader.read("POLYGON ((70 340, 430 50, 70 50, 70 340))");
     assertEquals(Location.EXTERIOR, pointLocator.locate(new Coordinate(
-      (double)420, 340, Coordinates.NULL_ORDINATE), polygon));
+      (double)420, 340, Point.NULL_ORDINATE), polygon));
     assertEquals(Location.BOUNDARY, pointLocator.locate(new Coordinate(
-      (double)350, 50, Coordinates.NULL_ORDINATE), polygon));
+      (double)350, 50, Point.NULL_ORDINATE), polygon));
     assertEquals(Location.BOUNDARY, pointLocator.locate(new Coordinate(
-      (double)410, 50, Coordinates.NULL_ORDINATE), polygon));
+      (double)410, 50, Point.NULL_ORDINATE), polygon));
     assertEquals(Location.INTERIOR, pointLocator.locate(new Coordinate(
-      (double)190, 150, Coordinates.NULL_ORDINATE), polygon));
+      (double)190, 150, Point.NULL_ORDINATE), polygon));
   }
 
   public void testPointLocatorLinearRingLineString() throws Exception {
     final PointLocator pointLocator = new PointLocator();
     final Geometry gc = this.reader.read("GEOMETRYCOLLECTION( LINESTRING(0 0, 10 10), LINEARRING(10 10, 10 20, 20 10, 10 10))");
     assertEquals(Location.BOUNDARY, pointLocator.locate(new Coordinate(
-      (double)10, 10, Coordinates.NULL_ORDINATE), gc));
+      (double)10, 10, Point.NULL_ORDINATE), gc));
   }
 
   public void testQuickPolygonUnion() throws Exception {
@@ -195,13 +196,13 @@ public class MiscellaneousTest2 extends TestCase {
   public void testUniqueCoordinateArrayFilter() throws Exception {
     final Geometry g = this.reader.read("MULTIPOINT(10 10, 20 20, 30 30, 20 20, 10 10)");
 
-    final Coordinates[] coordinates = UniqueCoordinateArrayFilter.getUniquePointsArray(g);
+    final Point[] coordinates = UniqueCoordinateArrayFilter.getUniquePointsArray(g);
     assertEquals(3, coordinates.length);
-    assertEquals(new Coordinate((double)10, 10, Coordinates.NULL_ORDINATE),
+    assertEquals(new Coordinate((double)10, 10, Point.NULL_ORDINATE),
       coordinates[0]);
-    assertEquals(new Coordinate((double)20, 20, Coordinates.NULL_ORDINATE),
+    assertEquals(new Coordinate((double)20, 20, Point.NULL_ORDINATE),
       coordinates[1]);
-    assertEquals(new Coordinate((double)30, 30, Coordinates.NULL_ORDINATE),
+    assertEquals(new Coordinate((double)30, 30, Point.NULL_ORDINATE),
       coordinates[2]);
   }
 

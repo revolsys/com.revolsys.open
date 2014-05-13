@@ -1,6 +1,6 @@
 package com.revolsys.jts.edgegraph;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A {@link HalfEdge} which supports
@@ -68,7 +68,7 @@ public class MarkHalfEdge extends HalfEdge {
    * 
    * @param orig the coordinate of the edge origin
    */
-  public MarkHalfEdge(final Coordinates orig) {
+  public MarkHalfEdge(final Point orig) {
     super(orig);
   }
 

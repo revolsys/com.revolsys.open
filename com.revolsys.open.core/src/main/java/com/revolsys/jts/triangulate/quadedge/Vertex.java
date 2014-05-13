@@ -36,7 +36,7 @@ package com.revolsys.jts.triangulate.quadedge;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Models a site (node) in a {@link QuadEdgeSubdivision}. 
@@ -78,8 +78,8 @@ public class Vertex {
    * @param p1
    * @return the interpolated Z value
    */
-  public static double interpolateZ(final Coordinates p, final Coordinates p0,
-    final Coordinates p1) {
+  public static double interpolateZ(final Point p, final Point p0,
+    final Point p1) {
     final double segLen = p0.distance(p1);
     final double ptLen = p.distance(p0);
     final double dz = p1.getZ() - p0.getZ();
@@ -100,8 +100,8 @@ public class Vertex {
    * @param v2 a vertex of a triangle containing the p
    * @return the interpolated Z-value (height) of the point  
    */
-  public static double interpolateZ(final Coordinates p, final Coordinates v0,
-    final Coordinates v1, final Coordinates v2) {
+  public static double interpolateZ(final Point p, final Point v0,
+    final Point v1, final Point v2) {
     final double x0 = v0.getX();
     final double y0 = v0.getY();
     final double a = v1.getX() - x0;
@@ -118,16 +118,16 @@ public class Vertex {
     return z;
   }
 
-  private final Coordinates p;
+  private final Point p;
 
   // private int edgeNumber = -1;
 
-  public Vertex(final Coordinates _p) {
+  public Vertex(final Point _p) {
     p = new Coordinate(_p);
   }
 
   public Vertex(final double _x, final double _y) {
-    p = new Coordinate(_x, _y, Coordinates.NULL_ORDINATE);
+    p = new Coordinate(_x, _y, Point.NULL_ORDINATE);
   }
 
   public Vertex(final double _x, final double _y, final double _z) {
@@ -150,7 +150,7 @@ public class Vertex {
    * 
    * @param b
    * @param c
-   * @return the Coordinates which is the circumcircle of the 3 points.
+   * @return the Point which is the circumcircle of the 3 points.
    */
   public Vertex circleCenter(final Vertex b, final Vertex c) {
     final Vertex a = new Vertex(this.getX(), this.getY());
@@ -267,7 +267,7 @@ public class Vertex {
     }
   }
 
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return p;
   }
 

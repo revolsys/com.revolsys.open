@@ -35,7 +35,7 @@ package com.revolsys.jts.shape.fractal;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -66,25 +66,25 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     super(geomFactory);
   }
 
-  private void addSegment(final Coordinates p0, final Coordinates p1) {
+  private void addSegment(final Point p0, final Point p1) {
     coordList.add(p1);
   }
 
-  public void addSide(final int level, final Coordinates p0,
-    final Coordinates p1) {
+  public void addSide(final int level, final Point p0,
+    final Point p1) {
     if (level == 0) {
       addSegment(p0, p1);
     } else {
       final Vector2D base = Vector2D.create(p0, p1);
-      final Coordinates midPt = base.multiply(0.5).translate(p0);
+      final Point midPt = base.multiply(0.5).translate(p0);
 
       final Vector2D heightVec = base.multiply(THIRD_HEIGHT);
       final Vector2D offsetVec = heightVec.rotateByQuarterCircle(1);
-      final Coordinates offsetPt = offsetVec.translate(midPt);
+      final Point offsetPt = offsetVec.translate(midPt);
 
       final int n2 = level - 1;
-      final Coordinates thirdPt = base.multiply(ONE_THIRD).translate(p0);
-      final Coordinates twoThirdPt = base.multiply(TWO_THIRDS).translate(p0);
+      final Point thirdPt = base.multiply(ONE_THIRD).translate(p0);
+      final Point twoThirdPt = base.multiply(TWO_THIRDS).translate(p0);
 
       // construct sides recursively
       addSide(n2, p0, thirdPt);
@@ -94,7 +94,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     }
   }
 
-  private Coordinates[] getBoundary(final int level, final Coordinates origin,
+  private Point[] getBoundary(final int level, final Point origin,
     final double width) {
     double y = origin.getY();
     // for all levels beyond 0 need to vertically shift shape by height of one
@@ -104,11 +104,11 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     }
 
     final Coordinate p0 = new Coordinate(origin.getX(), y,
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
     final Coordinate p1 = new Coordinate(origin.getX() + width / 2, y + width
-      * HEIGHT_FACTOR, Coordinates.NULL_ORDINATE);
+      * HEIGHT_FACTOR, Point.NULL_ORDINATE);
     final Coordinate p2 = new Coordinate(origin.getX() + width, y,
-      Coordinates.NULL_ORDINATE);
+      Point.NULL_ORDINATE);
     addSide(level, p0, p1);
     addSide(level, p1, p2);
     addSide(level, p2, p0);
@@ -120,7 +120,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
   public Geometry getGeometry() {
     final int level = recursionLevelForSize(numPts);
     final LineSegment baseLine = getSquareBaseLine();
-    final Coordinates[] pts = getBoundary(level, baseLine.getCoordinate(0),
+    final Point[] pts = getBoundary(level, baseLine.getCoordinate(0),
       baseLine.getLength());
     return geometryFactory.polygon(geometryFactory.linearRing(pts));
   }

@@ -27,7 +27,7 @@ import java.util.List;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -38,10 +38,10 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
   public SharesLineSegmentsFilter(final LineString line) {
 
     final CoordinatesList points = CoordinatesListUtil.get(line);
-    final Iterator<Coordinates> pointIterator = points.iterator();
-    Coordinates previousPoint = pointIterator.next();
+    final Iterator<Point> pointIterator = points.iterator();
+    Point previousPoint = pointIterator.next();
     while (pointIterator.hasNext()) {
-      final Coordinates nextPoint = pointIterator.next();
+      final Point nextPoint = pointIterator.next();
       segments.add(new LineSegmentImpl(previousPoint, nextPoint));
       previousPoint = nextPoint;
     }
@@ -51,10 +51,10 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
   public boolean accept(final LineString line) {
 
     final CoordinatesList points = CoordinatesListUtil.get(line);
-    final Iterator<Coordinates> pointIterator = points.iterator();
-    Coordinates previousPoint = pointIterator.next();
+    final Iterator<Point> pointIterator = points.iterator();
+    Point previousPoint = pointIterator.next();
     while (pointIterator.hasNext()) {
-      final Coordinates nextPoint = pointIterator.next();
+      final Point nextPoint = pointIterator.next();
       final LineSegment segment = new LineSegmentImpl(previousPoint, nextPoint);
       if (segments.contains(segment)) {
         return true;

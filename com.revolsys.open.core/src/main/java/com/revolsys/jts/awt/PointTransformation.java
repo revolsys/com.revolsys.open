@@ -34,7 +34,7 @@ package com.revolsys.jts.awt;
 
 import java.awt.geom.Point2D;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Point;
 
 /**
@@ -49,8 +49,8 @@ public interface PointTransformation {
 	/**
 	 * Transforms a {@link Coordinates} into a Java2D {@link Point}.
 	 * 
-	 * @param src the source Coordinates 
+	 * @param src the source Point 
 	 * @param dest the destination Point
 	 */
-  public void transform(Coordinates src, Point2D dest);
+  public void transform(Point src, Point2D dest);
 }

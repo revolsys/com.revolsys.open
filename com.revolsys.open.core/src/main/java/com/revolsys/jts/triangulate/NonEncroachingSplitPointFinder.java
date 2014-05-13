@@ -34,7 +34,7 @@
 package com.revolsys.jts.triangulate;
 
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 
 /**
@@ -55,13 +55,13 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
      * @param encroachPt the encroaching point
      * @return the point at which to split the encroached segment
      */
-    public Coordinates findSplitPoint(Segment seg, Coordinates encroachPt) {
+    public Point findSplitPoint(Segment seg, Point encroachPt) {
         LineSegment lineSeg = seg.getLineSegment();
         double segLen = lineSeg.getLength();
         double midPtLen = segLen / 2;
         SplitSegment splitSeg = new SplitSegment(lineSeg);
 
-        Coordinates projPt = projectedSplitPoint(seg, encroachPt);
+        Point projPt = projectedSplitPoint(seg, encroachPt);
         /**
          * Compute the largest diameter (length) that will produce a split segment which is not
          * still encroached upon by the encroaching point (The length is reduced slightly by a
@@ -86,9 +86,9 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
      * @param encroachPt
      * @return a split point on the segment
      */
-    public static Coordinates projectedSplitPoint(Segment seg, Coordinates encroachPt) {
+    public static Point projectedSplitPoint(Segment seg, Point encroachPt) {
         LineSegment lineSeg = seg.getLineSegment();
-        Coordinates projPt = lineSeg.project(encroachPt);
+        Point projPt = lineSeg.project(encroachPt);
         return projPt;
     }
 }

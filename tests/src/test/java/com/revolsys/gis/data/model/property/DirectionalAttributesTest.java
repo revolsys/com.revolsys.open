@@ -19,7 +19,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.LineString;
@@ -68,7 +68,7 @@ public class DirectionalAttributesTest {
 
   private static Map<String, String> DIRECTIONAL_VALUES = new LinkedHashMap<String, String>();
 
-  private final Coordinates MERGE_COORDINATES = new DoubleCoordinates(10, 20);
+  private final Point MERGE_COORDINATES = new DoubleCoordinates(10, 20);
 
   private final LineString LINE1 = GEOMETRY_FACTORY.createLineString(new DoubleCoordinatesList(
     2, 0, 0, 10, 20));

@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -64,7 +64,7 @@ public class BasicSegmentString implements SegmentString {
   }
 
   @Override
-  public Coordinates getCoordinate(final int i) {
+  public Point getCoordinate(final int i) {
     return points.get(i);
   }
 

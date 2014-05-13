@@ -33,7 +33,7 @@
 package com.revolsys.gis.algorithm;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Contains a pair of points and the distance between them. Provides methods to
@@ -45,18 +45,18 @@ public class PointPairDistance {
 
   private boolean isNull = true;
 
-  private final Coordinates[] pt = {
+  private final Point[] pt = {
     new Coordinate(), new Coordinate()
   };
 
   public PointPairDistance() {
   }
 
-  public Coordinates getCoordinate(final int i) {
+  public Point getCoordinate(final int i) {
     return pt[i];
   }
 
-  public Coordinates[] getCoordinates() {
+  public Point[] getCoordinates() {
     return pt;
   }
 
@@ -68,7 +68,7 @@ public class PointPairDistance {
     isNull = true;
   }
 
-  public void initialize(final Coordinates p0, final Coordinates p1) {
+  public void initialize(final Point p0, final Point p1) {
     initialize(p0, p1, p0.distance(p1));
   }
 
@@ -79,7 +79,7 @@ public class PointPairDistance {
    * @param p1
    * @param distance the distance between p0 and p1
    */
-  private void initialize(final Coordinates p0, final Coordinates p1,
+  private void initialize(final Point p0, final Point p1,
     final double distance) {
     pt[0] = p0.cloneCoordinates();
     pt[1] = p1.cloneCoordinates();
@@ -87,7 +87,7 @@ public class PointPairDistance {
     isNull = false;
   }
 
-  public void setMaximum(final Coordinates p0, final Coordinates p1) {
+  public void setMaximum(final Point p0, final Point p1) {
     if (isNull) {
       initialize(p0, p1);
       return;
@@ -102,7 +102,7 @@ public class PointPairDistance {
     setMaximum(ptDist.pt[0], ptDist.pt[1]);
   }
 
-  public void setMinimum(final Coordinates p0, final Coordinates p1) {
+  public void setMinimum(final Point p0, final Point p1) {
     if (isNull) {
       initialize(p0, p1);
       return;

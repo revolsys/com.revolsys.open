@@ -37,7 +37,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
@@ -75,12 +75,12 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
   }
 
   @Override
-  protected Coordinates createCoord(final double x, final double y) {
+  protected Point createCoord(final double x, final double y) {
     return new DoubleCoordinates(geometryFactory.makePrecise(0, x),
       geometryFactory.makePrecise(1, y));
   }
 
-  protected Coordinates createRandomCoord(final BoundingBox env) {
+  protected Point createRandomCoord(final BoundingBox env) {
     final double x = env.getMinX() + env.getWidth() * Math.random();
     final double y = env.getMinY() + env.getHeight() * Math.random();
     return createCoord(x, y);
@@ -88,10 +88,10 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
 
   @Override
   public Geometry getGeometry() {
-    final Coordinates[] pts = new Coordinates[numPts];
+    final Point[] pts = new Point[numPts];
     int i = 0;
     while (i < numPts) {
-      final Coordinates p = createRandomCoord(getExtent());
+      final Point p = createRandomCoord(getExtent());
       if (extentLocator != null && !isInExtent(p)) {
         continue;
       }
@@ -100,7 +100,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
     return geometryFactory.multiPoint(pts);
   }
 
-  protected boolean isInExtent(final Coordinates p) {
+  protected boolean isInExtent(final Point p) {
     if (extentLocator != null) {
       return extentLocator.locate(p) != Location.EXTERIOR;
     }

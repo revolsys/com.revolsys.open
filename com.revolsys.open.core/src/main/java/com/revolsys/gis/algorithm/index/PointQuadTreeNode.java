@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.util.MathUtil;
 
 public class PointQuadTreeNode<T> {
@@ -32,7 +32,7 @@ public class PointQuadTreeNode<T> {
     this.y = y;
   }
 
-  public boolean contains(final Coordinates point) {
+  public boolean contains(final Point point) {
     if (point.equals(this.x, this.y)) {
       return true;
     }
@@ -61,7 +61,7 @@ public class PointQuadTreeNode<T> {
     return false;
   }
 
-  public void findEntriesWithin(final List<Entry<Coordinates, T>> results,
+  public void findEntriesWithin(final List<Entry<Point, T>> results,
     final BoundingBox envelope) {
     final double minX = envelope.getMinX();
     final double maxX = envelope.getMaxX();
@@ -69,7 +69,7 @@ public class PointQuadTreeNode<T> {
     final double maxY = envelope.getMaxY();
     if (envelope.covers(x, y)) {
       final DoubleCoordinates coordinates = new DoubleCoordinates(x, y);
-      results.add(new SimpleImmutableEntry<Coordinates, T>(coordinates, value));
+      results.add(new SimpleImmutableEntry<Point, T>(coordinates, value));
     }
     final boolean minXLess = isLessThanX(minX);
     final boolean maxXLess = isLessThanX(maxX);

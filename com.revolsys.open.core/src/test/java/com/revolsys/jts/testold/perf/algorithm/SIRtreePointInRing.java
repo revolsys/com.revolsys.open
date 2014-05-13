@@ -38,7 +38,7 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.PointInRing;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LinearRing;
@@ -69,7 +69,7 @@ public class SIRtreePointInRing implements PointInRing {
   private void buildIndex() {
     this.sirTree = new SIRtree();
 
-    final Coordinates[] pts = CoordinatesListUtil.getCoordinateArray(this.ring);
+    final Point[] pts = CoordinatesListUtil.getCoordinateArray(this.ring);
     for (int i = 1; i < pts.length; i++) {
       if (pts[i - 1].equals(pts[i])) {
         continue;
@@ -80,7 +80,7 @@ public class SIRtreePointInRing implements PointInRing {
   }
 
   @Override
-  public boolean isInside(final Coordinates pt) {
+  public boolean isInside(final Point pt) {
     this.crossings = 0;
 
     // test all segments intersected by vertical ray at pt
@@ -102,7 +102,7 @@ public class SIRtreePointInRing implements PointInRing {
     return false;
   }
 
-  private void testLineSegment(final Coordinates p, final LineSegment seg) {
+  private void testLineSegment(final Point p, final LineSegment seg) {
     double xInt; // x intersection of segment with ray
     double x1; // translated coordinates
     double y1;
@@ -112,8 +112,8 @@ public class SIRtreePointInRing implements PointInRing {
     /*
      * Test if segment crosses ray from test point in positive x direction.
      */
-    final Coordinates p1 = seg.getP0();
-    final Coordinates p2 = seg.getP1();
+    final Point p1 = seg.getP0();
+    final Point p2 = seg.getP1();
     x1 = p1.getX() - p.getX();
     y1 = p1.getY() - p.getY();
     x2 = p2.getX() - p.getX();

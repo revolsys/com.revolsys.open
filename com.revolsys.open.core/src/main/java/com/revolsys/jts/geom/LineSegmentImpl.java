@@ -55,7 +55,7 @@ public class LineSegmentImpl extends AbstractLineSegment {
     this.coordinates = null;
   }
 
-  public LineSegmentImpl(final Coordinates point1, final Coordinates point2) {
+  public LineSegmentImpl(final Point point1, final Point point2) {
     final int axisCount = Math.max(point1.getAxisCount(), point2.getAxisCount());
     coordinates = new double[axisCount * 2];
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, point1);

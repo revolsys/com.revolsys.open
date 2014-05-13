@@ -36,7 +36,7 @@ package com.revolsys.jts.operation.overlay;
 /**
  * @version 1.7
  */
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
 import com.revolsys.jts.geomgraph.Node;
 import com.revolsys.jts.geomgraph.NodeFactory;
@@ -49,7 +49,7 @@ import com.revolsys.jts.geomgraph.PlanarGraph;
  * @version 1.7
  */
 public class OverlayNodeFactory extends NodeFactory {
-  public Node createNode(final Coordinates coord) {
+  public Node createNode(final Point coord) {
     return new Node(coord, new DirectedEdgeStar());
   }
 }

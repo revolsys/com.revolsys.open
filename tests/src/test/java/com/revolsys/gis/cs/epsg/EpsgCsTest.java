@@ -4,7 +4,7 @@ package com.revolsys.gis.cs.epsg;
 public class EpsgCsTest {
   //
   // private void printDms(
-  // final Coordinates c1) {
+  // final Point c1) {
   // printDms(c1.x);
   // System.out.print(", ");
   // printDms(c1.y);
@@ -74,9 +74,9 @@ public class EpsgCsTest {
   // withProjectionCount++;
   // final Area area = projCs.getArea();
   // if (area != null) {
-  // final Coordinates centre = area.getLatLonBounds().centre();
-  // final Coordinates c2 = new Coordinates();
-  // final Coordinates c3 = new Coordinates();
+  // final Point centre = area.getLatLonBounds().centre();
+  // final Point c2 = new Coordinates();
+  // final Point c3 = new Coordinates();
   // forwardOperation.perform(new CoordinatesCoordinatess(centre),
   // new CoordinatesCoordinatess(c2));
   // inverseOperation.perform(new CoordinatesCoordinatess(c2),
@@ -114,13 +114,13 @@ public class EpsgCsTest {
   // final ProjectedCoordinatesSystem cs =
   // (ProjectedCoordinatesSystem)EpsgCoordinatesSystems.getCoordinatesSystem(27700);
   // final TransverseMercator proj = new TransverseMercator(cs);
-  // final Coordinates c1 = new Coordinates((double)toDecimal(0, 30, 0), toDecimal(50, 30,
+  // final Point c1 = new Coordinates((double)toDecimal(0, 30, 0), toDecimal(50, 30,
   // 0));
   // printDms(c1);
-  // final Coordinates c2 = new Coordinates();
-  // final Coordinates c3 = new Coordinates();
-  // final Coordinates c4 = new Coordinates((double)577274.99, 69740.50);
-  // final Coordinates c5 = new Coordinates();
+  // final Point c2 = new Coordinates();
+  // final Point c3 = new Coordinates();
+  // final Point c4 = new Coordinates((double)577274.99, 69740.50);
+  // final Point c5 = new Coordinates();
   // proj.project(new CoordinatesCoordinatess(c1), new CoordinatesCoordinatess(c2));
   // proj.inverse(new CoordinatesCoordinatess(c2), new CoordinatesCoordinatess(c3));
   // proj.inverse(new CoordinatesCoordinatess(c4), new CoordinatesCoordinatess(c5));

@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -96,12 +96,12 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue, area3D, TOLERANCE);
   }
 
-  public void checkCentroid(final String wkt, final Coordinates expectedValue)
+  public void checkCentroid(final String wkt, final Point expectedValue)
     throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
-    Coordinates centroid = Triangle.centroid(t.p0, t.p1, t.p2);
+    Point centroid = Triangle.centroid(t.p0, t.p1, t.p2);
     // System.out.println("(Static) centroid = " + centroid);
     assertEquals(expectedValue.toString(), centroid.toString());
 
@@ -113,11 +113,11 @@ public class TriangleTest extends TestCase {
   }
 
   public void checkCircumCentre(final String wkt,
-    final Coordinates expectedValue) throws Exception {
+    final Point expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
-    Coordinates circumcentre = Triangle.circumcentre(t.p0, t.p1, t.p2);
+    Point circumcentre = Triangle.circumcentre(t.p0, t.p1, t.p2);
     // System.out.println("(Static) circumcentre = " + circumcentre);
     assertEquals(expectedValue.toString(), circumcentre.toString());
 
@@ -129,7 +129,7 @@ public class TriangleTest extends TestCase {
     assertEquals(expectedValue.toString(), circumcentre.toString());
   }
 
-  public void checkInterpolateZ(final String wkt, final Coordinates p,
+  public void checkInterpolateZ(final String wkt, final Point p,
     final double expectedValue) throws Exception {
     final Geometry g = this.reader.read(wkt);
 
@@ -211,36 +211,36 @@ public class TriangleTest extends TestCase {
     // right triangle
     checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))", new Coordinate(
       (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE));
     // CCW right tri
     checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))", new Coordinate(
       (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE));
     // acute
     checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))", new Coordinate(
       (10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0,
-      Coordinates.NULL_ORDINATE));
+      Point.NULL_ORDINATE));
   }
 
   public void testCircumCentre() throws Exception {
     // right triangle
     checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))", new Coordinate(
-      15.0, 15.0, Coordinates.NULL_ORDINATE));
+      15.0, 15.0, Point.NULL_ORDINATE));
     // CCW right tri
     checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))", new Coordinate(
-      15.0, 15.0, Coordinates.NULL_ORDINATE));
+      15.0, 15.0, Point.NULL_ORDINATE));
     // acute
     checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))", new Coordinate(
-      15.0, 13.75, Coordinates.NULL_ORDINATE));
+      15.0, 13.75, Point.NULL_ORDINATE));
   }
 
   public void testInterpolateZ() throws Exception {
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new Coordinate(1.5,
-      1.5, Coordinates.NULL_ORDINATE), 5);
+      1.5, Point.NULL_ORDINATE), 5);
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new Coordinate(1.2,
-      1.2, Coordinates.NULL_ORDINATE), 2);
+      1.2, Point.NULL_ORDINATE), 2);
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new Coordinate(0.0,
-      0, Coordinates.NULL_ORDINATE), -10);
+      0, Point.NULL_ORDINATE), -10);
   }
 
   public void testLongestSideLength() throws Exception {

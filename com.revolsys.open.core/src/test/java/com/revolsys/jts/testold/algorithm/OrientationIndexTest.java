@@ -37,7 +37,7 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -57,7 +57,7 @@ public class OrientationIndexTest extends TestCase {
    * @param pts an array of three points
    * @return true if all the orientations around the triangle are equal
    */
-  public static boolean isAllOrientationsEqual(final Coordinates[] pts) {
+  public static boolean isAllOrientationsEqual(final Point[] pts) {
     final int[] orient = new int[3];
     orient[0] = RobustDeterminant.orientationIndex(pts[0], pts[1], pts[2]);
     orient[1] = RobustDeterminant.orientationIndex(pts[1], pts[2], pts[0]);
@@ -68,10 +68,10 @@ public class OrientationIndexTest extends TestCase {
   public static boolean isAllOrientationsEqual(final double p0x,
     final double p0y, final double p1x, final double p1y, final double p2x,
     final double p2y) {
-    final Coordinates[] pts = {
-      new Coordinate(p0x, p0y, Coordinates.NULL_ORDINATE),
-      new Coordinate(p1x, p1y, Coordinates.NULL_ORDINATE),
-      new Coordinate(p2x, p2y, Coordinates.NULL_ORDINATE)
+    final Point[] pts = {
+      new Coordinate(p0x, p0y, Point.NULL_ORDINATE),
+      new Coordinate(p1x, p1y, Point.NULL_ORDINATE),
+      new Coordinate(p2x, p2y, Point.NULL_ORDINATE)
     };
     return isAllOrientationsEqual(pts);
   }
@@ -86,12 +86,12 @@ public class OrientationIndexTest extends TestCase {
 
   public void testCCW2() throws Exception {
     // experimental case - can't make it fail
-    final Coordinates[] pts2 = {
+    final Point[] pts2 = {
       new Coordinate(1.0000000000004998, -7.989685402102996,
-        Coordinates.NULL_ORDINATE),
-      new Coordinate(10.0, -7.004368924503866, Coordinates.NULL_ORDINATE),
+        Point.NULL_ORDINATE),
+      new Coordinate(10.0, -7.004368924503866, Point.NULL_ORDINATE),
       new Coordinate(1.0000000000005, -7.989685402102996,
-        Coordinates.NULL_ORDINATE),
+        Point.NULL_ORDINATE),
     };
     assertTrue(isAllOrientationsEqual(pts2));
   }

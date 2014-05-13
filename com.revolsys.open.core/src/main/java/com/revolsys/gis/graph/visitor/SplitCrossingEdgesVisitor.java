@@ -11,7 +11,7 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
@@ -78,10 +78,10 @@ public class SplitCrossingEdgesVisitor<T> extends
     for (final Edge<T> crossEdge : crossings) {
       if (!crossEdge.isRemoved()) {
         final LineString crossLine = crossEdge.getLine();
-        final Coordinates intersection = LineStringUtil.getCrossingIntersection(
+        final Point intersection = LineStringUtil.getCrossingIntersection(
           line, crossLine);
         if (intersection != null) {
-          final Coordinates point = graph.getPrecisionModel()
+          final Point point = graph.getPrecisionModel()
             .getPreciseCoordinates(intersection);
           final Node<T> node = graph.getNode(point);
           splitEdgesCloseToNodeVisitor.visit(node);

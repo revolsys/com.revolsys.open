@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -57,7 +57,7 @@ public class SegmentPointComparator {
    * 0 the two nodes are equal;
    * 1 node1 occurs first
    */
-  public static int compare(int octant, Coordinates p0, Coordinates p1)
+  public static int compare(int octant, Point p0, Point p1)
   {
     // nodes can only be equal if their coordinates are equal
     if (p0.equals2d(p1)) return 0;

@@ -42,7 +42,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -68,7 +68,7 @@ public class ShapeReader {
   private static final AffineTransform INVERT_Y = AffineTransform.getScaleInstance(
     1, -1);
 
-  private static Coordinates[] nextCoordinateArray(final PathIterator pathIt) {
+  private static Point[] nextCoordinateArray(final PathIterator pathIt) {
     final double[] pathPt = new double[6];
     CoordinateList coordList = null;
     boolean isDone = false;
@@ -82,13 +82,13 @@ public class ShapeReader {
           } else {
             coordList = new CoordinateList();
             coordList.add(new Coordinate(pathPt[0], pathPt[1],
-              Coordinates.NULL_ORDINATE));
+              Point.NULL_ORDINATE));
             pathIt.next();
           }
         break;
         case PathIterator.SEG_LINETO:
           coordList.add(new Coordinate(pathPt[0], pathPt[1],
-            Coordinates.NULL_ORDINATE));
+            Point.NULL_ORDINATE));
           pathIt.next();
         break;
         case PathIterator.SEG_CLOSE:
@@ -136,16 +136,16 @@ public class ShapeReader {
 
   /**
    * Extracts the points of the paths in a flat {@link PathIterator} into
-   * a list of Coordinates arrays.
+   * a list of Point arrays.
    * 
    * @param pathIt a path iterator
-   * @return a List of Coordinates arrays
+   * @return a List of Point arrays
    * @throws IllegalArgumentException if a non-linear segment type is encountered
    */
   public static List toCoordinates(final PathIterator pathIt) {
     final List coordArrays = new ArrayList();
     while (!pathIt.isDone()) {
-      final Coordinates[] pts = nextCoordinateArray(pathIt);
+      final Point[] pts = nextCoordinateArray(pathIt);
       if (pts == null) {
         break;
       }
@@ -160,7 +160,7 @@ public class ShapeReader {
     this.geometryFactory = geometryFactory;
   }
 
-  private boolean isHole(final Coordinates[] pts) {
+  private boolean isHole(final Point[] pts) {
     return CGAlgorithms.isCCW(pts);
   }
 
@@ -178,7 +178,7 @@ public class ShapeReader {
     while (seqIndex < pathPtSeq.size()) {
       // assume next seq is shell
       // TODO: test this
-      final Coordinates[] pts = (Coordinates[])pathPtSeq.get(seqIndex);
+      final Point[] pts = (Point[])pathPtSeq.get(seqIndex);
       seqIndex++;
 
       final List<LinearRing> rings = new ArrayList<>();
@@ -186,8 +186,8 @@ public class ShapeReader {
       rings.add(shell);
       // add holes as long as rings are CCW
       while (seqIndex < pathPtSeq.size()
-        && isHole((Coordinates[])pathPtSeq.get(seqIndex))) {
-        final Coordinates[] holePts = (Coordinates[])pathPtSeq.get(seqIndex);
+        && isHole((Point[])pathPtSeq.get(seqIndex))) {
+        final Point[] holePts = (Point[])pathPtSeq.get(seqIndex);
         final LinearRing hole = geometryFactory.linearRing(holePts);
         rings.add(hole);
         seqIndex++;

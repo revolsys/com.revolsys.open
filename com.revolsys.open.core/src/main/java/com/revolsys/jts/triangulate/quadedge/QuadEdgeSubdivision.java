@@ -45,7 +45,7 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -95,12 +95,12 @@ public class QuadEdgeSubdivision {
 
     @Override
     public void visit(final QuadEdge[] triEdges) {
-      final Coordinates a = triEdges[0].orig().getCoordinate();
-      final Coordinates b = triEdges[1].orig().getCoordinate();
-      final Coordinates c = triEdges[2].orig().getCoordinate();
+      final Point a = triEdges[0].orig().getCoordinate();
+      final Point b = triEdges[1].orig().getCoordinate();
+      final Point c = triEdges[2].orig().getCoordinate();
 
       // TODO: choose the most accurate circumcentre based on the edges
-      final Coordinates cc = Triangle.circumcentre(a, b, c);
+      final Point cc = Triangle.circumcentre(a, b, c);
       final Vertex ccVertex = new Vertex(cc);
       // save the circumcentre as the origin for the dual edges originating in
       // this triangle
@@ -118,7 +118,7 @@ public class QuadEdgeSubdivision {
     public TriangleCoordinatesVisitor() {
     }
 
-    private void checkTriangleSize(final Coordinates[] pts) {
+    private void checkTriangleSize(final Point[] pts) {
       String loc = "";
       if (pts.length >= 2) {
         loc = WktWriter.lineString(pts[0], pts[1]);
@@ -146,7 +146,7 @@ public class QuadEdgeSubdivision {
       }
       if (coordList.size() > 0) {
         coordList.closeRing();
-        final Coordinates[] pts = coordList.toCoordinateArray();
+        final Point[] pts = coordList.toCoordinateArray();
         if (pts.length != 4) {
           // checkTriangleSize(pts);
           return;
@@ -382,7 +382,7 @@ public class QuadEdgeSubdivision {
     int i = 0;
     for (final Iterator it = quadEdges.iterator(); it.hasNext();) {
       final QuadEdge qe = (QuadEdge)it.next();
-      edges[i++] = geomFact.lineString(new Coordinates[] {
+      edges[i++] = geomFact.lineString(new Point[] {
         qe.orig().getCoordinate(), qe.dest().getCoordinate()
       });
     }
@@ -485,7 +485,7 @@ public class QuadEdgeSubdivision {
     final Polygon[] tris = new Polygon[triPtsList.size()];
     int i = 0;
     for (final Iterator it = triPtsList.iterator(); it.hasNext();) {
-      final Coordinates[] triPt = (Coordinates[])it.next();
+      final Point[] triPt = (Point[])it.next();
       tris[i++] = geomFact.polygon(geomFact.linearRing(triPt));
     }
     return geomFact.geometryCollection(tris);
@@ -602,12 +602,12 @@ public class QuadEdgeSubdivision {
    */
   public Polygon getVoronoiCellPolygon(QuadEdge qe,
     final GeometryFactory geomFact) {
-    final List<Coordinates> cellPts = new ArrayList<>();
+    final List<Point> cellPts = new ArrayList<>();
     final QuadEdge startQE = qe;
     do {
-      // Coordinates cc = circumcentre(qe);
+      // Point cc = circumcentre(qe);
       // use previously computed circumcentre
-      final Coordinates cc = qe.rot().orig().getCoordinate();
+      final Point cc = qe.rot().orig().getCoordinate();
       cellPts.add(cc);
 
       // move to next triangle CW around vertex
@@ -799,9 +799,9 @@ public class QuadEdgeSubdivision {
    *          a point
    * @return true if the vertex lies on the edge
    */
-  public boolean isOnEdge(final QuadEdge e, final Coordinates point) {
-    final Coordinates p1 = e.orig().getCoordinate();
-    final Coordinates p2 = e.dest().getCoordinate();
+  public boolean isOnEdge(final QuadEdge e, final Point point) {
+    final Point p1 = e.orig().getCoordinate();
+    final Point p2 = e.dest().getCoordinate();
     final double dist = LineSegmentUtil.distance(p1, p2, point);
     // heuristic (hack?)
     return dist < edgeCoincidenceTolerance;
@@ -826,11 +826,11 @@ public class QuadEdgeSubdivision {
    * Finds a quadedge of a triangle containing a location
    * specified by a {@link Coordinates}, if one exists.
    * 
-   * @param p the Coordinates to locate
+   * @param p the Point to locate
    * @return a quadedge on the edge of a triangle which touches or contains the location
    * or null if no such triangle exists
    */
-  public QuadEdge locate(final Coordinates p) {
+  public QuadEdge locate(final Point p) {
     return locator.locate(new Vertex(p));
   }
 
@@ -843,7 +843,7 @@ public class QuadEdgeSubdivision {
    * @return the edge joining the coordinates, if present
    * or null if no such edge exists
    */
-  public QuadEdge locate(final Coordinates p0, final Coordinates p1) {
+  public QuadEdge locate(final Point p0, final Point p1) {
     // find an edge containing one of the points
     final QuadEdge e = locator.locate(new Vertex(p0));
     if (e == null) {

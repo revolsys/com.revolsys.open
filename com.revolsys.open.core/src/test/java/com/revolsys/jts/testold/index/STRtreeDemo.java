@@ -39,7 +39,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -155,12 +155,12 @@ public class STRtreeDemo {
     boolean first = true;
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
       final BoundingBox e = (BoundingBox)i.next();
-      final Geometry g = factory.polygon(factory.linearRing(new Coordinates[] {
-        new Coordinate(e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE),
-        new Coordinate(e.getMinX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
-        new Coordinate(e.getMaxX(), e.getMaxY(), Coordinates.NULL_ORDINATE),
-        new Coordinate(e.getMaxX(), e.getMinY(), Coordinates.NULL_ORDINATE),
-        new Coordinate(e.getMinX(), e.getMinY(), Coordinates.NULL_ORDINATE)
+      final Geometry g = factory.polygon(factory.linearRing(new Point[] {
+        new Coordinate(e.getMinX(), e.getMinY(), Point.NULL_ORDINATE),
+        new Coordinate(e.getMinX(), e.getMaxY(), Point.NULL_ORDINATE),
+        new Coordinate(e.getMaxX(), e.getMaxY(), Point.NULL_ORDINATE),
+        new Coordinate(e.getMaxX(), e.getMinY(), Point.NULL_ORDINATE),
+        new Coordinate(e.getMinX(), e.getMinY(), Point.NULL_ORDINATE)
       }));
       if (first) {
         first = false;
@@ -181,12 +181,12 @@ public class STRtreeDemo {
     final double left = EXTENT * Math.random();
     final double top = bottom + height;
     final double right = left + width;
-    return factory.polygon(factory.linearRing(new Coordinates[] {
-      new Coordinate(left, bottom, Coordinates.NULL_ORDINATE),
-      new Coordinate(right, bottom, Coordinates.NULL_ORDINATE),
-      new Coordinate(right, top, Coordinates.NULL_ORDINATE),
-      new Coordinate(left, top, Coordinates.NULL_ORDINATE),
-      new Coordinate(left, bottom, Coordinates.NULL_ORDINATE)
+    return factory.polygon(factory.linearRing(new Point[] {
+      new Coordinate(left, bottom, Point.NULL_ORDINATE),
+      new Coordinate(right, bottom, Point.NULL_ORDINATE),
+      new Coordinate(right, top, Point.NULL_ORDINATE),
+      new Coordinate(left, top, Point.NULL_ORDINATE),
+      new Coordinate(left, bottom, Point.NULL_ORDINATE)
     }));
   }
 

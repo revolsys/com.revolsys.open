@@ -34,7 +34,7 @@
 package com.revolsys.jts.triangulate;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 
@@ -57,7 +57,7 @@ public class Segment {
    * @param p0 the start point
    * @param p1 the end point
    */
-  public Segment(final Coordinates p0, final Coordinates p1) {
+  public Segment(final Point p0, final Point p1) {
     ls = new LineSegmentImpl(p0, p1);
   }
 
@@ -68,7 +68,7 @@ public class Segment {
    * @param p1 the end point
    * @param data an external data object
    */
-  public Segment(final Coordinates p0, final Coordinates p1, final Object data) {
+  public Segment(final Point p0, final Point p1, final Object data) {
     ls = new LineSegmentImpl(p0, p1);
     this.data = data;
   }
@@ -114,7 +114,7 @@ public class Segment {
    * 
    * @return a Coordinate
    */
-  public Coordinates getEnd() {
+  public Point getEnd() {
     return ls.getCoordinate(1);
   }
 
@@ -124,7 +124,7 @@ public class Segment {
    * @return the X ordinate value
    */
   public double getEndX() {
-    final Coordinates p = ls.getCoordinate(1);
+    final Point p = ls.getCoordinate(1);
     return p.getX();
   }
 
@@ -134,7 +134,7 @@ public class Segment {
    * @return the Y ordinate value
    */
   public double getEndY() {
-    final Coordinates p = ls.getCoordinate(1);
+    final Point p = ls.getCoordinate(1);
     return p.getY();
   }
 
@@ -144,7 +144,7 @@ public class Segment {
    * @return the Z ordinate value
    */
   public double getEndZ() {
-    final Coordinates p = ls.getCoordinate(1);
+    final Point p = ls.getCoordinate(1);
     return p.getZ();
   }
 
@@ -162,7 +162,7 @@ public class Segment {
    * 
    * @return a Coordinate
    */
-  public Coordinates getStart() {
+  public Point getStart() {
     return ls.getCoordinate(0);
   }
 
@@ -172,7 +172,7 @@ public class Segment {
    * @return the X ordinate value
    */
   public double getStartX() {
-    final Coordinates p = ls.getCoordinate(0);
+    final Point p = ls.getCoordinate(0);
     return p.getX();
   }
 
@@ -182,7 +182,7 @@ public class Segment {
    * @return the Y ordinate value
    */
   public double getStartY() {
-    final Coordinates p = ls.getCoordinate(0);
+    final Point p = ls.getCoordinate(0);
     return p.getY();
   }
 
@@ -192,7 +192,7 @@ public class Segment {
    * @return the Z ordinate value
    */
   public double getStartZ() {
-    final Coordinates p = ls.getCoordinate(0);
+    final Point p = ls.getCoordinate(0);
     return p.getZ();
   }
 
@@ -202,7 +202,7 @@ public class Segment {
    * @param s a segment
    * @return the intersection point, or <code>null</code> if there is none
    */
-  public Coordinates intersection(final Segment s) {
+  public Point intersection(final Segment s) {
     return ls.intersection(s.getLineSegment());
   }
 

@@ -38,7 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.dissolve.LineDissolver;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.operation.linemerge.LineMerger;
@@ -56,7 +56,7 @@ public class LineHandlingFunctions {
     if (index + size > line.getVertexCount()) {
       size = line.getVertexCount() - index;
     }
-    final Coordinates[] pts = new Coordinates[size];
+    final Point[] pts = new Point[size];
     for (int i = 0; i < size; i++) {
       pts[i] = line.getCoordinate(index + i);
     }
@@ -88,7 +88,7 @@ public class LineHandlingFunctions {
       final LineString line = (LineString)it.next();
       for (int i = 1; i < line.getVertexCount(); i++) {
         final LineString seg = g.getGeometryFactory().lineString(
-          new Coordinates[] {
+          new Point[] {
             line.getCoordinate(i - 1), line.getCoordinate(i)
           });
         segments.add(seg);

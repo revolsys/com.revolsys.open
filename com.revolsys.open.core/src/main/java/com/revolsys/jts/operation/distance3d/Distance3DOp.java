@@ -34,7 +34,7 @@ package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.jts.algorithm.CGAlgorithms3D;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -102,7 +102,7 @@ public class Distance3DOp {
    *            another {@link Geometry}
    * @return the nearest points in the geometries
    */
-  public static Coordinates[] nearestPoints(final Geometry g0, final Geometry g1) {
+  public static Point[] nearestPoints(final Geometry g0, final Geometry g1) {
     final Distance3DOp distOp = new Distance3DOp(g0, g1);
     return distOp.nearestPoints();
   }
@@ -131,8 +131,8 @@ public class Distance3DOp {
    *            proportional distance from computed point to end point
    * @return the computed point
    */
-  private static Coordinates segmentPoint(final Coordinates p0,
-    final Coordinates p1, final double d0, final double d1) {
+  private static Point segmentPoint(final Point p0,
+    final Point p1, final double d0, final double d1) {
     if (d0 <= 0) {
       return new Coordinate(p0);
     }
@@ -256,16 +256,16 @@ public class Distance3DOp {
     for (final Segment segment1 : line0.segments()) {
       int j = 0;
       for (final Segment segment2 : line1.segments()) {
-        final Coordinates line1point1 = segment1.get(0);
-        final Coordinates line1Point2 = segment1.get(1);
-        final Coordinates line2Point1 = segment2.get(0);
-        final Coordinates line2Point2 = segment2.get(1);
+        final Point line1point1 = segment1.get(0);
+        final Point line1Point2 = segment1.get(1);
+        final Point line2Point1 = segment2.get(0);
+        final Point line2Point2 = segment2.get(1);
         final double distance = CGAlgorithms3D.distanceSegmentSegment(
           line1point1, line1Point2, line2Point1, line2Point2);
         if (distance < minDistance) {
           minDistance = distance;
           // TODO: compute closest pts in 3D
-          final Coordinates[] closestPt = segment1.closestPoints(segment2);
+          final Point[] closestPt = segment1.closestPoints(segment2);
           updateDistance(distance,
             new GeometryLocation(line0, i, closestPt[0].cloneCoordinates()),
             new GeometryLocation(line1, j, closestPt[1].cloneCoordinates()),
@@ -282,14 +282,14 @@ public class Distance3DOp {
 
   private void computeMinDistanceLinePoint(final LineString line,
     final Point point, final boolean flip) {
-    final Coordinates coord = point.getCoordinate();
+    final Point coord = point.getCoordinate();
     // brute force approach!
     int i = 0;
     for (final Segment segment : line.segments()) {
       final double dist = CGAlgorithms3D.distancePointSegment(coord,
         segment.get(0), segment.get(1));
       if (dist < minDistance) {
-        final Coordinates segClosestPoint = segment.closestPoint(coord);
+        final Point segClosestPoint = segment.closestPoint(coord);
         updateDistance(dist,
           new GeometryLocation(line, i, segClosestPoint.cloneCoordinates()),
           new GeometryLocation(point, 0, coord), flip);
@@ -385,7 +385,7 @@ public class Distance3DOp {
     final LineString line, final boolean flip) {
 
     // first test if line intersects polygon
-    final Coordinates intPt = intersection(poly, line);
+    final Point intPt = intersection(poly, line);
     if (intPt != null) {
       updateDistance(0, new GeometryLocation(poly.getPolygon(), 0, intPt),
         new GeometryLocation(line, 0, intPt), flip);
@@ -409,7 +409,7 @@ public class Distance3DOp {
 
   private void computeMinDistancePolygonPoint(final PlanarPolygon3D polyPlane,
     final Point point, final boolean flip) {
-    final Coordinates pt = point.getCoordinate();
+    final Point pt = point.getCoordinate();
 
     final LineString shell = polyPlane.getPolygon().getExteriorRing();
     if (polyPlane.intersects(pt, shell)) {
@@ -505,7 +505,7 @@ public class Distance3DOp {
     return minDistance;
   }
 
-  private Coordinates intersection(final PlanarPolygon3D poly,
+  private Point intersection(final PlanarPolygon3D poly,
     final LineString line) {
     final CoordinatesList seq = line.getCoordinatesList();
     if (seq.size() == 0) {
@@ -513,13 +513,13 @@ public class Distance3DOp {
     }
 
     // start point of line
-    Coordinates p0 = seq.getCoordinate(0);
+    Point p0 = seq.getCoordinate(0);
     double d0 = poly.getPlane().orientedDistance(p0);
 
     // for each segment in the line
     for (int i = 0; i < seq.size() - 1; i++) {
       p0 = seq.getCoordinate(i);
-      final Coordinates p1 = seq.getCoordinate(i + 1);
+      final Point p1 = seq.getCoordinate(i + 1);
       final double d1 = poly.getPlane().orientedDistance(p1);
 
       /**
@@ -537,8 +537,8 @@ public class Distance3DOp {
        * give the proportional distance of the intersection point 
        * along the segment.
        */
-      final Coordinates intPt = segmentPoint(p0, p1, d0, d1);
-      // Coordinates intPt = polyPlane.intersection(p0, p1, s0, s1);
+      final Point intPt = segmentPoint(p0, p1, d0, d1);
+      // Point intPt = polyPlane.intersection(p0, p1, s0, s1);
       if (poly.intersects(intPt)) {
         return intPt;
       }
@@ -593,9 +593,9 @@ public class Distance3DOp {
    * 
    * @return a pair of {@link Coordinates}s of the nearest points
    */
-  public Coordinates[] nearestPoints() {
+  public Point[] nearestPoints() {
     computeMinDistance();
-    final Coordinates[] nearestPts = new Coordinates[] {
+    final Point[] nearestPts = new Point[] {
       minDistanceLocation[0].getCoordinate(),
       minDistanceLocation[1].getCoordinate()
     };

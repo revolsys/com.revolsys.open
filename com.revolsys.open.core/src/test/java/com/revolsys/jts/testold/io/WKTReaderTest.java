@@ -39,7 +39,7 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -101,7 +101,7 @@ public class WKTReaderTest extends TestCase {
     final WKTReader reader = new WKTReader(geometryFactory);
     final Geometry point1 = reader.read("POINT(123456789.01234567890 10)");
     final Point point2 = geometryFactory.point(new Coordinate(
-      123456789.01234567890, 10, Coordinates.NULL_ORDINATE));
+      123456789.01234567890, 10, Point.NULL_ORDINATE));
     assertEquals(point1.getCoordinate().getX(), point2.getCoordinate().getX(),
       1E-7);
     assertEquals(point1.getCoordinate().getY(), point2.getCoordinate().getY(),

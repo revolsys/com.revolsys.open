@@ -42,7 +42,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -210,7 +210,7 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
   }
 
   @Override
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     if (isEmpty()) {
       return null;
     } else {

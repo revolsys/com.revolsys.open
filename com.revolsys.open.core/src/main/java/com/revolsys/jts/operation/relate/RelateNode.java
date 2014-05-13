@@ -40,7 +40,7 @@ package com.revolsys.jts.operation.relate;
  * @version 1.7
  */
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geomgraph.EdgeEndStar;
 import com.revolsys.jts.geomgraph.Node;
@@ -52,7 +52,7 @@ import com.revolsys.jts.geomgraph.Node;
  */
 public class RelateNode extends Node {
 
-  public RelateNode(final Coordinates coord, final EdgeEndStar edges) {
+  public RelateNode(final Point coord, final EdgeEndStar edges) {
     super(coord, edges);
   }
 

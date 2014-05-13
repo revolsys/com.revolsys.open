@@ -34,7 +34,6 @@
 package com.revolsys.jts.operation.predicate;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -124,8 +123,8 @@ public class RectangleContains {
    * @param p1 an endpoint of the segment
    * @return true if the line segment is contained in the boundary
    */
-  private boolean isLineSegmentContainedInBoundary(final Coordinates p0,
-    final Coordinates p1) {
+  private boolean isLineSegmentContainedInBoundary(final Point p0,
+    final Point p1) {
     if (p0.equals(p1)) {
       return isPointContainedInBoundary(p0);
     }
@@ -159,8 +158,8 @@ public class RectangleContains {
   private boolean isLineStringContainedInBoundary(final LineString line) {
     final CoordinatesList seq = line.getCoordinatesList();
     for (int i = 0; i < seq.size() - 1; i++) {
-      final Coordinates p0 = seq.getCoordinate(i);
-      final Coordinates p1 = seq.getCoordinate(i + 1);
+      final Point p0 = seq.getCoordinate(i);
+      final Point p1 = seq.getCoordinate(i + 1);
 
       if (!isLineSegmentContainedInBoundary(p0, p1)) {
         return false;
@@ -172,21 +171,18 @@ public class RectangleContains {
   /**
    * Tests if a point is contained in the boundary of the target rectangle.
    * 
-   * @param pt the point to test
+   * @param point the point to test
    * @return true if the point is contained in the boundary
    */
-  private boolean isPointContainedInBoundary(final Coordinates pt) {
+  private boolean isPointContainedInBoundary(final Point point) {
     /**
      * contains = false iff the point is properly contained in the rectangle.
      * 
      * This code assumes that the point lies in the rectangle envelope
      */
-    return pt.getX() == rectEnv.getMinX() || pt.getX() == rectEnv.getMaxX()
-      || pt.getY() == rectEnv.getMinY() || pt.getY() == rectEnv.getMaxY();
-  }
-
-  private boolean isPointContainedInBoundary(final Point point) {
-    return isPointContainedInBoundary(point.getCoordinate());
+    return point.getX() == rectEnv.getMinX()
+      || point.getX() == rectEnv.getMaxX() || point.getY() == rectEnv.getMinY()
+      || point.getY() == rectEnv.getMaxY();
   }
 
 }

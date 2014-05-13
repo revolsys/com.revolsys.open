@@ -3,7 +3,7 @@ package com.revolsys.jts.testold.noding;
 import junit.framework.TestCase;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.noding.SegmentPointComparator;
 
 /**
@@ -25,7 +25,7 @@ public class SegmentPointComparatorTest extends TestCase {
     final double y0, final double x1, final double y1,
     final int expectedPositionValue) {
     final int posValue = SegmentPointComparator.compare(octant, new Coordinate((double)
-      x0, y0, Coordinates.NULL_ORDINATE), new Coordinate((double)x1, y1, Coordinates.NULL_ORDINATE));
+      x0, y0, Point.NULL_ORDINATE), new Coordinate((double)x1, y1, Point.NULL_ORDINATE));
     assertTrue(posValue == expectedPositionValue);
   }
 

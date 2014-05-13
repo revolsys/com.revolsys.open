@@ -2,11 +2,11 @@ package com.revolsys.gis.algorithm.index.quadtree;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.index.quadtree.IntervalSize;
 
 public class Root<T> extends NodeBase<T> {
-  private static final Coordinates origin = new DoubleCoordinates(0.0, 0.0);
+  private static final Point origin = new DoubleCoordinates(0.0, 0.0);
 
   public Root() {
   }

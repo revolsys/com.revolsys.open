@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.simplify;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegmentImpl;
 
@@ -47,11 +47,11 @@ class TaggedLineSegment extends LineSegmentImpl {
 
   private final int index;
 
-  public TaggedLineSegment(final Coordinates p0, final Coordinates p1) {
+  public TaggedLineSegment(final Point p0, final Point p1) {
     this(p0, p1, null, -1);
   }
 
-  public TaggedLineSegment(final Coordinates p0, final Coordinates p1,
+  public TaggedLineSegment(final Point p0, final Point p1,
     final Geometry parent, final int index) {
     super(p0, p1);
     this.parent = parent;

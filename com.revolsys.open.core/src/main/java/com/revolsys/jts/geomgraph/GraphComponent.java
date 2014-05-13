@@ -33,7 +33,7 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.util.Assert;
 
@@ -73,7 +73,7 @@ abstract public class GraphComponent {
   /**
    * @return a coordinate in this component (or null, if there are none)
    */
-  abstract public Coordinates getCoordinate();
+  abstract public Point getCoordinate();
 
   public Label getLabel() {
     return label;

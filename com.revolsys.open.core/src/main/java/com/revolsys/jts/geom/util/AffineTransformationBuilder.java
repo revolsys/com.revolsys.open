@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.geom.util;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.math.Matrix;
 
 /**
@@ -63,12 +63,12 @@ import com.revolsys.jts.math.Matrix;
  */
 public class AffineTransformationBuilder
 {
-  private Coordinates src0;
-  private Coordinates src1;
-  private Coordinates src2;
-  private Coordinates dest0;
-  private Coordinates dest1;
-  private Coordinates dest2;
+  private Point src0;
+  private Point src1;
+  private Point src2;
+  private Point dest0;
+  private Point dest1;
+  private Point dest2;
   
   // the matrix entries for the transformation
   private double m00, m01, m02, m10, m11, m12;
@@ -86,12 +86,12 @@ public class AffineTransformationBuilder
    * @param dest1 the image of control point 1 under the required transformation
    * @param dest2 the image of control point 2 under the required transformation
    */
-  public AffineTransformationBuilder(Coordinates src0,
-      Coordinates src1,
-      Coordinates src2,
-      Coordinates dest0,
-      Coordinates dest1,
-      Coordinates dest2)
+  public AffineTransformationBuilder(Point src0,
+      Point src1,
+      Point src2,
+      Point dest0,
+      Point dest1,
+      Point dest2)
   {
     this.src0 = src0;
     this.src1 = src1;

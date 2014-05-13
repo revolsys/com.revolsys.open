@@ -33,7 +33,7 @@
 package com.revolsys.jts.precision;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.vertex.Vertex;
 
@@ -69,14 +69,14 @@ import com.revolsys.jts.geom.vertex.Vertex;
 public class CommonBitsRemover {
   // TODO currently doesn't do anything
   // class Translater implements CoordinateFilter {
-  // Coordinates trans = null;
+  // Point trans = null;
   //
-  // public Translater(final Coordinates trans) {
+  // public Translater(final Point trans) {
   // this.trans = trans;
   // }
   //
   // @Override
-  // public void filter(final Coordinates coord) {
+  // public void filter(final Point coord) {
   // coord.setX(coord.getX() + trans.getX());
   // coord.setY(coord.getY() + trans.getY());
   // }
@@ -87,7 +87,7 @@ public class CommonBitsRemover {
 
   private final CommonBits commonBitsY = new CommonBits();
 
-  private Coordinates commonCoord;
+  private Point commonCoord;
 
   public CommonBitsRemover() {
   }
@@ -107,7 +107,7 @@ public class CommonBitsRemover {
 
     }
     commonCoord = new Coordinate(commonBitsX.getCommon(),
-      commonBitsY.getCommon(), Coordinates.NULL_ORDINATE);
+      commonBitsY.getCommon(), Point.NULL_ORDINATE);
   }
 
   /**
@@ -123,9 +123,9 @@ public class CommonBitsRemover {
   }
 
   /**
-   * The common bits of the Coordinates in the supplied Geometries.
+   * The common bits of the Point in the supplied Geometries.
    */
-  public Coordinates getCommonCoordinate() {
+  public Point getCommonCoordinate() {
     return commonCoord;
   }
 
@@ -142,8 +142,8 @@ public class CommonBitsRemover {
     // if (x == 0.0 && y == 0.0) {
     // return geom;
     // } else {
-    // final Coordinates invCoord = new Coordinate(-x, -y,
-    // Coordinates.NULL_ORDINATE);
+    // final Point invCoord = new Coordinate(-x, -y,
+    // Point.NULL_ORDINATE);
     // final Translater trans = new Translater(invCoord);
     // geom.apply(trans);
     // geom.geometryChanged();

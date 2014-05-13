@@ -8,14 +8,14 @@ import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
   Visitor<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph,
-    final Coordinates point, final double maxDistance) {
+    final Point point, final double maxDistance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
       point, maxDistance, results);
@@ -28,14 +28,14 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements
     return nodes;
   }
 
-  private final Coordinates coordinates;
+  private final Point coordinates;
 
   private final Visitor<Node<T>> matchVisitor;
 
   private final double maxDistance;
 
   public NodeLessThanDistanceOfCoordinatesVisitor(
-    final Coordinates coordinates, final double maxDistance,
+    final Point coordinates, final double maxDistance,
     final Visitor<Node<T>> matchVisitor) {
     this.coordinates = coordinates;
     this.maxDistance = maxDistance;

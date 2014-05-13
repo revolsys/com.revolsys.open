@@ -3,7 +3,7 @@ package com.revolsys.gis.jts;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -44,7 +44,7 @@ public class PointUtil {
     final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(polygon);
     final Point centroid = polygon.getCentroid();
     if (centroid.within(polygon)) {
-      final Coordinates coordinates = CoordinatesUtil.getInstance(centroid);
+      final Point coordinates = CoordinatesUtil.getInstance(centroid);
       final CoordinatesList coordinatesList = new DoubleCoordinatesList(2,
         coordinates.getX(), coordinates.getY());
       return factory.point(coordinatesList);

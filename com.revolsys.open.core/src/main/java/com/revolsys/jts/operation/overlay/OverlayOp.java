@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -563,7 +563,7 @@ public class OverlayOp extends GeometryGraphOperation {
    * @return true if the coord is located in the interior or boundary of
    * a geometry in the list.
    */
-  private boolean isCovered(final Coordinates coord,
+  private boolean isCovered(final Point coord,
     final List<? extends Geometry> geometries) {
     for (final Geometry geometry : geometries) {
       final Location loc = ptLocator.locate(coord, geometry);
@@ -580,7 +580,7 @@ public class OverlayOp extends GeometryGraphOperation {
    * @param coord the point coordinate
    * @return true if the coordinate point is covered by a result Area geometry
    */
-  public boolean isCoveredByA(final Coordinates coord) {
+  public boolean isCoveredByA(final Point coord) {
     if (isCovered(coord, resultPolyList)) {
       return true;
     }
@@ -593,7 +593,7 @@ public class OverlayOp extends GeometryGraphOperation {
    * @param coord the point coordinate
    * @return true if the coordinate point is covered by a result Line or Area geometry
    */
-  public boolean isCoveredByLA(final Coordinates coord) {
+  public boolean isCoveredByLA(final Point coord) {
     if (isCovered(coord, resultLineList)) {
       return true;
     }

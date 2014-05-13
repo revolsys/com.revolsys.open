@@ -9,7 +9,7 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
 
@@ -42,7 +42,7 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
 
   @Override
   public boolean visit(final Node<T> node) {
-    final Coordinates point = node;
+    final Point point = node;
     if (LineStringUtil.isPointOnLine(line, point)) {
       matchVisitor.visit(node);
     }

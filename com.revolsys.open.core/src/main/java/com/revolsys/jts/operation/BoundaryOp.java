@@ -40,7 +40,7 @@ import java.util.TreeMap;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.geom.CoordinateArrays;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -81,7 +81,7 @@ public class BoundaryOp {
     this.bnRule = bnRule;
   }
 
-  private void addEndpoint(final Coordinates pt) {
+  private void addEndpoint(final Point pt) {
     Counter counter = (Counter)endpointMap.get(pt);
     if (counter == null) {
       counter = new Counter();
@@ -101,7 +101,7 @@ public class BoundaryOp {
       if (closedEndpointOnBoundary) {
         return line.getStartPoint();
       } else {
-        return geomFact.multiPoint((Coordinates[])null);
+        return geomFact.multiPoint((Point[])null);
       }
     }
     return geomFact.multiPoint(new Point[] {
@@ -110,9 +110,9 @@ public class BoundaryOp {
   }
 
   /*
-   * // MD - superseded private Coordinates[]
+   * // MD - superseded private Point[]
    * computeBoundaryFromGeometryGraph(MultiLineString mLine) { GeometryGraph g =
-   * new GeometryGraph(0, mLine, bnRule); Coordinates[] bdyPts =
+   * new GeometryGraph(0, mLine, bnRule); Point[] bdyPts =
    * g.getBoundaryPoints(); return bdyPts; }
    */
 
@@ -121,7 +121,7 @@ public class BoundaryOp {
       return getEmptyMultiPoint();
     }
 
-    final Coordinates[] bdyPts = computeBoundaryCoordinates(mLine);
+    final Point[] bdyPts = computeBoundaryCoordinates(mLine);
 
     // return Point or MultiPoint
     if (bdyPts.length == 1) {
@@ -131,7 +131,7 @@ public class BoundaryOp {
     return geomFact.multiPoint(bdyPts);
   }
 
-  private Coordinates[] computeBoundaryCoordinates(final MultiLineString mLine) {
+  private Point[] computeBoundaryCoordinates(final MultiLineString mLine) {
     final List bdyPts = new ArrayList();
     endpointMap = new TreeMap();
     for (int i = 0; i < mLine.getGeometryCount(); i++) {

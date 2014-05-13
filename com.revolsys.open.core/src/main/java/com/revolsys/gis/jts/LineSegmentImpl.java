@@ -1,6 +1,6 @@
 package com.revolsys.gis.jts;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -13,13 +13,13 @@ public class LineSegmentImpl extends com.revolsys.jts.geom.LineSegmentImpl {
   public LineSegmentImpl() {
   }
 
-  public LineSegmentImpl(final Coordinates coordinates1,
-    final Coordinates coordinates2) {
+  public LineSegmentImpl(final Point coordinates1,
+    final Point coordinates2) {
     this(null, coordinates1, coordinates2);
   }
 
   public LineSegmentImpl(final GeometryFactory geometryFactory,
-    final Coordinates point1, final Coordinates point2) {
+    final Point point1, final Point point2) {
     super(point1, point2);
     setGeometryFactory(geometryFactory);
   }

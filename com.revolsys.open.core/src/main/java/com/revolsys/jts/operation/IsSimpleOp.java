@@ -43,7 +43,7 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -103,9 +103,9 @@ public class IsSimpleOp {
 
     boolean isClosed;
 
-    Coordinates pt;
+    Point pt;
 
-    public EndpointInfo(final Coordinates pt) {
+    public EndpointInfo(final Point pt) {
       this.pt = pt;
       isClosed = false;
       degree = 0;
@@ -116,7 +116,7 @@ public class IsSimpleOp {
       this.isClosed |= isClosed;
     }
 
-    public Coordinates getCoordinate() {
+    public Point getCoordinate() {
       return pt;
     }
   }
@@ -125,7 +125,7 @@ public class IsSimpleOp {
 
   private boolean isClosedEndpointsInInterior = true;
 
-  private final List<Coordinates> nonSimplePoints = new ArrayList<Coordinates>();
+  private final List<Point> nonSimplePoints = new ArrayList<Point>();
 
   private boolean shortCircuit = true;
 
@@ -158,8 +158,8 @@ public class IsSimpleOp {
   /**
    * Add an endpoint to the map, creating an entry for it if none exists
    */
-  private void addEndpoint(final Map<Coordinates, EndpointInfo> endPoints,
-    final Coordinates p, final boolean isClosed) {
+  private void addEndpoint(final Map<Point, EndpointInfo> endPoints,
+    final Point p, final boolean isClosed) {
     EndpointInfo eiInfo = endPoints.get(p);
     if (eiInfo == null) {
       eiInfo = new EndpointInfo(p);
@@ -177,7 +177,7 @@ public class IsSimpleOp {
    * @return a coordinate for the location of the non-boundary self-intersection
    * or null if the geometry is simple
    */
-  public Coordinates getNonSimpleLocation() {
+  public Point getNonSimpleLocation() {
     if (nonSimplePoints.isEmpty()) {
       return null;
     } else {
@@ -185,7 +185,7 @@ public class IsSimpleOp {
     }
   }
 
-  public List<Coordinates> getNonSimplePoints() {
+  public List<Point> getNonSimplePoints() {
     return nonSimplePoints;
   }
 
@@ -198,12 +198,12 @@ public class IsSimpleOp {
    * must be exactly 2.
    */
   private boolean hasClosedEndpointIntersection(final GeometryGraph graph) {
-    final Map<Coordinates, EndpointInfo> endPoints = new TreeMap<>();
+    final Map<Point, EndpointInfo> endPoints = new TreeMap<>();
     for (final Edge e : graph.edges()) {
       final boolean isClosed = e.isClosed();
-      final Coordinates p0 = e.getCoordinate(0);
+      final Point p0 = e.getCoordinate(0);
       addEndpoint(endPoints, p0, isClosed);
-      final Coordinates p1 = e.getCoordinate(e.getNumPoints() - 1);
+      final Point p1 = e.getCoordinate(e.getNumPoints() - 1);
       addEndpoint(endPoints, p1, isClosed);
     }
 
@@ -306,9 +306,9 @@ public class IsSimpleOp {
 
   private boolean isSimple(final MultiPoint mulitPoint) {
     boolean simple = true;
-    final Set<Coordinates> points = new TreeSet<>();
+    final Set<Point> points = new TreeSet<>();
     for (final Point point : mulitPoint.getPoints()) {
-      final Coordinates coordinates = new DoubleCoordinates(point, 2);
+      final Point coordinates = new DoubleCoordinates(point, 2);
       if (points.contains(coordinates)) {
         simple = false;
         nonSimplePoints.add(coordinates);

@@ -35,7 +35,7 @@ package com.revolsys.jts.algorithm.locate;
 import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
@@ -58,7 +58,7 @@ import com.revolsys.jts.geom.Polygonal;
  */
 public class SimplePointInAreaLocator implements PointOnGeometryLocator {
 
-  private static boolean containsPoint(final Coordinates p, final Geometry geom) {
+  private static boolean containsPoint(final Point p, final Geometry geom) {
     if (geom instanceof Polygon) {
       return containsPointInPolygon(p, (Polygon)geom);
     } else if (geom instanceof GeometryCollection) {
@@ -75,7 +75,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     return false;
   }
 
-  public static boolean containsPointInPolygon(final Coordinates p,
+  public static boolean containsPointInPolygon(final Point p,
     final Polygon poly) {
     if (poly.isEmpty()) {
       return false;
@@ -102,7 +102,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    * @param ring a linear ring
    * @return true if the point lies inside the ring
    */
-  private static boolean isPointInRing(final Coordinates p,
+  private static boolean isPointInRing(final Point p,
     final LinearRing ring) {
     // short-circuit if point is not in ring envelope
     if (!ring.getBoundingBox().intersects(p)) {
@@ -119,7 +119,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    * @param geom the areal geometry to test
    * @return the Location of the point in the geometry  
    */
-  public static Location locate(final Coordinates p, final Geometry geom) {
+  public static Location locate(final Point p, final Geometry geom) {
     if (geom.isEmpty()) {
       return Location.EXTERIOR;
     }
@@ -137,7 +137,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
   }
 
   @Override
-  public Location locate(final Coordinates p) {
+  public Location locate(final Point p) {
     return SimplePointInAreaLocator.locate(p, geom);
   }
 

@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.algorithm.distance;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineSegment;
@@ -46,7 +46,7 @@ import com.revolsys.jts.geom.segment.Segment;
  */
 public class DistanceToPoint {
 
-  public static void computeDistance(final Geometry geom, final Coordinates pt,
+  public static void computeDistance(final Geometry geom, final Point pt,
     final PointPairDistance ptDist) {
     if (geom instanceof LineString) {
       final LineString line = (LineString)geom;
@@ -66,20 +66,20 @@ public class DistanceToPoint {
   }
 
   public static void computeDistance(final LineSegment segment,
-    final Coordinates pt, final PointPairDistance ptDist) {
-    final Coordinates closestPt = segment.closestPoint(pt);
+    final Point pt, final PointPairDistance ptDist) {
+    final Point closestPt = segment.closestPoint(pt);
     ptDist.setMinimum(closestPt, pt);
   }
 
   public static void computeDistance(final LineString line,
-    final Coordinates pt, final PointPairDistance ptDist) {
+    final Point pt, final PointPairDistance ptDist) {
     for (final Segment segment : line.segments()) {
-      final Coordinates closestPt = segment.closestPoint(pt);
+      final Point closestPt = segment.closestPoint(pt);
       ptDist.setMinimum(closestPt, pt);
     }
   }
 
-  public static void computeDistance(final Polygon poly, final Coordinates pt,
+  public static void computeDistance(final Polygon poly, final Point pt,
     final PointPairDistance ptDist) {
     computeDistance(poly.getExteriorRing(), pt, ptDist);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {

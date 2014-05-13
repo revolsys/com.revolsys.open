@@ -34,7 +34,7 @@
 package com.revolsys.jts.triangulate;
 
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * An interface for strategies for determining the location of split points on constraint segments.
@@ -55,5 +55,5 @@ public interface ConstraintSplitPointFinder {
      * @param encroachPt the encroaching point
      * @return the point at which to split the encroached segment
      */
-    Coordinates findSplitPoint(Segment seg, Coordinates encroachPt);
+    Point findSplitPoint(Segment seg, Point encroachPt);
 }

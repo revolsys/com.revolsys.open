@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.WKTReader;
@@ -34,7 +34,7 @@ public class PolygonUnionPerfTest {
   public PolygonUnionPerfTest() {
   }
 
-  Geometry createPoly(final Coordinates base, final double size, final int nPts) {
+  Geometry createPoly(final Point base, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory(this.factory);
     gsf.setCentre(base);
     gsf.setSize(size);
@@ -83,8 +83,8 @@ public class PolygonUnionPerfTest {
     final double yInc = height / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Coordinates base = new Coordinate(i * xInc, j * yInc,
-          Coordinates.NULL_ORDINATE);
+        final Point base = new Coordinate(i * xInc, j * yInc,
+          Point.NULL_ORDINATE);
         final Geometry poly = createPoly(base, size, nPts);
         geoms.add(poly);
         // System.out.println(poly);

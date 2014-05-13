@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 
@@ -113,9 +113,9 @@ public class LengthIndexedLine {
    * the Z-ordinates of the line segment containing it, if they exist.
    *
    * @param index the index of the desired point
-   * @return the Coordinates at the given index
+   * @return the Point at the given index
    */
-  public Coordinates extractPoint(final double index) {
+  public Point extractPoint(final double index) {
     final LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
     return loc.getCoordinate(linearGeom);
   }
@@ -134,9 +134,9 @@ public class LengthIndexedLine {
    * @param index the index of the desired point
    * @param offsetDistance the distance the point is offset from the segment
    *    (positive is to the left, negative is to the right)
-   * @return the Coordinates at the given index
+   * @return the Point at the given index
    */
-  public Coordinates extractPoint(final double index,
+  public Point extractPoint(final double index,
     final double offsetDistance) {
     final LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
     final LinearLocation locLow = loc.toLowest(linearGeom);
@@ -175,9 +175,9 @@ public class LengthIndexedLine {
    * @param pt a point on the line
    * @return the minimum index of the point
    *
-   * @see #project(Coordinates)
+   * @see #project(Point)
    */
-  public double indexOf(final Coordinates pt) {
+  public double indexOf(final Point pt) {
     return LengthIndexOfPoint.indexOf(linearGeom, pt);
   }
 
@@ -201,9 +201,9 @@ public class LengthIndexedLine {
    * @param minIndex the value the returned index must be greater than
    * @return the index of the point greater than the given minimum index
    *
-   * @see #project(Coordinates)
+   * @see #project(Point)
    */
-  public double indexOfAfter(final Coordinates pt, final double minIndex) {
+  public double indexOfAfter(final Point pt, final double minIndex) {
     return LengthIndexOfPoint.indexOfAfter(linearGeom, pt, minIndex);
   }
 
@@ -261,7 +261,7 @@ public class LengthIndexedLine {
    * @param pt a point on the line
    * @return the index of the point
    */
-  public double project(final Coordinates pt) {
+  public double project(final Point pt) {
     return LengthIndexOfPoint.indexOf(linearGeom, pt);
   }
 }

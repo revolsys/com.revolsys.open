@@ -152,6 +152,11 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
   }
 
   @Override
+  protected boolean isEquivalentClass(final Geometry other) {
+    return other instanceof MultiLineString;
+  }
+
+  @Override
   public MultiLineString normalize() {
     if (isEmpty()) {
       return this;

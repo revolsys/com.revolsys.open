@@ -1,17 +1,14 @@
 package com.revolsys.jts.geom.vertex;
 
 import com.revolsys.gis.data.io.IteratorReader;
-import com.revolsys.gis.model.coordinates.AbstractCoordinates;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.AbstractPoint;
 
-public abstract class AbstractVertex extends AbstractCoordinates implements
-  Vertex {
+public abstract class AbstractVertex extends AbstractPoint implements Vertex {
 
   protected final Geometry geometry;
 
@@ -25,11 +22,6 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   }
 
   @Override
-  public DoubleCoordinates cloneCoordinates() {
-    return new DoubleCoordinates(this);
-  }
-
-  @Override
   public int getAxisCount() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return (byte)geometryFactory.getAxisCount();
@@ -39,6 +31,11 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return new Envelope(geometryFactory, this);
+  }
+
+  @Override
+  public double getCoordinate(final int axisIndex) {
+    return 0;
   }
 
   @SuppressWarnings("unchecked")
@@ -86,11 +83,4 @@ public abstract class AbstractVertex extends AbstractCoordinates implements
   public Reader<Vertex> reader() {
     return new IteratorReader<Vertex>(this);
   }
-
-  @Override
-  public Point toPoint() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.point(this);
-  }
-
 }

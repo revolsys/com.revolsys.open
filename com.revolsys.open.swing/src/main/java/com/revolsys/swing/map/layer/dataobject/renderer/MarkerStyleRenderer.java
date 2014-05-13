@@ -16,7 +16,7 @@ import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -61,7 +61,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     if (viewportGeometryFactory != null) {
       final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
 
-      Coordinates point = null;
+      Point point = null;
       double orientation = 0;
       final String placement = style.getMarkerPlacement();
       final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
@@ -85,7 +85,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
             }
             point = ProjectionFactory.convert(points.get(index),
               geometryFactory, viewportGeometryFactory);
-            final Coordinates p2 = ProjectionFactory.convert(
+            final Point p2 = ProjectionFactory.convert(
               points.get(index - 1), geometryFactory, viewportGeometryFactory);
             orientation = Math.toDegrees(p2.angle2d(point));
 
@@ -96,7 +96,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
             }
             point = ProjectionFactory.convert(points.get(index),
               geometryFactory, viewportGeometryFactory);
-            final Coordinates p2 = ProjectionFactory.convert(
+            final Point p2 = ProjectionFactory.convert(
               points.get(index + 1), geometryFactory, viewportGeometryFactory);
             orientation = Math.toDegrees(-point.angle2d(p2));
           }
@@ -108,8 +108,8 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
             final double centreLength = totalLength / 2;
             double currentLength = 0;
             for (int i = 1; i < numPoints && currentLength < centreLength; i++) {
-              final Coordinates p1 = points.get(i - 1);
-              final Coordinates p2 = points.get(i);
+              final Point p1 = points.get(i - 1);
+              final Point p2 = points.get(i);
               final double segmentLength = p1.distance(p2);
               if (segmentLength + currentLength >= centreLength) {
                 point = LineSegmentUtil.project(2, p1, p2,
@@ -134,7 +134,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   /**
-   * Coordinates must be in the same geometry factory as the view.
+   * Point must be in the same geometry factory as the view.
    * 
    * @param viewport
    * @param graphics
@@ -142,7 +142,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
    * @param style
    */
   public static void renderMarker(final Viewport2D viewport,
-    final Graphics2D graphics, final Coordinates point,
+    final Graphics2D graphics, final Point point,
     final MarkerStyle style, final double orientation) {
     if (viewport.getBoundingBox().covers(point)) {
       final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
@@ -195,7 +195,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final Point point, final MarkerStyle style) {
     final Geometry geometry = getGeometry(viewport, point);
     if (!geometry.isEmpty()) {
-      final Coordinates coordinates = CoordinatesUtil.get(geometry);
+      final Point coordinates = CoordinatesUtil.get(geometry);
       renderMarker(viewport, graphics, coordinates, style, 0);
     }
   }
@@ -207,7 +207,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   /**
-   * Coordinates must be in the same geometry factory as the view.
+   * Point must be in the same geometry factory as the view.
    * 
    * @param viewport
    * @param graphics

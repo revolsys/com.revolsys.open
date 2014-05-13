@@ -27,7 +27,6 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -478,7 +477,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return setBoundingBox(centre, scale);
   }
 
-  private BoundingBox setBoundingBox(Coordinates centre, final double scale) {
+  private BoundingBox setBoundingBox(Point centre, final double scale) {
     final double unitsPerPixel = getUnitsPerPixel(scale);
     final GeometryFactory geometryFactory = getGeometryFactory();
     centre = new DoubleCoordinates(centre);
@@ -670,12 +669,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       transform.transform(modelCoordinates, 0, ordinates, 0, 1);
       return ordinates;
     }
-  }
-
-  public Point2D toViewPoint(final Coordinates point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return toViewPoint(x, y);
   }
 
   public Point2D toViewPoint(final double x, final double y) {

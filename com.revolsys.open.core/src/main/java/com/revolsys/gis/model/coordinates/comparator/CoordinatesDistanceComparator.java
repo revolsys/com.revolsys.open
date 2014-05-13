@@ -2,33 +2,26 @@ package com.revolsys.gis.model.coordinates.comparator;
 
 import java.util.Comparator;
 
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Point;
 
-public class CoordinatesDistanceComparator implements Comparator<Coordinates> {
+public class CoordinatesDistanceComparator implements Comparator<Point> {
 
   private final boolean invert;
 
-  private final Coordinates point;
+  private final Point point;
 
-  public CoordinatesDistanceComparator(final Coordinates point) {
+  public CoordinatesDistanceComparator(final Point point) {
     this.point = point;
     this.invert = false;
   }
 
-  public CoordinatesDistanceComparator(final Coordinates point,
-    final boolean invert) {
+  public CoordinatesDistanceComparator(final Point point, final boolean invert) {
     this.point = point;
     this.invert = invert;
   }
 
-  public CoordinatesDistanceComparator(final Point point) {
-    this(CoordinatesUtil.getInstance(point));
-  }
-
   @Override
-  public int compare(final Coordinates point1, final Coordinates point2) {
+  public int compare(final Point point1, final Point point2) {
     int compare;
     final double distance1 = point1.distance(point);
     final double distance2 = point2.distance(point);

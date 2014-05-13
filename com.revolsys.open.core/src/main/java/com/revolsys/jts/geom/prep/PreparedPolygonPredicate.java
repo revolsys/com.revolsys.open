@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -112,7 +112,7 @@ abstract class PreparedPolygonPredicate {
     final List targetRepPts) {
     final PointOnGeometryLocator piaLoc = new SimplePointInAreaLocator(testGeom);
     for (final Iterator i = targetRepPts.iterator(); i.hasNext();) {
-      final Coordinates p = (Coordinates)i.next();
+      final Point p = (Point)i.next();
       final Location loc = piaLoc.locate(p);
       if (loc != Location.EXTERIOR) {
         return true;

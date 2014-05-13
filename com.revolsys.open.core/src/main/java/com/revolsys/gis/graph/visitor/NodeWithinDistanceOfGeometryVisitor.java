@@ -8,7 +8,7 @@ import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -49,7 +49,7 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
 
   @Override
   public boolean visit(final Node<T> node) {
-    final Coordinates coordinates = node;
+    final Point coordinates = node;
     final Point point = geometryFactory.point(coordinates);
     final double distance = geometry.distance(point);
     if (distance <= maxDistance) {

@@ -35,7 +35,7 @@ package com.revolsys.jts.noding;
 import java.io.PrintStream;
 
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Represents an intersection point between two {@link SegmentString}s.
@@ -45,7 +45,7 @@ import com.revolsys.jts.geom.Coordinates;
 public class SegmentNode implements Comparable {
   private final NodedSegmentString segString;
 
-  public final Coordinates coord; // the point of intersection
+  public final Point coord; // the point of intersection
 
   public final int segmentIndex; // the index of the containing line segment in
                                  // the parent edge
@@ -55,7 +55,7 @@ public class SegmentNode implements Comparable {
   private final boolean isInterior;
 
   public SegmentNode(final NodedSegmentString segString,
-    final Coordinates coord, final int segmentIndex,
+    final Point coord, final int segmentIndex,
     final int segmentOctant) {
     this.segString = segString;
     this.coord = new Coordinate(coord);
@@ -93,7 +93,7 @@ public class SegmentNode implements Comparable {
    * 
    * @return the coordinate of the node
    */
-  public Coordinates getCoordinate() {
+  public Point getCoordinate() {
     return coord;
   }
 

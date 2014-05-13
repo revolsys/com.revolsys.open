@@ -2,7 +2,7 @@ package com.revolsys.jts.simplify;
 
 import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Triangle;
 
 /**
@@ -17,7 +17,7 @@ class VWLineSimplifier {
   static class VWVertex {
     public static double MAX_AREA = Double.MAX_VALUE;
 
-    public static VWLineSimplifier.VWVertex buildLine(final Coordinates[] pts) {
+    public static VWLineSimplifier.VWVertex buildLine(final Point[] pts) {
       VWLineSimplifier.VWVertex first = null;
       VWLineSimplifier.VWVertex prev = null;
       for (int i = 0; i < pts.length; i++) {
@@ -35,7 +35,7 @@ class VWLineSimplifier {
       return first;
     }
 
-    private final Coordinates pt;
+    private final Point pt;
 
     private VWLineSimplifier.VWVertex prev;
 
@@ -45,7 +45,7 @@ class VWLineSimplifier {
 
     private boolean isLive = true;
 
-    public VWVertex(final Coordinates pt) {
+    public VWVertex(final Point pt) {
       this.pt = pt;
     }
 
@@ -53,7 +53,7 @@ class VWLineSimplifier {
       return area;
     }
 
-    public Coordinates[] getCoordinates() {
+    public Point[] getCoordinates() {
       final CoordinateList coords = new CoordinateList();
       VWLineSimplifier.VWVertex curr = this;
       do {
@@ -104,32 +104,32 @@ class VWLineSimplifier {
     }
   }
 
-  public static Coordinates[] simplify(final Coordinates[] pts,
+  public static Point[] simplify(final Point[] pts,
     final double distanceTolerance) {
     final VWLineSimplifier simp = new VWLineSimplifier(pts, distanceTolerance);
     return simp.simplify();
   }
 
-  private final Coordinates[] pts;
+  private final Point[] pts;
 
   private final double tolerance;
 
-  public VWLineSimplifier(final Coordinates[] pts,
+  public VWLineSimplifier(final Point[] pts,
     final double distanceTolerance) {
     this.pts = pts;
     this.tolerance = distanceTolerance * distanceTolerance;
   }
 
-  public Coordinates[] simplify() {
+  public Point[] simplify() {
     final VWLineSimplifier.VWVertex vwLine = VWVertex.buildLine(pts);
     double minArea = tolerance;
     do {
       minArea = simplifyVertex(vwLine);
     } while (minArea < tolerance);
-    final Coordinates[] simp = vwLine.getCoordinates();
+    final Point[] simp = vwLine.getCoordinates();
     // ensure computed value is a valid line
     if (simp.length < 2) {
-      return new Coordinates[] {
+      return new Point[] {
         simp[0], new Coordinate(simp[0])
       };
     }

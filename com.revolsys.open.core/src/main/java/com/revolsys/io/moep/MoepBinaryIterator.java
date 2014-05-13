@@ -22,7 +22,7 @@ import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.saif.SaifConstants;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -78,7 +78,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private final byte[] buffer = new byte[512];
 
-  private Coordinates center;
+  private Point center;
 
   private byte coordinateBytes;
 
@@ -360,7 +360,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       } else {
         coordinate = readLEInt(in);
       }
-      coords[index * 3 + i] = center.getValue(i) + coordinate;
+      coords[index * 3 + i] = center.getCoordinate(i) + coordinate;
     }
     if (axisCount > 2) {
       final int z = readLEShort(in);

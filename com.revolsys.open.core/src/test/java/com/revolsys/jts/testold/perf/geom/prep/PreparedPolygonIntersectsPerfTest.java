@@ -38,7 +38,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -75,7 +75,7 @@ public class PreparedPolygonIntersectsPerfTest {
   public PreparedPolygonIntersectsPerfTest() {
   }
 
-  Geometry createCircle(final Coordinates origin, final double size,
+  Geometry createCircle(final Point origin, final double size,
     final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
@@ -87,7 +87,7 @@ public class PreparedPolygonIntersectsPerfTest {
     return circle;
   }
 
-  Geometry createLine(final Coordinates base, final double size, final int nPts) {
+  Geometry createLine(final Point base, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
@@ -107,8 +107,8 @@ public class PreparedPolygonIntersectsPerfTest {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Coordinates base = new Coordinate(env.getMinX() + i * xInc,
-          env.getMinY() + j * yInc, Coordinates.NULL_ORDINATE);
+        final Point base = new Coordinate(env.getMinX() + i * xInc,
+          env.getMinY() + j * yInc, Point.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);
       }
@@ -116,7 +116,7 @@ public class PreparedPolygonIntersectsPerfTest {
     return geoms;
   }
 
-  Geometry createSineStar(final Coordinates origin, final double size,
+  Geometry createSineStar(final Point origin, final double size,
     final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
@@ -158,7 +158,7 @@ public class PreparedPolygonIntersectsPerfTest {
   public void test(final int nPts) {
     // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
     final Geometry sinePoly = createSineStar(new Coordinate((double)0, 0,
-      Coordinates.NULL_ORDINATE), 100, nPts);
+      Point.NULL_ORDINATE), 100, nPts);
     // System.out.println(poly);
     // Geometry target = sinePoly.getBoundary();
     final Geometry target = sinePoly;

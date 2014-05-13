@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 
 /**
@@ -118,12 +118,12 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public Coordinates getCoordinate(final int i) {
+  public Point getCoordinate(final int i) {
     return getCoordinateCopy(i);
   }
 
   @Override
-  public Coordinates getCoordinateCopy(final int i) {
+  public Point getCoordinateCopy(final int i) {
     return new Coordinate(getX(i), getY(i), getZ(i));
   }
 
@@ -157,7 +157,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public Coordinates[] toCoordinateArray() {
+  public Point[] toCoordinateArray() {
     throw new UnsupportedOperationException();
   }
 

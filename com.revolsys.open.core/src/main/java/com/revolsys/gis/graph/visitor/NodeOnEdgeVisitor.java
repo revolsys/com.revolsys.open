@@ -10,7 +10,7 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.visitor.CreateListVisitor;
@@ -20,7 +20,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph,
     final Node<T> node, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
-    final Coordinates point = node;
+    final Point point = node;
     BoundingBox boundingBox = new Envelope(point);
     boundingBox = boundingBox.expand(maxDistance);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
@@ -35,7 +35,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
 
   private final Node<T> node;
 
-  private final Coordinates point;
+  private final Point point;
 
   private final BoundingBox boundingBox;
 

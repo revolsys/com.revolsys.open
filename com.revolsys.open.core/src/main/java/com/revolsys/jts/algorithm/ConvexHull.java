@@ -42,7 +42,6 @@ import java.util.TreeSet;
 
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -71,7 +70,7 @@ public class ConvexHull {
    * @author Martin Davis
    * @version 1.7
    */
-  private static class RadialComparator implements Comparator<Coordinates> {
+  private static class RadialComparator implements Comparator<Point> {
     /**
      * Given two points p and q compare them with respect to their radial
      * ordering about point o.  First checks radial ordering.
@@ -90,8 +89,7 @@ public class ConvexHull {
      * @return -1, 0 or 1 depending on whether p is less than,
      * equal to or greater than q
      */
-    private static int polarCompare(final Coordinates o, final Coordinates p,
-      final Coordinates q) {
+    private static int polarCompare(final Point o, final Point p, final Point q) {
       final double dxp = p.getX() - o.getX();
       final double dyp = p.getY() - o.getY();
       final double dxq = q.getX() - o.getX();
@@ -124,31 +122,44 @@ public class ConvexHull {
       return 0;
     }
 
-    private final Coordinates origin;
+    private final Point origin;
 
-    public RadialComparator(final Coordinates origin) {
+    public RadialComparator(final Point origin) {
       this.origin = origin;
     }
 
     @Override
-    public int compare(final Coordinates p1, final Coordinates p2) {
+    public int compare(final Point p1, final Point p2) {
       return polarCompare(origin, p1, p2);
     }
 
   }
 
+  /**
+   * Tests whether a point lies inside or on a ring. The ring may be oriented in
+   * either direction. A point lying exactly on the ring boundary is considered
+   * to be inside the ring.
+   * <p>
+   * This method does <i>not</i> first check the point against the envelope of
+   * the ring.
+   * 
+   * @param p
+   *          point to check for ring inclusion
+   * @param ring
+   *          an array of coordinates representing the ring (which must have
+   *          first point identical to last point)
+   * @return true if p is inside ring
+   * 
+   * @see locatePointInRing
+   */
+  public static boolean isPointInRing(final Point p, final Point... ring) {
+    final Location location = RayCrossingCounter.locatePointInRing(p, ring);
+    return location != Location.EXTERIOR;
+  }
+
   private final GeometryFactory geomFactory;
 
-  private final Coordinates[] inputPts;
-
-  /**
-   * Create a new convex hull construction for the input {@link Coordinates} array.
-   */
-  public ConvexHull(final Coordinates[] pts, final GeometryFactory geomFactory) {
-    inputPts = UniqueCoordinateArrayFilter.getUniquePointsArray(Arrays.asList(pts));
-    // inputPts = pts;
-    this.geomFactory = geomFactory;
-  }
+  private final Point[] inputPts;
 
   /**
    * Create a new convex hull construction for the input {@link Geometry}.
@@ -159,18 +170,27 @@ public class ConvexHull {
   }
 
   /**
+   * Create a new convex hull construction for the input {@link Coordinates} array.
+   */
+  public ConvexHull(final Point[] pts, final GeometryFactory geomFactory) {
+    inputPts = UniqueCoordinateArrayFilter.getUniquePointsArray(Arrays.asList(pts));
+    // inputPts = pts;
+    this.geomFactory = geomFactory;
+  }
+
+  /**
    *@param  vertices  the vertices of a linear ring, which may or may not be
    *      flattened (i.e. vertices collinear)
    *@return           the coordinates with unnecessary (collinear) vertices
    *      removed
    */
-  private Coordinates[] cleanRing(final Coordinates[] original) {
+  private Point[] cleanRing(final Point[] original) {
     Assert.equals(original[0], original[original.length - 1]);
-    final List<Coordinates> cleanedRing = new ArrayList<Coordinates>();
-    Coordinates previousDistinctCoordinate = null;
+    final List<Point> cleanedRing = new ArrayList<Point>();
+    Point previousDistinctCoordinate = null;
     for (int i = 0; i <= original.length - 2; i++) {
-      final Coordinates currentCoordinate = original[i];
-      final Coordinates nextCoordinate = original[i + 1];
+      final Point currentCoordinate = original[i];
+      final Point nextCoordinate = original[i + 1];
       if (currentCoordinate.equals(nextCoordinate)) {
         continue;
       }
@@ -183,12 +203,12 @@ public class ConvexHull {
       previousDistinctCoordinate = currentCoordinate;
     }
     cleanedRing.add(original[original.length - 1]);
-    final Coordinates[] cleanedRingCoordinates = new Coordinates[cleanedRing.size()];
+    final Point[] cleanedRingCoordinates = new Point[cleanedRing.size()];
     return cleanedRing.toArray(cleanedRingCoordinates);
   }
 
-  private Coordinates[] computeOctPts(final Coordinates[] inputPts) {
-    final Coordinates[] pts = new Coordinates[8];
+  private Point[] computeOctPts(final Point[] inputPts) {
+    final Point[] pts = new Point[8];
     for (int j = 0; j < pts.length; j++) {
       pts[j] = inputPts[0];
     }
@@ -226,8 +246,8 @@ public class ConvexHull {
 
   }
 
-  private Coordinates[] computeOctRing(final Coordinates[] inputPts) {
-    final Coordinates[] octPts = computeOctPts(inputPts);
+  private Point[] computeOctRing(final Point[] inputPts) {
+    final Point[] octPts = computeOctPts(inputPts);
     final CoordinateList coordList = new CoordinateList();
     coordList.add(octPts, false);
 
@@ -263,19 +283,19 @@ public class ConvexHull {
       return geomFactory.lineString(inputPts);
     }
 
-    Coordinates[] reducedPts = inputPts;
+    Point[] reducedPts = inputPts;
     // use heuristic to reduce points, if large
     if (inputPts.length > 50) {
       reducedPts = reduce(inputPts);
     }
     // sort points for Graham scan.
-    final Coordinates[] sortedPts = preSort(reducedPts);
+    final Point[] sortedPts = preSort(reducedPts);
 
     // Use Graham scan to find convex hull.
-    final Stack<Coordinates> cHS = grahamScan(sortedPts);
+    final Stack<Point> cHS = grahamScan(sortedPts);
 
     // Convert stack to an array.
-    final Coordinates[] cH = toCoordinateArray(cHS);
+    final Point[] cH = toCoordinateArray(cHS);
 
     // Convert array to appropriate output geometry.
     return lineOrPolygon(cH);
@@ -287,9 +307,9 @@ public class ConvexHull {
    * @param c a list of points, with at least 3 entries
    * @return a Stack containing the ordered points of the convex hull ring
    */
-  private Stack<Coordinates> grahamScan(final Coordinates[] c) {
-    Coordinates p;
-    final Stack<Coordinates> ps = new Stack<Coordinates>();
+  private Stack<Point> grahamScan(final Point[] c) {
+    Point p;
+    final Stack<Point> ps = new Stack<Point>();
     p = ps.push(c[0]);
     p = ps.push(c[1]);
     p = ps.push(c[2]);
@@ -311,8 +331,7 @@ public class ConvexHull {
    *@return    whether the three coordinates are collinear and c2 lies between
    *      c1 and c3 inclusive
    */
-  private boolean isBetween(final Coordinates c1, final Coordinates c2,
-    final Coordinates c3) {
+  private boolean isBetween(final Point c1, final Point c2, final Point c3) {
     if (CGAlgorithms.computeOrientation(c1, c2, c3) != 0) {
       return false;
     }
@@ -342,14 +361,12 @@ public class ConvexHull {
    *      collinear; otherwise, a <code>Polygon</code> with unnecessary
    *      (collinear) vertices removed
    */
-  private Geometry lineOrPolygon(Coordinates[] coordinates) {
+  private Geometry lineOrPolygon(Point[] coordinates) {
 
     coordinates = cleanRing(coordinates);
     if (coordinates.length == 3) {
-      return geomFactory.lineString(new Coordinates[] {
-        coordinates[0], coordinates[1]
-      });
-      // return new LineString(new Coordinates[]{coordinates[0],
+      return geomFactory.lineString(coordinates[0], coordinates[1]);
+      // return new LineString(new Point[]{coordinates[0],
       // coordinates[1]},
       // geometry.getPrecisionModel(), geometry.getSRID());
     }
@@ -357,8 +374,31 @@ public class ConvexHull {
     return geomFactory.polygon(ring);
   }
 
-  private Coordinates[] padArray3(final Coordinates[] pts) {
-    final Coordinates[] pad = new Coordinates[3];
+  /*
+   * // MD - no longer used, but keep for reference purposes private Point[]
+   * computeQuad(Point[] inputPts) { BigQuad bigQuad = bigQuad(inputPts); //
+   * Build a linear ring defining a big poly. ArrayList bigPoly = new
+   * ArrayList(); bigPoly.add(bigQuad.westmost); if (!
+   * bigPoly.contains(bigQuad.northmost)) { bigPoly.add(bigQuad.northmost); } if
+   * (! bigPoly.contains(bigQuad.eastmost)) { bigPoly.add(bigQuad.eastmost); }
+   * if (! bigPoly.contains(bigQuad.southmost)) {
+   * bigPoly.add(bigQuad.southmost); } // points must all lie in a line if
+   * (bigPoly.size() < 3) { return null; } // closing point
+   * bigPoly.add(bigQuad.westmost); Point[] bigPolyArray =
+   * CoordinateArrays.toCoordinateArray(bigPoly); return bigPolyArray; } private
+   * BigQuad bigQuad(Point[] pts) { BigQuad bigQuad = new BigQuad();
+   * bigQuad.northmost = pts[0]; bigQuad.southmost = pts[0]; bigQuad.westmost =
+   * pts[0]; bigQuad.eastmost = pts[0]; for (int i = 1; i < pts.length; i++) {
+   * if (pts[i].x < bigQuad.westmost.x) { bigQuad.westmost = pts[i]; } if
+   * (pts[i].x > bigQuad.eastmost.x) { bigQuad.eastmost = pts[i]; } if (pts[i].y
+   * < bigQuad.southmost.y) { bigQuad.southmost = pts[i]; } if (pts[i].y >
+   * bigQuad.northmost.y) { bigQuad.northmost = pts[i]; } } return bigQuad; }
+   * private static class BigQuad { public Point northmost; public Point
+   * southmost; public Point westmost; public Coordinate eastmost; }
+   */
+
+  private Point[] padArray3(final Point[] pts) {
+    final Point[] pad = new Point[3];
     for (int i = 0; i < pad.length; i++) {
       if (i < pts.length) {
         pad[i] = pts[i];
@@ -369,32 +409,8 @@ public class ConvexHull {
     return pad;
   }
 
-  /*
-   * // MD - no longer used, but keep for reference purposes private
-   * Coordinates[] computeQuad(Coordinates[] inputPts) { BigQuad bigQuad =
-   * bigQuad(inputPts); // Build a linear ring defining a big poly. ArrayList
-   * bigPoly = new ArrayList(); bigPoly.add(bigQuad.westmost); if (!
-   * bigPoly.contains(bigQuad.northmost)) { bigPoly.add(bigQuad.northmost); } if
-   * (! bigPoly.contains(bigQuad.eastmost)) { bigPoly.add(bigQuad.eastmost); }
-   * if (! bigPoly.contains(bigQuad.southmost)) {
-   * bigPoly.add(bigQuad.southmost); } // points must all lie in a line if
-   * (bigPoly.size() < 3) { return null; } // closing point
-   * bigPoly.add(bigQuad.westmost); Coordinates[] bigPolyArray =
-   * CoordinateArrays.toCoordinateArray(bigPoly); return bigPolyArray; } private
-   * BigQuad bigQuad(Coordinates[] pts) { BigQuad bigQuad = new BigQuad();
-   * bigQuad.northmost = pts[0]; bigQuad.southmost = pts[0]; bigQuad.westmost =
-   * pts[0]; bigQuad.eastmost = pts[0]; for (int i = 1; i < pts.length; i++) {
-   * if (pts[i].x < bigQuad.westmost.x) { bigQuad.westmost = pts[i]; } if
-   * (pts[i].x > bigQuad.eastmost.x) { bigQuad.eastmost = pts[i]; } if (pts[i].y
-   * < bigQuad.southmost.y) { bigQuad.southmost = pts[i]; } if (pts[i].y >
-   * bigQuad.northmost.y) { bigQuad.northmost = pts[i]; } } return bigQuad; }
-   * private static class BigQuad { public Coordinates northmost; public
-   * Coordinates southmost; public Coordinates westmost; public Coordinate
-   * eastmost; }
-   */
-
-  private Coordinates[] preSort(final Coordinates[] pts) {
-    Coordinates t;
+  private Point[] preSort(final Point[] pts) {
+    Point t;
 
     // find the lowest point in the set. If two or more points have
     // the same minimum y coordinate choose the one with the minimu x.
@@ -434,10 +450,10 @@ public class ConvexHull {
    * @param pts the points to reduce
    * @return the reduced list of points (at least 3)
    */
-  private Coordinates[] reduce(final Coordinates[] inputPts) {
-    // Coordinates[] polyPts = computeQuad(inputPts);
-    final Coordinates[] polyPts = computeOctRing(inputPts);
-    // Coordinates[] polyPts = null;
+  private Point[] reduce(final Point[] inputPts) {
+    // Point[] polyPts = computeQuad(inputPts);
+    final Point[] polyPts = computeOctRing(inputPts);
+    // Point[] polyPts = null;
 
     // unable to compute interior polygon for some reason
     if (polyPts == null) {
@@ -448,7 +464,7 @@ public class ConvexHull {
     // System.out.println(ring);
 
     // add points defining polygon
-    final Set<Coordinates> reducedSet = new TreeSet<Coordinates>();
+    final Set<Point> reducedSet = new TreeSet<Point>();
     for (int i = 0; i < polyPts.length; i++) {
       reducedSet.add(polyPts[i]);
     }
@@ -463,7 +479,7 @@ public class ConvexHull {
         reducedSet.add(inputPts[i]);
       }
     }
-    final Coordinates[] reducedPts = CoordinateArrays.toCoordinateArray(reducedSet);
+    final Point[] reducedPts = CoordinateArrays.toCoordinateArray(reducedSet);
 
     // ensure that computed array has at least 3 points (not necessarily unique)
     if (reducedPts.length < 3) {
@@ -476,35 +492,12 @@ public class ConvexHull {
    * An alternative to Stack.toArray, which is not present in earlier versions
    * of Java.
    */
-  protected Coordinates[] toCoordinateArray(final Stack<Coordinates> stack) {
-    final Coordinates[] coordinates = new Coordinates[stack.size()];
+  protected Point[] toCoordinateArray(final Stack<Point> stack) {
+    final Point[] coordinates = new Point[stack.size()];
     for (int i = 0; i < stack.size(); i++) {
-      final Coordinates coordinate = stack.get(i);
+      final Point coordinate = stack.get(i);
       coordinates[i] = coordinate;
     }
     return coordinates;
-  }
-
-  /**
-   * Tests whether a point lies inside or on a ring. The ring may be oriented in
-   * either direction. A point lying exactly on the ring boundary is considered
-   * to be inside the ring.
-   * <p>
-   * This method does <i>not</i> first check the point against the envelope of
-   * the ring.
-   * 
-   * @param p
-   *          point to check for ring inclusion
-   * @param ring
-   *          an array of coordinates representing the ring (which must have
-   *          first point identical to last point)
-   * @return true if p is inside ring
-   * 
-   * @see locatePointInRing
-   */
-  public static boolean isPointInRing(final Coordinates p,
-    final Coordinates... ring) {
-    Location location = RayCrossingCounter.locatePointInRing(p, ring);
-    return location != Location.EXTERIOR;
   }
 }

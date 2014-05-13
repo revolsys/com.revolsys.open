@@ -42,7 +42,7 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.MCPointInRing;
 import com.revolsys.jts.algorithm.PointInRing;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -73,8 +73,8 @@ public class IsValidOp {
    *
    * @return the point found, or <code>null</code> if none found
    */
-  public static Coordinates findPtNotNode(
-    final Iterable<? extends Coordinates> testPoints,
+  public static Point findPtNotNode(
+    final Iterable<? extends Point> testPoints,
     final LinearRing searchRing, final GeometryGraph graph) {
     // find edge corresponding to searchRing.
     final Edge searchEdge = graph.findEdge(searchRing);
@@ -82,36 +82,12 @@ public class IsValidOp {
     final EdgeIntersectionList eiList = searchEdge.getEdgeIntersectionList();
     // somewhat inefficient - is there a better way? (Use a node map, for
     // instance?)
-    for (final Coordinates testPoint : testPoints) {
+    for (final Point testPoint : testPoints) {
       if (!eiList.isIntersection(testPoint)) {
         return testPoint.cloneCoordinates();
       }
     }
     return null;
-  }
-
-  /**
-   * Checks whether a coordinate is valid for processing.
-   * Coordinates are valid iff their x and y ordinates are in the
-   * range of the floating point representation.
-   *
-   * @param coord the coordinate to validate
-   * @return <code>true</code> if the coordinate is valid
-   */
-  public static boolean isValid(final Coordinates coord) {
-    if (Double.isNaN(coord.getX())) {
-      return false;
-    }
-    if (Double.isInfinite(coord.getX())) {
-      return false;
-    }
-    if (Double.isNaN(coord.getY())) {
-      return false;
-    }
-    if (Double.isInfinite(coord.getY())) {
-      return false;
-    }
-    return true;
   }
 
   /**
@@ -122,6 +98,30 @@ public class IsValidOp {
   public static boolean isValid(final Geometry geom) {
     final IsValidOp isValidOp = new IsValidOp(geom);
     return isValidOp.isValid();
+  }
+
+  /**
+   * Checks whether a coordinate is valid for processing.
+   * Point are valid iff their x and y ordinates are in the
+   * range of the floating point representation.
+   *
+   * @param vertex the coordinate to validate
+   * @return <code>true</code> if the coordinate is valid
+   */
+  public static boolean isValid(final Vertex vertex) {
+    if (Double.isNaN(vertex.getX())) {
+      return false;
+    }
+    if (Double.isInfinite(vertex.getX())) {
+      return false;
+    }
+    if (Double.isNaN(vertex.getY())) {
+      return false;
+    }
+    if (Double.isInfinite(vertex.getY())) {
+      return false;
+    }
+    return true;
   }
 
   private final Geometry geometry; // the base Geometry to be validated
@@ -153,7 +153,7 @@ public class IsValidOp {
     if (ring.isClosed()) {
       return true;
     } else {
-      Coordinates point = null;
+      Point point = null;
       if (ring.getVertexCount() >= 1) {
         point = ring.getCoordinate(0);
       }
@@ -231,7 +231,7 @@ public class IsValidOp {
     final PointInRing pir = new MCPointInRing(shell);
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
       final LinearRing hole = p.getInteriorRing(i);
-      final Coordinates holePt = findPtNotNode(hole.vertices(), shell, graph);
+      final Point holePt = findPtNotNode(hole.vertices(), shell, graph);
       /**
        * If no non-node hole vertex can be found, the hole must
        * split the polygon into disconnected interiors.
@@ -304,7 +304,7 @@ public class IsValidOp {
    */
   private boolean checkNoSelfIntersectingRing(final EdgeIntersectionList eiList) {
     boolean valid = true;
-    final Set<Coordinates> nodeSet = new TreeSet<>();
+    final Set<Point> nodeSet = new TreeSet<>();
     boolean isFirst = true;
     for (final EdgeIntersection ei : eiList) {
       if (isFirst) {
@@ -348,13 +348,13 @@ public class IsValidOp {
    * properly intersect.
    *
    * @return <code>null</code> if the shell is properly contained, or
-   *   a Coordinates which is not inside the hole if it is not
+   *   a Point which is not inside the hole if it is not
    *
    */
-  private Coordinates checkShellInsideHole(final LinearRing shell,
+  private Point checkShellInsideHole(final LinearRing shell,
     final LinearRing hole, final GeometryGraph graph) {
     // TODO: improve performance of this - by sorting pointlists for instance?
-    final Coordinates shellPt = findPtNotNode(shell.vertices(), hole, graph);
+    final Point shellPt = findPtNotNode(shell.vertices(), hole, graph);
     // if point is on shell but not hole, check that the shell is inside the
     // hole
     if (shellPt != null) {
@@ -363,7 +363,7 @@ public class IsValidOp {
         return shellPt;
       }
     }
-    final Coordinates holePt = findPtNotNode(hole.vertices(), shell, graph);
+    final Point holePt = findPtNotNode(hole.vertices(), shell, graph);
     // if point is on hole but not shell, check that the hole is outside the
     // shell
     if (holePt != null) {
@@ -390,7 +390,7 @@ public class IsValidOp {
     final Polygon polygon, final GeometryGraph graph) {
     // test if shell is inside polygon shell
     final LinearRing polyShell = polygon.getExteriorRing();
-    final Coordinates shellPt = findPtNotNode(shell.vertices(), polyShell,
+    final Point shellPt = findPtNotNode(shell.vertices(), polyShell,
       graph);
     // if no point could be found, we can assume that the shell is outside the
     // polygon
@@ -416,7 +416,7 @@ public class IsValidOp {
        * returns a null coordinate.
        * Otherwise, the shell is not properly contained in a hole, which is an error.
        */
-      Coordinates badNestedPt = null;
+      Point badNestedPt = null;
       for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
         final LinearRing hole = polygon.getInteriorRing(i);
         badNestedPt = checkShellInsideHole(shell, hole, graph);

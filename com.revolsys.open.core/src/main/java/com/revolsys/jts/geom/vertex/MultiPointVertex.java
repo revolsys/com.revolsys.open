@@ -22,7 +22,7 @@ public class MultiPointVertex extends AbstractVertex {
   }
 
   @Override
-  public double getValue(final int vertexIndex) {
+  public double getCoordinate(final int vertexIndex) {
     final MultiPoint geometry = getGeometry();
     return geometry.getCoordinate(this.partIndex, vertexIndex);
   }

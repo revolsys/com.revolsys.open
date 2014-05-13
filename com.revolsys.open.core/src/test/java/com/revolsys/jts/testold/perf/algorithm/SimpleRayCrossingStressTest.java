@@ -37,7 +37,7 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
@@ -55,7 +55,7 @@ public class SimpleRayCrossingStressTest extends TestCase {
     }
 
     @Override
-    public Location locate(final Coordinates p) {
+    public Location locate(final Point p) {
       final RayCrossingCounter rcc = new RayCrossingCounter(p);
       for (final Segment segment : geom.segments()) {
         rcc.countSegment(segment);

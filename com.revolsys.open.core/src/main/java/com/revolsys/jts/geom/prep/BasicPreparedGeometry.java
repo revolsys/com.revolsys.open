@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -158,8 +158,8 @@ class BasicPreparedGeometry implements PreparedGeometry {
    * 
    * @return a List of Coordinate
    */
-  public List<Coordinates> getRepresentativePoints() {
-    final List<Coordinates> points = new ArrayList<Coordinates>();
+  public List<Point> getRepresentativePoints() {
+    final List<Point> points = new ArrayList<Point>();
     for (final Vertex vertex : geometry.vertices()) {
       points.add(vertex.cloneCoordinates());
     }

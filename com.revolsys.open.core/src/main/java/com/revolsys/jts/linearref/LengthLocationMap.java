@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 
 /**
@@ -166,8 +166,8 @@ public class LengthLocationMap
         }
       }
       else {
-        Coordinates p0 = it.getSegmentStart();
-        Coordinates p1 = it.getSegmentEnd();
+        Point p0 = it.getSegmentStart();
+        Point p1 = it.getSegmentEnd();
         double segLen = p1.distance(p0);
         // length falls in this segment
         if (totalLength + segLen > length) {
@@ -208,8 +208,8 @@ public class LengthLocationMap
     LinearIterator it = new LinearIterator(linearGeom);
     while (it.hasNext()) {
       if (! it.isEndOfLine()) {
-        Coordinates p0 = it.getSegmentStart();
-        Coordinates p1 = it.getSegmentEnd();
+        Point p0 = it.getSegmentStart();
+        Point p1 = it.getSegmentEnd();
         double segLen = p1.distance(p0);
         // length falls in this segment
         if (loc.getComponentIndex() == it.getComponentIndex()

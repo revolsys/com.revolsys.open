@@ -3,37 +3,14 @@ package com.revolsys.gis.model.coordinates;
 import java.io.Serializable;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.AbstractPoint;
 import com.revolsys.util.MathUtil;
 
-public class DoubleCoordinates extends AbstractCoordinates implements
-  Serializable {
+public class DoubleCoordinates extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final double[] coordinates;
-
-  public DoubleCoordinates(final Coordinates coordinates) {
-    final int axisCount = coordinates.getAxisCount();
-    this.coordinates = new double[axisCount];
-    for (int i = 0; i < axisCount; i++) {
-      final double value = coordinates.getValue(i);
-      this.coordinates[i] = value;
-    }
-  }
-
-  public DoubleCoordinates(final Coordinates point, final int axisCount) {
-    this(axisCount);
-    final int pointAxisCount = point.getAxisCount();
-    for (int i = 0; i < axisCount; i++) {
-      final double value;
-      if (i < pointAxisCount) {
-        value = point.getValue(i);
-      } else {
-        value = Double.NaN;
-      }
-      this.coordinates[i] = value;
-    }
-  }
 
   public DoubleCoordinates(final double... coordinates) {
     this(coordinates.length, coordinates);
@@ -53,9 +30,27 @@ public class DoubleCoordinates extends AbstractCoordinates implements
     this(MathUtil.toDoubleArray(coordinates));
   }
 
-  @Override
-  public DoubleCoordinates cloneCoordinates() {
-    return new DoubleCoordinates(coordinates);
+  public DoubleCoordinates(final Point coordinates) {
+    final int axisCount = coordinates.getAxisCount();
+    this.coordinates = new double[axisCount];
+    for (int i = 0; i < axisCount; i++) {
+      final double value = coordinates.getCoordinate(i);
+      this.coordinates[i] = value;
+    }
+  }
+
+  public DoubleCoordinates(final Point point, final int axisCount) {
+    this(axisCount);
+    final int pointAxisCount = point.getAxisCount();
+    for (int i = 0; i < axisCount; i++) {
+      final double value;
+      if (i < pointAxisCount) {
+        value = point.getCoordinate(i);
+      } else {
+        value = Double.NaN;
+      }
+      this.coordinates[i] = value;
+    }
   }
 
   @Override
@@ -64,20 +59,20 @@ public class DoubleCoordinates extends AbstractCoordinates implements
   }
 
   @Override
-  public double[] getCoordinates() {
-    final double[] coordinates = new double[this.coordinates.length];
-    System.arraycopy(this.coordinates, 0, coordinates, 0,
-      this.coordinates.length);
-    return coordinates;
-  }
-
-  @Override
-  public double getValue(final int index) {
+  public double getCoordinate(final int index) {
     if (index >= 0 && index < getAxisCount()) {
       return coordinates[index];
     } else {
       return Double.NaN;
     }
+  }
+
+  @Override
+  public double[] getCoordinates() {
+    final double[] coordinates = new double[this.coordinates.length];
+    System.arraycopy(this.coordinates, 0, coordinates, 0,
+      this.coordinates.length);
+    return coordinates;
   }
 
 }

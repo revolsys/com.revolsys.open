@@ -17,7 +17,7 @@ package com.revolsys.gis.tin;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -31,14 +31,14 @@ public class Circle extends DoubleCoordinates {
 
   private final double tolerance = 0.0001;
 
-  public Circle(final Coordinates centre, final double radius) {
+  public Circle(final Point centre, final double radius) {
     super(centre);
     this.radius = radius;
     this.envelope = new Envelope(2, getX(), getY());
     envelope = envelope.expand(radius);
   }
 
-  public boolean contains(final Coordinates point) {
+  public boolean contains(final Point point) {
     final double distanceFromCentre = distance(point);
     return distanceFromCentre < (this.radius + tolerance);
   }

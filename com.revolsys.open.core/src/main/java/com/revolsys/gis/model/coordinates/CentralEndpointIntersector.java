@@ -32,7 +32,7 @@
  */
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Computes an approximate intersection of two line segments
@@ -53,7 +53,7 @@ import com.revolsys.jts.geom.Coordinates;
  * @version 1.8
  */
 public class CentralEndpointIntersector {
-  private static Coordinates average(final Coordinates[] pts) {
+  private static Point average(final Point[] pts) {
     double averageX = 0;
     double averageY = 0;
     final int n = pts.length;
@@ -68,27 +68,27 @@ public class CentralEndpointIntersector {
     return new DoubleCoordinates(averageX, averageY);
   }
 
-  public static Coordinates getIntersection(final Coordinates p00,
-    final Coordinates p01, final Coordinates p10, final Coordinates p11) {
+  public static Point getIntersection(final Point p00,
+    final Point p01, final Point p10, final Point p11) {
     final CentralEndpointIntersector intor = new CentralEndpointIntersector(
       p00, p01, p10, p11);
     return intor.getIntersection();
   }
 
-  private final Coordinates[] pts;
+  private final Point[] pts;
 
-  private Coordinates intPt = null;
+  private Point intPt = null;
 
-  public CentralEndpointIntersector(final Coordinates p00,
-    final Coordinates p01, final Coordinates p10, final Coordinates p11) {
-    pts = new Coordinates[] {
+  public CentralEndpointIntersector(final Point p00,
+    final Point p01, final Point p10, final Point p11) {
+    pts = new Point[] {
       p00, p01, p10, p11
     };
     compute();
   }
 
   private void compute() {
-    final Coordinates centroid = average(pts);
+    final Point centroid = average(pts);
     intPt = findNearestPoint(centroid, pts);
   }
 
@@ -102,10 +102,10 @@ public class CentralEndpointIntersector {
    * @param q2 a potential result point
    * @return the point closest to the input point p
    */
-  private Coordinates findNearestPoint(final Coordinates p,
-    final Coordinates[] pts) {
+  private Point findNearestPoint(final Point p,
+    final Point[] pts) {
     double minDist = Double.MAX_VALUE;
-    Coordinates result = null;
+    Point result = null;
     for (int i = 0; i < pts.length; i++) {
       final double dist = p.distance(pts[i]);
       if (dist < minDist) {
@@ -116,7 +116,7 @@ public class CentralEndpointIntersector {
     return result;
   }
 
-  public Coordinates getIntersection() {
+  public Point getIntersection() {
     return intPt;
   }
 

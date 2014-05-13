@@ -1,7 +1,7 @@
 package com.revolsys.gis.model.coordinates.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.LineSegment;
 
@@ -19,7 +19,7 @@ public class CrossingLineSegmentFilter implements Filter<LineSegment> {
     } else {
       final CoordinatesList intersections = this.line.getIntersection(line);
       if (intersections.size() == 1) {
-        final Coordinates intersection = intersections.get(0);
+        final Point intersection = intersections.get(0);
         if (this.line.contains(intersection)) {
           return false;
         } else {

@@ -8,7 +8,7 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.TestConstants;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -24,7 +24,7 @@ public class PointTest implements TestConstants {
     Assert.assertEquals("Vertex Count", coordinates.length,
       point.getAxisCount());
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
-      final double value = point.getValue(axisIndex);
+      final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
         if (!Double.isNaN(value)) {
           TestUtil.failNotEquals("Value NaN", Double.NaN, value);
@@ -43,7 +43,7 @@ public class PointTest implements TestConstants {
     Assert.assertNull("Null First Segment", point.getSegment(0));
 
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
-      final double value = point.getValue(axisIndex);
+      final double value = point.getCoordinate(axisIndex);
       if (!Double.isNaN(value)) {
         TestUtil.failNotEquals("Value NaN", Double.NaN, value);
       }
@@ -138,7 +138,7 @@ public class PointTest implements TestConstants {
       final Point pointEmpty = geometryFactory.point();
       assertEmpty(pointEmpty);
 
-      final Point pointCoordinatesNull = geometryFactory.point((Coordinates)null);
+      final Point pointCoordinatesNull = geometryFactory.point((Point)null);
       assertEmpty(pointCoordinatesNull);
 
       final Point pointCoordinatesSize0 = geometryFactory.point(new DoubleCoordinates(

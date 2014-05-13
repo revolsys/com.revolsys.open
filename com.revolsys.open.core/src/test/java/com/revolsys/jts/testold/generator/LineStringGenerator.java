@@ -33,7 +33,7 @@
 package com.revolsys.jts.testold.generator;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -49,7 +49,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  */
 public class LineStringGenerator extends GeometryGenerator {
   private static void fillArc(final double x, final double dx, final double y,
-    final double dy, final Coordinates[] coords, final GeometryFactory gf) {
+    final double dy, final Point[] coords, final GeometryFactory gf) {
     if (coords.length == 2) {
       throw new IllegalStateException("Too few points for Arc");
     }
@@ -74,7 +74,7 @@ public class LineStringGenerator extends GeometryGenerator {
   }
 
   private static void fillHorz(final double x, final double dx, final double y,
-    final double dy, final Coordinates[] coords, final GeometryFactory gf) {
+    final double dy, final Point[] coords, final GeometryFactory gf) {
     final double fy = y + Math.random() * dy;
     double rx = dx; // remainder of x distance
     coords[0] = new DoubleCoordinates(gf.makePrecise(0, x), gf.makePrecise(1,
@@ -89,7 +89,7 @@ public class LineStringGenerator extends GeometryGenerator {
   }
 
   private static void fillVert(final double x, final double dx, final double y,
-    final double dy, final Coordinates[] coords, final GeometryFactory gf) {
+    final double dy, final Point[] coords, final GeometryFactory gf) {
     final double fx = x + Math.random() * dx;
     double ry = dy; // remainder of y distance
 
@@ -166,7 +166,7 @@ public class LineStringGenerator extends GeometryGenerator {
       throw new IllegalStateException("Too few points");
     }
 
-    final Coordinates[] coords = new Coordinates[this.numberPoints];
+    final Point[] coords = new Point[this.numberPoints];
 
     final double x = this.boundingBox.getMinX(); // base x
     final double dx = this.boundingBox.getMaxX() - x;

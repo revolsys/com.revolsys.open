@@ -2,15 +2,15 @@ package com.revolsys.gis.graph.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 
 public class NodeCoordinatesFilter<T> implements Filter<Node<T>> {
-  private Filter<Coordinates> filter;
+  private Filter<Point> filter;
 
   public NodeCoordinatesFilter() {
   }
 
-  public NodeCoordinatesFilter(final Filter<Coordinates> filter) {
+  public NodeCoordinatesFilter(final Filter<Point> filter) {
     this.filter = filter;
   }
 
@@ -19,11 +19,11 @@ public class NodeCoordinatesFilter<T> implements Filter<Node<T>> {
     return filter.accept(node);
   }
 
-  public Filter<Coordinates> getFilter() {
+  public Filter<Point> getFilter() {
     return filter;
   }
 
-  public void setFilter(final Filter<Coordinates> filter) {
+  public void setFilter(final Filter<Point> filter) {
     this.filter = filter;
   }
 }

@@ -43,6 +43,7 @@ import junit.framework.Test;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.util.NoOp;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
@@ -64,7 +65,7 @@ public class TestCase extends junit.framework.TestSuite implements
 
   private Geometry b;
 
-  private final TestFile testRun;
+  private final TestFile testFile;
 
   private final int caseIndex;
 
@@ -77,19 +78,23 @@ public class TestCase extends junit.framework.TestSuite implements
    *  to a and b.
    */
   public TestCase(final String description, final Geometry a, final Geometry b,
-    final File aWktFile, final File bWktFile, final TestFile testRun,
+    final File aWktFile, final File bWktFile, final TestFile testFile,
     final int caseIndex, final int lineNumber) {
+    this.testFile = testFile;
+    this.caseIndex = caseIndex;
     if (StringUtils.hasText(description)) {
-      this.testDescription = description.replaceAll("\\s+", " ");
-      setName(testDescription);
+      if (description.startsWith("P/L-2")) {
+        NoOp.noOp();
+      }
+      this.testDescription = description.replaceAll("\\s+", " ").replaceAll(
+        "[^A-Za-z0-9\\-_ ]", " ");
+      setName(getId() + "." + testDescription);
     } else {
-      setName(testRun.getName() + "_" + String.valueOf(caseIndex));
+      setName(getId() + ".");
 
     }
     this.a = a;
     this.b = b;
-    this.testRun = testRun;
-    this.caseIndex = caseIndex;
   }
 
   /**
@@ -115,6 +120,10 @@ public class TestCase extends junit.framework.TestSuite implements
     return geometryFactory;
   }
 
+  public String getId() {
+    return testFile.getId() + "." + caseIndex;
+  }
+
   public int getLineNumber() {
     return 0;
   }
@@ -133,7 +142,7 @@ public class TestCase extends junit.framework.TestSuite implements
   }
 
   public TestFile getTestRun() {
-    return testRun;
+    return testFile;
   }
 
   public List<GeometryOperationTest> getTests() {
@@ -171,8 +180,8 @@ public class TestCase extends junit.framework.TestSuite implements
     }
     MapSerializerUtil.add(map, "geometryFactory", geometryFactory);
     final Map<String, Object> properties = new LinkedHashMap<String, Object>();
-    if (testRun != null) {
-      MapSerializerUtil.addAll(properties, testRun.getProperties());
+    if (testFile != null) {
+      MapSerializerUtil.addAll(properties, testFile.getProperties());
     }
     MapSerializerUtil.add(properties, "a", a);
     MapSerializerUtil.add(properties, "b", b);

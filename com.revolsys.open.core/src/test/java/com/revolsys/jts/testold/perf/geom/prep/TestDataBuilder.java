@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.util.SineStarFactory;
@@ -46,7 +46,7 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 public class TestDataBuilder {
   private GeometryFactory geomFact = GeometryFactory.getFactory();
 
-  private Coordinates origin = new Coordinate((double)0, 0, Coordinates.NULL_ORDINATE);
+  private Point origin = new Coordinate((double)0, 0, Point.NULL_ORDINATE);
 
   private double size = 100.0;
 
@@ -69,7 +69,7 @@ public class TestDataBuilder {
     return circle;
   }
 
-  Geometry createLine(final Coordinates base, final double size, final int nPts) {
+  Geometry createLine(final Point base, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
@@ -100,8 +100,8 @@ public class TestDataBuilder {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Coordinates base = new Coordinate((double)env.getMinX() + i * xInc,
-          env.getMinY() + j * yInc, Coordinates.NULL_ORDINATE);
+        final Point base = new Coordinate((double)env.getMinX() + i * xInc,
+          env.getMinY() + j * yInc, Point.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);
       }
@@ -109,7 +109,7 @@ public class TestDataBuilder {
     return geoms;
   }
 
-  public void setExtent(final Coordinates origin, final double size) {
+  public void setExtent(final Point origin, final double size) {
     this.origin = origin;
     this.size = size;
   }

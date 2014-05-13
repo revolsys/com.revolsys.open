@@ -42,7 +42,7 @@ import java.util.TreeMap;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.Assert;
 
 // INCOMPLETE!
@@ -140,7 +140,7 @@ public class SegmentNodeList {
    *
    * @return the SegmentIntersection found or added
    */
-  public SegmentNode add(final Coordinates intPt, final int segmentIndex) {
+  public SegmentNode add(final Point intPt, final int segmentIndex) {
     final SegmentNode eiNew = new SegmentNode(edge, intPt, segmentIndex,
       edge.getSegmentOctant(segmentIndex));
     final SegmentNode ei = (SegmentNode)nodeMap.get(eiNew);
@@ -225,7 +225,7 @@ public class SegmentNodeList {
     // Debug.println("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
 
-    final Coordinates lastSegStartPt = edge.getCoordinate(ei1.segmentIndex);
+    final Point lastSegStartPt = edge.getCoordinate(ei1.segmentIndex);
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally
@@ -243,7 +243,7 @@ public class SegmentNodeList {
     int ipt = 0;
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei0.coord);
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
-      final Coordinates point = edge.getCoordinate(i);
+      final Point point = edge.getCoordinate(i);
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, point);
     }
     if (useIntPt1) {
@@ -284,9 +284,9 @@ public class SegmentNodeList {
   private void findCollapsesFromExistingVertices(
     final List collapsedVertexIndexes) {
     for (int i = 0; i < edge.size() - 2; i++) {
-      final Coordinates p0 = edge.getCoordinate(i);
-      final Coordinates p1 = edge.getCoordinate(i + 1);
-      final Coordinates p2 = edge.getCoordinate(i + 2);
+      final Point p0 = edge.getCoordinate(i);
+      final Point p1 = edge.getCoordinate(i + 1);
+      final Point p2 = edge.getCoordinate(i + 2);
       if (p0.equals2d(p2)) {
         // add base of collapse as node
         collapsedVertexIndexes.add(new Integer(i + 1));

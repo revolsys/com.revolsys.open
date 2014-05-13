@@ -37,7 +37,7 @@ import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -358,13 +358,13 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected LineString createXorLine(final GeometryFactory geometryFactory,
-    final Coordinates c0, final Point p1) {
+    final Point c0, final Point p1) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     final LineSegment line = new LineSegmentImpl(geometryFactory, c0, p1).convert(viewportGeometryFactory);
     final double length = line.getLength();
     final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
-    final Coordinates newC1 = line.pointAlongOffset((length - cursorRadius)
+    final Point newC1 = line.pointAlongOffset((length - cursorRadius)
       / length, 0);
     Point point = viewportGeometryFactory.point(newC1);
     point = (Point)point.copy(geometryFactory);
@@ -405,7 +405,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     } else if (toPointDistance <= maxDistance) {
       return toPoint;
     } else {
-      final Coordinates pointOnLine = segment.project(point);
+      final Point pointOnLine = segment.project(point);
       return geometryFactory.point(pointOnLine);
     }
   }
@@ -494,8 +494,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       final int pointIndex = index[index.length - 1];
       int previousPointIndex = pointIndex + previousPointOffset;
       int nextPointIndex = pointIndex + nextPointOffset;
-      Coordinates previousPoint = null;
-      Coordinates nextPoint = null;
+      Point previousPoint = null;
+      Point nextPoint = null;
 
       final int numPoints = points.size();
       if (DataTypes.LINE_STRING.equals(geometryPartDataType)) {
@@ -674,7 +674,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           if (this.addGeometry.isEmpty()) {
             setAddGeometry(appendVertex(point));
           } else {
-            final Coordinates previousPoint = GeometryEditUtil.getVertex(
+            final Point previousPoint = GeometryEditUtil.getVertex(
               this.addGeometry, this.addGeometryPartIndex, -1);
             if (!CoordinatesUtil.getInstance(point).equals(previousPoint)) {
               final Geometry newGeometry = appendVertex(point);
@@ -714,20 +714,20 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         } else if (!hasSnapPoint(event, boundingBox)) {
           setMapCursor(CURSOR_NODE_ADD);
         }
-        final Coordinates firstPoint = GeometryEditUtil.getVertex(
+        final Point firstPoint = GeometryEditUtil.getVertex(
           this.addGeometry, this.addGeometryPartIndex, 0);
         Geometry xorGeometry = null;
         if (DataTypes.POINT.equals(this.addGeometryPartDataType)) {
         } else {
           final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
           if (DataTypes.LINE_STRING.equals(this.addGeometryPartDataType)) {
-            final Coordinates previousPoint = GeometryEditUtil.getVertex(
+            final Point previousPoint = GeometryEditUtil.getVertex(
               this.addGeometry, this.addGeometryPartIndex, -1);
             if (previousPoint != null) {
               xorGeometry = createXorLine(geometryFactory, previousPoint, point);
             }
           } else if (DataTypes.POLYGON.equals(this.addGeometryPartDataType)) {
-            final Coordinates previousPoint = GeometryEditUtil.getVertex(
+            final Point previousPoint = GeometryEditUtil.getVertex(
               this.addGeometry, this.addGeometryPartIndex, -1);
             if (previousPoint != null) {
               if (previousPoint.equals(firstPoint)) {
@@ -1107,7 +1107,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           }
           final int[] vertexIndex = location.getVertexIndex();
           Geometry newGeometry;
-          final Coordinates newPoint = CoordinatesUtil.getInstance(point);
+          final Point newPoint = CoordinatesUtil.getInstance(point);
           if (vertexIndex == null) {
             final int[] segmentIndex = location.getSegment().getIndex();
             final int[] newIndex = segmentIndex.clone();

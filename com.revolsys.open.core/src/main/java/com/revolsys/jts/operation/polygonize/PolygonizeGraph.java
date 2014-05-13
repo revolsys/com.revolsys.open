@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
@@ -292,8 +292,8 @@ class PolygonizeGraph extends PlanarGraph {
       return;
     }
 
-    final Coordinates startPt = cleanLine.getVertex(0).cloneCoordinates();
-    final Coordinates endPt = cleanLine.getVertex(-1).cloneCoordinates();
+    final Point startPt = cleanLine.getVertex(0).cloneCoordinates();
+    final Point endPt = cleanLine.getVertex(-1).cloneCoordinates();
 
     final Node nStart = getNode(startPt);
     final Node nEnd = getNode(endPt);
@@ -493,7 +493,7 @@ class PolygonizeGraph extends PlanarGraph {
     return edgeRingList;
   }
 
-  private Node getNode(final Coordinates pt) {
+  private Node getNode(final Point pt) {
     Node node = findNode(pt);
     if (node == null) {
       node = new Node(pt);

@@ -7,7 +7,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.gml.GmlConstants;
 import com.revolsys.io.gml.GmlDataObjectWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -24,14 +24,14 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     super(dataType, "xs:" + dataType.getName());
   }
 
-  private void coordinates(final XmlWriter out, final Coordinates point) {
+  private void coordinates(final XmlWriter out, final Point point) {
     out.startTag(GmlConstants.COORDINATES);
     final int axisCount = point.getAxisCount();
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       if (axisIndex > 0) {
         out.text(",");
       }
-      final double value = point.getValue(axisIndex);
+      final double value = point.getCoordinate(axisIndex);
       number(out, value);
     }
     out.endTag(GmlConstants.COORDINATES);
@@ -184,7 +184,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(POLYGON);
   }
 
-  private void pos(final XmlWriter out, final Coordinates coordinates) {
+  private void pos(final XmlWriter out, final Point coordinates) {
     out.startTag(GmlConstants.POS);
     final int axisCount = coordinates.getAxisCount();
     out.attribute(GmlConstants.DIMENSION, axisCount);

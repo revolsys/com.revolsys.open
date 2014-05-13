@@ -9,7 +9,7 @@ import java.util.Stack;
 import com.revolsys.jts.edgegraph.HalfEdge;
 import com.revolsys.jts.edgegraph.MarkHalfEdge;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Coordinates;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
