@@ -1,5 +1,6 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,12 +11,13 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
 
-public class QuadTree<T> {
-  public static com.revolsys.jts.geom.BoundingBox ensureExtent(
-    final BoundingBox envelope, final double minExtent) {
+public class QuadTree<T> implements SpatialIndex<T>, Serializable {
+  public static BoundingBox ensureExtent(final BoundingBox envelope,
+    final double minExtent) {
     double minX = envelope.getMinX();
     double maxX = envelope.getMaxX();
     double minY = envelope.getMinY();
@@ -87,6 +89,7 @@ public class QuadTree<T> {
     return size;
   }
 
+  @Override
   public void insert(BoundingBox boundingBox, final T item) {
     if (boundingBox == null) {
       throw new IllegalArgumentException("Item envelope must not be null");
@@ -99,6 +102,7 @@ public class QuadTree<T> {
     }
   }
 
+  @Override
   public List<T> query(final BoundingBox boundingBox) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
     query(boundingBox, visitor);
@@ -153,6 +157,7 @@ public class QuadTree<T> {
     }
   }
 
+  @Override
   public boolean remove(BoundingBox boundingBox, final T item) {
     boundingBox = convert(boundingBox);
     final BoundingBox posEnv = ensureExtent(boundingBox, minExtent);

@@ -354,7 +354,6 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
   /**
    * Returns items whose bounds intersect the given envelope.
    */
-  @Override
   public void query(final BoundingBox searchEnv, final ItemVisitor visitor) {
     // Yes this method does something. It specifies that the bounds is an
     // Envelope. super.query takes an Object, not an Envelope. [Jon Aquino

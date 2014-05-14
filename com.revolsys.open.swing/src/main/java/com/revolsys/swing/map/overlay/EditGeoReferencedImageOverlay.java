@@ -18,10 +18,8 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -136,7 +134,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           if (snapPoint != null) {
             mapPoint = snapPoint;
           }
-          final Point sourcePoint = CoordinatesUtil.getInstance(this.addTiePointFirstPoint);
+          final Point sourcePoint = this.addTiePointFirstPoint;
           final WarpFilter warpFilter = layer.getWarpFilter();
           final Point sourcePixel = warpFilter.targetPointToSourcePixel(sourcePoint);
           final MappedLocation mappedLocation = new MappedLocation(sourcePixel,
@@ -208,8 +206,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         }
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
-      moveImageBoundingBox = new Envelope(geometryFactory, 2, minX, minY,
-        maxX, maxY);
+      moveImageBoundingBox = new Envelope(geometryFactory, 2, minX, minY, maxX,
+        maxY);
     }
   }
 
@@ -531,7 +529,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       return false;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point mousePoint = CoordinatesUtil.getInstance(getViewportPoint(event));
+      final Point mousePoint = getViewportPoint(event);
       moveImageBoundingBox = new Envelope(geometryFactory, mousePoint,
         this.moveCornerOppositePoint);
 
@@ -583,7 +581,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       int closestIndex = -1;
       for (int i = 0; i < 4; i++) {
         final Point point = getImageBoundingBox().getCornerPoint(i);
-        final double distance = point.distance(CoordinatesUtil.getInstance(mousePoint));
+        final double distance = point.distance(mousePoint);
         if (distance < maxDistance && distance < closestDistance) {
           closestPoint = geometryFactory.point(point);
           closestDistance = distance;
@@ -739,7 +737,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
       if (tiePoint != null) {
         Point point = getPoint(event);
         if (moveTiePointSource) {
-          final Point sourcePoint = CoordinatesUtil.getInstance(point);
+          final Point sourcePoint = point;
           final WarpFilter warpFilter = layer.getWarpFilter();
           final Point sourcePixel = warpFilter.targetPointToSourcePixel(sourcePoint);
 

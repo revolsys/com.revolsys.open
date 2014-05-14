@@ -35,8 +35,8 @@ package com.revolsys.jts.testold.index;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.index.quadtree.Quadtree;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
@@ -65,9 +65,9 @@ public class QuadtreeCorrectTest {
     test.run();
   }
 
-  EnvelopeList envList = new EnvelopeList();
+  private final EnvelopeList envList = new EnvelopeList();
 
-  Quadtree q = new Quadtree();
+  private final QuadTree<Envelope> index = new QuadTree<>();
 
   public QuadtreeCorrectTest() {
   }
@@ -84,7 +84,7 @@ public class QuadtreeCorrectTest {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
         final Envelope env = new Envelope(2, x, y, x + cellSize, y + cellSize);
-        this.q.insert(env, env);
+        this.index.insert(env, env);
         this.envList.add(env);
       }
     }
@@ -127,7 +127,7 @@ public class QuadtreeCorrectTest {
   }
 
   void queryTest(final Envelope env) {
-    final List candidateList = this.q.query(env);
+    final List candidateList = this.index.query(env);
     final List finalList = getOverlapping(candidateList, env);
 
     final List eList = this.envList.query(env);

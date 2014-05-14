@@ -1,9 +1,7 @@
 package com.revolsys.gis.jts;
 
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -14,7 +12,8 @@ import com.revolsys.jts.geom.Polygon;
 public class PointUtil {
 
   public static Point createRandomPoint(
-    final com.revolsys.jts.geom.GeometryFactory factory, final BoundingBox envelope) {
+    final com.revolsys.jts.geom.GeometryFactory factory,
+    final BoundingBox envelope) {
     final double x = envelope.getMinX() + envelope.getWidth() * Math.random();
     final double y = envelope.getMinY() + envelope.getHeight() * Math.random();
     final CoordinatesList coordinatesList = new DoubleCoordinatesList(2, x, y);
@@ -41,13 +40,10 @@ public class PointUtil {
   }
 
   public static Point getPointWithin(final Polygon polygon) {
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(polygon);
+    final GeometryFactory factory = polygon.getGeometryFactory();
     final Point centroid = polygon.getCentroid();
     if (centroid.within(polygon)) {
-      final Point coordinates = CoordinatesUtil.getInstance(centroid);
-      final CoordinatesList coordinatesList = new DoubleCoordinatesList(2,
-        coordinates.getX(), coordinates.getY());
-      return factory.point(coordinatesList);
+      return centroid;
     } else {
       final BoundingBox envelope = polygon.getBoundingBox();
       Point point = createRandomPoint(factory, envelope);

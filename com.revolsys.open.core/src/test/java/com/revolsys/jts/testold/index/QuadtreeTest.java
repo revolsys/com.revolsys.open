@@ -34,7 +34,8 @@ package com.revolsys.jts.testold.index;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.index.quadtree.Quadtree;
+import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.testold.util.SerializationUtil;
 
 /**
@@ -42,24 +43,17 @@ import com.revolsys.jts.testold.util.SerializationUtil;
  */
 public class QuadtreeTest extends TestCase {
 
-  public static void main(final String[] args) {
-    final String[] testCaseName = {
-      QuadtreeTest.class.getName()
-    };
-    junit.textui.TestRunner.main(testCaseName);
-  }
-
-  public QuadtreeTest(final String Name_) {
-    super(Name_);
+  public QuadtreeTest(final String name) {
+    super(name);
   }
 
   public void testSerialization() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
-    tester.setSpatialIndex(new Quadtree());
+    tester.setSpatialIndex(new QuadTree<Envelope>());
     tester.init();
-    Quadtree tree = (Quadtree)tester.getSpatialIndex();
+    QuadTree<Envelope> tree = (QuadTree<Envelope>)tester.getSpatialIndex();
     final byte[] data = SerializationUtil.serialize(tree);
-    tree = (Quadtree)SerializationUtil.deserialize(data);
+    tree = (QuadTree<Envelope>)SerializationUtil.deserialize(data);
     tester.setSpatialIndex(tree);
     tester.run();
     assertTrue(tester.isSuccess());
@@ -67,7 +61,7 @@ public class QuadtreeTest extends TestCase {
 
   public void testSpatialIndex() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
-    tester.setSpatialIndex(new Quadtree());
+    tester.setSpatialIndex(new QuadTree<Envelope>());
     tester.init();
     tester.run();
     assertTrue(tester.isSuccess());

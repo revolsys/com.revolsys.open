@@ -5,12 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.index.quadtree.Quadtree;
 import com.revolsys.visitor.CreateListVisitor;
 
-public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
-  IdObjectIndex<T> {
+public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
+
+  private QuadTree<Integer> index;
 
   public void add(final Collection<Integer> ids) {
     for (final Integer id : ids) {
@@ -23,7 +24,7 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
   public T add(final T object) {
     final BoundingBox envelope = getEnvelope(object);
     final int id = getId(object);
-    insert(envelope, id);
+    index.insert(envelope, id);
     return object;
   }
 
@@ -39,10 +40,8 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
     return visitor.getList();
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
   public List<T> queryAll() {
-    final List<Integer> ids = super.queryAll();
+    final List<Integer> ids = index.queryAll();
     return getObjects(ids);
   }
 
@@ -50,7 +49,7 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
   public boolean remove(final T object) {
     final BoundingBox envelope = getEnvelope(object);
     final int id = getId(object);
-    return remove(envelope, id);
+    return index.remove(envelope, id);
   }
 
   public void removeAll(final Collection<T> objects) {
@@ -63,7 +62,7 @@ public abstract class AbstractIdObjectQuadTree<T> extends Quadtree implements
   public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
     final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(
       this, envelope, visitor);
-    query(envelope, itemVisitor);
+    index.query(envelope, itemVisitor);
   }
 
 }

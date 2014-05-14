@@ -35,11 +35,9 @@ import com.revolsys.gis.algorithm.index.PointQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.IndexedLineSegment;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.comparator.GeometryDistanceComparator;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -135,7 +133,7 @@ public class AbstractOverlay extends JComponent implements
           text.append("</td><td style=\"border-right: solid black 1px\">");
           text.append(location.getIndexString());
           text.append("</td></td>");
-          text.append(CoordinatesUtil.getInstance(location.getPoint()));
+          text.append(location.getPoint());
           text.append("</td></tr>");
         }
         text.append("</tbody></table>");

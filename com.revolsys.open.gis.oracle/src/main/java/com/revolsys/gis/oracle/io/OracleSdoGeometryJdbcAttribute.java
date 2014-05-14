@@ -17,11 +17,9 @@ import oracle.sql.STRUCT;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -308,9 +306,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     int k = 0;
     for (int i = 0; i < numPoints; i++) {
       final Point point = (Point)multiPoint.getGeometry(i);
-      final Point coordinates = CoordinatesUtil.getInstance(point);
       for (int j = 0; j < axisCount; j++) {
-        final double value = coordinates.getCoordinate(j);
+        final double value = point.getCoordinate(j);
         if (Double.isNaN(value)) {
           points[k] = 0;
         } else {

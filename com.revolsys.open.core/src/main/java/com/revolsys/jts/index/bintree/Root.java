@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,7 +32,7 @@
  */
 package com.revolsys.jts.index.bintree;
 
-import com.revolsys.jts.index.quadtree.IntervalSize;
+import com.revolsys.jts.index.IntervalSize;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -43,23 +42,19 @@ import com.revolsys.jts.util.Assert;
  *
  * @version 1.7
  */
-public class Root
-  extends NodeBase
-{
+public class Root extends NodeBase {
 
   // the singleton root node is centred at the origin.
   private static final double origin = 0.0;
 
-  public Root()
-  {
+  public Root() {
   }
 
   /**
    * Insert an item into the tree this is the root of.
    */
-  public void insert(Interval itemInterval, Object item)
-  {
-    int index = getSubnodeIndex(itemInterval, origin);
+  public void insert(final Interval itemInterval, final Object item) {
+    final int index = getSubnodeIndex(itemInterval, origin);
     // if index is -1, itemEnv must contain the origin.
     if (index == -1) {
       add(item);
@@ -69,22 +64,22 @@ public class Root
      * the item must be contained in one interval, so insert it into the
      * tree for that interval (which may not yet exist)
      */
-    Node node = subnode[index];
+    final Node node = subnode[index];
     /**
      *  If the subnode doesn't exist or this item is not contained in it,
      *  have to expand the tree upward to contain the item.
      */
 
-    if (node == null || ! node.getInterval().contains(itemInterval)) {
-       Node largerNode = Node.createExpanded(node, itemInterval);
-       subnode[index] = largerNode;
+    if (node == null || !node.getInterval().contains(itemInterval)) {
+      final Node largerNode = Node.createExpanded(node, itemInterval);
+      subnode[index] = largerNode;
     }
     /**
      * At this point we have a subnode which exists and must contain
      * contains the env for the item.  Insert the item into the tree.
      */
     insertContained(subnode[index], itemInterval, item);
-//System.out.println("depth = " + root.depth() + " size = " + root.size());
+    // System.out.println("depth = " + root.depth() + " size = " + root.size());
   }
 
   /**
@@ -92,30 +87,31 @@ public class Root
    * the given Node.  Lower levels of the tree will be created
    * if necessary to hold the item.
    */
-  private void insertContained(Node tree, Interval itemInterval, Object item)
-  {
+  private void insertContained(final Node tree, final Interval itemInterval,
+    final Object item) {
     Assert.isTrue(tree.getInterval().contains(itemInterval));
-   /**
-    * Do NOT create a new node for zero-area intervals - this would lead
-    * to infinite recursion. Instead, use a heuristic of simply returning
-    * the smallest existing node containing the query
-    */
-    boolean isZeroArea = IntervalSize.isZeroWidth(itemInterval.getMin(), itemInterval.getMax());
+    /**
+     * Do NOT create a new node for zero-area intervals - this would lead
+     * to infinite recursion. Instead, use a heuristic of simply returning
+     * the smallest existing node containing the query
+     */
+    final boolean isZeroArea = IntervalSize.isZeroWidth(itemInterval.getMin(),
+      itemInterval.getMax());
     NodeBase node;
-    if (isZeroArea)
+    if (isZeroArea) {
       node = tree.find(itemInterval);
-    else
+    } else {
       node = tree.getNode(itemInterval);
+    }
     node.add(item);
   }
 
   /**
    * The root node matches all searches
    */
-  protected boolean isSearchMatch(Interval interval)
-  {
+  @Override
+  protected boolean isSearchMatch(final Interval interval) {
     return true;
   }
-
 
 }

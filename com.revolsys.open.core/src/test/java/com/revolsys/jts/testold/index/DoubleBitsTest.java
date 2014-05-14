@@ -35,7 +35,7 @@ package com.revolsys.jts.testold.index;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.index.quadtree.DoubleBits;
+import com.revolsys.jts.index.DoubleBits;
 
 /**
  * Tests DoubleBits

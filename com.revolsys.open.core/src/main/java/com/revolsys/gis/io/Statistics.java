@@ -125,7 +125,7 @@ public class Statistics {
   }
 
   public synchronized void logCounts() {
-    if (isLogCounts()) {
+    if (isLogCounts() && !counts.isEmpty()) {
       final StringBuffer sb = new StringBuffer();
       addCountsText(sb);
       log.info(sb.toString());

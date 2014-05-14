@@ -1,103 +1,160 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.index.DoubleBits;
+import com.revolsys.jts.util.EnvelopeUtil;
 
 public class Node<T> extends NodeBase<T> {
+  public static int computeQuadLevel(final double... bounds) {
+    final double dx = bounds[2] - bounds[0];
+    final double dy = bounds[3] - bounds[1];
+    final double dMax = dx > dy ? dx : dy;
+    final int level = DoubleBits.exponent(dMax) + 1;
+    return level;
+  }
+
   public static <V> Node<V> createExpanded(final Node<V> node,
     final BoundingBox addEnv) {
-    BoundingBox expandEnv = addEnv;
+    final double[] bounds = new double[] {
+      addEnv.getMinX(), addEnv.getMinY(), addEnv.getMaxX(), addEnv.getMaxY()
+    };
     if (node != null) {
-      expandEnv = expandEnv.expandToInclude(node.env);
+      EnvelopeUtil.expand(bounds, 2, 0, node.minX);
+      EnvelopeUtil.expand(bounds, 2, 0, node.maxX);
+      EnvelopeUtil.expand(bounds, 2, 1, node.minY);
+      EnvelopeUtil.expand(bounds, 2, 1, node.maxY);
     }
 
-    final Node<V> largerNode = createNode(expandEnv);
+    final Node<V> largerNode = createNode(bounds);
     if (node != null) {
       largerNode.insertNode(node);
     }
     return largerNode;
   }
 
-  public static <V> Node<V> createNode(final BoundingBox env) {
-    final Key key = new Key(env);
-    final Node<V> node = new Node<V>(key.getKeyEnvelope(), key.getLevel());
+  private static <V> Node<V> createNode(final double[] bounds) {
+    final double[] newBounds = new double[4];
+    final double minX = bounds[0];
+    final double minY = bounds[1];
+    final double maxX = bounds[2];
+    final double maxY = bounds[3];
+    int level = computeQuadLevel(bounds);
+    setBounds(minX, minY, newBounds, level);
+    while (!EnvelopeUtil.covers(newBounds[0], newBounds[1], newBounds[2],
+      newBounds[3], minX, minY, maxX, maxY)) {
+      level++;
+      setBounds(minX, minY, newBounds, level);
+    }
+
+    final Node<V> node = new Node<V>(level, newBounds);
     return node;
   }
 
-  private final BoundingBox env;
+  private static void setBounds(final double minX, final double minY,
+    final double[] newBounds, final int level) {
+    final double quadSize = DoubleBits.powerOf2(level);
+    final double x1 = Math.floor(minX / quadSize) * quadSize;
+    final double y1 = Math.floor(minY / quadSize) * quadSize;
+    final double x2 = x1 + quadSize;
+    final double y2 = y1 + quadSize;
+    newBounds[0] = x1;
+    newBounds[1] = y1;
+    newBounds[2] = x2;
+    newBounds[3] = y2;
+  }
 
-  private final Point centre;
+  private final double minX;
+
+  private final double minY;
+
+  private final double maxX;
+
+  private final double maxY;
 
   private final int level;
 
-  public Node(final BoundingBox env, final int level) {
-    this.env = env;
+  public Node(final int level, final double... bounds) {
     this.level = level;
-    final double x = (env.getMinX() + env.getMaxX()) / 2;
-    final double y = (env.getMinY() + env.getMaxY()) / 2;
-    centre = new DoubleCoordinates(x, y);
+    this.minX = bounds[0];
+    this.minY = bounds[1];
+    this.maxX = bounds[2];
+    this.maxY = bounds[3];
   }
 
   private Node<T> createSubnode(final int index) {
+    // create a new subquad in the appropriate quadrant
+
     double minX = 0.0;
     double maxX = 0.0;
     double minY = 0.0;
     double maxY = 0.0;
 
+    final double centreX = getCentreX();
+    final double centreY = getCentreY();
     switch (index) {
       case 0:
-        minX = env.getMinX();
-        maxX = centre.getX();
-        minY = env.getMinY();
-        maxY = centre.getY();
+        minX = this.minX;
+        maxX = centreX;
+        minY = this.minY;
+        maxY = centreY;
       break;
       case 1:
-        minX = centre.getX();
-        maxX = env.getMaxX();
-        minY = env.getMinY();
-        maxY = centre.getY();
+        minX = centreX;
+        maxX = this.maxX;
+        minY = this.minY;
+        maxY = centreY;
       break;
       case 2:
-        minX = env.getMinX();
-        maxX = centre.getX();
-        minY = centre.getY();
-        maxY = env.getMaxY();
+        minX = this.minX;
+        maxX = centreX;
+        minY = centreY;
+        maxY = this.maxY;
       break;
       case 3:
-        minX = centre.getX();
-        maxX = env.getMaxX();
-        minY = centre.getY();
-        maxY = env.getMaxY();
+        minX = centreX;
+        maxX = this.maxX;
+        minY = centreY;
+        maxY = this.maxY;
       break;
     }
-    final Envelope envelope = new Envelope(2, minX, minY, maxX, maxY);
-    final Node<T> node = new Node<T>(envelope, level - 1);
+    final Node<T> node = new Node<T>(level - 1, minX, minY, maxX, maxY);
     return node;
   }
 
-  public NodeBase<T> find(final BoundingBox searchEnv) {
-    final int subnodeIndex = getSubnodeIndex(searchEnv, centre);
+  public NodeBase<T> find(final BoundingBox boundingBox) {
+    final int subnodeIndex = getSubnodeIndex(boundingBox.getMinX(),
+      boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY(),
+      getCentreX(), getCentreY());
     if (subnodeIndex == -1) {
       return this;
     }
     if (getNode(subnodeIndex) != null) {
       final Node<T> node = getNode(subnodeIndex);
-      return node.find(searchEnv);
+      return node.find(boundingBox);
     }
     return this;
   }
 
-  public BoundingBox getEnvelope() {
-    return env;
+  private double getCentreX() {
+    return (minX + maxX) / 2;
   }
 
-  public Node<T> getNode(final BoundingBox searchEnv) {
-    final int subnodeIndex = getSubnodeIndex(searchEnv, centre);
+  private double getCentreY() {
+    return (minY + maxY) / 2;
+  }
+
+  public BoundingBox getEnvelope() {
+    return new Envelope(2, minX, minY, maxX, maxY);
+  }
+
+  public Node<T> getNode(final BoundingBox boundingBox) {
+    final int subnodeIndex = getSubnodeIndex(boundingBox.getMinX(),
+      boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY(),
+      getCentreX(), getCentreY());
     if (subnodeIndex != -1) {
       final Node<T> node = getSubnode(subnodeIndex);
-      return node.getNode(searchEnv);
+      return node.getNode(boundingBox);
     } else {
       return this;
     }
@@ -111,7 +168,10 @@ public class Node<T> extends NodeBase<T> {
   }
 
   void insertNode(final Node<T> node) {
-    final int index = getSubnodeIndex(node.env, centre);
+    final double centreX = getCentreX();
+    final double centreY = getCentreY();
+    final int index = getSubnodeIndex(node.minX, node.minY, node.maxX,
+      node.maxY, centreX, centreY);
     if (node.level == level - 1) {
       setNode(index, node);
     } else {
@@ -122,8 +182,14 @@ public class Node<T> extends NodeBase<T> {
   }
 
   @Override
-  protected boolean isSearchMatch(final BoundingBox searchEnv) {
-    return env.intersects(searchEnv);
+  protected boolean isSearchMatch(final BoundingBox boundingBox) {
+    if (boundingBox.isEmpty()) {
+      return false;
+    } else {
+      return EnvelopeUtil.intersects(this.minX, this.minY, this.maxX,
+        this.maxY, boundingBox.getMinX(), boundingBox.getMinY(),
+        boundingBox.getMaxX(), boundingBox.getMaxY());
+    }
   }
 
 }

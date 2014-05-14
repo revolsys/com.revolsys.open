@@ -48,11 +48,11 @@ import com.revolsys.jts.geom.Envelope;
  *
  * @version 1.7
  */
-public interface SpatialIndex {
+public interface SpatialIndex<V> {
   /**
    * Adds a spatial item with an extent specified by the given {@link Envelope} to the index
    */
-  void insert(BoundingBox itemEnv, Object item);
+  void insert(BoundingBox boundingBox, V item);
 
   /**
    * Queries the index for all items whose extents intersect the given search {@link Envelope}
@@ -62,26 +62,28 @@ public interface SpatialIndex {
    * @param searchEnv the envelope to query for
    * @return a list of the items found by the query
    */
-  List query(BoundingBox searchEnv);
+  List<V> query(BoundingBox searchEnv);
 
-  /**
-   * Queries the index for all items whose extents intersect the given search {@link Envelope},
-   * and applies an {@link ItemVisitor} to them.
-   * Note that some kinds of indexes may also return objects which do not in fact
-   * intersect the query envelope.
-   *
-   * @param searchEnv the envelope to query for
-   * @param visitor a visitor object to apply to the items found
-   */
-  void query(BoundingBox searchEnv, ItemVisitor visitor);
+  // /**
+  // * Queries the index for all items whose extents intersect the given search
+  // {@link Envelope},
+  // * and applies an {@link ItemVisitor} to them.
+  // * Note that some kinds of indexes may also return objects which do not in
+  // fact
+  // * intersect the query envelope.
+  // *
+  // * @param searchEnv the envelope to query for
+  // * @param visitor a visitor object to apply to the items found
+  // */
+  // void query(BoundingBox searchEnv, ItemVisitor visitor);
 
   /**
    * Removes a single item from the tree.
    *
-   * @param itemEnv the BoundingBox of the item to remove
+   * @param boundingBox the BoundingBox of the item to remove
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */
-  boolean remove(BoundingBox itemEnv, Object item);
+  boolean remove(BoundingBox b, V item);
 
 }

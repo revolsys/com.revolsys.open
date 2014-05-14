@@ -12,9 +12,7 @@ import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -80,8 +78,9 @@ public class DataObjectGraph extends Graph<DataObject> {
     }
   }
 
+  @Override
   public Node<DataObject> getNode(final Point point) {
-    return getNode(CoordinatesUtil.getInstance(point));
+    return super.getNode(point);
   }
 
   public List<DataObject> getObjects(final Collection<Integer> edgeIds) {

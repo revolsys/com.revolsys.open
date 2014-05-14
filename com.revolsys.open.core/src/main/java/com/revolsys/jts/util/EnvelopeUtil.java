@@ -283,4 +283,10 @@ public class EnvelopeUtil {
     return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
       line2x2, line2y2);
   }
+
+  public static boolean covers(final double minX1, final double minY1,
+    final double maxX1, final double maxY1, final double minX2,
+    final double minY2, final double maxX2, final double maxY2) {
+    return minX2 >= minX1 && maxX2 <= maxX1 && minY2 >= minY1 && maxY2 <= maxY1;
+  }
 }

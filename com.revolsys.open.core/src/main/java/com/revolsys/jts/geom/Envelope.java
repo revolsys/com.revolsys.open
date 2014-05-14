@@ -314,6 +314,19 @@ public class Envelope implements Serializable, BoundingBox {
     }
   }
 
+  @Override
+  public boolean coveredBy(final double... bounds) {
+    final double minX1 = bounds[0];
+    final double minY1 = bounds[1];
+    final double maxX1 = bounds[2];
+    final double maxY1 = bounds[3];
+    final double minX2 = getMinX();
+    final double minY2 = getMinY();
+    final double maxX2 = getMaxX();
+    final double maxY2 = getMaxY();
+    return EnvelopeUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2, maxY2);
+  }
+
   /**
    * Tests if the <code>Envelope other</code>
    * lies wholely inside this <code>Envelope</code> (inclusive of the boundary).
@@ -332,8 +345,7 @@ public class Envelope implements Serializable, BoundingBox {
       final double maxX = getMaxX();
       final double maxY = getMaxY();
 
-      return other.getMinX() >= minX && other.getMaxX() <= maxX
-        && other.getMinY() >= minY && other.getMaxY() <= maxY;
+      return other.coveredBy(minX, minY, maxX, maxY);
     }
   }
 
@@ -357,7 +369,7 @@ public class Envelope implements Serializable, BoundingBox {
       final double maxX = getMaxX();
       final double maxY = getMaxY();
 
-      return x >= minX && x <= maxX && y >= minY && y <= maxY;
+      return EnvelopeUtil.covers(minX, minY, maxX, maxY, x, y, x, y);
     }
   }
 

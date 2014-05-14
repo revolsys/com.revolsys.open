@@ -13,9 +13,7 @@ import java.util.Map;
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
@@ -51,9 +49,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
               GeometryStyle.line(Color.LIGHT_GRAY));
 
             final Point centroid = polygon.getCentroid();
-            final Point centre = CoordinatesUtil.getInstance(centroid);
-            final double centreX = centre.getX();
-            final double centreY = centre.getY();
+            final double centreX = centroid.getX();
+            final double centreY = centroid.getY();
 
             final boolean saved = viewport.setUseModelCoordinates(false,
               graphics);

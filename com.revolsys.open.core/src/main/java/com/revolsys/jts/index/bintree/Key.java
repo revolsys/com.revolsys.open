@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -33,9 +32,7 @@
  */
 package com.revolsys.jts.index.bintree;
 
-
-
-import com.revolsys.jts.index.quadtree.DoubleBits;
+import com.revolsys.jts.index.DoubleBits;
 
 /**
  * A Key is a unique identifier for a node in a tree.
@@ -46,51 +43,56 @@ import com.revolsys.jts.index.quadtree.DoubleBits;
  */
 public class Key {
 
-  public static int computeLevel(Interval interval)
-  {
-    double dx = interval.getWidth();
-    //int level = BinaryPower.exponent(dx) + 1;
-    int level = DoubleBits.exponent(dx) + 1;
+  public static int computeLevel(final Interval interval) {
+    final double dx = interval.getWidth();
+    // int level = BinaryPower.exponent(dx) + 1;
+    final int level = DoubleBits.exponent(dx) + 1;
     return level;
   }
 
-
   // the fields which make up the key
   private double pt = 0.0;
+
   private int level = 0;
+
   // auxiliary data which is derived from the key for use in computation
   private Interval interval;
 
-  public Key(Interval interval)
-  {
+  public Key(final Interval interval) {
     computeKey(interval);
   }
 
-  public double getPoint() { return pt; }
-  public int getLevel() { return level; }
-  public Interval getInterval() { return interval; }
+  private void computeInterval(final int level, final Interval itemInterval) {
+    final double size = DoubleBits.powerOf2(level);
+    // double size = pow2.power(level);
+    pt = Math.floor(itemInterval.getMin() / size) * size;
+    interval.init(pt, pt + size);
+  }
 
   /**
    * return a square envelope containing the argument envelope,
    * whose extent is a power of two and which is based at a power of 2
    */
-  public void computeKey(Interval itemInterval)
-  {
+  public void computeKey(final Interval itemInterval) {
     level = computeLevel(itemInterval);
     interval = new Interval();
     computeInterval(level, itemInterval);
     // MD - would be nice to have a non-iterative form of this algorithm
-    while (! interval.contains(itemInterval)) {
+    while (!interval.contains(itemInterval)) {
       level += 1;
       computeInterval(level, itemInterval);
     }
   }
 
-  private void computeInterval(int level, Interval itemInterval)
-  {
-    double size = DoubleBits.powerOf2(level);
-    //double size = pow2.power(level);
-    pt = Math.floor(itemInterval.getMin() / size) * size;
-    interval.init(pt, pt + size);
+  public Interval getInterval() {
+    return interval;
+  }
+
+  public int getLevel() {
+    return level;
+  }
+
+  public double getPoint() {
+    return pt;
   }
 }

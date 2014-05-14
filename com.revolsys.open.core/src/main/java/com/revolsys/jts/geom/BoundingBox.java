@@ -15,6 +15,8 @@ public interface BoundingBox {
 
   BoundingBox convert(GeometryFactory geometryFactory);
 
+  boolean coveredBy(double... bounds);
+
   /**
    * Tests if the <code>BoundingBox other</code>
    * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).

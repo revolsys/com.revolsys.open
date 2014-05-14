@@ -1,5 +1,6 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,17 +8,27 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 
-public abstract class NodeBase<T> {
+public abstract class NodeBase<T> implements Serializable {
   public static int getSubnodeIndex(final BoundingBox envelope,
-    final Point centre) {
-    int subnodeIndex = -1;
+    final double centreX, final double centreY) {
     final double minX = envelope.getMinX();
     final double minY = envelope.getMinY();
     final double maxX = envelope.getMaxX();
     final double maxY = envelope.getMaxY();
+    return getSubnodeIndex(minX, minY, maxX, maxY, centreX, centreY);
+  }
 
+  public static int getSubnodeIndex(final BoundingBox envelope,
+    final Point centre) {
     final double centreX = centre.getX();
     final double centreY = centre.getY();
+    return getSubnodeIndex(envelope, centreX, centreY);
+  }
+
+  public static int getSubnodeIndex(final double minX, final double minY,
+    final double maxX, final double maxY, final double centreX,
+    final double centreY) {
+    int subnodeIndex = -1;
 
     if (minX >= centreX) {
       if (minY >= centreY) {
@@ -42,12 +53,10 @@ public abstract class NodeBase<T> {
 
   private final List<BoundingBox> envelopes = new ArrayList<>();
 
-  private final List<Node<T>> nodes = new ArrayList<>(4);
+  @SuppressWarnings("unchecked")
+  private final Node<T>[] nodes = new Node[4];
 
   public NodeBase() {
-    for (int i = 0; i < 4; i++) {
-      nodes.add(null);
-    }
   }
 
   public void add(final BoundingBox envelope, final T item) {
@@ -81,7 +90,7 @@ public abstract class NodeBase<T> {
   }
 
   protected Node<T> getNode(final int i) {
-    return nodes.get(i);
+    return nodes[i];
   }
 
   protected int getNodeCount() {
@@ -137,7 +146,7 @@ public abstract class NodeBase<T> {
         if (node != null) {
           if (node.remove(envelope, item)) {
             if (node.isPrunable()) {
-              nodes.set(i, null);
+              nodes[i] = null;
             }
             return true;
           }
@@ -157,7 +166,7 @@ public abstract class NodeBase<T> {
   }
 
   protected void setNode(final int i, final Node<T> node) {
-    nodes.set(i, node);
+    nodes[i] = node;
   }
 
   protected int size() {

@@ -36,7 +36,6 @@ import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -122,8 +121,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             }
             point = ProjectionFactory.convert(points.get(index),
               geometryFactory, viewportGeometryFactory);
-            final Point p2 = ProjectionFactory.convert(
-              points.get(index - 1), geometryFactory, viewportGeometryFactory);
+            final Point p2 = ProjectionFactory.convert(points.get(index - 1),
+              geometryFactory, viewportGeometryFactory);
             final double angle = Math.toDegrees(p2.angle2d(point));
             orientation += angle;
           } else {
@@ -133,8 +132,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             }
             point = ProjectionFactory.convert(points.get(index),
               geometryFactory, viewportGeometryFactory);
-            final Point p2 = ProjectionFactory.convert(
-              points.get(index + 1), geometryFactory, viewportGeometryFactory);
+            final Point p2 = ProjectionFactory.convert(points.get(index + 1),
+              geometryFactory, viewportGeometryFactory);
             final double angle = Math.toDegrees(point.angle2d(p2));
             orientation += angle;
           }
@@ -165,7 +164,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
         }
         if (point == null) {
           PointUtil.getPointWithin(geometry);
-          point = CoordinatesUtil.getInstance((Point)geometry.getCentroid().copy(geometryFactory));
+          point = geometry.getCentroid().copy(geometryFactory);
           if (!viewport.getBoundingBox().covers(point)) {
             final Geometry clippedGeometry = viewport.getBoundingBox()
               .toPolygon()
@@ -179,14 +178,14 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
                   final double area = part.getArea();
                   if (area > maxArea) {
                     maxArea = area;
-                    point = CoordinatesUtil.getInstance(part.getCentroid());
+                    point = part.getCentroid();
                   }
                 } else if (part instanceof LineString) {
                   if (maxArea == 0) {
                     final double length = part.getLength();
                     if (length > maxLength) {
                       maxLength = length;
-                      point = CoordinatesUtil.getInstance(part.getCentroid());
+                      point = part.getCentroid();
                     }
                   }
                 } else if (part instanceof Point) {

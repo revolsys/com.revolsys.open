@@ -1,18 +1,15 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.index.quadtree.IntervalSize;
+import com.revolsys.jts.index.IntervalSize;
 
 public class Root<T> extends NodeBase<T> {
-  private static final Point origin = new DoubleCoordinates(0.0, 0.0);
-
   public Root() {
   }
 
   public void insert(final BoundingBox envelope, final T item) {
-    final int index = getSubnodeIndex(envelope, origin);
+    final int index = getSubnodeIndex(envelope.getMinX(), envelope.getMinY(),
+      envelope.getMaxX(), envelope.getMaxY(), 0, 0);
     if (index == -1) {
       add(envelope, item);
     } else {

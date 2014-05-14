@@ -122,7 +122,7 @@ public class PointDataObjectMap {
 
   public List<DataObject> getObjects(final Point point) {
     final Point coordinates = new DoubleCoordinates(point, 2);
-    final List<DataObject> objects = getObjects(coordinates);
+    final List<DataObject> objects = objectMap.get(coordinates);
     if (objects == null) {
       return Collections.emptyList();
     } else {

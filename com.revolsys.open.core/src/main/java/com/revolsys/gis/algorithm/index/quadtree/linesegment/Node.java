@@ -2,9 +2,9 @@ package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
 import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.index.quadtree.DoubleBits;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.index.DoubleBits;
 
 public class Node extends NodeBase {
 
