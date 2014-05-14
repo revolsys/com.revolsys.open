@@ -33,8 +33,8 @@
 
 package com.revolsys.jts.index.kdtree;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * A node of a {@link KdTree}, which represents one or more points in the same location.
@@ -60,7 +60,7 @@ public class KdNode {
    * @param data a data objects to associate with this node
    */
   public KdNode(final Point p, final Object data) {
-    this.p = new Coordinate(p);
+    this.p = new PointDouble(p);
     left = null;
     right = null;
     count = 1;
@@ -75,7 +75,7 @@ public class KdNode {
    * @param data a data objects to associate with this node
    */
   public KdNode(final double _x, final double _y, final Object data) {
-    p = new Coordinate(_x, _y, Point.NULL_ORDINATE);
+    p = new PointDouble(_x, _y, Point.NULL_ORDINATE);
     left = null;
     right = null;
     count = 1;

@@ -38,11 +38,10 @@ package com.revolsys.jts.algorithm;
 
 import com.revolsys.gis.model.coordinates.CentralEndpointIntersector;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 
 /**
@@ -220,13 +219,13 @@ public class RobustLineIntersector extends LineIntersector {
        * Now check to see if any endpoint lies on the interior of the other segment.
        */
       else if (Pq1 == 0) {
-        intPt[0] = new Coordinate(q1);
+        intPt[0] = new PointDouble(q1);
       } else if (Pq2 == 0) {
-        intPt[0] = new Coordinate(q2);
+        intPt[0] = new PointDouble(q2);
       } else if (Qp1 == 0) {
-        intPt[0] = new Coordinate(p1);
+        intPt[0] = new PointDouble(p1);
       } else if (Qp2 == 0) {
-        intPt[0] = new Coordinate(p2);
+        intPt[0] = new PointDouble(p2);
       }
     } else {
       isProper = true;
@@ -291,7 +290,7 @@ public class RobustLineIntersector extends LineIntersector {
 
       // compute a safer result
       // copy the coordinate, since it may be rounded later
-      intPt = new Coordinate(nearestEndpoint(p1, p2, q1, q2));
+      intPt = new PointDouble(nearestEndpoint(p1, p2, q1, q2));
       // intPt = CentralEndpointIntersector.getIntersection(p1, p2, q1, q2);
 
       // System.out.println("Segments: " + this);
@@ -330,13 +329,13 @@ public class RobustLineIntersector extends LineIntersector {
      * intMidPt.getY();
      */
 
-    final Point n1 = new DoubleCoordinates(p1.getX() - normX, p1.getY()
+    final Point n1 = new PointDouble(p1.getX() - normX, p1.getY()
       - normY);
-    final Point n2 = new DoubleCoordinates(p2.getX() - normX, p2.getY()
+    final Point n2 = new PointDouble(p2.getX() - normX, p2.getY()
       - normY);
-    final Point n3 = new DoubleCoordinates(q1.getX() - normX, q1.getY()
+    final Point n3 = new PointDouble(q1.getX() - normX, q1.getY()
       - normY);
-    final Point n4 = new DoubleCoordinates(q2.getX() - normX, q2.getY()
+    final Point n4 = new PointDouble(q2.getX() - normX, q2.getY()
       - normY);
 
     final Point intPt = safeHCoordinatesIntersection(n1, n2, n3, n4);
@@ -344,7 +343,7 @@ public class RobustLineIntersector extends LineIntersector {
     final double x = intPt.getX() + normX;
     final double y = intPt.getY() + normY;
 
-    return new Coordinate(x, y);
+    return new PointDouble(x, y);
   }
 
   /**

@@ -36,7 +36,7 @@ package com.revolsys.jts.geom.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -122,11 +122,11 @@ public class GeometryTransformer {
   }
 
   /**
-   * Convenience method which provides statndard way of copying {@link CoordinatesList}s
+   * Convenience method which provides statndard way of copying {@link PointList}s
    * @param seq the sequence to copy
    * @return a deep copy of the sequence
    */
-  protected final CoordinatesList copy(final CoordinatesList seq) {
+  protected final PointList copy(final PointList seq) {
     return seq.clone();
   }
 
@@ -173,7 +173,7 @@ public class GeometryTransformer {
   }
 
   /**
-   * Transforms a {@link CoordinatesList}.
+   * Transforms a {@link PointList}.
    * This method should always return a valid coordinate list for
    * the desired result type.  (E.g. a coordinate list for a LineString
    * must have 0 or at least 2 points).
@@ -184,7 +184,7 @@ public class GeometryTransformer {
    * @param parent the parent geometry
    * @return the transformed coordinates
    */
-  protected CoordinatesList transformCoordinates(final CoordinatesList coords,
+  protected PointList transformCoordinates(final PointList coords,
     final Geometry parent) {
     return copy(coords);
   }
@@ -223,10 +223,10 @@ public class GeometryTransformer {
    */
   protected Geometry transformLinearRing(final LinearRing geom,
     final Geometry parent) {
-    final CoordinatesList seq = transformCoordinates(geom.getCoordinatesList(),
+    final PointList seq = transformCoordinates(geom.getCoordinatesList(),
       geom);
     if (seq == null) {
-      return factory.linearRing((CoordinatesList)null);
+      return factory.linearRing((PointList)null);
     }
     final int seqSize = seq.size();
     // ensure a valid LinearRing

@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.algorithm.distance;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.segment.Segment;
 
@@ -61,7 +61,7 @@ public class DistanceToPoint {
         computeDistance(g, pt, ptDist);
       }
     } else { // assume geom is Point
-      ptDist.setMinimum(geom.getCoordinate(), pt);
+      ptDist.setMinimum(geom.getPoint(), pt);
     }
   }
 

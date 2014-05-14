@@ -12,14 +12,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.TestConstants;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
@@ -250,7 +250,7 @@ public class BoundingBoxTest implements TestConstants {
               bounds[axisCount + axisIndex] = value;
             }
           }
-          points[i] = new DoubleCoordinates(values);
+          points[i] = new PointDouble(values);
         }
         final Envelope noGeometryFactory = new Envelope(points);
         assertEnvelope(noGeometryFactory, null, false, axisCount, bounds);
@@ -346,7 +346,7 @@ public class BoundingBoxTest implements TestConstants {
     assertEnvelope(emptyListWithNulls, null, true, 0, NULL_BOUNDS);
 
     final BoundingBox emptyNullCoordinatesList = new Envelope(
-      (CoordinatesList)null);
+      (PointList)null);
     assertEnvelope(emptyNullCoordinatesList, null, true, 0, NULL_BOUNDS);
 
     final BoundingBox emptyCoordinatesList = new Envelope(
@@ -372,7 +372,7 @@ public class BoundingBoxTest implements TestConstants {
               bounds[axisCount + axisIndex] = value;
             }
           }
-          points.add(new DoubleCoordinates(values));
+          points.add(new PointDouble(values));
         }
         final Envelope noGeometryFactory = new Envelope(points);
         assertEnvelope(noGeometryFactory, null, false, axisCount, bounds);

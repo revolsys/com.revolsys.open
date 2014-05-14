@@ -33,8 +33,8 @@
 
 package com.revolsys.jts.math;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a vector in 3-dimensional Cartesian space.
@@ -168,7 +168,7 @@ public class Vector3D {
 
 	public static Point normalize(Point v) {
 		double len = length(v);
-		return new Coordinate((double)v.getX() / len, v.getY() / len, v.getZ() / len);
+		return new PointDouble((double)v.getX() / len, v.getY() / len, v.getZ() / len);
 	}
 	  /**
 	   * Gets a string representation of this vector

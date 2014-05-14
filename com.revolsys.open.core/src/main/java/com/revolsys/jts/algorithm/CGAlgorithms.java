@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -364,7 +364,7 @@ public class CGAlgorithms {
    *          the points specifying the linestring
    * @return the length of the linestring
    */
-  public static double length(final CoordinatesList pts) {
+  public static double length(final PointList pts) {
     // optimized for processing CoordinateSequences
     final int n = pts.size();
     if (n <= 1) {
@@ -418,10 +418,10 @@ public class CGAlgorithms {
      * For instance, the following situation produces identical results in spite
      * of the inverse orientation of the line segment:
      * 
-     * Point p0 = new Coordinate((double)219.3649559090992, 140.84159161824724);
-     * Point p1 = new Coordinate((double)168.9018919682399, -5.713787599646864);
+     * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
+     * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
      * 
-     * Point p = new Coordinate((double)186.80814046338352, 46.28973405831556); int
+     * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
      * orient = orientationIndex(p0, p1, p); int orientInv =
      * orientationIndex(p1, p0, p);
      * 
@@ -479,7 +479,7 @@ public class CGAlgorithms {
    *          the coordinates forming the ring
    * @return the signed area of the ring
    */
-  public static double signedArea(final CoordinatesList ring) {
+  public static double signedArea(final PointList ring) {
     final int n = ring.size();
     if (n < 3) {
       return 0.0;

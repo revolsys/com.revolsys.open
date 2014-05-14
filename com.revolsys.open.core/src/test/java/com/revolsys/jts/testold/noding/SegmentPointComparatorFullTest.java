@@ -2,10 +2,10 @@ package com.revolsys.jts.testold.noding;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.noding.Octant;
 import com.revolsys.jts.noding.SegmentPointComparator;
 import com.revolsys.util.MathUtil;
@@ -47,9 +47,9 @@ public class SegmentPointComparatorFullTest extends TestCase {
   }
 
   private void checkSegment(final double x, final double y) {
-    final Point seg0 = new Coordinate((double)0, 0,
+    final Point seg0 = new PointDouble((double)0, 0,
       Point.NULL_ORDINATE);
-    final Point seg1 = new Coordinate(x, y, Point.NULL_ORDINATE);
+    final Point seg1 = new PointDouble(x, y, Point.NULL_ORDINATE);
     final LineSegment seg = new LineSegmentImpl(seg0, seg1);
 
     for (int i = 0; i < 4; i++) {
@@ -68,7 +68,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final double dx = seg.getP1().getX() - seg.getP0().getX();
     final double dy = seg.getP1().getY() - seg.getP0().getY();
     final double len = seg.getLength();
-    final Point pt = new Coordinate(MathUtil.makePrecise(1.0, dist
+    final Point pt = new PointDouble(MathUtil.makePrecise(1.0, dist
       * dx / len), MathUtil.makePrecise(1.0, dist * dy / len));
     return pt;
   }

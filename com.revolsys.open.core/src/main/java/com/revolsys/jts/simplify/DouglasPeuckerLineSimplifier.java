@@ -34,9 +34,9 @@
 package com.revolsys.jts.simplify;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Simplifies a linestring (sequence of points) using
@@ -83,7 +83,7 @@ class DouglasPeuckerLineSimplifier {
     final CoordinateList coordList = new CoordinateList();
     for (int i = 0; i < pts.length; i++) {
       if (usePt[i]) {
-        coordList.add(new Coordinate(pts[i]));
+        coordList.add(new PointDouble(pts[i]));
       }
     }
     return coordList.toCoordinateArray();

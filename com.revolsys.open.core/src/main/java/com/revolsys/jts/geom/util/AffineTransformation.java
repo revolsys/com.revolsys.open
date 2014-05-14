@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.geom.util;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -441,11 +441,11 @@ public class AffineTransformation implements Cloneable
   /**
    * Transforms the i'th coordinate in the input sequence
    * 
-   *@param seq  a <code>CoordinatesList</code>
+   *@param seq  a <code>PointList</code>
    *@param i the index of the coordinate to transform
    */
   // @Override
-  // public void filter(final CoordinatesList seq, final int i) {
+  // public void filter(final PointList seq, final int i) {
   // transform(seq, i);
   // }
 
@@ -1072,17 +1072,17 @@ public class AffineTransformation implements Cloneable
   public Point transform(final Point src) {
     final double xp = m00 * src.getX() + m01 * src.getY() + m02;
     final double yp = m10 * src.getX() + m11 * src.getY() + m12;
-    return new DoubleCoordinates(xp, yp);
+    return new PointDouble(xp, yp);
   }
 
   /**
    * Applies this transformation to the i'th coordinate
-   * in the given CoordinatesList.
+   * in the given PointList.
    * 
-   *@param seq  a <code>CoordinatesList</code>
+   *@param seq  a <code>PointList</code>
    *@param i the index of the coordinate to transform
    */
-  // public void transform(final CoordinatesList seq, final int i) {
+  // public void transform(final PointList seq, final int i) {
   // final double xp = m00 * seq.getValue(i, 0) + m01 * seq.getValue(i, 1) +
   // m02;
   // final double yp = m10 * seq.getValue(i, 0) + m11 * seq.getValue(i, 1) +

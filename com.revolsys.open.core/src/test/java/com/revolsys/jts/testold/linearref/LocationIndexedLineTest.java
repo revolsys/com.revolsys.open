@@ -1,7 +1,7 @@
 package com.revolsys.jts.testold.linearref;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.linearref.LinearLocation;
 import com.revolsys.jts.linearref.LocationIndexedLine;
 

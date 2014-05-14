@@ -34,7 +34,6 @@ package com.revolsys.jts.algorithm;
 
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
@@ -178,7 +177,7 @@ public class PointLocator {
   private Location locate(final Point p, final Point pt) {
     // no point in doing envelope test, since equality test is just as fast
 
-    final Point ptCoord = pt.getCoordinate();
+    final Point ptCoord = pt.getPoint();
     if (ptCoord.equals2d(p)) {
       return Location.INTERIOR;
     }

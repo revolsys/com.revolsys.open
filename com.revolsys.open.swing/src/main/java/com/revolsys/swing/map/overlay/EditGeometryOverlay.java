@@ -36,7 +36,7 @@ import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -488,7 +488,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     } else if (DataTypes.POINT.equals(geometryPartDataType)) {
     } else {
       final Point point = getPoint(geometryFactory, event);
-      final CoordinatesList points = GeometryEditUtil.getPoints(geometry, index);
+      final PointList points = GeometryEditUtil.getPoints(geometry, index);
       final int pointIndex = index[index.length - 1];
       int previousPointIndex = pointIndex + previousPointOffset;
       int nextPointIndex = pointIndex + nextPointOffset;

@@ -37,11 +37,11 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.index.bintree.Bintree;
 import com.revolsys.jts.index.bintree.Interval;
@@ -90,7 +90,7 @@ public class MCPointInRing implements PointInRing {
     // Envelope env = ring.getEnvelopeInternal();
     tree = new Bintree();
 
-    final CoordinatesList points = CleanDuplicatePoints.clean(ring.getCoordinatesList());
+    final PointList points = CleanDuplicatePoints.clean(ring.getCoordinatesList());
     final List<MonotoneChain> mcList = MonotoneChainBuilder.getChains(points);
 
     for (int i = 0; i < mcList.size(); i++) {

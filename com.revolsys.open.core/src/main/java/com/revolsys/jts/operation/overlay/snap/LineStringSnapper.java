@@ -34,11 +34,11 @@
 package com.revolsys.jts.operation.overlay.snap;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Snaps the vertices and segments of a {@link LineString} 
@@ -51,7 +51,7 @@ import com.revolsys.jts.geom.LineString;
  * @version 1.7
  */
 public class LineStringSnapper {
-  public static boolean isClosed(final CoordinatesList pts) {
+  public static boolean isClosed(final PointList pts) {
     if (pts.size() <= 1) {
       return false;
     }
@@ -60,7 +60,7 @@ public class LineStringSnapper {
 
   private double snapTolerance = 0.0;
 
-  private final CoordinatesList srcPts;
+  private final PointList srcPts;
 
   private boolean allowSnappingToSourceVertices = false;
 
@@ -73,7 +73,7 @@ public class LineStringSnapper {
    * @param srcPts the points to snap 
    * @param snapTolerance the snap tolerance to use
    */
-  public LineStringSnapper(final CoordinatesList srcPts,
+  public LineStringSnapper(final PointList srcPts,
     final double snapTolerance) {
     this.srcPts = srcPts;
     isClosed = isClosed(srcPts);
@@ -199,7 +199,7 @@ public class LineStringSnapper {
        * Duplicate points are not added.
        */
       if (index >= 0) {
-        srcCoords.add(index + 1, new Coordinate(snapPt), false);
+        srcCoords.add(index + 1, new PointDouble(snapPt), false);
       }
     }
   }
@@ -237,10 +237,10 @@ public class LineStringSnapper {
       final Point snapVert = findSnapForVertex(srcPt, snapPts);
       if (snapVert != null) {
         // update src with snap pt
-        srcCoords.set(i, new Coordinate(snapVert));
+        srcCoords.set(i, new PointDouble(snapVert));
         // keep final closing point in synch (rings only)
         if (i == 0 && isClosed) {
-          srcCoords.set(srcCoords.size() - 1, new Coordinate(snapVert));
+          srcCoords.set(srcCoords.size() - 1, new PointDouble(snapVert));
         }
       }
     }

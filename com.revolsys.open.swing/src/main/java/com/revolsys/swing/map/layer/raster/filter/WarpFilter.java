@@ -4,12 +4,12 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import com.jhlabs.image.WholeImageFilter;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.overlay.MappedLocation;
 
 public abstract class WarpFilter extends WholeImageFilter {
@@ -52,8 +52,8 @@ public abstract class WarpFilter extends WholeImageFilter {
     return new WarpAffineFilter(boundingBox, imageWidth, imageHeight);
   }
 
-  public static CoordinatesList targetPointsToPixels(
-    final BoundingBox boundingBox, final CoordinatesList points,
+  public static PointList targetPointsToPixels(
+    final BoundingBox boundingBox, final PointList points,
     final int imageWidth, final int imageHeight) {
     final int numPoints = points.size();
     final double[] coordinates = new double[numPoints * 2];
@@ -88,7 +88,7 @@ public abstract class WarpFilter extends WholeImageFilter {
 
     final double imageX = imageWidth * xRatio;
     final double imageY = imageHeight * yRatio;
-    return new DoubleCoordinates(imageX, imageY);
+    return new PointDouble(imageX, imageY);
   }
 
   public static Point toModelPoint(final BoundingBox boundingBox,
@@ -102,7 +102,7 @@ public abstract class WarpFilter extends WholeImageFilter {
 
     final double modelX = boundingBox.getMinX() + modelWidth * xPercent;
     final double modelY = boundingBox.getMinY() + modelHeight * yPercent;
-    final DoubleCoordinates imagePoint = new DoubleCoordinates(modelX, modelY);
+    final PointDouble imagePoint = new PointDouble(modelX, modelY);
     return imagePoint;
   }
 
@@ -170,7 +170,7 @@ public abstract class WarpFilter extends WholeImageFilter {
   }
 
   public Point sourcePixelToTargetPoint(final double x, final double y) {
-    final DoubleCoordinates sourcePixel = new DoubleCoordinates(x, y);
+    final PointDouble sourcePixel = new PointDouble(x, y);
     return sourcePixelToTargetPoint(sourcePixel);
   }
 

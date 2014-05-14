@@ -36,11 +36,11 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.prep.PreparedPolygon;
@@ -101,7 +101,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Point basePt = new Coordinate(env.getMinX() + xOffset,
+    final Point basePt = new PointDouble(env.getMinX() + xOffset,
       env.getMinY() + yOffset, Point.NULL_ORDINATE);
     final LineString line = createTestLine(basePt, size, nPts);
     return line;
@@ -119,8 +119,8 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
   }
 
   public void run(final int nPts) {
-    // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
-    final Geometry poly = createSineStar(new Coordinate((double)0, 0,
+    // Geometry poly = createCircle(new PointDouble((double)0, 0), 100, nPts);
+    final Geometry poly = createSineStar(new PointDouble((double)0, 0,
       Point.NULL_ORDINATE), 100, nPts);
     // System.out.println(poly);
     //

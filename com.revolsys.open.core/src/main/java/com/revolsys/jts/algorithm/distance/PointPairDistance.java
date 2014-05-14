@@ -34,8 +34,8 @@
 package com.revolsys.jts.algorithm.distance;
 
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Contains a pair of points and the distance between them.
@@ -45,7 +45,7 @@ import com.revolsys.jts.geom.Point;
 public class PointPairDistance {
 
   private final Point[] pt = {
-    new Coordinate(), new Coordinate()
+    new PointDouble(), new PointDouble()
   };
 
   private double distance = Double.NaN;

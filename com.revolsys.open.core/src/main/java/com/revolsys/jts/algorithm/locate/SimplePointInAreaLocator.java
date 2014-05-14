@@ -35,12 +35,12 @@ package com.revolsys.jts.algorithm.locate;
 import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryCollectionIterator;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
 

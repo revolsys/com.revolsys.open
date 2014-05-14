@@ -33,10 +33,10 @@
 
 package com.revolsys.jts.triangulate;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Models a constraint segment in a triangulation.
@@ -78,7 +78,7 @@ public class Segment {
    */
   public Segment(final double x1, final double y1, final double z1,
     final double x2, final double y2, final double z2) {
-    this(new Coordinate(x1, y1, z1), new Coordinate(x2, y2, z2));
+    this(new PointDouble(x1, y1, z1), new PointDouble(x2, y2, z2));
   }
 
   /** 
@@ -86,7 +86,7 @@ public class Segment {
    */
   public Segment(final double x1, final double y1, final double z1,
     final double x2, final double y2, final double z2, final Object data) {
-    this(new Coordinate(x1, y1, z1), new Coordinate(x2, y2, z2), data);
+    this(new PointDouble(x1, y1, z1), new PointDouble(x2, y2, z2), data);
   }
 
   /**

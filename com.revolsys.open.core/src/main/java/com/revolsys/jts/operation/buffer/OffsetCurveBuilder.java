@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.operation.buffer;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Position;
 
 /**
@@ -83,13 +83,13 @@ public class OffsetCurveBuilder {
     this.bufParams = bufParams;
   }
 
-  private void computeLineBufferCurve(final CoordinatesList points,
+  private void computeLineBufferCurve(final PointList points,
     final OffsetSegmentGenerator segGen) {
     final double distTol = simplifyTolerance(distance);
 
     // --------- compute points for left side of line
     // Simplify the appropriate side of the line before generating
-    final CoordinatesList simp1 = BufferInputLineSimplifier.simplify(points,
+    final PointList simp1 = BufferInputLineSimplifier.simplify(points,
       distTol);
     // MD - used for testing only (to eliminate simplification)
     // Point[] simp1 = inputPts;
@@ -106,7 +106,7 @@ public class OffsetCurveBuilder {
 
     // ---------- compute points for right side of line
     // Simplify the appropriate side of the line before generating
-    final CoordinatesList simp2 = BufferInputLineSimplifier.simplify(points,
+    final PointList simp2 = BufferInputLineSimplifier.simplify(points,
       -distTol);
     // MD - used for testing only (to eliminate simplification)
     // Point[] simp2 = inputPts;
@@ -126,14 +126,14 @@ public class OffsetCurveBuilder {
     segGen.closeRing();
   }
 
-  private void computeOffsetCurve(final CoordinatesList points,
+  private void computeOffsetCurve(final PointList points,
     final boolean isRightSide, final OffsetSegmentGenerator segGen) {
     final double distTol = simplifyTolerance(distance);
 
     if (isRightSide) {
       // ---------- compute points for right side of line
       // Simplify the appropriate side of the line before generating
-      final CoordinatesList simp2 = BufferInputLineSimplifier.simplify(points,
+      final PointList simp2 = BufferInputLineSimplifier.simplify(points,
         -distTol);
       // MD - used for testing only (to eliminate simplification)
       // Point[] simp2 = inputPts;
@@ -149,7 +149,7 @@ public class OffsetCurveBuilder {
     } else {
       // --------- compute points for left side of line
       // Simplify the appropriate side of the line before generating
-      final CoordinatesList simp1 = BufferInputLineSimplifier.simplify(points,
+      final PointList simp1 = BufferInputLineSimplifier.simplify(points,
         distTol);
       // MD - used for testing only (to eliminate simplification)
       // Point[] simp1 = inputPts;
@@ -177,7 +177,7 @@ public class OffsetCurveBuilder {
     }
   }
 
-  private void computeRingBufferCurve(final CoordinatesList inputPts,
+  private void computeRingBufferCurve(final PointList inputPts,
     final int side, final OffsetSegmentGenerator segGen) {
     // simplify input line to improve performance
     double distTol = simplifyTolerance(distance);
@@ -185,7 +185,7 @@ public class OffsetCurveBuilder {
     if (side == Position.RIGHT) {
       distTol = -distTol;
     }
-    final CoordinatesList simp = BufferInputLineSimplifier.simplify(inputPts,
+    final PointList simp = BufferInputLineSimplifier.simplify(inputPts,
       distTol);
     // Point[] simp = inputPts;
 
@@ -198,7 +198,7 @@ public class OffsetCurveBuilder {
     segGen.closeRing();
   }
 
-  private void computeSingleSidedBufferCurve(final CoordinatesList inputPts,
+  private void computeSingleSidedBufferCurve(final PointList inputPts,
     final boolean isRightSide, final OffsetSegmentGenerator segGen) {
     final double distTol = simplifyTolerance(distance);
 
@@ -208,7 +208,7 @@ public class OffsetCurveBuilder {
 
       // ---------- compute points for right side of line
       // Simplify the appropriate side of the line before generating
-      final CoordinatesList simp2 = BufferInputLineSimplifier.simplify(
+      final PointList simp2 = BufferInputLineSimplifier.simplify(
         inputPts, -distTol);
       // MD - used for testing only (to eliminate simplification)
       // Point[] simp2 = inputPts;
@@ -227,7 +227,7 @@ public class OffsetCurveBuilder {
 
       // --------- compute points for left side of line
       // Simplify the appropriate side of the line before generating
-      final CoordinatesList simp1 = BufferInputLineSimplifier.simplify(
+      final PointList simp1 = BufferInputLineSimplifier.simplify(
         inputPts, distTol);
       // MD - used for testing only (to eliminate simplification)
       // Point[] simp1 = inputPts;
@@ -263,7 +263,7 @@ public class OffsetCurveBuilder {
    * @return a Point array representing the curve
    * or null if the curve is empty
    */
-  public CoordinatesList getLineCurve(final CoordinatesList inputPts,
+  public PointList getLineCurve(final PointList inputPts,
     final double distance) {
     this.distance = distance;
 
@@ -291,7 +291,7 @@ public class OffsetCurveBuilder {
     return segGen.getPoints();
   }
 
-  public CoordinatesList getOffsetCurve(final CoordinatesList inputPts,
+  public PointList getOffsetCurve(final PointList inputPts,
     final double distance) {
     this.distance = distance;
 
@@ -308,7 +308,7 @@ public class OffsetCurveBuilder {
     } else {
       computeOffsetCurve(inputPts, isRightSide, segGen);
     }
-    final CoordinatesList curvePts = segGen.getPoints();
+    final PointList curvePts = segGen.getPoints();
     // for right side line is traversed in reverse direction, so have to reverse
     // generated line
     if (isRightSide) {
@@ -324,7 +324,7 @@ public class OffsetCurveBuilder {
    * @return a Point array representing the curve
    * or null if the curve is empty
    */
-  public CoordinatesList getRingCurve(final CoordinatesList points,
+  public PointList getRingCurve(final PointList points,
     final int side, final double distance) {
     this.distance = distance;
     if (points.size() <= 2) {

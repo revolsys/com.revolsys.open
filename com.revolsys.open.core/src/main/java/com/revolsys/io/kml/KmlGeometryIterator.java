@@ -13,17 +13,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   Kml22Constants {
@@ -70,7 +69,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
     }
   }
 
-  private CoordinatesList parseCoordinates() throws XMLStreamException {
+  private PointList parseCoordinates() throws XMLStreamException {
     StaxUtils.requireLocalName(in, COORDINATES);
     final String coordinatesListString = StaxUtils.getElementText(in);
     if (StringUtils.hasText(coordinatesListString)) {
@@ -87,7 +86,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
           coordinates[axisIndex] = Double.valueOf(coordinate);
         }
         axisCount = Math.max(axisCount, coordinates.length);
-        points.add(new DoubleCoordinates(coordinates));
+        points.add(new PointDouble(coordinates));
       }
       StaxUtils.skipToEndElement(in);
       return new DoubleCoordinatesList(axisCount, points);
@@ -112,7 +111,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
 
   private LinearRing parseLinearRing() throws XMLStreamException {
     StaxUtils.requireLocalName(in, LINEAR_RING);
-    CoordinatesList points = null;
+    PointList points = null;
     if (StaxUtils.skipToChildStartElements(in, COORDINATES)) {
       points = parseCoordinates();
       StaxUtils.skipToEndElement(in);
@@ -131,7 +130,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
 
   private LineString parseLineString() throws XMLStreamException {
     StaxUtils.requireLocalName(in, LINE_STRING);
-    CoordinatesList points = null;
+    PointList points = null;
     while (!StaxUtils.isEndElementLocalName(in, LINE_STRING)
       && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (StaxUtils.matchElementLocalName(in, COORDINATES)) {
@@ -168,7 +167,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
 
   private Point parsePoint() throws XMLStreamException {
     StaxUtils.requireLocalName(in, POINT);
-    CoordinatesList points = null;
+    PointList points = null;
     while (!StaxUtils.isEndElementLocalName(in, POINT)
       && in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (points == null && StaxUtils.matchElementLocalName(in, COORDINATES)) {

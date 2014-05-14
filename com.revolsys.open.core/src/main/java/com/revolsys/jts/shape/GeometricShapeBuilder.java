@@ -33,15 +33,14 @@
 
 package com.revolsys.jts.shape;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public abstract class GeometricShapeBuilder {
   protected BoundingBox extent = new Envelope(2, 0, 0, 1, 1);
@@ -55,7 +54,7 @@ public abstract class GeometricShapeBuilder {
   }
 
   protected Point createCoord(final double x, final double y) {
-    return new DoubleCoordinates(geometryFactory.makePrecise(0, x),
+    return new PointDouble(geometryFactory.makePrecise(0, x),
       geometryFactory.makePrecise(1, y));
   }
 
@@ -81,10 +80,10 @@ public abstract class GeometricShapeBuilder {
     final double radius = getRadius();
 
     final Point centre = getCentre();
-    final Coordinate p0 = new Coordinate(centre.getX() - radius, centre.getY()
-      - radius, Point.NULL_ORDINATE);
-    final Coordinate p1 = new Coordinate(centre.getX() + radius, centre.getY()
-      - radius, Point.NULL_ORDINATE);
+    final Point p0 = new PointDouble(centre.getX() - radius,
+      centre.getY() - radius, Point.NULL_ORDINATE);
+    final Point p1 = new PointDouble(centre.getX() + radius,
+      centre.getY() - radius, Point.NULL_ORDINATE);
     return new LineSegmentImpl(p0, p1);
   }
 

@@ -35,7 +35,7 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -148,7 +148,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     }
   }
 
-  public CoordinatesList getCoordinates(final SeShape shape,
+  public PointList getCoordinates(final SeShape shape,
     final double[][][] allCoordinates, final int partIndex,
     final int ringIndex, final int axisCount) {
     try {
@@ -284,7 +284,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
           for (int partIndex = 0; partIndex < numParts; partIndex++) {
             final int numRings = shape.getNumSubParts(partIndex + 1);
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final CoordinatesList coordinates = getCoordinates(shape,
+              final PointList coordinates = getCoordinates(shape,
                 allCoordinates, partIndex, ringIndex, axisCount);
               final Point point = geometryFactory.point(coordinates);
               if (!point.isEmpty()) {
@@ -303,7 +303,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
           for (int partIndex = 0; partIndex < numParts; partIndex++) {
             final int numRings = shape.getNumSubParts(partIndex + 1);
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final CoordinatesList coordinates = getCoordinates(shape,
+              final PointList coordinates = getCoordinates(shape,
                 allCoordinates, partIndex, ringIndex, axisCount);
               final LineString line = geometryFactory.lineString(coordinates);
               if (!line.isEmpty()) {
@@ -321,9 +321,9 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
           final List<Polygon> polygons = new ArrayList<Polygon>();
           for (int partIndex = 0; partIndex < numParts; partIndex++) {
             final int numRings = shape.getNumSubParts(partIndex + 1);
-            final List<CoordinatesList> rings = new ArrayList<CoordinatesList>();
+            final List<PointList> rings = new ArrayList<PointList>();
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final CoordinatesList coordinates = getCoordinates(shape,
+              final PointList coordinates = getCoordinates(shape,
                 allCoordinates, partIndex, ringIndex, axisCount);
               rings.add(coordinates);
             }

@@ -35,6 +35,7 @@ package com.revolsys.jts.geom;
 import java.util.Collection;
 import java.util.Comparator;
 
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.math.MathUtil;
 
 /**
@@ -108,7 +109,7 @@ public class CoordinateArrays {
   public static Point[] copyDeep(final Point[] coordinates) {
     final Point[] copy = new Point[coordinates.length];
     for (int i = 0; i < coordinates.length; i++) {
-      copy[i] = new Coordinate(coordinates[i]);
+      copy[i] = new PointDouble(coordinates[i]);
     }
     return copy;
   }
@@ -128,17 +129,16 @@ public class CoordinateArrays {
   public static void copyDeep(final Point[] src, final int srcStart,
     final Point[] dest, final int destStart, final int length) {
     for (int i = 0; i < length; i++) {
-      dest[destStart + i] = new Coordinate(src[srcStart + i]);
+      dest[destStart + i] = new PointDouble(src[srcStart + i]);
     }
   }
 
   /**
    * Returns true if the two arrays are identical, both null, or pointwise
    * equal (as compared using Coordinate#equals)
-   * @see Coordinate#equals(Object)
+   * @see Point#equals(Object)
    */
-  public static boolean equals(final Point[] coord1,
-    final Point[] coord2) {
+  public static boolean equals(final Point[] coord1, final Point[] coord2) {
     if (coord1 == coord2) {
       return true;
     }
@@ -164,8 +164,8 @@ public class CoordinateArrays {
    * @param coord2 an array of Coordinates
    * @param coordinateComparator a Comparator for Coordinates
    */
-  public static boolean equals(final Point[] coord1,
-    final Point[] coord2, final Comparator coordinateComparator) {
+  public static boolean equals(final Point[] coord1, final Point[] coord2,
+    final Comparator coordinateComparator) {
     if (coord1 == coord2) {
       return true;
     }
@@ -196,8 +196,7 @@ public class CoordinateArrays {
    * @param end the index of the end of the subsequence to extract
    * @return a subsequence of the input array
    */
-  public static Point[] extract(final Point[] pts, int start,
-    int end) {
+  public static Point[] extract(final Point[] pts, int start, int end) {
     start = MathUtil.clamp(start, 0, pts.length);
     end = MathUtil.clamp(end, -1, pts.length);
 
@@ -246,8 +245,7 @@ public class CoordinateArrays {
    *@return              the position of <code>coordinate</code>, or -1 if it is
    *      not found
    */
-  public static int indexOf(final Point coordinate,
-    final Point[] coordinates) {
+  public static int indexOf(final Point coordinate, final Point[] coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       if (coordinate.equals(coordinates[i])) {
         return i;
@@ -264,8 +262,7 @@ public class CoordinateArrays {
    * @param pts2
    * @return <code>true</code> if the two arrays are equal in opposite directions.
    */
-  private static boolean isEqualReversed(final Point[] pts1,
-    final Point[] pts2) {
+  private static boolean isEqualReversed(final Point[] pts1, final Point[] pts2) {
     for (int i = 0; i < pts1.length; i++) {
       final Point p1 = pts1[i];
       final Point p2 = pts2[pts1.length - i - 1];
@@ -301,8 +298,7 @@ public class CoordinateArrays {
    * @return a {@link Coordinates} from <code>testPts</code> which is not in <code>pts</code>, '
    * or <code>null</code>
    */
-  public static Point ptNotInList(final Point[] testPts,
-    final Point[] pts) {
+  public static Point ptNotInList(final Point[] testPts, final Point[] pts) {
     for (int i = 0; i < testPts.length; i++) {
       final Point testPt = testPts[i];
       if (CoordinateArrays.indexOf(testPt, pts) < 0) {

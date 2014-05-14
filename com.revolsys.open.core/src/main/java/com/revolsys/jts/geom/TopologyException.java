@@ -33,6 +33,8 @@
  */
 package com.revolsys.jts.geom;
 
+import com.revolsys.jts.geom.impl.PointDouble;
+
 /**
  * Indicates an invalid or inconsistent topological situation encountered during processing
  *
@@ -54,7 +56,7 @@ public class TopologyException extends RuntimeException {
 
   public TopologyException(final String msg, final Point pt) {
     super(msgWithCoord(msg, pt));
-    this.pt = new Coordinate(pt);
+    this.pt = new PointDouble(pt);
   }
 
   public Point getCoordinate() {

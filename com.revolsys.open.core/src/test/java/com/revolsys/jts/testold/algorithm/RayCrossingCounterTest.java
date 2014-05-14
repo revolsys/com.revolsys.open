@@ -35,8 +35,8 @@ package com.revolsys.jts.testold.algorithm;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.WKTReader;
 

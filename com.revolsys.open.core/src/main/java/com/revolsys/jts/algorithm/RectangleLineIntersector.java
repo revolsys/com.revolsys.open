@@ -33,9 +33,9 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Computes whether a rectangle intersects line segments.
@@ -81,13 +81,13 @@ public class RectangleLineIntersector {
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    diagUp0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMinY(),
+    diagUp0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(),
       Point.NULL_ORDINATE);
-    diagUp1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY(),
+    diagUp1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(),
       Point.NULL_ORDINATE);
-    diagDown0 = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY(),
+    diagDown0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(),
       Point.NULL_ORDINATE);
-    diagDown1 = new Coordinate(rectEnv.getMaxX(), rectEnv.getMinY(),
+    diagDown1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(),
       Point.NULL_ORDINATE);
   }
 

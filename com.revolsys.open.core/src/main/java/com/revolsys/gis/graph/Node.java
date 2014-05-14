@@ -18,15 +18,14 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.AbstractPoint;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class Node<T> extends AbstractPoint implements AttributedObject,
   Externalizable {
@@ -158,8 +157,8 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
   }
 
   @Override
-  public DoubleCoordinates cloneCoordinates() {
-    return new DoubleCoordinates(x, y);
+  public PointDouble cloneCoordinates() {
+    return new PointDouble(x, y);
   }
 
   public int compareTo(final Node<T> node) {
@@ -186,7 +185,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
         Point coordinates = null;
         for (final Edge<T> edge : edges) {
           final LineString line = edge.getLine();
-          final CoordinatesList points = CoordinatesListUtil.get(line);
+          final PointList points = CoordinatesListUtil.get(line);
           Point point = null;
           if (edge.getFromNode() == this) {
             point = points.get(0);

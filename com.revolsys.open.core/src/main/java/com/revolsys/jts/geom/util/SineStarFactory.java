@@ -34,12 +34,12 @@
 package com.revolsys.jts.geom.util;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 /**
@@ -121,7 +121,7 @@ public class SineStarFactory extends GeometricShapeFactory {
       final double y = curveRadius * Math.sin(ang) + centreY;
       pts[iPt++] = coord(x, y);
     }
-    pts[iPt] = new Coordinate(pts[0]);
+    pts[iPt] = new PointDouble(pts[0]);
 
     final LinearRing ring = geomFact.linearRing(pts);
     final Polygon poly = geomFact.polygon(ring);

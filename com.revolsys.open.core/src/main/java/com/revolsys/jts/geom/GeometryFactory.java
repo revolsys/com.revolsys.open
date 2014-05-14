@@ -56,7 +56,6 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
@@ -69,7 +68,8 @@ import com.revolsys.jts.geom.impl.LinearRingImpl;
 import com.revolsys.jts.geom.impl.MultiLineStringImpl;
 import com.revolsys.jts.geom.impl.MultiPointImpl;
 import com.revolsys.jts.geom.impl.MultiPolygonImpl;
-import com.revolsys.jts.geom.impl.PointImpl;
+import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.impl.PointDoubleGF;
 import com.revolsys.jts.geom.impl.PolygonImpl;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.util.CollectionUtil;
@@ -441,7 +441,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     for (int i = 0; i < coordinates.length; i++) {
       coordinates[i] = makePrecise(i, coordinates[i]);
     }
-    final Point newPoint = new DoubleCoordinates(this.axisCount, coordinates);
+    final Point newPoint = new PointDouble(this.axisCount, coordinates);
     return newPoint;
   }
 
@@ -449,7 +449,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return getPreciseCoordinates(point);
   }
 
-  public CoordinatesList createCoordinatesList(final Collection<?> points) {
+  public PointList createCoordinatesList(final Collection<?> points) {
     if (points == null || points.isEmpty()) {
       return null;
     } else {
@@ -467,9 +467,9 @@ public class GeometryFactory implements Serializable, MapSerializer {
           final Point projectedPoint = ((Point)object).convert(this);
           point = projectedPoint;
         } else if (object instanceof double[]) {
-          point = new DoubleCoordinates((double[])object);
-        } else if (object instanceof CoordinatesList) {
-          final CoordinatesList pointList = (CoordinatesList)object;
+          point = new PointDouble((double[])object);
+        } else if (object instanceof PointList) {
+          final PointList pointList = (PointList)object;
           point = pointList.get(0);
         } else {
           throw new IllegalArgumentException("Unexepected data type: " + object);
@@ -602,14 +602,14 @@ public class GeometryFactory implements Serializable, MapSerializer {
   /**
    * Creates a deep copy of the input {@link Geometry}.
    * <p>
-   * This is a convenient way to change the <tt>CoordinatesList</tt>
+   * This is a convenient way to change the <tt>PointList</tt>
    * used to represent a geometry, or to change the 
    * factory used for a geometry.
    * <p>
    * {@link Geometry#clone()} can also be used to make a deep copy,
-   * but it does not allow changing the CoordinatesList type.
+   * but it does not allow changing the PointList type.
    * 
-   * @return a deep copy of the input geometry, using the CoordinatesList type of this factory
+   * @return a deep copy of the input geometry, using the PointList type of this factory
    * 
    * @see Geometry#clone() 
    */
@@ -786,12 +786,12 @@ public class GeometryFactory implements Serializable, MapSerializer {
     final Object ring = rings.get(index);
     if (ring instanceof LinearRing) {
       return (LinearRing)ring;
-    } else if (ring instanceof CoordinatesList) {
-      final CoordinatesList points = (CoordinatesList)ring;
+    } else if (ring instanceof PointList) {
+      final PointList points = (PointList)ring;
       return linearRing(points);
     } else if (ring instanceof LineString) {
       final LineString line = (LineString)ring;
-      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final PointList points = CoordinatesListUtil.get(line);
       return linearRing(points);
     } else if (ring instanceof double[]) {
       final double[] coordinates = (double[])ring;
@@ -809,8 +809,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
       LineString lineString;
       if (value instanceof LineString) {
         lineString = (LineString)value;
-      } else if (value instanceof CoordinatesList) {
-        final CoordinatesList coordinates = (CoordinatesList)value;
+      } else if (value instanceof PointList) {
+        final PointList coordinates = (PointList)value;
         lineString = lineString(coordinates);
       } else if (value instanceof double[]) {
         final double[] points = (double[])value;
@@ -875,10 +875,10 @@ public class GeometryFactory implements Serializable, MapSerializer {
       if (value instanceof Polygon) {
         polygon = (Polygon)value;
       } else if (value instanceof List) {
-        final List<CoordinatesList> coordinateList = (List<CoordinatesList>)value;
+        final List<PointList> coordinateList = (List<PointList>)value;
         polygon = polygon(coordinateList);
-      } else if (value instanceof CoordinatesList) {
-        final CoordinatesList coordinateList = (CoordinatesList)value;
+      } else if (value instanceof PointList) {
+        final PointList coordinateList = (PointList)value;
         polygon = polygon(coordinateList);
       } else {
         polygon = null;
@@ -902,7 +902,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   public Point getPreciseCoordinates(final Point point) {
     final double[] coordinates = point.getCoordinates();
     makePrecise(coordinates.length, coordinates);
-    return new DoubleCoordinates(coordinates);
+    return new PointDouble(coordinates);
   }
 
   public double getResolution(final int axisIndex) {
@@ -990,21 +990,21 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (points == null || points.isEmpty()) {
       return linearRing();
     } else {
-      final CoordinatesList coordinatesList = createCoordinatesList(points);
+      final PointList coordinatesList = createCoordinatesList(points);
       return linearRing(coordinatesList);
     }
   }
 
   /**
-   * Creates a {@link LinearRing} using the given {@link CoordinatesList}. 
+   * Creates a {@link LinearRing} using the given {@link PointList}. 
    * A null or empty array creates an empty LinearRing. 
    * The points must form a closed and simple linestring. 
    * 
-   * @param coordinates a CoordinatesList (possibly empty), or null
+   * @param coordinates a PointList (possibly empty), or null
    * @return the created LinearRing
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    */
-  public LinearRing linearRing(final CoordinatesList points) {
+  public LinearRing linearRing(final PointList points) {
     return new LinearRingImpl(this, points);
   }
 
@@ -1040,18 +1040,18 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (points.isEmpty()) {
       return lineString();
     } else {
-      final CoordinatesList coordinatesList = createCoordinatesList(points);
+      final PointList coordinatesList = createCoordinatesList(points);
       return lineString(coordinatesList);
     }
   }
 
   /**
-   * Creates a LineString using the given CoordinatesList.
-   * A null or empty CoordinatesList creates an empty LineString. 
+   * Creates a LineString using the given PointList.
+   * A null or empty PointList creates an empty LineString. 
    * 
-   * @param coordinates a CoordinatesList (possibly empty), or null
+   * @param coordinates a PointList (possibly empty), or null
    */
-  public LineString lineString(final CoordinatesList points) {
+  public LineString lineString(final PointList points) {
     return new LineStringImpl(this, points);
   }
 
@@ -1145,13 +1145,13 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   /**
    * Creates a {@link MultiPoint} using the 
-   * points in the given {@link CoordinatesList}.
-   * A <code>null</code> or empty CoordinatesList creates an empty MultiPoint.
+   * points in the given {@link PointList}.
+   * A <code>null</code> or empty PointList creates an empty MultiPoint.
    *
-   * @param coordinates a CoordinatesList (possibly empty), or <code>null</code>
+   * @param coordinates a PointList (possibly empty), or <code>null</code>
    * @return a MultiPoint geometry
    */
-  public MultiPoint multiPoint(final CoordinatesList coordinatesList) {
+  public MultiPoint multiPoint(final PointList coordinatesList) {
     if (coordinatesList == null) {
       return multiPoint();
     } else {
@@ -1214,17 +1214,17 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @return The point.
    */
   public Point point() {
-    return new PointImpl(this);
+    return new PointDoubleGF(this);
   }
 
   /**
-   * Creates a Point using the given CoordinatesList; a null or empty
-   * CoordinatesList will create an empty Point.
+   * Creates a Point using the given PointList; a null or empty
+   * PointList will create an empty Point.
    * 
-   * @param points a CoordinatesList (possibly empty), or null
+   * @param points a PointList (possibly empty), or null
    * @return the created Point
    */
-  public Point point(final CoordinatesList points) {
+  public Point point(final PointList points) {
     if (points == null) {
       return point();
     } else {
@@ -1260,7 +1260,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (coordinates == null || coordinates.length < 2) {
       return point();
     } else {
-      return new PointImpl(this, coordinates);
+      return new PointDoubleGF(this, coordinates);
     }
   }
 
@@ -1270,7 +1270,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    *   <li><code>null</code> using {@link #point()}</li>
    *   <li>Instances of {@link Point} using {@link Point#copy(GeometryFactory)}</li>
    *   <li>Instances of {@link Coordinates} using {@link #point(Point)}</li>
-   *   <li>Instances of {@link CoordinatesList} using {@link #point(CoordinatesList)}</li>
+   *   <li>Instances of {@link PointList} using {@link #point(PointList)}</li>
    *   <li>Instances of {@link double[]} using {@link #point(double[])}</li>
    *   <li>Instances of any other class throws {@link IllegalArgumentException}.<li>
    * </ul>
@@ -1289,8 +1289,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return point((double[])object);
     } else if (object instanceof Point) {
       return point((Point)object);
-    } else if (object instanceof CoordinatesList) {
-      return point((CoordinatesList)object);
+    } else if (object instanceof PointList) {
+      return point((PointList)object);
     } else {
       throw new IllegalArgumentException("Cannot create a point from "
         + object.getClass());
@@ -1319,8 +1319,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return new PolygonImpl(this);
   }
 
-  public Polygon polygon(final CoordinatesList... rings) {
-    final List<CoordinatesList> ringList = Arrays.asList(rings);
+  public Polygon polygon(final PointList... rings) {
+    final List<PointList> ringList = Arrays.asList(rings);
     return polygon(ringList);
   }
 

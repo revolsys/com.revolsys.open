@@ -31,17 +31,17 @@ import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.PointUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.gis.model.coordinates.PointWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -82,10 +82,10 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     }
   }
 
-  public static CoordinatesWithOrientation getTextLocation(
+  public static PointWithOrientation getTextLocation(
     final Viewport2D viewport, final Geometry geometry, final TextStyle style) {
     if (viewport == null) {
-      return new CoordinatesWithOrientation(new DoubleCoordinates(0.0, 0.0), 0);
+      return new PointWithOrientation(new PointDouble(0.0, 0.0), 0);
     }
     final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
@@ -97,14 +97,14 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
       final String placementType = style.getTextPlacementType();
       final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
         placementType);
-      final CoordinatesList points = CoordinatesListUtil.get(geometry);
+      final PointList points = CoordinatesListUtil.get(geometry);
       final int numPoints = points.size();
       if (numPoints == 1) {
         point = points.get(0);
         point = ProjectionFactory.convert(point, geometryFactory,
           viewportGeometryFactory);
 
-        return new CoordinatesWithOrientation(point, 0);
+        return new PointWithOrientation(point, 0);
       } else if (numPoints > 1) {
         final boolean matches = matcher.matches();
         if (matches) {
@@ -203,7 +203,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
           if ("none".equals(orientationType)) {
             orientation = 0;
           }
-          return new CoordinatesWithOrientation(point, orientation);
+          return new PointWithOrientation(point, orientation);
         }
       }
     }
@@ -215,7 +215,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Geometry geometry, final TextStyle style) {
     final String label = getLabel(object, style);
     if (StringUtils.hasText(label) && geometry != null || viewport == null) {
-      final CoordinatesWithOrientation point = getTextLocation(viewport,
+      final PointWithOrientation point = getTextLocation(viewport,
         geometry, style);
       if (point != null) {
         final double orientation = point.getOrientation();

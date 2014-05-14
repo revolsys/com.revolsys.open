@@ -22,13 +22,13 @@ package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStartsSharesStartOrEndFilter implements Filter<LineString> {
-  private final CoordinatesList points;
+  private final PointList points;
 
-  private final CoordinatesList reversePoints;
+  private final PointList reversePoints;
 
   public LineStartsSharesStartOrEndFilter(final LineString line) {
     this.points = CoordinatesListUtil.get(line);
@@ -37,7 +37,7 @@ public class LineStartsSharesStartOrEndFilter implements Filter<LineString> {
 
   @Override
   public boolean accept(final LineString line) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final PointList points = CoordinatesListUtil.get(line);
 
     if (this.points.startsWith(points, this.points.getAxisCount())) {
       return true;

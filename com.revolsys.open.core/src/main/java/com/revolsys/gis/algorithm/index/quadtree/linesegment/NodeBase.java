@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Point;
 
 public abstract class NodeBase {
   public static int getSubnodeIndex(

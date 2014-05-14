@@ -39,11 +39,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -51,6 +49,7 @@ import com.revolsys.jts.geom.Lineal;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeIntersection;
 import com.revolsys.jts.geomgraph.GeometryGraph;
@@ -308,7 +307,7 @@ public class IsSimpleOp {
     boolean simple = true;
     final Set<Point> points = new TreeSet<>();
     for (final Point point : mulitPoint.getPoints()) {
-      final Point coordinates = new DoubleCoordinates(point, 2);
+      final Point coordinates = new PointDouble(point, 2);
       if (points.contains(coordinates)) {
         simple = false;
         nonSimplePoints.add(coordinates);

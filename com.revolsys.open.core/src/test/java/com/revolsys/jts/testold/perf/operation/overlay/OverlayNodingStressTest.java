@@ -4,11 +4,11 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
 
 /**
@@ -79,7 +79,7 @@ public class OverlayNodingStressTest extends TestCase {
     final double angle2) {
     final RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
     final double basex = angle2 * MAX_DISPLACEMENT - MAX_DISPLACEMENT / 2;
-    final Point base = new Coordinate(basex, basex,
+    final Point base = new PointDouble(basex, basex,
       Point.NULL_ORDINATE);
     final Polygon rr1 = rrFact.createRectangle(100, 20, angle1, base);
 
@@ -152,7 +152,7 @@ class RotatedRectangleFactory {
 
   public Polygon createRectangle(final double length, final double width,
     final double angle) {
-    return createRectangle(length, width, angle, new Coordinate((double)0, 0,
+    return createRectangle(length, width, angle, new PointDouble((double)0, 0,
       Point.NULL_ORDINATE));
   }
 
@@ -166,18 +166,18 @@ class RotatedRectangleFactory {
     final double widthOffsety = width / 2 * Math.sin(angle + PI_OVER_2);
 
     final Point[] pts = new Point[] {
-      new Coordinate(base.getX() + posx + widthOffsetx, base.getY() + posy
+      new PointDouble(base.getX() + posx + widthOffsetx, base.getY() + posy
         + widthOffsety, Point.NULL_ORDINATE),
-      new Coordinate(base.getX() + posx - widthOffsetx, base.getY() + posy
+      new PointDouble(base.getX() + posx - widthOffsetx, base.getY() + posy
         - widthOffsety, Point.NULL_ORDINATE),
-      new Coordinate(base.getX() + negx - widthOffsetx, base.getY() + negy
+      new PointDouble(base.getX() + negx - widthOffsetx, base.getY() + negy
         - widthOffsety, Point.NULL_ORDINATE),
-      new Coordinate(base.getX() + negx + widthOffsetx, base.getY() + negy
+      new PointDouble(base.getX() + negx + widthOffsetx, base.getY() + negy
         + widthOffsety, Point.NULL_ORDINATE),
-      new Coordinate(0.0, 0, Point.NULL_ORDINATE),
+      new PointDouble(0.0, 0, Point.NULL_ORDINATE),
     };
     // close polygon
-    pts[4] = new Coordinate(pts[0]);
+    pts[4] = new PointDouble(pts[0]);
     final Polygon poly = this.fact.polygon(this.fact.linearRing(pts));
     return poly;
   }

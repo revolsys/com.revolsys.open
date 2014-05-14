@@ -17,7 +17,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -128,7 +128,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       int numPoints = 0;
       byte[] data;
 
-      final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(
+      final List<List<PointList>> parts = CoordinatesListUtil.getParts(
         geometry, false);
       final int entityType = ArcSdeConstants.getStGeometryType(geometry);
       numPoints = PackedCoordinateUtil.getNumPoints(parts);

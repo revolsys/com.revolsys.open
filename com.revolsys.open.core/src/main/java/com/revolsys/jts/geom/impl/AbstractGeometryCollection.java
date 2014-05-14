@@ -42,12 +42,12 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -56,8 +56,8 @@ import com.revolsys.jts.geom.GeometryFactory;
  *
  *@version 1.7
  */
-public abstract class AbstractGeometryCollection extends AbstractGeometry
-  implements GeometryCollection {
+public abstract class AbstractGeometryCollection extends BaseGeometry implements
+  GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
 
   /**
@@ -210,11 +210,11 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
   }
 
   @Override
-  public Point getCoordinate() {
+  public Point getPoint() {
     if (isEmpty()) {
       return null;
     } else {
-      return getGeometry(0).getCoordinate();
+      return getGeometry(0).getPoint();
     }
   }
 

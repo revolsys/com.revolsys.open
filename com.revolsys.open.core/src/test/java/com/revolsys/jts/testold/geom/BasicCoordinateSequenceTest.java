@@ -35,7 +35,7 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 
 /**
  * @version 1.7
@@ -50,8 +50,8 @@ public class BasicCoordinateSequenceTest extends TestCase {
   }
 
   public void testClone() {
-    final CoordinatesList s1 = new DoubleCoordinatesList(2, 1.0, 2.0, 3.0, 4.0);
-    final CoordinatesList s2 = s1.clone();
+    final PointList s1 = new DoubleCoordinatesList(2, 1.0, 2.0, 3.0, 4.0);
+    final PointList s2 = s1.clone();
     assertTrue(s1.getCoordinate(0).equals(s2.getCoordinate(0)));
     assertTrue(s1.getCoordinate(0) != s2.getCoordinate(0));
   }

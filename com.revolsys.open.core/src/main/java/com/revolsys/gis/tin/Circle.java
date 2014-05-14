@@ -15,15 +15,14 @@
  */
 package com.revolsys.gis.tin;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
-public class Circle extends DoubleCoordinates {
+public class Circle extends PointDouble {
 
   private BoundingBox envelope;
 

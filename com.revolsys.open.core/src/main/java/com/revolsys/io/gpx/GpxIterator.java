@@ -26,16 +26,16 @@ import com.revolsys.gis.data.io.DataObjectIterator;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.DateUtil;
 
 public class GpxIterator implements DataObjectIterator {
@@ -257,9 +257,9 @@ public class GpxIterator implements DataObjectIterator {
 
     Point coord = null;
     if (Double.isNaN(elevation)) {
-      coord = new DoubleCoordinates(lon, lat);
+      coord = new PointDouble(lon, lat);
     } else {
-      coord = new DoubleCoordinates(lon, lat, elevation);
+      coord = new PointDouble(lon, lat, elevation);
     }
 
     final Point point = geometryFactory.point(coord);
@@ -319,12 +319,12 @@ public class GpxIterator implements DataObjectIterator {
     dataObject.setValue("dataset_name", baseName);
     dataObject.setValue("index", index);
     dataObject.setValue("feature_type", "trk");
-    final List<CoordinatesList> segments = new ArrayList<CoordinatesList>();
+    final List<PointList> segments = new ArrayList<PointList>();
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
         StaxUtils.skipSubTree(in);
       } else if (in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
-        final CoordinatesList points = parseTrackSegment();
+        final PointList points = parseTrackSegment();
         if (points.size() > 1) {
           segments.add(points);
         }
@@ -382,7 +382,7 @@ public class GpxIterator implements DataObjectIterator {
     return axisCount;
   }
 
-  private CoordinatesList parseTrackSegment() throws XMLStreamException {
+  private PointList parseTrackSegment() throws XMLStreamException {
     final List<Double> coordinates = new ArrayList<Double>();
     int axisCount = 2;
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {

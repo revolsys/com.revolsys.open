@@ -36,8 +36,8 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -69,9 +69,9 @@ public class OrientationIndexTest extends TestCase {
     final double p0y, final double p1x, final double p1y, final double p2x,
     final double p2y) {
     final Point[] pts = {
-      new Coordinate(p0x, p0y, Point.NULL_ORDINATE),
-      new Coordinate(p1x, p1y, Point.NULL_ORDINATE),
-      new Coordinate(p2x, p2y, Point.NULL_ORDINATE)
+      new PointDouble(p0x, p0y, Point.NULL_ORDINATE),
+      new PointDouble(p1x, p1y, Point.NULL_ORDINATE),
+      new PointDouble(p2x, p2y, Point.NULL_ORDINATE)
     };
     return isAllOrientationsEqual(pts);
   }
@@ -87,10 +87,10 @@ public class OrientationIndexTest extends TestCase {
   public void testCCW2() throws Exception {
     // experimental case - can't make it fail
     final Point[] pts2 = {
-      new Coordinate(1.0000000000004998, -7.989685402102996,
+      new PointDouble(1.0000000000004998, -7.989685402102996,
         Point.NULL_ORDINATE),
-      new Coordinate(10.0, -7.004368924503866, Point.NULL_ORDINATE),
-      new Coordinate(1.0000000000005, -7.989685402102996,
+      new PointDouble(10.0, -7.004368924503866, Point.NULL_ORDINATE),
+      new PointDouble(1.0000000000005, -7.989685402102996,
         Point.NULL_ORDINATE),
     };
     assertTrue(isAllOrientationsEqual(pts2));

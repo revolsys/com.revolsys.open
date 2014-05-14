@@ -5,7 +5,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
@@ -54,7 +54,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     if (multiLine.isEmpty()) {
       hasZ = false;
     } else {
-      final CoordinatesList points = CoordinatesListUtil.get((LineString)multiLine.getGeometry(0));
+      final PointList points = CoordinatesListUtil.get((LineString)multiLine.getGeometry(0));
       hasZ = points.getAxisCount() > 2;
     }
     out.element(HAS_ID, false);
@@ -112,7 +112,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   private void writePolygon(final XmlWriter out, final Polygon polygon) {
     final boolean hasZ;
     final LineString exteriorRing = polygon.getExteriorRing();
-    final CoordinatesList points = CoordinatesListUtil.get(exteriorRing);
+    final PointList points = CoordinatesListUtil.get(exteriorRing);
     hasZ = points.getAxisCount() > 2;
     out.element(HAS_ID, false);
     out.element(HAS_Z, hasZ);

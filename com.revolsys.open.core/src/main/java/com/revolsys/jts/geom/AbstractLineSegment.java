@@ -3,7 +3,6 @@ package com.revolsys.jts.geom;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -11,6 +10,7 @@ import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractLineSegment extends AbstractCoordinatesList
@@ -253,11 +253,11 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
     Point intersection = null;
     final Polygon polygon = boundingBox.toPolygon(1);
     final LineString ring = polygon.getExteriorRing();
-    final CoordinatesList points = CoordinatesListUtil.get(ring);
+    final PointList points = CoordinatesListUtil.get(ring);
     for (int i = 0; i < 4; i++) {
       final Point ringC1 = points.get(i);
       final Point ringC2 = points.get(i);
-      final CoordinatesList currentIntersections = LineSegmentUtil.getIntersection(
+      final PointList currentIntersections = LineSegmentUtil.getIntersection(
         geometryFactory, coordinates1, coordinates2, ringC1, ringC2);
       if (currentIntersections.size() == 1) {
         final Point currentIntersection = currentIntersections.get(0);
@@ -311,23 +311,23 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
   }
 
   @Override
-  public CoordinatesList getIntersection(final Point point1,
+  public PointList getIntersection(final Point point1,
     final Point point2) {
-    final CoordinatesList intersection = LineSegmentUtil.getIntersection(
+    final PointList intersection = LineSegmentUtil.getIntersection(
       getGeometryFactory(), get(0), get(1), point1, point2);
     return intersection;
   }
 
   @Override
-  public CoordinatesList getIntersection(final GeometryFactory precisionModel,
+  public PointList getIntersection(final GeometryFactory precisionModel,
     final LineSegment lineSegment2) {
     return LineSegmentUtil.getIntersection(getGeometryFactory(), get(0),
       get(1), lineSegment2.get(0), lineSegment2.get(1));
   }
 
   @Override
-  public CoordinatesList getIntersection(final LineSegment lineSegment2) {
-    final CoordinatesList intersection = LineSegmentUtil.getIntersection(
+  public PointList getIntersection(final LineSegment lineSegment2) {
+    final PointList intersection = LineSegmentUtil.getIntersection(
       getGeometryFactory(), get(0), get(1), lineSegment2.get(0),
       lineSegment2.get(1));
     return intersection;
@@ -402,7 +402,7 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
    */
   @Override
   public Point intersection(final LineSegment line) {
-    final CoordinatesList intersection = getIntersection(line);
+    final PointList intersection = getIntersection(line);
     if (intersection.size() == 0) {
       return null;
     } else {
@@ -419,7 +419,7 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
     } else if (boundingBox.intersects(p2)) {
       return true;
     } else {
-      final CoordinatesList cornerPoints = boundingBox.getCornerPoints();
+      final PointList cornerPoints = boundingBox.getCornerPoints();
       for (int i = 0; i < 4; i++) {
         final Point bp1 = cornerPoints.get(i);
         final Point bp2 = cornerPoints.get((i + 1) % 4);
@@ -605,7 +605,7 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
       newValue = geometryFactory.makePrecise(i, newValue);
       coordinates[i] = newValue;
     }
-    return new DoubleCoordinates(coordinates);
+    return new PointDouble(coordinates);
   }
 
   /**
@@ -658,7 +658,7 @@ public abstract class AbstractLineSegment extends AbstractCoordinatesList
       y = y + ux;
     }
 
-    final DoubleCoordinates coord = new DoubleCoordinates(x, y);
+    final PointDouble coord = new PointDouble(x, y);
     return coord;
   }
 

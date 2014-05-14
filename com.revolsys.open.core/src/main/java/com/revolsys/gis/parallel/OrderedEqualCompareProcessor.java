@@ -14,7 +14,7 @@ import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.parallel.channel.Channel;
@@ -66,12 +66,12 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
           return false;
         }
       } else {
-        final List<CoordinatesList> parts1 = CoordinatesListUtil.getAll(geometry1);
-        final List<CoordinatesList> parts2 = CoordinatesListUtil.getAll(geometry2);
+        final List<PointList> parts1 = CoordinatesListUtil.getAll(geometry1);
+        final List<PointList> parts2 = CoordinatesListUtil.getAll(geometry2);
         if (parts1.size() == parts2.size()) {
           for (int i = 0; i < parts1.size(); i++) {
-            final CoordinatesList points1 = parts1.get(i);
-            final CoordinatesList points2 = parts2.get(i);
+            final PointList points1 = parts1.get(i);
+            final PointList points2 = parts2.get(i);
             if (points1.size() == points2.size()
               && points1.getAxisCount() == points2.getAxisCount()) {
               for (int j = 0; j < points1.size(); j++) {

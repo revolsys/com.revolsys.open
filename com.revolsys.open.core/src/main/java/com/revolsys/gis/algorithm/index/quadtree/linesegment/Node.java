@@ -1,9 +1,9 @@
 package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.DoubleBits;
 
 public class Node extends NodeBase {
@@ -60,7 +60,7 @@ public class Node extends NodeBase {
     this.level = level;
     final double x = (env.getMinX() + env.getMaxX()) / 2;
     final double y = (env.getMinY() + env.getMaxY()) / 2;
-    centre = new DoubleCoordinates(x, y);
+    centre = new PointDouble(x, y);
   }
 
   private Node createSubnode(final int index) {

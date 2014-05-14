@@ -2,8 +2,8 @@ package com.revolsys.jts.testold.linearref;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -65,7 +65,7 @@ public abstract class AbstractIndexedLineTest extends TestCase {
   {
     final Geometry input = read(inputStr);
     final Geometry testPoint = read(testPtWKT);
-    final Point testPt = testPoint.getCoordinate();
+    final Point testPt = testPoint.getPoint();
     final boolean resultOK = indexOfAfterCheck(input, testPt);
     assertTrue(resultOK);
   }
@@ -76,9 +76,9 @@ public abstract class AbstractIndexedLineTest extends TestCase {
   {
     final Geometry input = read(inputStr);
     final Geometry testPoint = read(testPtWKT);
-    final Point testPt = testPoint.getCoordinate();
+    final Point testPt = testPoint.getPoint();
     final Geometry afterPoint = read(afterPtWKT);
-    final Point afterPt = afterPoint.getCoordinate();
+    final Point afterPt = afterPoint.getPoint();
     final boolean resultOK = indexOfAfterCheck(input, testPt, afterPt);
     assertTrue(resultOK);
   }
@@ -100,8 +100,8 @@ public abstract class AbstractIndexedLineTest extends TestCase {
     final Geometry input = read(inputWKT);
     final Geometry testPoint = read(testPtWKT);
     final Geometry expectedPoint = read(expectedPtWKT);
-    final Point testPt = testPoint.getCoordinate();
-    final Point expectedPt = expectedPoint.getCoordinate();
+    final Point testPt = testPoint.getPoint();
+    final Point expectedPt = expectedPoint.getPoint();
     final Point offsetPt = extractOffsetAt(input, testPt, offsetDistance);
 
     final boolean isOk = offsetPt.distance(expectedPt) < TOLERANCE_DIST;

@@ -25,7 +25,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
@@ -53,8 +53,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
 
   public boolean fixMissingZValues(final LineString line1,
     final LineString line2) {
-    final CoordinatesList points1 = line1.getCoordinatesList();
-    final CoordinatesList points2 = line2.getCoordinatesList();
+    final PointList points1 = line1.getCoordinatesList();
+    final PointList points2 = line2.getCoordinatesList();
     final int axisCount = points1.getAxisCount();
     if (axisCount > 2) {
       final int vertexCount = points1.size();
@@ -80,8 +80,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  public boolean fixZValues(final CoordinatesList points1, final int index1,
-    final CoordinatesList points2, final int index2) {
+  public boolean fixZValues(final PointList points1, final int index1,
+    final PointList points2, final int index2) {
     // TODO
     // final double z1 = points1.getZ(index2);
     // final double z2 = points2.getZ(index1);
@@ -110,8 +110,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     duplicateStatistics.connect();
   }
 
-  public boolean isReverse(final CoordinatesList points1,
-    final CoordinatesList points2) {
+  public boolean isReverse(final PointList points1,
+    final PointList points2) {
     final int numPoints = points1.size();
     if (points1.equal(0, points2, numPoints - 1, 2)) {
       if (points1.equal(0, points1, numPoints - 1, 2)) {

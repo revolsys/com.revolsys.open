@@ -34,11 +34,11 @@
 package com.revolsys.jts.simplify;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 
@@ -97,8 +97,8 @@ public class VWSimplifier {
     }
 
     @Override
-    protected CoordinatesList transformCoordinates(
-      final CoordinatesList coords, final Geometry parent) {
+    protected PointList transformCoordinates(
+      final PointList coords, final Geometry parent) {
       if (coords.size() == 0) {
         return coords;
       } else {

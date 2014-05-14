@@ -34,8 +34,8 @@ package com.revolsys.jts.noding;
 
 import java.io.PrintStream;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents an intersection point between two {@link SegmentString}s.
@@ -58,7 +58,7 @@ public class SegmentNode implements Comparable {
     final Point coord, final int segmentIndex,
     final int segmentOctant) {
     this.segString = segString;
-    this.coord = new Coordinate(coord);
+    this.coord = new PointDouble(coord);
     this.segmentIndex = segmentIndex;
     this.segmentOctant = segmentOctant;
     isInterior = !coord.equals2d(segString.getCoordinate(segmentIndex));

@@ -40,8 +40,7 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -128,7 +127,7 @@ public class OffsetCurveSetBuilder {
    * <br>Left: Location.EXTERIOR
    * <br>Right: Location.INTERIOR
    */
-  private void addCurve(final CoordinatesList points, final Location leftLoc,
+  private void addCurve(final PointList points, final Location leftLoc,
     final Location rightLoc) {
     if (points != null && points.size() >= 2) {
       final Label label = new Label(0, Location.BOUNDARY, leftLoc, rightLoc);
@@ -142,8 +141,8 @@ public class OffsetCurveSetBuilder {
     if (distance <= 0.0 && !curveBuilder.getBufferParameters().isSingleSided()) {
       return;
     } else {
-      final CoordinatesList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
-      final CoordinatesList curve = curveBuilder.getLineCurve(points, distance);
+      final PointList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
+      final PointList curve = curveBuilder.getLineCurve(points, distance);
       addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
   }
@@ -154,8 +153,8 @@ public class OffsetCurveSetBuilder {
   private void addPoint(final Point p) {
     // a zero or negative width buffer of a line/point is empty
     if (distance > 0.0) {
-      final CoordinatesList coord = p.getCoordinatesList();
-      final CoordinatesList curve = curveBuilder.getLineCurve(coord, distance);
+      final PointList coord = p.getCoordinatesList();
+      final PointList curve = curveBuilder.getLineCurve(coord, distance);
       addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
   }
@@ -170,7 +169,7 @@ public class OffsetCurveSetBuilder {
 
     final LinearRing shell = p.getExteriorRing();
     final boolean shellClockwise = shell.isClockwise();
-    final CoordinatesList shellCoord = CleanDuplicatePoints.clean(shell.getCoordinatesList());
+    final PointList shellCoord = CleanDuplicatePoints.clean(shell.getCoordinatesList());
     // optimization - don't bother computing buffer
     // if the polygon would be completely eroded
     if (distance < 0.0 && isErodedCompletely(shell, distance)) {
@@ -187,7 +186,7 @@ public class OffsetCurveSetBuilder {
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
       final LinearRing hole = p.getInteriorRing(i);
       final boolean holeClockwise = hole.isClockwise();
-      final CoordinatesList holeCoord = CleanDuplicatePoints.clean(hole.getCoordinatesList());
+      final PointList holeCoord = CleanDuplicatePoints.clean(hole.getCoordinatesList());
 
       // optimization - don't bother computing buffer for this hole
       // if the hole would be completely covered
@@ -215,7 +214,7 @@ public class OffsetCurveSetBuilder {
    * @param cwLeftLoc the location on the L side of the ring (if it is CW)
    * @param cwRightLoc the location on the R side of the ring (if it is CW)
    */
-  private void addPolygonRing(final CoordinatesList points,
+  private void addPolygonRing(final PointList points,
     final boolean clockwise, final double offsetDistance, int side,
     final Location cwLeftLoc, final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
@@ -230,7 +229,7 @@ public class OffsetCurveSetBuilder {
       rightLoc = cwLeftLoc;
       side = Position.opposite(side);
     }
-    final CoordinatesList curve = curveBuilder.getRingCurve(points, side,
+    final PointList curve = curveBuilder.getRingCurve(points, side,
       offsetDistance);
     addCurve(curve, leftLoc, rightLoc);
   }

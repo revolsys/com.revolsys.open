@@ -150,7 +150,7 @@ public class TiffImage extends GeoReferencedImage {
             "Exepectig 0 for the raster x,y tie points in a GeoTIFF");
         }
         // double rasterZOffset = fieldModelTiePoints.getAsDouble(2);
-        // setTopLeftRasterPoint(new DoubleCoordinates(
+        // setTopLeftRasterPoint(new PointDouble(
         // rasterXOffset,
         // rasterYOffset));
 
@@ -158,7 +158,7 @@ public class TiffImage extends GeoReferencedImage {
         final double x1 = tiePoints.getAsDouble(3);
         final double y1 = tiePoints.getAsDouble(4);
         // double modelZOffset = fieldModelTiePoints.getAsDouble(5);
-        // setTopLeftModelPoint(new DoubleCoordinates(
+        // setTopLeftModelPoint(new PointDouble(
         // modelXOffset,
         // modelYOffset));
         final double pixelWidth = pixelScale.getAsDouble(0);

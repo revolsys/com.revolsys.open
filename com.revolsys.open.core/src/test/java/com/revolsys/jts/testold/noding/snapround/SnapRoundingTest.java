@@ -6,10 +6,10 @@ import java.util.List;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.noding.snapround.GeometryNoder;
 

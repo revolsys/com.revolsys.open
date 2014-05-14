@@ -40,7 +40,6 @@ import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.Reader;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;

@@ -10,8 +10,7 @@ import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.filter.LineSegmentCoordinateDistanceFilter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -58,13 +57,13 @@ public class LineSegmentQuadTree {
     } else if (geometry instanceof Point) {
     } else if (geometry instanceof MultiPoint) {
     } else if (geometry instanceof LineString) {
-      final CoordinatesList points = CoordinatesListUtil.get(geometry);
+      final PointList points = CoordinatesListUtil.get(geometry);
       add(points);
     } else if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
-      final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+      final List<PointList> rings = CoordinatesListUtil.getAll(polygon);
       for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
-        final CoordinatesList points = rings.get(ringIndex);
+        final PointList points = rings.get(ringIndex);
         add(points, ringIndex);
       }
     } else {
@@ -73,13 +72,13 @@ public class LineSegmentQuadTree {
         if (part instanceof Point) {
         } else if (part instanceof LineString) {
           final LineString line = (LineString)part;
-          final CoordinatesList points = CoordinatesListUtil.get(line);
+          final PointList points = CoordinatesListUtil.get(line);
           add(points, partIndex);
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
-          final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+          final List<PointList> rings = CoordinatesListUtil.getAll(polygon);
           for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
-            final CoordinatesList points = rings.get(ringIndex);
+            final PointList points = rings.get(ringIndex);
             add(points, partIndex, ringIndex);
           }
         }
@@ -87,7 +86,7 @@ public class LineSegmentQuadTree {
     }
   }
 
-  private void add(final CoordinatesList points, final int... parentIndex) {
+  private void add(final PointList points, final int... parentIndex) {
     double x1 = points.getX(0);
     double y1 = points.getY(0);
     for (int segmentIndex = 0; segmentIndex < points.size() - 1; segmentIndex++) {
@@ -126,7 +125,7 @@ public class LineSegmentQuadTree {
   }
 
   protected com.revolsys.jts.geom.BoundingBox getEnvelope(final int[] index) {
-    final CoordinatesList points = GeometryEditUtil.getPoints(geometry, index);
+    final PointList points = GeometryEditUtil.getPoints(geometry, index);
     final int vertexIndex = GeometryEditUtil.getVertexIndex(index);
     final double x1 = points.getX(vertexIndex);
     final double y1 = points.getY(vertexIndex);
@@ -151,7 +150,7 @@ public class LineSegmentQuadTree {
   }
 
   protected LineSegment getLineSegment(final int[] index) {
-    final CoordinatesList points = GeometryEditUtil.getPoints(geometry, index);
+    final PointList points = GeometryEditUtil.getPoints(geometry, index);
     final int vertexIndex = GeometryEditUtil.getVertexIndex(index);
     final Point p1 = points.get(vertexIndex);
     final Point p2 = points.get(vertexIndex + 1);

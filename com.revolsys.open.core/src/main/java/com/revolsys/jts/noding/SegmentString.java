@@ -32,8 +32,8 @@
  */
 package com.revolsys.jts.noding;
 
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * An interface for classes which represent a sequence of contiguous line segments.
@@ -52,7 +52,7 @@ public interface SegmentString {
    */
   Object getData();
 
-  CoordinatesList getPoints();
+  PointList getPoints();
 
   boolean isClosed();
 

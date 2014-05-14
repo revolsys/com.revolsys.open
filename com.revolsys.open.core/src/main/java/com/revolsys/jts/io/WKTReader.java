@@ -39,8 +39,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -50,6 +48,7 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Converts a geometry in Well-Known Text format to a {@link Geometry}.
@@ -93,9 +92,9 @@ import com.revolsys.jts.geom.Polygon;
  *
  * <i>WKTPoint:</i> <b>POINT ( </b><i>Coordinate</i> <b>)</b>
  *
- * <i>WKTLineString:</i> <b>LINESTRING</b> <i>CoordinatesList</i>
+ * <i>WKTLineString:</i> <b>LINESTRING</b> <i>PointList</i>
  *
- * <i>WKTLinearRing:</i> <b>LINEARRING</b> <i>CoordinatesList</i>
+ * <i>WKTLinearRing:</i> <b>LINEARRING</b> <i>PointList</i>
  *
  * <i>WKTPolygon:</i> <b>POLYGON</b> <i>CoordinateSequenceList</i>
  *
@@ -118,10 +117,10 @@ import com.revolsys.jts.geom.Polygon;
  *         | <b>EMPTY</b>
  *
  * <i>CoordinateSequenceList:</i>
- *         <b>(</b> <i>CoordinatesList {</i> <b>,</b> <i>CoordinatesList }</i> <b>)</b>
+ *         <b>(</b> <i>PointList {</i> <b>,</b> <i>PointList }</i> <b>)</b>
  *         | <b>EMPTY</b>
  *
- * <i>CoordinatesList:</i>
+ * <i>PointList:</i>
  *         <b>(</b> <i>Coordinate {</i> , <i>Coordinate }</i> <b>)</b>
  *         | <b>EMPTY</b>
  *
@@ -334,9 +333,9 @@ public class WKTReader {
     final Point coord;
     if (isNumberNext()) {
       final double z = getNextNumber();
-      coord = new DoubleCoordinates(x, y, z);
+      coord = new PointDouble(x, y, z);
     } else {
-      coord = new DoubleCoordinates(x, y);
+      coord = new PointDouble(x, y);
     }
     return coord;
   }

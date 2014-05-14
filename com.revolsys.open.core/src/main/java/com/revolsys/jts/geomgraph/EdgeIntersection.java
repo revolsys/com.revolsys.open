@@ -35,8 +35,8 @@ package com.revolsys.jts.geomgraph;
 
 import java.io.PrintStream;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a point on an
@@ -60,7 +60,7 @@ public class EdgeIntersection implements Comparable {
 
   public EdgeIntersection(final Point coord, final int segmentIndex,
     final double dist) {
-    this.coord = new Coordinate(coord);
+    this.coord = new PointDouble(coord);
     this.segmentIndex = segmentIndex;
     this.dist = dist;
   }

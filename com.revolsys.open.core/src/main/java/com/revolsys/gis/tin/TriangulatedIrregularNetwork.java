@@ -11,18 +11,18 @@ import com.revolsys.gis.algorithm.index.EnvelopeSpatialIndex;
 import com.revolsys.gis.algorithm.index.RTree;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.comparator.AngleFromPointComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class TriangulatedIrregularNetwork {
   private static final int[] OPPOSITE_INDEXES = {
@@ -69,10 +69,10 @@ public class TriangulatedIrregularNetwork {
       final double minY = geometryFactory.makeXyPrecise(boundingBox.getMinY() - 100);
       final double maxX = geometryFactory.makeXyPrecise(boundingBox.getMaxX() + 100);
       final double maxY = geometryFactory.makeXyPrecise(boundingBox.getMaxY() + 100);
-      final Point c1 = new DoubleCoordinates(minX, minY, 0);
-      final Point c2 = new DoubleCoordinates(maxX, minY, 0);
-      final Point c3 = new DoubleCoordinates(maxX, maxY, 0);
-      final Point c4 = new DoubleCoordinates(minX, maxY, 0);
+      final Point c1 = new PointDouble(minX, minY, 0);
+      final Point c2 = new PointDouble(maxX, minY, 0);
+      final Point c3 = new PointDouble(maxX, maxY, 0);
+      final Point c4 = new PointDouble(minX, maxY, 0);
       final Triangle triangle1 = Triangle.createClockwiseTriangle(c1, c2, c3);
       addTriangle(triangle1);
       final Triangle triangle2 = Triangle.createClockwiseTriangle(c1, c3, c4);
@@ -410,8 +410,8 @@ public class TriangulatedIrregularNetwork {
 
   public LineString getElevation(final LineString line) {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(line);
-    final CoordinatesList oldPoints = CoordinatesListUtil.get(line);
-    final CoordinatesList newPoints = new DoubleCoordinatesList(oldPoints);
+    final PointList oldPoints = CoordinatesListUtil.get(line);
+    final PointList newPoints = new DoubleCoordinatesList(oldPoints);
     final int vertexCount = line.getVertexCount();
     final int axisCount = line.getAxisCount();
     final double[] newCoordinates = new double[vertexCount * axisCount];
@@ -472,14 +472,14 @@ public class TriangulatedIrregularNetwork {
       }
       LineSegment segment = new LineSegmentImpl(closestCorner, coordinate).extend(
         0, t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
-      final CoordinatesList intersectCoordinates = oppositeEdge.getIntersection(segment);
+      final PointList intersectCoordinates = oppositeEdge.getIntersection(segment);
       if (intersectCoordinates.size() > 0) {
         final Point intersectPoint = intersectCoordinates.get(0);
         final double z = oppositeEdge.getElevation(intersectPoint);
         if (!Double.isNaN(z)) {
           final double x = intersectPoint.getX();
           final double y = intersectPoint.getY();
-          final Point end = new DoubleCoordinates(x, y, z);
+          final Point end = new PointDouble(x, y, z);
           segment = new LineSegmentImpl(t0, end);
           return segment.getElevation(coordinate);
         }
@@ -492,7 +492,7 @@ public class TriangulatedIrregularNetwork {
     return Collections.unmodifiableSet(nodes);
   }
 
-  private Point getOtherCoordinates(final CoordinatesList coords, final int i1,
+  private Point getOtherCoordinates(final PointList coords, final int i1,
     final int i2) {
     final int index = getOtherIndex(i1, i2);
     return coords.get(index);
@@ -568,7 +568,7 @@ public class TriangulatedIrregularNetwork {
     return triangles;
   }
 
-  public void insertEdge(final CoordinatesList coordinates) {
+  public void insertEdge(final PointList coordinates) {
     Point previousCoordinates = coordinates.get(0);
     for (int i = 1; i < coordinates.size(); i++) {
       final Point coordinate = coordinates.get(i);
@@ -599,13 +599,13 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void insertEdge(final LineString breakline) {
-    final CoordinatesList coordinates = CoordinatesListUtil.get(breakline);
+    final PointList coordinates = CoordinatesListUtil.get(breakline);
     insertEdge(coordinates);
   }
 
   public void insertNode(final Point coordinate) {
     if (boundingBox.covers(coordinate)) {
-      final Point point = new DoubleCoordinates(
+      final Point point = new PointDouble(
         geometryFactory.createCoordinates(coordinate), 3);
       if (!nodes.contains(point)) {
         final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);

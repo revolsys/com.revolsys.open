@@ -124,6 +124,8 @@ public interface Point extends Geometry, Puntal, Serializable {
 
   boolean equals(double... coordinates);
 
+  boolean equals(int axisCount, Point point);
+
   boolean equals(Point point);
 
   /**
@@ -171,7 +173,7 @@ public interface Point extends Geometry, Puntal, Serializable {
 
   double[] getCoordinates();
 
-  CoordinatesList getCoordinatesList();
+  PointList getCoordinatesList();
 
   double getM();
 

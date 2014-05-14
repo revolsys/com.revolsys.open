@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
@@ -28,7 +28,7 @@ public class TestPackedGeometry {
     final Double mScale = null;
     final Double mOffset = null;
 
-    final List<List<CoordinatesList>> parts = CoordinatesListUtil.getParts(geometry, false);
+    final List<List<PointList>> parts = CoordinatesListUtil.getParts(geometry, false);
 
     final int numPoints = PackedCoordinateUtil.getNumPoints(parts);
 

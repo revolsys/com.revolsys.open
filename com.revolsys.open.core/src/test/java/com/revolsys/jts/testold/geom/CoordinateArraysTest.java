@@ -35,10 +35,10 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Unit tests for {@link Envelope}
@@ -59,26 +59,26 @@ public class CoordinateArraysTest extends TestCase {
   public void testPtNotInList1() {
     assertTrue(CoordinateArrays.ptNotInList(
       new Point[] {
-        new Coordinate((double)1.0, 1, Point.NULL_ORDINATE),
-        new Coordinate((double)2.0, 2, Point.NULL_ORDINATE),
-        new Coordinate((double)3.0, 3, Point.NULL_ORDINATE)
+        new PointDouble((double)1.0, 1, Point.NULL_ORDINATE),
+        new PointDouble((double)2.0, 2, Point.NULL_ORDINATE),
+        new PointDouble((double)3.0, 3, Point.NULL_ORDINATE)
       },
       new Point[] {
-        new Coordinate((double)1.0, 1, Point.NULL_ORDINATE),
-        new Coordinate((double)1.0, 2, Point.NULL_ORDINATE),
-        new Coordinate((double)1.0, 3, Point.NULL_ORDINATE)
-      }).equals2d(new Coordinate((double)2, 2, Point.NULL_ORDINATE)));
+        new PointDouble((double)1.0, 1, Point.NULL_ORDINATE),
+        new PointDouble((double)1.0, 2, Point.NULL_ORDINATE),
+        new PointDouble((double)1.0, 3, Point.NULL_ORDINATE)
+      }).equals2d(new PointDouble((double)2, 2, Point.NULL_ORDINATE)));
   }
 
   public void testPtNotInList2() {
     assertTrue(CoordinateArrays.ptNotInList(new Point[] {
-      new Coordinate((double)1.0, 1, Point.NULL_ORDINATE),
-      new Coordinate((double)2.0, 2, Point.NULL_ORDINATE),
-      new Coordinate((double)3.0, 3, Point.NULL_ORDINATE)
+      new PointDouble((double)1.0, 1, Point.NULL_ORDINATE),
+      new PointDouble((double)2.0, 2, Point.NULL_ORDINATE),
+      new PointDouble((double)3.0, 3, Point.NULL_ORDINATE)
     }, new Point[] {
-      new Coordinate((double)1.0, 1, Point.NULL_ORDINATE),
-      new Coordinate((double)2.0, 2, Point.NULL_ORDINATE),
-      new Coordinate((double)3.0, 3, Point.NULL_ORDINATE)
+      new PointDouble((double)1.0, 1, Point.NULL_ORDINATE),
+      new PointDouble((double)2.0, 2, Point.NULL_ORDINATE),
+      new PointDouble((double)3.0, 3, Point.NULL_ORDINATE)
     }) == null);
   }
 }

@@ -3,12 +3,12 @@ package com.revolsys.gis.util;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.graph.Edge;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class NoOp {
   public static boolean equals(final Point coordinates1End,
@@ -33,8 +33,8 @@ public class NoOp {
 
   public static boolean equals(final Geometry geometry, final double x,
     final double y) {
-    final CoordinatesList points = CoordinatesListUtil.get(geometry);
-    final DoubleCoordinates point = new DoubleCoordinates(x, y);
+    final PointList points = CoordinatesListUtil.get(geometry);
+    final PointDouble point = new PointDouble(x, y);
     if (points.equal(0, point, 2)) {
       noOp();
       return true;
@@ -45,7 +45,7 @@ public class NoOp {
 
   public static boolean equals(final LineString line, final double x1,
     final double y1, final double x2, final double y2) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final PointList points = CoordinatesListUtil.get(line);
     if (points.get(0).equals(x1, y1)
       && points.get(points.size() - 1).equals(x2, y2)) {
       noOp();

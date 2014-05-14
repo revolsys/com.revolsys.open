@@ -35,8 +35,8 @@ package com.revolsys.jts.math;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -318,7 +318,7 @@ public class Vector2D {
   }
 
   public Point toCoordinate() {
-    return new Coordinate((double)x, y, Point.NULL_ORDINATE);
+    return new PointDouble((double)x, y, Point.NULL_ORDINATE);
   }
 
   /**
@@ -332,7 +332,7 @@ public class Vector2D {
   }
 
   public Point translate(final Point coord) {
-    return new Coordinate((double)x + coord.getX(), y + coord.getY(),
+    return new PointDouble((double)x + coord.getX(), y + coord.getY(),
       Point.NULL_ORDINATE);
   }
 

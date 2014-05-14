@@ -32,9 +32,9 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 /**

@@ -38,8 +38,8 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class DistanceLineLineStressTest extends TestCase {
 
@@ -58,10 +58,10 @@ public class DistanceLineLineStressTest extends TestCase {
     final double x1 = 10;
     final double x2 = x1 + gap;
     final double x3 = x1 + gap + 10;
-    seg[0] = new Coordinate((double)0, 0, Point.NULL_ORDINATE);
-    seg[1] = new Coordinate((double)x1, slope * x1, Point.NULL_ORDINATE);
-    seg[2] = new Coordinate((double)x2, slope * x2, Point.NULL_ORDINATE);
-    seg[3] = new Coordinate((double)x3, slope * x3, Point.NULL_ORDINATE);
+    seg[0] = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
+    seg[1] = new PointDouble((double)x1, slope * x1, Point.NULL_ORDINATE);
+    seg[2] = new PointDouble((double)x2, slope * x2, Point.NULL_ORDINATE);
+    seg[3] = new PointDouble((double)x3, slope * x3, Point.NULL_ORDINATE);
 
     return seg;
   }

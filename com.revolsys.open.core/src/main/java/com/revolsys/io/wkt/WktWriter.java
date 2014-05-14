@@ -36,7 +36,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -150,7 +150,7 @@ public class WktWriter {
   }
 
   public static void write(final PrintWriter out,
-    final CoordinatesList coordinates, final int axisCount) {
+    final PointList coordinates, final int axisCount) {
     out.print('(');
     write(out, coordinates, 0, axisCount);
     for (int i = 1; i < coordinates.size(); i++) {
@@ -161,7 +161,7 @@ public class WktWriter {
   }
 
   private static void write(final PrintWriter out,
-    final CoordinatesList coordinates, final int index, final int axisCount) {
+    final PointList coordinates, final int index, final int axisCount) {
     writeOrdinate(out, coordinates, index, 0);
     for (int j = 1; j < axisCount; j++) {
       out.print(' ');
@@ -271,7 +271,7 @@ public class WktWriter {
     if (line.isEmpty()) {
       out.print(" EMPTY");
     } else {
-      final CoordinatesList coordinates = line.getCoordinatesList();
+      final PointList coordinates = line.getCoordinatesList();
       write(out, coordinates, axisCount);
     }
   }
@@ -287,7 +287,7 @@ public class WktWriter {
     if (line.isEmpty()) {
       out.print(" EMPTY");
     } else {
-      final CoordinatesList coordinates = line.getCoordinatesList();
+      final PointList coordinates = line.getCoordinatesList();
       write(out, coordinates, axisCount);
     }
   }
@@ -306,7 +306,7 @@ public class WktWriter {
     } else {
       out.print("(");
       LineString line = (LineString)multiLineString.getGeometry(0);
-      CoordinatesList points = CoordinatesListUtil.get(line);
+      PointList points = CoordinatesListUtil.get(line);
       write(out, points, axisCount);
       for (int i = 1; i < multiLineString.getGeometryCount(); i++) {
         out.print(",");
@@ -422,7 +422,7 @@ public class WktWriter {
   }
 
   private static void writeOrdinate(final PrintWriter out,
-    final CoordinatesList coordinates, final int index, final int ordinateIndex) {
+    final PointList coordinates, final int index, final int ordinateIndex) {
     if (ordinateIndex > coordinates.getAxisCount()) {
       out.print(0);
     } else {
@@ -449,12 +449,12 @@ public class WktWriter {
     final Polygon polygon, final int axisCount) {
     out.print('(');
     final LineString shell = polygon.getExteriorRing();
-    final CoordinatesList coordinates = shell.getCoordinatesList();
+    final PointList coordinates = shell.getCoordinatesList();
     write(out, coordinates, axisCount);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       out.print(',');
       final LineString hole = polygon.getInteriorRing(i);
-      final CoordinatesList holeCoordinates = hole.getCoordinatesList();
+      final PointList holeCoordinates = hole.getCoordinatesList();
       write(out, holeCoordinates, axisCount);
     }
     out.print(')');

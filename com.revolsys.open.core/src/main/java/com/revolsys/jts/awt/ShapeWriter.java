@@ -36,7 +36,6 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -310,7 +309,7 @@ public class ShapeWriter {
   }
 
   private Shape toShape(final Point point) {
-    final Point2D viewPoint = transformPoint(point.getCoordinate());
+    final Point2D viewPoint = transformPoint(point.getPoint());
     return pointFactory.createPoint(viewPoint);
   }
 

@@ -34,8 +34,8 @@
 package com.revolsys.jts.triangulate;
 
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A strategy for finding constraint split points which attempts to maximise the length of the split

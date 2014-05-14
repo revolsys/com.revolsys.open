@@ -20,7 +20,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -167,7 +167,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   public double[] toClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
-    final CoordinatesList coordinates = CoordinatesListUtil.get(ring);
+    final PointList coordinates = CoordinatesListUtil.get(ring);
     if (!coordinates.isCounterClockwise()) {
       return toCoordinateArray(coordinates, dimension);
     } else {
@@ -175,7 +175,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private double[] toCoordinateArray(final CoordinatesList sequence,
+  private double[] toCoordinateArray(final PointList sequence,
     final int dimension) {
     int geometryDimension = sequence.getAxisCount();
     if (Double.isNaN(sequence.getValue(0, 2))) {
@@ -204,7 +204,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private double[] toCoordinateArray(final LineString line, final int dimension) {
-    final CoordinatesList sequence = line.getCoordinatesList();
+    final PointList sequence = line.getCoordinatesList();
     final double[] coordinates = toCoordinateArray(sequence, dimension);
     return coordinates;
   }
@@ -227,7 +227,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   public double[] toCounterClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
-    final CoordinatesList coordinates = CoordinatesListUtil.get(ring);
+    final PointList coordinates = CoordinatesListUtil.get(ring);
     if (coordinates.isCounterClockwise()) {
       return toCoordinateArray(coordinates, dimension);
     } else {
@@ -395,14 +395,14 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int columnIndex, final int axisCount) throws SQLException {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+    final PointList coordinatesList = new DoubleCoordinatesList(
       axisCount, coordinates);
     return this.geometryFactory.lineString(coordinatesList);
   }
 
   private MultiLineString toMultiLineString(final ResultSet resultSet,
     final int columnIndex, final int axisCount) throws SQLException {
-    final List<CoordinatesList> pointsList = new ArrayList<CoordinatesList>();
+    final List<PointList> pointsList = new ArrayList<PointList>();
 
     final ARRAY elemInfoArray = (ARRAY)resultSet.getArray(columnIndex + 4);
     final long[] elemInfo = elemInfoArray.getLongArray();
@@ -422,7 +422,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       if (interpretation == 1) {
         final double[] ordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final CoordinatesList points = new DoubleCoordinatesList(axisCount,
+        final PointList points = new DoubleCoordinatesList(axisCount,
           ordinates);
         pointsList.add(points);
       } else {
@@ -439,7 +439,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
 
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+    final PointList coordinatesList = new DoubleCoordinatesList(
       axisCount, coordinates);
 
     return this.geometryFactory.multiPoint(coordinatesList);
@@ -469,7 +469,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       if (interpretation == 1) {
         final double[] ordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+        final PointList coordinatesList = new DoubleCoordinatesList(
           axisCount, ordinates);
         final LinearRing ring = this.geometryFactory.linearRing(coordinatesList);
 
@@ -506,7 +506,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private Point toPoint(final ResultSet resultSet, final int columnIndex,
     final int axisCount) throws SQLException {
-    final CoordinatesList coordinatesList;
+    final PointList coordinatesList;
     final double x = resultSet.getDouble(columnIndex + 1);
     final double y = resultSet.getDouble(columnIndex + 2);
     if (axisCount == 2) {
@@ -541,7 +541,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       if (interpretation == 1) {
         final double[] ordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final CoordinatesList coordinatesList = new DoubleCoordinatesList(
+        final PointList coordinatesList = new DoubleCoordinatesList(
           axisCount, ordinates);
         final LinearRing ring = this.geometryFactory.linearRing(coordinatesList);
 

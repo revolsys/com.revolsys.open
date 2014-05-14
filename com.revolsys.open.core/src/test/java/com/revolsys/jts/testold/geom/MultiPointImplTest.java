@@ -38,13 +38,12 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -109,8 +108,8 @@ public class MultiPointImplTest extends TestCase {
     final Geometry g = m.getGeometry(1);
     assertTrue(g instanceof Point);
     final Point p = (Point)g;
-    final Point internal = p.getCoordinate();
-    final Point externalCoordinate = new DoubleCoordinates(
+    final Point internal = p.getPoint();
+    final Point externalCoordinate = new PointDouble(
       internal.getX(), internal.getY());
     assertEquals(3.333, externalCoordinate.getX(), 1E-10);
     assertEquals(4.444, externalCoordinate.getY(), 1E-10);

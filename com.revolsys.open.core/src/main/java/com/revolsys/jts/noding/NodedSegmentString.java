@@ -37,10 +37,10 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a list of contiguous line segments,
@@ -73,7 +73,7 @@ public class NodedSegmentString implements NodableSegmentString {
 
   private final SegmentNodeList nodeList = new SegmentNodeList(this);
 
-  private final CoordinatesList points;
+  private final PointList points;
 
   private Object data;
 
@@ -83,7 +83,7 @@ public class NodedSegmentString implements NodableSegmentString {
    * @param points the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public NodedSegmentString(final CoordinatesList points, final Object data) {
+  public NodedSegmentString(final PointList points, final Object data) {
     this.points = points;
     this.data = data;
   }
@@ -107,7 +107,7 @@ public class NodedSegmentString implements NodableSegmentString {
    */
   public void addIntersection(final LineIntersector li, final int segmentIndex,
     final int geomIndex, final int intIndex) {
-    final Point point = new Coordinate(li.getIntersection(intIndex));
+    final Point point = new PointDouble(li.getIntersection(intIndex));
     addIntersection(point, segmentIndex);
   }
 
@@ -172,7 +172,7 @@ public class NodedSegmentString implements NodableSegmentString {
   }
 
   @Override
-  public CoordinatesList getPoints() {
+  public PointList getPoints() {
     return points;
   }
 

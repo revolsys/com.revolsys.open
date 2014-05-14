@@ -35,10 +35,10 @@ package com.revolsys.jts.testold.operation;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.valid.IsValidOp;
 import com.revolsys.jts.operation.valid.TopologyValidationError;
@@ -62,10 +62,10 @@ public class IsValidTest extends TestCase {
   }
 
   public void testInvalidCoordinate() throws Exception {
-    final Point badCoord = new Coordinate(1.0, Double.NaN,
+    final Point badCoord = new PointDouble(1.0, Double.NaN,
       Point.NULL_ORDINATE);
     final Point[] pts = {
-      new Coordinate(0.0, 0.0, Point.NULL_ORDINATE), badCoord
+      new PointDouble(0.0, 0.0, Point.NULL_ORDINATE), badCoord
     };
     final Geometry line = this.geometryFactory.lineString(pts);
     final IsValidOp isValidOp = new IsValidOp(line);

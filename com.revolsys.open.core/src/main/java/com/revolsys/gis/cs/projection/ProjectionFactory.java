@@ -17,8 +17,8 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 
 public final class ProjectionFactory {
   /** The map from projection names to projection classes. */

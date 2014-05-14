@@ -4,13 +4,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.util.CollectionUtil;
@@ -24,7 +24,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
   public MappedLocation(final Map<String, Object> map) {
     final double sourceX = CollectionUtil.getDouble(map, "sourceX", 0.0);
     final double sourceY = CollectionUtil.getDouble(map, "sourceY", 0.0);
-    this.sourcePixel = new DoubleCoordinates(sourceX, sourceY);
+    this.sourcePixel = new PointDouble(sourceX, sourceY);
     this.targetPoint = GeometryFactory.getFactory().geometry(
       (String)map.get("target"));
   }

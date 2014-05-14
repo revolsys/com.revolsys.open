@@ -15,12 +15,12 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.UrlUtil;
 
 public class GeoNamesService {
@@ -162,12 +162,12 @@ public class GeoNamesService {
       final double lat = ((Number)name.get("lat")).doubleValue();
       final double lon = ((Number)name.get("lng")).doubleValue();
 
-      Point coordinate = new DoubleCoordinates(lon, lat);
+      Point coordinate = new PointDouble(lon, lat);
       final Number elevation = (Number)name.get("elevation");
       if (elevation == null) {
-        coordinate = new DoubleCoordinates(lon, lat);
+        coordinate = new PointDouble(lon, lat);
       } else {
-        coordinate = new DoubleCoordinates(lon, lat, elevation.doubleValue());
+        coordinate = new PointDouble(lon, lat, elevation.doubleValue());
       }
       dataObject.setGeometryValue(GeometryFactory.getFactory()
         .point(coordinate));

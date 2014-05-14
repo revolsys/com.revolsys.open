@@ -2,7 +2,7 @@ package com.revolsys.gis.jts;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -16,7 +16,7 @@ public class PointUtil {
     final BoundingBox envelope) {
     final double x = envelope.getMinX() + envelope.getWidth() * Math.random();
     final double y = envelope.getMinY() + envelope.getHeight() * Math.random();
-    final CoordinatesList coordinatesList = new DoubleCoordinatesList(2, x, y);
+    final PointList coordinatesList = new DoubleCoordinatesList(2, x, y);
     return factory.point(coordinatesList);
   }
 

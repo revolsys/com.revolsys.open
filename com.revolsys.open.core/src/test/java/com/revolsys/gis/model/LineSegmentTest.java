@@ -3,12 +3,12 @@ package com.revolsys.gis.model;
 import org.junit.Test;
 
 import com.revolsys.gis.jts.LineSegmentImpl;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
 
 public class LineSegmentTest {
@@ -18,23 +18,23 @@ public class LineSegmentTest {
   private static final GeometryFactory GEOMETRY_FACTORY_3D = GeometryFactory.getFactory(
     3005, 3, 1000, 1000);
 
-  private final DoubleCoordinates c_0_0_0 = c(0, 0, 0);
+  private final PointDouble c_0_0_0 = c(0, 0, 0);
 
-  private final DoubleCoordinates c_50_0_5 = c(50, 0, 5);
+  private final PointDouble c_50_0_5 = c(50, 0, 5);
 
-  private final DoubleCoordinates c_50_0 = c(50, 0);
+  private final PointDouble c_50_0 = c(50, 0);
 
-  private final DoubleCoordinates c_50_50_5 = c(50, 50, 5);
+  private final PointDouble c_50_50_5 = c(50, 50, 5);
 
-  private final DoubleCoordinates c_70_0_7 = c(70, 0, 7);
+  private final PointDouble c_70_0_7 = c(70, 0, 7);
 
-  private final DoubleCoordinates c_70_0 = c(70, 0);
+  private final PointDouble c_70_0 = c(70, 0);
 
-  private final DoubleCoordinates c_100_0_10 = c(100, 0, 10);
+  private final PointDouble c_100_0_10 = c(100, 0, 10);
 
-  private final DoubleCoordinates c_100_100_10 = c(100, 100, 10);
+  private final PointDouble c_100_100_10 = c(100, 100, 10);
 
-  private final DoubleCoordinates c_0_100_1 = c(0, 100, 1);
+  private final PointDouble c_0_100_1 = c(0, 100, 1);
 
   public void assertIntersection3d(final Point line1Start,
     final Point line1End, final Point line2Start,
@@ -43,10 +43,10 @@ public class LineSegmentTest {
       line1End);
     final LineSegment line2 = new LineSegmentImpl(GEOMETRY_FACTORY_3D, line2Start,
       line2End);
-    final CoordinatesList points = new DoubleCoordinatesList(3,
+    final PointList points = new DoubleCoordinatesList(3,
       expectedIntersection);
 
-    final CoordinatesList intersection = line1.getIntersection(line2);
+    final PointList intersection = line1.getIntersection(line2);
     Assert.equals(points, intersection);
   }
 
@@ -61,12 +61,12 @@ public class LineSegmentTest {
     final LineSegment line = new LineSegmentImpl(GEOMETRY_FACTORY_2D, 2, lx1,
       ly1, lx2, ly2);
 
-    final CoordinatesList intersection = line1.getIntersection(line2);
+    final PointList intersection = line1.getIntersection(line2);
     Assert.equals(line, intersection);
   }
 
-  public DoubleCoordinates c(final double... coordinates) {
-    return new DoubleCoordinates(coordinates);
+  public PointDouble c(final double... coordinates) {
+    return new PointDouble(coordinates);
   }
 
   @Test

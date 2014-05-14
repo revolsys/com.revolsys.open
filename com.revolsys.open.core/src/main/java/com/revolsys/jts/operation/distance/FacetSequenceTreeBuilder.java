@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -50,7 +50,7 @@ public class FacetSequenceTreeBuilder {
   // Seems to be better to use a minimum node capacity
   private static final int STR_TREE_NODE_CAPACITY = 4;
 
-  private static void addFacetSequences(final CoordinatesList pts,
+  private static void addFacetSequences(final PointList pts,
     final List<FacetSequence> sections) {
     int i = 0;
     final int size = pts.size();
@@ -88,11 +88,11 @@ public class FacetSequenceTreeBuilder {
     final Geometry geometry) {
     final List<FacetSequence> sections = new ArrayList<>();
     for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
-      final CoordinatesList seq = line.getCoordinatesList();
+      final PointList seq = line.getCoordinatesList();
       addFacetSequences(seq, sections);
     }
     for (final Point point : geometry.getGeometries(Point.class)) {
-      final CoordinatesList seq = point.getCoordinatesList();
+      final PointList seq = point.getCoordinatesList();
       addFacetSequences(seq, sections);
     }
     return sections;

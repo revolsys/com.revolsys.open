@@ -37,10 +37,10 @@ import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.testold.algorithm.PerturbedGridPolygonBuilder;
 

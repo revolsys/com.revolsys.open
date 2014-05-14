@@ -33,14 +33,13 @@
 
 package com.revolsys.jts.operation.distance3d;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.math.Plane3D;
 import com.revolsys.jts.math.Vector3D;
 
@@ -61,16 +60,16 @@ public class PlanarPolygon3D {
   private static Point project(final Point p, final int facingPlane) {
     switch (facingPlane) {
       case Plane3D.XY_PLANE:
-        return new Coordinate(p.getX(), p.getY(), Point.NULL_ORDINATE);
+        return new PointDouble(p.getX(), p.getY(), Point.NULL_ORDINATE);
       case Plane3D.XZ_PLANE:
-        return new Coordinate(p.getX(), p.getZ(), Point.NULL_ORDINATE);
+        return new PointDouble(p.getX(), p.getZ(), Point.NULL_ORDINATE);
         // Plane3D.YZ
       default:
-        return new Coordinate(p.getY(), p.getZ(), Point.NULL_ORDINATE);
+        return new PointDouble(p.getY(), p.getZ(), Point.NULL_ORDINATE);
     }
   }
 
-  private static CoordinatesList project(final CoordinatesList seq,
+  private static PointList project(final PointList seq,
     final int facingPlane) {
     switch (facingPlane) {
       case Plane3D.XY_PLANE:
@@ -104,7 +103,7 @@ public class PlanarPolygon3D {
    * @param seq the sequence of coordinates for the polygon
    * @return a normal vector
    */
-  private Vector3D averageNormal(final CoordinatesList seq) {
+  private Vector3D averageNormal(final PointList seq) {
     final int n = seq.size();
     final double[] sum = new double[3];
     for (int i = 0; i < n - 1; i++) {
@@ -121,7 +120,7 @@ public class PlanarPolygon3D {
     sum[0] /= n;
     sum[1] /= n;
     sum[2] /= n;
-    final Vector3D norm = Vector3D.create(new DoubleCoordinates(sum))
+    final Vector3D norm = Vector3D.create(new PointDouble(sum))
       .normalize();
     return norm;
   }
@@ -135,18 +134,18 @@ public class PlanarPolygon3D {
    * @param seq a coordinate sequence
    * @return a Point with averaged ordinates
    */
-  private Point averagePoint(final CoordinatesList seq) {
+  private Point averagePoint(final PointList seq) {
     final double[] a = new double[3];
     final int n = seq.size();
     for (int i = 0; i < n; i++) {
-      a[0] += seq.getValue(i, CoordinatesList.X);
-      a[1] += seq.getValue(i, CoordinatesList.Y);
-      a[2] += seq.getValue(i, CoordinatesList.Z);
+      a[0] += seq.getValue(i, PointList.X);
+      a[1] += seq.getValue(i, PointList.Y);
+      a[2] += seq.getValue(i, PointList.Z);
     }
     a[0] /= n;
     a[1] /= n;
     a[2] /= n;
-    return new DoubleCoordinates(a);
+    return new PointDouble(a);
   }
 
   /**
@@ -162,7 +161,7 @@ public class PlanarPolygon3D {
    * @return the best-fit plane
    */
   private Plane3D findBestFitPlane(final Polygon poly) {
-    final CoordinatesList seq = poly.getExteriorRing().getCoordinatesList();
+    final PointList seq = poly.getExteriorRing().getCoordinatesList();
     final Point basePt = averagePoint(seq);
     final Vector3D normal = averageNormal(seq);
     return new Plane3D(normal, basePt);
@@ -190,16 +189,16 @@ public class PlanarPolygon3D {
   }
 
   public boolean intersects(final Point pt, final LineString ring) {
-    final CoordinatesList seq = ring.getCoordinatesList();
-    final CoordinatesList seqProj = project(seq, facingPlane);
+    final PointList seq = ring.getCoordinatesList();
+    final PointList seqProj = project(seq, facingPlane);
     final Point ptProj = project(pt, facingPlane);
     return Location.EXTERIOR != RayCrossingCounter.locatePointInRing(ptProj,
       seqProj);
   }
 
   private Location locate(final Point pt, final LineString ring) {
-    final CoordinatesList seq = ring.getCoordinatesList();
-    final CoordinatesList seqProj = project(seq, facingPlane);
+    final PointList seq = ring.getCoordinatesList();
+    final PointList seqProj = project(seq, facingPlane);
     final Point ptProj = project(pt, facingPlane);
     return RayCrossingCounter.locatePointInRing(ptProj, seqProj);
   }

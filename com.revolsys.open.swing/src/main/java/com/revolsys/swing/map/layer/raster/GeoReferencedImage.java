@@ -36,7 +36,6 @@ import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
@@ -49,6 +48,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
@@ -138,7 +138,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
   private void addMapping(final List<MappedLocation> mappings,
     final double imageX, final double imageY, final double modelX,
     final double modelY) {
-    final DoubleCoordinates imagePoint = new DoubleCoordinates(imageX, imageY);
+    final PointDouble imagePoint = new PointDouble(imageX, imageY);
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
     final Point modelPoint = geometryFactory.point(modelX, modelY);
     final MappedLocation mappedLocation = new MappedLocation(imagePoint,
@@ -432,7 +432,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
               && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
-              final Point sourcePixel = new DoubleCoordinates(imageX,
+              final Point sourcePixel = new PointDouble(imageX,
                 imageY);
 
               final double x = targetControlPoints.get(i);

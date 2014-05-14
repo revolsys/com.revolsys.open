@@ -34,12 +34,11 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateArrays;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Triangle;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -183,7 +182,7 @@ public class MinimumBoundingCircle {
         centre = extremalPts[0];
       break;
       case 2:
-        centre = new Coordinate(
+        centre = new PointDouble(
           (extremalPts[0].getX() + extremalPts[1].getX()) / 2.0,
           (extremalPts[0].getY() + extremalPts[1].getY()) / 2.0,
           Point.NULL_ORDINATE);
@@ -203,7 +202,7 @@ public class MinimumBoundingCircle {
     }
     if (input.getVertexCount() == 1) {
       extremalPts = new Point[] {
-        input.getCoordinate()
+        input.getPoint()
       };
       return;
     }
@@ -251,7 +250,7 @@ public class MinimumBoundingCircle {
       // if PRQ is obtuse, then MBC is determined by P and Q
       if (Angle.isObtuse(P, R, Q)) {
         extremalPts = new Point[] {
-          new Coordinate(P), new Coordinate(Q)
+          new PointDouble(P), new PointDouble(Q)
         };
         return;
       }
@@ -268,7 +267,7 @@ public class MinimumBoundingCircle {
       // otherwise all angles are acute, and the MBC is determined by the
       // triangle PQR
       extremalPts = new Point[] {
-        new Coordinate(P), new Coordinate(Q), new Coordinate(R)
+        new PointDouble(P), new PointDouble(Q), new PointDouble(R)
       };
       return;
     }

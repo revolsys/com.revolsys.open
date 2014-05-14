@@ -21,9 +21,9 @@ import com.revolsys.gis.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   Externalizable {
@@ -337,7 +337,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   public double getFromAngle() {
     final LineString line = getLine();
-    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final PointList points = CoordinatesListUtil.get(line);
     return CoordinatesListUtil.angleToNext(points, 0);
   }
 
@@ -405,7 +405,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     if (line == null) {
       return Double.NaN;
     } else {
-      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final PointList points = CoordinatesListUtil.get(line);
       return CoordinatesListUtil.angleToPrevious(points, points.size() - 1);
     }
   }

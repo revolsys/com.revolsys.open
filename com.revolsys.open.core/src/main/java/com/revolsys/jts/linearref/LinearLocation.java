@@ -33,13 +33,13 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a location along a {@link LineString} or {@link MultiLineString}.
@@ -132,7 +132,7 @@ public class LinearLocation implements Comparable {
     // interpolate Z value. If either input Z is NaN, result z will be NaN as
     // well.
     final double z = (p1.getZ() - p0.getZ()) * frac + p0.getZ();
-    return new Coordinate(x, y, z);
+    return new PointDouble(x, y, z);
   }
 
   private int componentIndex = 0;

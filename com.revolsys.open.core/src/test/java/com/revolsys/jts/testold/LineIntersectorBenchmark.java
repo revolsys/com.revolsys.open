@@ -38,8 +38,8 @@ import java.util.Date;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.NonRobustLineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * @version 1.7
@@ -67,86 +67,86 @@ public class LineIntersectorBenchmark implements Runnable {
   }
 
   private void exerciseOnce(final LineIntersector lineIntersector) {
-    Point p1 = new Coordinate(10.0, 10, Point.NULL_ORDINATE);
-    Point p2 = new Coordinate(20.0, 20, Point.NULL_ORDINATE);
-    Point q1 = new Coordinate(20.0, 10, Point.NULL_ORDINATE);
-    Point q2 = new Coordinate(10.0, 20, Point.NULL_ORDINATE);
-    final Point x = new Coordinate(15.0, 15, Point.NULL_ORDINATE);
+    Point p1 = new PointDouble(10.0, 10, Point.NULL_ORDINATE);
+    Point p2 = new PointDouble(20.0, 20, Point.NULL_ORDINATE);
+    Point q1 = new PointDouble(20.0, 10, Point.NULL_ORDINATE);
+    Point q2 = new PointDouble(10.0, 20, Point.NULL_ORDINATE);
+    final Point x = new PointDouble(15.0, 15, Point.NULL_ORDINATE);
     lineIntersector.computeIntersection(p1, p2, q1, q2);
     lineIntersector.getIntersectionNum();
     lineIntersector.getIntersection(0);
     lineIntersector.isProper();
     lineIntersector.hasIntersection();
 
-    p1 = new Coordinate(10.0, 10, Point.NULL_ORDINATE);
-    p2 = new Coordinate(20.0, 10, Point.NULL_ORDINATE);
-    q1 = new Coordinate(22.0, 10, Point.NULL_ORDINATE);
-    q2 = new Coordinate(30.0, 10, Point.NULL_ORDINATE);
+    p1 = new PointDouble(10.0, 10, Point.NULL_ORDINATE);
+    p2 = new PointDouble(20.0, 10, Point.NULL_ORDINATE);
+    q1 = new PointDouble(22.0, 10, Point.NULL_ORDINATE);
+    q2 = new PointDouble(30.0, 10, Point.NULL_ORDINATE);
     lineIntersector.computeIntersection(p1, p2, q1, q2);
     lineIntersector.isProper();
     lineIntersector.hasIntersection();
 
-    p1 = new Coordinate(10.0, 10, Point.NULL_ORDINATE);
-    p2 = new Coordinate(20.0, 10, Point.NULL_ORDINATE);
-    q1 = new Coordinate(20.0, 10, Point.NULL_ORDINATE);
-    q2 = new Coordinate(30.0, 10, Point.NULL_ORDINATE);
+    p1 = new PointDouble(10.0, 10, Point.NULL_ORDINATE);
+    p2 = new PointDouble(20.0, 10, Point.NULL_ORDINATE);
+    q1 = new PointDouble(20.0, 10, Point.NULL_ORDINATE);
+    q2 = new PointDouble(30.0, 10, Point.NULL_ORDINATE);
     lineIntersector.computeIntersection(p1, p2, q1, q2);
     lineIntersector.isProper();
     lineIntersector.hasIntersection();
 
-    p1 = new Coordinate(10.0, 10, Point.NULL_ORDINATE);
-    p2 = new Coordinate(20.0, 10, Point.NULL_ORDINATE);
-    q1 = new Coordinate(15.0, 10, Point.NULL_ORDINATE);
-    q2 = new Coordinate(30.0, 10, Point.NULL_ORDINATE);
+    p1 = new PointDouble(10.0, 10, Point.NULL_ORDINATE);
+    p2 = new PointDouble(20.0, 10, Point.NULL_ORDINATE);
+    q1 = new PointDouble(15.0, 10, Point.NULL_ORDINATE);
+    q2 = new PointDouble(30.0, 10, Point.NULL_ORDINATE);
     lineIntersector.computeIntersection(p1, p2, q1, q2);
     lineIntersector.isProper();
     lineIntersector.hasIntersection();
 
-    p1 = new Coordinate(30.0, 10, Point.NULL_ORDINATE);
-    p2 = new Coordinate(20.0, 10, Point.NULL_ORDINATE);
-    q1 = new Coordinate(10.0, 10, Point.NULL_ORDINATE);
-    q2 = new Coordinate(30.0, 10, Point.NULL_ORDINATE);
+    p1 = new PointDouble(30.0, 10, Point.NULL_ORDINATE);
+    p2 = new PointDouble(20.0, 10, Point.NULL_ORDINATE);
+    q1 = new PointDouble(10.0, 10, Point.NULL_ORDINATE);
+    q2 = new PointDouble(30.0, 10, Point.NULL_ORDINATE);
     lineIntersector.computeIntersection(p1, p2, q1, q2);
     lineIntersector.hasIntersection();
 
-    lineIntersector.computeIntersection(new Coordinate(100.0, 100,
-      Point.NULL_ORDINATE), new Coordinate(10.0, 100,
-      Point.NULL_ORDINATE), new Coordinate(100.0, 10,
-      Point.NULL_ORDINATE), new Coordinate(100.0, 100,
+    lineIntersector.computeIntersection(new PointDouble(100.0, 100,
+      Point.NULL_ORDINATE), new PointDouble(10.0, 100,
+      Point.NULL_ORDINATE), new PointDouble(100.0, 10,
+      Point.NULL_ORDINATE), new PointDouble(100.0, 100,
       Point.NULL_ORDINATE));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionNum();
 
-    lineIntersector.computeIntersection(new Coordinate(190.0, 50,
-      Point.NULL_ORDINATE), new Coordinate(120.0, 100,
-      Point.NULL_ORDINATE), new Coordinate(120.0, 100,
-      Point.NULL_ORDINATE), new Coordinate(50.0, 150,
+    lineIntersector.computeIntersection(new PointDouble(190.0, 50,
+      Point.NULL_ORDINATE), new PointDouble(120.0, 100,
+      Point.NULL_ORDINATE), new PointDouble(120.0, 100,
+      Point.NULL_ORDINATE), new PointDouble(50.0, 150,
       Point.NULL_ORDINATE));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionNum();
     lineIntersector.getIntersection(1);
 
-    lineIntersector.computeIntersection(new Coordinate(180.0, 200,
-      Point.NULL_ORDINATE), new Coordinate(160.0, 180,
-      Point.NULL_ORDINATE), new Coordinate(220.0, 240,
-      Point.NULL_ORDINATE), new Coordinate(140.0, 160,
+    lineIntersector.computeIntersection(new PointDouble(180.0, 200,
+      Point.NULL_ORDINATE), new PointDouble(160.0, 180,
+      Point.NULL_ORDINATE), new PointDouble(220.0, 240,
+      Point.NULL_ORDINATE), new PointDouble(140.0, 160,
       Point.NULL_ORDINATE));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionNum();
 
-    lineIntersector.computeIntersection(new Coordinate(30.0, 10,
-      Point.NULL_ORDINATE), new Coordinate(30.0, 30,
-      Point.NULL_ORDINATE), new Coordinate(10.0, 10,
-      Point.NULL_ORDINATE), new Coordinate(90.0, 11,
+    lineIntersector.computeIntersection(new PointDouble(30.0, 10,
+      Point.NULL_ORDINATE), new PointDouble(30.0, 30,
+      Point.NULL_ORDINATE), new PointDouble(10.0, 10,
+      Point.NULL_ORDINATE), new PointDouble(90.0, 11,
       Point.NULL_ORDINATE));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionNum();
     lineIntersector.isProper();
 
-    lineIntersector.computeIntersection(new Coordinate(10.0, 30,
-      Point.NULL_ORDINATE), new Coordinate(10.0, 0,
-      Point.NULL_ORDINATE), new Coordinate(11.0, 90,
-      Point.NULL_ORDINATE), new Coordinate(10.0, 10,
+    lineIntersector.computeIntersection(new PointDouble(10.0, 30,
+      Point.NULL_ORDINATE), new PointDouble(10.0, 0,
+      Point.NULL_ORDINATE), new PointDouble(11.0, 90,
+      Point.NULL_ORDINATE), new PointDouble(10.0, 10,
       Point.NULL_ORDINATE));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionNum();

@@ -33,6 +33,7 @@
 package com.revolsys.gis.model.coordinates;
 
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Computes an approximate intersection of two line segments
@@ -65,7 +66,7 @@ public class CentralEndpointIntersector {
       averageX /= n;
       averageX /= n;
     }
-    return new DoubleCoordinates(averageX, averageY);
+    return new PointDouble(averageX, averageY);
   }
 
   public static Point getIntersection(final Point p00,

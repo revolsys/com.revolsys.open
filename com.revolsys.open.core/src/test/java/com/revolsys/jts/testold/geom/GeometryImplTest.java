@@ -38,8 +38,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -239,8 +238,8 @@ public class GeometryImplTest extends TestCase {
       0.0, 0, 100.0, 0, 100.0, 100, 0.0, 0);
     final LinearRing somethingNotEqualButSameClass = this.geometryFactory.linearRing(
       2, 0.0, 0, 100.0, 0, 100.0, 555, 0.0, 0);
-    final LinearRing sameClassButEmpty = this.geometryFactory.linearRing((CoordinatesList)null);
-    final LinearRing anotherSameClassButEmpty = this.geometryFactory.linearRing((CoordinatesList)null);
+    final LinearRing sameClassButEmpty = this.geometryFactory.linearRing((PointList)null);
+    final LinearRing anotherSameClassButEmpty = this.geometryFactory.linearRing((PointList)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {
@@ -253,9 +252,9 @@ public class GeometryImplTest extends TestCase {
 
     // LineString somethingEqualButNotExactly =
     // geometryFactory.createLineString(new Point[] {
-    // new Coordinate((double)0, 0), new Coordinate((double)100, 0), new
+    // new PointDouble((double)0, 0), new PointDouble((double)100, 0), new
     // Coordinate((double)100, 100),
-    // new Coordinate((double)0, 0) });
+    // new PointDouble((double)0, 0) });
     //
     // doTestEqualsExact(x, somethingExactlyEqual, somethingEqualButNotExactly,
     // somethingNotEqualButSameClass);

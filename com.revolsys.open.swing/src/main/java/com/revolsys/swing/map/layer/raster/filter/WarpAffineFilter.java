@@ -7,8 +7,8 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.util.ExceptionUtil;
 
@@ -284,7 +284,7 @@ public class WarpAffineFilter extends WarpFilter {
         inverseScaleX, inverseShearX);
       final double destY = transformY(sourceX, sourceY, inverseTranslateY,
         inverseScaleY, inverseShearY);
-      return new DoubleCoordinates(destX, destY);
+      return new PointDouble(destX, destY);
     } else {
       return null;
     }
@@ -295,7 +295,7 @@ public class WarpAffineFilter extends WarpFilter {
     final double destY) {
     final double sourceX = transformX(destX, destY, translateX, scaleX, shearX);
     final double sourceY = transformY(destX, destY, translateY, scaleY, shearY);
-    return new DoubleCoordinates(sourceX, sourceY);
+    return new PointDouble(sourceX, sourceY);
   }
 
   @Override

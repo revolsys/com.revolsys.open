@@ -6,10 +6,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
@@ -37,7 +37,7 @@ public class CascadedPolygonUnionTest extends TestCase {
     final List geoms = new ArrayList();
     for (int i = 0; i < num; i++) {
       for (int j = 0; j < num; j++) {
-        final Point pt = new Coordinate((double)i, j,
+        final Point pt = new PointDouble((double)i, j,
           Point.NULL_ORDINATE);
         final Geometry ptGeom = this.geomFact.point(pt);
         final Geometry disc = ptGeom.buffer(radius);

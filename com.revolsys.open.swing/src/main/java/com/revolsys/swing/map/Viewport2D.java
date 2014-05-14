@@ -24,13 +24,13 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.layer.Project;
 
 public class Viewport2D implements PropertyChangeSupportProxy {
@@ -480,7 +480,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   private BoundingBox setBoundingBox(Point centre, final double scale) {
     final double unitsPerPixel = getUnitsPerPixel(scale);
     final GeometryFactory geometryFactory = getGeometryFactory();
-    centre = new DoubleCoordinates(centre);
+    centre = new PointDouble(centre);
     final int viewWidthPixels = getViewWidthPixels();
     final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();

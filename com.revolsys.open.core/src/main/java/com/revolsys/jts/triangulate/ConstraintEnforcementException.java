@@ -34,8 +34,8 @@
 package com.revolsys.jts.triangulate;
 
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Indicates a failure during constraint enforcement.
@@ -73,7 +73,7 @@ public class ConstraintEnforcementException extends RuntimeException {
    */
   public ConstraintEnforcementException(final String msg, final Point pt) {
     super(msgWithCoord(msg, pt));
-    this.pt = new Coordinate(pt);
+    this.pt = new PointDouble(pt);
   }
 
   /**

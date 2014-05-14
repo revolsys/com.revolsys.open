@@ -33,14 +33,13 @@
 package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.jts.algorithm.CGAlgorithms3D;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.operation.distance.GeometryLocation;
 
@@ -134,17 +133,17 @@ public class Distance3DOp {
   private static Point segmentPoint(final Point p0,
     final Point p1, final double d0, final double d1) {
     if (d0 <= 0) {
-      return new Coordinate(p0);
+      return new PointDouble(p0);
     }
     if (d1 <= 0) {
-      return new Coordinate(p1);
+      return new PointDouble(p1);
     }
 
     final double f = Math.abs(d0) / (Math.abs(d0) + Math.abs(d1));
     final double intx = p0.getX() + f * (p1.getX() - p0.getX());
     final double inty = p0.getY() + f * (p1.getY() - p0.getY());
     final double intz = p0.getZ() + f * (p1.getZ() - p0.getZ());
-    return new Coordinate(intx, inty, intz);
+    return new PointDouble(intx, inty, intz);
   }
 
   // input
@@ -282,7 +281,7 @@ public class Distance3DOp {
 
   private void computeMinDistanceLinePoint(final LineString line,
     final Point point, final boolean flip) {
-    final Point coord = point.getCoordinate();
+    final Point coord = point.getPoint();
     // brute force approach!
     int i = 0;
     for (final Segment segment : line.segments()) {
@@ -372,12 +371,12 @@ public class Distance3DOp {
 
   private void computeMinDistancePointPoint(final Point point0,
     final Point point1, final boolean flip) {
-    final double dist = CGAlgorithms3D.distance(point0.getCoordinate(),
-      point1.getCoordinate());
+    final double dist = CGAlgorithms3D.distance(point0.getPoint(),
+      point1.getPoint());
     if (dist < minDistance) {
       updateDistance(dist,
-        new GeometryLocation(point0, 0, point0.getCoordinate()),
-        new GeometryLocation(point1, 0, point1.getCoordinate()), flip);
+        new GeometryLocation(point0, 0, point0.getPoint()),
+        new GeometryLocation(point1, 0, point1.getPoint()), flip);
     }
   }
 
@@ -409,7 +408,7 @@ public class Distance3DOp {
 
   private void computeMinDistancePolygonPoint(final PlanarPolygon3D polyPlane,
     final Point point, final boolean flip) {
-    final Point pt = point.getCoordinate();
+    final Point pt = point.getPoint();
 
     final LineString shell = polyPlane.getPolygon().getExteriorRing();
     if (polyPlane.intersects(pt, shell)) {
@@ -507,7 +506,7 @@ public class Distance3DOp {
 
   private Point intersection(final PlanarPolygon3D poly,
     final LineString line) {
-    final CoordinatesList seq = line.getCoordinatesList();
+    final PointList seq = line.getCoordinatesList();
     if (seq.size() == 0) {
       return null;
     }

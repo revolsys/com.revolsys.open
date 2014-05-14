@@ -37,10 +37,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.Segment;
 
 /**
@@ -91,12 +91,12 @@ public class OffsetPointGenerator {
     final double midY = (y2 + y1) / 2;
 
     if (doLeft) {
-      final Point offsetLeft = new Coordinate(midX - uy, midY + ux);
+      final Point offsetLeft = new PointDouble(midX - uy, midY + ux);
       offsetPts.add(offsetLeft);
     }
 
     if (doRight) {
-      final Point offsetRight = new Coordinate(midX + uy, midY - ux);
+      final Point offsetRight = new PointDouble(midX + uy, midY - ux);
       offsetPts.add(offsetRight);
     }
   }

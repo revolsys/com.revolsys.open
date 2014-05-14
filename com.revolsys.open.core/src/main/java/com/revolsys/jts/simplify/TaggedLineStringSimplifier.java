@@ -38,10 +38,10 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Simplifies a TaggedLineString, preserving topology

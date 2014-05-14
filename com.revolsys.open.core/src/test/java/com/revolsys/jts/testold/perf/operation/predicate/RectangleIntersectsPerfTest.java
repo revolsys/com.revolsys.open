@@ -37,11 +37,11 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.GeometricShapeFactory;
@@ -158,7 +158,7 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Point origin = new Coordinate((double)0, 0,
+    final Point origin = new PointDouble((double)0, 0,
       Point.NULL_ORDINATE);
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();

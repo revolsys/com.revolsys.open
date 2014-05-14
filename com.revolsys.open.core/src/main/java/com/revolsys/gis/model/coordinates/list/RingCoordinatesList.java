@@ -1,6 +1,6 @@
 package com.revolsys.gis.model.coordinates.list;
 
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 
 public class RingCoordinatesList extends DoubleCoordinatesList {
 
@@ -9,7 +9,7 @@ public class RingCoordinatesList extends DoubleCoordinatesList {
    */
   private static final long serialVersionUID = 5660399503744099455L;
 
-  public RingCoordinatesList(final CoordinatesList coordinatesList) {
+  public RingCoordinatesList(final PointList coordinatesList) {
     super(coordinatesList.subList(0, coordinatesList.size() - 1));
   }
 

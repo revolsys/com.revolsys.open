@@ -5,11 +5,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.saif.SaifConstants;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class PointConverter implements OsnConverter {
   private String geometryClass = SaifConstants.POINT;
@@ -46,11 +45,11 @@ public class PointConverter implements OsnConverter {
           if (z == 2147483648.0) {
             z = 0;
           }
-          coordinate = new DoubleCoordinates(x, y, z);
+          coordinate = new PointDouble(x, y, z);
         } else if (coordTypeName.equals("/Coord2D")) {
           final double x = iterator.nextDoubleAttribute("c1");
           final double y = iterator.nextDoubleAttribute("c2");
-          coordinate = new DoubleCoordinates(x, y);
+          coordinate = new PointDouble(x, y);
         } else {
           iterator.throwParseError("Expecting Coord2D or Coord3D");
         }

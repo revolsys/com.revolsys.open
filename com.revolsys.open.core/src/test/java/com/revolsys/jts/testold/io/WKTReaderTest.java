@@ -38,11 +38,10 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -100,11 +99,11 @@ public class WKTReaderTest extends TestCase {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 1E9);
     final WKTReader reader = new WKTReader(geometryFactory);
     final Geometry point1 = reader.read("POINT(123456789.01234567890 10)");
-    final Point point2 = geometryFactory.point(new Coordinate(
+    final Point point2 = geometryFactory.point(new PointDouble(
       123456789.01234567890, 10, Point.NULL_ORDINATE));
-    assertEquals(point1.getCoordinate().getX(), point2.getCoordinate().getX(),
+    assertEquals(point1.getPoint().getX(), point2.getPoint().getX(),
       1E-7);
-    assertEquals(point1.getCoordinate().getY(), point2.getCoordinate().getY(),
+    assertEquals(point1.getPoint().getY(), point2.getPoint().getY(),
       1E-7);
   }
 
@@ -185,8 +184,8 @@ public class WKTReaderTest extends TestCase {
   }
 
   public void testReadZ() throws Exception {
-    assertEquals(new Coordinate((double)1, 2, 3),
-      this.reader.read("POINT(1 2 3)").getCoordinate());
+    assertEquals(new PointDouble((double)1, 2, 3),
+      this.reader.read("POINT(1 2 3)").getPoint());
   }
 
 }

@@ -1,11 +1,11 @@
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Densifies a LineString
@@ -32,17 +32,17 @@ public class SegmentDensifier {
     final double segLenFrac = segLength / origLen;
     for (int i = 0; i <= nPtsToAdd; i++) {
       final double addedPtFrac = i * segLenFrac;
-      final Point pt = new Coordinate(p0.getX() + addedPtFrac * delx,
+      final Point pt = new PointDouble(p0.getX() + addedPtFrac * delx,
         p0.getY() + addedPtFrac * dely, Point.NULL_ORDINATE);
       this.newCoords.add(pt, false);
     }
-    this.newCoords.add(new Coordinate(p1), false);
+    this.newCoords.add(new PointDouble(p1), false);
   }
 
   public Geometry densify(final double segLength) {
     this.newCoords = new CoordinateList();
 
-    final CoordinatesList seq = this.inputLine.getCoordinatesList();
+    final PointList seq = this.inputLine.getCoordinatesList();
 
     this.newCoords.add(seq.getCoordinate(0).cloneCoordinates());
 

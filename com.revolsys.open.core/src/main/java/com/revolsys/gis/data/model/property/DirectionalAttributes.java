@@ -25,10 +25,10 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   public static final String PROPERTY_NAME = DirectionalAttributes.class.getName()
@@ -442,8 +442,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     if (attributeName.equals(metaData.getGeometryAttributeName())) {
       return line1.equals(line2);
     }
-    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    final PointList points1 = CoordinatesListUtil.get(line1);
+    final PointList points2 = CoordinatesListUtil.get(line2);
 
     boolean reverseEquals;
     if (points1.equal(0, points2, 0)) {
@@ -557,8 +557,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final LineString line1 = object1.getGeometryValue();
     final LineString line2 = object2.getGeometryValue();
 
-    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    final PointList points1 = CoordinatesListUtil.get(line1);
+    final PointList points2 = CoordinatesListUtil.get(line2);
 
     final boolean[] forwards = new boolean[2];
     final int lastPointIndex1 = points1.size() - 1;
@@ -591,8 +591,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final DataObject object1, DataObject object2) {
     final LineString line1 = object1.getGeometryValue();
     LineString line2 = object2.getGeometryValue();
-    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    final PointList points1 = CoordinatesListUtil.get(line1);
+    final PointList points2 = CoordinatesListUtil.get(line2);
 
     DataObject startObject;
     DataObject endObject;
@@ -651,8 +651,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final DataObject object1, DataObject object2) {
     final LineString line1 = object1.getGeometryValue();
     LineString line2 = object2.getGeometryValue();
-    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    final PointList points1 = CoordinatesListUtil.get(line1);
+    final PointList points2 = CoordinatesListUtil.get(line2);
 
     DataObject startObject;
     DataObject endObject;
@@ -713,8 +713,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   public DataObject getMergedObject(final DataObject object1, DataObject object2) {
     final LineString line1 = object1.getGeometryValue();
     LineString line2 = object2.getGeometryValue();
-    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
-    final CoordinatesList points2 = CoordinatesListUtil.get(line2);
+    final PointList points1 = CoordinatesListUtil.get(line1);
+    final PointList points2 = CoordinatesListUtil.get(line2);
 
     DataObject startObject;
     DataObject endObject;

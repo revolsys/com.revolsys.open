@@ -37,13 +37,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Models a triangle formed from {@link QuadEdge}s in a {@link QuadEdgeSubdivision}
@@ -201,7 +201,7 @@ public class QuadEdgeTriangle {
     for (int i = 0; i < 3; i++) {
       pts[i] = edge[i].orig().getCoordinate();
     }
-    pts[3] = new Coordinate(pts[0]);
+    pts[3] = new PointDouble(pts[0]);
     return pts;
   }
 

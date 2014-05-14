@@ -36,14 +36,14 @@ package com.revolsys.jts.shape.fractal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
@@ -88,11 +88,11 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
   private LinearRing createSquareHole(final double x, final double y,
     final double width) {
     final Point[] pts = new Point[] {
-      new Coordinate(x, y, Point.NULL_ORDINATE),
-      new Coordinate(x + width, y, Point.NULL_ORDINATE),
-      new Coordinate(x + width, y + width, Point.NULL_ORDINATE),
-      new Coordinate(x, y + width, Point.NULL_ORDINATE),
-      new Coordinate(x, y, Point.NULL_ORDINATE)
+      new PointDouble(x, y, Point.NULL_ORDINATE),
+      new PointDouble(x + width, y, Point.NULL_ORDINATE),
+      new PointDouble(x + width, y + width, Point.NULL_ORDINATE),
+      new PointDouble(x, y + width, Point.NULL_ORDINATE),
+      new PointDouble(x, y, Point.NULL_ORDINATE)
     };
     return geometryFactory.linearRing(pts);
   }

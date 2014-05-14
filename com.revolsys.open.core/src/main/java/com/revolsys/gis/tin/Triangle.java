@@ -6,18 +6,18 @@ import java.util.Set;
 
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.MathUtil;
 
@@ -63,7 +63,7 @@ public class Triangle extends AbstractCoordinatesList {
     final Set<Point> coordinates, final Point line1Start,
     final Point line1End, final Point line2Start,
     final Point line2End) {
-    final CoordinatesList intersections = LineSegmentUtil.getIntersection(
+    final PointList intersections = LineSegmentUtil.getIntersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
     for (final Point point : intersections) {
       coordinates.add(point);
@@ -186,7 +186,7 @@ public class Triangle extends AbstractCoordinatesList {
     final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2
       * c.getY())
       / circum;
-    return new DoubleCoordinates(inCentreX, inCentreY);
+    return new PointDouble(inCentreX, inCentreY);
   }
 
   public Point getP0() {

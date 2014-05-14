@@ -5,13 +5,12 @@ import org.junit.Test;
 
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.TestConstants;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class PointTest implements TestConstants {
 
@@ -141,15 +140,15 @@ public class PointTest implements TestConstants {
       final Point pointCoordinatesNull = geometryFactory.point((Point)null);
       assertEmpty(pointCoordinatesNull);
 
-      final Point pointCoordinatesSize0 = geometryFactory.point(new DoubleCoordinates(
+      final Point pointCoordinatesSize0 = geometryFactory.point(new PointDouble(
         0));
       assertEmpty(pointCoordinatesSize0);
 
-      final Point pointCoordinatesSize1 = geometryFactory.point(new DoubleCoordinates(
+      final Point pointCoordinatesSize1 = geometryFactory.point(new PointDouble(
         1));
       assertEmpty(pointCoordinatesSize1);
 
-      final Point pointCoordinatesListNull = geometryFactory.point((CoordinatesList)null);
+      final Point pointCoordinatesListNull = geometryFactory.point((PointList)null);
       assertEmpty(pointCoordinatesListNull);
 
       final Point pointCoordinatesListSize0 = geometryFactory.point(new DoubleCoordinatesList(
@@ -220,11 +219,11 @@ public class PointTest implements TestConstants {
         pointDoubleAllAxis, pointDoubleExtraAxis, pointDoubleLessAxis);
 
       // Coordinates
-      final Point pointCoordinatesAllAxis = geometryFactory.point(new DoubleCoordinates(
+      final Point pointCoordinatesAllAxis = geometryFactory.point(new PointDouble(
         coordinates));
-      final Point pointCoordinatesExtraAxis = geometryFactory.point(new DoubleCoordinates(
+      final Point pointCoordinatesExtraAxis = geometryFactory.point(new PointDouble(
         coordinatesExtra));
-      final Point pointCoordinatesLessAxis = geometryFactory.point(new DoubleCoordinates(
+      final Point pointCoordinatesLessAxis = geometryFactory.point(new PointDouble(
         coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesAllAxis,
         pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
@@ -232,7 +231,7 @@ public class PointTest implements TestConstants {
         pointCoordinatesAllAxis, pointCoordinatesExtraAxis,
         pointCoordinatesLessAxis);
 
-      // CoordinatesList
+      // PointList
       final Point pointCoordinatesListAllAxis = geometryFactory.point(new DoubleCoordinatesList(
         axisCount, coordinates));
       final Point pointCoordinatesListExtraAxis = geometryFactory.point(new DoubleCoordinatesList(

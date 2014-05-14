@@ -5,9 +5,9 @@ import junit.textui.TestRunner;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * General test cases for CoordinateSequences.
@@ -30,24 +30,24 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
     final Point[] coords = new Point[size];
     for (int i = 0; i < size; i++) {
       final double base = 2 * 1;
-      coords[i] = new Coordinate(base, base + 1, base + 2);
+      coords[i] = new PointDouble(base, base + 1, base + 2);
     }
     return coords;
   }
 
-  boolean isAllCoordsEqual(final CoordinatesList seq, final Point coord) {
+  boolean isAllCoordsEqual(final PointList seq, final Point coord) {
     for (int i = 0; i < seq.size(); i++) {
       if (!coord.equals(seq.getCoordinate(i))) {
         return false;
       }
 
-      if (coord.getX() != seq.getValue(i, CoordinatesList.X)) {
+      if (coord.getX() != seq.getValue(i, PointList.X)) {
         return false;
       }
-      if (coord.getY() != seq.getValue(i, CoordinatesList.Y)) {
+      if (coord.getY() != seq.getValue(i, PointList.Y)) {
         return false;
       }
-      if (coord.getZ() != seq.getValue(i, CoordinatesList.Z)) {
+      if (coord.getZ() != seq.getValue(i, PointList.Z)) {
         return false;
       }
     }
@@ -62,7 +62,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
    * @param coords
    * @return
    */
-  boolean isEqual(final CoordinatesList seq, final Point[] coords) {
+  boolean isEqual(final PointList seq, final Point[] coords) {
     if (seq.size() != coords.length) {
       return false;
     }
@@ -81,13 +81,13 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
       }
 
       // Ordinate indexed getters
-      if (coords[i].getX() != seq.getValue(i, CoordinatesList.X)) {
+      if (coords[i].getX() != seq.getValue(i, PointList.X)) {
         return false;
       }
-      if (coords[i].getY() != seq.getValue(i, CoordinatesList.Y)) {
+      if (coords[i].getY() != seq.getValue(i, PointList.Y)) {
         return false;
       }
-      if (coords[i].getZ() != seq.getValue(i, CoordinatesList.Z)) {
+      if (coords[i].getZ() != seq.getValue(i, PointList.Z)) {
         return false;
       }
 
@@ -118,7 +118,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
       final Point point = coords[i];
       CoordinatesListUtil.setCoordinates(coordinates, 2, i, point);
     }
-    final CoordinatesList seq = new DoubleCoordinatesList(2, coordinates);
+    final PointList seq = new DoubleCoordinatesList(2, coordinates);
 
     for (int i = 0; i < seq.size(); i++) {
       final Point p = seq.getCoordinate(i);
@@ -128,7 +128,7 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
 
   public void testCreateByInit() {
     final Point[] coords = createArray(SIZE);
-    final CoordinatesList seq = new DoubleCoordinatesList(coords);
+    final PointList seq = new DoubleCoordinatesList(coords);
     assertTrue(isEqual(seq, coords));
   }
 
@@ -140,16 +140,16 @@ public abstract class CoordinateSequenceTestBase extends TestCase {
       final Point point = coords[i];
       CoordinatesListUtil.setCoordinates(coordinates, 3, i, point);
     }
-    final CoordinatesList seq = new DoubleCoordinatesList(3, coordinates);
+    final PointList seq = new DoubleCoordinatesList(3, coordinates);
 
     assertTrue(isEqual(seq, coords));
   }
 
   public void testZeroLength() {
-    final CoordinatesList seq = new DoubleCoordinatesList(0, 3);
+    final PointList seq = new DoubleCoordinatesList(0, 3);
     assertTrue(seq.size() == 0);
 
-    final CoordinatesList seq2 = new DoubleCoordinatesList(0);
+    final PointList seq2 = new DoubleCoordinatesList(0);
     assertTrue(seq2.size() == 0);
   }
 }

@@ -34,8 +34,8 @@
  */
 package com.revolsys.jts.operation.valid;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Contains information about the nature and location of a {@link Geometry}

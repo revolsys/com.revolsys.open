@@ -3,10 +3,10 @@ package com.revolsys.jts.testold.perf.operation.union;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
@@ -83,7 +83,7 @@ public class PolygonUnionPerfTest {
     final double yInc = height / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new Coordinate(i * xInc, j * yInc,
+        final Point base = new PointDouble(i * xInc, j * yInc,
           Point.NULL_ORDINATE);
         final Geometry poly = createPoly(base, size, nPts);
         geoms.add(poly);

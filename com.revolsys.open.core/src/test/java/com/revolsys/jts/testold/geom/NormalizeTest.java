@@ -85,7 +85,7 @@ public class NormalizeTest extends TestCase {
   public void testNormalizeEmptyPoint() throws Exception {
     Point point = geometryFactory.geometry("POINT EMPTY");
     point = point.normalize();
-    assertEquals(null, point.getCoordinate());
+    assertEquals(null, point.getPoint());
   }
 
   public void testNormalizeEmptyPolygon() throws Exception {
@@ -165,7 +165,7 @@ public class NormalizeTest extends TestCase {
   public void testNormalizePoint() throws Exception {
     Point point = geometryFactory.geometry("POINT (30 30)");
     point = point.normalize();
-    CoordinateTest.assertEquals(point.getCoordinate(), 30, 30);
+    CoordinateTest.assertEquals(point.getPoint(), 30, 30);
   }
 
   public void testNormalizePolygon1() throws Exception {

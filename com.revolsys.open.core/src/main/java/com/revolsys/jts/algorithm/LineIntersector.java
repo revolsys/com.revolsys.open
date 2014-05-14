@@ -36,8 +36,8 @@ package com.revolsys.jts.algorithm;
  * @version 1.7
  */
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -179,8 +179,8 @@ public abstract class LineIntersector {
   // public int numIntersects = 0;
 
   public LineIntersector() {
-    intPt[0] = new Coordinate();
-    intPt[1] = new Coordinate();
+    intPt[0] = new PointDouble();
+    intPt[1] = new PointDouble();
     // alias the intersection points for ease of reference
     pa = intPt[0];
     pb = intPt[1];

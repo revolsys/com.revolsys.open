@@ -1,13 +1,13 @@
 package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.IntervalSize;
 
 public class Root extends NodeBase {
-  private static final Point origin = new DoubleCoordinates(0.0, 0.0);
+  private static final Point origin = new PointDouble(0.0, 0.0);
 
   public Root() {
   }

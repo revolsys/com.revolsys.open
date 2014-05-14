@@ -2,12 +2,12 @@ package com.revolsys.jts.testold.algorithm;
 
 import java.util.Random;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class PerturbedGridPolygonBuilder {
   private final GeometryFactory geomFactory;
@@ -34,9 +34,9 @@ public class PerturbedGridPolygonBuilder {
     int index = 0;
 
     for (int i = 0; i < this.numLines; i++) {
-      final Point p0 = new Coordinate(getRandOrdinate(), 0,
+      final Point p0 = new PointDouble(getRandOrdinate(), 0,
         Point.NULL_ORDINATE);
-      final Point p1 = new Coordinate(getRandOrdinate(), this.gridWidth,
+      final Point p1 = new PointDouble(getRandOrdinate(), this.gridWidth,
         Point.NULL_ORDINATE);
       final LineString line = this.geomFactory.lineString(new Point[] {
         p0, p1
@@ -45,9 +45,9 @@ public class PerturbedGridPolygonBuilder {
     }
 
     for (int i = 0; i < this.numLines; i++) {
-      final Point p0 = new Coordinate((double)0, getRandOrdinate(),
+      final Point p0 = new PointDouble((double)0, getRandOrdinate(),
         Point.NULL_ORDINATE);
-      final Point p1 = new Coordinate(this.gridWidth, getRandOrdinate(),
+      final Point p1 = new PointDouble(this.gridWidth, getRandOrdinate(),
         Point.NULL_ORDINATE);
       final LineString line = this.geomFactory.lineString(new Point[] {
         p0, p1

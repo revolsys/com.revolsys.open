@@ -1,8 +1,8 @@
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a location along a {@link LineString}.
@@ -51,7 +51,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     }
     final double x = (p1.getX() - p0.getX()) * frac + p0.getX();
     final double y = (p1.getY() - p0.getY()) * frac + p0.getY();
-    return new Coordinate(x, y, Point.NULL_ORDINATE);
+    return new PointDouble(x, y, Point.NULL_ORDINATE);
   }
 
   private final LineString line;

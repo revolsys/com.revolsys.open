@@ -47,7 +47,6 @@ import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -55,12 +54,13 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 import com.revolsys.visitor.CreateListVisitor;
 
@@ -145,7 +145,7 @@ public class Graph<T> {
   }
 
   public Edge<T> addEdge(final T object, final LineString line) {
-    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final PointList points = CoordinatesListUtil.get(line);
     final Point from = points.get(0);
     final Point to = points.get(points.size() - 1);
     return addEdge(object, line, from, to);
@@ -245,7 +245,7 @@ public class Graph<T> {
 
   public Edge<T> createEdge(
     final com.revolsys.jts.geom.GeometryFactory geometryFactory,
-    final T object, final CoordinatesList points) {
+    final T object, final PointList points) {
     final LineString newLine = geometryFactory.lineString(points);
     final T newObject = clone(object, newLine);
     final Edge<T> newEdge = addEdge(newObject, newLine);
@@ -590,7 +590,7 @@ public class Graph<T> {
     if (node == null) {
       final int nodeId = ++nextNodeId;
       node = new Node<T>(nodeId, this, point);
-      nodesIdsByCoordinates.put(new DoubleCoordinates(node, 2), nodeId);
+      nodesIdsByCoordinates.put(new PointDouble(node, 2), nodeId);
       nodesById.put(nodeId, node);
       if (nodeIndex != null) {
         nodeIndex.add(node);
@@ -856,7 +856,7 @@ public class Graph<T> {
     } else {
       z = Double.NaN;
     }
-    final Point newPoint = new DoubleCoordinates(x, y, z);
+    final Point newPoint = new PointDouble(x, y, z);
     final Node<DataObject> newNode = graph.getNode(midPoint);
     if (!Node.hasEdgesBetween(typePath, node1, newNode)
       && !Node.hasEdgesBetween(typePath, node2, newNode)) {
@@ -1103,7 +1103,7 @@ public class Graph<T> {
       return Collections.emptyList();
     } else {
       final LineString line = edge.getLine();
-      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final PointList points = CoordinatesListUtil.get(line);
       final Set<Integer> splitVertices = new TreeSet<Integer>();
       final Set<Integer> splitIndexes = new TreeSet<Integer>();
 
@@ -1178,12 +1178,12 @@ public class Graph<T> {
         nodes.remove(node);
       }
       if (nodes.isEmpty()) {
-        final List<CoordinatesList> newLines = new ArrayList<CoordinatesList>();
+        final List<PointList> newLines = new ArrayList<PointList>();
         int startIndex = 0;
         Point startPoint = null;
         for (final Integer index : splitIndexes) {
           if (splitVertices.contains(index)) {
-            final CoordinatesList newPoints = CoordinatesListUtil.subList(
+            final PointList newPoints = CoordinatesListUtil.subList(
               points, startPoint, startIndex, index - startIndex + 1, null);
             newLines.add(newPoints);
             startPoint = null;
@@ -1209,11 +1209,11 @@ public class Graph<T> {
                   final Point p1 = points.get(index);
                   final Point p2 = points.get(index + 1);
                   final double z = LineSegmentUtil.getElevation(p1, p2, point);
-                  point = new DoubleCoordinates(point.getX(), point.getY(), z);
+                  point = new PointDouble(point.getX(), point.getY(), z);
                 }
               }
 
-              final CoordinatesList newPoints;
+              final PointList newPoints;
               if (startIndex > index) {
                 final Point[] coordinateArray = {
                   startPoint, point
@@ -1230,13 +1230,13 @@ public class Graph<T> {
             }
           }
         }
-        final CoordinatesList newPoints = CoordinatesListUtil.subList(points,
+        final PointList newPoints = CoordinatesListUtil.subList(points,
           startPoint, startIndex);
         newLines.add(newPoints);
 
         if (newLines.size() > 1) {
           final List<Edge<T>> newEdges = new ArrayList<Edge<T>>();
-          for (final CoordinatesList edgePoints : newLines) {
+          for (final PointList edgePoints : newLines) {
             final Edge<T> newEdge = createEdge(geometryFactory, object,
               edgePoints);
             newEdges.add(newEdge);
@@ -1260,7 +1260,7 @@ public class Graph<T> {
     if (!edge.isRemoved()) {
       final Point point = node;
       final LineString line = edge.getLine();
-      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final PointList points = CoordinatesListUtil.get(line);
 
       final Map<String, Number> result = CoordinatesListUtil.findClosestSegmentAndCoordinate(
         points, point);

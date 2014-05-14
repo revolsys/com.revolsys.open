@@ -1,9 +1,9 @@
 package com.revolsys.jts.simplify;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Triangle;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Simplifies a linestring (sequence of points) using the 
@@ -130,7 +130,7 @@ class VWLineSimplifier {
     // ensure computed value is a valid line
     if (simp.length < 2) {
       return new Point[] {
-        simp[0], new Coordinate(simp[0])
+        simp[0], new PointDouble(simp[0])
       };
     }
     return simp;

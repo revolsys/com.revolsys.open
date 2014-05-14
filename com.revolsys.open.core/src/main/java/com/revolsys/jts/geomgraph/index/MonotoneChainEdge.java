@@ -33,8 +33,8 @@
 package com.revolsys.jts.geomgraph.index;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Edge;
 
 /**

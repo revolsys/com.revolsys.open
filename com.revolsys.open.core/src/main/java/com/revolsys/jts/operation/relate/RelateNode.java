@@ -40,8 +40,8 @@ package com.revolsys.jts.operation.relate;
  * @version 1.7
  */
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.EdgeEndStar;
 import com.revolsys.jts.geomgraph.Node;
 

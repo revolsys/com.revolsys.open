@@ -1,7 +1,8 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
 
 /**
@@ -132,8 +133,8 @@ public abstract class LineIntersector {
   // public int numIntersects = 0;
 
   public LineIntersector() {
-    intPt[0] = new DoubleCoordinates(2);
-    intPt[1] = new DoubleCoordinates(2);
+    intPt[0] = new PointDouble(2);
+    intPt[1] = new PointDouble(2);
     // alias the intersection points for ease of reference
     pa = intPt[0];
     pb = intPt[1];

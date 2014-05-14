@@ -5,14 +5,13 @@ import java.util.Set;
 
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.visitor.AbstractEdgeListenerVisitor;
-import com.revolsys.gis.jts.LineSegmentImpl;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineSegment;
 
 public class LineSegmentIntersectionVisitor extends
   AbstractEdgeListenerVisitor<LineSegment> {
 
-  private final Set<CoordinatesList> intersections = new LinkedHashSet<CoordinatesList>();
+  private final Set<PointList> intersections = new LinkedHashSet<PointList>();
 
   private final LineSegment querySeg;
 
@@ -20,7 +19,7 @@ public class LineSegmentIntersectionVisitor extends
     this.querySeg = querySeg;
   }
 
-  public Set<CoordinatesList> getIntersections() {
+  public Set<PointList> getIntersections() {
     return intersections;
   }
 
@@ -28,7 +27,7 @@ public class LineSegmentIntersectionVisitor extends
   public boolean visit(final Edge<LineSegment> edge) {
     final LineSegment lineSegment = edge.getObject();
     if (lineSegment.getBoundingBox().intersects(querySeg.getBoundingBox())) {
-      final CoordinatesList intersection = querySeg.getIntersection(lineSegment);
+      final PointList intersection = querySeg.getIntersection(lineSegment);
       if (intersection != null && intersection.size() > 0) {
         intersections.add(intersection);
       }

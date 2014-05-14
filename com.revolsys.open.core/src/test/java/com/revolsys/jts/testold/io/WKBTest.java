@@ -5,11 +5,11 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ByteOrderValues;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKBReader;
@@ -122,7 +122,7 @@ public class WKBTest extends TestCase {
   public void testBigPolygon() throws IOException, ParseException {
     final GeometricShapeFactory shapeFactory = new GeometricShapeFactory(
       this.geomFactory);
-    shapeFactory.setBase(new Coordinate((double)0, 0, Point.NULL_ORDINATE));
+    shapeFactory.setBase(new PointDouble((double)0, 0, Point.NULL_ORDINATE));
     shapeFactory.setSize(1000);
     shapeFactory.setNumPoints(1000);
     final Geometry geom = shapeFactory.createRectangle();

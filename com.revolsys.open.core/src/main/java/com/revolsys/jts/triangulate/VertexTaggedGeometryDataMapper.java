@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Creates a map between the vertex {@link Coordinates}s of a 

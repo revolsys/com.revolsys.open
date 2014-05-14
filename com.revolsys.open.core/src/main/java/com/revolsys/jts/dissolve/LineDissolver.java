@@ -9,8 +9,7 @@ import java.util.Stack;
 import com.revolsys.jts.edgegraph.HalfEdge;
 import com.revolsys.jts.edgegraph.MarkHalfEdge;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -99,7 +98,7 @@ public class LineDissolver {
     if (factory == null) {
       this.factory = lineString.getGeometryFactory();
     }
-    final CoordinatesList seq = lineString.getCoordinatesList();
+    final PointList seq = lineString.getCoordinatesList();
     for (int i = 1; i < seq.size(); i++) {
       final DissolveHalfEdge e = (DissolveHalfEdge)graph.addEdge(
         seq.getCoordinate(i - 1), seq.getCoordinate(i));

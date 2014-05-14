@@ -44,13 +44,13 @@ import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geomgraph.DirectedEdge;
@@ -289,7 +289,7 @@ public class Buffer {
           segment.getCoordinate(1)))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
-        final CoordinatesList points = segment.getPoints();
+        final PointList points = segment.getPoints();
         final Edge edge = new Edge(points, label);
         insertUniqueEdge(edges, edge);
       }

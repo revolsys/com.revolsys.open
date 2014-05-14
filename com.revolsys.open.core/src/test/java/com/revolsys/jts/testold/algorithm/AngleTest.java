@@ -36,8 +36,8 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.Angle;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * @version 1.7
@@ -55,52 +55,39 @@ public class AngleTest extends TestCase {
   }
 
   public void testAngle() throws Exception {
-    assertEquals(
-      Angle.angle(new Coordinate((double)10.0, 0, Point.NULL_ORDINATE)), 0.0,
+    assertEquals(Angle.angle(new PointDouble(10.0, 0)), 0.0, TOLERANCE);
+    assertEquals(Angle.angle(new PointDouble(10.0, 10)), Math.PI / 4,
       TOLERANCE);
-    assertEquals(
-      Angle.angle(new Coordinate((double)10.0, 10, Point.NULL_ORDINATE)),
-      Math.PI / 4, TOLERANCE);
-    assertEquals(
-      Angle.angle(new Coordinate((double)0.0, 10, Point.NULL_ORDINATE)),
-      Math.PI / 2, TOLERANCE);
-    assertEquals(
-      Angle.angle(new Coordinate((double)-10.0, 10, Point.NULL_ORDINATE)),
-      0.75 * Math.PI, TOLERANCE);
-    assertEquals(
-      Angle.angle(new Coordinate((double)-10.0, 0, Point.NULL_ORDINATE)),
-      Math.PI, TOLERANCE);
-    assertEquals(
-      Angle.angle(new Coordinate((double)-10.0, -0.1, Point.NULL_ORDINATE)),
+    assertEquals(Angle.angle(new PointDouble(0.0, 10)), Math.PI / 2,
+      TOLERANCE);
+    assertEquals(Angle.angle(new PointDouble(-10.0, 10)), 0.75 * Math.PI,
+      TOLERANCE);
+    assertEquals(Angle.angle(new PointDouble(-10.0, 0)), Math.PI,
+      TOLERANCE);
+    assertEquals(Angle.angle(new PointDouble(-10.0, -0.1)),
       -3.131592986903128, TOLERANCE);
-    assertEquals(
-      Angle.angle(new Coordinate((double)-10.0, -10, Point.NULL_ORDINATE)), -0.75
-        * Math.PI, TOLERANCE);
+    assertEquals(Angle.angle(new PointDouble(-10.0, -10)), -0.75
+      * Math.PI, TOLERANCE);
   }
 
   public void testIsAcute() throws Exception {
-    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)0.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)5.0, 10.0,
-      Point.NULL_ORDINATE)), true);
-    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)0.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)5.0, -10,
-      Point.NULL_ORDINATE)), true);
+    assertEquals(Angle.isAcute(new PointDouble(10.0, 0,
+      Point.NULL_ORDINATE), new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+      new PointDouble(5.0, 10.0, Point.NULL_ORDINATE)), true);
+    assertEquals(Angle.isAcute(new PointDouble(10.0, 0,
+      Point.NULL_ORDINATE), new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+      new PointDouble(5.0, -10, Point.NULL_ORDINATE)), true);
     // angle of 0
-    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)0.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)10.0, 0,
-      Point.NULL_ORDINATE)), true);
+    assertEquals(Angle.isAcute(new PointDouble(10.0, 0,
+      Point.NULL_ORDINATE), new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+      new PointDouble(10.0, 0, Point.NULL_ORDINATE)), true);
 
-    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)0.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)-5.0, 10,
-      Point.NULL_ORDINATE)), false);
-    assertEquals(Angle.isAcute(new Coordinate((double)10.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)0.0, 0,
-      Point.NULL_ORDINATE), new Coordinate((double)-5.0, -10,
-      Point.NULL_ORDINATE)), false);
+    assertEquals(Angle.isAcute(new PointDouble(10.0, 0,
+      Point.NULL_ORDINATE), new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+      new PointDouble(-5.0, 10, Point.NULL_ORDINATE)), false);
+    assertEquals(Angle.isAcute(new PointDouble(10.0, 0,
+      Point.NULL_ORDINATE), new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+      new PointDouble(-5.0, -10, Point.NULL_ORDINATE)), false);
 
   }
 

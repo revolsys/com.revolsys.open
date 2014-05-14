@@ -3,7 +3,7 @@ package com.revolsys.jts.geom;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 
-public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
+public interface LineSegment extends Comparable<LineSegment>, PointList {
 
   /**
    * Computes the angle that the vector defined by this segment
@@ -87,13 +87,13 @@ public interface LineSegment extends Comparable<LineSegment>, CoordinatesList {
 
   LineSegment getIntersection(BoundingBox boundingBox);
 
-  CoordinatesList getIntersection(final Point point1,
+  PointList getIntersection(final Point point1,
     final Point point2);
 
-  CoordinatesList getIntersection(final GeometryFactory precisionModel,
+  PointList getIntersection(final GeometryFactory precisionModel,
     final LineSegment lineSegment2);
 
-  CoordinatesList getIntersection(LineSegment lineSegment2);
+  PointList getIntersection(LineSegment lineSegment2);
 
   /**
    * Computes the length of the line segment.

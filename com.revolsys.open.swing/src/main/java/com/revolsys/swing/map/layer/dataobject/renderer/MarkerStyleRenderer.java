@@ -12,12 +12,12 @@ import javax.swing.Icon;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.CoordinatesWithOrientation;
+import com.revolsys.gis.model.coordinates.PointWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -55,7 +55,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     return EMPTY_GEOMETRY;
   }
 
-  public static CoordinatesWithOrientation getMarkerLocation(
+  public static PointWithOrientation getMarkerLocation(
     final Viewport2D viewport, final Geometry geometry, final MarkerStyle style) {
     final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
@@ -67,7 +67,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
       final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
         placement);
       // TODO optimize projection?
-      CoordinatesList points = CoordinatesListUtil.get(geometry);
+      PointList points = CoordinatesListUtil.get(geometry);
       final int numPoints = points.size();
       if (numPoints > 1) {
         final boolean matches = matcher.matches();
@@ -126,7 +126,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
         }
 
         if (point != null && viewport.getBoundingBox().covers(point)) {
-          return new CoordinatesWithOrientation(point, orientation);
+          return new PointWithOrientation(point, orientation);
         }
       }
     }
@@ -183,7 +183,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private static void renderMarker(final Viewport2D viewport,
     final Graphics2D graphics, final LineString line, final MarkerStyle style) {
-    final CoordinatesWithOrientation point = getMarkerLocation(viewport, line,
+    final PointWithOrientation point = getMarkerLocation(viewport, line,
       style);
     if (point != null) {
       final double orientation = point.getOrientation();
@@ -215,7 +215,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
    * @param point
    */
   public static void renderMarkers(final Viewport2D viewport,
-    final Graphics2D graphics, final CoordinatesList points,
+    final Graphics2D graphics, final PointList points,
     final MarkerStyle style) {
     final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
       graphics);
@@ -250,7 +250,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   public static void renderMarkers(final Viewport2D viewport,
-    final Graphics2D graphics, final CoordinatesList points,
+    final Graphics2D graphics, final PointList points,
     final MarkerStyle styleFirst, final MarkerStyle styleLast,
     final MarkerStyle styleVertex) {
     if (points != null) {
@@ -305,12 +305,12 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
           renderMarker(viewport, graphics, point, style);
         } else if (part instanceof LineString) {
           final LineString lineString = (LineString)part;
-          final CoordinatesList points = CoordinatesListUtil.get(lineString);
+          final PointList points = CoordinatesListUtil.get(lineString);
           renderMarkers(viewport, graphics, points, style);
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
-          final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
-          for (final CoordinatesList points : pointsList) {
+          final List<PointList> pointsList = CoordinatesListUtil.getAll(polygon);
+          for (final PointList points : pointsList) {
             renderMarkers(viewport, graphics, points, style);
           }
         }
@@ -327,12 +327,12 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
         final Geometry part = geometry.getGeometry(i);
         if (part instanceof LineString) {
           final LineString lineString = (LineString)part;
-          final CoordinatesList points = CoordinatesListUtil.get(lineString);
+          final PointList points = CoordinatesListUtil.get(lineString);
           renderMarkers(viewport, graphics, points, style);
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
-          final List<CoordinatesList> pointsList = CoordinatesListUtil.getAll(polygon);
-          for (final CoordinatesList points : pointsList) {
+          final List<PointList> pointsList = CoordinatesListUtil.getAll(polygon);
+          for (final PointList points : pointsList) {
             renderMarkers(viewport, graphics, points, style);
           }
         }

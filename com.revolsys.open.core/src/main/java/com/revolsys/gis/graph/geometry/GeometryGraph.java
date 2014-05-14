@@ -16,12 +16,10 @@ import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.gis.jts.LineSegmentImpl;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -31,6 +29,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 
 public class GeometryGraph extends Graph<LineSegment> {
@@ -68,9 +67,9 @@ public class GeometryGraph extends Graph<LineSegment> {
     addEdge(lineSegment, fromNode, toNode);
   }
 
-  private void addEdges(final CoordinatesList points,
+  private void addEdges(final PointList points,
     final Map<String, Object> attributes) {
-    startPoints.add(new DoubleCoordinates(points.get(0), 2));
+    startPoints.add(new PointDouble(points.get(0), 2));
     final CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
       getGeometryFactory(), points);
     int index = 0;
@@ -98,14 +97,14 @@ public class GeometryGraph extends Graph<LineSegment> {
         points.add(point);
       } else if (part instanceof LineString) {
         final LineString line = (LineString)part;
-        final CoordinatesList points = CoordinatesListUtil.get(line);
+        final PointList points = CoordinatesListUtil.get(line);
         properties.put("type", "LineString");
         addEdges(points, properties);
       } else if (part instanceof Polygon) {
         final Polygon polygon = (Polygon)part;
-        final List<CoordinatesList> rings = CoordinatesListUtil.getAll(polygon);
+        final List<PointList> rings = CoordinatesListUtil.getAll(polygon);
         int ringIndex = 0;
-        for (final CoordinatesList ring : rings) {
+        for (final PointList ring : rings) {
           properties.put("ringIndex", ringIndex++);
           if (ringIndex == 0) {
             properties.put("type", "PolygonShell");
@@ -139,7 +138,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);
     if (boundingBox.intersects(this.boundingBox)) {
-      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final PointList points = CoordinatesListUtil.get(line);
       final int numPoints = points.size();
       final Point fromPoint = points.get(0);
       final Point toPoint = points.get(numPoints - 1);
@@ -153,7 +152,7 @@ public class GeometryGraph extends Graph<LineSegment> {
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();
-          final CoordinatesList segmentIntersection = line1.getIntersection(line2);
+          final PointList segmentIntersection = line1.getIntersection(line2);
           final int numIntersections = segmentIntersection.size();
           if (numIntersections == 1) {
             final Point intersection = segmentIntersection.get(0);
@@ -314,7 +313,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     }
     boundingBox = boundingBox.expand(maxDistance);
     if (boundingBox.intersects(this.boundingBox)) {
-      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final PointList points = CoordinatesListUtil.get(line);
       final int numPoints = points.size();
       final Point fromPoint = points.get(0);
       final Point toPoint = points.get(numPoints - 1);
@@ -327,7 +326,7 @@ public class GeometryGraph extends Graph<LineSegment> {
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();
-          final CoordinatesList intersections = line1.getIntersection(line2);
+          final PointList intersections = line1.getIntersection(line2);
           final int numIntersections = intersections.size();
           for (int j = 0; j < numIntersections; j++) {
             final Point intersection = intersections.get(j);

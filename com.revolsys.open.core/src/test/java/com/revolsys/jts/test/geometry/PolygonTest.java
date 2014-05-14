@@ -7,10 +7,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class PolygonTest {
@@ -19,14 +19,14 @@ public class PolygonTest {
     4326, 2);
 
   private static final List<Point> EXTERIOR_1 = Arrays.<Point> asList(
-    new DoubleCoordinates(0.0, 0.0), new DoubleCoordinates(10.0, 0.0),
-    new DoubleCoordinates(10.0, 10.0), new DoubleCoordinates(0.0, 10.0),
-    new DoubleCoordinates(0.0, 0));
+    new PointDouble(0.0, 0.0), new PointDouble(10.0, 0.0),
+    new PointDouble(10.0, 10.0), new PointDouble(0.0, 10.0),
+    new PointDouble(0.0, 0));
 
   private static final List<Point> INTERIOR_2 = Arrays.<Point> asList(
-    new DoubleCoordinates(2.0, 2.0), new DoubleCoordinates(8.0, 2.0),
-    new DoubleCoordinates(8.0, 8.0), new DoubleCoordinates(2.0, 8.0),
-    new DoubleCoordinates(2.0, 2.0));
+    new PointDouble(2.0, 2.0), new PointDouble(8.0, 2.0),
+    new PointDouble(8.0, 8.0), new PointDouble(2.0, 8.0),
+    new PointDouble(2.0, 2.0));
 
   private static final Polygon WITH_HOLE = GEOMETRY_FACTORY.polygon(
     GEOMETRY_FACTORY.linearRing(EXTERIOR_1),
@@ -50,7 +50,7 @@ public class PolygonTest {
       Assert.assertEquals(point, vertex);
       i++;
     }
-    Assert.assertEquals(new DoubleCoordinates(0.0, 0.0),
+    Assert.assertEquals(new PointDouble(0.0, 0.0),
       polygon.getVertex(0, 0));
     Assert.assertNull("VertexIndex Negative", polygon.getVertex(0, -1));
     Assert.assertNull("VertexIndex out of range", polygon.getVertex(0, 6));

@@ -32,19 +32,18 @@
  */
 package com.revolsys.jts.operation.buffer;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geomgraph.Position;
 
 /**
@@ -327,13 +326,13 @@ class OffsetSegmentGenerator {
          * Add "closing segment" of required length.
          */
         if (closingSegLengthFactor > 0) {
-          final Point mid0 = new Coordinate((closingSegLengthFactor
+          final Point mid0 = new PointDouble((closingSegLengthFactor
             * offset0.getP1().getX() + s1.getX())
             / (closingSegLengthFactor + 1), (closingSegLengthFactor
             * offset0.getP1().getY() + s1.getY())
             / (closingSegLengthFactor + 1), Point.NULL_ORDINATE);
           segList.addPt(mid0);
-          final Point mid1 = new Coordinate((closingSegLengthFactor
+          final Point mid1 = new PointDouble((closingSegLengthFactor
             * offset1.getP0().getX() + s1.getX())
             / (closingSegLengthFactor + 1), (closingSegLengthFactor
             * offset1.getP0().getY() + s1.getY())
@@ -398,7 +397,7 @@ class OffsetSegmentGenerator {
     // compute the midpoint of the bevel segment
     final double bevelMidX = basePt.getX() + mitreDist * Math.cos(mitreMidAng);
     final double bevelMidY = basePt.getY() + mitreDist * Math.sin(mitreMidAng);
-    final Point bevelMidPt = new Coordinate(bevelMidX, bevelMidY,
+    final Point bevelMidPt = new PointDouble(bevelMidX, bevelMidY,
       Point.NULL_ORDINATE);
 
     // compute the mitre midline segment from the corner point to the bevel
@@ -455,7 +454,7 @@ class OffsetSegmentGenerator {
       break;
       case BufferParameters.CAP_SQUARE:
         // add a square defined by extensions of the offset segment endpoints
-        final Point squareCapSideOffset = new DoubleCoordinates(
+        final Point squareCapSideOffset = new PointDouble(
           Math.abs(distance) * Math.cos(angle), Math.abs(distance)
             * Math.sin(angle));
 
@@ -500,7 +499,7 @@ class OffsetSegmentGenerator {
         isMitreWithinLimit = false;
       }
     } catch (final NotRepresentableException ex) {
-      intPt = new Coordinate(0.0, 0.0, Point.NULL_ORDINATE);
+      intPt = new PointDouble(0.0, 0.0, Point.NULL_ORDINATE);
       isMitreWithinLimit = false;
     }
 
@@ -573,7 +572,7 @@ class OffsetSegmentGenerator {
     }
   }
 
-  public void addSegments(final CoordinatesList points, final boolean isForward) {
+  public void addSegments(final PointList points, final boolean isForward) {
     segList.addPts(points, isForward);
   }
 
@@ -652,7 +651,7 @@ class OffsetSegmentGenerator {
     segList.closeRing();
   }
 
-  public CoordinatesList getPoints() {
+  public PointList getPoints() {
     return segList.getPoints();
   }
 

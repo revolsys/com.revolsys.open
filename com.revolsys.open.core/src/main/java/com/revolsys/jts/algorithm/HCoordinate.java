@@ -32,9 +32,8 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a homogeneous coordinate in a 2-D coordinate space.
@@ -80,7 +79,7 @@ public class HCoordinate {
       throw new NotRepresentableException();
     }
 
-    return new Coordinate(xInt, yInt, Point.NULL_ORDINATE);
+    return new PointDouble(xInt, yInt, Point.NULL_ORDINATE);
   }
 
   /*
@@ -155,7 +154,7 @@ public class HCoordinate {
   }
 
   public Point getCoordinate() throws NotRepresentableException {
-    return new DoubleCoordinates(getX(), getY());
+    return new PointDouble(getX(), getY());
   }
 
   public double getX() throws NotRepresentableException {

@@ -33,11 +33,11 @@
 
 package com.revolsys.jts.shape.random;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
@@ -63,7 +63,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
 
     final double x0 = centreX + rndX;
     final double y0 = centreY + rndY;
-    return new Coordinate(x0, y0, Point.NULL_ORDINATE);
+    return new PointDouble(x0, y0, Point.NULL_ORDINATE);
   }
 
   private boolean isConstrainedToCircle = false;

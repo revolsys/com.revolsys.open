@@ -3,8 +3,7 @@ package com.revolsys.gis.parallel;
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -87,7 +86,7 @@ public class ValidateGeometryRange extends
   }
 
   private boolean isValid(final String type,
-    final CoordinatesList coordinates) {
+    final PointList coordinates) {
     boolean valid = true;
     for (int j = 0; j < coordinates.size(); j++) {
       final Point coordinate = coordinates.getCoordinate(j);
@@ -103,7 +102,7 @@ public class ValidateGeometryRange extends
     for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final Geometry subGeometry = geometry.getGeometry(i);
       if (subGeometry instanceof Point) {
-        final Point coordinate = geometry.getCoordinate();
+        final Point coordinate = geometry.getPoint();
         if (!isValid(type, coordinate)) {
           valid = false;
         }
@@ -130,7 +129,7 @@ public class ValidateGeometryRange extends
   }
 
   private boolean isValid(final String type, final LineString line) {
-    final CoordinatesList coordinates = line.getCoordinatesList();
+    final PointList coordinates = line.getCoordinatesList();
     if (!isValid(type, coordinates)) {
       return false;
     }

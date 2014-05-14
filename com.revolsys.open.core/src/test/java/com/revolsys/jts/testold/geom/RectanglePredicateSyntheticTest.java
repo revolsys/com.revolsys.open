@@ -8,12 +8,12 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Test spatial predicate optimizations for rectangles by
@@ -66,9 +66,9 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final int xFac = factor[quadrant][0];
     final int yFac = factor[quadrant][1];
 
-    final Point p0 = new Coordinate(base.getX() + xFac * size,
+    final Point p0 = new PointDouble(base.getX() + xFac * size,
       base.getY() + yFac * size, Point.NULL_ORDINATE);
-    final Point p2 = new Coordinate(base.getX() + yFac * size,
+    final Point p2 = new PointDouble(base.getX() + yFac * size,
       base.getY() + -xFac * size, Point.NULL_ORDINATE);
 
     return this.fact.lineString(new Point[] {
@@ -82,7 +82,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
     for (double y = env.getMinY(); y <= env.getMaxY(); y += inc) {
       for (double x = env.getMinX(); x <= env.getMaxX(); x += inc) {
-        final Point base = new Coordinate(x, y, Point.NULL_ORDINATE);
+        final Point base = new PointDouble(x, y, Point.NULL_ORDINATE);
         testGeoms.add(createAngle(base, size, 0));
         testGeoms.add(createAngle(base, size, 1));
         testGeoms.add(createAngle(base, size, 2));

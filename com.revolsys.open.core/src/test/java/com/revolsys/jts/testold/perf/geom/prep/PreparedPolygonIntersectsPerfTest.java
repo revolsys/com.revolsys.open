@@ -37,11 +37,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.util.SineStarFactory;
@@ -107,7 +107,7 @@ public class PreparedPolygonIntersectsPerfTest {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new Coordinate(env.getMinX() + i * xInc,
+        final Point base = new PointDouble(env.getMinX() + i * xInc,
           env.getMinY() + j * yInc, Point.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);
@@ -156,8 +156,8 @@ public class PreparedPolygonIntersectsPerfTest {
   }
 
   public void test(final int nPts) {
-    // Geometry poly = createCircle(new Coordinate((double)0, 0), 100, nPts);
-    final Geometry sinePoly = createSineStar(new Coordinate((double)0, 0,
+    // Geometry poly = createCircle(new PointDouble((double)0, 0), 100, nPts);
+    final Geometry sinePoly = createSineStar(new PointDouble((double)0, 0,
       Point.NULL_ORDINATE), 100, nPts);
     // System.out.println(poly);
     // Geometry target = sinePoly.getBoundary();

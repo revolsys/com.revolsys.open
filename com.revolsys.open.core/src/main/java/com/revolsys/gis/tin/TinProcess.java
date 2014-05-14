@@ -14,7 +14,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -96,17 +96,17 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
     if (tin == null) {
       LOG.info("Loading tin from database");
       tin = new TriangulatedIrregularNetwork(boundingBox);
-      List<CoordinatesList> lines = new ArrayList<CoordinatesList>();
+      List<PointList> lines = new ArrayList<PointList>();
       if (tinIn != null) {
         readTinFeatures(tin, lines, tinIn);
       }
       if (tinReader != null) {
         readTinFeatures(tin, lines, tinReader);
       }
-      for (final CoordinatesList line : lines) {
+      for (final PointList line : lines) {
         tin.insertNodes(line);
       }
-      for (final CoordinatesList line : lines) {
+      for (final PointList line : lines) {
         tin.insertEdge(line);
       }
       lines = null;
@@ -170,7 +170,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   private void readTinFeatures(final TriangulatedIrregularNetwork tin,
-    final List<CoordinatesList> lines, final Iterable<DataObject> iterable) {
+    final List<PointList> lines, final Iterable<DataObject> iterable) {
     for (final DataObject object : iterable) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry instanceof Point) {
@@ -178,7 +178,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
         tin.insertNode(point);
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
-        final CoordinatesList points = CoordinatesListUtil.get(line);
+        final PointList points = CoordinatesListUtil.get(line);
         lines.add(points);
       }
     }

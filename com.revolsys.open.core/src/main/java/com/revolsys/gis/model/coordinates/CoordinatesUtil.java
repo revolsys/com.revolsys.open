@@ -6,10 +6,11 @@ import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
 
@@ -84,7 +85,7 @@ public class CoordinatesUtil {
       }
       coordinates[i] = value;
     }
-    return new DoubleCoordinates(coordinates);
+    return new PointDouble(coordinates);
   }
 
   public static Point circumcentre(final double x1, final double y1,
@@ -97,7 +98,7 @@ public class CoordinatesUtil {
     final HCoordinate hcc = new HCoordinate(cab, cbc);
     Point cc = null;
     try {
-      cc = new DoubleCoordinates(hcc.getX(), hcc.getY());
+      cc = new PointDouble(hcc.getX(), hcc.getY());
     } catch (final NotRepresentableException ex) {
       // MD - not sure what we can do to prevent this (robustness problem)
       // Idea - can we condition which edges we choose?
@@ -229,16 +230,16 @@ public class CoordinatesUtil {
     if (geometry == null || geometry.isEmpty()) {
       return null;
     } else {
-      final CoordinatesList points = CoordinatesListUtil.get(geometry);
+      final PointList points = CoordinatesListUtil.get(geometry);
       return points.get(0);
     }
   }
 
   public static Point get(final Point coordinate) {
     if (Double.isNaN(coordinate.getZ())) {
-      return new DoubleCoordinates(coordinate.getX(), coordinate.getY());
+      return new PointDouble(coordinate.getX(), coordinate.getY());
     } else {
-      return new DoubleCoordinates(coordinate.getX(), coordinate.getY(),
+      return new PointDouble(coordinate.getX(), coordinate.getY(),
         coordinate.getZ());
     }
   }
@@ -248,7 +249,7 @@ public class CoordinatesUtil {
       return null;
     } else {
       final Point point = get(geometry);
-      return new DoubleCoordinates(point, 2);
+      return new PointDouble(point, 2);
     }
   }
 
@@ -270,7 +271,7 @@ public class CoordinatesUtil {
 
   public static double getElevation(final LineString line,
     final Point coordinate) {
-    final CoordinatesList coordinates = line.getCoordinatesList();
+    final PointList coordinates = line.getCoordinatesList();
     Point previousCoordinate = coordinates.getCoordinate(0);
     for (int i = 1; i < coordinates.size(); i++) {
       final Point currentCoordinate = coordinates.getCoordinate(i);
@@ -299,7 +300,7 @@ public class CoordinatesUtil {
       final double[] coordinates = point.getCoordinates();
       coordinates[0] = MathUtil.makePrecise(scale, coordinates[0]);
       coordinates[1] = MathUtil.makePrecise(scale, coordinates[1]);
-      return new DoubleCoordinates(coordinates);
+      return new PointDouble(coordinates);
     }
   }
 
@@ -420,7 +421,7 @@ public class CoordinatesUtil {
     final double distance) {
     final double newX = coordinate.getX() + distance * Math.cos(angle);
     final double newY = coordinate.getY() + distance * Math.sin(angle);
-    final Point newCoordinate = new DoubleCoordinates(newX, newY);
+    final Point newCoordinate = new PointDouble(newX, newY);
     return newCoordinate;
 
   }
@@ -479,7 +480,7 @@ public class CoordinatesUtil {
       } else {
         final double[] points = originalLocation.getCoordinates();
         points[2] = z;
-        final Point newCoordinates = new DoubleCoordinates(points);
+        final Point newCoordinates = new PointDouble(points);
         return newCoordinates;
       }
     } else {
@@ -487,7 +488,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static float[] toFloatArray(final CoordinatesList points,
+  public static float[] toFloatArray(final PointList points,
     final int axisCount) {
     final float[] coordinates = new float[axisCount * points.size()];
     for (int i = 0; i < points.size(); i++) {
@@ -506,7 +507,7 @@ public class CoordinatesUtil {
     final double newX = Trig.adjacent(x, angle, length);
     final double newY = Trig.opposite(y, angle, length);
 
-    final Point newPoint = new DoubleCoordinates(newX, newY);
+    final Point newPoint = new PointDouble(newX, newY);
     return newPoint;
   }
 }

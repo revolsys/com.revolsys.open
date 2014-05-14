@@ -37,12 +37,12 @@ import java.util.List;
 
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.operation.distance.DistanceOp;
 

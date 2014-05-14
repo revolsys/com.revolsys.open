@@ -32,8 +32,8 @@
 
 package com.revolsys.gis.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Contains a pair of points and the distance between them. Provides methods to
@@ -46,7 +46,7 @@ public class PointPairDistance {
   private boolean isNull = true;
 
   private final Point[] pt = {
-    new Coordinate(), new Coordinate()
+    new PointDouble(), new PointDouble()
   };
 
   public PointPairDistance() {

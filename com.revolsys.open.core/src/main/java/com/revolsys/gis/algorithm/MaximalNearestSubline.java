@@ -1,9 +1,9 @@
 package com.revolsys.gis.algorithm;
 
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Computes the Maximal Nearest Subline of a given linestring relative to
@@ -116,7 +116,7 @@ public class MaximalNearestSubline {
      */
 
     // Heuristic #1: use every vertex of B as a test point
-    final CoordinatesList bCoords = b.getCoordinatesList();
+    final PointList bCoords = b.getCoordinatesList();
     for (int ib = 0; ib < bCoords.size(); ib++) {
       findNearestOnA(bCoords.getCoordinate(ib));
     }
@@ -127,7 +127,7 @@ public class MaximalNearestSubline {
      * outside current max interval.
      */
     final LocationOfPoint bPtLocator = new LocationOfPoint(b);
-    final CoordinatesList aCoords = a.getCoordinatesList();
+    final PointList aCoords = a.getCoordinatesList();
     for (int ia = 0; ia < aCoords.size(); ia++) {
       if (isOutsideInterval(ia)) {
         final LineStringLocation bLoc = bPtLocator.locate(aCoords.getCoordinate(ia));

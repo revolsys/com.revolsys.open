@@ -34,14 +34,14 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Computes a point in the interior of an areal geometry.
@@ -135,7 +135,7 @@ public class InteriorPointArea {
     LineString bisector = horizontalBisector(geometry);
     if (bisector.getLength() == 0.0) {
       width = 0;
-      intPt = bisector.getCoordinate();
+      intPt = bisector.getPoint();
     }
     else {
       Geometry intersections = bisector.intersection(geometry);
@@ -186,8 +186,8 @@ public class InteriorPointArea {
     
     double bisectY = SafeBisectorFinder.getBisectorY((Polygon) geometry);
     return factory.lineString(new Point[] {
-            new Coordinate((double)envelope.getMinX(), bisectY, Point.NULL_ORDINATE),
-            new Coordinate((double)envelope.getMaxX(), bisectY, Point.NULL_ORDINATE)
+            new PointDouble((double)envelope.getMinX(), bisectY, Point.NULL_ORDINATE),
+            new PointDouble((double)envelope.getMaxX(), bisectY, Point.NULL_ORDINATE)
         });
   }
 
@@ -197,7 +197,7 @@ public class InteriorPointArea {
    * @return the centre of the envelope
    */
   public static Point centre(BoundingBox envelope) {
-      return new Coordinate((double)avg(envelope.getMinX(),
+      return new PointDouble((double)avg(envelope.getMinX(),
               envelope.getMaxX()),
           avg(envelope.getMinY(), envelope.getMaxY()), Point.NULL_ORDINATE);
   }
@@ -246,7 +246,7 @@ public class InteriorPointArea {
 	  }
 
 	private void process(LineString line) {
-		CoordinatesList seq = line.getCoordinatesList();
+		PointList seq = line.getCoordinatesList();
 		for (int i = 0; i < seq.size(); i++) {
 			double y = seq.getY(i);
 			updateInterval(y);

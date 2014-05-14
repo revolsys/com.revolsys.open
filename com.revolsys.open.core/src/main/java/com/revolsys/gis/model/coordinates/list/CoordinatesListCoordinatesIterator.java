@@ -3,20 +3,18 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.gis.model.coordinates.CoordinatesListCoordinates;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * The CoordinatesListCoordinatesIterator is an iterator which iterates through
- * each item in a {@link CoordinatesList}.
+ * each item in a {@link PointList}.
  * 
  * @author Paul Austin
  */
-public class CoordinatesListCoordinatesIterator implements
-  Iterator<Point> {
+public class CoordinatesListCoordinatesIterator implements Iterator<Point> {
   /** The coordinates list. */
-  private final CoordinatesList coordinatesList;
+  private final PointList coordinatesList;
 
   private int index = 0;
 
@@ -25,7 +23,7 @@ public class CoordinatesListCoordinatesIterator implements
    * 
    * @param coordinates The coordinates list.
    */
-  public CoordinatesListCoordinatesIterator(final CoordinatesList coordinates) {
+  public CoordinatesListCoordinatesIterator(final PointList coordinates) {
     this.coordinatesList = coordinates;
   }
 
@@ -41,10 +39,9 @@ public class CoordinatesListCoordinatesIterator implements
   @Override
   public Point next() {
     if (hasNext()) {
-      final CoordinatesListCoordinates coordinates = new CoordinatesListCoordinates(
-        coordinatesList, index);
-      index++;
-      return coordinates;
+      final int index = this.index;
+      this.index++;
+      return coordinatesList.get(index);
     } else {
       throw new NoSuchElementException();
     }

@@ -32,9 +32,9 @@
  */
 package com.revolsys.jts.precision;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
@@ -106,7 +106,7 @@ public class CommonBitsRemover {
       commonBitsY.add(vertex.getY());
 
     }
-    commonCoord = new Coordinate(commonBitsX.getCommon(),
+    commonCoord = new PointDouble(commonBitsX.getCommon(),
       commonBitsY.getCommon(), Point.NULL_ORDINATE);
   }
 
@@ -142,7 +142,7 @@ public class CommonBitsRemover {
     // if (x == 0.0 && y == 0.0) {
     // return geom;
     // } else {
-    // final Point invCoord = new Coordinate(-x, -y,
+    // final Point invCoord = new PointDouble(-x, -y,
     // Point.NULL_ORDINATE);
     // final Translater trans = new Translater(invCoord);
     // geom.apply(trans);

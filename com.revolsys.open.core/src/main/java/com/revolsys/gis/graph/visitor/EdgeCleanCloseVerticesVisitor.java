@@ -8,12 +8,10 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.event.EdgeEvent;
 import com.revolsys.gis.graph.event.EdgeEventListenerList;
-import com.revolsys.gis.model.coordinates.CoordinateSequenceCoordinatesIterator;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 
 public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
@@ -41,20 +39,17 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
     this.visitor = visitor;
   }
 
-  private double getAngle(final Edge<T> edge,
-    final CoordinateSequenceCoordinatesIterator ordinates,
-    final int relativeIndex) {
-    final int index = ordinates.getIndex();
-    if (index + relativeIndex - 1 < 0
-      || index + relativeIndex + 1 >= ordinates.size()) {
+  private double getAngle(final Edge<T> edge, final LineString line,
+    final int index) {
+    if (index + index - 1 < 0 || index + index + 1 >= line.getVertexCount()) {
       return Double.NaN;
     } else {
-      final double x1 = ordinates.getValue(relativeIndex - 1, 0);
-      final double y1 = ordinates.getValue(relativeIndex - 1, 1);
-      final double x2 = ordinates.getValue(relativeIndex, 0);
-      final double y2 = ordinates.getValue(relativeIndex, 1);
-      final double x3 = ordinates.getValue(relativeIndex + 1, 0);
-      final double y3 = ordinates.getValue(relativeIndex + 1, 1);
+      final double x1 = line.getCoordinate(index - 1, 0);
+      final double y1 = line.getCoordinate(index - 1, 1);
+      final double x2 = line.getCoordinate(index, 0);
+      final double y2 = line.getCoordinate(index, 1);
+      final double x3 = line.getCoordinate(index + 1, 0);
+      final double y3 = line.getCoordinate(index + 1, 1);
       return MathUtil.angle(x1, y1, x2, y2, x3, y3);
     }
   }
@@ -80,26 +75,22 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
   @Override
   public boolean visit(final Edge<T> edge) {
     final String typePath = edge.getTypeName();
-    final LineString lineString = edge.getLine();
-    final CoordinatesList coordinates = lineString.getCoordinatesList();
-    final int numCoordinates = coordinates.size();
-    if (numCoordinates > 2) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(lineString);
-      final CoordinateSequenceCoordinatesIterator ordinates = new CoordinateSequenceCoordinatesIterator(
-        coordinates);
+    final LineString line = edge.getLine();
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 2) {
+      final GeometryFactory geometryFactory = line.getGeometryFactory();
       final LinkedHashSet<Integer> removeIndicies = new LinkedHashSet<Integer>();
 
-      double x1 = ordinates.getX();
-      double y1 = ordinates.getY();
-      while (ordinates.hasNext()) {
-        ordinates.next();
-        final double x2 = ordinates.getX();
-        final double y2 = ordinates.getY();
+      double x1 = line.getX(0);
+      double y1 = line.getY(0);
+      for (int i = 1; i < vertexCount; i++) {
+        final double x2 = line.getX(i);
+        final double y2 = line.getY(i);
         final double distance = MathUtil.distance(x1, y1, x2, y2);
         if (distance < minDistance) {
-          final double previousAngle = getAngle(edge, ordinates, -1);
-          final double angle = getAngle(edge, ordinates, 0);
-          final double nextAngle = getAngle(edge, ordinates, 1);
+          final double previousAngle = getAngle(edge, line, i - 1);
+          final double angle = getAngle(edge, line, i);
+          final double nextAngle = getAngle(edge, line, i + 1);
           boolean fixed = false;
           if (angle > previousAngle) {
             if (angle > nextAngle) {
@@ -112,7 +103,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
           }
           if (fixed) {
             coordinateListeners.coordinateEvent(
-              new DoubleCoordinates(x2, y2),
+              new PointDouble(x2, y2),
               typePath,
               "Short Segment",
               "Fixed",
@@ -120,7 +111,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
                 + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           } else {
             coordinateListeners.coordinateEvent(
-              new DoubleCoordinates(x2, y2),
+              new PointDouble(x2, y2),
               typePath,
               "Short Segment",
               "Review",
@@ -132,14 +123,14 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
         y1 = y2;
       }
       if (!removeIndicies.isEmpty()) {
-        final int axisCount = coordinates.getAxisCount();
-        final double[] newCoordinates = new double[(numCoordinates - removeIndicies.size())
+        final int axisCount = line.getAxisCount();
+        final double[] newCoordinates = new double[(vertexCount - removeIndicies.size())
           * axisCount];
         int k = 0;
-        for (int j = 0; j < numCoordinates; j++) {
+        for (int j = 0; j < vertexCount; j++) {
           if (!removeIndicies.contains(j)) {
             CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, k,
-              coordinates, j);
+              line, j);
             k++;
           }
         }

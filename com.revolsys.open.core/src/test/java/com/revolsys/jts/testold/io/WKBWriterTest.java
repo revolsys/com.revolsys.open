@@ -2,10 +2,9 @@ package com.revolsys.jts.testold.io;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKBReader;
 import com.revolsys.jts.io.WKBWriter;
 
@@ -17,7 +16,7 @@ public class WKBWriterTest extends TestCase {
 
   public void testSRID() throws Exception {
     final GeometryFactory gf = GeometryFactory.getFactory();
-    final Point p1 = gf.point(new Coordinate((double)1, 2, Point.NULL_ORDINATE));
+    final Point p1 = gf.point(new PointDouble((double)1, 2, Point.NULL_ORDINATE));
     // p1.setSRID(1234);
 
     // first write out without srid set

@@ -59,11 +59,13 @@ public interface LineString extends Lineal {
   @Override
   LineString clone();
 
+  boolean equals(int axisIndex, int vertexIndex, Point point);
+
   Point getCoordinate(final int vertexIndex);
 
   double getCoordinate(int vertexIndex, final int axisIndex);
 
-  CoordinatesList getCoordinatesList();
+  PointList getCoordinatesList();
 
   Point getEndPoint();
 
@@ -89,8 +91,6 @@ public interface LineString extends Lineal {
 
   boolean isRing();
 
-  LineString merge(Point point, LineString line);
-
   /**
    * Merge two lines that share common coordinates at either the start or end.
    * If the lines touch only at their start coordinates, the line2 will be
@@ -103,6 +103,8 @@ public interface LineString extends Lineal {
    * @return The new line string
    */
   LineString merge(LineString line);
+
+  LineString merge(Point point, LineString line);
 
   @Override
   LineString move(final double... deltas);

@@ -35,12 +35,11 @@ package com.revolsys.jts.testold.operation;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance.DistanceOp;
@@ -84,43 +83,45 @@ public class DistanceTest extends TestCase {
   public void testClosestPoints1() throws Exception {
     final String wkt1 = "POLYGON ((200 180, 60 140, 60 260, 200 180))";
     final String wkt2 = "POINT (140 280)";
-    final Coordinate p1 = new Coordinate(111.6923076923077, 230.46153846153845);
-    final Coordinate p2 = new Coordinate(140.0, 280);
+    final Point p1 = new PointDouble(111.6923076923077,
+      230.46153846153845);
+    final Point p2 = new PointDouble(140.0, 280);
     doNearestPointsTest(wkt1, wkt2, 57.05597791103589, p1, p2);
   }
 
   public void testClosestPoints2() throws Exception {
     doNearestPointsTest("POLYGON ((200 180, 60 140, 60 260, 200 180))",
-      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589, new Coordinate(
-        111.6923076923077, 230.46153846153845, Point.NULL_ORDINATE),
-      new Coordinate((double)140, 280, Point.NULL_ORDINATE));
+      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589,
+      new PointDouble(111.6923076923077, 230.46153846153845,
+        Point.NULL_ORDINATE), new PointDouble((double)140, 280,
+        Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints3() throws Exception {
     doNearestPointsTest(
       "LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)",
-      "POINT (10 10)", 127.27922061357856, new Coordinate((double)100, 100,
-        Point.NULL_ORDINATE), new Coordinate((double)10, 10,
+      "POINT (10 10)", 127.27922061357856, new PointDouble((double)100,
+        100, Point.NULL_ORDINATE), new PointDouble((double)10, 10,
         Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints4() throws Exception {
     doNearestPointsTest("LINESTRING (100 100, 200 200)",
       "LINESTRING (100 200, 200 100)", 0.0,
-      new DoubleCoordinates(150.0, 150.0), new DoubleCoordinates(150.0, 150.0));
+      new PointDouble(150.0, 150.0), new PointDouble(150.0, 150.0));
   }
 
   public void testClosestPoints5() throws Exception {
     doNearestPointsTest("LINESTRING (100 100, 200 200)",
-      "LINESTRING (150 121, 200 0)", 20.506096654409877, new Coordinate(135.5,
-        135.5, Point.NULL_ORDINATE), new Coordinate((double)150, 121,
-        Point.NULL_ORDINATE));
+      "LINESTRING (150 121, 200 0)", 20.506096654409877, new PointDouble(
+        135.5, 135.5, Point.NULL_ORDINATE), new PointDouble((double)150,
+        121, Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints6() throws Exception {
-    final DoubleCoordinates p1 = new DoubleCoordinates(139.4956500724988,
+    final PointDouble p1 = new PointDouble(139.4956500724988,
       206.78661188980183);
-    final DoubleCoordinates p2 = new DoubleCoordinates(153.0, 204);
+    final PointDouble p2 = new PointDouble(153.0, 204);
     final String wkt1 = "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))";
     final String wkt2 = "LINESTRING (153 204, 185 224, 209 207, 238 222, 254 186)";
     doNearestPointsTest(wkt1, wkt2, 13.788860460124573, p1, p2);
@@ -130,8 +131,8 @@ public class DistanceTest extends TestCase {
     doNearestPointsTest(
       "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
       "LINESTRING (120 215, 185 224, 209 207, 238 222, 254 186)", 0.0,
-      new Coordinate((double)120, 215, Point.NULL_ORDINATE),
-      new Coordinate((double)120, 215, Point.NULL_ORDINATE));
+      new PointDouble((double)120, 215, Point.NULL_ORDINATE),
+      new PointDouble((double)120, 215, Point.NULL_ORDINATE));
   }
 
   public void testDisjointCollinearSegments() throws Exception {

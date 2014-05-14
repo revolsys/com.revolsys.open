@@ -37,12 +37,11 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Stopwatch;
 
 public class RectangleLineIntersectorPerfTest {
@@ -75,14 +74,14 @@ public class RectangleLineIntersectorPerfTest {
   }
 
   private BoundingBox createRectangle() {
-    final BoundingBox rectEnv = new Envelope(new Coordinate(this.baseX,
-      this.baseY, Point.NULL_ORDINATE), new Coordinate(this.baseX
+    final BoundingBox rectEnv = new Envelope(new PointDouble(this.baseX,
+      this.baseY, Point.NULL_ORDINATE), new PointDouble(this.baseX
       + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
     return rectEnv;
   }
 
   private Point[] createTestPoints(final int nPts) {
-    final Point pt = this.geomFact.point(new Coordinate(this.baseX, this.baseY,
+    final Point pt = this.geomFact.point(new PointDouble(this.baseX, this.baseY,
       Point.NULL_ORDINATE));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return CoordinatesListUtil.getCoordinateArray(circle);
@@ -170,13 +169,13 @@ class SimpleRectangleIntersector {
   }
 
   private void initCorners(final BoundingBox rectEnv) {
-    this.corner[0] = new Coordinate(rectEnv.getMaxX(), rectEnv.getMaxY(),
+    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(),
       Point.NULL_ORDINATE);
-    this.corner[1] = new Coordinate(rectEnv.getMinX(), rectEnv.getMaxY(),
+    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(),
       Point.NULL_ORDINATE);
-    this.corner[2] = new Coordinate(rectEnv.getMinX(), rectEnv.getMinY(),
+    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(),
       Point.NULL_ORDINATE);
-    this.corner[3] = new Coordinate(rectEnv.getMaxX(), rectEnv.getMinY(),
+    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(),
       Point.NULL_ORDINATE);
   }
 

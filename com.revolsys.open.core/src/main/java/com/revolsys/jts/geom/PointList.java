@@ -46,13 +46,13 @@ import java.util.List;
  * Or a custom coordinate class might support extra attributes like M-values.
  * <p>
  * Implementing a custom coordinate storage structure
- * requires implementing the {@link CoordinatesList} and
+ * requires implementing the {@link PointList} and
  *interfaces. 
- * To use the custom CoordinatesList, create a
+ * To use the custom PointList, create a
  * new {@link GeometryFactory} parameterized by the CoordinateSequenceFactory
  * The {@link GeometryFactory} can then be used to create new {@link Geometry}s.
  * The new Geometries
- * will use the custom CoordinatesList implementation.
+ * will use the custom PointList implementation.
  * <p>
  * For an example, see the code for
  * {@link ExtendedCoordinateExample}.
@@ -60,7 +60,7 @@ import java.util.List;
  *
  * @version 1.7
  */
-public interface CoordinatesList extends Cloneable, Iterable<Point>,
+public interface PointList extends Cloneable, Iterable<Point>,
   Serializable {
   /**
    * Standard ordinate index values
@@ -79,27 +79,27 @@ public interface CoordinatesList extends Cloneable, Iterable<Point>,
    *
    * @return a copy of the coordinate sequence containing copies of all points
    */
-  CoordinatesList clone();
+  PointList clone();
 
   boolean contains(Point point);
 
+  double distance(int index, PointList other, int otherIndex);
+
   double distance(int index, Point point);
 
-  double distance(int index, CoordinatesList other, int otherIndex);
+  boolean equal(int index, PointList other, int otherIndex);
+
+  boolean equal(int index, PointList other, int otherIndex, int axisCount);
 
   boolean equal(int i, Point point);
 
   boolean equal(int i, Point point, int axisCount);
 
-  boolean equal(int index, CoordinatesList other, int otherIndex);
-
-  boolean equal(int index, CoordinatesList other, int otherIndex, int axisCount);
-
   boolean equal2d(int index, Point point);
 
-  boolean equals(CoordinatesList coordinatesList);
+  boolean equals(PointList coordinatesList);
 
-  boolean equals(CoordinatesList coordinatesList, int axisCount);
+  boolean equals(PointList coordinatesList, int axisCount);
 
   Point get(int i);
 
@@ -112,24 +112,13 @@ public interface CoordinatesList extends Cloneable, Iterable<Point>,
    * <p>
    * Note that in the future the semantics of this method may change
    * to guarantee that the Point returned is always a copy.
-   * Callers should not to assume that they can modify a CoordinatesList by
+   * Callers should not to assume that they can modify a PointList by
    * modifying the object returned by this method.
    *
    * @param i the index of the coordinate to retrieve
    * @return the i'th coordinate in the sequence
    */
   Point getCoordinate(int i);
-
-  /**
-   * Returns a copy of the i'th coordinate in this sequence.
-   * This method optimizes the situation where the caller is
-   * going to make a copy anyway - if the implementation
-   * has already created a new Point object, no further copy is needed.
-   *
-   * @param i the index of the coordinate to retrieve
-   * @return a copy of the i'th coordinate in the sequence
-   */
-  Point getCoordinateCopy(int i);
 
   double[] getCoordinates();
 
@@ -170,7 +159,7 @@ public interface CoordinatesList extends Cloneable, Iterable<Point>,
 
   boolean isCounterClockwise();
 
-  CoordinatesList reverse();
+  PointList reverse();
 
   /**
      * Returns the number of coordinates in this sequence.
@@ -178,15 +167,15 @@ public interface CoordinatesList extends Cloneable, Iterable<Point>,
      */
   int size();
 
-  boolean startsWith(CoordinatesList coordinatesList, int axisCount);
+  boolean startsWith(PointList coordinatesList, int axisCount);
 
-  CoordinatesList subList(int index);
+  PointList subList(int index);
 
-  CoordinatesList subList(int index, int count);
+  PointList subList(int index, int count);
 
-  CoordinatesList subList(int length, int index, int count);
+  PointList subList(int length, int index, int count);
 
-  CoordinatesList subList(int length, int sourceIndex, int targetIndex,
+  PointList subList(int length, int sourceIndex, int targetIndex,
     int count);
 
   /**

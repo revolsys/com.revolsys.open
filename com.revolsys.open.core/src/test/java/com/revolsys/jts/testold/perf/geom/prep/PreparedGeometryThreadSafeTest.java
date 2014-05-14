@@ -1,9 +1,9 @@
 package com.revolsys.jts.testold.perf.geom.prep;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.util.SineStarFactory;
@@ -62,10 +62,10 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
 
   @Override
   public void setup() {
-    final Geometry sinePoly = createSineStar(new Coordinate((double)0, 0,
+    final Geometry sinePoly = createSineStar(new PointDouble((double)0, 0,
       Point.NULL_ORDINATE), 100000.0, this.nPts);
     this.pg = PreparedGeometryFactory.prepare(sinePoly);
-    this.g = createSineStar(new Coordinate((double)10, 10,
+    this.g = createSineStar(new PointDouble((double)10, 10,
       Point.NULL_ORDINATE), 100000.0, 100);
   }
 }

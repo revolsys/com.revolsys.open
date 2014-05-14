@@ -35,11 +35,11 @@ package com.revolsys.jts.geomgraph;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geomgraph.index.MonotoneChainEdge;
 
 /**
@@ -62,7 +62,7 @@ public class Edge extends GraphComponent {
     }
   }
 
-  private final CoordinatesList points;
+  private final PointList points;
 
   private Envelope env;
 
@@ -79,11 +79,11 @@ public class Edge extends GraphComponent {
   private int depthDelta = 0; // the change in area depth from the R to L side
                               // of this edge
 
-  public Edge(final CoordinatesList points) {
+  public Edge(final PointList points) {
     this(points, null);
   }
 
-  public Edge(final CoordinatesList points, final Label label) {
+  public Edge(final PointList points, final Label label) {
     this.points = points;
     this.label = label;
   }
@@ -95,7 +95,7 @@ public class Edge extends GraphComponent {
    */
   public void addIntersection(final LineIntersector li, final int segmentIndex,
     final int geomIndex, final int intIndex) {
-    final Point intPt = new Coordinate(li.getIntersection(intIndex));
+    final Point intPt = new PointDouble(li.getIntersection(intIndex));
     int normalizedSegmentIndex = segmentIndex;
     double dist = li.getEdgeDistance(geomIndex, intIndex);
     // normalize the intersection point location
@@ -171,7 +171,7 @@ public class Edge extends GraphComponent {
   }
 
   public Edge getCollapsedEdge() {
-    final CoordinatesList points = new DoubleCoordinatesList(getCoordinate(0),
+    final PointList points = new DoubleCoordinatesList(getCoordinate(0),
       getCoordinate(1));
     final Edge edge = new Edge(points, Label.toLineLabel(label));
     return edge;
@@ -227,7 +227,7 @@ public class Edge extends GraphComponent {
     return points.size();
   }
 
-  public CoordinatesList getPoints() {
+  public PointList getPoints() {
     return points;
   }
 

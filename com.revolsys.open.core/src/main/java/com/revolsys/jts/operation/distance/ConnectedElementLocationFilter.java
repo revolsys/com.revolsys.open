@@ -62,7 +62,7 @@ public class ConnectedElementLocationFilter {
     for (final Geometry part : geometry.geometries()) {
       if (part instanceof Point || part instanceof LineString
         || part instanceof Polygon) {
-        locations.add(new GeometryLocation(part, 0, part.getCoordinate()));
+        locations.add(new GeometryLocation(part, 0, part.getPoint()));
       }
     }
     return locations;

@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.testold.geom;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * @version 1.7
@@ -55,24 +55,24 @@ public class GeometryTestFactory {
     for (i = 0; i < nSide; i++) {
       final double x = minx + i * segLen;
       final double y = miny;
-      pts[ipt++] = new Coordinate(x, y, Point.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y, Point.NULL_ORDINATE);
     }
     for (i = 0; i < nSide; i++) {
       final double x = maxx;
       final double y = miny + i * segLen;
-      pts[ipt++] = new Coordinate(x, y, Point.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y, Point.NULL_ORDINATE);
     }
     for (i = 0; i < nSide; i++) {
       final double x = maxx - i * segLen;
       final double y = maxy;
-      pts[ipt++] = new Coordinate(x, y, Point.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y, Point.NULL_ORDINATE);
     }
     for (i = 0; i < nSide; i++) {
       final double x = minx;
       final double y = maxy - i * segLen;
-      pts[ipt++] = new Coordinate(x, y, Point.NULL_ORDINATE);
+      pts[ipt++] = new PointDouble(x, y, Point.NULL_ORDINATE);
     }
-    pts[ipt++] = new Coordinate(pts[0]);
+    pts[ipt++] = new PointDouble(pts[0]);
 
     return pts;
   }
@@ -103,7 +103,7 @@ public class GeometryTestFactory {
       final double ang = i * (2 * Math.PI / nPts);
       final double x = len * Math.cos(ang) + basex;
       final double y = len * Math.sin(ang) + basey;
-      final Point pt = new Coordinate(x, y, Point.NULL_ORDINATE);
+      final Point pt = new PointDouble(x, y, Point.NULL_ORDINATE);
       pts[iPt++] = pt;
     }
     pts[iPt] = pts[0];
@@ -155,7 +155,7 @@ public class GeometryTestFactory {
           + basex;
         final double y = len * Math.sin(starAng + iArmPt * angInc / nArmPt)
           + basey;
-        final Point pt = new Coordinate(x, y, Point.NULL_ORDINATE);
+        final Point pt = new PointDouble(x, y, Point.NULL_ORDINATE);
         pts[iPt++] = pt;
       }
       starAng += angInc;

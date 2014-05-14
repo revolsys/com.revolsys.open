@@ -3,7 +3,7 @@ package com.revolsys.gis.model.coordinates.list;
 import java.util.Iterator;
 
 import com.revolsys.gis.jts.LineSegmentImpl;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
@@ -14,16 +14,16 @@ public class CoordinatesListIndexLineSegmentIterator implements
 
   private final GeometryFactory factory;
 
-  private final CoordinatesList points;
+  private final PointList points;
 
   private int index = -1;
 
-  public CoordinatesListIndexLineSegmentIterator(final CoordinatesList points) {
+  public CoordinatesListIndexLineSegmentIterator(final PointList points) {
     this(FACTORY, points);
   }
 
   public CoordinatesListIndexLineSegmentIterator(final GeometryFactory factory,
-    final CoordinatesList points) {
+    final PointList points) {
     this.factory = factory;
     this.points = points;
   }

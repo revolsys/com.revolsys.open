@@ -40,11 +40,11 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.kdtree.KdNode;
 import com.revolsys.jts.index.kdtree.KdTree;
 import com.revolsys.jts.triangulate.quadedge.LastFoundQuadEdgeLocator;
@@ -311,7 +311,7 @@ public class ConformingDelaunayTriangulator {
     final Point p = seg.getStart();
     final Point q = seg.getEnd();
     // Find the mid point on the line and compute the radius of enclosing circle
-    final Point midPt = new Coordinate((p.getX() + q.getX()) / 2.0,
+    final Point midPt = new PointDouble((p.getX() + q.getX()) / 2.0,
       (p.getY() + q.getY()) / 2.0, Point.NULL_ORDINATE);
     final double segRadius = p.distance(midPt);
 

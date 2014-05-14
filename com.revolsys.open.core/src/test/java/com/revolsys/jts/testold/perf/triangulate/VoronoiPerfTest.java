@@ -3,10 +3,10 @@ package com.revolsys.jts.testold.perf.triangulate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -29,7 +29,7 @@ public class VoronoiPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double x = i * SIDE_LEN + SIDE_LEN * Math.random();
         final double y = j * SIDE_LEN + SIDE_LEN * Math.random();
-        pts.add(new Coordinate((double)x, y, Point.NULL_ORDINATE));
+        pts.add(new PointDouble((double)x, y, Point.NULL_ORDINATE));
       }
     }
     return pts;

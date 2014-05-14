@@ -3,9 +3,9 @@ package com.revolsys.gis.grid.filter;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.grid.RectangularMapGrid;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 
 /**
  * The MapGridGeometrySheetFilter will compare the centroid of the Geometry for
@@ -29,7 +29,7 @@ public class MapGridGeometrySheetFilter implements Filter<DataObject> {
       if (geometry != null) {
         final Geometry geographicsGeometry = geometry.convert(GeometryFactory.getFactory(4326));
         final Point centroid = geographicsGeometry.getCentroid()
-          .getCoordinate();
+          .getPoint();
         final String geometrySheet = grid.getMapTileName(centroid.getX(),
           centroid.getY());
         if (geometrySheet != null) {

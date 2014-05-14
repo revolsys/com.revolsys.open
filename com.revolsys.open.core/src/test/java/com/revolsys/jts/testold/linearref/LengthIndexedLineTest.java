@@ -1,8 +1,8 @@
 package com.revolsys.jts.testold.linearref;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.linearref.LengthIndexedLine;
 
 /**
@@ -90,11 +90,11 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZ() {
     final Geometry linearGeom = read("LINESTRING (0 0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new Coordinate((double)5, 5,
+    final double projIndex = indexedLine.project(new PointDouble((double)5, 5,
       Point.NULL_ORDINATE));
     final Point projPt = indexedLine.extractPoint(projIndex);
     // System.out.println(projPt);
-    assertTrue(projPt.equals3d(new Coordinate((double)5, 5, 5)));
+    assertTrue(projPt.equals3d(new PointDouble((double)5, 5, 5)));
   }
 
   /**
@@ -104,7 +104,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZNaN() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new Coordinate((double)5, 5,
+    final double projIndex = indexedLine.project(new PointDouble((double)5, 5,
       Point.NULL_ORDINATE));
     final Point projPt = indexedLine.extractPoint(projIndex);
     assertTrue(Double.isNaN(projPt.getZ()));
@@ -175,11 +175,11 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
     final Point pt = indexedLine.extractPoint(100);
-    assertTrue(pt.equals(new Coordinate((double)10, 10,
+    assertTrue(pt.equals(new PointDouble((double)10, 10,
       Point.NULL_ORDINATE)));
 
     final Point pt2 = indexedLine.extractPoint(0);
-    assertTrue(pt2.equals(new Coordinate((double)0, 0,
+    assertTrue(pt2.equals(new PointDouble((double)0, 0,
       Point.NULL_ORDINATE)));
   }
 
@@ -205,16 +205,16 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testProjectExtractPoint() {
     final Geometry linearGeom = read("MULTILINESTRING ((0 2, 0 0), (-1 1, 1 1))");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double index = indexedLine.project(new Coordinate((double)1, 0,
+    final double index = indexedLine.project(new PointDouble((double)1, 0,
       Point.NULL_ORDINATE));
     final Point pt = indexedLine.extractPoint(index);
-    assertTrue(pt.equals(new Coordinate((double)0, 0, Point.NULL_ORDINATE)));
+    assertTrue(pt.equals(new PointDouble((double)0, 0, Point.NULL_ORDINATE)));
   }
 
   public void testProjectPointWithDuplicateCoords() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 0, 10 0, 20 0)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine.project(new Coordinate((double)10, 1,
+    final double projIndex = indexedLine.project(new PointDouble((double)10, 1,
       Point.NULL_ORDINATE));
     assertTrue(projIndex == 10.0);
   }

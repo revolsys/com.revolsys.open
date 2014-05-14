@@ -34,8 +34,8 @@
 package com.revolsys.jts.geom.util;
 
 import com.revolsys.jts.algorithm.Angle;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Supports creating {@link AffineTransformation}s defined by various kinds of
@@ -64,7 +64,7 @@ public class AffineTransformationFactory {
    */
   public static AffineTransformation createFromBaseLines(final Point src0,
     final Point src1, final Point dest0, final Point dest1) {
-    final Point rotPt = new Coordinate(src0.getX() + dest1.getX()
+    final Point rotPt = new PointDouble(src0.getX() + dest1.getX()
       - dest0.getX(), src0.getY() + dest1.getY() - dest0.getY(),
       Point.NULL_ORDINATE);
 
@@ -124,7 +124,7 @@ public class AffineTransformationFactory {
    */
   public static AffineTransformation createFromControlVectors(final Point src0,
     final Point src1, final Point dest0, final Point dest1) {
-    final Point rotPt = new Coordinate(dest1.getX() - dest0.getX(),
+    final Point rotPt = new PointDouble(dest1.getX() - dest0.getX(),
       dest1.getY() - dest0.getY(), Point.NULL_ORDINATE);
 
     final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);

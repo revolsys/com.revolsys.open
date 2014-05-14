@@ -34,7 +34,7 @@
 package com.revolsys.jts.operation.predicate;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -156,7 +156,7 @@ public class RectangleContains {
    * @return true if the linestring is contained in the boundary
    */
   private boolean isLineStringContainedInBoundary(final LineString line) {
-    final CoordinatesList seq = line.getCoordinatesList();
+    final PointList seq = line.getCoordinatesList();
     for (int i = 0; i < seq.size() - 1; i++) {
       final Point p0 = seq.getCoordinate(i);
       final Point p1 = seq.getCoordinate(i + 1);

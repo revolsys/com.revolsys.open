@@ -37,8 +37,6 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -52,6 +50,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.MultiLineStringImpl;
 import com.revolsys.jts.geom.impl.MultiPointImpl;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.Assert;
 
@@ -99,12 +98,12 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testCoordinateNaN() {
-    final Point c1 = new Coordinate();
+    final Point c1 = new PointDouble();
     assertTrue(!Double.isNaN(c1.getX()));
     assertTrue(!Double.isNaN(c1.getY()));
     assertTrue(Double.isNaN(c1.getZ()));
 
-    final Point c2 = new Coordinate((double)3, 4,
+    final Point c2 = new PointDouble((double)3, 4,
       Point.NULL_ORDINATE);
     assertEquals(3, c2.getX(), 1E-10);
     assertEquals(4, c2.getY(), 1E-10);
@@ -113,13 +112,13 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(c1, c1);
     assertEquals(c2, c2);
     assertTrue(!c1.equals(c2));
-    assertEquals(new Coordinate(), new Coordinate((double)0, 0,
+    assertEquals(new PointDouble(), new PointDouble((double)0, 0,
       Point.NULL_ORDINATE));
-    assertEquals(new Coordinate((double)3, 5, Point.NULL_ORDINATE),
-      new Coordinate((double)3, 5, Point.NULL_ORDINATE));
-    assertEquals(new Coordinate((double)3, 5, Double.NaN), new Coordinate(
+    assertEquals(new PointDouble((double)3, 5, Point.NULL_ORDINATE),
+      new PointDouble((double)3, 5, Point.NULL_ORDINATE));
+    assertEquals(new PointDouble((double)3, 5, Double.NaN), new PointDouble(
       (double)3, 5, Double.NaN));
-    assertTrue(new Coordinate((double)3, 5, 0).equals(new Coordinate((double)3,
+    assertTrue(new PointDouble((double)3, 5, 0).equals(new PointDouble((double)3,
       5, Double.NaN)));
   }
 
@@ -294,9 +293,9 @@ public class MiscellaneousTest extends TestCase {
 
   public void testLinearRingIsSimple() throws Exception {
     final Point[] coordinates = {
-      new Coordinate((double)10, 10, 0), new Coordinate((double)10, 20, 0),
-      new Coordinate((double)20, 20, 0), new Coordinate((double)20, 15, 0),
-      new Coordinate((double)10, 10, 0)
+      new PointDouble((double)10, 10, 0), new PointDouble((double)10, 20, 0),
+      new PointDouble((double)20, 20, 0), new PointDouble((double)20, 15, 0),
+      new PointDouble((double)10, 10, 0)
     };
     final LinearRing linearRing = this.geometryFactory.linearRing(coordinates);
     assertTrue(linearRing.isSimple());
@@ -480,7 +479,7 @@ public class MiscellaneousTest extends TestCase {
   public void testPredicatesReturnFalseForEmptyGeometries() {
     final Point p1 = GeometryFactory.getFactory().point((Point)null);
     final Point p2 = GeometryFactory.getFactory().point(
-      new Coordinate((double)5, 5, Point.NULL_ORDINATE));
+      new PointDouble((double)5, 5, Point.NULL_ORDINATE));
     assertEquals(false, p1.equals(p2));
     assertEquals(true, p1.disjoint(p2));
     assertEquals(false, p1.intersects(p2));

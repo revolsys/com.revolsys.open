@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.simplify;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A {@link LineSegmentImpl} which is tagged with its location in a parent {@link Geometry}.

@@ -38,12 +38,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.strtree.AbstractNode;
 import com.revolsys.jts.index.strtree.Boundable;
 import com.revolsys.jts.index.strtree.STRtree;
@@ -156,11 +156,11 @@ public class STRtreeDemo {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
       final BoundingBox e = (BoundingBox)i.next();
       final Geometry g = factory.polygon(factory.linearRing(new Point[] {
-        new Coordinate(e.getMinX(), e.getMinY(), Point.NULL_ORDINATE),
-        new Coordinate(e.getMinX(), e.getMaxY(), Point.NULL_ORDINATE),
-        new Coordinate(e.getMaxX(), e.getMaxY(), Point.NULL_ORDINATE),
-        new Coordinate(e.getMaxX(), e.getMinY(), Point.NULL_ORDINATE),
-        new Coordinate(e.getMinX(), e.getMinY(), Point.NULL_ORDINATE)
+        new PointDouble(e.getMinX(), e.getMinY(), Point.NULL_ORDINATE),
+        new PointDouble(e.getMinX(), e.getMaxY(), Point.NULL_ORDINATE),
+        new PointDouble(e.getMaxX(), e.getMaxY(), Point.NULL_ORDINATE),
+        new PointDouble(e.getMaxX(), e.getMinY(), Point.NULL_ORDINATE),
+        new PointDouble(e.getMinX(), e.getMinY(), Point.NULL_ORDINATE)
       }));
       if (first) {
         first = false;
@@ -182,11 +182,11 @@ public class STRtreeDemo {
     final double top = bottom + height;
     final double right = left + width;
     return factory.polygon(factory.linearRing(new Point[] {
-      new Coordinate(left, bottom, Point.NULL_ORDINATE),
-      new Coordinate(right, bottom, Point.NULL_ORDINATE),
-      new Coordinate(right, top, Point.NULL_ORDINATE),
-      new Coordinate(left, top, Point.NULL_ORDINATE),
-      new Coordinate(left, bottom, Point.NULL_ORDINATE)
+      new PointDouble(left, bottom, Point.NULL_ORDINATE),
+      new PointDouble(right, bottom, Point.NULL_ORDINATE),
+      new PointDouble(right, top, Point.NULL_ORDINATE),
+      new PointDouble(left, top, Point.NULL_ORDINATE),
+      new PointDouble(left, bottom, Point.NULL_ORDINATE)
     }));
   }
 

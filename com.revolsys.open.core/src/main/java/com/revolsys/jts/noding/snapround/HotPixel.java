@@ -33,12 +33,11 @@
 
 package com.revolsys.jts.noding.snapround;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.util.Assert;
 
@@ -104,7 +103,7 @@ public class HotPixel {
       throw new IllegalArgumentException("Scale factor must be non-zero");
     }
     if (scaleFactor != 1.0) {
-      this.pt = new Coordinate(scale(pt.getX()), scale(pt.getY()),
+      this.pt = new PointDouble(scale(pt.getX()), scale(pt.getY()),
         Point.NULL_ORDINATE);
     }
     initCorners(this.pt);
@@ -160,7 +159,7 @@ public class HotPixel {
   }
 
   private Point getScaled(final Point p) {
-    return new DoubleCoordinates(scale(p.getX()), scale(p.getY()));
+    return new PointDouble(scale(p.getX()), scale(p.getY()));
   }
 
   private void initCorners(final Point pt) {
@@ -170,10 +169,10 @@ public class HotPixel {
     miny = pt.getY() - tolerance;
     maxy = pt.getY() + tolerance;
 
-    corner[0] = new Coordinate(maxx, maxy, Point.NULL_ORDINATE);
-    corner[1] = new Coordinate(minx, maxy, Point.NULL_ORDINATE);
-    corner[2] = new Coordinate(minx, miny, Point.NULL_ORDINATE);
-    corner[3] = new Coordinate(maxx, miny, Point.NULL_ORDINATE);
+    corner[0] = new PointDouble(maxx, maxy, Point.NULL_ORDINATE);
+    corner[1] = new PointDouble(minx, maxy, Point.NULL_ORDINATE);
+    corner[2] = new PointDouble(minx, miny, Point.NULL_ORDINATE);
+    corner[3] = new PointDouble(maxx, miny, Point.NULL_ORDINATE);
   }
 
   /**

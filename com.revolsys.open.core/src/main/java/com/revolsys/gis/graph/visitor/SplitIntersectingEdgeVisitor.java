@@ -15,14 +15,13 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.filter.LineFilter;
 import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
 

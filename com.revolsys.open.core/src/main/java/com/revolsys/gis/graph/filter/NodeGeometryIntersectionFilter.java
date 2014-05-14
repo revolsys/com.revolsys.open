@@ -2,7 +2,6 @@ package com.revolsys.gis.graph.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;

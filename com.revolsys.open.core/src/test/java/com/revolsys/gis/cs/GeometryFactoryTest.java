@@ -6,7 +6,7 @@ import junit.framework.Assert;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -23,20 +23,20 @@ public class GeometryFactoryTest {
     3857, 1.0);
 
   public static void assertCoordinatesListEqual(final Geometry geometry,
-    final CoordinatesList... pointsList) {
+    final PointList... pointsList) {
     System.out.println(geometry);
-    final List<CoordinatesList> geometryPointsList = CoordinatesListUtil.getAll(geometry);
+    final List<PointList> geometryPointsList = CoordinatesListUtil.getAll(geometry);
     Assert.assertEquals("Number of coordinates Lists", pointsList.length,
       geometryPointsList.size());
     for (int i = 0; i < pointsList.length; i++) {
-      final CoordinatesList points = pointsList[i];
-      final CoordinatesList geometryPoints = geometryPointsList.get(i);
+      final PointList points = pointsList[i];
+      final PointList geometryPoints = geometryPointsList.get(i);
       Assert.assertEquals("Coordinates not equal", points, geometryPoints);
     }
   }
 
   public static void assertCopyGeometry(final Geometry geometry,
-    final CoordinatesList... pointsList) {
+    final PointList... pointsList) {
     assertCoordinatesListEqual(geometry, pointsList);
     final Geometry copy = (Geometry)geometry.copy(GEOMETRY_FACTORY);
     final Class<? extends Geometry> geometryClass = geometry.getClass();
@@ -52,7 +52,7 @@ public class GeometryFactoryTest {
   }
 
   public static void assertCreateGeometryCollection(final Geometry geometry,
-    final CoordinatesList... pointsList) {
+    final PointList... pointsList) {
     if (geometry instanceof GeometryCollection) {
       if (geometry.getGeometryCount() == 1) {
         final Geometry part = geometry.getGeometry(0);
@@ -85,13 +85,13 @@ public class GeometryFactoryTest {
   }
 
   private static void testCreateGeometry() {
-    final CoordinatesList pointPoints = new DoubleCoordinatesList(2, 0.0, 0);
-    final CoordinatesList point2Points = new DoubleCoordinatesList(2, 20.0, 20);
-    final CoordinatesList ringPoints = new DoubleCoordinatesList(2, 0.0, 0, 0,
+    final PointList pointPoints = new DoubleCoordinatesList(2, 0.0, 0);
+    final PointList point2Points = new DoubleCoordinatesList(2, 20.0, 20);
+    final PointList ringPoints = new DoubleCoordinatesList(2, 0.0, 0, 0,
       100, 100, 100, 100, 0, 0, 0);
-    final CoordinatesList ring2Points = new DoubleCoordinatesList(2, 20.0, 20,
+    final PointList ring2Points = new DoubleCoordinatesList(2, 20.0, 20,
       20, 80, 80, 80, 80, 20, 20, 20);
-    final CoordinatesList ring3Points = new DoubleCoordinatesList(2, 120.0,
+    final PointList ring3Points = new DoubleCoordinatesList(2, 120.0,
       120, 120, 180, 180, 180, 180, 120, 120, 120);
 
     final Point point = GEOMETRY_FACTORY.point(pointPoints);

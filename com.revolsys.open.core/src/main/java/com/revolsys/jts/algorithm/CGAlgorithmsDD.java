@@ -32,8 +32,8 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.math.DD;
 
 /**
@@ -202,6 +202,6 @@ public class CGAlgorithmsDD
     
     double y = DD.valueOf(q1.getY()).selfAdd(DD.valueOf(q2.getY()).selfSubtract(q1.getY()).selfMultiply(fracQ)).doubleValue();
 
-    return new Coordinate((double)x,y, Point.NULL_ORDINATE);
+    return new PointDouble((double)x,y, Point.NULL_ORDINATE);
   }
 }

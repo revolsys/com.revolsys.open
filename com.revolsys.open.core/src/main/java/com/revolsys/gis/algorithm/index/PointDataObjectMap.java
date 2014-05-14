@@ -12,9 +12,9 @@ import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.parallel.channel.Channel;
 
 public class PointDataObjectMap {
@@ -43,7 +43,7 @@ public class PointDataObjectMap {
    */
   public void add(final DataObject object) {
     final Point point = object.getGeometryValue();
-    final Point coordinates = new DoubleCoordinates(point, 2);
+    final Point coordinates = new PointDouble(point, 2);
     final List<DataObject> objects = getObjectInternal(coordinates);
     objects.add(object);
     if (comparator != null) {
@@ -58,7 +58,7 @@ public class PointDataObjectMap {
   }
 
   public boolean containsKey(final Point point) {
-    final DoubleCoordinates coordinates = new DoubleCoordinates(point, 2);
+    final PointDouble coordinates = new PointDouble(point, 2);
     return objectMap.containsKey(coordinates);
   }
 
@@ -107,7 +107,7 @@ public class PointDataObjectMap {
     List<DataObject> objects = objectMap.get(coordinates);
     if (objects == null) {
       objects = new ArrayList<DataObject>(1);
-      final Point indexCoordinates = new DoubleCoordinates(coordinates.getX(),
+      final Point indexCoordinates = new PointDouble(coordinates.getX(),
         coordinates.getY());
       objectMap.put(indexCoordinates, objects);
     }
@@ -121,7 +121,7 @@ public class PointDataObjectMap {
   }
 
   public List<DataObject> getObjects(final Point point) {
-    final Point coordinates = new DoubleCoordinates(point, 2);
+    final Point coordinates = new PointDouble(point, 2);
     final List<DataObject> objects = objectMap.get(coordinates);
     if (objects == null) {
       return Collections.emptyList();
@@ -132,7 +132,7 @@ public class PointDataObjectMap {
 
   public void initialize(final Point point) {
     if (!isRemoveEmptyLists()) {
-      final Point coordinates = new DoubleCoordinates(point, 2);
+      final Point coordinates = new PointDouble(point, 2);
       getObjectInternal(coordinates);
     }
   }
@@ -169,7 +169,7 @@ public class PointDataObjectMap {
   public void sort(final DataObject object) {
     if (comparator != null) {
       final Geometry geometry = object.getGeometryValue();
-      final Point coordinate = geometry.getCoordinate();
+      final Point coordinate = geometry.getPoint();
       final List<DataObject> objects = objectMap.get(coordinate);
       if (objects != null) {
         Collections.sort(objects, comparator);

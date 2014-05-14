@@ -35,9 +35,7 @@ package com.revolsys.jts.io;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -245,7 +243,7 @@ public class WKBWriter {
    * the given dimension (2 or 3) for output coordinates
    * and {@link ByteOrderValues#BIG_ENDIAN} byte order.
    * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Coordinate#Coordinate.NULL_ORDINATE}.
+   * coordinates will be padded with {@link Point#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    */
@@ -260,7 +258,7 @@ public class WKBWriter {
    * takes a flag to control whether srid information will be
    * written.
    * If the input geometry has a smaller coordinate dimension,
-   * coordinates will be padded with {@link Coordinate#Coordinate.NULL_ORDINATE}.
+   * coordinates will be padded with {@link Point#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param includeSRID indicates whether SRID should be written
@@ -274,7 +272,7 @@ public class WKBWriter {
    * the given dimension (2 or 3) for output coordinates
    * and byte order
    * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Coordinate#Coordinate.NULL_ORDINATE}.
+   * coordinates will be padded with {@link Point#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param byteOrder the byte ordering to use
@@ -289,7 +287,7 @@ public class WKBWriter {
    * and byte order. This constructor also takes a flag to 
    * control whether srid information will be written.
    * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Coordinate#Coordinate.NULL_ORDINATE}.
+   * coordinates will be padded with {@link Point#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param byteOrder the byte ordering to use
@@ -361,7 +359,7 @@ public class WKBWriter {
     os.write(buf, 1);
   }
 
-  private void writeCoordinate(final CoordinatesList seq, final int index,
+  private void writeCoordinate(final PointList seq, final int index,
     final OutStream os) throws IOException {
     ByteOrderValues.putDouble(seq.getX(index), buf, byteOrder);
     os.write(buf, 8);
@@ -370,7 +368,7 @@ public class WKBWriter {
 
     // only write 3rd dim if caller has requested it for this writer
     if (outputDimension >= 3) {
-      // if 3rd dim is requested, only write it if the CoordinatesList provides
+      // if 3rd dim is requested, only write it if the PointList provides
       // it
       double ordVal = Point.NULL_ORDINATE;
       if (seq.getAxisCount() >= 3) {
@@ -390,7 +388,7 @@ public class WKBWriter {
 
     // only write 3rd dim if caller has requested it for this writer
     if (outputDimension >= 3) {
-      // if 3rd dim is requested, only write it if the CoordinatesList provides
+      // if 3rd dim is requested, only write it if the PointList provides
       // it
       double ordVal = Point.NULL_ORDINATE;
       if (seq.getAxisCount() >= 3) {
@@ -401,7 +399,7 @@ public class WKBWriter {
     }
   }
 
-  private void writeCoordinateSequence(final CoordinatesList seq,
+  private void writeCoordinateSequence(final PointList seq,
     final boolean writeSize, final OutStream os) throws IOException {
     if (writeSize) {
       writeInt(seq.size(), os);

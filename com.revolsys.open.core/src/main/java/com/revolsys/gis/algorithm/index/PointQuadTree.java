@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 

@@ -6,13 +6,12 @@ import org.junit.Test;
 
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class LineStringTest {
 
@@ -135,12 +134,12 @@ public class LineStringTest {
       final LineString pointCoordinatesNull = geometryFactory.lineString((Point)null);
       assertEmpty(pointCoordinatesNull);
 
-      final LineString pointCoordinatesSize0 = geometryFactory.lineString(new DoubleCoordinates(
+      final LineString pointCoordinatesSize0 = geometryFactory.lineString(new PointDouble(
         0));
       assertEmpty(pointCoordinatesSize0);
 
-      // CoordinatesList Constructor
-      final LineString pointCoordinatesListNull = geometryFactory.lineString((CoordinatesList)null);
+      // PointList Constructor
+      final LineString pointCoordinatesListNull = geometryFactory.lineString((PointList)null);
       assertEmpty(pointCoordinatesListNull);
 
       final LineString pointCoordinatesListSize0 = geometryFactory.lineString(new DoubleCoordinatesList(
@@ -218,11 +217,11 @@ public class LineStringTest {
         pointDoubleAllAxis, pointDoubleExtraAxis, pointDoubleLessAxis);
 
       // Coordinates
-      final Point pointCoordinatesAllAxis = geometryFactory.point(new DoubleCoordinates(
+      final Point pointCoordinatesAllAxis = geometryFactory.point(new PointDouble(
         coordinates));
-      final Point pointCoordinatesExtraAxis = geometryFactory.point(new DoubleCoordinates(
+      final Point pointCoordinatesExtraAxis = geometryFactory.point(new PointDouble(
         coordinatesExtra));
-      final Point pointCoordinatesLessAxis = geometryFactory.point(new DoubleCoordinates(
+      final Point pointCoordinatesLessAxis = geometryFactory.point(new PointDouble(
         coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN, pointCoordinatesAllAxis,
         pointCoordinatesExtraAxis, pointCoordinatesLessAxis);
@@ -230,7 +229,7 @@ public class LineStringTest {
         pointCoordinatesAllAxis, pointCoordinatesExtraAxis,
         pointCoordinatesLessAxis);
 
-      // CoordinatesList
+      // PointList
       final Point pointCoordinatesListAllAxis = geometryFactory.point(new DoubleCoordinatesList(
         axisCount, coordinates));
       final Point pointCoordinatesListExtraAxis = geometryFactory.point(new DoubleCoordinatesList(

@@ -6,7 +6,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -15,7 +15,7 @@ import com.revolsys.swing.map.Viewport2D;
 
 public final class GeometryShapeUtil {
   public static void addCoordinateSequence(final Viewport2D viewport,
-    final GeneralPath path, final CoordinatesList sequence) {
+    final GeneralPath path, final PointList sequence) {
     double x = sequence.getValue(0, 0);
     double y = sequence.getValue(0, 1);
     double[] screenCoords = viewport.toViewCoordinates(x, y);
@@ -34,7 +34,7 @@ public final class GeometryShapeUtil {
 
   public static void addLineString(final Viewport2D viewport,
     final GeneralPath path, final LineString line) {
-    final CoordinatesList sequence = line.getCoordinatesList();
+    final PointList sequence = line.getCoordinatesList();
     addCoordinateSequence(viewport, path, sequence);
   }
 

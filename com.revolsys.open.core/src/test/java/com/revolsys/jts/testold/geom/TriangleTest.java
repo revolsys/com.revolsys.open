@@ -35,13 +35,13 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Triangle;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -209,37 +209,37 @@ public class TriangleTest extends TestCase {
 
   public void testCentroid() throws Exception {
     // right triangle
-    checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))", new Coordinate(
+    checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDouble(
       (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0,
       Point.NULL_ORDINATE));
     // CCW right tri
-    checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))", new Coordinate(
+    checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDouble(
       (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0,
       Point.NULL_ORDINATE));
     // acute
-    checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))", new Coordinate(
+    checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDouble(
       (10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0,
       Point.NULL_ORDINATE));
   }
 
   public void testCircumCentre() throws Exception {
     // right triangle
-    checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))", new Coordinate(
+    checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDouble(
       15.0, 15.0, Point.NULL_ORDINATE));
     // CCW right tri
-    checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))", new Coordinate(
+    checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDouble(
       15.0, 15.0, Point.NULL_ORDINATE));
     // acute
-    checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))", new Coordinate(
+    checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDouble(
       15.0, 13.75, Point.NULL_ORDINATE));
   }
 
   public void testInterpolateZ() throws Exception {
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new Coordinate(1.5,
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(1.5,
       1.5, Point.NULL_ORDINATE), 5);
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new Coordinate(1.2,
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(1.2,
       1.2, Point.NULL_ORDINATE), 2);
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new Coordinate(0.0,
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDouble(0.0,
       0, Point.NULL_ORDINATE), -10);
   }
 

@@ -1,9 +1,9 @@
 package com.revolsys.gis.jts;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public class LineSegmentImpl extends com.revolsys.jts.geom.LineSegmentImpl {
   private static final long serialVersionUID = 3905321662159212931L;

@@ -40,13 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Converts a Java2D {@link Shape} 
@@ -81,13 +81,13 @@ public class ShapeReader {
             isDone = true;
           } else {
             coordList = new CoordinateList();
-            coordList.add(new Coordinate(pathPt[0], pathPt[1],
+            coordList.add(new PointDouble(pathPt[0], pathPt[1],
               Point.NULL_ORDINATE));
             pathIt.next();
           }
         break;
         case PathIterator.SEG_LINETO:
-          coordList.add(new Coordinate(pathPt[0], pathPt[1],
+          coordList.add(new PointDouble(pathPt[0], pathPt[1],
             Point.NULL_ORDINATE));
           pathIt.next();
         break;

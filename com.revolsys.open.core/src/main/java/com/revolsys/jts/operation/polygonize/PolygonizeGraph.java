@@ -41,9 +41,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.planargraph.DirectedEdge;
 import com.revolsys.jts.planargraph.DirectedEdgeStar;

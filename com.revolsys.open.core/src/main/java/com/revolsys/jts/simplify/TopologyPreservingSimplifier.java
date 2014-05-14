@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPolygon;
@@ -96,8 +96,8 @@ public class TopologyPreservingSimplifier {
 
   class LineStringTransformer extends GeometryTransformer {
     @Override
-    protected CoordinatesList transformCoordinates(
-      final CoordinatesList coords, final Geometry parent) {
+    protected PointList transformCoordinates(
+      final PointList coords, final Geometry parent) {
       if (coords.size() == 0) {
         return null;
       }

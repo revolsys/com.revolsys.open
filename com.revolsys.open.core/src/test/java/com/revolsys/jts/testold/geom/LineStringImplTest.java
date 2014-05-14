@@ -38,14 +38,14 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -156,7 +156,7 @@ public class LineStringImplTest extends TestCase {
     assertTrue(l.isEmpty());
     assertTrue(!l.isClosed());
 
-    final LinearRing r = this.geometryFactory.linearRing((CoordinatesList)null);
+    final LinearRing r = this.geometryFactory.linearRing((PointList)null);
     assertTrue(r.isEmpty());
     assertTrue(r.isClosed());
 
@@ -182,9 +182,9 @@ public class LineStringImplTest extends TestCase {
     try {
       final LinearRing ring = GeometryFactory.getFactory().linearRing(
         new Point[] {
-          new Coordinate(0.0, 0, Point.NULL_ORDINATE),
-          new Coordinate(10.0, 10, Point.NULL_ORDINATE),
-          new Coordinate(0.0, 0, Point.NULL_ORDINATE)
+          new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+          new PointDouble(10.0, 10, Point.NULL_ORDINATE),
+          new PointDouble(0.0, 0, Point.NULL_ORDINATE)
         });
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
@@ -195,10 +195,10 @@ public class LineStringImplTest extends TestCase {
   public void testUnclosedLinearRing() {
     try {
       this.geometryFactory.linearRing(new Point[] {
-        new Coordinate(0.0, 0, Point.NULL_ORDINATE),
-        new Coordinate(1.0, 0, Point.NULL_ORDINATE),
-        new Coordinate(1.0, 1, Point.NULL_ORDINATE),
-        new Coordinate(2.0, 1, Point.NULL_ORDINATE)
+        new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+        new PointDouble(1.0, 0, Point.NULL_ORDINATE),
+        new PointDouble(1.0, 1, Point.NULL_ORDINATE),
+        new PointDouble(2.0, 1, Point.NULL_ORDINATE)
       });
       assertTrue(false);
     } catch (final Exception e) {

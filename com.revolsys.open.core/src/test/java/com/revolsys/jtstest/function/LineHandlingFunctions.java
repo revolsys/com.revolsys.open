@@ -38,9 +38,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.dissolve.LineDissolver;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.operation.linemerge.LineSequencer;
 

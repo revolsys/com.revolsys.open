@@ -41,8 +41,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 
 /**
  * The computation of the <code>IntersectionMatrix</code> relies on the use of a structure

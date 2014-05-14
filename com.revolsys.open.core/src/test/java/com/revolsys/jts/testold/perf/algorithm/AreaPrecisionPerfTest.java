@@ -1,10 +1,10 @@
 package com.revolsys.jts.testold.perf.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class AreaPrecisionPerfTest {
   public static double accurateSignedArea(final Point[] ring) {
@@ -34,7 +34,7 @@ public class AreaPrecisionPerfTest {
 
       Point vertex;
       for (int i = 0; i <= nrVertices; i++) {
-        vertex = new Coordinate(originX
+        vertex = new PointDouble(originX
           + (1 + Math.sin((float)i / (float)nrVertices * 2 * Math.PI)), originY
           + (1 + Math.cos((float)i / (float)nrVertices * 2 * Math.PI)),
           Point.NULL_ORDINATE);

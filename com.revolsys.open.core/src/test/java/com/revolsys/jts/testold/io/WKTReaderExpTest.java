@@ -5,9 +5,9 @@ import java.io.IOException;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -41,7 +41,7 @@ public class WKTReaderExpTest extends TestCase {
   private void readGoodCheckCoordinate(final String wkt, final double x,
     final double y) throws IOException, ParseException {
     final Geometry g = this.rdr.read(wkt);
-    final Point pt = g.getCoordinate();
+    final Point pt = g.getPoint();
     assertEquals(pt.getX(), x, 0.0001);
     assertEquals(pt.getY(), y, 0.0001);
   }

@@ -33,8 +33,8 @@
 
 package com.revolsys.jts.linearref;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Computes the {@link LinearLocation} for a given length

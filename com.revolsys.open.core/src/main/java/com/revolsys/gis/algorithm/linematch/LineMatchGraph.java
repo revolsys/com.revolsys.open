@@ -18,12 +18,12 @@ import com.revolsys.gis.graph.visitor.BoundingBoxIntersectsEdgeVisitor;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Point;
 
 public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   private final GeometryFactory geometryFactory;
@@ -101,7 +101,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
   private void add(final LineString line, final int index) {
     if (line.getLength() > 0) {
-      final CoordinatesList coords = CoordinatesListUtil.get(line);
+      final PointList coords = CoordinatesListUtil.get(line);
       final Point coordinate0 = coords.get(0);
       final Node<LineSegmentMatch> node = getNode(coordinate0);
       final Set<Node<LineSegmentMatch>> indexStartNodes = getStartNodes(index);
@@ -243,7 +243,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     final LineString line, final int index) {
     final Set<Edge<LineSegmentMatch>> edges = new LinkedHashSet<Edge<LineSegmentMatch>>();
 
-    final CoordinatesList coordinatesList = CoordinatesListUtil.get(line);
+    final PointList coordinatesList = CoordinatesListUtil.get(line);
     final Point coordinate0 = coordinatesList.get(0);
     Point previousCoordinate = coordinate0;
     for (int i = 1; i < coordinatesList.size(); i++) {

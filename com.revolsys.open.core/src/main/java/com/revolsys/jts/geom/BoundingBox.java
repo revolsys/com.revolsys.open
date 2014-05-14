@@ -100,7 +100,7 @@ public interface BoundingBox {
 
   Point getCornerPoint(int i);
 
-  CoordinatesList getCornerPoints();
+  PointList getCornerPoints();
 
   GeometryFactory getGeometryFactory();
 

@@ -33,8 +33,8 @@
 package com.revolsys.jtstest.geomop;
 
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.jtstest.testrunner.GeometryResult;

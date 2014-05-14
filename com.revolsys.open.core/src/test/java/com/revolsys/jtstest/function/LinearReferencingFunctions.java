@@ -1,7 +1,7 @@
 package com.revolsys.jtstest.function;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.linearref.LengthIndexedLine;
 
 public class LinearReferencingFunctions {
@@ -19,14 +19,14 @@ public class LinearReferencingFunctions {
 
   public static Geometry project(final Geometry g, final Geometry g2) {
     final LengthIndexedLine ll = new LengthIndexedLine(g);
-    final double index = ll.project(g2.getCoordinate());
+    final double index = ll.project(g2.getPoint());
     final Point p = ll.extractPoint(index);
     return g.getGeometryFactory().point(p);
   }
 
   public static double projectIndex(final Geometry g, final Geometry g2) {
     final LengthIndexedLine ll = new LengthIndexedLine(g);
-    return ll.project(g2.getCoordinate());
+    return ll.project(g2.getPoint());
   }
 
 }

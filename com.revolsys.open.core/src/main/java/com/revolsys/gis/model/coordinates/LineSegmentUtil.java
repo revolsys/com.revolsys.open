@@ -7,9 +7,10 @@ import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparat
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.MathUtil;
 
@@ -298,7 +299,7 @@ public class LineSegmentUtil {
    * @param line2End
    * @return
    */
-  public static CoordinatesList getIntersection(
+  public static PointList getIntersection(
     final GeometryFactory geometryFactory, Point line1Start,
     Point line1End, Point line2Start, Point line2End) {
     line1Start = geometryFactory.createCoordinates(line1Start);
@@ -532,7 +533,7 @@ public class LineSegmentUtil {
     final double y2 = p1.getY();
     final double x = x1 + segmentLengthFraction * (x2 - x1);
     final double y = y1 + segmentLengthFraction * (y2 - y1);
-    final Point coord = new DoubleCoordinates(x, y,
+    final Point coord = new PointDouble(x, y,
       Point.NULL_ORDINATE);
     return coord;
   }
@@ -576,7 +577,7 @@ public class LineSegmentUtil {
           if (MathUtil.isNanOrInfinite(z) || z == 0) {
             final double[] coordinates = projectedCoordinate.getCoordinates();
             coordinates[2] = point.getZ();
-            return new DoubleCoordinates(coordinates);
+            return new PointDouble(coordinates);
           }
         }
 
@@ -611,7 +612,7 @@ public class LineSegmentUtil {
     final double y = y1 + r * (y2 - y1);
 
     if (axisCount == 2) {
-      return new DoubleCoordinates(x, y);
+      return new PointDouble(x, y);
     } else {
       double z;
       if (MathUtil.isNanOrInfinite(z1, z2)) {
@@ -619,7 +620,7 @@ public class LineSegmentUtil {
       } else {
         z = z1 + r * (z2 - z1);
       }
-      return new DoubleCoordinates(axisCount, x, y, z);
+      return new PointDouble(axisCount, x, y, z);
     }
   }
 

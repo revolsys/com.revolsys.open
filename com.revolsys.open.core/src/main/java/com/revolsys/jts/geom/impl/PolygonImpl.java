@@ -44,14 +44,13 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.segment.PolygonSegment;
 import com.revolsys.jts.geom.segment.Segment;
@@ -84,13 +83,13 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public class PolygonImpl extends AbstractGeometry implements Polygon {
+public class PolygonImpl extends BaseGeometry implements Polygon {
   /**
    *  Returns the minimum coordinate, using the usual lexicographic comparison.
    *
    *@param  coordinates  the array to search
    *@return              the minimum coordinate in the array, found using <code>compareTo</code>
-   *@see Coordinate#compareTo(Object)
+   *@see Point#compareTo(Object)
    */
   public static int minCoordinateIndex(final LinearRing ring) {
     Point minCoord = null;
@@ -112,7 +111,7 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
    *@param  firstCoordinate  the coordinate to make first
    */
   public static LinearRing scroll(final LinearRing ring, final int index) {
-    final CoordinatesList points = ring.getCoordinatesList();
+    final PointList points = ring.getCoordinatesList();
     final int vertexCount = ring.getVertexCount();
     final int axisCount = ring.getAxisCount();
     final double[] coordinates = new double[vertexCount * axisCount];
@@ -365,11 +364,6 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
   }
 
   @Override
-  public Point getCoordinate() {
-    return getExteriorRing().getCoordinate();
-  }
-
-  @Override
   public DataType getDataType() {
     return DataTypes.POLYGON;
   }
@@ -431,6 +425,15 @@ public class PolygonImpl extends AbstractGeometry implements Polygon {
       return 0;
     } else {
       return rings.length - 1;
+    }
+  }
+
+  @Override
+  public Point getPoint() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return getExteriorRing().getPoint();
     }
   }
 

@@ -4,8 +4,8 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 
 public class CGAlgorithmFunctions {
   public static int orientationIndex(final Geometry segment,
@@ -16,7 +16,7 @@ public class CGAlgorithmFunctions {
     }
     final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 
-    final Point p = ptGeom.getCoordinate();
+    final Point p = ptGeom.getPoint();
     final int index = CGAlgorithms.orientationIndex(segPt[0], segPt[1], p);
     return index;
   }
@@ -29,7 +29,7 @@ public class CGAlgorithmFunctions {
     }
     final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 
-    final Point p = ptGeom.getCoordinate();
+    final Point p = ptGeom.getPoint();
     final int index = CGAlgorithmsDD.orientationIndex(segPt[0], segPt[1], p);
     return index;
   }

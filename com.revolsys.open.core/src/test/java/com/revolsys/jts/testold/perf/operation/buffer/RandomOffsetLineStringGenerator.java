@@ -1,12 +1,12 @@
 package com.revolsys.jts.testold.perf.operation.buffer;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Generates random {@link LineString}s, which are somewhat coherent
@@ -100,10 +100,10 @@ public class RandomOffsetLineStringGenerator {
   public Geometry generate(final GeometryFactory fact) {
     this.pts = new Point[this.numPts];
 
-    this.pts[0] = new Coordinate();
+    this.pts[0] = new PointDouble();
 
     final double ang = Math.PI * Math.random();
-    this.endPoint = new Coordinate(this.maxSegLen * Math.cos(ang),
+    this.endPoint = new PointDouble(this.maxSegLen * Math.cos(ang),
       this.maxSegLen * Math.sin(ang), Point.NULL_ORDINATE);
     this.pts[this.numPts - 1] = this.endPoint;
 

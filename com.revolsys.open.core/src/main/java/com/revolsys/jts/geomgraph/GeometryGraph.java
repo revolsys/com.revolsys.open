@@ -42,7 +42,7 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -178,7 +178,7 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private void addLineString(final LineString line) {
-    final CoordinatesList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
+    final PointList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
 
     if (points.size() < 2) {
       hasTooFewPoints = true;
@@ -237,7 +237,7 @@ public class GeometryGraph extends PlanarGraph {
     if (ring.isEmpty()) {
       return;
     }
-    final CoordinatesList coordinatesList = CleanDuplicatePoints.clean(ring.getCoordinatesList());
+    final PointList coordinatesList = CleanDuplicatePoints.clean(ring.getCoordinatesList());
 
     if (coordinatesList.size() < 4) {
       hasTooFewPoints = true;

@@ -33,15 +33,15 @@
 
 package com.revolsys.jts.shape.random;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 /**
@@ -76,7 +76,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
 
   @Override
   protected Point createCoord(final double x, final double y) {
-    return new DoubleCoordinates(geometryFactory.makePrecise(0, x),
+    return new PointDouble(geometryFactory.makePrecise(0, x),
       geometryFactory.makePrecise(1, y));
   }
 

@@ -35,9 +35,9 @@ package com.revolsys.jts.geomgraph;
 import java.io.PrintStream;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 
 /**
  * @version 1.7

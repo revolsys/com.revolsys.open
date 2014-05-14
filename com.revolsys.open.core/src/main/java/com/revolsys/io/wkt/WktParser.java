@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -126,7 +126,7 @@ public class WktParser {
     }
   }
 
-  private CoordinatesList parseCoordinates(
+  private PointList parseCoordinates(
     final GeometryFactory geometryFactory, final StringBuffer text,
     final int axisCount) {
     final int geometryFactoryAxisCount = geometryFactory.getAxisCount();
@@ -265,7 +265,7 @@ public class WktParser {
     if (isEmpty(text)) {
       return geometryFactory.lineString();
     } else {
-      final CoordinatesList points = parseCoordinates(geometryFactory, text,
+      final PointList points = parseCoordinates(geometryFactory, text,
         axisCount);
       return geometryFactory.lineString(points);
     }
@@ -283,9 +283,9 @@ public class WktParser {
           scaleZ);
       }
     }
-    final List<CoordinatesList> lines;
+    final List<PointList> lines;
     if (isEmpty(text)) {
-      lines = new ArrayList<CoordinatesList>();
+      lines = new ArrayList<PointList>();
     } else {
       lines = parseParts(geometryFactory, text, axisCount);
     }
@@ -308,7 +308,7 @@ public class WktParser {
     if (isEmpty(text)) {
       return geometryFactory.multiPoint();
     } else {
-      final List<CoordinatesList> pointsList = parseParts(geometryFactory,
+      final List<PointList> pointsList = parseParts(geometryFactory,
         text, axisCount);
       return geometryFactory.multiPoint(pointsList);
     }
@@ -327,25 +327,25 @@ public class WktParser {
       }
     }
 
-    final List<List<CoordinatesList>> polygons;
+    final List<List<PointList>> polygons;
     if (isEmpty(text)) {
-      polygons = new ArrayList<List<CoordinatesList>>();
+      polygons = new ArrayList<List<PointList>>();
     } else {
       polygons = parsePartsList(geometryFactory, text, axisCount);
     }
     return geometryFactory.multiPolygon(polygons);
   }
 
-  private List<CoordinatesList> parseParts(
+  private List<PointList> parseParts(
     final GeometryFactory geometryFactory, final StringBuffer text,
     final int axisCount) {
-    final List<CoordinatesList> parts = new ArrayList<CoordinatesList>();
+    final List<PointList> parts = new ArrayList<PointList>();
     final char firstChar = text.charAt(0);
     switch (firstChar) {
       case '(':
         do {
           text.delete(0, 1);
-          final CoordinatesList coordinates = parseCoordinates(geometryFactory,
+          final PointList coordinates = parseCoordinates(geometryFactory,
             text, axisCount);
           parts.add(coordinates);
         } while (text.charAt(0) == ',');
@@ -365,16 +365,16 @@ public class WktParser {
     return parts;
   }
 
-  private List<List<CoordinatesList>> parsePartsList(
+  private List<List<PointList>> parsePartsList(
     final GeometryFactory geometryFactory, final StringBuffer text,
     final int axisCount) {
-    final List<List<CoordinatesList>> partsList = new ArrayList<List<CoordinatesList>>();
+    final List<List<PointList>> partsList = new ArrayList<List<PointList>>();
     final char firstChar = text.charAt(0);
     switch (firstChar) {
       case '(':
         do {
           text.delete(0, 1);
-          final List<CoordinatesList> parts = parseParts(geometryFactory, text,
+          final List<PointList> parts = parseParts(geometryFactory, text,
             axisCount);
           partsList.add(parts);
         } while (text.charAt(0) == ',');
@@ -409,7 +409,7 @@ public class WktParser {
     if (isEmpty(text)) {
       return geometryFactory.point();
     } else {
-      final CoordinatesList points = parseCoordinates(geometryFactory, text,
+      final PointList points = parseCoordinates(geometryFactory, text,
         axisCount);
       if (points.size() > 1) {
         throw new IllegalArgumentException("Points may only have 1 vertex");
@@ -431,9 +431,9 @@ public class WktParser {
       }
     }
 
-    final List<CoordinatesList> parts;
+    final List<PointList> parts;
     if (isEmpty(text)) {
-      parts = new ArrayList<CoordinatesList>();
+      parts = new ArrayList<PointList>();
     } else {
       parts = parseParts(geometryFactory, text, axisCount);
     }

@@ -49,7 +49,6 @@ import com.revolsys.jts.algorithm.InteriorPointLine;
 import com.revolsys.jts.algorithm.InteriorPointPoint;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -229,17 +228,6 @@ public abstract class AbstractGeometry implements Geometry {
     }
     return false;
   }
-
-  /**
-   *  The bounding box of this <code>Geometry</code>.
-   */
-  private BoundingBox boundingBox;
-
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData = null;
 
   /**
    * Computes a buffer area around this geometry having the given width. The
@@ -828,8 +816,7 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   @Override
-  public boolean equal(final Point a, final Point b,
-    final double tolerance) {
+  public boolean equal(final Point a, final Point b, final double tolerance) {
     if (tolerance == 0) {
       return a.equals(b);
     } else {
@@ -1103,14 +1090,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public BoundingBox getBoundingBox() {
-    if (boundingBox == null) {
-      if (isEmpty()) {
-        boundingBox = new Envelope(getGeometryFactory());
-      } else {
-        boundingBox = computeBoundingBox();
-      }
-    }
-    return boundingBox;
+    return computeBoundingBox();
   }
 
   /**
@@ -1139,19 +1119,6 @@ public abstract class AbstractGeometry implements Geometry {
     final int index = sortedGeometryTypes.indexOf(geometryType);
     return index;
   }
-
-  /**
-   *  Returns a vertex of this <code>Geometry</code>
-   *  (usually, but not necessarily, the first one).
-   *  The returned coordinate should not be assumed
-   *  to be an actual Point object used in
-   *  the internal representation.
-   *
-   *@return    a {@link Coordinates} which is a vertex of this <code>Geometry</code>.
-   *@return null if this Geometry is empty
-   */
-  @Override
-  public abstract Point getCoordinate();
 
   /**
    * 
@@ -1348,16 +1315,18 @@ public abstract class AbstractGeometry implements Geometry {
     }
   }
 
+  /**
+   *  Returns a vertex of this <code>Geometry</code>
+   *  (usually, but not necessarily, the first one).
+   *  The returned coordinate should not be assumed
+   *  to be an actual Point object used in
+   *  the internal representation.
+   *
+   *@return    a {@link Coordinates} which is a vertex of this <code>Geometry</code>.
+   *@return null if this Geometry is empty
+   */
   @Override
-  public Point getPoint() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (isEmpty()) {
-      return geometryFactory.point();
-    } else {
-      final Point point = getCoordinate();
-      return geometryFactory.point(point);
-    }
-  }
+  public abstract Point getPoint();
 
   /**
    *  Returns the ID of the Spatial Reference System used by the <code>Geometry</code>.
@@ -1385,7 +1354,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public Object getUserData() {
-    return userData;
+    return null;
   }
 
   /**
@@ -1723,7 +1692,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public void setUserData(final Object userData) {
-    this.userData = userData;
+    throw new UnsupportedOperationException("User data not supported");
   }
 
   /**

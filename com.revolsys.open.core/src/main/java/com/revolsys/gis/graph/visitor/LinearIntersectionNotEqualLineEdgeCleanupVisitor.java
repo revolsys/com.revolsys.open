@@ -30,7 +30,7 @@ import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.jts.filter.LinearIntersectionFilter;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
@@ -74,8 +74,8 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     duplicateStatistics.connect();
   }
 
-  private boolean middleCoordinatesEqual(final CoordinatesList points1,
-    final CoordinatesList points2) {
+  private boolean middleCoordinatesEqual(final PointList points1,
+    final PointList points2) {
     if (points1.size() == points2.size()) {
       for (int i = 1; i < points2.size(); i++) {
         if (!points1.equal(i, points1, i, 2)) {
@@ -147,11 +147,11 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
 
     if (!intersectingEdges.isEmpty()) {
       if (intersectingEdges.size() == 1 && line.getLength() > 10) {
-        final CoordinatesList points = CoordinatesListUtil.get(line);
+        final PointList points = CoordinatesListUtil.get(line);
         if (points.size() > 2) {
           final Edge<DataObject> edge2 = intersectingEdges.get(0);
           final LineString line2 = edge2.getLine();
-          final CoordinatesList points2 = CoordinatesListUtil.get(line2);
+          final PointList points2 = CoordinatesListUtil.get(line2);
 
           if (middleCoordinatesEqual(points, points2)) {
             final boolean firstEqual = points.equal(0, points2, 0, 2);

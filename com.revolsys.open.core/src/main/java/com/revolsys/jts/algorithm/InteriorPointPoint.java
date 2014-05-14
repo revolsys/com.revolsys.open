@@ -32,11 +32,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Computes a point in the interior of an point geometry.
@@ -54,14 +53,14 @@ public class InteriorPointPoint {
   private Point interiorPoint = null;
 
   public InteriorPointPoint(final Geometry g) {
-    centroid = g.getCentroid().getCoordinate();
+    centroid = g.getCentroid().getPoint();
     add(g);
   }
 
   private void add(final Point point) {
     final double dist = point.distance(centroid);
     if (dist < minDistance) {
-      interiorPoint = new Coordinate(point);
+      interiorPoint = new PointDouble(point);
       minDistance = dist;
     }
   }
@@ -73,7 +72,7 @@ public class InteriorPointPoint {
    */
   private void add(final Geometry geom) {
     if (geom instanceof Point) {
-      add(geom.getCoordinate());
+      add(geom.getPoint());
     } else if (geom instanceof GeometryCollection) {
       final GeometryCollection gc = (GeometryCollection)geom;
       for (int i = 0; i < gc.getGeometryCount(); i++) {

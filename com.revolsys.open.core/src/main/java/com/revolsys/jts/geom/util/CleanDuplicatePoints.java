@@ -37,7 +37,7 @@ import java.util.List;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -54,7 +54,7 @@ import com.revolsys.jts.geom.Polygon;
  */
 public class CleanDuplicatePoints {
 
-  public static CoordinatesList clean(final CoordinatesList points) {
+  public static PointList clean(final PointList points) {
     if (points.size() == 0) {
       return points;
     } else {
@@ -122,7 +122,7 @@ public class CleanDuplicatePoints {
     if (ring.isEmpty()) {
       return ring;
     } else {
-      final CoordinatesList points = clean(ring.getCoordinatesList());
+      final PointList points = clean(ring.getCoordinatesList());
       final GeometryFactory geometryFactory = ring.getGeometryFactory();
       if (points.size() < 4) {
         return geometryFactory.linearRing();
@@ -136,7 +136,7 @@ public class CleanDuplicatePoints {
     if (line.isEmpty()) {
       return line;
     } else {
-      final CoordinatesList points = clean(line.getCoordinatesList());
+      final PointList points = clean(line.getCoordinatesList());
       final GeometryFactory geometryFactory = line.getGeometryFactory();
       if (points.size() < 2) {
         return geometryFactory.lineString();

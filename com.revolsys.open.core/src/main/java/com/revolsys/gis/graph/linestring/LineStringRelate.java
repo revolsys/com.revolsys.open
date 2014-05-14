@@ -10,12 +10,12 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Point;
 
 public class LineStringRelate {
   private final LineString line1;
@@ -90,7 +90,7 @@ public class LineStringRelate {
 
   public MultiLineString getOverlap() {
     final List<List<Point>> intersections = new ArrayList<>();
-    final CoordinatesList points1 = CoordinatesListUtil.get(line1);
+    final PointList points1 = CoordinatesListUtil.get(line1);
     final List<Point> currentCoordinates = new ArrayList<>();
     Node<LineSegment> previousNode = graph1.getNode(fromPoint1);
     do {

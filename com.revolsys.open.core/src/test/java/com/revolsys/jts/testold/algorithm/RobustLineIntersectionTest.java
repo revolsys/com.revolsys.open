@@ -7,10 +7,10 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
 
@@ -43,7 +43,7 @@ public class RobustLineIntersectionTest extends TestCase {
     // save input points
     final Point[] savePt = new Point[4];
     for (int i = 0; i < 4; i++) {
-      savePt[i] = new Coordinate(pt[i]);
+      savePt[i] = new PointDouble(pt[i]);
     }
 
     final LineIntersector li = new RobustLineIntersector(scaleFactor);
@@ -193,17 +193,17 @@ public class RobustLineIntersectionTest extends TestCase {
    */
   public void testCmp5CaseRaw() throws ParseException {
     checkIntersection(new Point[] {
-      new Coordinate(4348433.262114629, 5552595.478385733,
+      new PointDouble(4348433.262114629, 5552595.478385733,
         Point.NULL_ORDINATE),
-      new Coordinate(4348440.849387404, 5552599.272022122,
+      new PointDouble(4348440.849387404, 5552599.272022122,
         Point.NULL_ORDINATE),
 
-      new Coordinate(4348433.26211463, 5552595.47838573,
+      new PointDouble(4348433.26211463, 5552595.47838573,
         Point.NULL_ORDINATE),
-      new Coordinate(4348440.8493874, 5552599.27202212,
+      new PointDouble(4348440.8493874, 5552599.27202212,
         Point.NULL_ORDINATE)
     }, 1, new Point[] {
-      new Coordinate(4348440.8493874, 5552599.27202212,
+      new PointDouble(4348440.8493874, 5552599.27202212,
         Point.NULL_ORDINATE),
     }, 0);
   }
@@ -218,7 +218,7 @@ public class RobustLineIntersectionTest extends TestCase {
       "LINESTRING (4348433.262114629 5552595.478385733, 4348440.849387404 5552599.272022122 )",
       "LINESTRING (4348433.26211463  5552595.47838573,  4348440.8493874   5552599.27202212  )",
       1, new Point[] {
-        new Coordinate(4348440.8493874, 5552599.27202212,
+        new PointDouble(4348440.8493874, 5552599.27202212,
           Point.NULL_ORDINATE),
       }, 0);
   }
@@ -234,7 +234,7 @@ public class RobustLineIntersectionTest extends TestCase {
       "LINESTRING ( 2089426.5233462777 1180182.3877339689, 2085646.6891757075 1195618.7333999649 )",
       "LINESTRING ( 1889281.8148903656 1997547.0560044837, 2259977.3672235999 483675.17050843034 )",
       1, new Point[] {
-        new Coordinate(2087536.6062609926, 1187900.560566967,
+        new PointDouble(2087536.6062609926, 1187900.560566967,
           Point.NULL_ORDINATE),
       }, 0);
   }

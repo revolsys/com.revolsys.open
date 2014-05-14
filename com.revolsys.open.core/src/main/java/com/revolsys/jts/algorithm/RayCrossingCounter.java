@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.segment.Segment;
 
@@ -99,7 +99,7 @@ public class RayCrossingCounter {
   * @return the location of the point in the ring
   */
   public static Location locatePointInRing(final Point coordinates,
-    final CoordinatesList ring) {
+    final PointList ring) {
     final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
 
     double x0 = ring.getX(0);

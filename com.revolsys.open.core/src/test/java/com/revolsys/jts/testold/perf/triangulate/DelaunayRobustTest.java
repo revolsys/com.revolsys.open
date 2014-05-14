@@ -3,9 +3,9 @@ package com.revolsys.jts.testold.perf.triangulate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -38,7 +38,7 @@ public class DelaunayRobustTest {
     for (int i = 0; i < nPts; i++) {
       final double x = SIDE_LEN * Math.random();
       final double y = SIDE_LEN * Math.random();
-      pts.add(new Coordinate(x, y, Point.NULL_ORDINATE));
+      pts.add(new PointDouble(x, y, Point.NULL_ORDINATE));
     }
     return pts;
   }
@@ -52,7 +52,7 @@ public class DelaunayRobustTest {
       for (int j = 0; j < nSide; j++) {
         final double x = basex + i * SIDE_LEN + SIDE_LEN * Math.random();
         final double y = basey + j * SIDE_LEN + SIDE_LEN * Math.random();
-        pts.add(new Coordinate(x, y, Point.NULL_ORDINATE));
+        pts.add(new PointDouble(x, y, Point.NULL_ORDINATE));
       }
     }
     return pts;

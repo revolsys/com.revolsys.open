@@ -38,8 +38,7 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -113,13 +112,13 @@ public class WKTWriter {
 
   /**
    * Generates the WKT for a <tt>LINESTRING</tt>
-   * specified by a {@link CoordinatesList}.
+   * specified by a {@link PointList}.
    *
    * @param seq the sequence to write
    *
    * @return the WKT string
    */
-  public static String toLineString(final CoordinatesList seq) {
+  public static String toLineString(final PointList seq) {
     final StringBuffer buf = new StringBuffer();
     buf.append("LINESTRING ");
     if (seq.size() == 0) {
@@ -195,11 +194,11 @@ public class WKTWriter {
   /**
    * Appends the i'th coordinate from the sequence to the writer
    *
-   * @param  seq  the <code>CoordinatesList</code> to process
+   * @param  seq  the <code>PointList</code> to process
    * @param i     the index of the coordinate to write
    * @param  writer the output writer to append to
    */
-  private void appendCoordinate(final CoordinatesList seq, final int i,
+  private void appendCoordinate(final PointList seq, final int i,
     final Writer writer) throws IOException {
     writer.write(writeNumber(seq.getX(i)) + " " + writeNumber(seq.getY(i)));
     if (outputDimension >= 3 && seq.getAxisCount() >= 3) {
@@ -265,7 +264,7 @@ public class WKTWriter {
 
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      appendPointTaggedText(point.getCoordinate(), level, writer);
+      appendPointTaggedText(point.getPoint(), level, writer);
     } else if (geometry instanceof LinearRing) {
       appendLinearRingTaggedText((LinearRing)geometry, level, writer);
     } else if (geometry instanceof LineString) {
@@ -418,7 +417,7 @@ public class WKTWriter {
           indentCoords(i, level + 1, writer);
         }
         writer.write("(");
-        appendCoordinate(((Point)multiPoint.getGeometry(i)).getCoordinate(),
+        appendCoordinate(((Point)multiPoint.getGeometry(i)).getPoint(),
           writer);
         writer.write(")");
       }
@@ -544,7 +543,7 @@ public class WKTWriter {
    *@param  lineString  the <code>LineString</code> to process
    *@param  writer      the output writer to append to
    */
-  private void appendSequenceText(final CoordinatesList seq, final int level,
+  private void appendSequenceText(final PointList seq, final int level,
     final boolean doIndent, final Writer writer) throws IOException {
     if (seq.size() == 0) {
       writer.write("EMPTY");

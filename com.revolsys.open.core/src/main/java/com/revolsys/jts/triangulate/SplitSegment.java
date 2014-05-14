@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.triangulate;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Models a constraint segment which can be split in two in various ways, 
@@ -59,7 +59,7 @@ public class SplitSegment {
       * (seg.getP1().getX() - seg.getP0().getX());
     final double y = seg.getP1().getY() - segmentLengthFraction
       * (seg.getP1().getY() - seg.getP0().getY());
-    final Point coord = new Coordinate(x, y, Point.NULL_ORDINATE);
+    final Point coord = new PointDouble(x, y, Point.NULL_ORDINATE);
     return coord;
   }
 

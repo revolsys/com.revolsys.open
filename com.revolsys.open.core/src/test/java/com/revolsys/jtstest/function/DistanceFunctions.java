@@ -33,8 +33,8 @@
 package com.revolsys.jtstest.function;
 
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.operation.distance.DistanceOp;
 
 public class DistanceFunctions {

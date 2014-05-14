@@ -33,12 +33,12 @@
 
 package com.revolsys.jts.shape.fractal;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.math.Vector2D;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
@@ -70,8 +70,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     coordList.add(p1);
   }
 
-  public void addSide(final int level, final Point p0,
-    final Point p1) {
+  public void addSide(final int level, final Point p0, final Point p1) {
     if (level == 0) {
       addSegment(p0, p1);
     } else {
@@ -103,11 +102,11 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
       y += THIRD_HEIGHT * width;
     }
 
-    final Coordinate p0 = new Coordinate(origin.getX(), y,
+    final Point p0 = new PointDouble(origin.getX(), y,
       Point.NULL_ORDINATE);
-    final Coordinate p1 = new Coordinate(origin.getX() + width / 2, y + width
+    final Point p1 = new PointDouble(origin.getX() + width / 2, y + width
       * HEIGHT_FACTOR, Point.NULL_ORDINATE);
-    final Coordinate p2 = new Coordinate(origin.getX() + width, y,
+    final Point p2 = new PointDouble(origin.getX() + width, y,
       Point.NULL_ORDINATE);
     addSide(level, p0, p1);
     addSide(level, p1, p2);

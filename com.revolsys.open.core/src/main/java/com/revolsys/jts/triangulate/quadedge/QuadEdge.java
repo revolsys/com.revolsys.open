@@ -34,9 +34,9 @@
 package com.revolsys.jts.triangulate.quadedge;
 
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.Point;
 
 /**
  * A class that represents the edge data structure which implements the quadedge algebra. 

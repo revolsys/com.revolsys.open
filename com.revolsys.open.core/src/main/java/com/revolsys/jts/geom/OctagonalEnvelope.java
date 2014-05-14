@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.geom;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * A Bounding Container which is in the shape of an octagon.
@@ -159,7 +159,7 @@ public class OctagonalEnvelope {
     return this;
   }
 
-  public OctagonalEnvelope expandToInclude(final CoordinatesList seq) {
+  public OctagonalEnvelope expandToInclude(final PointList seq) {
     for (int i = 0; i < seq.size(); i++) {
       final double x = seq.getX(i);
       final double y = seq.getY(i);
@@ -382,27 +382,27 @@ public class OctagonalEnvelope {
 
   public Geometry toGeometry(final GeometryFactory geometryFactory) {
     if (isNull()) {
-      return geometryFactory.point((CoordinatesList)null);
+      return geometryFactory.point((PointList)null);
     }
 
-    final Point px00 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point px00 = new PointDouble(geometryFactory.makePrecise(
       0, minX), geometryFactory.makePrecise(1, minA - minX));
-    final Point px01 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point px01 = new PointDouble(geometryFactory.makePrecise(
       0, minX), geometryFactory.makePrecise(1, minX - minB));
 
-    final Point px10 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point px10 = new PointDouble(geometryFactory.makePrecise(
       0, maxX), geometryFactory.makePrecise(1, maxX - maxB));
-    final Point px11 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point px11 = new PointDouble(geometryFactory.makePrecise(
       0, maxX), geometryFactory.makePrecise(1, maxA - maxX));
 
-    final Point py00 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point py00 = new PointDouble(geometryFactory.makePrecise(
       0, minA - minY), geometryFactory.makePrecise(1, minY));
-    final Point py01 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point py01 = new PointDouble(geometryFactory.makePrecise(
       0, minY + maxB), geometryFactory.makePrecise(1, minY));
 
-    final Point py10 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point py10 = new PointDouble(geometryFactory.makePrecise(
       0, maxY + minB), geometryFactory.makePrecise(1, maxY));
-    final Point py11 = new DoubleCoordinates(geometryFactory.makePrecise(
+    final Point py11 = new PointDouble(geometryFactory.makePrecise(
       0, maxA - maxY), geometryFactory.makePrecise(1, maxY));
 
     final CoordinateList coordList = new CoordinateList();

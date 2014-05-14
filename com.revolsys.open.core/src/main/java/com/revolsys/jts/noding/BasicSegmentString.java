@@ -32,8 +32,8 @@
  */
 package com.revolsys.jts.noding;
 
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Represents a list of contiguous line segments,
@@ -48,7 +48,7 @@ import com.revolsys.jts.geom.CoordinatesList;
  * @version 1.7
  */
 public class BasicSegmentString implements SegmentString {
-  private final CoordinatesList points;
+  private final PointList points;
 
   private Object data;
 
@@ -58,7 +58,7 @@ public class BasicSegmentString implements SegmentString {
    * @param points the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public BasicSegmentString(final CoordinatesList points, final Object data) {
+  public BasicSegmentString(final PointList points, final Object data) {
     this.points = points;
     this.data = data;
   }
@@ -79,7 +79,7 @@ public class BasicSegmentString implements SegmentString {
   }
 
   @Override
-  public CoordinatesList getPoints() {
+  public PointList getPoints() {
     return points;
   }
 

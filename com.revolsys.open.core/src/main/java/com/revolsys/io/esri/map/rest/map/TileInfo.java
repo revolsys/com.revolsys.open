@@ -3,10 +3,9 @@ package com.revolsys.io.esri.map.rest.map;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.esri.map.rest.AbstractMapWrapper;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.CollectionUtil;
 
 public class TileInfo extends AbstractMapWrapper {
@@ -69,7 +68,7 @@ public class TileInfo extends AbstractMapWrapper {
     } else {
       final Double x = CollectionUtil.getDoubleValue(origin, "x");
       final Double y = CollectionUtil.getDoubleValue(origin, "y");
-      return new DoubleCoordinates(x, y);
+      return new PointDouble(x, y);
     }
   }
 

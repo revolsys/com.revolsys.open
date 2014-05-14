@@ -32,14 +32,14 @@
  */
 package com.revolsys.jts.testold.perf.algorithm;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
@@ -104,7 +104,7 @@ public class PointInAreaStressTester {
           * xStep);
         final double y = this.geomFactory.makePrecise(1, areaEnv.getMinY() + j
           * yStep);
-        final Point pt = new DoubleCoordinates(x, y);
+        final Point pt = new PointDouble(x, y);
 
         final boolean isEqual = testPIA(pt);
         if (!isEqual) {

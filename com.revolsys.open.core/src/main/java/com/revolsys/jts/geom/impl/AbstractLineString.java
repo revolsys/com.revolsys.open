@@ -44,14 +44,13 @@ import com.revolsys.io.Reader;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.segment.LineStringSegment;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.AbstractVertex;
@@ -190,6 +189,19 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
+  public boolean equals(final int axisCount, final int vertexIndex,
+    final Point point) {
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double value = getCoordinate(vertexIndex, axisIndex);
+      final double value2 = point.getCoordinate(axisIndex);
+      if (!NumberEquals.equal(value, value2)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {
       return false;
@@ -251,19 +263,10 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     return 0;
   }
 
-  @Override
-  public Point getCoordinate() {
-    if (isEmpty()) {
-      return null;
-    } else {
-      return getCoordinate(0);
-    }
-  }
-
   public abstract double[] getCoordinates();
 
   @Override
-  public CoordinatesList getCoordinatesList() {
+  public PointList getCoordinatesList() {
     if (isEmpty()) {
       return new DoubleCoordinatesList(getAxisCount());
     } else {
@@ -302,6 +305,15 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   @Override
   public double getM(final int vertexIndex) {
     return getCoordinate(vertexIndex, 3);
+  }
+
+  @Override
+  public Point getPoint() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return getPoint(0);
+    }
   }
 
   @Override
@@ -399,7 +411,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
 
   @Override
   public boolean isCounterClockwise() {
-    final CoordinatesList points = getCoordinatesList();
+    final PointList points = getCoordinatesList();
     final boolean counterClockwise = points.isCounterClockwise();
     return counterClockwise;
   }
@@ -412,6 +424,51 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   @Override
   public boolean isRing() {
     return isClosed() && isSimple();
+  }
+
+  @Override
+  public LineString merge(final LineString line) {
+    final int axisCount = Math.max(getAxisCount(), line.getAxisCount());
+    final int vertexCount1 = getVertexCount();
+    final int vertexCount2 = line.getVertexCount();
+    final int vertexCount = vertexCount1 + vertexCount2 - 1;
+    final double[] coordinates = new double[vertexCount * axisCount];
+
+    int newVertexCount = 0;
+    final Point coordinates1Start = getVertex(0);
+    final Point coordinates1End = getVertex(-1);
+    final Point coordinates2Start = line.getVertex(0);
+    final Point coordinates2End = line.getVertex(-1);
+    if (coordinates1Start.equals2d(coordinates2End)) {
+      newVertexCount = CoordinatesListUtil.append(axisCount, line, 0,
+        coordinates, 0, vertexCount2);
+      newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
+        coordinates, newVertexCount, vertexCount1 - 1);
+    } else if (coordinates2Start.equals2d(coordinates1End)) {
+      newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
+        coordinates, 0, vertexCount1);
+      newVertexCount = CoordinatesListUtil.append(axisCount, line, 1,
+        coordinates, newVertexCount, vertexCount2 - 1);
+    } else if (coordinates1Start.equals2d(coordinates2Start)) {
+      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 0,
+        coordinates, 0, vertexCount2);
+      newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
+        coordinates, newVertexCount, vertexCount);
+    } else if (coordinates1End.equals2d(coordinates2End)) {
+      newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
+        coordinates, newVertexCount, vertexCount);
+      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 1,
+        coordinates, newVertexCount, vertexCount2 - 1);
+    } else {
+      throw new IllegalArgumentException("lines don't touch\n" + this + "\n"
+        + line);
+
+    }
+    final GeometryFactory factory = getGeometryFactory();
+    final LineString newLine = factory.lineString(axisCount, newVertexCount,
+      coordinates);
+    GeometryProperties.copyUserData(this, newLine);
+    return line;
   }
 
   @Override
@@ -447,51 +504,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements
         coordinates, newVertexCount, vertexCount);
     } else if (coordinates1End.equals2d(coordinates2End)
       && coordinates1End.equals2d(point)) {
-      newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
-        coordinates, newVertexCount, vertexCount);
-      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 1,
-        coordinates, newVertexCount, vertexCount2 - 1);
-    } else {
-      throw new IllegalArgumentException("lines don't touch\n" + this + "\n"
-        + line);
-
-    }
-    final GeometryFactory factory = getGeometryFactory();
-    final LineString newLine = factory.lineString(axisCount, newVertexCount,
-      coordinates);
-    GeometryProperties.copyUserData(this, newLine);
-    return line;
-  }
-
-  @Override
-  public LineString merge(final LineString line) {
-    final int axisCount = Math.max(getAxisCount(), line.getAxisCount());
-    final int vertexCount1 = getVertexCount();
-    final int vertexCount2 = line.getVertexCount();
-    final int vertexCount = vertexCount1 + vertexCount2 - 1;
-    final double[] coordinates = new double[vertexCount * axisCount];
-
-    int newVertexCount = 0;
-    final Point coordinates1Start = getVertex(0);
-    final Point coordinates1End = getVertex(-1);
-    final Point coordinates2Start = line.getVertex(0);
-    final Point coordinates2End = line.getVertex(-1);
-    if (coordinates1Start.equals2d(coordinates2End)) {
-      newVertexCount = CoordinatesListUtil.append(axisCount, line, 0,
-        coordinates, 0, vertexCount2);
-      newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
-        coordinates, newVertexCount, vertexCount1 - 1);
-    } else if (coordinates2Start.equals2d(coordinates1End)) {
-      newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
-        coordinates, 0, vertexCount1);
-      newVertexCount = CoordinatesListUtil.append(axisCount, line, 1,
-        coordinates, newVertexCount, vertexCount2 - 1);
-    } else if (coordinates1Start.equals2d(coordinates2Start)) {
-      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 0,
-        coordinates, 0, vertexCount2);
-      newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
-        coordinates, newVertexCount, vertexCount);
-    } else if (coordinates1End.equals2d(coordinates2End)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
         coordinates, newVertexCount, vertexCount);
       newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 1,
@@ -569,8 +581,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements
    */
   @Override
   public LineString reverse() {
-    final CoordinatesList points = getCoordinatesList();
-    final CoordinatesList reversePoints = points.reverse();
+    final PointList points = getCoordinatesList();
+    final PointList reversePoints = points.reverse();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final LineString reverseLine = geometryFactory.lineString(reversePoints);
     GeometryProperties.copyUserData(this, reverseLine);

@@ -12,7 +12,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -91,7 +91,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     super(out, useNamespaces);
   }
 
-  public void write(final CoordinatesList points) {
+  public void write(final PointList points) {
     startTag(Kml22Constants.COORDINATES);
     final int vertexCount = points.size();
     final int axisCount = points.getAxisCount();
@@ -201,7 +201,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writeLinearRing(final LineString ring) {
     startTag(Kml22Constants.LINEAR_RING);
-    final CoordinatesList coordinateSequence = ring.getCoordinatesList();
+    final PointList coordinateSequence = ring.getCoordinatesList();
     write(coordinateSequence);
     endTag();
 
@@ -209,7 +209,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writeLineString(final LineString line) {
     startTag(Kml22Constants.LINE_STRING);
-    final CoordinatesList coordinateSequence = line.getCoordinatesList();
+    final PointList coordinateSequence = line.getCoordinatesList();
     write(coordinateSequence);
     endTag();
   }

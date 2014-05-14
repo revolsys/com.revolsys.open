@@ -52,10 +52,10 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.wkt.WktParser;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
@@ -710,18 +710,18 @@ public class Envelope implements Serializable, BoundingBox {
     index = index % 4;
     switch (index) {
       case 0:
-        return new DoubleCoordinates(maxX, minY);
+        return new PointDouble(maxX, minY);
       case 1:
-        return new DoubleCoordinates(minX, minY);
+        return new PointDouble(minX, minY);
       case 2:
-        return new DoubleCoordinates(minX, maxY);
+        return new PointDouble(minX, maxY);
       default:
-        return new DoubleCoordinates(maxX, maxY);
+        return new PointDouble(maxX, maxY);
     }
   }
 
   @Override
-  public CoordinatesList getCornerPoints() {
+  public PointList getCornerPoints() {
     final double minX = getMinX();
     final double maxX = getMaxX();
     final double minY = getMinY();

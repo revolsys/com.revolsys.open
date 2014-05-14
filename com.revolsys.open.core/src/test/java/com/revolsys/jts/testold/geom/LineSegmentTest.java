@@ -35,10 +35,10 @@ package com.revolsys.jts.testold.geom;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -78,7 +78,7 @@ public class LineSegmentTest extends TestCase {
     final LineSegment seg = new LineSegmentImpl(2, x0, y0, x1, y1);
     final Point p = seg.pointAlongOffset(segFrac, offset);
 
-    assertTrue(equalsTolerance(new Coordinate((double)expectedX, expectedY,
+    assertTrue(equalsTolerance(new PointDouble((double)expectedX, expectedY,
       Point.NULL_ORDINATE), p, 0.000001));
   }
 
@@ -98,7 +98,7 @@ public class LineSegmentTest extends TestCase {
 
   void checkOrientationIndex(final LineSegment seg, final double px,
     final double py, final int expectedOrient) {
-    final Point p = new Coordinate((double)px, py, Point.NULL_ORDINATE);
+    final Point p = new PointDouble((double)px, py, Point.NULL_ORDINATE);
     final int orient = seg.orientationIndex(p);
     assertTrue(orient == expectedOrient);
   }
@@ -148,11 +148,11 @@ public class LineSegmentTest extends TestCase {
   public void testProjectionFactor() {
     // zero-length line
     final LineSegment seg = new LineSegmentImpl(2, 10, 0, 10, 0);
-    assertTrue(Double.isNaN(seg.projectionFactor(new Coordinate((double)11.0, 0,
+    assertTrue(Double.isNaN(seg.projectionFactor(new PointDouble((double)11.0, 0,
       Point.NULL_ORDINATE))));
 
     final LineSegment seg2 = new LineSegmentImpl(2, 10, 0, 20, 0);
-    assertTrue(seg2.projectionFactor(new Coordinate((double)11.0, 0,
+    assertTrue(seg2.projectionFactor(new PointDouble((double)11.0, 0,
       Point.NULL_ORDINATE)) == 0.1);
 
   }

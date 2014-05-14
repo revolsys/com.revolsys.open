@@ -1,8 +1,8 @@
 package com.revolsys.gis.algorithm;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.util.Assert;
 

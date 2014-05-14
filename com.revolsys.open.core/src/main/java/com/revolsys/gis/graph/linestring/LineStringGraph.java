@@ -26,7 +26,6 @@ import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.NodeCoordinatesFilter;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.gis.jts.LineSegmentImpl;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.filter.CrossingLineSegmentFilter;
@@ -34,12 +33,13 @@ import com.revolsys.gis.model.coordinates.filter.PointOnLineSegment;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class LineStringGraph extends Graph<LineSegment> {
   private static final String INDEX = "INDEX";
@@ -68,13 +68,13 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   private GeometryFactory geometryFactory;
 
-  private CoordinatesList points;
+  private PointList points;
 
   private Point fromPoint;
 
   private BoundingBox envelope;
 
-  public LineStringGraph(final CoordinatesList points) {
+  public LineStringGraph(final PointList points) {
     super(false);
     setGeometryFactory(GeometryFactory.getFactory());
     setPoints(points);
@@ -222,7 +222,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       for (final Edge<LineSegment> edge2 : edges) {
         if (edge1 != edge2) {
           final LineSegment lineSegment2 = edge2.getObject();
-          final CoordinatesList intersections = lineSegment1.getIntersection(
+          final PointList intersections = lineSegment1.getIntersection(
             precisionModel, lineSegment2);
           for (final Point intersection : intersections) {
             if (!lineSegment1.contains(intersection)
@@ -287,7 +287,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     }
     envelope = envelope.expand(maxDistance);
     if (envelope.intersects(this.envelope)) {
-      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final PointList points = CoordinatesListUtil.get(line);
       final int numPoints = points.size();
       final Point fromPoint = points.get(0);
       final Point toPoint = points.get(numPoints - 1);
@@ -300,7 +300,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();
-          final CoordinatesList intersections = line1.getIntersection(line2);
+          final PointList intersections = line1.getIntersection(line2);
           final int numIntersections = intersections.size();
           for (int j = 0; j < numIntersections; j++) {
             final Point intersection = intersections.get(j);
@@ -372,7 +372,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         line.getBoundingBox());
       for (final Edge<LineSegment> edge2 : edges) {
         final LineSegment line2 = edge2.getObject();
-        final CoordinatesList intersections = line.getIntersection(line2);
+        final PointList intersections = line.getIntersection(line2);
         if (intersections.size() == 2) {
           return false;
         } else if (intersections.size() == 1) {
@@ -389,7 +389,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   public void nodeMoved(final Node<LineSegment> node,
     final Node<LineSegment> newNode) {
     if (fromPoint.equals2d(node)) {
-      fromPoint = new DoubleCoordinates(newNode);
+      fromPoint = new PointDouble(newNode);
     }
   }
 
@@ -429,11 +429,11 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   private void setLineString(final LineString lineString) {
-    final CoordinatesList points = CoordinatesListUtil.get(lineString);
+    final PointList points = CoordinatesListUtil.get(lineString);
     setPoints(points);
   }
 
-  private void setPoints(final CoordinatesList points) {
+  private void setPoints(final PointList points) {
     this.points = points;
     final CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
       geometryFactory, points);
@@ -445,7 +445,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
       edge.setAttribute(INDEX, Arrays.asList(index++));
     }
-    fromPoint = new DoubleCoordinates(points.get(0));
+    fromPoint = new PointDouble(points.get(0));
     envelope = CoordinatesListUtil.getBoundingBox(geometryFactory, points);
   }
 
@@ -469,9 +469,9 @@ public class LineStringGraph extends Graph<LineSegment> {
       final List<Point> points = new ArrayList<Point>();
       for (final Edge<LineSegment> edge2 : edges) {
         final LineSegment line2 = edge2.getObject();
-        final CoordinatesList intersections = line1.getIntersection(line2);
+        final PointList intersections = line1.getIntersection(line2);
         if (intersections.size() == 1) {
-          final Point intersection = new DoubleCoordinates(
+          final Point intersection = new PointDouble(
             intersections.get(0));
           points.add(intersection);
           edge2.split(intersection);

@@ -41,11 +41,11 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.ConvexHull;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
 
 /**
@@ -135,7 +135,7 @@ public class ConvexHullTest extends TestCase {
   public void testAllIdenticalPoints() throws Exception {
     final Point[] pts = new Point[100];
     for (int i = 0; i < 100; i++) {
-      pts[i] = new Coordinate(0.0, 0, Point.NULL_ORDINATE);
+      pts[i] = new PointDouble(0.0, 0);
     }
     final ConvexHull ch = new ConvexHull(pts, this.geometryFactory);
     final Geometry actualGeometry = ch.getConvexHull();
@@ -146,9 +146,9 @@ public class ConvexHullTest extends TestCase {
   public void testManyIdenticalPoints() throws Exception {
     final Point[] pts = new Point[100];
     for (int i = 0; i < 99; i++) {
-      pts[i] = new Coordinate(0.0, 0, Point.NULL_ORDINATE);
+      pts[i] = new PointDouble(0.0, 0);
     }
-    pts[99] = new Coordinate(1.0, 1, Point.NULL_ORDINATE);
+    pts[99] = new PointDouble(1.0, 1);
     final ConvexHull ch = new ConvexHull(pts, this.geometryFactory);
     final Geometry actualGeometry = ch.getConvexHull();
     final Geometry expectedGeometry = this.reader.read("LINESTRING (0 0, 1 1)");
@@ -159,14 +159,14 @@ public class ConvexHullTest extends TestCase {
     final ConvexHullEx convexHull = new ConvexHullEx(
       this.geometryFactory.geometryCollection());
     final Stack stack = new Stack();
-    stack.push(new Coordinate(0.0, 0, Point.NULL_ORDINATE));
-    stack.push(new Coordinate(1.0, 1, Point.NULL_ORDINATE));
-    stack.push(new Coordinate(2.0, 2, Point.NULL_ORDINATE));
+    stack.push(new PointDouble(0.0, 0));
+    stack.push(new PointDouble(1.0, 1));
+    stack.push(new PointDouble(2.0, 2));
     final Object[] array1 = convexHull.toCoordinateArray(stack);
     assertEquals(3, array1.length);
-    assertEquals(new Coordinate(0.0, 0, Point.NULL_ORDINATE), array1[0]);
-    assertEquals(new Coordinate(1.0, 1, Point.NULL_ORDINATE), array1[1]);
-    assertEquals(new Coordinate(2.0, 2, Point.NULL_ORDINATE), array1[2]);
+    assertEquals(new PointDouble(0.0, 0), array1[0]);
+    assertEquals(new PointDouble(1.0, 1), array1[1]);
+    assertEquals(new PointDouble(2.0, 2), array1[2]);
     assertTrue(!array1[0].equals(array1[1]));
   }
 

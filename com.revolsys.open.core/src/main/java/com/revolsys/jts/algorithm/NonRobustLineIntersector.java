@@ -33,11 +33,11 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 /**
  *@version 1.7
  */
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * A non-robust version of {@link LineIntersector}.
@@ -206,7 +206,7 @@ public class NonRobustLineIntersector extends LineIntersector {
      * " - int: " + valInt + ", floor: " + pa.x);
      */
     final double numY = a2 * c1 - a1 * c2;
-    pa = new DoubleCoordinates(numX / denom, numY / denom);
+    pa = new PointDouble(numX / denom, numY / denom);
 
     // check if this is a proper intersection BEFORE truncating values,
     // to avoid spurious equality comparisons with endpoints

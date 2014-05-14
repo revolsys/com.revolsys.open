@@ -35,8 +35,8 @@ package com.revolsys.jts.triangulate.quadedge;
 
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Models a site (node) in a {@link QuadEdgeSubdivision}. 
@@ -123,15 +123,15 @@ public class Vertex {
   // private int edgeNumber = -1;
 
   public Vertex(final Point _p) {
-    p = new Coordinate(_p);
+    p = new PointDouble(_p);
   }
 
   public Vertex(final double _x, final double _y) {
-    p = new Coordinate(_x, _y, Point.NULL_ORDINATE);
+    p = new PointDouble(_x, _y, Point.NULL_ORDINATE);
   }
 
   public Vertex(final double _x, final double _y, final double _z) {
-    p = new Coordinate(_x, _y, _z);
+    p = new PointDouble(_x, _y, _z);
   }
 
   private HCoordinate bisector(final Vertex a, final Vertex b) {

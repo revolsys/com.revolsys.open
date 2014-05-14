@@ -33,8 +33,8 @@
 
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.math.Vector3D;
 
 /**
@@ -176,7 +176,7 @@ public class CGAlgorithms3D
 		double z2 = C.getZ() + t * (D.getZ() - C.getZ());
 		
 		// length (p1-p2)
-		return distance(new Coordinate((double)x1, y1, z1), new Coordinate((double)x2, y2, z2));
+		return distance(new PointDouble((double)x1, y1, z1), new PointDouble((double)x2, y2, z2));
 	}
 
 	

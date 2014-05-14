@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.AffineTransformation;
 import com.revolsys.jts.geom.util.NoninvertibleTransformationException;
 import com.revolsys.jts.io.ParseException;
@@ -42,7 +42,7 @@ public class AffineTransformationTest extends TestCase {
    */
   void checkTransformation(final double x, final double y,
     final AffineTransformation trans, final double xp, final double yp) {
-    final Point p = new Coordinate(x, y, Point.NULL_ORDINATE);
+    final Point p = new PointDouble(x, y);
     final Point p2 = trans.transform(p);
 
     assertEquals(xp, p2.getX(), .00005);

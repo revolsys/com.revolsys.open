@@ -37,19 +37,17 @@ import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.PointVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -88,7 +86,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @Override
   public Point cloneCoordinates() {
-    return new DoubleCoordinates(this);
+    return new PointDouble(this);
   }
 
   @Override
@@ -117,7 +115,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   @Override
   public int compareToSameClass(final Geometry other) {
     final Point point = (Point)other;
-    return getCoordinate().compareTo(point.getCoordinate());
+    return getPoint().compareTo(point.getPoint());
   }
 
   @Override
@@ -202,6 +200,18 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
+  public boolean equals(final int axisCount, final Point point) {
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double value = getCoordinate(axisIndex);
+      final double value2 = point.getCoordinate(axisIndex);
+      if (!NumberEquals.equal(value, value2)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public boolean equals(final Object other) {
     if (other instanceof Point) {
       final Point point = (Point)other;
@@ -257,7 +267,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
       } else if (isEmpty() != other.isEmpty()) {
         return false;
       } else {
-        return equal(point, getCoordinate(), tolerance);
+        return equal(point, getPoint(), tolerance);
       }
     } else {
       return false;
@@ -292,24 +302,12 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  public Point getCoordinate() {
-    if (isEmpty()) {
-      return null;
-    } else {
-      final double x = getX();
-      final double y = getY();
-      final double z = getZ();
-      return new Coordinate(x, y, z);
-    }
-  }
-
-  @Override
   public double[] getCoordinates() {
     return CoordinatesUtil.getCoordinates(this);
   }
 
   @Override
-  public CoordinatesList getCoordinatesList() {
+  public PointList getCoordinatesList() {
     final int axisCount = getAxisCount();
     final double[] coordinates = getCoordinates();
     return new DoubleCoordinatesList(axisCount, coordinates);
@@ -333,6 +331,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   @Override
   public double getM() {
     return getCoordinate(3);
+  }
+
+  @Override
+  public Point getPoint() {
+    return this;
   }
 
   @Override

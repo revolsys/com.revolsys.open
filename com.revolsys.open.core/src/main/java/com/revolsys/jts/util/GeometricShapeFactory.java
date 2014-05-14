@@ -32,16 +32,15 @@
  */
 package com.revolsys.jts.util;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.AffineTransformation;
 
 /**
@@ -55,7 +54,7 @@ import com.revolsys.jts.geom.util.AffineTransformation;
  *  GeometricShapeFactory gsf = new GeometricShapeFactory();
  *  gsf.setSize(100);
  *  gsf.setNumPoints(100);
- *  gsf.setBase(new Coordinate(100.0, 100.0));
+ *  gsf.setBase(new PointDouble(100.0, 100.0));
  *  gsf.setRotation(0.5);
  *  Polygon rect = gsf.createRectangle();
  * </pre>
@@ -78,7 +77,7 @@ public class GeometricShapeFactory {
 
     public Point getCentre() {
       if (centre == null) {
-        centre = new Coordinate(base.getX() + width / 2, base.getY() + height
+        centre = new PointDouble(base.getX() + width / 2, base.getY() + height
           / 2, Point.NULL_ORDINATE);
       }
       return centre;
@@ -119,7 +118,7 @@ public class GeometricShapeFactory {
     public void setEnvelope(final BoundingBox env) {
       this.width = env.getWidth();
       this.height = env.getHeight();
-      this.base = new DoubleCoordinates(env.getMinX(), env.getMinY());
+      this.base = new PointDouble(env.getMinX(), env.getMinY());
       this.centre = env.getCentre().cloneCoordinates();
     }
 
@@ -168,7 +167,7 @@ public class GeometricShapeFactory {
   }
 
   protected Point coord(final double x, final double y) {
-    final Point point = new DoubleCoordinates(geomFact.makePrecise(0, x),
+    final Point point = new PointDouble(geomFact.makePrecise(0, x),
       geomFact.makePrecise(1, y));
     return point;
   }

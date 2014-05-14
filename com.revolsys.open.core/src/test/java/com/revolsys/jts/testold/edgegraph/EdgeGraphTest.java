@@ -8,8 +8,8 @@ import junit.textui.TestRunner;
 import com.revolsys.jts.edgegraph.EdgeGraph;
 import com.revolsys.jts.edgegraph.EdgeGraphBuilder;
 import com.revolsys.jts.edgegraph.HalfEdge;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
@@ -53,10 +53,10 @@ public class EdgeGraphTest extends TestCase {
 
   public void testNode() throws Exception {
     final EdgeGraph graph = build("MULTILINESTRING((0 0, 1 0), (0 0, 0 1), (0 0, -1 0))");
-    checkEdgeRing(graph, new Coordinate((double)0, 0, Point.NULL_ORDINATE), new Point[] {
-      new Coordinate((double)1, 0, Point.NULL_ORDINATE), new Coordinate((double)0, 1, Point.NULL_ORDINATE), new Coordinate((double)-1, 0, Point.NULL_ORDINATE)
+    checkEdgeRing(graph, new PointDouble((double)0, 0, Point.NULL_ORDINATE), new Point[] {
+      new PointDouble((double)1, 0, Point.NULL_ORDINATE), new PointDouble((double)0, 1, Point.NULL_ORDINATE), new PointDouble((double)-1, 0, Point.NULL_ORDINATE)
     });
-    checkEdge(graph, new Coordinate((double)0, 0, Point.NULL_ORDINATE), new Coordinate((double)1, 0, Point.NULL_ORDINATE));
+    checkEdge(graph, new PointDouble((double)0, 0, Point.NULL_ORDINATE), new PointDouble((double)1, 0, Point.NULL_ORDINATE));
   }
 
 }

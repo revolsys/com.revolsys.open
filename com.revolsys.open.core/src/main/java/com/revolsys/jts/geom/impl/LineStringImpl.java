@@ -33,11 +33,12 @@
 package com.revolsys.jts.geom.impl;
 
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 /**
  *  Models an OGC-style <code>LineString</code>.
@@ -59,6 +60,17 @@ import com.revolsys.jts.geom.LineString;
 public class LineStringImpl extends AbstractLineString implements LineString {
 
   /**
+   *  The bounding box of this <code>Geometry</code>.
+   */
+  private BoundingBox boundingBox;
+
+  /**
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
+   */
+  private Object userData;
+
+  /**
    * The {@link GeometryFactory} used to create this Geometry
    */
   private final GeometryFactory geometryFactory;
@@ -76,7 +88,7 @@ public class LineStringImpl extends AbstractLineString implements LineString {
   }
 
   public LineStringImpl(final GeometryFactory geometryFactory,
-    final CoordinatesList points) {
+    final PointList points) {
     this.geometryFactory = geometryFactory;
     if (points == null) {
       this.coordinates = null;
@@ -217,6 +229,18 @@ public class LineStringImpl extends AbstractLineString implements LineString {
   }
 
   @Override
+  public BoundingBox getBoundingBox() {
+    if (boundingBox == null) {
+      if (isEmpty()) {
+        boundingBox = new Envelope(getGeometryFactory());
+      } else {
+        boundingBox = computeBoundingBox();
+      }
+    }
+    return boundingBox;
+  }
+
+  @Override
   public Point getCoordinate(final int vertexIndex) {
     if (isEmpty()) {
       return null;
@@ -225,7 +249,7 @@ public class LineStringImpl extends AbstractLineString implements LineString {
       final double[] coordinates = new double[axisCount];
       System.arraycopy(this.coordinates, vertexIndex * axisCount, coordinates,
         0, axisCount);
-      return new DoubleCoordinates(coordinates);
+      return new PointDouble(coordinates);
     }
   }
 
@@ -265,6 +289,16 @@ public class LineStringImpl extends AbstractLineString implements LineString {
     return geometryFactory;
   }
 
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+  @Override
+  public Object getUserData() {
+    return userData;
+  }
+
   @Override
   public int getVertexCount() {
     if (isEmpty()) {
@@ -277,5 +311,20 @@ public class LineStringImpl extends AbstractLineString implements LineString {
   @Override
   public boolean isEmpty() {
     return this.coordinates == null;
+  }
+
+  /**
+   * A simple scheme for applications to add their own custom data to a Geometry.
+   * An example use might be to add an object representing a Point Reference System.
+   * <p>
+   * Note that user data objects are not present in geometries created by
+   * construction methods.
+   *
+   * @param userData an object, the semantics for which are defined by the
+   * application using this Geometry
+   */
+  @Override
+  public void setUserData(final Object userData) {
+    this.userData = userData;
   }
 }

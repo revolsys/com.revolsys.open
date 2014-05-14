@@ -40,11 +40,11 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.planargraph.DirectedEdge;
 
@@ -56,7 +56,7 @@ import com.revolsys.jts.planargraph.DirectedEdge;
  */
 class EdgeRing {
 
-  private static void addEdge(final CoordinatesList coords,
+  private static void addEdge(final PointList coords,
     final boolean isForward, final CoordinateList coordList) {
     if (isForward) {
       for (int i = 0; i < coords.size(); i++) {

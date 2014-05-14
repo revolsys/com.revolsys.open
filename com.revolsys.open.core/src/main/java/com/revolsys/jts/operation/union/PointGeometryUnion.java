@@ -38,7 +38,6 @@ import java.util.TreeSet;
 
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.CoordinateArrays;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
@@ -80,7 +79,7 @@ public class PointGeometryUnion {
 
     for (int i = 0; i < pointGeom.getGeometryCount(); i++) {
       final Point point = (Point)pointGeom.getGeometry(i);
-      final Point coord = point.getCoordinate();
+      final Point coord = point.getPoint();
       final Location loc = locater.locate(coord, otherGeom);
       if (loc == Location.EXTERIOR) {
         exteriorCoords.add(coord);

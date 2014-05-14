@@ -37,8 +37,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.ItemVisitor;
 
 /**
@@ -141,7 +141,7 @@ public class SortedPackedIntervalRTree
 	
   private void printNode(IntervalRTreeNode node)
   {
-    System.out.println(WktWriter.lineString(new Coordinate((double)node.min, level, Point.NULL_ORDINATE), new Coordinate((double)node.max, level, Point.NULL_ORDINATE)));
+    System.out.println(WktWriter.lineString(new PointDouble((double)node.min, level, Point.NULL_ORDINATE), new PointDouble((double)node.max, level, Point.NULL_ORDINATE)));
   }
   
   /**

@@ -35,61 +35,61 @@ package com.revolsys.jts.operation.distance;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a sequence of facets (points or line segments)
  * of a {@link Geometry}
- * specified by a subsequence of a {@link CoordinatesList}.
+ * specified by a subsequence of a {@link PointList}.
  * 
  * @author Martin Davis
  *
  */
 public class FacetSequence {
-  private final CoordinatesList pts;
+  private final PointList pts;
 
   private final int start;
 
   private final int end;
 
-  // temporary Point to materialize points from the CoordinatesList
-  private Point pt = new Coordinate();
+  // temporary Point to materialize points from the PointList
+  private Point pt = new PointDouble();
 
-  private Point seqPt = new Coordinate();
+  private Point seqPt = new PointDouble();
 
-  // temporary Point to materialize points from the CoordinatesList
-  private Point p0 = new Coordinate();
+  // temporary Point to materialize points from the PointList
+  private Point p0 = new PointDouble();
 
-  private Point p1 = new Coordinate();
+  private Point p1 = new PointDouble();
 
-  private Point q0 = new Coordinate();
+  private Point q0 = new PointDouble();
 
-  private Point q1 = new Coordinate();
+  private Point q1 = new PointDouble();
 
   /**
-   * Creates a new sequence for a single point from a CoordinatesList.
+   * Creates a new sequence for a single point from a PointList.
    * 
    * @param pts the sequence holding the points in the facet sequence
    * @param start the index of the point
    */
-  public FacetSequence(final CoordinatesList pts, final int start) {
+  public FacetSequence(final PointList pts, final int start) {
     this.pts = pts;
     this.start = start;
     this.end = start + 1;
   }
 
   /**
-   * Creates a new section based on a CoordinatesList.
+   * Creates a new section based on a PointList.
    * 
    * @param pts the sequence holding the points in the section
    * @param start the index of the start point
    * @param end the index of the end point + 1
    */
-  public FacetSequence(final CoordinatesList pts, final int start, final int end) {
+  public FacetSequence(final PointList pts, final int start, final int end) {
     this.pts = pts;
     this.start = start;
     this.end = end;

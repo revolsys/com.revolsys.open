@@ -1,7 +1,6 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;

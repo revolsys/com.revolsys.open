@@ -794,18 +794,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   int getClassSortIndex();
 
   /**
-   *  Returns a vertex of this <code>Geometry</code>
-   *  (usually, but not necessarily, the first one).
-   *  The returned coordinate should not be assumed
-   *  to be an actual Point object used in
-   *  the internal representation.
-   *
-   *@return    a {@link Coordinates} which is a vertex of this <code>Geometry</code>.
-   *@return null if this Geometry is empty
-   */
-  Point getCoordinate();
-
-  /**
    * 
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return
@@ -920,6 +908,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   double getLength();
 
+  /**
+   *  Returns a vertex of this <code>Geometry</code>
+   *  (usually, but not necessarily, the first one).
+   *  The returned coordinate should not be assumed
+   *  to be an actual Point object used in
+   *  the internal representation.
+   *
+   *@return    a {@link Coordinates} which is a vertex of this <code>Geometry</code>.
+   *@return null if this Geometry is empty
+   */
   Point getPoint();
 
   /**

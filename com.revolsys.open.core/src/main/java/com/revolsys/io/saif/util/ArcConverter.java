@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.saif.SaifConstants;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 public class ArcConverter implements OsnConverter {
   private final GeometryFactory geometryFactory;
@@ -54,11 +54,11 @@ public class ArcConverter implements OsnConverter {
             final double x = iterator.nextDoubleAttribute("c1");
             final double y = iterator.nextDoubleAttribute("c2");
             final double z = iterator.nextDoubleAttribute("c3");
-            coordinates.add(new DoubleCoordinates(x, y, z));
+            coordinates.add(new PointDouble(x, y, z));
           } else if (coordTypeName.equals("/Coord2D")) {
             final double x = iterator.nextDoubleAttribute("c1");
             final double y = iterator.nextDoubleAttribute("c2");
-            coordinates.add(new DoubleCoordinates(x, y));
+            coordinates.add(new PointDouble(x, y));
           } else {
             iterator.throwParseError("Expecting Coord2D or Coord3D");
           }
@@ -99,7 +99,7 @@ public class ArcConverter implements OsnConverter {
 
       serializer.attributeName("pointList");
       serializer.startCollection("List");
-      final CoordinatesList points = CoordinatesListUtil.get(line);
+      final PointList points = CoordinatesListUtil.get(line);
       final int axisCount = points.getAxisCount();
       for (int i = 0; i < points.size(); i++) {
         serializer.startObject(SaifConstants.POINT);

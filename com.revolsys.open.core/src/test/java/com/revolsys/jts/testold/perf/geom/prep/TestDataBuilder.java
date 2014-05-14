@@ -36,17 +36,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class TestDataBuilder {
   private GeometryFactory geomFact = GeometryFactory.getFactory();
 
-  private Point origin = new Coordinate((double)0, 0, Point.NULL_ORDINATE);
+  private Point origin = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
 
   private double size = 100.0;
 
@@ -100,7 +100,7 @@ public class TestDataBuilder {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new Coordinate((double)env.getMinX() + i * xInc,
+        final Point base = new PointDouble((double)env.getMinX() + i * xInc,
           env.getMinY() + j * yInc, Point.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);

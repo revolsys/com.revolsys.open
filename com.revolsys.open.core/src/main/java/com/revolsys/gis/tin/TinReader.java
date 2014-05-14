@@ -6,12 +6,12 @@ import java.io.IOException;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.IntHashMap;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;
 
@@ -91,7 +91,7 @@ public class TinReader {
     for (int i = 1; i <= numNodes; i++) {
       line = readLine();
       final double[] coordinates = MathUtil.toDoubleArraySplit(line, " ");
-      final Point point = new DoubleCoordinates(3, coordinates);
+      final Point point = new PointDouble(3, coordinates);
       boundingBox = boundingBox.expand(point);
       nodeIdMap.put(i, point);
     }

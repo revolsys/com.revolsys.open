@@ -36,9 +36,9 @@ import java.util.Collection;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Validates that a collection of {@link SegmentString}s is correctly noded.
@@ -74,7 +74,7 @@ public class NodingValidator {
   }
 
   private void checkCollapses(final NodedSegmentString ss) {
-    final CoordinatesList points = ss.getPoints();
+    final PointList points = ss.getPoints();
     for (int i = 0; i < points.size() - 2; i++) {
       checkCollapse(points.get(i), points.get(i + 1), points.get(i + 2));
     }
@@ -94,7 +94,7 @@ public class NodingValidator {
   private void checkEndPtVertexIntersections(final Point testPt,
     final Collection<NodedSegmentString> segStrings) {
     for (final NodedSegmentString ss : segStrings) {
-      final CoordinatesList pts = ss.getPoints();
+      final PointList pts = ss.getPoints();
       for (int j = 1; j < pts.size() - 1; j++) {
         if (pts.get(j).equals(testPt)) {
           throw new RuntimeException(

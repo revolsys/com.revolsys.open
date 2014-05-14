@@ -23,7 +23,7 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 
 public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
@@ -286,7 +286,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private LinearRing toPgLinearRing(final com.revolsys.jts.geom.LineString ring) {
-    final CoordinatesList points = CoordinatesListUtil.get(ring);
+    final PointList points = CoordinatesListUtil.get(ring);
     final Point[] pgPoints = toPgPoints(points);
     final LinearRing linearRing = new LinearRing(pgPoints);
     linearRing.setSrid(ring.getSrid());
@@ -295,7 +295,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private LineString toPgLineString(
     final com.revolsys.jts.geom.LineString lineString) {
-    final CoordinatesList points = CoordinatesListUtil.get(lineString);
+    final PointList points = CoordinatesListUtil.get(lineString);
     final Point[] pgPoints = toPgPoints(points);
     final LineString pgLineString = new LineString(pgPoints);
     final int srid = lineString.getSrid();
@@ -455,7 +455,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
-  private Point[] toPgPoints(final CoordinatesList coordinates) {
+  private Point[] toPgPoints(final PointList coordinates) {
     final Point[] points = new Point[coordinates.size()];
     for (int i = 0; i < coordinates.size(); i++) {
       Point pgPoint;

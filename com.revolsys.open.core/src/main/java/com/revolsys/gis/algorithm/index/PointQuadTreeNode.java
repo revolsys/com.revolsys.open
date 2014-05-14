@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 
 public class PointQuadTreeNode<T> {
@@ -68,7 +68,7 @@ public class PointQuadTreeNode<T> {
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
     if (envelope.covers(x, y)) {
-      final DoubleCoordinates coordinates = new DoubleCoordinates(x, y);
+      final PointDouble coordinates = new PointDouble(x, y);
       results.add(new SimpleImmutableEntry<Point, T>(coordinates, value));
     }
     final boolean minXLess = isLessThanX(minX);

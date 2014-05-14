@@ -1,7 +1,7 @@
 package com.revolsys.jts.testold.perf.math;
 
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
@@ -19,15 +19,15 @@ public class InCirclePerf {
     test.run();
   }
 
-  Point pa = new Coordinate(687958.05, 7460725.97,
+  Point pa = new PointDouble(687958.05, 7460725.97,
     Point.NULL_ORDINATE);
 
-  Point pb = new Coordinate(687957.43, 7460725.93,
+  Point pb = new PointDouble(687957.43, 7460725.93,
     Point.NULL_ORDINATE);
 
-  Point pc = new Coordinate(687957.58, 7460721, Point.NULL_ORDINATE);
+  Point pc = new PointDouble(687957.58, 7460721, Point.NULL_ORDINATE);
 
-  Point pp = new Coordinate(687958.13, 7460720.99,
+  Point pp = new PointDouble(687958.13, 7460720.99,
     Point.NULL_ORDINATE);
 
   public InCirclePerf() {

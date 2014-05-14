@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.geom.impl;
 
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -63,7 +63,7 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
 
   /**
    * Constructs a <code>LinearRing</code> with the vertices
-   * specifed by the given {@link CoordinatesList}.
+   * specifed by the given {@link PointList}.
    *
    *@param  points  a sequence points forming a closed and simple linestring, or
    *      <code>null</code> to create the empty geometry.
@@ -72,7 +72,7 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
    *
    */
   public LinearRingImpl(final GeometryFactory factory,
-    final CoordinatesList points) {
+    final PointList points) {
     super(factory, points);
     if (isClosed()) {
       final int vertexCount = getVertexCount();
@@ -89,7 +89,7 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
 
   /**
    * Constructs a <code>LinearRing</code> with the vertices
-   * specifed by the given {@link CoordinatesList}.
+   * specifed by the given {@link PointList}.
    *
    *@param  points  a sequence points forming a closed and simple linestring, or
    *      <code>null</code> to create the empty geometry.
@@ -173,8 +173,8 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
 
   @Override
   public LinearRing reverse() {
-    final CoordinatesList points = getCoordinatesList();
-    final CoordinatesList reversePoints = points.reverse();
+    final PointList points = getCoordinatesList();
+    final PointList reversePoints = points.reverse();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final LinearRing reverseLine = geometryFactory.linearRing(reversePoints);
     return reverseLine;

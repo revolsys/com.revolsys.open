@@ -6,8 +6,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.io.Reader;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class UniqueCoordinateArrayFilter {

@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.util.MathUtil;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {

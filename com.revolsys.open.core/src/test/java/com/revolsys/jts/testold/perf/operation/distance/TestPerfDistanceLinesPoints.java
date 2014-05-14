@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.revolsys.jts.densify.Densifier;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance.DistanceOp;
@@ -71,7 +71,7 @@ public class TestPerfDistanceLinesPoints {
     final double inc = extent / nSegs;
     for (int i = 0; i < nSegs; i++) {
       final double ord = i * inc;
-      final Point p = new Coordinate(ord, ord, Point.NULL_ORDINATE);
+      final Point p = new PointDouble(ord, ord, Point.NULL_ORDINATE);
       final Geometry pt = geomFact.point(p);
       circles[i] = (Polygon)pt.buffer(inc / 2);
     }
@@ -81,21 +81,21 @@ public class TestPerfDistanceLinesPoints {
 
   Geometry createDiagonalLine(final double extent, final int nSegs) {
     final Point[] pts = new Point[nSegs + 1];
-    pts[0] = new Coordinate((double)0, 0, Point.NULL_ORDINATE);
+    pts[0] = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
     final double inc = extent / nSegs;
     for (int i = 1; i <= nSegs; i++) {
       final double ord = i * inc;
-      pts[i] = new Coordinate(ord, ord, Point.NULL_ORDINATE);
+      pts[i] = new PointDouble(ord, ord, Point.NULL_ORDINATE);
     }
     return geomFact.lineString(pts);
   }
 
   Geometry createLine(final double extent, final int nSegs) {
     final Point[] pts = new Point[] {
-      new Coordinate((double)0, 0, Point.NULL_ORDINATE),
-      new Coordinate((double)0, extent, Point.NULL_ORDINATE),
-      new Coordinate(extent, extent, Point.NULL_ORDINATE),
-      new Coordinate(extent, 0, Point.NULL_ORDINATE)
+      new PointDouble((double)0, 0, Point.NULL_ORDINATE),
+      new PointDouble((double)0, extent, Point.NULL_ORDINATE),
+      new PointDouble(extent, extent, Point.NULL_ORDINATE),
+      new PointDouble(extent, 0, Point.NULL_ORDINATE)
 
     };
     final Geometry outline = geomFact.lineString(pts);
@@ -111,7 +111,7 @@ public class TestPerfDistanceLinesPoints {
     final double yinc = extent.getHeight() / nPtsSide;
     for (int i = 0; i < nPtsSide; i++) {
       for (int j = 0; j < nPtsSide; j++) {
-        pts[index++] = geomFact.point(new Coordinate(extent.getMinX() + i
+        pts[index++] = geomFact.point(new PointDouble(extent.getMinX() + i
           * xinc, extent.getMinY() + j * yinc, Point.NULL_ORDINATE));
       }
     }

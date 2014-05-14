@@ -32,13 +32,12 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.Segment;
 
 /**
@@ -131,7 +130,7 @@ public class Centroid {
       return;
     }
     if (geom instanceof Point) {
-      addPoint(geom.getCoordinate());
+      addPoint(geom.getPoint());
     } else if (geom instanceof LineString) {
       addLineSegments((LineString)geom);
     } else if (geom instanceof Polygon) {
@@ -244,18 +243,18 @@ public class Centroid {
       /**
        * Input contains areal geometry
        */
-      return new DoubleCoordinates(cg3X / 3 / areasum2, cg3Y / 3 / areasum2);
+      return new PointDouble(cg3X / 3 / areasum2, cg3Y / 3 / areasum2);
     } else if (totalLength > 0.0) {
       /**
        * Input contains lineal geometry
        */
-      return new DoubleCoordinates(lineCenterX / totalLength, lineCenterY
+      return new PointDouble(lineCenterX / totalLength, lineCenterY
         / totalLength);
     } else if (ptCount > 0) {
       /**
        * Input contains puntal geometry only
        */
-      return new DoubleCoordinates(centSumX / ptCount, centSumY / ptCount);
+      return new PointDouble(centSumX / ptCount, centSumY / ptCount);
     } else {
       return null;
     }

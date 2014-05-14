@@ -35,7 +35,6 @@ package com.revolsys.jts.awt;
 import java.awt.geom.Point2D;
 
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Point;
 
 /**
  * Transforms a geometry {@link Coordinates} into a Java2D {@link Point},

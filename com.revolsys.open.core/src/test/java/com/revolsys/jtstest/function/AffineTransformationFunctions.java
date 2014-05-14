@@ -2,9 +2,9 @@ package com.revolsys.jtstest.function;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.AffineTransformation;
 import com.revolsys.jts.geom.util.AffineTransformationFactory;
 
@@ -15,7 +15,7 @@ public class AffineTransformationFunctions {
 
   private static Point envelopeLowerLeft(final Geometry g) {
     final BoundingBox env = g.getBoundingBox();
-    return new Coordinate(env.getMinX(), env.getMinY());
+    return new PointDouble(env.getMinX(), env.getMinY());
   }
 
   public static Geometry reflectInX(final Geometry g) {
@@ -57,8 +57,8 @@ public class AffineTransformationFunctions {
   public static Geometry transformByBaseline(final Geometry g,
     final Geometry destBaseline) {
     final BoundingBox env = g.getBoundingBox();
-    final Point src0 = new Coordinate(env.getMinX(), env.getMinY());
-    final Point src1 = new Coordinate(env.getMaxX(), env.getMinY());
+    final Point src0 = new PointDouble(env.getMinX(), env.getMinY());
+    final Point src1 = new PointDouble(env.getMaxX(), env.getMinY());
 
     final Point[] destPts = CoordinatesListUtil.getCoordinateArray(destBaseline);
     final Point dest0 = destPts[0];

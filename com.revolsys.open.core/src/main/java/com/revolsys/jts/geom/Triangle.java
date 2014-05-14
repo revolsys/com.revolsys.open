@@ -35,6 +35,7 @@ package com.revolsys.jts.geom;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.HCoordinate;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a planar triangle, and provides methods for calculating various
@@ -68,7 +69,7 @@ public class Triangle {
     final double dx = c.getX() - a.getX();
     final double dy = c.getY() - a.getY();
 
-    final Point splitPt = new Coordinate(a.getX() + frac * dx, a.getY()
+    final Point splitPt = new PointDouble(a.getX() + frac * dx, a.getY()
       + frac * dy, Point.NULL_ORDINATE);
     return splitPt;
   }
@@ -183,7 +184,7 @@ public class Triangle {
     final Point c) {
     final double x = (a.getX() + b.getX() + c.getX()) / 3;
     final double y = (a.getY() + b.getY() + c.getY()) / 3;
-    return new Coordinate(x, y, Point.NULL_ORDINATE);
+    return new PointDouble(x, y, Point.NULL_ORDINATE);
   }
 
   /**
@@ -224,7 +225,7 @@ public class Triangle {
     final double ccx = cx - numx / denom;
     final double ccy = cy + numy / denom;
 
-    return new Coordinate(ccx, ccy, Point.NULL_ORDINATE);
+    return new PointDouble(ccx, ccy, Point.NULL_ORDINATE);
   }
 
   /**
@@ -277,7 +278,7 @@ public class Triangle {
     final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2
       * c.getY())
       / circum;
-    return new Coordinate(inCentreX, inCentreY, Point.NULL_ORDINATE);
+    return new PointDouble(inCentreX, inCentreY, Point.NULL_ORDINATE);
   }
 
   /**

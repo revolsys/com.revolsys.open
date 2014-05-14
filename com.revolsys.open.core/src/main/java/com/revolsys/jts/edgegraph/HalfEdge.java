@@ -1,7 +1,6 @@
 package com.revolsys.jts.edgegraph;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Coordinate;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Quadrant;
 import com.revolsys.jts.util.Assert;
@@ -103,7 +102,7 @@ public class HalfEdge {
    * it is trivial to determine which edge has a greater angle.
    * 
    * <li>if the vectors lie in the same quadrant, the 
-   * {@link CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)} function
+   * {@link CGAlgorithms#computeOrientation(Point, Point, Point)} function
    * can be used to determine the relative orientation of the vectors.
    * </ul>
    */

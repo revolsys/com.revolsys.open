@@ -35,8 +35,8 @@ package com.revolsys.jts.operation.buffer;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
 
 /**
  * Simplifies a buffer input line to 
@@ -86,14 +86,14 @@ public class BufferInputLineSimplifier {
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public static CoordinatesList simplify(final CoordinatesList inputLine,
+  public static PointList simplify(final PointList inputLine,
     final double distanceTol) {
     final BufferInputLineSimplifier simp = new BufferInputLineSimplifier(
       inputLine);
     return simp.simplify(distanceTol);
   }
 
-  private final CoordinatesList inputLine;
+  private final PointList inputLine;
 
   private double distanceTol;
 
@@ -103,11 +103,11 @@ public class BufferInputLineSimplifier {
 
   private final int deleteCount = 0;
 
-  public BufferInputLineSimplifier(final CoordinatesList inputLine) {
+  public BufferInputLineSimplifier(final PointList inputLine) {
     this.inputLine = inputLine;
   }
 
-  private CoordinatesList collapseLine() {
+  private PointList collapseLine() {
     final int axisCount = inputLine.getAxisCount();
     final int vertexCount = inputLine.size();
     final double[] coordinates = new double[(vertexCount - deleteCount)
@@ -244,7 +244,7 @@ public class BufferInputLineSimplifier {
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public CoordinatesList simplify(final double distanceTol) {
+  public PointList simplify(final double distanceTol) {
     this.distanceTol = Math.abs(distanceTol);
     if (distanceTol < 0) {
       angleOrientation = CGAlgorithms.CLOCKWISE;

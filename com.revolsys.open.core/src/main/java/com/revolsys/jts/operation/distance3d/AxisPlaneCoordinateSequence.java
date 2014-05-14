@@ -34,12 +34,12 @@
 package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
-import com.revolsys.jts.geom.Coordinate;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
- * A CoordinatesList wrapper which 
+ * A PointList wrapper which 
  * projects 3D coordinates into one of the
  * three Cartesian axis planes,
  * using the standard orthonormal projection
@@ -69,7 +69,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
-  public static CoordinatesList projectToXY(final CoordinatesList seq) {
+  public static PointList projectToXY(final PointList seq) {
     /**
      * This is just a no-op, but return a wrapper
      * to allow better testing
@@ -83,7 +83,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
-  public static CoordinatesList projectToXZ(final CoordinatesList seq) {
+  public static PointList projectToXZ(final PointList seq) {
     return new AxisPlaneCoordinateSequence(seq, XZ_INDEX);
   }
 
@@ -93,15 +93,15 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
-  public static CoordinatesList projectToYZ(final CoordinatesList seq) {
+  public static PointList projectToYZ(final PointList seq) {
     return new AxisPlaneCoordinateSequence(seq, YZ_INDEX);
   }
 
-  private final CoordinatesList seq;
+  private final PointList seq;
 
   private final int[] indexMap;
 
-  private AxisPlaneCoordinateSequence(final CoordinatesList seq,
+  private AxisPlaneCoordinateSequence(final PointList seq,
     final int[] indexMap) {
     this.seq = seq;
     this.indexMap = indexMap;
@@ -113,18 +113,13 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
+  public Point get(final int i) {
+    return new PointDouble(getX(i), getY(i), getZ(i));
+  }
+
+  @Override
   public int getAxisCount() {
     return 2;
-  }
-
-  @Override
-  public Point getCoordinate(final int i) {
-    return getCoordinateCopy(i);
-  }
-
-  @Override
-  public Point getCoordinateCopy(final int i) {
-    return new Coordinate(getX(i), getY(i), getZ(i));
   }
 
   @Override

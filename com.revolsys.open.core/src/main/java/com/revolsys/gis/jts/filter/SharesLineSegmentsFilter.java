@@ -27,17 +27,17 @@ import java.util.List;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.jts.LineSegmentImpl;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public class SharesLineSegmentsFilter implements Filter<LineString> {
   private final List<LineSegment> segments = new ArrayList<LineSegment>();
 
   public SharesLineSegmentsFilter(final LineString line) {
 
-    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final PointList points = CoordinatesListUtil.get(line);
     final Iterator<Point> pointIterator = points.iterator();
     Point previousPoint = pointIterator.next();
     while (pointIterator.hasNext()) {
@@ -50,7 +50,7 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
   @Override
   public boolean accept(final LineString line) {
 
-    final CoordinatesList points = CoordinatesListUtil.get(line);
+    final PointList points = CoordinatesListUtil.get(line);
     final Iterator<Point> pointIterator = points.iterator();
     Point previousPoint = pointIterator.next();
     while (pointIterator.hasNext()) {

@@ -6,11 +6,11 @@ import java.util.List;
 
 import com.revolsys.jts.awt.FontGlyphReader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.AffineTransformation;
 import com.revolsys.jts.geom.util.AffineTransformationFactory;
 import com.revolsys.jts.util.GeometricShapeFactory;
@@ -53,12 +53,12 @@ public class CreateShapeFunctions {
 
     if (g != null) {
       // transform to baseline
-      final Point baseText0 = new Coordinate(envText.getMinX(),
+      final Point baseText0 = new PointDouble(envText.getMinX(),
         envText.getMinY());
-      final Point baseText1 = new Coordinate(envText.getMaxX(),
+      final Point baseText1 = new PointDouble(envText.getMaxX(),
         envText.getMinY());
-      final Point baseGeom0 = new Coordinate(env.getMinX(), env.getMinY());
-      final Point baseGeom1 = new Coordinate(env.getMaxX(), env.getMinY());
+      final Point baseGeom0 = new PointDouble(env.getMinX(), env.getMinY());
+      final Point baseGeom1 = new PointDouble(env.getMaxX(), env.getMinY());
       final AffineTransformation trans = AffineTransformationFactory.createFromBaseLines(
         baseText0, baseText1, baseGeom0, baseGeom1);
       return trans.transform(textGeom);

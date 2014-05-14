@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
 import com.revolsys.util.MathUtil;
 
 public class DoubleCoordinatesList extends AbstractCoordinatesList {
@@ -22,7 +22,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     this(3, coordinates);
   }
 
-  public DoubleCoordinatesList(final CoordinatesList coordinatesList) {
+  public DoubleCoordinatesList(final PointList coordinatesList) {
     this(coordinatesList.getAxisCount(), coordinatesList);
   }
 
@@ -44,7 +44,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     this(axisCount, Arrays.asList(points));
   }
 
-  public DoubleCoordinatesList(final int axisCount, final CoordinatesList points) {
+  public DoubleCoordinatesList(final int axisCount, final PointList points) {
     this(points.size(), axisCount);
     int i = 0;
     for (final Point point : points) {

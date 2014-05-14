@@ -35,13 +35,12 @@ package com.revolsys.jts.operation.buffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.DoubleCoordinates;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.Coordinate;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * A dynamic list of the vertices in a constructed offset curve.
@@ -73,13 +72,13 @@ class OffsetSegmentString {
       coordinates[0] = precisionModel.makePrecise(0, coordinates[0]);
       coordinates[1] = precisionModel.makePrecise(1, coordinates[1]);
     }
-    final Point bufPt = new DoubleCoordinates(coordinates);
+    final Point bufPt = new PointDouble(coordinates);
     if (!isRedundant(bufPt)) {
       points.add(bufPt);
     }
   }
 
-  public void addPts(final CoordinatesList points, final boolean isForward) {
+  public void addPts(final PointList points, final boolean isForward) {
     if (isForward) {
       for (int i = 0; i < points.size(); i++) {
         addPt(points.get(i));
@@ -95,7 +94,7 @@ class OffsetSegmentString {
     if (points.size() < 1) {
       return;
     }
-    final Point startPt = new Coordinate(points.get(0));
+    final Point startPt = new PointDouble(points.get(0));
     final Point lastPt = points.get(points.size() - 1);
     Point last2Pt = null;
     if (points.size() >= 2) {
@@ -107,7 +106,7 @@ class OffsetSegmentString {
     points.add(startPt);
   }
 
-  public CoordinatesList getPoints() {
+  public PointList getPoints() {
     return new DoubleCoordinatesList(2, points);
   }
 
@@ -147,7 +146,7 @@ class OffsetSegmentString {
   @Override
   public String toString() {
     final GeometryFactory geometryFactory = GeometryFactory.getFactory();
-    final CoordinatesList points = getPoints();
+    final PointList points = getPoints();
     if (points.size() == 1) {
       return geometryFactory.point(points).toString();
     } else {

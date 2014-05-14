@@ -34,8 +34,8 @@
 package com.revolsys.jts.linearref;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.Assert;
 
 /**

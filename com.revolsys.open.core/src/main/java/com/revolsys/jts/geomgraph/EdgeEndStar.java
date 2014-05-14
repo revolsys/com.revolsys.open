@@ -41,8 +41,8 @@ import java.util.TreeMap;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.util.Assert;
 

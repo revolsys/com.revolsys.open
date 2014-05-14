@@ -4,12 +4,12 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.jts.locator.SortedPackedIntervalRTree;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.PointInArea;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.CoordinatesList;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.Location;
+import com.revolsys.jts.geom.Point;
 
 public class IndexedPointInAreaLocator {
 
@@ -20,7 +20,7 @@ public class IndexedPointInAreaLocator {
       init(geom);
     }
 
-    private void addLine(final CoordinatesList points) {
+    private void addLine(final PointList points) {
       final int size = points.size();
       if (size > 1) {
         for (int i = 1; i < size; i++) {
@@ -37,7 +37,7 @@ public class IndexedPointInAreaLocator {
     }
 
     private void init(final Geometry geometry) {
-      for (final CoordinatesList points : CoordinatesListUtil.getAll(geometry)) {
+      for (final PointList points : CoordinatesListUtil.getAll(geometry)) {
         addLine(points);
       }
     }

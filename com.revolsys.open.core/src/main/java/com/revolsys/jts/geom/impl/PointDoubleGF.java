@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom.impl;
 
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
@@ -46,17 +48,26 @@ import com.revolsys.jts.geom.Point;
  * 
  *@version 1.7
  */
-public class PointImpl extends AbstractPoint {
+public class PointDoubleGF extends PointDouble {
   private static final long serialVersionUID = 4902022702746614570L;
+
+  /**
+   *  The bounding box of this <code>Geometry</code>.
+   */
+  private BoundingBox boundingBox;
+
+  /**
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
+   */
+  private Object userData;
 
   /**
   * The {@link GeometryFactory} used to create this Geometry
   */
   private final GeometryFactory geometryFactory;
 
-  private double[] coordinates;
-
-  public PointImpl(final GeometryFactory geometryFactory) {
+  public PointDoubleGF(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
@@ -64,68 +75,37 @@ public class PointImpl extends AbstractPoint {
    *@param  coordinates      contains the single coordinate on which to base this <code>Point</code>
    *      , or <code>null</code> to create the empty geometry.
    */
-  public PointImpl(final GeometryFactory geometryFactory,
+  public PointDoubleGF(final GeometryFactory geometryFactory,
     final double... coordinates) {
+    super(geometryFactory.getAxisCount(), coordinates);
     this.geometryFactory = geometryFactory;
-    final int axisCount = geometryFactory.getAxisCount();
-    this.coordinates = new double[axisCount];
-    for (int i = 0; i < axisCount; i++) {
-      double coordinate;
-      if (i < coordinates.length) {
-        coordinate = coordinates[i];
-        if (i < 2) {
-          coordinate = geometryFactory.makeXyPrecise(coordinate);
-        } else if (i == 2) {
-          coordinate = geometryFactory.makeZPrecise(coordinate);
-        }
-      } else {
-        coordinate = Double.NaN;
-      }
-      this.coordinates[i] = coordinate;
-    }
-  }
-
-  /**
-   * Creates and returns a full copy of this {@link Point} object.
-   * (including all coordinates contained by it).
-   *
-   * @return a clone of this instance
-   */
-  @Override
-  public PointImpl clone() {
-    final PointImpl point = (PointImpl)super.clone();
-    if (coordinates != null) {
-      point.coordinates = coordinates.clone();
-    }
-    return point;
   }
 
   @Override
-  public double getCoordinate(final int axisIndex) {
-    if (isEmpty()) {
-      return Double.NaN;
-    } else {
-      final int axisCount = getAxisCount();
-      if (axisIndex >= 0 && axisIndex < axisCount) {
-        return coordinates[axisIndex];
+  public BoundingBox getBoundingBox() {
+    if (boundingBox == null) {
+      if (isEmpty()) {
+        boundingBox = new Envelope(getGeometryFactory());
       } else {
-        return Double.NaN;
+        boundingBox = computeBoundingBox();
       }
     }
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    if (coordinates == null) {
-      return coordinates;
-    } else {
-      return this.coordinates.clone();
-    }
+    return boundingBox;
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
+  }
+
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+  @Override
+  public Object getUserData() {
+    return userData;
   }
 
   @Override
@@ -134,13 +114,28 @@ public class PointImpl extends AbstractPoint {
     if (deltas == null || isEmpty()) {
       return this;
     } else {
-      final double[] coordinates = this.coordinates.clone();
+      final double[] coordinates = getCoordinates();
       final int axisCount = Math.min(deltas.length, getAxisCount());
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         coordinates[axisIndex] += deltas[axisIndex];
       }
       return geometryFactory.point(coordinates);
     }
+  }
+
+  /**
+   * A simple scheme for applications to add their own custom data to a Geometry.
+   * An example use might be to add an object representing a Point Reference System.
+   * <p>
+   * Note that user data objects are not present in geometries created by
+   * construction methods.
+   *
+   * @param userData an object, the semantics for which are defined by the
+   * application using this Geometry
+   */
+  @Override
+  public void setUserData(final Object userData) {
+    this.userData = userData;
   }
 
 }

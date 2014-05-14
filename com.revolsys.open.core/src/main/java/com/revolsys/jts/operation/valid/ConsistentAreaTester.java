@@ -38,8 +38,8 @@ import java.util.Iterator;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geomgraph.GeometryGraph;
 import com.revolsys.jts.geomgraph.index.SegmentIntersector;
