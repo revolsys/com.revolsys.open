@@ -3,6 +3,7 @@ package com.revolsys.jts.geom.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.util.MathUtil;
 
@@ -11,8 +12,28 @@ public class PointDouble extends AbstractPoint implements Serializable {
 
   private double[] coordinates;
 
+  protected PointDouble() {
+  }
+
   public PointDouble(final double... coordinates) {
     this(coordinates.length, coordinates);
+  }
+
+  protected PointDouble(final GeometryFactory geometryFactory,
+    final double... coordinates) {
+    if (coordinates != null && coordinates.length > 0) {
+      final int axisCount = geometryFactory.getAxisCount();
+      this.coordinates = new double[axisCount];
+      for (int i = 0; i < axisCount; i++) {
+        double value;
+        if (i < coordinates.length) {
+          value = geometryFactory.makePrecise(i, coordinates[i]);
+        } else {
+          value = Double.NaN;
+        }
+        this.coordinates[i] = value;
+      }
+    }
   }
 
   public PointDouble(final int axisCount) {
@@ -21,8 +42,15 @@ public class PointDouble extends AbstractPoint implements Serializable {
 
   public PointDouble(final int axisCount, final double... coordinates) {
     this.coordinates = new double[axisCount];
-    System.arraycopy(coordinates, 0, this.coordinates, 0,
-      Math.min(axisCount, coordinates.length));
+    for (int i = 0; i < axisCount; i++) {
+      double value;
+      if (i < coordinates.length) {
+        value = coordinates[i];
+      } else {
+        value = Double.NaN;
+      }
+      this.coordinates[i] = value;
+    }
   }
 
   public PointDouble(final List<Number> coordinates) {
@@ -63,7 +91,11 @@ public class PointDouble extends AbstractPoint implements Serializable {
 
   @Override
   public int getAxisCount() {
-    return (byte)coordinates.length;
+    if (coordinates == null) {
+      return 0;
+    } else {
+      return (byte)coordinates.length;
+    }
   }
 
   @Override
@@ -87,6 +119,11 @@ public class PointDouble extends AbstractPoint implements Serializable {
     } else {
       return this.coordinates.clone();
     }
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return coordinates == null;
   }
 
   @Override

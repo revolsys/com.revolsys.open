@@ -335,7 +335,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @Override
   public Point getPoint() {
-    return this;
+    if (isEmpty()) {
+      return null;
+    } else {
+      return this;
+    }
   }
 
   @Override

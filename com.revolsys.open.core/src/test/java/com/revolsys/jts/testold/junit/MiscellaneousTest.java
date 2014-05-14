@@ -99,12 +99,8 @@ public class MiscellaneousTest extends TestCase {
 
   public void testCoordinateNaN() {
     final Point c1 = new PointDouble();
-    assertTrue(!Double.isNaN(c1.getX()));
-    assertTrue(!Double.isNaN(c1.getY()));
-    assertTrue(Double.isNaN(c1.getZ()));
 
-    final Point c2 = new PointDouble((double)3, 4,
-      Point.NULL_ORDINATE);
+    final Point c2 = new PointDouble((double)3, 4, Point.NULL_ORDINATE);
     assertEquals(3, c2.getX(), 1E-10);
     assertEquals(4, c2.getY(), 1E-10);
     assertTrue(Double.isNaN(c2.getZ()));
@@ -112,14 +108,12 @@ public class MiscellaneousTest extends TestCase {
     assertEquals(c1, c1);
     assertEquals(c2, c2);
     assertTrue(!c1.equals(c2));
-    assertEquals(new PointDouble(), new PointDouble((double)0, 0,
-      Point.NULL_ORDINATE));
     assertEquals(new PointDouble((double)3, 5, Point.NULL_ORDINATE),
       new PointDouble((double)3, 5, Point.NULL_ORDINATE));
     assertEquals(new PointDouble((double)3, 5, Double.NaN), new PointDouble(
       (double)3, 5, Double.NaN));
-    assertTrue(new PointDouble((double)3, 5, 0).equals(new PointDouble((double)3,
-      5, Double.NaN)));
+    assertTrue(new PointDouble((double)3, 5, 0).equals(new PointDouble(
+      (double)3, 5, Double.NaN)));
   }
 
   public void testCreateEmptyGeometry() throws Exception {
@@ -147,9 +141,7 @@ public class MiscellaneousTest extends TestCase {
     // }).isSimple());
     // assertTrue(geometryFactory.multiPoint(new Point[] { }).isSimple());
 
-    assertTrue(this.geometryFactory.point((Point)null)
-      .getBoundary()
-      .isEmpty());
+    assertTrue(this.geometryFactory.point((Point)null).getBoundary().isEmpty());
     assertTrue(this.geometryFactory.linearRing(new Point[] {})
       .getBoundary()
       .isEmpty());

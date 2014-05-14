@@ -77,8 +77,13 @@ public class PointDoubleGF extends PointDouble {
    */
   public PointDoubleGF(final GeometryFactory geometryFactory,
     final double... coordinates) {
-    super(geometryFactory.getAxisCount(), coordinates);
+    super(geometryFactory, coordinates);
     this.geometryFactory = geometryFactory;
+  }
+
+  @Override
+  public int getAxisCount() {
+    return geometryFactory.getAxisCount();
   }
 
   @Override
