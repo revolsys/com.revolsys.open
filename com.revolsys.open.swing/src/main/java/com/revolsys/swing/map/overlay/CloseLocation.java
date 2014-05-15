@@ -2,21 +2,21 @@ package com.revolsys.swing.map.overlay;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.jts.IndexedLineSegment;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.CollectionUtil;
 
-public class CloseLocation {
+public class CloseLocation implements Comparable<CloseLocation> {
 
   private final LayerDataObject object;
 
   private final int[] vertexIndex;
 
-  private final IndexedLineSegment segment;
+  private final Segment segment;
 
   private final AbstractDataObjectLayer layer;
 
@@ -26,13 +26,18 @@ public class CloseLocation {
 
   public CloseLocation(final AbstractDataObjectLayer layer,
     final LayerDataObject object, final Geometry geometry,
-    final int[] vertexIndex, final IndexedLineSegment segment, final Point point) {
+    final int[] vertexIndex, final Segment segment, final Point point) {
     this.object = object;
     this.layer = layer;
     this.geometry = geometry;
     this.vertexIndex = vertexIndex;
     this.segment = segment;
     this.point = point;
+  }
+
+  @Override
+  public int compareTo(final CloseLocation location) {
+    return 0;
   }
 
   @SuppressWarnings("unchecked")
@@ -63,7 +68,7 @@ public class CloseLocation {
     int[] index = this.vertexIndex;
     if (index != null) {
     } else {
-      index = this.segment.getIndex();
+      index = this.segment.getSegmentId();
     }
     return CollectionUtil.toString(CollectionUtil.arrayToList(index));
   }
@@ -84,12 +89,12 @@ public class CloseLocation {
     return this.point;
   }
 
-  public IndexedLineSegment getSegment() {
+  public Segment getSegment() {
     return this.segment;
   }
 
-  public int[] getSegmentIndex() {
-    return this.segment.getIndex();
+  public int[] getSegmentId() {
+    return this.segment.getSegmentId();
   }
 
   public String getType() {
@@ -133,7 +138,7 @@ public class CloseLocation {
       string.append(", index=");
     } else {
       string.append(", index=");
-      index = this.segment.getIndex();
+      index = getSegmentId();
     }
     final String indexString = CollectionUtil.toString(CollectionUtil.arrayToList(index));
     string.append(indexString);

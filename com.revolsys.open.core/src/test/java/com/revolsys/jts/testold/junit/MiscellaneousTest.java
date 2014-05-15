@@ -63,7 +63,7 @@ public class MiscellaneousTest extends TestCase {
     TestRunner.run(MiscellaneousTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
     1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
@@ -328,14 +328,14 @@ public class MiscellaneousTest extends TestCase {
     final Geometry g = this.reader.read("MULTILINESTRING("
       + "(0 0,  100 0, 50 50)," + "(50 50, 50 -50))");
     final Geometry m = this.reader.read("MULTIPOINT(0 0, 50 -50)");
-    assertTrue(m.equalsExact2d(g.getBoundary()));
+    assertTrue(m.equals(2,g.getBoundary()));
   }
 
   public void testMultiLineStringGetBoundary2() throws Exception {
     final Geometry g = this.reader.read("MULTILINESTRING("
       + "(0 0,  100 0, 50 50)," + "(50 50, 50 0))");
     final Geometry m = this.reader.read("MULTIPOINT(0 0, 50 0)");
-    assertTrue(m.equalsExact2d(g.getBoundary()));
+    assertTrue(m.equals(2,g.getBoundary()));
   }
 
   /**
@@ -368,7 +368,7 @@ public class MiscellaneousTest extends TestCase {
       + "(0 0, 40 0, 40 40, 0 40, 0 0),"
       + "(10 10, 30 10, 30 30, 10 30, 10 10),"
       + "(200 200, 210 200, 210 210, 200 200))");
-    assertTrue(b.equalsExact2d(g.getBoundary()));
+    assertTrue(b.equals(2,g.getBoundary()));
   }
 
   public void testMultiPolygonIsSimple1() throws Exception {
@@ -400,7 +400,7 @@ public class MiscellaneousTest extends TestCase {
     final Geometry b = this.reader.read("MULTILINESTRING("
       + "(0 0, 40 0, 40 40, 0 40, 0 0),"
       + "(10 10, 30 10, 30 30, 10 30, 10 10))");
-    assertTrue(b.equalsExact2d(g.getBoundary()));
+    assertTrue(b.equals(2,g.getBoundary()));
   }
 
   // public void testGeometryCollectionIsSimple1() throws Exception {
@@ -469,8 +469,8 @@ public class MiscellaneousTest extends TestCase {
   // }
 
   public void testPredicatesReturnFalseForEmptyGeometries() {
-    final Point p1 = GeometryFactory.getFactory().point((Point)null);
-    final Point p2 = GeometryFactory.getFactory().point(
+    final Point p1 = GeometryFactory.floating3().point((Point)null);
+    final Point p2 = GeometryFactory.floating3().point(
       new PointDouble((double)5, 5, Point.NULL_ORDINATE));
     assertEquals(false, p1.equals(p2));
     assertEquals(true, p1.disjoint(p2));

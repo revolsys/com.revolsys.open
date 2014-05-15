@@ -97,7 +97,7 @@ public class CoordinateList extends ArrayList<Point> {
     if (!allowRepeated) {
       if (size() >= 1) {
         final Point last = get(size() - 1);
-        if (last.equals2d(coord)) {
+        if (last.equals(2,coord)) {
           return;
         }
       }
@@ -173,13 +173,13 @@ public class CoordinateList extends ArrayList<Point> {
       if (size > 0) {
         if (i > 0) {
           final Point prev = get(i - 1);
-          if (prev.equals2d(coord)) {
+          if (prev.equals(2,coord)) {
             return;
           }
         }
         if (i < size) {
           final Point next = get(i);
-          if (next.equals2d(coord)) {
+          if (next.equals(2,coord)) {
             return;
           }
         }

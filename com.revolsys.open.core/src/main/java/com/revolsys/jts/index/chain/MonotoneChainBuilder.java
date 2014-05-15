@@ -61,7 +61,7 @@ public class MonotoneChainBuilder {
     // (since they cannot be used to establish a quadrant)
     final int size = points.size();
     while (safeStart < size - 1
-      && points.get(safeStart).equals2d(points.get(safeStart + 1))) {
+      && points.get(safeStart).equals(2,points.get(safeStart + 1))) {
       safeStart++;
     }
     // check if there are NO non-zero-length segments
@@ -74,7 +74,7 @@ public class MonotoneChainBuilder {
     int last = start + 1;
     while (last < size) {
       // skip zero-length segments, but include them in the chain
-      if (!points.get(last - 1).equals2d(points.get(last))) {
+      if (!points.get(last - 1).equals(2,points.get(last))) {
         // compute quadrant for next possible segment in chain
         final int quad = Quadrant.quadrant(points.get(last - 1),
           points.get(last));

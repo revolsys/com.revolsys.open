@@ -67,7 +67,7 @@ public class CoordinateArraysTest extends TestCase {
         new PointDouble((double)1.0, 1, Point.NULL_ORDINATE),
         new PointDouble((double)1.0, 2, Point.NULL_ORDINATE),
         new PointDouble((double)1.0, 3, Point.NULL_ORDINATE)
-      }).equals2d(new PointDouble((double)2, 2, Point.NULL_ORDINATE)));
+      }).equals(2,new PointDouble((double)2, 2, Point.NULL_ORDINATE)));
   }
 
   public void testPtNotInList2() {

@@ -36,7 +36,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
     super(name, type, -1, 0, 0, required, description, properties);
     this.spatialReference = spatialReference;
     final com.revolsys.jts.geom.GeometryFactory factory = spatialReference.getGeometryFactory();
-    this.geometryFactory = GeometryFactory.getFactory(factory.getSrid(),
+    this.geometryFactory = GeometryFactory.fixed(factory.getSrid(),
       dimension, factory.getScaleXY(), factory.getScaleZ());
     this.dimension = dimension;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);

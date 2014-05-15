@@ -78,7 +78,7 @@ public class ArcSdeStGeometryDataStoreExtension implements
             srid = geometryFactory.getSrid();
           }
           axisCount = Math.min(axisCount, 3);
-          geometryFactory = GeometryFactory.getFactory(srid, axisCount, scaleXy,
+          geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
             scaleZ);
 
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,

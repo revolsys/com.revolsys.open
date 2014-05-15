@@ -145,7 +145,7 @@ class OffsetSegmentString {
 
   @Override
   public String toString() {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+    final GeometryFactory geometryFactory = GeometryFactory.floating3();
     final PointList points = getPoints();
     if (points.size() == 1) {
       return geometryFactory.point(points).toString();

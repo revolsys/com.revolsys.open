@@ -10,7 +10,7 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance3d.Distance3DOp;
 
 public class WithinDistance3DTest extends TestCase {
-  static GeometryFactory geomFact = GeometryFactory.getFactory();
+  static GeometryFactory geomFact = GeometryFactory.floating3();
 
   static WKTReader rdr = new WKTReader();
 

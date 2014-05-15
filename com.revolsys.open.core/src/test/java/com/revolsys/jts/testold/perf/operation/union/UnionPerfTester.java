@@ -21,7 +21,7 @@ public class UnionPerfTester {
 
   static final int MAX_ITER = 1;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
@@ -39,7 +39,7 @@ public class UnionPerfTester {
 
   Stopwatch sw = new Stopwatch();
 
-  GeometryFactory factory = GeometryFactory.getFactory();
+  GeometryFactory factory = GeometryFactory.floating3();
 
   private final List polys;
 

@@ -3,21 +3,21 @@ package com.revolsys.open.gis.oracle.esri;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
 import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.PointList;
 
 public class TestPackedGeometry {
-  public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
-    3005, 3, 1, 1);
+  public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
+    3005, 1.0, 1.0);
 
   public static void checkGeometry(final Geometry geometry) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometry.getGeometryFactory();
     final Double xOffset = 0.0;
     final Double yOffset = 0.0;
     final Double xyScale = geometryFactory.getScaleXY();
@@ -28,7 +28,8 @@ public class TestPackedGeometry {
     final Double mScale = null;
     final Double mOffset = null;
 
-    final List<List<PointList>> parts = CoordinatesListUtil.getParts(geometry, false);
+    final List<List<PointList>> parts = CoordinatesListUtil.getParts(geometry,
+      false);
 
     final int numPoints = PackedCoordinateUtil.getNumPoints(parts);
 

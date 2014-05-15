@@ -8,8 +8,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStringGraphTest {
-  com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
-    3005, 2, 1000.0, 1);
+  com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixed(
+    3005, 1000.0);
 
   public void checkLines(final List<LineString> actualLines,
     final String... expectedLines) {

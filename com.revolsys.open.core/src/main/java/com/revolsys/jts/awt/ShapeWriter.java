@@ -258,7 +258,7 @@ public class ShapeWriter {
   private GeneralPath toShape(final LineString lineString) {
     final GeneralPath shape = new GeneralPath();
 
-    Point prev = lineString.getCoordinate(0);
+    Point prev = lineString.getPoint(0);
     transformPoint(prev, transPoint);
     shape.moveTo((float)transPoint.getX(), (float)transPoint.getY());
 
@@ -268,7 +268,7 @@ public class ShapeWriter {
     final int n = lineString.getVertexCount() - 1;
     // int count = 0;
     for (int i = 1; i <= n; i++) {
-      final Point currentCoord = lineString.getCoordinate(i);
+      final Point currentCoord = lineString.getPoint(i);
       if (decimationDistance > 0.0) {
         final boolean isDecimated = prev != null
           && Math.abs(currentCoord.getX() - prev.getX()) < decimationDistance

@@ -416,7 +416,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
 
   private void writeSrid(final Geometry geometry) {
     if (geometry != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometry.getGeometryFactory();
       writeSrid(geometryFactory);
     }
   }

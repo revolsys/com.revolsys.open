@@ -81,7 +81,7 @@ public class ConnectedInteriorTester {
     return null;
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+  private final GeometryFactory geometryFactory = GeometryFactory.floating3();
 
   private final GeometryGraph geomGraph;
 

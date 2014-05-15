@@ -3,7 +3,7 @@ package com.revolsys.jts.testold.perf.operation.buffer;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
@@ -62,7 +62,7 @@ public class RandomOffsetLineStringGenerator {
     final double len = p0.distance(p1);
     final double len2 = len / 2;
     final double offsetLen = len * Math.random() - len2;
-    final LineSegment seg = new LineSegmentImpl(p0, p1);
+    final LineSegment seg = new LineSegmentDouble(p0, p1);
     return seg.pointAlongOffset(segFrac, offsetLen);
   }
 

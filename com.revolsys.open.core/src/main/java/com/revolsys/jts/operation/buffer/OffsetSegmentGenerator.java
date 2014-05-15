@@ -41,7 +41,7 @@ import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geomgraph.Position;
@@ -402,7 +402,7 @@ class OffsetSegmentGenerator {
 
     // compute the mitre midline segment from the corner point to the bevel
     // segment midpoint
-    final LineSegment mitreMidLine = new LineSegmentImpl(basePt, bevelMidPt);
+    final LineSegment mitreMidLine = new LineSegmentDouble(basePt, bevelMidPt);
 
     // finally the bevel segment endpoints are computed as offsets from
     // the mitre midline
@@ -426,7 +426,7 @@ class OffsetSegmentGenerator {
    * Add an end cap around point p1, terminating a line segment coming from p0
    */
   public void addLineEndCap(final Point p0, final Point p1) {
-    final LineSegment seg = new LineSegmentImpl(p0, p1);
+    final LineSegment seg = new LineSegmentDouble(p0, p1);
 
     final LineSegment offsetL = createOffsetSegment(seg, Position.LEFT,
       distance);
@@ -610,7 +610,7 @@ class OffsetSegmentGenerator {
     final double y1 = precisionModel.makePrecise(1, p1y + ux);
     final double x2 = precisionModel.makePrecise(0, p2x - uy);
     final double y2 = precisionModel.makePrecise(1, p2Y + ux);
-    final LineSegmentImpl line = new LineSegmentImpl(2, x1, y1, x2, y2);
+    final LineSegmentDouble line = new LineSegmentDouble(2, x1, y1, x2, y2);
     return line;
   }
 
@@ -637,7 +637,7 @@ class OffsetSegmentGenerator {
     final double y1 = precisionModel.makePrecise(1, seg.getY(0) + ux);
     final double x2 = precisionModel.makePrecise(0, seg.getX(1) - uy);
     final double y2 = precisionModel.makePrecise(1, seg.getY(1) + ux);
-    return new LineSegmentImpl(2, x1, y1, x2, y2);
+    return new LineSegmentDouble(2, x1, y1, x2, y2);
   }
 
   /**

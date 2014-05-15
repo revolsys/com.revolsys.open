@@ -28,7 +28,7 @@ import javax.swing.border.AbstractBorder;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -258,7 +258,7 @@ public class MapRulerBorder extends AbstractBorder implements
         textY = this.rulerSize - 3;
         y0 = boundingBox.getMinY();
       }
-      line = new LineSegmentImpl(boundingBox.getGeometryFactory(), 2, x1, y0,
+      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x1, y0,
         x2, y0);
 
       line = line.convert(this.rulerGeometryFactory);
@@ -365,7 +365,7 @@ public class MapRulerBorder extends AbstractBorder implements
         textX = this.rulerSize - 3;
         x0 = boundingBox.getMaxX();
       }
-      line = new LineSegmentImpl(boundingBox.getGeometryFactory(), 2, x0, y1,
+      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x0, y1,
         x0, y2);
 
       line = line.convert(this.rulerGeometryFactory);

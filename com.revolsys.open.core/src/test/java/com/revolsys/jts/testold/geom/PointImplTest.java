@@ -56,13 +56,13 @@ public class PointImplTest extends TestCase {
     return new TestSuite(PointImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
     1000.0);
 
-  private final GeometryFactory albers2d = GeometryFactory.getFactory(3005,
+  private final GeometryFactory albers2d = GeometryFactory.fixed(3005,
     1000.0);
 
-  private final GeometryFactory albers3d = GeometryFactory.getFactory(3005,
+  private final GeometryFactory albers3d = GeometryFactory.fixed(3005,
     1000.0, 1.0);
 
   private final GeometryFactory worldMercator = GeometryFactory.worldMercator();
@@ -134,7 +134,7 @@ public class PointImplTest extends TestCase {
     final Point albersPoint = albers3d.geometry("SRID=3005;POINT Z(1000000 1500000 10)");
     final Point webMercatorPoint = albersPoint.convert(worldMercator);
     final Point albersPoint2 = webMercatorPoint.convert(albers3d);
-    if (!albersPoint.equalsExact2d(albersPoint2)) {
+    if (!albersPoint.equals(2,albersPoint2)) {
       failNotEquals("Not Equal Exact", albersPoint, albersPoint2);
     }
     final Point albersPoint3 = webMercatorPoint.convert(albers2d);

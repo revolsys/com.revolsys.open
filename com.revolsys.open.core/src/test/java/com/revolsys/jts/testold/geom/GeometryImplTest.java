@@ -38,13 +38,13 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
@@ -65,8 +65,8 @@ public class GeometryImplTest extends TestCase {
     return new TestSuite(GeometryImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
-    3, 1, 1);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
+    1.0, 1.0);
 
   private final WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -81,7 +81,7 @@ public class GeometryImplTest extends TestCase {
     final boolean equalsExact, final boolean equalsHash) {
     assertEquals(equalsGeometry, a.equals(b));
     assertEquals(equalsObject, a.equals((Object)b));
-    assertEquals(equalsExact, a.equalsExact2d(b));
+    assertEquals(equalsExact, a.equals(2, b));
     assertEquals(equalsHash, a.hashCode() == b.hashCode());
   }
 
@@ -97,15 +97,15 @@ public class GeometryImplTest extends TestCase {
       differentClass = this.reader.read("POINT(2351 1563)");
     }
 
-    assertTrue(x.equalsExact2d(x));
-    assertTrue(x.equalsExact2d(somethingExactlyEqual));
-    assertTrue(somethingExactlyEqual.equalsExact2d(x));
+    assertTrue(x.equals(2, x));
+    assertTrue(x.equals(2, somethingExactlyEqual));
+    assertTrue(somethingExactlyEqual.equals(2, x));
     // assertTrue(!x.equalsExact(somethingEqualButNotExactly));
     // assertTrue(!somethingEqualButNotExactly.equalsExact(x));
     // assertTrue(!x.equalsExact(somethingEqualButNotExactly));
     // assertTrue(!somethingEqualButNotExactly.equalsExact(x));
-    assertTrue(!x.equalsExact2d(differentClass));
-    assertTrue(!differentClass.equalsExact2d(x));
+    assertTrue(!x.equals(2, differentClass));
+    assertTrue(!differentClass.equals(2, x));
   }
 
   private void doTestEqualsExact(final Geometry x,

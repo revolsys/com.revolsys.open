@@ -129,7 +129,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  * <h4>Structural Equality</h4>
  *
  * Structural Equality is provided by the 
- * {@link #equalsExact2d(Geometry)} method.  
+ * {@link #equals(2,Geometry)} method.  
  * This implements a comparison based on exact, structural pointwise
  * equality. 
  * The {@link #equals(Object)} is a synonym for this method, 
@@ -588,13 +588,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   boolean equals(final Geometry geometry);
 
+  boolean equals(int axisCount, Geometry geometry);
+
   /**
    * Tests whether this geometry is structurally and numerically equal
    * to a given <code>Object</code>.
    * If the argument <code>Object</code> is not a <code>Geometry</code>, 
    * the result is <code>false</code>.
    * Otherwise, the result is computed using
-   * {@link #equalsExact2d(Geometry)}.
+   * {@link #equals(2,Geometry)}.
    * <p>
    * This method is provided to fulfill the Java contract
    * for value-based object equality. 
@@ -612,7 +614,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @param other the Object to compare
    * @return true if this geometry is exactly equal to the argument 
    * 
-   * @see #equalsExact2d(Geometry)
+   * @see #equals(2,Geometry)
    * @see #hashCode()
    * @see #norm()
    * @see #normalize()
@@ -645,50 +647,18 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @return <code>true</code> if this and the other <code>Geometry</code>
    *   have identical structure and point values, up to the distance tolerance.
    *   
-   * @see #equalsExact2d(Geometry)
+   * @see #equals(2,Geometry)
    * @see #normalize()
    * @see #norm()
    */
   boolean equalsExact(Geometry other, double tolerance);
 
   /**
-   * Returns true if the two <code>Geometry</code>s are exactly equal.
-   * Two Geometries are exactly equal iff:
-   * <ul>
-   * <li>they have the same structure
-   * <li>they have the same values for their vertices,
-   * in exactly the same order.
-   * </ul>
-   * This provides a stricter test of equality than
-   * {@link #equalsTopo(Geometry)}, which is more useful
-   * in certain situations
-   * (such as using geometries as keys in collections).
-   * <p>
-   * This method does <i>not</i>
-   * test the values of the <code>GeometryFactory</code>, the <code>SRID</code>, 
-   * or the <code>userData</code> fields.
-   * <p>
-   * To properly test equality between different geometries,
-   * it is usually necessary to {@link #normalize()} them first.
-   *
-   *@param  other  the <code>Geometry</code> with which to compare this <code>Geometry</code>
-   *@return <code>true</code> if this and the other <code>Geometry</code>
-   *      have identical structure and point values.
-   *      
-   * @see #equalsExact(Geometry, double)
-   * @see #normalize()
-   * @see #norm()
-   */
-  boolean equalsExact2d(final Geometry other);
-
-  boolean equalsExact3d(Geometry geometry);
-
-  /**
    * Tests whether two geometries are exactly equal
    * in their normalized forms.
    * This is a convenience method which creates normalized
    * versions of both geometries before computing
-   * {@link #equalsExact2d(Geometry)}.
+   * {@link #equals(2,Geometry)}.
    * <p>
    * This method is relatively expensive to compute.  
    * For maximum performance, the client 
@@ -717,12 +687,12 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * </pre>
    * </ul>
    * <b>Note</b> that this method computes <b>topologically equality</b>. 
-   * For structural equality, see {@link #equalsExact2d(Geometry)}.
+   * For structural equality, see {@link #equals(2,Geometry)}.
    *
    *@param g the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return <code>true</code> if the two <code>Geometry</code>s are topologically equal
    *
-   *@see #equalsExact2d(Geometry) 
+   *@see #equals(2,Geometry) 
    */
   boolean equalsTopo(final Geometry geometry);
 

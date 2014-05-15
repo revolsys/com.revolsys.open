@@ -70,7 +70,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @Override
   public double angle2d(final Point other) {
-    return CoordinatesUtil.angle2d(this, other);
+    final double x1 = this.getX();
+    final double y1 = this.getY();
+    final double x2 = other.getX();
+    final double y2 = other.getY();
+    return MathUtil.angle(x1, y1, x2, y2);
   }
 
   /**
@@ -164,7 +168,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @Override
   public double distance(final Point point) {
-    return CoordinatesUtil.distance(this, point);
+    final double x1 = this.getX();
+    final double y1 = this.getY();
+    final double x2 = point.getX();
+    final double y2 = point.getY();
+    return MathUtil.distance(x1, y1, x2, y2);
   }
 
   /**
@@ -182,25 +190,8 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  protected boolean doEqualsExact(final Geometry geometry) {
+  public boolean doEquals(final int axisCount, final Geometry geometry) {
     final Point point = (Point)geometry;
-    for (int i = 0; i < getAxisCount(); i++) {
-      final double value = getCoordinate(i);
-      final double otherValue = point.getCoordinate(i);
-      if (!NumberEquals.equal(value, otherValue)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean equals(final double... coordinates) {
-    return CoordinatesUtil.equals(this, coordinates);
-  }
-
-  @Override
-  public boolean equals(final int axisCount, final Point point) {
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       final double value = getCoordinate(axisIndex);
       final double value2 = point.getCoordinate(axisIndex);
@@ -212,26 +203,38 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
+  public boolean equals(final double... coordinates) {
+    for (int i = 0; i < coordinates.length; i++) {
+      final double coordinate2 = coordinates[i];
+      final double coordinate = getCoordinate(i);
+      if (!NumberEquals.equal(coordinate, coordinate2)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public boolean equals(final Object other) {
     if (other instanceof Point) {
       final Point point = (Point)other;
-      return equalsExact2d(point);
-    } else if (other instanceof Point) {
-      final Point coordinates = (Point)other;
-      return equals2d(coordinates);
+      return equals(point);
     } else {
-      return super.equals(other);
+      return false;
     }
   }
 
   @Override
   public boolean equals(final Point point) {
-    return equals2d(point);
-  }
-
-  @Override
-  public boolean equals2d(final Point point) {
-    return CoordinatesUtil.equals2d(this, point);
+    if (point == null) {
+      return false;
+    } else if (isEmpty()) {
+      return point.isEmpty();
+    } else if (point.isEmpty()) {
+      return false;
+    } else {
+      return equals(2, point);
+    }
   }
 
   /**
@@ -254,11 +257,6 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  public boolean equals3d(final Point point) {
-    return CoordinatesUtil.equals3d(this, point);
-  }
-
-  @Override
   public boolean equalsExact(final Geometry other, final double tolerance) {
     if (other instanceof Point) {
       final Point point = (Point)other;
@@ -272,15 +270,6 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     } else {
       return false;
     }
-  }
-
-  @Override
-  public boolean equalsExact3d(final Geometry geometry) {
-    if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      return equals3d(point);
-    }
-    return false;
   }
 
   /**
@@ -303,7 +292,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @Override
   public double[] getCoordinates() {
-    return CoordinatesUtil.getCoordinates(this);
+    final double[] coordinates = new double[this.getAxisCount()];
+    for (int i = 0; i < coordinates.length; i++) {
+      coordinates[i] = this.getCoordinate(i);
+    }
+    return coordinates;
   }
 
   @Override
@@ -325,7 +318,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.getFactory();
+    return GeometryFactory.floating3();
   }
 
   @Override
@@ -396,7 +389,14 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   @Override
   public int hashCode() {
-    return CoordinatesUtil.hashCode(this);
+    final int prime = 31;
+    int result = 1;
+    long temp;
+    temp = Double.doubleToLongBits(getX());
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(getY());
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    return result;
   }
 
   @Override

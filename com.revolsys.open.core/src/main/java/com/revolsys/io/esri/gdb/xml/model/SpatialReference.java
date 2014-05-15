@@ -112,10 +112,10 @@ public class SpatialReference {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
         if (xYScale == FLOATING_SCALE) {
-          geometryFactory = GeometryFactory.getFactory(
-            coordinateSystem.getId(), 0, zScale);
+          geometryFactory = GeometryFactory.fixed(
+            coordinateSystem.getId(), 0.0, zScale);
         } else {
-          geometryFactory = GeometryFactory.getFactory(
+          geometryFactory = GeometryFactory.fixed(
             coordinateSystem.getId(), xYScale, zScale);
         }
       }

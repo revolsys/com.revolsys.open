@@ -60,8 +60,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Point[] pt = new Point[] {
-      l1.getCoordinate(0), l1.getCoordinate(1), l2.getCoordinate(0),
-      l2.getCoordinate(1)
+      l1.getPoint(0), l1.getPoint(1), l2.getPoint(0),
+      l2.getPoint(1)
     };
     checkInputNotAltered(pt, scaleFactor);
   }
@@ -123,8 +123,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Point[] pt = new Point[] {
-      l1.getCoordinate(0), l1.getCoordinate(1), l2.getCoordinate(0),
-      l2.getCoordinate(1)
+      l1.getPoint(0), l1.getPoint(1), l2.getPoint(0),
+      l2.getPoint(1)
     };
     checkIntersection(pt, expectedIntersectionNum, intPt, distanceTolerance);
   }
@@ -135,8 +135,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Point[] pt = new Point[] {
-      l1.getCoordinate(0), l1.getCoordinate(1), l2.getCoordinate(0),
-      l2.getCoordinate(1)
+      l1.getPoint(0), l1.getPoint(1), l2.getPoint(0),
+      l2.getPoint(1)
     };
     final Geometry g = this.reader.read(expectedWKT);
     final Point[] intPt = CoordinatesListUtil.getCoordinateArray(g);
@@ -148,8 +148,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Point[] pt = new Point[] {
-      l1.getCoordinate(0), l1.getCoordinate(1), l2.getCoordinate(0),
-      l2.getCoordinate(1)
+      l1.getPoint(0), l1.getPoint(1), l2.getPoint(0),
+      l2.getPoint(1)
     };
     checkIntersection(pt, 0, null, 0);
   }

@@ -15,7 +15,7 @@ public class WKBWriterTest extends TestCase {
   }
 
   public void testSRID() throws Exception {
-    final GeometryFactory gf = GeometryFactory.getFactory();
+    final GeometryFactory gf = GeometryFactory.floating3();
     final Point p1 = gf.point(new PointDouble((double)1, 2, Point.NULL_ORDINATE));
     // p1.setSRID(1234);
 
@@ -31,7 +31,7 @@ public class WKBWriterTest extends TestCase {
     WKBReader r = new WKBReader(gf);
     Point p2 = (Point)r.read(wkb);
 
-    assertTrue(p1.equalsExact2d(p2));
+    assertTrue(p1.equals(2,p2));
     assertEquals(0, p2.getSrid());
 
     // not write out with srid set
@@ -51,7 +51,7 @@ public class WKBWriterTest extends TestCase {
     p2 = (Point)r.read(wkb);
 
     // read the geometry back in
-    assertTrue(p1.equalsExact2d(p2));
+    assertTrue(p1.equals(2,p2));
     assertEquals(1234, p2.getSrid());
   }
 }

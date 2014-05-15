@@ -49,7 +49,7 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class TriangleTest extends TestCase {
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
     2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);

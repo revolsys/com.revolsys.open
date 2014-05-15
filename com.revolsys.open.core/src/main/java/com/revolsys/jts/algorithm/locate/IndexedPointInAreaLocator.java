@@ -37,7 +37,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
@@ -72,7 +72,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
         final double y2 = segment.getY(1);
         final double min = Math.min(y1, y2);
         final double max = Math.max(y1, y2);
-        index.insert(min, max, new LineSegmentImpl(segment));
+        index.insert(min, max, new LineSegmentDouble(segment));
       }
     }
 
@@ -105,7 +105,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     @Override
     public void visitItem(final Object item) {
       final LineSegment seg = (LineSegment)item;
-      counter.countSegment(seg.getCoordinate(0), seg.getCoordinate(1));
+      counter.countSegment(seg.getPoint(0), seg.getPoint(1));
     }
   }
 

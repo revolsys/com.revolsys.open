@@ -22,7 +22,7 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
   }
 
   public LineStringCoordinatesListIterator(final LineString line) {
-    this(GeometryFactory.getFactory(line), CoordinatesListUtil.get(line));
+    this(line.getGeometryFactory(), CoordinatesListUtil.get(line));
   }
 
   @Override

@@ -184,7 +184,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.getFactory(this);
+    return GeometryFactory.floating3(this);
   }
 
   @Override

@@ -89,7 +89,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     }
     final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
       Point point = null;
 
@@ -190,7 +190,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
                   }
                 } else if (part instanceof Point) {
                   if (maxArea == 0 && maxLength == 0) {
-                    point = CoordinatesUtil.get(part);
+                    point = part.getPoint();
                   }
                 }
               }

@@ -22,7 +22,7 @@ public class GeometryEqualsExact3d implements Equals<Geometry> {
     } else if (geometry2 == null) {
       return false;
     } else {
-      return geometry1.equalsExact3d(geometry2);
+      return geometry1.equals(3, geometry2);
     }
   }
 

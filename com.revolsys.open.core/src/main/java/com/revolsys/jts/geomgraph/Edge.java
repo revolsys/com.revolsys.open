@@ -104,7 +104,7 @@ public class Edge extends GraphComponent {
       final Point nextPt = getCoordinate(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (intPt.equals2d(nextPt)) {
+      if (intPt.equals(2,nextPt)) {
         normalizedSegmentIndex = nextSegIndex;
         dist = 0.0;
       }
@@ -157,10 +157,10 @@ public class Edge extends GraphComponent {
     boolean isEqualReverse = true;
     int iRev = getNumPoints();
     for (int i = 0; i < getNumPoints(); i++) {
-      if (!getCoordinate(i).equals2d(e.getCoordinate(i))) {
+      if (!getCoordinate(i).equals(2,e.getCoordinate(i))) {
         isEqualForward = false;
       }
-      if (!getCoordinate(i).equals2d(e.getCoordinate(--iRev))) {
+      if (!getCoordinate(i).equals(2,e.getCoordinate(--iRev))) {
         isEqualReverse = false;
       }
       if (!isEqualForward && !isEqualReverse) {
@@ -266,7 +266,7 @@ public class Edge extends GraphComponent {
     }
 
     for (int i = 0; i < getNumPoints(); i++) {
-      if (!getCoordinate(i).equals2d(e.getCoordinate(i))) {
+      if (!getCoordinate(i).equals(2,e.getCoordinate(i))) {
         return false;
       }
     }

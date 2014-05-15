@@ -43,7 +43,7 @@ public class MaximalNearestSubline {
     }
 
     for (int i = includedStartIndex; i <= includedEndIndex; i++) {
-      newCoordinates.add(line.getCoordinate(i), false);
+      newCoordinates.add(line.getPoint(i), false);
     }
     if (!end.isVertex()) {
       newCoordinates.add(end.getCoordinate(), false);

@@ -58,7 +58,7 @@ public class PreparedPolygonIntersectsPerfTest {
 
   static final int NUM_LINE_PTS = 100;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);

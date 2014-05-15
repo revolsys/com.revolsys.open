@@ -43,7 +43,7 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
     this.geometry = geometry;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;
-    this.geometryFactory = GeometryFactory.getFactory(geometry);
+    this.geometryFactory = geometry.getGeometryFactory();
   }
 
   @Override

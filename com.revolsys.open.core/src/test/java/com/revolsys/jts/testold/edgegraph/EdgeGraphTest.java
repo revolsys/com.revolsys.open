@@ -45,7 +45,7 @@ public class EdgeGraphTest extends TestCase {
     HalfEdge onext = e;
     int i = 0;
     do {
-      assertTrue(onext.dest().equals2d(dest[i++]));
+      assertTrue(onext.dest().equals(2,dest[i++]));
       onext = onext.oNext();
     } while (onext != e);
 

@@ -33,11 +33,11 @@
 package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.jts.algorithm.CGAlgorithms3D;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.Segment;
@@ -130,8 +130,8 @@ public class Distance3DOp {
    *            proportional distance from computed point to end point
    * @return the computed point
    */
-  private static Point segmentPoint(final Point p0,
-    final Point p1, final double d0, final double d1) {
+  private static Point segmentPoint(final Point p0, final Point p1,
+    final double d0, final double d1) {
     if (d0 <= 0) {
       return new PointDouble(p0);
     }
@@ -255,10 +255,10 @@ public class Distance3DOp {
     for (final Segment segment1 : line0.segments()) {
       int j = 0;
       for (final Segment segment2 : line1.segments()) {
-        final Point line1point1 = segment1.get(0);
-        final Point line1Point2 = segment1.get(1);
-        final Point line2Point1 = segment2.get(0);
-        final Point line2Point2 = segment2.get(1);
+        final Point line1point1 = segment1.getPoint(0);
+        final Point line1Point2 = segment1.getPoint(1);
+        final Point line2Point1 = segment2.getPoint(0);
+        final Point line2Point2 = segment2.getPoint(1);
         final double distance = CGAlgorithms3D.distanceSegmentSegment(
           line1point1, line1Point2, line2Point1, line2Point2);
         if (distance < minDistance) {
@@ -286,7 +286,7 @@ public class Distance3DOp {
     int i = 0;
     for (final Segment segment : line.segments()) {
       final double dist = CGAlgorithms3D.distancePointSegment(coord,
-        segment.get(0), segment.get(1));
+        segment.getPoint(0), segment.getPoint(1));
       if (dist < minDistance) {
         final Point segClosestPoint = segment.closestPoint(coord);
         updateDistance(dist,
@@ -374,8 +374,7 @@ public class Distance3DOp {
     final double dist = CGAlgorithms3D.distance(point0.getPoint(),
       point1.getPoint());
     if (dist < minDistance) {
-      updateDistance(dist,
-        new GeometryLocation(point0, 0, point0.getPoint()),
+      updateDistance(dist, new GeometryLocation(point0, 0, point0.getPoint()),
         new GeometryLocation(point1, 0, point1.getPoint()), flip);
     }
   }
@@ -504,8 +503,7 @@ public class Distance3DOp {
     return minDistance;
   }
 
-  private Point intersection(final PlanarPolygon3D poly,
-    final LineString line) {
+  private Point intersection(final PlanarPolygon3D poly, final LineString line) {
     final PointList seq = line.getCoordinatesList();
     if (seq.size() == 0) {
       return null;

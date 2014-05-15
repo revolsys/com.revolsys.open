@@ -852,13 +852,13 @@ public class QuadEdgeSubdivision {
 
     // normalize so that p0 is origin of base edge
     QuadEdge base = e;
-    if (e.dest().getCoordinate().equals2d(p0)) {
+    if (e.dest().getCoordinate().equals(2,p0)) {
       base = e.sym();
     }
     // check all edges around origin of base edge
     QuadEdge locEdge = base;
     do {
-      if (locEdge.dest().getCoordinate().equals2d(p1)) {
+      if (locEdge.dest().getCoordinate().equals(2,p1)) {
         return locEdge;
       }
       locEdge = locEdge.oNext();

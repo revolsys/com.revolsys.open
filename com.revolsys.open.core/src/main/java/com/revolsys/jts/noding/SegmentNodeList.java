@@ -146,7 +146,7 @@ public class SegmentNodeList {
     final SegmentNode ei = (SegmentNode)nodeMap.get(eiNew);
     if (ei != null) {
       // debugging sanity check
-      Assert.isTrue(ei.coord.equals2d(intPt),
+      Assert.isTrue(ei.coord.equals(2,intPt),
         "Found equal nodes with different coordinates");
       // if (! ei.coord.equals2D(intPt))
       // Debug.println("Found equal nodes with different coordinates");
@@ -232,7 +232,7 @@ public class SegmentNodeList {
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
     final boolean useIntPt1 = ei1.isInterior()
-      || !ei1.coord.equals2d(lastSegStartPt);
+      || !ei1.coord.equals(2,lastSegStartPt);
     if (!useIntPt1) {
       npts--;
     }
@@ -259,7 +259,7 @@ public class SegmentNodeList {
   private boolean findCollapseIndex(final SegmentNode ei0,
     final SegmentNode ei1, final int[] collapsedVertexIndex) {
     // only looking for equal nodes
-    if (!ei0.coord.equals2d(ei1.coord)) {
+    if (!ei0.coord.equals(2,ei1.coord)) {
       return false;
     }
 
@@ -287,7 +287,7 @@ public class SegmentNodeList {
       final Point p0 = edge.getCoordinate(i);
       final Point p1 = edge.getCoordinate(i + 1);
       final Point p2 = edge.getCoordinate(i + 2);
-      if (p0.equals2d(p2)) {
+      if (p0.equals(2,p2)) {
         // add base of collapse as node
         collapsedVertexIndexes.add(new Integer(i + 1));
       }

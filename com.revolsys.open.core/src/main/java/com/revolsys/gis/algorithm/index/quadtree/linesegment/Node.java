@@ -23,7 +23,7 @@ public class Node extends NodeBase {
     return level;
   }
 
-  public static Node createExpanded(final Node node, final Envelope addEnv) {
+  public static Node createExpanded(final Node node, final BoundingBox addEnv) {
     BoundingBox expandEnv = addEnv;
     if (node != null) {
       expandEnv = expandEnv.expandToInclude(node.env);

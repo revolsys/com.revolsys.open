@@ -95,7 +95,7 @@ public class DataObjectReaderHttpMessageConverter extends
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
-          factory = GeometryFactory.getFactory(Integer.parseInt(srid));
+          factory = GeometryFactory.floating3(Integer.parseInt(srid));
         }
         reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
         return (DataObjectReader)reader;
@@ -187,7 +187,7 @@ public class DataObjectReaderHttpMessageConverter extends
             DataObject dataObject = iterator.next();
             final Geometry geometry = dataObject.getGeometryValue();
             if (geometry != null) {
-              final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+              final GeometryFactory geometryFactory = geometry.getGeometryFactory();
               writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
             }
 

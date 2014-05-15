@@ -8,5 +8,5 @@ public interface TestConstants {
 
   int UTM10_X_START = 500000;
 
-  GeometryFactory UTM10_GF_2_FLOATING = GeometryFactory.getFactory(26910, 2);
+  GeometryFactory UTM10_GF_2_FLOATING = GeometryFactory.floating(26910, 2);
 }

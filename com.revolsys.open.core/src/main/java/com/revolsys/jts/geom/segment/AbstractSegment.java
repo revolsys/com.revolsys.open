@@ -27,6 +27,19 @@ public abstract class AbstractSegment extends AbstractLineSegment implements
     return (byte)geometryFactory.getAxisCount();
   }
 
+  @Override
+  public double[] getCoordinates() {
+    final int axisCount = getAxisCount();
+    final double[] coordinates = new double[axisCount * 2];
+    for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(
+          vertexIndex, axisIndex);
+      }
+    }
+    return coordinates;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry() {

@@ -116,7 +116,7 @@ public class TiffImage extends GeoReferencedImage {
       coordinateSystemId = (Short)geoKeys.get(GEOGRAPHIC_TYPE_GEO_KEY);
     }
     if (coordinateSystemId != null) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(coordinateSystemId);
+      final GeometryFactory geometryFactory = GeometryFactory.floating3(coordinateSystemId);
       setGeometryFactory(geometryFactory);
     }
 

@@ -154,7 +154,7 @@ public class DirectionalAttributesTest {
     final LineString mergedLine = mergedObject.getGeometryValue();
     Assert.assertTrue("Directional attribute merge line " + expectedMergedLine
       + " != " + mergedLine,
-      LineStringUtil.equalsExact2d(expectedMergedLine, mergedLine));
+      LineStringUtil.equals(2,expectedMergedLine, mergedLine));
   }
 
   private void assertDirectionalAttributesNotCanMerge(final LineString line1,
@@ -240,7 +240,7 @@ public class DirectionalAttributesTest {
 
       final LineString mergedLine = mergedObject.getGeometryValue();
       Assert.assertTrue("End attribute merge line",
-        LineStringUtil.equalsExact2d(expectedMergedLine, mergedLine));
+        LineStringUtil.equals(2,expectedMergedLine, mergedLine));
     } catch (final AssertionFailedError e) {
       LOG.error(e.getMessage());
       LOG.error(expectedMergedLine.toString());
@@ -353,7 +353,7 @@ public class DirectionalAttributesTest {
     final LineString mergedLine = mergedObject.getGeometryValue();
     Assert.assertTrue("End attribute merge line " + expectedMergedLine + " != "
       + mergedLine,
-      LineStringUtil.equalsExact2d(expectedMergedLine, mergedLine));
+      LineStringUtil.equals(2,expectedMergedLine, mergedLine));
   }
 
   private void assertEndAttributesNotCanMerge(final LineString line1,
@@ -448,7 +448,7 @@ public class DirectionalAttributesTest {
 
       final LineString mergedLine = mergedObject.getGeometryValue();
       Assert.assertTrue("End turn attribute merge line",
-        LineStringUtil.equalsExact2d(expectedMergedLine, mergedLine));
+        LineStringUtil.equals(2,expectedMergedLine, mergedLine));
     } catch (final AssertionFailedError e) {
       LOG.error(e.getMessage());
       LOG.error(expectedMergedLine.toString());
@@ -560,7 +560,7 @@ public class DirectionalAttributesTest {
 
     final LineString mergedLine = mergedObject.getGeometryValue();
     Assert.assertTrue("Side attribute merge line",
-      LineStringUtil.equalsExact2d(expectedMergedLine, mergedLine));
+      LineStringUtil.equals(2,expectedMergedLine, mergedLine));
   }
 
   private void assertSideAttributesNotCanMerge(final LineString line1,

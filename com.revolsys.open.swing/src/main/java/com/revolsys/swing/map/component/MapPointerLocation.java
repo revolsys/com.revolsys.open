@@ -17,7 +17,6 @@ import javax.swing.border.BevelBorder;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -85,7 +84,8 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
     }
   }
 
-  public void setGeometryFactory(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public void setGeometryFactory(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
     double scaleFactor;
     CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
 
@@ -99,7 +99,7 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
       scaleFactor = 1000;
     }
     final int srid = coordinateSystem.getId();
-    this.geometryFactory = GeometryFactory.getFactory(srid, 2, scaleFactor,
+    this.geometryFactory = geometryFactory.convertAxisCount(2).convertScales(
       scaleFactor);
     this.setToolTipText(coordinateSystem.getName());
     this.title = String.valueOf(srid);

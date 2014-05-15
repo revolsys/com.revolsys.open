@@ -15,7 +15,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
 
 public class PolygonTest {
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating(
     4326, 2);
 
   private static final List<Point> EXTERIOR_1 = Arrays.<Point> asList(

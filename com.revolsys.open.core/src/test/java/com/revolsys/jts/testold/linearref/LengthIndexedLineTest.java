@@ -49,10 +49,10 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
     // check extracted points are the same as the input
     final Point pt1 = indexedLine.extractPoint(loc1);
     final Point pt2 = indexedLine.extractPoint(loc2);
-    if (!pt1.equals2d(testPt)) {
+    if (!pt1.equals(2, testPt)) {
       return false;
     }
-    if (!pt2.equals2d(testPt)) {
+    if (!pt2.equals(2, testPt)) {
       return false;
     }
 
@@ -94,7 +94,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
       Point.NULL_ORDINATE));
     final Point projPt = indexedLine.extractPoint(projIndex);
     // System.out.println(projPt);
-    assertTrue(projPt.equals3d(new PointDouble((double)5, 5, 5)));
+    assertTrue(projPt.equals(3, new PointDouble(5.0, 5, 5)));
   }
 
   /**
@@ -175,12 +175,10 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
     final Point pt = indexedLine.extractPoint(100);
-    assertTrue(pt.equals(new PointDouble((double)10, 10,
-      Point.NULL_ORDINATE)));
+    assertTrue(pt.equals(new PointDouble((double)10, 10, Point.NULL_ORDINATE)));
 
     final Point pt2 = indexedLine.extractPoint(0);
-    assertTrue(pt2.equals(new PointDouble((double)0, 0,
-      Point.NULL_ORDINATE)));
+    assertTrue(pt2.equals(new PointDouble((double)0, 0, Point.NULL_ORDINATE)));
   }
 
   /**

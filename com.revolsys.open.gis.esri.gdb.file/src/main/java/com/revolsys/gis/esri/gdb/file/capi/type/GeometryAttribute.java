@@ -46,7 +46,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   private static final ShapefileGeometryUtil SHP_UTIL = new ShapefileGeometryUtil(
     false);
 
-  private GeometryFactory geometryFactory = GeometryFactory.getFactory();
+  private GeometryFactory geometryFactory = GeometryFactory.floating3();
 
   private Method readMethod;
 
@@ -90,7 +90,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
           final int srid = geometryFactory.getSrid();
           final double scaleXY = geometryFactory.getScaleXY();
           final double scaleZ = geometryFactory.getScaleZ();
-          geometryFactory = GeometryFactory.getFactory(srid, axisCount,
+          geometryFactory = GeometryFactory.fixed(srid, axisCount,
             scaleXY, scaleZ);
         }
         setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);

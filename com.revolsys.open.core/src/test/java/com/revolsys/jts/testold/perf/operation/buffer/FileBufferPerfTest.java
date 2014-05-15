@@ -12,7 +12,7 @@ import com.revolsys.jts.util.Stopwatch;
 public class FileBufferPerfTest {
   static final int MAX_ITER = 1;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
@@ -26,7 +26,7 @@ public class FileBufferPerfTest {
     }
   }
 
-  GeometryFactory factory = GeometryFactory.getFactory();
+  GeometryFactory factory = GeometryFactory.floating3();
 
   boolean testFailed = false;
 

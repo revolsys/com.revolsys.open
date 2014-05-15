@@ -41,28 +41,21 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
  * <p>
  * This class is designed to be easily mutable (to the extent of
  * having its contained points public).
- * This supports a common pattern of reusing a single LineSegmentImpl
+ * This supports a common pattern of reusing a single LineSegmentDouble
  * object as a way of computing segment properties on the
  * segments defined by arrays or lists of {@link Coordinates}s.
  *
  *@version 1.7
  */
-public class LineSegmentImpl extends AbstractLineSegment {
+public class LineSegmentDouble extends AbstractLineSegment {
 
   private double[] coordinates;
 
-  public LineSegmentImpl() {
+  public LineSegmentDouble() {
     this.coordinates = null;
   }
 
-  public LineSegmentImpl(final Point point1, final Point point2) {
-    final int axisCount = Math.max(point1.getAxisCount(), point2.getAxisCount());
-    coordinates = new double[axisCount * 2];
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, point1);
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 1, point2);
-  }
-
-  public LineSegmentImpl(final int axisCount, final double... coordinates) {
+  public LineSegmentDouble(final int axisCount, final double... coordinates) {
     if (coordinates == null || coordinates.length == 0 || axisCount < 1) {
       this.coordinates = null;
     } else if (coordinates.length % axisCount == 0) {
@@ -86,17 +79,24 @@ public class LineSegmentImpl extends AbstractLineSegment {
     }
   }
 
-  public LineSegmentImpl(final LineSegment line) {
-    this(line.get(0), line.get(1));
+  public LineSegmentDouble(final LineSegment line) {
+    this(line.getPoint(0), line.getPoint(1));
   }
 
-  public LineSegmentImpl(final LineString line) {
+  public LineSegmentDouble(final LineString line) {
     this(line.getVertex(0), line.getVertex(-1));
   }
 
+  public LineSegmentDouble(final Point point1, final Point point2) {
+    final int axisCount = Math.max(point1.getAxisCount(), point2.getAxisCount());
+    coordinates = new double[axisCount * 2];
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, point1);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 1, point2);
+  }
+
   @Override
-  public LineSegmentImpl clone() {
-    final LineSegmentImpl clone = (LineSegmentImpl)super.clone();
+  public LineSegmentDouble clone() {
+    final LineSegmentDouble clone = (LineSegmentDouble)super.clone();
     if (clone.coordinates != null) {
       clone.coordinates = clone.coordinates.clone();
     }
@@ -109,7 +109,7 @@ public class LineSegmentImpl extends AbstractLineSegment {
   }
 
   @Override
-  public double getValue(final int index, final int axisIndex) {
+  public double getCoordinate(final int index, final int axisIndex) {
     final int axisCount = getAxisCount();
     if (axisIndex >= 0 && axisIndex < axisCount) {
       if (index >= 0 && index < 2) {
@@ -119,6 +119,15 @@ public class LineSegmentImpl extends AbstractLineSegment {
       }
     }
     return Double.NaN;
+  }
+
+  @Override
+  public double[] getCoordinates() {
+    if (coordinates == null) {
+      return coordinates;
+    } else {
+      return coordinates.clone();
+    }
   }
 
   @Override

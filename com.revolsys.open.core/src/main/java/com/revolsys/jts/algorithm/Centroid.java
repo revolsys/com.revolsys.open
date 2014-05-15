@@ -74,8 +74,7 @@ public class Centroid {
    * Returns twice the signed area of the triangle p1-p2-p3.
    * The area is positive if the triangle is oriented CCW, and negative if CW.
    */
-  private static double area2(final Point p1, final Point p2,
-    final Point p3) {
+  private static double area2(final Point p1, final Point p2, final Point p3) {
     return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY())
       - (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
   }
@@ -154,8 +153,8 @@ public class Centroid {
   private void addHole(final LineString line) {
     final boolean isPositiveArea = line.isCounterClockwise();
     for (final Segment segment : line.segments()) {
-      final Point point1 = segment.get(0);
-      final Point point2 = segment.get(1);
+      final Point point1 = segment.getPoint(0);
+      final Point point2 = segment.getPoint(1);
       addTriangle(areaBasePt, point1, point2, isPositiveArea);
     }
     addLineSegments(line);
@@ -207,15 +206,15 @@ public class Centroid {
     }
     final boolean isPositiveArea = line.isClockwise();
     for (final Segment segment : line.segments()) {
-      final Point point1 = segment.get(0);
-      final Point point2 = segment.get(1);
+      final Point point1 = segment.getPoint(0);
+      final Point point2 = segment.getPoint(1);
       addTriangle(areaBasePt, point1, point2, isPositiveArea);
     }
     addLineSegments(line);
   }
 
-  private void addTriangle(final Point p0, final Point p1,
-    final Point p2, final boolean isPositiveArea) {
+  private void addTriangle(final Point p0, final Point p1, final Point p2,
+    final boolean isPositiveArea) {
     final double sign = (isPositiveArea) ? 1.0 : -1.0;
 
     final double triangleCent3X = p0.getX() + p1.getX() + p2.getX();

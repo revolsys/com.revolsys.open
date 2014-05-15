@@ -178,7 +178,7 @@ public class PointLocator {
     // no point in doing envelope test, since equality test is just as fast
 
     final Point ptCoord = pt.getPoint();
-    if (ptCoord.equals2d(p)) {
+    if (ptCoord.equals(2,p)) {
       return Location.INTERIOR;
     }
     return Location.EXTERIOR;

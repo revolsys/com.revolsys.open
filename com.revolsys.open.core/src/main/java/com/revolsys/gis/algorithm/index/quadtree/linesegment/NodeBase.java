@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.Segment;
 
 public abstract class NodeBase {
   public static int getSubnodeIndex(
@@ -145,10 +145,10 @@ public abstract class NodeBase {
   }
 
   public boolean visit(final LineSegmentQuadTree tree,
-    final BoundingBox boundingBox, final Visitor<LineSegment> visitor) {
+    final BoundingBox boundingBox, final Visitor<Segment> visitor) {
     if (isSearchMatch(boundingBox)) {
       for (final int[] segmentIndex : segmentIndexes) {
-        final LineSegment segment = tree.getLineSegment(segmentIndex);
+        final Segment segment = tree.getLineSegment(segmentIndex);
         if (segment.intersects(boundingBox)) {
           if (!visitor.visit(segment)) {
             return false;
@@ -169,9 +169,9 @@ public abstract class NodeBase {
   }
 
   public boolean visit(final LineSegmentQuadTree tree,
-    final Visitor<LineSegment> visitor) {
+    final Visitor<Segment> visitor) {
     for (final int[] segmentIndex : segmentIndexes) {
-      final LineSegment segment = tree.getLineSegment(segmentIndex);
+      final Segment segment = tree.getLineSegment(segmentIndex);
       if (!visitor.visit(segment)) {
         return false;
       }

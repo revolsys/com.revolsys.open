@@ -120,7 +120,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
         setProperty(IoConstants.GEOMETRY_FACTORY,
-          GeometryFactory.getFactory(geometry));
+          geometry.getGeometryFactory());
       }
       writers.put(path, writer);
     }

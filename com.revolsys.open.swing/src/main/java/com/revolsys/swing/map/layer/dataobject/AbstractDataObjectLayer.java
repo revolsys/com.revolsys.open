@@ -69,7 +69,6 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -125,6 +124,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
+    menu.setName("Layer");
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");
     menu.addGroup(3, "dnd");
@@ -328,7 +328,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public AbstractDataObjectLayer(final String name) {
-    this(name, GeometryFactory.getFactory(4326));
+    this(name, GeometryFactory.floating3(4326));
     setReadOnly(false);
     setSelectSupported(true);
     setQuerySupported(true);
@@ -2209,7 +2209,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
       final int numPoints = line.getVertexCount();
       if (vertexIndex == null) {
-        final int pointIndex = mouseLocation.getSegmentIndex()[0];
+        final int pointIndex = mouseLocation.getSegmentId()[0];
         line1 = LineStringUtil.subLineString(line, null, 0, pointIndex + 1,
           convertedPoint);
         line2 = LineStringUtil.subLineString(line, convertedPoint,

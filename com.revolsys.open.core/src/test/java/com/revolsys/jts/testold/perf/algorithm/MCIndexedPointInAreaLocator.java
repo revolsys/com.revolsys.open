@@ -102,7 +102,7 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
 
     @Override
     public void select(final LineSegment ls) {
-      this.rcc.countSegment(ls.getCoordinate(0), ls.getCoordinate(1));
+      this.rcc.countSegment(ls.getPoint(0), ls.getPoint(1));
     }
   }
 

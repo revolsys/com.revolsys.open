@@ -12,12 +12,13 @@ public class OsnConverterRegistry {
   private com.revolsys.jts.geom.GeometryFactory geometryFactory;
 
   public OsnConverterRegistry() {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(1.0);
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(
+      1.0, 1.0);
     init(geometryFactory);
   }
 
   public OsnConverterRegistry(final int srid) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixed(
       srid, 1.0, 1.0);
 
     init(geometryFactory);

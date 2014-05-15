@@ -36,7 +36,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.EnvelopeUtil;
 
@@ -233,7 +233,7 @@ public class MonotoneChain {
    * @param ls line segment to extract into
    */
   public LineSegment getLineSegment(final int index) {
-    return new LineSegmentImpl(points.get(index), points.get(index + 1));
+    return new LineSegmentDouble(points.get(index), points.get(index + 1));
   }
 
   public int getStartIndex() {

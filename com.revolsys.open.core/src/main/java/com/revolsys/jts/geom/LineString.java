@@ -61,8 +61,6 @@ public interface LineString extends Lineal {
 
   boolean equals(int axisIndex, int vertexIndex, Point point);
 
-  Point getCoordinate(final int vertexIndex);
-
   double getCoordinate(int vertexIndex, final int axisIndex);
 
   PointList getCoordinatesList();

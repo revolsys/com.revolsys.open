@@ -103,8 +103,8 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
   }
 
   public Point getCoordinate() {
-    final Point p0 = line.getCoordinate(segmentIndex);
-    final Point p1 = line.getCoordinate(segmentIndex + 1);
+    final Point p0 = line.getPoint(segmentIndex);
+    final Point p1 = line.getPoint(segmentIndex + 1);
     return pointAlongSegmentByFraction(p0, p1, segmentFraction);
   }
 

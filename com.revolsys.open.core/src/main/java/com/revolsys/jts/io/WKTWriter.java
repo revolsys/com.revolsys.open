@@ -336,7 +336,7 @@ public class WKTWriter {
             indent(level + 1, writer);
           }
         }
-        appendCoordinate(lineString.getCoordinate(i), writer);
+        appendCoordinate(lineString.getPoint(i), writer);
       }
       writer.write(")");
     }

@@ -1,7 +1,6 @@
 package com.revolsys.gis.algorithm.index.quadtree.linesegment;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.IntervalSize;
@@ -12,7 +11,7 @@ public class Root extends NodeBase {
   public Root() {
   }
 
-  public void insert(final Envelope envelope, final int[] item) {
+  public void insert(final BoundingBox envelope, final int[] item) {
     final int index = getSubnodeIndex(envelope, origin);
     if (index == -1) {
       add(envelope, item);

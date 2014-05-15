@@ -197,7 +197,7 @@ public class HalfEdge {
    * @return true if the vertices are equal to the ones of this edge
    */
   public boolean equals(final Point p0, final Point p1) {
-    return orig.equals2d(p0) && sym.orig.equals(p1);
+    return orig.equals(2,p0) && sym.orig.equals(p1);
   }
 
   /**
@@ -215,7 +215,7 @@ public class HalfEdge {
       if (oNext == null) {
         return null;
       }
-      if (oNext.dest().equals2d(dest)) {
+      if (oNext.dest().equals(2,dest)) {
         return oNext;
       }
       oNext = oNext.oNext();

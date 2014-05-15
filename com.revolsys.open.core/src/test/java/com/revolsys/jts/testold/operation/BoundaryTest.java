@@ -53,7 +53,7 @@ public class BoundaryTest extends TestCase {
     TestRunner.run(BoundaryTest.class);
   }
 
-  private final GeometryFactory fact = GeometryFactory.getFactory();
+  private final GeometryFactory fact = GeometryFactory.floating3();
 
   private final WKTReader rdr = new WKTReader(this.fact);
 
@@ -70,7 +70,7 @@ public class BoundaryTest extends TestCase {
     Geometry boundary = op.getBoundary();
     boundary = boundary.normalize();
     // System.out.println("Computed Boundary = " + boundary);
-    assertTrue(boundary.equalsExact2d(expected));
+    assertTrue(boundary.equals(2,expected));
   }
 
   /**

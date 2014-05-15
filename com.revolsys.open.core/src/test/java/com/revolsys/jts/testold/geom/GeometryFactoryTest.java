@@ -52,7 +52,7 @@ public class GeometryFactoryTest extends TestCase {
     TestRunner.run(GeometryFactoryTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
     2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
@@ -64,7 +64,7 @@ public class GeometryFactoryTest extends TestCase {
   private void checkCreateGeometryExact(final String wkt) throws ParseException {
     final Geometry g = geometryFactory.geometry(wkt);
     final Geometry g2 = this.geometryFactory.geometry(g);
-    if (!g.equalsExact2d(g2)) {
+    if (!g.equals(2,g2)) {
       failNotEquals("Geometry not equal exact", g, g2);
     }
   }

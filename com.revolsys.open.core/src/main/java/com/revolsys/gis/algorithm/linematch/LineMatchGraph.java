@@ -15,15 +15,15 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
 import com.revolsys.gis.graph.visitor.BoundingBoxIntersectsEdgeVisitor;
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 
 public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   private final GeometryFactory geometryFactory;
@@ -47,27 +47,11 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public LineMatchGraph(final LineString line) {
-    this(GeometryFactory.getFactory(line), line);
+    this(line.getGeometryFactory(), line);
   }
 
   public LineMatchGraph(final T object, final LineString line) {
-    this(GeometryFactory.getFactory(line), object, line);
-  }
-
-  private Edge<LineSegmentMatch> add(final Point start,
-    final Point end) {
-    final Node<LineSegmentMatch> startNode = getNode(start);
-    final Node<LineSegmentMatch> endNode = getNode(end);
-
-    return add(startNode, endNode);
-  }
-
-  private Edge<LineSegmentMatch> add(final Point start,
-    final Point end, final LineSegment segment, final int index) {
-    final Edge<LineSegmentMatch> edge = add(start, end);
-    final LineSegmentMatch lineSegmentMatch = edge.getObject();
-    lineSegmentMatch.addSegment(segment, index);
-    return edge;
+    this(line.getGeometryFactory(), object, line);
   }
 
   private Edge<LineSegmentMatch> add(final LineSegmentMatch lineSegmentMatch,
@@ -80,7 +64,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         final Point coordinate0 = realSegment.project(from);
         final Point coordinate1 = realSegment.project(to);
 
-        final LineSegment newSegment = new LineSegmentImpl(geometryFactory,
+        final LineSegment newSegment = new LineSegmentDoubleGF(geometryFactory,
           coordinate0, coordinate1);
         newLineSegmentMatch.addSegment(newSegment, i);
       }
@@ -110,7 +94,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       Point previousCoordinate = coordinate0;
       for (int i = 1; i < coords.size(); i++) {
         final Point coordinate = coords.get(i);
-        final LineSegment segment = new LineSegmentImpl(geometryFactory,
+        final LineSegment segment = new LineSegmentDoubleGF(geometryFactory,
           previousCoordinate, coordinate);
         if (segment.getLength() > 0) {
           add(previousCoordinate, coordinate, segment, index);
@@ -144,6 +128,21 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         geometryFactory, startNode, endNode);
       edge = addEdge(lineSegmentMatch, lineSegmentMatch.getLine());
     }
+    return edge;
+  }
+
+  private Edge<LineSegmentMatch> add(final Point start, final Point end) {
+    final Node<LineSegmentMatch> startNode = getNode(start);
+    final Node<LineSegmentMatch> endNode = getNode(end);
+
+    return add(startNode, endNode);
+  }
+
+  private Edge<LineSegmentMatch> add(final Point start, final Point end,
+    final LineSegment segment, final int index) {
+    final Edge<LineSegmentMatch> edge = add(start, end);
+    final LineSegmentMatch lineSegmentMatch = edge.getObject();
+    lineSegmentMatch.addSegment(segment, index);
     return edge;
   }
 
@@ -222,13 +221,6 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return 0;
   }
 
-  private Edge<LineSegmentMatch> getEdge(final Point coordinate0,
-    final Point coordinate1) {
-    final Node<LineSegmentMatch> node1 = findNode(coordinate0);
-    final Node<LineSegmentMatch> node2 = findNode(coordinate1);
-    return getEdge(node1, node2);
-  }
-
   private Edge<LineSegmentMatch> getEdge(final Node<LineSegmentMatch> node1,
     final Node<LineSegmentMatch> node2) {
     final List<Edge<LineSegmentMatch>> edges = node1.getOutEdgesTo(node2);
@@ -237,6 +229,13 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     } else {
       return edges.get(0);
     }
+  }
+
+  private Edge<LineSegmentMatch> getEdge(final Point coordinate0,
+    final Point coordinate1) {
+    final Node<LineSegmentMatch> node1 = findNode(coordinate0);
+    final Node<LineSegmentMatch> node2 = findNode(coordinate1);
+    return getEdge(node1, node2);
   }
 
   private Set<Edge<LineSegmentMatch>> getEdgesWithoutMatch(
@@ -697,9 +696,9 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     final LineSegmentMatch lineSegmentMatch = edge.getObject();
     final LineSegment segment = lineSegmentMatch.getSegment();
 
-    final Edge<LineSegmentMatch> edge1 = add(segment.get(0), coordinate);
+    final Edge<LineSegmentMatch> edge1 = add(segment.getPoint(0), coordinate);
     final LineSegmentMatch lineSegmentMatch1 = edge1.getObject();
-    final Edge<LineSegmentMatch> edge2 = add(coordinate, segment.get(1));
+    final Edge<LineSegmentMatch> edge2 = add(coordinate, segment.getPoint(1));
     final LineSegmentMatch lineSegmentMatch2 = edge2.getObject();
 
     for (int i = 0; i < lineSegmentMatch.getSegmentCount(); i++) {
@@ -707,13 +706,13 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         final LineSegment realSegment = lineSegmentMatch.getSegment(i);
         final Point projectedCoordinate = realSegment.project(coordinate);
 
-        final Point startCoordinate = realSegment.get(0);
-        final LineSegment segment1 = new LineSegmentImpl(geometryFactory,
+        final Point startCoordinate = realSegment.getPoint(0);
+        final LineSegment segment1 = new LineSegmentDoubleGF(geometryFactory,
           startCoordinate, projectedCoordinate);
         lineSegmentMatch1.addSegment(segment1, i);
 
-        final Point endCoordinate = realSegment.get(1);
-        final LineSegment segment2 = new LineSegmentImpl(geometryFactory,
+        final Point endCoordinate = realSegment.getPoint(1);
+        final LineSegment segment2 = new LineSegmentDoubleGF(geometryFactory,
           projectedCoordinate, endCoordinate);
         lineSegmentMatch2.addSegment(segment2, i);
       }

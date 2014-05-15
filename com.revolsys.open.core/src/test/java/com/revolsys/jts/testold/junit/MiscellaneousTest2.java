@@ -63,7 +63,7 @@ public class MiscellaneousTest2 extends TestCase {
     junit.textui.TestRunner.main(testCaseName);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
     1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
@@ -183,7 +183,7 @@ public class MiscellaneousTest2 extends TestCase {
   public void testQuickPolygonUnion() throws Exception {
     final Geometry a = this.reader.read("POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))");
     final Geometry b = this.reader.read("POLYGON((50 50, 150 50, 150 150, 50 150, 50 50))");
-    final GeometryCollection polygonCollection = GeometryFactory.getFactory(0,
+    final GeometryCollection polygonCollection = GeometryFactory.floating(0,
       2).geometryCollection(a, b);
     final Geometry union = polygonCollection.buffer(0);
     // System.out.println(union);

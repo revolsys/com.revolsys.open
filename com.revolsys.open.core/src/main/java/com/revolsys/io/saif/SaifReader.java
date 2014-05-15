@@ -590,7 +590,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
         loadSchema();
         loadExportedObjects();
         loadSrid();
-        final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
+        final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixed(
           srid, 1.0, 1.0);
 
         for (final DataObjectMetaData metaData : ((DataObjectMetaDataFactoryImpl)this.metaDataFactory).getTypes()) {

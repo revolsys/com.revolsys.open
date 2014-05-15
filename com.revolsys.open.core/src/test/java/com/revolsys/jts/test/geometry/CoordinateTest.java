@@ -22,9 +22,9 @@ public class CoordinateTest extends TestCase {
   }
 
   public static void assertEquals3d(final Point point1, final Point point2) {
-    final boolean equal = point1.equals3d(point2);
+    final boolean equal = point1.equals(3, point2);
     failNotEqual("Not Equal 3D", equal, point1, point2);
-    final boolean inverseEqual = point2.equals3d(point1);
+    final boolean inverseEqual = point2.equals(3, point1);
     failNotEqual("Not Equal 3D Inverse", inverseEqual, point2, point1);
   }
 
@@ -102,19 +102,19 @@ public class CoordinateTest extends TestCase {
     assertTrue(!c1.equals(s));
 
     final Point c2 = new PointDouble(1.0, 2.0, 3.0);
-    assertTrue(c1.equals2d(c2));
+    assertTrue(c1.equals(2, c2));
 
     final Point c3 = new PointDouble(1.0, 22.0, 3.0);
-    assertTrue(!c1.equals2d(c3));
+    assertTrue(!c1.equals(2, c3));
   }
 
   public void testEquals2D() {
     final Point c1 = new PointDouble(1.0, 2.0, 3.0);
     final Point c2 = new PointDouble(1.0, 2.0, 3.0);
-    assertTrue(c1.equals2d(c2));
+    assertTrue(c1.equals(2, c2));
 
     final Point c3 = new PointDouble(1.0, 22.0, 3.0);
-    assertTrue(!c1.equals2d(c3));
+    assertTrue(!c1.equals(2, c3));
   }
 
   public void testEquals2DWithinTolerance() {
@@ -126,10 +126,10 @@ public class CoordinateTest extends TestCase {
   public void testEquals3D() {
     final Point c1 = new PointDouble(1.0, 2.0, 3.0);
     final Point c2 = new PointDouble(1.0, 2.0, 3.0);
-    assertTrue(c1.equals3d(c2));
+    assertTrue(c1.equals(3, c2));
 
     final Point c3 = new PointDouble(1.0, 22.0, 3.0);
-    assertTrue(!c1.equals3d(c3));
+    assertTrue(!c1.equals(3, c3));
   }
 
   public void testGetOrdinate() {

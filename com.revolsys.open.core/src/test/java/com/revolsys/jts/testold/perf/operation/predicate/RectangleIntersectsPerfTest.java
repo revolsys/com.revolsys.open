@@ -56,7 +56,7 @@ public class RectangleIntersectsPerfTest {
 
   static final int NUM_LINE_PTS = 1000;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
@@ -162,7 +162,7 @@ public class RectangleIntersectsPerfTest {
       Point.NULL_ORDINATE);
     final Geometry sinePoly = createSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
-    geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),
+    geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
       geometryFactory.getAxisCount(), size / 10, geometryFactory.getScaleZ());
     final Geometry newGeometry = sinePoly.convert(geometryFactory);
     /**

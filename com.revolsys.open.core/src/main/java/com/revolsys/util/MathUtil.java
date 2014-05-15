@@ -841,4 +841,9 @@ public final class MathUtil {
   private MathUtil() {
   }
 
+  public static int hashCode(final double d) {
+    final long f = Double.doubleToLongBits(d);
+    return (int)(f ^ (f >>> 32));
+  }
+
 }

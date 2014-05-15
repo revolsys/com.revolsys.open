@@ -20,7 +20,7 @@ public class RectanglePredicateTest extends TestCase {
 
   private final WKTReader rdr = new WKTReader();
 
-  private final GeometryFactory fact = GeometryFactory.getFactory();
+  private final GeometryFactory fact = GeometryFactory.floating3();
 
   public RectanglePredicateTest(final String name) {
     super(name);

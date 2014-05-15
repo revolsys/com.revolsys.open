@@ -32,12 +32,12 @@
  */
 package com.revolsys.jts.math;
 
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
+import com.revolsys.util.MathUtil;
 
 /**
  * A 2-dimensional mathematical vector represented by double-precision X and Y components.
@@ -238,8 +238,8 @@ public class Vector2D {
   public int hashCode() {
     // Algorithm from Effective Java by Joshua Bloch
     int result = 17;
-    result = 37 * result + CoordinatesUtil.hashCode(x);
-    result = 37 * result + CoordinatesUtil.hashCode(y);
+    result = 37 * result + MathUtil.hashCode(x);
+    result = 37 * result + MathUtil.hashCode(y);
     return result;
   }
 

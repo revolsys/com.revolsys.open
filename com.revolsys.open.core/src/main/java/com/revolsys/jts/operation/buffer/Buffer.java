@@ -48,7 +48,7 @@ import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
@@ -285,7 +285,7 @@ public class Buffer {
     for (final SegmentString segment : nodedSegments) {
       final int vertexCount = segment.size();
       if (vertexCount > 2
-        || (vertexCount == 2 && !segment.getCoordinate(0).equals2d(
+        || (vertexCount == 2 && !segment.getCoordinate(0).equals(2,
           segment.getCoordinate(1)))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
@@ -369,7 +369,7 @@ public class Buffer {
     final Edge edge = dirEdge.getEdge();
     for (int i = 0; i < edge.getNumPoints() - 1; i++) {
       final Point p1 = edge.getCoordinate(i);
-      LineSegment seg = new LineSegmentImpl(p1, edge.getCoordinate(i + 1));
+      LineSegment seg = new LineSegmentDouble(p1, edge.getCoordinate(i + 1));
       double y1 = seg.getY(0);
       double y2 = seg.getY(1);
       // ensure segment always points upwards

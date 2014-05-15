@@ -56,7 +56,7 @@ public class RandomLineBufferStressTest {
 
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
     2);
 
   WKTReader rdr = new WKTReader(this.geometryFactory);

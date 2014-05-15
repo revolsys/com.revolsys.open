@@ -285,7 +285,7 @@ public class CoordinateArrays {
     if (pts.length < 4) {
       return false;
     }
-    if (!pts[0].equals2d(pts[pts.length - 1])) {
+    if (!pts[0].equals(2,pts[pts.length - 1])) {
       return false;
     }
     return true;

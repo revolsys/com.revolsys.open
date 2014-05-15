@@ -35,7 +35,7 @@ package com.revolsys.jts.precision;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Lineal;
 import com.revolsys.jts.geom.MultiPoint;
@@ -189,7 +189,7 @@ public class MinimumClearance {
           final Point seg0 = fs2.getCoordinate(i2 - 1);
           final Point seg1 = fs2.getCoordinate(i2);
 
-          if (!(p.equals2d(seg0) || p.equals2d(seg1))) {
+          if (!(p.equals(2,seg0) || p.equals(2,seg1))) {
             final double d = CGAlgorithms.distancePointLine(p, seg0, seg1);
             if (d < minDist) {
               minDist = d;
@@ -207,7 +207,7 @@ public class MinimumClearance {
     private void updatePts(final Point p, final Point seg0,
       final Point seg1) {
       minPts[0] = p;
-      final LineSegment seg = new LineSegmentImpl(seg0, seg1);
+      final LineSegment seg = new LineSegmentDouble(seg0, seg1);
       minPts[1] = new PointDouble(seg.closestPoint(p));
     }
 
@@ -217,7 +217,7 @@ public class MinimumClearance {
         for (int i2 = 0; i2 < fs2.size(); i2++) {
           final Point p1 = fs1.getCoordinate(i1);
           final Point p2 = fs2.getCoordinate(i2);
-          if (!p1.equals2d(p2)) {
+          if (!p1.equals(2,p2)) {
             final double d = p1.distance(p2);
             if (d < minDist) {
               minDist = d;

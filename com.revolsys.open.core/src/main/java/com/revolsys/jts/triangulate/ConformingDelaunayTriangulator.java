@@ -164,7 +164,7 @@ public class ConformingDelaunayTriangulator {
   }
 
   private void computeConvexHull() {
-    final GeometryFactory fact = GeometryFactory.getFactory();
+    final GeometryFactory fact = GeometryFactory.floating3();
     final Point[] coords = getPointArray();
     final ConvexHull hull = new ConvexHull(coords, fact);
     convexHull = hull.getConvexHull();
@@ -266,7 +266,7 @@ public class ConformingDelaunayTriangulator {
        * </ul>
        */
       final ConstraintVertex insertedVertex = insertSite(splitVertex);
-      if (!insertedVertex.getCoordinate().equals2d(splitPt)) {
+      if (!insertedVertex.getCoordinate().equals(2,splitPt)) {
         // throw new ConstraintEnforcementException("Split point snapped to
         // existing point
         // (tolerance too large or constraint interior narrow angle?)",
@@ -328,7 +328,7 @@ public class ConformingDelaunayTriangulator {
       final KdNode nextNode = (KdNode)i.next();
       final Point testPt = nextNode.getCoordinate();
       // ignore segment endpoints
-      if (testPt.equals2d(p) || testPt.equals2d(q)) {
+      if (testPt.equals(2,p) || testPt.equals(2,q)) {
         continue;
       }
 

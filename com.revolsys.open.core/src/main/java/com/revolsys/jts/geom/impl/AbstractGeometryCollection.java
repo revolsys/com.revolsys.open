@@ -116,21 +116,20 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
   }
 
   @Override
-  protected boolean doEqualsExact(final Geometry geometry) {
-    final GeometryCollection collection = (GeometryCollection)geometry;
-    final int geometryCount = getGeometryCount();
-    if (geometryCount != collection.getGeometryCount()) {
-      return false;
-    } else {
-      for (int i = 0; i < geometryCount; i++) {
-        final Geometry part = getGeometry(i);
-        final Geometry otherPart = collection.getGeometry(i);
-        if (!part.equalsExact(otherPart)) {
+  protected boolean doEquals(final int axisCount, final Geometry geometry) {
+    final int geometryCount1 = getGeometryCount();
+    final int geometryCount2 = geometry.getGeometryCount();
+    if (geometryCount1 == geometryCount2) {
+      for (int i = 0; i < geometryCount1; i++) {
+        final Geometry part1 = getGeometry(i);
+        final Geometry part2 = geometry.getGeometry(i);
+        if (!part1.equals(axisCount, part2)) {
           return false;
         }
       }
       return true;
     }
+    return false;
   }
 
   @Override
@@ -150,29 +149,6 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
       i++;
     }
     return true;
-  }
-
-  @Override
-  public boolean equalsExact3d(final Geometry geometry) {
-    if (geometry == this) {
-      return true;
-    } else if (geometry != null) {
-      if (getDataType().equals(geometry.getDataType())) {
-        final int geometryCount = getGeometryCount();
-        if (geometryCount == geometry.getGeometryCount()) {
-          for (int i = 0; i < geometryCount; i++) {
-            final Geometry part1 = getGeometry(i);
-            final Geometry part2 = geometry.getGeometry(i);
-            if (!part1.equals(part2)) {
-              return false;
-            }
-          }
-          return true;
-        }
-
-      }
-    }
-    return false;
   }
 
   @Override
@@ -207,15 +183,6 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
       dimension = Math.max(dimension, geometry.getBoundaryDimension());
     }
     return dimension;
-  }
-
-  @Override
-  public Point getPoint() {
-    if (isEmpty()) {
-      return null;
-    } else {
-      return getGeometry(0).getPoint();
-    }
   }
 
   @Override
@@ -276,6 +243,15 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
       sum += geometry.getLength();
     }
     return sum;
+  }
+
+  @Override
+  public Point getPoint() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return getGeometry(0).getPoint();
+    }
   }
 
   @Override

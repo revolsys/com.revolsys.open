@@ -4,18 +4,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -40,8 +40,8 @@ public class Triangle extends AbstractCoordinatesList {
 
   private final double[] coordinates = new double[9];
 
-  private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
-    0, 2, 1.0, 1);
+  private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
+    0, 1.0);
 
   public Triangle() {
   }
@@ -60,9 +60,8 @@ public class Triangle extends AbstractCoordinatesList {
   }
 
   private void addIntersection(final GeometryFactory geometryFactory,
-    final Set<Point> coordinates, final Point line1Start,
-    final Point line1End, final Point line2Start,
-    final Point line2End) {
+    final Set<Point> coordinates, final Point line1Start, final Point line1End,
+    final Point line2Start, final Point line2End) {
     final PointList intersections = LineSegmentUtil.getIntersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
     for (final Point point : intersections) {
@@ -131,8 +130,7 @@ public class Triangle extends AbstractCoordinatesList {
     final double x3 = getX(2);
     final double y3 = getY(2);
 
-    final Point centre = CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3,
-      y3);
+    final Point centre = CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3, y3);
     final double angleB = MathUtil.angle(x1, y1, x2, y2, x3, y3);
     final double radius = MathUtil.distance(x1, y1, x3, y3) / Math.sin(angleB)
       * 0.5;
@@ -216,8 +214,8 @@ public class Triangle extends AbstractCoordinatesList {
 
   public LineSegment intersection(final GeometryFactory geometryFactory,
     final LineSegment line) {
-    final Point lc0 = line.get(0);
-    final Point lc1 = line.get(1);
+    final Point lc0 = line.getPoint(0);
+    final Point lc1 = line.getPoint(1);
     final boolean lc0Contains = contains(lc0);
     final boolean lc1Contains = contains(lc1);
     if (lc0Contains && lc1Contains) {
@@ -236,9 +234,9 @@ public class Triangle extends AbstractCoordinatesList {
           if (coordIterator.hasNext()) {
             // TODO Too many intersect
           }
-          return new LineSegmentImpl(c1, c2);
+          return new LineSegmentDoubleGF(c1, c2);
         } else {
-          return new LineSegmentImpl(c1, c1);
+          return new LineSegmentDoubleGF(c1, c1);
         }
       } else {
         return null;

@@ -35,7 +35,7 @@ import com.revolsys.util.MathUtil;
 
 public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
-  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
+  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
     .geometry();
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_marker");
@@ -59,7 +59,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Viewport2D viewport, final Geometry geometry, final MarkerStyle style) {
     final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
       Point point = null;
       double orientation = 0;
@@ -121,7 +121,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
             }
           }
         } else {
-          point = ProjectionFactory.convert(CoordinatesUtil.get(geometry),
+          point = ProjectionFactory.convert(geometry.getPoint(),
             geometryFactory, viewportGeometryFactory);
         }
 
@@ -195,7 +195,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final Point point, final MarkerStyle style) {
     final Geometry geometry = getGeometry(viewport, point);
     if (!geometry.isEmpty()) {
-      final Point coordinates = CoordinatesUtil.get(geometry);
+      final Point coordinates = geometry.getPoint();
       renderMarker(viewport, graphics, coordinates, style, 0);
     }
   }

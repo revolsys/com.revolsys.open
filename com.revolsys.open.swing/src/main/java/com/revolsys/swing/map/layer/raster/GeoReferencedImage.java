@@ -90,7 +90,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   private int imageHeight = -1;
 
-  private GeometryFactory geometryFactory = GeometryFactory.getFactory();
+  private GeometryFactory geometryFactory = GeometryFactory.floating3();
 
   private PlanarImage jaiImage;
 
@@ -418,7 +418,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
               }
             }
           }
-          final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+          final GeometryFactory geometryFactory = GeometryFactory.floating(
             srid, 2);
           setGeometryFactory(geometryFactory);
 

@@ -3,7 +3,7 @@ package com.revolsys.jts.geom;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 
-public interface LineSegment extends Comparable<LineSegment>, PointList {
+public interface LineSegment extends LineString {
 
   /**
    * Computes the angle that the vector defined by this segment
@@ -29,26 +29,7 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
    */
   Point[] closestPoints(LineSegment line);
 
-  /**
-   *  Compares this object with the specified object for order.
-   *  Uses the standard lexicographic ordering for the points in the LineSegmentImpl.
-   *
-   *@param  o  the <code>LineSegmentImpl</code> with which this <code>LineSegmentImpl</code>
-   *      is being compared
-   *@return    a negative integer, zero, or a positive integer as this <code>LineSegmentImpl</code>
-   *      is less than, equal to, or greater than the specified <code>LineSegmentImpl</code>
-   */
-  @Override
-  int compareTo(LineSegment o);
-
-  LineSegment convert(GeometryFactory geometryFactory);
-
-  /**
-   * Computes the distance between this line segment and a given point.
-   *
-   * @return the distance from this segment to the given point
-   */
-  double distance(Point p);
+  boolean contains(Point point);
 
   /**
    * Computes the distance between this line segment and another segment.
@@ -56,6 +37,13 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
    * @return the distance to the other segment
    */
   double distance(LineSegment ls);
+
+  /**
+   * Computes the distance between this line segment and a given point.
+   *
+   * @return the distance from this segment to the given point
+   */
+  double distance(Point p);
 
   /**
    * Computes the perpendicular distance between the (infinite) line defined
@@ -70,42 +58,38 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
    *  topologically equal to this LineSegment (e.g. irrespective
    *  of orientation).
    *
-   *@param  other  a <code>LineSegmentImpl</code> with which to do the comparison.
-   *@return        <code>true</code> if <code>other</code> is a <code>LineSegmentImpl</code>
+   *@param  other  a <code>LineSegmentDouble</code> with which to do the comparison.
+   *@return        <code>true</code> if <code>other</code> is a <code>LineSegmentDouble</code>
    *      with the same values for the x and y ordinates.
    */
   boolean equalsTopo(LineSegment other);
 
+  @Override
+  int getAxisCount();
+
+  @Override
   BoundingBox getBoundingBox();
 
   @Override
-  Point getCoordinate(int i);
+  double getCoordinate(int vertexIndex, int axisIndex);
 
   double getElevation(Point point);
 
+  @Override
   GeometryFactory getGeometryFactory();
 
   LineSegment getIntersection(BoundingBox boundingBox);
-
-  PointList getIntersection(final Point point1,
-    final Point point2);
 
   PointList getIntersection(final GeometryFactory precisionModel,
     final LineSegment lineSegment2);
 
   PointList getIntersection(LineSegment lineSegment2);
 
-  /**
-   * Computes the length of the line segment.
-   * @return the length of the line segment
-   */
-  double getLength();
+  PointList getIntersection(final Point point1, final Point point2);
 
   Point getP0();
 
   Point getP1();
-
-  Point getPoint(int vertexIndex);
 
   /**
    * Computes an intersection point between two line segments, if there is one.
@@ -126,8 +110,6 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
   boolean intersects(BoundingBox boundingBox);
 
   boolean intersects(Point point, double maxDistance);
-
-  boolean isEmpty();
 
   /**
    * Tests whether the segment is horizontal.
@@ -179,21 +161,8 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
    * than the second (according to the standard ordering on {@link Coordinates}).
    */
 
+  @Override
   LineSegment normalize();
-
-  /**
-   * Determines the orientation index of a {@link Coordinates} relative to this segment.
-   * The orientation index is as defined in {@link CGAlgorithms#computeOrientation}.
-   *
-   * @param p the coordinate to compare
-   *
-   * @return 1 (LEFT) if <code>p</code> is to the left of this segment
-   * @return -1 (RIGHT) if <code>p</code> is to the right of this segment
-   * @return 0 (COLLINEAR) if <code>p</code> is collinear with this segment
-   * 
-   * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
-   */
-  int orientationIndex(Point p);
 
   /**
    * Determines the orientation of a LineSegment relative to this segment.
@@ -215,6 +184,20 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
    * @return 0 if <code>seg</code> has indeterminate orientation relative to this segment
    */
   int orientationIndex(LineSegment seg);
+
+  /**
+   * Determines the orientation index of a {@link Coordinates} relative to this segment.
+   * The orientation index is as defined in {@link CGAlgorithms#computeOrientation}.
+   *
+   * @param p the coordinate to compare
+   *
+   * @return 1 (LEFT) if <code>p</code> is to the left of this segment
+   * @return -1 (RIGHT) if <code>p</code> is to the right of this segment
+   * @return 0 (COLLINEAR) if <code>p</code> is collinear with this segment
+   * 
+   * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
+   */
+  int orientationIndex(Point p);
 
   /**
    * Computes the {@link Coordinates} that lies a given
@@ -245,18 +228,7 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
    * 
    * @throws IllegalStateException if the segment has zero length
    */
-  Point pointAlongOffset(double segmentLengthFraction,
-    double offsetDistance);
-
-  /**
-   * Compute the projection of a point onto the line determined
-   * by this line segment.
-   * <p>
-   * Note that the projected point
-   * may lie outside the line segment.  If this is the case,
-   * the projection factor will lie outside the range [0.0, 1.0].
-   */
-  Point project(Point p);
+  Point pointAlongOffset(double segmentLengthFraction, double offsetDistance);
 
   /**
    * Project a line segment onto this line segment and return the resulting
@@ -273,8 +245,18 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
   LineSegment project(LineSegment seg);
 
   /**
+   * Compute the projection of a point onto the line determined
+   * by this line segment.
+   * <p>
+   * Note that the projected point
+   * may lie outside the line segment.  If this is the case,
+   * the projection factor will lie outside the range [0.0, 1.0].
+   */
+  Point project(Point p);
+
+  /**
    * Computes the Projection Factor for the projection of the point p
-   * onto this LineSegmentImpl.  The Projection Factor is the constant r
+   * onto this LineSegmentDouble.  The Projection Factor is the constant r
    * by which the vector for this segment must be multiplied to
    * equal the vector for the projection of <tt>p<//t> on the line
    * defined by this segment.
@@ -307,14 +289,6 @@ public interface LineSegment extends Comparable<LineSegment>, PointList {
    * @return the fraction along the line segment the projection of the point occurs
    */
   double segmentFraction(Point point);
-
-  /**
-   * Creates a LineString with the same coordinates as this segment
-   * 
-   * @param geomFactory the geometery factory to use
-   * @return a LineString with the same geometry as this segment
-   */
-  LineString toLineString();
 
   boolean touchesEnd(LineSegment closestSegment);
 

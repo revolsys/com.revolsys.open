@@ -254,7 +254,7 @@ public class WKBReader {
   private double[] ordValues;
 
   public WKBReader() {
-    this(GeometryFactory.getFactory());
+    this(GeometryFactory.floating3());
   }
 
   public WKBReader(final GeometryFactory geometryFactory) {

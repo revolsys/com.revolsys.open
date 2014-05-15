@@ -14,7 +14,7 @@ public class MinimumClearanceTest extends TestCase {
     TestRunner.run(MinimumClearanceTest.class);
   }
 
-  private final GeometryFactory geomFact = GeometryFactory.getFactory();
+  private final GeometryFactory geomFact = GeometryFactory.floating3();
 
   private final WKTReader reader = new WKTReader();
 

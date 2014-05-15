@@ -2,7 +2,7 @@ package com.revolsys.gis.model.coordinates.list;
 
 import java.util.Iterator;
 
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -10,7 +10,7 @@ import com.revolsys.jts.geom.LineString;
 
 public class CoordinatesListIndexLineSegmentIterator implements
   Iterator<LineSegment>, Iterable<LineSegment> {
-  private static final GeometryFactory FACTORY = GeometryFactory.getFactory();
+  private static final GeometryFactory FACTORY = GeometryFactory.floating3();
 
   private final GeometryFactory factory;
 
@@ -29,7 +29,7 @@ public class CoordinatesListIndexLineSegmentIterator implements
   }
 
   public CoordinatesListIndexLineSegmentIterator(final LineString line) {
-    this.factory = GeometryFactory.getFactory(line);
+    this.factory = line.getGeometryFactory();
     this.points = CoordinatesListUtil.get(line);
   }
 
@@ -46,7 +46,7 @@ public class CoordinatesListIndexLineSegmentIterator implements
   @Override
   public LineSegment next() {
     index++;
-    return new LineSegmentImpl(factory, points.get(index),
+    return new LineSegmentDoubleGF(factory, points.get(index),
       points.get(index + 1));
   }
 

@@ -33,10 +33,9 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -46,6 +45,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
@@ -359,7 +359,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final Point c0, final Point p1) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    final LineSegment line = new LineSegmentImpl(geometryFactory, c0, p1).convert(viewportGeometryFactory);
+    final LineSegment line = new LineSegmentDoubleGF(geometryFactory, c0, p1).convert(viewportGeometryFactory);
     final double length = line.getLength();
     final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
     final Point newC1 = line.pointAlongOffset((length - cursorRadius) / length,
@@ -478,7 +478,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     if (index == null) {
       previousPointOffset = 0;
       nextPointOffset = 1;
-      index = location.getSegment().getIndex();
+      index = location.getSegmentId();
     } else {
       previousPointOffset = -1;
       nextPointOffset = 1;
@@ -1109,7 +1109,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           Geometry newGeometry;
           final Point newPoint = point;
           if (vertexIndex == null) {
-            final int[] segmentIndex = location.getSegment().getIndex();
+            final int[] segmentIndex = location.getSegmentId();
             final int[] newIndex = segmentIndex.clone();
             newIndex[newIndex.length - 1] = newIndex[newIndex.length - 1] + 1;
             newGeometry = GeometryEditUtil.insertVertex(geometry, newPoint,

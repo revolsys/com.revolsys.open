@@ -58,7 +58,7 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 public class PreparedPolygonIntersectsStressTest extends TestCase {
   static final int MAX_ITER = 10000;
 
-  private static final GeometryFactory fact = GeometryFactory.getFactory(0, 2);
+  private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
 
   private static WKTReader wktRdr = new WKTReader(fact);
 

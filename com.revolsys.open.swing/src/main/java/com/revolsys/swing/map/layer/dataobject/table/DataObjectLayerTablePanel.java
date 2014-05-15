@@ -89,6 +89,11 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     // Right click Menu
     final MenuFactory menu = getMenu();
 
+    final MenuFactory layerMenuFactory = ObjectTreeModel.findMenu(layer);
+    if (layerMenuFactory != null) {
+      menu.addComponentFactory("defauly", 0, layerMenuFactory);
+    }
+
     menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit",
       notEnableCheck, this, "editRecord");
 
@@ -125,10 +130,9 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     // Toolbar
     final ToolBar toolBar = getToolBar();
 
-    final MenuFactory menuFactory = ObjectTreeModel.findMenu(layer);
-    if (menuFactory != null) {
+    if (layerMenuFactory != null) {
       toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-        ObjectTree.class, "showMenu", menuFactory, layer, this, 10, 10);
+        ObjectTree.class, "showMenu", layerMenuFactory, layer, this, 10, 10);
     }
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 

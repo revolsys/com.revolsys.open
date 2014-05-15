@@ -25,7 +25,7 @@ import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.NodeCoordinatesFilter;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.filter.CrossingLineSegmentFilter;
@@ -33,12 +33,12 @@ import com.revolsys.gis.model.coordinates.filter.PointOnLineSegment;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 public class LineStringGraph extends Graph<LineSegment> {
@@ -74,12 +74,6 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   private BoundingBox envelope;
 
-  public LineStringGraph(final PointList points) {
-    super(false);
-    setGeometryFactory(GeometryFactory.getFactory());
-    setPoints(points);
-  }
-
   public LineStringGraph(final GeometryFactory geometryFactory,
     final LineString line) {
     super(false);
@@ -88,12 +82,18 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public LineStringGraph(final LineString lineString) {
-    this(GeometryFactory.getFactory(lineString), lineString);
+    this(lineString.getGeometryFactory(), lineString);
+  }
+
+  public LineStringGraph(final PointList points) {
+    super(false);
+    setGeometryFactory(GeometryFactory.floating3());
+    setPoints(points);
   }
 
   @Override
   protected LineSegment clone(final LineSegment object, final LineString line) {
-    return new LineSegmentImpl(line);
+    return new LineSegmentDoubleGF(line);
   }
 
   @Override
@@ -102,7 +102,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     if (segment == null) {
       return null;
     } else {
-      return segment.toLineString();
+      return segment;
     }
   }
 
@@ -125,7 +125,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
         previousNode = nextNode;
       }
-    } while (previousNode != null && !previousNode.equals2d(fromPoint));
+    } while (previousNode != null && !previousNode.equals(2,fromPoint));
     return geometryFactory.lineString(newPoints);
   }
 
@@ -143,8 +143,8 @@ public class LineStringGraph extends Graph<LineSegment> {
         final Node<LineSegment> fromNode = edge.getFromNode();
         final Node<LineSegment> toNode = edge.getToNode();
         if (previousNode == null) {
-          points.add(lineSegment.get(0));
-          points.add(lineSegment.get(1));
+          points.add(lineSegment.getPoint(0));
+          points.add(lineSegment.getPoint(1));
         } else if (fromNode == previousNode) {
           if (edge.getLength() > 0) {
             points.add(toNode);
@@ -155,8 +155,8 @@ public class LineStringGraph extends Graph<LineSegment> {
             lines.add(line);
           }
           points = new ArrayList<>();
-          points.add(lineSegment.get(0));
-          points.add(lineSegment.get(1));
+          points.add(lineSegment.getPoint(0));
+          points.add(lineSegment.getPoint(1));
         }
         if (points.size() > 1) {
           final int toDegree = toNode.getDegree();
@@ -194,9 +194,9 @@ public class LineStringGraph extends Graph<LineSegment> {
         comparator);
       for (final Iterator<Node<LineSegment>> iterator = nodes.iterator(); iterator.hasNext();) {
         final Node<LineSegment> node = iterator.next();
-        if (node.equals2d(fromNode)) {
+        if (node.equals(2,fromNode)) {
           iterator.remove();
-        } else if (node.equals2d(toNode)) {
+        } else if (node.equals(2,toNode)) {
           iterator.remove();
         }
       }
@@ -248,8 +248,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       final double maxDistance = geometryFactory.getScaleXY() / 1000;
       for (final Edge<LineSegment> edge : findEdges(point, maxDistance)) {
         final LineSegment line = edge.getObject();
-        final Point lineStart = line.get(0);
-        final Point lineEnd = line.get(1);
+        final Point lineStart = line.getPoint(0);
+        final Point lineEnd = line.getPoint(1);
         if (LineSegmentUtil.isPointOnLineMiddle(lineStart, lineEnd, point,
           maxDistance)) {
           final double elevation = LineSegmentUtil.getElevation(lineStart,
@@ -295,7 +295,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Point nextPoint = points.get(i);
-        final LineSegment line1 = new LineSegmentImpl(previousPoint, nextPoint);
+        final LineSegment line1 = new LineSegmentDoubleGF(previousPoint,
+          nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
@@ -308,7 +309,7 @@ public class LineStringGraph extends Graph<LineSegment> {
               // Point intersection, make sure it's not at the start
               final Node<LineSegment> node = findNode(intersection);
               final int degree = node.getDegree();
-              if (node.equals2d(this.fromPoint)) {
+              if (node.equals(2,this.fromPoint)) {
                 if (degree > 2) {
                   // Intersection not at the start/end of the other line, taking
                   // into account loops
@@ -323,7 +324,7 @@ public class LineStringGraph extends Graph<LineSegment> {
               return true;
             }
           }
-          for (final Point point : line1) {
+          for (final Point point : line1.vertices()) {
             if (line2.distance(point) < maxDistance) {
 
               if (point.equals(fromPoint) || point.equals(toPoint)) {
@@ -331,7 +332,7 @@ public class LineStringGraph extends Graph<LineSegment> {
                 for (final Node<LineSegment> node : NodeLessThanDistanceOfCoordinatesVisitor.getNodes(
                   this, point, maxDistance)) {
                   final int degree = node.getDegree();
-                  if (node.equals2d(this.fromPoint)) {
+                  if (node.equals(2,this.fromPoint)) {
                     if (degree > 2) {
                       // Intersection not at the start/end of the other line,
                       // taking
@@ -388,7 +389,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   @Override
   public void nodeMoved(final Node<LineSegment> node,
     final Node<LineSegment> newNode) {
-    if (fromPoint.equals2d(node)) {
+    if (fromPoint.equals(2,node)) {
       fromPoint = new PointDouble(newNode);
     }
   }
@@ -439,8 +440,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       geometryFactory, points);
     int index = 0;
     for (final LineSegment lineSegment : iterator) {
-      final Point from = lineSegment.get(0);
-      final Point to = lineSegment.get(1);
+      final Point from = lineSegment.getPoint(0);
+      final Point to = lineSegment.getPoint(1);
       final Edge<LineSegment> edge = addEdge(lineSegment, from, to);
 
       edge.setAttribute(INDEX, Arrays.asList(index++));
@@ -471,8 +472,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         final LineSegment line2 = edge2.getObject();
         final PointList intersections = line1.getIntersection(line2);
         if (intersections.size() == 1) {
-          final Point intersection = new PointDouble(
-            intersections.get(0));
+          final Point intersection = new PointDouble(intersections.get(0));
           points.add(intersection);
           edge2.split(intersection);
         }
@@ -503,7 +503,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       int i = 0;
       Point previousPoint = fromNode;
       for (final Point point : newPoints) {
-        final LineSegment lineSegment = new LineSegmentImpl(previousPoint,
+        final LineSegment lineSegment = new LineSegmentDoubleGF(previousPoint,
           point);
         final Edge<LineSegment> newEdge = addEdge(lineSegment, previousPoint,
           point);

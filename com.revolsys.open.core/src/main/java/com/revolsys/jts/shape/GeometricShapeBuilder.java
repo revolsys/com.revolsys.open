@@ -38,7 +38,7 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
@@ -84,7 +84,7 @@ public abstract class GeometricShapeBuilder {
       centre.getY() - radius, Point.NULL_ORDINATE);
     final Point p1 = new PointDouble(centre.getX() + radius,
       centre.getY() - radius, Point.NULL_ORDINATE);
-    return new LineSegmentImpl(p0, p1);
+    return new LineSegmentDouble(p0, p1);
   }
 
   public BoundingBox getSquareExtent() {

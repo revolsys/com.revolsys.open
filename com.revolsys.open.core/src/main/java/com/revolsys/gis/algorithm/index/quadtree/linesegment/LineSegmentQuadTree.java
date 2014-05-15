@@ -5,24 +5,17 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.filter.InvokeMethodFilter;
 import com.revolsys.gis.model.coordinates.filter.LineSegmentCoordinateDistanceFilter;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class LineSegmentQuadTree {
-  public static Envelope ensureExtent(final Envelope envelope,
+  public static BoundingBox ensureExtent(final BoundingBox envelope,
     final double minExtent) {
     double minX = envelope.getMinX();
     double maxX = envelope.getMaxX();
@@ -53,52 +46,12 @@ public class LineSegmentQuadTree {
 
   public LineSegmentQuadTree(final Geometry geometry) {
     this.geometry = geometry;
-    if (geometry == null || geometry.isEmpty()) {
-    } else if (geometry instanceof Point) {
-    } else if (geometry instanceof MultiPoint) {
-    } else if (geometry instanceof LineString) {
-      final PointList points = CoordinatesListUtil.get(geometry);
-      add(points);
-    } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      final List<PointList> rings = CoordinatesListUtil.getAll(polygon);
-      for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
-        final PointList points = rings.get(ringIndex);
-        add(points, ringIndex);
+    if (geometry != null) {
+      for (final Segment segment : geometry.segments()) {
+        final BoundingBox boundingBox = segment.getBoundingBox();
+        final int[] segmentId = segment.getSegmentId();
+        insert(boundingBox, segmentId);
       }
-    } else {
-      for (int partIndex = 0; partIndex < geometry.getGeometryCount(); partIndex++) {
-        final Geometry part = geometry.getGeometry(partIndex);
-        if (part instanceof Point) {
-        } else if (part instanceof LineString) {
-          final LineString line = (LineString)part;
-          final PointList points = CoordinatesListUtil.get(line);
-          add(points, partIndex);
-        } else if (part instanceof Polygon) {
-          final Polygon polygon = (Polygon)part;
-          final List<PointList> rings = CoordinatesListUtil.getAll(polygon);
-          for (int ringIndex = 0; ringIndex < rings.size(); ringIndex++) {
-            final PointList points = rings.get(ringIndex);
-            add(points, partIndex, ringIndex);
-          }
-        }
-      }
-    }
-  }
-
-  private void add(final PointList points, final int... parentIndex) {
-    double x1 = points.getX(0);
-    double y1 = points.getY(0);
-    for (int segmentIndex = 0; segmentIndex < points.size() - 1; segmentIndex++) {
-      final int segmentEndVertexIndex = segmentIndex + 1;
-      final double x2 = points.getX(segmentEndVertexIndex);
-      final double y2 = points.getY(segmentEndVertexIndex);
-      final int[] index = GeometryEditUtil.createVertexIndex(parentIndex,
-        segmentIndex);
-      final Envelope envelope = new Envelope(2, x1, y1, x2, y2);
-      insert(envelope, index);
-      x1 = x2;
-      y1 = y2;
     }
   }
 
@@ -118,29 +71,18 @@ public class LineSegmentQuadTree {
     return root.depth();
   }
 
-  public List<LineSegment> getAll() {
-    final CreateListVisitor<LineSegment> visitor = new CreateListVisitor<LineSegment>();
-    root.visit(this, visitor);
-    return visitor.getList();
+  protected BoundingBox getEnvelope(final int[] index) {
+    final Segment segment = geometry.getSegment(index);
+    return segment.getBoundingBox();
   }
 
-  protected com.revolsys.jts.geom.BoundingBox getEnvelope(final int[] index) {
-    final PointList points = GeometryEditUtil.getPoints(geometry, index);
-    final int vertexIndex = GeometryEditUtil.getVertexIndex(index);
-    final double x1 = points.getX(vertexIndex);
-    final double y1 = points.getY(vertexIndex);
-    final double x2 = points.getX(vertexIndex + 1);
-    final double y2 = points.getY(vertexIndex + 1);
-    return new Envelope(2, x1, y1, x2, y2);
-  }
-
-  public List<LineSegment> getIntersecting(final BoundingBox boundingBox) {
-    final CreateListVisitor<LineSegment> visitor = new CreateListVisitor<LineSegment>();
+  public List<Segment> getIntersecting(final BoundingBox boundingBox) {
+    final CreateListVisitor<Segment> visitor = new CreateListVisitor<>();
     visit(boundingBox, visitor);
     return visitor.getList();
   }
 
-  public List<LineSegment> getIntersectingBoundingBox(final Geometry geometry) {
+  public List<Segment> getIntersectingBoundingBox(final Geometry geometry) {
     if (geometry == null) {
       return Collections.emptyList();
     } else {
@@ -149,27 +91,22 @@ public class LineSegmentQuadTree {
     }
   }
 
-  protected LineSegment getLineSegment(final int[] index) {
-    final PointList points = GeometryEditUtil.getPoints(geometry, index);
-    final int vertexIndex = GeometryEditUtil.getVertexIndex(index);
-    final Point p1 = points.get(vertexIndex);
-    final Point p2 = points.get(vertexIndex + 1);
-    return new LineSegmentImpl(GeometryFactory.getFactory(geometry), p1, p2);
+  protected Segment getLineSegment(final int[] index) {
+    return geometry.getSegment(index);
   }
 
   public int getSize() {
     return size;
   }
 
-  public List<LineSegment> getWithin(final BoundingBox boundingBox,
-    final Filter<LineSegment> filter) {
-    final CreateListVisitor<LineSegment> visitor = new CreateListVisitor<LineSegment>(
-      filter);
+  public List<Segment> getWithin(final BoundingBox boundingBox,
+    final Filter<Segment> filter) {
+    final CreateListVisitor<Segment> visitor = new CreateListVisitor<>(filter);
     visit(boundingBox, visitor);
     return visitor.getList();
   }
 
-  public List<LineSegment> getWithinDistance(final Point point,
+  public List<Segment> getWithinDistance(final Point point,
     final double maxDistance) {
     BoundingBox boundingBox = new Envelope(point);
     boundingBox = boundingBox.expand(maxDistance);
@@ -178,11 +115,18 @@ public class LineSegmentQuadTree {
     return getWithin(boundingBox, filter);
   }
 
-  public void insert(final Envelope envelope, final int[] index) {
+  public void insert(final BoundingBox envelope, final int[] index) {
     size++;
     collectStats(envelope);
-    final Envelope insertEnv = ensureExtent(envelope, minExtent);
+    final BoundingBox insertEnv = ensureExtent(envelope, minExtent);
     root.insert(insertEnv, index);
+  }
+
+  public List<Segment> query(final BoundingBox boundingBox,
+    final String methodName, final Object... parameters) {
+    final Filter<Segment> filter = new InvokeMethodFilter<>(methodName,
+      parameters);
+    return getWithin(boundingBox, filter);
   }
 
   public int size() {
@@ -190,7 +134,7 @@ public class LineSegmentQuadTree {
   }
 
   public void visit(final BoundingBox boundingBox,
-    final Visitor<LineSegment> visitor) {
+    final Visitor<Segment> visitor) {
     root.visit(this, boundingBox, visitor);
   }
 

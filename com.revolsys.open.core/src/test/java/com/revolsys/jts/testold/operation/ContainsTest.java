@@ -18,7 +18,7 @@ public class ContainsTest extends TestCase {
     TestRunner.run(ContainsTest.class);
   }
 
-  private final GeometryFactory fact = GeometryFactory.getFactory();
+  private final GeometryFactory fact = GeometryFactory.floating3();
 
   private final WKTReader rdr = new WKTReader(this.fact);
 

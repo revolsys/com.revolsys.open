@@ -81,7 +81,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     500L, 250L, 100L, 50L, 25L, 10L, 5L);
 
   public static final BoundingBox BC_ENVELOPE = new Envelope(
-    GeometryFactory.getFactory(3005, 3, 1000, 1000), 2, 25000, 340000, 1900000,
+    GeometryFactory.fixed(3005, 1000.0), 2, 25000, 340000, 1900000,
     1750000);
 
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
@@ -599,7 +599,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final String propertyName = event.getPropertyName();
     if ("srid".equals(propertyName)) {
       final Integer srid = (Integer)event.getNewValue();
-      setGeometryFactory(GeometryFactory.getFactory(srid));
+      setGeometryFactory(GeometryFactory.floating3(srid));
     } else if ("viewBoundingBox".equals(propertyName)) {
       final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
       setBoundingBox(boundingBox);

@@ -51,7 +51,7 @@ public class GpxIterator implements DataObjectIterator {
 
   private File file;
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(4326);
+  private final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
 
   private boolean hasNext = true;
 

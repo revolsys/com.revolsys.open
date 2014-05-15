@@ -124,19 +124,7 @@ public interface Point extends Geometry, Puntal, Serializable {
 
   boolean equals(double... coordinates);
 
-  boolean equals(int axisCount, Point point);
-
   boolean equals(Point point);
-
-  /**
-   *  Returns whether the planar projections of the two <code>Coordinate</code>s
-   *  are equal.
-   *
-   *@param  other  a <code>Coordinate</code> with which to do the 2D comparison.
-   *@return        <code>true</code> if the x- and y-coordinates are equal; the
-   *      z-coordinates do not have to be equal.
-   */
-  boolean equals2d(Point point);
 
   /**
    * Tests if another coordinate has the same values for the X and Y ordinates.
@@ -147,18 +135,6 @@ public interface Point extends Geometry, Puntal, Serializable {
    *      with the same values for X and Y.
    */
   boolean equals2d(Point point, double tolerance);
-
-  /**
-   * Tests if another coordinate has the same values for the X, Y and Z ordinates.
-   *
-   *@param point a <code>Coordinate</code> with which to do the 3D comparison.
-   *@return true if <code>other</code> is a <code>Coordinate</code>
-   *      with the same values for X, Y and Z.
-   */
-  boolean equals3d(Point point);
-
-  @Override
-  int getAxisCount();
 
   /**
    * Gets the ordinate value for the given index.

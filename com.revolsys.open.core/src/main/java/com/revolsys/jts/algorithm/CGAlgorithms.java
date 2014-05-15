@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -91,8 +91,8 @@ public class CGAlgorithms {
    * or -1 if q is clockwise from p1-p2,
    * or 0 if q is collinear with p1-p2
    */
-  public static int computeOrientation(final Point p1,
-    final Point p2, final Point q) {
+  public static int computeOrientation(final Point p1, final Point p2,
+    final Point q) {
     return orientationIndex(p1, p2, q);
   }
 
@@ -110,8 +110,8 @@ public class CGAlgorithms {
    * @param D
    *          another point of the line (must be different to A)
    */
-  public static double distanceLineLine(final Point A,
-    final Point B, final Point C, final Point D) {
+  public static double distanceLineLine(final Point A, final Point B,
+    final Point C, final Point D) {
     // check for zero-length segments
     if (A.equals(B)) {
       return distancePointLine(A, C, D);
@@ -179,8 +179,8 @@ public class CGAlgorithms {
    *          another point of the line (must be different to A)
    * @return the distance from p to line segment AB
    */
-  public static double distancePointLine(final Point p,
-    final Point A, final Point B) {
+  public static double distancePointLine(final Point p, final Point A,
+    final Point B) {
     // if start = end, then just compute distance to one of the endpoints
     if (A.getX() == B.getX() && A.getY() == B.getY()) {
       return p.distance(A);
@@ -289,13 +289,13 @@ public class CGAlgorithms {
       if (iPrev < 0) {
         iPrev = nPts;
       }
-    } while (ring[iPrev].equals2d(hiPt) && iPrev != hiIndex);
+    } while (ring[iPrev].equals(2,hiPt) && iPrev != hiIndex);
 
     // find distinct point after highest point
     int iNext = hiIndex;
     do {
       iNext = (iNext + 1) % nPts;
-    } while (ring[iNext].equals2d(hiPt) && iNext != hiIndex);
+    } while (ring[iNext].equals(2,hiPt) && iNext != hiIndex);
 
     final Point prev = ring[iPrev];
     final Point next = ring[iNext];
@@ -306,7 +306,7 @@ public class CGAlgorithms {
      * (including the case where the input array has fewer than 4 elements), or
      * it contains coincident line segments.
      */
-    if (prev.equals2d(hiPt) || next.equals2d(hiPt) || prev.equals2d(next)) {
+    if (prev.equals(2,hiPt) || next.equals(2,hiPt) || prev.equals(2,next)) {
       return false;
     }
 
@@ -342,8 +342,8 @@ public class CGAlgorithms {
   public static boolean isOnLine(final Point p, final LineString line) {
     final LineIntersector lineIntersector = new RobustLineIntersector();
     for (final Segment segment : line.segments()) {
-      final Point p0 = segment.get(0);
-      final Point p1 = segment.get(1);
+      final Point p0 = segment.getPoint(0);
+      final Point p1 = segment.getPoint(1);
       lineIntersector.computeIntersection(p, p0, p1);
       if (lineIntersector.hasIntersection()) {
         return true;
@@ -352,8 +352,7 @@ public class CGAlgorithms {
     return false;
   }
 
-  public static boolean isPointInRing(final Point point,
-    final LineString ring) {
+  public static boolean isPointInRing(final Point point, final LineString ring) {
     return locatePointInRing(point, ring) != Location.EXTERIOR;
   }
 
@@ -390,8 +389,7 @@ public class CGAlgorithms {
     return len;
   }
 
-  public static Location locatePointInRing(final Point p,
-    final LineString ring) {
+  public static Location locatePointInRing(final Point p, final LineString ring) {
     return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
@@ -407,8 +405,8 @@ public class CGAlgorithms {
    * @return -1 if q is clockwise (right) from p1-p2
    * @return 0 if q is collinear with p1-p2
    */
-  public static int orientationIndex(final Point p1,
-    final Point p2, final Point q) {
+  public static int orientationIndex(final Point p1, final Point p2,
+    final Point q) {
     /**
      * MD - 9 Aug 2010 It seems that the basic algorithm is slightly orientation
      * dependent, when computing the orientation of a point very close to a

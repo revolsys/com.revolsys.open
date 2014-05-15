@@ -72,8 +72,8 @@ public class ConformingDelaunayTriangulationBuilder {
   private static void createConstraintSegments(final LineString line,
     final List<Segment> constraintSegs) {
     for (final com.revolsys.jts.geom.segment.Segment segment : line.segments()) {
-      constraintSegs.add(new Segment(segment.get(0).cloneCoordinates(),
-        segment.get(1).cloneCoordinates()));
+      constraintSegs.add(new Segment(segment.getPoint(0).cloneCoordinates(),
+        segment.getPoint(1).cloneCoordinates()));
     }
   }
 

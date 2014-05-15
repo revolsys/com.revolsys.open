@@ -47,11 +47,11 @@ public class GeometryCollectionSegment extends AbstractSegment {
   }
 
   @Override
-  public double getValue(final int index, final int axisIndex) {
+  public double getCoordinate(final int index, final int axisIndex) {
     if (segment == null) {
       return Double.NaN;
     } else {
-      return segment.getValue(index, axisIndex);
+      return segment.getCoordinate(index, axisIndex);
     }
   }
 

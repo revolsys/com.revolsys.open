@@ -56,7 +56,7 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
    */
   public DataObjectGeometryIntersectsFilter(final Geometry geometry) {
     this.geometry = geometry;
-    this.geometryFactory = GeometryFactory.getFactory(geometry);
+    this.geometryFactory = geometry.getGeometryFactory();
   }
 
   @Override

@@ -243,7 +243,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
    * @return The distance.
    */
   public double getDistance(final Geometry geometry) {
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(geometry);
+    final com.revolsys.jts.geom.GeometryFactory factory = geometry.getGeometryFactory();
     final Point point = factory.point(this);
     return point.distance(geometry);
   }

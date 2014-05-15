@@ -40,11 +40,11 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 
 /**
- * An spatial index on a set of {@link LineSegmentImpl}s.
+ * An spatial index on a set of {@link LineSegmentDouble}s.
  * Supports adding and removing items.
  *
  * @author Martin Davis

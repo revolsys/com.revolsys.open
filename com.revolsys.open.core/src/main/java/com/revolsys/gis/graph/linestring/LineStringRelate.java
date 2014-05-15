@@ -10,12 +10,12 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 
 public class LineStringRelate {
   private final LineString line1;
@@ -42,7 +42,7 @@ public class LineStringRelate {
     final double tolerance) {
     this.line1 = line1;
     this.line2 = line2;
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(line1);
+    final GeometryFactory geometryFactory = line1.getGeometryFactory();
     graph1 = new LineStringGraph(geometryFactory, line1);
     graph2 = new LineStringGraph(geometryFactory, line2);
 
@@ -77,9 +77,8 @@ public class LineStringRelate {
     return line2;
   }
 
-  public Point getMovedCoordinate(
-    final Map<Point, Point> movedNodes, final LineString line,
-    final int i) {
+  public Point getMovedCoordinate(final Map<Point, Point> movedNodes,
+    final LineString line, final int i) {
     final Point coordinates = CoordinatesListUtil.get(line, i);
     if (movedNodes.containsKey(coordinates)) {
       return movedNodes.get(coordinates);
@@ -100,7 +99,7 @@ public class LineStringRelate {
       } else if (outEdges.size() > 1) {
         System.err.println("Cannot handle overlaps\n" + getLine1() + "\n "
           + getLine2());
-        final GeometryFactory factory = GeometryFactory.getFactory(line1);
+        final GeometryFactory factory = line1.getGeometryFactory();
         return factory.multiLineString();
       } else {
         final Edge<LineSegment> edge = outEdges.get(0);
@@ -108,9 +107,9 @@ public class LineStringRelate {
         final Node<LineSegment> nextNode = edge.getToNode();
         if (graph2.hasEdgeBetween(previousNode, nextNode)) {
           if (currentCoordinates.size() == 0) {
-            currentCoordinates.add(line.get(0));
+            currentCoordinates.add(line.getPoint(0));
           }
-          currentCoordinates.add(line.get(1));
+          currentCoordinates.add(line.getPoint(1));
         } else {
           if (currentCoordinates.size() > 0) {
             final List<Point> points = new ArrayList<>();
@@ -121,12 +120,12 @@ public class LineStringRelate {
         previousNode = nextNode;
       }
 
-    } while (previousNode != null && !previousNode.equals2d(fromPoint1));
+    } while (previousNode != null && !previousNode.equals(2,fromPoint1));
     if (currentCoordinates.size() > 0) {
       final List<Point> points = new ArrayList<>();
       intersections.add(points);
     }
-    final GeometryFactory factory = GeometryFactory.getFactory(line1);
+    final GeometryFactory factory = line1.getGeometryFactory();
     return factory.multiLineString(intersections);
   }
 
@@ -215,9 +214,8 @@ public class LineStringRelate {
     return false;
   }
 
-  private boolean isWithin(final LineStringGraph graph,
-    final Point fromPoint, final Point toPoint,
-    final Point point, final double maxDistance) {
+  private boolean isWithin(final LineStringGraph graph, final Point fromPoint,
+    final Point toPoint, final Point point, final double maxDistance) {
     if (point.distance(fromPoint) < maxDistance) {
       return false;
     } else if (point.distance(toPoint) < maxDistance) {

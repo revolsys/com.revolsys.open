@@ -145,7 +145,7 @@ public class LinearIterator {
    */
   public Point getSegmentEnd() {
     if (vertexIndex < getLine().getVertexCount() - 1) {
-      return currentLine.getCoordinate(vertexIndex + 1);
+      return currentLine.getPoint(vertexIndex + 1);
     }
     return null;
   }
@@ -156,7 +156,7 @@ public class LinearIterator {
    * @return a {@link Coordinates}
    */
   public Point getSegmentStart() {
-    return currentLine.getCoordinate(vertexIndex);
+    return currentLine.getPoint(vertexIndex);
   }
 
   /**

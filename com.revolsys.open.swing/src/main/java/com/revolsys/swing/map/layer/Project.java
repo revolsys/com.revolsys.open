@@ -416,7 +416,7 @@ public class Project extends LayerGroup {
       try {
         final Integer srid = StringConverterRegistry.toObject(Integer.class,
           value);
-        setGeometryFactory(GeometryFactory.getFactory(srid));
+        setGeometryFactory(GeometryFactory.floating3(srid));
       } catch (final Throwable t) {
       }
     } else if ("viewBoundingBox".equals(name)) {
@@ -435,7 +435,7 @@ public class Project extends LayerGroup {
 
   public void setSrid(final Number srid) {
     if (srid != null) {
-      setGeometryFactory(GeometryFactory.getFactory(srid.intValue()));
+      setGeometryFactory(GeometryFactory.floating3(srid.intValue()));
     }
   }
 

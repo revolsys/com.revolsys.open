@@ -257,21 +257,21 @@ public class PolygonImpl extends BaseGeometry implements Polygon {
   }
 
   @Override
-  protected boolean doEqualsExact(final Geometry geometry) {
+  protected boolean doEquals(final int axisCount, final Geometry geometry) {
     final Polygon polygon = (Polygon)geometry;
     final int ringCount = getRingCount();
-    if (ringCount != polygon.getRingCount()) {
-      return false;
-    } else {
+    final int ringCount2 = polygon.getRingCount();
+    if (ringCount == ringCount2) {
       for (int i = 0; i < ringCount; i++) {
-        final LinearRing ring = getRing(i);
-        final LinearRing otherRing = polygon.getRing(i);
-        if (!ring.equalsExact(otherRing)) {
+        final LinearRing ring1 = getRing(i);
+        final LinearRing ring2 = polygon.getRing(i);
+        if (!ring1.equals(axisCount, ring2)) {
           return false;
         }
       }
       return true;
     }
+    return false;
   }
 
   @Override
@@ -294,28 +294,6 @@ public class PolygonImpl extends BaseGeometry implements Polygon {
         return true;
       }
     }
-  }
-
-  @Override
-  public boolean equalsExact3d(final Geometry geometry) {
-    if (geometry == this) {
-      return true;
-    } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      final int ringCount = getRingCount();
-      if (ringCount == polygon.getRingCount()) {
-        for (int i = 0; i < ringCount; i++) {
-          final LinearRing ring1 = getRing(i);
-          final LinearRing ring2 = polygon.getRing(i);
-          if (!ring1.equalsExact3d(ring2)) {
-            return false;
-          }
-        }
-        return true;
-
-      }
-    }
-    return false;
   }
 
   /**

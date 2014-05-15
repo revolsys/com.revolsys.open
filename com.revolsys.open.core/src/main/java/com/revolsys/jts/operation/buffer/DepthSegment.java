@@ -1,7 +1,7 @@
 package com.revolsys.jts.operation.buffer;
 
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 
 /**
   * A segment from a directed edge which has been assigned a depth value
@@ -14,7 +14,7 @@ public class DepthSegment implements Comparable<DepthSegment> {
 
   public DepthSegment(final LineSegment seg, final int depth) {
     // input seg is assumed to be normalized
-    upwardSeg = new LineSegmentImpl(seg);
+    upwardSeg = new LineSegmentDouble(seg);
     // upwardSeg.normalize();
     this.leftDepth = depth;
   }

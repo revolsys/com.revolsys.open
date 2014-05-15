@@ -27,7 +27,7 @@ public class MapGridGeometrySheetFilter implements Filter<DataObject> {
     if (sheet != null && grid != null) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
-        final Geometry geographicsGeometry = geometry.convert(GeometryFactory.getFactory(4326));
+        final Geometry geographicsGeometry = geometry.convert(GeometryFactory.floating3(4326));
         final Point centroid = geographicsGeometry.getCentroid()
           .getPoint();
         final String geometrySheet = grid.getMapTileName(centroid.getX(),

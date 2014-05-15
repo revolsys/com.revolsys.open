@@ -33,7 +33,7 @@ public class GeometryHttpMessageConverter extends
   AbstractHttpMessageConverter<Geometry> {
   private static final Logger LOG = LoggerFactory.getLogger(GeometryHttpMessageConverter.class);
 
-  private GeometryFactory geometryFactory = GeometryFactory.getFactory(4326);
+  private GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
@@ -73,7 +73,7 @@ public class GeometryHttpMessageConverter extends
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
-          factory = GeometryFactory.getFactory(Integer.parseInt(srid));
+          factory = GeometryFactory.floating3(Integer.parseInt(srid));
         }
         reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
         for (final Geometry geometry : reader) {

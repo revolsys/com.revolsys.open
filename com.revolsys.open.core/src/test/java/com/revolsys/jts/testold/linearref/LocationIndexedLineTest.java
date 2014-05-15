@@ -41,10 +41,10 @@ public class LocationIndexedLineTest extends AbstractIndexedLineTest {
     // check extracted points are the same as the input
     final Point pt1 = indexedLine.extractPoint(loc1);
     final Point pt2 = indexedLine.extractPoint(loc2);
-    if (!pt1.equals2d(testPt)) {
+    if (!pt1.equals(2,testPt)) {
       return false;
     }
-    if (!pt2.equals2d(testPt)) {
+    if (!pt2.equals(2,testPt)) {
       return false;
     }
     return true;

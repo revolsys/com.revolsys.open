@@ -51,7 +51,7 @@ public class PreparedLineIntersectsPerfTest {
 
   static final int NUM_LINE_PTS = 10;
 
-  static GeometryFactory geometryFactory = GeometryFactory.getFactory(0, 2);
+  static GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   public static void main(final String[] args) {
     final PreparedLineIntersectsPerfTest test = new PreparedLineIntersectsPerfTest();

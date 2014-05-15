@@ -63,7 +63,7 @@ public class LineStringImplTest extends TestCase {
     return new TestSuite(LineStringImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.getFactory(0,
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
     1000.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
@@ -79,12 +79,12 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals10() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.getFactory(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
     Geometry l1 = reader.read("POLYGON((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     Geometry l2 = reader.read("POLYGON((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     l1 = l1.normalize();
     l2 = l2.normalize();
-    assertTrue(l1.equalsExact2d(l2));
+    assertTrue(l1.equals(2,l2));
   }
 
   public void testEquals2() throws Exception {
@@ -125,21 +125,21 @@ public class LineStringImplTest extends TestCase {
 
   public void testEquals8() throws Exception {
     final WKTReader reader = new WKTReader(
-      GeometryFactory.getFactory(0, 1000.0));
+      GeometryFactory.fixed(0, 1000.0));
     final MultiLineString l1 = (MultiLineString)reader.read("MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final MultiLineString l2 = (MultiLineString)reader.read("MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals9() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.getFactory(0, 1.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
     final MultiLineString l1 = (MultiLineString)reader.read("MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final MultiLineString l2 = (MultiLineString)reader.read("MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
 
   public void testFiveZeros() {
-    final GeometryFactory factory = GeometryFactory.getFactory(0, 2);
+    final GeometryFactory factory = GeometryFactory.floating(0, 2);
     final LineString line = factory.lineString(2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0, 0.0);
     final boolean closed = line.isClosed();
@@ -180,7 +180,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testLinearRingConstructor() throws Exception {
     try {
-      final LinearRing ring = GeometryFactory.getFactory().linearRing(
+      final LinearRing ring = GeometryFactory.floating3().linearRing(
         new Point[] {
           new PointDouble(0.0, 0, Point.NULL_ORDINATE),
           new PointDouble(10.0, 10, Point.NULL_ORDINATE),

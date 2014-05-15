@@ -21,11 +21,11 @@ import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 public class CascadedPolygonUnionTester {
   public static final double MIN_SIMILARITY_MEAURE = 0.999999;;
 
-  private static final GeometryFactory fact = GeometryFactory.getFactory(0, 2);
+  private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
 
   static WKTReader wktRdr = new WKTReader(fact);
 
-  GeometryFactory geomFact = GeometryFactory.getFactory();
+  GeometryFactory geomFact = GeometryFactory.floating3();
 
   public CascadedPolygonUnionTester() {
   }

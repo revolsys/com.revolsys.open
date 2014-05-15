@@ -90,7 +90,7 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final QuadEdge[] tri, final Point pt) {
-    final LineString ring = GeometryFactory.getFactory().lineString(
+    final LineString ring = GeometryFactory.floating3().lineString(
       tri[0].orig().getCoordinate(), tri[1].orig().getCoordinate(),
       tri[2].orig().getCoordinate(), tri[0].orig().getCoordinate());
     return CGAlgorithms.isPointInRing(pt, ring);
@@ -107,7 +107,7 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final Vertex[] tri, final Point pt) {
-    final LineString ring = GeometryFactory.getFactory().lineString(
+    final LineString ring = GeometryFactory.floating3().lineString(
       tri[0].getCoordinate(), tri[1].getCoordinate(), tri[2].getCoordinate(),
       tri[0].getCoordinate());
     return CGAlgorithms.isPointInRing(pt, ring);
@@ -146,7 +146,7 @@ public class QuadEdgeTriangle {
       e[0].orig().getCoordinate(), e[1].orig().getCoordinate(),
       e[2].orig().getCoordinate(), e[0].orig().getCoordinate()
     };
-    final GeometryFactory fact = GeometryFactory.getFactory();
+    final GeometryFactory fact = GeometryFactory.floating3();
     final LinearRing ring = fact.linearRing(ringPts);
     final Polygon tri = fact.polygon(ring);
     return tri;
@@ -157,7 +157,7 @@ public class QuadEdgeTriangle {
       v[0].getCoordinate(), v[1].getCoordinate(), v[2].getCoordinate(),
       v[0].getCoordinate()
     };
-    final GeometryFactory fact = GeometryFactory.getFactory();
+    final GeometryFactory fact = GeometryFactory.floating3();
     final LinearRing ring = fact.linearRing(ringPts);
     final Polygon tri = fact.polygon(ring);
     return tri;
@@ -263,7 +263,7 @@ public class QuadEdgeTriangle {
   }
 
   public LineString getLine() {
-    return GeometryFactory.getFactory().lineString(getCoordinates());
+    return GeometryFactory.floating3().lineString(getCoordinates());
   }
 
   /**
@@ -359,6 +359,6 @@ public class QuadEdgeTriangle {
 
   @Override
   public String toString() {
-    return getGeometry(GeometryFactory.getFactory()).toString();
+    return getGeometry(GeometryFactory.floating3()).toString();
   }
 }

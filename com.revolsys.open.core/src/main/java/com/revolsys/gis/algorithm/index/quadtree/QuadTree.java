@@ -8,7 +8,6 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.InvokeMethodFilter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.index.SpatialIndex;
@@ -16,30 +15,32 @@ import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
 
 public class QuadTree<T> implements SpatialIndex<T>, Serializable {
-  public static BoundingBox ensureExtent(final BoundingBox envelope,
+  public static double[] ensureExtent(final double[] bounds,
     final double minExtent) {
-    double minX = envelope.getMinX();
-    double maxX = envelope.getMaxX();
-    double minY = envelope.getMinY();
-    double maxY = envelope.getMaxY();
+    double minX = bounds[0];
+    double maxX = bounds[2];
+    double minY = bounds[1];
+    double maxY = bounds[2];
     if (minX != maxX && minY != maxY) {
-      return envelope;
+      return bounds;
+    } else {
+      if (minX == maxX) {
+        minX = minX - minExtent / 2.0;
+        maxX = minX + minExtent / 2.0;
+      }
+      if (minY == maxY) {
+        minY = minY - minExtent / 2.0;
+        maxY = minY + minExtent / 2.0;
+      }
+      return new double[] {
+        minX, minY, maxX, maxY
+      };
     }
-
-    if (minX == maxX) {
-      minX = minX - minExtent / 2.0;
-      maxX = minX + minExtent / 2.0;
-    }
-    if (minY == maxY) {
-      minY = minY - minExtent / 2.0;
-      maxY = minY + minExtent / 2.0;
-    }
-    return new Envelope(2, minX, minY, maxX, maxY);
   }
 
   private GeometryFactory geometryFactory;
 
-  private Root<T> root = new Root<T>();
+  private final AbstractNode<T> root = new Node<T>(-1);
 
   private double minExtent = 1.0;
 
@@ -53,7 +54,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   public void clear() {
-    root = new Root<T>();
+    root.clear();
     minExtent = 1.0;
     size = 0;
   }
@@ -70,18 +71,18 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  protected BoundingBox convert(BoundingBox boundingBox) {
+  protected double[] convert(BoundingBox boundingBox) {
     if (geometryFactory != null) {
       boundingBox = boundingBox.convert(geometryFactory);
     }
-    return boundingBox;
+    return boundingBox.getBounds(2);
   }
 
   public int depth() {
     return root.depth();
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
@@ -90,15 +91,17 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   @Override
-  public void insert(BoundingBox boundingBox, final T item) {
+  public void insert(final BoundingBox boundingBox, final T item) {
     if (boundingBox == null) {
       throw new IllegalArgumentException("Item envelope must not be null");
     } else {
-      boundingBox = convert(boundingBox);
-      size++;
-      collectStats(boundingBox);
-      final BoundingBox insertEnv = ensureExtent(boundingBox, minExtent);
-      root.insert(insertEnv, item);
+      double[] bounds = convert(boundingBox);
+      if (bounds != null) {
+        size++;
+        collectStats(boundingBox);
+        bounds = ensureExtent(bounds, minExtent);
+        root.insertRoot(this, bounds, item);
+      }
     }
   }
 
@@ -122,14 +125,14 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return query(boundingBox, filter);
   }
 
-  public void query(BoundingBox boundingBox, final Visitor<T> visitor) {
-    boundingBox = convert(boundingBox);
-    root.visit(boundingBox, visitor);
+  public void query(final BoundingBox boundingBox, final Visitor<T> visitor) {
+    final double[] bounds = convert(boundingBox);
+    root.visit(this, bounds, visitor);
   }
 
   public List<T> queryAll() {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    root.visit(visitor);
+    root.visit(this, visitor);
     return visitor.getList();
   }
 
@@ -158,10 +161,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   @Override
-  public boolean remove(BoundingBox boundingBox, final T item) {
-    boundingBox = convert(boundingBox);
-    final BoundingBox posEnv = ensureExtent(boundingBox, minExtent);
-    final boolean removed = root.remove(posEnv, item);
+  public boolean remove(final BoundingBox boundingBox, final T item) {
+    double[] bounds = convert(boundingBox);
+    bounds = ensureExtent(bounds, minExtent);
+    final boolean removed = root.remove(this, bounds, item);
     if (removed) {
       size--;
     }

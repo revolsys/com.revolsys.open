@@ -60,7 +60,7 @@ public class SegmentPointComparator {
   public static int compare(int octant, Point p0, Point p1)
   {
     // nodes can only be equal if their coordinates are equal
-    if (p0.equals2d(p1)) return 0;
+    if (p0.equals(2,p1)) return 0;
 
     int xSign = relativeSign(p0.getX(), p1.getX());
     int ySign = relativeSign(p0.getY(), p1.getY());

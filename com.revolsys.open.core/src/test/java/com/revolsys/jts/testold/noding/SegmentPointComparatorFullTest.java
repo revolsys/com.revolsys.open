@@ -3,7 +3,7 @@ package com.revolsys.jts.testold.noding;
 import junit.framework.TestCase;
 
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.noding.Octant;
@@ -50,7 +50,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final Point seg0 = new PointDouble((double)0, 0,
       Point.NULL_ORDINATE);
     final Point seg1 = new PointDouble(x, y, Point.NULL_ORDINATE);
-    final LineSegment seg = new LineSegmentImpl(seg0, seg1);
+    final LineSegment seg = new LineSegmentDouble(seg0, seg1);
 
     for (int i = 0; i < 4; i++) {
       final double dist = i;

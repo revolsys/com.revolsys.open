@@ -43,7 +43,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   protected void doInit() {
     geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (geometryFactory == null) {
-      geometryFactory = GeometryFactory.getFactory(4326);
+      geometryFactory = GeometryFactory.floating3(4326);
     }
     if (in.hasNext()) {
       in.next();
@@ -216,10 +216,10 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
         if (name != null) {
           if (name.startsWith(URN_OGC_DEF_CRS_EPSG)) {
             final int srid = Integer.parseInt(name.substring(URN_OGC_DEF_CRS_EPSG.length()));
-            factory = GeometryFactory.getFactory(srid);
+            factory = GeometryFactory.floating3(srid);
           } else if (name.startsWith(EPSG)) {
             final int srid = Integer.parseInt(name.substring(EPSG.length()));
-            factory = GeometryFactory.getFactory(srid);
+            factory = GeometryFactory.floating3(srid);
           }
         }
       }

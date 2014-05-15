@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -21,6 +20,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.JdbcConstants;
 import com.revolsys.jdbc.io.SqlFunction;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
 
@@ -80,9 +80,9 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       final com.revolsys.jts.geom.GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
       final com.revolsys.jts.geom.GeometryFactory geometryFactory;
       if (storeGeometryFactory == null) {
-        geometryFactory = GeometryFactory.getFactory(srid, axisCount, 0, 0);
+        geometryFactory = GeometryFactory.floating(srid, axisCount);
       } else {
-        geometryFactory = GeometryFactory.getFactory(srid, axisCount,
+        geometryFactory = GeometryFactory.fixed(srid, axisCount,
           storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
       final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(name,

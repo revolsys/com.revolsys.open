@@ -217,7 +217,7 @@ public class MinimumBoundingCircle {
 
     // strip duplicate final point, if any
     Point[] pts = hullPts;
-    if (hullPts[0].equals2d(hullPts[hullPts.length - 1])) {
+    if (hullPts[0].equals(2,hullPts[hullPts.length - 1])) {
       pts = new Point[hullPts.length - 1];
       CoordinateArrays.copyDeep(hullPts, 0, pts, 0, hullPts.length - 1);
     }

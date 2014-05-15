@@ -154,7 +154,7 @@ public class IsValidOp {
     } else {
       Point point = null;
       if (ring.getVertexCount() >= 1) {
-        point = ring.getCoordinate(0);
+        point = ring.getPoint(0);
       }
       addError(new TopologyValidationError(
         TopologyValidationError.RING_NOT_CLOSED, point));

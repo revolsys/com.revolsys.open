@@ -15,11 +15,10 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -28,6 +27,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.linemerge.LineMerger;
@@ -45,7 +45,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   private double maxDistance;
 
   public GeometryGraph(final Geometry geometry) {
-    this(GeometryFactory.getFactory(geometry));
+    this(geometry.getGeometryFactory());
     addGeometry(geometry);
   }
 
@@ -63,7 +63,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public void addEdge(final Node<LineSegment> fromNode,
     final Node<LineSegment> toNode) {
-    final LineSegment lineSegment = new LineSegmentImpl(fromNode, toNode);
+    final LineSegment lineSegment = new LineSegmentDoubleGF(fromNode, toNode);
     addEdge(lineSegment, fromNode, toNode);
   }
 
@@ -74,8 +74,8 @@ public class GeometryGraph extends Graph<LineSegment> {
       getGeometryFactory(), points);
     int index = 0;
     for (final LineSegment lineSegment : iterator) {
-      final Point from = lineSegment.get(0);
-      final Point to = lineSegment.get(1);
+      final Point from = lineSegment.getPoint(0);
+      final Point to = lineSegment.getPoint(1);
       final Edge<LineSegment> edge = addEdge(lineSegment, from, to);
       attributes.put("segmentIndex", index++);
       edge.setAttributes(attributes);
@@ -122,7 +122,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   @Override
   protected LineSegment clone(final LineSegment segment, final LineString line) {
-    return new LineSegmentImpl(line);
+    return new LineSegmentDoubleGF(line);
   }
 
   /**
@@ -146,7 +146,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Point nextPoint = points.get(i);
-        final LineSegment line1 = new LineSegmentImpl(getGeometryFactory(),
+        final LineSegment line1 = new LineSegmentDoubleGF(getGeometryFactory(),
           previousPoint, nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
           this, line1, maxDistance);
@@ -182,7 +182,7 @@ public class GeometryGraph extends Graph<LineSegment> {
           } else if (numIntersections == 2) {
             lineIntersections.add(geometryFactory.lineString(segmentIntersection));
           }
-          for (final Point point : line1) {
+          for (final Point point : line1.vertices()) {
             if (line2.distance(point) < maxDistance) {
               if (point.equals(fromPoint) || point.equals(toPoint)) {
                 // Point intersection, make sure it's not at the start
@@ -244,7 +244,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     if (object == null) {
       return null;
     } else {
-      final LineString line = object.toLineString();
+      final LineString line = object;
       return line;
     }
   }
@@ -270,8 +270,8 @@ public class GeometryGraph extends Graph<LineSegment> {
         final Node<LineSegment> fromNode = edge.getFromNode();
         final Node<LineSegment> toNode = edge.getToNode();
         if (previousNode == null) {
-          points.add(lineSegment.get(0));
-          points.add(lineSegment.get(1));
+          points.add(lineSegment.getPoint(0));
+          points.add(lineSegment.getPoint(1));
         } else if (fromNode == previousNode) {
           if (edge.getLength() > 0) {
             points.add(toNode);
@@ -282,8 +282,8 @@ public class GeometryGraph extends Graph<LineSegment> {
             geometries.add(line);
           }
           points = new ArrayList<>();
-          points.add(lineSegment.get(0));
-          points.add(lineSegment.get(1));
+          points.add(lineSegment.getPoint(0));
+          points.add(lineSegment.getPoint(1));
         }
         if (points.size() > 1) {
           final int toDegree = toNode.getDegree();
@@ -321,7 +321,8 @@ public class GeometryGraph extends Graph<LineSegment> {
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
         final Point nextPoint = points.get(i);
-        final LineSegment line1 = new LineSegmentImpl(previousPoint, nextPoint);
+        final LineSegment line1 = new LineSegmentDoubleGF(previousPoint,
+          nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
@@ -349,7 +350,7 @@ public class GeometryGraph extends Graph<LineSegment> {
               return true;
             }
           }
-          for (final Point point : line1) {
+          for (final Point point : line1.vertices()) {
             if (line2.distance(point) < maxDistance) {
 
               if (point.equals(fromPoint) || point.equals(toPoint)) {

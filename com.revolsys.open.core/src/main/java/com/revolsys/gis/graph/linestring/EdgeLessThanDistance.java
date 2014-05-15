@@ -7,8 +7,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
-import com.revolsys.gis.jts.LineSegmentImpl;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.Point;
@@ -21,8 +20,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
     final Graph<LineSegment> graph, final LineSegment lineSegment,
     final double maxDistance) {
     final CreateListVisitor<Edge<LineSegment>> results = new CreateListVisitor<Edge<LineSegment>>();
-    BoundingBox envelope = CoordinatesListUtil.getBoundingBox(
-      lineSegment.getGeometryFactory(), lineSegment);
+    BoundingBox envelope = lineSegment.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
     edgeIndex.visit(envelope, new EdgeLessThanDistance(lineSegment,
@@ -31,9 +29,8 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   }
 
   public static List<Edge<LineSegment>> getEdges(final LineStringGraph graph,
-    final Point fromPoint, final Point toPoint,
-    final double maxDistance) {
-    final LineSegment lineSegment = new LineSegmentImpl(fromPoint, toPoint);
+    final Point fromPoint, final Point toPoint, final double maxDistance) {
+    final LineSegment lineSegment = new LineSegmentDoubleGF(fromPoint, toPoint);
     return getEdges(graph, lineSegment, maxDistance);
 
   }

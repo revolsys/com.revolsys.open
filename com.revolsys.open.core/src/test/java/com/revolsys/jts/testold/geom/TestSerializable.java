@@ -55,7 +55,7 @@ public class TestSerializable {
 
   public static final String FILENAME = "c:\\testSerial.txt";
 
-  public static final GeometryFactory fact = GeometryFactory.getFactory();
+  public static final GeometryFactory fact = GeometryFactory.floating3();
 
   public static void main(final String[] args) {
     final TestSerializable test = new TestSerializable();
@@ -74,7 +74,7 @@ public class TestSerializable {
         matched = true;
       }
     } else if (o1 instanceof Geometry) {
-      if (!((Geometry)o1).equalsExact2d((Geometry)o2)) {
+      if (!((Geometry)o1).equals(2,(Geometry)o2)) {
         // System.out.println("expected " + o1 + ", found " + o2);
       } else {
         matched = true;

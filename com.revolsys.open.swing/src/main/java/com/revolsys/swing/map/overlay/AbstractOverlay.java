@@ -32,9 +32,8 @@ import com.revolsys.comparator.IntArrayComparator;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.PointQuadTree;
-import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
+import com.revolsys.gis.algorithm.index.quadtree.linesegment.LineSegmentQuadTree;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.jts.IndexedLineSegment;
 import com.revolsys.gis.model.coordinates.comparator.GeometryDistanceComparator;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
@@ -42,6 +41,7 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
@@ -249,31 +249,29 @@ public class AbstractOverlay extends JComponent implements
     final AbstractDataObjectLayer layer, final LayerDataObject object,
     final Geometry geometry, final BoundingBox boundingBox) {
 
-    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
     final Geometry convertedGeometry = geometry.copy(viewportGeometryFactory);
 
     final double maxDistance = getMaxDistance(boundingBox);
-    final QuadTree<IndexedLineSegment> lineSegments = GeometryEditUtil.getLineSegmentQuadTree(convertedGeometry);
-    if (lineSegments != null) {
-      final Point point = boundingBox.getCentre();
-      double closestDistance = Double.MAX_VALUE;
-      final List<IndexedLineSegment> segments = lineSegments.query(boundingBox,
-        "isWithinDistance", point, maxDistance);
-      IndexedLineSegment closestSegment = null;
-      for (final IndexedLineSegment segment : segments) {
-        final double distance = segment.distance(point);
-        if (distance < closestDistance) {
-          closestSegment = segment;
-          closestDistance = distance;
-        }
+    final LineSegmentQuadTree lineSegments = GeometryEditUtil.getLineSegmentQuadTree(convertedGeometry);
+    final Point point = boundingBox.getCentre();
+    double closestDistance = Double.MAX_VALUE;
+    final List<Segment> segments = lineSegments.query(boundingBox,
+      "isWithinDistance", point, maxDistance);
+    Segment closestSegment = null;
+    for (final Segment segment : segments) {
+      final double distance = segment.distance(point);
+      if (distance < closestDistance) {
+        closestSegment = segment;
+        closestDistance = distance;
       }
-      if (closestSegment != null) {
-        final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
-        final GeometryFactory geometryFactory = layer.getGeometryFactory();
-        final Point closePoint = pointOnLine.convert(geometryFactory);
-        return new CloseLocation(layer, object, geometry, null, closestSegment,
-          closePoint);
-      }
+    }
+    if (closestSegment != null) {
+      final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
+      final GeometryFactory geometryFactory = layer.getGeometryFactory();
+      final Point closePoint = pointOnLine.convert(geometryFactory);
+      return new CloseLocation(layer, object, geometry, null, closestSegment,
+        closePoint);
     }
     return null;
   }
@@ -283,7 +281,7 @@ public class AbstractOverlay extends JComponent implements
     final Geometry geometry, final BoundingBox boundingBox) {
     final PointQuadTree<int[]> index = GeometryEditUtil.getPointQuadTree(geometry);
     if (index != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
       int[] closestVertexIndex = null;
       Point closeVertex = null;
       final Point centre = boundingBox.getCentre();
@@ -314,7 +312,7 @@ public class AbstractOverlay extends JComponent implements
   protected double getDistance(final MouseEvent event) {
     final int x = event.getX();
     final int y = event.getY();
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     final Point p1 = geometryFactory.project(this.viewport.toModelPoint(x, y));
     final Point p2 = geometryFactory.project(this.viewport.toModelPoint(x
       + getHotspotPixels(), y + getHotspotPixels()));
@@ -382,7 +380,7 @@ public class AbstractOverlay extends JComponent implements
     if (eventPoint == null) {
       return null;
     } else {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+      final GeometryFactory geometryFactory = getGeometryFactory();
       final Point point = this.viewport.toModelPointRounded(geometryFactory,
         eventPoint);
       return point;
@@ -416,7 +414,7 @@ public class AbstractOverlay extends JComponent implements
 
   protected GeometryFactory getViewportGeometryFactory() {
     if (this.viewport == null) {
-      return GeometryFactory.getFactory();
+      return GeometryFactory.floating3();
     } else {
       return this.viewport.getGeometryFactory();
     }

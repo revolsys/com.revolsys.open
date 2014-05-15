@@ -35,7 +35,7 @@ import com.revolsys.swing.map.layer.Project;
 
 public class Viewport2D implements PropertyChangeSupportProxy {
 
-  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.getFactory()
+  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
     .geometry();
 
   public static AffineTransform createScreenToModelTransform(
@@ -88,9 +88,9 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   /** The current bounding box of the project. */
   private BoundingBox boundingBox = new Envelope();
 
-  private GeometryFactory geometryFactory = GeometryFactory.getFactory(3005);
+  private GeometryFactory geometryFactory = GeometryFactory.floating3(3005);
 
-  private GeometryFactory geometryFactory2d = GeometryFactory.getFactory(3005,
+  private GeometryFactory geometryFactory2d = GeometryFactory.floating(3005,
     2);
 
   private Reference<Project> project;
@@ -261,7 +261,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     if (geometry == null) {
       return null;
     } else {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(geometry);
+      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
       final GeometryFactory roundedGeometryFactory = getRoundedGeometryFactory(geometryFactory);
       if (geometryFactory == roundedGeometryFactory) {
@@ -280,7 +280,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       if (resolution > 2) {
         final int srid = geometryFactory.getSrid();
         final int axisCount = geometryFactory.getAxisCount();
-        geometryFactory = GeometryFactory.getFactory(srid, axisCount, 1, 1);
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, 1.0, 1.0);
       }
     }
     return geometryFactory;
@@ -485,7 +485,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
     final double viewHeight = viewHeightPixels * unitsPerPixel;
-    final GeometryFactory precisionModel = GeometryFactory.getFactory(1 / unitsPerPixel);
+    final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel);
     centre = precisionModel.getPreciseCoordinates(centre);
     final double centreX = centre.getX();
     final double centreY = centre.getY();
@@ -526,8 +526,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       if (geometryFactory == null) {
         this.geometryFactory2d = null;
       } else {
-        this.geometryFactory2d = GeometryFactory.getFactory(
-          geometryFactory.getSrid(), 2, geometryFactory.getScaleXY(), 1);
+        this.geometryFactory2d = geometryFactory.convertAxisCount(2);
       }
       this.propertyChangeSupport.firePropertyChange("geometryFactory",
         oldGeometryFactory, geometryFactory);
@@ -613,7 +612,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   public Point toModelPoint(final double... viewCoordinates) {
     if (this.geometryFactory2d == null) {
-      return GeometryFactory.getFactory().point();
+      return GeometryFactory.floating3().point();
     } else {
       final double[] coordinates = toModelCoordinates(viewCoordinates);
       return this.geometryFactory2d.point(coordinates);

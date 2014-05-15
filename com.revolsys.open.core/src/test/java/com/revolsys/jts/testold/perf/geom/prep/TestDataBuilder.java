@@ -44,7 +44,7 @@ import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class TestDataBuilder {
-  private GeometryFactory geomFact = GeometryFactory.getFactory();
+  private GeometryFactory geomFact = GeometryFactory.floating3();
 
   private Point origin = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
 

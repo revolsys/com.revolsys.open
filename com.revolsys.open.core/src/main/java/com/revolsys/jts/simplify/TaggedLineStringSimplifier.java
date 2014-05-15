@@ -39,7 +39,7 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
@@ -123,7 +123,7 @@ public class TaggedLineStringSimplifier {
     // make a new segment for the simplified geometry
     final Point p0 = line.getVertex(start).cloneCoordinates();
     final Point p1 = line.getVertex(end).cloneCoordinates();
-    final LineSegment newSeg = new LineSegmentImpl(p0, p1);
+    final LineSegment newSeg = new LineSegmentDouble(p0, p1);
     // update the indexes
     remove(taggedLine, start, end);
     outputIndex.add(newSeg);
@@ -242,10 +242,10 @@ public class TaggedLineStringSimplifier {
       isValidToSimplify = false;
     }
     // test if flattened section would cause intersection
-    // final LineSegment candidateSeg = new LineSegmentImpl();
+    // final LineSegment candidateSeg = new LineSegmentDouble();
     final Point p0 = line.getVertex(i).cloneCoordinates();
     final Point p1 = line.getVertex(j).cloneCoordinates();
-    final LineSegment candidateSeg = new LineSegmentImpl(p0, p1);
+    final LineSegment candidateSeg = new LineSegmentDouble(p0, p1);
     sectionIndex[0] = i;
     sectionIndex[1] = j;
     if (hasBadIntersection(taggedLine, sectionIndex, candidateSeg)) {

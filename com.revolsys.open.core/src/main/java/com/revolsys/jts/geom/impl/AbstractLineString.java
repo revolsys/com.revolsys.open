@@ -100,7 +100,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     int j = 0;
     final int vertexCount = getVertexCount();
     while (i < vertexCount && j < line.getVertexCount()) {
-      final int comparison = getCoordinate(i).compareTo(line.getCoordinate(j));
+      final int comparison = getPoint(i).compareTo(line.getPoint(j));
       if (comparison != 0) {
         return comparison;
       }
@@ -169,23 +169,23 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
-  protected boolean doEqualsExact(final Geometry geometry) {
+  public boolean doEquals(final int axisCount, final Geometry geometry) {
     final LineString line = (LineString)geometry;
     final int vertexCount = getVertexCount();
-    if (vertexCount == line.getVertexCount()) {
-      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-        for (int axisIndex = 0; axisIndex < getAxisCount(); axisIndex++) {
-          final double value = getCoordinate(vertexIndex, axisIndex);
-          final double otherValue = line.getCoordinate(vertexIndex, axisIndex);
-          if (!NumberEquals.equal(value, otherValue)) {
+    final int vertexCount2 = line.getVertexCount();
+    if (vertexCount == vertexCount2) {
+      for (int i = 0; i < vertexCount2; i++) {
+        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+          final double value1 = getCoordinate(i, axisIndex);
+          final double value2 = line.getCoordinate(i, axisIndex);
+          if (!NumberEquals.equal(value1, value2)) {
             return false;
           }
         }
       }
-    } else {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 
   @Override
@@ -211,36 +211,13 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       return false;
     }
     for (int i = 0; i < getVertexCount(); i++) {
-      final Point point = getCoordinate(i);
-      final Point otherPoint = otherLineString.getCoordinate(i);
+      final Point point = getPoint(i);
+      final Point otherPoint = otherLineString.getPoint(i);
       if (!equal(point, otherPoint, tolerance)) {
         return false;
       }
     }
     return true;
-  }
-
-  @Override
-  public boolean equalsExact3d(final Geometry geometry) {
-    if (geometry == this) {
-      return true;
-    } else if (geometry instanceof LineString) {
-      final LineString line = (LineString)geometry;
-      final int vertexCount = getVertexCount();
-      if (vertexCount == line.getVertexCount()) {
-        for (int i = 0; i < line.getVertexCount(); i++) {
-          for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
-            final double value1 = getCoordinate(i, axisIndex);
-            final double value2 = line.getCoordinate(i, axisIndex);
-            if (!NumberEquals.equal(value1, value2)) {
-              return false;
-            }
-          }
-        }
-      }
-      return true;
-    }
-    return false;
   }
 
   /**
@@ -317,10 +294,14 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
-  public Point getPoint(final int vertexIndex) {
+  public final Point getPoint(final int vertexIndex) {
+    final int axisCount = getAxisCount();
+    final double[] coordinates = new double[axisCount];
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
+    }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point coordinate = getCoordinate(vertexIndex);
-    return geometryFactory.point(coordinate);
+    return geometryFactory.point(coordinates);
   }
 
   @Override
@@ -439,22 +420,22 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     final Point coordinates1End = getVertex(-1);
     final Point coordinates2Start = line.getVertex(0);
     final Point coordinates2End = line.getVertex(-1);
-    if (coordinates1Start.equals2d(coordinates2End)) {
+    if (coordinates1Start.equals(2, coordinates2End)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, line, 0,
         coordinates, 0, vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
         coordinates, newVertexCount, vertexCount1 - 1);
-    } else if (coordinates2Start.equals2d(coordinates1End)) {
+    } else if (coordinates2Start.equals(2, coordinates1End)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
         coordinates, 0, vertexCount1);
       newVertexCount = CoordinatesListUtil.append(axisCount, line, 1,
         coordinates, newVertexCount, vertexCount2 - 1);
-    } else if (coordinates1Start.equals2d(coordinates2Start)) {
+    } else if (coordinates1Start.equals(2, coordinates2Start)) {
       newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 0,
         coordinates, 0, vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
         coordinates, newVertexCount, vertexCount);
-    } else if (coordinates1End.equals2d(coordinates2End)) {
+    } else if (coordinates1End.equals(2, coordinates2End)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
         coordinates, newVertexCount, vertexCount);
       newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 1,
@@ -484,26 +465,26 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     final Point coordinates1End = getVertex(-1);
     final Point coordinates2Start = line.getVertex(0);
     final Point coordinates2End = line.getVertex(-1);
-    if (coordinates1Start.equals2d(coordinates2End)
-      && coordinates1Start.equals2d(point)) {
+    if (coordinates1Start.equals(2, coordinates2End)
+      && coordinates1Start.equals(2, point)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, line, 0,
         coordinates, 0, vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
         coordinates, newVertexCount, vertexCount1 - 1);
-    } else if (coordinates2Start.equals2d(coordinates1End)
-      && coordinates2Start.equals2d(point)) {
+    } else if (coordinates2Start.equals(2, coordinates1End)
+      && coordinates2Start.equals(2, point)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
         coordinates, 0, vertexCount1);
       newVertexCount = CoordinatesListUtil.append(axisCount, line, 1,
         coordinates, newVertexCount, vertexCount2 - 1);
-    } else if (coordinates1Start.equals2d(coordinates2Start)
-      && coordinates1Start.equals2d(point)) {
+    } else if (coordinates1Start.equals(2, coordinates2Start)
+      && coordinates1Start.equals(2, point)) {
       newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 0,
         coordinates, 0, vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
         coordinates, newVertexCount, vertexCount);
-    } else if (coordinates1End.equals2d(coordinates2End)
-      && coordinates1End.equals2d(point)) {
+    } else if (coordinates1End.equals(2, coordinates2End)
+      && coordinates1End.equals(2, point)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
         coordinates, newVertexCount, vertexCount);
       newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 1,
@@ -558,7 +539,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       final Vertex point1 = getVertex(i);
       final Vertex point2 = getVertex(j);
       // skip equal points on both ends
-      if (!point1.equals2d(point2)) {
+      if (!point1.equals(2, point2)) {
         if (point1.compareTo(point2) > 0) {
           return reverse();
         }

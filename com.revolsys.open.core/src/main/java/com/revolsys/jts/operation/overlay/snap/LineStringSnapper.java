@@ -55,7 +55,7 @@ public class LineStringSnapper {
     if (pts.size() <= 1) {
       return false;
     }
-    return pts.get(0).equals2d(pts.get(pts.size() - 1));
+    return pts.get(0).equals(2,pts.get(pts.size() - 1));
   }
 
   private double snapTolerance = 0.0;
@@ -123,7 +123,7 @@ public class LineStringSnapper {
        * 
        * If the snap pt is already in the src list, don't snap at all.
        */
-      if (p0.equals2d(snapPt) || p1.equals2d(snapPt)) {
+      if (p0.equals(2,snapPt) || p1.equals(2,snapPt)) {
         if (allowSnappingToSourceVertices) {
           continue;
         } else {
@@ -144,7 +144,7 @@ public class LineStringSnapper {
     final Point[] snapPts) {
     for (int i = 0; i < snapPts.length; i++) {
       // if point is already equal to a src pt, don't snap
-      if (pt.equals2d(snapPts[i])) {
+      if (pt.equals(2,snapPts[i])) {
         return null;
       }
       if (pt.distance(snapPts[i]) < snapTolerance) {
@@ -185,7 +185,7 @@ public class LineStringSnapper {
     // check for duplicate snap pts when they are sourced from a linear ring.
     // TODO: Need to do this better - need to check *all* snap points for dups
     // (using a Set?)
-    if (snapPts[0].equals2d(snapPts[snapPts.length - 1])) {
+    if (snapPts[0].equals(2,snapPts[snapPts.length - 1])) {
       distinctPtCount = snapPts.length - 1;
     }
 

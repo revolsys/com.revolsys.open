@@ -125,7 +125,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
     final boolean useIntPt1 = ei1.dist > 0.0
-      || !ei1.coord.equals2d(lastSegStartPt);
+      || !ei1.coord.equals(2,lastSegStartPt);
     if (!useIntPt1) {
       npts--;
     }

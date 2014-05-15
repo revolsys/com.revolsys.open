@@ -50,7 +50,7 @@ public class BufferTest extends TestCase {
         final int axisCount = CollectionUtil.getInteger(map, "axisCount", 2);
         final double scaleXy = CollectionUtil.getDouble(map, "scaleXy", 0.0);
         final double scaleZ = CollectionUtil.getDouble(map, "scaleZ", 0.0);
-        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(
           srid, axisCount, scaleXy, scaleZ);
 
         final String sourceWkt = (String)map.get("sourceWkt");
@@ -150,7 +150,7 @@ public class BufferTest extends TestCase {
       Assert.assertEquals(message("Area", actual), expectedArea, area, 0);
     }
     if (expected != null) {
-      if (!actual.equalsExact2d(expected)) {
+      if (!actual.equals(2,expected)) {
         TestUtil.failNotEquals(message("Geometry Equal", actual), expected,
           actual);
       }

@@ -19,8 +19,8 @@ public class PointOnLineSegment implements Filter<Point> {
 
   @Override
   public boolean accept(final Point point) {
-    final Point start = lineSegment.get(0);
-    final Point end = lineSegment.get(1);
+    final Point start = lineSegment.getPoint(0);
+    final Point end = lineSegment.getPoint(1);
     final boolean onLine = LineSegmentUtil.isPointOnLine(start, end, point,
       maxDistance);
     return onLine;

@@ -178,7 +178,7 @@ public class Densifier extends GeometryTransformer {
 
     for (final Segment segment : line.segments()) {
       if (points.isEmpty()) {
-        points.add(segment.get(0).cloneCoordinates());
+        points.add(segment.getPoint(0).cloneCoordinates());
       }
       final double length = segment.getLength();
       if (length > 0) {
@@ -193,7 +193,7 @@ public class Densifier extends GeometryTransformer {
             }
           }
         }
-        points.add(segment.get(1).cloneCoordinates());
+        points.add(segment.getPoint(1).cloneCoordinates());
       }
     }
     return points;

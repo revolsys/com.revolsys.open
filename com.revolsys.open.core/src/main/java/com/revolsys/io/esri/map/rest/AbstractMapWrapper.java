@@ -29,13 +29,13 @@ public class AbstractMapWrapper {
       GeometryFactory geometryFactory;
       final Map<String, Object> spatialReference = (Map<String, Object>)extent.get("spatialReference");
       if (spatialReference == null) {
-        geometryFactory = GeometryFactory.getFactory();
+        geometryFactory = GeometryFactory.floating3();
       } else {
         Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
         if (srid == 102100) {
           srid = 3857;
         }
-        geometryFactory = GeometryFactory.getFactory(srid);
+        geometryFactory = GeometryFactory.floating3(srid);
       }
       return new Envelope(geometryFactory, 2, minX, minY, maxX, maxY);
     }
@@ -96,7 +96,7 @@ public class AbstractMapWrapper {
   public GeometryFactory getSpatialReference() {
     final Map<String, Object> spatialReference = getValue("spatialReference");
     if (spatialReference == null) {
-      return GeometryFactory.getFactory();
+      return GeometryFactory.floating3();
     } else {
       Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
       if (srid == 102100) {
@@ -104,7 +104,7 @@ public class AbstractMapWrapper {
       } else if (srid == 102190) {
         srid = 3005;
       }
-      return GeometryFactory.getFactory(srid);
+      return GeometryFactory.floating3(srid);
     }
   }
 

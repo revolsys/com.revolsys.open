@@ -87,7 +87,7 @@ class EdgeRing {
     final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getRing();
     final BoundingBox testEnv = testRing.getBoundingBox();
-    Point testPt = testRing.getCoordinate(0);
+    Point testPt = testRing.getPoint(0);
 
     EdgeRing minShell = null;
     BoundingBox minShellEnv = null;

@@ -7,9 +7,9 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.TestConstants;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 public class PointTest implements TestConstants {
@@ -58,10 +58,10 @@ public class PointTest implements TestConstants {
     if (geometryFactory.getCoordinateSystem() instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projectedCs = (ProjectedCoordinateSystem)geometryFactory.getCoordinateSystem();
       final GeographicCoordinateSystem geographicCoordinateSystem = projectedCs.getGeographicCoordinateSystem();
-      geometryFactory2 = GeometryFactory.getFactory(
+      geometryFactory2 = GeometryFactory.floating(
         geographicCoordinateSystem.getId(), axisCount);
     } else {
-      geometryFactory2 = GeometryFactory.getFactory(26910, axisCount);
+      geometryFactory2 = GeometryFactory.floating(26910, axisCount);
     }
 
     assertCoordinatesEquals(point, coordinates);
@@ -131,8 +131,8 @@ public class PointTest implements TestConstants {
   @Test
   public void constructEmpty() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(26910,
-        axisCount, 1000, 1000);
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910,
+        axisCount, 1000.0, 1000.0);
 
       final Point pointEmpty = geometryFactory.point();
       assertEmpty(pointEmpty);
@@ -176,11 +176,11 @@ public class PointTest implements TestConstants {
       if (axisCountLess > 2) {
         axisCountLess--;
       }
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory(26910,
-        axisCount, 1000, 1000);
-      final GeometryFactory geometryFactoryExtra = GeometryFactory.getFactory(
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910,
+        axisCount, 1000.0, 1000.0);
+      final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(
         26910, axisCount + 1);
-      final GeometryFactory geometryFactoryLess = GeometryFactory.getFactory(
+      final GeometryFactory geometryFactoryLess = GeometryFactory.floating(
         26910, axisCountLess);
       final double[] coordinatesExtra = new double[axisCount + 1];
       final double[] coordinates = new double[axisCount];

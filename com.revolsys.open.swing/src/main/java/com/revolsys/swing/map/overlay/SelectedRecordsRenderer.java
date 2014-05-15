@@ -10,11 +10,10 @@ import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.valid.IsValidOp;
@@ -144,21 +143,25 @@ public class SelectedRecordsRenderer {
         }
       }
 
-      final IsValidOp validOp = new IsValidOp(geometry, false);
-      if (validOp.isValid()) {
-        final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
-        if (!simpleOp.isSimple()) {
-          for (final Point coordinates : simpleOp.getNonSimplePoints()) {
-            final Point point = viewportGeometryFactory.point(coordinates);
+      try {
+        final IsValidOp validOp = new IsValidOp(geometry, false);
+        if (validOp.isValid()) {
+          final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
+          if (!simpleOp.isSimple()) {
+            for (final Point coordinates : simpleOp.getNonSimplePoints()) {
+              final Point point = viewportGeometryFactory.point(coordinates);
+              MarkerStyleRenderer.renderMarker(viewport, graphics, point,
+                erroStyle);
+            }
+          }
+        } else {
+          for (final TopologyValidationError error : validOp.getErrors()) {
+            final Point point = viewportGeometryFactory.point(error.getCoordinate());
             MarkerStyleRenderer.renderMarker(viewport, graphics, point,
               erroStyle);
           }
         }
-      } else {
-        for (final TopologyValidationError error : validOp.getErrors()) {
-          final Point point = viewportGeometryFactory.point(error.getCoordinate());
-          MarkerStyleRenderer.renderMarker(viewport, graphics, point, erroStyle);
-        }
+      } catch (final Throwable e) {
       }
     }
   }

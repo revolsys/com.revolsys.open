@@ -90,6 +90,8 @@ public interface BoundingBox {
 
   double[] getBounds();
 
+  double[] getBounds(int axisCount);
+
   Point getCentre();
 
   double getCentreX();

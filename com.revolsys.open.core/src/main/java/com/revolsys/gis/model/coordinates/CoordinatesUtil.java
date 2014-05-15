@@ -1,28 +1,18 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
 
 public class CoordinatesUtil {
-
-  public static double angle(final double x1, final double y1, final double x2,
-    final double y2) {
-    final double dx = x2 - x1;
-    final double dy = y2 - y1;
-    final double angle = Math.atan2(dy, dx);
-    return angle;
-  }
 
   public static double angle(final Point p1, final Point p2, final Point p3) {
     final double x1 = p1.getX();
@@ -32,14 +22,6 @@ public class CoordinatesUtil {
     final double x3 = p3.getX();
     final double y3 = p3.getY();
     return MathUtil.angle(x1, y1, x2, y2, x3, y3);
-  }
-
-  public static double angle2d(final Point point1, final Point point2) {
-    final double x1 = point1.getX();
-    final double y1 = point1.getY();
-    final double x2 = point2.getX();
-    final double y2 = point2.getY();
-    return angle(x1, y1, x2, y2);
   }
 
   /**
@@ -166,21 +148,6 @@ public class CoordinatesUtil {
   }
 
   /**
-   * Computes the 2-dimensional Euclidean distance to another location.
-   * The Z-ordinate is ignored.
-   * 
-   * @param c a point
-   * @return the 2-dimensional Euclidean distance between the locations
-   */
-  public static double distance(final Point point1, final Point point2) {
-    final double x1 = point1.getX();
-    final double y1 = point1.getY();
-    final double x2 = point2.getX();
-    final double y2 = point2.getY();
-    return MathUtil.distance(x1, y1, x2, y2);
-  }
-
-  /**
    * Computes the 3-dimensional Euclidean distance to another location.
    * 
    * @param c a coordinate
@@ -198,57 +165,11 @@ public class CoordinatesUtil {
     return x1 == x2 && y1 == y2;
   }
 
-  public static boolean equals(final Point point, final double... coordinates) {
-    for (int i = 0; i < coordinates.length; i++) {
-      final double coordinate = coordinates[i];
-      if (coordinate != point.getCoordinate(i)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public static boolean equals2d(final Point point1, final Point point2) {
-    if (NumberEquals.equal(point1.getX(), point2.getX())) {
-      if (NumberEquals.equal(point1.getY(), point2.getY())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static boolean equals3d(final Point point1, final Point point2) {
-    if (equals2d(point1, point2)) {
-      if (NumberEquals.equal(point1.getZ(), point2.getZ())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static Point get(final Geometry geometry) {
-    if (geometry == null || geometry.isEmpty()) {
-      return null;
-    } else {
-      final PointList points = CoordinatesListUtil.get(geometry);
-      return points.get(0);
-    }
-  }
-
-  public static Point get(final Point coordinate) {
-    if (Double.isNaN(coordinate.getZ())) {
-      return new PointDouble(coordinate.getX(), coordinate.getY());
-    } else {
-      return new PointDouble(coordinate.getX(), coordinate.getY(),
-        coordinate.getZ());
-    }
-  }
-
   public static Point get2d(final Geometry geometry) {
     if (geometry.isEmpty()) {
       return null;
     } else {
-      final Point point = get(geometry);
+      final Point point = geometry.getPoint();
       return new PointDouble(point, 2);
     }
   }
@@ -259,14 +180,6 @@ public class CoordinatesUtil {
       axisCount = Math.max(axisCount, point.getAxisCount());
     }
     return axisCount;
-  }
-
-  public static double[] getCoordinates(final Point point) {
-    final double[] coordinates = new double[point.getAxisCount()];
-    for (int i = 0; i < coordinates.length; i++) {
-      coordinates[i] = point.getCoordinate(i);
-    }
-    return coordinates;
   }
 
   public static double getElevation(final LineString line,
@@ -302,36 +215,6 @@ public class CoordinatesUtil {
       coordinates[1] = MathUtil.makePrecise(scale, coordinates[1]);
       return new PointDouble(coordinates);
     }
-  }
-
-  public static double getX(final Point point) {
-    if (point == null) {
-      return Double.NaN;
-    } else {
-      return point.getX();
-    }
-  }
-
-  public static double getY(final Point point) {
-    if (point == null) {
-      return Double.NaN;
-    } else {
-      return point.getY();
-    }
-  }
-
-  public static int hashCode(final double d) {
-    final long f = Double.doubleToLongBits(d);
-    return (int)(f ^ (f >>> 32));
-  }
-
-  public static int hashCode(final Point point) {
-    int result = 17;
-    final double x = point.getX();
-    result = 37 * result + hashCode(x);
-    final double y = point.getY();
-    result = 37 * result + hashCode(y);
-    return result;
   }
 
   public static boolean isAcute(final Point point1, final Point point2,
@@ -488,8 +371,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static float[] toFloatArray(final PointList points,
-    final int axisCount) {
+  public static float[] toFloatArray(final PointList points, final int axisCount) {
     final float[] coordinates = new float[axisCount * points.size()];
     for (int i = 0; i < points.size(); i++) {
       for (int axis = 0; axis < axisCount; axis++) {

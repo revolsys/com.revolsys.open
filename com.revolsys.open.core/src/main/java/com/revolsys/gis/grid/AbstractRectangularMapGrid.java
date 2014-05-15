@@ -12,7 +12,7 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
 
   @Override
   public BoundingBox getBoundingBox(final String mapTileName, final int srid) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory(srid);
+    final GeometryFactory geometryFactory = GeometryFactory.floating3(srid);
     final RectangularMapTile mapTile = getTileByName(mapTileName);
     final BoundingBox boundingBox = mapTile.getBoundingBox();
     return boundingBox.convert(geometryFactory);

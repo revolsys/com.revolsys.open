@@ -323,7 +323,7 @@ public abstract class LineIntersector {
    */
   public boolean isInteriorIntersection(final int inputLineIndex) {
     for (int i = 0; i < result; i++) {
-      if (!(intPt[i].equals2d(inputLines[inputLineIndex][0]) || intPt[i].equals2d(inputLines[inputLineIndex][1]))) {
+      if (!(intPt[i].equals(2,inputLines[inputLineIndex][0]) || intPt[i].equals(2,inputLines[inputLineIndex][1]))) {
         return true;
       }
     }
@@ -340,7 +340,7 @@ public abstract class LineIntersector {
    */
   public boolean isIntersection(final Point pt) {
     for (int i = 0; i < result; i++) {
-      if (intPt[i].equals2d(pt)) {
+      if (intPt[i].equals(2,pt)) {
         return true;
       }
     }

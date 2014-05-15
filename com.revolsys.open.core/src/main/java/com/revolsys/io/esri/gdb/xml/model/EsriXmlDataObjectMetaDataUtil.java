@@ -365,10 +365,10 @@ public class EsriXmlDataObjectMetaDataUtil implements
       final SpatialReference spatialReference = featureClass.getSpatialReference();
       com.revolsys.jts.geom.GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       if (featureClass.isHasM()) {
-        geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),
+        geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
           4, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       } else if (featureClass.isHasZ()) {
-        geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),
+        geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
           3, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       }
       final Attribute geometryAttribute = metaData.getGeometryAttribute();

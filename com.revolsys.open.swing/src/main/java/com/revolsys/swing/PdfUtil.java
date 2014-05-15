@@ -135,7 +135,7 @@ public class PdfUtil {
         if (PdfUtil.hasNameValue(measure, "Subtype", "GEO")) {
           final COSDictionary gcs = PdfUtil.getDictionary(measure, "GCS");
           if (gcs != null) {
-            GeometryFactory geometryFactory = GeometryFactory.getFactory();
+            GeometryFactory geometryFactory = GeometryFactory.floating3();
             final int srid = gcs.getInt("EPSG");
             if (srid == -1) {
               final String wkt = gcs.getString("WKT");
@@ -143,7 +143,7 @@ public class PdfUtil {
                 geometryFactory = GeometryFactory.getFactory(wkt);
               }
             } else {
-              geometryFactory = GeometryFactory.getFactory(srid);
+              geometryFactory = GeometryFactory.floating3(srid);
             }
             final com.revolsys.jts.geom.GeometryFactory geoGeometryFactory = geometryFactory.getGeographicGeometryFactory();
 

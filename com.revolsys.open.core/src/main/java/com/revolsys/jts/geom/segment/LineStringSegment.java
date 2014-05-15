@@ -26,7 +26,7 @@ public class LineStringSegment extends AbstractSegment implements
   }
 
   @Override
-  public double getValue(final int vertexIndex, final int axisIndex) {
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
     if (vertexIndex < 0 || vertexIndex > 1) {
       return Double.NaN;
     } else {

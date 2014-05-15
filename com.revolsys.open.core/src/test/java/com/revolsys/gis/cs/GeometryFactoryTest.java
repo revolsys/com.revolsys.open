@@ -19,7 +19,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 
 public class GeometryFactoryTest {
-  private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(
+  private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
     3857, 1.0);
 
   public static void assertCoordinatesListEqual(final Geometry geometry,

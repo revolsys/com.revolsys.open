@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.linematch;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineSegment;
@@ -17,7 +17,7 @@ public class LineSegmentMatch {
 
   public LineSegmentMatch(final GeometryFactory geometryFactory,
     final Point start, final Point end) {
-    this(new LineSegmentImpl(geometryFactory, start, end));
+    this(new LineSegmentDoubleGF(geometryFactory, start, end));
   }
 
   public LineSegmentMatch(final LineSegment segment) {
@@ -36,7 +36,7 @@ public class LineSegmentMatch {
   }
 
   public LineString getLine() {
-    return segment.toLineString();
+    return segment;
   }
 
   public int getMatchCount(final int index) {

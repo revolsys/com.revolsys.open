@@ -63,7 +63,7 @@ public class GeometryReaderHttpMessageConverter extends
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
-          factory = GeometryFactory.getFactory(Integer.parseInt(srid));
+          factory = GeometryFactory.floating3(Integer.parseInt(srid));
         }
         reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
         return reader;

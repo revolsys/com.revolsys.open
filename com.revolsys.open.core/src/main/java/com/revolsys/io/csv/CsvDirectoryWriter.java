@@ -59,7 +59,7 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
         final Geometry geometry = object.getGeometryValue();
         if (geometry != null) {
           writer.setProperty(IoConstants.GEOMETRY_FACTORY,
-            GeometryFactory.getFactory(geometry));
+            geometry.getGeometryFactory());
         }
         writers.put(metaData, writer);
       } catch (final IOException e) {

@@ -124,8 +124,9 @@ class TaggedLineString {
     segs = new TaggedLineSegment[parentLine.getVertexCount() - 1];
     int i = 0;
     for (final Segment segment : parentLine.segments()) {
-      final TaggedLineSegment seg = new TaggedLineSegment(segment.get(0)
-        .cloneCoordinates(), segment.get(1).cloneCoordinates(), parentLine, i);
+      final TaggedLineSegment seg = new TaggedLineSegment(segment.getPoint(0)
+        .cloneCoordinates(), segment.getPoint(1).cloneCoordinates(),
+        parentLine, i);
       segs[i] = seg;
       i++;
     }

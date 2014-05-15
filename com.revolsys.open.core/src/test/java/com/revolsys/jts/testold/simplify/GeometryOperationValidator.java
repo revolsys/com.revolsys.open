@@ -67,7 +67,7 @@ public class GeometryOperationValidator {
     }
     final Geometry expectedGeom = rdr.read(this.wktExpected);
     Assert.assertTrue("Expected result not found",
-      expectedGeom.equalsExact2d(this.ioGeometry[1]));
+      expectedGeom.equals(2,this.ioGeometry[1]));
 
   }
 

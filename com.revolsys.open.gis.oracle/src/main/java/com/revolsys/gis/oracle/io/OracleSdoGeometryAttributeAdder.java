@@ -211,7 +211,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
               final Datum[] values = dimInfo.getOracleArray();
               final double scaleXy = getScale(values, 0);
               final double scaleZ = getScale(values, 2);
-              final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.getFactory(
+              final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixed(
                 srid, axisCount, scaleXy, scaleZ);
               setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
                 geometryFactory);

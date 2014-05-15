@@ -209,9 +209,9 @@ public class RobustLineIntersector extends LineIntersector {
        * which used to produce the INCORRECT result: (20.31970698357233, 46.76654261437082, NaN)
        * 
        */
-      if (p1.equals2d(q1) || p1.equals2d(q2)) {
+      if (p1.equals(2,q1) || p1.equals(2,q2)) {
         intPt[0] = p1;
-      } else if (p2.equals2d(q1) || p2.equals2d(q2)) {
+      } else if (p2.equals(2,q1) || p2.equals(2,q2)) {
         intPt[0] = p2;
       }
 

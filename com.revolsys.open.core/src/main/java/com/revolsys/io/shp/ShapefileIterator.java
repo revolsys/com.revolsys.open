@@ -151,7 +151,7 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           if (srid < 1) {
             srid = 4326;
           }
-          geometryFactory = GeometryFactory.getFactory(srid, axisCount);
+          geometryFactory = GeometryFactory.floating(srid, axisCount);
         }
 
         if (xbaseIterator != null) {

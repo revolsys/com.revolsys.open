@@ -61,7 +61,7 @@ public class SegmentNode implements Comparable {
     this.coord = new PointDouble(coord);
     this.segmentIndex = segmentIndex;
     this.segmentOctant = segmentOctant;
-    isInterior = !coord.equals2d(segString.getCoordinate(segmentIndex));
+    isInterior = !coord.equals(2,segString.getCoordinate(segmentIndex));
   }
 
   /**
@@ -80,7 +80,7 @@ public class SegmentNode implements Comparable {
       return 1;
     }
 
-    if (coord.equals2d(other.coord)) {
+    if (coord.equals(2,other.coord)) {
       return 0;
     }
 

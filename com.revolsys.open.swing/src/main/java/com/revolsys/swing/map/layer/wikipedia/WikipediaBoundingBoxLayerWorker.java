@@ -30,7 +30,7 @@ public class WikipediaBoundingBoxLayerWorker extends
 
   public static DataObjectBoundingBoxLayer create(
     final Map<String, Object> properties) {
-    final GeometryFactory wgs84 = GeometryFactory.getFactory(4326);
+    final GeometryFactory wgs84 = GeometryFactory.floating3(4326);
     final DataObjectBoundingBoxLayer layer1 = new DataObjectBoundingBoxLayer(
       "wikipedia", "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class,
       wgs84);

@@ -35,8 +35,8 @@ public class FileGdbIoTest {
     if (geometry.isEmpty() || geometryFactory.getAxisCount() == 4) {
       return;
     }
-    geometryFactory = GeometryFactory.getFactory(geometryFactory.getSrid(),
-      geometryFactory.getAxisCount(), 10000000, 10000000);
+    geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
+      geometryFactory.getAxisCount(), 10000000.0, 10000000.0);
 
     geometry = geometry.convert(geometryFactory);
     final String geometryTypeString = dataType.toString();
@@ -84,12 +84,12 @@ public class FileGdbIoTest {
         final Geometry actual = objects.get(0).getGeometryValue();
         Assert.assertEquals("Empty", geometry.isEmpty(), actual.isEmpty());
         if (!geometry.isEmpty()) {
-          Assert.assertEquals("Axis Count", geometry.getAxisCount(),
-            actual.getAxisCount());
-          if (!actual.equalsExact(geometry)) {
+          final int axisCount = geometry.getAxisCount();
+          Assert.assertEquals("Axis Count", axisCount, actual.getAxisCount());
+          if (!actual.equals(axisCount, geometry)) {
             // Allow for conversion of multi part to single part
             if (geometry.getGeometryCount() != 1
-              || !actual.equalsExact(geometry.getGeometry(0))) {
+              || !actual.equals(axisCount, geometry.getGeometry(0))) {
               TestUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
             }
           }

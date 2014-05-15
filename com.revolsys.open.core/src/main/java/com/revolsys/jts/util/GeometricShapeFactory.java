@@ -153,7 +153,7 @@ public class GeometricShapeFactory {
    * {@link GeometryFactory}.
    */
   public GeometricShapeFactory() {
-    this(GeometryFactory.getFactory());
+    this(GeometryFactory.floating3());
   }
 
   /**

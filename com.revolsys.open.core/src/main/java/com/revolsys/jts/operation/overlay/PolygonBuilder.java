@@ -167,7 +167,7 @@ public class PolygonBuilder {
     final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getLinearRing();
     final BoundingBox testEnv = testRing.getBoundingBox();
-    final Point testPt = testRing.getCoordinate(0);
+    final Point testPt = testRing.getPoint(0);
 
     EdgeRing minShell = null;
     BoundingBox minEnv = null;

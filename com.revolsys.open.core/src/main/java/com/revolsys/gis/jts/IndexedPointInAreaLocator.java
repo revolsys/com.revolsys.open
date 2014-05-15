@@ -28,7 +28,7 @@ public class IndexedPointInAreaLocator {
           final double x2 = points.getX(i);
           final double y1 = points.getY(i - 1);
           final double y2 = points.getY(i);
-          final LineSegment seg = new LineSegmentImpl(2, x1, y1, x2, y2);
+          final LineSegment seg = new LineSegmentDoubleGF(2, x1, y1, x2, y2);
           final double min = Math.min(y1, y2);
           final double max = Math.max(y1, y2);
           index.insert(min, max, seg);
@@ -79,7 +79,7 @@ public class IndexedPointInAreaLocator {
   }
 
   public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.getFactory(geometry);
+    return geometry.getGeometryFactory();
   }
 
   public IntervalIndexedGeometry getIndex() {

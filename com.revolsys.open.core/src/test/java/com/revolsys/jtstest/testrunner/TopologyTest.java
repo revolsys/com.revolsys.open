@@ -8,7 +8,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class TopologyTest {
 
-  private static GeometryFactory geometryFactory = GeometryFactory.getFactory();
+  private static GeometryFactory geometryFactory = GeometryFactory.floating3();
 
   private static final TestReader testReader = new TestReader();
 

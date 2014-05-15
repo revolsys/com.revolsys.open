@@ -66,7 +66,7 @@ public class IoTestSuite {
               maxRingCount = 0;
             }
             for (int ringCount = 0; ringCount <= maxRingCount; ringCount++) {
-              final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+              final GeometryFactory geometryFactory = GeometryFactory.fixed(
                 4326, axisCount, 0.0, 0.0);
               double delta = 1.0;
               if (geometryFactory.isProjected()) {
@@ -133,12 +133,12 @@ public class IoTestSuite {
       final Geometry actual = geometries.get(0);
       Assert.assertEquals("Empty", geometry.isEmpty(), actual.isEmpty());
       if (!geometry.isEmpty()) {
-        Assert.assertEquals("Axis Count", geometry.getAxisCount(),
-          actual.getAxisCount());
-        if (!actual.equalsExact(geometry)) {
+        final int axisCount = geometry.getAxisCount();
+        Assert.assertEquals("Axis Count", axisCount, actual.getAxisCount());
+        if (!actual.equals(axisCount, geometry)) {
           // Allow for conversion of multi part to single part
           if (geometry.getGeometryCount() != 1
-            || !actual.equalsExact(geometry.getGeometry(0))) {
+            || !actual.equals(axisCount, geometry.getGeometry(0))) {
             TestUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
           }
         }

@@ -23,7 +23,7 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
 
   int nPts = 1000;
 
-  GeometryFactory factory = GeometryFactory.getFactory(0, 1.0);
+  GeometryFactory factory = GeometryFactory.fixed(0, 1.0);
 
   protected PreparedGeometry pg;
 

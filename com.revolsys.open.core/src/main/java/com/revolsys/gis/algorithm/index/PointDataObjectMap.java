@@ -143,7 +143,7 @@ public class PointDataObjectMap {
 
   public void remove(final DataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    final Point coordinates = CoordinatesUtil.get(geometry);
+    final Point coordinates = geometry.getPoint();
     final List<DataObject> objects = objectMap.get(coordinates);
     if (objects != null) {
       objects.remove(object);

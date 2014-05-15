@@ -44,7 +44,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements
     this.geometry = geometry;
     this.maxDistance = maxDistance;
     this.matchVisitor = matchVisitor;
-    this.geometryFactory = GeometryFactory.getFactory(geometry);
+    this.geometryFactory = geometry.getGeometryFactory();
   }
 
   @Override

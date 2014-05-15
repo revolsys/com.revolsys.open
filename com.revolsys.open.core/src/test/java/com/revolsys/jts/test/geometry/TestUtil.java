@@ -25,7 +25,7 @@ public class TestUtil {
         final int axisCount = object.getInteger("axisCount");
         final double scaleXy = object.getInteger("scaleXy");
         final double scaleZ = object.getInteger("scaleZ");
-        final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(
           srid, axisCount, scaleXy, scaleZ);
         final String wkt = object.getValue("wkt");
         final Geometry geometry = geometryFactory.geometry(wkt);
@@ -34,10 +34,10 @@ public class TestUtil {
         GeometryFactory otherGeometryFactory;
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-          otherGeometryFactory = GeometryFactory.getFactory(
+          otherGeometryFactory = GeometryFactory.fixed(
             projectedCoordinateSystem.getId(), axisCount, scaleXy, scaleZ);
         } else {
-          otherGeometryFactory = GeometryFactory.getFactory(3005, axisCount,
+          otherGeometryFactory = GeometryFactory.fixed(3005, axisCount,
             scaleXy, scaleZ);
         }
         final Geometry convertedGeometry = geometry.convert(otherGeometryFactory);
@@ -59,7 +59,7 @@ public class TestUtil {
       System.err.println(i + "\tEquals Srid\t" + expectedSrid + "\t"
         + actualSrid);
       return false;
-    } else if (actualGeometry.equalsExact2d(expectedGeometry)) {
+    } else if (actualGeometry.equals(2,expectedGeometry)) {
       return true;
     } else {
       System.err.println(i + "\tEquals Exact\t" + expectedGeometry + "\t"
@@ -70,7 +70,7 @@ public class TestUtil {
 
   public static boolean equalsExpectedWkt(final int i, final DataObject object,
     final Geometry actualGeometry) {
-    final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+    final GeometryFactory geometryFactory = GeometryFactory.floating3();
     final String wkt = object.getValue("expectedWkt");
     final Geometry expectedGeometry = geometryFactory.geometry(wkt, true);
     return equalsExpectedGeometry(i, actualGeometry, expectedGeometry);

@@ -9,7 +9,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public final class GpxConstants {
 
-  public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
+  public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
   public static final String GPX_NS = "gpx";
 

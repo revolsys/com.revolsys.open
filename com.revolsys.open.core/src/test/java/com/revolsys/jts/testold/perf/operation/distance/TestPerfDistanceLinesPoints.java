@@ -27,7 +27,7 @@ import com.revolsys.jts.util.Stopwatch;
 public class TestPerfDistanceLinesPoints {
   static final boolean USE_INDEXED_DIST = true;
 
-  static GeometryFactory geomFact = GeometryFactory.getFactory();
+  static GeometryFactory geomFact = GeometryFactory.floating3();
 
   static final int MAX_ITER = 1;
 

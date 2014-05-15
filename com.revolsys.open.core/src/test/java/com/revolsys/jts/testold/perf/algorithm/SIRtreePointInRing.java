@@ -39,7 +39,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.PointInRing;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentImpl;
+import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.index.strtree.SIRtree;
@@ -74,7 +74,7 @@ public class SIRtreePointInRing implements PointInRing {
       if (pts[i - 1].equals(pts[i])) {
         continue;
       } // Optimization suggested by MD. [Jon Aquino]
-      final LineSegment seg = new LineSegmentImpl(pts[i - 1], pts[i]);
+      final LineSegment seg = new LineSegmentDouble(pts[i - 1], pts[i]);
       this.sirTree.insert(seg.getP0().getY(), seg.getP1().getY(), seg);
     }
   }

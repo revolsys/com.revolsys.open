@@ -8,9 +8,8 @@ public class PointWithOrientation extends PointDouble {
 
   private final double orientation;
 
-  public PointWithOrientation(final Point coordinates,
-    final double orientation) {
-    super(coordinates);
+  public PointWithOrientation(final Point point, final double orientation) {
+    super(point);
     this.orientation = orientation;
   }
 

@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.jts.LineSegmentImpl;
+import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineSegment;
@@ -42,7 +42,7 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
     Point previousPoint = pointIterator.next();
     while (pointIterator.hasNext()) {
       final Point nextPoint = pointIterator.next();
-      segments.add(new LineSegmentImpl(previousPoint, nextPoint));
+      segments.add(new LineSegmentDoubleGF(previousPoint, nextPoint));
       previousPoint = nextPoint;
     }
   }
@@ -55,7 +55,7 @@ public class SharesLineSegmentsFilter implements Filter<LineString> {
     Point previousPoint = pointIterator.next();
     while (pointIterator.hasNext()) {
       final Point nextPoint = pointIterator.next();
-      final LineSegment segment = new LineSegmentImpl(previousPoint, nextPoint);
+      final LineSegment segment = new LineSegmentDoubleGF(previousPoint, nextPoint);
       if (segments.contains(segment)) {
         return true;
       }

@@ -146,7 +146,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
     if (geometry == null) {
-      this.geometryFactory = GeometryFactory.getFactory();
+      this.geometryFactory = GeometryFactory.floating3();
       this.vertexIndexMap = Collections.emptyMap();
       this.vertexIndices = Collections.emptyList();
     } else {

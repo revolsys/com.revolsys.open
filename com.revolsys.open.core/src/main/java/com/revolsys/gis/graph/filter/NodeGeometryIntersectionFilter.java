@@ -31,6 +31,6 @@ public class NodeGeometryIntersectionFilter<T> implements Filter<Node<T>> {
 
   public void setGeometry(final Geometry geometry) {
     this.preparedGeometry = PreparedGeometryFactory.prepare(geometry);
-    this.geometryFactory = GeometryFactory.getFactory(geometry);
+    this.geometryFactory = geometry.getGeometryFactory();
   }
 }

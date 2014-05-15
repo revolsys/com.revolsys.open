@@ -101,7 +101,7 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
   public Geometry getGeometry() {
     final int level = recursionLevelForSize(numPts);
     final LineSegment baseLine = getSquareBaseLine();
-    final Point origin = baseLine.getCoordinate(0);
+    final Point origin = baseLine.getPoint(0);
     final List<LinearRing> rings = new ArrayList<>();
     final LinearRing shell = ((Polygon)getSquareExtent().toGeometry()).getExteriorRing();
     rings.add(shell);

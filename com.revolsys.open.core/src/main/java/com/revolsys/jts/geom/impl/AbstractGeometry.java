@@ -154,7 +154,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  * <h4>Structural Equality</h4>
  *
  * Structural Equality is provided by the 
- * {@link #equalsExact2d(Geometry)} method.  
+ * {@link #equals(2,Geometry)} method.  
  * This implements a comparison based on exact, structural pointwise
  * equality. 
  * The {@link #equals(Object)} is a synonym for this method, 
@@ -811,9 +811,7 @@ public abstract class AbstractGeometry implements Geometry {
     return DistanceOp.distance(this, g);
   }
 
-  protected boolean doEqualsExact(final Geometry geometry) {
-    return false;
-  }
+  protected abstract boolean doEquals(int axisCount, Geometry geometry);
 
   @Override
   public boolean equal(final Point a, final Point b, final double tolerance) {
@@ -849,13 +847,33 @@ public abstract class AbstractGeometry implements Geometry {
     return equalsTopo(g);
   }
 
+  @Override
+  public boolean equals(final int axisCount, final Geometry geometry) {
+    if (geometry == this) {
+      return true;
+    } else if (geometry == null) {
+      return false;
+    } else if (axisCount < 2) {
+      throw new IllegalArgumentException("Axis Count must be >=2");
+    } else if (isEquivalentClass(geometry)) {
+      if (isEmpty()) {
+        return geometry.isEmpty();
+      } else if (geometry.isEmpty()) {
+        return false;
+      } else {
+        return doEquals(axisCount, geometry);
+      }
+    }
+    return false;
+  }
+
   /**
    * Tests whether this geometry is structurally and numerically equal
    * to a given <code>Object</code>.
    * If the argument <code>Object</code> is not a <code>Geometry</code>, 
    * the result is <code>false</code>.
    * Otherwise, the result is computed using
-   * {@link #equalsExact2d(Geometry)}.
+   * {@link #equals(2,Geometry)}.
    * <p>
    * This method is provided to fulfill the Java contract
    * for value-based object equality. 
@@ -873,7 +891,7 @@ public abstract class AbstractGeometry implements Geometry {
    * @param other the Object to compare
    * @return true if this geometry is exactly equal to the argument 
    * 
-   * @see #equalsExact2d(Geometry)
+   * @see #equals(2,Geometry)
    * @see #hashCode()
    * @see #norm()
    * @see #normalize()
@@ -882,7 +900,7 @@ public abstract class AbstractGeometry implements Geometry {
   public boolean equals(final Object other) {
     if (other instanceof Geometry) {
       final Geometry geometry = (Geometry)other;
-      return equalsExact2d(geometry);
+      return equals(2, geometry);
     } else {
       return false;
     }
@@ -892,16 +910,14 @@ public abstract class AbstractGeometry implements Geometry {
   public boolean equalsExact(final Geometry geometry) {
     if (geometry == null) {
       return false;
-    } else if (isEmpty()) {
-      return geometry.isEmpty();
-    } else if (geometry.isEmpty()) {
-      return false;
-    } else if (getDataType().equals(geometry.getDataType())) {
-      if (getAxisCount() == geometry.getAxisCount()) {
+    } else {
+      final int axisCount = getAxisCount();
+      final int axisCount2 = geometry.getAxisCount();
+      if (axisCount == axisCount2) {
         final int srid = getSrid();
         final int otherSrid = geometry.getSrid();
         if (srid == 0 || otherSrid == 0 || srid == otherSrid) {
-          return doEqualsExact(geometry);
+          return equals(axisCount, geometry);
         }
       }
     }
@@ -931,7 +947,7 @@ public abstract class AbstractGeometry implements Geometry {
    * @return <code>true</code> if this and the other <code>Geometry</code>
    *   have identical structure and point values, up to the distance tolerance.
    *   
-   * @see #equalsExact2d(Geometry)
+   * @see #equals(2,Geometry)
    * @see #normalize()
    * @see #norm()
    */
@@ -939,44 +955,11 @@ public abstract class AbstractGeometry implements Geometry {
   public abstract boolean equalsExact(Geometry other, double tolerance);
 
   /**
-   * Returns true if the two <code>Geometry</code>s are exactly equal.
-   * Two Geometries are exactly equal iff:
-   * <ul>
-   * <li>they have the same structure
-   * <li>they have the same values for their vertices,
-   * in exactly the same order.
-   * </ul>
-   * This provides a stricter test of equality than
-   * {@link #equalsTopo(Geometry)}, which is more useful
-   * in certain situations
-   * (such as using geometries as keys in collections).
-   * <p>
-   * This method does <i>not</i>
-   * test the values of the <code>GeometryFactory</code>, the <code>SRID</code>, 
-   * or the <code>userData</code> fields.
-   * <p>
-   * To properly test equality between different geometries,
-   * it is usually necessary to {@link #normalize()} them first.
-   *
-   *@param  other  the <code>Geometry</code> with which to compare this <code>Geometry</code>
-   *@return <code>true</code> if this and the other <code>Geometry</code>
-   *      have identical structure and point values.
-   *      
-   * @see #equalsExact(Geometry, double)
-   * @see #normalize()
-   * @see #norm()
-   */
-  @Override
-  public boolean equalsExact2d(final Geometry other) {
-    return equalsExact(other, 0);
-  }
-
-  /**
    * Tests whether two geometries are exactly equal
    * in their normalized forms.
    * This is a convenience method which creates normalized
    * versions of both geometries before computing
-   * {@link #equalsExact2d(Geometry)}.
+   * {@link #equals(2,Geometry)}.
    * <p>
    * This method is relatively expensive to compute.  
    * For maximum performance, the client 
@@ -991,7 +974,7 @@ public abstract class AbstractGeometry implements Geometry {
     if (g == null) {
       return false;
     }
-    return normalize().equalsExact2d(g.normalize());
+    return normalize().equals(2, g.normalize());
   }
 
   /**
@@ -1011,12 +994,12 @@ public abstract class AbstractGeometry implements Geometry {
    * </pre>
    * </ul>
    * <b>Note</b> that this method computes <b>topologically equality</b>. 
-   * For structural equality, see {@link #equalsExact2d(Geometry)}.
+   * For structural equality, see {@link #equals(2,Geometry)}.
    *
    *@param g the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return <code>true</code> if the two <code>Geometry</code>s are topologically equal
    *
-   *@see #equalsExact2d(Geometry) 
+   *@see #equals(2,Geometry) 
    */
   @Override
   public boolean equalsTopo(final Geometry g) {
@@ -1047,7 +1030,7 @@ public abstract class AbstractGeometry implements Geometry {
 
   @Override
   public int getAxisCount() {
-    return (byte)getGeometryFactory().getAxisCount();
+    return getGeometryFactory().getAxisCount();
   }
 
   /**
@@ -1240,7 +1223,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public GeometryFactory getGeometryFactory() {
-    return getGeometryFactory();
+    return GeometryFactory.floating3();
   }
 
   /**
@@ -1300,16 +1283,12 @@ public abstract class AbstractGeometry implements Geometry {
   protected GeometryFactory getNonZeroGeometryFactory(
     GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      return GeometryFactory.getFactory();
+      return GeometryFactory.floating3();
     } else {
       final int geometrySrid = getSrid();
       final int srid = geometryFactory.getSrid();
       if (srid == 0 && geometrySrid != 0) {
-        final int axisCount = geometryFactory.getAxisCount();
-        final double scaleXY = geometryFactory.getScaleXY();
-        final double scaleZ = geometryFactory.getScaleZ();
-        geometryFactory = GeometryFactory.getFactory(geometrySrid, axisCount,
-          scaleXY, scaleZ);
+        geometryFactory = geometryFactory.convertSrid(geometrySrid);
       }
       return geometryFactory;
     }

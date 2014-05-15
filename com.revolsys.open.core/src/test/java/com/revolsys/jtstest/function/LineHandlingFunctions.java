@@ -58,7 +58,7 @@ public class LineHandlingFunctions {
     }
     final Point[] pts = new Point[size];
     for (int i = 0; i < size; i++) {
-      pts[i] = line.getCoordinate(index + i);
+      pts[i] = line.getPoint(index + i);
     }
     return line.getGeometryFactory().lineString(pts);
   }
@@ -89,7 +89,7 @@ public class LineHandlingFunctions {
       for (int i = 1; i < line.getVertexCount(); i++) {
         final LineString seg = g.getGeometryFactory().lineString(
           new Point[] {
-            line.getCoordinate(i - 1), line.getCoordinate(i)
+            line.getPoint(i - 1), line.getPoint(i)
           });
         segments.add(seg);
       }

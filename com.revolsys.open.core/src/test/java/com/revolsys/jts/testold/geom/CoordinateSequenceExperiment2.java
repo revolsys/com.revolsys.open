@@ -49,7 +49,7 @@ public class CoordinateSequenceExperiment2 {
     System.exit(0);
   }
 
-  GeometryFactory fact = GeometryFactory.getFactory(0, 2);
+  GeometryFactory fact = GeometryFactory.floating(0, 2);
 
   public void run() throws IOException {
     int factor = 1;

@@ -32,10 +32,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.segment.Segment;
 
@@ -67,6 +67,34 @@ import com.revolsys.jts.geom.segment.Segment;
  */
 public class RayCrossingCounter {
   /**
+  * Determines the {@link Location} of a point in a ring. 
+  * 
+  * @param p
+  *            the point to test
+  * @param ring
+  *            a coordinate sequence forming a ring
+  * @return the location of the point in the ring
+  */
+  public static Location locatePointInRing(final Point coordinates,
+    final LineString ring) {
+    final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
+
+    double x0 = ring.getX(0);
+    double y0 = ring.getY(0);
+    for (int i = 1; i < ring.getVertexCount(); i++) {
+      final double x1 = ring.getX(i);
+      final double y1 = ring.getY(i);
+      counter.countSegment(x1, y1, x0, y0);
+      if (counter.isOnSegment()) {
+        return counter.getLocation();
+      }
+      x0 = x1;
+      y0 = y1;
+    }
+    return counter.getLocation();
+  }
+
+  /**
    * Determines the {@link Location} of a point in a ring.
    * This method is an exemplar of how to use this class.
    * 
@@ -74,8 +102,7 @@ public class RayCrossingCounter {
    * @param ring an array of Point forming a ring 
    * @return the location of the point in the ring
    */
-  public static Location locatePointInRing(final Point p,
-    final Point[] ring) {
+  public static Location locatePointInRing(final Point p, final Point[] ring) {
     final RayCrossingCounter counter = new RayCrossingCounter(p);
 
     for (int i = 1; i < ring.length; i++) {
@@ -117,34 +144,6 @@ public class RayCrossingCounter {
     return counter.getLocation();
   }
 
-  /**
-  * Determines the {@link Location} of a point in a ring. 
-  * 
-  * @param p
-  *            the point to test
-  * @param ring
-  *            a coordinate sequence forming a ring
-  * @return the location of the point in the ring
-  */
-  public static Location locatePointInRing(final Point coordinates,
-    final LineString ring) {
-    final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
-
-    double x0 = ring.getX(0);
-    double y0 = ring.getY(0);
-    for (int i = 1; i < ring.getVertexCount(); i++) {
-      final double x1 = ring.getX(i);
-      final double y1 = ring.getY(i);
-      counter.countSegment(x1, y1, x0, y0);
-      if (counter.isOnSegment()) {
-        return counter.getLocation();
-      }
-      x0 = x1;
-      y0 = y1;
-    }
-    return counter.getLocation();
-  }
-
   private final double x;
 
   private final double y;
@@ -154,30 +153,13 @@ public class RayCrossingCounter {
   // true if the test point lies on an input segment
   private boolean pointOnSegment = false;
 
-  public RayCrossingCounter(final Point point) {
-    this(point.getX(), point.getY());
-  }
-
   public RayCrossingCounter(final double x, final double y) {
     this.x = x;
     this.y = y;
   }
 
-  /**
-    * For each segment, check if it crosses a horizontal ray running from the
-     * test point in the positive x direction.
-    * 
-   * @param p1 an endpoint of the segment
-   * @param p2 another endpoint of the segment
-   */
-  public void countSegment(final Point p1, final Point p2) {
-
-    final double x1 = p1.getX();
-    final double y1 = p1.getY();
-    final double x2 = p2.getX();
-    final double y2 = p2.getY();
-
-    countSegment(x1, y1, x2, y2);
+  public RayCrossingCounter(final Point point) {
+    this(point.getX(), point.getY());
   }
 
   public void countSegment(final double x1, final double y1, final double x2,
@@ -248,8 +230,25 @@ public class RayCrossingCounter {
     }
   }
 
+  /**
+    * For each segment, check if it crosses a horizontal ray running from the
+     * test point in the positive x direction.
+    * 
+   * @param p1 an endpoint of the segment
+   * @param p2 another endpoint of the segment
+   */
+  public void countSegment(final Point p1, final Point p2) {
+
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
+
+    countSegment(x1, y1, x2, y2);
+  }
+
   public void countSegment(final Segment segment) {
-    countSegment(segment.get(1), segment.get(0));
+    countSegment(segment.getPoint(1), segment.getPoint(0));
   }
 
   /**

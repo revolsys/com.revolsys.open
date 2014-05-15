@@ -60,7 +60,7 @@ public class NodingValidator {
     final Point p2) {
     if (p0.equals(p2)) {
       throw new RuntimeException("found non-noded collapse at "
-        + GeometryFactory.getFactory().lineString(p0, p1, p2));
+        + GeometryFactory.floating3().lineString(p0, p1, p2));
     }
   }
 

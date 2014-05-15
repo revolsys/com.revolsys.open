@@ -45,13 +45,13 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
   private List<LineString> getSplitLines(
     final LineMatchGraph<LineSegmentMatch> graph, final LineString line,
     final int index) {
-    final Point startCoordinate = CoordinatesUtil.get(line);
+    final Point startCoordinate = line.getPoint();
     Node<LineSegmentMatch> currentNode = graph.findNode(startCoordinate);
     final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
     boolean started = false;
     boolean matched = false;
     final List<Point> coordinates = new ArrayList<Point>();
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.getFactory(line);
+    final com.revolsys.jts.geom.GeometryFactory factory = line.getGeometryFactory();
     final List<LineString> lines = new ArrayList<LineString>();
 
     while (currentNode != null) {

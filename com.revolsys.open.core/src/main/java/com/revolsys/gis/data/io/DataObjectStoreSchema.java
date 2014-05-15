@@ -76,7 +76,7 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     if (geometryFactory == null) {
       final AbstractDataObjectStore dataStore = getDataStore();
       if (dataStore == null) {
-        return GeometryFactory.getFactory();
+        return GeometryFactory.floating3();
       } else {
         return dataStore.getGeometryFactory();
       }

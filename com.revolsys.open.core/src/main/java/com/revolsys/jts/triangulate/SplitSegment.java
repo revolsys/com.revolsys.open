@@ -49,7 +49,7 @@ public class SplitSegment {
    * reverse of the given segment. A fraction of <code>0.0</code> returns the end point of the
    * segment; a fraction of <code>1.0</code> returns the start point of the segment.
    * 
-   * @param seg the LineSegmentImpl
+   * @param seg the LineSegmentDouble
    * @param segmentLengthFraction the fraction of the segment length along the line
    * @return the point at that distance
    */
@@ -109,7 +109,7 @@ public class SplitSegment {
   public void splitAt(final double length, final Point endPt) {
     final double actualLen = getConstrainedLength(length);
     final double frac = actualLen / segLen;
-    if (endPt.equals2d(seg.getP0())) {
+    if (endPt.equals(2,seg.getP0())) {
       splitPt = seg.pointAlong(frac);
     } else {
       splitPt = pointAlongReverse(seg, frac);

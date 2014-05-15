@@ -9,7 +9,7 @@ import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 public class FileUnionPerfTest {
   static final int MAX_ITER = 1;
 
-  private static final GeometryFactory geometryFactory = GeometryFactory.getFactory(
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
@@ -23,7 +23,7 @@ public class FileUnionPerfTest {
     }
   }
 
-  GeometryFactory factory = GeometryFactory.getFactory();
+  GeometryFactory factory = GeometryFactory.floating3();
 
   boolean testFailed = false;
 

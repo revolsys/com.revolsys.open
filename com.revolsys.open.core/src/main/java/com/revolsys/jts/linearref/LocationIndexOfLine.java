@@ -65,9 +65,9 @@ class LocationIndexOfLine {
   }
 
   public LinearLocation[] indicesOf(final Geometry subLine) {
-    final Point startPt = ((LineString)subLine.getGeometry(0)).getCoordinate(0);
+    final Point startPt = ((LineString)subLine.getGeometry(0)).getPoint(0);
     final LineString lastLine = (LineString)subLine.getGeometry(subLine.getGeometryCount() - 1);
-    final Point endPt = lastLine.getCoordinate(lastLine.getVertexCount() - 1);
+    final Point endPt = lastLine.getPoint(lastLine.getVertexCount() - 1);
 
     final LocationIndexOfPoint locPt = new LocationIndexOfPoint(linearGeom);
     final LinearLocation[] subLineLoc = new LinearLocation[2];

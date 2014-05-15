@@ -138,8 +138,8 @@ public class BoundaryOp {
       if (line.getVertexCount() == 0) {
         continue;
       }
-      addEndpoint(line.getCoordinate(0));
-      addEndpoint(line.getCoordinate(line.getVertexCount() - 1));
+      addEndpoint(line.getPoint(0));
+      addEndpoint(line.getPoint(line.getVertexCount() - 1));
     }
 
     for (final Iterator it = endpointMap.entrySet().iterator(); it.hasNext();) {

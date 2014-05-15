@@ -157,8 +157,8 @@ public class LineSequencer {
     final List currNodes = new ArrayList();
     for (int i = 0; i < mls.getGeometryCount(); i++) {
       final LineString line = (LineString)mls.getGeometry(i);
-      final Point startNode = line.getCoordinate(0);
-      final Point endNode = line.getCoordinate(line.getVertexCount() - 1);
+      final Point startNode = line.getPoint(0);
+      final Point endNode = line.getPoint(line.getVertexCount() - 1);
 
       /**
        * If this linestring is connected to a previous subgraph, geom is not sequenced
@@ -193,7 +193,7 @@ public class LineSequencer {
   private final LineMergeGraph graph = new LineMergeGraph();
 
   // initialize with default, in case no lines are input
-  private GeometryFactory factory = GeometryFactory.getFactory();
+  private GeometryFactory factory = GeometryFactory.floating3();
 
   private int lineCount = 0;
 

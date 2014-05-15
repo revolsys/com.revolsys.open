@@ -7,7 +7,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.ParseException;
 
 public class FixedPrecisionSnappingTest extends TestCase {
-  private final GeometryFactory factory = GeometryFactory.getFactory(0, 1.0);
+  private final GeometryFactory factory = GeometryFactory.fixed(0, 1.0);
 
   public FixedPrecisionSnappingTest(final String name) {
     super(name);

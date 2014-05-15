@@ -118,7 +118,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
       geometrySrid = StringConverterRegistry.toObject(DataTypes.INT,
         getProperty("geometryColumnName"));
       if (geometrySrid != null) {
-        geometryFactory = GeometryFactory.getFactory(geometrySrid);
+        geometryFactory = GeometryFactory.floating3(geometrySrid);
       }
       final DataType geometryType = DataTypes.getType((String)getProperty("geometryType"));
       if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {

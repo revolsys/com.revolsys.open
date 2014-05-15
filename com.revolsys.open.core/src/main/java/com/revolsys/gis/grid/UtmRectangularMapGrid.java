@@ -17,7 +17,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.getCoordinateSystem(4326);
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.getFactory(4326);
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
   public static final double MIN_LAT = -80;
 

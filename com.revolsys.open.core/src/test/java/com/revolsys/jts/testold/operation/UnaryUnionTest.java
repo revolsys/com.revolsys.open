@@ -23,7 +23,7 @@ public class UnaryUnionTest extends TestCase {
     Geometry result;
     final Collection<Geometry> geoms = GeometryUtils.readWKT(inputWKT);
     if (geoms.size() == 0) {
-      final GeometryFactory geometryFactory = GeometryFactory.getFactory();
+      final GeometryFactory geometryFactory = GeometryFactory.floating3();
       result = UnaryUnionOp.union(geoms, geometryFactory);
     } else {
       result = UnaryUnionOp.union(geoms);

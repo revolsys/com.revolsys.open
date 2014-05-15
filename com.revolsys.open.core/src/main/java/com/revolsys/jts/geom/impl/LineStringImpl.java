@@ -34,11 +34,10 @@ package com.revolsys.jts.geom.impl;
 
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 
 /**
  *  Models an OGC-style <code>LineString</code>.
@@ -85,33 +84,6 @@ public class LineStringImpl extends AbstractLineString implements LineString {
   public LineStringImpl(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     this.coordinates = null;
-  }
-
-  public LineStringImpl(final GeometryFactory geometryFactory,
-    final PointList points) {
-    this.geometryFactory = geometryFactory;
-    if (points == null) {
-      this.coordinates = null;
-    } else {
-      final int vertexCount = points.size();
-      if (vertexCount == 0) {
-        this.coordinates = null;
-      } else if (vertexCount == 1) {
-        throw new IllegalArgumentException(
-          "Invalid number of points in LineString (found " + vertexCount
-            + " - must be 0 or >= 2)");
-      } else {
-        final int axisCount = getAxisCount();
-        this.coordinates = new double[axisCount * vertexCount];
-        for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-          for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-            double value = points.getValue(vertexIndex, axisIndex);
-            value = geometryFactory.makePrecise(axisIndex, value);
-            this.coordinates[vertexIndex * axisCount + axisIndex] = value;
-          }
-        }
-      }
-    }
   }
 
   public LineStringImpl(final GeometryFactory geometryFactory,
@@ -191,6 +163,33 @@ public class LineStringImpl extends AbstractLineString implements LineString {
     }
   }
 
+  public LineStringImpl(final GeometryFactory geometryFactory,
+    final PointList points) {
+    this.geometryFactory = geometryFactory;
+    if (points == null) {
+      this.coordinates = null;
+    } else {
+      final int vertexCount = points.size();
+      if (vertexCount == 0) {
+        this.coordinates = null;
+      } else if (vertexCount == 1) {
+        throw new IllegalArgumentException(
+          "Invalid number of points in LineString (found " + vertexCount
+            + " - must be 0 or >= 2)");
+      } else {
+        final int axisCount = getAxisCount();
+        this.coordinates = new double[axisCount * vertexCount];
+        for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+          for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+            double value = points.getValue(vertexIndex, axisIndex);
+            value = geometryFactory.makePrecise(axisIndex, value);
+            this.coordinates[vertexIndex * axisCount + axisIndex] = value;
+          }
+        }
+      }
+    }
+  }
+
   /**
    * Creates and returns a full copy of this {@link LineString} object.
    * (including all coordinates contained by it).
@@ -238,19 +237,6 @@ public class LineStringImpl extends AbstractLineString implements LineString {
       }
     }
     return boundingBox;
-  }
-
-  @Override
-  public Point getCoordinate(final int vertexIndex) {
-    if (isEmpty()) {
-      return null;
-    } else {
-      final int axisCount = getAxisCount();
-      final double[] coordinates = new double[axisCount];
-      System.arraycopy(this.coordinates, vertexIndex * axisCount, coordinates,
-        0, axisCount);
-      return new PointDouble(coordinates);
-    }
   }
 
   @Override
