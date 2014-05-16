@@ -1,4 +1,4 @@
-package com.revolsys.io.csv;
+package com.revolsys.io.tsv;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -11,14 +11,15 @@ import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
+import com.revolsys.io.csv.CsvMapWriter;
 import com.revolsys.spring.SpringUtil;
 
-public class CsvMapIoFactory extends AbstractIoFactory implements
+public class TsvMapIoFactory extends AbstractIoFactory implements
   MapWriterFactory {
-  public CsvMapIoFactory() {
-    super(CsvConstants.DESCRIPTION);
-    addMediaTypeAndFileExtension(CsvConstants.MEDIA_TYPE,
-      CsvConstants.FILE_EXTENSION);
+  public TsvMapIoFactory() {
+    super(TsvConstants.DESCRIPTION);
+    addMediaTypeAndFileExtension(TsvConstants.MEDIA_TYPE,
+      TsvConstants.FILE_EXTENSION);
   }
 
   @Override
@@ -41,7 +42,7 @@ public class CsvMapIoFactory extends AbstractIoFactory implements
 
   @Override
   public MapWriter getMapWriter(final Writer out) {
-    return new CsvMapWriter(out);
+    return new CsvMapWriter(out, TsvConstants.FIELD_SEPARATOR, true);
   }
 
   @Override

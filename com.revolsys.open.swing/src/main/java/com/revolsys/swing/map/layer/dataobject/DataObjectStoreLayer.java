@@ -364,7 +364,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       try {
         final GeometryFactory geometryFactory = getGeometryFactory();
 
-        final Geometry queryGeometry = (Geometry)geometry.copy(geometryFactory);
+        final Geometry queryGeometry = geometry.copy(geometryFactory);
         BoundingBox boundingBox = queryGeometry.getBoundingBox();
         boundingBox = boundingBox.expand(distance);
         final String typePath = getTypePath();
@@ -587,7 +587,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     addIds(ids, getSelectedRecords());
     addIds(ids, getHighlightedRecords());
     addIds(ids, getModifiedRecords());
-    addIds(ids, getIndex().queryAll());
+    addIds(ids, getIndex().getAll());
     return ids;
   }
 
@@ -819,7 +819,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       synchronized (this.sync) {
         if (loadedBoundingBox == this.loadingBoundingBox) {
           setIndex(index);
-          cacheRecords(index.queryAll());
+          cacheRecords(index.getAll());
           final List<LayerDataObject> newObjects = getNewRecords();
           index.insert(newObjects);
           clearLoading(loadedBoundingBox);

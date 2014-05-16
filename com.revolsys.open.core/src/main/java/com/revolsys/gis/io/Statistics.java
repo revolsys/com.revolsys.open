@@ -124,12 +124,14 @@ public class Statistics {
     return logCounts;
   }
 
-  public synchronized void logCounts() {
+  public synchronized String logCounts() {
+    final StringBuffer sb = new StringBuffer();
+    addCountsText(sb);
+    final String string = sb.toString();
     if (isLogCounts() && !counts.isEmpty()) {
-      final StringBuffer sb = new StringBuffer();
-      addCountsText(sb);
-      log.info(sb.toString());
+      log.info(string);
     }
+    return string;
   }
 
   public void setLogCounts(final boolean logCounts) {

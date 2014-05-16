@@ -64,6 +64,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private boolean loadMissingCodes = true;
 
+  private final ThreadLocal<Boolean> threadLoading = new ThreadLocal<Boolean>();
+
   public CodeTableProperty() {
   }
 
@@ -85,7 +87,6 @@ public class CodeTableProperty extends AbstractCodeTable implements
     for (final DataObject code : allCodes) {
       addValue(code);
     }
-    Property.firePropertyChange(this, "valuesChanged", false, true);
   }
 
   @Override
@@ -225,34 +226,39 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   protected synchronized void loadAll() {
-    if (loading) {
-      while (loading) {
+    if (threadLoading.get() != Boolean.TRUE) {
+      if (loading) {
+        while (loading) {
+          try {
+            wait(1000);
+          } catch (final InterruptedException e) {
+          }
+        }
+        return;
+      } else {
+        threadLoading.set(Boolean.TRUE);
+        loading = true;
         try {
-          wait(1000);
-        } catch (final InterruptedException e) {
+          final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
+          final Query query = new Query(typePath);
+          query.setAttributeNames(metaData.getAttributeNames());
+          for (final String order : orderBy) {
+            query.addOrderBy(order, true);
+          }
+          try (
+            Reader<DataObject> reader = dataStore.query(query)) {
+            final List<DataObject> codes = reader.read();
+            dataStore.getStatistics()
+              .getStatistics("query")
+              .add(typePath, -codes.size());
+            Collections.sort(codes, new DataObjectAttributeComparator(orderBy));
+            addValues(codes);
+          }
+          Property.firePropertyChange(this, "valuesChanged", false, true);
+        } finally {
+          loading = false;
+          threadLoading.set(null);
         }
-      }
-      return;
-    } else {
-      loading = true;
-      try {
-        final DataObjectMetaData metaData = dataStore.getMetaData(typePath);
-        final Query query = new Query(typePath);
-        query.setAttributeNames(metaData.getAttributeNames());
-        for (final String order : orderBy) {
-          query.addOrderBy(order, true);
-        }
-        try (
-          Reader<DataObject> reader = dataStore.query(query)) {
-          final List<DataObject> codes = reader.read();
-          dataStore.getStatistics()
-            .getStatistics("query")
-            .add(typePath, -codes.size());
-          Collections.sort(codes, new DataObjectAttributeComparator(orderBy));
-          addValues(codes);
-        }
-      } finally {
-        loading = false;
       }
     }
   }
@@ -292,6 +298,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
           .add(typePath, -codes.size());
         addValues(codes);
         id = getIdByValue(values);
+        Property.firePropertyChange(this, "valuesChanged", false, true);
       } finally {
         reader.close();
       }

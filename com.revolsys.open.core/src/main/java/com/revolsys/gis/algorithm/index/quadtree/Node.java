@@ -9,6 +9,9 @@ public class Node<T> extends AbstractNode<T> {
 
   private final List<double[]> boundingBoxes = new ArrayList<>();
 
+  public Node() {
+  }
+
   public Node(final int level, final double... bounds) {
     super(level, bounds);
   }

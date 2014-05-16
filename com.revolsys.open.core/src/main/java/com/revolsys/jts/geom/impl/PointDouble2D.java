@@ -1,5 +1,6 @@
 package com.revolsys.jts.geom.impl;
 
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 public class PointDouble2D extends AbstractPoint {
@@ -28,6 +29,11 @@ public class PointDouble2D extends AbstractPoint {
       default:
         return Double.NaN;
     }
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return GeometryFactory.floating(0, 2);
   }
 
   @Override

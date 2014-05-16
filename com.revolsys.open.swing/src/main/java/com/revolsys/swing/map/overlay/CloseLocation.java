@@ -6,33 +6,37 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.util.CollectionUtil;
 
 public class CloseLocation implements Comparable<CloseLocation> {
 
-  private final LayerDataObject object;
-
-  private final int[] vertexIndex;
-
-  private final Segment segment;
-
   private final AbstractDataObjectLayer layer;
 
-  private final Geometry geometry;
+  private final LayerDataObject object;
+
+  private Vertex vertex;
+
+  private Segment segment;
 
   private final Point point;
 
   public CloseLocation(final AbstractDataObjectLayer layer,
-    final LayerDataObject object, final Geometry geometry,
-    final int[] vertexIndex, final Segment segment, final Point point) {
-    this.object = object;
+    final LayerDataObject object, final Segment segment, final Point point) {
     this.layer = layer;
-    this.geometry = geometry;
-    this.vertexIndex = vertexIndex;
+    this.object = object;
     this.segment = segment;
     this.point = point;
+  }
+
+  public CloseLocation(final AbstractDataObjectLayer layer,
+    final LayerDataObject object, final Vertex vertex) {
+    this.layer = layer;
+    this.object = object;
+    this.vertex = vertex;
+    this.point = vertex;
   }
 
   @Override
@@ -40,13 +44,16 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return 0;
   }
 
-  @SuppressWarnings("unchecked")
   public <G extends Geometry> G getGeometry() {
-    return (G)this.geometry;
+    if (vertex == null) {
+      return segment.getGeometry();
+    } else {
+      return vertex.getGeometry();
+    }
   }
 
   public GeometryFactory getGeometryFactory() {
-    return this.layer.getGeometryFactory();
+    return layer.getGeometryFactory();
   }
 
   public Object getId() {
@@ -65,8 +72,9 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public String getIndexString() {
-    int[] index = this.vertexIndex;
-    if (index != null) {
+    int[] index;
+    if (vertex != null) {
+      index = vertex.getVertexId();
     } else {
       index = this.segment.getSegmentId();
     }
@@ -74,11 +82,11 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public AbstractDataObjectLayer getLayer() {
-    return this.layer;
+    return layer;
   }
 
   public DataObjectMetaData getMetaData() {
-    return this.layer.getMetaData();
+    return layer.getMetaData();
   }
 
   public LayerDataObject getObject() {
@@ -98,13 +106,14 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public String getType() {
+    final Geometry geometry = getGeometry();
     if (geometry instanceof Point) {
       return "Point";
     } else if (segment != null) {
       return "Edge";
     } else {
-      if (GeometryEditUtil.isFromPoint(geometry, vertexIndex)
-        || GeometryEditUtil.isToPoint(geometry, vertexIndex)) {
+      if (GeometryEditUtil.isFromPoint(geometry, getVertexIndex())
+        || GeometryEditUtil.isToPoint(geometry, getVertexIndex())) {
         return "End-Vertex";
       } else {
         return "Vertex";
@@ -117,8 +126,16 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return metaData.getPath();
   }
 
+  public Vertex getVertex() {
+    return vertex;
+  }
+
   public int[] getVertexIndex() {
-    return this.vertexIndex;
+    if (vertex == null) {
+      return null;
+    } else {
+      return this.vertex.getVertexId();
+    }
   }
 
   @Override
@@ -133,7 +150,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
     string.append(id);
     string.append(", ");
     string.append(getType());
-    int[] index = this.vertexIndex;
+    int[] index = getVertexIndex();
     if (index != null) {
       string.append(", index=");
     } else {

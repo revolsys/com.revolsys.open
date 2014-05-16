@@ -12,22 +12,28 @@ import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 
 public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
+  private final char fieldSeparator = ',';
+
   /** The writer */
   private final PrintWriter out;
 
   private final DataObjectMetaData metaData;
 
-  /**
-   * Constructs CSVReader with supplied separator and quote char.
-   * 
-   * @param reader The reader to the CSV file.
-   */
+  private final boolean useQuotes;
+
   public CsvDataObjectWriter(final DataObjectMetaData metaData, final Writer out) {
+    this(metaData, out, CsvConstants.FIELD_SEPARATOR, true);
+
+  }
+
+  public CsvDataObjectWriter(final DataObjectMetaData metaData,
+    final Writer out, final char fieldSeparator, final boolean useQuotes) {
     this.metaData = metaData;
     this.out = new PrintWriter(out);
+    this.useQuotes = useQuotes;
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i > 0) {
-        this.out.print(',');
+        this.out.print(fieldSeparator);
       }
       final String name = metaData.getAttributeName(i);
       string(name);
@@ -49,17 +55,22 @@ public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   private void string(final Object value) {
-    final String string = value.toString().replaceAll("\"", "\"\"");
-    out.print('"');
-    out.print(string);
-    out.print('"');
+    String string = value.toString();
+    if (useQuotes) {
+      string = string.replaceAll("\"", "\"\"");
+      out.print('"');
+      out.print(string);
+      out.print('"');
+    } else {
+      out.print(string);
+    }
   }
 
   @Override
   public void write(final DataObject object) {
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i > 0) {
-        out.print(',');
+        out.print(fieldSeparator);
       }
       final Object value = object.getValue(i);
       if (value != null) {

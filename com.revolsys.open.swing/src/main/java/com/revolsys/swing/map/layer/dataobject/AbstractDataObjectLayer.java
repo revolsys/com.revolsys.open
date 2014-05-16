@@ -1497,8 +1497,13 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (reader == null) {
         final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
         if (StringUtils.hasText(string)) {
-          final Resource resource = new ByteArrayResource("t.csv", string);
-          reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+          if (string.contains("\t")) {
+            final Resource tsvResource = new ByteArrayResource("t.tsv", string);
+            reader = AbstractDataObjectReaderFactory.dataObjectReader(tsvResource);
+          } else {
+            final Resource csvResource = new ByteArrayResource("t.csv", string);
+            reader = AbstractDataObjectReaderFactory.dataObjectReader(csvResource);
+          }
         }
       }
       final List<LayerDataObject> newRecords = new ArrayList<LayerDataObject>();

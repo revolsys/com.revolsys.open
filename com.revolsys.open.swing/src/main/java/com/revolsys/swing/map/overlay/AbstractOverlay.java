@@ -17,8 +17,11 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,17 +34,19 @@ import javax.swing.undo.UndoableEdit;
 import com.revolsys.comparator.IntArrayComparator;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.algorithm.index.PointQuadTree;
-import com.revolsys.gis.algorithm.index.quadtree.linesegment.LineSegmentQuadTree;
+import com.revolsys.gis.algorithm.index.quadtree.GeometrySegmentQuadTree;
+import com.revolsys.gis.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.model.coordinates.comparator.GeometryDistanceComparator;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble2D;
 import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.jts.geom.vertex.VertexIndexComparator;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
@@ -69,6 +74,8 @@ public class AbstractOverlay extends JComponent implements
 
   private static final IntArrayComparator INT_ARRAY_COMPARATOR = new IntArrayComparator();
 
+  private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
+
   private static final long serialVersionUID = 1L;
 
   public static final GeometryStyle XOR_LINE_STYLE = GeometryStyle.line(
@@ -95,6 +102,10 @@ public class AbstractOverlay extends JComponent implements
   private Viewport2D viewport;
 
   private Geometry xorGeometry;
+
+  private Point snapCentre;
+
+  private final List<Point> snapPoints = new ArrayList<Point>();
 
   protected AbstractOverlay(final MapPanel map) {
     this.map = map;
@@ -253,7 +264,7 @@ public class AbstractOverlay extends JComponent implements
     final Geometry convertedGeometry = geometry.copy(viewportGeometryFactory);
 
     final double maxDistance = getMaxDistance(boundingBox);
-    final LineSegmentQuadTree lineSegments = GeometryEditUtil.getLineSegmentQuadTree(convertedGeometry);
+    final GeometrySegmentQuadTree lineSegments = GeometryEditUtil.getGeometrySegmentIndex(convertedGeometry);
     final Point point = boundingBox.getCentre();
     double closestDistance = Double.MAX_VALUE;
     final List<Segment> segments = lineSegments.query(boundingBox,
@@ -270,8 +281,7 @@ public class AbstractOverlay extends JComponent implements
       final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
       final GeometryFactory geometryFactory = layer.getGeometryFactory();
       final Point closePoint = pointOnLine.convert(geometryFactory);
-      return new CloseLocation(layer, object, geometry, null, closestSegment,
-        closePoint);
+      return new CloseLocation(layer, object, closestSegment, closePoint);
     }
     return null;
   }
@@ -279,31 +289,26 @@ public class AbstractOverlay extends JComponent implements
   protected CloseLocation findCloseVertexLocation(
     final AbstractDataObjectLayer layer, final LayerDataObject object,
     final Geometry geometry, final BoundingBox boundingBox) {
-    final PointQuadTree<int[]> index = GeometryEditUtil.getPointQuadTree(geometry);
+    final GeometryVertexQuadTree index = GeometryEditUtil.getGeometryVertexIndex(geometry);
     if (index != null) {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-      int[] closestVertexIndex = null;
-      Point closeVertex = null;
+      Vertex closeVertex = null;
       final Point centre = boundingBox.getCentre();
 
-      final List<int[]> closeVertices = index.findWithin(boundingBox);
-      Collections.sort(closeVertices, INT_ARRAY_COMPARATOR);
+      final List<Vertex> closeVertices = index.query(boundingBox);
+      Collections.sort(closeVertices, VERTEX_INDEX_COMPARATOR);
       double minDistance = Double.MAX_VALUE;
-      for (final int[] vertexIndex : closeVertices) {
-        final Point vertex = GeometryEditUtil.getVertexPoint(geometry,
-          vertexIndex);
+      for (final Vertex vertex : closeVertices) {
         if (vertex != null) {
           final double distance = ((Point)vertex.copy(geometryFactory)).distance(centre);
           if (distance < minDistance) {
             minDistance = distance;
-            closestVertexIndex = vertexIndex;
             closeVertex = vertex;
           }
         }
       }
-      if (closestVertexIndex != null) {
-        return new CloseLocation(layer, object, geometry, closestVertexIndex,
-          null, closeVertex);
+      if (closeVertex != null) {
+        return new CloseLocation(layer, object, closeVertex);
       }
     }
     return null;
@@ -452,10 +457,9 @@ public class AbstractOverlay extends JComponent implements
     final java.awt.Point eventPoint = event.getPoint();
     snapEventPoint = eventPoint;
     new TreeMap<Point, List<CloseLocation>>();
-    final Point point = boundingBox.getCentre();
+    this.snapCentre = boundingBox.getCentre();
     final List<AbstractDataObjectLayer> layers = getSnapLayers();
-    final TreeMap<Point, Set<CloseLocation>> snapLocations = new TreeMap<Point, Set<CloseLocation>>(
-      new GeometryDistanceComparator(point));
+    final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<Point, Set<CloseLocation>>();
     this.snapPoint = null;
     for (final AbstractDataObjectLayer layer : layers) {
       final List<LayerDataObject> objects = layer.queryBackground(boundingBox);
@@ -464,20 +468,10 @@ public class AbstractOverlay extends JComponent implements
           final CloseLocation closeLocation = findCloseLocation(object,
             boundingBox);
           if (closeLocation != null) {
-            boolean found = false;
             final Point closePoint = closeLocation.getPoint();
-            for (final Entry<Point, Set<CloseLocation>> entry : snapLocations.entrySet()) {
-              if (entry.getKey().equals(closePoint)) {
-                final Set<CloseLocation> pointSnapLocations = entry.getValue();
-                pointSnapLocations.add(closeLocation);
-                found = true;
-              }
-            }
-            if (!found) {
-              final Set<CloseLocation> pointSnapLocations = new LinkedHashSet<CloseLocation>();
-              snapLocations.put(closePoint, pointSnapLocations);
-              pointSnapLocations.add(closeLocation);
-            }
+            final Point key = new PointDouble2D(closePoint);
+            CollectionUtil.addToSet(snapLocations, key, closeLocation);
+
           }
         }
       }
@@ -587,23 +581,61 @@ public class AbstractOverlay extends JComponent implements
 
   protected boolean setSnapLocations(
     final Map<Point, Set<CloseLocation>> snapLocations) {
-    this.snapPointLocationMap = snapLocations;
+    if (snapLocations != snapPointLocationMap) {
+      this.snapPointLocationMap = snapLocations;
+      snapPoints.clear();
+      snapPoints.addAll(snapLocations.keySet());
+      Collections.sort(snapPoints, new Comparator<Point>() {
+        @Override
+        public int compare(final Point point1, final Point point2) {
+          final Collection<CloseLocation> locations1 = snapLocations.get(point1);
+          final Collection<CloseLocation> locations2 = snapLocations.get(point2);
+          final boolean hasVertex1 = hasVertex(locations1);
+          final boolean hasVertex2 = hasVertex(locations2);
+          if (hasVertex1) {
+            if (!hasVertex2) {
+              return -1;
+            }
+          } else if (hasVertex2) {
+            return 0;
+          }
+          final double distance1 = snapCentre.distance(point1);
+          final double distance2 = snapCentre.distance(point2);
+          if (distance1 <= distance2) {
+            return -1;
+          } else {
+            return 0;
+          }
+        }
+
+        private boolean hasVertex(final Collection<CloseLocation> locations) {
+          for (final CloseLocation location : locations) {
+            if (location.getVertex() != null) {
+              return true;
+            }
+          }
+          return false;
+        }
+      });
+
+    }
     if (this.snapPointLocationMap.isEmpty()) {
+      this.snapCentre = null;
       this.snapPoint = null;
+      snapPoints.clear();
       if (!hasOverlayAction()) {
         clearMapCursor();
       }
       return false;
     } else {
-      this.snapPoint = CollectionUtil.get(snapLocations.keySet(),
-        snapPointIndex);
+
+      this.snapPoint = snapPoints.get(snapPointIndex);
 
       boolean nodeSnap = false;
       final StringBuffer text = new StringBuffer(
         "<html><ol style=\"margin: 2px 2px 2px 15px\">");
       int i = 0;
-      for (final Entry<Point, Set<CloseLocation>> entry : this.snapPointLocationMap.entrySet()) {
-        final Point snapPoint = entry.getKey();
+      for (final Point snapPoint : this.snapPoints) {
         if (this.snapPointIndex == i) {
           text.append("<li style=\"border: 3px solid maroon; padding: 2px\">");
         } else {
@@ -615,7 +647,7 @@ public class AbstractOverlay extends JComponent implements
         text.append(")</b><ul style=\"margin: 2px 2px 2px 15px\">");
 
         final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<String, Set<CloseLocation>>();
-        for (final CloseLocation snapLocation : entry.getValue()) {
+        for (final CloseLocation snapLocation : snapPointLocationMap.get(snapPoint)) {
           final String typePath = snapLocation.getTypePath();
           final String locationType = snapLocation.getType();
           if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {

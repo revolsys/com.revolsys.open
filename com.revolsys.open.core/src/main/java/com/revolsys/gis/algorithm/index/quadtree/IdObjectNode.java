@@ -7,6 +7,9 @@ public class IdObjectNode<T> extends AbstractNode<T> {
 
   private final List<Object> ids = new ArrayList<>();
 
+  public IdObjectNode() {
+  }
+
   public IdObjectNode(final int level, final double... bounds) {
     super(level, bounds);
   }

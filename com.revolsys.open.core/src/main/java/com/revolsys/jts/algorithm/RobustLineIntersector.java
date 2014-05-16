@@ -71,8 +71,8 @@ public class RobustLineIntersector extends LineIntersector {
    * @param q2 an endpoint of segment Q
    * @return the nearest endpoint to the other segment
    */
-  private static Point nearestEndpoint(final Point p1,
-    final Point p2, final Point q1, final Point q2) {
+  private static Point nearestEndpoint(final Point p1, final Point p2,
+    final Point q1, final Point q2) {
     Point nearestPt = p1;
     double minDist = CGAlgorithms.distancePointLine(p1, q1, q2);
 
@@ -101,8 +101,8 @@ public class RobustLineIntersector extends LineIntersector {
     super(scale);
   }
 
-  private int computeCollinearIntersection(final Point p1,
-    final Point p2, final Point q1, final Point q2) {
+  private int computeCollinearIntersection(final Point p1, final Point p2,
+    final Point q1, final Point q2) {
     final boolean p1q1p2 = EnvelopeUtil.intersects(p1, p2, q1);
     final boolean p1q2p2 = EnvelopeUtil.intersects(p1, p2, q2);
     final boolean q1p1q2 = EnvelopeUtil.intersects(q1, q2, p1);
@@ -209,9 +209,9 @@ public class RobustLineIntersector extends LineIntersector {
        * which used to produce the INCORRECT result: (20.31970698357233, 46.76654261437082, NaN)
        * 
        */
-      if (p1.equals(2,q1) || p1.equals(2,q2)) {
+      if (p1.equals(2, q1) || p1.equals(2, q2)) {
         intPt[0] = p1;
-      } else if (p2.equals(2,q1) || p2.equals(2,q2)) {
+      } else if (p2.equals(2, q1) || p2.equals(2, q2)) {
         intPt[0] = p2;
       }
 
@@ -235,8 +235,7 @@ public class RobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  public void computeIntersection(final Point p, final Point p1,
-    final Point p2) {
+  public void computeIntersection(final Point p, final Point p1, final Point p2) {
     isProper = false;
     // do between check first, since it is faster than the orientation test
     if (EnvelopeUtil.intersects(p1, p2, p)) {
@@ -261,14 +260,14 @@ public class RobustLineIntersector extends LineIntersector {
    * removing common significant digits from the calculation to
    * maintain more bits of precision.
    */
-  private Point intersection(final Point p1, final Point p2,
-    final Point q1, final Point q2) {
+  private Point intersection(final Point p1, final Point p2, final Point q1,
+    final Point q2) {
     Point intPt = intersectionWithNormalization(p1, p2, q1, q2);
 
     /*
-     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2,
-     * q1, q2); double dist = intPt.distance(intPtDD); System.out.println(intPt
-     * + " - " + intPtDD + " dist = " + dist); //intPt = intPtDD;
+     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1,
+     * q2); double dist = intPt.distance(intPtDD); System.out.println(intPt +
+     * " - " + intPtDD + " dist = " + dist); //intPt = intPtDD;
      */
 
     /**
@@ -300,8 +299,8 @@ public class RobustLineIntersector extends LineIntersector {
     return CoordinatesUtil.getPrecise(getScale(), intPt);
   }
 
-  private Point intersectionWithNormalization(final Point p1,
-    final Point p2, final Point q1, final Point q2) {
+  private Point intersectionWithNormalization(final Point p1, final Point p2,
+    final Point q1, final Point q2) {
 
     final double minX0 = p1.getX() < p2.getX() ? p1.getX() : p2.getX();
     final double minY0 = p1.getY() < p2.getY() ? p1.getY() : p2.getY();
@@ -329,14 +328,10 @@ public class RobustLineIntersector extends LineIntersector {
      * intMidPt.getY();
      */
 
-    final Point n1 = new PointDouble(p1.getX() - normX, p1.getY()
-      - normY);
-    final Point n2 = new PointDouble(p2.getX() - normX, p2.getY()
-      - normY);
-    final Point n3 = new PointDouble(q1.getX() - normX, q1.getY()
-      - normY);
-    final Point n4 = new PointDouble(q2.getX() - normX, q2.getY()
-      - normY);
+    final Point n1 = new PointDouble(p1.getX() - normX, p1.getY() - normY);
+    final Point n2 = new PointDouble(p2.getX() - normX, p2.getY() - normY);
+    final Point n3 = new PointDouble(q1.getX() - normX, q1.getY() - normY);
+    final Point n4 = new PointDouble(q2.getX() - normX, q2.getY() - normY);
 
     final Point intPt = safeHCoordinatesIntersection(n1, n2, n3, n4);
 
@@ -373,8 +368,8 @@ public class RobustLineIntersector extends LineIntersector {
    * @param q2 a segment endpoint
    * @return the computed intersection point
    */
-  private Point safeHCoordinatesIntersection(final Point p1,
-    final Point p2, final Point q1, final Point q2) {
+  private Point safeHCoordinatesIntersection(final Point p1, final Point p2,
+    final Point q1, final Point q2) {
     Point intPt = null;
     try {
       intPt = HCoordinate.intersection(p1, p2, q1, q2);

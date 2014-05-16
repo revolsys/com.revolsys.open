@@ -16,6 +16,8 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.swing.SwingUtil;
 
 public class MouseOverlay extends JComponent implements MouseListener,
@@ -140,16 +142,20 @@ public class MouseOverlay extends JComponent implements MouseListener,
   }
 
   @Override
-  public void mouseMoved(final MouseEvent e) {
-    requestFocusInWindow();
-    for (final Component overlay : getOverlays()) {
-      if (overlay instanceof MouseMotionListener) {
-        final MouseMotionListener listener = (MouseMotionListener)overlay;
-        listener.mouseMoved(e);
-        if (e.isConsumed()) {
-          return;
+  public void mouseMoved(final MouseEvent event) {
+    try {
+      requestFocusInWindow();
+      for (final Component overlay : getOverlays()) {
+        if (overlay instanceof MouseMotionListener) {
+          final MouseMotionListener listener = (MouseMotionListener)overlay;
+          listener.mouseMoved(event);
+          if (event.isConsumed()) {
+            return;
+          }
         }
       }
+    } catch (final RuntimeException e) {
+      LoggerFactory.getLogger(getClass()).error("Mouse move error", e);
     }
   }
 

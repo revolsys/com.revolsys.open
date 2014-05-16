@@ -75,7 +75,7 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
 
   public void query(final Geometry geometry, final Visitor<DataObject> visitor) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    query(boundingBox, visitor);
+    visit(boundingBox, visitor);
   }
 
   public List<DataObject> queryDistance(final Geometry geometry,
@@ -95,7 +95,7 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
   public DataObject queryFirst(final DataObject object,
     final Filter<DataObject> filter) {
     final Geometry geometry = object.getGeometryValue();
-    return queryFirst(geometry, filter);
+    return getFirstBoundingBox(geometry, filter);
   }
 
   public DataObject queryFirstEquals(final DataObject object,
@@ -137,7 +137,7 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     final Filter<DataObject> filter, final Comparator<DataObject> comparator) {
     final CreateListVisitor<DataObject> listVisitor = new CreateListVisitor<DataObject>(
       filter);
-    query(boundingBox, listVisitor);
+    visit(boundingBox, listVisitor);
     final List<DataObject> list = listVisitor.getList();
     if (comparator != null) {
       Collections.sort(list, comparator);

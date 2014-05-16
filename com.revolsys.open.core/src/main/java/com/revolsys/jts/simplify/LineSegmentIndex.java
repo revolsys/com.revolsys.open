@@ -48,7 +48,9 @@ import com.revolsys.jts.util.EnvelopeUtil;
  * Supports adding and removing items.
  *
  * @author Martin Davis
+ * 
  */
+@Deprecated
 class LineSegmentIndex {
   private final QuadTree<LineSegment> index = new QuadTree<>();
 
@@ -71,7 +73,7 @@ class LineSegmentIndex {
     final Envelope env = new Envelope(querySeg.getP0(), querySeg.getP1());
 
     final LineSegmentVisitor visitor = new LineSegmentVisitor(querySeg);
-    index.query(env, visitor);
+    index.visit(env, visitor);
     final List itemsFound = visitor.getItems();
 
     // List listQueryItems = index.query(env);

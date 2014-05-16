@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectIterator;
+import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -29,6 +30,8 @@ import com.revolsys.util.ExceptionUtil;
 public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   implements DataObjectIterator {
 
+  private final char fieldSeparator;
+
   private String pointXAttributeName;
 
   private String pointYAttributeName;
@@ -39,7 +42,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
 
   private Integer geometrySrid;
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private DataObjectFactory dataObjectFactory;
 
@@ -53,16 +56,25 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
 
   private boolean hasPointFields;
 
-  /**
-   * Constructs CSVReader with supplied separator and quote char.
-   * 
-   * @param reader
-   * @throws IOException
-   */
+  public CsvDataObjectIterator(final Resource resource) {
+    this(resource, new ArrayDataObjectFactory(), CsvConstants.FIELD_SEPARATOR);
+  }
+
+  public CsvDataObjectIterator(final Resource resource,
+    final char fieldSeparator) {
+    this(resource, new ArrayDataObjectFactory(), fieldSeparator);
+  }
+
   public CsvDataObjectIterator(final Resource resource,
     final DataObjectFactory dataObjectFactory) {
+    this(resource, dataObjectFactory, CsvConstants.FIELD_SEPARATOR);
+  }
+
+  public CsvDataObjectIterator(final Resource resource,
+    final DataObjectFactory dataObjectFactory, final char fieldSeparator) {
     this.resource = resource;
     this.dataObjectFactory = dataObjectFactory;
+    this.fieldSeparator = fieldSeparator;
   }
 
   private void createMetaData(final String[] fieldNames) throws IOException {
@@ -238,13 +250,13 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
               i++;
             } else {
               inQuotes = !inQuotes;
-              if (i > 2 && line.charAt(i - 1) != CsvConstants.FIELD_SEPARATOR
+              if (i > 2 && line.charAt(i - 1) != fieldSeparator
                 && line.length() > (i + 1)
-                && line.charAt(i + 1) != CsvConstants.FIELD_SEPARATOR) {
+                && line.charAt(i + 1) != fieldSeparator) {
                 sb.append(c);
               }
             }
-          } else if (c == CsvConstants.FIELD_SEPARATOR && !inQuotes) {
+          } else if (c == fieldSeparator && !inQuotes) {
             hadQuotes = false;
             if (hadQuotes || sb.length() > 0) {
               fields.add(sb.toString());

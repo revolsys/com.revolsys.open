@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 
@@ -16,13 +17,19 @@ public class CsvMapWriter extends AbstractMapWriter {
   /** The writer */
   private final PrintWriter out;
 
-  /**
-   * Constructs CSVReader with supplied separator and quote char.
-   * 
-   * @param reader The reader to the CSV file.
-   */
+  private final boolean useQuotes;
+
+  private final char fieldSeparator;
+
   public CsvMapWriter(final Writer out) {
+    this(out, CsvConstants.FIELD_SEPARATOR, true);
+  }
+
+  public CsvMapWriter(final Writer out, final char fieldSeparator,
+    final boolean useQuotes) {
     this.out = new PrintWriter(out);
+    this.fieldSeparator = fieldSeparator;
+    this.useQuotes = useQuotes;
   }
 
   /**
@@ -67,15 +74,20 @@ public class CsvMapWriter extends AbstractMapWriter {
 
   public void write(final Object... values) {
     for (int i = 0; i < values.length; i++) {
+      if (i > 0) {
+        out.write(fieldSeparator);
+      }
       final Object value = values[i];
       if (value != null) {
-        final String string = value.toString().replaceAll("\"", "\"\"");
-        out.write('"');
-        out.write(string);
-        out.write('"');
-      }
-      if (i < values.length - 1) {
-        out.write(',');
+        String string = StringConverterRegistry.toString(value);
+        if (useQuotes) {
+          string = string.replaceAll("\"", "\"\"");
+          out.write('"');
+          out.write(string);
+          out.write('"');
+        } else {
+          out.write(string);
+        }
       }
     }
     out.println();

@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.algorithm.index.PointQuadTree;
-import com.revolsys.gis.algorithm.index.quadtree.linesegment.LineSegmentQuadTree;
+import com.revolsys.gis.algorithm.index.quadtree.GeometrySegmentQuadTree;
+import com.revolsys.gis.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
@@ -25,12 +26,14 @@ import com.revolsys.jts.geom.vertex.Vertex;
 
 public class GeometryEditUtil {
 
-  private static final String LINE_SEGMENT_QUAD_TREE = "LineSegmentQuadTree";
+  private static final String GEOMETRY_SEGMENT_INDEX = "GeometrySegmentQuadTree";
+
+  private static final String GEOMETRY_VERTEX_INDEX = "GeometryVertexQuadTree";
 
   private static final String POINT_QUAD_TREE = "PointQuadTree";
 
   static {
-    GeometryEqualsExact3d.addExclude(LINE_SEGMENT_QUAD_TREE);
+    GeometryEqualsExact3d.addExclude(GEOMETRY_SEGMENT_INDEX);
     GeometryEqualsExact3d.addExclude(POINT_QUAD_TREE);
   }
 
@@ -285,6 +288,50 @@ public class GeometryEditUtil {
     return getVertex(geometry, newPointId);
   }
 
+  public static GeometrySegmentQuadTree getGeometrySegmentIndex(
+    final Geometry geometry) {
+    if (geometry != null && !geometry.isEmpty()) {
+      final Reference<GeometrySegmentQuadTree> reference = GeometryProperties.getGeometryProperty(
+        geometry, GEOMETRY_SEGMENT_INDEX);
+      GeometrySegmentQuadTree index;
+      if (reference == null) {
+        index = null;
+      } else {
+        index = reference.get();
+      }
+      if (index == null) {
+        index = new GeometrySegmentQuadTree(geometry);
+        GeometryProperties.setGeometryProperty(geometry,
+          GEOMETRY_SEGMENT_INDEX, new SoftReference<GeometrySegmentQuadTree>(
+            index));
+      }
+      return index;
+    }
+    return new GeometrySegmentQuadTree(null);
+  }
+
+  public static GeometryVertexQuadTree getGeometryVertexIndex(
+    final Geometry geometry) {
+    if (geometry != null && !geometry.isEmpty()) {
+      final Reference<GeometryVertexQuadTree> reference = GeometryProperties.getGeometryProperty(
+        geometry, GEOMETRY_VERTEX_INDEX);
+      GeometryVertexQuadTree index;
+      if (reference == null) {
+        index = null;
+      } else {
+        index = reference.get();
+      }
+      if (index == null) {
+        index = new GeometryVertexQuadTree(geometry);
+        GeometryProperties.setGeometryProperty(geometry,
+          GEOMETRY_SEGMENT_INDEX, new SoftReference<GeometryVertexQuadTree>(
+            index));
+      }
+      return index;
+    }
+    return new GeometryVertexQuadTree(null);
+  }
+
   public static Map<int[], Point> getIndexOfVertices(final Geometry geometry) {
     final Map<int[], Point> pointIndexes = new LinkedHashMap<int[], Point>();
     if (geometry == null || geometry.isEmpty()) {
@@ -336,27 +383,6 @@ public class GeometryEditUtil {
       }
     }
     return pointIndexes;
-  }
-
-  public static LineSegmentQuadTree getLineSegmentQuadTree(
-    final Geometry geometry) {
-    if (geometry != null && !geometry.isEmpty()) {
-      final Reference<LineSegmentQuadTree> reference = GeometryProperties.getGeometryProperty(
-        geometry, LINE_SEGMENT_QUAD_TREE);
-      LineSegmentQuadTree index;
-      if (reference == null) {
-        index = null;
-      } else {
-        index = reference.get();
-      }
-      if (index == null) {
-        index = new LineSegmentQuadTree(geometry);
-        GeometryProperties.setGeometryProperty(geometry,
-          LINE_SEGMENT_QUAD_TREE, new SoftReference<LineSegmentQuadTree>(index));
-      }
-      return index;
-    }
-    return new LineSegmentQuadTree(null);
   }
 
   public static PointQuadTree<int[]> getPointQuadTree(final Geometry geometry) {
@@ -656,7 +682,7 @@ public class GeometryEditUtil {
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, pointIndex,
       newPoint);
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, pointIndex + 1,
-      line, 0, vertexCount - pointIndex);
+      line, pointIndex, vertexCount - pointIndex);
 
     final GeometryFactory geometryFactory = line.getGeometryFactory();
     return geometryFactory.linearRing(axisCount, coordinates);
@@ -672,7 +698,7 @@ public class GeometryEditUtil {
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, pointIndex,
       newPoint);
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, pointIndex + 1,
-      line, 0, vertexCount - pointIndex);
+      line, pointIndex, vertexCount - pointIndex);
 
     final GeometryFactory geometryFactory = line.getGeometryFactory();
     return geometryFactory.lineString(axisCount, coordinates);

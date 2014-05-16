@@ -235,7 +235,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       processExactLineMatches();
       processPartialMatches();
     }
-    for (final DataObject object : otherIndex.queryAll()) {
+    for (final DataObject object : otherIndex.getAll()) {
       logError(object, "Other missing in Source", false);
     }
     for (final DataObject object : otherPointMap.getAll()) {

@@ -1,5 +1,6 @@
 package com.revolsys.gis.data.io;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -14,10 +15,11 @@ public class IteratorReader<T> extends AbstractReader<T> {
   private ObjectWithProperties object;
 
   public IteratorReader() {
+    setIterator(null);
   }
 
   public IteratorReader(final Iterator<T> iterator) {
-    this.iterator = iterator;
+    setIterator(iterator);
     if (iterator instanceof ObjectWithProperties) {
       object = (ObjectWithProperties)iterator;
     }
@@ -31,7 +33,7 @@ public class IteratorReader<T> extends AbstractReader<T> {
         i.close();
       }
     } finally {
-      iterator = null;
+      setIterator(null);
     }
   }
 
@@ -61,13 +63,15 @@ public class IteratorReader<T> extends AbstractReader<T> {
 
   @Override
   public void open() {
-    if (iterator != null) {
-      iterator.hasNext();
-    }
+    iterator.hasNext();
   }
 
   protected void setIterator(final Iterator<T> iterator) {
-    this.iterator = iterator;
+    if (iterator == null) {
+      this.iterator = Collections.<T> emptyList().iterator();
+    } else {
+      this.iterator = iterator;
+    }
   }
 
   @Override

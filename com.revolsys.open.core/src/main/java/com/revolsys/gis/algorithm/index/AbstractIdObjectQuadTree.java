@@ -11,7 +11,7 @@ import com.revolsys.visitor.CreateListVisitor;
 
 public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
 
-  private QuadTree<Integer> index;
+  private final QuadTree<Integer> index = new QuadTree<>();
 
   public void add(final Collection<Integer> ids) {
     for (final Integer id : ids) {
@@ -41,7 +41,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   }
 
   public List<T> queryAll() {
-    final List<Integer> ids = index.queryAll();
+    final List<Integer> ids = index.getAll();
     return getObjects(ids);
   }
 
@@ -62,7 +62,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
     final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(
       this, envelope, visitor);
-    index.query(envelope, itemVisitor);
+    index.visit(envelope, itemVisitor);
   }
 
 }

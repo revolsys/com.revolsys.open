@@ -20,7 +20,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     double minX = bounds[0];
     double maxX = bounds[2];
     double minY = bounds[1];
-    double maxY = bounds[2];
+    double maxY = bounds[3];
     if (minX != maxX && minY != maxY) {
       return bounds;
     } else {
@@ -40,17 +40,23 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private GeometryFactory geometryFactory;
 
-  private final AbstractNode<T> root = new Node<T>(-1);
+  private AbstractNode<T> root;
 
   private double minExtent = 1.0;
 
   private int size = 0;
 
   public QuadTree() {
+    root = new Node<T>();
   }
 
   public QuadTree(final GeometryFactory geometryFactory) {
+    this();
     this.geometryFactory = geometryFactory;
+  }
+
+  protected QuadTree(final IdObjectNode<T> root) {
+    this.root = root;
   }
 
   public void clear() {
@@ -82,6 +88,27 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return root.depth();
   }
 
+  public List<T> getAll() {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
+    root.visit(this, visitor);
+    return visitor.getList();
+  }
+
+  public T getFirst(final BoundingBox boundingBox, final Filter<T> filter) {
+    final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<T>(filter);
+    visit(boundingBox, visitor);
+    return visitor.getObject();
+  }
+
+  public T getFirstBoundingBox(final Geometry geometry, final Filter<T> filter) {
+    if (geometry == null) {
+      return null;
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      return getFirst(boundingBox, filter);
+    }
+  }
+
   public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
@@ -108,13 +135,13 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   @Override
   public List<T> query(final BoundingBox boundingBox) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    query(boundingBox, visitor);
+    visit(boundingBox, visitor);
     return visitor.getList();
   }
 
   public List<T> query(final BoundingBox boundingBox, final Filter<T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>(filter);
-    query(boundingBox, visitor);
+    visit(boundingBox, visitor);
     return visitor.getList();
   }
 
@@ -125,38 +152,12 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return query(boundingBox, filter);
   }
 
-  public void query(final BoundingBox boundingBox, final Visitor<T> visitor) {
-    final double[] bounds = convert(boundingBox);
-    root.visit(this, bounds, visitor);
-  }
-
-  public List<T> queryAll() {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    root.visit(this, visitor);
-    return visitor.getList();
-  }
-
   public List<T> queryBoundingBox(final Geometry geometry) {
     if (geometry == null) {
       return Collections.emptyList();
     } else {
       final BoundingBox boundingBox = geometry.getBoundingBox();
       return query(boundingBox);
-    }
-  }
-
-  public T queryFirst(final BoundingBox boundingBox, final Filter<T> filter) {
-    final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<T>(filter);
-    query(boundingBox, visitor);
-    return visitor.getObject();
-  }
-
-  public T queryFirst(final Geometry geometry, final Filter<T> filter) {
-    if (geometry == null) {
-      return null;
-    } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      return queryFirst(boundingBox, filter);
     }
   }
 
@@ -171,8 +172,20 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return removed;
   }
 
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
   public int size() {
     return getSize();
   }
 
+  public void visit(final BoundingBox boundingBox, final Visitor<T> visitor) {
+    final double[] bounds = convert(boundingBox);
+    root.visit(this, bounds, visitor);
+  }
+
+  public void visitAll(final Visitor<T> visitor) {
+    root.visit(this, visitor);
+  }
 }
