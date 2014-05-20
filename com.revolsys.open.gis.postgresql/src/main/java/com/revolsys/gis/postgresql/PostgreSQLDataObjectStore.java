@@ -13,21 +13,23 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
@@ -51,11 +53,6 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     initSettings();
   }
 
-  protected void initSettings() {
-    setIteratorFactory(new DataStoreIteratorFactory(
-      PostgreSQLDataObjectStore.class, "createPostgreSQLIterator"));
-  }
-
   public PostgreSQLDataObjectStore(final DataObjectFactory dataObjectFactory,
     final DataSource dataSource) {
     this(dataObjectFactory);
@@ -75,6 +72,19 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     setDataSource(dataSource);
     initSettings();
     setConnectionProperties(connectionProperties);
+  }
+
+  @Override
+  protected JdbcAttribute addAttribute(final DataObjectMetaDataImpl metaData,
+    final String dbColumnName, final String name, final String dataType,
+    final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
+    final JdbcAttribute attribute = super.addAttribute(metaData, dbColumnName,
+      name, dataType, sqlType, length, scale, required, description);
+    if (!dbColumnName.matches("[a-z_]")) {
+      attribute.setQuoteName(true);
+    }
+    return attribute;
   }
 
   @Override
@@ -215,6 +225,11 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
       + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
       + "order by t.table_schema, t.table_name, t.privilege_type");
+  }
+
+  protected void initSettings() {
+    setIteratorFactory(new DataStoreIteratorFactory(
+      PostgreSQLDataObjectStore.class, "createPostgreSQLIterator"));
   }
 
   @Override

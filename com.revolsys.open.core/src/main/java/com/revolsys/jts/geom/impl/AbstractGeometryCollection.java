@@ -264,6 +264,20 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
   }
 
   @Override
+  public boolean intersects(final BoundingBox boundingBox) {
+    if (isEmpty() || boundingBox.isEmpty()) {
+      return false;
+    } else {
+      for (final Geometry geometry : geometries()) {
+        if (geometry.intersects(boundingBox)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
+  @Override
   public boolean isEmpty() {
     if (getGeometryCount() == 0) {
       return true;

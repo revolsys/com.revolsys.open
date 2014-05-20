@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.geom.util;
 
-import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.math.Angle;
 
 /**
  * Supports creating {@link AffineTransformation}s defined by various kinds of

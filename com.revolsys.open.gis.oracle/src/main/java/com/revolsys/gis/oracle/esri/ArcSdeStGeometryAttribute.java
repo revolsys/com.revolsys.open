@@ -16,10 +16,10 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 
 public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
@@ -29,15 +29,15 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
   private final GeometryFactory geometryFactory;
 
-  public ArcSdeStGeometryAttribute(final String name, final DataType type,
-    final boolean required, final String description,
+  public ArcSdeStGeometryAttribute(final String dbName, final String name,
+    final DataType type, final boolean required, final String description,
     final Map<String, Object> properties,
     final ArcSdeSpatialReference spatialReference, final int dimension) {
-    super(name, type, -1, 0, 0, required, description, properties);
+    super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.spatialReference = spatialReference;
     final com.revolsys.jts.geom.GeometryFactory factory = spatialReference.getGeometryFactory();
-    this.geometryFactory = GeometryFactory.fixed(factory.getSrid(),
-      dimension, factory.getScaleXY(), factory.getScaleZ());
+    this.geometryFactory = GeometryFactory.fixed(factory.getSrid(), dimension,
+      factory.getScaleXY(), factory.getScaleZ());
     this.dimension = dimension;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }
@@ -59,8 +59,9 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
   @Override
   public ArcSdeStGeometryAttribute clone() {
-    return new ArcSdeStGeometryAttribute(getName(), getType(), isRequired(),
-      getDescription(), getProperties(), this.spatialReference, this.dimension);
+    return new ArcSdeStGeometryAttribute(getDbName(), getName(), getType(),
+      isRequired(), getDescription(), getProperties(), this.spatialReference,
+      this.dimension);
   }
 
   @Override

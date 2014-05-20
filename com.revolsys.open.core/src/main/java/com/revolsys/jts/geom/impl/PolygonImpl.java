@@ -184,8 +184,11 @@ public class PolygonImpl extends BaseGeometry implements Polygon {
   @Override
   public PolygonImpl clone() {
     final PolygonImpl poly = (PolygonImpl)super.clone();
-    for (int i = 0; i < rings.length; i++) {
-      poly.rings[i] = rings[i].clone();
+    if (rings != null) {
+      poly.rings = rings.clone();
+      for (int i = 0; i < rings.length; i++) {
+        poly.rings[i] = rings[i].clone();
+      }
     }
     return poly;
   }
@@ -492,6 +495,20 @@ public class PolygonImpl extends BaseGeometry implements Polygon {
         holes.add(ring);
       }
       return holes;
+    }
+  }
+
+  @Override
+  public boolean intersects(final BoundingBox boundingBox) {
+    if (isEmpty() || boundingBox.isEmpty()) {
+      return false;
+    } else {
+      for (final LinearRing ring : rings()) {
+        if (ring.intersects(boundingBox)) {
+          return true;
+        }
+      }
+      return false;
     }
   }
 

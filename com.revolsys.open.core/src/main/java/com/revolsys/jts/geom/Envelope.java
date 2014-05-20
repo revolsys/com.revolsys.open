@@ -98,6 +98,34 @@ public class Envelope implements Serializable, BoundingBox {
   /** The serialization version. */
   private static final long serialVersionUID = -810356856421113732L;
 
+  /**
+   * The bitmask that indicates that a point lies to the left of
+   * this <code>Rectangle2D</code>.
+   * @since 1.2
+   */
+  public static final int OUT_LEFT = 1;
+
+  /**
+   * The bitmask that indicates that a point lies above
+   * this <code>Rectangle2D</code>.
+   * @since 1.2
+   */
+  public static final int OUT_TOP = 2;
+
+  /**
+   * The bitmask that indicates that a point lies to the right of
+   * this <code>Rectangle2D</code>.
+   * @since 1.2
+   */
+  public static final int OUT_RIGHT = 4;
+
+  /**
+   * The bitmask that indicates that a point lies below
+   * this <code>Rectangle2D</code>.
+   * @since 1.2
+   */
+  public static final int OUT_BOTTOM = 8;
+
   public static BoundingBox create(final String wkt) {
     if (StringUtils.hasLength(wkt)) {
       GeometryFactory geometryFactory = null;
@@ -669,6 +697,7 @@ public class Envelope implements Serializable, BoundingBox {
     }
   }
 
+  @Override
   public double[] getBounds(final int axisCount) {
     if (this.bounds == null) {
       return this.bounds;
@@ -1015,9 +1044,38 @@ public class Envelope implements Serializable, BoundingBox {
     }
   }
 
+  @Override
+  public boolean intersects(double x1, double y1, final double x2,
+    final double y2) {
+    int out1, out2;
+    if ((out2 = outcode(x2, y2)) == 0) {
+      return true;
+    }
+    while ((out1 = outcode(x1, y1)) != 0) {
+      if ((out1 & out2) != 0) {
+        return false;
+      }
+      if ((out1 & (OUT_LEFT | OUT_RIGHT)) != 0) {
+        double minX = getMinX();
+        if ((out1 & OUT_RIGHT) != 0) {
+          minX += getWidth();
+        }
+        y1 = y1 + (minX - x1) * (y2 - y1) / (x2 - x1);
+        x1 = minX;
+      } else {
+        double minY = getMinY();
+        if ((out1 & OUT_TOP) != 0) {
+          minY += getHeight();
+        }
+        x1 = x1 + (minY - y1) * (x2 - x1) / (y2 - y1);
+        y1 = minY;
+      }
+    }
+    return true;
+  }
+
   public boolean intersects(final Geometry geometry) {
-    final BoundingBox boundingBox = geometry.getBoundingBox();
-    return intersects(boundingBox);
+    return geometry.intersects(this);
   }
 
   /**
@@ -1029,13 +1087,7 @@ public class Envelope implements Serializable, BoundingBox {
    */
   @Override
   public boolean intersects(final Point point) {
-    if (point == null) {
-      return false;
-    } else {
-      final double x = point.getX();
-      final double y = point.getY();
-      return this.intersects(x, y);
-    }
+    return point.intersects(this);
   }
 
   @Override
@@ -1072,6 +1124,21 @@ public class Envelope implements Serializable, BoundingBox {
       final double y2 = getMaxY() + yDisplacement;
       return new Envelope(geometryFactory, 2, x1, y1, x2, y2);
     }
+  }
+
+  private int outcode(final double x, final double y) {
+    int out = 0;
+    if (x < getMinX()) {
+      out |= OUT_LEFT;
+    } else if (x > getMaxX()) {
+      out |= OUT_RIGHT;
+    }
+    if (y < getMinY()) {
+      out |= OUT_BOTTOM;
+    } else if (y > getMaxY()) {
+      out |= OUT_TOP;
+    }
+    return out;
   }
 
   @Override

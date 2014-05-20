@@ -20,34 +20,17 @@
  */
 package com.revolsys.gis.data.model.filter;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.revolsys.filter.Filter;
-import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.TopologyException;
 
 public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static <D extends DataObject> List<D> filter(
-    final Collection<D> collection, final BoundingBox boundingBox) {
-    final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
-    return FilterUtil.filter(collection, filter);
-  }
-
   /** The geometry to compare the data objects to to. */
   private final Geometry geometry;
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
-
-  public DataObjectGeometryIntersectsFilter(final BoundingBox boundingBox) {
-    this(boundingBox.toPolygon());
-  }
+  private final GeometryFactory geometryFactory;
 
   /**
    * Construct a new DataObjectGeometryIntersectsFilter.
@@ -64,11 +47,16 @@ public class DataObjectGeometryIntersectsFilter implements Filter<DataObject> {
     try {
       final Geometry matchGeometry = object.getGeometryValue();
       final Geometry convertedGeometry = matchGeometry.convert(geometryFactory);
-      if (convertedGeometry != null && geometry != null
-        && convertedGeometry.intersects(geometry)) {
+      try {
+        if (convertedGeometry != null && geometry != null
+          && convertedGeometry.intersects(geometry)) {
+          return true;
+        } else {
+          return false;
+        }
+      } catch (final TopologyException e) {
+        e.printStackTrace();
         return true;
-      } else {
-        return false;
       }
     } catch (final Throwable t) {
       t.printStackTrace();

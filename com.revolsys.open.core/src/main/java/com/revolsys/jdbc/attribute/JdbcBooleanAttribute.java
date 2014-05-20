@@ -9,17 +9,17 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcBooleanAttribute extends JdbcAttribute {
-  public JdbcBooleanAttribute(final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(name, DataTypes.BOOLEAN, sqlType, length, 0, required, description,
-      properties);
+  public JdbcBooleanAttribute(final String dbName, final String name,
+    final int sqlType, final int length, final boolean required,
+    final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.BOOLEAN, sqlType, length, 0, required,
+      description, properties);
   }
 
   @Override
   public JdbcBooleanAttribute clone() {
-    return new JdbcBooleanAttribute(getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcBooleanAttribute(getDbName(), getName(), getSqlType(),
+      getLength(), isRequired(), getDescription(), getProperties());
   }
 
   @Override

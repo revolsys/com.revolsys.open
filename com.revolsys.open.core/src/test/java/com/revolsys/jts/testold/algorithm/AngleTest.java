@@ -35,9 +35,9 @@ package com.revolsys.jts.testold.algorithm;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.math.Angle;
 
 /**
  * @version 1.7

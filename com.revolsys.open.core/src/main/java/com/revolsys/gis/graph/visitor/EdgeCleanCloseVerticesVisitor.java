@@ -12,6 +12,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
@@ -50,7 +51,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Visitor<Edge<T>> {
       final double y2 = line.getCoordinate(index, 1);
       final double x3 = line.getCoordinate(index + 1, 0);
       final double y3 = line.getCoordinate(index + 1, 1);
-      return MathUtil.angle(x1, y1, x2, y2, x3, y3);
+      return Angle.angle(x1, y1, x2, y2, x3, y3);
     }
   }
 

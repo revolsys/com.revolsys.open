@@ -10,17 +10,17 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcDateAttribute extends JdbcAttribute {
-  public JdbcDateAttribute(final String name, final int sqlType,
-    final boolean required, final String description,
+  public JdbcDateAttribute(final String dbName, final String name,
+    final int sqlType, final boolean required, final String description,
     final Map<String, Object> properties) {
-    super(name, DataTypes.DATE, sqlType, 0, 0, required, description,
+    super(dbName, name, DataTypes.DATE, sqlType, 0, 0, required, description,
       properties);
   }
 
   @Override
   public JdbcDateAttribute clone() {
-    return new JdbcDateAttribute(getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    return new JdbcDateAttribute(getDbName(), getName(), getSqlType(),
+      isRequired(), getDescription(), getProperties());
   }
 
   @Override

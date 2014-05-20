@@ -152,7 +152,7 @@ public class PointTest implements TestConstants {
       assertEmpty(pointCoordinatesListNull);
 
       final Point pointCoordinatesListSize0 = geometryFactory.point(new DoubleCoordinatesList(
-        axisCount, 0));
+        0, axisCount));
       assertEmpty(pointCoordinatesListSize0);
 
       final Point pointObjectNull = geometryFactory.point((Object)null);

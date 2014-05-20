@@ -35,11 +35,11 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.PasswordUtil;
 
@@ -100,7 +100,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     }
 
     final ArcSdeBinaryGeometryAttribute sdeAttribute = new ArcSdeBinaryGeometryAttribute(
-      this, columnName, dataType, attribute.isRequired(),
+      this, columnName, columnName, dataType, attribute.isRequired(),
       "The GEOMETRY reference", attribute.getProperties(), geometryFactory);
     ((DataObjectMetaDataImpl)metaData).replaceAttribute(attribute, sdeAttribute);
     sdeAttribute.setMetaData(metaData);

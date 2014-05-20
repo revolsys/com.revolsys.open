@@ -9,17 +9,17 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcByteAttribute extends JdbcAttribute {
-  public JdbcByteAttribute(final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(name, DataTypes.BYTE, sqlType, length, 0, required, description,
-      properties);
+  public JdbcByteAttribute(final String dbName, final String name,
+    final int sqlType, final int length, final boolean required,
+    final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.BYTE, sqlType, length, 0, required,
+      description, properties);
   }
 
   @Override
   public JdbcByteAttribute clone() {
-    return new JdbcByteAttribute(getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcByteAttribute(getDbName(), getName(), getSqlType(),
+      getLength(), isRequired(), getDescription(), getProperties());
   }
 
   @Override

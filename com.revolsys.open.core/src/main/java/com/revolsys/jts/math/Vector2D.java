@@ -32,11 +32,11 @@
  */
 package com.revolsys.jts.math;
 
-import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
+import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 /**

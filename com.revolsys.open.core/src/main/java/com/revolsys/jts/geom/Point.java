@@ -105,6 +105,8 @@ public interface Point extends Geometry, Puntal, Serializable {
   @Override
   int compareTo(Object o);
 
+  void copyCoordinates(GeometryFactory geometryFactory, double[] coordinates);
+
   /**
    * Computes the 2-dimensional Euclidean distance to another location.
    * The Z-ordinate is ignored.

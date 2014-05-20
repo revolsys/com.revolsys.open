@@ -143,8 +143,10 @@ public class MultiLineStringImpl extends GeometryCollectionImpl implements
     if (isEmpty()) {
       return false;
     }
-    for (final Geometry geometry : geometries()) {
-      if (!((LineString)geometry).isClosed()) {
+    for (final LineString line : getLineStrings()) {
+      if (line.isEmpty()) {
+        return false;
+      } else if (!line.isClosed()) {
         return false;
       }
     }

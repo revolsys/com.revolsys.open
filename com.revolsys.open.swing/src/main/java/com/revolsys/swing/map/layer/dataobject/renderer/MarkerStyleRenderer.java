@@ -23,6 +23,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.math.Angle;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -31,7 +32,6 @@ import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
 import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
 import com.revolsys.swing.map.layer.dataobject.style.panel.MarkerStylePanel;
-import com.revolsys.util.MathUtil;
 
 public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
@@ -234,11 +234,11 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
           if (i == 0 || isNext) {
             final double x1 = points.getX(i + 1);
             final double y1 = points.getY(i + 1);
-            orientation = MathUtil.angleDegrees(x, y, x1, y1);
+            orientation = Angle.angleDegrees(x, y, x1, y1);
           } else {
             final double x1 = points.getX(i - 1);
             final double y1 = points.getY(i - 1);
-            orientation = MathUtil.angleDegrees(x1, y1, x, y);
+            orientation = Angle.angleDegrees(x1, y1, x, y);
           }
         }
         marker.render(viewport, graphics, style, x, y, orientation);
@@ -276,11 +276,11 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
               if (i == 0) {
                 final double x1 = points.getX(i + 1);
                 final double y1 = points.getY(i + 1);
-                orientation = MathUtil.angleDegrees(x, y, x1, y1);
+                orientation = Angle.angleDegrees(x, y, x1, y1);
               } else {
                 final double x1 = points.getX(i - 1);
                 final double y1 = points.getY(i - 1);
-                orientation = MathUtil.angleDegrees(x1, y1, x, y);
+                orientation = Angle.angleDegrees(x1, y1, x, y);
               }
               final Marker marker = style.getMarker();
               marker.render(viewport, graphics, style, x, y, orientation);

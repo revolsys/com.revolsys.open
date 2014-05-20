@@ -11,6 +11,8 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public interface CoordinateSystem extends Serializable {
+  CoordinateSystem clone();
+
   Area getArea();
 
   BoundingBox getAreaBoundingBox();

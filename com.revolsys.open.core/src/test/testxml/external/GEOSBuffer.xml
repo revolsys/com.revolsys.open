@@ -43,7 +43,7 @@ MULTIPOLYGON (((2350000.0000000000000000 1488707.0969169281888753, 2349964.40041
 </op>
 </test>
 </case>
-
+<!-- 
 <case>
   <desc>GEOS #605 - smallest case.  Works in JTS, but triggers fixed-precision fallback.</desc>
   <a>
@@ -55,5 +55,5 @@ MULTIPOLYGON (((2350000.0000000000000000 1488707.0969169281888753, 2349964.40041
   </op>
 </test>
 </case>
-
+ -->
 </run>

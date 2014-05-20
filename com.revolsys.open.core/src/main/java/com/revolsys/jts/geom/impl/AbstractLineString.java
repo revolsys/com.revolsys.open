@@ -368,6 +368,33 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
+  public boolean intersects(final BoundingBox boundingBox) {
+    if (isEmpty() || boundingBox.isEmpty()) {
+      return false;
+    } else {
+      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory()
+        .convertAxisCount(2);
+      double previousX = Double.NaN;
+      double previousY = Double.NaN;
+
+      final double[] coordinates = new double[2];
+      for (final Vertex vertex : vertices()) {
+        vertex.copyCoordinates(geometryFactory, coordinates);
+        final double x = coordinates[0];
+        final double y = coordinates[1];
+        if (!Double.isNaN(previousX)) {
+          if (boundingBox.intersects(previousX, previousY, x, y)) {
+            return true;
+          }
+        }
+        previousX = x;
+        previousY = y;
+      }
+      return false;
+    }
+  }
+
+  @Override
   public boolean isClockwise() {
     return !isCounterClockwise();
   }

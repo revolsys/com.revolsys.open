@@ -160,6 +160,11 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
   }
 
   @Override
+  public boolean isEmpty() {
+    return geometries == null;
+  }
+
+  @Override
   protected boolean isEquivalentClass(final Geometry other) {
     return other instanceof GeometryCollection;
   }

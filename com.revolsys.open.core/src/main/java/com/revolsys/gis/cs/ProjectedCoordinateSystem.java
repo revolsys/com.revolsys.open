@@ -33,7 +33,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final LinearUnit linearUnit;
 
-  private final int id;
+  private int id;
 
   private final String name;
 
@@ -79,6 +79,15 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       this.axis.add(axis.get(1));
     }
     this.authority = authority;
+  }
+
+  @Override
+  public ProjectedCoordinateSystem clone() {
+    try {
+      return (ProjectedCoordinateSystem)super.clone();
+    } catch (final Exception e) {
+      return null;
+    }
   }
 
   @Override
@@ -151,7 +160,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     BoundingBox boundingBox;
     final GeometryFactory geographicGeometryFactory = geographicCoordinateSystem.getGeometryFactory();
     if (area == null) {
-      boundingBox = new Envelope(geographicGeometryFactory, 2, -180, -90, 180, 90);
+      boundingBox = new Envelope(geographicGeometryFactory, 2, -180, -90, 180,
+        90);
     } else {
       final Envelope latLonBounds = area.getLatLonBounds();
       boundingBox = latLonBounds.convert(geographicGeometryFactory);
@@ -183,6 +193,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     return geographicCoordinateSystem;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return GeometryFactory.floating3(this);
   }
@@ -250,6 +261,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   @Override
   public boolean isDeprecated() {
     return deprecated;
+  }
+
+  public void setId(final int id) {
+    this.id = id;
   }
 
   public void setParameters(final Map<String, Object> parameters) {

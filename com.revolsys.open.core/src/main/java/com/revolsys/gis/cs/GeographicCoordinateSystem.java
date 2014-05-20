@@ -108,6 +108,15 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   }
 
   @Override
+  public GeographicCoordinateSystem clone() {
+    try {
+      return (GeographicCoordinateSystem)super.clone();
+    } catch (final Exception e) {
+      return null;
+    }
+  }
+
+  @Override
   public boolean equals(final Object object) {
     if (object == null) {
       return false;
@@ -202,6 +211,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     return datum;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return GeometryFactory.floating3(this);
   }

@@ -63,8 +63,7 @@ public class MiscellaneousTest2 extends TestCase {
     junit.textui.TestRunner.main(testCaseName);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
-    1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -79,51 +78,46 @@ public class MiscellaneousTest2 extends TestCase {
   }
 
   public void test1() throws Exception {
-    assertTrue(CGAlgorithms.isOnLine(new PointDouble(10, 10),
+    assertTrue(CGAlgorithms.isOnLine(new PointDouble(2, 10, 10),
       geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)));
-    assertTrue(!CGAlgorithms.isOnLine(new PointDouble(30, 10),
+    assertTrue(!CGAlgorithms.isOnLine(new PointDouble(2, 30, 10),
       geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)));
   }
 
   public void testCoordinateHash() {
     doTestCoordinateHash(true, new PointDouble((double)1, 2,
-      Point.NULL_ORDINATE), new PointDouble((double)1, 2,
-      Point.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new PointDouble((double)1, 2, Point.NULL_ORDINATE));
     doTestCoordinateHash(false, new PointDouble((double)1, 2,
-      Point.NULL_ORDINATE), new PointDouble((double)3, 4,
-      Point.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new PointDouble((double)3, 4, Point.NULL_ORDINATE));
     doTestCoordinateHash(false, new PointDouble((double)1, 2,
-      Point.NULL_ORDINATE), new PointDouble((double)1, 4,
-      Point.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new PointDouble((double)1, 4, Point.NULL_ORDINATE));
     doTestCoordinateHash(false, new PointDouble((double)1, 2,
-      Point.NULL_ORDINATE), new PointDouble((double)3, 2,
-      Point.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new PointDouble((double)3, 2, Point.NULL_ORDINATE));
     doTestCoordinateHash(false, new PointDouble((double)1, 2,
-      Point.NULL_ORDINATE), new PointDouble((double)2, 1,
-      Point.NULL_ORDINATE));
+      Point.NULL_ORDINATE), new PointDouble((double)2, 1, Point.NULL_ORDINATE));
   }
 
   public void testDirectedEdgeComparator() {
-    final DirectedEdge d1 = new DirectedEdge(new Node(new PointDouble((double)0,
-      0, Point.NULL_ORDINATE)), new Node(new PointDouble((double)10, 10,
-      Point.NULL_ORDINATE)), new PointDouble((double)10, 10,
+    final DirectedEdge d1 = new DirectedEdge(new Node(new PointDouble(
+      (double)0, 0, Point.NULL_ORDINATE)), new Node(new PointDouble((double)10,
+      10, Point.NULL_ORDINATE)), new PointDouble((double)10, 10,
       Point.NULL_ORDINATE), true);
-    final DirectedEdge d2 = new DirectedEdge(new Node(new PointDouble((double)0,
-      0, Point.NULL_ORDINATE)), new Node(new PointDouble((double)20, 20,
-      Point.NULL_ORDINATE)), new PointDouble((double)20, 20,
+    final DirectedEdge d2 = new DirectedEdge(new Node(new PointDouble(
+      (double)0, 0, Point.NULL_ORDINATE)), new Node(new PointDouble((double)20,
+      20, Point.NULL_ORDINATE)), new PointDouble((double)20, 20,
       Point.NULL_ORDINATE), false);
     assertEquals(0, d2.compareTo(d1));
   }
 
   public void testDirectedEdgeToEdges() {
-    final DirectedEdge d1 = new DirectedEdge(new Node(new PointDouble((double)0,
-      0, Point.NULL_ORDINATE)), new Node(new PointDouble((double)10, 10,
-      Point.NULL_ORDINATE)), new PointDouble((double)10, 10,
+    final DirectedEdge d1 = new DirectedEdge(new Node(new PointDouble(
+      (double)0, 0, Point.NULL_ORDINATE)), new Node(new PointDouble((double)10,
+      10, Point.NULL_ORDINATE)), new PointDouble((double)10, 10,
       Point.NULL_ORDINATE), true);
     final DirectedEdge d2 = new DirectedEdge(new Node(new PointDouble(
       (double)20, 0, Point.NULL_ORDINATE)), new Node(new PointDouble(
-      (double)20, 10, Point.NULL_ORDINATE)), new PointDouble((double)20,
-      10, Point.NULL_ORDINATE), false);
+      (double)20, 10, Point.NULL_ORDINATE)), new PointDouble((double)20, 10,
+      Point.NULL_ORDINATE), false);
     final List edges = DirectedEdge.toEdges(Arrays.asList(new Object[] {
       d1, d2
     }));
@@ -183,8 +177,8 @@ public class MiscellaneousTest2 extends TestCase {
   public void testQuickPolygonUnion() throws Exception {
     final Geometry a = this.reader.read("POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))");
     final Geometry b = this.reader.read("POLYGON((50 50, 150 50, 150 150, 50 150, 50 50))");
-    final GeometryCollection polygonCollection = GeometryFactory.floating(0,
-      2).geometryCollection(a, b);
+    final GeometryCollection polygonCollection = GeometryFactory.floating(0, 2)
+      .geometryCollection(a, b);
     final Geometry union = polygonCollection.buffer(0);
     // System.out.println(union);
     assertEquals(

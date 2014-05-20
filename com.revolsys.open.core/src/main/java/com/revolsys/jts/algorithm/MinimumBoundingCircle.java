@@ -40,6 +40,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
+import com.revolsys.math.Angle;
 
 /**
  * Computes the <b>Minimum Bounding Circle</b> (MBC)

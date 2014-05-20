@@ -32,6 +32,7 @@ import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public class CoordinatesListUtil {
@@ -48,7 +49,7 @@ public class CoordinatesListUtil {
     final double y1 = points.getY(i1);
     final double x2 = points.getX(i2);
     final double y2 = points.getY(i2);
-    final double angle = MathUtil.angle(x1, y1, x2, y2);
+    final double angle = Angle.angle2d(x1, x2, y1, y2);
     return angle;
   }
 
@@ -63,7 +64,7 @@ public class CoordinatesListUtil {
       y2 = points.getY(j);
       j++;
     } while (x1 == x2 && y1 == y2 && j < points.size());
-    final double angle = MathUtil.angle(x1, y1, x2, y2);
+    final double angle = Angle.angle2d(x1, x2, y1, y2);
     return angle;
   }
 
@@ -79,7 +80,7 @@ public class CoordinatesListUtil {
         y2 = points.getY(j);
         j--;
       } while (x1 == x2 && y1 == y2 && j > -1);
-      final double angle = MathUtil.angle(x1, y1, x2, y2);
+      final double angle = Angle.angle2d(x1, x2, y1, y2);
       return angle;
     } else {
       throw new IllegalArgumentException(

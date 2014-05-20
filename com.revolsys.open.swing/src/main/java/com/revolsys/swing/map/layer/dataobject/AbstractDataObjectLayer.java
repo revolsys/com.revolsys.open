@@ -58,8 +58,8 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
-import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -1643,7 +1643,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final GeometryFactory geometryFactory = getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
       final List<LayerDataObject> results = doQuery(boundingBox);
-      final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+      final Filter filter = new DataObjectGeometryBoundingBoxIntersectsFilter(
+        boundingBox);
       return filterQueryResults(results, filter);
     } else {
       return Collections.emptyList();

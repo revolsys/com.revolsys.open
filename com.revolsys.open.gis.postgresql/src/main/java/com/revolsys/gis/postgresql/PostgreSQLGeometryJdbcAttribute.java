@@ -32,11 +32,12 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private final int axisCount;
 
-  public PostgreSQLGeometryJdbcAttribute(final String name,
-    final DataType type, final boolean required, final String description,
-    final Map<String, Object> properties, final int srid, final int axisCount,
+  public PostgreSQLGeometryJdbcAttribute(final String dbName,
+    final String name, final DataType type, final boolean required,
+    final String description, final Map<String, Object> properties,
+    final int srid, final int axisCount,
     final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
-    super(name, type, -1, 0, 0, required, description, properties);
+    super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.srid = srid;
     this.geometryFactory = geometryFactory;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
@@ -45,9 +46,9 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   @Override
   public JdbcAttribute clone() {
-    return new PostgreSQLGeometryJdbcAttribute(getName(), getType(),
-      isRequired(), getDescription(), getProperties(), srid, axisCount,
-      geometryFactory);
+    return new PostgreSQLGeometryJdbcAttribute(getDbName(), getName(),
+      getType(), isRequired(), getDescription(), getProperties(), srid,
+      axisCount, geometryFactory);
   }
 
   public Object getInsertUpdateValue(Object object) throws SQLException {
@@ -268,9 +269,14 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     for (int ringIndex = 0; ringIndex < polygon.numRings(); ringIndex++) {
       final LinearRing ring = polygon.getRing(ringIndex);
       final Point[] points = ring.getPoints();
-      final double[] coordinates = new double[points.length * axisCount];
-      for (int i = 0; i < points.length; i++) {
-        final Point point = points[i];
+      int vertexCount = points.length;
+      if (!points[0].equals(points[vertexCount - 1])) {
+        vertexCount++;
+      }
+      final double[] coordinates = new double[vertexCount * axisCount];
+
+      for (int i = 0; i < vertexCount; i++) {
+        final Point point = points[i % points.length];
         coordinates[i * axisCount + 0] = point.x;
         coordinates[i * axisCount + 1] = point.y;
         if (axisCount > 2) {

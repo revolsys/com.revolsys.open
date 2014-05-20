@@ -379,18 +379,20 @@ public class GeometryFactory implements Serializable, MapSerializer {
     boolean isHeterogeneous = false;
     boolean hasGeometryCollection = false;
     for (final Geometry geometry : geometries) {
-      DataType geometryDataType = geometry.getDataType();
-      if (geometry instanceof LinearRing) {
-        geometryDataType = DataTypes.LINE_STRING;
-      }
-      if (collectionDataType == null) {
-        collectionDataType = geometryDataType;
-      } else if (geometryDataType != collectionDataType) {
+      if (geometry != null) {
+        DataType geometryDataType = geometry.getDataType();
+        if (geometry instanceof LinearRing) {
+          geometryDataType = DataTypes.LINE_STRING;
+        }
+        if (collectionDataType == null) {
+          collectionDataType = geometryDataType;
+        } else if (geometryDataType != collectionDataType) {
 
-        isHeterogeneous = true;
-      }
-      if (geometry instanceof GeometryCollection) {
-        hasGeometryCollection = true;
+          isHeterogeneous = true;
+        }
+        if (geometry instanceof GeometryCollection) {
+          hasGeometryCollection = true;
+        }
       }
     }
 
@@ -1139,7 +1141,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @param lineStrings LineStrings, each of which may be empty but not null
    * @return the created MultiLineString
    */
-  public MultiLineString multiLineString(final LineString[] lineStrings) {
+  public MultiLineString multiLineString(final LineString... lineStrings) {
     return new MultiLineStringImpl(lineStrings, this);
   }
 

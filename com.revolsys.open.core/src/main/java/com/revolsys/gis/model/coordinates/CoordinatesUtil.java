@@ -1,6 +1,5 @@
 package com.revolsys.gis.model.coordinates;
 
-import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustDeterminant;
@@ -13,43 +12,6 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
 
 public class CoordinatesUtil {
-
-  public static double angle(final Point p1, final Point p2, final Point p3) {
-    final double x1 = p1.getX();
-    final double y1 = p1.getY();
-    final double x2 = p2.getX();
-    final double y2 = p2.getY();
-    final double x3 = p3.getX();
-    final double y3 = p3.getY();
-    return MathUtil.angle(x1, y1, x2, y2, x3, y3);
-  }
-
-  /**
-   * Returns the oriented smallest angle between two vectors. The computed angle
-   * will be in the range (-Pi, Pi]. A positive result corresponds to a
-   * counterclockwise rotation from v1 to v2; a negative result corresponds to a
-   * clockwise rotation.
-   * 
-   * @param tip1 the tip of v1
-   * @param tail the tail of each vector
-   * @param tip2 the tip of v2
-   * @return the angle between v1 and v2, relative to v1
-   */
-  public static double angleBetweenOriented(final Point tip1, final Point tail,
-    final Point tip2) {
-    final double a1 = tail.angle2d(tip1);
-    final double a2 = tail.angle2d(tip2);
-    final double angDel = a2 - a1;
-
-    // normalize, maintaining orientation
-    if (angDel <= -Math.PI) {
-      return angDel + Angle.PI_TIMES_2;
-    } else if (angDel > Math.PI) {
-      return angDel - Angle.PI_TIMES_2;
-    } else {
-      return angDel;
-    }
-  }
 
   public static Point average(final Point c1, final Point c2) {
     final int axisCount = Math.min(c1.getAxisCount(), c2.getAxisCount());

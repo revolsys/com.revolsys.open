@@ -204,6 +204,14 @@ public interface BoundingBox {
   boolean intersects(double x, double y);
 
   /**
+   *  Check if the line <code>(x1, y1) -> (x2, y2)</code>
+   *  intersects (covered by or crosses) the region of this <code>BoundingBox</code>.
+   *
+   *@return        <code>true</code> if the line overlaps this <code>BoundingBox</code>
+   */
+  boolean intersects(double x1, double y1, double x2, double y2);
+
+  /**
    *  Check if the point <code>p</code>
    *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
    *

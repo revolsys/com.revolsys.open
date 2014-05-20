@@ -12,6 +12,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.filter.DataObjectEqualsFilter;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
 import com.revolsys.jts.geom.BoundingBox;
@@ -111,15 +112,14 @@ public class DataObjectQuadTree extends QuadTree<DataObject> {
     if (convertedBoundingBox.isEmpty()) {
       return Arrays.asList();
     } else {
-      final Geometry geometry = convertedBoundingBox.toPolygon(1, 1);
-      final DataObjectGeometryIntersectsFilter filter = new DataObjectGeometryIntersectsFilter(
-        geometry);
-      return queryList(geometry, filter);
+      final Filter<DataObject> filter = new DataObjectGeometryBoundingBoxIntersectsFilter(
+        boundingBox);
+      return queryList(convertedBoundingBox, filter);
     }
   }
 
   public List<DataObject> queryIntersects(Geometry geometry) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
       geometry = geometry.convert(geometryFactory);
     }

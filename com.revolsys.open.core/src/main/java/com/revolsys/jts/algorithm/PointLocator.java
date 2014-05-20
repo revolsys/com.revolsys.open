@@ -159,7 +159,7 @@ public class PointLocator {
 
   private Location locate(final Point point, final LineString line) {
     // bounding-box check
-    if (!line.getBoundingBox().intersects(point)) {
+    if (!point.intersects(line.getBoundingBox())) {
       return Location.EXTERIOR;
     }
 
@@ -178,7 +178,7 @@ public class PointLocator {
     // no point in doing envelope test, since equality test is just as fast
 
     final Point ptCoord = pt.getPoint();
-    if (ptCoord.equals(2,p)) {
+    if (ptCoord.equals(2, p)) {
       return Location.INTERIOR;
     }
     return Location.EXTERIOR;
@@ -212,10 +212,9 @@ public class PointLocator {
     return Location.INTERIOR;
   }
 
-  private Location locateInPolygonRing(final Point p,
-    final LinearRing ring) {
+  private Location locateInPolygonRing(final Point p, final LinearRing ring) {
     // bounding-box check
-    if (!ring.getBoundingBox().intersects(p)) {
+    if (!p.intersects(ring.getBoundingBox())) {
       return Location.EXTERIOR;
     }
 

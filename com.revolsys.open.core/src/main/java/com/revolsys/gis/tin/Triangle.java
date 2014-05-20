@@ -19,6 +19,7 @@ import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public class Triangle extends AbstractCoordinatesList {
@@ -131,7 +132,7 @@ public class Triangle extends AbstractCoordinatesList {
     final double y3 = getY(2);
 
     final Point centre = CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3, y3);
-    final double angleB = MathUtil.angle(x1, y1, x2, y2, x3, y3);
+    final double angleB = Angle.angle(x1, y1, x2, y2, x3, y3);
     final double radius = MathUtil.distance(x1, y1, x3, y3) / Math.sin(angleB)
       * 0.5;
 

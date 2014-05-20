@@ -9,17 +9,17 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcDoubleAttribute extends JdbcAttribute {
-  public JdbcDoubleAttribute(final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(name, DataTypes.DOUBLE, sqlType, length, 0, required, description,
-      properties);
+  public JdbcDoubleAttribute(final String dbName, final String name,
+    final int sqlType, final int length, final boolean required,
+    final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.DOUBLE, sqlType, length, 0, required,
+      description, properties);
   }
 
   @Override
   public JdbcDoubleAttribute clone() {
-    return new JdbcDoubleAttribute(getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcDoubleAttribute(getDbName(), getName(), getSqlType(),
+      getLength(), isRequired(), getDescription(), getProperties());
   }
 
   @Override

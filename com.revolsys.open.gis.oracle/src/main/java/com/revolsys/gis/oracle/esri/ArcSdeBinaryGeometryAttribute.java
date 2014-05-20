@@ -30,10 +30,11 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
   private boolean valid;
 
   public ArcSdeBinaryGeometryAttribute(
-    final ArcSdeBinaryGeometryDataStoreUtil sdeUtil, final String name,
-    final DataType type, final boolean required, final String description,
-    final Map<String, Object> properties, final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
-    super(name, type, -1, 0, 0, required, description, properties);
+    final ArcSdeBinaryGeometryDataStoreUtil sdeUtil, final String dbName,
+    final String name, final DataType type, final boolean required,
+    final String description, final Map<String, Object> properties,
+    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+    super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.sdeUtil = sdeUtil;
     this.geometryFactory = geometryFactory;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);

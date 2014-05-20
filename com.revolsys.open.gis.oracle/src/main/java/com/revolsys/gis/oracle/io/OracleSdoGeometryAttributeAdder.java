@@ -16,7 +16,6 @@ import oracle.sql.STRUCT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
@@ -29,6 +28,7 @@ import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcConstants;
 import com.revolsys.jdbc.io.SqlFunction;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   private final DataSource dataSource;
@@ -98,7 +98,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  public static int getGeometryTypeId(final DataType dataType, final int axisCount) {
+  public static int getGeometryTypeId(final DataType dataType,
+    final int axisCount) {
     final int id = DATA_TYPE_TO_2D_ID.get(dataType);
     if (axisCount > 3) {
       return 3000 + id;
@@ -121,9 +122,9 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   @Override
   public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, final String dataTypeName, final int sqlType,
-    final int length, final int scale, final boolean required,
-    final String description) {
+    final String dbName, final String name, final String dataTypeName,
+    final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
     final String typePath = metaData.getPath();
     final String columnName = name.toUpperCase();
     final DataObjectStoreSchema schema = metaData.getSchema();
@@ -146,8 +147,9 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
       axisCount = geometryFactory.getAxisCount();
     }
 
-    final Attribute attribute = new OracleSdoGeometryJdbcAttribute(name,
-      dataType, sqlType, required, description, null, geometryFactory, axisCount);
+    final Attribute attribute = new OracleSdoGeometryJdbcAttribute(dbName,
+      name, dataType, sqlType, required, description, null, geometryFactory,
+      axisCount);
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
       "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));
@@ -202,7 +204,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
               }
               final ARRAY dimInfo = (ARRAY)resultSet.getObject("DIMINFO");
               int axisCount = dimInfo.length();
-              setColumnProperty(schema, typePath, columnName, NUM_AXIS, axisCount);
+              setColumnProperty(schema, typePath, columnName, NUM_AXIS,
+                axisCount);
               if (axisCount < 2) {
                 axisCount = 2;
               } else if (axisCount > 4) {

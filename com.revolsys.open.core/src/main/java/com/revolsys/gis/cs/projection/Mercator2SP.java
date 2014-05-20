@@ -4,7 +4,7 @@ import com.revolsys.gis.cs.Datum;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Spheroid;
-import com.revolsys.jts.algorithm.Angle;
+import com.revolsys.math.Angle;
 
 public class Mercator2SP extends AbstractCoordinatesProjection {
 

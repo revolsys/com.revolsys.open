@@ -255,6 +255,8 @@ public final class EpsgCoordinateSystems {
         final Map<Integer, LinearUnit> linearUnits = loadLinearUnits();
         loadGeographicCoordinateSystems(angularUnits, axisMap, areas);
         loadProjectedCoordinateSystems(axisMap, areas, linearUnits);
+        final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)coordinateSystemsById.get(3857);
+        coordinateSystemsById.put(900913, worldMercator);
         coordinateSystems = Collections.unmodifiableSet(new LinkedHashSet<CoordinateSystem>(
           coordinateSystemsByCoordinateSystem.values()));
         initialized = true;
@@ -316,8 +318,8 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(6));
             final Authority authority = new EpsgAuthority(code);
 
-            final Area area = new Area(name, new Envelope(2, minX, minY,
-              maxX, maxY), authority, deprecated);
+            final Area area = new Area(name, new Envelope(2, minX, minY, maxX,
+              maxY), authority, deprecated);
             areas.put(code, area);
           }
         }

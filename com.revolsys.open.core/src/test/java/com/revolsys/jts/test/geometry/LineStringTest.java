@@ -143,7 +143,7 @@ public class LineStringTest {
       assertEmpty(pointCoordinatesListNull);
 
       final LineString pointCoordinatesListSize0 = geometryFactory.lineString(new DoubleCoordinatesList(
-        axisCount, 0));
+        0, axisCount));
       assertEmpty(pointCoordinatesListSize0);
 
       // double[] Constructor

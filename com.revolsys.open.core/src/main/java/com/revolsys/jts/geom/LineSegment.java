@@ -107,8 +107,6 @@ public interface LineSegment extends LineString {
    */
   Point intersection(LineSegment line);
 
-  boolean intersects(BoundingBox boundingBox);
-
   boolean intersects(Point point, double maxDistance);
 
   /**

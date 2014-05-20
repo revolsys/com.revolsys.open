@@ -26,9 +26,9 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
 
   @Override
   public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, final String dataTypeName, final int sqlType,
-    final int length, final int scale, final boolean required,
-    final String description) {
+    final String dbName, final String name, final String dataTypeName,
+    final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
     final DataObjectStoreSchema schema = metaData.getSchema();
     final String typePath = metaData.getPath();
     final String owner = this.dataStore.getDatabaseSchemaName(schema);
@@ -59,8 +59,8 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     final com.revolsys.jts.geom.GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
       schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
 
-    final Attribute attribute = new ArcSdeStGeometryAttribute(name, dataType,
-      required, description, null, spatialReference, axisCount);
+    final Attribute attribute = new ArcSdeStGeometryAttribute(dbName, name,
+      dataType, required, description, null, spatialReference, axisCount);
 
     metaData.addAttribute(attribute);
     attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(

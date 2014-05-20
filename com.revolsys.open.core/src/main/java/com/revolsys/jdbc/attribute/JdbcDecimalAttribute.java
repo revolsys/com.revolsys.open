@@ -9,17 +9,18 @@ import java.util.Map;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcDecimalAttribute extends JdbcAttribute {
-  public JdbcDecimalAttribute(final String name, final int sqlType,
-    final int length, final int scale, final boolean required,
-    final String description, final Map<String, Object> properties) {
-    super(name, DataTypes.DECIMAL, sqlType, length, scale, required,
+  public JdbcDecimalAttribute(final String dbName, final String name,
+    final int sqlType, final int length, final int scale,
+    final boolean required, final String description,
+    final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.DECIMAL, sqlType, length, scale, required,
       description, properties);
   }
 
   @Override
   public JdbcDecimalAttribute clone() {
-    return new JdbcDecimalAttribute(getName(), getSqlType(), getLength(),
-      getScale(), isRequired(), getDescription(), getProperties());
+    return new JdbcDecimalAttribute(getDbName(), getName(), getSqlType(),
+      getLength(), getScale(), isRequired(), getDescription(), getProperties());
   }
 
   @Override

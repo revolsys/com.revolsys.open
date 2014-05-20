@@ -142,16 +142,16 @@ public abstract class AbstractJdbcDataObjectStore extends
     allSchemaNames.add(schemaName.toUpperCase());
   }
 
-  protected void addAttribute(final DataObjectMetaDataImpl metaData,
-    final String name, final String dataType, final int sqlType,
-    final int length, final int scale, final boolean required,
-    final String description) {
+  protected JdbcAttribute addAttribute(final DataObjectMetaDataImpl metaData,
+    final String dbColumnName, final String name, final String dataType,
+    final int sqlType, final int length, final int scale,
+    final boolean required, final String description) {
     JdbcAttributeAdder attributeAdder = attributeAdders.get(dataType);
     if (attributeAdder == null) {
       attributeAdder = new JdbcAttributeAdder(DataTypes.OBJECT);
     }
-    attributeAdder.addAttribute(metaData, name, dataType, sqlType, length,
-      scale, required, description);
+    return (JdbcAttribute)attributeAdder.addAttribute(metaData, dbColumnName,
+      name, dataType, sqlType, length, scale, required, description);
   }
 
   protected void addAttribute(final ResultSetMetaData resultSetMetaData,
@@ -162,8 +162,8 @@ public abstract class AbstractJdbcDataObjectStore extends
     final int length = resultSetMetaData.getPrecision(i);
     final int scale = resultSetMetaData.getScale(i);
     final boolean required = false;
-    addAttribute(metaData, name, dataType, sqlType, length, scale, required,
-      description);
+    addAttribute(metaData, name, name.toUpperCase(), dataType, sqlType, length,
+      scale, required, description);
   }
 
   public void addAttributeAdder(final String sqlTypeName,
@@ -796,8 +796,8 @@ public abstract class AbstractJdbcDataObjectStore extends
           final String typePath = PathUtil.toPath(schemaName, tableName);
           final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)metaDataMap.get(typePath);
           if (metaData != null) {
-            final String name = columnsRs.getString("COLUMN_NAME")
-              .toUpperCase();
+            final String dbColumnName = columnsRs.getString("COLUMN_NAME");
+            final String name = dbColumnName.toUpperCase();
             final int sqlType = columnsRs.getInt("DATA_TYPE");
             final String dataType = columnsRs.getString("TYPE_NAME");
             final int length = columnsRs.getInt("COLUMN_SIZE");
@@ -808,8 +808,8 @@ public abstract class AbstractJdbcDataObjectStore extends
             final boolean required = !columnsRs.getString("IS_NULLABLE")
               .equals("YES");
             final String description = columnsRs.getString("REMARKS");
-            addAttribute(metaData, name, dataType, sqlType, length, scale,
-              required, description);
+            addAttribute(metaData, dbColumnName, name, dataType, sqlType,
+              length, scale, required, description);
           }
         }
 

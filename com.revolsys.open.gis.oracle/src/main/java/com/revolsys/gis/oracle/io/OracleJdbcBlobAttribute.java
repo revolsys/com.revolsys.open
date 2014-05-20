@@ -20,10 +20,11 @@ import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.spring.SpringUtil;
 
 public class OracleJdbcBlobAttribute extends JdbcAttribute {
-  public OracleJdbcBlobAttribute(final String name, final int sqlType,
-    final int length, final boolean required, final String description) {
-    super(name, DataTypes.BLOB, sqlType, length, 0, required, description,
-      Collections.<String, Object> emptyMap());
+  public OracleJdbcBlobAttribute(final String dbName, final String name,
+    final int sqlType, final int length, final boolean required,
+    final String description) {
+    super(dbName, name, DataTypes.BLOB, sqlType, length, 0, required,
+      description, Collections.<String, Object> emptyMap());
   }
 
   @Override

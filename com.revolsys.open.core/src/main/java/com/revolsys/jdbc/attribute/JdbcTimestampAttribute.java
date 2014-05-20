@@ -10,17 +10,17 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataTypes;
 
 public class JdbcTimestampAttribute extends JdbcAttribute {
-  public JdbcTimestampAttribute(final String name, final int sqlType,
-    final boolean required, final String description,
+  public JdbcTimestampAttribute(final String dbName, final String name,
+    final int sqlType, final boolean required, final String description,
     final Map<String, Object> properties) {
-    super(name, DataTypes.DATE_TIME, sqlType, 0, 0, required, description,
-      properties);
+    super(dbName, name, DataTypes.DATE_TIME, sqlType, 0, 0, required,
+      description, properties);
   }
 
   @Override
   public JdbcTimestampAttribute clone() {
-    return new JdbcTimestampAttribute(getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    return new JdbcTimestampAttribute(getDbName(), getName(), getSqlType(),
+      isRequired(), getDescription(), getProperties());
   }
 
   @Override

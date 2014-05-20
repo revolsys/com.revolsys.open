@@ -32,7 +32,6 @@
  */
 package com.revolsys.jts.operation.buffer;
 
-import com.revolsys.jts.algorithm.Angle;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.LineIntersector;
@@ -45,6 +44,7 @@ import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geomgraph.Position;
+import com.revolsys.math.Angle;
 
 /**
  * Generates segments which form an offset curve.
@@ -375,7 +375,7 @@ class OffsetSegmentGenerator {
     final LineSegment offset1, final double distance, final double mitreLimit) {
     final Point basePt = s1;
 
-    final double ang0 = Angle.angle(basePt, s0);
+    final double ang0 = basePt.angle2d(s0);
 
     // oriented angle between segments
     final double angDiff = Angle.angleBetweenOriented(s0, basePt, s2);

@@ -52,6 +52,7 @@ import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.PointVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.util.NumberUtil;
+import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -74,7 +75,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     final double y1 = this.getY();
     final double x2 = other.getX();
     final double y2 = other.getY();
-    return MathUtil.angle(x1, y1, x2, y2);
+    return Angle.angle2d(x1, x2, y1, y2);
   }
 
   /**
@@ -163,6 +164,42 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
       }
 
       return (V)geometryFactory.point(targetCoordinates);
+    }
+  }
+
+  /**
+   * Copy the coordinates in this point to the coordinates array parameter and convert them to the geometry factory.
+   * 
+   * @param geometryFactory
+   * @param coordinates
+   */
+  public void copyCoordinates(GeometryFactory geometryFactory,
+    final double[] coordinates) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      for (int i = 0; i < coordinates.length; i++) {
+        final double value = getCoordinate(i);
+        coordinates[i] = value;
+      }
+    } else if (isEmpty()) {
+      for (int i = 0; i < coordinates.length; i++) {
+        coordinates[i] = Double.NaN;
+      }
+    } else {
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory.getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        for (int i = 0; i < coordinates.length; i++) {
+          final double value = getCoordinate(i);
+          coordinates[i] = value;
+        }
+      } else {
+        final int sourceAxisCount = getAxisCount();
+        final int targetAxisCount = geometryFactory.getAxisCount();
+        coordinatesOperation.perform(sourceAxisCount, getCoordinates(),
+          targetAxisCount, coordinates);
+      }
+
     }
   }
 
@@ -397,6 +434,19 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     temp = Double.doubleToLongBits(getY());
     result = prime * result + (int)(temp ^ temp >>> 32);
     return result;
+  }
+
+  @Override
+  public boolean intersects(final BoundingBox boundingBox) {
+    if (isEmpty() || boundingBox.isEmpty()) {
+      return false;
+    } else {
+      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+      final Point point = this.convert(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      return boundingBox.intersects(x, y);
+    }
   }
 
   @Override

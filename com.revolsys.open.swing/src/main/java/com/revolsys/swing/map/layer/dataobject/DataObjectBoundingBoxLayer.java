@@ -15,7 +15,6 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.parallel.Invoke;
 
 public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
@@ -38,6 +37,9 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
     this.workerClass = workerClass;
   }
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   @Override
   public List<LayerDataObject> doQuery(final BoundingBox boundingBox) {
     if (boundingBox.isEmpty()) {
@@ -72,9 +74,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
           }
         }
       }
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Polygon polygon = boundingBox.toPolygon(geometryFactory);
-      return (List)getIndex().queryIntersects(polygon);
+      return (List)getIndex().queryIntersects(boundingBox);
     }
   }
 

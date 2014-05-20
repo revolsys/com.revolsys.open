@@ -12,7 +12,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.PointList;
 
-public class TestPackedGeometry {
+public class PackedGeometry {
   public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
     3005, 1.0, 1.0);
 

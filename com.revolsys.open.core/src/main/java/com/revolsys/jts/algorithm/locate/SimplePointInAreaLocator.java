@@ -75,8 +75,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     return false;
   }
 
-  public static boolean containsPointInPolygon(final Point p,
-    final Polygon poly) {
+  public static boolean containsPointInPolygon(final Point p, final Polygon poly) {
     if (poly.isEmpty()) {
       return false;
     }
@@ -102,10 +101,9 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
    * @param ring a linear ring
    * @return true if the point lies inside the ring
    */
-  private static boolean isPointInRing(final Point p,
-    final LinearRing ring) {
+  private static boolean isPointInRing(final Point p, final LinearRing ring) {
     // short-circuit if point is not in ring envelope
-    if (!ring.getBoundingBox().intersects(p)) {
+    if (!p.intersects(ring.getBoundingBox())) {
       return false;
     }
     return CGAlgorithms.isPointInRing(p, ring);

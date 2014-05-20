@@ -23,6 +23,7 @@ import java.util.Random;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.jts.geom.PointList;
+import com.revolsys.math.Angle;
 
 /**
  * The MathUtil class is a utility class for handling integer, percent and
@@ -92,141 +93,6 @@ public final class MathUtil {
     final BigDecimal b = getBigDecimal(right);
     final BigDecimal result = a.add(b);
     return (V)StringConverterRegistry.toObject(resultClass, result);
-  }
-
-  /**
-   * Calculate the angle of a coordinates
-   * 
-   * @param x The x coordinate.
-   * @param y The y coordinate.
-   * @return The distance.
-   */
-  public static double angle(final double x, final double y) {
-    final double angle = Math.atan2(y, x);
-    return angle;
-  }
-
-  /**
-   * Calculate the angle between two coordinates.
-   * 
-   * @param x1 The first x coordinate.
-   * @param y1 The first y coordinate.
-   * @param x2 The second x coordinate.
-   * @param y2 The second y coordinate.
-   * @return The distance.
-   */
-  public static double angle(final double x1, final double y1, final double x2,
-    final double y2) {
-    final double dx = x2 - x1;
-    final double dy = y2 - y1;
-
-    final double angle = Math.atan2(dy, dx);
-    return angle;
-  }
-
-  /**
-   * Calculate the angle between three coordinates.
-   * 
-   * @param x1 The first x coordinate.
-   * @param y1 The first y coordinate.
-   * @param x2 The second x coordinate.
-   * @param y2 The second y coordinate.
-   * @param x3 The third x coordinate.
-   * @param y3 The third y coordinate.
-   * @return The distance.
-   */
-  public static double angle(final double x1, final double y1, final double x2,
-    final double y2, final double x3, final double y3) {
-    final double angle1 = angle(x2, y2, x1, y1);
-    final double angle2 = angle(x2, y2, x3, y3);
-    return angleDiff(angle1, angle2);
-  }
-
-  public static double angle2d(final double x1, final double x2,
-    final double y1, final double y2) {
-    final double dx = x2 - x1;
-    final double dy = y2 - y1;
-    return Math.atan2(dy, dx);
-  }
-
-  public static double angleDegrees(final double x1, final double y1,
-    final double x2, final double y2) {
-    final double width = x2 - x1;
-    final double height = y2 - y1;
-    if (width == 0) {
-      if (height < 0) {
-        return 270;
-      } else {
-        return 90;
-      }
-    } else if (height == 0) {
-      if (width < 0) {
-        return 180;
-      } else {
-        return 0;
-      }
-    }
-    final double arctan = Math.atan(height / width);
-    double degrees = Math.toDegrees(arctan);
-    if (width < 0) {
-      degrees = 180 + degrees;
-    } else {
-      degrees = (360 + degrees) % 360;
-    }
-    return degrees;
-  }
-
-  public static double angleDiff(final double ang1, final double ang2) {
-    double delAngle;
-
-    if (ang1 < ang2) {
-      delAngle = ang2 - ang1;
-    } else {
-      delAngle = ang1 - ang2;
-    }
-
-    if (delAngle > Math.PI) {
-      delAngle = (2 * Math.PI) - delAngle;
-    }
-
-    return delAngle;
-  }
-
-  public static double angleDiff(final double angle1, final double angle2,
-    final boolean clockwise) {
-    if (clockwise) {
-      if (angle2 < angle1) {
-        final double angle = angle2 + Math.PI * 2 - angle1;
-        return angle;
-      } else {
-        final double angle = angle2 - angle1;
-        return angle;
-      }
-    } else {
-      if (angle1 < angle2) {
-        final double angle = angle1 + Math.PI * 2 - angle2;
-        return angle;
-      } else {
-        final double angle = angle1 - angle2;
-        return angle;
-      }
-    }
-  }
-
-  public static double angleDiffDegrees(final double a, final double b) {
-    final double largest = Math.max(a, b);
-    final double smallest = Math.min(a, b);
-    double diff = largest - smallest;
-    if (diff > 180) {
-      diff = 360 - diff;
-    }
-    return diff;
-  }
-
-  public static double angleNorthDegrees(final double x1, final double y1,
-    final double x2, final double y2) {
-    final double angle = angleDegrees(x1, y1, x2, y2);
-    return getNorthClockwiseAngle(angle);
   }
 
   public static void append(final StringBuffer string, final double number) {
@@ -352,7 +218,7 @@ public final class MathUtil {
         }
       }
     }
-    return angleNorthDegrees(x1, y1, x2, y2);
+    return Angle.angleNorthDegrees(x1, y1, x2, y2);
   }
 
   public static BigDecimal getBigDecimal(final Object value) {

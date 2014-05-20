@@ -17,6 +17,7 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
@@ -86,7 +87,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
         final double previousX = line.getX(i - 1);
         final double previousY = line.getY(i - 1);
         x = MathUtil.distance(previousX, previousY, currentX, y);
-        y = MathUtil.angleNorthDegrees(previousX, previousY, currentX, y);
+        y = Angle.angleNorthDegrees(previousX, previousY, currentX, y);
       }
 
       out.print('[');

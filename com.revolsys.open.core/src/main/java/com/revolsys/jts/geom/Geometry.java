@@ -971,6 +971,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   Geometry intersection(final Geometry other);
 
+  boolean intersects(BoundingBox boundingBox);
+
   /**
    * Tests whether this geometry intersects the argument geometry.
    * <p>

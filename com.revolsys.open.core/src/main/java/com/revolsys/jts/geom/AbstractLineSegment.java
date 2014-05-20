@@ -11,6 +11,7 @@ import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.impl.AbstractLineString;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractLineSegment extends AbstractLineString implements
@@ -33,7 +34,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
-    return MathUtil.angle(x1, y1, x2, y2);
+    return Angle.angle2d(x1, x2, y1, y2);
   }
 
   @Override
@@ -372,27 +373,6 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     } else {
       return intersection.get(0);
     }
-  }
-
-  @Override
-  public boolean intersects(final BoundingBox boundingBox) {
-    final Point p1 = getPoint(0);
-    final Point p2 = getPoint(1);
-    if (boundingBox.intersects(p1)) {
-      return true;
-    } else if (boundingBox.intersects(p2)) {
-      return true;
-    } else {
-      final PointList cornerPoints = boundingBox.getCornerPoints();
-      for (int i = 0; i < 4; i++) {
-        final Point bp1 = cornerPoints.get(i);
-        final Point bp2 = cornerPoints.get((i + 1) % 4);
-        if (LineSegmentUtil.intersects(p1, p2, bp1, bp2)) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   @Override

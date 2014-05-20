@@ -15,11 +15,11 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jdbc.LocalBlob;
 
 public class JdbcBlobAttribute extends JdbcAttribute {
-  public JdbcBlobAttribute(final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(name, DataTypes.BLOB, sqlType, length, 0, required, description,
-      properties);
+  public JdbcBlobAttribute(final String dbName, final String name,
+    final int sqlType, final int length, final boolean required,
+    final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.BLOB, sqlType, length, 0, required,
+      description, properties);
   }
 
   @Override

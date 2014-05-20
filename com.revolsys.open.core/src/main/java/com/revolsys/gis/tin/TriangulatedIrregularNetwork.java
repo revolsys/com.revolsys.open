@@ -23,6 +23,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.math.Angle;
 
 public class TriangulatedIrregularNetwork {
   private static final int[] OPPOSITE_INDEXES = {
@@ -220,8 +221,8 @@ public class TriangulatedIrregularNetwork {
       addTrianglesContained(triangle, t0, t1, t2, l0, l1);
 
     } else if (c0i0i1Orientation == CGAlgorithms.CLOCKWISE) {
-      final double angleCornerLine = CoordinatesUtil.angle(t0, l0, l1);
-      final double angleCornerLineCorner = CoordinatesUtil.angle(t0, l0, t2);
+      final double angleCornerLine = Angle.angle(t0, l0, l1);
+      final double angleCornerLineCorner = Angle.angle(t0, l0, t2);
       if (angleCornerLine > angleCornerLineCorner) {
         addTrianglesContained(triangle, t0, t1, t2, l0, l1);
       } else if (angleCornerLine == angleCornerLineCorner) {
@@ -231,8 +232,8 @@ public class TriangulatedIrregularNetwork {
       }
 
     } else {
-      final double angleCornerLine = CoordinatesUtil.angle(t0, l0, l1);
-      final double angleCornerLineCorner = CoordinatesUtil.angle(t0, l0, t1);
+      final double angleCornerLine = Angle.angle(t0, l0, l1);
+      final double angleCornerLineCorner = Angle.angle(t0, l0, t1);
       if (angleCornerLine > angleCornerLineCorner) {
         addTrianglesContained(triangle, t0, t1, t2, l0, l1);
       } else if (angleCornerLine == angleCornerLineCorner) {

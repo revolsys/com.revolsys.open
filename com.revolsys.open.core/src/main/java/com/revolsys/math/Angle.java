@@ -30,9 +30,11 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package com.revolsys.jts.algorithm;
+package com.revolsys.math;
 
+import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.util.MathUtil;
 
 /**
  * Utility functions for working with angles.
@@ -55,6 +57,36 @@ public class Angle {
   public static final int NONE = CGAlgorithms.COLLINEAR;
 
   /**
+   * Calculate the angle of a coordinates
+   * 
+   * @param x The x coordinate.
+   * @param y The y coordinate.
+   * @return The distance.
+   */
+  public static double angle(final double x, final double y) {
+    final double angle = Math.atan2(y, x);
+    return angle;
+  }
+
+  /**
+   * Calculate the angle between three coordinates.
+   * 
+   * @param x1 The first x coordinate.
+   * @param y1 The first y coordinate.
+   * @param x2 The second x coordinate.
+   * @param y2 The second y coordinate.
+   * @param x3 The third x coordinate.
+   * @param y3 The third y coordinate.
+   * @return The distance.
+   */
+  public static double angle(final double x1, final double y1, final double x2,
+    final double y2, final double x3, final double y3) {
+    final double angle1 = angle2d(x2, x1, y2, y1);
+    final double angle2 = angle2d(x2, x3, y2, y3);
+    return angleDiff(angle1, angle2);
+  }
+
+  /**
    * Returns the angle that the vector from (0,0) to p,
    * relative to the positive X-axis.
    * The angle is normalized to be in the range ( -Pi, Pi ].
@@ -62,19 +94,25 @@ public class Angle {
    * @return the normalized angle (in radians) that p makes with the positive x-axis.
    */
   public static double angle(final Point p) {
-    return Math.atan2(p.getY(), p.getX());
+    final double x = p.getX();
+    final double y = p.getY();
+    return angle(x, y);
   }
 
-  /**
-   * Returns the angle of the vector from p0 to p1,
-   * relative to the positive X-axis.
-   * The angle is normalized to be in the range [ -Pi, Pi ].
-   *
-   * @return the normalized angle (in radians) that p0-p1 makes with the positive x-axis.
-   */
-  public static double angle(final Point p0, final Point p1) {
-    final double dx = p1.getX() - p0.getX();
-    final double dy = p1.getY() - p0.getY();
+  public static double angle(final Point p1, final Point p2, final Point p3) {
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
+    final double x3 = p3.getX();
+    final double y3 = p3.getY();
+    return angle(x1, y1, x2, y2, x3, y3);
+  }
+
+  public static double angle2d(final double x1, final double x2,
+    final double y1, final double y2) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
     return Math.atan2(dy, dx);
   }
 
@@ -89,8 +127,8 @@ public class Angle {
    */
   public static double angleBetween(final Point tip1, final Point tail,
     final Point tip2) {
-    final double a1 = angle(tail, tip1);
-    final double a2 = angle(tail, tip2);
+    final double a1 = tail.angle2d(tip1);
+    final double a2 = tail.angle2d(tip2);
 
     return diff(a1, a2);
   }
@@ -111,8 +149,8 @@ public class Angle {
    */
   public static double angleBetweenOriented(final Point tip1, final Point tail,
     final Point tip2) {
-    final double a1 = angle(tail, tip1);
-    final double a2 = angle(tail, tip2);
+    final double a1 = tail.angle2d(tip1);
+    final double a2 = tail.angle2d(tip2);
     final double angDel = a2 - a1;
 
     // normalize, maintaining orientation
@@ -123,6 +161,86 @@ public class Angle {
       return angDel - PI_TIMES_2;
     }
     return angDel;
+  }
+
+  public static double angleDegrees(final double x1, final double y1,
+    final double x2, final double y2) {
+    final double width = x2 - x1;
+    final double height = y2 - y1;
+    if (width == 0) {
+      if (height < 0) {
+        return 270;
+      } else {
+        return 90;
+      }
+    } else if (height == 0) {
+      if (width < 0) {
+        return 180;
+      } else {
+        return 0;
+      }
+    }
+    final double arctan = Math.atan(height / width);
+    double degrees = Math.toDegrees(arctan);
+    if (width < 0) {
+      degrees = 180 + degrees;
+    } else {
+      degrees = (360 + degrees) % 360;
+    }
+    return degrees;
+  }
+
+  public static double angleDiff(final double ang1, final double ang2) {
+    double delAngle;
+
+    if (ang1 < ang2) {
+      delAngle = ang2 - ang1;
+    } else {
+      delAngle = ang1 - ang2;
+    }
+
+    if (delAngle > Math.PI) {
+      delAngle = (2 * Math.PI) - delAngle;
+    }
+
+    return delAngle;
+  }
+
+  public static double angleDiff(final double angle1, final double angle2,
+    final boolean clockwise) {
+    if (clockwise) {
+      if (angle2 < angle1) {
+        final double angle = angle2 + Math.PI * 2 - angle1;
+        return angle;
+      } else {
+        final double angle = angle2 - angle1;
+        return angle;
+      }
+    } else {
+      if (angle1 < angle2) {
+        final double angle = angle1 + Math.PI * 2 - angle2;
+        return angle;
+      } else {
+        final double angle = angle1 - angle2;
+        return angle;
+      }
+    }
+  }
+
+  public static double angleDiffDegrees(final double a, final double b) {
+    final double largest = Math.max(a, b);
+    final double smallest = Math.min(a, b);
+    double diff = largest - smallest;
+    if (diff > 180) {
+      diff = 360 - diff;
+    }
+    return diff;
+  }
+
+  public static double angleNorthDegrees(final double x1, final double y1,
+    final double x2, final double y2) {
+    final double angle = angleDegrees(x1, y1, x2, y2);
+    return MathUtil.getNorthClockwiseAngle(angle);
   }
 
   /**
@@ -186,8 +304,8 @@ public class Angle {
    */
   public static double interiorAngle(final Point p0, final Point p1,
     final Point p2) {
-    final double anglePrev = Angle.angle(p1, p0);
-    final double angleNext = Angle.angle(p1, p2);
+    final double anglePrev = p1.angle2d(p0);
+    final double angleNext = p1.angle2d(p2);
     return Math.abs(angleNext - anglePrev);
   }
 

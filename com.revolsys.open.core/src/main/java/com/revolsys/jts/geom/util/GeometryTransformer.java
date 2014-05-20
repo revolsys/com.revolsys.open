@@ -36,7 +36,6 @@ package com.revolsys.jts.geom.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -46,6 +45,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 
 /**
@@ -221,19 +221,25 @@ public class GeometryTransformer {
    * @return a LinearRing if the transformation resulted in a structurally valid ring
    * @return a LineString if the transformation caused the LinearRing to collapse to 3 or fewer points
    */
-  protected Geometry transformLinearRing(final LinearRing geom,
+  protected Geometry transformLinearRing(final LinearRing geometry,
     final Geometry parent) {
-    final PointList seq = transformCoordinates(geom.getCoordinatesList(),
-      geom);
-    if (seq == null) {
-      return factory.linearRing((PointList)null);
+    if (geometry == null) {
+      return factory.linearRing();
+    } else {
+      final PointList points = transformCoordinates(
+        geometry.getCoordinatesList(), geometry);
+      if (points == null) {
+        return factory.linearRing();
+      } else {
+        final int seqSize = points.size();
+        // ensure a valid LinearRing
+        if (seqSize > 0 && seqSize < 4 && !preserveType) {
+          return factory.lineString(points);
+        } else {
+          return factory.linearRing(points);
+        }
+      }
     }
-    final int seqSize = seq.size();
-    // ensure a valid LinearRing
-    if (seqSize > 0 && seqSize < 4 && !preserveType) {
-      return factory.lineString(seq);
-    }
-    return factory.linearRing(seq);
   }
 
   /**

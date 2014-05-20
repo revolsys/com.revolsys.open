@@ -27,7 +27,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.gis.data.model.filter.DataObjectGeometryIntersectsFilter;
+import com.revolsys.gis.data.model.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathUtil;
@@ -439,14 +439,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           Invoke.worker(this.loadingWorker);
         }
       }
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
-      final Polygon polygon = boundingBox.toPolygon(geometryFactory, 10, 10);
-
       final DataObjectQuadTree index = getIndex();
 
-      final List<LayerDataObject> records = (List)index.queryIntersects(polygon);
+      final List<LayerDataObject> records = (List)index.queryIntersects(boundingBox);
 
-      final Filter filter = new DataObjectGeometryIntersectsFilter(boundingBox);
+      final Filter filter = new DataObjectGeometryBoundingBoxIntersectsFilter(
+        boundingBox);
       for (final ListIterator<LayerDataObject> iterator = records.listIterator(); iterator.hasNext();) {
         final LayerDataObject record = iterator.next();
         final LayerDataObject cachedRecord = getCacheRecord(record);

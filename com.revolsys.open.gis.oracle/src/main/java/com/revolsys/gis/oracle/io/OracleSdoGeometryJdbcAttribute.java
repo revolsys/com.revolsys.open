@@ -20,7 +20,6 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -29,6 +28,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 
 public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
@@ -37,11 +37,11 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private final GeometryFactory geometryFactory;
 
-  public OracleSdoGeometryJdbcAttribute(final String name, final DataType type,
-    final int sqlType, final boolean required, final String description,
-    final Map<String, Object> properties,
+  public OracleSdoGeometryJdbcAttribute(final String dbName, final String name,
+    final DataType type, final int sqlType, final boolean required,
+    final String description, final Map<String, Object> properties,
     final GeometryFactory geometryFactory, final int axisCount) {
-    super(name, type, sqlType, 0, 0, required, description, properties);
+    super(dbName, name, type, sqlType, 0, 0, required, description, properties);
     this.geometryFactory = geometryFactory;
     this.axisCount = axisCount;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
@@ -65,8 +65,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   @Override
   public OracleSdoGeometryJdbcAttribute clone() {
-    return new OracleSdoGeometryJdbcAttribute(getName(), getType(),
-      getSqlType(), isRequired(), getDescription(), getProperties(),
+    return new OracleSdoGeometryJdbcAttribute(getDbName(), getName(),
+      getType(), getSqlType(), isRequired(), getDescription(), getProperties(),
       this.geometryFactory, this.axisCount);
   }
 
@@ -175,6 +175,12 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     }
   }
 
+  private double[] toCoordinateArray(final LineString line, final int dimension) {
+    final PointList sequence = line.getCoordinatesList();
+    final double[] coordinates = toCoordinateArray(sequence, dimension);
+    return coordinates;
+  }
+
   private double[] toCoordinateArray(final PointList sequence,
     final int dimension) {
     int geometryDimension = sequence.getAxisCount();
@@ -201,12 +207,6 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       }
     }
     return ordinates;
-  }
-
-  private double[] toCoordinateArray(final LineString line, final int dimension) {
-    final PointList sequence = line.getCoordinatesList();
-    final double[] coordinates = toCoordinateArray(sequence, dimension);
-    return coordinates;
   }
 
   private double[][] toCoordinateArrays(final Polygon polygon,
@@ -395,8 +395,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int columnIndex, final int axisCount) throws SQLException {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    final PointList coordinatesList = new DoubleCoordinatesList(
-      axisCount, coordinates);
+    final PointList coordinatesList = new DoubleCoordinatesList(axisCount,
+      coordinates);
     return this.geometryFactory.lineString(coordinatesList);
   }
 
@@ -422,8 +422,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       if (interpretation == 1) {
         final double[] ordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final PointList points = new DoubleCoordinatesList(axisCount,
-          ordinates);
+        final PointList points = new DoubleCoordinatesList(axisCount, ordinates);
         pointsList.add(points);
       } else {
         throw new IllegalArgumentException("Unsupported geometry type " + type
@@ -439,8 +438,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
 
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    final PointList coordinatesList = new DoubleCoordinatesList(
-      axisCount, coordinates);
+    final PointList coordinatesList = new DoubleCoordinatesList(axisCount,
+      coordinates);
 
     return this.geometryFactory.multiPoint(coordinatesList);
   }
@@ -469,8 +468,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       if (interpretation == 1) {
         final double[] ordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final PointList coordinatesList = new DoubleCoordinatesList(
-          axisCount, ordinates);
+        final PointList coordinatesList = new DoubleCoordinatesList(axisCount,
+          ordinates);
         final LinearRing ring = this.geometryFactory.linearRing(coordinatesList);
 
         switch ((int)type) {
@@ -541,8 +540,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       if (interpretation == 1) {
         final double[] ordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final PointList coordinatesList = new DoubleCoordinatesList(
-          axisCount, ordinates);
+        final PointList coordinatesList = new DoubleCoordinatesList(axisCount,
+          ordinates);
         final LinearRing ring = this.geometryFactory.linearRing(coordinatesList);
 
         switch ((int)type) {

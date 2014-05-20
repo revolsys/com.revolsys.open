@@ -38,7 +38,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -84,7 +83,7 @@ public class LineStringImplTest extends TestCase {
     Geometry l2 = reader.read("POLYGON((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     l1 = l1.normalize();
     l2 = l2.normalize();
-    assertTrue(l1.equals(2,l2));
+    assertTrue(l1.equals(2, l2));
   }
 
   public void testEquals2() throws Exception {
@@ -124,8 +123,7 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals8() throws Exception {
-    final WKTReader reader = new WKTReader(
-      GeometryFactory.fixed(0, 1000.0));
+    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1000.0));
     final MultiLineString l1 = (MultiLineString)reader.read("MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
     final MultiLineString l2 = (MultiLineString)reader.read("MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
@@ -156,18 +154,14 @@ public class LineStringImplTest extends TestCase {
     assertTrue(l.isEmpty());
     assertTrue(!l.isClosed());
 
-    final LinearRing r = this.geometryFactory.linearRing((PointList)null);
+    final LinearRing r = this.geometryFactory.linearRing();
     assertTrue(r.isEmpty());
     assertTrue(r.isClosed());
 
-    final MultiLineString m = this.geometryFactory.multiLineString(new LineString[] {
-      l, r
-    });
+    final MultiLineString m = this.geometryFactory.multiLineString(l, r);
     assertTrue(!m.isClosed());
 
-    final MultiLineString m2 = this.geometryFactory.multiLineString(new LineString[] {
-      r
-    });
+    final MultiLineString m2 = this.geometryFactory.multiLineString(r);
     assertTrue(!m2.isClosed());
   }
 
@@ -180,12 +174,8 @@ public class LineStringImplTest extends TestCase {
 
   public void testLinearRingConstructor() throws Exception {
     try {
-      final LinearRing ring = GeometryFactory.floating3().linearRing(
-        new Point[] {
-          new PointDouble(0.0, 0, Point.NULL_ORDINATE),
-          new PointDouble(10.0, 10, Point.NULL_ORDINATE),
-          new PointDouble(0.0, 0, Point.NULL_ORDINATE)
-        });
+      final LinearRing ring = GeometryFactory.floating3().linearRing(2, 0.0, 0,
+        10.0, 10, 0.0, 0);
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
       assertTrue(true);
