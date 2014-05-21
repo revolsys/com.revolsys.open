@@ -101,7 +101,7 @@ public class ConvexHull {
        * if (alph > beta) { result = 1; } if (result != 0) return result; //
        */
 
-      final int orient = CGAlgorithms.computeOrientation(o, p, q);
+      final int orient = CGAlgorithmsDD.orientationIndex(o, p, q);
 
       if (orient == CGAlgorithms.COUNTERCLOCKWISE) {
         return 1;
@@ -317,7 +317,7 @@ public class ConvexHull {
       p = ps.pop();
       // check for empty stack to guard against robustness problems
       while (!ps.empty()
-        && CGAlgorithms.computeOrientation(ps.peek(), p, c[i]) > 0) {
+        && CGAlgorithmsDD.orientationIndex(ps.peek(), p, c[i]) > 0) {
         p = ps.pop();
       }
       p = ps.push(p);
@@ -332,7 +332,7 @@ public class ConvexHull {
    *      c1 and c3 inclusive
    */
   private boolean isBetween(final Point c1, final Point c2, final Point c3) {
-    if (CGAlgorithms.computeOrientation(c1, c2, c3) != 0) {
+    if (CGAlgorithmsDD.orientationIndex(c1, c2, c3) != 0) {
       return false;
     }
     if (c1.getX() != c3.getX()) {

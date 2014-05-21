@@ -41,6 +41,7 @@ import java.util.List;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.Centroid;
 import com.revolsys.jts.algorithm.ConvexHull;
@@ -587,6 +588,39 @@ public abstract class AbstractGeometry implements Geometry {
       return (V)this;
     } else {
       return (V)copy(geometryFactory);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends Geometry> V convert(GeometryFactory geometryFactory,
+    final int axisCount) {
+    geometryFactory = geometryFactory.convertAxisCount(axisCount);
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    boolean copy = false;
+    if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
+      final int srid = getSrid();
+      final int srid2 = geometryFactory.getSrid();
+      if (srid <= 0) {
+        if (srid2 > 0) {
+          copy = true;
+        }
+      } else if (srid != srid2) {
+        copy = true;
+      }
+      if (!copy) {
+        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+          final double scale = sourceGeometryFactory.getScale(axisIndex);
+          final double scale1 = geometryFactory.getScale(axisIndex);
+          if (!NumberEquals.equal(scale, scale1)) {
+            copy = true;
+          }
+        }
+      }
+    }
+    if (copy) {
+      return (V)copy(geometryFactory);
+    } else {
+      return (V)this;
     }
   }
 

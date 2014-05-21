@@ -7,10 +7,10 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
-import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 

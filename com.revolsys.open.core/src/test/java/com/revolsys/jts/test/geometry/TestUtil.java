@@ -25,8 +25,8 @@ public class TestUtil {
         final int axisCount = object.getInteger("axisCount");
         final double scaleXy = object.getInteger("scaleXy");
         final double scaleZ = object.getInteger("scaleZ");
-        final GeometryFactory geometryFactory = GeometryFactory.fixed(
-          srid, axisCount, scaleXy, scaleZ);
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(srid,
+          axisCount, scaleXy, scaleZ);
         final String wkt = object.getValue("wkt");
         final Geometry geometry = geometryFactory.geometry(wkt);
         valid &= equalsExpectedWkt(i, object, geometry);
@@ -51,6 +51,17 @@ public class TestUtil {
     }
   }
 
+  public static boolean equalsExact(final int axisCount,
+    final Geometry actualGeometry, final Geometry expectedGeometry) {
+    if (actualGeometry.equals(axisCount, expectedGeometry)) {
+      return true;
+    } else {
+      System.err.println("Equals Exact\t" + expectedGeometry + "\t"
+        + actualGeometry);
+      return false;
+    }
+  }
+
   public static boolean equalsExpectedGeometry(final int i,
     final Geometry actualGeometry, final Geometry expectedGeometry) {
     final int actualSrid = actualGeometry.getSrid();
@@ -59,7 +70,7 @@ public class TestUtil {
       System.err.println(i + "\tEquals Srid\t" + expectedSrid + "\t"
         + actualSrid);
       return false;
-    } else if (actualGeometry.equals(2,expectedGeometry)) {
+    } else if (actualGeometry.equals(2, expectedGeometry)) {
       return true;
     } else {
       System.err.println(i + "\tEquals Exact\t" + expectedGeometry + "\t"

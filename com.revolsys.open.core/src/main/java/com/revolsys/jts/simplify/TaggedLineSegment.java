@@ -34,8 +34,11 @@
 package com.revolsys.jts.simplify;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineSegmentDouble;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
+import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
 /**
  * A {@link LineSegmentDouble} which is tagged with its location in a parent {@link Geometry}.
@@ -47,6 +50,13 @@ class TaggedLineSegment extends LineSegmentDouble {
 
   private final int index;
 
+  public TaggedLineSegment(final Geometry parent, final int index,
+    final int axisCount, final double... coordinates) {
+    super(axisCount, coordinates);
+    this.parent = parent;
+    this.index = index;
+  }
+
   public TaggedLineSegment(final Point p0, final Point p1) {
     this(p0, p1, null, -1);
   }
@@ -56,6 +66,14 @@ class TaggedLineSegment extends LineSegmentDouble {
     super(p0, p1);
     this.parent = parent;
     this.index = index;
+  }
+
+  @Override
+  protected LineSegment createLineSegment(
+    final GeometryFactory geometryFactory, final int axisCount,
+    final double... coordinates) {
+    return new LineSegmentDoubleGF(parent.getGeometryFactory(), axisCount,
+      coordinates);
   }
 
   public int getIndex() {

@@ -33,10 +33,10 @@
 
 package com.revolsys.jts.triangulate;
 
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
 /**
  * Models a constraint segment in a triangulation.

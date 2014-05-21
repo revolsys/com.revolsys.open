@@ -33,6 +33,7 @@
 
 package com.revolsys.jts.operation.distance;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.PointList;
@@ -106,7 +107,7 @@ public class FacetSequence {
         q0 = facetSeq.pts.getCoordinate(j);
         q1 = facetSeq.pts.getCoordinate(j + 1);
 
-        final double dist = CGAlgorithms.distanceLineLine(p0, p1, q0, q1);
+        final double dist = LineSegmentUtil.distanceLineLine(p0, p1, q0, q1);
         if (dist == 0.0) {
           return 0.0;
         }
@@ -125,7 +126,7 @@ public class FacetSequence {
     for (int i = facetSeq.start; i < facetSeq.end - 1; i++) {
       q0 = facetSeq.pts.getCoordinate(i);
       q1 = facetSeq.pts.getCoordinate(i + 1);
-      final double dist = CGAlgorithms.distancePointLine(pt, q0, q1);
+      final double dist = LineSegmentUtil.distanceLinePoint(q0, q1, pt);
       if (dist == 0.0) {
         return 0.0;
       }

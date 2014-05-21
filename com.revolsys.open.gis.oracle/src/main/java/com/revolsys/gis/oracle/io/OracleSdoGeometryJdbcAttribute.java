@@ -386,23 +386,21 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private JGeometry toJGeometry(final Polygon polygon, final int dimension) {
-    final Object[] oridinateArrays = toCoordinateArrays(polygon, dimension);
+    final Object[] coordinateArray = toCoordinateArrays(polygon, dimension);
     final int srid = this.geometryFactory.getSrid();
-    return JGeometry.createLinearPolygon(oridinateArrays, dimension, srid);
+    return JGeometry.createLinearPolygon(coordinateArray, dimension, srid);
   }
 
   private LineString toLineString(final ResultSet resultSet,
     final int columnIndex, final int axisCount) throws SQLException {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    final PointList coordinatesList = new DoubleCoordinatesList(axisCount,
-      coordinates);
-    return this.geometryFactory.lineString(coordinatesList);
+    return this.geometryFactory.lineString(axisCount, coordinates);
   }
 
   private MultiLineString toMultiLineString(final ResultSet resultSet,
     final int columnIndex, final int axisCount) throws SQLException {
-    final List<PointList> pointsList = new ArrayList<PointList>();
+    final List<LineString> lines = new ArrayList<>();
 
     final ARRAY elemInfoArray = (ARRAY)resultSet.getArray(columnIndex + 4);
     final long[] elemInfo = elemInfoArray.getLongArray();
@@ -420,17 +418,18 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         length = (int)(coordinatesArray.length() - offset) + 1;
       }
       if (interpretation == 1) {
-        final double[] ordinates = coordinatesArray.getDoubleArray(offset,
+        final double[] coordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final PointList points = new DoubleCoordinatesList(axisCount, ordinates);
-        pointsList.add(points);
+        final LineString points = this.geometryFactory.lineString(axisCount,
+          coordinates);
+        lines.add(points);
       } else {
         throw new IllegalArgumentException("Unsupported geometry type " + type
           + " interpretation " + interpretation);
       }
     }
 
-    return this.geometryFactory.multiLineString(pointsList);
+    return this.geometryFactory.multiLineString(lines);
   }
 
   private MultiPoint toMultiPoint(final ResultSet resultSet,
@@ -466,11 +465,10 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         length = (int)(coordinatesArray.length() - offset) + 1;
       }
       if (interpretation == 1) {
-        final double[] ordinates = coordinatesArray.getDoubleArray(offset,
+        final double[] coordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final PointList coordinatesList = new DoubleCoordinatesList(axisCount,
-          ordinates);
-        final LinearRing ring = this.geometryFactory.linearRing(coordinatesList);
+        final LinearRing ring = this.geometryFactory.linearRing(axisCount,
+          coordinates);
 
         switch ((int)type) {
           case 1003:
@@ -505,16 +503,14 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private Point toPoint(final ResultSet resultSet, final int columnIndex,
     final int axisCount) throws SQLException {
-    final PointList coordinatesList;
     final double x = resultSet.getDouble(columnIndex + 1);
     final double y = resultSet.getDouble(columnIndex + 2);
     if (axisCount == 2) {
-      coordinatesList = new DoubleCoordinatesList(axisCount, x, y);
+      return this.geometryFactory.point(x, y);
     } else {
       final double z = resultSet.getDouble(columnIndex + 3);
-      coordinatesList = new DoubleCoordinatesList(axisCount, x, y, z);
+      return this.geometryFactory.point(x, y, z);
     }
-    return this.geometryFactory.point(coordinatesList);
   }
 
   private Polygon toPolygon(final ResultSet resultSet, final int columnIndex,
@@ -538,11 +534,10 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         length = (int)(coordinatesArray.length() - offset) + 1;
       }
       if (interpretation == 1) {
-        final double[] ordinates = coordinatesArray.getDoubleArray(offset,
+        final double[] coordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final PointList coordinatesList = new DoubleCoordinatesList(axisCount,
-          ordinates);
-        final LinearRing ring = this.geometryFactory.linearRing(coordinatesList);
+        final LinearRing ring = this.geometryFactory.linearRing(axisCount,
+          coordinates);
 
         switch ((int)type) {
           case 1003:

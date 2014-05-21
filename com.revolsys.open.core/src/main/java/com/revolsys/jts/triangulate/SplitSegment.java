@@ -33,9 +33,9 @@
 
 package com.revolsys.jts.triangulate;
 
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
 
 /**
  * Models a constraint segment which can be split in two in various ways, 

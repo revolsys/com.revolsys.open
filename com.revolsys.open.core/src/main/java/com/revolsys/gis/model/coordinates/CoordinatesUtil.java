@@ -53,6 +53,23 @@ public class CoordinatesUtil {
     return cc;
   }
 
+  public static int compare(final double x1, final double y1, final double x2,
+    final double y2) {
+    if (x1 < x2) {
+      return -1;
+    } else if (x1 > x2) {
+      return 1;
+    } else {
+      if (y1 < y2) {
+        return -1;
+      } else if (y1 > y2) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  }
+
   public static int compareToOrigin(final Point point1, final Object other) {
     if (other instanceof Point) {
       final Point point2 = (Point)other;
@@ -76,26 +93,6 @@ public class CoordinatesUtil {
       return yCompare;
     } else {
       return distanceCompare;
-    }
-  }
-
-  public static int compareToXY(final Point point1, final Point point2) {
-    final double x = point1.getX();
-    final double otherX = point2.getX();
-    if (x < otherX) {
-      return -1;
-    } else if (x > otherX) {
-      return 1;
-    } else {
-      final double y = point1.getY();
-      final double otherY = point2.getY();
-      if (y < otherY) {
-        return -1;
-      } else if (y > otherY) {
-        return 1;
-      } else {
-        return 0;
-      }
     }
   }
 
@@ -151,7 +148,7 @@ public class CoordinatesUtil {
     for (int i = 1; i < coordinates.size(); i++) {
       final Point currentCoordinate = coordinates.getCoordinate(i);
 
-      if (LineSegmentUtil.distance(previousCoordinate, currentCoordinate,
+      if (LineSegmentUtil.distanceLinePoint(previousCoordinate, currentCoordinate,
         coordinate) < 1) {
         return LineSegmentUtil.getElevation(previousCoordinate,
           currentCoordinate, coordinate);

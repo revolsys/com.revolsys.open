@@ -188,7 +188,7 @@ public class Densifier extends GeometryTransformer {
           for (int j = 1; j < densifiedSegCount; j++) {
             final double segFract = (j * densifiedSegLen) / length;
             final Point point = segment.pointAlong(segFract);
-            if (!segment.contains(point)) {
+            if (!segment.isEndPoint(point)) {
               points.add(point.cloneCoordinates());
             }
           }

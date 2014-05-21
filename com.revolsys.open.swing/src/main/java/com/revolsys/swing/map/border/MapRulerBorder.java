@@ -28,10 +28,10 @@ import javax.swing.border.AbstractBorder;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 

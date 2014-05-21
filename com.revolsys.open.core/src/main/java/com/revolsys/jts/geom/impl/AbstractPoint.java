@@ -108,7 +108,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
       } else if (otherEmpty) {
         return 1;
       } else {
-        return CoordinatesUtil.compareToXY(this, point);
+        final double x1 = this.getX();
+        final double y1 = this.getY();
+        final double x2 = point.getX();
+        final double y2 = point.getY();
+        return CoordinatesUtil.compare(x1, y1, x2, y2);
       }
     } else if (other instanceof Geometry) {
       return super.compareTo(other);
@@ -173,6 +177,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
    * @param geometryFactory
    * @param coordinates
    */
+  @Override
   public void copyCoordinates(GeometryFactory geometryFactory,
     final double[] coordinates) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
@@ -442,7 +447,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
       return false;
     } else {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-      final Point point = this.convert(geometryFactory);
+      final Point point = this.convert(geometryFactory, 2);
       final double x = point.getX();
       final double y = point.getY();
       return boundingBox.intersects(x, y);

@@ -98,7 +98,7 @@ class DouglasPeuckerLineSimplifier {
     double maxDistance = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
-      final double distance = LineSegmentUtil.distance(p0, p1, pts[k]);
+      final double distance = LineSegmentUtil.distanceLinePoint(p0, p1, pts[k]);
       if (distance > maxDistance) {
         maxDistance = distance;
         maxIndex = k;

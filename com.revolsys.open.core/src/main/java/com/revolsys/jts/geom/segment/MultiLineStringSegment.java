@@ -18,6 +18,20 @@ public class MultiLineStringSegment extends AbstractSegment implements
     setSegmentId(segmentId);
   }
 
+  @Override
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    if (vertexIndex < 0 || vertexIndex > 1) {
+      return Double.NaN;
+    } else {
+      final LineString part = getPart();
+      if (part == null) {
+        return Double.NaN;
+      } else {
+        return part.getCoordinate(segmentIndex + vertexIndex, axisIndex);
+      }
+    }
+  }
+
   public MultiLineString getMultiLineString() {
     return (MultiLineString)getGeometry();
   }
@@ -49,20 +63,6 @@ public class MultiLineStringSegment extends AbstractSegment implements
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    if (vertexIndex < 0 || vertexIndex > 1) {
-      return Double.NaN;
-    } else {
-      final LineString part = getPart();
-      if (part == null) {
-        return Double.NaN;
-      } else {
-        return part.getCoordinate(segmentIndex + vertexIndex, axisIndex);
-      }
-    }
-  }
-
-  @Override
   public boolean hasNext() {
     if (getGeometry().isEmpty()) {
       return false;
@@ -81,6 +81,17 @@ public class MultiLineStringSegment extends AbstractSegment implements
       }
       return false;
     }
+  }
+
+  @Override
+  public boolean isLineEnd() {
+    final LineString line = getPart();
+    return segmentIndex == line.getSegmentCount();
+  }
+
+  @Override
+  public boolean isLineStart() {
+    return segmentIndex == 0;
   }
 
   @Override

@@ -37,6 +37,7 @@ import java.util.Random;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
@@ -76,7 +77,7 @@ public class DistanceLineLineStressTest extends TestCase {
     for (int i = 0; i < n; i++) {
       // System.out.println(i);
       final Point[] seg = randomDisjointCollinearSegments();
-      if (0 == CGAlgorithms.distanceLineLine(seg[0], seg[1], seg[2], seg[3])) {
+      if (0 == LineSegmentUtil.distanceLineLine(seg[0], seg[1], seg[2], seg[3])) {
         /*
          * System.out.println("FAILED! - " + WKTWriter.toLineString(seg[0],
          * seg[1]) + "  -  " + WKTWriter.toLineString(seg[2], seg[3]));

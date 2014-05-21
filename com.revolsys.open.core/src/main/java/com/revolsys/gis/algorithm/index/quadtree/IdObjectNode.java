@@ -1,11 +1,8 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class IdObjectNode<T> extends AbstractNode<T> {
 
-  private final List<Object> ids = new ArrayList<>();
+  private Object[] ids;
 
   public IdObjectNode() {
   }
@@ -24,29 +21,64 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   protected void doAdd(final QuadTree<T> tree, final double[] bounds,
     final T item) {
     final Object id = ((IdObjectQuadTree<T>)tree).getId(item);
-    ids.add(id);
+    if (ids == null) {
+      ids = new Object[] {
+        id
+      };
+    } else {
+      final int length = ids.length;
+      final Object[] newIds = new Object[length + 1];
+      System.arraycopy(ids, 0, newIds, 0, length);
+      newIds[length] = id;
+      this.ids = newIds;
+    }
   }
 
   @Override
   protected void doRemove(final int index) {
-    ids.remove(index);
+    final int length = ids.length;
+    final int newLength = length - 1;
+    if (newLength == 0) {
+      this.ids = null;
+    } else {
+      final Object[] newIds = new Object[newLength];
+      if (index > 0) {
+        System.arraycopy(ids, 0, newIds, 0, index);
+      }
+      if (index < newLength) {
+        System.arraycopy(ids, index + 1, newIds, index, length - index - 1);
+      }
+      this.ids = newIds;
+    }
   }
 
   @Override
   protected double[] getBounds(final QuadTree<T> tree, final int i) {
-    final Object id = ids.get(i);
-    return ((IdObjectQuadTree<T>)tree).getBounds(id);
+    if (ids == null) {
+      return null;
+    } else {
+      final Object id = ids[i];
+      return ((IdObjectQuadTree<T>)tree).getBounds(id);
+    }
   }
 
   @Override
   protected T getItem(final QuadTree<T> tree, final int i) {
-    final Object id = ids.get(i);
-    return ((IdObjectQuadTree<T>)tree).getItem(id);
+    if (ids == null) {
+      return null;
+    } else {
+      final Object id = ids[i];
+      return ((IdObjectQuadTree<T>)tree).getItem(id);
+    }
   }
 
   @Override
   public int getItemCount() {
-    return ids.size();
+    if (ids == null) {
+      return 0;
+    } else {
+      return ids.length;
+    }
   }
 
 }

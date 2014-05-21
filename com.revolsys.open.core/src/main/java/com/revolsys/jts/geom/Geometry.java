@@ -166,7 +166,6 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  */
 public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   DataTypeProxy {
-
   List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
     "Polygon", "MultiPolygon", "GeometryCollection"));
@@ -381,6 +380,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @return The converted geometry
    */
   <V extends Geometry> V convert(GeometryFactory geometryFactory);
+
+  <V extends Geometry> V convert(GeometryFactory geometryFactory,
+    final int axisCount);
 
   /**
    *  Computes the smallest convex <code>Polygon</code> that contains all the

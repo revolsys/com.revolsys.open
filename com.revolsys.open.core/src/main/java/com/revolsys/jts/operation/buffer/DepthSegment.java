@@ -1,7 +1,7 @@
 package com.revolsys.jts.operation.buffer;
 
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
 /**
   * A segment from a directed edge which has been assigned a depth value

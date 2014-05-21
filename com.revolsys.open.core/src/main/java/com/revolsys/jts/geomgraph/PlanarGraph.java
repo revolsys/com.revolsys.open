@@ -41,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 
@@ -269,7 +270,7 @@ public class PlanarGraph {
       return false;
     }
 
-    if (CGAlgorithms.computeOrientation(p0, p1, ep1) == CGAlgorithms.COLLINEAR
+    if (CGAlgorithmsDD.orientationIndex(p0, p1, ep1) == CGAlgorithms.COLLINEAR
       && Quadrant.quadrant(p0, p1) == Quadrant.quadrant(ep0, ep1)) {
       return true;
     }

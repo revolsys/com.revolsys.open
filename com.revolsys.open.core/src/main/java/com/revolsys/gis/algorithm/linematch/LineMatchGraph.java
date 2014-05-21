@@ -15,15 +15,14 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
 import com.revolsys.gis.graph.visitor.BoundingBoxIntersectsEdgeVisitor;
-import com.revolsys.gis.jts.LineSegmentDoubleGF;
-import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
 public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   private final GeometryFactory geometryFactory;
@@ -613,6 +612,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       for (final Edge<LineSegmentMatch> edge : edgesToProcess) {
         if (!edge.isRemoved()) {
           final LineSegmentMatch lineSegmentMatch = edge.getObject();
+          final LineSegment segment = lineSegmentMatch.getSegment();
           if (!lineSegmentMatch.hasMatches(index)) {
             final List<Edge<LineSegmentMatch>> matchEdges = BoundingBoxIntersectsEdgeVisitor.getEdges(
               this, edge, tolerance);
@@ -633,13 +633,12 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
                   final Node<LineSegmentMatch> line2End = matchEdge.getToNode();
                   final Set<Node<LineSegmentMatch>> matchSplitNodes = new TreeSet<Node<LineSegmentMatch>>(
                     new NodeDistanceComparator<LineSegmentMatch>(line2Start));
+                  final LineSegment matchSegment = matchLineSegmentMatch.getSegment();
                   if (matchEdge.getLength() >= 2 * tolerance) {
-                    if (LineSegmentUtil.isPointOnLineMiddle(line2Start,
-                      line2End, lineStart, tolerance)) {
+                    if (matchSegment.isPointOnLineMiddle(lineStart, tolerance)) {
                       matchSplitNodes.add(lineStart);
                     }
-                    if (LineSegmentUtil.isPointOnLineMiddle(line2Start,
-                      line2End, lineEnd, tolerance)) {
+                    if (matchSegment.isPointOnLineMiddle(lineEnd, tolerance)) {
                       matchSplitNodes.add(lineEnd);
                     }
                   }
@@ -650,12 +649,10 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
                       iterator.add(splitEdge);
                     }
                   } else if (allowSplit) {
-                    if (LineSegmentUtil.isPointOnLineMiddle(lineStart, lineEnd,
-                      line2Start, tolerance)) {
+                    if (segment.isPointOnLineMiddle(line2Start, tolerance)) {
                       splitNodes.add(line2Start);
                     }
-                    if (LineSegmentUtil.isPointOnLineMiddle(lineStart, lineEnd,
-                      line2End, tolerance)) {
+                    if (segment.isPointOnLineMiddle(line2End, tolerance)) {
                       splitNodes.add(line2End);
                     }
                   }

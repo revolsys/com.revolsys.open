@@ -15,14 +15,12 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
-import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
@@ -30,6 +28,8 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 
 public class GeometryGraph extends Graph<LineSegment> {
@@ -152,10 +152,9 @@ public class GeometryGraph extends Graph<LineSegment> {
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();
-          final PointList segmentIntersection = line1.getIntersection(line2);
-          final int numIntersections = segmentIntersection.size();
-          if (numIntersections == 1) {
-            final Point intersection = segmentIntersection.get(0);
+          final Geometry segmentIntersection = line1.getIntersection(line2);
+          if (segmentIntersection instanceof Point) {
+            final Point intersection = (Point)segmentIntersection;
             if (intersection.equals(fromPoint) || intersection.equals(toPoint)) {
               // Point intersection, make sure it's not at the start
               final Node<LineSegment> node = findNode(intersection);
@@ -179,8 +178,8 @@ public class GeometryGraph extends Graph<LineSegment> {
               // Intersection not at the start/end of the line
               pointIntersections.add(geometryFactory.point(intersection));
             }
-          } else if (numIntersections == 2) {
-            lineIntersections.add(geometryFactory.lineString(segmentIntersection));
+          } else if (segmentIntersection instanceof LineSegment) {
+            lineIntersections.add((LineSegment)segmentIntersection);
           }
           for (final Point point : line1.vertices()) {
             if (line2.distance(point) < maxDistance) {
@@ -327,10 +326,8 @@ public class GeometryGraph extends Graph<LineSegment> {
           this, line1, maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();
-          final PointList intersections = line1.getIntersection(line2);
-          final int numIntersections = intersections.size();
-          for (int j = 0; j < numIntersections; j++) {
-            final Point intersection = intersections.get(j);
+          final Geometry intersections = line1.getIntersection(line2);
+          for (final Point intersection : intersections.vertices()) {
             if (intersection.equals(fromPoint) || intersection.equals(toPoint)) {
               // Point intersection, make sure it's not at the start
               final Node<LineSegment> node = findNode(intersection);

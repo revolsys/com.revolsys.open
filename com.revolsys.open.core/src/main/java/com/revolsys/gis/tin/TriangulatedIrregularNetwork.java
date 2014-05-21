@@ -9,7 +9,6 @@ import java.util.TreeSet;
 
 import com.revolsys.gis.algorithm.index.EnvelopeSpatialIndex;
 import com.revolsys.gis.algorithm.index.RTree;
-import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.comparator.AngleFromPointComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
@@ -17,12 +16,14 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.math.Angle;
 
 public class TriangulatedIrregularNetwork {
@@ -474,9 +475,9 @@ public class TriangulatedIrregularNetwork {
       }
       LineSegment segment = new LineSegmentDoubleGF(closestCorner, coordinate).extend(
         0, t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
-      final PointList intersectCoordinates = oppositeEdge.getIntersection(segment);
-      if (intersectCoordinates.size() > 0) {
-        final Point intersectPoint = intersectCoordinates.get(0);
+      final Geometry intersectCoordinates = oppositeEdge.getIntersection(segment);
+      if (intersectCoordinates.getVertexCount() > 0) {
+        final Point intersectPoint = intersectCoordinates.getVertex(0);
         final double z = oppositeEdge.getElevation(intersectPoint);
         if (!Double.isNaN(z)) {
           final double x = intersectPoint.getX();

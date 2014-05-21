@@ -463,11 +463,9 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
             final LineString line = edge.getLine();
             LineString newLine;
             if (edge.isForwards(this)) {
-              newLine = LineStringUtil.subLineString(line, newNode, 1,
-                line.getVertexCount() - 1, null);
+              newLine = line.subLine(newNode, 1, line.getVertexCount() - 1, null);
             } else {
-              newLine = LineStringUtil.subLineString(line, null, 0,
-                line.getVertexCount() - 1, newNode);
+              newLine = line.subLine(null, 0, line.getVertexCount() - 1, newNode);
             }
             graph.replaceEdge(edge, newLine);
             if (!edge.isRemoved()) {

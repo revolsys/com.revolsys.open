@@ -2216,18 +2216,15 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final int numPoints = line.getVertexCount();
       if (vertexIndex == null) {
         final int pointIndex = mouseLocation.getSegmentId()[0];
-        line1 = LineStringUtil.subLineString(line, null, 0, pointIndex + 1,
-          convertedPoint);
-        line2 = LineStringUtil.subLineString(line, convertedPoint,
-          pointIndex + 1, numPoints - pointIndex - 1, null);
+        line1 = line.subLine(null, 0, pointIndex + 1, convertedPoint);
+        line2 = line.subLine(convertedPoint, pointIndex + 1, numPoints - pointIndex - 1, null);
       } else {
         final int pointIndex = vertexIndex[0];
         if (numPoints - pointIndex < 2) {
           return Collections.singletonList(record);
         } else {
-          line1 = LineStringUtil.subLineString(line, pointIndex + 1);
-          line2 = LineStringUtil.subLineString(line, null, pointIndex,
-            numPoints - pointIndex, null);
+          line1 = line.subLine(pointIndex + 1);
+          line2 = line.subLine(null, pointIndex, numPoints - pointIndex, null);
         }
 
       }

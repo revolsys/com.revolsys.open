@@ -113,8 +113,8 @@ public class DataObjectGraph extends Graph<DataObject> {
 
   public boolean hasEdge(final DataObject object) {
     final LineString line = object.getGeometryValue();
-    final Point fromPoint = LineStringUtil.getFromCoordinates(line);
-    final Point toPoint = LineStringUtil.getToCoordinates(line);
+    final Point fromPoint = line.getPoint(0);
+    final Point toPoint = line.getPoint(-1);
     final Node<DataObject> fromNode = findNode(fromPoint);
     final Node<DataObject> toNode = findNode(toPoint);
     if (fromNode != null && toNode != null) {

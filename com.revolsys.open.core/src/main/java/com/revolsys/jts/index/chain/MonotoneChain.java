@@ -35,9 +35,9 @@ package com.revolsys.jts.index.chain;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 
 /**

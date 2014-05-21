@@ -38,6 +38,7 @@ package com.revolsys.jts.operation.buffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.PointList;
@@ -300,8 +301,7 @@ public class OffsetCurveSetBuilder {
     final Triangle tri = new Triangle(triangleCoord.getVertex(0),
       triangleCoord.getVertex(1), triangleCoord.getVertex(2));
     final Point inCentre = tri.inCentre();
-    final double distToCentre = CGAlgorithms.distancePointLine(inCentre,
-      tri.p0, tri.p1);
+    final double distToCentre = LineSegmentUtil.distanceLinePoint(tri.p0, tri.p1, inCentre);
     return distToCentre < Math.abs(bufferDistance);
   }
 

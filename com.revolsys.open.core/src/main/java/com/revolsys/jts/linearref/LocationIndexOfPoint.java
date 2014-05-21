@@ -122,7 +122,7 @@ class LocationIndexOfPoint {
       if (!it.isEndOfLine()) {
         final Point p0 = it.getSegmentStart();
         final Point p1 = it.getSegmentEnd();
-        final double segDistance = LineSegmentUtil.distance(p0, p1, inputPt);
+        final double segDistance = LineSegmentUtil.distanceLinePoint(p0, p1, inputPt);
         final double segFrac = LineSegmentUtil.segmentFraction(p0, p1, inputPt);
 
         final int candidateComponentIndex = it.getComponentIndex();

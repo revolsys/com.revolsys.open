@@ -42,7 +42,6 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Envelope;
@@ -307,10 +306,35 @@ public class PolygonImpl extends BaseGeometry implements Polygon {
   @Override
   public double getArea() {
     double totalArea = 0.0;
-    for (int i = 0; i < getRingCount(); i++) {
-      final LinearRing ring = getRing(i);
-      final double area = Math.abs(CGAlgorithms.signedArea(ring.getCoordinatesList()));
-      if (i == 0) {
+    for (int ringIndex = 0; ringIndex < getRingCount(); ringIndex++) {
+      final LinearRing ring = getRing(ringIndex);
+      final int vertexCount = ring.getVertexCount();
+      double area;
+      if (vertexCount < 3) {
+        area = 0.0;
+      } else {
+        /**
+         * Based on the Shoelace formula.
+         * http://en.wikipedia.org/wiki/Shoelace_formula
+         */
+        double p1x = ring.getX(0);
+        double p1y = ring.getY(0);
+
+        final double x0 = p1x;
+        double p2x = ring.getX(1) - x0;
+        double p2y = ring.getY(1);
+        double sum = 0.0;
+        for (int i = 1; i < vertexCount - 1; i++) {
+          final double p0y = p1y;
+          p1x = p2x;
+          p1y = p2y;
+          p2x = ring.getX(i + 1) - x0;
+          p2y = ring.getY(i + 1);
+          sum += p1x * (p0y - p2y);
+        }
+        area = Math.abs(sum / 2.0);
+      }
+      if (ringIndex == 0) {
         totalArea += area;
       } else {
         totalArea -= area;

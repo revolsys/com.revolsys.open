@@ -15,6 +15,8 @@ public interface BoundingBox {
 
   BoundingBox convert(GeometryFactory geometryFactory);
 
+  BoundingBox convert(GeometryFactory geometryFactory, int axisCount);
+
   boolean coveredBy(double... bounds);
 
   /**

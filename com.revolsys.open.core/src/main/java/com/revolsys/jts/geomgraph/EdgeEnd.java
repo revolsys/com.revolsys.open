@@ -1,4 +1,3 @@
-
 /*
  * The JTS Topology Suite is a collection of Java classes that
  * implement the fundamental operations required to validate a given
@@ -37,6 +36,7 @@ import java.io.PrintStream;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.Assert;
 
@@ -93,7 +93,9 @@ public class EdgeEnd implements Comparable {
    * can be used to decide the relative orientation of the vectors.
    */
   public int compareDirection(final EdgeEnd e) {
-    if (dx == e.dx && dy == e.dy) {
+    final double dx = getDx();
+    final double dy = getDy();
+    if (dx == e.getDx() && dy == e.getDy()) {
       return 0;
     }
     // if the rays are in different quadrants, determining the ordering is
@@ -107,7 +109,33 @@ public class EdgeEnd implements Comparable {
     // vectors are in the same quadrant - check relative orientation of
     // direction vectors
     // this is > e if it is CCW of e
-    return CGAlgorithms.computeOrientation(e.p0, e.p1, p1);
+    /**
+     * MD - 9 Aug 2010 It seems that the basic algorithm is slightly orientation
+     * dependent, when computing the orientation of a point very close to a
+     * line. This is possibly due to the arithmetic in the translation to the
+     * origin.
+     * 
+     * For instance, the following situation produces identical results in spite
+     * of the inverse orientation of the line segment:
+     * 
+     * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
+     * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
+     * 
+     * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
+     * orient = orientationIndex(p0, p1, p); int orientInv =
+     * orientationIndex(p1, p0, p);
+     * 
+     * A way to force consistent results is to normalize the orientation of the
+     * vector using the following code. However, this may make the results of
+     * orientationIndex inconsistent through the triangle of points, so it's not
+     * clear this is an appropriate patch.
+     * 
+     */
+    return CGAlgorithmsDD.orientationIndex(e.p0, e.p1, p1);
+    // testing only
+    // return ShewchuksDeterminant.orientationIndex(p1, p2, q);
+    // previous implementation - not quite fully robust
+    // return RobustDeterminant.orientationIndex(p1, p2, q);
   }
 
   @Override
@@ -163,12 +191,16 @@ public class EdgeEnd implements Comparable {
   }
 
   public void print(final PrintStream out) {
-    final double angle = Math.atan2(dy, dx);
+    final double angle = Math.atan2(getDy(), getDx());
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
     out.print("  " + name + ": " + p0 + " - " + p1 + " " + quadrant + ":"
       + angle + "   " + getLabel());
+  }
+
+  protected void setLabel(final Label label) {
+    this.label = label;
   }
 
   public void setNode(final Node node) {
@@ -177,15 +209,11 @@ public class EdgeEnd implements Comparable {
 
   @Override
   public String toString() {
-    final double angle = Math.atan2(dy, dx);
+    final double angle = Math.atan2(getDy(), getDx());
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
     return "  " + name + ": " + p0 + " - " + p1 + " " + quadrant + ":" + angle
       + "   " + getLabel();
-  }
-
-  protected void setLabel(Label label) {
-    this.label = label;
   }
 }

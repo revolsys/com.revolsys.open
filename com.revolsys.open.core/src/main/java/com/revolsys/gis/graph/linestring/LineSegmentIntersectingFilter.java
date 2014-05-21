@@ -1,8 +1,8 @@
 package com.revolsys.gis.graph.linestring;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.jts.geom.PointList;
-import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.segment.LineSegment;
 
 public class LineSegmentIntersectingFilter implements Filter<LineSegment> {
 
@@ -17,8 +17,8 @@ public class LineSegmentIntersectingFilter implements Filter<LineSegment> {
     if (line == this.line) {
       return false;
     } else {
-      final PointList intersection = this.line.getIntersection(line);
-      return intersection != null && intersection.size() > 0;
+      final Geometry intersection = this.line.getIntersection(line);
+      return intersection != null && !intersection.isEmpty();
     }
   }
 }

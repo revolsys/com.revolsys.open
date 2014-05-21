@@ -17,7 +17,7 @@ public class CGAlgorithmFunctions {
     final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 
     final Point p = ptGeom.getPoint();
-    final int index = CGAlgorithms.orientationIndex(segPt[0], segPt[1], p);
+    final int index = CGAlgorithmsDD.orientationIndex(segPt[0], segPt[1], p);
     return index;
   }
 

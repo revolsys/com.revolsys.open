@@ -14,6 +14,16 @@ public class LineStringSegment extends AbstractSegment implements
     setSegmentId(segmentId);
   }
 
+  @Override
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    if (vertexIndex < 0 || vertexIndex > 1) {
+      return Double.NaN;
+    } else {
+      final LineString lineString = getLineString();
+      return lineString.getCoordinate(segmentIndex + vertexIndex, axisIndex);
+    }
+  }
+
   public LineString getLineString() {
     return (LineString)getGeometry();
   }
@@ -26,28 +36,29 @@ public class LineStringSegment extends AbstractSegment implements
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    if (vertexIndex < 0 || vertexIndex > 1) {
-      return Double.NaN;
-    } else {
-      final LineString lineString = getLineString();
-      return lineString.getCoordinate(segmentIndex + vertexIndex, axisIndex);
-    }
-  }
-
-  @Override
   public boolean hasNext() {
-    final LineString lineString = getLineString();
-    if (lineString.isEmpty()) {
+    final LineString line = getLineString();
+    if (line.isEmpty()) {
       return false;
     } else {
       final int segmentIndex = this.segmentIndex;
-      if (segmentIndex + 1 < lineString.getSegmentCount()) {
+      if (segmentIndex + 1 < line.getSegmentCount()) {
         return true;
       } else {
         return false;
       }
     }
+  }
+
+  @Override
+  public boolean isLineEnd() {
+    final LineString line = getLineString();
+    return segmentIndex == line.getSegmentCount();
+  }
+
+  @Override
+  public boolean isLineStart() {
+    return segmentIndex == 0;
   }
 
   @Override

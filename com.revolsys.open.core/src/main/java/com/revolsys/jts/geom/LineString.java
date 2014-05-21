@@ -61,6 +61,12 @@ public interface LineString extends Lineal {
 
   boolean equals(int axisIndex, int vertexIndex, Point point);
 
+  boolean equalsVertex(final int vertexIndex, final double... coordinates);
+
+  boolean equalsVertex(final int vertexIndex, int axisCount, final Point point);
+
+  boolean equalsVertex(final int vertexIndex, final Point point);
+
   double getCoordinate(int vertexIndex, final int axisIndex);
 
   PointList getCoordinatesList();
@@ -119,5 +125,12 @@ public interface LineString extends Lineal {
 
   @Override
   LineString reverse();
+
+  LineString subLine(final int vertexCount);
+
+  LineString subLine(final int vertexCount, final Point toPoint);
+
+  LineString subLine(final Point fromPoint, final int fromVertexIndex,
+    int vertexCount, final Point toPoint);
 
 }

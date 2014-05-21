@@ -30,9 +30,12 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.segment;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Represents a line segment defined by two {@link Coordinates}s.
@@ -55,32 +58,55 @@ public class LineSegmentDouble extends AbstractLineSegment {
     this.coordinates = null;
   }
 
-  public LineSegmentDouble(final int axisCount, final double... coordinates) {
+  protected LineSegmentDouble(final GeometryFactory geometryFactory,
+    final int axisCount, final double... coordinates) {
     if (coordinates == null || coordinates.length == 0 || axisCount < 1) {
       this.coordinates = null;
-    } else if (coordinates.length % axisCount == 0) {
-      this.coordinates = new double[axisCount * 2];
-      int i = 0;
-      final int axisCount2 = coordinates.length / 2;
-      for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
-        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          double value;
-          if (axisIndex < axisCount2) {
-            value = coordinates[vertexIndex * axisCount2 + axisIndex];
-          } else {
-            value = Double.NaN;
+    } else if (coordinates.length % axisCount == 0
+      && coordinates.length / 2 == axisCount) {
+      this.coordinates = coordinates;
+      if (coordinates != null && geometryFactory != null) {
+        int coordinateIndex = 0;
+        for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
+          for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+            final double value = coordinates[coordinateIndex];
+            coordinates[coordinateIndex] = geometryFactory.makePrecise(
+              axisIndex, value);
+            coordinateIndex++;
           }
-          this.coordinates[i++] = value;
         }
       }
     } else {
-      throw new IllegalArgumentException("Expecting a multiple of " + axisCount
-        + " not " + coordinates.length);
+      throw new IllegalArgumentException("(coordinates.length) "
+        + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
     }
   }
 
-  public LineSegmentDouble(final LineSegment line) {
-    this(line.getPoint(0), line.getPoint(1));
+  protected LineSegmentDouble(final GeometryFactory geometryFactory,
+    final LineString line) {
+    this(geometryFactory, line.getVertex(0), line.getVertex(-1));
+  }
+
+  protected LineSegmentDouble(final GeometryFactory geometryFactory,
+    final Point point1, final Point point2) {
+    final int axisCount = geometryFactory.getAxisCount();
+    coordinates = new double[axisCount * 2];
+    CoordinatesListUtil.setCoordinates(geometryFactory, coordinates, axisCount,
+      0, point1);
+    CoordinatesListUtil.setCoordinates(geometryFactory, coordinates, axisCount,
+      1, point2);
+  }
+
+  public LineSegmentDouble(final int axisCount, final double... coordinates) {
+    if (coordinates == null || coordinates.length == 0 || axisCount < 1) {
+      this.coordinates = null;
+    } else if (coordinates.length % axisCount == 0
+      && coordinates.length / 2 == axisCount) {
+      this.coordinates = coordinates;
+    } else {
+      throw new IllegalArgumentException("(coordinates.length) "
+        + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
+    }
   }
 
   public LineSegmentDouble(final LineString line) {
@@ -101,6 +127,13 @@ public class LineSegmentDouble extends AbstractLineSegment {
       clone.coordinates = clone.coordinates.clone();
     }
     return clone;
+  }
+
+  @Override
+  protected LineSegment createLineSegment(
+    final GeometryFactory geometryFactory, final int axisCount,
+    final double... coordinates) {
+    return new LineSegmentDouble(axisCount, coordinates);
   }
 
   @Override

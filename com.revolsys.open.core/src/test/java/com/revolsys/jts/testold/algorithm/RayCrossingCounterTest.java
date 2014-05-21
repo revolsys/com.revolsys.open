@@ -35,6 +35,7 @@ package com.revolsys.jts.testold.algorithm;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
@@ -62,7 +63,7 @@ public class RayCrossingCounterTest extends AbstractPointInRingTest {
     final String wkt) throws Exception {
     final Polygon geom = (Polygon)this.reader.read(wkt);
     assertEquals(expectedLoc,
-      CGAlgorithms.locatePointInRing(pt, geom.getExteriorRing()));
+      RayCrossingCounter.locatePointInRing(pt, geom.getExteriorRing()));
   }
 
 }

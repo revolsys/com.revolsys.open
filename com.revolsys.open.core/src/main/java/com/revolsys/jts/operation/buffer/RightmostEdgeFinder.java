@@ -38,6 +38,7 @@ package com.revolsys.jts.operation.buffer;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
@@ -143,8 +144,7 @@ class RightmostEdgeFinder {
       "rightmost point expected to be interior vertex of edge");
     final Point pPrev = edge.getCoordinate(minIndex - 1);
     final Point pNext = edge.getCoordinate(minIndex + 1);
-    final int orientation = CGAlgorithms.computeOrientation(minCoord, pNext,
-      pPrev);
+    final int orientation = CGAlgorithmsDD.orientationIndex(minCoord, pNext, pPrev);
     boolean usePrev = false;
     // both segments are below min point
     if (pPrev.getY() < minCoord.getY() && pNext.getY() < minCoord.getY()

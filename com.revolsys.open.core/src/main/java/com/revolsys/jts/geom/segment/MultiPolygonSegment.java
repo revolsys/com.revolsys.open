@@ -3,6 +3,7 @@ package com.revolsys.jts.geom.segment;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
@@ -19,6 +20,20 @@ public class MultiPolygonSegment extends AbstractSegment implements
     final int... segmentId) {
     super(multiPolygon);
     setSegmentId(segmentId);
+  }
+
+  @Override
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    if (vertexIndex < 0 || vertexIndex > 1) {
+      return Double.NaN;
+    } else {
+      final LinearRing ring = getRing();
+      if (ring == null) {
+        return Double.NaN;
+      } else {
+        return ring.getCoordinate(segmentIndex + vertexIndex, axisIndex);
+      }
+    }
   }
 
   public MultiPolygon getMultiPolygon() {
@@ -66,20 +81,6 @@ public class MultiPolygonSegment extends AbstractSegment implements
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    if (vertexIndex < 0 || vertexIndex > 1) {
-      return Double.NaN;
-    } else {
-      final LinearRing ring = getRing();
-      if (ring == null) {
-        return Double.NaN;
-      } else {
-        return ring.getCoordinate(segmentIndex + vertexIndex, axisIndex);
-      }
-    }
-  }
-
-  @Override
   public boolean hasNext() {
     final MultiPolygon multiPolygon = getMultiPolygon();
     if (multiPolygon.isEmpty()) {
@@ -105,6 +106,17 @@ public class MultiPolygonSegment extends AbstractSegment implements
       }
       return false;
     }
+  }
+
+  @Override
+  public boolean isLineEnd() {
+    final LineString line = getRing();
+    return segmentIndex == line.getSegmentCount();
+  }
+
+  @Override
+  public boolean isLineStart() {
+    return segmentIndex == 0;
   }
 
   @Override

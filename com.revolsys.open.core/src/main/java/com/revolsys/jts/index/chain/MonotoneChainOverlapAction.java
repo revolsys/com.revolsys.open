@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.index.chain;
 
-import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegment;
 
 /**
  * The action for the internal iterator for performing

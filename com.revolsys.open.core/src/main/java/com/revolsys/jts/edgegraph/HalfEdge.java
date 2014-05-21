@@ -1,6 +1,7 @@
 package com.revolsys.jts.edgegraph;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geomgraph.Quadrant;
 import com.revolsys.jts.util.Assert;
@@ -131,7 +132,33 @@ public class HalfEdge {
     // vectors are in the same quadrant
     // Check relative orientation of direction vectors
     // this is > e if it is CCW of e
-    return CGAlgorithms.computeOrientation(e.orig, e.dest(), dest());
+    /**
+     * MD - 9 Aug 2010 It seems that the basic algorithm is slightly orientation
+     * dependent, when computing the orientation of a point very close to a
+     * line. This is possibly due to the arithmetic in the translation to the
+     * origin.
+     * 
+     * For instance, the following situation produces identical results in spite
+     * of the inverse orientation of the line segment:
+     * 
+     * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
+     * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
+     * 
+     * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
+     * orient = orientationIndex(p0, p1, p); int orientInv =
+     * orientationIndex(p1, p0, p);
+     * 
+     * A way to force consistent results is to normalize the orientation of the
+     * vector using the following code. However, this may make the results of
+     * orientationIndex inconsistent through the triangle of points, so it's not
+     * clear this is an appropriate patch.
+     * 
+     */
+    return CGAlgorithmsDD.orientationIndex(e.orig, e.dest(), dest());
+    // testing only
+    // return ShewchuksDeterminant.orientationIndex(p1, p2, q);
+    // previous implementation - not quite fully robust
+    // return RobustDeterminant.orientationIndex(p1, p2, q);
   }
 
   /**

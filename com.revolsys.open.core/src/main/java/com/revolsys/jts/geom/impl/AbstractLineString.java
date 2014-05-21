@@ -41,7 +41,6 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Dimension;
@@ -220,6 +219,46 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     return true;
   }
 
+  @Override
+  public boolean equalsVertex(final int vertexIndex,
+    final double... coordinates) {
+    for (int axisIndex = 0; axisIndex < coordinates.length; axisIndex++) {
+      final double coordinate = coordinates[axisIndex];
+      final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+      if (!NumberEquals.equal(coordinate, matchCoordinate)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean equalsVertex(final int vertexIndex, final int axisCount,
+    Point point) {
+    point = point.convert(getGeometryFactory(), axisCount);
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double coordinate = point.getCoordinate(axisIndex);
+      final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+      if (!NumberEquals.equal(coordinate, matchCoordinate)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean equalsVertex(final int vertexIndex, Point point) {
+    point = point.convert(getGeometryFactory());
+    for (int axisIndex = 0; axisIndex < point.getAxisCount(); axisIndex++) {
+      final double coordinate = point.getCoordinate(axisIndex);
+      final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+      if (!NumberEquals.equal(coordinate, matchCoordinate)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /**
    * Gets the boundary of this geometry.
    * The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
@@ -276,7 +315,24 @@ public abstract class AbstractLineString extends AbstractGeometry implements
    */
   @Override
   public double getLength() {
-    return CGAlgorithms.length(getCoordinatesList());
+    final int vertexCount = getVertexCount();
+    if (vertexCount <= 1) {
+      return 0.0;
+    } else {
+      double len = 0.0;
+      double x0 = getX(0);
+      double y0 = getY(0);
+      for (int i = 1; i < vertexCount; i++) {
+        final double x1 = getX(i);
+        final double y1 = getY(i);
+        final double dx = x1 - x0;
+        final double dy = y1 - y0;
+        len += Math.sqrt(dx * dx + dy * dy);
+        x0 = x1;
+        y0 = y1;
+      }
+      return len;
+    }
   }
 
   @Override
@@ -294,14 +350,25 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
-  public final Point getPoint(final int vertexIndex) {
-    final int axisCount = getAxisCount();
-    final double[] coordinates = new double[axisCount];
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
+  public final Point getPoint(int vertexIndex) {
+    if (isEmpty()) {
+      return null;
+    } else {
+      while (vertexIndex < 0) {
+        vertexIndex += getVertexCount();
+      }
+      if (vertexIndex > getVertexCount()) {
+        return null;
+      } else {
+        final int axisCount = getAxisCount();
+        final double[] coordinates = new double[axisCount];
+        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+          coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
+        }
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.point(coordinates);
+      }
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.point(coordinates);
   }
 
   @Override
@@ -601,6 +668,57 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   public Reader<Segment> segments() {
     final LineStringSegment iterator = new LineStringSegment(this, -1);
     return new IteratorReader<Segment>(iterator);
+  }
+
+  @Override
+  public LineString subLine(final int vertexCount) {
+    return subLine(null, 0, vertexCount, null);
+  }
+
+  @Override
+  public LineString subLine(final int vertexCount, final Point toPoint) {
+    return subLine(null, 0, vertexCount, toPoint);
+  }
+
+  @Override
+  public LineString subLine(final Point fromPoint, final int fromVertexIndex,
+    int vertexCount, final Point toPoint) {
+    if (fromVertexIndex + vertexCount > getVertexCount()) {
+      vertexCount = getVertexCount() - fromVertexIndex;
+    }
+    int newVertexCount = vertexCount;
+    final boolean hasFromPoint = fromPoint != null && !fromPoint.isEmpty();
+    if (hasFromPoint) {
+      newVertexCount++;
+    }
+    final boolean hasToPoint = toPoint != null && !toPoint.isEmpty();
+    if (hasToPoint) {
+      newVertexCount++;
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (newVertexCount < 2) {
+      return geometryFactory.lineString();
+    } else {
+      final int axisCount = getAxisCount();
+      final double[] coordinates = new double[newVertexCount * axisCount];
+      int vertexIndex = 0;
+      if (hasFromPoint) {
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+          vertexIndex++, fromPoint);
+      }
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex,
+        this, fromVertexIndex, vertexCount);
+      vertexIndex += vertexCount;
+      if (hasToPoint) {
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+          vertexIndex++, toPoint);
+      }
+      final LineString newLine = geometryFactory.lineString(axisCount,
+        coordinates);
+      GeometryProperties.copyUserData(this, newLine);
+      return newLine;
+    }
+
   }
 
   @Override

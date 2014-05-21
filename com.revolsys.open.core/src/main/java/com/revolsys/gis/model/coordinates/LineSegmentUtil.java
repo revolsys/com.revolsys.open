@@ -6,6 +6,7 @@ import java.util.TreeSet;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
@@ -32,9 +33,108 @@ public class LineSegmentUtil {
     return lineEnd;
   }
 
-  static double det(final double a, final double b, final double c,
+  public static double det(final double a, final double b, final double c,
     final double d) {
     return a * d - b * c;
+  }
+
+  public static double distanceLineLine(final Point line1From, final Point line1To,
+    final Point line2From, final Point line2To) {
+    final double line1X1 = line1From.getX();
+    final double line1Y1 = line1From.getY();
+
+    final double line1X2 = line1To.getX();
+    final double line1Y2 = line1To.getY();
+
+    final double line2X1 = line2From.getX();
+    final double line2Y1 = line2From.getY();
+
+    final double line2X2 = line2To.getX();
+    final double line2Y2 = line2To.getY();
+    return distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1,
+      line2Y1, line2X2, line2Y2);
+  }
+
+  /**
+   * Computes the distance from a line segment AB to a line segment CD
+   * 
+   * Note: NON-ROBUST!
+   * 
+   * @param A
+   *          a point of one line
+   * @param B
+   *          the second point of (must be different to A)
+   * @param C
+   *          one point of the line
+   * @param D
+   *          another point of the line (must be different to A)
+   */
+  public static double distanceLineLine(final double line1X1,
+    final double line1Y1, final double line1X2, final double line1Y2,
+    final double line2X1, final double line2Y1, final double line2X2,
+    final double line2Y2) {
+    // check for zero-length segments
+    if (line1X1 == line1X2 && line1Y1 == line1Y2) {
+      return distanceLinePoint(line2X1, line2Y1, line2X2, line2Y2, line1X1,
+        line1Y1);
+    } else if (line2X1 == line2X2 && line2Y1 == line2Y2) {
+      return distanceLinePoint(line1X1, line1Y1, line1X2, line1Y2, line2X1,
+        line2Y1);
+    } else {
+      // AB and CD are line segments
+      /*
+       * from comp.graphics.algo Solving the above for r and s yields
+       * (Ay-Cy)(Dx-Cx)-(Ax-Cx)(Dy-Cy) r = ----------------------------- (eqn 1)
+       * (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) s =
+       * ----------------------------- (eqn 2) (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) Let
+       * P be the position vector of the intersection point, then P=A+r(B-A) or
+       * Px=Ax+r(Bx-Ax) Py=Ay+r(By-Ay) By examining the values of r & s, you can
+       * also determine some other limiting conditions: If 0<=r<=1 & 0<=s<=1,
+       * intersection exists r<0 or r>1 or s<0 or s>1 line segments do not
+       * intersect If the denominator in eqn 1 is zero, AB & CD are parallel If
+       * the numerator in eqn 1 is also zero, AB & CD are collinear.
+       */
+
+      boolean noIntersection = false;
+      if (!EnvelopeUtil.intersects(line1X1, line1Y1, line1X2, line1Y2, line2X1,
+        line2Y1, line2X2, line2Y2)) {
+        noIntersection = true;
+      } else {
+        final double denom = (line1X2 - line1X1) * (line2Y2 - line2Y1)
+          - (line1Y2 - line1Y1) * (line2X2 - line2X1);
+
+        if (denom == 0) {
+          noIntersection = true;
+        } else {
+          final double r_num = (line1Y1 - line2Y1) * (line2X2 - line2X1)
+            - (line1X1 - line2X1) * (line2Y2 - line2Y1);
+          final double s_num = (line1Y1 - line2Y1) * (line1X2 - line1X1)
+            - (line1X1 - line2X1) * (line1Y2 - line1Y1);
+
+          final double s = s_num / denom;
+          final double r = r_num / denom;
+
+          if ((r < 0) || (r > 1) || (s < 0) || (s > 1)) {
+            noIntersection = true;
+          }
+        }
+      }
+      if (noIntersection) {
+        final double distance1 = distanceLinePoint(line2X1, line2Y1, line2X2,
+          line2Y2, line1X1, line1Y1);
+        final double distance2 = distanceLinePoint(line2X1, line2Y1, line2X2,
+          line2Y2, line1X2, line1Y2);
+        final double distance3 = distanceLinePoint(line1X1, line1Y1, line1X2,
+          line1Y2, line2X1, line2Y1);
+        final double distance4 = distanceLinePoint(line1X1, line1Y1, line1X2,
+          line1Y2, line2X2, line2Y2);
+        return com.revolsys.jts.math.MathUtil.min(distance1, distance2,
+          distance3, distance4);
+      } else {
+        // segments intersect
+        return 0.0;
+      }
+    }
   }
 
   /**
@@ -49,7 +149,7 @@ public class LineSegmentUtil {
    * @param y The y coordinate of the point.
    * @return The distance.
    */
-  public static double distance(final double x1, final double y1,
+  public static double distanceLinePoint(final double x1, final double y1,
     final double x2, final double y2, final double x, final double y) {
     if (x1 == x2 && y1 == y2) {
       return MathUtil.distance(x, y, x1, y1);
@@ -87,69 +187,15 @@ public class LineSegmentUtil {
    * @param point The coordinates of the point location.
    * @return The distance.
    */
-  public static double distance(final Point lineStart, final Point lineEnd,
-    final Point point) {
+  public static double distanceLinePoint(final Point lineStart,
+    final Point lineEnd, final Point point) {
     final double x1 = lineStart.getX();
     final double y1 = lineStart.getY();
     final double x2 = lineEnd.getX();
     final double y2 = lineEnd.getY();
     final double x = point.getX();
     final double y = point.getY();
-    return distance(x1, y1, x2, y2, x, y);
-  }
-
-  public static double distance(final Point line1From, final Point line1To,
-    final Point line2From, final Point line2To) {
-    if (line1From.equals(line1To)) {
-      return distance(line1From, line2From, line2To);
-    } else if (line2From.equals(line2To)) {
-      return distance(line2To, line1From, line1To);
-    } else {
-      final double line1FromX = line1From.getX();
-      final double line1FromY = line1From.getY();
-
-      final double line1ToX = line1To.getX();
-      final double line1ToY = line1To.getY();
-
-      final double line2FromX = line2From.getX();
-      final double line2FromY = line2From.getY();
-
-      final double line2ToX = line2To.getX();
-      final double line2ToY = line2To.getY();
-
-      final double r_top = (line1FromY - line2FromY) * (line2ToX - line2FromX)
-        - (line1FromX - line2FromX) * (line2ToY - line2FromY);
-      final double r_bot = (line1ToX - line1FromX) * (line2ToY - line2FromY)
-        - (line1ToY - line1FromY) * (line2ToX - line2FromX);
-
-      final double s_top = (line1FromY - line2FromY) * (line1ToX - line1FromX)
-        - (line1FromX - line2FromX) * (line1ToY - line1FromY);
-      final double s_bot = (line1ToX - line1FromX) * (line2ToY - line2FromY)
-        - (line1ToY - line1FromY) * (line2ToX - line2FromX);
-
-      if ((r_bot == 0) || (s_bot == 0)) {
-        return Math.min(
-          distance(line1From, line2From, line2To),
-          Math.min(
-            distance(line1To, line2From, line2To),
-            Math.min(distance(line2From, line1From, line1To),
-              distance(line2To, line1From, line1To))));
-      } else {
-        final double s = s_top / s_bot;
-        final double r = r_top / r_bot;
-
-        if ((r < 0) || (r > 1) || (s < 0) || (s > 1)) {
-          return Math.min(
-            distance(line2From, line2To, line1From),
-            Math.min(
-              distance(line2From, line2To, line1To),
-              Math.min(distance(line1From, line1To, line2From),
-                distance(line1From, line1To, line2To))));
-        } else {
-          return 0.0;
-        }
-      }
-    }
+    return distanceLinePoint(x1, y1, x2, y2, x, y);
   }
 
   /**
@@ -393,14 +439,20 @@ public class LineSegmentUtil {
   public static boolean isPointOnLine(final double x1, final double y1,
     final double x2, final double y2, final double x, final double y,
     final double maxDistance) {
-    final double distance = distance(x1, y1, x2, y2, x, y);
-    if (distance < maxDistance) {
-      final double projectionFactor = projectionFactor(x1, y1, x2, y2, x, y);
-      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-        return true;
+    if (NumberEquals.equal(x, x1) && NumberEquals.equal(y, y1)) {
+      return true;
+    } else if (NumberEquals.equal(x, x2) && NumberEquals.equal(y, y2)) {
+      return true;
+    } else {
+      final double distance = distanceLinePoint(x1, y1, x2, y2, x, y);
+      if (distance < maxDistance) {
+        final double projectionFactor = projectionFactor(x1, y1, x2, y2, y, y);
+        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
   }
 
   /**
@@ -443,10 +495,29 @@ public class LineSegmentUtil {
     } else if (lineEnd.equals(2, point)) {
       return true;
     } else {
-      final double distance = distance(lineStart, lineEnd, point);
+      final double distance = distanceLinePoint(lineStart, lineEnd, point);
       if (distance < maxDistance) {
         final double projectionFactor = projectionFactor(lineStart, lineEnd,
           point);
+        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
+  public static boolean isPointOnLineMiddle(final double x1, final double y1,
+    final double x2, final double y2, final double x, final double y,
+    final double maxDistance) {
+    if (NumberEquals.equal(x, x1) && NumberEquals.equal(y, y1)) {
+      return false;
+    } else if (NumberEquals.equal(x, x2) && NumberEquals.equal(y, y2)) {
+      return false;
+    } else {
+      final double distance = distanceLinePoint(x1, y1, x2, y2, x, y);
+      if (distance < maxDistance) {
+        final double projectionFactor = projectionFactor(x1, y1, x2, y2, x, y);
         if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
           return true;
         }
@@ -473,17 +544,6 @@ public class LineSegmentUtil {
         }
       }
       return false;
-    }
-  }
-
-  public static boolean isPointOnLineMiddle(final Point lineStart,
-    final Point lineEnd, final Point point, final double maxDistance) {
-    if (point.equals(2, lineStart)) {
-      return false;
-    } else if (point.equals(2, lineEnd)) {
-      return false;
-    } else {
-      return isPointOnLine(lineStart, lineEnd, point, maxDistance);
     }
   }
 

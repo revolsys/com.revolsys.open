@@ -33,16 +33,17 @@
 package com.revolsys.jts.operation.buffer;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.geomgraph.Position;
 import com.revolsys.math.Angle;
 
@@ -524,7 +525,7 @@ class OffsetSegmentGenerator {
       return;
     }
 
-    final int orientation = CGAlgorithms.computeOrientation(s0, s1, s2);
+    final int orientation = CGAlgorithmsDD.orientationIndex(s0, s1, s2);
     final boolean outsideTurn = (orientation == CGAlgorithms.CLOCKWISE && side == Position.LEFT)
       || (orientation == CGAlgorithms.COUNTERCLOCKWISE && side == Position.RIGHT);
 

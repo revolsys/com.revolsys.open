@@ -131,7 +131,7 @@ public class LineStringSnapper {
         }
       }
 
-      final double dist = LineSegmentUtil.distance(p0, p1, snapPt);
+      final double dist = LineSegmentUtil.distanceLinePoint(p0, p1, snapPt);
       if (dist < snapTolerance && dist < minDist) {
         minDist = dist;
         snapIndex = i;

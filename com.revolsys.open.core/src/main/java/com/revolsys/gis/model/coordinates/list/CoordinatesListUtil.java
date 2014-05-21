@@ -19,18 +19,19 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
+import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
@@ -197,6 +198,20 @@ public class CoordinatesListUtil {
       }
     }
     return true;
+  }
+
+  public static boolean containsXy(final double[] coordinates,
+    final int vertexCount, final int axisCount, final double x, final double y) {
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x1 = coordinates[vertexIndex * axisCount];
+      if (NumberEquals.equal(x, x1)) {
+        final double y1 = coordinates[vertexIndex * axisCount + 1];
+        if (NumberEquals.equal(y, y1)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public static boolean equals2dCoordinate(final PointList coordinates,
@@ -447,7 +462,7 @@ public class CoordinatesListUtil {
         previousNode = nextNode;
       }
 
-    } while (previousNode != null && !endPoint.equals(2,startPoint));
+    } while (previousNode != null && !endPoint.equals(2, startPoint));
     if (currentCoordinates.size() > 0) {
       final PointList points = new DoubleCoordinatesList(
         points1.getAxisCount(), currentCoordinates);
@@ -492,13 +507,13 @@ public class CoordinatesListUtil {
         final GeometryFactory precisionModel = graph1.getPrecisionModel();
         final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1,
           node2);
-        if (!node1.equals(2,midPoint)) {
+        if (!node1.equals(2, midPoint)) {
           if (movedNodes != null) {
             movedNodes.put(node1.cloneCoordinates(), midPoint);
           }
           node1.move(midPoint);
         }
-        if (!node2.equals(2,midPoint)) {
+        if (!node2.equals(2, midPoint)) {
           if (movedNodes != null) {
             movedNodes.put(node2.cloneCoordinates(), midPoint);
           }
@@ -685,7 +700,7 @@ public class CoordinatesListUtil {
           final double y1 = points.getY(segmentIndex);
           final double x2 = points.getX(i);
           final double y2 = points.getY(i);
-          final double segmentDistance = LineSegmentUtil.distance(x1, y1, x2,
+          final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2,
             y2, x, y);
           if (segmentDistance == 0) {
             pointDistanceMap.put(point, segmentDistance);
@@ -787,7 +802,7 @@ public class CoordinatesListUtil {
     int startIndex = 0;
     boolean startEqual = false;
     if (startPoint != null) {
-      startEqual = startPoint.equals(2,points.get(start));
+      startEqual = startPoint.equals(2, points.get(start));
       if (!startEqual) {
         vertexCount++;
         startIndex++;
@@ -818,7 +833,7 @@ public class CoordinatesListUtil {
     boolean endEqual = false;
     if (startPoint != null) {
       final Point p1 = points.get(start);
-      startEqual = startPoint.equals(2,p1);
+      startEqual = startPoint.equals(2, p1);
       if (!startEqual) {
         vertexCount++;
         lastIndex++;
@@ -827,7 +842,7 @@ public class CoordinatesListUtil {
     }
     if (endPoint != null) {
       final Point pointsEnd = points.get(start + length - 1);
-      endEqual = endPoint.equals(2,pointsEnd);
+      endEqual = endPoint.equals(2, pointsEnd);
       if (!endEqual) {
         vertexCount++;
       }
@@ -849,6 +864,17 @@ public class CoordinatesListUtil {
     }
 
     return new DoubleCoordinatesList(axisCount, coordinates);
+  }
+
+  public static void switchCoordinates(final double[] coordinates,
+    final int axisCount, final int vertexIndex1, final int vertexIndex2) {
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double value1 = coordinates[vertexIndex1 * axisCount + axisIndex];
+      final double value2 = coordinates[vertexIndex2 * axisCount + axisIndex];
+      coordinates[vertexIndex1 * axisCount + axisIndex] = value2;
+      coordinates[vertexIndex2 * axisCount + axisIndex] = value1;
+    }
+
   }
 
 }

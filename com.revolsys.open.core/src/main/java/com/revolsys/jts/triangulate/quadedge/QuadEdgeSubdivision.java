@@ -802,7 +802,7 @@ public class QuadEdgeSubdivision {
   public boolean isOnEdge(final QuadEdge e, final Point point) {
     final Point p1 = e.orig().getCoordinate();
     final Point p2 = e.dest().getCoordinate();
-    final double dist = LineSegmentUtil.distance(p1, p2, point);
+    final double dist = LineSegmentUtil.distanceLinePoint(p1, p2, point);
     // heuristic (hack?)
     return dist < edgeCoincidenceTolerance;
   }

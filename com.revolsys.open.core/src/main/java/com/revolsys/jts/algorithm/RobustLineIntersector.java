@@ -38,6 +38,7 @@ package com.revolsys.jts.algorithm;
 
 import com.revolsys.gis.model.coordinates.CentralEndpointIntersector;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
@@ -74,19 +75,19 @@ public class RobustLineIntersector extends LineIntersector {
   private static Point nearestEndpoint(final Point p1, final Point p2,
     final Point q1, final Point q2) {
     Point nearestPt = p1;
-    double minDist = CGAlgorithms.distancePointLine(p1, q1, q2);
+    double minDist = LineSegmentUtil.distanceLinePoint(q1, q2, p1);
 
-    double dist = CGAlgorithms.distancePointLine(p2, q1, q2);
+    double dist = LineSegmentUtil.distanceLinePoint(q1, q2, p2);
     if (dist < minDist) {
       minDist = dist;
       nearestPt = p2;
     }
-    dist = CGAlgorithms.distancePointLine(q1, p1, p2);
+    dist = LineSegmentUtil.distanceLinePoint(p1, p2, q1);
     if (dist < minDist) {
       minDist = dist;
       nearestPt = q1;
     }
-    dist = CGAlgorithms.distancePointLine(q2, p1, p2);
+    dist = LineSegmentUtil.distanceLinePoint(p1, p2, q2);
     if (dist < minDist) {
       minDist = dist;
       nearestPt = q2;
@@ -158,15 +159,15 @@ public class RobustLineIntersector extends LineIntersector {
     // for each endpoint, compute which side of the other segment it lies
     // if both endpoints lie on the same side of the other segment,
     // the segments do not intersect
-    final int Pq1 = CGAlgorithms.orientationIndex(p1, p2, q1);
-    final int Pq2 = CGAlgorithms.orientationIndex(p1, p2, q2);
+    final int Pq1 = CGAlgorithmsDD.orientationIndex(p1, p2, q1);
+    final int Pq2 = CGAlgorithmsDD.orientationIndex(p1, p2, q2);
 
     if ((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0)) {
       return NO_INTERSECTION;
     }
 
-    final int Qp1 = CGAlgorithms.orientationIndex(q1, q2, p1);
-    final int Qp2 = CGAlgorithms.orientationIndex(q1, q2, p2);
+    final int Qp1 = CGAlgorithmsDD.orientationIndex(q1, q2, p1);
+    final int Qp2 = CGAlgorithmsDD.orientationIndex(q1, q2, p2);
 
     if ((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0)) {
       return NO_INTERSECTION;
@@ -239,8 +240,8 @@ public class RobustLineIntersector extends LineIntersector {
     isProper = false;
     // do between check first, since it is faster than the orientation test
     if (EnvelopeUtil.intersects(p1, p2, p)) {
-      if ((CGAlgorithms.orientationIndex(p1, p2, p) == 0)
-        && (CGAlgorithms.orientationIndex(p2, p1, p) == 0)) {
+      if ((CGAlgorithmsDD.orientationIndex(p1, p2, p) == 0)
+        && (CGAlgorithmsDD.orientationIndex(p2, p1, p) == 0)) {
         isProper = true;
         if (p.equals(p1) || p.equals(p2)) {
           isProper = false;

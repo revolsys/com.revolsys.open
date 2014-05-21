@@ -218,7 +218,7 @@ public class PointLocator {
       return Location.EXTERIOR;
     }
 
-    return CGAlgorithms.locatePointInRing(p, ring);
+    return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
   private void updateLocationInfo(final Location loc) {

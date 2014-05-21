@@ -170,34 +170,37 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
           graph.addEdge(mergeableRecord);
         }
         for (final Node<DataObject> node : graph.nodes()) {
-          final List<Edge<DataObject>> edges = node.getEdges();
-          if (edges.size() == 2) {
-            final Edge<DataObject> edge1 = edges.get(0);
-            final DataObject record1 = edge1.getObject();
-            final Edge<DataObject> edge2 = edges.get(1);
-            final DataObject record2 = edge2.getObject();
-            if (record1 != record2) {
-              final DataObject mergedRecord = layer.getMergedRecord(node,
-                record1, record2);
+          if (node != null) {
+            final List<Edge<DataObject>> edges = node.getEdges();
+            if (edges.size() == 2) {
+              final Edge<DataObject> edge1 = edges.get(0);
+              final DataObject record1 = edge1.getObject();
+              final Edge<DataObject> edge2 = edges.get(1);
+              final DataObject record2 = edge2.getObject();
+              if (record1 != record2) {
+                final DataObject mergedRecord = layer.getMergedRecord(node,
+                  record1, record2);
 
-              graph.addEdge(mergedRecord);
-              edge1.remove();
-              edge2.remove();
+                graph.addEdge(mergedRecord);
+                edge1.remove();
+                edge2.remove();
 
-              final Set<LayerDataObject> sourceRecords = new LinkedHashSet<LayerDataObject>();
-              // TODO verify orientation to ensure they are in the correct order
-              // and see if they are reversed
-              CollectionUtil.addIfNotNull(sourceRecords,
-                mergeableToOiginalRecordMap.get(record1));
-              CollectionUtil.addAllIfNotNull(sourceRecords,
-                mergedRecords.remove(record1));
-              CollectionUtil.addIfNotNull(sourceRecords,
-                mergeableToOiginalRecordMap.get(record2));
-              CollectionUtil.addAllIfNotNull(sourceRecords,
-                mergedRecords.remove(record2));
-              mergedRecords.put(mergedRecord, sourceRecords);
-              replaceRecord(mergedRecord, record1);
-              replaceRecord(mergedRecord, record2);
+                final Set<LayerDataObject> sourceRecords = new LinkedHashSet<LayerDataObject>();
+                // TODO verify orientation to ensure they are in the correct
+                // order
+                // and see if they are reversed
+                CollectionUtil.addIfNotNull(sourceRecords,
+                  mergeableToOiginalRecordMap.get(record1));
+                CollectionUtil.addAllIfNotNull(sourceRecords,
+                  mergedRecords.remove(record1));
+                CollectionUtil.addIfNotNull(sourceRecords,
+                  mergeableToOiginalRecordMap.get(record2));
+                CollectionUtil.addAllIfNotNull(sourceRecords,
+                  mergedRecords.remove(record2));
+                mergedRecords.put(mergedRecord, sourceRecords);
+                replaceRecord(mergedRecord, record1);
+                replaceRecord(mergedRecord, record2);
+              }
             }
           }
         }

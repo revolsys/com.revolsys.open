@@ -25,12 +25,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.jts.LineSegmentDoubleGF;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.PointList;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
 public class SharesLineSegmentsFilter implements Filter<LineString> {
   private final List<LineSegment> segments = new ArrayList<LineSegment>();

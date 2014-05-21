@@ -2,6 +2,7 @@ package com.revolsys.gis.graph.visitor;
 
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgeVisitor;
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.PointList;
@@ -39,9 +40,7 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
       Point previousMatchCoordinate = matchCoords.getCoordinate(0);
       for (int j = 1; j < coords.size(); j++) {
         final Point matchCoordinate = matchCoords.getCoordinate(i);
-        final double distance = CGAlgorithms.distanceLineLine(
-          previousCoordinate, coordinate, previousMatchCoordinate,
-          matchCoordinate);
+        final double distance = LineSegmentUtil.distanceLineLine(previousCoordinate, coordinate, previousMatchCoordinate, matchCoordinate);
         if (distance <= maxDistance) {
           final double angle1 = Angle.normalizePositive(previousCoordinate.angle2d(coordinate));
           final double angle2 = Angle.normalizePositive(previousMatchCoordinate.angle2d(matchCoordinate));

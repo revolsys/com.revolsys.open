@@ -1,9 +1,9 @@
 package com.revolsys.gis.model.coordinates.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.jts.geom.PointList;
-import com.revolsys.jts.geom.LineSegment;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.LineSegment;
 
 public class CrossingLineSegmentFilter implements Filter<LineSegment> {
   private final LineSegment line;
@@ -17,10 +17,10 @@ public class CrossingLineSegmentFilter implements Filter<LineSegment> {
     if (this.line == line) {
       return false;
     } else {
-      final PointList intersections = this.line.getIntersection(line);
-      if (intersections.size() == 1) {
-        final Point intersection = intersections.get(0);
-        if (this.line.contains(intersection)) {
+      final Geometry intersection = this.line.getIntersection(line);
+      if (intersection instanceof Point) {
+        final Point intersectionPoint = (Point)intersection;
+        if (this.line.isEndPoint(intersectionPoint)) {
           return false;
         } else {
           return true;

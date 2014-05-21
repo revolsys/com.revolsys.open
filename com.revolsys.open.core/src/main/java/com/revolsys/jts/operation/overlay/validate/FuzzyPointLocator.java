@@ -112,7 +112,7 @@ public class FuzzyPointLocator {
         final double y1 = line.getY(j + 1);
         final double x2 = line.getX(j);
         final double y2 = line.getY(j + 1);
-        final double dist = LineSegmentUtil.distance(x1, y1, x2, y2, x, y);
+        final double dist = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
         if (dist <= boundaryDistanceTolerance) {
           return true;
         }

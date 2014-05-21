@@ -53,6 +53,7 @@ import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
+import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.wkt.WktParser;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
@@ -335,6 +336,43 @@ public class Envelope implements Serializable, BoundingBox {
           }
         }
         return new Envelope(geometryFactory, axisCount, bounds);
+      } else {
+        return this;
+      }
+    }
+  }
+
+  @Override
+  public BoundingBox convert(GeometryFactory geometryFactory,
+    final int axisCount) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (geometryFactory == null || sourceGeometryFactory == null) {
+      return this;
+    } else {
+      geometryFactory = geometryFactory.convertAxisCount(axisCount);
+      boolean copy = false;
+      if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
+        final int srid = getSrid();
+        final int srid2 = geometryFactory.getSrid();
+        if (srid <= 0) {
+          if (srid2 > 0) {
+            copy = true;
+          }
+        } else if (srid != srid2) {
+          copy = true;
+        }
+        if (!copy) {
+          for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+            final double scale = sourceGeometryFactory.getScale(axisIndex);
+            final double scale1 = geometryFactory.getScale(axisIndex);
+            if (!NumberEquals.equal(scale, scale1)) {
+              copy = true;
+            }
+          }
+        }
+      }
+      if (copy) {
+        return convert(geometryFactory);
       } else {
         return this;
       }
@@ -1011,7 +1049,7 @@ public class Envelope implements Serializable, BoundingBox {
       return false;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox convertedBoundingBox = other.convert(geometryFactory);
+      final BoundingBox convertedBoundingBox = other.convert(geometryFactory, 2);
       final double minX = getMinX();
       final double minY = getMinY();
       final double maxX = getMaxX();

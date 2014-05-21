@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineSegment;
 
 public interface Segment extends LineSegment, Iterator<Segment> {
 
@@ -21,10 +20,15 @@ public interface Segment extends LineSegment, Iterator<Segment> {
 
   int getSegmentIndex();
 
+  @Override
   int getSrid();
 
   @Override
   boolean isEmpty();
+
+  boolean isLineEnd();
+
+  boolean isLineStart();
 
   Reader<Segment> reader();
 }

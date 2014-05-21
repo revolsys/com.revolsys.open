@@ -1,6 +1,7 @@
 package com.revolsys.gis.algorithm.index.quadtree;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.jts.index.DoubleBits;
@@ -56,8 +57,7 @@ public abstract class AbstractNode<T> implements Serializable {
     newBounds[3] = y2;
   }
 
-  @SuppressWarnings("unchecked")
-  private final AbstractNode<T>[] nodes = new AbstractNode[4];
+  private AbstractNode<T>[] nodes;
 
   private double minX;
 
@@ -92,9 +92,7 @@ public abstract class AbstractNode<T> implements Serializable {
   }
 
   public void clear() {
-    for (int i = 0; i < nodes.length; i++) {
-      nodes[i] = null;
-    }
+    nodes = null;
   }
 
   public AbstractNode<T> createExpanded(final AbstractNode<T> node,
@@ -236,7 +234,11 @@ public abstract class AbstractNode<T> implements Serializable {
   }
 
   protected AbstractNode<T> getNode(final int i) {
-    return nodes[i];
+    if (nodes == null) {
+      return null;
+    } else {
+      return nodes[i];
+    }
   }
 
   protected int getNodeCount() {
@@ -360,7 +362,7 @@ public abstract class AbstractNode<T> implements Serializable {
         if (node != null) {
           if (node.remove(tree, bounds, item)) {
             if (node.isPrunable()) {
-              nodes[i] = null;
+              setNode(i, null);
             }
             removed = true;
           }
@@ -378,7 +380,14 @@ public abstract class AbstractNode<T> implements Serializable {
 
   }
 
+  @SuppressWarnings("unchecked")
   protected void setNode(final int i, final AbstractNode<T> node) {
+    if (nodes == null) {
+      if (node == null) {
+        return;
+      }
+      nodes = new AbstractNode[4];
+    }
     nodes[i] = node;
   }
 
@@ -395,7 +404,11 @@ public abstract class AbstractNode<T> implements Serializable {
 
   @Override
   public String toString() {
-    return nodes + "=" + getItemCount();
+    if (nodes == null) {
+      return "[]=" + getItemCount();
+    } else {
+      return Arrays.toString(nodes) + "=" + getItemCount();
+    }
   }
 
   public boolean visit(final QuadTree<T> tree, final double[] bounds,
@@ -404,7 +417,7 @@ public abstract class AbstractNode<T> implements Serializable {
       final int itemCount = getItemCount();
       for (int i = 0; i < itemCount; i++) {
         final double[] itemBounds = getBounds(tree, i);
-        if (isSearchMatch(itemBounds)) {
+        if (EnvelopeUtil.intersects(bounds, itemBounds)) {
           final T item = getItem(tree, i);
           if (!visitor.visit(item)) {
             return false;

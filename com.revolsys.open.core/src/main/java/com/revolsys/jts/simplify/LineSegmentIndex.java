@@ -39,8 +39,8 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 
 /**

@@ -32,16 +32,17 @@
  */
 package com.revolsys.jts.precision;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Lineal;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Puntal;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.index.strtree.ItemBoundable;
 import com.revolsys.jts.index.strtree.ItemDistance;
 import com.revolsys.jts.index.strtree.STRtree;
@@ -190,7 +191,7 @@ public class MinimumClearance {
           final Point seg1 = fs2.getCoordinate(i2);
 
           if (!(p.equals(2,seg0) || p.equals(2,seg1))) {
-            final double d = CGAlgorithms.distancePointLine(p, seg0, seg1);
+            final double d = LineSegmentUtil.distanceLinePoint(seg0, seg1, p);
             if (d < minDist) {
               minDist = d;
               updatePts(p, seg0, seg1);

@@ -32,9 +32,11 @@
  */
 package com.revolsys.jts.operation.buffer;
 
+import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Point;
 
@@ -176,7 +178,7 @@ public class BufferInputLineSimplifier {
 
   private boolean isConcave(final Point p0, final Point p1,
     final Point p2) {
-    final int orientation = CGAlgorithms.computeOrientation(p0, p1, p2);
+    final int orientation = CGAlgorithmsDD.orientationIndex(p0, p1, p2);
     final boolean isConcave = (orientation == angleOrientation);
     return isConcave;
   }
@@ -202,7 +204,7 @@ public class BufferInputLineSimplifier {
 
   private boolean isShallow(final Point p0, final Point p1,
     final Point p2, final double distanceTol) {
-    final double dist = CGAlgorithms.distancePointLine(p1, p0, p2);
+    final double dist = LineSegmentUtil.distanceLinePoint(p0, p2, p1);
     return dist < distanceTol;
   }
 

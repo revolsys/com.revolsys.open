@@ -50,6 +50,7 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeIntersection;
@@ -72,8 +73,7 @@ public class IsValidOp {
    *
    * @return the point found, or <code>null</code> if none found
    */
-  public static Point findPtNotNode(
-    final Iterable<? extends Point> testPoints,
+  public static Point findPtNotNode(final Iterable<? extends Point> testPoints,
     final LinearRing searchRing, final GeometryGraph graph) {
     // find edge corresponding to searchRing.
     final Edge searchEdge = graph.findEdge(searchRing);
@@ -389,8 +389,7 @@ public class IsValidOp {
     final Polygon polygon, final GeometryGraph graph) {
     // test if shell is inside polygon shell
     final LinearRing polyShell = polygon.getExteriorRing();
-    final Point shellPt = findPtNotNode(shell.vertices(), polyShell,
-      graph);
+    final Point shellPt = findPtNotNode(shell.vertices(), polyShell, graph);
     // if no point could be found, we can assume that the shell is outside the
     // polygon
     if (shellPt == null) {
@@ -472,6 +471,23 @@ public class IsValidOp {
     }
   }
 
+  private boolean checkTooFewPoints(final LineString line,
+    final int minVertexCount) {
+    int vertexCount = 1;
+    for (final Segment segment : line.segments()) {
+      if (segment.getLength() > 0) {
+        vertexCount++;
+      }
+    }
+    if (vertexCount < minVertexCount) {
+      addError(new TopologyValidationError(
+        TopologyValidationError.TOO_FEW_POINTS, line.getPoint(0)));
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   private boolean checkValid(final Geometry geometry) {
     errors.clear();
     if (geometry.isEmpty()) {
@@ -511,36 +527,33 @@ public class IsValidOp {
    */
   private boolean checkValid(final LinearRing ring) {
     boolean valid = checkInvalidCoordinates(ring);
-    if (isErrorReturn()) {
-      return false;
-    }
-    valid &= checkClosedRing(ring);
-    if (isErrorReturn()) {
-      return false;
-    }
+    if (valid) {
+      if (checkTooFewPoints(ring, 4)) {
+        valid &= checkClosedRing(ring);
+        if (isErrorReturn()) {
+          return false;
+        }
 
-    final GeometryGraph graph = new GeometryGraph(0, ring);
-    valid &= checkTooFewPoints(graph);
-    if (isErrorReturn()) {
-      return false;
+        final GeometryGraph graph = new GeometryGraph(0, ring);
+        final LineIntersector li = new RobustLineIntersector();
+        graph.computeSelfNodes(li, true);
+        valid &= checkNoSelfIntersectingRings(graph);
+        return valid;
+      }
     }
-    final LineIntersector li = new RobustLineIntersector();
-    graph.computeSelfNodes(li, true);
-    valid &= checkNoSelfIntersectingRings(graph);
-    return valid;
+    return false;
   }
 
   /**
    * Checks validity of a LineString.  Almost anything goes for linestrings!
    */
   private boolean checkValid(final LineString line) {
-    boolean valid = checkInvalidCoordinates(line);
-    if (isErrorReturn()) {
+    final boolean valid = checkInvalidCoordinates(line);
+    if (valid) {
+      return checkTooFewPoints(line, 2);
+    } else {
       return false;
     }
-    final GeometryGraph graph = new GeometryGraph(0, line);
-    valid &= checkTooFewPoints(graph);
-    return valid;
   }
 
   /**

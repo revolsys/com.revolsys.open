@@ -41,7 +41,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     for (final Iterator<Entry<Point, T>> iterator = entries.iterator(); iterator.hasNext();) {
       final Entry<Point, T> entry = iterator.next();
       final Point coordinates = entry.getKey();
-      final double distance = LineSegmentUtil.distance(from, to, coordinates);
+      final double distance = LineSegmentUtil.distanceLinePoint(from, to, coordinates);
       if (distance >= maxDistance) {
         iterator.remove();
       }

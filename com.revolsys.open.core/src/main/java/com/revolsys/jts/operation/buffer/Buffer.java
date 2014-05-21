@@ -41,18 +41,19 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeList;
@@ -215,7 +216,7 @@ public class Buffer {
       buildSubgraphs(subgraphList, polyBuilder);
       final List<Polygon> polygons = polyBuilder.getPolygons();
 
-      if (polygons.size() <= 0) {
+      if (polygons.size() == 0) {
         return geometryFactory.polygon();
       } else {
         final Geometry resultGeom = geometryFactory.buildGeometry(polygons);
@@ -363,9 +364,8 @@ public class Buffer {
    * @param stabbedSegments the current list of {@link DepthSegments} intersecting the stabbing line
    */
   private static void findStabbedSegments(
-    final Collection<BufferSubgraph> subgraphs,
-    final Point stabbingRayLeftPt, final DirectedEdge dirEdge,
-    final List<DepthSegment> stabbedSegments) {
+    final Collection<BufferSubgraph> subgraphs, final Point stabbingRayLeftPt,
+    final DirectedEdge dirEdge, final List<DepthSegment> stabbedSegments) {
     final Edge edge = dirEdge.getEdge();
     for (int i = 0; i < edge.getNumPoints() - 1; i++) {
       final Point p1 = edge.getCoordinate(i);
@@ -398,8 +398,7 @@ public class Buffer {
       }
 
       // skip if stabbing ray is right of the segment
-      if (CGAlgorithms.computeOrientation(seg.getP0(), seg.getP1(),
-        stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
+      if (CGAlgorithmsDD.orientationIndex(seg.getP0(), seg.getP1(), stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
         continue;
       }
 

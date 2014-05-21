@@ -1,7 +1,12 @@
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.segment;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 public interface LineSegment extends LineString {
 
@@ -29,7 +34,7 @@ public interface LineSegment extends LineString {
    */
   Point[] closestPoints(LineSegment line);
 
-  boolean contains(Point point);
+  double distance(double x, double y);
 
   /**
    * Computes the distance between this line segment and another segment.
@@ -80,12 +85,7 @@ public interface LineSegment extends LineString {
 
   LineSegment getIntersection(BoundingBox boundingBox);
 
-  PointList getIntersection(final GeometryFactory precisionModel,
-    final LineSegment lineSegment2);
-
-  PointList getIntersection(LineSegment lineSegment2);
-
-  PointList getIntersection(final Point point1, final Point point2);
+  Geometry getIntersection(LineSegment lineSegment2);
 
   Point getP0();
 
@@ -108,6 +108,8 @@ public interface LineSegment extends LineString {
   Point intersection(LineSegment line);
 
   boolean intersects(Point point, double maxDistance);
+
+  boolean isEndPoint(Point point);
 
   /**
    * Tests whether the segment is horizontal.
@@ -251,6 +253,10 @@ public interface LineSegment extends LineString {
    * the projection factor will lie outside the range [0.0, 1.0].
    */
   Point project(Point p);
+
+  double projectCoordinate(int axisIndex, double projectionFactor);
+
+  double projectionFactor(double x, double y);
 
   /**
    * Computes the Projection Factor for the projection of the point p

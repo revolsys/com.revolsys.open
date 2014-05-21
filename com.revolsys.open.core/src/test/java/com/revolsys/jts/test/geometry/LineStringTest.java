@@ -256,4 +256,29 @@ public class LineStringTest {
   public void testFromFile() {
     TestUtil.doTestGeometry(getClass(), "LineString.csv");
   }
+
+  @Test
+  public void testSubList() {
+    final GeometryFactory geometryFactory = GeometryFactory.wgs84();
+    final LineString line = geometryFactory.lineString(2, 0.0, 0, 2, 2, 3, 3,
+      4, 4, 5, 5);
+    assertEmpty(line.subLine(0));
+
+    TestUtil.equalsExact(2, line.subLine(2),
+      geometryFactory.lineString(2, 0.0, 0, 2, 2));
+    TestUtil.equalsExact(2, line.subLine(2, geometryFactory.point(10, 10)),
+      geometryFactory.lineString(2, 0.0, 0, 2, 2, 10, 10));
+    TestUtil.equalsExact(
+      2,
+      line.subLine(geometryFactory.point(-1, -1), 0, 2,
+        geometryFactory.point(10, 10)),
+      geometryFactory.lineString(2, -1.0, -1.0, 0.0, 0, 2, 2, 10, 10));
+
+    final LineString actualFromToIndexMaxLength = line.subLine(
+      geometryFactory.point(-1, -1), 3, 3, geometryFactory.point(10, 10));
+    final LineString expectedFromToIndexMaxLength = geometryFactory.lineString(
+      2, -1.0, -1.0, 4, 4, 5, 5, 10, 10);
+    TestUtil.equalsExact(2, actualFromToIndexMaxLength,
+      expectedFromToIndexMaxLength);
+  }
 }

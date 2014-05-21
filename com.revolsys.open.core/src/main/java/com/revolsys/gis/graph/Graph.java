@@ -820,11 +820,9 @@ public class Graph<T> {
             final LineString line = edge.getLine();
             LineString newLine;
             if (line.getPoint().equals(fromNode)) {
-              newLine = LineStringUtil.subLineString(line, newPoint, 1,
-                line.getVertexCount() - 1, null);
+              newLine = line.subLine(newPoint, 1, line.getVertexCount() - 1, null);
             } else {
-              newLine = LineStringUtil.subLineString(line, null, 0,
-                line.getVertexCount() - 1, newPoint);
+              newLine = line.subLine(null, 0, line.getVertexCount() - 1, newPoint);
             }
             final Graph<DataObject> graph = edge.getGraph();
             graph.replaceEdge(edge, newLine);
@@ -1134,7 +1132,7 @@ public class Graph<T> {
             final double y1 = points.getY(segmentIndex);
             final double x2 = points.getX(i);
             final double y2 = points.getY(i);
-            final double segmentDistance = LineSegmentUtil.distance(x1, y1, x2,
+            final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2,
               y2, x, y);
             if (segmentDistance == 0) {
               nodeDistanceMap.put(node, segmentDistance);

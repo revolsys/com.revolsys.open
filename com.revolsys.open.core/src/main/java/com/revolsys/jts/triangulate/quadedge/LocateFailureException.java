@@ -32,8 +32,8 @@
  */
 package com.revolsys.jts.triangulate.quadedge;
 
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
 public class LocateFailureException 
 	extends RuntimeException 

@@ -38,10 +38,10 @@ import java.util.List;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.LineSegment;
-import com.revolsys.jts.geom.LineSegmentDouble;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
 /**
  * Simplifies a TaggedLineString, preserving topology
@@ -98,7 +98,7 @@ public class TaggedLineStringSimplifier {
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
       final Point midPt = line.getVertex(k);
-      final double distance = LineSegmentUtil.distance(p0, p1, midPt);
+      final double distance = LineSegmentUtil.distanceLinePoint(p0, p1, midPt);
       if (distance > maxDist) {
         maxDist = distance;
         maxIndex = k;

@@ -18,6 +18,15 @@ public class GeometryCollectionSegment extends AbstractSegment {
     setSegmentId(segmentId);
   }
 
+  @Override
+  public double getCoordinate(final int index, final int axisIndex) {
+    if (segment == null) {
+      return Double.NaN;
+    } else {
+      return segment.getCoordinate(index, axisIndex);
+    }
+  }
+
   public Geometry getGeometryCollection() {
     return getGeometry();
   }
@@ -43,15 +52,6 @@ public class GeometryCollectionSegment extends AbstractSegment {
       segmentId[0] = partIndex;
       System.arraycopy(partSegmentId, 0, segmentId, 1, partSegmentId.length);
       return segmentId;
-    }
-  }
-
-  @Override
-  public double getCoordinate(final int index, final int axisIndex) {
-    if (segment == null) {
-      return Double.NaN;
-    } else {
-      return segment.getCoordinate(index, axisIndex);
     }
   }
 
@@ -89,6 +89,24 @@ public class GeometryCollectionSegment extends AbstractSegment {
       } else {
         return segment.hasNext();
       }
+    }
+  }
+
+  @Override
+  public boolean isLineEnd() {
+    if (segment == null) {
+      return false;
+    } else {
+      return segment.isLineEnd();
+    }
+  }
+
+  @Override
+  public boolean isLineStart() {
+    if (segment == null) {
+      return false;
+    } else {
+      return segment.isLineStart();
     }
   }
 

@@ -19,9 +19,9 @@ import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineSegment;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.LineSegment;
 
 public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
 

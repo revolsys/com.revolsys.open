@@ -4,6 +4,12 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 public class EnvelopeUtil {
+  public static boolean covers(final double minX1, final double minY1,
+    final double maxX1, final double maxY1, final double minX2,
+    final double minY2, final double maxX2, final double maxY2) {
+    return minX2 >= minX1 && maxX2 <= maxX1 && minY2 >= minY1 && maxY2 <= maxY1;
+  }
+
   public static double[] createBounds(final double... bounds) {
     final int axisCount = bounds.length;
     final double[] newBounds = new double[axisCount * 2];
@@ -238,6 +244,22 @@ public class EnvelopeUtil {
     }
   }
 
+  public static boolean intersects(final double[] bounds1,
+    final double[] bounds2) {
+    final int axisCount1 = bounds1.length / 2;
+    final double minX1 = bounds1[0];
+    final double minY1 = bounds1[1];
+    final double maxX1 = bounds1[axisCount1];
+    final double maxY1 = bounds1[axisCount1 + 1];
+
+    final int axisCount2 = bounds2.length / 2;
+    final double minX2 = bounds2[0];
+    final double minY2 = bounds2[1];
+    final double maxX2 = bounds2[axisCount2];
+    final double maxY2 = bounds2[axisCount2 + 1];
+    return intersects(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2, maxY2);
+  }
+
   /**
    * Point intersects the bounding box of the line.
    * 
@@ -282,11 +304,5 @@ public class EnvelopeUtil {
     final double line2y2 = line2End.getY();
     return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
       line2x2, line2y2);
-  }
-
-  public static boolean covers(final double minX1, final double minY1,
-    final double maxX1, final double maxY1, final double minX2,
-    final double minY2, final double maxX2, final double maxY2) {
-    return minX2 >= minX1 && maxX2 <= maxX1 && minY2 >= minY1 && maxY2 <= maxY1;
   }
 }

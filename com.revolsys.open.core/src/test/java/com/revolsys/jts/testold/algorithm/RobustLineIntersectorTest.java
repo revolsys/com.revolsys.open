@@ -36,6 +36,7 @@ package com.revolsys.jts.testold.algorithm;
 import junit.framework.TestCase;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
+import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -98,7 +99,7 @@ public class RobustLineIntersectorTest extends TestCase {
     assertEquals(false, l.intersects(p));
     assertEquals(false,
       CGAlgorithms.isOnLine(q, geometryFactory.lineString(p1, p2)));
-    assertEquals(-1, CGAlgorithms.computeOrientation(p1, p2, q));
+    assertEquals(-1, CGAlgorithmsDD.orientationIndex(p1, p2, q));
   }
 
   public void testCollinear1() {
@@ -187,17 +188,17 @@ public class RobustLineIntersectorTest extends TestCase {
   }
 
   public void testIsCCW() {
-    assertEquals(1, CGAlgorithms.computeOrientation(new PointDouble(
-      (double)-123456789, -40, Point.NULL_ORDINATE), new PointDouble(
-      (double)0, 0, Point.NULL_ORDINATE), new PointDouble(
-      381039468754763d, 123456789, Point.NULL_ORDINATE)));
+    assertEquals(1, CGAlgorithmsDD.orientationIndex(new PointDouble(
+    (double)-123456789, -40, Point.NULL_ORDINATE), new PointDouble(
+    (double)0, 0, Point.NULL_ORDINATE), new PointDouble(
+    381039468754763d, 123456789, Point.NULL_ORDINATE)));
   }
 
   public void testIsCCW2() {
-    assertEquals(0, CGAlgorithms.computeOrientation(new PointDouble((double)10,
-      10, Point.NULL_ORDINATE), new PointDouble((double)20, 20,
-      Point.NULL_ORDINATE), new PointDouble((double)0, 0,
-      Point.NULL_ORDINATE)));
+    assertEquals(0, CGAlgorithmsDD.orientationIndex(new PointDouble((double)10,
+    10, Point.NULL_ORDINATE), new PointDouble((double)20, 20,
+    Point.NULL_ORDINATE), new PointDouble((double)0, 0,
+    Point.NULL_ORDINATE)));
   }
 
   public void testIsProper1() {
