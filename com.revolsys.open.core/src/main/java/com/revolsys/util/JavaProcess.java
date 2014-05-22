@@ -6,9 +6,31 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.parallel.ThreadInterruptedException;
 
 public final class JavaProcess {
+
+  public static Process exec(final File logFile,
+    final List<String> javaArguments, final Class<?> klass) {
+    return exec(logFile, javaArguments, klass, Collections.<String> emptyList());
+  }
+
+  public static Process exec(File logFile, final List<String> javaArguments,
+    final Class<?> klass, final List<String> programArguments) {
+    final ProcessBuilder builder = processBuilder(javaArguments, klass,
+      programArguments);
+
+    logFile = FileUtil.getFile(logFile);
+    logFile.getParentFile().mkdirs();
+    builder.redirectErrorStream(true);
+    builder.redirectOutput(logFile);
+    try {
+      return builder.start();
+    } catch (final Throwable e) {
+      throw new RuntimeException("Unable to start " + builder.command(), e);
+    }
+  }
 
   public static Process exec(final List<String> javaArguments,
     final Class<?> klass) {

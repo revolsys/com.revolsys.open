@@ -29,6 +29,16 @@ public class ClassUtil {
     }
   }
 
+  public static String getFileName(final Class<?> clazz) {
+    final String name = clazz.getName();
+    final int index = name.lastIndexOf('.');
+    if (index == -1) {
+      return name;
+    } else {
+      return name.substring(index + 1);
+    }
+  }
+
   public static Set<Class<? extends Object>> getSuperClasses(
     final Class<? extends Object> clazz) {
     final Set<Class<? extends Object>> classes = new LinkedHashSet<Class<? extends Object>>();
