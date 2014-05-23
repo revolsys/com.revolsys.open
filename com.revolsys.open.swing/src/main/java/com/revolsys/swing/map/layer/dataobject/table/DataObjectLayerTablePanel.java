@@ -90,9 +90,9 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     final MenuFactory menu = getMenu();
 
     final MenuFactory layerMenuFactory = ObjectTreeModel.findMenu(layer);
-    if (layerMenuFactory != null) {
-      menu.addComponentFactory("defauly", 0, layerMenuFactory);
-    }
+    // if (layerMenuFactory != null) {
+    // menu.addComponentFactory("default", 0, layerMenuFactory);
+    // }
 
     menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit",
       notEnableCheck, this, "editRecord");
