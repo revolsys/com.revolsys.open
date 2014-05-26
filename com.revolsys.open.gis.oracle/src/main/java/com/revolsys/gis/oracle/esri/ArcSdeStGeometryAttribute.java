@@ -35,7 +35,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
     final ArcSdeSpatialReference spatialReference, final int dimension) {
     super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.spatialReference = spatialReference;
-    final com.revolsys.jts.geom.GeometryFactory factory = spatialReference.getGeometryFactory();
+    final GeometryFactory factory = spatialReference.getGeometryFactory();
     this.geometryFactory = GeometryFactory.fixed(factory.getSrid(), dimension,
       factory.getScaleXY(), factory.getScaleZ());
     this.dimension = dimension;
@@ -82,7 +82,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       final Double mScale = this.spatialReference.getMScale();
       final Double mOffset = this.spatialReference.getMOffset();
 
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = this.spatialReference.getGeometryFactory();
+      final GeometryFactory geometryFactory = this.spatialReference.getGeometryFactory();
       final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn,
         geometryFactory, geometryType, numPoints, xOffset, yOffset, xyScale,
         zOffset, zScale, mOffset, mScale);
