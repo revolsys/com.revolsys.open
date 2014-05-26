@@ -44,7 +44,6 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.io.xml.DomUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -432,8 +431,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
               && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
-              final Point sourcePixel = new PointDouble(imageX,
-                imageY);
+              final Point sourcePixel = new PointDouble(imageX, imageY);
 
               final double x = targetControlPoints.get(i);
               final double y = targetControlPoints.get(i + 1);
@@ -611,7 +609,7 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (!EqualsRegistry.equal(boundingBox, this.boundingBox)) {
-      this.geometryFactory = boundingBox.getGeometryFactory();
+      setGeometryFactory(boundingBox.getGeometryFactory());
       this.boundingBox = boundingBox;
       clearWarp();
       setHasChanges(true);
@@ -641,7 +639,10 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+    this.geometryFactory = geometryFactory.convertAxisCount(2);
+    for (final MappedLocation mappedLocation : tiePoints) {
+      mappedLocation.setGeometryFactory(geometryFactory);
+    }
   }
 
   protected void setHasChanges(final boolean hasChanges) {
@@ -675,7 +676,9 @@ public class GeoReferencedImage extends AbstractPropertyChangeObject implements
       }
       this.tiePoints.clear();
       this.tiePoints.addAll(tiePoints);
+      final GeometryFactory geometryFactory = getGeometryFactory();
       for (final MappedLocation mappedLocation : tiePoints) {
+        mappedLocation.setGeometryFactory(geometryFactory);
         mappedLocation.addListener(this);
       }
       setHasChanges(true);

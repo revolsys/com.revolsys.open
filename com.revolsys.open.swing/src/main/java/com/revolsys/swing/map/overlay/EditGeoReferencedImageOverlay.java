@@ -137,8 +137,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           final Point sourcePoint = this.addTiePointFirstPoint;
           final WarpFilter warpFilter = layer.getWarpFilter();
           final Point sourcePixel = warpFilter.targetPointToSourcePixel(sourcePoint);
-          final GeometryFactory geometryFactory = getImageBoundingBox().getGeometryFactory();
-          final Point targetPoint = mapPoint.convert(geometryFactory, 2);
+          final GeometryFactory geometryFactory = getImageGeometryFactory();
+          final Point targetPoint = mapPoint.copy(geometryFactory);
           final MappedLocation mappedLocation = new MappedLocation(sourcePixel,
             targetPoint);
           addUndo(new ListAddUndo(image.getTiePoints(), mappedLocation));
@@ -335,9 +335,12 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   protected BoundingBox getMoveBoundingBox(final MouseEvent event) {
     BoundingBox boundingBox = getImageBoundingBox();
-    final Point eventPoint = getPoint(event);
-    final double deltaX = eventPoint.getX() - moveImageFirstPoint.getX();
-    final double deltaY = eventPoint.getY() - moveImageFirstPoint.getY();
+    final Point mousePoint = getViewportPoint(event);
+    final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
+    final Point imagePoint = mousePoint.convert(imageGeometryFactory);
+
+    final double deltaX = imagePoint.getX() - moveImageFirstPoint.getX();
+    final double deltaY = imagePoint.getY() - moveImageFirstPoint.getY();
     boundingBox = boundingBox.move(deltaX, deltaY);
     return boundingBox;
   }
@@ -709,10 +712,12 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
           && SwingUtil.isControlOrMetaDown(event)) {
           if (setOverlayAction(ACTION_MOVE_IMAGE)) {
             final Point mousePoint = getViewportPoint(event);
-            final boolean inImage = isInImage(mousePoint);
+            final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
+            final Point imagePoint = mousePoint.convert(imageGeometryFactory);
+            final boolean inImage = isInImage(imagePoint);
             if (inImage) {
               setMapCursor(CURSOR_MOVE_IMAGE);
-              this.moveImageFirstPoint = mousePoint;
+              this.moveImageFirstPoint = imagePoint;
               event.consume();
               return true;
             }
@@ -761,7 +766,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
             point = snapPoint;
           }
           final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
-          point = point.convert(imageGeometryFactory, 2);
+          point = point.copy(imageGeometryFactory);
           tiePoint.setTargetPoint(point);
           final SetObjectProperty setTargetPoint = new SetObjectProperty(
             tiePoint, "targetPoint", tiePoint.getTargetPoint(), point);
@@ -857,7 +862,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
       final BufferedImage renderImage = getCachedImage(boundingBox);
       try {
-        GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+        final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
         final BoundingBox renderBoundingBox = boundingBox.convert(viewportGeometryFactory);
         GeoReferencedImageLayerRenderer.render(viewport, graphics, this.image,
           renderImage, renderBoundingBox);

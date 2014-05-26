@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -21,17 +20,23 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
 
   private Point targetPoint;
 
+  private GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+
   public MappedLocation(final Map<String, Object> map) {
     final double sourceX = CollectionUtil.getDouble(map, "sourceX", 0.0);
     final double sourceY = CollectionUtil.getDouble(map, "sourceY", 0.0);
     this.sourcePixel = new PointDouble(sourceX, sourceY);
-    this.targetPoint = GeometryFactory.floating3().geometry(
-      (String)map.get("target"));
+    this.targetPoint = geometryFactory.geometry((String)map.get("target"));
   }
 
   public MappedLocation(final Point sourcePixel, final Point targetPoint) {
     this.sourcePixel = sourcePixel;
     this.targetPoint = targetPoint;
+    this.geometryFactory = targetPoint.getGeometryFactory().convertAxisCount(2);
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   public Point getSourcePixel() {
@@ -72,7 +77,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final Point sourcePoint = filter.sourcePixelToTargetPoint(boundingBox,
         sourcePixel);
       final GeometryFactory geometryFactory = filter.getGeometryFactory();
-      Point targetPoint = getTargetPoint();
+      final Point targetPoint = getTargetPoint();
       return geometryFactory.lineString(sourcePoint, targetPoint);
     }
   }
@@ -88,6 +93,11 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
 
   public Point getTargetPoint() {
     return targetPoint;
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory.convertAxisCount(2);
+    this.targetPoint = targetPoint.convert(this.geometryFactory);
   }
 
   public void setSourcePixel(final Point sourcePixel) {
@@ -107,7 +117,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("sourceX", sourcePixel.getX());
     map.put("sourceY", sourcePixel.getY());
-    map.put("target", WktWriter.toString(targetPoint, true));
+    map.put("target", targetPoint.toWkt());
     return map;
   }
 
