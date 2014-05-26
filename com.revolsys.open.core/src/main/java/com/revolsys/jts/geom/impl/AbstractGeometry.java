@@ -595,7 +595,9 @@ public abstract class AbstractGeometry implements Geometry {
   @SuppressWarnings("unchecked")
   public <V extends Geometry> V convert(GeometryFactory geometryFactory,
     final int axisCount) {
-    geometryFactory = geometryFactory.convertAxisCount(axisCount);
+    if (geometryFactory != null) {
+      geometryFactory = geometryFactory.convertAxisCount(axisCount);
+    }
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     boolean copy = false;
     if (geometryFactory != null && sourceGeometryFactory != geometryFactory) {
