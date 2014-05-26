@@ -591,6 +591,7 @@ public abstract class AbstractGeometry implements Geometry {
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <V extends Geometry> V convert(GeometryFactory geometryFactory,
     final int axisCount) {
@@ -835,14 +836,16 @@ public abstract class AbstractGeometry implements Geometry {
    *  Returns the minimum distance between this <code>Geometry</code>
    *  and another <code>Geometry</code>.
    *
-   * @param  g the <code>Geometry</code> from which to compute the distance
+   * @param  geometry the <code>Geometry</code> from which to compute the distance
    * @return the distance between the geometries
    * @return 0 if either input geometry is empty
    * @throws IllegalArgumentException if g is null
    */
   @Override
-  public double distance(final Geometry g) {
-    return DistanceOp.distance(this, g);
+  public double distance(Geometry geometry) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    geometry = geometry.convert(geometryFactory, 2);
+    return DistanceOp.distance(this, geometry);
   }
 
   protected abstract boolean doEquals(int axisCount, Geometry geometry);

@@ -639,9 +639,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final char keyChar = e.getKeyChar();
     if (keyChar >= '1' && keyChar <= '9') {
       final int snapPointIndex = keyChar - '1';
-      if (snapPointIndex < this.snapPointLocationMap.size()) {
-        this.snapPointIndex = snapPointIndex;
-        setSnapLocations(snapPointLocationMap);
+      if (snapPointIndex < getSnapPointLocationMap().size()) {
+        setSnapPointIndex(snapPointIndex);
+        setSnapLocations(getSnapPointLocationMap());
       }
     } else {
       super.keyTyped(e);

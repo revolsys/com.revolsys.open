@@ -474,8 +474,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
         if (object == null) {
           point = null;
         } else if (object instanceof Point) {
-          point = (Point)object;
-        } else if (object instanceof Point) {
           final Point projectedPoint = ((Point)object).convert(this);
           point = projectedPoint;
         } else if (object instanceof double[]) {

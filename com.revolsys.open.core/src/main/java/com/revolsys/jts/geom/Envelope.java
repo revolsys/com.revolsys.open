@@ -55,7 +55,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.wkt.WktParser;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.impl.PointDoubleGF;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
@@ -794,13 +794,13 @@ public class Envelope implements Serializable, BoundingBox {
     index = index % 4;
     switch (index) {
       case 0:
-        return new PointDouble(maxX, minY);
+        return new PointDoubleGF(getGeometryFactory(), maxX, minY);
       case 1:
-        return new PointDouble(minX, minY);
+        return new PointDoubleGF(getGeometryFactory(), minX, minY);
       case 2:
-        return new PointDouble(minX, maxY);
+        return new PointDoubleGF(getGeometryFactory(), minX, maxY);
       default:
-        return new PointDouble(maxX, maxY);
+        return new PointDoubleGF(getGeometryFactory(), maxX, maxY);
     }
   }
 

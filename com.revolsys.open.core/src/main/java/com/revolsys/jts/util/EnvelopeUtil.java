@@ -37,7 +37,8 @@ public class EnvelopeUtil {
   }
 
   public static double[] createBounds(final GeometryFactory geometryFactory,
-    final int axisCount, final Point point) {
+    final int axisCount, Point point) {
+    point = point.convert(geometryFactory, axisCount);
     final double[] bounds = new double[axisCount * 2];
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       double value = point.getCoordinate(axisIndex);
@@ -144,8 +145,9 @@ public class EnvelopeUtil {
   }
 
   public static void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, final Point point) {
+    final double[] bounds, Point point) {
     final int axisCount = bounds.length / 2;
+    point = point.convert(geometryFactory, axisCount);
     final int count = Math.min(axisCount, point.getAxisCount());
     for (int axisIndex = 0; axisIndex < count; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);

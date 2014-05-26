@@ -25,10 +25,10 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 
 public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   public static final String PROPERTY_NAME = DirectionalAttributes.class.getName()
@@ -72,9 +72,9 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     return property.equals(object1, object2, equalExcludeAttributes);
   }
 
-  public static Set<String> getCantMergeAttributesObjects(
-    final Point point, final DataObject object1,
-    final DataObject object2, final Set<String> equalExcludeAttributes) {
+  public static Set<String> getCantMergeAttributesObjects(final Point point,
+    final DataObject object1, final DataObject object2,
+    final Set<String> equalExcludeAttributes) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.getCantMergeAttributes(point, object1, object2,
       equalExcludeAttributes);
@@ -106,28 +106,28 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     return metaData.getProperty(PROPERTY_NAME) != null;
   }
 
-  public static DataObject merge(final Point point,
-    final DataObject object1, final DataObject object2) {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
-    return property.getMergedObject(point, object1, object2);
-  }
-
   public static DataObject merge(final DataObject object1,
     final DataObject object2) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.getMergedObject(object1, object2);
   }
 
-  public static DataObject mergeLongest(final Point point,
-    final DataObject object1, final DataObject object2) {
+  public static DataObject merge(final Point point, final DataObject object1,
+    final DataObject object2) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
-    return property.getMergedObjectReverseLongest(point, object1, object2);
+    return property.getMergedObject(point, object1, object2);
   }
 
   public static DataObject mergeLongest(final DataObject object1,
     final DataObject object2) {
     final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
     return property.getMergedObjectReverseLongest(object1, object2);
+  }
+
+  public static DataObject mergeLongest(final Point point,
+    final DataObject object1, final DataObject object2) {
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(object1);
+    return property.getMergedObjectReverseLongest(point, object1, object2);
   }
 
   public static void reverse(final DataObject object) {
@@ -150,8 +150,6 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   private final Map<String, Map<Object, Object>> directionalAttributeValues = new HashMap<String, Map<Object, Object>>();
 
   private final List<List<String>> endAndSideAttributeNamePairs = new ArrayList<List<String>>();
-
-  private final List<List<String>> endTurnAttributeNamePairs = new ArrayList<List<String>>();
 
   public DirectionalAttributes() {
   }
@@ -220,19 +218,6 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       endAttributeName);
     startAttributeNames.add(startAttributeName);
     endAttributeNames.add(endAttributeName);
-  }
-
-  public void addEndTurnAttributePairs(final String startLeftAttributeName,
-    final String startRightAttributeName, final String endLeftAttributeName,
-    final String endRightAttributeName) {
-    endTurnAttributeNamePairs.add(Arrays.asList(startLeftAttributeName,
-      startRightAttributeName, endLeftAttributeName, endRightAttributeName));
-    addEndAttributePairInternal(startLeftAttributeName, endLeftAttributeName);
-    addEndAttributePairInternal(startRightAttributeName, endRightAttributeName);
-    addAttributeNamePair(reverseAttributeNameMap, startLeftAttributeName,
-      endLeftAttributeName);
-    addAttributeNamePair(reverseAttributeNameMap, startRightAttributeName,
-      endRightAttributeName);
   }
 
   public void addSideAttributePair(final String leftAttributeName,
@@ -548,10 +533,6 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     return endAttributeNames;
   }
 
-  public List<List<String>> getEndTurnAttributeNamePairs() {
-    return endTurnAttributeNamePairs;
-  }
-
   protected boolean[] getForwardsIndicators(final Point point,
     final DataObject object1, final DataObject object2) {
     final LineString line1 = object1.getGeometryValue();
@@ -647,6 +628,63 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
    * @param object2
    * @return
    */
+  public DataObject getMergedObject(final DataObject object1, DataObject object2) {
+    final LineString line1 = object1.getGeometryValue();
+    LineString line2 = object2.getGeometryValue();
+    final PointList points1 = CoordinatesListUtil.get(line1);
+    final PointList points2 = CoordinatesListUtil.get(line2);
+
+    DataObject startObject;
+    DataObject endObject;
+
+    final boolean line1Longer = line1.getLength() > line2.getLength();
+    LineString newLine;
+
+    if (points1.equal(0, points2, 0)) {
+      object2 = getReverse(object2);
+      line2 = object2.getGeometryValue();
+      startObject = object2;
+      endObject = object1;
+      newLine = line1.merge(line2);
+    } else if (points1.equal(points1.size() - 1, points2, points2.size() - 1)) {
+      object2 = getReverse(object2);
+      line2 = object2.getGeometryValue();
+      startObject = object1;
+      endObject = object2;
+      newLine = line1.merge(line2);
+    } else if (points1.equal(points1.size() - 1, points2, 0)) {
+      startObject = object1;
+      endObject = object2;
+      newLine = line1.merge(line2);
+    } else if (points1.equal(0, points2, points2.size() - 1)) {
+      startObject = object2;
+      endObject = object1;
+      newLine = line2.merge(line1);
+    } else {
+      throw new IllegalArgumentException("Lines for objects don't touch");
+    }
+
+    DataObject newObject;
+    if (line1Longer) {
+      newObject = DataObjectUtil.copy(object1, newLine);
+    } else {
+      newObject = DataObjectUtil.copy(object2, newLine);
+    }
+    setStartAttributes(startObject, newObject);
+    setEndAttributes(endObject, newObject);
+    LengthAttributeName.setObjectLength(newObject);
+    return newObject;
+  }
+
+  /**
+   * Get a new object that is the result of merging the two objects. The
+   * attributes will be taken from the object with the longest length. If one
+   * line needs to be reversed then the second object will be reversed.
+   * 
+   * @param object1
+   * @param object2
+   * @return
+   */
   public DataObject getMergedObject(final Point point,
     final DataObject object1, DataObject object2) {
     final LineString line1 = object1.getGeometryValue();
@@ -704,74 +742,6 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   /**
    * Get a new object that is the result of merging the two objects. The
    * attributes will be taken from the object with the longest length. If one
-   * line needs to be reversed then the second object will be reversed.
-   * 
-   * @param object1
-   * @param object2
-   * @return
-   */
-  public DataObject getMergedObject(final DataObject object1, DataObject object2) {
-    final LineString line1 = object1.getGeometryValue();
-    LineString line2 = object2.getGeometryValue();
-    final PointList points1 = CoordinatesListUtil.get(line1);
-    final PointList points2 = CoordinatesListUtil.get(line2);
-
-    DataObject startObject;
-    DataObject endObject;
-
-    final boolean line1Longer = line1.getLength() > line2.getLength();
-    LineString newLine;
-
-    if (points1.equal(0, points2, 0)) {
-      object2 = getReverse(object2);
-      line2 = object2.getGeometryValue();
-      startObject = object2;
-      endObject = object1;
-      newLine = line1.merge(line2);
-    } else if (points1.equal(points1.size() - 1, points2, points2.size() - 1)) {
-      object2 = getReverse(object2);
-      line2 = object2.getGeometryValue();
-      startObject = object1;
-      endObject = object2;
-      newLine = line1.merge(line2);
-    } else if (points1.equal(points1.size() - 1, points2, 0)) {
-      startObject = object1;
-      endObject = object2;
-      newLine = line1.merge(line2);
-    } else if (points1.equal(0, points2, points2.size() - 1)) {
-      startObject = object2;
-      endObject = object1;
-      newLine = line2.merge(line1);
-    } else {
-      throw new IllegalArgumentException("Lines for objects don't touch");
-    }
-
-    DataObject newObject;
-    if (line1Longer) {
-      newObject = DataObjectUtil.copy(object1, newLine);
-    } else {
-      newObject = DataObjectUtil.copy(object2, newLine);
-    }
-    setStartAttributes(startObject, newObject);
-    setEndAttributes(endObject, newObject);
-    LengthAttributeName.setObjectLength(newObject);
-    return newObject;
-  }
-
-  public DataObject getMergedObjectReverseLongest(final Point point,
-    final DataObject object1, final DataObject object2) {
-    final LineString line1 = object1.getGeometryValue();
-    final LineString line2 = object2.getGeometryValue();
-    if (line1.getLength() >= line2.getLength()) {
-      return getMergedObject(point, object1, object2);
-    } else {
-      return getMergedObject(point, object2, object1);
-    }
-  }
-
-  /**
-   * Get a new object that is the result of merging the two objects. The
-   * attributes will be taken from the object with the longest length. If one
    * line needs to be reversed then the longest will be reversed.
    * 
    * @param object1
@@ -786,6 +756,17 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
       return getMergedObject(object1, object2);
     } else {
       return getMergedObject(object2, object1);
+    }
+  }
+
+  public DataObject getMergedObjectReverseLongest(final Point point,
+    final DataObject object1, final DataObject object2) {
+    final LineString line1 = object1.getGeometryValue();
+    final LineString line2 = object2.getGeometryValue();
+    if (line1.getLength() >= line2.getLength()) {
+      return getMergedObject(point, object1, object2);
+    } else {
+      return getMergedObject(point, object2, object1);
     }
   }
 
@@ -930,8 +911,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
-  public void setEdgeSplitAttributes(final LineString line,
-    final Point point, final List<Edge<DataObject>> edges) {
+  public void setEdgeSplitAttributes(final LineString line, final Point point,
+    final List<Edge<DataObject>> edges) {
     for (final Edge<DataObject> edge : edges) {
       final DataObject object = edge.getObject();
       setSplitAttributes(line, point, object);
@@ -970,18 +951,6 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
-  public void setEndTurnAttributeNamePairs(
-    final List<List<String>> endAndSideAttributePairs) {
-    for (final List<String> endAndSideAttributePair : endAndSideAttributePairs) {
-      final String startLeftAttributeName = endAndSideAttributePair.get(0);
-      final String startRightAttributeName = endAndSideAttributePair.get(1);
-      final String endLeftAttributeName = endAndSideAttributePair.get(2);
-      final String endRightAttributeName = endAndSideAttributePair.get(3);
-      addEndTurnAttributePairs(startLeftAttributeName, startRightAttributeName,
-        endLeftAttributeName, endRightAttributeName);
-    }
-  }
-
   public void setSideAttributeNamePairs(
     final Map<String, String> attributeNamePairs) {
     this.sideAttributeNamePairs.clear();
@@ -992,8 +961,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     }
   }
 
-  public void setSplitAttributes(final LineString line,
-    final Point point, final DataObject object) {
+  public void setSplitAttributes(final LineString line, final Point point,
+    final DataObject object) {
     final LineString newLine = object.getGeometryValue();
     if (newLine != null) {
       final boolean firstPoint = LineStringUtil.isFromPoint(newLine, point);

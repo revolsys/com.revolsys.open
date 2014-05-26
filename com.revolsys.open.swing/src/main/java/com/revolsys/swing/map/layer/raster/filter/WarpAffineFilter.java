@@ -9,6 +9,7 @@ import java.util.List;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.impl.PointDouble2D;
 import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.util.ExceptionUtil;
 
@@ -108,16 +109,16 @@ public class WarpAffineFilter extends WarpFilter {
 
     for (int j = 0; j < numRow / 2; ++j) {
       final MappedLocation mappedLocation = mappings.get(j);
-      final Point targetPixel = mappedLocation.getTargetPixel(
-        boundingBox, imageWidth, imageHeight);
+      final Point targetPixel = mappedLocation.getTargetPixel(boundingBox,
+        imageWidth, imageHeight);
       final double x = targetPixel.getX();
       X.setElement(j, 0, x);
     }
 
     for (int j = numRow / 2; j < numRow; ++j) {
       final MappedLocation mappedLocation = mappings.get(j - (numRow / 2));
-      final Point targetPixel = mappedLocation.getTargetPixel(
-        boundingBox, imageWidth, imageHeight);
+      final Point targetPixel = mappedLocation.getTargetPixel(boundingBox,
+        imageWidth, imageHeight);
       final double y = targetPixel.getY();
       X.setElement(j, 0, y);
     }
@@ -284,15 +285,14 @@ public class WarpAffineFilter extends WarpFilter {
         inverseScaleX, inverseShearX);
       final double destY = transformY(sourceX, sourceY, inverseTranslateY,
         inverseScaleY, inverseShearY);
-      return new PointDouble(destX, destY);
+      return new PointDouble2D(destX, destY);
     } else {
       return null;
     }
   }
 
   @Override
-  public Point targetPixelToSourcePixel(final double destX,
-    final double destY) {
+  public Point targetPixelToSourcePixel(final double destX, final double destY) {
     final double sourceX = transformX(destX, destY, translateX, scaleX, shearX);
     final double sourceY = transformY(destX, destY, translateY, scaleY, shearY);
     return new PointDouble(sourceX, sourceY);

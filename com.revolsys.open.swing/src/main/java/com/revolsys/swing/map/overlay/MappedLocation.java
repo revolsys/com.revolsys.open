@@ -46,7 +46,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final Point sourcePixel = getSourcePixel();
       final Point sourcePoint = filter.sourcePixelToTargetPoint(boundingBox,
         sourcePixel);
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
+      final GeometryFactory geometryFactory = filter.getGeometryFactory();
       return geometryFactory.point(sourcePoint);
     }
   }
@@ -55,7 +55,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
     if (filter == null) {
       return null;
     } else {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
+      final GeometryFactory geometryFactory = filter.getGeometryFactory();
       final Point sourcePixel = getSourcePixel();
       final Point sourcePoint = filter.sourcePixelToTargetPoint(sourcePixel);
       final Point targetPoint = getTargetPoint();
@@ -71,15 +71,17 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final Point sourcePixel = getSourcePixel();
       final Point sourcePoint = filter.sourcePixelToTargetPoint(boundingBox,
         sourcePixel);
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = filter.getGeometryFactory();
-      return geometryFactory.lineString(sourcePoint, getTargetPoint());
+      final GeometryFactory geometryFactory = filter.getGeometryFactory();
+      Point targetPoint = getTargetPoint();
+      return geometryFactory.lineString(sourcePoint, targetPoint);
     }
   }
 
   public Point getTargetPixel(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Point targetPointCoordinates = (Point)targetPoint.copy(geometryFactory);
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    final Point targetPointCoordinates = (Point)targetPoint.convert(
+      geometryFactory, 2);
     return WarpAffineFilter.targetPointToPixel(boundingBox,
       targetPointCoordinates, imageWidth, imageHeight);
   }

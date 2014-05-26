@@ -31,7 +31,6 @@ import java.util.TreeMap;
 import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
-import com.revolsys.comparator.IntArrayComparator;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.quadtree.GeometrySegmentQuadTree;
@@ -43,7 +42,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble2D;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geom.vertex.VertexIndexComparator;
@@ -72,8 +70,6 @@ public class AbstractOverlay extends JComponent implements
   public static final Cursor CURSOR_NODE_SNAP = SilkIconLoader.getCursor(
     "cursor_node_snap", 8, 7);
 
-  private static final IntArrayComparator INT_ARRAY_COMPARATOR = new IntArrayComparator();
-
   private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
 
   private static final long serialVersionUID = 1L;
@@ -91,13 +87,13 @@ public class AbstractOverlay extends JComponent implements
 
   private Project project;
 
-  protected java.awt.Point snapEventPoint;
+  private java.awt.Point snapEventPoint;
 
-  protected Point snapPoint;
+  private Point snapPoint;
 
-  protected int snapPointIndex;
+  private int snapPointIndex;
 
-  protected Map<Point, Set<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
+  private Map<Point, Set<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
 
   private Viewport2D viewport;
 
@@ -318,9 +314,10 @@ public class AbstractOverlay extends JComponent implements
     final int x = event.getX();
     final int y = event.getY();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point p1 = geometryFactory.project(this.viewport.toModelPoint(x, y));
-    final Point p2 = geometryFactory.project(this.viewport.toModelPoint(x
-      + getHotspotPixels(), y + getHotspotPixels()));
+    final Point p1 = this.viewport.toModelPoint(x, y).convert(geometryFactory,
+      2);
+    final Point p2 = this.viewport.toModelPoint(x + getHotspotPixels(),
+      y + getHotspotPixels()).convert(geometryFactory, 2);
 
     return p1.distance(p2);
   }
@@ -413,6 +410,10 @@ public class AbstractOverlay extends JComponent implements
     return snapPoint;
   }
 
+  public Map<Point, Set<CloseLocation>> getSnapPointLocationMap() {
+    return snapPointLocationMap;
+  }
+
   public Viewport2D getViewport() {
     return this.viewport;
   }
@@ -469,8 +470,7 @@ public class AbstractOverlay extends JComponent implements
             boundingBox);
           if (closeLocation != null) {
             final Point closePoint = closeLocation.getPoint();
-            final Point key = new PointDouble2D(closePoint);
-            CollectionUtil.addToSet(snapLocations, key, closeLocation);
+            CollectionUtil.addToSet(snapLocations, closePoint, closeLocation);
 
           }
         }
@@ -681,6 +681,10 @@ public class AbstractOverlay extends JComponent implements
 
   protected void setSnapPoint(final Point snapPoint) {
     this.snapPoint = snapPoint;
+  }
+
+  public void setSnapPointIndex(final int snapPointIndex) {
+    this.snapPointIndex = snapPointIndex;
   }
 
   public void setXorGeometry(final Geometry xorGeometry) {
