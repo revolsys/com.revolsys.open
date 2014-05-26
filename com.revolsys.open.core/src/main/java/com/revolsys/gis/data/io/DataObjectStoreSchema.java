@@ -20,7 +20,7 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
 
   private Reference<AbstractDataObjectStore> dataStore;
 
-  private Map<String, DataObjectMetaData> metaDataCache = new TreeMap<String, DataObjectMetaData>();
+  private Map<String, DataObjectMetaData> metaDataCache = null;
 
   private String path;
 
@@ -39,17 +39,17 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
 
   protected void addMetaData(final String typePath,
     final DataObjectMetaData metaData) {
+    final Map<String, DataObjectMetaData> metaDataCache = getMetaDataCache();
     metaDataCache.put(typePath.toUpperCase(), metaData);
   }
 
   @Override
   @PreDestroy
-  public void close() {
+  public synchronized void close() {
     if (metaDataCache != null) {
       for (final DataObjectMetaData metaData : metaDataCache.values()) {
         metaData.destroy();
       }
-      metaDataCache.clear();
     }
     dataStore = null;
     metaDataCache = null;
@@ -58,6 +58,7 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   }
 
   public synchronized DataObjectMetaData findMetaData(final String typePath) {
+    final Map<String, DataObjectMetaData> metaDataCache = getMetaDataCache();
     final DataObjectMetaData metaData = metaDataCache.get(typePath);
     return metaData;
   }
@@ -88,9 +89,7 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   public synchronized DataObjectMetaData getMetaData(String typePath) {
     typePath = typePath.toUpperCase();
     if (typePath.startsWith(path + "/") || path.equals("/")) {
-      if (metaDataCache.isEmpty()) {
-        refreshMetaData();
-      }
+      final Map<String, DataObjectMetaData> metaDataCache = getMetaDataCache();
       final DataObjectMetaData metaData = metaDataCache.get(typePath.toUpperCase());
       return metaData;
     } else {
@@ -98,7 +97,10 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
     }
   }
 
-  protected Map<String, DataObjectMetaData> getMetaDataCache() {
+  protected synchronized Map<String, DataObjectMetaData> getMetaDataCache() {
+    if (metaDataCache == null) {
+      refreshMetaData();
+    }
     return metaDataCache;
   }
 
@@ -112,20 +114,21 @@ public class DataObjectStoreSchema extends AbstractObjectWithProperties {
   }
 
   public List<String> getTypeNames() {
-    if (metaDataCache.isEmpty()) {
-      refreshMetaData();
-    }
+    final Map<String, DataObjectMetaData> metaDataCache = getMetaDataCache();
     return new ArrayList<String>(metaDataCache.keySet());
   }
 
   public List<DataObjectMetaData> getTypes() {
-    if (metaDataCache.isEmpty()) {
-      refreshMetaData();
-    }
+    final Map<String, DataObjectMetaData> metaDataCache = getMetaDataCache();
     return new ArrayList<DataObjectMetaData>(metaDataCache.values());
   }
 
-  public void refreshMetaData() {
+  public boolean isInitialized() {
+    return metaDataCache != null;
+  }
+
+  public synchronized void refreshMetaData() {
+    metaDataCache = new TreeMap<>();
     final AbstractDataObjectStore dataStore = getDataStore();
     if (dataStore != null) {
       final Collection<DataObjectStoreExtension> extensions = dataStore.getDataStoreExtensions();

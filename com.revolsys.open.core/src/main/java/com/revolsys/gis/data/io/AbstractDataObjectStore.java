@@ -133,12 +133,15 @@ public abstract class AbstractDataObjectStore extends
     if (columnName != null && !columnName.equalsIgnoreCase("ID")) {
       this.columnToTableMap.put(columnName, codeTable);
       for (final DataObjectStoreSchema schema : getSchemas()) {
-        for (final DataObjectMetaData metaData : schema.getTypes()) {
-          final String idFieldName = metaData.getIdAttributeName();
-          for (final Attribute attribute : metaData.getAttributes()) {
-            final String fieldName = attribute.getName();
-            if (fieldName.equals(columnName) && !fieldName.equals(idFieldName)) {
-              attribute.setCodeTable(codeTable);
+        if (schema.isInitialized()) {
+          for (final DataObjectMetaData metaData : schema.getTypes()) {
+            final String idFieldName = metaData.getIdAttributeName();
+            for (final Attribute attribute : metaData.getAttributes()) {
+              final String fieldName = attribute.getName();
+              if (fieldName.equals(columnName)
+                && !fieldName.equals(idFieldName)) {
+                attribute.setCodeTable(codeTable);
+              }
             }
           }
         }
