@@ -230,14 +230,14 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   }
 
   public void setMergedRecords(String errorMessage,
-    final Map<DataObject, Set<LayerDataObject>> mergedObjects) {
+    final Map<DataObject, Set<LayerDataObject>> mergedRecords) {
     final Set<DataObject> unMergeableRecords = new HashSet<DataObject>(
       mergeableToOiginalRecordMap.keySet());
-    unMergeableRecords.removeAll(mergedObjects.keySet());
-    if (!mergedObjects.isEmpty()) {
+    unMergeableRecords.removeAll(mergedRecords.keySet());
+    if (!mergedRecords.isEmpty()) {
       int i = 0;
 
-      for (final Entry<DataObject, Set<LayerDataObject>> mergedEntry : mergedObjects.entrySet()) {
+      for (final Entry<DataObject, Set<LayerDataObject>> mergedEntry : mergedRecords.entrySet()) {
         final DataObject mergedObject = mergedEntry.getKey();
         final Set<LayerDataObject> originalObjects = mergedEntry.getValue();
         setMergedRecord(i, mergedObject, originalObjects);

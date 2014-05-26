@@ -787,9 +787,9 @@ public abstract class AbstractJdbcDataObjectStore extends
         metaDataMap.put(typePath, metaData);
       }
 
-      final ResultSet columnsRs = databaseMetaData.getColumns(null,
-        dbSchemaName, "%", "%");
-      try {
+      try (
+        final ResultSet columnsRs = databaseMetaData.getColumns(null,
+          dbSchemaName, "%", "%")) {
         while (columnsRs.next()) {
           final String tableName = columnsRs.getString("TABLE_NAME")
             .toUpperCase();
@@ -813,14 +813,12 @@ public abstract class AbstractJdbcDataObjectStore extends
           }
         }
 
-        for (final DataObjectMetaData metaData : schema.getTypes()) {
+        for (final DataObjectMetaData metaData : metaDataMap.values()) {
           final String typePath = metaData.getPath();
           final List<String> idAttributeNames = idAttributeNameMap.get(typePath);
           ((DataObjectMetaDataImpl)metaData).setIdAttributeNames(idAttributeNames);
         }
 
-      } finally {
-        JdbcUtils.close(columnsRs);
       }
 
     } catch (final SQLException e) {

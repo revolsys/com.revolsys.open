@@ -592,7 +592,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     final LineString newLine = factory.lineString(axisCount, newVertexCount,
       coordinates);
     GeometryProperties.copyUserData(this, newLine);
-    return line;
+    return newLine;
   }
 
   @Override
