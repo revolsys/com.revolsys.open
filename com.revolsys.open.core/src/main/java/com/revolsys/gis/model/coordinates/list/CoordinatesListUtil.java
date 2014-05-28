@@ -102,13 +102,18 @@ public class CoordinatesListUtil {
       previousX = targetCoordinates[(targetIndex - 1) * axisCount];
       previousY = targetCoordinates[(targetIndex - 1) * axisCount + 1];
     }
+    int coordinateIndex = coordIndex * axisCount;
     for (int i = 0; i < vertexCount; i++) {
-      final double x = source.getX(sourceIndex + i);
-      final double y = source.getY(sourceIndex + i);
+      final int sourceVertexIndex = sourceIndex + i;
+      final double x = source.getX(sourceVertexIndex);
+      final double y = source.getY(sourceVertexIndex);
       if (x != previousX || y != previousY) {
-        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          final double coordinate = source.getCoordinate(i, axisIndex);
-          targetCoordinates[coordIndex * axisCount + axisIndex] = coordinate;
+        targetCoordinates[coordinateIndex++] = x;
+        targetCoordinates[coordinateIndex++] = y;
+        for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+          final double coordinate = source.getCoordinate(sourceVertexIndex,
+            axisIndex);
+          targetCoordinates[coordinateIndex++] = coordinate;
         }
         coordIndex++;
       }
@@ -132,17 +137,21 @@ public class CoordinatesListUtil {
       previousX = targetCoordinates[(targetStartIndex - 1) * axisCount];
       previousY = targetCoordinates[(targetStartIndex - 1) * axisCount + 1];
     }
+    int coordinateIndex = coordIndex * axisCount;
+    int sourceIndex = sourceVertexCount - 1 - sourceStartIndex;
     for (int i = 0; i < vertexCount; i++) {
-      final int sourceIndex = sourceVertexCount - (sourceStartIndex + i);
       final double x = source.getX(sourceIndex);
       final double y = source.getY(sourceIndex);
       if (x != previousX || y != previousY) {
-        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          final double coordinate = source.getCoordinate(i, axisIndex);
-          targetCoordinates[coordIndex * axisCount + axisIndex] = coordinate;
+        targetCoordinates[coordinateIndex++] = x;
+        targetCoordinates[coordinateIndex++] = y;
+        for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+          final double coordinate = source.getCoordinate(sourceIndex, axisIndex);
+          targetCoordinates[coordinateIndex++] = coordinate;
         }
         coordIndex++;
       }
+      sourceIndex--;
       previousX = x;
       previousY = y;
     }
@@ -635,7 +644,10 @@ public class CoordinatesListUtil {
 
   public static void setCoordinates(final GeometryFactory geometryFactory,
     final double[] coordinates, final int axisCount, final int vertexIndex,
-    final Point point) {
+    Point point) {
+    if (geometryFactory != null) {
+      point = point.convert(geometryFactory, axisCount);
+    }
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       double value = point.getCoordinate(axisIndex);
       value = geometryFactory.makePrecise(axisIndex, value);
@@ -700,8 +712,8 @@ public class CoordinatesListUtil {
           final double y1 = points.getY(segmentIndex);
           final double x2 = points.getX(i);
           final double y2 = points.getY(i);
-          final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2,
-            y2, x, y);
+          final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1,
+            y1, x2, y2, x, y);
           if (segmentDistance == 0) {
             pointDistanceMap.put(point, segmentDistance);
             pointSegment.put(point, segmentIndex);

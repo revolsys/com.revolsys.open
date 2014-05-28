@@ -37,7 +37,11 @@ public class PointDouble extends AbstractPoint implements Serializable {
   }
 
   public PointDouble(final int axisCount) {
-    this.coordinates = new double[axisCount];
+    if (axisCount > 1) {
+      this.coordinates = new double[axisCount];
+    } else {
+      this.coordinates = null;
+    }
   }
 
   public PointDouble(final int axisCount, final double... coordinates) {

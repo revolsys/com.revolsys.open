@@ -502,90 +502,86 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
-  public LineString merge(final LineString line) {
-    final int axisCount = Math.max(getAxisCount(), line.getAxisCount());
+  public LineString merge(final LineString line2) {
+    final int axisCount = Math.max(getAxisCount(), line2.getAxisCount());
     final int vertexCount1 = getVertexCount();
-    final int vertexCount2 = line.getVertexCount();
+    final int vertexCount2 = line2.getVertexCount();
     final int vertexCount = vertexCount1 + vertexCount2 - 1;
     final double[] coordinates = new double[vertexCount * axisCount];
 
     int newVertexCount = 0;
-    final Point coordinates1Start = getVertex(0);
-    final Point coordinates1End = getVertex(-1);
-    final Point coordinates2Start = line.getVertex(0);
-    final Point coordinates2End = line.getVertex(-1);
-    if (coordinates1Start.equals(2, coordinates2End)) {
-      newVertexCount = CoordinatesListUtil.append(axisCount, line, 0,
+    final Point line1From = getVertex(0);
+    final Point line1To = getVertex(-1);
+    final Point line2From = line2.getVertex(0);
+    final Point line2To = line2.getVertex(-1);
+    if (line1From.equals(2, line2To)) {
+      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0,
         coordinates, 0, vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
         coordinates, newVertexCount, vertexCount1 - 1);
-    } else if (coordinates2Start.equals(2, coordinates1End)) {
+    } else if (line2From.equals(2, line1To)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
         coordinates, 0, vertexCount1);
-      newVertexCount = CoordinatesListUtil.append(axisCount, line, 1,
+      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 1,
         coordinates, newVertexCount, vertexCount2 - 1);
-    } else if (coordinates1Start.equals(2, coordinates2Start)) {
-      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 0,
+    } else if (line1From.equals(2, line2From)) {
+      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line2, 0,
         coordinates, 0, vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
-        coordinates, newVertexCount, vertexCount);
-    } else if (coordinates1End.equals(2, coordinates2End)) {
+        coordinates, newVertexCount, vertexCount1 - 1);
+    } else if (line1To.equals(2, line2To)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
-        coordinates, newVertexCount, vertexCount);
-      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 1,
+        coordinates, newVertexCount, vertexCount1);
+      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line2, 1,
         coordinates, newVertexCount, vertexCount2 - 1);
     } else {
       throw new IllegalArgumentException("lines don't touch\n" + this + "\n"
-        + line);
+        + line2);
 
     }
     final GeometryFactory factory = getGeometryFactory();
     final LineString newLine = factory.lineString(axisCount, newVertexCount,
       coordinates);
     GeometryProperties.copyUserData(this, newLine);
-    return line;
+    return newLine;
   }
 
   @Override
-  public LineString merge(final Point point, final LineString line) {
-    final int axisCount = Math.max(getAxisCount(), line.getAxisCount());
+  public LineString merge(final Point point, final LineString line2) {
+    final int axisCount = Math.max(getAxisCount(), line2.getAxisCount());
     final int vertexCount1 = getVertexCount();
-    final int vertexCount2 = line.getVertexCount();
+    final int vertexCount2 = line2.getVertexCount();
     final int vertexCount = vertexCount1 + vertexCount2 - 1;
     final double[] coordinates = new double[vertexCount * axisCount];
 
     int newVertexCount = 0;
-    final Point coordinates1Start = getVertex(0);
-    final Point coordinates1End = getVertex(-1);
-    final Point coordinates2Start = line.getVertex(0);
-    final Point coordinates2End = line.getVertex(-1);
-    if (coordinates1Start.equals(2, coordinates2End)
-      && coordinates1Start.equals(2, point)) {
-      newVertexCount = CoordinatesListUtil.append(axisCount, line, 0,
+    final Point line1From = getVertex(0);
+    final Point line1To = getVertex(-1);
+    final Point line2From = line2.getVertex(0);
+    final Point line2To = line2.getVertex(-1);
+    if (line1From.equals(2, line2To) && line1From.equals(2, point)) {
+      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0,
         coordinates, 0, vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
         coordinates, newVertexCount, vertexCount1 - 1);
-    } else if (coordinates2Start.equals(2, coordinates1End)
-      && coordinates2Start.equals(2, point)) {
+    } else if (line2From.equals(2, line1To) && line2From.equals(2, point)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
         coordinates, 0, vertexCount1);
-      newVertexCount = CoordinatesListUtil.append(axisCount, line, 1,
+      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 1,
         coordinates, newVertexCount, vertexCount2 - 1);
-    } else if (coordinates1Start.equals(2, coordinates2Start)
-      && coordinates1Start.equals(2, point)) {
-      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 0,
+    } else if (line1From.equals(2, line2From) && line1From.equals(2, point)) {
+      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line2, 0,
         coordinates, 0, vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1,
-        coordinates, newVertexCount, vertexCount);
-    } else if (coordinates1End.equals(2, coordinates2End)
-      && coordinates1End.equals(2, point)) {
+        coordinates, newVertexCount, vertexCount1 - 1);
+    } else if (line1To.equals(2, line2To) && line1To.equals(2, point)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 0,
-        coordinates, newVertexCount, vertexCount);
-      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line, 1,
+        coordinates, newVertexCount, vertexCount1);
+      newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line2, 1,
         coordinates, newVertexCount, vertexCount2 - 1);
     } else {
       throw new IllegalArgumentException("lines don't touch\n" + this + "\n"
-        + line);
+        + line2);
 
     }
     final GeometryFactory factory = getGeometryFactory();

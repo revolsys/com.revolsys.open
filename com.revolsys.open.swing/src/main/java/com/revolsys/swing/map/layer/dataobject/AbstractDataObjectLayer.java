@@ -2207,24 +2207,27 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     final Geometry geometry = mouseLocation.getGeometry();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
-      final int[] vertexIndex = mouseLocation.getVertexIndex();
+      final int[] vertexId = mouseLocation.getVertexIndex();
       final Point point = mouseLocation.getPoint();
       final Point convertedPoint = (Point)point.copy(getGeometryFactory());
       final LineString line1;
       final LineString line2;
 
-      final int numPoints = line.getVertexCount();
-      if (vertexIndex == null) {
-        final int pointIndex = mouseLocation.getSegmentId()[0];
-        line1 = line.subLine(null, 0, pointIndex + 1, convertedPoint);
-        line2 = line.subLine(convertedPoint, pointIndex + 1, numPoints - pointIndex - 1, null);
+      final int vertexCount = line.getVertexCount();
+      if (vertexId == null) {
+        final int vertexIndex = mouseLocation.getSegmentId()[0];
+        line1 = line.subLine(null, 0, vertexIndex + 1, convertedPoint);
+        line2 = line.subLine(convertedPoint, vertexIndex + 1, vertexCount
+          - vertexIndex - 1, null);
       } else {
-        final int pointIndex = vertexIndex[0];
-        if (numPoints - pointIndex < 2) {
+        final int pointIndex = vertexId[0];
+        if (pointIndex == 0) {
+          return Collections.singletonList(record);
+        } else if (vertexCount - pointIndex < 2) {
           return Collections.singletonList(record);
         } else {
           line1 = line.subLine(pointIndex + 1);
-          line2 = line.subLine(null, pointIndex, numPoints - pointIndex, null);
+          line2 = line.subLine(null, pointIndex, vertexCount - pointIndex, null);
         }
 
       }

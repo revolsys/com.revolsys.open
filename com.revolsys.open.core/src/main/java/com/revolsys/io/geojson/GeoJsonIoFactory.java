@@ -22,6 +22,7 @@ public class GeoJsonIoFactory extends
     super(GeoJsonConstants.DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(GeoJsonConstants.MEDIA_TYPE,
       GeoJsonConstants.FILE_EXTENSION);
+    addMediaType(GeoJsonConstants.MEDIA_TYPE);
   }
 
   @Override

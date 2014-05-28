@@ -14,6 +14,16 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class TestUtil {
 
+  public static boolean assertEqualsExact(final int axisCount,
+    final Geometry actualGeometry, final Geometry expectedGeometry) {
+    if (actualGeometry.equals(axisCount, expectedGeometry)) {
+      return true;
+    } else {
+      failNotEquals("Equals Exact", expectedGeometry, actualGeometry);
+      return false;
+    }
+  }
+
   public static void doTestGeometry(final Class<?> clazz, final String file) {
     boolean valid = true;
     final Resource resource = new ClassPathResource(file, clazz);

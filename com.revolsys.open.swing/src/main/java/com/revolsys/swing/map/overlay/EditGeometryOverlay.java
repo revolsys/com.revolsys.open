@@ -48,7 +48,6 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.prep.PreparedGeometry;
 import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -359,14 +358,16 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final Point c0, final Point p1) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    final LineSegment line = new LineSegmentDoubleGF(geometryFactory, c0, p1).convert(viewportGeometryFactory);
+    final LineSegment line = viewportGeometryFactory.lineSegment(c0, p1);
     final double length = line.getLength();
-    final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
-    final Point newC1 = line.pointAlongOffset((length - cursorRadius) / length,
-      0);
-    Point point = viewportGeometryFactory.point(newC1);
-    point = (Point)point.copy(geometryFactory);
-    return geometryFactory.lineString(c0, point);
+    if (length > 0) {
+      final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
+      final Point newC1 = line.pointAlongOffset((length - cursorRadius)
+        / length, 0);
+      return geometryFactory.lineString(c0, newC1);
+    } else {
+      return null;
+    }
   }
 
   protected void fireActionPerformed(final ActionListener listener,
@@ -520,15 +521,15 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         }
       }
 
-      final List<LineString> pointsList = new ArrayList<LineString>();
-      if (previousPoint != null) {
-        pointsList.add(createXorLine(geometryFactory, previousPoint, point));
+      final List<LineString> lines = new ArrayList<LineString>();
+      if (previousPoint != null && !previousPoint.isEmpty()) {
+        lines.add(createXorLine(geometryFactory, previousPoint, point));
       }
-      if (nextPoint != null) {
-        pointsList.add(createXorLine(geometryFactory, nextPoint, point));
+      if (nextPoint != null && !nextPoint.isEmpty()) {
+        lines.add(createXorLine(geometryFactory, nextPoint, point));
       }
-      if (!pointsList.isEmpty()) {
-        return geometryFactory.multiLineString(pointsList);
+      if (!lines.isEmpty()) {
+        return geometryFactory.multiLineString(lines);
       }
     }
     return null;
@@ -721,13 +722,13 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           if (DataTypes.LINE_STRING.equals(this.addGeometryPartDataType)) {
             final Point previousPoint = GeometryEditUtil.getVertex(
               this.addGeometry, this.addGeometryPartIndex, -1);
-            if (previousPoint != null) {
+            if (previousPoint != null && !previousPoint.isEmpty()) {
               xorGeometry = createXorLine(geometryFactory, previousPoint, point);
             }
           } else if (DataTypes.POLYGON.equals(this.addGeometryPartDataType)) {
             final Point previousPoint = GeometryEditUtil.getVertex(
               this.addGeometry, this.addGeometryPartIndex, -1);
-            if (previousPoint != null) {
+            if (previousPoint != null && !previousPoint.isEmpty()) {
               if (previousPoint.equals(firstPoint)) {
                 xorGeometry = createXorLine(geometryFactory, previousPoint,
                   point);

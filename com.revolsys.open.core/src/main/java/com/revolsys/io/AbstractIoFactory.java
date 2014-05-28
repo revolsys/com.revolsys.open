@@ -37,12 +37,16 @@ public abstract class AbstractIoFactory implements IoFactory {
 
   protected void addMediaTypeAndFileExtension(final String mediaType,
     final String fileExtension) {
-    mediaTypes.add(mediaType);
+    addMediaType(mediaType);
     fileExtensions.add(fileExtension);
     add(mediaTypeToFileExtension, mediaType, fileExtension);
     add(mediaTypeToFileExtension, fileExtension, fileExtension);
     add(fileExtensionToMediaType, fileExtension, mediaType);
     add(fileExtensionToMediaType, mediaType, mediaType);
+  }
+
+  public void addMediaType(final String mediaType) {
+    mediaTypes.add(mediaType);
   }
 
   @Override

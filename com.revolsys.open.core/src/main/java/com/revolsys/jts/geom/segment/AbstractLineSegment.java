@@ -17,7 +17,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.AbstractLineString;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.impl.PointDoubleGF;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
@@ -249,6 +249,11 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     final GeometryFactory geometryFactory, final int axisCount,
     final double... coordinates) {
     return new LineSegmentDoubleGF(geometryFactory, axisCount, coordinates);
+  }
+
+  protected Point createPoint(final GeometryFactory geometryFactory,
+    final double... coordinates) {
+    return new PointDoubleGF(geometryFactory, coordinates);
   }
 
   @Override
@@ -775,7 +780,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
       newValue = geometryFactory.makePrecise(i, newValue);
       coordinates[i] = newValue;
     }
-    return new PointDouble(coordinates);
+    return createPoint(geometryFactory, coordinates);
   }
 
   /**
@@ -828,8 +833,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
       y = y + ux;
     }
 
-    final PointDouble coord = new PointDouble(x, y);
-    return coord;
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return createPoint(geometryFactory, x, y);
   }
 
   /**

@@ -29,6 +29,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
   public static final String PROPERTY_NAME = DirectionalAttributes.class.getName()
@@ -572,41 +573,40 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final DataObject object1, DataObject object2) {
     final LineString line1 = object1.getGeometryValue();
     LineString line2 = object2.getGeometryValue();
-    final PointList points1 = CoordinatesListUtil.get(line1);
-    final PointList points2 = CoordinatesListUtil.get(line2);
 
     DataObject startObject;
     DataObject endObject;
 
     LineString newLine;
-    final int lastPoint1 = points1.size() - 1;
-    final int lastPoint2 = points2.size() - 1;
 
-    if (points1.equal(0, points2, 0) && points1.equal2d(0, point)) {
+    final Vertex line1From = line1.getVertex(0);
+    final Vertex line2From = line2.getVertex(0);
+    if (line1From.equals(2, line2From) && line1From.equals(2, point)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object2;
       endObject = object1;
       newLine = line1.merge(point, line2);
-    } else if (points1.equal(lastPoint1, points2, lastPoint2)
-      && points1.equal2d(lastPoint1, point)) {
-      object2 = getReverse(object2);
-      line2 = object2.getGeometryValue();
-      startObject = object1;
-      endObject = object2;
-      newLine = line1.merge(point, line2);
-    } else if (points1.equal(lastPoint1, points2, 0)
-      && points1.equal2d(lastPoint1, point)) {
-      startObject = object1;
-      endObject = object2;
-      newLine = line1.merge(point, line2);
-    } else if (points1.equal(0, points2, lastPoint2)
-      && points1.equal2d(0, point)) {
-      startObject = object2;
-      endObject = object1;
-      newLine = line2.merge(point, line1);
     } else {
-      throw new IllegalArgumentException("Lines for objects don't touch");
+      final Vertex line1To = line1.getVertex(-1);
+      final Vertex line2To = line2.getVertex(-1);
+      if (line1To.equals(2, line2To) && line1To.equals(2, point)) {
+        object2 = getReverse(object2);
+        line2 = object2.getGeometryValue();
+        startObject = object1;
+        endObject = object2;
+        newLine = line1.merge(point, line2);
+      } else if (line1To.equals(2, line2From) && line1To.equals(2, point)) {
+        startObject = object1;
+        endObject = object2;
+        newLine = line1.merge(point, line2);
+      } else if (line1From.equals(2, line2To) && line1From.equals(2, point)) {
+        startObject = object2;
+        endObject = object1;
+        newLine = line2.merge(point, line1);
+      } else {
+        throw new IllegalArgumentException("Lines for objects don't touch");
+      }
     }
 
     final Map<String, Object> newValues = new LinkedHashMap<String, Object>(

@@ -1,7 +1,6 @@
 package com.revolsys.jts.test.geometry;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
@@ -15,6 +14,10 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 public class LineStringTest {
 
+  private static final double START_Y = 6000000;
+
+  private static final double START_X = 500000;
+
   public static void assertCoordinatesEquals(final Point point,
     final double... coordinates) {
     Assert.assertEquals("Is Empty", false, point.isEmpty());
@@ -25,10 +28,11 @@ public class LineStringTest {
       final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
         if (!Double.isNaN(value)) {
-          Assert.failNotEquals("Value NaN", Double.NaN, value);
+          TestUtil.failNotEquals("Value NaN", Double.NaN, value);
         }
       } else {
-        Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value);
+        Assert.assertEquals("Coordinate Value", coordinates[axisIndex], value,
+          0);
       }
     }
   }
@@ -40,7 +44,7 @@ public class LineStringTest {
     for (int axisIndex = -1; axisIndex < line.getAxisCount() + 1; axisIndex++) {
       final double value = line.getCoordinate(0, axisIndex);
       if (!Double.isNaN(value)) {
-        Assert.failNotEquals("Value NaN", Double.NaN, value);
+        TestUtil.failNotEquals("Value NaN", Double.NaN, value);
       }
     }
   }
@@ -91,6 +95,25 @@ public class LineStringTest {
     final Point pointWkt = geometryFactory.geometry(wkt);
     assertCoordinatesEquals(pointWkt, coordinates);
 
+  }
+
+  public static void assertMerge(final boolean loop, final LineString line1,
+    final LineString line2, final double mergeX, final double mergeY,
+    final double... expectedCoordinates) {
+    final GeometryFactory geometryFactory = line1.getGeometryFactory();
+    final int axisCount = geometryFactory.getAxisCount();
+    final LineString expectedMergedLine = geometryFactory.lineString(axisCount,
+      expectedCoordinates);
+
+    final Point mergePoint = geometryFactory.point(mergeX, mergeY);
+
+    final LineString mergedLine = line1.merge(mergePoint, line2);
+    TestUtil.assertEqualsExact(axisCount, mergedLine, expectedMergedLine);
+
+    if (!loop) {
+      final LineString mergedLine2 = line1.merge(line2);
+      TestUtil.assertEqualsExact(axisCount, mergedLine2, expectedMergedLine);
+    }
   }
 
   private void assertEquals(final double[] coordinates,
@@ -188,10 +211,10 @@ public class LineStringTest {
         double value;
         switch (i) {
           case 0:
-            value = 500000;
+            value = START_X;
           break;
           case 1:
-            value = 6000000;
+            value = START_Y;
           break;
           default:
             value = i * 10 + i;
@@ -255,6 +278,75 @@ public class LineStringTest {
   @Test
   public void testFromFile() {
     TestUtil.doTestGeometry(getClass(), "LineString.csv");
+  }
+
+  @Test
+  public void testMerge() {
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, 3, 1,
+      1);
+
+    // Last point is duplicated
+    final LineString line1 = geometryFactory.lineString(3, START_X, START_Y, 0,
+      START_X + 100, START_Y + 100, 1, START_X + 200, START_Y + 200, 2,
+      START_X + 300, START_Y + 300, 3, START_X + 300, START_Y + 300, 3);
+    final LineString line1Reverse = line1.reverse();
+
+    // Every point is duplicated
+    final LineString line2 = geometryFactory.lineString(3, START_X + 300,
+      START_Y + 300, 3, START_X + 300, START_Y + 300, 3, START_X + 400,
+      START_Y + 400, 4, START_X + 400, START_Y + 400, 4, START_X + 500,
+      START_Y + 500, 5, START_X + 500, START_Y + 500, 5);
+    final LineString line2Reverse = line2.reverse();
+
+    // Line to make a loop
+    final LineString line3 = geometryFactory.lineString(3, START_X + 300,
+      START_Y + 300, 3, START_X, START_Y, 0);
+    final LineString line3Reverse = line3.reverse();
+
+    // Forwards, Forwards
+    assertMerge(false, line1, line2, START_X + 300, START_Y + 300, START_X,
+      START_Y, 0, START_X + 100, START_Y + 100, 1, START_X + 200,
+      START_Y + 200, 2, START_X + 300, START_Y + 300, 3, START_X + 400,
+      START_Y + 400, 4, START_X + 500, START_Y + 500, 5);
+
+    // Forwards, Reverse
+    assertMerge(false, line1, line2Reverse, START_X + 300, START_Y + 300,
+      START_X, START_Y, 0, START_X + 100, START_Y + 100, 1, START_X + 200,
+      START_Y + 200, 2, START_X + 300, START_Y + 300, 3, START_X + 400,
+      START_Y + 400, 4, START_X + 500, START_Y + 500, 5);
+
+    // Reverse, Forwards
+    assertMerge(false, line1Reverse, line2, START_X + 300, START_Y + 300,
+      START_X + 500, START_Y + 500, 5, START_X + 400, START_Y + 400, 4,
+      START_X + 300, START_Y + 300, 3, START_X + 200, START_Y + 200, 2,
+      START_X + 100, START_Y + 100, 1, START_X, START_Y, 0);
+
+    // Reverse, Reverse
+    assertMerge(false, line1Reverse, line2Reverse, START_X + 300,
+      START_Y + 300, START_X + 500, START_Y + 500, 5, START_X + 400,
+      START_Y + 400, 4, START_X + 300, START_Y + 300, 3, START_X + 200,
+      START_Y + 200, 2, START_X + 100, START_Y + 100, 1, START_X, START_Y, 0);
+
+    // Loop Forwards, Forwards
+    assertMerge(true, line1, line3, START_X + 300, START_Y + 300, START_X,
+      START_Y, 0, START_X + 100, START_Y + 100, 1, START_X + 200,
+      START_Y + 200, 2, START_X + 300, START_Y + 300, 3, START_X, START_Y, 0);
+
+    // Loop Forwards, Reverse
+    assertMerge(true, line1, line3Reverse, START_X + 300, START_Y + 300,
+      START_X, START_Y, 0, START_X + 100, START_Y + 100, 1, START_X + 200,
+      START_Y + 200, 2, START_X + 300, START_Y + 300, 3, START_X, START_Y, 0);
+
+    // Loop Reverse, Forwards
+    assertMerge(true, line1Reverse, line3, START_X + 300, START_Y + 300,
+      START_X, START_Y, 0, START_X + 300, START_Y + 300, 3, START_X + 200,
+      START_Y + 200, 2, START_X + 100, START_Y + 100, 1, START_X, START_Y, 0);
+
+    // Loop Reverse, Reverse
+    assertMerge(true, line1Reverse, line3Reverse, START_X + 300, START_Y + 300,
+      START_X, START_Y, 0, START_X + 300, START_Y + 300, 3, START_X + 200,
+      START_Y + 200, 2, START_X + 100, START_Y + 100, 1, START_X, START_Y, 0);
+
   }
 
   @Test

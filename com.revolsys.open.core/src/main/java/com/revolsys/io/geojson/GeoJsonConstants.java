@@ -33,7 +33,9 @@ public interface GeoJsonConstants {
 
   String LINE_STRING = "LineString";
 
-  String MEDIA_TYPE = "application/x-geo+json";
+  String MEDIA_TYPE = "application/vnd.geo+json";
+
+  String MEDIA_TYPE_OLD = "application/x-geo+json";
 
   String COGO_MEDIA_TYPE = "application/x-cogo+json";
 

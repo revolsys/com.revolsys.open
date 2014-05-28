@@ -72,6 +72,8 @@ import com.revolsys.jts.geom.impl.MultiPolygonImpl;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.impl.PointDoubleGF;
 import com.revolsys.jts.geom.impl.PolygonImpl;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
@@ -1045,6 +1047,10 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return new LinearRingImpl(this, points);
   }
 
+  public LineSegment lineSegment(final Point p0, final Point p1) {
+    return new LineSegmentDoubleGF(this, p0, p1);
+  }
+
   public LineString lineString() {
     return new LineStringImpl(this);
   }
@@ -1079,7 +1085,12 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (points == null) {
       return lineString();
     } else {
-      final List<Point> pointList = Arrays.asList(points);
+      final List<Point> pointList = new ArrayList<>();
+      for (final Point point : points) {
+        if (point != null && !point.isEmpty()) {
+          pointList.add(point);
+        }
+      }
       return lineString(pointList);
     }
   }

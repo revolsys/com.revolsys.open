@@ -36,6 +36,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Represents a line segment defined by two {@link Coordinates}s.
@@ -134,6 +135,12 @@ public class LineSegmentDouble extends AbstractLineSegment {
     final GeometryFactory geometryFactory, final int axisCount,
     final double... coordinates) {
     return new LineSegmentDouble(axisCount, coordinates);
+  }
+
+  @Override
+  protected Point createPoint(final GeometryFactory geometryFactory,
+    final double... coordinates) {
+    return new PointDouble(coordinates);
   }
 
   @Override
