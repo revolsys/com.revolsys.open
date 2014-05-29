@@ -178,11 +178,11 @@ public class PackedCoordinateUtil {
       }
 
       if (hasZ) {
-        readCoordinates(in, coordinates, axisCount, vertexCount, 2, zOffset,
+        readCoordinates(in, coordinates, vertexCount,axisCount,  2, zOffset,
           zScale);
       }
       if (hasM) {
-        readCoordinates(in, coordinates, axisCount, vertexCount, 3, mOffset,
+        readCoordinates(in, coordinates, vertexCount,axisCount,  3, mOffset,
           mScale);
       }
 
@@ -268,7 +268,7 @@ public class PackedCoordinateUtil {
         y = readCoordinate(in, coordinates, j, axisCount, 1, y, xyScale);
         if (x == -1 && y == 0) {
           if (j > 2) {
-            final double[] subCoordinates = new double[j * axisCount];
+            final double[] subCoordinates = new double[j * axisCount + axisCount];
             System.arraycopy(coordinates, 0, subCoordinates, 0,
               subCoordinates.length);
             pointsList.add(subCoordinates);
@@ -282,7 +282,7 @@ public class PackedCoordinateUtil {
           if (coordinates[0] == coordinates[j * axisCount]
             && coordinates[1] == coordinates[j * axisCount + 1]) {
             if (j > 2) {
-              final double[] subCoordinates = new double[j * axisCount];
+              final double[] subCoordinates = new double[j * axisCount + axisCount];
               System.arraycopy(coordinates, 0, subCoordinates, 0,
                 subCoordinates.length);
               pointsList.add(subCoordinates);
@@ -494,12 +494,11 @@ public class PackedCoordinateUtil {
         x = readCoordinate(in, coordinates, j, axisCount, 0, x, xyScale);
         y = readCoordinate(in, coordinates, j, axisCount, 1, y, xyScale);
         if (j > 0 && i < vertexCount - 1) {
-          final int numVertices = j * axisCount;
-          if (coordinates[0] == coordinates[(numVertices) * axisCount]
-            && coordinates[1] == coordinates[(numVertices) * axisCount + 1]) {
+          final int numCoordinates = j * axisCount;
+          if (coordinates[0] == coordinates[numCoordinates]
+            && coordinates[1] == coordinates[numCoordinates + 1]) {
             if (j > 2) {
-              final double[] subCoordinates = new double[numVertices
-                * axisCount];
+              final double[] subCoordinates = new double[numCoordinates + axisCount];
               System.arraycopy(coordinates, 0, subCoordinates, 0,
                 subCoordinates.length);
               pointsList.add(subCoordinates);
@@ -514,11 +513,11 @@ public class PackedCoordinateUtil {
         }
       }
       if (j > 2) {
-        final int numVertices = j * axisCount;
-        if (numVertices == coordinates.length) {
+        final int numCoordinates = j * axisCount;
+        if (numCoordinates == coordinates.length) {
           pointsList.add(coordinates);
         } else {
-          final double[] subCoordinates = new double[numVertices];
+          final double[] subCoordinates = new double[numCoordinates];
           System.arraycopy(coordinates, 0, subCoordinates, 0,
             subCoordinates.length);
           pointsList.add(subCoordinates);
