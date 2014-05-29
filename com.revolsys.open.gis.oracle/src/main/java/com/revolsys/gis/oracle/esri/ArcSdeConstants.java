@@ -13,12 +13,6 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.MultiPoint;
-import com.revolsys.jts.geom.MultiPolygon;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 
 public final class ArcSdeConstants {
 
@@ -32,7 +26,7 @@ public final class ArcSdeConstants {
 
   public static final int GEOMETRY = 0;
 
-  public static final Map<Class<?>, Integer> GEOMETRY_CLASS_ST_TYPE = new HashMap<Class<?>, Integer>();
+  public static final Map<DataType, Integer> GEOMETRY_DATA_TYPE_ST_TYPE = new HashMap<DataType, Integer>();
 
   public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
 
@@ -90,13 +84,16 @@ public final class ArcSdeConstants {
     DATA_TYPE_MAP.put(MULTI_LINESTRING, DataTypes.MULTI_LINE_STRING);
     DATA_TYPE_MAP.put(MULTI_POLYGON, DataTypes.MULTI_POLYGON);
 
-    GEOMETRY_CLASS_ST_TYPE.put(Point.class, ST_GEOMETRY_POINT);
-    GEOMETRY_CLASS_ST_TYPE.put(MultiPoint.class, ST_GEOMETRY_MULTI_POINT);
-    GEOMETRY_CLASS_ST_TYPE.put(LineString.class, ST_GEOMETRY_LINESTRING);
-    GEOMETRY_CLASS_ST_TYPE.put(MultiLineString.class,
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.POINT, ST_GEOMETRY_POINT);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_POINT,
+      ST_GEOMETRY_MULTI_POINT);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.LINE_STRING,
+      ST_GEOMETRY_LINESTRING);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_LINE_STRING,
       ST_GEOMETRY_MULTI_LINESTRING);
-    GEOMETRY_CLASS_ST_TYPE.put(Polygon.class, ST_GEOMETRY_POLYGON);
-    GEOMETRY_CLASS_ST_TYPE.put(MultiPolygon.class, ST_GEOMETRY_MULTI_POLYGON);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.POLYGON, ST_GEOMETRY_POLYGON);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_POLYGON,
+      ST_GEOMETRY_MULTI_POLYGON);
   }
 
   public static DataType getGeometryDataType(final int geometryType) {
@@ -109,11 +106,11 @@ public final class ArcSdeConstants {
   }
 
   public static Integer getStGeometryType(final Geometry geometry) {
-    final Class<? extends Geometry> geometryClass = geometry.getClass();
-    final Integer type = GEOMETRY_CLASS_ST_TYPE.get(geometryClass);
+    final DataType dataType = geometry.getDataType();
+    final Integer type = GEOMETRY_DATA_TYPE_ST_TYPE.get(dataType);
     if (type == null) {
       throw new IllegalArgumentException("Unsupported geometry type "
-        + geometryClass);
+        + dataType);
     } else {
       return type;
     }
