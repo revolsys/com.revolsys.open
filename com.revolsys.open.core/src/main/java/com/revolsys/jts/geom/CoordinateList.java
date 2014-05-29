@@ -82,8 +82,8 @@ public class CoordinateList extends ArrayList<Point> {
   }
 
   public CoordinateList(final PointList points) {
-    ensureCapacity(points.size());
-    add(points.toList(), true, true);
+    ensureCapacity(points.getVertexCount());
+    add(points.toPointList(), true, true);
   }
 
   /**

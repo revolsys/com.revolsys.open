@@ -1,10 +1,10 @@
-package com.revolsys.jts.geom.impl;
+package com.revolsys.jts.geom.segment;
 
 import java.util.NoSuchElementException;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.segment.AbstractSegment;
-import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.GeometryCollection;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 public class GeometryCollectionSegment extends AbstractSegment {
 
@@ -27,8 +27,23 @@ public class GeometryCollectionSegment extends AbstractSegment {
     }
   }
 
-  public Geometry getGeometryCollection() {
-    return getGeometry();
+  public GeometryCollection getGeometryCollection() {
+    return (GeometryCollection)getGeometry();
+  }
+
+  @Override
+  public Vertex getGeometryVertex(final int index) {
+    final GeometryCollection geometryCollection = getGeometryCollection();
+    if (index == 0) {
+      getSegmentId().clone();
+      return geometryCollection.getVertex(getSegmentId());
+    } else if (index == 1) {
+      final int[] segmentId = getSegmentId();
+      segmentId[segmentId.length - 1]++;
+      return geometryCollection.getVertex(segmentId);
+    } else {
+      return null;
+    }
   }
 
   @Override

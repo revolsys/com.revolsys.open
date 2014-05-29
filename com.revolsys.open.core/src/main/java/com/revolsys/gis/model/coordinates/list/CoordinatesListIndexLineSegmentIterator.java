@@ -30,12 +30,12 @@ public class CoordinatesListIndexLineSegmentIterator implements
 
   public CoordinatesListIndexLineSegmentIterator(final LineString line) {
     this.factory = line.getGeometryFactory();
-    this.points = CoordinatesListUtil.get(line);
+    this.points = line;
   }
 
   @Override
   public boolean hasNext() {
-    return index < points.size() - 2;
+    return index < points.getVertexCount() - 2;
   }
 
   @Override
@@ -46,8 +46,8 @@ public class CoordinatesListIndexLineSegmentIterator implements
   @Override
   public LineSegment next() {
     index++;
-    return new LineSegmentDoubleGF(factory, points.get(index),
-      points.get(index + 1));
+    return new LineSegmentDoubleGF(factory, points.getPoint(index),
+      points.getPoint(index + 1));
   }
 
   @Override

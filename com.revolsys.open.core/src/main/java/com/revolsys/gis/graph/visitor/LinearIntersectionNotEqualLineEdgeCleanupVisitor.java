@@ -28,9 +28,7 @@ import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.EqualFilter;
 import com.revolsys.gis.jts.filter.LinearIntersectionFilter;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
@@ -74,11 +72,11 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     duplicateStatistics.connect();
   }
 
-  private boolean middleCoordinatesEqual(final PointList points1,
-    final PointList points2) {
-    if (points1.size() == points2.size()) {
-      for (int i = 1; i < points2.size(); i++) {
-        if (!points1.equal(i, points1, i, 2)) {
+  private boolean middleCoordinatesEqual(final LineString points1,
+    final LineString points2) {
+    if (points1.getVertexCount() == points2.getVertexCount()) {
+      for (int i = 1; i < points2.getVertexCount(); i++) {
+        if (!points1.equalsVertex(2, i, points1, i)) {
           return false;
         }
       }
@@ -147,14 +145,12 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
 
     if (!intersectingEdges.isEmpty()) {
       if (intersectingEdges.size() == 1 && line.getLength() > 10) {
-        final PointList points = CoordinatesListUtil.get(line);
-        if (points.size() > 2) {
+        if (line.getVertexCount() > 2) {
           final Edge<DataObject> edge2 = intersectingEdges.get(0);
           final LineString line2 = edge2.getLine();
-          final PointList points2 = CoordinatesListUtil.get(line2);
 
-          if (middleCoordinatesEqual(points, points2)) {
-            final boolean firstEqual = points.equal(0, points2, 0, 2);
+          if (middleCoordinatesEqual(line, line2)) {
+            final boolean firstEqual = line.equalsVertex(2, 0, line2, 0);
             if (!firstEqual) {
               final Node<DataObject> fromNode1 = edge.getFromNode();
               final Node<DataObject> fromNode2 = edge2.getFromNode();
@@ -163,8 +159,8 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
                 return true;
               }
             }
-            final boolean lastEqual = points.equal(points.size() - 1, points2,
-              points.size() - 1, 2);
+            final boolean lastEqual = line.equalsVertex(2,
+              line.getVertexCount() - 1, line2, line.getVertexCount() - 1);
             if (!lastEqual) {
               final Node<DataObject> toNode1 = edge.getToNode();
               final Node<DataObject> toNode2 = edge2.getToNode();

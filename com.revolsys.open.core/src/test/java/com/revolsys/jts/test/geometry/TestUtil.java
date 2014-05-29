@@ -15,7 +15,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 public class TestUtil {
 
   public static boolean assertEqualsExact(final int axisCount,
-    final Geometry actualGeometry, final Geometry expectedGeometry) {
+    final Geometry expectedGeometry, final Geometry actualGeometry) {
     if (actualGeometry.equals(axisCount, expectedGeometry)) {
       return true;
     } else {

@@ -411,7 +411,7 @@ public class WktParser {
     } else {
       final PointList points = parseCoordinates(geometryFactory, text,
         axisCount);
-      if (points.size() > 1) {
+      if (points.getVertexCount() > 1) {
         throw new IllegalArgumentException("Points may only have 1 vertex");
       }
       return geometryFactory.point(points);

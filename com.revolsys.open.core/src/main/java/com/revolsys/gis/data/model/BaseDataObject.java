@@ -121,6 +121,17 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     return this == o;
   }
 
+  @Override
+  public Object get(final Object key) {
+    if (key instanceof String) {
+      final String name = (String)key;
+      return getValue(name);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   public String getAttributeTitle(final String name) {
     final DataObjectMetaData metaData = getMetaData();
     return metaData.getAttributeTitle(name);

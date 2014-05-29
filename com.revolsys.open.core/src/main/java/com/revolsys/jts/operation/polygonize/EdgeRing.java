@@ -59,12 +59,12 @@ class EdgeRing {
   private static void addEdge(final PointList coords,
     final boolean isForward, final CoordinateList coordList) {
     if (isForward) {
-      for (int i = 0; i < coords.size(); i++) {
-        coordList.add(coords.get(i), false);
+      for (int i = 0; i < coords.getVertexCount(); i++) {
+        coordList.add(coords.getPoint(i), false);
       }
     } else {
-      for (int i = coords.size() - 1; i >= 0; i--) {
-        coordList.add(coords.get(i), false);
+      for (int i = coords.getVertexCount() - 1; i >= 0; i--) {
+        coordList.add(coords.getPoint(i), false);
       }
     }
   }
@@ -209,7 +209,7 @@ class EdgeRing {
       final CoordinateList coordList = new CoordinateList();
       for (final DirectedEdge de : deList) {
         final PolygonizeEdge edge = (PolygonizeEdge)de.getEdge();
-        addEdge(edge.getLine().getCoordinatesList(), de.getEdgeDirection(),
+        addEdge(edge.getLine(), de.getEdgeDirection(),
           coordList);
       }
       ringPts = coordList.toCoordinateArray();

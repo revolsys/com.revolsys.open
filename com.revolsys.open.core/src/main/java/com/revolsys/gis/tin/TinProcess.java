@@ -11,14 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.MathUtil;
@@ -104,7 +103,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
         readTinFeatures(tin, lines, tinReader);
       }
       for (final PointList line : lines) {
-        tin.insertNodes(line);
+        tin.insertNodes(line.toPointList());
       }
       for (final PointList line : lines) {
         tin.insertEdge(line);
@@ -178,7 +177,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
         tin.insertNode(point);
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
-        final PointList points = CoordinatesListUtil.get(line);
+        final PointList points = line;
         lines.add(points);
       }
     }

@@ -55,9 +55,9 @@ public class EdgeGraphBuilder {
   }
 
   private void add(final LineString lineString) {
-    final PointList seq = lineString.getCoordinatesList();
-    for (int i = 1; i < seq.size(); i++) {
-      graph.addEdge(seq.getCoordinate(i - 1), seq.getCoordinate(i));
+    final PointList seq = lineString;
+    for (int i = 1; i < seq.getVertexCount(); i++) {
+      graph.addEdge(seq.getPoint(i - 1), seq.getPoint(i));
     }
   }
 

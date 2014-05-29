@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom;
 
+import java.util.List;
+
 /**
  *  Models an OGC-style <code>LineString</code>.
  *  A LineString consists of a sequence of two or more vertices,
@@ -49,7 +51,7 @@ package com.revolsys.jts.geom;
  *
  *@version 1.7
  */
-public interface LineString extends Lineal {
+public interface LineString extends Lineal, PointList {
   /**
    * Creates and returns a full copy of this {@link LineString} object.
    * (including all coordinates contained by it).
@@ -59,38 +61,58 @@ public interface LineString extends Lineal {
   @Override
   LineString clone();
 
+  @Override
+  double distance(int index, Point point);
+
   boolean equals(int axisIndex, int vertexIndex, Point point);
 
   boolean equalsVertex(final int vertexIndex, final double... coordinates);
 
-  boolean equalsVertex(final int vertexIndex, int axisCount, final Point point);
+  boolean equalsVertex(int axisCount, final int vertexIndex1,
+    final int vertexIndex2);
+
+  boolean equalsVertex(int axisCount, final int vertexIndex,
+    final LineString line2, int vertexIndex2);
+
+  @Override
+  boolean equalsVertex(int axisCount, final int vertexIndex, final Point point);
 
   boolean equalsVertex(final int vertexIndex, final Point point);
 
+  @Override
   double getCoordinate(int vertexIndex, final int axisIndex);
 
   PointList getCoordinatesList();
 
   Point getEndPoint();
 
+  @Override
   double getM(int vertexIndex);
 
+  @Override
   Point getPoint(final int vertexIndex);
 
   int getSegmentCount();
 
   Point getStartPoint();
 
+  @Override
   double getX(int vertexIndex);
 
+  @Override
   double getY(int vertexIndex);
 
+  @Override
   double getZ(int vertexIndex);
+
+  @Override
+  boolean hasVertex(Point point);
 
   boolean isClockwise();
 
   boolean isClosed();
 
+  @Override
   boolean isCounterClockwise();
 
   boolean isRing();
@@ -126,7 +148,13 @@ public interface LineString extends Lineal {
   @Override
   LineString reverse();
 
+  List<LineString> split(Point point);
+
+  @Override
   LineString subLine(final int vertexCount);
+
+  @Override
+  LineString subLine(final int fromVertexIndex, int vertexCount);
 
   LineString subLine(final int vertexCount, final Point toPoint);
 

@@ -21,34 +21,29 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 
 public class LineEqualExactFilter implements Filter<LineString> {
-  private final PointList points;
+  private final LineString line;
 
   int axisCount = -1;
 
   public LineEqualExactFilter(final LineString line) {
-    this.points = CoordinatesListUtil.get(line);
+    this.line = line;
   }
 
   public LineEqualExactFilter(final LineString line, final int axisCount) {
-    this.points = CoordinatesListUtil.get(line);
+    this.line = line;
     this.axisCount = axisCount;
   }
 
   @Override
   public boolean accept(final LineString line) {
-    final PointList points = CoordinatesListUtil.get(line);
-
-    final boolean equal;
-    if (axisCount >= 2) {
-      equal = this.points.equals(points, axisCount);
-    } else {
-      equal = this.points.equals(points);
+    int axisCount = this.axisCount;
+    if (axisCount == -1) {
+      axisCount = Math.max(this.line.getAxisCount(), line.getAxisCount());
     }
+    final boolean equal = this.line.equals(axisCount, line);
     if (equal) {
       return true;
     } else {

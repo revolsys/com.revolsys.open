@@ -32,12 +32,13 @@
  */
 package com.revolsys.jts.geom.impl;
 
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.PointList;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.
@@ -71,9 +72,9 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingImpl(final GeometryFactory factory,
-    final PointList points) {
-    super(factory, points);
+  public LinearRingImpl(final GeometryFactory factory, final int axisCount,
+    final double... points) {
+    super(factory, axisCount, points);
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
@@ -87,6 +88,13 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
     }
   }
 
+  public LinearRingImpl(final GeometryFactory geometryFactory,
+    final int axisCount, final int vertexCount, final double... coordinates) {
+    super(geometryFactory, axisCount, getNewCoordinates(geometryFactory,
+      axisCount, vertexCount, coordinates));
+
+  }
+
   /**
    * Constructs a <code>LinearRing</code> with the vertices
    * specifed by the given {@link PointList}.
@@ -97,9 +105,8 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingImpl(final GeometryFactory factory, final int axisCount,
-    final double... points) {
-    super(factory, axisCount, points);
+  public LinearRingImpl(final GeometryFactory factory, final PointList points) {
+    super(factory, points);
     if (isClosed()) {
       final int vertexCount = getVertexCount();
       if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
@@ -173,10 +180,21 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
 
   @Override
   public LinearRing reverse() {
-    final PointList points = getCoordinatesList();
-    final PointList reversePoints = points.reverse();
+    final int vertexCount = getVertexCount();
+    final int axisCount = getAxisCount();
+    final double[] coordinates = new double[vertexCount * axisCount];
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final int coordinateIndex = (vertexCount - 1 - vertexIndex) * axisCount
+          + axisIndex;
+        coordinates[coordinateIndex] = getCoordinate(vertexIndex, axisIndex);
+      }
+    }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final LinearRing reverseLine = geometryFactory.linearRing(reversePoints);
+    final LinearRing reverseLine = geometryFactory.linearRing(axisCount,
+      coordinates);
+    GeometryProperties.copyUserData(this, reverseLine);
     return reverseLine;
+
   }
 }

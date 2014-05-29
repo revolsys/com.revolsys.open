@@ -36,7 +36,7 @@ package com.revolsys.jts.simplify;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.PointList;
 
 /**
  * Simplifies a linestring (sequence of points) using
@@ -45,7 +45,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * @version 1.7
  */
 class DouglasPeuckerLineSimplifier {
-  public static Point[] simplify(final Point[] pts,
+  public static Point[] simplify(final PointList pts,
     final double distanceTolerance) {
     final DouglasPeuckerLineSimplifier simp = new DouglasPeuckerLineSimplifier(
       pts);
@@ -53,13 +53,13 @@ class DouglasPeuckerLineSimplifier {
     return simp.simplify();
   }
 
-  private final Point[] pts;
+  private final PointList pts;
 
   private boolean[] usePt;
 
   private double distanceTolerance;
 
-  public DouglasPeuckerLineSimplifier(final Point[] pts) {
+  public DouglasPeuckerLineSimplifier(final PointList pts) {
     this.pts = pts;
   }
 
@@ -75,15 +75,15 @@ class DouglasPeuckerLineSimplifier {
   }
 
   public Point[] simplify() {
-    usePt = new boolean[pts.length];
-    for (int i = 0; i < pts.length; i++) {
+    usePt = new boolean[pts.getVertexCount()];
+    for (int i = 0; i < pts.getVertexCount(); i++) {
       usePt[i] = true;
     }
-    simplifySection(0, pts.length - 1);
+    simplifySection(0, pts.getVertexCount() - 1);
     final CoordinateList coordList = new CoordinateList();
-    for (int i = 0; i < pts.length; i++) {
+    for (int i = 0; i < pts.getVertexCount(); i++) {
       if (usePt[i]) {
-        coordList.add(new PointDouble(pts[i]));
+        coordList.add(pts.getPoint(i));
       }
     }
     return coordList.toCoordinateArray();
@@ -93,12 +93,13 @@ class DouglasPeuckerLineSimplifier {
     if ((i + 1) == j) {
       return;
     }
-    final Point p0 = pts[i];
-    final Point p1 = pts[j];
+    final Point p0 = pts.getPoint(i);
+    final Point p1 = pts.getPoint(j);
     double maxDistance = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
-      final double distance = LineSegmentUtil.distanceLinePoint(p0, p1, pts[k]);
+      final double distance = LineSegmentUtil.distanceLinePoint(p0, p1,
+        pts.getPoint(k));
       if (distance > maxDistance) {
         maxDistance = distance;
         maxIndex = k;

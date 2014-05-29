@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 public class MultiLineStringSegment extends AbstractSegment implements
   Iterator<Segment> {
@@ -29,6 +30,18 @@ public class MultiLineStringSegment extends AbstractSegment implements
       } else {
         return part.getCoordinate(segmentIndex + vertexIndex, axisIndex);
       }
+    }
+  }
+
+  @Override
+  public Vertex getGeometryVertex(final int index) {
+    final MultiLineString line = getMultiLineString();
+    if (index == 0) {
+      return line.getVertex(partIndex, segmentIndex);
+    } else if (index == 1) {
+      return line.getVertex(partIndex, segmentIndex + 1);
+    } else {
+      return null;
     }
   }
 

@@ -140,9 +140,9 @@ public class Graph<T> {
   }
 
   public Edge<T> addEdge(final T object, final LineString line) {
-    final PointList points = CoordinatesListUtil.get(line);
-    final Point from = points.get(0);
-    final Point to = points.get(points.size() - 1);
+    final PointList points = line;
+    final Point from = points.getPoint(0);
+    final Point to = points.getPoint(points.getVertexCount() - 1);
     return addEdge(object, line, from, to);
   }
 
@@ -1098,7 +1098,7 @@ public class Graph<T> {
       return Collections.emptyList();
     } else {
       final LineString line = edge.getLine();
-      final PointList points = CoordinatesListUtil.get(line);
+      final PointList points = line;
       final Set<Integer> splitVertices = new TreeSet<Integer>();
       final Set<Integer> splitIndexes = new TreeSet<Integer>();
 
@@ -1112,12 +1112,12 @@ public class Graph<T> {
       final Map<Point, Double> nodeDistanceMap = new HashMap<Point, Double>();
       final Map<Point, Integer> nodeSegment = new HashMap<Point, Integer>();
 
-      for (int i = 1; i < points.size() && !nodes.isEmpty(); i++) {
+      for (int i = 1; i < points.getVertexCount() && !nodes.isEmpty(); i++) {
         for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
           final Point node = nodeIter.next();
           final double nodeDistance = points.distance(i, node);
           if (nodeDistance < maxDistance) {
-            if (i < points.size() - 1) {
+            if (i < points.getVertexCount() - 1) {
               splitVertices.add(i);
               splitIndexes.add(i);
             }
@@ -1163,7 +1163,7 @@ public class Graph<T> {
         final Integer index = entry.getValue();
         Set<Point> splitNodes = segmentSplitNodes.get(index);
         if (splitNodes == null) {
-          final Point point = points.get(index);
+          final Point point = points.getPoint(index);
           splitNodes = new TreeSet<Point>(new CoordinatesDistanceComparator(
             point));
           segmentSplitNodes.put(index, splitNodes);
@@ -1201,8 +1201,8 @@ public class Graph<T> {
                   point = node.get3dCoordinates(typePath);
                 }
                 if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
-                  final Point p1 = points.get(index);
-                  final Point p2 = points.get(index + 1);
+                  final Point p1 = points.getPoint(index);
+                  final Point p2 = points.getPoint(index + 1);
                   final double z = LineSegmentUtil.getElevation(p1, p2, point);
                   point = new PointDouble(point.getX(), point.getY(), z);
                 }
@@ -1251,7 +1251,7 @@ public class Graph<T> {
     if (!edge.isRemoved()) {
       final Point point = node;
       final LineString line = edge.getLine();
-      final PointList points = CoordinatesListUtil.get(line);
+      final PointList points = line;
 
       final Map<String, Number> result = CoordinatesListUtil.findClosestSegmentAndCoordinate(
         points, point);
@@ -1268,11 +1268,11 @@ public class Graph<T> {
           } else if (segmentDistance == 0) {
             lines = LineStringUtil.split(line, segmentIndex, point);
           } else {
-            final Point c0 = points.get(0);
+            final Point c0 = points.getPoint(0);
             Point c1;
             int i = 1;
             do {
-              c1 = points.get(i);
+              c1 = points.getPoint(i);
               i++;
             } while (c1.equals(c0));
             if (CoordinatesUtil.isAcute(c1, c0, point)) {
@@ -1291,11 +1291,11 @@ public class Graph<T> {
           } else if (segmentDistance == 0) {
             lines = LineStringUtil.split(line, segmentIndex, point);
           } else {
-            final Point cn = points.get(line.getVertexCount() - 1);
+            final Point cn = points.getPoint(line.getVertexCount() - 1);
             Point cn1;
             int i = line.getVertexCount() - 2;
             do {
-              cn1 = points.get(i);
+              cn1 = points.getPoint(i);
               i++;
             } while (cn1.equals(cn));
             if (CoordinatesUtil.isAcute(cn1, cn, point)) {

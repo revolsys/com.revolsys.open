@@ -34,6 +34,7 @@
 package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.jts.algorithm.RayCrossingCounter;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
@@ -104,7 +105,7 @@ public class PlanarPolygon3D {
    * @return a normal vector
    */
   private Vector3D averageNormal(final PointList seq) {
-    final int n = seq.size();
+    final int n = seq.getVertexCount();
     final double[] sum = new double[3];
     for (int i = 0; i < n - 1; i++) {
       final double x1 = seq.getX(0);
@@ -136,11 +137,11 @@ public class PlanarPolygon3D {
    */
   private Point averagePoint(final PointList seq) {
     final double[] a = new double[3];
-    final int n = seq.size();
+    final int n = seq.getVertexCount();
     for (int i = 0; i < n; i++) {
-      a[0] += seq.getValue(i, PointList.X);
-      a[1] += seq.getValue(i, PointList.Y);
-      a[2] += seq.getValue(i, PointList.Z);
+      a[0] += seq.getCoordinate(i, Geometry.X);
+      a[1] += seq.getCoordinate(i, Geometry.Y);
+      a[2] += seq.getCoordinate(i, Geometry.Z);
     }
     a[0] /= n;
     a[1] /= n;
@@ -161,7 +162,7 @@ public class PlanarPolygon3D {
    * @return the best-fit plane
    */
   private Plane3D findBestFitPlane(final Polygon poly) {
-    final PointList seq = poly.getExteriorRing().getCoordinatesList();
+    final PointList seq = poly.getExteriorRing();
     final Point basePt = averagePoint(seq);
     final Vector3D normal = averageNormal(seq);
     return new Plane3D(normal, basePt);
@@ -189,7 +190,7 @@ public class PlanarPolygon3D {
   }
 
   public boolean intersects(final Point pt, final LineString ring) {
-    final PointList seq = ring.getCoordinatesList();
+    final PointList seq = ring;
     final PointList seqProj = project(seq, facingPlane);
     final Point ptProj = project(pt, facingPlane);
     return Location.EXTERIOR != RayCrossingCounter.locatePointInRing(ptProj,
@@ -197,7 +198,7 @@ public class PlanarPolygon3D {
   }
 
   private Location locate(final Point pt, final LineString ring) {
-    final PointList seq = ring.getCoordinatesList();
+    final PointList seq = ring;
     final PointList seqProj = project(seq, facingPlane);
     final Point ptProj = project(pt, facingPlane);
     return RayCrossingCounter.locatePointInRing(ptProj, seqProj);

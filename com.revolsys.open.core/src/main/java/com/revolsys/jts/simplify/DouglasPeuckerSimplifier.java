@@ -34,11 +34,11 @@
 package com.revolsys.jts.simplify;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 
@@ -90,14 +90,13 @@ public class DouglasPeuckerSimplifier {
     }
 
     @Override
-    protected PointList transformCoordinates(
-      final PointList coords, final Geometry parent) {
-      if (coords.size() == 0) {
+    protected PointList transformCoordinates(final PointList coords,
+      final Geometry parent) {
+      if (coords.getVertexCount() == 0) {
         return coords;
       } else {
-        final Point[] inputPts = coords.toCoordinateArray();
-        final Point[] newPts = DouglasPeuckerLineSimplifier.simplify(
-          inputPts, distanceTolerance);
+        final Point[] newPts = DouglasPeuckerLineSimplifier.simplify(coords,
+          distanceTolerance);
         return new DoubleCoordinatesList(newPts);
       }
     }
@@ -116,7 +115,6 @@ public class DouglasPeuckerSimplifier {
       if (removeDegenerateRings && !(simpResult instanceof LinearRing)) {
         return null;
       }
-      ;
       return simpResult;
     }
 

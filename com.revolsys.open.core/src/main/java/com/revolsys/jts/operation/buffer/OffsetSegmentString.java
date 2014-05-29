@@ -36,10 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -63,10 +63,6 @@ class OffsetSegmentString {
    */
   private double minimimVertexDistance = 0.0;
 
-  public void addPt(final Point point) {
-    addPt(point.getX(), point.getY());
-  }
-
   public void addPt(final double... coordinates) {
     if (!precisionModel.isFloating()) {
       coordinates[0] = precisionModel.makePrecise(0, coordinates[0]);
@@ -78,14 +74,18 @@ class OffsetSegmentString {
     }
   }
 
+  public void addPt(final Point point) {
+    addPt(point.getX(), point.getY());
+  }
+
   public void addPts(final PointList points, final boolean isForward) {
     if (isForward) {
-      for (int i = 0; i < points.size(); i++) {
-        addPt(points.get(i));
+      for (int i = 0; i < points.getVertexCount(); i++) {
+        addPt(points.getPoint(i));
       }
     } else {
-      for (int i = points.size() - 1; i >= 0; i--) {
-        addPt(points.get(i));
+      for (int i = points.getVertexCount() - 1; i >= 0; i--) {
+        addPt(points.getPoint(i));
       }
     }
   }
@@ -146,9 +146,8 @@ class OffsetSegmentString {
   @Override
   public String toString() {
     final GeometryFactory geometryFactory = GeometryFactory.floating3();
-    final PointList points = getPoints();
     if (points.size() == 1) {
-      return geometryFactory.point(points).toString();
+      return points.get(0).toString();
     } else {
       final LineString line = geometryFactory.lineString(points);
       return line.toString();

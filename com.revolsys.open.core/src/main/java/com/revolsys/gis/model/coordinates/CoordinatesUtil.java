@@ -143,10 +143,10 @@ public class CoordinatesUtil {
 
   public static double getElevation(final LineString line,
     final Point coordinate) {
-    final PointList coordinates = line.getCoordinatesList();
-    Point previousCoordinate = coordinates.getCoordinate(0);
-    for (int i = 1; i < coordinates.size(); i++) {
-      final Point currentCoordinate = coordinates.getCoordinate(i);
+    final PointList coordinates = line;
+    Point previousCoordinate = coordinates.getPoint(0);
+    for (int i = 1; i < coordinates.getVertexCount(); i++) {
+      final Point currentCoordinate = coordinates.getPoint(i);
 
       if (LineSegmentUtil.distanceLinePoint(previousCoordinate, currentCoordinate,
         coordinate) < 1) {
@@ -331,10 +331,10 @@ public class CoordinatesUtil {
   }
 
   public static float[] toFloatArray(final PointList points, final int axisCount) {
-    final float[] coordinates = new float[axisCount * points.size()];
-    for (int i = 0; i < points.size(); i++) {
+    final float[] coordinates = new float[axisCount * points.getVertexCount()];
+    for (int i = 0; i < points.getVertexCount(); i++) {
       for (int axis = 0; axis < axisCount; axis++) {
-        coordinates[i * axisCount + axis] = (float)points.getValue(i, axis);
+        coordinates[i * axisCount + axis] = (float)points.getCoordinate(i, axis);
       }
     }
     return coordinates;

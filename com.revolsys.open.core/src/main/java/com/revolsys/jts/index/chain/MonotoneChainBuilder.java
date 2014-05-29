@@ -59,9 +59,9 @@ public class MonotoneChainBuilder {
     int safeStart = start;
     // skip any zero-length segments at the start of the sequence
     // (since they cannot be used to establish a quadrant)
-    final int size = points.size();
+    final int size = points.getVertexCount();
     while (safeStart < size - 1
-      && points.get(safeStart).equals(2,points.get(safeStart + 1))) {
+      && points.getPoint(safeStart).equals(2,points.getPoint(safeStart + 1))) {
       safeStart++;
     }
     // check if there are NO non-zero-length segments
@@ -69,15 +69,15 @@ public class MonotoneChainBuilder {
       return size - 1;
     }
     // determine overall quadrant for chain (which is the starting quadrant)
-    final int chainQuad = Quadrant.quadrant(points.get(safeStart),
-      points.get(safeStart + 1));
+    final int chainQuad = Quadrant.quadrant(points.getPoint(safeStart),
+      points.getPoint(safeStart + 1));
     int last = start + 1;
     while (last < size) {
       // skip zero-length segments, but include them in the chain
-      if (!points.get(last - 1).equals(2,points.get(last))) {
+      if (!points.getPoint(last - 1).equals(2,points.getPoint(last))) {
         // compute quadrant for next possible segment in chain
-        final int quad = Quadrant.quadrant(points.get(last - 1),
-          points.get(last));
+        final int quad = Quadrant.quadrant(points.getPoint(last - 1),
+          points.getPoint(last));
         if (quad != chainQuad) {
           break;
         }
@@ -125,7 +125,7 @@ public class MonotoneChainBuilder {
       final int last = findChainEnd(points, start);
       startIndexList.add(last);
       start = last;
-    } while (start < points.size() - 1);
+    } while (start < points.getVertexCount() - 1);
     // copy list to an array of ints, for efficiency
     return startIndexList;
   }

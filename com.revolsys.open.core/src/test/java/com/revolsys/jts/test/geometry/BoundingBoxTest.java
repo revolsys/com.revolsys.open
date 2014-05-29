@@ -12,13 +12,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.TestConstants;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.CollectionUtil;
@@ -260,8 +258,8 @@ public class BoundingBoxTest implements TestConstants {
         assertEnvelope(new Envelope(gfFloating, points), gfFloating, false,
           axisCount, bounds);
 
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326,
-          axisCount, 10.0, 10.0);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
+          10.0, 10.0);
 
         points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
@@ -345,11 +343,12 @@ public class BoundingBoxTest implements TestConstants {
       Collections.<Point> singleton(null));
     assertEnvelope(emptyListWithNulls, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyNullCoordinatesList = new Envelope((PointList)null);
+    final BoundingBox emptyNullCoordinatesList = new Envelope(
+      (Iterable<Point>)null);
     assertEnvelope(emptyNullCoordinatesList, null, true, 0, NULL_BOUNDS);
 
     final BoundingBox emptyCoordinatesList = new Envelope(
-      new DoubleCoordinatesList(0, 2));
+      new ArrayList<Point>());
     assertEnvelope(emptyCoordinatesList, null, true, 0, NULL_BOUNDS);
 
     // Different number of axis and values
@@ -381,8 +380,8 @@ public class BoundingBoxTest implements TestConstants {
         assertEnvelope(new Envelope(gfFloating, points), gfFloating, false,
           axisCount, bounds);
 
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326,
-          axisCount, 10.0, 10.0);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
+          10.0, 10.0);
 
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
         assertEnvelope(new Envelope(gfFixed, points), gfFixed, false,

@@ -337,7 +337,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   public double getFromAngle() {
     final LineString line = getLine();
-    final PointList points = CoordinatesListUtil.get(line);
+    final PointList points = line;
     return CoordinatesListUtil.angleToNext(points, 0);
   }
 
@@ -405,8 +405,8 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     if (line == null) {
       return Double.NaN;
     } else {
-      final PointList points = CoordinatesListUtil.get(line);
-      return CoordinatesListUtil.angleToPrevious(points, points.size() - 1);
+      final PointList points = line;
+      return CoordinatesListUtil.angleToPrevious(points, points.getVertexCount() - 1);
     }
   }
 

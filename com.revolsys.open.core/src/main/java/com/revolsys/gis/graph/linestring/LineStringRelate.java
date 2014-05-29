@@ -79,7 +79,7 @@ public class LineStringRelate {
 
   public Point getMovedCoordinate(final Map<Point, Point> movedNodes,
     final LineString line, final int i) {
-    final Point coordinates = CoordinatesListUtil.get(line, i);
+    final Point coordinates = line.getVertex(i);
     if (movedNodes.containsKey(coordinates)) {
       return movedNodes.get(coordinates);
     } else {
@@ -89,7 +89,7 @@ public class LineStringRelate {
 
   public MultiLineString getOverlap() {
     final List<List<Point>> intersections = new ArrayList<>();
-    final PointList points1 = CoordinatesListUtil.get(line1);
+    final PointList points1 = line1;
     final List<Point> currentCoordinates = new ArrayList<>();
     Node<LineSegment> previousNode = graph1.getNode(fromPoint1);
     do {

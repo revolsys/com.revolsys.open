@@ -350,7 +350,7 @@ public class PackedCoordinateUtil {
     if (!parts.isEmpty()) {
       for (final List<PointList> part : parts) {
         for (final PointList points : part) {
-          numPoints += points.size();
+          numPoints += points.getVertexCount();
         }
       }
       numPoints += parts.size() - 1;
@@ -393,7 +393,7 @@ public class PackedCoordinateUtil {
         previousY = writeOrdinate(out, previousY, xyScale, 0);
       }
       for (final PointList points : part) {
-        final int numPoints = points.size();
+        final int numPoints = points.getVertexCount();
         for (int i = 0; i < numPoints; i++) {
           previousX = writeOrdinate(out, points, previousX, xyScale, i, 0);
           previousY = writeOrdinate(out, points, previousY, xyScale, i, 1);
@@ -614,7 +614,7 @@ public class PackedCoordinateUtil {
   private static long writeCoordinates(final PackedIntegerOutputStream out,
     final PointList points, long previousValue, final double scale,
     final int ordinateIndex) {
-    for (int i = 0; i < points.size(); i++) {
+    for (int i = 0; i < points.getVertexCount(); i++) {
       previousValue = writeOrdinate(out, points, previousValue, scale, i,
         ordinateIndex);
     }
@@ -636,7 +636,7 @@ public class PackedCoordinateUtil {
         if (points.getAxisCount() > axisIndex) {
           previous = writeCoordinates(out, points, previous, scale, axisIndex);
         } else {
-          previous = writeZeroCoordinates(out, points.size(), scale, previous);
+          previous = writeZeroCoordinates(out, points.getVertexCount(), scale, previous);
         }
       }
     }
@@ -672,7 +672,7 @@ public class PackedCoordinateUtil {
   private static long writeOrdinate(final PackedIntegerOutputStream out,
     final PointList coordinates, final long previousValue, final double scale,
     final int coordinateIndex, final int ordinateIndex) {
-    final double value = coordinates.getValue(coordinateIndex, ordinateIndex);
+    final double value = coordinates.getCoordinate(coordinateIndex, ordinateIndex);
     return writeOrdinate(out, previousValue, scale, value);
   }
 

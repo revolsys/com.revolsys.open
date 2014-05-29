@@ -372,7 +372,7 @@ public class WKBWriter {
       // it
       double ordVal = Point.NULL_ORDINATE;
       if (seq.getAxisCount() >= 3) {
-        ordVal = seq.getValue(index, 2);
+        ordVal = seq.getCoordinate(index, 2);
       }
       ByteOrderValues.putDouble(ordVal, buf, byteOrder);
       os.write(buf, 8);
@@ -402,10 +402,10 @@ public class WKBWriter {
   private void writeCoordinateSequence(final PointList seq,
     final boolean writeSize, final OutStream os) throws IOException {
     if (writeSize) {
-      writeInt(seq.size(), os);
+      writeInt(seq.getVertexCount(), os);
     }
 
-    for (int i = 0; i < seq.size(); i++) {
+    for (int i = 0; i < seq.getVertexCount(); i++) {
       writeCoordinate(seq, i, os);
     }
   }
@@ -441,7 +441,7 @@ public class WKBWriter {
     throws IOException {
     writeByteOrder(os);
     writeGeometryType(WKBConstants.wkbLineString, line, os);
-    writeCoordinateSequence(line.getCoordinatesList(), true, os);
+    writeCoordinateSequence(line, true, os);
   }
 
   private void writePoint(final Point point, final OutStream os)
@@ -460,10 +460,10 @@ public class WKBWriter {
     writeByteOrder(os);
     writeGeometryType(WKBConstants.wkbPolygon, poly, os);
     writeInt(poly.getNumInteriorRing() + 1, os);
-    writeCoordinateSequence(poly.getExteriorRing().getCoordinatesList(), true,
+    writeCoordinateSequence(poly.getExteriorRing(), true,
       os);
     for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      writeCoordinateSequence(poly.getInteriorRing(i).getCoordinatesList(),
+      writeCoordinateSequence(poly.getInteriorRing(i),
         true, os);
     }
   }

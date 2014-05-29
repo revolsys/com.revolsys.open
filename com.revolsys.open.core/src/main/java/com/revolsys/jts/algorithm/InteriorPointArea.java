@@ -246,8 +246,8 @@ public class InteriorPointArea {
 	  }
 
 	private void process(LineString line) {
-		PointList seq = line.getCoordinatesList();
-		for (int i = 0; i < seq.size(); i++) {
+		PointList seq = line;
+		for (int i = 0; i < seq.getVertexCount(); i++) {
 			double y = seq.getY(i);
 			updateInterval(y);
 		}

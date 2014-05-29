@@ -40,7 +40,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.startTag(GmlConstants.COORDINATES);
     final int axisCount = points.getAxisCount();
     boolean first = true;
-    for (int i = 0; i < points.size(); i++) {
+    for (int i = 0; i < points.getVertexCount(); i++) {
       if (first) {
         first = false;
       } else {
@@ -50,7 +50,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
         if (axisIndex > 0) {
           out.text(",");
         }
-        final double value = points.getValue(i, axisIndex);
+        final double value = points.getCoordinate(i, axisIndex);
         number(out, value);
       }
     }
@@ -106,7 +106,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   private void linearRing(final XmlWriter out, final LineString line,
     final boolean writeSrsName) {
     out.startTag(LINEAR_RING);
-    final PointList points = CoordinatesListUtil.get(line);
+    final PointList points = line;
     coordinates(out, points);
     out.endTag(LINEAR_RING);
   }
@@ -116,7 +116,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.startTag(LINE_STRING);
     srsName(out, line, writeSrsName);
     if (!line.isEmpty()) {
-      final PointList points = line.getCoordinatesList();
+      final PointList points = line;
       coordinates(out, points);
     }
     out.endTag(LINE_STRING);
@@ -209,7 +209,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     final int axisCount = points.getAxisCount();
     out.attribute(GmlConstants.DIMENSION, axisCount);
     boolean first = true;
-    for (int i = 0; i < points.size(); i++) {
+    for (int i = 0; i < points.getVertexCount(); i++) {
       if (first) {
         first = false;
       } else {

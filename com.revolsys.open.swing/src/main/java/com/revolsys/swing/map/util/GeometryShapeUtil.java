@@ -6,7 +6,6 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -14,28 +13,23 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
 
 public final class GeometryShapeUtil {
-  public static void addCoordinateSequence(final Viewport2D viewport,
-    final GeneralPath path, final PointList sequence) {
-    double x = sequence.getValue(0, 0);
-    double y = sequence.getValue(0, 1);
+  public static void addLineString(final Viewport2D viewport,
+    final GeneralPath path, final LineString line) {
+    double x = line.getX(0);
+    double y = line.getY(0);
     double[] screenCoords = viewport.toViewCoordinates(x, y);
     float screenX = (float)screenCoords[0];
     float screenY = (float)screenCoords[1];
     path.moveTo(screenX, screenY);
-    for (int i = 0; i < sequence.size(); i++) {
-      x = sequence.getValue(i, 0);
-      y = sequence.getValue(i, 1);
+    final int vertexCount = line.getVertexCount();
+    for (int i = 1; i < vertexCount; i++) {
+      x = line.getX(i);
+      y = line.getY(i);
       screenCoords = viewport.toViewCoordinates(x, y);
       screenX = (float)screenCoords[0];
       screenY = (float)screenCoords[1];
       path.lineTo(screenX, screenY);
     }
-  }
-
-  public static void addLineString(final Viewport2D viewport,
-    final GeneralPath path, final LineString line) {
-    final PointList sequence = line.getCoordinatesList();
-    addCoordinateSequence(viewport, path, sequence);
   }
 
   public static Shape toShape(final Viewport2D viewport,

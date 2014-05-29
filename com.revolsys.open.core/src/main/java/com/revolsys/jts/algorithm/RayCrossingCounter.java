@@ -131,7 +131,7 @@ public class RayCrossingCounter {
 
     double x0 = ring.getX(0);
     double y0 = ring.getY(0);
-    for (int i = 1; i < ring.size(); i++) {
+    for (int i = 1; i < ring.getVertexCount(); i++) {
       final double x1 = ring.getX(i);
       final double y1 = ring.getY(i);
       counter.countSegment(x1, y1, x0, y0);

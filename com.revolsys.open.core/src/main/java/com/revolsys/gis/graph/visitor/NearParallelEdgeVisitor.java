@@ -32,14 +32,14 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
     if (line.getBoundingBox().distance(matchLine.getBoundingBox()) > maxDistance) {
       return false;
     }
-    final PointList coords = line.getCoordinatesList();
-    final PointList matchCoords = line.getCoordinatesList();
-    Point previousCoordinate = coords.getCoordinate(0);
-    for (int i = 1; i < coords.size(); i++) {
-      final Point coordinate = coords.getCoordinate(i);
-      Point previousMatchCoordinate = matchCoords.getCoordinate(0);
-      for (int j = 1; j < coords.size(); j++) {
-        final Point matchCoordinate = matchCoords.getCoordinate(i);
+    final PointList coords = line;
+    final PointList matchCoords = line;
+    Point previousCoordinate = coords.getPoint(0);
+    for (int i = 1; i < coords.getVertexCount(); i++) {
+      final Point coordinate = coords.getPoint(i);
+      Point previousMatchCoordinate = matchCoords.getPoint(0);
+      for (int j = 1; j < coords.getVertexCount(); j++) {
+        final Point matchCoordinate = matchCoords.getPoint(i);
         final double distance = LineSegmentUtil.distanceLineLine(previousCoordinate, coordinate, previousMatchCoordinate, matchCoordinate);
         if (distance <= maxDistance) {
           final double angle1 = Angle.normalizePositive(previousCoordinate.angle2d(coordinate));

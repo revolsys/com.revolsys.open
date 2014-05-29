@@ -33,7 +33,7 @@ public class CoordinatesListCoordinatesIterator implements Iterator<Point> {
 
   @Override
   public boolean hasNext() {
-    return index < coordinatesList.size();
+    return index < coordinatesList.getVertexCount();
   }
 
   @Override
@@ -41,7 +41,7 @@ public class CoordinatesListCoordinatesIterator implements Iterator<Point> {
     if (hasNext()) {
       final int index = this.index;
       this.index++;
-      return coordinatesList.get(index);
+      return coordinatesList.getPoint(index);
     } else {
       throw new NoSuchElementException();
     }

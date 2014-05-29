@@ -9,12 +9,9 @@ import java.util.List;
 import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.valid.IsValidOp;
 import com.revolsys.jts.operation.valid.TopologyValidationError;
@@ -125,21 +122,10 @@ public class SelectedRecordsRenderer {
         outlineStyle);
 
       if (!geometry.isEmpty()) {
-        for (int i = 0; i < geometry.getGeometryCount(); i++) {
-          final Geometry part = geometry.getGeometry(i);
-          if (part instanceof LineString) {
-            final LineString lineString = (LineString)part;
-            final PointList points = CoordinatesListUtil.get(lineString);
-            MarkerStyleRenderer.renderMarkers(viewport, graphics, points,
-              firstVertexStyle, lastVertexStyle, vertexStyle);
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            final List<PointList> pointsList = CoordinatesListUtil.getAll(polygon);
-            for (final PointList points : pointsList) {
-              MarkerStyleRenderer.renderMarkers(viewport, graphics, points,
-                firstVertexStyle, lastVertexStyle, vertexStyle);
-            }
-          }
+        final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
+        for (final LineString line : lines) {
+          MarkerStyleRenderer.renderMarkers(viewport, graphics, line,
+            firstVertexStyle, lastVertexStyle, vertexStyle);
         }
       }
 

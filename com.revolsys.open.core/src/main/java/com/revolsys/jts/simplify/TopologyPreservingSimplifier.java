@@ -98,7 +98,7 @@ public class TopologyPreservingSimplifier {
     @Override
     protected PointList transformCoordinates(
       final PointList coords, final Geometry parent) {
-      if (coords.size() == 0) {
+      if (coords.getVertexCount() == 0) {
         return null;
       }
       // for linear components (including rings), simplify the linestring

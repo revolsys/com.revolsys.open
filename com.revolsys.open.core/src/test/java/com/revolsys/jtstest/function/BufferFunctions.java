@@ -156,7 +156,7 @@ public class BufferFunctions {
       final Point[] pts = CoordinatesListUtil.getCoordinateArray(line);
       simpLines.add(geometry.getGeometryFactory()
         .lineString(
-          BufferInputLineSimplifier.simplify(line.getCoordinatesList(),
+          BufferInputLineSimplifier.simplify(line,
             distance)));
     }
     final Geometry simpGeom = geometry.getGeometryFactory().buildGeometry(

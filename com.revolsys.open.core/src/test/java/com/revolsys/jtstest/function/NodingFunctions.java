@@ -42,7 +42,7 @@ public class NodingFunctions {
     final List<NodedSegmentString> segs = new ArrayList<>();
     final List<LineString> lines = geom.getGeometries(LineString.class);
     for (final LineString line : lines) {
-      segs.add(new NodedSegmentString(line.getCoordinatesList(), null));
+      segs.add(new NodedSegmentString(line, null));
     }
     return segs;
   }
@@ -51,7 +51,7 @@ public class NodingFunctions {
     final List<SegmentString> segs = new ArrayList<>();
     final List<LineString> lines = geom.getGeometries(LineString.class);
     for (final LineString line : lines) {
-      segs.add(new BasicSegmentString(line.getCoordinatesList(), null));
+      segs.add(new BasicSegmentString(line, null));
     }
     return segs;
   }

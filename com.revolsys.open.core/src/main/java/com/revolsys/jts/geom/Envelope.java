@@ -250,6 +250,11 @@ public class Envelope implements Serializable, BoundingBox {
     this(null, points);
   }
 
+  @Deprecated
+  public Envelope(final PointList points) {
+    this(points.toPointList());
+  }
+
   @Override
   public BoundingBox clipToCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();

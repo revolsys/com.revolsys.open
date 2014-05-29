@@ -210,7 +210,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   public Geometry getSelfIntersections() {
     final GeometryFactory precisionModel = getPrecisionModel();
     final Set<Point> intersectionPoints = new HashSet<Point>();
-    for (final Point point : points) {
+    for (final Point point : points.toPointList()) {
       final Node<LineSegment> node = getNode(point);
       if (node.getDegree() > 2 || hasTouchingEdges(node)) {
         intersectionPoints.add(point);
@@ -282,14 +282,14 @@ public class LineStringGraph extends Graph<LineSegment> {
     }
     envelope = envelope.expand(maxDistance);
     if (envelope.intersects(this.envelope)) {
-      final PointList points = CoordinatesListUtil.get(line);
-      final int numPoints = points.size();
-      final Point fromPoint = points.get(0);
-      final Point toPoint = points.get(numPoints - 1);
+      final PointList points = line;
+      final int numPoints = points.getVertexCount();
+      final Point fromPoint = points.getPoint(0);
+      final Point toPoint = points.getPoint(numPoints - 1);
 
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
-        final Point nextPoint = points.get(i);
+        final Point nextPoint = points.getPoint(i);
         final LineSegment line1 = new LineSegmentDoubleGF(previousPoint,
           nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
@@ -423,7 +423,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   private void setLineString(final LineString lineString) {
-    final PointList points = CoordinatesListUtil.get(lineString);
+    final PointList points = lineString;
     setPoints(points);
   }
 
@@ -439,7 +439,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
       edge.setAttribute(INDEX, Arrays.asList(index++));
     }
-    fromPoint = new PointDouble(points.get(0));
+    fromPoint = new PointDouble(points.getPoint(0));
     envelope = CoordinatesListUtil.getBoundingBox(geometryFactory, points);
   }
 

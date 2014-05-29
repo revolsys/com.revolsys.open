@@ -73,7 +73,7 @@ class MCIndexedGeometry {
   private void init(final Geometry geom) {
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      final PointList points = line.getCoordinatesList();
+      final PointList points = line;
       addLine(points);
     }
   }

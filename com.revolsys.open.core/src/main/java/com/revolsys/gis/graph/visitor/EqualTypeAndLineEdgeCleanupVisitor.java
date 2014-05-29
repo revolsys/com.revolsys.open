@@ -25,8 +25,8 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
@@ -53,12 +53,12 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
 
   public boolean fixMissingZValues(final LineString line1,
     final LineString line2) {
-    final PointList points1 = line1.getCoordinatesList();
-    final PointList points2 = line2.getCoordinatesList();
+    final PointList points1 = line1;
+    final PointList points2 = line2;
     final int axisCount = points1.getAxisCount();
     if (axisCount > 2) {
-      final int vertexCount = points1.size();
-      final boolean reverse = isReverse(points1, points2);
+      final int vertexCount = points1.getVertexCount();
+      final boolean reverse = isReverse(line1, line2);
       if (reverse) {
         int j = vertexCount - 1;
         for (int i = 0; i < vertexCount; i++) {
@@ -110,14 +110,13 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     duplicateStatistics.connect();
   }
 
-  public boolean isReverse(final PointList points1,
-    final PointList points2) {
-    final int numPoints = points1.size();
-    if (points1.equal(0, points2, numPoints - 1, 2)) {
-      if (points1.equal(0, points1, numPoints - 1, 2)) {
+  public boolean isReverse(final LineString points1, final LineString points2) {
+    final int numPoints = points1.getVertexCount();
+    if (points1.equalsVertex(2, 0, points2, numPoints - 1)) {
+      if (points1.equalsVertex(2, 0, points1, numPoints - 1)) {
         int j = numPoints - 1;
         for (int i = 1; i < numPoints; i++) {
-          if (!points1.equal(i, points2, j, 2)) {
+          if (!points1.equalsVertex(2, i, points2, j)) {
             return false;
           }
           j++;

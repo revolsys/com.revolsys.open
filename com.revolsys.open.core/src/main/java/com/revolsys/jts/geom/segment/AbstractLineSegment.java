@@ -357,14 +357,14 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     Point intersection = null;
     final Polygon polygon = boundingBox.toPolygon(1);
     final LineString ring = polygon.getExteriorRing();
-    final PointList points = CoordinatesListUtil.get(ring);
+    final PointList points = ring;
     for (int i = 0; i < 4; i++) {
-      final Point ringC1 = points.get(i);
-      final Point ringC2 = points.get(i);
+      final Point ringC1 = points.getPoint(i);
+      final Point ringC2 = points.getPoint(i);
       final PointList currentIntersections = LineSegmentUtil.getIntersection(
         geometryFactory, coordinates1, coordinates2, ringC1, ringC2);
-      if (currentIntersections.size() == 1) {
-        final Point currentIntersection = currentIntersections.get(0);
+      if (currentIntersections.getVertexCount() == 1) {
+        final Point currentIntersection = currentIntersections.getPoint(0);
         if (intersection == null) {
           intersection = currentIntersection;
         } else if (coordinates1.distance(currentIntersection) < coordinates1.distance(intersection)) {
@@ -569,9 +569,9 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
 
   @Override
   public boolean isEndPoint(final Point point) {
-    if (equalsVertex(0, 2, point)) {
+    if (equalsVertex(2, 0, point)) {
       return true;
-    } else if (equalsVertex(-1, 2, point)) {
+    } else if (equalsVertex(2, -1, point)) {
       return true;
     } else {
       return false;

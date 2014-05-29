@@ -116,9 +116,9 @@ public class MaximalNearestSubline {
      */
 
     // Heuristic #1: use every vertex of B as a test point
-    final PointList bCoords = b.getCoordinatesList();
-    for (int ib = 0; ib < bCoords.size(); ib++) {
-      findNearestOnA(bCoords.getCoordinate(ib));
+    final PointList bCoords = b;
+    for (int ib = 0; ib < bCoords.getVertexCount(); ib++) {
+      findNearestOnA(bCoords.getPoint(ib));
     }
 
     /**
@@ -127,10 +127,10 @@ public class MaximalNearestSubline {
      * outside current max interval.
      */
     final LocationOfPoint bPtLocator = new LocationOfPoint(b);
-    final PointList aCoords = a.getCoordinatesList();
-    for (int ia = 0; ia < aCoords.size(); ia++) {
+    final PointList aCoords = a;
+    for (int ia = 0; ia < aCoords.getVertexCount(); ia++) {
       if (isOutsideInterval(ia)) {
-        final LineStringLocation bLoc = bPtLocator.locate(aCoords.getCoordinate(ia));
+        final LineStringLocation bLoc = bPtLocator.locate(aCoords.getPoint(ia));
         final Point bPt = bLoc.getCoordinate();
         findNearestOnA(bPt);
       }

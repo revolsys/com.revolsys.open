@@ -59,7 +59,7 @@ public class SegmentStringUtil {
     final List<NodedSegmentString> segStr = new ArrayList<>();
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      segStr.add(new NodedSegmentString(line.getCoordinatesList(), geom));
+      segStr.add(new NodedSegmentString(line, geom));
     }
     return segStr;
   }

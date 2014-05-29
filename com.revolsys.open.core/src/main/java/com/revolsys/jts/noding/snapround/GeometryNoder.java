@@ -139,7 +139,7 @@ public class GeometryNoder {
     final Collection<LineString> lines) {
     final List<NodedSegmentString> segStrings = new ArrayList<>();
     for (final LineString line : lines) {
-      segStrings.add(new NodedSegmentString(line.getCoordinatesList(), null));
+      segStrings.add(new NodedSegmentString(line, null));
     }
     return segStrings;
   }

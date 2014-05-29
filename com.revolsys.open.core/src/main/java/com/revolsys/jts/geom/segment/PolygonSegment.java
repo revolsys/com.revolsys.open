@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 public class PolygonSegment extends AbstractSegment implements
   Iterator<Segment> {
@@ -29,6 +30,18 @@ public class PolygonSegment extends AbstractSegment implements
       } else {
         return ring.getCoordinate(segmentIndex + vertexIndex, axisIndex);
       }
+    }
+  }
+
+  @Override
+  public Vertex getGeometryVertex(final int index) {
+    final Polygon polygon = getPolygon();
+    if (index == 0) {
+      return polygon.getVertex(ringIndex, segmentIndex);
+    } else if (index == 1) {
+      return polygon.getVertex(ringIndex, segmentIndex + 1);
+    } else {
+      return null;
     }
   }
 

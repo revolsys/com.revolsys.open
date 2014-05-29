@@ -153,7 +153,7 @@ public class WktWriter {
     final PointList coordinates, final int axisCount) {
     out.print('(');
     write(out, coordinates, 0, axisCount);
-    for (int i = 1; i < coordinates.size(); i++) {
+    for (int i = 1; i < coordinates.getVertexCount(); i++) {
       out.print(',');
       write(out, coordinates, i, axisCount);
     }
@@ -271,7 +271,7 @@ public class WktWriter {
     if (line.isEmpty()) {
       out.print(" EMPTY");
     } else {
-      final PointList coordinates = line.getCoordinatesList();
+      final PointList coordinates = line;
       write(out, coordinates, axisCount);
     }
   }
@@ -287,7 +287,7 @@ public class WktWriter {
     if (line.isEmpty()) {
       out.print(" EMPTY");
     } else {
-      final PointList coordinates = line.getCoordinatesList();
+      final PointList coordinates = line;
       write(out, coordinates, axisCount);
     }
   }
@@ -306,12 +306,12 @@ public class WktWriter {
     } else {
       out.print("(");
       LineString line = (LineString)multiLineString.getGeometry(0);
-      PointList points = CoordinatesListUtil.get(line);
+      PointList points = line;
       write(out, points, axisCount);
       for (int i = 1; i < multiLineString.getGeometryCount(); i++) {
         out.print(",");
         line = (LineString)multiLineString.getGeometry(i);
-        points = CoordinatesListUtil.get(line);
+        points = line;
         write(out, points, axisCount);
       }
       out.print(")");
@@ -426,7 +426,7 @@ public class WktWriter {
     if (ordinateIndex > coordinates.getAxisCount()) {
       out.print(0);
     } else {
-      final double ordinate = coordinates.getValue(index, ordinateIndex);
+      final double ordinate = coordinates.getCoordinate(index, ordinateIndex);
       if (Double.isNaN(ordinate)) {
         out.print(0);
       } else {
@@ -449,12 +449,12 @@ public class WktWriter {
     final Polygon polygon, final int axisCount) {
     out.print('(');
     final LineString shell = polygon.getExteriorRing();
-    final PointList coordinates = shell.getCoordinatesList();
+    final PointList coordinates = shell;
     write(out, coordinates, axisCount);
     for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
       out.print(',');
       final LineString hole = polygon.getInteriorRing(i);
-      final PointList holeCoordinates = hole.getCoordinatesList();
+      final PointList holeCoordinates = hole;
       write(out, holeCoordinates, axisCount);
     }
     out.print(')');

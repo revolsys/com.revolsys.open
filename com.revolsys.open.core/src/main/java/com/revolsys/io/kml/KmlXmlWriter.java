@@ -93,7 +93,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void write(final PointList points) {
     startTag(Kml22Constants.COORDINATES);
-    final int vertexCount = points.size();
+    final int vertexCount = points.getVertexCount();
     final int axisCount = points.getAxisCount();
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       if (vertexIndex > 0) {
@@ -103,7 +103,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         if (axisIndex > 0) {
           write(',');
         }
-        write(String.valueOf(points.getValue(vertexIndex, axisIndex)));
+        write(String.valueOf(points.getCoordinate(vertexIndex, axisIndex)));
       }
     }
     endTag();
@@ -201,7 +201,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writeLinearRing(final LineString ring) {
     startTag(Kml22Constants.LINEAR_RING);
-    final PointList coordinateSequence = ring.getCoordinatesList();
+    final PointList coordinateSequence = ring;
     write(coordinateSequence);
     endTag();
 
@@ -209,7 +209,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
 
   public void writeLineString(final LineString line) {
     startTag(Kml22Constants.LINE_STRING);
-    final PointList coordinateSequence = line.getCoordinatesList();
+    final PointList coordinateSequence = line;
     write(coordinateSequence);
     endTag();
   }

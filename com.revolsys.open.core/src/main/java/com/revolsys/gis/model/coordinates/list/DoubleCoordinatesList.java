@@ -86,12 +86,9 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   }
 
   public DoubleCoordinatesList(final int axisCount, final PointList points) {
-    this(points.size(), axisCount);
-    int i = 0;
-    for (final Point point : points) {
-      CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, i++,
-        point);
-    }
+    this(points.getVertexCount(), axisCount);
+    CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, 0, points,
+      0, points.getVertexCount());
   }
 
   public DoubleCoordinatesList(final Point... coordinates) {
@@ -113,14 +110,7 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public double[] getCoordinates() {
-    final double[] coordinates = new double[this.coordinates.length];
-    System.arraycopy(this.coordinates, 0, coordinates, 0, coordinates.length);
-    return coordinates;
-  }
-
-  @Override
-  public double getValue(final int index, final int axisIndex) {
+  public double getCoordinate(final int index, final int axisIndex) {
     final int axisCount = getAxisCount();
     if (axisIndex < axisCount) {
       return coordinates[index * axisCount + axisIndex];
@@ -130,7 +120,14 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
-  public int size() {
+  public double[] getCoordinates() {
+    final double[] coordinates = new double[this.coordinates.length];
+    System.arraycopy(this.coordinates, 0, coordinates, 0, coordinates.length);
+    return coordinates;
+  }
+
+  @Override
+  public int getVertexCount() {
     if (axisCount < 2 || coordinates == null) {
       return 0;
     } else {

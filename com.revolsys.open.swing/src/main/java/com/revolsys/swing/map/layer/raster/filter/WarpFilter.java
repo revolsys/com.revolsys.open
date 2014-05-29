@@ -54,11 +54,11 @@ public abstract class WarpFilter extends WholeImageFilter {
 
   public static PointList targetPointsToPixels(final BoundingBox boundingBox,
     final PointList points, final int imageWidth, final int imageHeight) {
-    final int numPoints = points.size();
+    final int numPoints = points.getVertexCount();
     final double[] coordinates = new double[numPoints * 2];
     int j = 0;
     for (int i = 0; i < numPoints; i++) {
-      final Point modelPoint = points.get(i);
+      final Point modelPoint = points.getPoint(i);
       final Point imagePoint = toImagePoint(boundingBox, modelPoint,
         imageWidth, imageHeight);
       coordinates[j++] = imagePoint.getX();

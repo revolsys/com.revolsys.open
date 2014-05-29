@@ -2,10 +2,8 @@ package com.revolsys.gis.jts;
 
 import java.util.Iterator;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.PointList;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.PointList;
 
 public class LineStringCoordinatesListIterator implements Iterator<LineString>,
   Iterable<LineString> {
@@ -15,19 +13,19 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
 
   private final PointList points;
 
-  public LineStringCoordinatesListIterator(final com.revolsys.jts.geom.GeometryFactory factory,
-    final PointList points) {
+  public LineStringCoordinatesListIterator(
+    final com.revolsys.jts.geom.GeometryFactory factory, final PointList points) {
     this.factory = factory;
     this.points = points;
   }
 
   public LineStringCoordinatesListIterator(final LineString line) {
-    this(line.getGeometryFactory(), CoordinatesListUtil.get(line));
+    this(line.getGeometryFactory(), line);
   }
 
   @Override
   public boolean hasNext() {
-    return index < points.size() - 1;
+    return index < points.getVertexCount() - 1;
   }
 
   @Override
@@ -37,8 +35,7 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
 
   @Override
   public LineString next() {
-    final LineString lineString = factory.lineString(points.subList(
-      index, 2));
+    final LineString lineString = factory.lineString(points.subLine(index, 2));
     index++;
     return lineString;
   }

@@ -39,9 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -52,6 +50,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
@@ -130,7 +129,7 @@ public class OffsetCurveSetBuilder {
    */
   private void addCurve(final PointList points, final Location leftLoc,
     final Location rightLoc) {
-    if (points != null && points.size() >= 2) {
+    if (points != null && points.getVertexCount() >= 2) {
       final Label label = new Label(0, Location.BOUNDARY, leftLoc, rightLoc);
       final NodedSegmentString segment = new NodedSegmentString(points, label);
       curveList.add(segment);
@@ -142,7 +141,7 @@ public class OffsetCurveSetBuilder {
     if (distance <= 0.0 && !curveBuilder.getBufferParameters().isSingleSided()) {
       return;
     } else {
-      final PointList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
+      final PointList points = CleanDuplicatePoints.clean(line);
       final PointList curve = curveBuilder.getLineCurve(points, distance);
       addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
@@ -170,14 +169,14 @@ public class OffsetCurveSetBuilder {
 
     final LinearRing shell = p.getExteriorRing();
     final boolean shellClockwise = shell.isClockwise();
-    final PointList shellCoord = CleanDuplicatePoints.clean(shell.getCoordinatesList());
+    final LineString shellCoord = CleanDuplicatePoints.clean((LineString)shell);
     // optimization - don't bother computing buffer
     // if the polygon would be completely eroded
     if (distance < 0.0 && isErodedCompletely(shell, distance)) {
       return;
     }
     // don't attempt to buffer a polygon with too few distinct vertices
-    if (distance <= 0.0 && shellCoord.size() < 3) {
+    if (distance <= 0.0 && shellCoord.getVertexCount() < 3) {
       return;
     }
 
@@ -187,7 +186,7 @@ public class OffsetCurveSetBuilder {
     for (int i = 0; i < p.getNumInteriorRing(); i++) {
       final LinearRing hole = p.getInteriorRing(i);
       final boolean holeClockwise = hole.isClockwise();
-      final PointList holeCoord = CleanDuplicatePoints.clean(hole.getCoordinatesList());
+      final LineString holeCoord = CleanDuplicatePoints.clean((LineString)hole);
 
       // optimization - don't bother computing buffer for this hole
       // if the hole would be completely covered
@@ -215,17 +214,18 @@ public class OffsetCurveSetBuilder {
    * @param cwLeftLoc the location on the L side of the ring (if it is CW)
    * @param cwRightLoc the location on the R side of the ring (if it is CW)
    */
-  private void addPolygonRing(final PointList points,
-    final boolean clockwise, final double offsetDistance, int side,
-    final Location cwLeftLoc, final Location cwRightLoc) {
+  private void addPolygonRing(final PointList points, final boolean clockwise,
+    final double offsetDistance, int side, final Location cwLeftLoc,
+    final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
-    if (offsetDistance == 0.0 && points.size() < LinearRing.MINIMUM_VALID_SIZE) {
+    if (offsetDistance == 0.0
+      && points.getVertexCount() < LinearRing.MINIMUM_VALID_SIZE) {
       return;
     }
 
     Location leftLoc = cwLeftLoc;
     Location rightLoc = cwRightLoc;
-    if (points.size() >= LinearRing.MINIMUM_VALID_SIZE && !clockwise) {
+    if (points.getVertexCount() >= LinearRing.MINIMUM_VALID_SIZE && !clockwise) {
       leftLoc = cwRightLoc;
       rightLoc = cwLeftLoc;
       side = Position.opposite(side);
@@ -301,7 +301,8 @@ public class OffsetCurveSetBuilder {
     final Triangle tri = new Triangle(triangleCoord.getVertex(0),
       triangleCoord.getVertex(1), triangleCoord.getVertex(2));
     final Point inCentre = tri.inCentre();
-    final double distToCentre = LineSegmentUtil.distanceLinePoint(tri.p0, tri.p1, inCentre);
+    final double distToCentre = LineSegmentUtil.distanceLinePoint(tri.p0,
+      tri.p1, inCentre);
     return distToCentre < Math.abs(bufferDistance);
   }
 

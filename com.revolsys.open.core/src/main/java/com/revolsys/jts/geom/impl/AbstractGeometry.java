@@ -49,7 +49,6 @@ import com.revolsys.jts.algorithm.InteriorPointArea;
 import com.revolsys.jts.algorithm.InteriorPointLine;
 import com.revolsys.jts.algorithm.InteriorPointPoint;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -450,54 +449,6 @@ public abstract class AbstractGeometry implements Geometry {
 
   /**
    *  Returns whether this <code>Geometry</code> is greater than, equal to,
-   *  or less than another <code>Geometry</code>,
-   * using the given {@link CoordinateSequenceComparator}.
-   * <P>
-   *
-   *  If their classes are different, they are compared using the following
-   *  ordering:
-   *  <UL>
-   *    <LI> Point (lowest)
-   *    <LI> MultiPoint
-   *    <LI> LineString
-   *    <LI> LinearRing
-   *    <LI> MultiLineString
-   *    <LI> Polygon
-   *    <LI> MultiPolygon
-   *    <LI> GeometryCollection (highest)
-   *  </UL>
-   *  If the two <code>Geometry</code>s have the same class, their first
-   *  elements are compared. If those are the same, the second elements are
-   *  compared, etc.
-   *
-   *@param  o  a <code>Geometry</code> with which to compare this <code>Geometry</code>
-   *@param comp a <code>CoordinateSequenceComparator</code>
-   *
-   *@return    a positive number, 0, or a negative number, depending on whether
-   *      this object is greater than, equal to, or less than <code>o</code>, as
-   *      defined in "Normal Form For Geometry" in the JTS Technical
-   *      Specifications
-   */
-  @Override
-  public int compareTo(final Object o, final CoordinateSequenceComparator comp) {
-    final Geometry other = (Geometry)o;
-    if (getClassSortIndex() != other.getClassSortIndex()) {
-      return getClassSortIndex() - other.getClassSortIndex();
-    }
-    if (isEmpty() && other.isEmpty()) {
-      return 0;
-    }
-    if (isEmpty()) {
-      return -1;
-    }
-    if (other.isEmpty()) {
-      return 1;
-    }
-    return compareToSameClass(other, comp);
-  }
-
-  /**
-   *  Returns whether this <code>Geometry</code> is greater than, equal to,
    *  or less than another <code>Geometry</code> having the same class.
    *
    *@param  o  a <code>Geometry</code> having the same class as this <code>Geometry</code>
@@ -508,22 +459,6 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public abstract int compareToSameClass(Geometry o);
-
-  /**
-   *  Returns whether this <code>Geometry</code> is greater than, equal to,
-   *  or less than another <code>Geometry</code> of the same class.
-   * using the given {@link CoordinateSequenceComparator}.
-   *
-   *@param  o  a <code>Geometry</code> having the same class as this <code>Geometry</code>
-   *@param comp a <code>CoordinateSequenceComparator</code>
-   *@return    a positive number, 0, or a negative number, depending on whether
-   *      this object is greater than, equal to, or less than <code>o</code>, as
-   *      defined in "Normal Form For Geometry" in the JTS Technical
-   *      Specifications
-   */
-  @Override
-  public abstract int compareToSameClass(Geometry o,
-    CoordinateSequenceComparator comp);
 
   /**
    *  Returns the minimum and maximum x and y values in this <code>Geometry</code>

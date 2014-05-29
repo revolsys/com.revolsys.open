@@ -98,10 +98,10 @@ public class LineDissolver {
     if (factory == null) {
       this.factory = lineString.getGeometryFactory();
     }
-    final PointList seq = lineString.getCoordinatesList();
-    for (int i = 1; i < seq.size(); i++) {
+    final PointList seq = lineString;
+    for (int i = 1; i < seq.getVertexCount(); i++) {
       final DissolveHalfEdge e = (DissolveHalfEdge)graph.addEdge(
-        seq.getCoordinate(i - 1), seq.getCoordinate(i));
+        seq.getPoint(i - 1), seq.getPoint(i));
       /**
        * Record source initial segments, so that they can be reflected in output when needed
        * (i.e. during formation of isolated rings)

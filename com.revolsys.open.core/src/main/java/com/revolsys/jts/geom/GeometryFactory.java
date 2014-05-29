@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -47,6 +46,7 @@ import java.util.Set;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.collection.IntHashMap;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
@@ -93,13 +93,12 @@ public class GeometryFactory implements Serializable, MapSerializer {
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "geometryFactory", "Geometry Factory", GeometryFactory.class, "create");
 
-  /** The cached geometry factories. */
-  private static Map<String, GeometryFactory> factories = new HashMap<String, GeometryFactory>();
-
   private static final long serialVersionUID = 4328651897279304108L;
 
+  private static IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
+
   public static void clear() {
-    factories.clear();
+    factoriesBySrid.clear();
   }
 
   public static GeometryFactory create(final Map<String, Object> properties) {
@@ -165,14 +164,30 @@ public class GeometryFactory implements Serializable, MapSerializer {
    */
   public static GeometryFactory fixed(final int srid, final int axisCount,
     double... scales) {
-    synchronized (factories) {
+    synchronized (factoriesBySrid) {
       scales = getScales(axisCount, scales);
-      final String key = srid + "-" + axisCount + "-"
-        + CollectionUtil.toString("-", CollectionUtil.toList(scales));
-      GeometryFactory factory = factories.get(key);
+      GeometryFactory factory = null;
+      IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid.get(srid);
+      if (factoriesByAxisCount == null) {
+        factoriesByAxisCount = new IntHashMap<>();
+        factoriesBySrid.put(srid, factoriesByAxisCount);
+      }
+      List<GeometryFactory> factories = factoriesByAxisCount.get(axisCount);
+      if (factories == null) {
+        factories = new ArrayList<>();
+        factoriesByAxisCount.put(axisCount, factories);
+      } else {
+        final int size = factories.size();
+        for (int i = 0; i < size; i++) {
+          final GeometryFactory matchFactory = factories.get(i);
+          if (matchFactory.scalesEqual(scales)) {
+            return matchFactory;
+          }
+        }
+      }
       if (factory == null) {
         factory = new GeometryFactory(srid, axisCount, scales);
-        factories.put(key, factory);
+        factories.add(factory);
       }
       return factory;
     }
@@ -482,7 +497,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
           point = new PointDouble((double[])object);
         } else if (object instanceof PointList) {
           final PointList pointList = (PointList)object;
-          point = pointList.get(0);
+          point = pointList.getPoint(0);
         } else {
           throw new IllegalArgumentException("Unexepected data type: " + object);
         }
@@ -803,13 +818,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return linearRing(points);
     } else if (ring instanceof LineString) {
       final LineString line = (LineString)ring;
-      final PointList points = CoordinatesListUtil.get(line);
+      final PointList points = line;
       return linearRing(points);
     } else if (ring instanceof double[]) {
       final double[] coordinates = (double[])ring;
-      final DoubleCoordinatesList points = new DoubleCoordinatesList(
-        getAxisCount(), coordinates);
-      return linearRing(points);
+      return linearRing(getAxisCount(), coordinates);
     } else {
       return null;
     }
@@ -969,6 +982,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return srid;
   }
 
+  @Override
+  public int hashCode() {
+    return srid;
+  }
+
   public boolean hasM() {
     return axisCount > 3;
   }
@@ -1014,8 +1032,13 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return new LinearRingImpl(this, axisCount, coordinates);
   }
 
+  public LinearRing linearRing(final int axisCount, final int vertexCount,
+    final double... coordinates) {
+    return new LinearRingImpl(this, axisCount, vertexCount, coordinates);
+  }
+
   public LinearRing linearRing(final LineString lineString) {
-    return linearRing(lineString.getCoordinatesList());
+    return linearRing((PointList)lineString);
   }
 
   /**
@@ -1026,11 +1049,11 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @return the created LinearRing
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    */
-  public LinearRing linearRing(final Point... coordinates) {
-    if (coordinates == null) {
+  public LinearRing linearRing(final Point... points) {
+    if (points == null || points.length == 0) {
       return linearRing();
     } else {
-      return linearRing(new DoubleCoordinatesList(coordinates));
+      return linearRing(Arrays.asList(points));
     }
   }
 
@@ -1077,7 +1100,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (lineString == null || lineString.isEmpty()) {
       return lineString();
     } else {
-      return new LineStringImpl(this, lineString.getCoordinatesList());
+      return new LineStringImpl(this, lineString);
     }
   }
 
@@ -1198,9 +1221,9 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (coordinatesList == null) {
       return multiPoint();
     } else {
-      final Point[] points = new Point[coordinatesList.size()];
+      final Point[] points = new Point[coordinatesList.getVertexCount()];
       for (int i = 0; i < points.length; i++) {
-        final Point coordinates = coordinatesList.get(i);
+        final Point coordinates = coordinatesList.getPoint(i);
         final Point point = point(coordinates);
         points[i] = point;
       }
@@ -1321,14 +1344,14 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (points == null) {
       return point();
     } else {
-      final int size = points.size();
+      final int size = points.getVertexCount();
       if (size == 0) {
         return point();
       } else if (size == 1) {
         final int axisCount = Math.min(points.getAxisCount(), getAxisCount());
         final double[] coordinates = new double[axisCount];
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          final double coordinate = points.getValue(0, axisIndex);
+          final double coordinate = points.getCoordinate(0, axisIndex);
           coordinates[axisIndex] = coordinate;
         }
         return point(coordinates);
@@ -1389,6 +1412,10 @@ public class GeometryFactory implements Serializable, MapSerializer {
    */
   public <G extends Geometry> G project(final G geometry) {
     return geometry.convert(this);
+  }
+
+  private boolean scalesEqual(final double[] scales) {
+    return Arrays.equals(this.scales, scales);
   }
 
   @Override

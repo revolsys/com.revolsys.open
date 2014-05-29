@@ -86,21 +86,6 @@ public class OctagonalEnvelope {
   }
 
   /**
-   * Creates a new null bounding octagon bounding a {@link Coordinates}
-   */
-  public OctagonalEnvelope(final Point p) {
-    expandToInclude(p);
-  }
-
-  /**
-   * Creates a new null bounding octagon bounding a pair of {@link Coordinates}s
-   */
-  public OctagonalEnvelope(final Point p0, final Point p1) {
-    expandToInclude(p0);
-    expandToInclude(p1);
-  }
-
-  /**
    * Creates a new null bounding octagon bounding a {@link Geometry}
    */
   public OctagonalEnvelope(final Geometry geom) {
@@ -113,6 +98,21 @@ public class OctagonalEnvelope {
    */
   public OctagonalEnvelope(final OctagonalEnvelope oct) {
     expandToInclude(oct);
+  }
+
+  /**
+   * Creates a new null bounding octagon bounding a {@link Coordinates}
+   */
+  public OctagonalEnvelope(final Point p) {
+    expandToInclude(p);
+  }
+
+  /**
+   * Creates a new null bounding octagon bounding a pair of {@link Coordinates}s
+   */
+  public OctagonalEnvelope(final Point p0, final Point p1) {
+    expandToInclude(p0);
+    expandToInclude(p1);
   }
 
   public boolean contains(final OctagonalEnvelope other) {
@@ -151,20 +151,6 @@ public class OctagonalEnvelope {
     expandToInclude(env.getMinX(), env.getMaxY());
     expandToInclude(env.getMaxX(), env.getMinY());
     expandToInclude(env.getMaxX(), env.getMaxY());
-    return this;
-  }
-
-  public OctagonalEnvelope expandToInclude(final Point p) {
-    expandToInclude(p.getX(), p.getY());
-    return this;
-  }
-
-  public OctagonalEnvelope expandToInclude(final PointList seq) {
-    for (int i = 0; i < seq.size(); i++) {
-      final double x = seq.getX(i);
-      final double y = seq.getY(i);
-      expandToInclude(x, y);
-    }
     return this;
   }
 
@@ -212,10 +198,10 @@ public class OctagonalEnvelope {
 
   public void expandToInclude(final Geometry geometry) {
     for (final Point point : geometry.getGeometries(Point.class)) {
-      expandToInclude((Point)point);
+      expandToInclude(point);
     }
     for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
-      expandToInclude(line.getCoordinatesList());
+      expandToInclude((PointList)line);
     }
   }
 
@@ -262,6 +248,20 @@ public class OctagonalEnvelope {
     return this;
   }
 
+  public OctagonalEnvelope expandToInclude(final Point p) {
+    expandToInclude(p.getX(), p.getY());
+    return this;
+  }
+
+  public OctagonalEnvelope expandToInclude(final PointList seq) {
+    for (int i = 0; i < seq.getVertexCount(); i++) {
+      final double x = seq.getX(i);
+      final double y = seq.getY(i);
+      expandToInclude(x, y);
+    }
+    return this;
+  }
+
   public double getMaxA() {
     return maxA;
   }
@@ -292,37 +292,6 @@ public class OctagonalEnvelope {
 
   public double getMinY() {
     return minY;
-  }
-
-  public boolean intersects(final Point p) {
-    if (minX > p.getX()) {
-      return false;
-    }
-    if (maxX < p.getX()) {
-      return false;
-    }
-    if (minY > p.getY()) {
-      return false;
-    }
-    if (maxY < p.getY()) {
-      return false;
-    }
-
-    final double A = computeA(p.getX(), p.getY());
-    final double B = computeB(p.getX(), p.getY());
-    if (minA > A) {
-      return false;
-    }
-    if (maxA < A) {
-      return false;
-    }
-    if (minB > B) {
-      return false;
-    }
-    if (maxB < B) {
-      return false;
-    }
-    return true;
   }
 
   public boolean intersects(final OctagonalEnvelope other) {
@@ -357,6 +326,37 @@ public class OctagonalEnvelope {
     return true;
   }
 
+  public boolean intersects(final Point p) {
+    if (minX > p.getX()) {
+      return false;
+    }
+    if (maxX < p.getX()) {
+      return false;
+    }
+    if (minY > p.getY()) {
+      return false;
+    }
+    if (maxY < p.getY()) {
+      return false;
+    }
+
+    final double A = computeA(p.getX(), p.getY());
+    final double B = computeB(p.getX(), p.getY());
+    if (minA > A) {
+      return false;
+    }
+    if (maxA < A) {
+      return false;
+    }
+    if (minB > B) {
+      return false;
+    }
+    if (maxB < B) {
+      return false;
+    }
+    return true;
+  }
+
   public boolean isNull() {
     return Double.isNaN(minX);
   }
@@ -385,25 +385,25 @@ public class OctagonalEnvelope {
       return geometryFactory.point((PointList)null);
     }
 
-    final Point px00 = new PointDouble(geometryFactory.makePrecise(
-      0, minX), geometryFactory.makePrecise(1, minA - minX));
-    final Point px01 = new PointDouble(geometryFactory.makePrecise(
-      0, minX), geometryFactory.makePrecise(1, minX - minB));
+    final Point px00 = new PointDouble(geometryFactory.makePrecise(0, minX),
+      geometryFactory.makePrecise(1, minA - minX));
+    final Point px01 = new PointDouble(geometryFactory.makePrecise(0, minX),
+      geometryFactory.makePrecise(1, minX - minB));
 
-    final Point px10 = new PointDouble(geometryFactory.makePrecise(
-      0, maxX), geometryFactory.makePrecise(1, maxX - maxB));
-    final Point px11 = new PointDouble(geometryFactory.makePrecise(
-      0, maxX), geometryFactory.makePrecise(1, maxA - maxX));
+    final Point px10 = new PointDouble(geometryFactory.makePrecise(0, maxX),
+      geometryFactory.makePrecise(1, maxX - maxB));
+    final Point px11 = new PointDouble(geometryFactory.makePrecise(0, maxX),
+      geometryFactory.makePrecise(1, maxA - maxX));
 
-    final Point py00 = new PointDouble(geometryFactory.makePrecise(
-      0, minA - minY), geometryFactory.makePrecise(1, minY));
-    final Point py01 = new PointDouble(geometryFactory.makePrecise(
-      0, minY + maxB), geometryFactory.makePrecise(1, minY));
+    final Point py00 = new PointDouble(geometryFactory.makePrecise(0, minA
+      - minY), geometryFactory.makePrecise(1, minY));
+    final Point py01 = new PointDouble(geometryFactory.makePrecise(0, minY
+      + maxB), geometryFactory.makePrecise(1, minY));
 
-    final Point py10 = new PointDouble(geometryFactory.makePrecise(
-      0, maxY + minB), geometryFactory.makePrecise(1, maxY));
-    final Point py11 = new PointDouble(geometryFactory.makePrecise(
-      0, maxA - maxY), geometryFactory.makePrecise(1, maxY));
+    final Point py10 = new PointDouble(geometryFactory.makePrecise(0, maxY
+      + minB), geometryFactory.makePrecise(1, maxY));
+    final Point py11 = new PointDouble(geometryFactory.makePrecise(0, maxA
+      - maxY), geometryFactory.makePrecise(1, maxY));
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(px00, false);

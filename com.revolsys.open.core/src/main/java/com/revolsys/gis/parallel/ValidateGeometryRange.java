@@ -88,8 +88,8 @@ public class ValidateGeometryRange extends
   private boolean isValid(final String type,
     final PointList coordinates) {
     boolean valid = true;
-    for (int j = 0; j < coordinates.size(); j++) {
-      final Point coordinate = coordinates.getCoordinate(j);
+    for (int j = 0; j < coordinates.getVertexCount(); j++) {
+      final Point coordinate = coordinates.getPoint(j);
       if (!isValid(type, coordinate)) {
         valid = false;
       }
@@ -129,7 +129,7 @@ public class ValidateGeometryRange extends
   }
 
   private boolean isValid(final String type, final LineString line) {
-    final PointList coordinates = line.getCoordinatesList();
+    final PointList coordinates = line;
     if (!isValid(type, coordinates)) {
       return false;
     }

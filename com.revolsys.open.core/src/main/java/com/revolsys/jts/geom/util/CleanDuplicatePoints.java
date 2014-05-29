@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -53,31 +51,6 @@ import com.revolsys.jts.geom.Polygon;
  * @version 1.7
  */
 public class CleanDuplicatePoints {
-
-  public static PointList clean(final PointList points) {
-    if (points.size() == 0) {
-      return points;
-    } else {
-      final int axisCount = points.getAxisCount();
-      final int vertexCount = points.size();
-      final double[] coordinates = new double[vertexCount * axisCount];
-      double previousX = points.getX(0);
-      double previousY = points.getY(0);
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, points, 0);
-      int j = 1;
-      for (int i = 0; i < points.size(); i++) {
-        final double x = points.getX(i);
-        final double y = points.getY(i);
-        if (x != previousX || y != previousY) {
-          CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++,
-            points, i);
-        }
-        previousX = x;
-        previousY = y;
-      }
-      return new DoubleCoordinatesList(axisCount, j, coordinates);
-    }
-  }
 
   public static Geometry clean(final Geometry geometry) {
     if (geometry.isEmpty()) {
@@ -122,12 +95,33 @@ public class CleanDuplicatePoints {
     if (ring.isEmpty()) {
       return ring;
     } else {
-      final PointList points = clean(ring.getCoordinatesList());
-      final GeometryFactory geometryFactory = ring.getGeometryFactory();
-      if (points.size() < 4) {
-        return geometryFactory.linearRing();
+      final int vertexCount = ring.getVertexCount();
+      if (vertexCount < 4) {
+        return ring;
       } else {
-        return geometryFactory.linearRing(points);
+        final int axisCount = ring.getAxisCount();
+        final double[] coordinates = new double[vertexCount * axisCount];
+        double previousX = ring.getX(0);
+        double previousY = ring.getY(0);
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, ring, 0);
+        int j = 1;
+        for (int i = 1; i < vertexCount; i++) {
+          final double x = ring.getX(i);
+          final double y = ring.getY(i);
+          if (x != previousX || y != previousY) {
+            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++,
+              ring, i);
+          }
+          previousX = x;
+          previousY = y;
+        }
+
+        final GeometryFactory geometryFactory = ring.getGeometryFactory();
+        if (j < 4) {
+          return geometryFactory.linearRing();
+        } else {
+          return geometryFactory.linearRing(axisCount, j, coordinates);
+        }
       }
     }
   }
@@ -136,12 +130,33 @@ public class CleanDuplicatePoints {
     if (line.isEmpty()) {
       return line;
     } else {
-      final PointList points = clean(line.getCoordinatesList());
-      final GeometryFactory geometryFactory = line.getGeometryFactory();
-      if (points.size() < 2) {
-        return geometryFactory.lineString();
+      final int vertexCount = line.getVertexCount();
+      if (vertexCount < 2) {
+        return line;
       } else {
-        return geometryFactory.lineString(points);
+        final int axisCount = line.getAxisCount();
+        final double[] coordinates = new double[vertexCount * axisCount];
+        double previousX = line.getX(0);
+        double previousY = line.getY(0);
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, line, 0);
+        int j = 1;
+        for (int i = 1; i < vertexCount; i++) {
+          final double x = line.getX(i);
+          final double y = line.getY(i);
+          if (x != previousX || y != previousY) {
+            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++,
+              line, i);
+          }
+          previousX = x;
+          previousY = y;
+        }
+
+        final GeometryFactory geometryFactory = line.getGeometryFactory();
+        if (j < 2) {
+          return geometryFactory.lineString();
+        } else {
+          return geometryFactory.lineString(axisCount, j, coordinates);
+        }
       }
     }
   }

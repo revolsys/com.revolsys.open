@@ -496,28 +496,28 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       Point previousPoint = null;
       Point nextPoint = null;
 
-      final int numPoints = points.size();
+      final int numPoints = points.getVertexCount();
       if (DataTypes.LINE_STRING.equals(geometryPartDataType)) {
         if (numPoints > 1) {
-          previousPoint = points.get(previousPointIndex);
-          nextPoint = points.get(nextPointIndex);
+          previousPoint = points.getPoint(previousPointIndex);
+          nextPoint = points.getPoint(nextPointIndex);
         }
       } else if (DataTypes.POLYGON.equals(geometryPartDataType)) {
         if (numPoints == 2) {
-          previousPoint = points.get(previousPointIndex);
-          nextPoint = points.get(nextPointIndex);
+          previousPoint = points.getPoint(previousPointIndex);
+          nextPoint = points.getPoint(nextPointIndex);
         } else if (numPoints > 3) {
           while (previousPointIndex < 0) {
             previousPointIndex += numPoints - 1;
           }
           previousPointIndex = previousPointIndex % (numPoints - 1);
-          previousPoint = points.get(previousPointIndex);
+          previousPoint = points.getPoint(previousPointIndex);
 
           while (nextPointIndex < 0) {
             nextPointIndex += numPoints - 1;
           }
           nextPointIndex = nextPointIndex % (numPoints - 1);
-          nextPoint = points.get(nextPointIndex);
+          nextPoint = points.getPoint(nextPointIndex);
         }
       }
 

@@ -47,7 +47,6 @@ import com.revolsys.jts.testold.algorithm.NonRobustLineIntersectorTest;
 import com.revolsys.jts.testold.algorithm.OrientationIndexTest;
 import com.revolsys.jts.testold.algorithm.RobustLineIntersectionTest;
 import com.revolsys.jts.testold.geom.AreaLengthTest;
-import com.revolsys.jts.testold.geom.BasicCoordinateSequenceTest;
 import com.revolsys.jts.testold.geom.CoordinateArraysTest;
 import com.revolsys.jts.testold.geom.GeometryCollectionImplTest;
 import com.revolsys.jts.testold.geom.GeometryImplTest;
@@ -87,11 +86,10 @@ import com.revolsys.jts.testold.triangulate.DelaunayTest;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  AngleTest.class, AreaLengthTest.class, BasicCoordinateSequenceTest.class,
-  CascadedPolygonUnionTest.class, OrientationIndexTest.class,
-  ConformingDelaunayTest.class, ConvexHullTest.class,
-  CoordinateArraysTest.class, DelaunayTest.class, DistanceTest.class,
-  GeometryCollectionImplTest.class, GeometryImplTest.class,
+  AngleTest.class, AreaLengthTest.class, CascadedPolygonUnionTest.class,
+  OrientationIndexTest.class, ConformingDelaunayTest.class,
+  ConvexHullTest.class, CoordinateArraysTest.class, DelaunayTest.class,
+  DistanceTest.class, GeometryCollectionImplTest.class, GeometryImplTest.class,
   IntersectionMatrixTest.class, IntervalTest.class,
   IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,
   LengthIndexedLineTest.class, LineMergerTest.class, LineStringImplTest.class,

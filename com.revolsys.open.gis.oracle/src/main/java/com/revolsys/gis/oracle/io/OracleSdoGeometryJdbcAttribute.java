@@ -167,7 +167,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   public double[] toClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
-    final PointList coordinates = CoordinatesListUtil.get(ring);
+    final PointList coordinates = ring;
     if (!coordinates.isCounterClockwise()) {
       return toCoordinateArray(coordinates, dimension);
     } else {
@@ -176,7 +176,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private double[] toCoordinateArray(final LineString line, final int dimension) {
-    final PointList sequence = line.getCoordinatesList();
+    final PointList sequence = line;
     final double[] coordinates = toCoordinateArray(sequence, dimension);
     return coordinates;
   }
@@ -184,19 +184,19 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   private double[] toCoordinateArray(final PointList sequence,
     final int dimension) {
     int geometryDimension = sequence.getAxisCount();
-    if (Double.isNaN(sequence.getValue(0, 2))) {
+    if (Double.isNaN(sequence.getCoordinate(0, 2))) {
       geometryDimension = 2;
     }
 
-    final double[] ordinates = new double[dimension * sequence.size()];
+    final double[] ordinates = new double[dimension * sequence.getVertexCount()];
     int ordinateIndex = 0;
 
-    for (int i = 0; i < sequence.size(); i++) {
+    for (int i = 0; i < sequence.getVertexCount(); i++) {
       for (int j = 0; j < dimension; j++) {
         if (j >= geometryDimension) {
           ordinates[ordinateIndex++] = 0;
         } else {
-          final double ordinate = sequence.getValue(i, j);
+          final double ordinate = sequence.getCoordinate(i, j);
           if (Double.isNaN(ordinate)) {
             ordinates[ordinateIndex++] = 0;
           } else {
@@ -227,7 +227,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   public double[] toCounterClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
-    final PointList coordinates = CoordinatesListUtil.get(ring);
+    final PointList coordinates = ring;
     if (coordinates.isCounterClockwise()) {
       return toCoordinateArray(coordinates, dimension);
     } else {

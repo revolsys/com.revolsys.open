@@ -504,19 +504,19 @@ public class Distance3DOp {
   }
 
   private Point intersection(final PlanarPolygon3D poly, final LineString line) {
-    final PointList seq = line.getCoordinatesList();
-    if (seq.size() == 0) {
+    final PointList seq = line;
+    if (seq.getVertexCount() == 0) {
       return null;
     }
 
     // start point of line
-    Point p0 = seq.getCoordinate(0);
+    Point p0 = seq.getPoint(0);
     double d0 = poly.getPlane().orientedDistance(p0);
 
     // for each segment in the line
-    for (int i = 0; i < seq.size() - 1; i++) {
-      p0 = seq.getCoordinate(i);
-      final Point p1 = seq.getCoordinate(i + 1);
+    for (int i = 0; i < seq.getVertexCount() - 1; i++) {
+      p0 = seq.getPoint(i);
+      final Point p1 = seq.getPoint(i + 1);
       final double d1 = poly.getPlane().orientedDistance(p1);
 
       /**

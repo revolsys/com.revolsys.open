@@ -169,6 +169,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
     "Polygon", "MultiPolygon", "GeometryCollection"));
+  /**
+   * Standard ordinate index values
+   */
+  int X = 0;
+  int Y = 1;
+  int Z = 2;
+  int M = 3;
 
   /**
    * Computes a buffer area around this geometry having the given width. The
@@ -305,41 +312,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   @Override
   int compareTo(final Object other);
 
-  /**
-   *  Returns whether this <code>Geometry</code> is greater than, equal to,
-   *  or less than another <code>Geometry</code>,
-   * using the given {@link CoordinateSequenceComparator}.
-   * <P>
-   *
-   *  If their classes are different, they are compared using the following
-   *  ordering:
-   *  <UL>
-   *    <LI> Point (lowest)
-   *    <LI> MultiPoint
-   *    <LI> LineString
-   *    <LI> LinearRing
-   *    <LI> MultiLineString
-   *    <LI> Polygon
-   *    <LI> MultiPolygon
-   *    <LI> GeometryCollection (highest)
-   *  </UL>
-   *  If the two <code>Geometry</code>s have the same class, their first
-   *  elements are compared. If those are the same, the second elements are
-   *  compared, etc.
-   *
-   *@param  o  a <code>Geometry</code> with which to compare this <code>Geometry</code>
-   *@param comp a <code>CoordinateSequenceComparator</code>
-   *
-   *@return    a positive number, 0, or a negative number, depending on whether
-   *      this object is greater than, equal to, or less than <code>o</code>, as
-   *      defined in "Normal Form For Geometry" in the JTS Technical
-   *      Specifications
-   */
-  int compareTo(final Object o, final CoordinateSequenceComparator comp);
-
   int compareToSameClass(Geometry geometry);
-
-  int compareToSameClass(Geometry geometry, CoordinateSequenceComparator comp);
 
   /**
    * Tests whether this geometry contains the

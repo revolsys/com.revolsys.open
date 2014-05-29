@@ -36,6 +36,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.revolsys.jts.geom.PointList;
+
 /**
  * Dissolves a noded collection of {@link SegmentString}s to produce
  * a set of merged linework with unique segments.
@@ -127,10 +129,36 @@ public class SegmentStringDissolver {
       add(oca, segString);
     } else {
       if (merger != null) {
-        final boolean isSameOrientation = existing.getPoints().equals(
-          segString.getPoints(), 2);
+        final boolean isSameOrientation = equals(existing.getPoints(), 2,
+          segString.getPoints());
         merger.merge(existing, segString, isSameOrientation);
       }
+    }
+  }
+
+  private boolean equals(final PointList points1, final int axisCount,
+    final PointList points2) {
+    double maxAxis = Math.max(points1.getAxisCount(), points2.getAxisCount());
+    if (maxAxis > axisCount) {
+      maxAxis = axisCount;
+    }
+    if (points1.getAxisCount() < maxAxis) {
+      return false;
+    } else if (points2.getAxisCount() < maxAxis) {
+      return false;
+    } else if (points1.getVertexCount() == points2.getVertexCount()) {
+      for (int i = 0; i < points1.getVertexCount(); i++) {
+        for (int j = 0; j < axisCount; j++) {
+          final double value1 = points1.getCoordinate(i, j);
+          final double value2 = points2.getCoordinate(i, j);
+          if (Double.compare(value1, value2) != 0) {
+            return false;
+          }
+        }
+      }
+      return true;
+    } else {
+      return false;
     }
   }
 

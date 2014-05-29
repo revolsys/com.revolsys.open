@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -980,9 +979,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     GeometryStyleRenderer.renderLineString(viewport, graphics, line,
       STYLE_MAPPED_LINE);
     line = line.convert(viewport.getGeometryFactory());
-    MarkerStyleRenderer.renderMarkers(viewport, graphics,
-      CoordinatesListUtil.get(line), STYLE_VERTEX_FIRST_POINT,
-      STYLE_VERTEX_LAST_POINT, null);
+    MarkerStyleRenderer.renderMarkers(viewport, graphics, line,
+      STYLE_VERTEX_FIRST_POINT, STYLE_VERTEX_LAST_POINT, null);
   }
 
   public void setImageBoundingBox(BoundingBox boundingBox) {

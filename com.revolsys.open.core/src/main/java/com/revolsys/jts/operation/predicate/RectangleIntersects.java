@@ -130,7 +130,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
   private boolean containsPoint = false;
 
   public GeometryContainsPointVisitor(final Polygon rectangle) {
-    this.rectSeq = rectangle.getExteriorRing().getCoordinatesList();
+    this.rectSeq = rectangle.getExteriorRing();
     rectEnv = rectangle.getBoundingBox();
   }
 
@@ -165,7 +165,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
 
     // test each corner of rectangle for inclusion
     for (int i = 0; i < 4; i++) {
-      final Point rectPt = rectSeq.getCoordinate(i);
+      final Point rectPt = rectSeq.getPoint(i);
       if (!elementEnv.covers(rectPt)) {
         continue;
       }
@@ -305,10 +305,10 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
   }
 
   private void checkIntersectionWithSegments(final LineString testLine) {
-    final PointList seq1 = testLine.getCoordinatesList();
-    for (int j = 1; j < seq1.size(); j++) {
-      final Point p0 = seq1.getCoordinate(j - 1);
-      final Point p1 = seq1.getCoordinate(j);
+    final PointList seq1 = testLine;
+    for (int j = 1; j < seq1.getVertexCount(); j++) {
+      final Point p0 = seq1.getPoint(j - 1);
+      final Point p1 = seq1.getPoint(j);
 
       if (rectIntersector.intersects(p0, p1)) {
         hasIntersection = true;

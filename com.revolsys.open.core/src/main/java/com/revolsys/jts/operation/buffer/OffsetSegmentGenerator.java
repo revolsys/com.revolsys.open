@@ -32,15 +32,16 @@
  */
 package com.revolsys.jts.operation.buffer;
 
+import com.revolsys.gis.util.NoOp;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.HCoordinate;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
@@ -199,39 +200,6 @@ class OffsetSegmentGenerator {
   }
 
   /**
-   * Add points for a circular fillet around a reflex corner.
-   * Adds the start and end points
-   * 
-   * @param p base point of curve
-   * @param p0 start point of fillet curve
-   * @param p1 endpoint of fillet curve
-   * @param direction the orientation of the fillet
-   * @param radius the radius of the fillet
-   */
-  private void addFillet(final Point p, final Point p0,
-    final Point p1, final int direction, final double radius) {
-    final double dx0 = p0.getX() - p.getX();
-    final double dy0 = p0.getY() - p.getY();
-    double startAngle = Math.atan2(dy0, dx0);
-    final double dx1 = p1.getX() - p.getX();
-    final double dy1 = p1.getY() - p.getY();
-    final double endAngle = Math.atan2(dy1, dx1);
-
-    if (direction == CGAlgorithms.CLOCKWISE) {
-      if (startAngle <= endAngle) {
-        startAngle += 2.0 * Math.PI;
-      }
-    } else { // direction == COUNTERCLOCKWISE
-      if (startAngle >= endAngle) {
-        startAngle -= 2.0 * Math.PI;
-      }
-    }
-    segList.addPt(p0);
-    addFillet(p, startAngle, endAngle, direction, radius);
-    segList.addPt(p1);
-  }
-
-  /**
    * Adds points for a circular fillet arc
    * between two specified angles.  
    * The start and end point for the fillet are not added -
@@ -266,6 +234,39 @@ class OffsetSegmentGenerator {
       segList.addPt(x, y);
       currAngle += currAngleInc;
     }
+  }
+
+  /**
+   * Add points for a circular fillet around a reflex corner.
+   * Adds the start and end points
+   * 
+   * @param p base point of curve
+   * @param p0 start point of fillet curve
+   * @param p1 endpoint of fillet curve
+   * @param direction the orientation of the fillet
+   * @param radius the radius of the fillet
+   */
+  private void addFillet(final Point p, final Point p0, final Point p1,
+    final int direction, final double radius) {
+    final double dx0 = p0.getX() - p.getX();
+    final double dy0 = p0.getY() - p.getY();
+    double startAngle = Math.atan2(dy0, dx0);
+    final double dx1 = p1.getX() - p.getX();
+    final double dy1 = p1.getY() - p.getY();
+    final double endAngle = Math.atan2(dy1, dx1);
+
+    if (direction == CGAlgorithms.CLOCKWISE) {
+      if (startAngle <= endAngle) {
+        startAngle += 2.0 * Math.PI;
+      }
+    } else { // direction == COUNTERCLOCKWISE
+      if (startAngle >= endAngle) {
+        startAngle -= 2.0 * Math.PI;
+      }
+    }
+    segList.addPt(p0);
+    addFillet(p, startAngle, endAngle, direction, radius);
+    segList.addPt(p1);
   }
 
   public void addFirstSegment() {
@@ -407,8 +408,7 @@ class OffsetSegmentGenerator {
 
     // finally the bevel segment endpoints are computed as offsets from
     // the mitre midline
-    final Point bevelEndLeft = mitreMidLine.pointAlongOffset(1.0,
-      bevelHalfLen);
+    final Point bevelEndLeft = mitreMidLine.pointAlongOffset(1.0, bevelHalfLen);
     final Point bevelEndRight = mitreMidLine.pointAlongOffset(1.0,
       -bevelHalfLen);
 
@@ -455,9 +455,8 @@ class OffsetSegmentGenerator {
       break;
       case BufferParameters.CAP_SQUARE:
         // add a square defined by extensions of the offset segment endpoints
-        final Point squareCapSideOffset = new PointDouble(
-          Math.abs(distance) * Math.cos(angle), Math.abs(distance)
-            * Math.sin(angle));
+        final Point squareCapSideOffset = new PointDouble(Math.abs(distance)
+          * Math.cos(angle), Math.abs(distance) * Math.sin(angle));
 
         final double lx = lp1.getX() + squareCapSideOffset.getX();
         final double ly = lp1.getY() + squareCapSideOffset.getY();
@@ -585,34 +584,16 @@ class OffsetSegmentGenerator {
    * Creates a CW circle around a point
    */
   public void createCircle(final Point point) {
-    // add start point
-    final double x = point.getX() + distance;
-    final double y = point.getY();
-    segList.addPt(x, y);
-    addFillet(point, 0.0, 2.0 * Math.PI, -1, distance);
-    segList.closeRing();
-  }
-
-  private LineSegment createOffsetSegment(final Point p1,
-    final Point p2, final int side, final double distance) {
-    final int sideSign = side == Position.LEFT ? 1 : -1;
-    final double p1x = p1.getX();
-    final double p1y = p1.getY();
-    final double p2x = p2.getX();
-    final double p2Y = p2.getY();
-    final double dx = p2x - p1x;
-    final double dy = p2Y - p1y;
-    final double len = Math.sqrt(dx * dx + dy * dy);
-    // u is the vector that is the length of the offset, in the direction of the
-    // segment
-    final double ux = sideSign * distance * dx / len;
-    final double uy = sideSign * distance * dy / len;
-    final double x1 = precisionModel.makePrecise(0, p1x - uy);
-    final double y1 = precisionModel.makePrecise(1, p1y + ux);
-    final double x2 = precisionModel.makePrecise(0, p2x - uy);
-    final double y2 = precisionModel.makePrecise(1, p2Y + ux);
-    final LineSegmentDouble line = new LineSegmentDouble(2, x1, y1, x2, y2);
-    return line;
+    if (point == null) {
+      NoOp.noOp();
+    } else {
+      // add start point
+      final double x = point.getX() + distance;
+      final double y = point.getY();
+      segList.addPt(x, y);
+      addFillet(point, 0.0, 2.0 * Math.PI, -1, distance);
+      segList.closeRing();
+    }
   }
 
   /**
@@ -639,6 +620,28 @@ class OffsetSegmentGenerator {
     final double x2 = precisionModel.makePrecise(0, seg.getX(1) - uy);
     final double y2 = precisionModel.makePrecise(1, seg.getY(1) + ux);
     return new LineSegmentDouble(2, x1, y1, x2, y2);
+  }
+
+  private LineSegment createOffsetSegment(final Point p1, final Point p2,
+    final int side, final double distance) {
+    final int sideSign = side == Position.LEFT ? 1 : -1;
+    final double p1x = p1.getX();
+    final double p1y = p1.getY();
+    final double p2x = p2.getX();
+    final double p2Y = p2.getY();
+    final double dx = p2x - p1x;
+    final double dy = p2Y - p1y;
+    final double len = Math.sqrt(dx * dx + dy * dy);
+    // u is the vector that is the length of the offset, in the direction of the
+    // segment
+    final double ux = sideSign * distance * dx / len;
+    final double uy = sideSign * distance * dy / len;
+    final double x1 = precisionModel.makePrecise(0, p1x - uy);
+    final double y1 = precisionModel.makePrecise(1, p1y + ux);
+    final double x2 = precisionModel.makePrecise(0, p2x - uy);
+    final double y2 = precisionModel.makePrecise(1, p2Y + ux);
+    final LineSegmentDouble line = new LineSegmentDouble(2, x1, y1, x2, y2);
+    return line;
   }
 
   /**
@@ -683,8 +686,7 @@ class OffsetSegmentGenerator {
       * CURVE_VERTEX_SNAP_DISTANCE_FACTOR);
   }
 
-  public void initSideSegments(final Point s1, final Point s2,
-    final int side) {
+  public void initSideSegments(final Point s1, final Point s2, final int side) {
     this.s1 = s1;
     this.s2 = s2;
     this.side = side;

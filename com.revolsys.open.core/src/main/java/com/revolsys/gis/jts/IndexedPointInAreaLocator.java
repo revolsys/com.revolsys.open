@@ -2,15 +2,14 @@ package com.revolsys.gis.jts;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.jts.locator.SortedPackedIntervalRTree;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.algorithm.PointInArea;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
+import com.revolsys.jts.geom.segment.Segment;
 
 public class IndexedPointInAreaLocator {
 
@@ -21,25 +20,19 @@ public class IndexedPointInAreaLocator {
       init(geom);
     }
 
-    private void addLine(final PointList points) {
-      final int size = points.size();
-      if (size > 1) {
-        for (int i = 1; i < size; i++) {
-          final double x1 = points.getX(i - 1);
-          final double x2 = points.getX(i);
-          final double y1 = points.getY(i - 1);
-          final double y2 = points.getY(i);
-          final LineSegment seg = new LineSegmentDoubleGF(2, x1, y1, x2, y2);
-          final double min = Math.min(y1, y2);
-          final double max = Math.max(y1, y2);
-          index.insert(min, max, seg);
-        }
+    private void addLine(final LineString line) {
+      for (final Segment segment : line.segments()) {
+        final double y1 = segment.getY(0);
+        final double y2 = segment.getY(1);
+        final double min = Math.min(y1, y2);
+        final double max = Math.max(y1, y2);
+        index.insert(min, max, segment.clone());
       }
     }
 
     private void init(final Geometry geometry) {
-      for (final PointList points : CoordinatesListUtil.getAll(geometry)) {
-        addLine(points);
+      for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+        addLine(line);
       }
     }
 
@@ -87,12 +80,6 @@ public class IndexedPointInAreaLocator {
     return index;
   }
 
-  public Location locate(final Point coordinates) {
-    final double x = coordinates.getX();
-    final double y = coordinates.getY();
-    return locate(x, y);
-  }
-
   public Location locate(final double x, final double y) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final double resolutionXy = geometryFactory.getResolutionXy();
@@ -102,6 +89,12 @@ public class IndexedPointInAreaLocator {
     index.query(minY, maxY, visitor);
 
     return visitor.getLocation();
+  }
+
+  public Location locate(final Point coordinates) {
+    final double x = coordinates.getX();
+    final double y = coordinates.getY();
+    return locate(x, y);
   }
 
 }

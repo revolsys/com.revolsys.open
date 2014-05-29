@@ -12,9 +12,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectLog;
 import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.parallel.channel.Channel;
@@ -22,7 +20,6 @@ import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInProcess;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.MathUtil;
 
 public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> {
 
@@ -66,34 +63,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
           return false;
         }
       } else {
-        final List<PointList> parts1 = CoordinatesListUtil.getAll(geometry1);
-        final List<PointList> parts2 = CoordinatesListUtil.getAll(geometry2);
-        if (parts1.size() == parts2.size()) {
-          for (int i = 0; i < parts1.size(); i++) {
-            final PointList points1 = parts1.get(i);
-            final PointList points2 = parts2.get(i);
-            if (points1.size() == points2.size()
-              && points1.getAxisCount() == points2.getAxisCount()) {
-              for (int j = 0; j < points1.size(); j++) {
-                for (int k = 0; k < points1.getAxisCount(); k++) {
-                  double value1 = points1.getValue(j, k);
-                  double value2 = points2.getValue(j, k);
-                  value1 = MathUtil.makePrecise(1000.0, value1);
-                  value2 = MathUtil.makePrecise(1000.0, value2);
-                  if (Double.compare(value1, value2) != 0) {
-                    return false;
-                  }
-                }
-              }
-            } else {
-              return false;
-            }
-          }
-          return true;
-        } else {
-          return false;
-        }
-
+        return geometry1.equals(geometry1.getAxisCount(), geometry2);
       }
     } else {
       return false;

@@ -7,6 +7,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 public class MultiPolygonSegment extends AbstractSegment implements
   Iterator<Segment> {
@@ -33,6 +34,18 @@ public class MultiPolygonSegment extends AbstractSegment implements
       } else {
         return ring.getCoordinate(segmentIndex + vertexIndex, axisIndex);
       }
+    }
+  }
+
+  @Override
+  public Vertex getGeometryVertex(final int index) {
+    final MultiPolygon polygon = getMultiPolygon();
+    if (index == 0) {
+      return polygon.getVertex(partIndex, ringIndex, segmentIndex);
+    } else if (index == 1) {
+      return polygon.getVertex(partIndex, ringIndex, segmentIndex + 1);
+    } else {
+      return null;
     }
   }
 

@@ -111,13 +111,13 @@ public class BufferInputLineSimplifier {
 
   private PointList collapseLine() {
     final int axisCount = inputLine.getAxisCount();
-    final int vertexCount = inputLine.size();
+    final int vertexCount = inputLine.getVertexCount();
     final double[] coordinates = new double[(vertexCount - deleteCount)
       * axisCount];
     int j = 0;
     for (int i = 0; i < vertexCount; i++) {
       if (isDeleted[i] != DELETE) {
-        final Point point = inputLine.get(i);
+        final Point point = inputLine.getPoint(i);
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, point);
       }
     }
@@ -141,7 +141,7 @@ public class BufferInputLineSimplifier {
     int lastIndex = findNextNonDeletedIndex(midIndex);
 
     boolean isChanged = false;
-    while (lastIndex < inputLine.size()) {
+    while (lastIndex < inputLine.getVertexCount()) {
       // test triple for shallow concavity
       boolean isMiddleVertexDeleted = false;
       if (isDeletable(index, midIndex, lastIndex, distanceTol)) {
@@ -170,7 +170,7 @@ public class BufferInputLineSimplifier {
    */
   private int findNextNonDeletedIndex(final int index) {
     int next = index + 1;
-    while (next < inputLine.size() && isDeleted[next] == DELETE) {
+    while (next < inputLine.getVertexCount() && isDeleted[next] == DELETE) {
       next++;
     }
     return next;
@@ -185,9 +185,9 @@ public class BufferInputLineSimplifier {
 
   private boolean isDeletable(final int i0, final int i1, final int i2,
     final double distanceTol) {
-    final Point p0 = inputLine.get(i0);
-    final Point p1 = inputLine.get(i1);
-    final Point p2 = inputLine.get(i2);
+    final Point p0 = inputLine.getPoint(i0);
+    final Point p1 = inputLine.getPoint(i1);
+    final Point p2 = inputLine.getPoint(i2);
 
     if (!isConcave(p0, p1, p2)) {
       return false;
@@ -229,7 +229,7 @@ public class BufferInputLineSimplifier {
     }
 
     for (int i = i0; i < i2; i += inc) {
-      if (!isShallow(p0, p2, inputLine.get(i), distanceTol)) {
+      if (!isShallow(p0, p2, inputLine.getPoint(i), distanceTol)) {
         return false;
       }
     }
@@ -253,7 +253,7 @@ public class BufferInputLineSimplifier {
     }
 
     // rely on fact that boolean array is filled with false value
-    isDeleted = new byte[inputLine.size()];
+    isDeleted = new byte[inputLine.getVertexCount()];
 
     boolean isChanged = false;
     do {

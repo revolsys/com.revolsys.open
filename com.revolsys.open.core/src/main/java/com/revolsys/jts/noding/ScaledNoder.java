@@ -114,14 +114,14 @@ public class ScaledNoder implements Noder {
   private NodedSegmentString rescale(final NodedSegmentString segment) {
     final PointList points = segment.getPoints();
     final int axisCount = points.getAxisCount();
-    final int vertexCount = points.size();
+    final int vertexCount = points.getVertexCount();
     final double[] coordinates = new double[vertexCount * axisCount];
     for (int i = 0; i < vertexCount; i++) {
       final double x = points.getX(i) / scaleFactor + offsetX;
       final double y = points.getY(i) / scaleFactor + offsetY;
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, x, y);
       for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-        final double value = points.getValue(i, axisIndex);
+        final double value = points.getCoordinate(i, axisIndex);
         coordinates[i * axisCount + axisIndex] = value;
       }
     }

@@ -3,7 +3,6 @@ package com.revolsys.jts.testold.io;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.io.ParseException;
@@ -17,8 +16,6 @@ import com.revolsys.jts.io.WKTReader;
  *
  */
 public class WKBReaderTest extends TestCase {
-  private static CoordinateSequenceComparator comp2 = new CoordinateSequenceComparator(
-    2);
 
   public static void main(final String args[]) {
     TestRunner.run(WKBReaderTest.class);
@@ -40,7 +37,7 @@ public class WKBReaderTest extends TestCase {
 
     final Geometry expected = this.rdr.read(expectedWKT);
 
-    final boolean isEqual = expected.compareTo(g2, comp2) == 0;
+    final boolean isEqual = expected.equals(2, g2);
     assertTrue(isEqual);
 
   }

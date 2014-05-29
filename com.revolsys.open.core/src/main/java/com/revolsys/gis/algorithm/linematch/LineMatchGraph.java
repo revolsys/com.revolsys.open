@@ -84,15 +84,15 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
   private void add(final LineString line, final int index) {
     if (line.getLength() > 0) {
-      final PointList coords = CoordinatesListUtil.get(line);
-      final Point coordinate0 = coords.get(0);
+      final PointList coords = line;
+      final Point coordinate0 = coords.getPoint(0);
       final Node<LineSegmentMatch> node = getNode(coordinate0);
       final Set<Node<LineSegmentMatch>> indexStartNodes = getStartNodes(index);
       indexStartNodes.add(node);
 
       Point previousCoordinate = coordinate0;
-      for (int i = 1; i < coords.size(); i++) {
-        final Point coordinate = coords.get(i);
+      for (int i = 1; i < coords.getVertexCount(); i++) {
+        final Point coordinate = coords.getPoint(i);
         final LineSegment segment = new LineSegmentDoubleGF(geometryFactory,
           previousCoordinate, coordinate);
         if (segment.getLength() > 0) {
@@ -241,11 +241,11 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     final LineString line, final int index) {
     final Set<Edge<LineSegmentMatch>> edges = new LinkedHashSet<Edge<LineSegmentMatch>>();
 
-    final PointList coordinatesList = CoordinatesListUtil.get(line);
-    final Point coordinate0 = coordinatesList.get(0);
+    final PointList coordinatesList = line;
+    final Point coordinate0 = coordinatesList.getPoint(0);
     Point previousCoordinate = coordinate0;
-    for (int i = 1; i < coordinatesList.size(); i++) {
-      final Point coordinate = coordinatesList.get(i);
+    for (int i = 1; i < coordinatesList.getVertexCount(); i++) {
+      final Point coordinate = coordinatesList.getPoint(i);
       if (previousCoordinate.distance(coordinate) > 0) {
         final Edge<LineSegmentMatch> edge = getEdge(previousCoordinate,
           coordinate);

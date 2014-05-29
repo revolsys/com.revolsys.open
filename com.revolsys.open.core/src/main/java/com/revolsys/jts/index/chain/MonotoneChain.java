@@ -105,10 +105,10 @@ public class MonotoneChain {
   private void computeOverlaps(final int start0, final int end0,
     final MonotoneChain mc, final int start1, final int end1,
     final MonotoneChainOverlapAction mco) {
-    final Point p00 = points.get(start0);
-    final Point p01 = points.get(end0);
-    final Point p10 = mc.points.get(start1);
-    final Point p11 = mc.points.get(end1);
+    final Point p00 = points.getPoint(start0);
+    final Point p01 = points.getPoint(end0);
+    final Point p10 = mc.points.getPoint(start1);
+    final Point p11 = mc.points.getPoint(end1);
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {
       mco.overlap(this, start0, mc, start1);
@@ -163,8 +163,8 @@ public class MonotoneChain {
 
   private void computeSelect(final BoundingBox searchEnv, final int start0,
     final int end0, final MonotoneChainSelectAction mcs) {
-    final Point p0 = points.get(start0);
-    final Point p1 = points.get(end0);
+    final Point p0 = points.getPoint(start0);
+    final Point p1 = points.getPoint(end0);
     mcs.tempEnv1 = new Envelope(p0, p1);
 
     // Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
@@ -204,7 +204,7 @@ public class MonotoneChain {
     final Point coord[] = new Point[end - start + 1];
     int index = 0;
     for (int i = start; i <= end; i++) {
-      coord[index++] = points.get(i);
+      coord[index++] = points.getPoint(i);
     }
     return coord;
   }
@@ -215,8 +215,8 @@ public class MonotoneChain {
 
   public Envelope getEnvelope() {
     if (env == null) {
-      final Point p0 = points.get(start);
-      final Point p1 = points.get(end);
+      final Point p0 = points.getPoint(start);
+      final Point p1 = points.getPoint(end);
       env = new Envelope(p0, p1);
     }
     return env;
@@ -233,7 +233,7 @@ public class MonotoneChain {
    * @param ls line segment to extract into
    */
   public LineSegment getLineSegment(final int index) {
-    return new LineSegmentDouble(points.get(index), points.get(index + 1));
+    return new LineSegmentDouble(points.getPoint(index), points.getPoint(index + 1));
   }
 
   public int getStartIndex() {

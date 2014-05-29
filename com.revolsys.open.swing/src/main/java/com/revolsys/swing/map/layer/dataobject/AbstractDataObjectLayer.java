@@ -65,7 +65,6 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
@@ -2266,7 +2265,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   public List<LayerDataObject> splitRecord(final LayerDataObject record,
     final Point point) {
     final LineString line = record.getGeometryValue();
-    final List<LineString> lines = LineStringUtil.split(line, point);
+    final List<LineString> lines = line.split(point);
     if (lines.size() == 2) {
       final LineString line1 = lines.get(0);
       final LineString line2 = lines.get(1);

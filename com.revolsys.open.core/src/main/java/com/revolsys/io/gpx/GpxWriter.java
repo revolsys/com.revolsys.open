@@ -133,7 +133,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     out.startTag(GpxConstants.TRACK_ELEMENT);
     LineString line = object.getGeometryValue();
     line = line.convert(GpxConstants.GEOMETRY_FACTORY);
-    final PointList coordinatesList = CoordinatesListUtil.get(line);
+    final PointList coordinatesList = line;
     writeAttributes(object);
     out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
 

@@ -297,7 +297,7 @@ class BufferSubgraph implements Comparable {
       double[] bounds = null;
       for (final DirectedEdge dirEdge : dirEdgeList) {
         final Edge edge = dirEdge.getEdge();
-        for (final Point point : edge.getPoints()) {
+        for (final Point point : edge.getPoints().toPointList()) {
           if (bounds == null) {
             bounds = EnvelopeUtil.createBounds(2, point);
           } else {

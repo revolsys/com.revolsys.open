@@ -27,15 +27,11 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.PointUtil;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.PointWithOrientation;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.gis.model.coordinates.PointWithOrientation;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -82,8 +78,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     }
   }
 
-  public static PointWithOrientation getTextLocation(
-    final Viewport2D viewport, final Geometry geometry, final TextStyle style) {
+  public static PointWithOrientation getTextLocation(final Viewport2D viewport,
+    final Geometry geometry, final TextStyle style) {
     if (viewport == null) {
       return new PointWithOrientation(new PointDouble(0.0, 0.0), 0);
     }
@@ -97,43 +93,39 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
       final String placementType = style.getTextPlacementType();
       final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
         placementType);
-      final PointList points = CoordinatesListUtil.get(geometry);
-      final int numPoints = points.size();
-      if (numPoints == 1) {
-        point = points.get(0);
-        point = ProjectionFactory.convert(point, geometryFactory,
-          viewportGeometryFactory);
+      final int vertexCount = geometry.getVertexCount();
+      if (vertexCount == 1) {
+        point = geometry.getPoint();
+        point = point.convert(viewportGeometryFactory);
 
         return new PointWithOrientation(point, 0);
-      } else if (numPoints > 1) {
+      } else if (vertexCount > 1) {
         final boolean matches = matcher.matches();
         if (matches) {
           final String argument = matcher.group(1);
           int index;
           if (argument.matches("n(?:\\s*-\\s*(\\d+)\\s*)?")) {
             final String indexString = argument.replaceAll("[^0-9]+", "");
-            index = numPoints - 1;
+            index = vertexCount - 1;
             if (indexString.length() > 0) {
               index -= Integer.parseInt(indexString);
             }
             if (index == 0) {
               index++;
             }
-            point = ProjectionFactory.convert(points.get(index),
-              geometryFactory, viewportGeometryFactory);
-            final Point p2 = ProjectionFactory.convert(points.get(index - 1),
-              geometryFactory, viewportGeometryFactory);
+            point = geometry.getVertex(index).convert(viewportGeometryFactory);
+            final Point p2 = geometry.getVertex(index - 1).convert(
+              viewportGeometryFactory);
             final double angle = Math.toDegrees(p2.angle2d(point));
             orientation += angle;
           } else {
             index = Integer.parseInt(argument);
-            if (index + 1 == numPoints) {
+            if (index + 1 == vertexCount) {
               index--;
             }
-            point = ProjectionFactory.convert(points.get(index),
-              geometryFactory, viewportGeometryFactory);
-            final Point p2 = ProjectionFactory.convert(points.get(index + 1),
-              geometryFactory, viewportGeometryFactory);
+            point = geometry.getVertex(index).convert(viewportGeometryFactory);
+            final Point p2 = geometry.getVertex(index + 1).convert(
+              viewportGeometryFactory);
             final double angle = Math.toDegrees(point.angle2d(p2));
             orientation += angle;
           }
@@ -143,15 +135,13 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
             final double totalLength = geometry.getLength();
             final double centreLength = totalLength / 2;
             double currentLength = 0;
-            for (int i = 1; i < numPoints && currentLength < centreLength; i++) {
-              Point p1 = points.get(i - 1);
-              Point p2 = points.get(i);
+            for (int i = 1; i < vertexCount && currentLength < centreLength; i++) {
+              Point p1 = geometry.getVertex(i - 1);
+              Point p2 = geometry.getVertex(i);
               final double segmentLength = p1.distance(p2);
               if (segmentLength + currentLength >= centreLength) {
-                p1 = ProjectionFactory.convert(p1, geometryFactory,
-                  viewportGeometryFactory);
-                p2 = ProjectionFactory.convert(p2, geometryFactory,
-                  viewportGeometryFactory);
+                p1 = p1.convert(viewportGeometryFactory);
+                p2 = p2.convert(viewportGeometryFactory);
                 point = LineSegmentUtil.project(geometryFactory, p1, p2,
                   (centreLength - currentLength) / segmentLength);
 
@@ -215,8 +205,8 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Geometry geometry, final TextStyle style) {
     final String label = getLabel(object, style);
     if (StringUtils.hasText(label) && geometry != null || viewport == null) {
-      final PointWithOrientation point = getTextLocation(viewport,
-        geometry, style);
+      final PointWithOrientation point = getTextLocation(viewport, geometry,
+        style);
       if (point != null) {
         final double orientation = point.getOrientation();
 

@@ -60,135 +60,57 @@ import java.util.List;
  *
  * @version 1.7
  */
-public interface PointList extends Cloneable, Iterable<Point>,
-  Serializable {
-  /**
-   * Standard ordinate index values
-   */
-  int X = 0;
-
-  int Y = 1;
-
-  int Z = 2;
-
-  int M = 3;
-
-  /**
-   * Returns a deep copy of this collection.
-   * Called by Geometry#clone.
-   *
-   * @return a copy of the coordinate sequence containing copies of all points
-   */
+public interface PointList extends Cloneable, Serializable {
+  // done
   PointList clone();
 
-  boolean contains(Point point);
-
-  double distance(int index, PointList other, int otherIndex);
-
+  // done
   double distance(int index, Point point);
 
-  boolean equal(int index, PointList other, int otherIndex);
+  // done
+  boolean equalsVertex(int axisCount, int vertexIndex, Point point);
 
-  boolean equal(int index, PointList other, int otherIndex, int axisCount);
-
-  boolean equal(int i, Point point);
-
-  boolean equal(int i, Point point, int axisCount);
-
-  boolean equal2d(int index, Point point);
-
-  boolean equals(PointList coordinatesList);
-
-  boolean equals(PointList coordinatesList, int axisCount);
-
-  Point get(int i);
-
+  // done
   int getAxisCount();
 
-  /**
-   * Returns (possibly a copy of) the i'th coordinate in this sequence.
-   * Whether or not the Point returned is the actual underlying
-   * Point or merely a copy depends on the implementation.
-   * <p>
-   * Note that in the future the semantics of this method may change
-   * to guarantee that the Point returned is always a copy.
-   * Callers should not to assume that they can modify a PointList by
-   * modifying the object returned by this method.
-   *
-   * @param i the index of the coordinate to retrieve
-   * @return the i'th coordinate in the sequence
-   */
-  Point getCoordinate(int i);
+  // done
+  double getCoordinate(int index, int axisIndex);
 
+  // done
   double[] getCoordinates();
 
-  List<Point> getList();
-
+  // done
   double getM(int index);
 
-  long getTime(int index);
+  // done
+  Point getPoint(int i);
 
-  /**
-   * Returns the ordinate of a coordinate in this sequence.
-   * Ordinate indices 0 and 1 are assumed to be X and Y.
-   * Ordinates indices greater than 1 have user-defined semantics
-   * (for instance, they may contain other dimensions or measure values).
-   *
-   * @param index  the coordinate index in the sequence
-   * @param ordinateIndex the ordinate index in the coordinate (in range [0, dimension-1])
-   */
-  double getValue(int index, int axisIndex);
+  // done
+  int getVertexCount();
 
-  /**
-   * Returns ordinate X (0) of the specified coordinate.
-   *
-   * @param index
-   * @return the value of the X ordinate in the index'th coordinate
-   */
+  // done
   double getX(int index);
 
-  /**
-   * Returns ordinate Y (1) of the specified coordinate.
-   *
-   * @param index
-   * @return the value of the Y ordinate in the index'th coordinate
-   */
+  // done
   double getY(int index);
 
+  // done
   double getZ(int index);
 
+  // done
+  boolean hasVertex(Point point);
+
+  // done
   boolean isCounterClockwise();
 
+  // done
   PointList reverse();
 
-  /**
-     * Returns the number of coordinates in this sequence.
-     * @return the size of the sequence
-     */
-  int size();
+  // done
+  PointList subLine(int index);
 
-  boolean startsWith(PointList coordinatesList, int axisCount);
+  // done
+  PointList subLine(int index, int count);
 
-  PointList subList(int index);
-
-  PointList subList(int index, int count);
-
-  PointList subList(int length, int index, int count);
-
-  PointList subList(int length, int sourceIndex, int targetIndex,
-    int count);
-
-  /**
-   * Returns (possibly copies of) the Point in this collection.
-   * Whether or not the Point returned are the actual underlying
-   * Point or merely copies depends on the implementation. Note that
-   * if this implementation does not store its data as an array of Coordinates,
-   * this method will incur a performance penalty because the array needs to
-   * be built from scratch.
-   *
-   * @return a array of coordinates containing the point values in this sequence
-   */
-  Point[] toCoordinateArray();
-
-  List<Point> toList();
+  List<Point> toPointList();
 }

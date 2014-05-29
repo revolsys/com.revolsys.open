@@ -1,5 +1,7 @@
 package com.revolsys.jts.test.geometry;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -108,11 +110,27 @@ public class LineStringTest {
     final Point mergePoint = geometryFactory.point(mergeX, mergeY);
 
     final LineString mergedLine = line1.merge(mergePoint, line2);
-    TestUtil.assertEqualsExact(axisCount, mergedLine, expectedMergedLine);
+    TestUtil.assertEqualsExact(axisCount, expectedMergedLine, mergedLine);
 
     if (!loop) {
       final LineString mergedLine2 = line1.merge(line2);
-      TestUtil.assertEqualsExact(axisCount, mergedLine2, expectedMergedLine);
+      TestUtil.assertEqualsExact(axisCount, expectedMergedLine, mergedLine2);
+    }
+  }
+
+  public static void assertSplit(final LineString line, final Point splitPoint,
+    final LineString... splitLines) {
+    final GeometryFactory geometryFactory = line.getGeometryFactory();
+    final int axisCount = geometryFactory.getAxisCount();
+
+    final List<LineString> actualSplitLines = line.split(splitPoint);
+    final int splitCount = splitLines.length;
+    Assert.assertEquals("Split Count", splitCount, actualSplitLines.size());
+
+    for (int i = 0; i < splitLines.length; i++) {
+      final LineString expectedSplitLine = splitLines[i];
+      final LineString actualSplitLine = actualSplitLines.get(i);
+      TestUtil.assertEqualsExact(axisCount, expectedSplitLine, actualSplitLine);
     }
   }
 
@@ -347,6 +365,58 @@ public class LineStringTest {
       START_X, START_Y, 0, START_X + 300, START_Y + 300, 3, START_X + 200,
       START_Y + 200, 2, START_X + 100, START_Y + 100, 1, START_X, START_Y, 0);
 
+  }
+
+  @Test
+  public void testSplit() {
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, 3,
+      1000.0, 1);
+
+    // Last point is duplicated
+    final LineString line = geometryFactory.lineString(3, START_X, START_Y, 0,
+      START_X + 100, START_Y + 100, 1, START_X + 200, START_Y + 100, 2,
+      START_X + 100, START_Y, 3);
+
+    // From vertex
+    assertSplit(line, geometryFactory.point(START_X, START_Y), line);
+
+    // To vertex
+    assertSplit(line, geometryFactory.point(START_X + 100, START_Y), line);
+
+    // Middle vertex
+    final LineString lineVertexMiddle1 = geometryFactory.lineString(3, START_X,
+      START_Y, 0, START_X + 100, START_Y + 100, 1);
+    final LineString lineVertexMiddle2 = geometryFactory.lineString(3,
+      START_X + 100, START_Y + 100, 1, START_X + 200, START_Y + 100, 2,
+      START_X + 100, START_Y, 3);
+    assertSplit(line, geometryFactory.point(START_X + 100, START_Y + 100),
+      lineVertexMiddle1, lineVertexMiddle2);
+
+    // Middle vertex
+    final LineString lineVertexClose1 = geometryFactory.lineString(3, START_X,
+      START_Y, 0, START_X + 100, START_Y + 100, 1, START_X + 99.999,
+      START_Y + 100.001, 1);
+    final LineString lineVertexClose2 = geometryFactory.lineString(3,
+      START_X + 99.999, START_Y + 100.001, 1, START_X + 100, START_Y + 100, 1,
+      START_X + 200, START_Y + 100, 2, START_X + 100, START_Y, 3);
+    assertSplit(line,
+      geometryFactory.point(START_X + 99.999, START_Y + 100.001, 1),
+      lineVertexClose1, lineVertexClose2);
+
+    // Middle of first segment
+    for (final double offset : new double[] {
+      0.001, 50, 99.999
+    }) {
+      final double x = START_X + offset;
+      final double y = START_Y + offset;
+      final LineString lineSegmentFirst1 = geometryFactory.lineString(3,
+        START_X, START_Y, 0, x, y, offset);
+      final LineString lineSegmentFirst2 = geometryFactory.lineString(3, x, y,
+        offset, START_X + 100, START_Y + 100, 1, START_X + 200, START_Y + 100,
+        2, START_X + 100, START_Y, 3);
+      assertSplit(line, geometryFactory.point(x, y, offset), lineSegmentFirst1,
+        lineSegmentFirst2);
+    }
   }
 
   @Test

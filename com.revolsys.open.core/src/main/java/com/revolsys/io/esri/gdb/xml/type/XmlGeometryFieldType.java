@@ -54,7 +54,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     if (multiLine.isEmpty()) {
       hasZ = false;
     } else {
-      final PointList points = CoordinatesListUtil.get((LineString)multiLine.getGeometry(0));
+      final PointList points = ((LineString)multiLine.getGeometry(0));
       hasZ = points.getAxisCount() > 2;
     }
     out.element(HAS_ID, false);
@@ -112,7 +112,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   private void writePolygon(final XmlWriter out, final Polygon polygon) {
     final boolean hasZ;
     final LineString exteriorRing = polygon.getExteriorRing();
-    final PointList points = CoordinatesListUtil.get(exteriorRing);
+    final PointList points = exteriorRing;
     hasZ = points.getAxisCount() > 2;
     out.element(HAS_ID, false);
     out.element(HAS_Z, hasZ);

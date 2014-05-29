@@ -154,7 +154,7 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public Point getCoordinate(final int i) {
-    return points.get(i);
+    return points.getPoint(i);
   }
 
   /**
@@ -215,14 +215,14 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public int size() {
-    return points.size();
+    return points.getVertexCount();
   }
 
   @Override
   public String toString() {
-    if (points == null || points.size() == 0) {
+    if (points == null || points.getVertexCount() == 0) {
       return "LINESTRING EMPTY\t" + data;
-    } else if (points.size() < 2) {
+    } else if (points.getVertexCount() < 2) {
       return GeometryFactory.floating(0, 2).point(points) + "\t" + data;
     } else {
       return GeometryFactory.floating(0, 2).lineString(points) + "\t" + data;

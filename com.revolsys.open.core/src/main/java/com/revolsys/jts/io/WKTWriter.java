@@ -121,11 +121,11 @@ public class WKTWriter {
   public static String toLineString(final PointList seq) {
     final StringBuffer buf = new StringBuffer();
     buf.append("LINESTRING ");
-    if (seq.size() == 0) {
+    if (seq.getVertexCount() == 0) {
       buf.append(" EMPTY");
     } else {
       buf.append("(");
-      for (int i = 0; i < seq.size(); i++) {
+      for (int i = 0; i < seq.getVertexCount(); i++) {
         if (i > 0) {
           buf.append(", ");
         }
@@ -202,7 +202,7 @@ public class WKTWriter {
     final Writer writer) throws IOException {
     writer.write(writeNumber(seq.getX(i)) + " " + writeNumber(seq.getY(i)));
     if (outputDimension >= 3 && seq.getAxisCount() >= 3) {
-      final double z = seq.getValue(i, 3);
+      final double z = seq.getCoordinate(i, 3);
       if (!Double.isNaN(z)) {
         writer.write(" ");
         writer.write(writeNumber(z));
@@ -545,14 +545,14 @@ public class WKTWriter {
    */
   private void appendSequenceText(final PointList seq, final int level,
     final boolean doIndent, final Writer writer) throws IOException {
-    if (seq.size() == 0) {
+    if (seq.getVertexCount() == 0) {
       writer.write("EMPTY");
     } else {
       if (doIndent) {
         indent(level, writer);
       }
       writer.write("(");
-      for (int i = 0; i < seq.size(); i++) {
+      for (int i = 0; i < seq.getVertexCount(); i++) {
         if (i > 0) {
           writer.write(", ");
           if (coordsPerLine > 0 && i % coordsPerLine == 0) {

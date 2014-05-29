@@ -11,11 +11,9 @@ import java.util.Map;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianOutput;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.EndianInput;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -23,7 +21,9 @@ import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
 
@@ -358,9 +358,7 @@ public final class ShapefileGeometryUtil {
     final double y = in.readLEDouble();
     final double z = 0;
     final double m = in.readLEDouble();
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(4, x, y, z,
-      m);
-    return geometryFactory.point(points);
+    return geometryFactory.point(x, y, z, m);
   }
 
   public void readPoints(final EndianInput in, final int[] partIndex,
@@ -378,8 +376,7 @@ public final class ShapefileGeometryUtil {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
     final double z = in.readLEDouble();
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(3, x, y, z);
-    return geometryFactory.point(points);
+    return geometryFactory.point(x, y, z);
   }
 
   public Point readPointZM(final GeometryFactory geometryFactory,
@@ -635,31 +632,22 @@ public final class ShapefileGeometryUtil {
     out.writeLEDouble(envelope.getMaxY());
   }
 
-  public void writeMCoordinates(final EndianOutput out,
-    final PointList coordinates) throws IOException {
-    if (coordinates.getAxisCount() >= 4) {
-      for (int i = 0; i < coordinates.size(); i++) {
-        final double m = coordinates.getM(i);
-        if (!Double.isNaN(m)) {
-          out.writeLEDouble(m);
-        } else {
-          out.writeLEDouble(0);
-        }
-      }
-    } else {
-      for (int i = 0; i < coordinates.size(); i++) {
-        out.writeLEDouble(0);
-      }
-    }
-  }
-
   public void writeMCoordinates(final EndianOutput out, final Geometry geometry)
     throws IOException {
     writeMCoordinatesRange(out, geometry);
-    for (int n = 0; n < geometry.getGeometryCount(); n++) {
-      final Geometry subGeometry = geometry.getGeometry(n);
-      final PointList coordinates = CoordinatesListUtil.get(subGeometry);
-      writeMCoordinates(out, coordinates);
+    if (geometry.getAxisCount() >= 4) {
+      for (final Vertex vertex : geometry.vertices()) {
+        final double m = vertex.getM();
+        if (Double.isNaN(m)) {
+          out.writeLEDouble(0);
+        } else {
+          out.writeLEDouble(m);
+        }
+      }
+    } else {
+      for (int i = 0; i < geometry.getVertexCount(); i++) {
+        out.writeLEDouble(0);
+      }
     }
   }
 
@@ -671,24 +659,30 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public void writeMCoordinatesRange(final EndianOutput out,
-    final Geometry geometry) throws IOException {
-    double minM = Double.MAX_VALUE;
-    double maxM = -Double.MAX_VALUE;
-    for (int n = 0; n < geometry.getGeometryCount(); n++) {
-      final Geometry subGeometry = geometry.getGeometry(n);
-      final PointList coordinates = CoordinatesListUtil.get(subGeometry);
-      if (coordinates.getAxisCount() >= 4) {
-        for (int i = 0; i < coordinates.size(); i++) {
-          final double m = coordinates.getM(i);
-          if (!Double.isNaN(m)) {
-            minM = Math.min(minM, m);
-            maxM = Math.max(maxM, m);
-          }
+  public void writeMCoordinates(final EndianOutput out,
+    final PointList coordinates) throws IOException {
+    if (coordinates.getAxisCount() >= 4) {
+      for (int i = 0; i < coordinates.getVertexCount(); i++) {
+        final double m = coordinates.getM(i);
+        if (!Double.isNaN(m)) {
+          out.writeLEDouble(m);
+        } else {
+          out.writeLEDouble(0);
         }
       }
+    } else {
+      for (int i = 0; i < coordinates.getVertexCount(); i++) {
+        out.writeLEDouble(0);
+      }
     }
-    if (minM == Double.MAX_VALUE && maxM == -Double.MAX_VALUE) {
+  }
+
+  public void writeMCoordinatesRange(final EndianOutput out,
+    final Geometry geometry) throws IOException {
+    final BoundingBox boundingBox = geometry.getBoundingBox();
+    final double minM = boundingBox.getMin(3);
+    final double maxM = boundingBox.getMax(3);
+    if (Double.isNaN(minM) || Double.isNaN(maxM)) {
       out.writeLEDouble(0);
       out.writeLEDouble(0);
     } else {
@@ -702,8 +696,8 @@ public final class ShapefileGeometryUtil {
     double minM = Double.MAX_VALUE;
     double maxM = -Double.MAX_VALUE;
     for (final PointList ring : pointsList) {
-      for (int i = 0; i < ring.size(); i++) {
-        double m = ring.getValue(i, 2);
+      for (int i = 0; i < ring.getVertexCount(); i++) {
+        double m = ring.getCoordinate(i, 2);
         if (Double.isNaN(m)) {
           m = 0;
         }
@@ -869,23 +863,23 @@ public final class ShapefileGeometryUtil {
       if (part instanceof Polygon) {
         final Polygon polygon = (Polygon)part;
         final LineString exterior = polygon.getExteriorRing();
-        PointList exteroirPoints = CoordinatesListUtil.get(exterior);
+        PointList exteroirPoints = exterior;
         final boolean exteriorClockwise = !exterior.isCounterClockwise();
         if (exteriorClockwise != clockwise) {
           exteroirPoints = exteroirPoints.reverse();
         }
         rings.add(exteroirPoints);
-        vertexCount += exteroirPoints.size();
+        vertexCount += exteroirPoints.getVertexCount();
         final int numHoles = polygon.getNumInteriorRing();
         for (int j = 0; j < numHoles; j++) {
           final LineString interior = polygon.getInteriorRing(j);
-          PointList interiorCoords = CoordinatesListUtil.get(interior);
+          PointList interiorCoords = interior;
           final boolean interiorClockwise = !interior.isCounterClockwise();
           if (interiorClockwise == clockwise) {
             interiorCoords = interiorCoords.reverse();
           }
           rings.add(interiorCoords);
-          vertexCount += interiorCoords.size();
+          vertexCount += interiorCoords.getVertexCount();
         }
       } else {
         throw new IllegalArgumentException("Expecting " + Polygon.class
@@ -909,7 +903,7 @@ public final class ShapefileGeometryUtil {
     int partIndex = 0;
     for (final PointList ring : rings) {
       out.writeLEInt(partIndex);
-      partIndex += ring.size();
+      partIndex += ring.getVertexCount();
     }
 
     for (final PointList ring : rings) {
@@ -933,8 +927,7 @@ public final class ShapefileGeometryUtil {
     } else {
       shapeType = ShapefileConstants.POLYGON_Z_SHAPE;
     }
-    final List<PointList> rings = writePolygon(out, geometry, shapeType,
-      8, 12);
+    final List<PointList> rings = writePolygon(out, geometry, shapeType, 8, 12);
     writeZCoordinates(out, rings);
   }
 
@@ -1014,28 +1007,28 @@ public final class ShapefileGeometryUtil {
     writeMCoordinates(out, geometry);
   }
 
+  public void writeXYCoordinates(final EndianOutput out, final Geometry geometry)
+    throws IOException {
+    for (final Vertex vertex : geometry.vertices()) {
+      out.writeLEDouble(vertex.getX());
+      out.writeLEDouble(vertex.getY());
+    }
+  }
+
   public void writeXYCoordinates(final EndianOutput out,
     final PointList coordinates) throws IOException {
-    for (int i = 0; i < coordinates.size(); i++) {
+    for (int i = 0; i < coordinates.getVertexCount(); i++) {
       out.writeLEDouble(coordinates.getX(i));
       out.writeLEDouble(coordinates.getY(i));
     }
   }
 
-  public void writeXYCoordinates(final EndianOutput out, final Geometry geometry)
+  public void writeZCoordinates(final EndianOutput out, final Geometry geometry)
     throws IOException {
-    for (int i = 0; i < geometry.getGeometryCount(); i++) {
-      final Geometry subGeometry = geometry.getGeometry(i);
-      final PointList points = CoordinatesListUtil.get(subGeometry);
-      writeXYCoordinates(out, points);
-    }
-  }
-
-  public void writeZCoordinates(final EndianOutput out,
-    final PointList coordinates) throws IOException {
-    if (coordinates.getAxisCount() >= 3) {
-      for (int i = 0; i < coordinates.size(); i++) {
-        final double z = coordinates.getZ(i);
+    writeZCoordinatesRange(out, geometry);
+    if (geometry.getAxisCount() >= 3) {
+      for (final Vertex vertex : geometry.vertices()) {
+        final double z = vertex.getZ();
         if (Double.isNaN(z)) {
           out.writeLEDouble(0);
         } else {
@@ -1043,19 +1036,9 @@ public final class ShapefileGeometryUtil {
         }
       }
     } else {
-      for (int i = 0; i < coordinates.size(); i++) {
+      for (int i = 0; i < geometry.getVertexCount(); i++) {
         out.writeLEDouble(0);
       }
-    }
-  }
-
-  public void writeZCoordinates(final EndianOutput out, final Geometry geometry)
-    throws IOException {
-    writeZCoordinatesRange(out, geometry);
-    for (int n = 0; n < geometry.getGeometryCount(); n++) {
-      final Geometry subGeometry = geometry.getGeometry(n);
-      final PointList coordinates = CoordinatesListUtil.get(subGeometry);
-      writeZCoordinates(out, coordinates);
     }
   }
 
@@ -1067,29 +1050,35 @@ public final class ShapefileGeometryUtil {
     }
   }
 
-  public void writeZCoordinatesRange(final EndianOutput out,
-    final Geometry geometry) throws IOException {
-    double minZ = Double.MAX_VALUE;
-    double maxZ = -Double.MAX_VALUE;
-    for (int n = 0; n < geometry.getGeometryCount(); n++) {
-      final Geometry subGeometry = geometry.getGeometry(n);
-      final PointList coordinates = CoordinatesListUtil.get(subGeometry);
-      if (coordinates.getAxisCount() >= 3) {
-        for (int i = 0; i < coordinates.size(); i++) {
-          final double z = coordinates.getZ(i);
-          if (!Double.isNaN(z)) {
-            minZ = Math.min(minZ, z);
-            maxZ = Math.max(maxZ, z);
-          }
+  public void writeZCoordinates(final EndianOutput out,
+    final PointList coordinates) throws IOException {
+    if (coordinates.getAxisCount() >= 3) {
+      for (int i = 0; i < coordinates.getVertexCount(); i++) {
+        final double z = coordinates.getZ(i);
+        if (Double.isNaN(z)) {
+          out.writeLEDouble(0);
+        } else {
+          out.writeLEDouble(z);
         }
       }
+    } else {
+      for (int i = 0; i < coordinates.getVertexCount(); i++) {
+        out.writeLEDouble(0);
+      }
     }
-    if (minZ == Double.MAX_VALUE && maxZ == -Double.MAX_VALUE) {
+  }
+
+  public void writeZCoordinatesRange(final EndianOutput out,
+    final Geometry geometry) throws IOException {
+    final BoundingBox boundingBox = geometry.getBoundingBox();
+    final double min = boundingBox.getMin(2);
+    final double max = boundingBox.getMax(2);
+    if (Double.isNaN(min) || Double.isNaN(max)) {
       out.writeLEDouble(0);
       out.writeLEDouble(0);
     } else {
-      out.writeLEDouble(minZ);
-      out.writeLEDouble(maxZ);
+      out.writeLEDouble(min);
+      out.writeLEDouble(max);
     }
   }
 
@@ -1098,8 +1087,8 @@ public final class ShapefileGeometryUtil {
     double minZ = Double.MAX_VALUE;
     double maxZ = -Double.MAX_VALUE;
     for (final PointList ring : pointsList) {
-      for (int i = 0; i < ring.size(); i++) {
-        double z = ring.getValue(i, 2);
+      for (int i = 0; i < ring.getVertexCount(); i++) {
+        double z = ring.getCoordinate(i, 2);
         if (Double.isNaN(z)) {
           z = 0;
         }

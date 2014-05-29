@@ -37,10 +37,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.index.strtree.STRtree;
 
 public class FacetSequenceTreeBuilder {
@@ -53,7 +53,7 @@ public class FacetSequenceTreeBuilder {
   private static void addFacetSequences(final PointList pts,
     final List<FacetSequence> sections) {
     int i = 0;
-    final int size = pts.size();
+    final int size = pts.getVertexCount();
     while (i <= size - 1) {
       int end = i + FACET_SEQUENCE_SIZE + 1;
       // if only one point remains after this section, include it in this
@@ -88,7 +88,7 @@ public class FacetSequenceTreeBuilder {
     final Geometry geometry) {
     final List<FacetSequence> sections = new ArrayList<>();
     for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
-      final PointList seq = line.getCoordinatesList();
+      final PointList seq = line;
       addFacetSequences(seq, sections);
     }
     for (final Point point : geometry.getGeometries(Point.class)) {

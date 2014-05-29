@@ -34,8 +34,9 @@
 package com.revolsys.jts.operation.distance3d;
 
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -101,8 +102,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
 
   private final int[] indexMap;
 
-  private AxisPlaneCoordinateSequence(final PointList seq,
-    final int[] indexMap) {
+  private AxisPlaneCoordinateSequence(final PointList seq, final int[] indexMap) {
     this.seq = seq;
     this.indexMap = indexMap;
   }
@@ -113,47 +113,42 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public Point get(final int i) {
-    return new PointDouble(getX(i), getY(i), getZ(i));
-  }
-
-  @Override
   public int getAxisCount() {
     return 2;
   }
 
   @Override
-  public double getValue(final int index, final int ordinateIndex) {
+  public double getCoordinate(final int index, final int ordinateIndex) {
     // Z ord is always 0
     if (ordinateIndex > 1) {
       return 0;
     }
-    return seq.getValue(index, indexMap[ordinateIndex]);
+    return seq.getCoordinate(index, indexMap[ordinateIndex]);
+  }
+
+  @Override
+  public Point getPoint(final int i) {
+    return new PointDouble(getX(i), getY(i), getZ(i));
+  }
+
+  @Override
+  public int getVertexCount() {
+    return seq.getVertexCount();
   }
 
   @Override
   public double getX(final int index) {
-    return getValue(index, X);
+    return getCoordinate(index, Geometry.X);
   }
 
   @Override
   public double getY(final int index) {
-    return getValue(index, Y);
+    return getCoordinate(index, Geometry.Y);
   }
 
   @Override
   public double getZ(final int index) {
-    return getValue(index, Z);
-  }
-
-  @Override
-  public int size() {
-    return seq.size();
-  }
-
-  @Override
-  public Point[] toCoordinateArray() {
-    throw new UnsupportedOperationException();
+    return getCoordinate(index, Geometry.Z);
   }
 
 }

@@ -5,10 +5,11 @@ import java.util.Iterator;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryComponent;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
-public interface Vertex extends Point, Iterator<Vertex> {
+public interface Vertex extends Point, Iterator<Vertex>, GeometryComponent {
 
   @Override
   Vertex clone();

@@ -58,6 +58,46 @@ import com.revolsys.jts.geom.PointList;
  */
 public class LineStringImpl extends AbstractLineString implements LineString {
 
+  public static double[] getNewCoordinates(
+    final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    final int axisCountThis = geometryFactory.getAxisCount();
+    double[] newCoordinates;
+    if (axisCount < 0 || axisCount == 1) {
+      throw new IllegalArgumentException("axisCount must 0 or > 1 not "
+        + axisCount);
+    } else if (coordinates == null || axisCount == 0 || vertexCount == 0
+      || coordinates.length == 0) {
+      newCoordinates = null;
+    } else {
+      final int coordinateCount = vertexCount * axisCount;
+      if (coordinates.length % axisCount != 0) {
+        throw new IllegalArgumentException("coordinates.length="
+          + coordinates.length + " must be a multiple of axisCount="
+          + axisCount);
+      } else if (coordinateCount > coordinates.length) {
+        throw new IllegalArgumentException("axisCount=" + axisCount
+          + " * vertexCount=" + vertexCount + " > coordinates.length="
+          + coordinates.length);
+      } else {
+        newCoordinates = new double[axisCountThis * vertexCount];
+        for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+          for (int axisIndex = 0; axisIndex < axisCountThis; axisIndex++) {
+            double value;
+            if (axisIndex < axisCount) {
+              value = coordinates[vertexIndex * axisCount + axisIndex];
+              value = geometryFactory.makePrecise(axisIndex, value);
+            } else {
+              value = Double.NaN;
+            }
+            newCoordinates[vertexIndex * axisCountThis + axisIndex] = value;
+          }
+        }
+      }
+    }
+    return newCoordinates;
+  }
+
   /**
    *  The bounding box of this <code>Geometry</code>.
    */
@@ -128,39 +168,8 @@ public class LineStringImpl extends AbstractLineString implements LineString {
   public LineStringImpl(final GeometryFactory geometryFactory,
     final int axisCount, final int vertexCount, final double... coordinates) {
     this.geometryFactory = geometryFactory;
-    if (axisCount < 0 || axisCount == 1) {
-      throw new IllegalArgumentException("axisCount must 0 or > 1 not "
-        + axisCount);
-    } else if (coordinates == null || axisCount == 0 || vertexCount == 0
-      || coordinates.length == 0) {
-      this.coordinates = null;
-    } else {
-      final int coordinateCount = vertexCount * axisCount;
-      if (coordinates.length % axisCount != 0) {
-        throw new IllegalArgumentException("coordinates.length="
-          + coordinates.length + " must be a multiple of axisCount="
-          + axisCount);
-      } else if (coordinateCount > coordinates.length) {
-        throw new IllegalArgumentException("axisCount=" + axisCount
-          + " * vertexCount=" + vertexCount + " > coordinates.length="
-          + coordinates.length);
-      } else {
-        final int axisCountThis = getAxisCount();
-        this.coordinates = new double[axisCountThis * vertexCount];
-        for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-          for (int axisIndex = 0; axisIndex < axisCountThis; axisIndex++) {
-            double value;
-            if (axisIndex < axisCount) {
-              value = coordinates[vertexIndex * axisCount + axisIndex];
-              value = geometryFactory.makePrecise(axisIndex, value);
-            } else {
-              value = Double.NaN;
-            }
-            this.coordinates[vertexIndex * axisCountThis + axisIndex] = value;
-          }
-        }
-      }
-    }
+    this.coordinates = getNewCoordinates(geometryFactory, axisCount,
+      vertexCount, coordinates);
   }
 
   public LineStringImpl(final GeometryFactory geometryFactory,
@@ -169,7 +178,7 @@ public class LineStringImpl extends AbstractLineString implements LineString {
     if (points == null) {
       this.coordinates = null;
     } else {
-      final int vertexCount = points.size();
+      final int vertexCount = points.getVertexCount();
       if (vertexCount == 0) {
         this.coordinates = null;
       } else if (vertexCount == 1) {
@@ -181,7 +190,7 @@ public class LineStringImpl extends AbstractLineString implements LineString {
         this.coordinates = new double[axisCount * vertexCount];
         for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-            double value = points.getValue(vertexIndex, axisIndex);
+            double value = points.getCoordinate(vertexIndex, axisIndex);
             value = geometryFactory.makePrecise(axisIndex, value);
             this.coordinates[vertexIndex * axisCount + axisIndex] = value;
           }

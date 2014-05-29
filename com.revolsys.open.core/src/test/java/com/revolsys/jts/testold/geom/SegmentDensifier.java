@@ -42,13 +42,13 @@ public class SegmentDensifier {
   public Geometry densify(final double segLength) {
     this.newCoords = new CoordinateList();
 
-    final PointList seq = this.inputLine.getCoordinatesList();
+    final PointList seq = this.inputLine;
 
-    this.newCoords.add(seq.getCoordinate(0).cloneCoordinates());
+    this.newCoords.add(seq.getPoint(0).cloneCoordinates());
 
-    for (int i = 0; i < seq.size() - 1; i++) {
-      final Point p0 = seq.getCoordinate(i);
-      final Point p1 = seq.getCoordinate(i + 1);
+    for (int i = 0; i < seq.getVertexCount() - 1; i++) {
+      final Point p0 = seq.getPoint(i);
+      final Point p1 = seq.getPoint(i + 1);
       densify(p0, p1, segLength);
     }
     final Point[] newPts = this.newCoords.toCoordinateArray();

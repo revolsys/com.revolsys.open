@@ -178,11 +178,11 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private void addLineString(final LineString line) {
-    final PointList points = CleanDuplicatePoints.clean(line.getCoordinatesList());
+    final PointList points = CleanDuplicatePoints.clean(line);
 
-    if (points.size() < 2) {
+    if (points.getVertexCount() < 2) {
       hasTooFewPoints = true;
-      invalidPoint = points.get(0);
+      invalidPoint = points.getPoint(0);
       return;
     }
 
@@ -196,9 +196,9 @@ public class GeometryGraph extends PlanarGraph {
      * Even if the LineString is closed, add both points as if they were endpoints.
      * This allows for the case that the node already exists and is a boundary point.
      */
-    Assert.isTrue(points.size() >= 2, "found LineString with single point");
-    insertBoundaryPoint(argIndex, points.get(0));
-    insertBoundaryPoint(argIndex, points.get(points.size() - 1));
+    Assert.isTrue(points.getVertexCount() >= 2, "found LineString with single point");
+    insertBoundaryPoint(argIndex, points.getPoint(0));
+    insertBoundaryPoint(argIndex, points.getPoint(points.getVertexCount() - 1));
 
   }
 
@@ -237,11 +237,11 @@ public class GeometryGraph extends PlanarGraph {
     if (ring.isEmpty()) {
       return;
     }
-    final PointList coordinatesList = CleanDuplicatePoints.clean(ring.getCoordinatesList());
+    final PointList coordinatesList = CleanDuplicatePoints.clean(ring);
 
-    if (coordinatesList.size() < 4) {
+    if (coordinatesList.getVertexCount() < 4) {
       hasTooFewPoints = true;
-      invalidPoint = coordinatesList.get(0);
+      invalidPoint = coordinatesList.getPoint(0);
       return;
     }
 
@@ -257,7 +257,7 @@ public class GeometryGraph extends PlanarGraph {
 
     insertEdge(e);
     // insert the endpoint as a node, to mark that it is on the boundary
-    insertPoint(argIndex, coordinatesList.get(0), Location.BOUNDARY);
+    insertPoint(argIndex, coordinatesList.getPoint(0), Location.BOUNDARY);
   }
 
   /**

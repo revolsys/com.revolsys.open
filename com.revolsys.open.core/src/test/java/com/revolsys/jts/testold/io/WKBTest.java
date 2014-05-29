@@ -65,8 +65,7 @@ public class WKBTest extends TestCase {
     }
     final Geometry g2 = this.wkbReader.read(wkb);
 
-    final CoordinateSequenceComparator comp = dimension == 2 ? comp2 : comp3;
-    final boolean isEqual = g.compareTo(g2, comp) == 0;
+    final boolean isEqual = g.equals(2, g2);
     assertTrue(isEqual);
 
     if (includeSRID) {

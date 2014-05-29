@@ -7,21 +7,61 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.Polygon;
 
 public class ArcSdeStGeometryAttribute extends JdbcAttribute {
+
+  public static List<List<PointList>> getParts(final Geometry geometry,
+    final boolean clockwise) {
+    final List<List<PointList>> partsList = new ArrayList<List<PointList>>();
+    if (geometry != null) {
+      for (final Geometry part : geometry.geometries()) {
+        if (!part.isEmpty()) {
+          if (part instanceof Point) {
+            final Point point = (Point)part;
+            partsList.add(Collections.singletonList(point.getCoordinatesList()));
+          } else if (part instanceof LineString) {
+            final LineString line = (LineString)part;
+            partsList.add(Collections.<PointList> singletonList(line));
+          } else if (part instanceof Polygon) {
+            final Polygon polygon = (Polygon)part;
+            final List<PointList> pointsList = new ArrayList<>();
+
+            boolean partClockwise = clockwise;
+            for (final LinearRing ring : polygon.rings()) {
+              PointList points = ring;
+              final boolean ringClockwise = !points.isCounterClockwise();
+              if (ringClockwise != partClockwise) {
+                points = points.reverse();
+              }
+              pointsList.add(points);
+              if (partClockwise == clockwise) {
+                partClockwise = !clockwise;
+              }
+            }
+            partsList.add(pointsList);
+          }
+        }
+      }
+    }
+    return partsList;
+  }
 
   private final int dimension;
 
@@ -129,8 +169,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       int numPoints = 0;
       byte[] data;
 
-      final List<List<PointList>> parts = CoordinatesListUtil.getParts(
-        geometry, false);
+      final List<List<PointList>> parts = getParts(geometry, false);
       final int entityType = ArcSdeConstants.getStGeometryType(geometry);
       numPoints = PackedCoordinateUtil.getNumPoints(parts);
       data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale,

@@ -88,7 +88,7 @@ public class GeometryFactoryTest extends TestCase {
   // public void testDeepCopy() throws ParseException {
   // final Point g = (Point)read("POINT(10 10) ");
   // final Geometry g2 = this.geometryFactory.createGeometry(g);
-  // g.getCoordinatesList().setOrdinate(0, 0, 99);
+  // g.setOrdinate(0, 0, 99);
   // assertTrue(!g.equalsExact(g2));
   // }
 

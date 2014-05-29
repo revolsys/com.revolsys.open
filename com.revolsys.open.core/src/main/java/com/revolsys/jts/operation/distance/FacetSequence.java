@@ -102,10 +102,10 @@ public class FacetSequence {
 
     for (int i = start; i < end - 1; i++) {
       for (int j = facetSeq.start; j < facetSeq.end - 1; j++) {
-        p0 = pts.getCoordinate(i);
-        p1 = pts.getCoordinate(i + 1);
-        q0 = facetSeq.pts.getCoordinate(j);
-        q1 = facetSeq.pts.getCoordinate(j + 1);
+        p0 = pts.getPoint(i);
+        p1 = pts.getPoint(i + 1);
+        q0 = facetSeq.pts.getPoint(j);
+        q1 = facetSeq.pts.getPoint(j + 1);
 
         final double dist = LineSegmentUtil.distanceLineLine(p0, p1, q0, q1);
         if (dist == 0.0) {
@@ -124,8 +124,8 @@ public class FacetSequence {
     double minDistance = Double.MAX_VALUE;
 
     for (int i = facetSeq.start; i < facetSeq.end - 1; i++) {
-      q0 = facetSeq.pts.getCoordinate(i);
-      q1 = facetSeq.pts.getCoordinate(i + 1);
+      q0 = facetSeq.pts.getPoint(i);
+      q1 = facetSeq.pts.getPoint(i + 1);
       final double dist = LineSegmentUtil.distanceLinePoint(q0, q1, pt);
       if (dist == 0.0) {
         return 0.0;
@@ -142,14 +142,14 @@ public class FacetSequence {
     final boolean isPointOther = facetSeq.isPoint();
 
     if (isPoint && isPointOther) {
-      pt = pts.getCoordinate(start);
-      seqPt = facetSeq.pts.getCoordinate(facetSeq.start);
+      pt = pts.getPoint(start);
+      seqPt = facetSeq.pts.getPoint(facetSeq.start);
       return pt.distance(seqPt);
     } else if (isPoint) {
-      pt = pts.getCoordinate(start);
+      pt = pts.getPoint(start);
       return computePointLineDistance(pt, facetSeq);
     } else if (isPointOther) {
-      seqPt = facetSeq.pts.getCoordinate(facetSeq.start);
+      seqPt = facetSeq.pts.getPoint(facetSeq.start);
       return computePointLineDistance(seqPt, this);
     }
     return computeLineLineDistance(facetSeq);
@@ -157,7 +157,7 @@ public class FacetSequence {
   }
 
   public Point getCoordinate(final int index) {
-    return pts.getCoordinate(start + index);
+    return pts.getPoint(start + index);
   }
 
   public BoundingBox getEnvelope() {

@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 public class LineStringSegment extends AbstractSegment implements
   Iterator<Segment> {
@@ -21,6 +22,18 @@ public class LineStringSegment extends AbstractSegment implements
     } else {
       final LineString lineString = getLineString();
       return lineString.getCoordinate(segmentIndex + vertexIndex, axisIndex);
+    }
+  }
+
+  @Override
+  public Vertex getGeometryVertex(final int index) {
+    final LineString line = getLineString();
+    if (index == 0) {
+      return line.getVertex(segmentIndex);
+    } else if (index == 1) {
+      return line.getVertex(segmentIndex + 1);
+    } else {
+      return null;
     }
   }
 

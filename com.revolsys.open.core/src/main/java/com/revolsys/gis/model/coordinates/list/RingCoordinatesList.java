@@ -10,7 +10,7 @@ public class RingCoordinatesList extends DoubleCoordinatesList {
   private static final long serialVersionUID = 5660399503744099455L;
 
   public RingCoordinatesList(final PointList coordinatesList) {
-    super(coordinatesList.subList(0, coordinatesList.size() - 1));
+    super(coordinatesList.subLine(0, coordinatesList.getVertexCount() - 1));
   }
 
   @Override
@@ -19,20 +19,20 @@ public class RingCoordinatesList extends DoubleCoordinatesList {
   }
 
   @Override
-  public double getValue(final int index, final int axisIndex) {
+  public double getCoordinate(final int index, final int axisIndex) {
     if (axisIndex >= getAxisCount()) {
       return Double.NaN;
     } else {
-      if (index >= super.size()) {
-        return super.getValue(index % super.size(), axisIndex);
+      if (index >= super.getVertexCount()) {
+        return super.getCoordinate(index % super.getVertexCount(), axisIndex);
       } else {
-        return super.getValue(index, axisIndex);
+        return super.getCoordinate(index, axisIndex);
       }
     }
   }
 
   @Override
-  public int size() {
-    return super.size() + 1;
+  public int getVertexCount() {
+    return super.getVertexCount() + 1;
   }
 }

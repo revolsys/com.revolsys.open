@@ -43,7 +43,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -110,7 +109,7 @@ public class PolygonImpl extends BaseGeometry implements Polygon {
    *@param  firstCoordinate  the coordinate to make first
    */
   public static LinearRing scroll(final LinearRing ring, final int index) {
-    final PointList points = ring.getCoordinatesList();
+    final PointList points = ring;
     final int vertexCount = ring.getVertexCount();
     final int axisCount = ring.getAxisCount();
     final double[] coordinates = new double[vertexCount * axisCount];
@@ -195,41 +194,9 @@ public class PolygonImpl extends BaseGeometry implements Polygon {
   @Override
   public int compareToSameClass(final Geometry geometry) {
     final LinearRing thisShell = getExteriorRing();
-    final LinearRing otherShell = ((Polygon)geometry).getExteriorRing();
+    Polygon ploygon2 = (Polygon)geometry;
+    final LinearRing otherShell = ploygon2.getExteriorRing();
     return thisShell.compareToSameClass(otherShell);
-  }
-
-  @Override
-  public int compareToSameClass(final Geometry o,
-    final CoordinateSequenceComparator comp) {
-    final Polygon poly = (Polygon)o;
-
-    final LinearRing thisShell = getExteriorRing();
-    final LinearRing otherShell = poly.getExteriorRing();
-    final int shellComp = thisShell.compareToSameClass(otherShell, comp);
-    if (shellComp != 0) {
-      return shellComp;
-    }
-
-    final int nHole1 = getNumInteriorRing();
-    final int nHole2 = poly.getNumInteriorRing();
-    int i = 0;
-    while (i < nHole1 && i < nHole2) {
-      final LinearRing thisHole = getInteriorRing(i);
-      final LinearRing otherHole = poly.getInteriorRing(i);
-      final int holeComp = thisHole.compareToSameClass(otherHole, comp);
-      if (holeComp != 0) {
-        return holeComp;
-      }
-      i++;
-    }
-    if (i < nHole1) {
-      return 1;
-    }
-    if (i < nHole2) {
-      return -1;
-    }
-    return 0;
   }
 
   @Override

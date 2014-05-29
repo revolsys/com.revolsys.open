@@ -26,15 +26,12 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.math.Angle;
-import com.revolsys.util.MathUtil;
 
 public class CoordinatesListUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";
@@ -64,7 +61,7 @@ public class CoordinatesListUtil {
       x2 = points.getX(j);
       y2 = points.getY(j);
       j++;
-    } while (x1 == x2 && y1 == y2 && j < points.size());
+    } while (x1 == x2 && y1 == y2 && j < points.getVertexCount());
     final double angle = Angle.angle2d(x1, x2, y1, y2);
     return angle;
   }
@@ -230,8 +227,8 @@ public class CoordinatesListUtil {
 
   public static boolean equals2dCoordinates(final PointList coordinates,
     final int index1, final int index2) {
-    return coordinates.getX(index1) == coordinates.getValue(index2, 0)
-      && coordinates.getY(index1) == coordinates.getValue(index2, 1);
+    return coordinates.getX(index1) == coordinates.getX(index2)
+      && coordinates.getY(index1) == coordinates.getY(index2);
   }
 
   public static Map<String, Number> findClosestSegmentAndCoordinate(
@@ -291,76 +288,10 @@ public class CoordinatesListUtil {
     return result;
   }
 
-  public static PointList get(final Geometry geometry) {
-    if (geometry == null) {
-      return null;
-    } else if (geometry instanceof Point) {
-      return ((Point)geometry).getCoordinatesList();
-    } else if (geometry instanceof LineString) {
-      return ((LineString)geometry).getCoordinatesList();
-    } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      return get(polygon);
-    } else if (geometry instanceof MultiPoint) {
-      final MultiPoint multiPoint = (MultiPoint)geometry;
-      return get(multiPoint);
-    } else if (geometry.getGeometryCount() > 0) {
-      return get(geometry.getGeometry(0));
-    } else {
-      return null;
-    }
-  }
-
-  public static PointList get(final LineString line) {
-    if (line == null) {
-      return null;
-    } else {
-      return line.getCoordinatesList();
-    }
-  }
-
-  public static Point get(final LineString line, final int i) {
-    final PointList points = get(line);
-    return points.get(i);
-  }
-
-  private static PointList get(final Polygon polygon) {
-    if (polygon == null) {
-      return null;
-    } else {
-      return get(polygon.getExteriorRing());
-    }
-  }
-
-  public static List<PointList> getAll(final Geometry geometry) {
-    final List<PointList> pointsList = new ArrayList<PointList>();
-    if (geometry != null) {
-      for (int i = 0; i < geometry.getGeometryCount(); i++) {
-        final Geometry subGeometry = geometry.getGeometry(i);
-        if (subGeometry instanceof Point) {
-          pointsList.add(((Point)subGeometry).getCoordinatesList());
-        } else if (subGeometry instanceof LineString) {
-          pointsList.add(get((LineString)subGeometry));
-        } else if (subGeometry instanceof Polygon) {
-          final Polygon polygon = (Polygon)subGeometry;
-          final LineString exteriorRing = polygon.getExteriorRing();
-          pointsList.add(get(exteriorRing));
-          for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
-            final LineString ring = polygon.getInteriorRing(j);
-            pointsList.add(get(ring));
-          }
-        }
-      }
-    }
-    return pointsList;
-  }
-
   public static BoundingBox getBoundingBox(
     final GeometryFactory geometryFactory, final PointList points) {
-    BoundingBox boundingBox = new Envelope(geometryFactory);
-    for (final Point point : points) {
-      boundingBox = boundingBox.expand(point);
-    }
+    final BoundingBox boundingBox = new Envelope(geometryFactory,
+      points.toPointList());
     return boundingBox;
   }
 
@@ -378,37 +309,6 @@ public class CoordinatesListUtil {
       coordinates.add(vertex.cloneCoordinates());
     }
     return coordinates.toArray(new Point[coordinates.size()]);
-  }
-
-  public static List<List<PointList>> getParts(final Geometry geometry,
-    final boolean clockwise) {
-    final List<List<PointList>> partsList = new ArrayList<List<PointList>>();
-    if (geometry != null) {
-      for (int i = 0; i < geometry.getGeometryCount(); i++) {
-        final Geometry part = geometry.getGeometry(i);
-        if (!part.isEmpty()) {
-          final List<PointList> pointsList = getAll(part);
-          if (part instanceof Polygon) {
-            if (pointsList.size() > 0 && !part.isEmpty()) {
-              boolean partClockwise = clockwise;
-              for (int j = 0; j < pointsList.size(); j++) {
-                PointList points = pointsList.get(j);
-                final boolean ringClockwise = !points.isCounterClockwise();
-                if (ringClockwise != partClockwise) {
-                  points = points.reverse();
-                }
-                pointsList.set(j, points);
-                if (j == 0) {
-                  partClockwise = !clockwise;
-                }
-              }
-            }
-          }
-          partsList.add(pointsList);
-        }
-      }
-    }
-    return partsList;
   }
 
   public static List<PointList> intersection(
@@ -433,11 +333,11 @@ public class CoordinatesListUtil {
       graph1, maxDistance);
     graph1.splitEdges(pointsOnEdge1);
     graph2.splitEdges(pointsOnEdge2);
-    Point startPoint = points1.get(0);
+    Point startPoint = points1.getPoint(0);
     if (movedNodes.containsKey(startPoint)) {
       startPoint = movedNodes.get(startPoint);
     }
-    Point endPoint = points1.get(points1.size() - 1);
+    Point endPoint = points1.getPoint(points1.getVertexCount() - 1);
     if (movedNodes.containsKey(endPoint)) {
       endPoint = movedNodes.get(endPoint);
     }
@@ -478,23 +378,6 @@ public class CoordinatesListUtil {
       intersections.add(points);
     }
     return intersections;
-  }
-
-  public static double length2d(final PointList points) {
-    double length = 0;
-    final int size = points.size();
-    if (size > 1) {
-      double x1 = points.getX(0);
-      double y1 = points.getY(0);
-      for (int i = 1; i < size; i++) {
-        final double x2 = points.getX(i);
-        final double y2 = points.getY(i);
-        length += MathUtil.distance(x1, y1, x2, y2);
-        x1 = x2;
-        y1 = y2;
-      }
-    }
-    return length;
   }
 
   /**
@@ -570,16 +453,16 @@ public class CoordinatesListUtil {
     coordinates.add(x);
     coordinates.add(y);
     for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-      coordinates.add(points.getValue(0, axisIndex));
+      coordinates.add(points.getCoordinate(0, axisIndex));
     }
-    for (int i = 0; i < points.size(); i++) {
+    for (int i = 0; i < points.getVertexCount(); i++) {
       final double x1 = points.getX(i);
       final double y1 = points.getY(i);
       if (x != x1 || y != y1) {
         coordinates.add(x1);
         coordinates.add(y1);
         for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-          coordinates.add(points.getValue(i, axisIndex));
+          coordinates.add(points.getCoordinate(i, axisIndex));
         }
         x = x1;
         y = y1;
@@ -629,7 +512,7 @@ public class CoordinatesListUtil {
   public static void setCoordinates(final double[] coordinates,
     final int axisCount, final int i, final PointList points, final int j) {
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = points.getValue(j, axisIndex);
+      final double value = points.getCoordinate(j, axisIndex);
       coordinates[i * axisCount + axisIndex] = value;
     }
   }
@@ -655,30 +538,11 @@ public class CoordinatesListUtil {
     }
   }
 
-  public static double signedArea(final PointList ring) {
-    final int n = ring.size();
-    if (n < 3) {
-      return 0.0;
-    } else {
-      double sum = 0.0;
-      double bx = ring.getX(0);
-      double by = ring.getY(0);
-      for (int i = 1; i < n; i++) {
-        final double cx = ring.getX(i);
-        final double cy = ring.getY(i);
-        sum += (bx + cx) * (cy - by);
-        bx = cx;
-        by = cy;
-      }
-      return -sum / 2.0;
-    }
-  }
-
   public static <V extends Point> List<LineString> split(final LineString line,
     Collection<V> splitPoints, final double maxDistance) {
     splitPoints = new ArrayList<V>(splitPoints);
     final List<LineString> lines = new ArrayList<LineString>();
-    final PointList points = CoordinatesListUtil.get(line);
+    final PointList points = line;
     final Set<Integer> splitVertices = new TreeSet<Integer>();
     final Set<Integer> splitIndexes = new TreeSet<Integer>();
 
@@ -692,12 +556,12 @@ public class CoordinatesListUtil {
     final Map<Point, Double> pointDistanceMap = new HashMap<Point, Double>();
     final Map<Point, Integer> pointSegment = new HashMap<Point, Integer>();
 
-    for (int i = 1; i < points.size() && !splitPoints.isEmpty(); i++) {
+    for (int i = 1; i < points.getVertexCount() && !splitPoints.isEmpty(); i++) {
       for (final Iterator<V> nodeIter = splitPoints.iterator(); nodeIter.hasNext();) {
         final Point point = nodeIter.next();
         final double pointDistance = points.distance(i, point);
         if (pointDistance < maxDistance) {
-          if (i < points.size() - 1) {
+          if (i < points.getVertexCount() - 1) {
             splitVertices.add(i);
             splitIndexes.add(i);
           }
@@ -742,7 +606,7 @@ public class CoordinatesListUtil {
       final Integer index = entry.getValue();
       Set<Point> splitNodes = segmentSplitPoints.get(index);
       if (splitNodes == null) {
-        final Point point = points.get(index);
+        final Point point = points.getPoint(index);
         splitNodes = new TreeSet<Point>(
           new CoordinatesDistanceComparator(point));
         segmentSplitPoints.put(index, splitNodes);
@@ -770,8 +634,8 @@ public class CoordinatesListUtil {
             final double splitPointZ = splitPoint.getZ();
             if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
               if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
-                final Point p1 = points.get(index);
-                final Point p2 = points.get(index + 1);
+                final Point p1 = points.getPoint(index);
+                final Point p2 = points.getPoint(index + 1);
                 final double z = LineSegmentUtil.getElevation(p1, p2, point);
                 point = new PointDouble(point.getX(), point.getY(), z);
               }
@@ -809,12 +673,12 @@ public class CoordinatesListUtil {
   public static PointList subList(final PointList points,
     final Point startPoint, final int start) {
     final int axisCount = points.getAxisCount();
-    final int length = points.size() - start;
+    final int length = points.getVertexCount() - start;
     int vertexCount = length;
     int startIndex = 0;
     boolean startEqual = false;
     if (startPoint != null) {
-      startEqual = startPoint.equals(2, points.get(start));
+      startEqual = startPoint.equals(2, points.getPoint(start));
       if (!startEqual) {
         vertexCount++;
         startIndex++;
@@ -828,7 +692,7 @@ public class CoordinatesListUtil {
     }
     for (int i = start; i < start + length; i++) {
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, startIndex++,
-        points.get(i));
+        points.getPoint(i));
     }
 
     return new DoubleCoordinatesList(axisCount, coordinates);
@@ -844,7 +708,7 @@ public class CoordinatesListUtil {
     boolean startEqual = false;
     boolean endEqual = false;
     if (startPoint != null) {
-      final Point p1 = points.get(start);
+      final Point p1 = points.getPoint(start);
       startEqual = startPoint.equals(2, p1);
       if (!startEqual) {
         vertexCount++;
@@ -853,7 +717,7 @@ public class CoordinatesListUtil {
       }
     }
     if (endPoint != null) {
-      final Point pointsEnd = points.get(start + length - 1);
+      final Point pointsEnd = points.getPoint(start + length - 1);
       endEqual = endPoint.equals(2, pointsEnd);
       if (!endEqual) {
         vertexCount++;
@@ -867,7 +731,7 @@ public class CoordinatesListUtil {
 
     for (int i = start; i < start + length; i++) {
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, startIndex++,
-        points.get(i));
+        points.getPoint(i));
     }
 
     if (!endEqual && endPoint != null) {

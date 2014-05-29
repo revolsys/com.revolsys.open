@@ -292,7 +292,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private LinearRing toPgLinearRing(final com.revolsys.jts.geom.LineString ring) {
-    final PointList points = CoordinatesListUtil.get(ring);
+    final PointList points = ring;
     final Point[] pgPoints = toPgPoints(points);
     final LinearRing linearRing = new LinearRing(pgPoints);
     linearRing.setSrid(ring.getSrid());
@@ -301,7 +301,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
 
   private LineString toPgLineString(
     final com.revolsys.jts.geom.LineString lineString) {
-    final PointList points = CoordinatesListUtil.get(lineString);
+    final PointList points = lineString;
     final Point[] pgPoints = toPgPoints(points);
     final LineString pgLineString = new LineString(pgPoints);
     final int srid = lineString.getSrid();
@@ -462,8 +462,8 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private Point[] toPgPoints(final PointList coordinates) {
-    final Point[] points = new Point[coordinates.size()];
-    for (int i = 0; i < coordinates.size(); i++) {
+    final Point[] points = new Point[coordinates.getVertexCount()];
+    for (int i = 0; i < coordinates.getVertexCount(); i++) {
       Point pgPoint;
       final double y = coordinates.getY(i);
       final double x = coordinates.getX(i);

@@ -185,12 +185,12 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
         Point coordinates = null;
         for (final Edge<T> edge : edges) {
           final LineString line = edge.getLine();
-          final PointList points = CoordinatesListUtil.get(line);
+          final PointList points = line;
           Point point = null;
           if (edge.getFromNode() == this) {
-            point = points.get(0);
+            point = points.getPoint(0);
           } else if (edge.getToNode() == this) {
-            point = points.get(points.size() - 1);
+            point = points.getPoint(points.getVertexCount() - 1);
           }
           if (point != null) {
             final double z = point.getZ();

@@ -325,7 +325,7 @@ public class GpxIterator implements DataObjectIterator {
         StaxUtils.skipSubTree(in);
       } else if (in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
         final PointList points = parseTrackSegment();
-        if (points.size() > 1) {
+        if (points.getVertexCount() > 1) {
           segments.add(points);
         }
       } else {

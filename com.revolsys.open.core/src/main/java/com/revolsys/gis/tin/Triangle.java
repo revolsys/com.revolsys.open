@@ -7,7 +7,6 @@ import java.util.Set;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -50,7 +49,7 @@ public class Triangle extends AbstractCoordinatesList {
   public Triangle(final Point... points) {
     if (points.length > 3) {
       throw new IllegalArgumentException(
-        "A traingle must have exeactly 3 points not " + size());
+        "A traingle must have exeactly 3 points not " + getVertexCount());
     }
     for (int i = 0; i < 3; i++) {
       final Point point = points[i];
@@ -65,40 +64,9 @@ public class Triangle extends AbstractCoordinatesList {
     final Point line2Start, final Point line2End) {
     final PointList intersections = LineSegmentUtil.getIntersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
-    for (final Point point : intersections) {
+    for (final Point point : intersections.toPointList()) {
       coordinates.add(point);
     }
-  }
-
-  /**
-   * Returns true if the coordinate lies inside or on the edge of the Triangle.
-   * 
-   * @param coordinate The coordinate.
-   * @return True if the coordinate lies inside or on the edge of the Triangle.
-   */
-  @Override
-  public boolean contains(final Point coordinate) {
-    final int triangleOrientation = CoordinatesUtil.orientationIndex(getP0(),
-      getP1(), getP2());
-    final int p0p1Orientation = CoordinatesUtil.orientationIndex(getP0(),
-      getP1(), coordinate);
-    if (p0p1Orientation != triangleOrientation
-      && p0p1Orientation != CGAlgorithms.COLLINEAR) {
-      return false;
-    }
-    final int p1p2Orientation = CoordinatesUtil.orientationIndex(getP1(),
-      getP2(), coordinate);
-    if (p1p2Orientation != triangleOrientation
-      && p1p2Orientation != CGAlgorithms.COLLINEAR) {
-      return false;
-    }
-    final int p2p0Orientation = CoordinatesUtil.orientationIndex(getP2(),
-      getP0(), coordinate);
-    if (p2p0Orientation != triangleOrientation
-      && p2p0Orientation != CGAlgorithms.COLLINEAR) {
-      return false;
-    }
-    return true;
   }
 
   public boolean equals(final Triangle triangle) {
@@ -139,6 +107,12 @@ public class Triangle extends AbstractCoordinatesList {
     return new Circle(centre, radius);
   }
 
+  @Override
+  public double getCoordinate(final int index, final int axisIndex) {
+    final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
+    return coordinates[coordinateIndex];
+  }
+
   private int getCoordinatesIndex(final int index, int axisIndex) {
     final byte axisCount = 3;
     axisIndex = axisIndex % 3;
@@ -170,9 +144,9 @@ public class Triangle extends AbstractCoordinatesList {
   }
 
   public Point getInCentre() {
-    final Point a = get(0);
-    final Point b = get(1);
-    final Point c = get(2);
+    final Point a = getPoint(0);
+    final Point b = getPoint(1);
+    final Point c = getPoint(2);
     // the lengths of the sides, labelled by their opposite vertex
     final double len0 = b.distance(c);
     final double len1 = a.distance(c);
@@ -189,36 +163,66 @@ public class Triangle extends AbstractCoordinatesList {
   }
 
   public Point getP0() {
-    return get(0);
+    return getPoint(0);
   }
 
   public Point getP1() {
-    return get(1);
+    return getPoint(1);
   }
 
   public Point getP2() {
-    return get(2);
+    return getPoint(2);
   }
 
   public Polygon getPolygon(
     final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
-    final LinearRing shell = geometryFactory.linearRing(new DoubleCoordinatesList(
-      getAxisCount(), getP0(), getP1(), getP2(), getP0()));
+    final LinearRing shell = geometryFactory.linearRing(getP0(), getP1(),
+      getP2(), getP0());
     return geometryFactory.polygon(shell);
   }
 
   @Override
-  public double getValue(final int index, final int axisIndex) {
-    final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
-    return coordinates[coordinateIndex];
+  public int getVertexCount() {
+    return 3;
+  }
+
+  /**
+   * Returns true if the coordinate lies inside or on the edge of the Triangle.
+   * 
+   * @param coordinate The coordinate.
+   * @return True if the coordinate lies inside or on the edge of the Triangle.
+   */
+  @Override
+  public boolean hasVertex(final Point coordinate) {
+    final int triangleOrientation = CoordinatesUtil.orientationIndex(getP0(),
+      getP1(), getP2());
+    final int p0p1Orientation = CoordinatesUtil.orientationIndex(getP0(),
+      getP1(), coordinate);
+    if (p0p1Orientation != triangleOrientation
+      && p0p1Orientation != CGAlgorithms.COLLINEAR) {
+      return false;
+    }
+    final int p1p2Orientation = CoordinatesUtil.orientationIndex(getP1(),
+      getP2(), coordinate);
+    if (p1p2Orientation != triangleOrientation
+      && p1p2Orientation != CGAlgorithms.COLLINEAR) {
+      return false;
+    }
+    final int p2p0Orientation = CoordinatesUtil.orientationIndex(getP2(),
+      getP0(), coordinate);
+    if (p2p0Orientation != triangleOrientation
+      && p2p0Orientation != CGAlgorithms.COLLINEAR) {
+      return false;
+    }
+    return true;
   }
 
   public LineSegment intersection(final GeometryFactory geometryFactory,
     final LineSegment line) {
     final Point lc0 = line.getPoint(0);
     final Point lc1 = line.getPoint(1);
-    final boolean lc0Contains = contains(lc0);
-    final boolean lc1Contains = contains(lc1);
+    final boolean lc0Contains = hasVertex(lc0);
+    final boolean lc1Contains = hasVertex(lc1);
     if (lc0Contains && lc1Contains) {
       return line;
     } else {
@@ -247,11 +251,6 @@ public class Triangle extends AbstractCoordinatesList {
 
   public boolean intersectsCircumCircle(final Point point) {
     return getCircumcircle().contains(point);
-  }
-
-  @Override
-  public int size() {
-    return 3;
   }
 
   @Override

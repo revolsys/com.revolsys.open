@@ -66,7 +66,7 @@ public class TinWriter {
         if (i > 0) {
           out.print(' ');
         }
-        final Point point = triangle.get(i);
+        final Point point = triangle.getPoint(i);
         final Integer index = nodeMap.get(point);
         if (index == null) {
           System.out.println(point);

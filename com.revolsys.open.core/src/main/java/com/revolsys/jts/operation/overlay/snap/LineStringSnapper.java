@@ -35,9 +35,9 @@ package com.revolsys.jts.operation.overlay.snap;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -52,10 +52,10 @@ import com.revolsys.jts.geom.impl.PointDouble;
  */
 public class LineStringSnapper {
   public static boolean isClosed(final PointList pts) {
-    if (pts.size() <= 1) {
+    if (pts.getVertexCount() <= 1) {
       return false;
     }
-    return pts.get(0).equals(2,pts.get(pts.size() - 1));
+    return pts.getPoint(0).equals(2, pts.getPoint(pts.getVertexCount() - 1));
   }
 
   private double snapTolerance = 0.0;
@@ -67,20 +67,6 @@ public class LineStringSnapper {
   private boolean isClosed = false;
 
   /**
-   * Creates a new snapper using the given points
-   * as source points to be snapped.
-   * 
-   * @param srcPts the points to snap 
-   * @param snapTolerance the snap tolerance to use
-   */
-  public LineStringSnapper(final PointList srcPts,
-    final double snapTolerance) {
-    this.srcPts = srcPts;
-    isClosed = isClosed(srcPts);
-    this.snapTolerance = snapTolerance;
-  }
-
-  /**
    * Creates a new snapper using the points in the given {@link LineString}
    * as source snap points.
    * 
@@ -88,7 +74,20 @@ public class LineStringSnapper {
    * @param snapTolerance the snap tolerance to use
    */
   public LineStringSnapper(final LineString srcLine, final double snapTolerance) {
-    this(srcLine.getCoordinatesList(), snapTolerance);
+    this((PointList)srcLine, snapTolerance);
+  }
+
+  /**
+   * Creates a new snapper using the given points
+   * as source points to be snapped.
+   * 
+   * @param srcPts the points to snap 
+   * @param snapTolerance the snap tolerance to use
+   */
+  public LineStringSnapper(final PointList srcPts, final double snapTolerance) {
+    this.srcPts = srcPts;
+    isClosed = isClosed(srcPts);
+    this.snapTolerance = snapTolerance;
   }
 
   /**
@@ -123,7 +122,7 @@ public class LineStringSnapper {
        * 
        * If the snap pt is already in the src list, don't snap at all.
        */
-      if (p0.equals(2,snapPt) || p1.equals(2,snapPt)) {
+      if (p0.equals(2, snapPt) || p1.equals(2, snapPt)) {
         if (allowSnappingToSourceVertices) {
           continue;
         } else {
@@ -140,11 +139,10 @@ public class LineStringSnapper {
     return snapIndex;
   }
 
-  private Point findSnapForVertex(final Point pt,
-    final Point[] snapPts) {
+  private Point findSnapForVertex(final Point pt, final Point[] snapPts) {
     for (int i = 0; i < snapPts.length; i++) {
       // if point is already equal to a src pt, don't snap
-      if (pt.equals(2,snapPts[i])) {
+      if (pt.equals(2, snapPts[i])) {
         return null;
       }
       if (pt.distance(snapPts[i]) < snapTolerance) {
@@ -185,7 +183,7 @@ public class LineStringSnapper {
     // check for duplicate snap pts when they are sourced from a linear ring.
     // TODO: Need to do this better - need to check *all* snap points for dups
     // (using a Set?)
-    if (snapPts[0].equals(2,snapPts[snapPts.length - 1])) {
+    if (snapPts[0].equals(2, snapPts[snapPts.length - 1])) {
       distinctPtCount = snapPts.length - 1;
     }
 

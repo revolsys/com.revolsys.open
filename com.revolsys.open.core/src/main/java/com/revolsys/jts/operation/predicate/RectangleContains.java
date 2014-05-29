@@ -156,10 +156,10 @@ public class RectangleContains {
    * @return true if the linestring is contained in the boundary
    */
   private boolean isLineStringContainedInBoundary(final LineString line) {
-    final PointList seq = line.getCoordinatesList();
-    for (int i = 0; i < seq.size() - 1; i++) {
-      final Point p0 = seq.getCoordinate(i);
-      final Point p1 = seq.getCoordinate(i + 1);
+    final PointList seq = line;
+    for (int i = 0; i < seq.getVertexCount() - 1; i++) {
+      final Point p0 = seq.getPoint(i);
+      final Point p1 = seq.getPoint(i + 1);
 
       if (!isLineSegmentContainedInBoundary(p0, p1)) {
         return false;

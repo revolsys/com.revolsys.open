@@ -186,7 +186,7 @@ public class Edge extends GraphComponent {
   }
 
   public Point getCoordinate(final int i) {
-    return points.get(i);
+    return points.getPoint(i);
   }
 
   public Depth getDepth() {
@@ -224,7 +224,7 @@ public class Edge extends GraphComponent {
   }
 
   public int getNumPoints() {
-    return points.size();
+    return points.getVertexCount();
   }
 
   public PointList getPoints() {

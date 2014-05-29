@@ -21,32 +21,54 @@
 package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStartsSharesStartOrEndFilter implements Filter<LineString> {
-  private final PointList points;
-
-  private final PointList reversePoints;
+  private final LineString line;
 
   public LineStartsSharesStartOrEndFilter(final LineString line) {
-    this.points = CoordinatesListUtil.get(line);
-    this.reversePoints = points.reverse();
+    this.line = line;
   }
 
   @Override
   public boolean accept(final LineString line) {
-    final PointList points = CoordinatesListUtil.get(line);
-
-    if (this.points.startsWith(points, this.points.getAxisCount())) {
+    if (startsWith(line)) {
       return true;
-    } else if (this.reversePoints.startsWith(points.reverse(),
-      this.points.getAxisCount())) {
+    } else if (endsWith(line)) {
       return true;
     } else {
       return false;
     }
   }
 
+  private boolean endsWith(final LineString line) {
+    final int vertexCount1 = this.line.getVertexCount();
+    final int vertexCount2 = line.getVertexCount();
+    if (vertexCount1 < vertexCount2) {
+      return false;
+    } else {
+      for (int vertexIndex = 0; vertexIndex < vertexCount2; vertexIndex++) {
+        if (!this.line.equalsVertex(2, vertexCount1 - 1 - vertexIndex, line,
+          vertexCount2 - 1 - vertexIndex)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private boolean startsWith(final LineString line) {
+    final int vertexCount1 = this.line.getVertexCount();
+    final int vertexCount2 = line.getVertexCount();
+    if (vertexCount1 < vertexCount2) {
+      return false;
+    } else {
+      for (int vertexIndex = 0; vertexIndex < vertexCount2; vertexIndex++) {
+        if (!this.line.equalsVertex(2, vertexIndex, line, vertexIndex)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 }

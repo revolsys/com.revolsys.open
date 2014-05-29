@@ -41,7 +41,6 @@ import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -125,13 +124,6 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   public int compareToSameClass(final Geometry other) {
     final Point point = (Point)other;
     return getPoint().compareTo(point.getPoint());
-  }
-
-  @Override
-  public int compareToSameClass(final Geometry other,
-    final CoordinateSequenceComparator comp) {
-    final Point point = (Point)other;
-    return comp.compare(getCoordinatesList(), point.getCoordinatesList());
   }
 
   @Override

@@ -106,8 +106,8 @@ public class CoordinateSequenceComparator
     PointList s1 = (PointList) o1;
     PointList s2 = (PointList) o2;
 
-    int size1 = s1.size();
-    int size2 = s2.size();
+    int size1 = s1.getVertexCount();
+    int size2 = s2.getVertexCount();
 
     int dim1 = s1.getAxisCount();
     int dim2 = s2.getAxisCount();
@@ -153,8 +153,8 @@ public class CoordinateSequenceComparator
   protected int compareCoordinate(PointList s1, PointList s2, int i, int dimension)
   {
     for (int d = 0; d < dimension; d++) {
-      double ord1 = s1.getValue(i, d);
-      double ord2 = s2.getValue(i, d);
+      double ord1 = s1.getCoordinate(i, d);
+      double ord2 = s2.getCoordinate(i, d);
       int comp = compare(ord1, ord2);
       if (comp != 0) return comp;
     }

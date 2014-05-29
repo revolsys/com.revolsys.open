@@ -48,7 +48,7 @@ public class PolyWarpSolver {
   public static double[] getCoeffs(final PointList sourcePixels,
     final PointList targetPixels, final int degree) {
 
-    final int pointCount = Math.min(sourcePixels.size(), targetPixels.size());
+    final int pointCount = Math.min(sourcePixels.getVertexCount(), targetPixels.getVertexCount());
     final int equations = pointCount / 2;
 
     // Number of unknowns

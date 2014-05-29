@@ -209,7 +209,7 @@ public final class MathUtil {
     final double y2 = points.getY(i2);
     if (distance(x1, y1, x2, y2) == 0) { // TODO
       if (start) {
-        if (i2 + 1 < points.size()) {
+        if (i2 + 1 < points.getVertexCount()) {
           return getAngle(points, i1, i2 + 1, start);
         }
       } else {

@@ -16,12 +16,12 @@ import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
@@ -69,7 +69,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   private void addEdges(final PointList points,
     final Map<String, Object> attributes) {
-    startPoints.add(new PointDouble(points.get(0), 2));
+    startPoints.add(new PointDouble(points.getPoint(0), 2));
     final CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
       getGeometryFactory(), points);
     int index = 0;
@@ -97,14 +97,13 @@ public class GeometryGraph extends Graph<LineSegment> {
         points.add(point);
       } else if (part instanceof LineString) {
         final LineString line = (LineString)part;
-        final PointList points = CoordinatesListUtil.get(line);
+        final PointList points = line;
         properties.put("type", "LineString");
         addEdges(points, properties);
       } else if (part instanceof Polygon) {
         final Polygon polygon = (Polygon)part;
-        final List<PointList> rings = CoordinatesListUtil.getAll(polygon);
         int ringIndex = 0;
-        for (final PointList ring : rings) {
+        for (final LinearRing ring : polygon.rings()) {
           properties.put("ringIndex", ringIndex++);
           if (ringIndex == 0) {
             properties.put("type", "PolygonShell");
@@ -138,14 +137,14 @@ public class GeometryGraph extends Graph<LineSegment> {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);
     if (boundingBox.intersects(this.boundingBox)) {
-      final PointList points = CoordinatesListUtil.get(line);
-      final int numPoints = points.size();
-      final Point fromPoint = points.get(0);
-      final Point toPoint = points.get(numPoints - 1);
+      final PointList points = line;
+      final int numPoints = points.getVertexCount();
+      final Point fromPoint = points.getPoint(0);
+      final Point toPoint = points.getPoint(numPoints - 1);
 
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
-        final Point nextPoint = points.get(i);
+        final Point nextPoint = points.getPoint(i);
         final LineSegment line1 = new LineSegmentDoubleGF(getGeometryFactory(),
           previousPoint, nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(
@@ -312,14 +311,14 @@ public class GeometryGraph extends Graph<LineSegment> {
     }
     boundingBox = boundingBox.expand(maxDistance);
     if (boundingBox.intersects(this.boundingBox)) {
-      final PointList points = CoordinatesListUtil.get(line);
-      final int numPoints = points.size();
-      final Point fromPoint = points.get(0);
-      final Point toPoint = points.get(numPoints - 1);
+      final PointList points = line;
+      final int numPoints = points.getVertexCount();
+      final Point fromPoint = points.getPoint(0);
+      final Point toPoint = points.getPoint(numPoints - 1);
 
       Point previousPoint = fromPoint;
       for (int i = 1; i < numPoints; i++) {
-        final Point nextPoint = points.get(i);
+        final Point nextPoint = points.getPoint(i);
         final LineSegment line1 = new LineSegmentDoubleGF(previousPoint,
           nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(

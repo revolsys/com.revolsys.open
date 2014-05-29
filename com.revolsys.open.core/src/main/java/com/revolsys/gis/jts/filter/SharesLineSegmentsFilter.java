@@ -20,46 +20,25 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
+import com.revolsys.jts.geom.segment.Segment;
 
 public class SharesLineSegmentsFilter implements Filter<LineString> {
-  private final List<LineSegment> segments = new ArrayList<LineSegment>();
+  private final LineString line;
 
   public SharesLineSegmentsFilter(final LineString line) {
-
-    final PointList points = CoordinatesListUtil.get(line);
-    final Iterator<Point> pointIterator = points.iterator();
-    Point previousPoint = pointIterator.next();
-    while (pointIterator.hasNext()) {
-      final Point nextPoint = pointIterator.next();
-      segments.add(new LineSegmentDoubleGF(previousPoint, nextPoint));
-      previousPoint = nextPoint;
-    }
+    this.line = line;
   }
 
   @Override
   public boolean accept(final LineString line) {
-
-    final PointList points = CoordinatesListUtil.get(line);
-    final Iterator<Point> pointIterator = points.iterator();
-    Point previousPoint = pointIterator.next();
-    while (pointIterator.hasNext()) {
-      final Point nextPoint = pointIterator.next();
-      final LineSegment segment = new LineSegmentDoubleGF(previousPoint, nextPoint);
-      if (segments.contains(segment)) {
-        return true;
+    for (final Segment segment1 : this.line.segments()) {
+      for (final Segment segment2 : line.segments()) {
+        if (segment1.equals(2, segment2)) {
+          return true;
+        }
       }
-      previousPoint = nextPoint;
     }
     return false;
   }

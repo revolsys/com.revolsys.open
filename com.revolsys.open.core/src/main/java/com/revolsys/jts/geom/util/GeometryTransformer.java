@@ -226,12 +226,11 @@ public class GeometryTransformer {
     if (geometry == null) {
       return factory.linearRing();
     } else {
-      final PointList points = transformCoordinates(
-        geometry.getCoordinatesList(), geometry);
+      final PointList points = transformCoordinates(geometry, geometry);
       if (points == null) {
         return factory.linearRing();
       } else {
-        final int seqSize = points.size();
+        final int seqSize = points.getVertexCount();
         // ensure a valid LinearRing
         if (seqSize > 0 && seqSize < 4 && !preserveType) {
           return factory.lineString(points);
@@ -252,8 +251,7 @@ public class GeometryTransformer {
   protected Geometry transformLineString(final LineString geom,
     final Geometry parent) {
     // should check for 1-point sequences and downgrade them to points
-    return factory.lineString(transformCoordinates(geom.getCoordinatesList(),
-      geom));
+    return factory.lineString(transformCoordinates(geom, geom));
   }
 
   protected Geometry transformMultiLineString(final MultiLineString geom,
@@ -307,8 +305,8 @@ public class GeometryTransformer {
     return factory.buildGeometry(transGeomList);
   }
 
-  protected Geometry transformPoint(final Point geom, final Geometry parent) {
-    return factory.point(transformCoordinates(geom.getCoordinatesList(), geom));
+  protected Geometry transformPoint(final Point point, final Geometry parent) {
+    return factory.point(transformCoordinates(point.getCoordinatesList(), point));
   }
 
   protected Geometry transformPolygon(final Polygon geom, final Geometry parent) {

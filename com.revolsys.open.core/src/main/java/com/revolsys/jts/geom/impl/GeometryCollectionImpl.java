@@ -40,6 +40,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.segment.GeometryCollectionSegment;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.GeometryCollectionVertex;
 import com.revolsys.jts.geom.vertex.Vertex;

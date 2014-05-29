@@ -41,7 +41,6 @@ import java.util.TreeSet;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.CoordinateSequenceComparator;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -77,33 +76,6 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
     final Set<Geometry> theseElements = new TreeSet<>(getGeometries());
     final Set<Geometry> otherElements = new TreeSet<>(geometry.getGeometries());
     return compare(theseElements, otherElements);
-  }
-
-  @Override
-  public int compareToSameClass(final Geometry o,
-    final CoordinateSequenceComparator comp) {
-    final GeometryCollection gc = (GeometryCollection)o;
-
-    final int n1 = getGeometryCount();
-    final int n2 = gc.getGeometryCount();
-    int i = 0;
-    while (i < n1 && i < n2) {
-      final Geometry thisGeom = getGeometry(i);
-      final Geometry otherGeom = gc.getGeometry(i);
-      final int holeComp = thisGeom.compareTo(otherGeom, comp);
-      if (holeComp != 0) {
-        return holeComp;
-      }
-      i++;
-    }
-    if (i < n1) {
-      return 1;
-    }
-    if (i < n2) {
-      return -1;
-    }
-    return 0;
-
   }
 
   @Override

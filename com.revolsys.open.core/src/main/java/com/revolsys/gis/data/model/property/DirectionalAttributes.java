@@ -21,14 +21,11 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.graph.Edge;
-import com.revolsys.gis.jts.LineStringUtil;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
@@ -428,12 +425,10 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     if (attributeName.equals(metaData.getGeometryAttributeName())) {
       return line1.equals(line2);
     }
-    final PointList points1 = CoordinatesListUtil.get(line1);
-    final PointList points2 = CoordinatesListUtil.get(line2);
 
     boolean reverseEquals;
-    if (points1.equal(0, points2, 0)) {
-      if (points1.equal(0, points1, points1.size() - 1)) {
+    if (line1.equalsVertex(2, 0, line2, 0)) {
+      if (line1.isClosed()) {
         // TODO handle loops
         throw new IllegalArgumentException("Cannot handle loops");
       }
@@ -539,27 +534,26 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final LineString line1 = object1.getGeometryValue();
     final LineString line2 = object2.getGeometryValue();
 
-    final PointList points1 = CoordinatesListUtil.get(line1);
-    final PointList points2 = CoordinatesListUtil.get(line2);
-
     final boolean[] forwards = new boolean[2];
-    final int lastPointIndex1 = points1.size() - 1;
-    if (points1.equal(0, points2, 0) && points1.equal(0, point, 2)) {
+    final int vertexCount1 = line1.getVertexCount();
+    final int vertexCount2 = line2.getVertexCount();
+    final int lastPointIndex1 = vertexCount1 - 1;
+    if (line1.equalsVertex(2, 0, line2, 0) && line1.equalsVertex(2, 0, point)) {
       // <--*--> false true
       forwards[0] = false;
       forwards[1] = true;
-    } else if (points1.equal(points1.size() - 1, points2, points2.size() - 1)
-      && points1.equal(lastPointIndex1, point, 2)) {
+    } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, vertexCount2 - 1)
+      && line1.equalsVertex(2, lastPointIndex1, point)) {
       // -->*<-- true false
       forwards[0] = true;
       forwards[1] = false;
-    } else if (points1.equal(points1.size() - 1, points2, 0)
-      && points1.equal(lastPointIndex1, point, 2)) {
+    } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, 0)
+      && line1.equalsVertex(2, lastPointIndex1, point)) {
       // -->*--> true true
       forwards[0] = true;
       forwards[1] = true;
-    } else if (points1.equal(0, points2, points2.size() - 1)
-      && points1.equal(0, point, 2)) {
+    } else if (line1.equalsVertex(2, 0, line2, vertexCount2 - 1)
+      && line1.equalsVertex(2, 0, point)) {
       // <--*<-- false false
       forwards[0] = false;
       forwards[1] = false;
@@ -630,9 +624,9 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
    */
   public DataObject getMergedObject(final DataObject object1, DataObject object2) {
     final LineString line1 = object1.getGeometryValue();
+    final int vertexCount1 = line1.getVertexCount();
     LineString line2 = object2.getGeometryValue();
-    final PointList points1 = CoordinatesListUtil.get(line1);
-    final PointList points2 = CoordinatesListUtil.get(line2);
+    final int vertexCount2 = line2.getVertexCount();
 
     DataObject startObject;
     DataObject endObject;
@@ -640,23 +634,23 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final boolean line1Longer = line1.getLength() > line2.getLength();
     LineString newLine;
 
-    if (points1.equal(0, points2, 0)) {
+    if (line1.equalsVertex(2, 0, line2, 0)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object2;
       endObject = object1;
       newLine = line1.merge(line2);
-    } else if (points1.equal(points1.size() - 1, points2, points2.size() - 1)) {
+    } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, vertexCount2 - 1)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object1;
       endObject = object2;
       newLine = line1.merge(line2);
-    } else if (points1.equal(points1.size() - 1, points2, 0)) {
+    } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, 0)) {
       startObject = object1;
       endObject = object2;
       newLine = line1.merge(line2);
-    } else if (points1.equal(0, points2, points2.size() - 1)) {
+    } else if (line1.equalsVertex(2, 0, line2, vertexCount2 - 1)) {
       startObject = object2;
       endObject = object1;
       newLine = line2.merge(line1);
@@ -689,37 +683,35 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final DataObject object1, DataObject object2) {
     final LineString line1 = object1.getGeometryValue();
     LineString line2 = object2.getGeometryValue();
-    final PointList points1 = CoordinatesListUtil.get(line1);
-    final PointList points2 = CoordinatesListUtil.get(line2);
 
     DataObject startObject;
     DataObject endObject;
 
     final boolean line1Longer = line1.getLength() > line2.getLength();
     LineString newLine;
-    final int lastPoint1 = points1.size() - 1;
-    final int lastPoint2 = points2.size() - 1;
+    final int lastPoint1 = line1.getVertexCount() - 1;
+    final int lastPoint2 = line2.getVertexCount() - 1;
 
-    if (points1.equal(0, points2, 0) && points1.equal2d(0, point)) {
+    if (line1.equalsVertex(2, 0, line2, 0) && line1.equalsVertex(2, 0, point)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object2;
       endObject = object1;
       newLine = line1.merge(point, line2);
-    } else if (points1.equal(lastPoint1, points2, lastPoint2)
-      && points1.equal2d(lastPoint1, point)) {
+    } else if (line1.equalsVertex(2, lastPoint1, line2, lastPoint2)
+      && line1.equalsVertex(2, lastPoint1, point)) {
       object2 = getReverse(object2);
       line2 = object2.getGeometryValue();
       startObject = object1;
       endObject = object2;
       newLine = line1.merge(point, line2);
-    } else if (points1.equal(lastPoint1, points2, 0)
-      && points1.equal2d(lastPoint1, point)) {
+    } else if (line1.equalsVertex(2, lastPoint1, line2, 0)
+      && line1.equalsVertex(2, lastPoint1, point)) {
       startObject = object1;
       endObject = object2;
       newLine = line1.merge(point, line2);
-    } else if (points1.equal(0, points2, lastPoint2)
-      && points1.equal2d(0, point)) {
+    } else if (line1.equalsVertex(2, 0, line2, lastPoint2)
+      && line1.equalsVertex(2, 0, point)) {
       startObject = object2;
       endObject = object1;
       newLine = line2.merge(point, line1);
@@ -965,8 +957,8 @@ public class DirectionalAttributes extends AbstractDataObjectMetaDataProperty {
     final DataObject object) {
     final LineString newLine = object.getGeometryValue();
     if (newLine != null) {
-      final boolean firstPoint = LineStringUtil.isFromPoint(newLine, point);
-      final boolean toPoint = LineStringUtil.isToPoint(newLine, point);
+      final boolean firstPoint = newLine.equalsVertex(2, 0, point);
+      final boolean toPoint = newLine.equalsVertex(2, -1, point);
       if (firstPoint) {
         if (!toPoint) {
           clearStartAttributes(object);

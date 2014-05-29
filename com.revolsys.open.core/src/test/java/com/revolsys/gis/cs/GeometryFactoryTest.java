@@ -1,12 +1,11 @@
 package com.revolsys.gis.cs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
 
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -16,16 +15,17 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 
 public class GeometryFactoryTest {
-  private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
-    3857, 1.0);
+  private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857,
+    1.0);
 
   public static void assertCoordinatesListEqual(final Geometry geometry,
     final PointList... pointsList) {
     System.out.println(geometry);
-    final List<PointList> geometryPointsList = CoordinatesListUtil.getAll(geometry);
+    final List<PointList> geometryPointsList = getAll(geometry);
     Assert.assertEquals("Number of coordinates Lists", pointsList.length,
       geometryPointsList.size());
     for (int i = 0; i < pointsList.length; i++) {
@@ -38,7 +38,7 @@ public class GeometryFactoryTest {
   public static void assertCopyGeometry(final Geometry geometry,
     final PointList... pointsList) {
     assertCoordinatesListEqual(geometry, pointsList);
-    final Geometry copy = (Geometry)geometry.copy(GEOMETRY_FACTORY);
+    final Geometry copy = geometry.copy(GEOMETRY_FACTORY);
     final Class<? extends Geometry> geometryClass = geometry.getClass();
     Assert.assertEquals("Geometry class", geometryClass, copy.getClass());
     Assert.assertEquals("Geometry", geometry, copy);
@@ -80,6 +80,26 @@ public class GeometryFactoryTest {
 
   }
 
+  public static List<PointList> getAll(final Geometry geometry) {
+    final List<PointList> pointsList = new ArrayList<PointList>();
+    if (geometry != null) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
+        final Geometry subGeometry = geometry.getGeometry(i);
+        if (subGeometry instanceof Point) {
+          pointsList.add(((Point)subGeometry).getCoordinatesList());
+        } else if (subGeometry instanceof LineString) {
+          pointsList.add(((LineString)subGeometry));
+        } else if (subGeometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)subGeometry;
+          for (final LineString ring : polygon.rings()) {
+            pointsList.add(ring);
+          }
+        }
+      }
+    }
+    return pointsList;
+  }
+
   public static void main(final String[] args) {
     testCreateGeometry();
   }
@@ -87,12 +107,12 @@ public class GeometryFactoryTest {
   private static void testCreateGeometry() {
     final PointList pointPoints = new DoubleCoordinatesList(2, 0.0, 0);
     final PointList point2Points = new DoubleCoordinatesList(2, 20.0, 20);
-    final PointList ringPoints = new DoubleCoordinatesList(2, 0.0, 0, 0,
-      100, 100, 100, 100, 0, 0, 0);
-    final PointList ring2Points = new DoubleCoordinatesList(2, 20.0, 20,
-      20, 80, 80, 80, 80, 20, 20, 20);
-    final PointList ring3Points = new DoubleCoordinatesList(2, 120.0,
-      120, 120, 180, 180, 180, 180, 120, 120, 120);
+    final PointList ringPoints = new DoubleCoordinatesList(2, 0.0, 0, 0, 100,
+      100, 100, 100, 0, 0, 0);
+    final PointList ring2Points = new DoubleCoordinatesList(2, 20.0, 20, 20,
+      80, 80, 80, 80, 20, 20, 20);
+    final PointList ring3Points = new DoubleCoordinatesList(2, 120.0, 120, 120,
+      180, 180, 180, 180, 120, 120, 120);
 
     final Point point = GEOMETRY_FACTORY.point(pointPoints);
     assertCopyGeometry(point, pointPoints);

@@ -48,13 +48,13 @@ public class OrientedCoordinateArray implements
     final boolean orientation2) {
     final int dir1 = orientation1 ? 1 : -1;
     final int dir2 = orientation2 ? 1 : -1;
-    final int limit1 = orientation1 ? points1.size() : -1;
-    final int limit2 = orientation2 ? points2.size() : -1;
+    final int limit1 = orientation1 ? points1.getVertexCount() : -1;
+    final int limit2 = orientation2 ? points2.getVertexCount() : -1;
 
-    int i1 = orientation1 ? 0 : points1.size() - 1;
-    int i2 = orientation2 ? 0 : points2.size() - 1;
+    int i1 = orientation1 ? 0 : points1.getVertexCount() - 1;
+    int i2 = orientation2 ? 0 : points2.getVertexCount() - 1;
     while (true) {
-      final int compPt = points1.get(i1).compareTo(points2.get(i2));
+      final int compPt = points1.getPoint(i1).compareTo(points2.getPoint(i2));
       if (compPt != 0) {
         return compPt;
       }
@@ -89,11 +89,11 @@ public class OrientedCoordinateArray implements
    * <code>-1</code> if smaller at the end
    */
   public static int increasingDirection(final PointList points) {
-    final int numPoints = points.size();
+    final int numPoints = points.getVertexCount();
     for (int i = 0; i < numPoints / 2; i++) {
       final int j = numPoints - 1 - i;
       // skip equal points on both ends
-      final int comp = points.get(i).compareTo(points.get(j));
+      final int comp = points.getPoint(i).compareTo(points.getPoint(j));
       if (comp != 0) {
         return comp;
       }

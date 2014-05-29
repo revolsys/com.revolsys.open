@@ -77,7 +77,7 @@ public class WKBReader {
     final int size) {
     final int axisCount = seq.getAxisCount();
     final double[] coordinates = new double[size * axisCount];
-    final int n = seq.size();
+    final int n = seq.getVertexCount();
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, seq, 0, n);
     // fill remaining coordinates with start point
     for (int i = n; i < size; i++) {
@@ -99,7 +99,7 @@ public class WKBReader {
    * @return the original sequence, if it was a valid ring, or a new sequence which is valid.
    */
   public static PointList ensureValidRing(final PointList seq) {
-    final int n = seq.size();
+    final int n = seq.getVertexCount();
     // empty sequence is valid
     if (n == 0) {
       return seq;
@@ -109,10 +109,10 @@ public class WKBReader {
       return createClosedRing(seq, 4);
     }
 
-    final boolean isClosed = seq.getValue(0, PointList.X) == seq.getValue(
-      n - 1, PointList.X)
-      && seq.getValue(0, PointList.Y) == seq.getValue(n - 1,
-        PointList.Y);
+    final boolean isClosed = seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(
+      n - 1, Geometry.X)
+      && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1,
+        Geometry.Y);
     if (isClosed) {
       return seq;
     }
@@ -123,7 +123,7 @@ public class WKBReader {
   public static PointList extend(final PointList seq, final int size) {
     final int axisCount = seq.getAxisCount();
     final double[] coordinates = new double[size * axisCount];
-    final int n = seq.size();
+    final int n = seq.getVertexCount();
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, seq, 0, n);
 
     // fill remaining coordinates with end point, if it exists
@@ -183,17 +183,17 @@ public class WKBReader {
    */
   public static boolean isEqual(final PointList cs1,
     final PointList cs2) {
-    final int cs1Size = cs1.size();
-    final int cs2Size = cs2.size();
+    final int cs1Size = cs1.getVertexCount();
+    final int cs2Size = cs2.getVertexCount();
     if (cs1Size != cs2Size) {
       return false;
     }
     final int dim = Math.min(cs1.getAxisCount(), cs2.getAxisCount());
     for (int i = 0; i < cs1Size; i++) {
       for (int d = 0; d < dim; d++) {
-        final double v1 = cs1.getValue(i, d);
-        final double v2 = cs2.getValue(i, d);
-        if (cs1.getValue(i, d) == cs2.getValue(i, d)) {
+        final double v1 = cs1.getCoordinate(i, d);
+        final double v2 = cs2.getCoordinate(i, d);
+        if (cs1.getCoordinate(i, d) == cs2.getCoordinate(i, d)) {
           continue;
         }
         // special check for NaNs
@@ -217,7 +217,7 @@ public class WKBReader {
    * @see LinearRing
    */
   public static boolean isRing(final PointList seq) {
-    final int n = seq.size();
+    final int n = seq.getVertexCount();
     if (n == 0) {
       return true;
     }
@@ -226,10 +226,10 @@ public class WKBReader {
       return false;
     }
     // test if closed
-    return seq.getValue(0, PointList.X) == seq.getValue(n - 1,
-      PointList.X)
-      && seq.getValue(0, PointList.Y) == seq.getValue(n - 1,
-        PointList.Y);
+    return seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(n - 1,
+      Geometry.X)
+      && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1,
+        Geometry.Y);
   }
 
   private final GeometryFactory factory;
@@ -323,7 +323,7 @@ public class WKBReader {
     if (isStrict) {
       return seq;
     }
-    if (seq.size() == 0 || seq.size() >= 2) {
+    if (seq.getVertexCount() == 0 || seq.getVertexCount() >= 2) {
       return seq;
     }
     return WKBReader.extend(seq, 2);

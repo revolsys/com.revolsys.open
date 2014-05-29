@@ -75,8 +75,8 @@ public class NodingValidator {
 
   private void checkCollapses(final NodedSegmentString ss) {
     final PointList points = ss.getPoints();
-    for (int i = 0; i < points.size() - 2; i++) {
-      checkCollapse(points.get(i), points.get(i + 1), points.get(i + 2));
+    for (int i = 0; i < points.getVertexCount() - 2; i++) {
+      checkCollapse(points.getPoint(i), points.getPoint(i + 1), points.getPoint(i + 2));
     }
   }
 
@@ -95,8 +95,8 @@ public class NodingValidator {
     final Collection<NodedSegmentString> segStrings) {
     for (final NodedSegmentString ss : segStrings) {
       final PointList pts = ss.getPoints();
-      for (int j = 1; j < pts.size() - 1; j++) {
-        if (pts.get(j).equals(testPt)) {
+      for (int j = 1; j < pts.getVertexCount() - 1; j++) {
+        if (pts.getPoint(j).equals(testPt)) {
           throw new RuntimeException(
             "found endpt/interior pt intersection at index " + j + " :pt "
               + testPt);

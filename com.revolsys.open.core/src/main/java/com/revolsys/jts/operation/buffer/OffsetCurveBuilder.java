@@ -94,15 +94,15 @@ public class OffsetCurveBuilder {
     // MD - used for testing only (to eliminate simplification)
     // Point[] simp1 = inputPts;
 
-    final int n1 = simp1.size() - 1;
-    segGen.initSideSegments(simp1.get(0), simp1.get(1), Position.LEFT);
+    final int n1 = simp1.getVertexCount() - 1;
+    segGen.initSideSegments(simp1.getPoint(0), simp1.getPoint(1), Position.LEFT);
     for (int i = 2; i <= n1; i++) {
-      final Point point = simp1.get(i);
+      final Point point = simp1.getPoint(i);
       segGen.addNextSegment(point, true);
     }
     segGen.addLastSegment();
     // add line cap for end of line
-    segGen.addLineEndCap(simp1.get(n1 - 1), simp1.get(n1));
+    segGen.addLineEndCap(simp1.getPoint(n1 - 1), simp1.getPoint(n1));
 
     // ---------- compute points for right side of line
     // Simplify the appropriate side of the line before generating
@@ -110,18 +110,18 @@ public class OffsetCurveBuilder {
       -distTol);
     // MD - used for testing only (to eliminate simplification)
     // Point[] simp2 = inputPts;
-    final int n2 = simp2.size() - 1;
+    final int n2 = simp2.getVertexCount() - 1;
 
     // since we are traversing line in opposite order, offset position is still
     // LEFT
-    segGen.initSideSegments(simp2.get(n2), simp2.get(n2 - 1), Position.LEFT);
+    segGen.initSideSegments(simp2.getPoint(n2), simp2.getPoint(n2 - 1), Position.LEFT);
     for (int i = n2 - 2; i >= 0; i--) {
-      final Point point = simp2.get(i);
+      final Point point = simp2.getPoint(i);
       segGen.addNextSegment(point, true);
     }
     segGen.addLastSegment();
     // add line cap for start of line
-    segGen.addLineEndCap(simp2.get(1), simp2.get(0));
+    segGen.addLineEndCap(simp2.getPoint(1), simp2.getPoint(0));
 
     segGen.closeRing();
   }
@@ -137,14 +137,14 @@ public class OffsetCurveBuilder {
         -distTol);
       // MD - used for testing only (to eliminate simplification)
       // Point[] simp2 = inputPts;
-      final int n2 = simp2.size() - 1;
+      final int n2 = simp2.getVertexCount() - 1;
 
       // since we are traversing line in opposite order, offset position is
       // still LEFT
-      segGen.initSideSegments(simp2.get(n2), simp2.get(n2 - 1), Position.LEFT);
+      segGen.initSideSegments(simp2.getPoint(n2), simp2.getPoint(n2 - 1), Position.LEFT);
       segGen.addFirstSegment();
       for (int i = n2 - 2; i >= 0; i--) {
-        segGen.addNextSegment(simp2.get(i), true);
+        segGen.addNextSegment(simp2.getPoint(i), true);
       }
     } else {
       // --------- compute points for left side of line
@@ -154,11 +154,11 @@ public class OffsetCurveBuilder {
       // MD - used for testing only (to eliminate simplification)
       // Point[] simp1 = inputPts;
 
-      final int n1 = simp1.size() - 1;
-      segGen.initSideSegments(simp1.get(0), simp1.get(1), Position.LEFT);
+      final int n1 = simp1.getVertexCount() - 1;
+      segGen.initSideSegments(simp1.getPoint(0), simp1.getPoint(1), Position.LEFT);
       segGen.addFirstSegment();
       for (int i = 2; i <= n1; i++) {
-        segGen.addNextSegment(simp1.get(i), true);
+        segGen.addNextSegment(simp1.getPoint(i), true);
       }
     }
     segGen.addLastSegment();
@@ -189,11 +189,11 @@ public class OffsetCurveBuilder {
       distTol);
     // Point[] simp = inputPts;
 
-    final int n = simp.size() - 1;
-    segGen.initSideSegments(simp.get(n - 1), simp.get(0), side);
+    final int n = simp.getVertexCount() - 1;
+    segGen.initSideSegments(simp.getPoint(n - 1), simp.getPoint(0), side);
     for (int i = 1; i <= n; i++) {
       final boolean addStartPoint = i != 1;
-      segGen.addNextSegment(simp.get(i), addStartPoint);
+      segGen.addNextSegment(simp.getPoint(i), addStartPoint);
     }
     segGen.closeRing();
   }
@@ -212,14 +212,14 @@ public class OffsetCurveBuilder {
         inputPts, -distTol);
       // MD - used for testing only (to eliminate simplification)
       // Point[] simp2 = inputPts;
-      final int n2 = simp2.size() - 1;
+      final int n2 = simp2.getVertexCount() - 1;
 
       // since we are traversing line in opposite order, offset position is
       // still LEFT
-      segGen.initSideSegments(simp2.get(n2), simp2.get(n2 - 1), Position.LEFT);
+      segGen.initSideSegments(simp2.getPoint(n2), simp2.getPoint(n2 - 1), Position.LEFT);
       segGen.addFirstSegment();
       for (int i = n2 - 2; i >= 0; i--) {
-        segGen.addNextSegment(simp2.get(i), true);
+        segGen.addNextSegment(simp2.getPoint(i), true);
       }
     } else {
       // add original line
@@ -232,11 +232,11 @@ public class OffsetCurveBuilder {
       // MD - used for testing only (to eliminate simplification)
       // Point[] simp1 = inputPts;
 
-      final int n1 = simp1.size() - 1;
-      segGen.initSideSegments(simp1.get(0), simp1.get(1), Position.LEFT);
+      final int n1 = simp1.getVertexCount() - 1;
+      segGen.initSideSegments(simp1.getPoint(0), simp1.getPoint(1), Position.LEFT);
       segGen.addFirstSegment();
       for (int i = 2; i <= n1; i++) {
-        segGen.addNextSegment(simp1.get(i), true);
+        segGen.addNextSegment(simp1.getPoint(i), true);
       }
     }
     segGen.addLastSegment();
@@ -277,8 +277,8 @@ public class OffsetCurveBuilder {
 
     final double posDistance = Math.abs(distance);
     final OffsetSegmentGenerator segGen = getSegGen(posDistance);
-    if (inputPts.size() <= 1) {
-      computePointCurve(inputPts.get(0), segGen);
+    if (inputPts.getVertexCount() <= 1) {
+      computePointCurve(inputPts.getPoint(0), segGen);
     } else {
       if (bufParams.isSingleSided()) {
         final boolean isRightSide = distance < 0.0;
@@ -303,8 +303,8 @@ public class OffsetCurveBuilder {
     final boolean isRightSide = distance < 0.0;
     final double posDistance = Math.abs(distance);
     final OffsetSegmentGenerator segGen = getSegGen(posDistance);
-    if (inputPts.size() <= 1) {
-      computePointCurve(inputPts.get(0), segGen);
+    if (inputPts.getVertexCount() <= 1) {
+      computePointCurve(inputPts.getPoint(0), segGen);
     } else {
       computeOffsetCurve(inputPts, isRightSide, segGen);
     }
@@ -327,7 +327,7 @@ public class OffsetCurveBuilder {
   public PointList getRingCurve(final PointList points,
     final int side, final double distance) {
     this.distance = distance;
-    if (points.size() <= 2) {
+    if (points.getVertexCount() <= 2) {
       return getLineCurve(points, distance);
     }
 
