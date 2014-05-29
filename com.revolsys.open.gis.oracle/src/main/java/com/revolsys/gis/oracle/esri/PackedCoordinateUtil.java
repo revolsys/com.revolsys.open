@@ -464,10 +464,10 @@ public class PackedCoordinateUtil {
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale, final InputStream inputStream) {
 
-    try {
-      final List<double[]> pointsList = new ArrayList<>();
+    try (
       final PackedIntegerInputStream in = new PackedIntegerInputStream(
-        inputStream);
+        inputStream)) {
+      final List<double[]> pointsList = new ArrayList<>();
 
       final long packedByteLength = in.readLong5();
       final long dimensionFlag = in.readLong();
@@ -495,10 +495,11 @@ public class PackedCoordinateUtil {
         y = readCoordinate(in, coordinates, j, axisCount, 1, y, xyScale);
         if (j > 0 && i < vertexCount - 1) {
           final int numVertices = j * axisCount;
-          if (coordinates[0] == coordinates[numVertices]
-            && coordinates[1] == coordinates[numVertices + 1]) {
+          if (coordinates[0] == coordinates[(numVertices) * axisCount]
+            && coordinates[1] == coordinates[(numVertices) * axisCount + 1]) {
             if (j > 2) {
-              final double[] subCoordinates = new double[numVertices];
+              final double[] subCoordinates = new double[numVertices
+                * axisCount];
               System.arraycopy(coordinates, 0, subCoordinates, 0,
                 subCoordinates.length);
               pointsList.add(subCoordinates);
