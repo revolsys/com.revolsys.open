@@ -37,6 +37,13 @@ void handleException(JNIEnv *jenv, const std::exception e) {
   jenv->ThrowNew(clazz, message.str().c_str());
 }
   
+void handleException(JNIEnv *jenv, const std::runtime_error e) {
+  std::stringstream message;
+  message << e.what() ;
+  jclass clazz = jenv->FindClass("java/lang/RuntimeException");
+  jenv->ThrowNew(clazz, message.str().c_str());
+}
+
 %}
 
 %pragma(java) jniclassimports=%{
@@ -100,6 +107,8 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %exception {
   try {
     $action;
+  } catch (const std::runtime_error& e) {
+    handleException(jenv, e);
   } catch (const std::exception& e) {
     handleException(jenv, e);
   }

@@ -247,6 +247,13 @@ void handleException(JNIEnv *jenv, const std::exception e) {
   jenv->ThrowNew(clazz, message.str().c_str());
 }
   
+void handleException(JNIEnv *jenv, const std::runtime_error e) {
+  std::stringstream message;
+  message << e.what() ;
+  jclass clazz = jenv->FindClass("java/lang/RuntimeException");
+  jenv->ThrowNew(clazz, message.str().c_str());
+}
+
 
 
 #include <stdexcept>
@@ -968,6 +975,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1176,6 +1185,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1356,6 +1367,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1390,6 +1403,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Geodatabase *)createGeodatabase((std::wstring const &)*arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1426,6 +1441,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Geodatabase *)openGeodatabase((std::wstring const &)*arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1446,6 +1463,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = getSpatialReferenceWkt(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1477,6 +1496,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)FileGDBAPI::CloseGeodatabase(*arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1513,6 +1534,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)FileGDBAPI::DeleteGeodatabase((std::wstring const &)*arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1541,6 +1564,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::Geodatabase const *)arg1)->GetDatasetTypes(*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1569,6 +1594,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::Geodatabase const *)arg1)->GetDatasetRelationshipTypes(*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1651,6 +1678,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::Geodatabase const *)arg1)->GetRelatedDatasets((std::wstring const &)*arg2,(std::wstring const &)*arg3,(std::wstring const &)*arg4,*arg5);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1715,6 +1744,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::Geodatabase const *)arg1)->GetChildDatasetDefinitions((std::wstring const &)*arg2,(std::wstring const &)*arg3,*arg4);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1797,6 +1828,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::Geodatabase const *)arg1)->GetRelatedDatasetDefinitions((std::wstring const &)*arg2,(std::wstring const &)*arg3,(std::wstring const &)*arg4,*arg5);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1872,6 +1905,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->Rename((std::wstring const &)*arg2,(std::wstring const &)*arg3,(std::wstring const &)*arg4);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1929,6 +1964,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->Move((std::wstring const &)*arg2,(std::wstring const &)*arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -1986,6 +2023,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->Delete((std::wstring const &)*arg2,(std::wstring const &)*arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2004,6 +2043,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Geodatabase *)new FileGDBAPI::Geodatabase();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2022,6 +2063,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2063,6 +2106,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)FileGDBAPI::CreateGeodatabase((std::wstring const &)*arg1,*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2106,6 +2151,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)FileGDBAPI::OpenGeodatabase((std::wstring const &)*arg1,*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2131,6 +2178,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)FileGDBAPI::CloseGeodatabase(*arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2167,6 +2216,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)FileGDBAPI::DeleteGeodatabase((std::wstring const &)*arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2195,6 +2246,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Geodatabase_createFeatureDataset(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2234,6 +2287,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::EnumRows *)FileGDBAPI_Geodatabase_query(arg1,(std::wstring const &)*arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2287,6 +2342,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = FileGDBAPI_Geodatabase_getChildDatasets(arg1,arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2340,6 +2397,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Geodatabase_getDatasetDefinition(arg1,arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2393,6 +2452,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Geodatabase_getDatasetDocumentation(arg1,arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2414,6 +2475,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = FileGDBAPI_Geodatabase_getDomains(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2451,6 +2514,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Geodatabase_getDomainDefinition(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2480,6 +2545,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Geodatabase_createDomain(arg1,(std::string const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2507,6 +2574,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Geodatabase_alterDomain(arg1,(std::string const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2542,6 +2611,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Geodatabase_deleteDomain(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2577,6 +2648,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Geodatabase_getQueryName(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2622,6 +2695,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Table *)FileGDBAPI_Geodatabase_openTable(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2648,6 +2723,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Geodatabase_closeTable(arg1,*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2685,6 +2762,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Geodatabase_getTableDefinition(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2734,6 +2813,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Table *)FileGDBAPI_Geodatabase_createTable(arg1,(std::string const &)*arg2,(std::wstring const &)*arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2765,6 +2846,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetDocumentation((std::string const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2793,6 +2876,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::Table const *)arg1)->GetFieldInformation(*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2824,6 +2909,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->AddField((std::string const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2852,6 +2939,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->AddField((FileGDBAPI::FieldDef const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2883,6 +2972,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->AlterField((std::string const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2922,6 +3013,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->DeleteField((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2953,6 +3046,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->AddIndex((std::string const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -2981,6 +3076,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->AddIndex((FileGDBAPI::IndexDef const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3020,6 +3117,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->DeleteIndex((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3051,6 +3150,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->CreateSubtype((std::string const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3082,6 +3183,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->AlterSubtype((std::string const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3121,6 +3224,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->DeleteSubtype((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3170,6 +3275,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->EnableSubtypes((std::wstring const &)*arg2,(std::string const &)*arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3193,6 +3300,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetDefaultSubtypeCode(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3214,6 +3323,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->DisableSubtypes();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3242,6 +3353,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::Table const *)arg1)->GetExtent(*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3260,6 +3373,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Table *)new FileGDBAPI::Table();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3278,6 +3393,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3297,6 +3414,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)FileGDBAPI_Table_isEditable(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3318,6 +3437,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Table_getDefinition(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3339,6 +3460,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Table_getDocumentation(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3360,6 +3483,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (int)FileGDBAPI_Table_getRowCount(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3381,6 +3506,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (int)FileGDBAPI_Table_getDefaultSubtypeCode(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3402,6 +3529,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = FileGDBAPI_Table_getIndexes(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3423,6 +3552,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Row *)FileGDBAPI_Table_createRowObject(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3449,6 +3580,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Table_insertRow(arg1,*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3473,6 +3606,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Table_updateRow(arg1,*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3497,6 +3632,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Table_deleteRow(arg1,*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3563,6 +3700,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::EnumRows *)FileGDBAPI_Table_search__SWIG_0(arg1,(std::wstring const &)*arg2,(std::wstring const &)*arg3,arg4,arg5);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3622,6 +3761,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::EnumRows *)FileGDBAPI_Table_search__SWIG_1(arg1,(std::wstring const &)*arg2,(std::wstring const &)*arg3,arg4);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3643,6 +3784,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Table_setLoadOnlyMode(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3660,6 +3803,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Table_setWriteLock(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3677,6 +3822,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Table_freeWriteLock(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3696,6 +3843,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = FileGDBAPI_Table_getFields(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3724,6 +3873,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::Row const *)arg1)->GetFieldInformation(*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3742,6 +3893,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Row *)new FileGDBAPI::Row();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3760,6 +3913,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3795,6 +3950,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)FileGDBAPI_Row_isNull(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3830,6 +3987,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setNull(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3867,6 +4026,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (long long)FileGDBAPI_Row_getDate(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3906,6 +4067,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setDate(arg1,(std::wstring const &)*arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3943,6 +4106,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_Row_getDouble(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -3982,6 +4147,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setDouble(arg1,(std::wstring const &)*arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4019,6 +4186,8 @@ SWIGEXPORT jfloat JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFile
   {
     try {
       result = (float)FileGDBAPI_Row_getFloat(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4058,6 +4227,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setFloat(arg1,(std::wstring const &)*arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4093,6 +4264,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = FileGDBAPI_Row_getGuid(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4114,6 +4287,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = FileGDBAPI_Row_getGlobalId(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4158,6 +4333,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setGuid(arg1,(std::wstring const &)*arg2,(FileGDBAPI::Guid const &)*arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4177,6 +4354,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (int)FileGDBAPI_Row_getOid(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4216,6 +4395,8 @@ SWIGEXPORT jshort JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFile
   {
     try {
       result = (short)FileGDBAPI_Row_getShort(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4255,6 +4436,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setShort(arg1,(std::wstring const &)*arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4292,6 +4475,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (int32)FileGDBAPI_Row_getInteger(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4331,6 +4516,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setInteger(arg1,(std::wstring const &)*arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4368,6 +4555,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Row_getString(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4429,6 +4618,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setString(arg1,(std::wstring const &)*arg2,(std::wstring const &)*arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4466,6 +4657,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Row_getXML(arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4513,6 +4706,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setXML(arg1,(std::wstring const &)*arg2,(std::string const &)*arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4532,6 +4727,8 @@ SWIGEXPORT jbyteArray JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_Esri
   {
     try {
       result = FileGDBAPI_Row_getGeometry(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4563,6 +4760,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       FileGDBAPI_Row_setGeometry(arg1,arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4586,6 +4785,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = FileGDBAPI_Row_getFields(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4605,6 +4806,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       (arg1)->Close();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4631,6 +4834,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::EnumRows const *)arg1)->GetFieldInformation(*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4649,6 +4854,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::EnumRows *)new FileGDBAPI::EnumRows();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4667,6 +4874,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4686,6 +4895,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Row *)FileGDBAPI_EnumRows_next(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4707,6 +4918,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = FileGDBAPI_EnumRows_getFields(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4725,6 +4938,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::SpatialReference *)new FileGDBAPI::SpatialReference();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4743,6 +4958,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4780,6 +4997,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetSpatialReferenceText((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4803,6 +5022,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetSpatialReferenceID(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4830,6 +5051,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetFalseOriginAndUnits(arg2,arg3,arg4);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4855,6 +5078,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetZFalseOriginAndUnits(arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4880,6 +5105,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetMFalseOriginAndUnits(arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4903,6 +5130,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetXYTolerance(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4926,6 +5155,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetZTolerance(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4949,6 +5180,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetMTolerance(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4970,6 +5203,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (int)FileGDBAPI_SpatialReference_getId(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -4991,6 +5226,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_SpatialReference_getText(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5018,6 +5255,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getXFalseOrigin(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5039,6 +5278,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getYFalseOrigin(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5060,6 +5301,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getXYUnits(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5081,6 +5324,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getMFalseOrigin(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5102,6 +5347,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getMUnits(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5123,6 +5370,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getMTolerance(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5144,6 +5393,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getXYTolerance(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5165,6 +5416,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getXUnits(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5186,6 +5439,8 @@ SWIGEXPORT jdouble JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = (double)FileGDBAPI_SpatialReference_getZTolerance(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5204,6 +5459,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::GeometryDef *)new FileGDBAPI::GeometryDef();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5222,6 +5479,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5243,6 +5502,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetGeometryType(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5266,6 +5527,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetHasZ(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5289,6 +5552,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetHasM(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5317,6 +5582,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::GeometryDef const *)arg1)->GetSpatialReference(*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5345,6 +5612,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetSpatialReference((FileGDBAPI::SpatialReference const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5366,6 +5635,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)FileGDBAPI_GeometryDef_hasM(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5387,6 +5658,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)FileGDBAPI_GeometryDef_hasZ(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5408,6 +5681,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (FileGDBAPI::GeometryType)FileGDBAPI_GeometryDef_getGeometryType(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5426,6 +5701,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::FieldDef *)new FileGDBAPI::FieldDef();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5444,6 +5721,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5481,6 +5760,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetName((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5520,6 +5801,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetAlias((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5543,6 +5826,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetType(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5566,6 +5851,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetLength(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5589,6 +5876,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetIsNullable(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5617,6 +5906,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)((FileGDBAPI::FieldDef const *)arg1)->GetGeometryDef(*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5645,6 +5936,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetGeometryDef((FileGDBAPI::GeometryDef const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5666,6 +5959,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_FieldDef_getAlias(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5693,6 +5988,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_FieldDef_getName(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5720,6 +6017,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)FileGDBAPI_FieldDef_isNullable(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5741,6 +6040,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (int)FileGDBAPI_FieldDef_getLength(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5762,6 +6063,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (FileGDBAPI::FieldType)FileGDBAPI_FieldDef_getType(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5780,6 +6083,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::IndexDef *)new FileGDBAPI::IndexDef();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5836,6 +6141,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::IndexDef *)new FileGDBAPI::IndexDef((std::wstring const &)*arg1,(std::wstring const &)*arg2,arg3);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5890,6 +6197,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::IndexDef *)new FileGDBAPI::IndexDef((std::wstring const &)*arg1,(std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5908,6 +6217,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5945,6 +6256,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetName((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -5984,6 +6297,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetFields((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6007,6 +6322,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->SetIsUnique(arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6028,6 +6345,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)FileGDBAPI_IndexDef_isUnique(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6049,6 +6368,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_IndexDef_getName(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6076,6 +6397,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_IndexDef_getFields(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6100,6 +6423,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::FieldInfo *)new FileGDBAPI::FieldInfo();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6118,6 +6443,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6137,6 +6464,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (int)FileGDBAPI_FieldInfo_getFieldCount(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6160,6 +6489,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_FieldInfo_getFieldName(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6189,6 +6520,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (int)FileGDBAPI_FieldInfo_getFieldLength(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6212,6 +6545,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)FileGDBAPI_FieldInfo_isNullable(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6235,6 +6570,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (FileGDBAPI::FieldType)FileGDBAPI_FieldInfo_getFieldType(arg1,arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6256,6 +6593,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)((FileGDBAPI::Envelope const *)arg1)->IsEmpty();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6275,6 +6614,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       (arg1)->SetEmpty();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6291,6 +6632,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Envelope *)new FileGDBAPI::Envelope();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6317,6 +6660,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Envelope *)new FileGDBAPI::Envelope(arg1,arg2,arg3,arg4);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6335,6 +6680,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6519,6 +6866,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Guid *)new FileGDBAPI::Guid();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6537,6 +6886,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6554,6 +6905,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       (arg1)->SetNull();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6571,6 +6924,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       (arg1)->Create();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6608,6 +6963,8 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->FromString((std::wstring const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6636,6 +6993,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)(arg1)->operator ==((FileGDBAPI::Guid const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6664,6 +7023,8 @@ SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFi
   {
     try {
       result = (bool)(arg1)->operator !=((FileGDBAPI::Guid const &)*arg2);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6685,6 +7046,8 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   {
     try {
       result = FileGDBAPI_Guid_toString(arg1);;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6709,6 +7072,8 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
   {
     try {
       result = (FileGDBAPI::Raster *)new FileGDBAPI::Raster();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }
@@ -6727,6 +7092,8 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
     } catch (const std::exception& e) {
       handleException(jenv, e);
     }

@@ -19,14 +19,15 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
   private File directory;
 
   private boolean useZeroForNull = true;
 
-  private Map<String, Writer<DataObject>> writers = new HashMap<String, Writer<DataObject>>();
+  private Map<String, Writer<DataObject>> writers = new HashMap<>();
+
+  private Map<String, DataObjectMetaData> metaDataMap = new HashMap<>();
 
   private boolean useNamespaceAsSubDirectory;
 
@@ -53,6 +54,7 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
         }
       }
       writers = null;
+      metaDataMap = null;
     }
     if (statistics != null) {
       statistics.disconnect();
@@ -97,6 +99,10 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     return metaData.getTypeName();
   }
 
+  public DataObjectMetaData getMetaData(final String path) {
+    return metaDataMap.get(path);
+  }
+
   public String getNameSuffix() {
     return nameSuffix;
   }
@@ -116,13 +122,14 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
         + ".shp");
       writer = AbstractDataObjectWriterFactory.dataObjectWriter(metaData,
         new FileSystemResource(file));
+
       ((XbaseDataObjectWriter)writer).setUseZeroForNull(useZeroForNull);
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
-        setProperty(IoConstants.GEOMETRY_FACTORY,
-          geometry.getGeometryFactory());
+        setProperty(IoConstants.GEOMETRY_FACTORY, geometry.getGeometryFactory());
       }
       writers.put(path, writer);
+      metaDataMap.put(path, ((ShapefileDataObjectWriter)writer).getMetaData());
     }
     return writer;
   }
@@ -141,6 +148,10 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
     statistics = new Statistics("Write Shape "
       + baseDirectory.getAbsolutePath());
     statistics.connect();
+  }
+
+  public void setLogCounts(final boolean logCounts) {
+    statistics.setLogCounts(false);
   }
 
   public void setNameSuffix(final String nameSuffix) {

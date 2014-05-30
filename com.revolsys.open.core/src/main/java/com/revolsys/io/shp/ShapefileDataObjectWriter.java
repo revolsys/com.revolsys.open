@@ -188,7 +188,9 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
           this.geometryFactory = geometry.getGeometryFactory();
         }
         if (this.geometryDataType == null) {
-          this.geometryDataType = geometry.getDataType();
+          this.geometryDataType = object.getMetaData()
+            .getGeometryAttribute()
+            .getType();
         }
         shapeType = ShapefileGeometryUtil.SHP_INSTANCE.getShapeType(
           this.geometryFactory, this.geometryDataType);
