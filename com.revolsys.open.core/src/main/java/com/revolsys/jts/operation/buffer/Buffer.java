@@ -193,6 +193,13 @@ public class Buffer {
     return buffer(geometry, distance, parameters);
   }
 
+  public static Geometry buffer(final Geometry geometry, final double distance,
+    final int quadrantSegments, final int endCapStyle, final int joinStyle,
+    final double mitreLimit) {
+    return buffer(geometry, distance, new BufferParameters(quadrantSegments,
+      endCapStyle, joinStyle, mitreLimit));
+  }
+
   private static Geometry buffer(final Noder noder,
     final GeometryFactory precisionModel, final Geometry geometry,
     final double distance, final BufferParameters parameters) {
@@ -398,7 +405,8 @@ public class Buffer {
       }
 
       // skip if stabbing ray is right of the segment
-      if (CGAlgorithmsDD.orientationIndex(seg.getP0(), seg.getP1(), stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
+      if (CGAlgorithmsDD.orientationIndex(seg.getP0(), seg.getP1(),
+        stabbingRayLeftPt) == CGAlgorithms.RIGHT) {
         continue;
       }
 

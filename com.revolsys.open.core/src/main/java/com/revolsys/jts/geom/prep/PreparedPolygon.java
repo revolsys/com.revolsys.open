@@ -225,6 +225,7 @@ public class PreparedPolygon extends AbstractPolygon {
       if (isRectangle) {
         return RectangleIntersects.intersects(getPolygon(), geometry);
       } else {
+        PointOnGeometryLocator pointLocator = getPointLocator();
         /**
          * Do point-in-poly tests first, since they are cheaper and may result in a
          * quick positive result.
@@ -232,7 +233,7 @@ public class PreparedPolygon extends AbstractPolygon {
          * If a point of any test components lie in target, result is true
          */
         final boolean isInPrepGeomArea = AbstractPreparedPolygonContains.isAnyTestComponentInTarget(
-          getPointLocator(), geometry);
+          pointLocator, geometry);
         if (isInPrepGeomArea) {
           return true;
         }

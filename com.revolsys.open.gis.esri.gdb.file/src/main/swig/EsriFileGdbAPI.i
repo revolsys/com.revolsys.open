@@ -18,16 +18,19 @@ std::string wstring2string(std::wstring wstr) {
 fgdbError checkResult(fgdbError error) {
   if (error) {
      std::wstring errorString;
-     FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString);
-     std::stringstream message;
-     message << error << "\t" << wstring2string(errorString);
-     FileGDBAPI::ErrorInfo::ClearErrors();
-     throw std::runtime_error(message.str());
+     if (FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString) == S_FALSE) {
+       throw std::runtime_error("Unknown error");
+     } else {
+       std::stringstream message;
+       message << error << "\t" << wstring2string(errorString);
+       FileGDBAPI::ErrorInfo::ClearErrors();
+       throw std::runtime_error(message.str());
+     }
   }
   return error;
 }
 
-void handleRuntimeError(JNIEnv *jenv, const std::runtime_error e) {
+void handleException(JNIEnv *jenv, const std::exception e) {
   std::stringstream message;
   message << e.what() ;
   jclass clazz = jenv->FindClass("java/lang/RuntimeException");
@@ -97,8 +100,8 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %exception {
   try {
     $action;
-  } catch (const std::runtime_error& e) {
-    handleRuntimeError(jenv, e);
+  } catch (const std::exception& e) {
+    handleException(jenv, e);
   }
 }
 
@@ -385,7 +388,10 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
     const time_t time = (time_t)date;
     struct tm* tm_time = localtime(&time);
     if (tm_time == 0) {
-      throw std::runtime_error("Invalid date " + date);
+      std::stringstream message;
+      message << "Invalid date ";
+      message << date;
+      throw std::runtime_error(message.str());
     } else {
       struct tm value;
       value = *tm_time;

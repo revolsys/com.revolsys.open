@@ -156,8 +156,8 @@ public class TaggedLineStringSimplifier {
   }
 
   private boolean hasBadOutputIntersection(final LineSegment candidateSeg) {
-    final List<TaggedLineSegment> querySegs = outputIndex.query(candidateSeg);
-    for (final TaggedLineSegment querySeg : querySegs) {
+    final List<LineSegment> querySegs = outputIndex.query(candidateSeg);
+    for (final LineSegment querySeg : querySegs) {
       if (hasInteriorIntersection(querySeg, candidateSeg)) {
         return true;
       }
