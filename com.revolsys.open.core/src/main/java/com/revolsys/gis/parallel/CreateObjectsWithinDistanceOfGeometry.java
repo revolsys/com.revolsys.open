@@ -17,8 +17,6 @@ import com.revolsys.gis.data.model.DataObjectMap;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.simplify.DouglasPeuckerSimplifier;
@@ -37,7 +35,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends
 
   private List<DataObject> geometryObjects = new ArrayList<DataObject>();
 
-  private Map<DataObjectMetaData, Map<DataObjectMetaData, PreparedGeometry>> metaDataGeometryMap = new HashMap<DataObjectMetaData, Map<DataObjectMetaData, PreparedGeometry>>();
+  private Map<DataObjectMetaData, Map<DataObjectMetaData, Geometry>> metaDataGeometryMap = new HashMap<DataObjectMetaData, Map<DataObjectMetaData, Geometry>>();
 
   private String typePathTemplate;
 
@@ -76,14 +74,13 @@ public class CreateObjectsWithinDistanceOfGeometry extends
     return geometryObjects;
   }
 
-  private final Map<DataObjectMetaData, PreparedGeometry> getMetaDataGeometries(
+  private final Map<DataObjectMetaData, Geometry> getMetaDataGeometries(
     final DataObjectMetaData metaData) {
-    Map<DataObjectMetaData, PreparedGeometry> metaDataGeometries = metaDataGeometryMap.get(metaData);
+    Map<DataObjectMetaData, Geometry> metaDataGeometries = metaDataGeometryMap.get(metaData);
     if (metaDataGeometries == null) {
-      final PreparedGeometryFactory preparedGeometryFactory = new PreparedGeometryFactory();
-      metaDataGeometries = new LinkedHashMap<DataObjectMetaData, PreparedGeometry>();
+      metaDataGeometries = new LinkedHashMap<DataObjectMetaData, Geometry>();
       DataObjectMetaData newMetaData;
-      PreparedGeometry preparedGeometry;
+      Geometry preparedGeometry;
       for (final DataObject object : geometryObjects) {
         Geometry geometry = object.getGeometryValue();
         if (geometry != null) {
@@ -103,7 +100,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends
             geometry = Buffer.buffer(geometry, distance, parameters);
           }
           geometry = DouglasPeuckerSimplifier.simplify(geometry, 2D);
-          preparedGeometry = preparedGeometryFactory.create(geometry);
+          preparedGeometry = geometry.prepare();
           metaDataGeometries.put(newMetaData, preparedGeometry);
         }
       }
@@ -143,10 +140,10 @@ public class CreateObjectsWithinDistanceOfGeometry extends
     }
     final DataObjectMetaData metaData = object.getMetaData();
     final Geometry geometryValue = object.getGeometryValue();
-    final Map<DataObjectMetaData, PreparedGeometry> metaDataGeometries = getMetaDataGeometries(metaData);
-    for (final Entry<DataObjectMetaData, PreparedGeometry> metaDataGeometry : metaDataGeometries.entrySet()) {
+    final Map<DataObjectMetaData, Geometry> metaDataGeometries = getMetaDataGeometries(metaData);
+    for (final Entry<DataObjectMetaData, Geometry> metaDataGeometry : metaDataGeometries.entrySet()) {
       final DataObjectMetaData newMetaData = metaDataGeometry.getKey();
-      final PreparedGeometry intersectsGeometry = metaDataGeometry.getValue();
+      final Geometry intersectsGeometry = metaDataGeometry.getValue();
       if (intersectsGeometry.intersects(geometryValue)) {
         final DataObject newObject = new ArrayDataObject(newMetaData, object);
         out.write(newObject);

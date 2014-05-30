@@ -1,4 +1,4 @@
-package com.revolsys.gis.jts.locator;
+package com.revolsys.jts.index.intervalrtree;
 
 import java.util.Comparator;
 

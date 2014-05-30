@@ -146,6 +146,9 @@ public interface LineString extends Lineal, PointList {
   Iterable<Point> points();
 
   @Override
+  LineString prepare();
+
+  @Override
   LineString reverse();
 
   List<LineString> split(Point point);

@@ -33,24 +33,16 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.gis.data.io.IteratorReader;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.io.Reader;
-import com.revolsys.jts.geom.Dimension;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.segment.MultiLineStringSegment;
-import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.geom.vertex.MultiLineStringVertex;
-import com.revolsys.jts.geom.vertex.Vertex;
-import com.revolsys.jts.operation.BoundaryOp;
+import com.revolsys.jts.geom.prep.PreparedMultiLineString;
 
 /**
  * Models a collection of (@link LineString}s.
@@ -59,154 +51,122 @@ import com.revolsys.jts.operation.BoundaryOp;
  *
  *@version 1.7
  */
-public class MultiLineStringImpl extends GeometryCollectionImpl implements
+public class MultiLineStringImpl extends AbstractMultiLineString implements
   MultiLineString {
 
   private static final long serialVersionUID = 8166665132445433741L;
 
   /**
-   * @param lineStrings
-   *            the <code>LineString</code>s for this <code>MultiLineString</code>,
-   *            or <code>null</code> or an empty array to create the empty
-   *            geometry. Elements may be empty <code>LineString</code>s,
-   *            but not <code>null</code>s.
+   *  The bounding box of this <code>Geometry</code>.
    */
-  public MultiLineStringImpl(final LineString[] lineStrings,
-    final GeometryFactory factory) {
-    super(factory, lineStrings);
+  private BoundingBox boundingBox;
+
+  /**
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
+   */
+  private Object userData;
+
+  private final GeometryFactory geometryFactory;
+
+  private LineString[] lines;
+
+  public MultiLineStringImpl(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
+  public MultiLineStringImpl(final GeometryFactory geometryFactory,
+    final LineString[] lines) {
+    this.geometryFactory = geometryFactory;
+    if (lines == null || lines.length == 0) {
+      this.lines = null;
+    } else if (hasNullElements(lines)) {
+      throw new IllegalArgumentException(
+        "geometries must not contain null elements");
+    } else {
+      this.lines = lines;
+    }
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    if (boundingBox == null) {
+      if (isEmpty()) {
+        boundingBox = new Envelope(getGeometryFactory());
+      } else {
+        boundingBox = computeBoundingBox();
+      }
+    }
+    return boundingBox;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<LineString> lines = new ArrayList<LineString>();
-    for (final LineString line : getLineStrings()) {
-      final LineString newLine = line.copy(geometryFactory);
-      lines.add(newLine);
-    }
-    return (V)geometryFactory.multiLineString(lines);
-  }
-
-  @Override
-  public boolean equalsExact(final Geometry other, final double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    return super.equalsExact(other, tolerance);
-  }
-
-  /**
-   * Gets the boundary of this geometry.
-   * The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
-   *
-   * @return the boundary geometry
-   * @see Geometry#getBoundary
-   */
-  @Override
-  public Geometry getBoundary() {
-    return (new BoundaryOp(this)).getBoundary();
-  }
-
-  @Override
-  public int getBoundaryDimension() {
-    if (isClosed()) {
-      return Dimension.FALSE;
-    }
-    return 0;
-  }
-
-  @Override
-  public DataType getDataType() {
-    return DataTypes.MULTI_LINE_STRING;
-  }
-
-  @Override
-  public int getDimension() {
-    return 1;
-  }
-
-  @Override
-  public LineString getLineString(final int partIndex) {
-    return (LineString)getGeometry(partIndex);
-  }
-
-  @Override
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public <V extends LineString> List<V> getLineStrings() {
-    return (List)super.getGeometries();
-  }
-
-  @Override
-  public boolean isClosed() {
-    if (isEmpty()) {
-      return false;
-    }
-    for (final LineString line : getLineStrings()) {
-      if (line.isEmpty()) {
-        return false;
-      } else if (!line.isClosed()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  protected boolean isEquivalentClass(final Geometry other) {
-    return other instanceof MultiLineString;
-  }
-
-  @Override
-  public MultiLineString normalize() {
-    if (isEmpty()) {
-      return this;
+  public <V extends Geometry> List<V> getGeometries() {
+    if (lines == null) {
+      return new ArrayList<V>();
     } else {
-      final List<LineString> geometries = new ArrayList<>();
-      for (final Geometry part : geometries()) {
-        final LineString normalizedPart = (LineString)part.normalize();
-        geometries.add(normalizedPart);
-      }
-      Collections.sort(geometries);
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiLineString normalizedGeometry = geometryFactory.multiLineString(geometries);
-      return normalizedGeometry;
+      return (List<V>)new ArrayList<>(Arrays.asList(lines));
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V getGeometry(final int n) {
+    if (lines == null) {
+      return null;
+    } else {
+      return (V)lines[n];
+    }
+  }
+
+  @Override
+  public int getGeometryCount() {
+    if (lines == null) {
+      return 0;
+    } else {
+      return lines.length;
+    }
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   /**
-   * Creates a {@link MultiLineString} in the reverse
-   * order to this object.
-   * Both the order of the component LineStrings
-   * and the order of their coordinate sequences
-   * are reversed.
+   * Gets the user data object for this geometry, if any.
    *
-   * @return a {@link MultiLineString} in the reverse order
+   * @return the user data object, or <code>null</code> if none set
    */
   @Override
-  public MultiLineString reverse() {
-    final LinkedList<LineString> revLines = new LinkedList<LineString>();
-    for (final Geometry geometry : geometries()) {
-      final LineString line = (LineString)geometry;
-      final LineString reverse = line.reverse();
-      revLines.addFirst(reverse);
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.multiLineString(revLines);
+  public Object getUserData() {
+    return userData;
   }
 
   @Override
-  public Reader<Segment> segments() {
-    final MultiLineStringSegment iterator = new MultiLineStringSegment(this, 0,
-      -1);
-    return new IteratorReader<Segment>(iterator);
+  public boolean isEmpty() {
+    return lines == null;
   }
 
   @Override
-  public Reader<Vertex> vertices() {
-    final MultiLineStringVertex vertex = new MultiLineStringVertex(this, 0, -1);
-    return vertex.reader();
+  public MultiLineString prepare() {
+    return new PreparedMultiLineString(this);
+  }
+
+  /**
+   * A simple scheme for applications to add their own custom data to a Geometry.
+   * An example use might be to add an object representing a Point Reference System.
+   * <p>
+   * Note that user data objects are not present in geometries created by
+   * construction methods.
+   *
+   * @param userData an object, the semantics for which are defined by the
+   * application using this Geometry
+   */
+  @Override
+  public void setUserData(final Object userData) {
+    this.userData = userData;
   }
 
 }

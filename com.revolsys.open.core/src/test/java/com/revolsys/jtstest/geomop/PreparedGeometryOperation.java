@@ -33,8 +33,6 @@
 package com.revolsys.jtstest.geomop;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jtstest.testrunner.BooleanResult;
 import com.revolsys.jtstest.testrunner.Result;
 
@@ -52,22 +50,22 @@ import com.revolsys.jtstest.testrunner.Result;
 public class PreparedGeometryOperation implements GeometryOperation {
   static class PreparedGeometryOp {
     public static boolean contains(final Geometry g1, final Geometry g2) {
-      final PreparedGeometry prepGeom = PreparedGeometryFactory.prepare(g1);
+      final Geometry prepGeom = g1.prepare();
       return prepGeom.contains(g2);
     }
 
     public static boolean containsProperly(final Geometry g1, final Geometry g2) {
-      final PreparedGeometry prepGeom = PreparedGeometryFactory.prepare(g1);
+      final Geometry prepGeom = g1.prepare();
       return prepGeom.containsProperly(g2);
     }
 
     public static boolean covers(final Geometry g1, final Geometry g2) {
-      final PreparedGeometry prepGeom = PreparedGeometryFactory.prepare(g1);
+      final Geometry prepGeom = g1.prepare();
       return prepGeom.covers(g2);
     }
 
     public static boolean intersects(final Geometry g1, final Geometry g2) {
-      final PreparedGeometry prepGeom = PreparedGeometryFactory.prepare(g1);
+      final Geometry prepGeom = g1.prepare();
       return prepGeom.intersects(g2);
     }
   }

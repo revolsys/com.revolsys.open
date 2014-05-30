@@ -48,6 +48,8 @@ import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.algorithm.InteriorPointArea;
 import com.revolsys.jts.algorithm.InteriorPointLine;
 import com.revolsys.jts.algorithm.InteriorPointPoint;
+import com.revolsys.jts.algorithm.PointLocator;
+import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -61,6 +63,7 @@ import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geom.util.GeometryCollectionMapper;
 import com.revolsys.jts.geom.util.GeometryMapper;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.distance.DistanceOp;
@@ -515,6 +518,15 @@ public abstract class AbstractGeometry implements Geometry {
     return relate(g).isContains();
   }
 
+  @Override
+  public boolean containsProperly(final Geometry geometry) {
+    if (getBoundingBox().covers(geometry.getBoundingBox())) {
+      return relate(geometry, "T**FF*FF*");
+    } else {
+      return false;
+    }
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V convert(final GeometryFactory geometryFactory) {
@@ -786,6 +798,22 @@ public abstract class AbstractGeometry implements Geometry {
   }
 
   protected abstract boolean doEquals(int axisCount, Geometry geometry);
+
+  public boolean envelopeCovers(final Geometry geometry) {
+    if (getBoundingBox().covers(geometry.getBoundingBox())) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean envelopesIntersect(final Geometry geometry) {
+    if (getBoundingBox().intersects(geometry.getBoundingBox())) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @Override
   public boolean equal(final Point a, final Point b, final double tolerance) {
@@ -1281,6 +1309,11 @@ public abstract class AbstractGeometry implements Geometry {
   @Override
   public abstract Point getPoint();
 
+  private PointOnGeometryLocator getPointLocator() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   /**
    *  Returns the ID of the Spatial Reference System used by the <code>Geometry</code>.
    *  <P>
@@ -1427,6 +1460,25 @@ public abstract class AbstractGeometry implements Geometry {
     }
     // general case
     return relate(g).isIntersects();
+  }
+
+  /**
+   * Tests whether any representative of the target geometry 
+   * intersects the test geometry.
+   * This is useful in A/A, A/L, A/P, L/P, and P/P cases.
+   * 
+   * @param geom the test geometry
+   * @param repPts the representative points of the target geometry
+   * @return true if any component intersects the areal test geometry
+   */
+  protected boolean isAnyTargetComponentInTest(final Geometry testGeom) {
+    final PointLocator locator = new PointLocator();
+    for (final Vertex vertex : vertices()) {
+      if (locator.intersects(vertex, testGeom)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

@@ -149,9 +149,7 @@
 <case>
   <desc>mL - intersection between elements at non-vertex</desc>
   <a>
-    MULTILINESTRING(
-  (40 140, 160 40), 
-  (160 140, 40 40))
+    MULTILINESTRING((40 140,160 40),(160 140,40 40))
   </a>
 <test>
   <op name="isSimple" arg1="A">

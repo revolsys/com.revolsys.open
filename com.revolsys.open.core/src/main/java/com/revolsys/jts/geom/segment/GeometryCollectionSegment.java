@@ -108,6 +108,11 @@ public class GeometryCollectionSegment extends AbstractSegment {
   }
 
   @Override
+  public boolean isLineClosed() {
+    return segment.isLineClosed();
+  }
+
+  @Override
   public boolean isLineEnd() {
     if (segment == null) {
       return false;
@@ -165,6 +170,7 @@ public class GeometryCollectionSegment extends AbstractSegment {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
   public void setSegmentId(final int[] segmentId) {
     this.segment = null;
     if (segmentId.length > 0) {

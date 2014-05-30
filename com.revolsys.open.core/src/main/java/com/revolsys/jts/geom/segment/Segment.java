@@ -31,9 +31,13 @@ public interface Segment extends LineSegment, Iterator<Segment>,
   @Override
   boolean isEmpty();
 
+  boolean isLineClosed();
+
   boolean isLineEnd();
 
   boolean isLineStart();
 
   Reader<Segment> reader();
+
+  void setSegmentId(int[] segmentId);
 }

@@ -32,48 +32,44 @@
  */
 package com.revolsys.jts.index.intervalrtree;
 
-import java.util.Comparator;
+import com.revolsys.collection.Visitor;
 
-import com.revolsys.io.wkt.WktWriter;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.index.ItemVisitor;
+public abstract class IntervalRTreeNode<V> {
 
-public abstract class IntervalRTreeNode 
-{
-	protected double min = Double.POSITIVE_INFINITY;
-	protected double max = Double.NEGATIVE_INFINITY;
+  private double min = Double.POSITIVE_INFINITY;
 
-	public double getMin() { return min; }
-	public double getMax() { return max; }
-	
-	public abstract void query(double queryMin, double queryMax, ItemVisitor visitor);
-	
-	protected boolean intersects(double queryMin, double queryMax)
-	{
-		if (min > queryMax 
-				|| max < queryMin)
-			return false;
-		return true;
-	}
+  private double max = Double.NEGATIVE_INFINITY;
 
-	public String toString()
-	{
-		return WktWriter.lineString(new PointDouble((double)min, 0, Point.NULL_ORDINATE), new PointDouble((double)max, 0, Point.NULL_ORDINATE));
-	}
-  
-  public static class NodeComparator implements Comparator
-  {
-    public int compare(Object o1, Object o2)
-    {
-      IntervalRTreeNode n1 = (IntervalRTreeNode) o1;
-      IntervalRTreeNode n2 = (IntervalRTreeNode) o2;
-      double mid1 = (n1.min + n1.max) / 2;
-      double mid2 = (n2.min + n2.max) / 2;
-      if (mid1 < mid2) return -1;
-      if (mid1 > mid2) return 1;
-      return 0;
-    }
+  public IntervalRTreeNode() {
   }
 
+  public IntervalRTreeNode(final double min, final double max) {
+    this.min = min;
+    this.max = max;
+  }
+
+  public double getMax() {
+    return max;
+  }
+
+  public double getMin() {
+    return min;
+  }
+
+  protected boolean intersects(final double queryMin, final double queryMax) {
+    if (getMin() > queryMax || getMax() < queryMin) {
+      return false;
+    }
+    return true;
+  }
+
+  public abstract void query(double queryMin, double queryMax,
+    Visitor<V> visitor);
+
+  @Override
+  public String toString() {
+    final double min = getMin();
+    final double max = getMax();
+    return "LINESTRING(0 " + min + ",0 " + max + ")";
+  }
 }

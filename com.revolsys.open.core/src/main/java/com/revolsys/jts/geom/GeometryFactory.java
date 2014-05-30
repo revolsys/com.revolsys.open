@@ -1173,8 +1173,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @param lineStrings LineStrings, each of which may be empty but not null
    * @return the created MultiLineString
    */
-  public MultiLineString multiLineString(final LineString... lineStrings) {
-    return new MultiLineStringImpl(lineStrings, this);
+  public MultiLineString multiLineString(final LineString... lines) {
+    return new MultiLineStringImpl(this, lines);
   }
 
   public MultiLineString multiLineString(final Object... lines) {
@@ -1252,7 +1252,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @return the created MultiPolygon
    */
   public MultiPolygon multiPolygon(final Polygon[] polygons) {
-    return new MultiPolygonImpl(polygons, this);
+    return new MultiPolygonImpl(this, polygons);
   }
 
   /**

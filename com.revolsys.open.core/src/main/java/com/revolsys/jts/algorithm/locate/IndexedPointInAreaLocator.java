@@ -34,17 +34,17 @@ package com.revolsys.jts.algorithm.locate;
 
 import java.util.List;
 
+import com.revolsys.collection.Visitor;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.segment.LineSegment;
-import com.revolsys.jts.geom.segment.LineSegmentDouble;
 import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.index.ArrayListVisitor;
-import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.intervalrtree.SortedPackedIntervalRTree;
 
 /**
@@ -52,15 +52,15 @@ import com.revolsys.jts.index.intervalrtree.SortedPackedIntervalRTree;
  * a {@link Polygonal} geometry, using indexing for efficiency.
  * This algorithm is suitable for use in cases where
  * many points will be tested against a given area.
- * 
+ *
  * Thread-safe and immutable.
  *
  * @author Martin Davis
  *
  */
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
-  private static class IntervalIndexedGeometry {
-    private final SortedPackedIntervalRTree index = new SortedPackedIntervalRTree();
+  public static class IntervalIndexedGeometry {
+    private final SortedPackedIntervalRTree<LineSegment> index = new SortedPackedIntervalRTree<>();
 
     public IntervalIndexedGeometry(final Geometry geom) {
       init(geom);
@@ -72,75 +72,82 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
         final double y2 = segment.getY(1);
         final double min = Math.min(y1, y2);
         final double max = Math.max(y1, y2);
-        index.insert(min, max, new LineSegmentDouble(segment));
+        this.index.insert(min, max, segment.clone());
       }
     }
 
-    private void init(final Geometry geom) {
-      final List<LineString> lines = geom.getGeometryComponents(LineString.class);
+    private void init(final Geometry geometry) {
+      final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
       for (final LineString line : lines) {
         addLine(line);
       }
     }
 
-    public List query(final double min, final double max) {
-      final ArrayListVisitor visitor = new ArrayListVisitor();
-      index.query(min, max, visitor);
-      return visitor.getItems();
-    }
-
     public void query(final double min, final double max,
-      final ItemVisitor visitor) {
-      index.query(min, max, visitor);
+      final Visitor<LineSegment> visitor) {
+      this.index.query(min, max, visitor);
     }
   }
 
-  private static class SegmentVisitor implements ItemVisitor {
-    private final RayCrossingCounter counter;
+  private static final String KEY = IndexedPointInAreaLocator.class.getName();
 
-    public SegmentVisitor(final RayCrossingCounter counter) {
-      this.counter = counter;
+  public static IndexedPointInAreaLocator get(final Geometry geometry) {
+    IndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(
+      geometry, KEY);
+    if (locator == null) {
+      locator = new IndexedPointInAreaLocator(geometry);
+      GeometryProperties.setGeometryProperty(geometry, KEY, locator);
     }
-
-    @Override
-    public void visitItem(final Object item) {
-      final LineSegment seg = (LineSegment)item;
-      counter.countSegment(seg.getPoint(0), seg.getPoint(1));
-    }
+    return locator;
   }
 
   private final IntervalIndexedGeometry index;
 
+  private final Geometry geometry;
+
   /**
    * Creates a new locator for a given {@link Geometry}
-   * @param g the Geometry to locate in
+   *
+   * @param geometry the Geometry to locate in
    */
-  public IndexedPointInAreaLocator(final Geometry g) {
-    if (!(g instanceof Polygonal)) {
+  public IndexedPointInAreaLocator(final Geometry geometry) {
+    if (!(geometry instanceof Polygonal)) {
       throw new IllegalArgumentException("Argument must be Polygonal");
     }
-    index = new IntervalIndexedGeometry(g);
+    this.geometry = geometry;
+    this.index = new IntervalIndexedGeometry(geometry);
+  }
+
+  public Geometry getGeometry() {
+    return this.geometry;
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return this.geometry.getGeometryFactory();
+  }
+
+  public IntervalIndexedGeometry getIndex() {
+    return this.index;
+  }
+
+  public Location locate(final double x, final double y) {
+    final RayCrossingCounter visitor = new RayCrossingCounter(x, y);
+    this.index.query(y, y, visitor);
+
+    return visitor.getLocation();
   }
 
   /**
    * Determines the {@link Location} of a point in an areal {@link Geometry}.
-   * 
+   *
    * @param p the point to test
-   * @return the location of the point in the geometry  
+   * @return the location of the point in the geometry
    */
   @Override
-  public Location locate(final Point p) {
-    final RayCrossingCounter rcc = new RayCrossingCounter(p);
-
-    final SegmentVisitor visitor = new SegmentVisitor(rcc);
-    index.query(p.getY(), p.getY(), visitor);
-
-    /*
-     * // MD - slightly slower alternative List segs = index.query(p.y, p.y);
-     * countSegs(rcc, segs);
-     */
-
-    return rcc.getLocation();
+  public Location locate(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return locate(x, y);
   }
 
 }

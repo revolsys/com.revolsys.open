@@ -40,7 +40,7 @@ public class TestPerfFastDistanceFile {
     final int numGeoms2 = geoms.size();
 
     for (int i = 0; i < numGeoms1; i++) {
-      // PreparedGeometry pg = PreparedGeometryFactory.prepare((Geometry)
+      // Geometry pg = PreparedGeometryFactory.prepare((Geometry)
       // geoms.get(i));
       for (int j = 0; j < numGeoms2; j++) {
         // don't compute distance to itself!

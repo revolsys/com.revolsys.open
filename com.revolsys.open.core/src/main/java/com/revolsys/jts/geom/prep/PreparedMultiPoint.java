@@ -32,36 +32,48 @@
  */
 package com.revolsys.jts.geom.prep;
 
+import java.util.List;
+
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.AbstractPoint;
+import com.revolsys.jts.geom.MultiPoint;
+import com.revolsys.jts.geom.impl.AbstractMultiPoint;
 
-public class PreparedPoint extends AbstractPoint {
-  private final Point point;
+public class PreparedMultiPoint extends AbstractMultiPoint {
+  private final MultiPoint multiPoint;
 
-  public PreparedPoint(final Point point) {
-    this.point = point;
+  public PreparedMultiPoint(final MultiPoint multiPoint) {
+    this.multiPoint = multiPoint;
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    return point.getBoundingBox();
+    return multiPoint.getBoundingBox();
   }
 
   @Override
-  public double getCoordinate(final int axisIndex) {
-    return point.getCoordinate(axisIndex);
+  public <V extends Geometry> List<V> getGeometries() {
+    return multiPoint.getGeometries();
+  }
+
+  @Override
+  public <V extends Geometry> V getGeometry(final int partIndex) {
+    return multiPoint.getGeometry(partIndex);
+  }
+
+  @Override
+  public int getGeometryCount() {
+    return multiPoint.getGeometryCount();
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return point.getGeometryFactory();
+    return multiPoint.getGeometryFactory();
   }
 
   /**
-   * Tests whether this point intersects a {@link Geometry}.
+   * Tests whether this multiPoint intersects a {@link Geometry}.
    * <p>
    * The optimization here is that computing topology for the test geometry
    * is avoided.  This can be significant for large geometries.
@@ -80,6 +92,11 @@ public class PreparedPoint extends AbstractPoint {
 
   @Override
   public boolean isEmpty() {
-    return point.isEmpty();
+    return multiPoint.isEmpty();
+  }
+
+  @Override
+  public Geometry prepare() {
+    return this;
   }
 }

@@ -4,14 +4,12 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.testold.perf.ThreadTestCase;
 import com.revolsys.jts.testold.perf.ThreadTestRunner;
 
 /**
- * Tests for race conditons in the PreparedGeometry classes.
+ * Tests for race conditons in the Geometry classes.
  * 
  * @author Martin Davis
  *
@@ -25,7 +23,7 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
 
   GeometryFactory factory = GeometryFactory.fixed(0, 1.0);
 
-  protected PreparedGeometry pg;
+  protected Geometry pg;
 
   protected Geometry g;
 
@@ -33,8 +31,7 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
 
   }
 
-  Geometry createSineStar(final Point origin, final double size,
-    final int nPts) {
+  Geometry createSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory(this.factory);
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -52,7 +49,7 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
       @Override
       public void run() {
         while (true) {
-        //  System.out.println(threadIndex);
+          // System.out.println(threadIndex);
           PreparedGeometryThreadSafeTest.this.pg.intersects(PreparedGeometryThreadSafeTest.this.g);
         }
       }
@@ -64,8 +61,8 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
   public void setup() {
     final Geometry sinePoly = createSineStar(new PointDouble((double)0, 0,
       Point.NULL_ORDINATE), 100000.0, this.nPts);
-    this.pg = PreparedGeometryFactory.prepare(sinePoly);
-    this.g = createSineStar(new PointDouble((double)10, 10,
-      Point.NULL_ORDINATE), 100000.0, 100);
+    this.pg = sinePoly.prepare();
+    this.g = createSineStar(
+      new PointDouble((double)10, 10, Point.NULL_ORDINATE), 100000.0, 100);
   }
 }

@@ -2,22 +2,21 @@ package com.revolsys.gis.jts.filter;
 
 import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class LinearIntersectionFilter implements Filter<LineString> {
 
   private final LineString line;
 
-  private final PreparedGeometry preparedLine;
+  private final Geometry preparedLine;
 
   private final BoundingBox envelope;
 
   public LinearIntersectionFilter(final LineString line) {
     this.line = line;
-    this.preparedLine = PreparedGeometryFactory.prepare(line);
+    this.preparedLine = line.prepare();
     this.envelope = line.getBoundingBox();
   }
 

@@ -39,12 +39,11 @@ import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
-import com.revolsys.jts.geom.impl.AbstractPolygon;
+import com.revolsys.jts.geom.impl.AbstractMultiPolygon;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.jts.noding.NodedSegmentString;
@@ -53,10 +52,10 @@ import com.revolsys.jts.operation.predicate.RectangleContains;
 import com.revolsys.jts.operation.predicate.RectangleIntersects;
 
 /**
- * A prepared version for {@link Polygonal} geometries.
- * This class supports both {@link Polygon}s and {@link MultiPolygon}s.
+ * A prepared version for {@link MultiPolygonal} geometries.
+ * This class supports both {@link MultiPolygon}s and {@link MultiMultiPolygon}s.
  * <p>
- * This class does <b>not</b> support MultiPolygons which are non-valid 
+ * This class does <b>not</b> support MultiMultiPolygons which are non-valid 
  * (e.g. with overlapping elements). 
  * <p>
  * Instances of this class are thread-safe and immutable.
@@ -64,7 +63,7 @@ import com.revolsys.jts.operation.predicate.RectangleIntersects;
  * @author mbdavis
  *
  */
-public class PreparedPolygon extends AbstractPolygon {
+public class PreparedMultiPolygon extends AbstractMultiPolygon {
   private final boolean isRectangle;
 
   // create these lazily, since they are expensive
@@ -72,10 +71,10 @@ public class PreparedPolygon extends AbstractPolygon {
 
   private PointOnGeometryLocator pia = null;
 
-  private final Polygon polygon;
+  private final MultiPolygon multiPolygon;
 
-  public PreparedPolygon(final Polygon polygon) {
-    this.polygon = polygon;
+  public PreparedMultiPolygon(final MultiPolygon polygon) {
+    this.multiPolygon = polygon;
     this.isRectangle = polygon.isRectangle();
   }
 
@@ -83,10 +82,10 @@ public class PreparedPolygon extends AbstractPolygon {
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
       if (isRectangle) {
-        return RectangleContains.contains(getPolygon(), g);
+        return RectangleContains.contains(getMultiPolygon(), g);
       } else {
         final PreparedPolygonContains contains = new PreparedPolygonContains(
-          this, getPolygon());
+          this, getMultiPolygon());
         return contains.contains(g);
       }
     } else {
@@ -147,13 +146,33 @@ public class PreparedPolygon extends AbstractPolygon {
     } else if (isRectangle) {
       return true;
     } else {
-      return new PreparedPolygonCovers(this, polygon).covers(geometry);
+      return new PreparedPolygonCovers(this, multiPolygon).covers(geometry);
     }
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    return polygon.getBoundingBox();
+    return multiPolygon.getBoundingBox();
+  }
+
+  @Override
+  public <V extends Geometry> List<V> getGeometries() {
+    return multiPolygon.getGeometries();
+  }
+
+  @Override
+  public <V extends Geometry> V getGeometry(final int partIndex) {
+    return multiPolygon.getGeometry(partIndex);
+  }
+
+  @Override
+  public int getGeometryCount() {
+    return multiPolygon.getGeometryCount();
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return multiPolygon.getGeometryFactory();
   }
 
   /**
@@ -170,21 +189,21 @@ public class PreparedPolygon extends AbstractPolygon {
      */
     if (segIntFinder == null) {
       segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(getPolygon()));
+        SegmentStringUtil.extractSegmentStrings(getMultiPolygon()));
     }
     return segIntFinder;
   }
 
+  public MultiPolygon getMultiPolygon() {
+    return multiPolygon;
+  }
+
   public synchronized PointOnGeometryLocator getPointLocator() {
     if (pia == null) {
-      pia = new IndexedPointInAreaLocator(getPolygon());
+      pia = new IndexedPointInAreaLocator(getMultiPolygon());
     }
 
     return pia;
-  }
-
-  public Polygon getPolygon() {
-    return polygon;
   }
 
   /**
@@ -205,25 +224,11 @@ public class PreparedPolygon extends AbstractPolygon {
   }
 
   @Override
-  public LinearRing getRing(final int ringIndex) {
-    return polygon.getRing(ringIndex);
-  }
-
-  @Override
-  public int getRingCount() {
-    return polygon.getRingCount();
-  }
-
-  @Override
-  public List<LinearRing> getRings() {
-    return polygon.getRings();
-  }
-
-  @Override
   public boolean intersects(final Geometry geometry) {
     if (envelopesIntersect(geometry)) {
       if (isRectangle) {
-        return RectangleIntersects.intersects(getPolygon(), geometry);
+        return RectangleIntersects.intersects(getMultiPolygon().getPolygon(0),
+          geometry);
       } else {
         /**
          * Do point-in-poly tests first, since they are cheaper and may result in a
@@ -281,7 +286,7 @@ public class PreparedPolygon extends AbstractPolygon {
   }
 
   @Override
-  public Polygon prepare() {
+  public MultiPolygon prepare() {
     return this;
   }
 }

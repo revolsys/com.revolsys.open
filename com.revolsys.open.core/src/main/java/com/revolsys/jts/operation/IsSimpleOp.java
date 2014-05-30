@@ -40,8 +40,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
-import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -50,10 +48,11 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeIntersection;
 import com.revolsys.jts.geomgraph.GeometryGraph;
-import com.revolsys.jts.geomgraph.index.SegmentIntersector;
 
 /**
  * Tests whether a <code>Geometry</code> is simple.
@@ -122,7 +121,7 @@ public class IsSimpleOp {
 
   private final Geometry geometry;
 
-  private boolean isClosedEndpointsInInterior = true;
+  private final boolean isClosedEndpointsInInterior = true;
 
   private final List<Point> nonSimplePoints = new ArrayList<Point>();
 
@@ -140,18 +139,6 @@ public class IsSimpleOp {
   public IsSimpleOp(final Geometry geometry, final boolean shortCircuit) {
     this.geometry = geometry;
     this.shortCircuit = shortCircuit;
-  }
-
-  /**
-   * Creates a simplicity checker using a given {@link BoundaryNodeRule}
-   *
-   * @param geometry the geometry to test
-   * @param boundaryNodeRule the rule to use.
-   */
-  public IsSimpleOp(final Geometry geometry,
-    final BoundaryNodeRule boundaryNodeRule) {
-    this.geometry = geometry;
-    isClosedEndpointsInInterior = !boundaryNodeRule.isInBoundary(2);
   }
 
   /**
@@ -232,6 +219,16 @@ public class IsSimpleOp {
     return false;
   }
 
+  private boolean isEndIntersection(final Segment segment, final Point point) {
+    if (segment.isLineStart()) {
+      return segment.equalsVertex(2, 0, point);
+    } else if (segment.isLineEnd()) {
+      return segment.equalsVertex(2, 1, point);
+    } else {
+      return false;
+    }
+  }
+
   private boolean isErrorReturn() {
     return shortCircuit && !nonSimplePoints.isEmpty();
   }
@@ -280,27 +277,50 @@ public class IsSimpleOp {
     return simple;
   }
 
-  private boolean isSimple(final Lineal geom) {
-    final GeometryGraph graph = new GeometryGraph(0, geom);
-    final LineIntersector li = new RobustLineIntersector();
-    final SegmentIntersector si = graph.computeSelfNodes(li, true);
-    // if no self-intersection, must be simple
-    if (!si.hasIntersection()) {
-      return true;
-    }
-    if (si.hasProperIntersection()) {
-      nonSimplePoints.add(si.getProperIntersectionPoint());
-      return false;
-    }
-    if (hasNonEndpointIntersection(graph)) {
-      return false;
-    }
-    if (isClosedEndpointsInInterior) {
-      if (hasClosedEndpointIntersection(graph)) {
-        return false;
+  private boolean isSimple(final Lineal lineal) {
+    final Segment segment2 = (Segment)lineal.segments().iterator();
+    for (final Segment segment : lineal.segments()) {
+      final boolean segment1Start = segment.isLineStart();
+      final boolean segment1End = segment.isLineEnd();
+      segment2.setSegmentId(segment.getSegmentId());
+      boolean nextSegment = true;
+      while (segment2.hasNext()) {
+        segment2.next();
+        final Geometry intersection = segment.getIntersection(segment2);
+        if (intersection instanceof Point) {
+          final Point pointIntersection = (Point)intersection;
+          final boolean segment1EndIntersection = isEndIntersection(segment,
+            pointIntersection);
+          final boolean segment2EndIntersection = isEndIntersection(segment2,
+            pointIntersection);
+
+          boolean isIntersection = true;
+          if (segment1EndIntersection && segment2EndIntersection) {
+            isIntersection = false;
+          } else if (nextSegment && !segment2.isLineStart()) {
+            if (segment2.equalsVertex(2, 0, pointIntersection)) {
+              isIntersection = false;
+            }
+          }
+          if (isIntersection) {
+            nonSimplePoints.add(pointIntersection);
+            if (shortCircuit) {
+              return false;
+            }
+          }
+          // TODO touching loops
+        } else if (intersection instanceof LineSegment) {
+          final LineSegment lineIntersection = (LineSegment)intersection;
+          nonSimplePoints.add(lineIntersection.getPoint(0));
+          nonSimplePoints.add(lineIntersection.getPoint(1));
+          if (shortCircuit) {
+            return false;
+          }
+        }
+        nextSegment = false;
       }
     }
-    return true;
+    return nonSimplePoints.isEmpty();
   }
 
   private boolean isSimple(final MultiPoint mulitPoint) {

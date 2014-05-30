@@ -34,12 +34,13 @@
 package com.revolsys.jts.operation.predicate;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.Polygonal;
 
 /**
  * Optimized implementation of the <tt>contains</tt> spatial predicate 
@@ -63,7 +64,7 @@ public class RectangleContains {
    * @param b a Geometry of any type
    * @return true if the geometries intersect
    */
-  public static boolean contains(final Polygon rectangle, final Geometry b) {
+  public static boolean contains(final Polygonal rectangle, final Geometry b) {
     final RectangleContains rc = new RectangleContains(rectangle);
     return rc.contains(b);
   }
@@ -75,7 +76,7 @@ public class RectangleContains {
    *
    * @param rectangle a rectangular geometry
    */
-  public RectangleContains(final Polygon rectangle) {
+  public RectangleContains(final Polygonal rectangle) {
     rectEnv = rectangle.getBoundingBox();
   }
 

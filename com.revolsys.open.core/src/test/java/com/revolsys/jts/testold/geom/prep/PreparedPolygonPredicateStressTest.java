@@ -36,8 +36,6 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.prep.PreparedPolygon;
 
 /**
@@ -78,8 +76,7 @@ public class PreparedPolygonPredicateStressTest extends TestCase {
   public boolean checkContains(final Geometry target, final Geometry test) {
     final boolean expectedResult = target.contains(test);
 
-    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-    final PreparedGeometry prepGeom = pgFact.create(target);
+    final Geometry prepGeom = target.prepare();
 
     final boolean prepResult = prepGeom.contains(test);
 
@@ -92,8 +89,7 @@ public class PreparedPolygonPredicateStressTest extends TestCase {
   public boolean checkIntersects(final Geometry target, final Geometry test) {
     final boolean expectedResult = target.intersects(test);
 
-    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-    final PreparedGeometry prepGeom = pgFact.create(target);
+    final Geometry prepGeom = target.prepare();
 
     final boolean prepResult = prepGeom.intersects(test);
 

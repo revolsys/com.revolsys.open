@@ -36,14 +36,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.io.Reader;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.segment.GeometryCollectionSegment;
-import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.geom.vertex.GeometryCollectionVertex;
-import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.jts.geom.prep.PreparedGeometryCollection;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -60,6 +58,17 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
    * The {@link GeometryFactory} used to create this Geometry
    */
   private final GeometryFactory geometryFactory;
+
+  /**
+   *  The bounding box of this <code>Geometry</code>.
+   */
+  private BoundingBox boundingBox;
+
+  /**
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
+   */
+  private Object userData;
 
   /**
    *  Internal representation of this <code>GeometryCollection</code>.
@@ -106,14 +115,16 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
     return gc;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<Geometry> geometries = new ArrayList<Geometry>();
-    for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.copy(geometryFactory));
+  public BoundingBox getBoundingBox() {
+    if (boundingBox == null) {
+      if (isEmpty()) {
+        boundingBox = new Envelope(getGeometryFactory());
+      } else {
+        boundingBox = computeBoundingBox();
+      }
     }
-    return (V)geometryFactory.geometryCollection(geometries);
+    return boundingBox;
   }
 
   @SuppressWarnings("unchecked")
@@ -150,14 +161,14 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
     return geometryFactory;
   }
 
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
   @Override
-  public Segment getSegment(final int... segmentId) {
-    return new GeometryCollectionSegment(this, segmentId);
-  }
-
-  @Override
-  public Vertex getVertex(final int... vertexId) {
-    return new GeometryCollectionVertex(this, vertexId);
+  public Object getUserData() {
+    return userData;
   }
 
   @Override
@@ -166,22 +177,23 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
   }
 
   @Override
-  protected boolean isEquivalentClass(final Geometry other) {
-    return other instanceof GeometryCollection;
+  public GeometryCollection prepare() {
+    return new PreparedGeometryCollection(this);
   }
 
+  /**
+   * A simple scheme for applications to add their own custom data to a Geometry.
+   * An example use might be to add an object representing a Point Reference System.
+   * <p>
+   * Note that user data objects are not present in geometries created by
+   * construction methods.
+   *
+   * @param userData an object, the semantics for which are defined by the
+   * application using this Geometry
+   */
   @Override
-  public Reader<Segment> segments() {
-    final GeometryCollectionSegment iterator = new GeometryCollectionSegment(
-      this, -1);
-    return iterator.reader();
-  }
-
-  @Override
-  public Reader<Vertex> vertices() {
-    final GeometryCollectionVertex iterator = new GeometryCollectionVertex(
-      this, -1);
-    return iterator.reader();
+  public void setUserData(final Object userData) {
+    this.userData = userData;
   }
 
 }

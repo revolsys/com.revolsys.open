@@ -128,7 +128,7 @@ public class MCIndexSnapRounder implements Noder {
    */
   private void computeVertexSnaps(final NodedSegmentString segment) {
     final int i = 0;
-    for (final Point point : segment.getPoints()) {
+    for (final Point point : segment.getPoints().toPointList()) {
       final HotPixel hotPixel = new HotPixel(point, scaleFactor, li);
       final boolean isNodeAdded = pointSnapper.snap(hotPixel, segment, i);
       // if a node is created for a vertex, that vertex must be noded too

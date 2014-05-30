@@ -32,16 +32,10 @@
  */
 package com.revolsys.jts.algorithm;
 
-import java.util.Iterator;
-
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryCollection;
-import com.revolsys.jts.geom.GeometryCollectionIterator;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Location;
-import com.revolsys.jts.geom.MultiLineString;
-import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 
@@ -61,66 +55,40 @@ import com.revolsys.jts.geom.Polygon;
  * @version 1.7
  */
 public class PointLocator {
-  // default is to use OGC SFS rule
-  private BoundaryNodeRule boundaryRule =
-  // BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE;
-  BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE;
+  private final BoundaryNodeRule boundaryRule = BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE;
 
   private boolean isIn; // true if the point lies in or on any Geometry element
-
-  private int numBoundaries; // the number of sub-elements whose boundaries the
-                             // point lies in
 
   public PointLocator() {
   }
 
-  public PointLocator(final BoundaryNodeRule boundaryRule) {
-    if (boundaryRule == null) {
-      throw new IllegalArgumentException("Rule must be non-null");
-    }
-    this.boundaryRule = boundaryRule;
-  }
-
-  private void computeLocation(final Point p, final Geometry geom) {
-    if (geom instanceof Point) {
-      updateLocationInfo(locate(p, (Point)geom));
-    }
-    if (geom instanceof LineString) {
-      updateLocationInfo(locate(p, (LineString)geom));
-    } else if (geom instanceof Polygon) {
-      updateLocationInfo(locate(p, (Polygon)geom));
-    } else if (geom instanceof MultiLineString) {
-      final MultiLineString ml = (MultiLineString)geom;
-      for (int i = 0; i < ml.getGeometryCount(); i++) {
-        final LineString l = (LineString)ml.getGeometry(i);
-        updateLocationInfo(locate(p, l));
-      }
-    } else if (geom instanceof MultiPolygon) {
-      final MultiPolygon mpoly = (MultiPolygon)geom;
-      for (int i = 0; i < mpoly.getGeometryCount(); i++) {
-        final Polygon poly = (Polygon)mpoly.getGeometry(i);
-        updateLocationInfo(locate(p, poly));
-      }
-    } else if (geom instanceof GeometryCollection) {
-      final Iterator<Geometry> geomi = new GeometryCollectionIterator(geom);
-      while (geomi.hasNext()) {
-        final Geometry g2 = geomi.next();
-        if (g2 != geom) {
-          computeLocation(p, g2);
+  private int computeLocation(final Point point, final Geometry geometry) {
+    int numBoundaries = 0;
+    if (geometry instanceof Point) {
+      return updateLocationInfo(locate(point, (Point)geometry));
+    } else if (geometry instanceof LineString) {
+      return updateLocationInfo(locate(point, (LineString)geometry));
+    } else if (geometry instanceof Polygon) {
+      return updateLocationInfo(locate(point, (Polygon)geometry));
+    } else {
+      for (final Geometry part : geometry.geometries()) {
+        if (part != geometry) {
+          numBoundaries += computeLocation(point, part);
         }
       }
     }
+    return numBoundaries;
   }
 
   /**
    * Convenience method to test a point for intersection with
    * a Geometry
-   * @param p the coordinate to test
-   * @param geom the Geometry to test
+   * @param point the coordinate to test
+   * @param geometry the Geometry to test
    * @return <code>true</code> if the point is in the interior or boundary of the Geometry
    */
-  public boolean intersects(final Point p, final Geometry geom) {
-    return locate(p, geom) != Location.EXTERIOR;
+  public boolean intersects(final Point point, final Geometry geometry) {
+    return locate(point, geometry) != Location.EXTERIOR;
   }
 
   /**
@@ -133,20 +101,17 @@ public class PointLocator {
    *
    * @return the {@link Location} of the point relative to the input Geometry
    */
-  public Location locate(final Point p, final Geometry geom) {
-    if (geom.isEmpty()) {
+  public Location locate(final Point point, final Geometry geometry) {
+    if (geometry.isEmpty()) {
       return Location.EXTERIOR;
-    }
-
-    if (geom instanceof LineString) {
-      return locate(p, (LineString)geom);
-    } else if (geom instanceof Polygon) {
-      return locate(p, (Polygon)geom);
+    } else if (geometry instanceof LineString) {
+      return locate(point, (LineString)geometry);
+    } else if (geometry instanceof Polygon) {
+      return locate(point, (Polygon)geometry);
     }
 
     isIn = false;
-    numBoundaries = 0;
-    computeLocation(p, geom);
+    final int numBoundaries = computeLocation(point, geometry);
     if (boundaryRule.isInBoundary(numBoundaries)) {
       return Location.BOUNDARY;
     }
@@ -159,17 +124,15 @@ public class PointLocator {
 
   private Location locate(final Point point, final LineString line) {
     // bounding-box check
-    if (!point.intersects(line.getBoundingBox())) {
-      return Location.EXTERIOR;
-    }
-
-    if (!line.isClosed()) {
-      if (point.equals(line.getVertex(0)) || point.equals(line.getVertex(-1))) {
-        return Location.BOUNDARY;
+    if (point.intersects(line.getBoundingBox())) {
+      if (!line.isClosed()) {
+        if (point.equals(line.getVertex(0)) || point.equals(line.getVertex(-1))) {
+          return Location.BOUNDARY;
+        }
       }
-    }
-    if (CGAlgorithms.isOnLine(point, line)) {
-      return Location.INTERIOR;
+      if (CGAlgorithms.isOnLine(point, line)) {
+        return Location.INTERIOR;
+      }
     }
     return Location.EXTERIOR;
   }
@@ -221,13 +184,14 @@ public class PointLocator {
     return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
-  private void updateLocationInfo(final Location loc) {
+  private int updateLocationInfo(final Location loc) {
+
     if (loc == Location.INTERIOR) {
       isIn = true;
+    } else if (loc == Location.BOUNDARY) {
+      return 1;
     }
-    if (loc == Location.BOUNDARY) {
-      numBoundaries++;
-    }
+    return 0;
   }
 
 }

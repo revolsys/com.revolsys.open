@@ -33,21 +33,16 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.gis.data.io.IteratorReader;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.io.Reader;
-import com.revolsys.jts.geom.Dimension;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.geom.vertex.MultiPointVertex;
-import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.jts.geom.prep.PreparedMultiPoint;
 
 /**
  * Models a collection of {@link Point}s.
@@ -56,155 +51,121 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public class MultiPointImpl extends GeometryCollectionImpl implements
-  MultiPoint {
+public class MultiPointImpl extends AbstractMultiPoint implements MultiPoint {
 
   private static final long serialVersionUID = -8048474874175355449L;
 
-  public MultiPointImpl(final GeometryFactory geometryFactory) {
-    super(geometryFactory, null);
-  }
+  private Point[] points;
 
   /**
-   *@param  points          the <code>Point</code>s for this <code>MultiPoint</code>
-   *      , or <code>null</code> or an empty array to create the empty geometry.
-   *      Elements may be empty <code>Point</code>s, but not <code>null</code>s.
+   *  The bounding box of this <code>Geometry</code>.
    */
+  private BoundingBox boundingBox;
+
+  /**
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
+   */
+  private Object userData;
+
+  private final GeometryFactory geometryFactory;
+
+  public MultiPointImpl(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
   public MultiPointImpl(final GeometryFactory geometryFactory,
     final Point[] points) {
-    super(geometryFactory, points);
+    this.geometryFactory = geometryFactory;
+    if (points == null || points.length == 0) {
+      this.points = null;
+    } else if (hasNullElements(points)) {
+      throw new IllegalArgumentException(
+        "geometries must not contain null elements");
+    } else {
+      this.points = points;
+    }
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    if (boundingBox == null) {
+      if (isEmpty()) {
+        boundingBox = new Envelope(getGeometryFactory());
+      } else {
+        boundingBox = computeBoundingBox();
+      }
+    }
+    return boundingBox;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<Point> points = new ArrayList<>();
-    for (final Point point : getPoints()) {
-      final Point newPoint = point.copy(geometryFactory);
-      points.add(newPoint);
+  public <V extends Geometry> List<V> getGeometries() {
+    if (points == null) {
+      return new ArrayList<V>();
+    } else {
+      return (List<V>)new ArrayList<>(Arrays.asList(points));
     }
-    return (V)geometryFactory.multiPoint(points);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public boolean equalsExact(final Geometry other, final double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
-    }
-    return super.equalsExact(other, tolerance);
-  }
-
-  /**
-   * Gets the boundary of this geometry.
-   * Zero-dimensional geometries have no boundary by definition,
-   * so an empty GeometryCollection is returned.
-   *
-   * @return an empty GeometryCollection
-   * @see Geometry#getBoundary
-   */
-  @Override
-  public Geometry getBoundary() {
-    return getGeometryFactory().geometryCollection();
-  }
-
-  @Override
-  public int getBoundaryDimension() {
-    return Dimension.FALSE;
-  }
-
-  /**
-   *  Returns the <code>Coordinate</code> at the given position.
-   *
-   *@param  n  the partIndex of the <code>Coordinate</code> to retrieve, beginning
-   *      at 0
-   *@return    the <code>n</code>th <code>Coordinate</code>
-   */
-  protected Point getCoordinate(final int n) {
-    return getPoint(n);
-  }
-
-  @Override
-  public double getCoordinate(final int partIndex, final int vertexIndex) {
-    final Point point = getPoint(partIndex);
-    return point.getCoordinate(vertexIndex);
-  }
-
-  @Override
-  public DataType getDataType() {
-    return DataTypes.MULTI_POINT;
-  }
-
-  @Override
-  public int getDimension() {
-    return 0;
-  }
-
-  @Override
-  public Point getPoint(final int partIndex) {
-    return (Point)getGeometry(partIndex);
-  }
-
-  /**
-   * @author Paul Austin <paul.austin@revolsys.com>
-   */
-  @Override
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public <V extends Point> List<V> getPoints() {
-    return (List)super.getGeometries();
-  }
-
-  @Override
-  public Segment getSegment(final int... segmentId) {
-    return null;
-  }
-
-  @Override
-  public Vertex getVertex(final int... vertexId) {
-    if (vertexId.length != 1 || vertexId[0] < 0
-      || vertexId[0] >= getGeometryCount()) {
+  public <V extends Geometry> V getGeometry(final int n) {
+    if (points == null) {
       return null;
     } else {
-      return new MultiPointVertex(this, vertexId);
+      return (V)points[n];
     }
   }
 
   @Override
-  protected boolean isEquivalentClass(final Geometry other) {
-    return other instanceof MultiPoint;
-  }
-
-  @Override
-  public boolean isValid() {
-    return true;
-  }
-
-  @Override
-  public MultiPoint normalize() {
-    if (isEmpty()) {
-      return this;
+  public int getGeometryCount() {
+    if (points == null) {
+      return 0;
     } else {
-      final List<Point> geometries = new ArrayList<>();
-      for (final Geometry part : geometries()) {
-        final Point normalizedPart = (Point)part.normalize();
-        geometries.add(normalizedPart);
-      }
-      Collections.sort(geometries);
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiPoint normalizedGeometry = geometryFactory.multiPoint(geometries);
-      return normalizedGeometry;
+      return points.length;
     }
   }
 
   @Override
-  public IteratorReader<Segment> segments() {
-    return new IteratorReader<Segment>();
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
+  }
+
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+  @Override
+  public Object getUserData() {
+    return userData;
   }
 
   @Override
-  public Reader<Vertex> vertices() {
-    final MultiPointVertex vertex = new MultiPointVertex(this, -1);
-    return vertex.reader();
+  public boolean isEmpty() {
+    return points == null;
   }
+
+  @Override
+  public Geometry prepare() {
+    return new PreparedMultiPoint(this);
+  }
+
+  /**
+   * A simple scheme for applications to add their own custom data to a Geometry.
+   * An example use might be to add an object representing a Point Reference System.
+   * <p>
+   * Note that user data objects are not present in geometries created by
+   * construction methods.
+   *
+   * @param userData an object, the semantics for which are defined by the
+   * application using this Geometry
+   */
+  @Override
+  public void setUserData(final Object userData) {
+    this.userData = userData;
+  }
+
 }

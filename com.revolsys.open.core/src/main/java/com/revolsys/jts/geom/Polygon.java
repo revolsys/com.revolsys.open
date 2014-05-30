@@ -91,6 +91,9 @@ public interface Polygon extends Geometry, Polygonal {
   Polygon normalize();
 
   @Override
+  Polygon prepare();
+
+  @Override
   Polygon reverse();
 
   Iterable<LinearRing> rings();

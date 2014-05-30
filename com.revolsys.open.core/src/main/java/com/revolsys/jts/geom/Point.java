@@ -168,4 +168,6 @@ public interface Point extends Geometry, Puntal, Serializable {
 
   @Override
   Point normalize();
+
+  Point prepare();
 }

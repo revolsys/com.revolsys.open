@@ -32,11 +32,13 @@
  */
 package com.revolsys.jts.algorithm;
 
+import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.Segment;
 
 /**
@@ -65,7 +67,7 @@ import com.revolsys.jts.geom.segment.Segment;
  * @author Martin Davis
  *
  */
-public class RayCrossingCounter {
+public class RayCrossingCounter implements Visitor<LineSegment> {
   /**
   * Determines the {@link Location} of a point in a ring. 
   * 
@@ -311,5 +313,17 @@ public class RayCrossingCounter {
 
   public void setPointOnSegment(final boolean pointOnSegment) {
     this.pointOnSegment = pointOnSegment;
+  }
+
+  @Override
+  public boolean visit(final LineSegment segment) {
+    final double x1 = segment.getX(0);
+    final double y1 = segment.getY(0);
+    final double x2 = segment.getX(1);
+    final double y2 = segment.getY(1);
+
+    countSegment(x1, y1, x2, y2);
+
+    return true;
   }
 }

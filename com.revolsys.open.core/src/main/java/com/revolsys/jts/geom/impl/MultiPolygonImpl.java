@@ -33,23 +33,16 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.gis.data.io.IteratorReader;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.io.Reader;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.segment.MultiPolygonSegment;
-import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.geom.vertex.MultiPolygonVertex;
-import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.jts.geom.prep.PreparedMultiPolygon;
 
 /**
  * Models a collection of {@link Polygon}s.
@@ -63,188 +56,122 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public class MultiPolygonImpl extends GeometryCollectionImpl implements
+public class MultiPolygonImpl extends AbstractMultiPolygon implements
   MultiPolygon {
 
-  private static final long serialVersionUID = -551033529766975875L;
+  private static final long serialVersionUID = 8166665132445433741L;
 
   /**
-   * @param polygons
-   *            the <code>Polygon</code>s for this <code>MultiPolygon</code>,
-   *            or <code>null</code> or an empty array to create the empty
-   *            geometry. Elements may be empty <code>Polygon</code>s, but
-   *            not <code>null</code>s. The polygons must conform to the
-   *            assertions specified in the <A
-   *            HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple
-   *            Features Specification for SQL</A>.
+   *  The bounding box of this <code>Geometry</code>.
    */
-  public MultiPolygonImpl(final Polygon[] polygons,
-    final GeometryFactory factory) {
-    super(factory, polygons);
+  private BoundingBox boundingBox;
+
+  /**
+   * An object reference which can be used to carry ancillary data defined
+   * by the client.
+   */
+  private Object userData;
+
+  private final GeometryFactory geometryFactory;
+
+  private Polygon[] polygons;
+
+  public MultiPolygonImpl(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
+  public MultiPolygonImpl(final GeometryFactory geometryFactory,
+    final Polygon[] polygons) {
+    this.geometryFactory = geometryFactory;
+    if (polygons == null || polygons.length == 0) {
+      this.polygons = null;
+    } else if (hasNullElements(polygons)) {
+      throw new IllegalArgumentException(
+        "geometries must not contain null elements");
+    } else {
+      this.polygons = polygons;
+    }
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    if (boundingBox == null) {
+      if (isEmpty()) {
+        boundingBox = new Envelope(getGeometryFactory());
+      } else {
+        boundingBox = computeBoundingBox();
+      }
+    }
+    return boundingBox;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<Polygon> polygons = new ArrayList<>();
-    for (final Polygon polygon : getPolygons()) {
-      final Polygon newPolygon = polygon.copy(geometryFactory);
-      polygons.add(newPolygon);
+  public <V extends Geometry> List<V> getGeometries() {
+    if (polygons == null) {
+      return new ArrayList<V>();
+    } else {
+      return (List<V>)new ArrayList<>(Arrays.asList(polygons));
     }
-    return (V)geometryFactory.multiPolygon(polygons);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V getGeometry(final int n) {
+    if (polygons == null) {
+      return null;
+    } else {
+      return (V)polygons[n];
+    }
   }
 
   @Override
-  public boolean equalsExact(final Geometry other, final double tolerance) {
-    if (!isEquivalentClass(other)) {
-      return false;
+  public int getGeometryCount() {
+    if (polygons == null) {
+      return 0;
+    } else {
+      return polygons.length;
     }
-    return super.equalsExact(other, tolerance);
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return geometryFactory;
   }
 
   /**
-   * Computes the boundary of this geometry
+   * Gets the user data object for this geometry, if any.
    *
-   * @return a lineal geometry (which may be empty)
-   * @see Geometry#getBoundary
+   * @return the user data object, or <code>null</code> if none set
    */
   @Override
-  public Geometry getBoundary() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (isEmpty()) {
-      return geometryFactory.multiLineString();
-    }
-    final List<LineString> allRings = new ArrayList<>();
-    for (final Polygon polygon : getPolygons()) {
-      final Geometry rings = polygon.getBoundary();
-      for (int j = 0; j < rings.getGeometryCount(); j++) {
-        final LineString ring = (LineString)rings.getGeometry(j);
-        allRings.add(ring);
-      }
-    }
-    return geometryFactory.multiLineString(allRings);
+  public Object getUserData() {
+    return userData;
   }
 
   @Override
-  public int getBoundaryDimension() {
-    return 1;
+  public boolean isEmpty() {
+    return polygons == null;
   }
 
   @Override
-  public DataType getDataType() {
-    return DataTypes.MULTI_POLYGON;
-  }
-
-  @Override
-  public int getDimension() {
-    return 2;
-  }
-
-  @Override
-  public Polygon getPolygon(final int partIndex) {
-    return (Polygon)super.getGeometry(partIndex);
-  }
-
-  @Override
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public <V extends Polygon> List<V> getPolygons() {
-    return (List)super.getGeometries();
-  }
-
-  @Override
-  public Segment getSegment(final int... segmentId) {
-    if (segmentId == null || segmentId.length != 3) {
-      return null;
-    } else {
-      final int partIndex = segmentId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final Polygon polygon = getPolygon(partIndex);
-        final int ringIndex = segmentId[1];
-        if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
-          final LinearRing ring = polygon.getRing(ringIndex);
-          final int segmentIndex = segmentId[2];
-          if (segmentIndex >= 0 && segmentIndex < ring.getSegmentCount()) {
-            return new MultiPolygonSegment(this, segmentId);
-          }
-        }
-      }
-      return null;
-    }
-  }
-
-  @Override
-  public Vertex getVertex(final int... vertexId) {
-    if (vertexId == null || vertexId.length != 3) {
-      return null;
-    } else {
-      final int partIndex = vertexId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final Polygon polygon = getPolygon(partIndex);
-        final int ringIndex = vertexId[1];
-        if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
-          final LinearRing ring = polygon.getRing(ringIndex);
-          final int vertexIndex = vertexId[2];
-          if (vertexIndex >= 0 && vertexIndex < ring.getVertexCount()) {
-            return new MultiPolygonVertex(this, vertexId);
-          }
-        }
-      }
-      return null;
-    }
-  }
-
-  @Override
-  protected boolean isEquivalentClass(final Geometry other) {
-    return other instanceof MultiPolygon;
-  }
-
-  @Override
-  public MultiPolygon normalize() {
-    if (isEmpty()) {
-      return this;
-    } else {
-      final List<Polygon> geometries = new ArrayList<>();
-      for (final Geometry part : geometries()) {
-        final Polygon normalizedPart = (Polygon)part.normalize();
-        geometries.add(normalizedPart);
-      }
-      Collections.sort(geometries);
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiPolygon normalizedGeometry = geometryFactory.multiPolygon(geometries);
-      return normalizedGeometry;
-    }
+  public MultiPolygon prepare() {
+    return new PreparedMultiPolygon(this);
   }
 
   /**
-   * Creates a {@link MultiPolygon} with
-   * every component reversed.
-   * The order of the components in the collection are not reversed.
+   * A simple scheme for applications to add their own custom data to a Geometry.
+   * An example use might be to add an object representing a Point Reference System.
+   * <p>
+   * Note that user data objects are not present in geometries created by
+   * construction methods.
    *
-   * @return a MultiPolygon in the reverse order
+   * @param userData an object, the semantics for which are defined by the
+   * application using this Geometry
    */
   @Override
-  public MultiPolygon reverse() {
-    final List<Polygon> polygons = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      final Polygon polygon = (Polygon)geometry;
-      final Polygon reverse = polygon.reverse();
-      polygons.add(reverse);
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.multiPolygon(polygons);
+  public void setUserData(final Object userData) {
+    this.userData = userData;
   }
 
-  @Override
-  public Reader<Segment> segments() {
-    final MultiPolygonSegment iterator = new MultiPolygonSegment(this, 0, 0, -1);
-    return new IteratorReader<>(iterator);
-  }
-
-  @Override
-  public Reader<Vertex> vertices() {
-    final MultiPolygonVertex vertex = new MultiPolygonVertex(this, 0, 0, -1);
-    return vertex.reader();
-  }
 }

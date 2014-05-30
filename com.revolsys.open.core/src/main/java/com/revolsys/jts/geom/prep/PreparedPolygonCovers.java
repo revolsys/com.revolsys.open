@@ -46,56 +46,35 @@ import com.revolsys.jts.geom.Geometry;
  * @author Martin Davis
  *
  */
-class PreparedPolygonCovers 
-	extends AbstractPreparedPolygonContains
-{
-	/**
-	 * Computes the </tt>covers</tt> predicate between a {@link PreparedPolygon}
-	 * and a {@link Geometry}.
-	 * 
-	 * @param prep the prepared polygon
-	 * @param geom a test geometry
-	 * @return true if the polygon covers the geometry
-	 */
-	public static boolean covers(PreparedPolygon prep, Geometry geom)
-	{
-    PreparedPolygonCovers polyInt = new PreparedPolygonCovers(prep);
-    return polyInt.covers(geom);
-	}
+class PreparedPolygonCovers extends AbstractPreparedPolygonContains {
+
+  public PreparedPolygonCovers(final Geometry preparedPolygon,
+    final Geometry polygon) {
+    super(preparedPolygon, polygon);
+    requireSomePointInInterior = false;
+  }
 
   /**
-   * Creates an instance of this operation.
+   * Tests whether this PreparedPolygon <tt>covers</tt> a given geometry.
    * 
-   * @param prepPoly the PreparedPolygon to evaluate
+   * @param geom the test geometry
+   * @return true if the test geometry is covered
    */
-	public PreparedPolygonCovers(PreparedPolygon prepPoly)
-	{
-		super(prepPoly);
-		requireSomePointInInterior = false;
-	}
-		
-	/**
-	 * Tests whether this PreparedPolygon <tt>covers</tt> a given geometry.
-	 * 
-	 * @param geom the test geometry
-	 * @return true if the test geometry is covered
-	 */
-	public boolean covers(Geometry geom)
-	{
-		return eval(geom);
-	}
-	
-	/**
-	 * Computes the full topological <tt>covers</tt> predicate.
-	 * Used when short-circuit tests are not conclusive.
-	 * 
-	 * @param geom the test geometry
-	 * @return true if this prepared polygon covers the test geometry
-	 */
-	protected boolean fullTopologicalPredicate(Geometry geom)
-	{
-		boolean result = prepPoly.getGeometry().covers(geom);
-		return result;
-	}
-	
+  public boolean covers(final Geometry geom) {
+    return eval(geom);
+  }
+
+  /**
+   * Computes the full topological <tt>covers</tt> predicate.
+   * Used when short-circuit tests are not conclusive.
+   * 
+   * @param geom the test geometry
+   * @return true if this prepared polygon covers the test geometry
+   */
+  @Override
+  protected boolean fullTopologicalPredicate(final Geometry geom) {
+    final boolean result = getOriginalGeometry().covers(geom);
+    return result;
+  }
+
 }

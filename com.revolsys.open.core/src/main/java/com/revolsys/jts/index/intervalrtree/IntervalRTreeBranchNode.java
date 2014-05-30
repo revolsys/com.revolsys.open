@@ -32,36 +32,31 @@
  */
 package com.revolsys.jts.index.intervalrtree;
 
-import com.revolsys.jts.index.ItemVisitor;
+import com.revolsys.collection.Visitor;
 
-public class IntervalRTreeBranchNode 
-extends IntervalRTreeNode
-{
-	private IntervalRTreeNode node1;
-	private IntervalRTreeNode node2;
-	
-	public IntervalRTreeBranchNode(IntervalRTreeNode n1, IntervalRTreeNode n2)
-	{
-		node1 = n1;
-		node2 = n2;
-		buildExtent(node1, node2);
-	}
-	
-	private void buildExtent(IntervalRTreeNode n1, IntervalRTreeNode n2)
-	{
-		min = Math.min(n1.min, n2.min);
-		max = Math.max(n1.max, n2.max);
-	}
-	
-	public void query(double queryMin, double queryMax, ItemVisitor visitor)
-	{
-		if (! intersects(queryMin, queryMax)) {
-//			System.out.println("Does NOT Overlap branch: " + this);
-			return;
-		}
-//		System.out.println("Overlaps branch: " + this);
-		if (node1 != null) node1.query(queryMin, queryMax, visitor);
-		if (node2 != null) node2.query(queryMin, queryMax, visitor);
-	}
-	
+public class IntervalRTreeBranchNode<V> extends IntervalRTreeNode<V> {
+  private final IntervalRTreeNode<V> node1;
+
+  private final IntervalRTreeNode<V> node2;
+
+  public IntervalRTreeBranchNode(final IntervalRTreeNode<V> node1,
+    final IntervalRTreeNode<V> node2) {
+    super(Math.min(node1.getMin(), node2.getMin()), Math.max(node1.getMax(),
+      node2.getMax()));
+    this.node1 = node1;
+    this.node2 = node2;
+  }
+
+  @Override
+  public void query(final double queryMin, final double queryMax,
+    final Visitor<V> visitor) {
+    if (intersects(queryMin, queryMax)) {
+      if (node1 != null) {
+        node1.query(queryMin, queryMax, visitor);
+      }
+      if (node2 != null) {
+        node2.query(queryMin, queryMax, visitor);
+      }
+    }
+  }
 }

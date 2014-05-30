@@ -11,10 +11,9 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.event.NodeEventListener;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class SplitCrossingEdgesVisitor<T> extends
   AbstractEdgeListenerVisitor<T> {
@@ -46,7 +45,7 @@ public class SplitCrossingEdgesVisitor<T> extends
 
   public List<Edge<T>> queryCrosses(final IdObjectIndex<Edge<T>> edgeIndex,
     final LineString line) {
-    final PreparedGeometry preparedLine = PreparedGeometryFactory.prepare(line);
+    final Geometry preparedLine = line.prepare();
     final BoundingBox envelope = line.getBoundingBox();
     final List<Edge<T>> edges = edgeIndex.query(envelope);
     // TODO change to use an visitor
@@ -78,11 +77,11 @@ public class SplitCrossingEdgesVisitor<T> extends
     for (final Edge<T> crossEdge : crossings) {
       if (!crossEdge.isRemoved()) {
         final LineString crossLine = crossEdge.getLine();
-        final Point intersection = LineStringUtil.getCrossingIntersection(
-          line, crossLine);
+        final Point intersection = LineStringUtil.getCrossingIntersection(line,
+          crossLine);
         if (intersection != null) {
-          final Point point = graph.getPrecisionModel()
-            .getPreciseCoordinates(intersection);
+          final Point point = graph.getPrecisionModel().getPreciseCoordinates(
+            intersection);
           final Node<T> node = graph.getNode(point);
           splitEdgesCloseToNodeVisitor.visit(node);
         }

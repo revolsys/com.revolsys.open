@@ -7,8 +7,6 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.parallel.process.AbstractProcess;
 
 public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
@@ -24,7 +22,7 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
 
   private Geometry boundary;
 
-  private PreparedGeometry preparedBoundary;
+  private Geometry preparedBoundary;
 
   public abstract void execute(BoundingBox cellBoundingBox);
 
@@ -54,7 +52,7 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
   protected void preRun() {
     if (boundingBox != null) {
       if (boundary != null) {
-        preparedBoundary = PreparedGeometryFactory.prepare(boundary);
+        preparedBoundary = boundary.prepare();
       }
     }
   }

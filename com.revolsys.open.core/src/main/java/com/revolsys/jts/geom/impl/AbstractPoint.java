@@ -47,6 +47,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.prep.PreparedPoint;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.PointVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
@@ -491,6 +492,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   @Override
   public Point normalize() {
     return this;
+  }
+
+  @Override
+  public Point prepare() {
+    return new PreparedPoint(this);
   }
 
   @Override

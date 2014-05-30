@@ -63,7 +63,7 @@ public class IndexedPointInAreaStressTest extends TestCase {
     gridBuilder.setSeed(1185072199562L);
     final Geometry area = gridBuilder.getGeometry();
 
-    // PointInAreaLocator pia = new IndexedPointInAreaLocator(area);
+    // PointInAreaLocator pia = new GeometryFactoryIndexedPointInAreaLocator(area);
     final PointOnGeometryLocator pia = new IndexedPointInAreaLocator(area);
 
     final PointInAreaStressTester gridTester = new PointInAreaStressTester(

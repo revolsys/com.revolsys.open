@@ -1,12 +1,10 @@
 package com.revolsys.jtstest.function;
 
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class PreparedGeometryFunctions {
-  private static PreparedGeometry createPG(final Geometry g) {
-    return (new PreparedGeometryFactory()).create(g);
+  private static Geometry createPG(final Geometry g) {
+    return g.prepare();
   }
 
   public static boolean intersects(final Geometry g1, final Geometry g2) {

@@ -56,7 +56,7 @@ import com.revolsys.jts.index.chain.MonotoneChainSelectAction;
  *
  * @version 1.7
  * 
- * @see IndexedPointInAreaLocator for more general functionality
+ * @see GeometryFactoryIndexedPointInAreaLocator for more general functionality
  */
 public class MCPointInRing implements PointInRing {
 

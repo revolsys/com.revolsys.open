@@ -65,16 +65,15 @@ public class IsSimpleTest extends TestCase {
     super(name);
   }
 
-  private void runIsSimpleTest(final String wkt, final BoundaryNodeRule bnRule,
-    final boolean expectedResult) throws ParseException {
-    runIsSimpleTest(wkt, bnRule, expectedResult, null);
+  private void runIsSimpleTest(final String wkt, final boolean expectedResult)
+    throws ParseException {
+    runIsSimpleTest(wkt, expectedResult, null);
   }
 
-  private void runIsSimpleTest(final String wkt, final BoundaryNodeRule bnRule,
-    final boolean expectedResult, final Point expectedLocation)
-    throws ParseException {
+  private void runIsSimpleTest(final String wkt, final boolean expectedResult,
+    final Point expectedLocation) throws ParseException {
     final Geometry g = this.rdr.read(wkt);
-    final IsSimpleOp op = new IsSimpleOp(g, bnRule);
+    final IsSimpleOp op = new IsSimpleOp(g);
     boolean isSimple = false;
     isSimple = op.isSimple();
     final Point nonSimpleLoc = op.getNonSimpleLocation();
@@ -95,10 +94,7 @@ public class IsSimpleTest extends TestCase {
    */
   public void test2TouchAtEndpoint() throws Exception {
     final String a = "MULTILINESTRING((0 1, 1 1, 2 1), (0 0, 1 0, 2 1))";
-    runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, true,
-      new PointDouble((double)2, 1, Point.NULL_ORDINATE));
-    runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, true,
-      new PointDouble((double)2, 1, Point.NULL_ORDINATE));
+    runIsSimpleTest(a, true, new PointDouble((double)2, 1, Point.NULL_ORDINATE));
   }
 
   /**
@@ -110,18 +106,13 @@ public class IsSimpleTest extends TestCase {
     final String a = "MULTILINESTRING ((0 1, 1 1, 2 1),   (0 0, 1 0, 2 1),  (0 2, 1 2, 2 1))";
 
     // rings are simple under all rules
-    runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, true,
-      new PointDouble((double)2, 1, Point.NULL_ORDINATE));
-    runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, true,
-      new PointDouble((double)2, 1, Point.NULL_ORDINATE));
+    runIsSimpleTest(a, true, new PointDouble((double)2, 1, Point.NULL_ORDINATE));
   }
 
   public void testCross() throws Exception {
     final String a = "MULTILINESTRING ((20 120, 120 20), (20 20, 120 120))";
-    runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, false,
-      new PointDouble((double)70, 70, Point.NULL_ORDINATE));
-    runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, false,
-      new PointDouble((double)70, 70, Point.NULL_ORDINATE));
+    runIsSimpleTest(a, false, new PointDouble((double)70, 70,
+      Point.NULL_ORDINATE));
   }
 
   public void testMultiLineStringWithRingTouchAtEndpoint() throws Exception {
@@ -129,19 +120,15 @@ public class IsSimpleTest extends TestCase {
 
     // under Mod-2, the ring has no boundary, so the line intersects the
     // interior ==> not simple
-    runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, false,
-      new PointDouble((double)100, 100, Point.NULL_ORDINATE));
-    // under Endpoint, the ring has a boundary point, so the line does NOT
-    // intersect the interior ==> simple
-    runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, true);
+    runIsSimpleTest(a, false, new PointDouble((double)100, 100,
+      Point.NULL_ORDINATE));
   }
 
   public void testRing() throws Exception {
     final String a = "LINESTRING (100 100, 20 20, 200 20, 100 100)";
 
     // rings are simple under all rules
-    runIsSimpleTest(a, BoundaryNodeRule.MOD2_BOUNDARY_RULE, true);
-    runIsSimpleTest(a, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE, true);
+    runIsSimpleTest(a, true);
   }
 
 }

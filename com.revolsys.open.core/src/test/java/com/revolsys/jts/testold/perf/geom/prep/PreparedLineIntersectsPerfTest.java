@@ -38,8 +38,6 @@ import java.util.List;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.util.Stopwatch;
 
 public class PreparedLineIntersectsPerfTest {
@@ -121,8 +119,7 @@ public class PreparedLineIntersectsPerfTest {
 
   public int testPrepGeomCached(final Geometry g, final List lines) {
     // System.out.println("Using cached Prepared Geometry");
-    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-    final PreparedGeometry prepGeom = pgFact.create(g);
+    final Geometry prepGeom = g.prepare();
 
     int count = 0;
     for (final Iterator i = lines.iterator(); i.hasNext();) {
@@ -137,7 +134,7 @@ public class PreparedLineIntersectsPerfTest {
 
   /**
    * Tests using PreparedGeometry, but creating a new
-   * PreparedGeometry object each time.
+   * Geometry object each time.
    * This tests whether there is a penalty for using 
    * the PG algorithm as a complete replacement for 
    * the original algorithm.
@@ -148,15 +145,14 @@ public class PreparedLineIntersectsPerfTest {
    */
   public int testPrepGeomNotCached(final Geometry g, final List lines) {
     // System.out.println("Using NON-CACHED Prepared Geometry");
-    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-    // PreparedGeometry prepGeom = pgFact.create(g);
+    // Geometry prepGeom = pgFact.create(g);
 
     int count = 0;
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
 
       // test performance of creating the prepared geometry each time
-      final PreparedGeometry prepGeom = pgFact.create(g);
+      final Geometry prepGeom = g.prepare();
 
       if (prepGeom.intersects(line)) {
         count++;

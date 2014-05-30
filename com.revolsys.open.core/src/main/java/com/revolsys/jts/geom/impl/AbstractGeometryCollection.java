@@ -40,6 +40,7 @@ import java.util.TreeSet;
 
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Envelope;
@@ -47,6 +48,10 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.segment.GeometryCollectionSegment;
+import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.GeometryCollectionVertex;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -55,8 +60,8 @@ import com.revolsys.jts.geom.Point;
  *
  *@version 1.7
  */
-public abstract class AbstractGeometryCollection extends BaseGeometry implements
-  GeometryCollection {
+public abstract class AbstractGeometryCollection extends AbstractGeometry
+  implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
 
   /**
@@ -85,6 +90,16 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
       envelope = envelope.expandToInclude(geometry);
     }
     return envelope;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    final List<Geometry> geometries = new ArrayList<Geometry>();
+    for (final Geometry geometry : geometries()) {
+      geometries.add(geometry.copy(geometryFactory));
+    }
+    return (V)geometryFactory.geometryCollection(geometries);
   }
 
   @Override
@@ -183,13 +198,6 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
     return geometries;
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V getGeometry(final int partIndex) {
-    final List<Geometry> geometries = getGeometries();
-    return (V)geometries.get(partIndex);
-  }
-
   @Override
   public <V extends Geometry> List<V> getGeometryComponents(
     final Class<V> geometryClass) {
@@ -201,11 +209,6 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
       }
     }
     return geometries;
-  }
-
-  @Override
-  public int getGeometryCount() {
-    return getGeometries().size();
   }
 
   @Override
@@ -224,6 +227,16 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
     } else {
       return getGeometry(0).getPoint();
     }
+  }
+
+  @Override
+  public Segment getSegment(final int... segmentId) {
+    return new GeometryCollectionSegment(this, segmentId);
+  }
+
+  @Override
+  public Vertex getVertex(final int... vertexId) {
+    return new GeometryCollectionVertex(this, vertexId);
   }
 
   @Override
@@ -261,6 +274,11 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
       }
       return true;
     }
+  }
+
+  @Override
+  protected boolean isEquivalentClass(final Geometry other) {
+    return other instanceof GeometryCollection;
   }
 
   @Override
@@ -309,5 +327,19 @@ public abstract class AbstractGeometryCollection extends BaseGeometry implements
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.geometryCollection(revGeoms);
+  }
+
+  @Override
+  public Reader<Segment> segments() {
+    final GeometryCollectionSegment iterator = new GeometryCollectionSegment(
+      this, -1);
+    return iterator.reader();
+  }
+
+  @Override
+  public Reader<Vertex> vertices() {
+    final GeometryCollectionVertex iterator = new GeometryCollectionVertex(
+      this, -1);
+    return iterator.reader();
   }
 }

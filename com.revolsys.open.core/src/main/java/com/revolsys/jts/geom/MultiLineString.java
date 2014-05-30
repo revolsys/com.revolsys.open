@@ -52,6 +52,9 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   @Override
   public MultiLineString normalize();
 
+  @Override
+  public MultiLineString prepare();
+
   /**
    * Creates a {@link MultiLineString} in the reverse
    * order to this object.
@@ -63,5 +66,4 @@ public interface MultiLineString extends GeometryCollection, Lineal {
    */
   @Override
   public MultiLineString reverse();
-
 }

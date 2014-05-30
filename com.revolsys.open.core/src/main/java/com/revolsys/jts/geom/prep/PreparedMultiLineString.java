@@ -38,9 +38,9 @@ import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Lineal;
-import com.revolsys.jts.geom.impl.AbstractLineString;
+import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.impl.AbstractMultiLineString;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.jts.noding.SegmentStringUtil;
@@ -53,36 +53,38 @@ import com.revolsys.jts.noding.SegmentStringUtil;
  * @author mbdavis
  *
  */
-public class PreparedLineString extends AbstractLineString {
+public class PreparedMultiLineString extends AbstractMultiLineString {
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
-  private final LineString line;
+  private final MultiLineString multiLine;
 
-  public PreparedLineString(final LineString line) {
-    this.line = line;
+  public PreparedMultiLineString(final MultiLineString multiLine) {
+    this.multiLine = multiLine;
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    return line.getBoundingBox();
+    return multiLine.getBoundingBox();
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    final LineString line = getLine();
-    return line.getCoordinate(vertexIndex, axisIndex);
+  public <V extends Geometry> List<V> getGeometries() {
+    return multiLine.getGeometries();
   }
 
   @Override
-  public double[] getCoordinates() {
-    final LineString line = getLine();
-    return line.getCoordinates();
+  public <V extends Geometry> V getGeometry(final int partIndex) {
+    return multiLine.getGeometry(partIndex);
   }
+
+  @Override
+  public int getGeometryCount() {
+    return multiLine.getGeometryCount();
+  };
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    final LineString line = getLine();
-    return line.getGeometryFactory();
+    return multiLine.getGeometryFactory();
   }
 
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
@@ -94,19 +96,9 @@ public class PreparedLineString extends AbstractLineString {
      */
     if (segIntFinder == null) {
       segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(getLine()));
+        SegmentStringUtil.extractSegmentStrings(multiLine));
     }
     return segIntFinder;
-  }
-
-  public LineString getLine() {
-    return line;
-  }
-
-  @Override
-  public int getVertexCount() {
-    final LineString line = getLine();
-    return line.getVertexCount();
   }
 
   @Override
@@ -166,9 +158,8 @@ public class PreparedLineString extends AbstractLineString {
      * However, it seems like the L/P case would be pretty rare in practice.
      */
     final PointLocator locator = new PointLocator();
-    final Geometry realGeometry = getLine();
     for (final Vertex vertex : geometry.vertices()) {
-      if (locator.intersects(vertex, realGeometry)) {
+      if (locator.intersects(vertex, multiLine)) {
         return true;
       }
     }
@@ -177,12 +168,11 @@ public class PreparedLineString extends AbstractLineString {
 
   @Override
   public boolean isEmpty() {
-    final LineString line = getLine();
-    return line.isEmpty();
+    return multiLine.isEmpty();
   }
 
   @Override
-  public LineString prepare() {
+  public MultiLineString prepare() {
     return this;
   }
 }

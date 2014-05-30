@@ -169,12 +169,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
     "Polygon", "MultiPolygon", "GeometryCollection"));
+
   /**
    * Standard ordinate index values
    */
   int X = 0;
+
   int Y = 1;
+
   int Z = 2;
+
   int M = 3;
 
   /**
@@ -206,34 +210,34 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   Geometry buffer(final double distance);
 
   /**
-   * Computes a buffer area around this geometry having the given width and with
-   * a specified accuracy of approximation for circular arcs.
-   * <p>
-   * Mathematically-exact buffer area boundaries can contain circular arcs. 
-   * To represent these arcs
-   * using linear geometry they must be approximated with line segments. The
-   * <code>quadrantSegments</code> argument allows controlling the accuracy of
-   * the approximation by specifying the number of line segments used to
-   * represent a quadrant of a circle
-   * <p>
-   * The buffer operation always returns a polygonal result. The negative or
-   * zero-distance buffer of lines and points is always an empty {@link Polygon}.
-   * This is also the result for the buffers of degenerate (zero-area) polygons.
-   * 
-   * @param distance
-   *          the width of the buffer (may be positive, negative or 0)
-   * @param quadrantSegments
-   *          the number of line segments used to represent a quadrant of a
-   *          circle
-   * @return a polygonal geometry representing the buffer region (which may be
-   *         empty)
-   * 
-   * @throws TopologyException
-   *           if a robustness error occurs
-   * 
-   * @see #buffer(double)
-   * @see #buffer(double, int, int)
-   */
+  * Computes a buffer area around this geometry having the given width and with
+  * a specified accuracy of approximation for circular arcs.
+  * <p>
+  * Mathematically-exact buffer area boundaries can contain circular arcs. 
+  * To represent these arcs
+  * using linear geometry they must be approximated with line segments. The
+  * <code>quadrantSegments</code> argument allows controlling the accuracy of
+  * the approximation by specifying the number of line segments used to
+  * represent a quadrant of a circle
+  * <p>
+  * The buffer operation always returns a polygonal result. The negative or
+  * zero-distance buffer of lines and points is always an empty {@link Polygon}.
+  * This is also the result for the buffers of degenerate (zero-area) polygons.
+  * 
+  * @param distance
+  *          the width of the buffer (may be positive, negative or 0)
+  * @param quadrantSegments
+  *          the number of line segments used to represent a quadrant of a
+  *          circle
+  * @return a polygonal geometry representing the buffer region (which may be
+  *         empty)
+  * 
+  * @throws TopologyException
+  *           if a robustness error occurs
+  * 
+  * @see #buffer(double)
+  * @see #buffer(double, int, int)
+  */
   Geometry buffer(final double distance, final int quadrantSegments);
 
   /**
@@ -342,6 +346,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * @see Geometry#covers
    */
   boolean contains(final Geometry geometry);
+
+  boolean containsProperly(final Geometry geometry);
 
   /**
    * Convert the geometry to the requried geometry factory. Projecting to the required
@@ -1070,6 +1076,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *@return        <code>true</code> if the two <code>Geometry</code>s overlap.
    */
   boolean overlaps(final Geometry geometry);
+
+  Geometry prepare();
 
   /**
    *  Returns the DE-9IM {@link IntersectionMatrix} for the two <code>Geometry</code>s.

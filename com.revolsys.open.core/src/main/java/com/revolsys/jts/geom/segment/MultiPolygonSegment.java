@@ -122,6 +122,11 @@ public class MultiPolygonSegment extends AbstractSegment implements
   }
 
   @Override
+  public boolean isLineClosed() {
+    return true;
+  }
+
+  @Override
   public boolean isLineEnd() {
     final LineString line = getRing();
     return segmentIndex == line.getSegmentCount();
@@ -159,6 +164,7 @@ public class MultiPolygonSegment extends AbstractSegment implements
     throw new UnsupportedOperationException("Removing segments not supported");
   }
 
+  @Override
   public void setSegmentId(final int... segmentId) {
     this.partIndex = segmentId[0];
     this.ringIndex = segmentId[1];

@@ -42,8 +42,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.util.GeometricShapeFactory;
@@ -75,8 +73,7 @@ public class PreparedPolygonIntersectsPerfTest {
   public PreparedPolygonIntersectsPerfTest() {
   }
 
-  Geometry createCircle(final Point origin, final double size,
-    final int nPts) {
+  Geometry createCircle(final Point origin, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -116,8 +113,7 @@ public class PreparedPolygonIntersectsPerfTest {
     return geoms;
   }
 
-  Geometry createSineStar(final Point origin, final double size,
-    final int nPts) {
+  Geometry createSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -190,8 +186,7 @@ public class PreparedPolygonIntersectsPerfTest {
     if (iter == 0) {
       // System.out.println("Using cached Prepared Geometry");
     }
-    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-    final PreparedGeometry prepGeom = pgFact.create(g);
+    final Geometry prepGeom = g.prepare();
 
     int count = 0;
     for (final Iterator i = lines.iterator(); i.hasNext();) {
@@ -206,7 +201,7 @@ public class PreparedPolygonIntersectsPerfTest {
 
   /**
    * Tests using PreparedGeometry, but creating a new
-   * PreparedGeometry object each time.
+   * Geometry object each time.
    * This tests whether there is a penalty for using 
    * the PG algorithm as a complete replacement for 
    * the original algorithm.
@@ -220,15 +215,14 @@ public class PreparedPolygonIntersectsPerfTest {
     if (iter == 0) {
       // System.out.println("Using NON-CACHED Prepared Geometry");
     }
-    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-    // PreparedGeometry prepGeom = pgFact.create(g);
+    // Geometry prepGeom = pgFact.create(g);
 
     int count = 0;
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
 
       // test performance of creating the prepared geometry each time
-      final PreparedGeometry prepGeom = pgFact.create(g);
+      final Geometry prepGeom = g.prepare();
 
       if (prepGeom.intersects(line)) {
         count++;

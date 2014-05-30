@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 
 public class OutsideBoundaryObjects {
   private static final Logger LOG = LoggerFactory.getLogger(OutsideBoundaryObjects.class);
@@ -18,7 +16,7 @@ public class OutsideBoundaryObjects {
 
   private Geometry boundary;
 
-  private PreparedGeometry preparedBoundary;
+  private Geometry preparedBoundary;
 
   public boolean addObject(final DataObject object) {
     return objects.add(object);
@@ -67,7 +65,7 @@ public class OutsideBoundaryObjects {
 
   public void setBoundary(final Geometry boundary) {
     this.boundary = boundary;
-    this.preparedBoundary = PreparedGeometryFactory.prepare(boundary);
+    this.preparedBoundary = boundary.prepare();
   }
 
   public void setObjects(final Set<DataObject> objects) {

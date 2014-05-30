@@ -63,8 +63,7 @@ public class MiscellaneousTest extends TestCase {
     TestRunner.run(MiscellaneousTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
-    1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -284,12 +283,8 @@ public class MiscellaneousTest extends TestCase {
   // }
 
   public void testLinearRingIsSimple() throws Exception {
-    final Point[] coordinates = {
-      new PointDouble((double)10, 10, 0), new PointDouble((double)10, 20, 0),
-      new PointDouble((double)20, 20, 0), new PointDouble((double)20, 15, 0),
-      new PointDouble((double)10, 10, 0)
-    };
-    final LinearRing linearRing = this.geometryFactory.linearRing(coordinates);
+    final LinearRing linearRing = this.geometryFactory.linearRing(2, 10.0, 10,
+      10, 20, 20, 20, 20, 15, 10, 10);
     assertTrue(linearRing.isSimple());
   }
 
@@ -328,14 +323,14 @@ public class MiscellaneousTest extends TestCase {
     final Geometry g = this.reader.read("MULTILINESTRING("
       + "(0 0,  100 0, 50 50)," + "(50 50, 50 -50))");
     final Geometry m = this.reader.read("MULTIPOINT(0 0, 50 -50)");
-    assertTrue(m.equals(2,g.getBoundary()));
+    assertTrue(m.equals(2, g.getBoundary()));
   }
 
   public void testMultiLineStringGetBoundary2() throws Exception {
     final Geometry g = this.reader.read("MULTILINESTRING("
       + "(0 0,  100 0, 50 50)," + "(50 50, 50 0))");
     final Geometry m = this.reader.read("MULTIPOINT(0 0, 50 0)");
-    assertTrue(m.equals(2,g.getBoundary()));
+    assertTrue(m.equals(2, g.getBoundary()));
   }
 
   /**
@@ -368,7 +363,7 @@ public class MiscellaneousTest extends TestCase {
       + "(0 0, 40 0, 40 40, 0 40, 0 0),"
       + "(10 10, 30 10, 30 30, 10 30, 10 10),"
       + "(200 200, 210 200, 210 210, 200 200))");
-    assertTrue(b.equals(2,g.getBoundary()));
+    assertTrue(b.equals(2, g.getBoundary()));
   }
 
   public void testMultiPolygonIsSimple1() throws Exception {
@@ -400,7 +395,7 @@ public class MiscellaneousTest extends TestCase {
     final Geometry b = this.reader.read("MULTILINESTRING("
       + "(0 0, 40 0, 40 40, 0 40, 0 0),"
       + "(10 10, 30 10, 30 30, 10 30, 10 10))");
-    assertTrue(b.equals(2,g.getBoundary()));
+    assertTrue(b.equals(2, g.getBoundary()));
   }
 
   // public void testGeometryCollectionIsSimple1() throws Exception {

@@ -64,9 +64,14 @@ public class LineStringSegment extends AbstractSegment implements
   }
 
   @Override
+  public boolean isLineClosed() {
+    return getLineString().isClosed();
+  }
+
+  @Override
   public boolean isLineEnd() {
     final LineString line = getLineString();
-    return segmentIndex == line.getSegmentCount();
+    return segmentIndex == line.getSegmentCount() - 1;
   }
 
   @Override
@@ -90,6 +95,7 @@ public class LineStringSegment extends AbstractSegment implements
     throw new UnsupportedOperationException("Removing segments not supported");
   }
 
+  @Override
   public void setSegmentId(final int... segmentId) {
     this.segmentIndex = segmentId[0];
   }

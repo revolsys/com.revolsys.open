@@ -34,7 +34,6 @@
 package com.revolsys.jts.noding;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
@@ -55,20 +54,21 @@ public class SegmentStringUtil {
    * @param geom the geometry to extract from
    * @return a List of SegmentStrings
    */
-  public static List extractSegmentStrings(final Geometry geom) {
-    final List<NodedSegmentString> segStr = new ArrayList<>();
+  public static List<NodedSegmentString> extractSegmentStrings(
+    final Geometry geom) {
+    final List<NodedSegmentString> segments = new ArrayList<>();
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      segStr.add(new NodedSegmentString(line, geom));
+      final NodedSegmentString segment = new NodedSegmentString(line, geom);
+      segments.add(segment);
     }
-    return segStr;
+    return segments;
   }
 
-  public static String toString(final List segStrings) {
+  public static String toString(final List<? extends SegmentString> segments) {
     final StringBuffer buf = new StringBuffer();
-    for (final Iterator i = segStrings.iterator(); i.hasNext();) {
-      final SegmentString segStr = (SegmentString)i.next();
-      buf.append(segStr.toString());
+    for (final SegmentString segment : segments) {
+      buf.append(segment.toString());
       buf.append("\n");
 
     }

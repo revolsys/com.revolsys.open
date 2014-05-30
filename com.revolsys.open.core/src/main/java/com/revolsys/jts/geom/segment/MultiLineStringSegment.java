@@ -97,9 +97,14 @@ public class MultiLineStringSegment extends AbstractSegment implements
   }
 
   @Override
+  public boolean isLineClosed() {
+    return getPart().isClosed();
+  }
+
+  @Override
   public boolean isLineEnd() {
     final LineString line = getPart();
-    return segmentIndex == line.getSegmentCount();
+    return segmentIndex == line.getSegmentCount() - 1;
   }
 
   @Override
@@ -128,6 +133,7 @@ public class MultiLineStringSegment extends AbstractSegment implements
     throw new UnsupportedOperationException("Removing segments not supported");
   }
 
+  @Override
   public void setSegmentId(final int... segmentId) {
     this.partIndex = segmentId[0];
     this.segmentIndex = segmentId[1];

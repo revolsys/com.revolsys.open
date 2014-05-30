@@ -57,6 +57,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.prep.PreparedLineString;
 import com.revolsys.jts.geom.segment.LineStringSegment;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.AbstractVertex;
@@ -757,6 +758,12 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   @Override
   public Iterable<Point> points() {
     return getCoordinatesList().toPointList();
+  }
+
+  @Override
+  @Deprecated
+  public LineString prepare() {
+    return new PreparedLineString(this);
   }
 
   /**

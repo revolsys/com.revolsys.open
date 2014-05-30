@@ -41,8 +41,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.prep.PreparedPolygon;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
@@ -72,8 +70,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     super(name);
   }
 
-  Geometry createCircle(final Point origin, final double size,
-    final int nPts) {
+  Geometry createCircle(final Point origin, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -84,8 +81,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     return circle;
   }
 
-  Geometry createSineStar(final Point origin, final double size,
-    final int nPts) {
+  Geometry createSineStar(final Point origin, final double size, final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
     gsf.setCentre(origin);
     gsf.setSize(size);
@@ -101,14 +97,13 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Point basePt = new PointDouble(env.getMinX() + xOffset,
-      env.getMinY() + yOffset, Point.NULL_ORDINATE);
+    final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY()
+      + yOffset, Point.NULL_ORDINATE);
     final LineString line = createTestLine(basePt, size, nPts);
     return line;
   }
 
-  LineString createTestLine(final Point base, final double size,
-    final int nPts) {
+  LineString createTestLine(final Point base, final double size, final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
     gsf.setCentre(base);
     gsf.setSize(size);
@@ -148,8 +143,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
   public void testResultsEqual(final Geometry g, final LineString line) {
     final boolean slowIntersects = g.intersects(line);
 
-    final PreparedGeometryFactory pgFact = new PreparedGeometryFactory();
-    final PreparedGeometry prepGeom = pgFact.create(g);
+    final Geometry prepGeom = g.prepare();
 
     final boolean fastIntersects = prepGeom.intersects(line);
 

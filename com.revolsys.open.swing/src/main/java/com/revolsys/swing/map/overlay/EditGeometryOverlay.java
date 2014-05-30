@@ -45,8 +45,6 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.prep.PreparedGeometry;
-import com.revolsys.jts.geom.prep.PreparedGeometryFactory;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
@@ -216,7 +214,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   private void addRecords(final List<LayerDataObject> results,
-    final LayerGroup group, final PreparedGeometry boundingBox) {
+    final LayerGroup group, final Geometry boundingBox) {
     final double scale = getViewport().getScale();
     final List<Layer> layers = group.getLayers();
     Collections.reverse(layers);
@@ -821,7 +819,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       && event.getClickCount() == 2) {
       final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
-      final PreparedGeometry boundary = PreparedGeometryFactory.prepare(boundingBox.toPolygon());
+      final Geometry boundary = boundingBox.toPolygon().prepare();
       addRecords(records, getProject(), boundary);
 
       final int size = records.size();

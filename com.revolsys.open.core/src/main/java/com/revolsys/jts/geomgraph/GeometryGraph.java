@@ -42,7 +42,6 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -52,13 +51,13 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.geomgraph.index.EdgeSetIntersector;
 import com.revolsys.jts.geomgraph.index.SegmentIntersector;
 import com.revolsys.jts.geomgraph.index.SimpleMCSweepLineIntersector;
-import com.revolsys.jts.util.Assert;
 
 /**
  * A GeometryGraph is a graph that models a given Geometry
@@ -178,28 +177,27 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private void addLineString(final LineString line) {
-    final PointList points = CleanDuplicatePoints.clean(line);
+    final LineString cleanLine = CleanDuplicatePoints.clean(line);
 
-    if (points.getVertexCount() < 2) {
+    if (cleanLine.getVertexCount() < 2 || cleanLine.isEmpty()) {
       hasTooFewPoints = true;
-      invalidPoint = points.getPoint(0);
+      invalidPoint = cleanLine.getPoint(0);
       return;
+    } else {
+      // add the edge for the LineString
+      // line edges do not have locations for their left and right sides
+      final Edge e = new Edge(cleanLine, new Label(argIndex, Location.INTERIOR));
+      lineEdgeMap.put(line, e);
+      insertEdge(e);
+      /**
+       * Add the boundary points of the LineString, if any.
+       * Even if the LineString is closed, add both points as if they were endpoints.
+       * This allows for the case that the node already exists and is a boundary point.
+       */
+      insertBoundaryPoint(argIndex, cleanLine.getPoint(0));
+      insertBoundaryPoint(argIndex,
+        cleanLine.getPoint(cleanLine.getVertexCount() - 1));
     }
-
-    // add the edge for the LineString
-    // line edges do not have locations for their left and right sides
-    final Edge e = new Edge(points, new Label(argIndex, Location.INTERIOR));
-    lineEdgeMap.put(line, e);
-    insertEdge(e);
-    /**
-     * Add the boundary points of the LineString, if any.
-     * Even if the LineString is closed, add both points as if they were endpoints.
-     * This allows for the case that the node already exists and is a boundary point.
-     */
-    Assert.isTrue(points.getVertexCount() >= 2, "found LineString with single point");
-    insertBoundaryPoint(argIndex, points.getPoint(0));
-    insertBoundaryPoint(argIndex, points.getPoint(points.getVertexCount() - 1));
-
   }
 
   /**
