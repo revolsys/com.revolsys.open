@@ -32,13 +32,13 @@
  */
 package com.revolsys.jts.geomgraph;
 
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geomgraph.index.MonotoneChainEdge;
 
@@ -62,7 +62,7 @@ public class Edge extends GraphComponent {
     }
   }
 
-  private final PointList points;
+  private final LineString points;
 
   private Envelope env;
 
@@ -79,11 +79,11 @@ public class Edge extends GraphComponent {
   private int depthDelta = 0; // the change in area depth from the R to L side
                               // of this edge
 
-  public Edge(final PointList points) {
+  public Edge(final LineString points) {
     this(points, null);
   }
 
-  public Edge(final PointList points, final Label label) {
+  public Edge(final LineString points, final Label label) {
     this.points = points;
     this.label = label;
   }
@@ -171,7 +171,7 @@ public class Edge extends GraphComponent {
   }
 
   public Edge getCollapsedEdge() {
-    final PointList points = new DoubleCoordinatesList(getCoordinate(0),
+    final LineString points = new LineStringDouble(getCoordinate(0),
       getCoordinate(1));
     final Edge edge = new Edge(points, Label.toLineLabel(label));
     return edge;
@@ -227,7 +227,7 @@ public class Edge extends GraphComponent {
     return points.getVertexCount();
   }
 
-  public PointList getPoints() {
+  public LineString getPoints() {
     return points;
   }
 

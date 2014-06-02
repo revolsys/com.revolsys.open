@@ -51,7 +51,7 @@ public class PointBuilder {
 
   private final GeometryFactory geometryFactory;
 
-  private final List<Point> resultPointList = new ArrayList<Point>();
+  private final List<Point> resultLineString = new ArrayList<Point>();
 
   public PointBuilder(final OverlayOp op,
     final GeometryFactory geometryFactory, final PointLocator ptLocator) {
@@ -73,7 +73,7 @@ public class PointBuilder {
      * result geometries, so must perform this filter.
      * (For instance, this can happen during topology collapse).
      */
-    return resultPointList;
+    return resultLineString;
   }
 
   /**
@@ -129,7 +129,7 @@ public class PointBuilder {
     final Point coord = n.getCoordinate();
     if (!op.isCoveredByLA(coord)) {
       final Point pt = geometryFactory.point(coord);
-      resultPointList.add(pt);
+      resultLineString.add(pt);
     }
   }
 }

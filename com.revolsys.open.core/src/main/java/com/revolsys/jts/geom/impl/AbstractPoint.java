@@ -37,7 +37,6 @@ import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
@@ -46,7 +45,6 @@ import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.prep.PreparedPoint;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.PointVertex;
@@ -202,12 +200,17 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  public double distance(final Point point) {
+  public double distance(final double x, final double y) {
     final double x1 = this.getX();
     final double y1 = this.getY();
+    return MathUtil.distance(x1, y1, x, y);
+  }
+
+  @Override
+  public double distance(final Point point) {
     final double x2 = point.getX();
     final double y2 = point.getY();
-    return MathUtil.distance(x1, y1, x2, y2);
+    return distance(x2, y2);
   }
 
   /**
@@ -332,13 +335,6 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
       coordinates[i] = this.getCoordinate(i);
     }
     return coordinates;
-  }
-
-  @Override
-  public PointList getCoordinatesList() {
-    final int axisCount = getAxisCount();
-    final double[] coordinates = getCoordinates();
-    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   @Override

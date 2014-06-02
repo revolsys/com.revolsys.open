@@ -20,8 +20,6 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -33,8 +31,6 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
@@ -75,49 +71,6 @@ public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
     final DataSource dataSource = databaseFactory.createDataSource(connectionProperties);
     setDataSource(dataSource);
     initSettings();
-
-  }
-
-  protected Query addBoundingBoxFilter(Query query) {
-    final BoundingBox boundingBox = query.getBoundingBox();
-    if (boundingBox != null) {
-      final String typePath = query.getTypeName();
-      final DataObjectMetaData metaData = getMetaData(typePath);
-      if (metaData == null) {
-        throw new IllegalArgumentException("Unable to  find table " + typePath);
-      } else {
-        query = query.clone();
-        final Attribute geometryAttribute = metaData.getGeometryAttribute();
-        final String geometryColumnName = geometryAttribute.getName();
-        final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-
-        final BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
-
-        final double k = projectedBoundingBox.getMinX();
-        final double y1 = projectedBoundingBox.getMinY();
-        final double x2 = projectedBoundingBox.getMaxX();
-        final double y2 = projectedBoundingBox.getMaxY();
-
-        // TODO BBOX
-        // if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
-        // final String where = " SDO_RELATE("
-        // + geometryColumnName
-        // + ","
-        // +
-        // "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?)),'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'";
-        // query.and(new SqlCondition(where, geometryFactory.getSRID(), x1, y1,
-        // x2, y2));
-        // } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
-        // final String where = " SDE.ST_ENVINTERSECTS(" + geometryColumnName
-        // + ", ?, ?, ?, ?) = 1";
-        // query.and(new SqlCondition(where, x1, y1, x2, y2));
-        // } else {
-        // throw new IllegalArgumentException("Unknown geometry attribute "
-        // + geometryAttribute);
-        // }
-      }
-    }
-    return query;
 
   }
 
@@ -186,15 +139,6 @@ public class SpatiaLiteDataObjectStore extends AbstractJdbcDataObjectStore {
       throw new IllegalArgumentException(
         "Cannot create ID for " + sequenceName, e);
     }
-  }
-
-  @Override
-  public int getRowCount(final Query query) {
-    final Query bboxQuery = addBoundingBoxFilter(query);
-    if (bboxQuery != query) {
-      query.setAttributeNames("count(*))");
-    }
-    return super.getRowCount(query);
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {

@@ -5,14 +5,14 @@ import java.util.TreeSet;
 
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.MathUtil;
@@ -348,7 +348,7 @@ public class LineSegmentUtil {
    * @param line2End
    * @return
    */
-  public static PointList getIntersection(
+  public static LineString getIntersection(
     final GeometryFactory geometryFactory, Point line1Start, Point line1End,
     Point line2Start, Point line2End) {
     line1Start = geometryFactory.createCoordinates(line1Start);
@@ -417,7 +417,7 @@ public class LineSegmentUtil {
             Point intersection = geometryFactory.createCoordinates(x, y);
             intersection = getElevation(geometryFactory, line1Start, line1End,
               intersection);
-            final DoubleCoordinatesList points = new DoubleCoordinatesList(
+            final LineStringDouble points = new LineStringDouble(
               geometryFactory.getAxisCount(), intersection);
             return points;
           }
@@ -426,7 +426,7 @@ public class LineSegmentUtil {
         return geometryFactory.createCoordinatesList(intersections);
       }
     }
-    return new DoubleCoordinatesList(2);
+    return new LineStringDouble(2);
   }
 
   public static boolean intersects(final Point line1p1, final Point line1p2,

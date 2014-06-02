@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -47,20 +48,21 @@ public class Between extends Condition {
   }
 
   @Override
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    column.appendSql(query, dataStore, buffer);
+    buffer.append(" BETWEEN ");
+    min.appendSql(query, dataStore, buffer);
+    buffer.append(" AND ");
+    max.appendSql(query, dataStore, buffer);
+  }
+
+  @Override
   public int appendParameters(int index, final PreparedStatement statement) {
     index = column.appendParameters(index, statement);
     index = min.appendParameters(index, statement);
     index = max.appendParameters(index, statement);
     return index;
-  }
-
-  @Override
-  public void appendSql(final StringBuffer buffer) {
-    column.appendSql(buffer);
-    buffer.append(" BETWEEN ");
-    min.appendSql(buffer);
-    buffer.append(" AND ");
-    max.appendSql(buffer);
   }
 
   @Override

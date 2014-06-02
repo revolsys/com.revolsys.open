@@ -12,6 +12,12 @@ public class MultiPointVertex extends AbstractVertex {
     setVertexId(vertexId);
   }
 
+  @Override
+  public double getCoordinate(final int vertexIndex) {
+    final MultiPoint geometry = getGeometry();
+    return geometry.getCoordinate(this.partIndex, vertexIndex);
+  }
+
   public MultiPoint getMultiPoint() {
     return (MultiPoint)getGeometry();
   }
@@ -19,12 +25,6 @@ public class MultiPointVertex extends AbstractVertex {
   @Override
   public int getPartIndex() {
     return partIndex;
-  }
-
-  @Override
-  public double getCoordinate(final int vertexIndex) {
-    final MultiPoint geometry = getGeometry();
-    return geometry.getCoordinate(this.partIndex, vertexIndex);
   }
 
   @Override
@@ -51,6 +51,16 @@ public class MultiPointVertex extends AbstractVertex {
         return false;
       }
     }
+  }
+
+  @Override
+  public boolean isFrom() {
+    return partIndex == 0;
+  }
+
+  @Override
+  public boolean isTo() {
+    return partIndex == 0;
   }
 
   @Override

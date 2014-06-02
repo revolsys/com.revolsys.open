@@ -1,15 +1,16 @@
 package com.revolsys.gis.model.coordinates.list;
 
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 
-public class RingCoordinatesList extends DoubleCoordinatesList {
+public class RingCoordinatesList extends LineStringDouble {
 
   /**
    * 
    */
   private static final long serialVersionUID = 5660399503744099455L;
 
-  public RingCoordinatesList(final PointList coordinatesList) {
+  public RingCoordinatesList(final LineString coordinatesList) {
     super(coordinatesList.subLine(0, coordinatesList.getVertexCount() - 1));
   }
 

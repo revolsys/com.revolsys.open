@@ -6,7 +6,7 @@ import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
@@ -143,7 +143,7 @@ public class CoordinatesUtil {
 
   public static double getElevation(final LineString line,
     final Point coordinate) {
-    final PointList coordinates = line;
+    final LineString coordinates = line;
     Point previousCoordinate = coordinates.getPoint(0);
     for (int i = 1; i < coordinates.getVertexCount(); i++) {
       final Point currentCoordinate = coordinates.getPoint(i);
@@ -330,7 +330,7 @@ public class CoordinatesUtil {
     }
   }
 
-  public static float[] toFloatArray(final PointList points, final int axisCount) {
+  public static float[] toFloatArray(final LineString points, final int axisCount) {
     final float[] coordinates = new float[axisCount * points.getVertexCount()];
     for (int i = 0; i < points.getVertexCount(); i++) {
       for (int axis = 0; axis < axisCount; axis++) {

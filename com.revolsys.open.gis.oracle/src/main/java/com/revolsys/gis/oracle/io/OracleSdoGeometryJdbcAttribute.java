@@ -17,9 +17,8 @@ import oracle.sql.STRUCT;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -28,8 +27,8 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 
 public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
@@ -167,7 +166,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   public double[] toClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
-    final PointList coordinates = ring;
+    final LineString coordinates = ring;
     if (!coordinates.isCounterClockwise()) {
       return toCoordinateArray(coordinates, dimension);
     } else {
@@ -176,27 +175,20 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private double[] toCoordinateArray(final LineString line, final int dimension) {
-    final PointList sequence = line;
-    final double[] coordinates = toCoordinateArray(sequence, dimension);
-    return coordinates;
-  }
-
-  private double[] toCoordinateArray(final PointList sequence,
-    final int dimension) {
-    int geometryDimension = sequence.getAxisCount();
-    if (Double.isNaN(sequence.getCoordinate(0, 2))) {
+    int geometryDimension = line.getAxisCount();
+    if (Double.isNaN(line.getCoordinate(0, 2))) {
       geometryDimension = 2;
     }
 
-    final double[] ordinates = new double[dimension * sequence.getVertexCount()];
+    final double[] ordinates = new double[dimension * line.getVertexCount()];
     int ordinateIndex = 0;
 
-    for (int i = 0; i < sequence.getVertexCount(); i++) {
+    for (int i = 0; i < line.getVertexCount(); i++) {
       for (int j = 0; j < dimension; j++) {
         if (j >= geometryDimension) {
           ordinates[ordinateIndex++] = 0;
         } else {
-          final double ordinate = sequence.getCoordinate(i, j);
+          final double ordinate = line.getCoordinate(i, j);
           if (Double.isNaN(ordinate)) {
             ordinates[ordinateIndex++] = 0;
           } else {
@@ -227,7 +219,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   public double[] toCounterClockwiseCoordinatesArray(final LineString ring,
     final int dimension) {
-    final PointList coordinates = ring;
+    final LineString coordinates = ring;
     if (coordinates.isCounterClockwise()) {
       return toCoordinateArray(coordinates, dimension);
     } else {
@@ -237,11 +229,11 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private STRUCT toJdbc(final Connection connection, final Object object,
     final int dimension) throws SQLException {
+    JGeometry jGeometry;
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
       geometry = geometry.copy(this.geometryFactory);
       // TODO direct convert to SDO Geometry from JTS Geometry
-      JGeometry jGeometry = null;
       if (object instanceof Polygon) {
         final Polygon polygon = (Polygon)geometry;
         jGeometry = toJGeometry(polygon, dimension);
@@ -268,16 +260,25 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         throw new IllegalArgumentException("Unable to convert to SDO_GEOMETRY "
           + object.getClass());
       }
-      try {
-        final STRUCT struct = JGeometry.store(jGeometry, connection);
-        return struct;
-      } catch (final SQLException e) {
-        throw new RuntimeException(
-          "Unable to convert Oracle JGeometry to STRUCT: " + e.getMessage(), e);
-      }
+    } else if (object instanceof BoundingBox) {
+      BoundingBox boundingBox = (BoundingBox)object;
+      boundingBox = boundingBox.convert(geometryFactory, 2);
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      final int srid = geometryFactory.getSrid();
+      jGeometry = new JGeometry(minX, minY, maxX, maxY, srid);
     } else {
       throw new IllegalArgumentException("Unable to convert to SDO_GEOMETRY "
         + object.getClass());
+    }
+    try {
+      final STRUCT struct = JGeometry.store(jGeometry, connection);
+      return struct;
+    } catch (final SQLException e) {
+      throw new RuntimeException(
+        "Unable to convert Oracle JGeometry to STRUCT: " + e.getMessage(), e);
     }
   }
 
@@ -437,7 +438,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
 
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    final PointList coordinatesList = new DoubleCoordinatesList(axisCount,
+    final LineString coordinatesList = new LineStringDouble(axisCount,
       coordinates);
 
     return this.geometryFactory.multiPoint(coordinatesList);

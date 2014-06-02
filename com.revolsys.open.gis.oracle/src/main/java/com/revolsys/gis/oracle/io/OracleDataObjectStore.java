@@ -14,14 +14,15 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.SqlCondition;
+import com.revolsys.gis.data.query.QueryValue;
+import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
+import com.revolsys.gis.data.query.functions.WithinDistance;
 import com.revolsys.gis.oracle.esri.ArcSdeBinaryGeometryDataStoreExtension;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryDataStoreExtension;
@@ -30,8 +31,6 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;
@@ -75,46 +74,112 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
 
   }
 
-  protected Query addBoundingBoxFilter(Query query) {
-    final BoundingBox boundingBox = query.getBoundingBox();
-    if (boundingBox != null) {
-      final String typePath = query.getTypeName();
-      final DataObjectMetaData metaData = getMetaData(typePath);
-      if (metaData == null) {
-        throw new IllegalArgumentException("Unable to  find table " + typePath);
-      } else if (metaData.getGeometryAttribute() == null) {
-        return query;
+  private void appendEnvelopeIntersects(final Query query,
+    final StringBuffer sql, final EnvelopeIntersects envelopeIntersects) {
+    final Attribute geometryAttribute = query.getGeometryAttribute();
+
+    if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
+      sql.append("SDO_RELATE(");
+      final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
+      if (boundingBox1Value == null) {
+        sql.append("NULL");
       } else {
-        query = query.clone();
-        final Attribute geometryAttribute = metaData.getGeometryAttribute();
-        final String geometryColumnName = geometryAttribute.getName();
-        final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-
-        final BoundingBox projectedBoundingBox = boundingBox.convert(geometryFactory);
-
-        final double x1 = projectedBoundingBox.getMinX();
-        final double y1 = projectedBoundingBox.getMinY();
-        final double x2 = projectedBoundingBox.getMaxX();
-        final double y2 = projectedBoundingBox.getMaxY();
-
-        if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
-          final String where = " SDO_RELATE("
-            + geometryColumnName
-            + ","
-            + "MDSYS.SDO_GEOMETRY(2003,?,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),MDSYS.SDO_ORDINATE_ARRAY(?,?,?,?)),'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'";
-          query.and(new SqlCondition(where, geometryFactory.getSrid(), x1, y1,
-            x2, y2));
-        } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
-          final String where = " SDE.ST_ENVINTERSECTS(" + geometryColumnName
-            + ", ?, ?, ?, ?) = 1";
-          query.and(new SqlCondition(where, x1, y1, x2, y2));
-        } else {
-          throw new IllegalArgumentException("Unknown geometry attribute "
-            + geometryAttribute);
-        }
+        boundingBox1Value.appendSql(query, this, sql);
       }
+      sql.append(",");
+      final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
+      if (boundingBox2Value == null) {
+        sql.append("NULL");
+      } else {
+        boundingBox2Value.appendSql(query, this, sql);
+      }
+      sql.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
+    } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
+      sql.append("SDE.ST_ENVINTERSECTS(");
+      final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
+      if (boundingBox1Value == null) {
+        sql.append("NULL");
+      } else {
+        boundingBox1Value.appendSql(query, this, sql);
+      }
+      sql.append(",");
+      final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
+      if (boundingBox2Value == null) {
+        sql.append("NULL");
+      } else {
+        boundingBox2Value.appendSql(query, this, sql);
+      }
+      sql.append(") = 1");
+    } else {
+      throw new IllegalArgumentException("Unknown geometry attribute type "
+        + geometryAttribute.getClass());
     }
-    return query;
+  }
+
+  @Override
+  public void appendQueryValue(final Query query, final StringBuffer sql,
+    final QueryValue queryValue) {
+    if (queryValue instanceof EnvelopeIntersects) {
+      appendEnvelopeIntersects(query, sql, (EnvelopeIntersects)queryValue);
+    } else if (queryValue instanceof WithinDistance) {
+      appendWithinDistance(query, sql, (WithinDistance)queryValue);
+    } else {
+      super.appendQueryValue(query, sql, queryValue);
+    }
+  }
+
+  private void appendWithinDistance(final Query query, final StringBuffer sql,
+    final WithinDistance withinDistance) {
+    final Attribute geometryAttribute = query.getGeometryAttribute();
+    if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
+      sql.append("MDSYS.SDO_WITHIN_DISTANCE(");
+      final QueryValue geometry1Value = withinDistance.getGeometry1Value();
+      if (geometry1Value == null) {
+        sql.append("NULL");
+      } else {
+        geometry1Value.appendSql(query, this, sql);
+      }
+      sql.append(", ");
+      final QueryValue geometry2Value = withinDistance.getGeometry1Value();
+      if (geometry2Value == null) {
+        sql.append("NULL");
+      } else {
+        geometry2Value.appendSql(query, this, sql);
+      }
+      sql.append(",'distance = ");
+      final QueryValue distanceValue = withinDistance.getDistanceValue();
+      if (distanceValue == null) {
+        sql.append("0");
+      } else {
+        distanceValue.appendSql(query, this, sql);
+      }
+      sql.append("') = 'TRUE'");
+    } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
+      sql.append("SDE.ST_DISTANCE(");
+      final QueryValue geometry1Value = withinDistance.getGeometry1Value();
+      if (geometry1Value == null) {
+        sql.append("NULL");
+      } else {
+        geometry1Value.appendSql(query, this, sql);
+      }
+      sql.append(", ");
+      final QueryValue geometry2Value = withinDistance.getGeometry1Value();
+      if (geometry2Value == null) {
+        sql.append("NULL");
+      } else {
+        geometry2Value.appendSql(query, this, sql);
+      }
+      sql.append(") <= ");
+      final QueryValue distanceValue = withinDistance.getDistanceValue();
+      if (distanceValue == null) {
+        sql.append("0");
+      } else {
+        distanceValue.appendSql(query, this, sql);
+      }
+    } else {
+      throw new IllegalArgumentException("Unknown geometry attribute type "
+        + geometryAttribute.getClass());
+    }
   }
 
   public AbstractIterator<DataObject> createOracleIterator(
@@ -144,15 +209,6 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       throw new IllegalArgumentException(
         "Cannot create ID for " + sequenceName, e);
     }
-  }
-
-  @Override
-  public int getRowCount(final Query query) {
-    final Query bboxQuery = addBoundingBoxFilter(query);
-    if (bboxQuery != query) {
-      query.setAttributeNames("count(*))");
-    }
-    return super.getRowCount(query);
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {

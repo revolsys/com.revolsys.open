@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class LeftUnaryCondition extends Condition {
@@ -18,15 +19,16 @@ public class LeftUnaryCondition extends Condition {
   }
 
   @Override
-  public int appendParameters(final int index, final PreparedStatement statement) {
-    return value.appendParameters(index, statement);
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    buffer.append(operator);
+    buffer.append(" ");
+    value.appendSql(query, dataStore, buffer);
   }
 
   @Override
-  public void appendSql(final StringBuffer buffer) {
-    buffer.append(operator);
-    buffer.append(" ");
-    value.appendSql(buffer);
+  public int appendParameters(final int index, final PreparedStatement statement) {
+    return value.appendParameters(index, statement);
   }
 
   @Override

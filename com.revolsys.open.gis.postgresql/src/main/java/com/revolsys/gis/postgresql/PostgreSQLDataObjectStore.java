@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
-import org.postgresql.geometric.PGbox;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
@@ -20,16 +19,15 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.data.query.BinaryCondition;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.QueryValue;
+import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
@@ -88,6 +86,29 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
+  public void appendQueryValue(final Query query, final StringBuffer sql,
+    final QueryValue queryValue) {
+    if (queryValue instanceof EnvelopeIntersects) {
+      final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)queryValue;
+      final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
+      if (boundingBox1Value == null) {
+        sql.append("NULL");
+      } else {
+        boundingBox1Value.appendSql(query, this, sql);
+      }
+      sql.append(" && ");
+      final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
+      if (boundingBox2Value == null) {
+        sql.append("NULL");
+      } else {
+        boundingBox2Value.appendSql(query, this, sql);
+      }
+    } else {
+      super.appendQueryValue(query, sql, queryValue);
+    }
+  }
+
+  @Override
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     final String sequenceName = getSequenceName(metaData);
     return "nextval('" + sequenceName + "')";
@@ -109,33 +130,6 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
       throw new IllegalArgumentException(
         "Cannot create ID for " + sequenceName, e);
     }
-  }
-
-  @Override
-  public int getRowCount(Query query) {
-    BoundingBox boundingBox = query.getBoundingBox();
-    if (boundingBox != null) {
-      final String typePath = query.getTypeName();
-      final DataObjectMetaData metaData = getMetaData(typePath);
-      if (metaData == null) {
-        throw new IllegalArgumentException("Unable to  find table " + typePath);
-      } else {
-        query = query.clone();
-        query.setAttributeNames("count(*))");
-        final String geometryAttributeName = metaData.getGeometryAttributeName();
-        final GeometryFactory geometryFactory = metaData.getGeometryFactory();
-        boundingBox = boundingBox.convert(geometryFactory);
-        final double x1 = boundingBox.getMinX();
-        final double y1 = boundingBox.getMinY();
-        final double x2 = boundingBox.getMaxX();
-        final double y2 = boundingBox.getMaxY();
-
-        final PGbox box = new PGbox(x1, y1, x2, y2);
-        query.and(new BinaryCondition(geometryAttributeName, "&&", box));
-      }
-    }
-
-    return super.getRowCount(query);
   }
 
   public String getSequenceName(final DataObjectMetaData metaData) {

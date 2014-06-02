@@ -22,6 +22,10 @@ public interface Vertex extends Point, Iterator<Vertex>, GeometryComponent {
   @Override
   GeometryFactory getGeometryFactory();
 
+  Vertex getLineNext();
+
+  Vertex getLinePrevious();
+
   int getPartIndex();
 
   int getRingIndex();
@@ -35,6 +39,10 @@ public interface Vertex extends Point, Iterator<Vertex>, GeometryComponent {
 
   @Override
   boolean isEmpty();
+
+  boolean isFrom();
+
+  boolean isTo();
 
   Reader<Vertex> reader();
 }

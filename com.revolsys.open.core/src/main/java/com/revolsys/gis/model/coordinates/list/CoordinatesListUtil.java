@@ -1,16 +1,10 @@
 package com.revolsys.gis.model.coordinates.list;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.gis.graph.Edge;
@@ -18,7 +12,6 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.BoundingBox;
@@ -27,9 +20,9 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.math.Angle;
 
@@ -42,7 +35,7 @@ public class CoordinatesListUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
-  public static double angle(final PointList points, final int i1, final int i2) {
+  public static double angle(final LineString points, final int i1, final int i2) {
     final double x1 = points.getX(i1);
     final double y1 = points.getY(i1);
     final double x2 = points.getX(i2);
@@ -51,7 +44,7 @@ public class CoordinatesListUtil {
     return angle;
   }
 
-  public static double angleToNext(final PointList points, final int i) {
+  public static double angleToNext(final LineString points, final int i) {
     final double x1 = points.getX(i);
     final double y1 = points.getY(i);
     double x2;
@@ -66,7 +59,7 @@ public class CoordinatesListUtil {
     return angle;
   }
 
-  public static double angleToPrevious(final PointList points, final int i) {
+  public static double angleToPrevious(final LineString points, final int i) {
     if (i > 0) {
       final double x1 = points.getX(i);
       final double y1 = points.getY(i);
@@ -178,8 +171,8 @@ public class CoordinatesListUtil {
    * @param tolerance
    * @return
    */
-  public static boolean containsWithinTolerance(final PointList points1,
-    final PointList points2, final double tolerance) {
+  public static boolean containsWithinTolerance(final LineString points1,
+    final LineString points2, final double tolerance) {
 
     final LineStringGraph graph1 = new LineStringGraph(points1);
     final LineStringGraph graph2 = new LineStringGraph(points2);
@@ -220,27 +213,15 @@ public class CoordinatesListUtil {
     return false;
   }
 
-  public static boolean equals2dCoordinate(final PointList coordinates,
-    final int index, final double x, final double y) {
-    return coordinates.getX(index) == x && coordinates.getY(index) == y;
-  }
-
-  public static boolean equals2dCoordinates(final PointList coordinates,
-    final int index1, final int index2) {
-    return coordinates.getX(index1) == coordinates.getX(index2)
-      && coordinates.getY(index1) == coordinates.getY(index2);
-  }
-
   public static Map<String, Number> findClosestSegmentAndCoordinate(
-    final PointList points, final Point point) {
+    final LineString points, final Point point) {
     final Map<String, Number> result = new HashMap<String, Number>();
     result.put(SEGMENT_INDEX, -1);
     result.put(COORDINATE_INDEX, -1);
     result.put(COORDINATE_DISTANCE, Double.MAX_VALUE);
     result.put(SEGMENT_DISTANCE, Double.MAX_VALUE);
     double closestSegmentDistance = Double.MAX_VALUE;
-    final CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
-      points);
+    final Iterator<Segment> iterator = points.segments().iterator();
     if (iterator.hasNext()) {
       LineSegment segment = iterator.next();
       double closestCoordinateDistance = segment.getPoint(0).distance(point);
@@ -289,9 +270,8 @@ public class CoordinatesListUtil {
   }
 
   public static BoundingBox getBoundingBox(
-    final GeometryFactory geometryFactory, final PointList points) {
-    final BoundingBox boundingBox = new Envelope(geometryFactory,
-      points.toPointList());
+    final GeometryFactory geometryFactory, final LineString points) {
+    final BoundingBox boundingBox = new Envelope(geometryFactory, points);
     return boundingBox;
   }
 
@@ -311,9 +291,9 @@ public class CoordinatesListUtil {
     return coordinates.toArray(new Point[coordinates.size()]);
   }
 
-  public static List<PointList> intersection(
-    final GeometryFactory geometryFactory, final PointList points1,
-    final PointList points2, final double maxDistance) {
+  public static List<LineString> intersection(
+    final GeometryFactory geometryFactory, final LineString points1,
+    final LineString points2, final double maxDistance) {
 
     final LineStringGraph graph1 = new LineStringGraph(points1);
     graph1.setPrecisionModel(geometryFactory);
@@ -341,7 +321,7 @@ public class CoordinatesListUtil {
     if (movedNodes.containsKey(endPoint)) {
       endPoint = movedNodes.get(endPoint);
     }
-    final List<PointList> intersections = new ArrayList<PointList>();
+    final List<LineString> intersections = new ArrayList<LineString>();
     final List<Point> currentCoordinates = new ArrayList<>();
     Node<LineSegment> previousNode = graph1.getNode(startPoint);
     do {
@@ -362,7 +342,7 @@ public class CoordinatesListUtil {
           currentCoordinates.add(line.getPoint(1));
         } else {
           if (currentCoordinates.size() > 0) {
-            final PointList points = new DoubleCoordinatesList(
+            final LineString points = new LineStringDouble(
               points1.getAxisCount(), currentCoordinates);
             intersections.add(points);
             currentCoordinates.clear();
@@ -373,8 +353,8 @@ public class CoordinatesListUtil {
 
     } while (previousNode != null && !endPoint.equals(2, startPoint));
     if (currentCoordinates.size() > 0) {
-      final PointList points = new DoubleCoordinatesList(
-        points1.getAxisCount(), currentCoordinates);
+      final LineString points = new LineStringDouble(points1.getAxisCount(),
+        currentCoordinates);
       intersections.add(points);
     }
     return intersections;
@@ -439,13 +419,13 @@ public class CoordinatesListUtil {
     return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
   }
 
-  public static int orientationIndex(final PointList ring, final int index1,
+  public static int orientationIndex(final LineString ring, final int index1,
     final int index2, final int index) {
     return orientationIndex(ring.getX(index1), ring.getY(index1),
       ring.getX(index2), ring.getY(index2), ring.getX(index), ring.getY(index));
   }
 
-  public static PointList removeRepeatedPoints(final PointList points) {
+  public static LineString removeRepeatedPoints(final LineString points) {
     final int axisCount = points.getAxisCount();
     final List<Double> coordinates = new ArrayList<Double>();
     double x = points.getX(0);
@@ -468,7 +448,7 @@ public class CoordinatesListUtil {
         y = y1;
       }
     }
-    return new DoubleCoordinatesList(axisCount, coordinates);
+    return new LineStringDouble(axisCount, coordinates);
   }
 
   public static void setCoordinates(final double[] coordinates,
@@ -509,22 +489,6 @@ public class CoordinatesListUtil {
     }
   }
 
-  public static void setCoordinates(final double[] coordinates,
-    final int axisCount, final int i, final PointList points, final int j) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = points.getCoordinate(j, axisIndex);
-      coordinates[i * axisCount + axisIndex] = value;
-    }
-  }
-
-  public static void setCoordinates(final double[] coordinates,
-    final int axisCount, final int offset, final PointList points,
-    final int vertexIndex, final int vertexCount) {
-    for (int i = 0; i < vertexCount; i++) {
-      setCoordinates(coordinates, axisCount, i, points, vertexIndex + i);
-    }
-  }
-
   public static void setCoordinates(final GeometryFactory geometryFactory,
     final double[] coordinates, final int axisCount, final int vertexIndex,
     Point point) {
@@ -536,210 +500,6 @@ public class CoordinatesListUtil {
       value = geometryFactory.makePrecise(axisIndex, value);
       coordinates[vertexIndex * axisCount + axisIndex] = value;
     }
-  }
-
-  public static <V extends Point> List<LineString> split(final LineString line,
-    Collection<V> splitPoints, final double maxDistance) {
-    splitPoints = new ArrayList<V>(splitPoints);
-    final List<LineString> lines = new ArrayList<LineString>();
-    final PointList points = line;
-    final Set<Integer> splitVertices = new TreeSet<Integer>();
-    final Set<Integer> splitIndexes = new TreeSet<Integer>();
-
-    for (final Iterator<V> iter = splitPoints.iterator(); iter.hasNext();) {
-      final Point node = iter.next();
-      final double distance = points.distance(0, node);
-      if (distance < maxDistance) {
-        iter.remove();
-      }
-    }
-    final Map<Point, Double> pointDistanceMap = new HashMap<Point, Double>();
-    final Map<Point, Integer> pointSegment = new HashMap<Point, Integer>();
-
-    for (int i = 1; i < points.getVertexCount() && !splitPoints.isEmpty(); i++) {
-      for (final Iterator<V> nodeIter = splitPoints.iterator(); nodeIter.hasNext();) {
-        final Point point = nodeIter.next();
-        final double pointDistance = points.distance(i, point);
-        if (pointDistance < maxDistance) {
-          if (i < points.getVertexCount() - 1) {
-            splitVertices.add(i);
-            splitIndexes.add(i);
-          }
-          pointDistanceMap.remove(point);
-          pointSegment.remove(point);
-          nodeIter.remove();
-        } else {
-          final int segmentIndex = i - 1;
-          final double x = point.getX();
-          final double y = point.getY();
-          final double x1 = points.getX(segmentIndex);
-          final double y1 = points.getY(segmentIndex);
-          final double x2 = points.getX(i);
-          final double y2 = points.getY(i);
-          final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1,
-            y1, x2, y2, x, y);
-          if (segmentDistance == 0) {
-            pointDistanceMap.put(point, segmentDistance);
-            pointSegment.put(point, segmentIndex);
-            nodeIter.remove();
-          } else {
-            final double projectionFactor = LineSegmentUtil.projectionFactor(
-              x1, y1, x2, y2, x, y);
-            if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-              final Double closestDistance = pointDistanceMap.get(point);
-              if (closestDistance == null) {
-                pointSegment.put(point, segmentIndex);
-                pointDistanceMap.put(point, segmentDistance);
-              } else if (closestDistance.compareTo(segmentDistance) > 0) {
-                pointSegment.put(point, segmentIndex);
-                pointDistanceMap.put(point, segmentDistance);
-              }
-            }
-          }
-        }
-      }
-    }
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = line.getGeometryFactory();
-    final Map<Integer, Set<Point>> segmentSplitPoints = new TreeMap<Integer, Set<Point>>();
-    for (final Entry<Point, Integer> entry : pointSegment.entrySet()) {
-      final Point splitPoint = entry.getKey();
-      final Integer index = entry.getValue();
-      Set<Point> splitNodes = segmentSplitPoints.get(index);
-      if (splitNodes == null) {
-        final Point point = points.getPoint(index);
-        splitNodes = new TreeSet<Point>(
-          new CoordinatesDistanceComparator(point));
-        segmentSplitPoints.put(index, splitNodes);
-        splitIndexes.add(index);
-      }
-      splitNodes.add(splitPoint);
-      splitPoints.remove(splitPoint);
-    }
-    if (splitPoints.isEmpty()) {
-      int startIndex = 0;
-      Point startPoint = null;
-      for (final Integer index : splitIndexes) {
-        if (splitVertices.contains(index)) {
-          final PointList newPoints = CoordinatesListUtil.subList(points,
-            startPoint, startIndex, index - startIndex + 1, null);
-          final LineString newLine = geometryFactory.lineString(newPoints);
-          lines.add(newLine);
-          startPoint = null;
-          startIndex = index;
-        }
-        final Set<Point> splitNodes = segmentSplitPoints.get(index);
-        if (splitNodes != null) {
-          for (final Point splitPoint : splitNodes) {
-            Point point = splitPoint;
-            final double splitPointZ = splitPoint.getZ();
-            if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
-              if (splitPointZ == 0 || Double.isNaN(splitPointZ)) {
-                final Point p1 = points.getPoint(index);
-                final Point p2 = points.getPoint(index + 1);
-                final double z = LineSegmentUtil.getElevation(p1, p2, point);
-                point = new PointDouble(point.getX(), point.getY(), z);
-              }
-            }
-
-            final PointList newPoints;
-            if (startIndex > index) {
-              final Point[] coordinateArray = {
-                startPoint, point
-              };
-              newPoints = new DoubleCoordinatesList(points.getAxisCount(),
-                coordinateArray);
-            } else {
-              newPoints = CoordinatesListUtil.subList(points, startPoint,
-                startIndex, index - startIndex + 1, point);
-            }
-            final LineString newLine = geometryFactory.lineString(newPoints);
-            lines.add(newLine);
-            startPoint = point;
-            startIndex = index + 1;
-          }
-        }
-      }
-      final PointList newPoints = CoordinatesListUtil.subList(points,
-        startPoint, startIndex);
-      final LineString newLine = geometryFactory.lineString(newPoints);
-      lines.add(newLine);
-
-      return lines;
-    } else {
-      return Collections.singletonList(line);
-    }
-  }
-
-  public static PointList subList(final PointList points,
-    final Point startPoint, final int start) {
-    final int axisCount = points.getAxisCount();
-    final int length = points.getVertexCount() - start;
-    int vertexCount = length;
-    int startIndex = 0;
-    boolean startEqual = false;
-    if (startPoint != null) {
-      startEqual = startPoint.equals(2, points.getPoint(start));
-      if (!startEqual) {
-        vertexCount++;
-        startIndex++;
-      }
-    }
-
-    final double[] coordinates = new double[vertexCount * axisCount];
-
-    if (!startEqual && startPoint != null) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, startPoint);
-    }
-    for (int i = start; i < start + length; i++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, startIndex++,
-        points.getPoint(i));
-    }
-
-    return new DoubleCoordinatesList(axisCount, coordinates);
-  }
-
-  public static PointList subList(final PointList points,
-    final Point startPoint, final int start, final int length,
-    final Point endPoint) {
-    final int axisCount = points.getAxisCount();
-    int vertexCount = length;
-    int startIndex = 0;
-    int lastIndex = length;
-    boolean startEqual = false;
-    boolean endEqual = false;
-    if (startPoint != null) {
-      final Point p1 = points.getPoint(start);
-      startEqual = startPoint.equals(2, p1);
-      if (!startEqual) {
-        vertexCount++;
-        lastIndex++;
-        startIndex++;
-      }
-    }
-    if (endPoint != null) {
-      final Point pointsEnd = points.getPoint(start + length - 1);
-      endEqual = endPoint.equals(2, pointsEnd);
-      if (!endEqual) {
-        vertexCount++;
-      }
-    }
-    final double[] coordinates = new double[vertexCount * axisCount];
-
-    if (!startEqual && startPoint != null) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, startPoint);
-    }
-
-    for (int i = start; i < start + length; i++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, startIndex++,
-        points.getPoint(i));
-    }
-
-    if (!endEqual && endPoint != null) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, lastIndex,
-        endPoint);
-    }
-
-    return new DoubleCoordinatesList(axisCount, coordinates);
   }
 
   public static void switchCoordinates(final double[] coordinates,

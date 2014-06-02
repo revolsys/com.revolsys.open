@@ -33,7 +33,6 @@
 package com.revolsys.jts.precision;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Lineal;
@@ -154,7 +153,7 @@ public class MinimumClearance {
       // compute MinClearance distance metric
 
       vertexDistance(fs1, fs2);
-      if (fs1.size() == 1 && fs2.size() == 1) {
+      if (fs1.getVertexCount() == 1 && fs2.getVertexCount() == 1) {
         return minDist;
       }
       if (minDist <= 0.0) {
@@ -182,15 +181,15 @@ public class MinimumClearance {
 
     private double segmentDistance(final FacetSequence fs1,
       final FacetSequence fs2) {
-      for (int i1 = 0; i1 < fs1.size(); i1++) {
-        for (int i2 = 1; i2 < fs2.size(); i2++) {
+      for (int i1 = 0; i1 < fs1.getVertexCount(); i1++) {
+        for (int i2 = 1; i2 < fs2.getVertexCount(); i2++) {
 
           final Point p = fs1.getCoordinate(i1);
 
           final Point seg0 = fs2.getCoordinate(i2 - 1);
           final Point seg1 = fs2.getCoordinate(i2);
 
-          if (!(p.equals(2,seg0) || p.equals(2,seg1))) {
+          if (!(p.equals(2, seg0) || p.equals(2, seg1))) {
             final double d = LineSegmentUtil.distanceLinePoint(seg0, seg1, p);
             if (d < minDist) {
               minDist = d;
@@ -205,8 +204,7 @@ public class MinimumClearance {
       return minDist;
     }
 
-    private void updatePts(final Point p, final Point seg0,
-      final Point seg1) {
+    private void updatePts(final Point p, final Point seg0, final Point seg1) {
       minPts[0] = p;
       final LineSegment seg = new LineSegmentDouble(seg0, seg1);
       minPts[1] = new PointDouble(seg.closestPoint(p));
@@ -214,11 +212,11 @@ public class MinimumClearance {
 
     private double vertexDistance(final FacetSequence fs1,
       final FacetSequence fs2) {
-      for (int i1 = 0; i1 < fs1.size(); i1++) {
-        for (int i2 = 0; i2 < fs2.size(); i2++) {
+      for (int i1 = 0; i1 < fs1.getVertexCount(); i1++) {
+        for (int i2 = 0; i2 < fs2.getVertexCount(); i2++) {
           final Point p1 = fs1.getCoordinate(i1);
           final Point p2 = fs2.getCoordinate(i2);
-          if (!p1.equals(2,p2)) {
+          if (!p1.equals(2, p2)) {
             final double d = p1.distance(p2);
             if (d < minDist) {
               minDist = d;
@@ -332,8 +330,7 @@ public class MinimumClearance {
     compute();
     // return empty line string if no min pts where found
     if (minClearancePts == null || minClearancePts[0] == null) {
-      return inputGeom.getGeometryFactory().lineString(
-        (Point[])null);
+      return inputGeom.getGeometryFactory().lineString((Point[])null);
     }
     return inputGeom.getGeometryFactory().lineString(minClearancePts);
   }

@@ -47,6 +47,7 @@ import java.util.Stack;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
@@ -297,7 +298,9 @@ class BufferSubgraph implements Comparable {
       double[] bounds = null;
       for (final DirectedEdge dirEdge : dirEdgeList) {
         final Edge edge = dirEdge.getEdge();
-        for (final Point point : edge.getPoints().toPointList()) {
+        final LineString points = edge.getPoints();
+        for (int i = 0; i < points.getVertexCount(); i++) {
+          final Point point = points.getPoint(i);
           if (bounds == null) {
             bounds = EnvelopeUtil.createBounds(2, point);
           } else {

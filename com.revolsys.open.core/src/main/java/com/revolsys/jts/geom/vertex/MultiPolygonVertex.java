@@ -2,6 +2,7 @@ package com.revolsys.jts.geom.vertex;
 
 import java.util.NoSuchElementException;
 
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
@@ -17,6 +18,49 @@ public class MultiPolygonVertex extends AbstractVertex {
     final int... vertexId) {
     super(multiPolygon);
     setVertexId(vertexId);
+  }
+
+  @Override
+  public double getCoordinate(final int index) {
+    final Polygon polygon = getPolygon();
+    final LinearRing ring = polygon.getRing(ringIndex);
+    if (ring == null) {
+      return Double.NaN;
+    } else {
+      return ring.getCoordinate(vertexIndex, index);
+    }
+  }
+
+  @Override
+  public Vertex getLineNext() {
+    final LineString ring = getRing();
+    if (ring != null) {
+      int newVertexIndex = vertexIndex + 1;
+      if (newVertexIndex >= ring.getVertexCount() - 1) {
+        newVertexIndex -= ring.getVertexCount();
+      }
+      if (newVertexIndex < ring.getVertexCount() - 1) {
+        return new MultiPolygonVertex(getMultiPolygon(), partIndex, ringIndex,
+          newVertexIndex);
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public Vertex getLinePrevious() {
+    final LineString ring = getRing();
+    if (ring != null) {
+      int newVertexIndex = vertexIndex - 1;
+      if (newVertexIndex == -1) {
+        newVertexIndex = ring.getVertexCount() - 2;
+      }
+      if (newVertexIndex >= 0) {
+        return new MultiPolygonVertex(getMultiPolygon(), partIndex, ringIndex,
+          newVertexIndex);
+      }
+    }
+    return null;
   }
 
   public MultiPolygon getMultiPolygon() {
@@ -41,17 +85,6 @@ public class MultiPolygonVertex extends AbstractVertex {
   @Override
   public int getRingIndex() {
     return ringIndex;
-  }
-
-  @Override
-  public double getCoordinate(final int index) {
-    final Polygon polygon = getPolygon();
-    final LinearRing ring = polygon.getRing(ringIndex);
-    if (ring == null) {
-      return Double.NaN;
-    } else {
-      return ring.getCoordinate(vertexIndex, index);
-    }
   }
 
   @Override

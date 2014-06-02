@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Allows comparing {@link Coordinates} arrays
@@ -43,8 +43,8 @@ import com.revolsys.jts.geom.PointList;
  */
 public class OrientedCoordinateArray implements
   Comparable<OrientedCoordinateArray> {
-  private static int compareOriented(final PointList points1,
-    final boolean orientation1, final PointList points2,
+  private static int compareOriented(final LineString points1,
+    final boolean orientation1, final LineString points2,
     final boolean orientation2) {
     final int dir1 = orientation1 ? 1 : -1;
     final int dir2 = orientation2 ? 1 : -1;
@@ -88,7 +88,7 @@ public class OrientedCoordinateArray implements
    * or is a palindrome,
    * <code>-1</code> if smaller at the end
    */
-  public static int increasingDirection(final PointList points) {
+  public static int increasingDirection(final LineString points) {
     final int numPoints = points.getVertexCount();
     for (int i = 0; i < numPoints / 2; i++) {
       final int j = numPoints - 1 - i;
@@ -102,7 +102,7 @@ public class OrientedCoordinateArray implements
     return 1;
   }
 
-  private final PointList points;
+  private final LineString points;
 
   private final boolean orientation;
 
@@ -112,7 +112,7 @@ public class OrientedCoordinateArray implements
    *
    * @param points the coordinates to orient
    */
-  public OrientedCoordinateArray(final PointList points) {
+  public OrientedCoordinateArray(final LineString points) {
     this.points = points;
     this.orientation = increasingDirection(points) == 1;
   }
@@ -136,7 +136,7 @@ public class OrientedCoordinateArray implements
     return orientation;
   }
 
-  public PointList getPoints() {
+  public LineString getPoints() {
     return points;
   }
 }

@@ -2,7 +2,7 @@ package com.revolsys.jts.simplify;
 
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.geom.impl.PointDouble;
 
@@ -18,7 +18,7 @@ class VWLineSimplifier {
   static class VWVertex {
     public static double MAX_AREA = Double.MAX_VALUE;
 
-    public static VWLineSimplifier.VWVertex buildLine(final PointList pts) {
+    public static VWLineSimplifier.VWVertex buildLine(final LineString pts) {
       VWLineSimplifier.VWVertex first = null;
       VWLineSimplifier.VWVertex prev = null;
       for (int i = 0; i < pts.getVertexCount(); i++) {
@@ -105,18 +105,18 @@ class VWLineSimplifier {
     }
   }
 
-  public static Point[] simplify(final PointList coords,
+  public static Point[] simplify(final LineString coords,
     final double distanceTolerance) {
     final VWLineSimplifier simp = new VWLineSimplifier(coords,
       distanceTolerance);
     return simp.simplify();
   }
 
-  private final PointList pts;
+  private final LineString pts;
 
   private final double tolerance;
 
-  public VWLineSimplifier(final PointList coords, final double distanceTolerance) {
+  public VWLineSimplifier(final LineString coords, final double distanceTolerance) {
     this.pts = coords;
     this.tolerance = distanceTolerance * distanceTolerance;
   }

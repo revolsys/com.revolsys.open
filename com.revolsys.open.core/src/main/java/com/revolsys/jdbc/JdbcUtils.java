@@ -100,7 +100,17 @@ public final class JdbcUtils {
     final Condition where = query.getWhereCondition();
     if (where != null && !where.isEmpty()) {
       sql.append(" WHERE ");
-      where.appendSql(sql);
+      final DataObjectMetaData metaData = query.getMetaData();
+      if (metaData == null) {
+        where.appendSql(query, null, sql);
+      } else {
+        final DataObjectStore dataStore = metaData.getDataStore();
+        if (dataStore == null) {
+          where.appendSql(query, dataStore, sql);
+        } else {
+          where.appendSql(query, dataStore, sql);
+        }
+      }
     }
   }
 

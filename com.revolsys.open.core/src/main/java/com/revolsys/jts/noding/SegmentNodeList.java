@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.util.Assert;
 
 // INCOMPLETE!
@@ -251,7 +251,7 @@ public class SegmentNodeList {
         ei1.coord);
     }
 
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(axisCount,
+    final LineStringDouble points = new LineStringDouble(axisCount,
       coordinates);
     return new NodedSegmentString(points, edge.getData());
   }

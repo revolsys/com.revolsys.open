@@ -14,13 +14,11 @@ import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.filter.DirectoryFilenameFilter;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
-import com.revolsys.jts.geom.Geometry;
 
 public class DirectoryDataObjectStore extends AbstractDataObjectStore {
 
@@ -182,12 +180,6 @@ public class DirectoryDataObjectStore extends AbstractDataObjectStore {
         addSchema(new DataObjectStoreSchema(this, directoryName));
       }
     }
-  }
-
-  @Override
-  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
-    final String typePath, final Geometry geometry) {
-    throw new UnsupportedOperationException();
   }
 
   public void setCreateMissingDataStore(final boolean createMissingDataStore) {

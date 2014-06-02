@@ -36,12 +36,12 @@ package com.revolsys.jts.simplify;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 
 /**
@@ -96,18 +96,23 @@ public class TopologyPreservingSimplifier {
 
   class LineStringTransformer extends GeometryTransformer {
     @Override
-    protected PointList transformCoordinates(
-      final PointList coords, final Geometry parent) {
+    protected LineString transformCoordinates(final LineString coords,
+      final Geometry parent) {
       if (coords.getVertexCount() == 0) {
         return null;
       }
       // for linear components (including rings), simplify the linestring
       if (parent instanceof LineString) {
         final TaggedLineString taggedLine = linestringMap.get(parent);
-        return new DoubleCoordinatesList(taggedLine.getResultCoordinates());
+        return new LineStringDouble(taggedLine.getResultCoordinates());
       }
       // for anything else (e.g. points) just copy the coordinates
       return super.transformCoordinates(coords, parent);
+    }
+
+    @Override
+    protected Geometry transformPoint(final Point point, final Geometry parent) {
+      return point;
     }
   }
 

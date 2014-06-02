@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.saif.SaifConstants;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -38,7 +38,7 @@ public class ArcConverter implements OsnConverter {
     String attributeName = iterator.nextAttributeName();
     LineString geometry = null;
     while (attributeName != null) {
-      if (attributeName.equals("pointList")) {
+      if (attributeName.equals("LineString")) {
         final List<Point> coordinates = new ArrayList<Point>();
         while (iterator.next() != OsnIterator.END_LIST) {
           final String pointName = iterator.nextObjectName();
@@ -97,9 +97,9 @@ public class ArcConverter implements OsnConverter {
       final LineString line = (LineString)object;
       serializer.startObject(geometryType);
 
-      serializer.attributeName("pointList");
+      serializer.attributeName("LineString");
       serializer.startCollection("List");
-      final PointList points = line;
+      final LineString points = line;
       final int axisCount = points.getAxisCount();
       for (int i = 0; i < points.getVertexCount(); i++) {
         serializer.startObject(SaifConstants.POINT);

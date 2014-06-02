@@ -43,9 +43,9 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.segment.LineSegment;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -279,7 +279,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   protected Geometry appendVertex(final Point newPoint) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
+    final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
     Geometry geometry = this.addGeometry;
     if (geometry.isEmpty()) {
       geometry = newPoint.convert(geometryFactory);
@@ -426,8 +426,27 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return getGraphics();
   }
 
-  protected Point getPoint(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point getLineNextVertex(final LineString line, final int vertexIndex,
+    final int offset) {
+    final int nextVertexIndex = vertexIndex + offset;
+    if (nextVertexIndex < line.getVertexCount()) {
+      return line.getPoint(nextVertexIndex);
+    } else {
+      return null;
+    }
+  }
+
+  public Point getLinePreviousVertex(final LineString line,
+    final int vertexIndex, final int offset) {
+    final int previousVertexIndex = vertexIndex + offset;
+    if (previousVertexIndex < 0) {
+      return null;
+    } else {
+      return line.getPoint(previousVertexIndex);
+    }
+  }
+
+  protected Point getPoint(final GeometryFactory geometryFactory,
     final MouseEvent event) {
     final Viewport2D viewport = getViewport();
     final java.awt.Point eventPoint = event.getPoint();
@@ -472,51 +491,31 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     final DataType geometryPartDataType = getGeometryPartDataType(geometryDataType);
 
     int previousPointOffset;
-    int nextPointOffset;
-    int[] index = location.getVertexIndex();
-    if (index == null) {
+    int[] vertexId = location.getVertexIndex();
+    if (vertexId == null) {
       previousPointOffset = 0;
-      nextPointOffset = 1;
-      index = location.getSegmentId();
+      vertexId = location.getSegmentId();
     } else {
       previousPointOffset = -1;
-      nextPointOffset = 1;
     }
     final GeometryFactory geometryFactory = location.getGeometryFactory();
     if (DataTypes.GEOMETRY.equals(geometryPartDataType)) {
     } else if (DataTypes.POINT.equals(geometryPartDataType)) {
     } else {
       final Point point = getPoint(geometryFactory, event);
-      final PointList points = GeometryEditUtil.getPoints(geometry, index);
-      final int pointIndex = index[index.length - 1];
-      int previousPointIndex = pointIndex + previousPointOffset;
-      int nextPointIndex = pointIndex + nextPointOffset;
+
+      final Vertex vertex = geometry.getVertex(vertexId);
       Point previousPoint = null;
       Point nextPoint = null;
 
-      final int numPoints = points.getVertexCount();
-      if (DataTypes.LINE_STRING.equals(geometryPartDataType)) {
-        if (numPoints > 1) {
-          previousPoint = points.getPoint(previousPointIndex);
-          nextPoint = points.getPoint(nextPointIndex);
+      if (DataTypes.LINE_STRING.equals(geometryPartDataType)
+        || DataTypes.POLYGON.equals(geometryPartDataType)) {
+        if (previousPointOffset == 0) {
+          previousPoint = vertex;
+        } else {
+          previousPoint = vertex.getLinePrevious();
         }
-      } else if (DataTypes.POLYGON.equals(geometryPartDataType)) {
-        if (numPoints == 2) {
-          previousPoint = points.getPoint(previousPointIndex);
-          nextPoint = points.getPoint(nextPointIndex);
-        } else if (numPoints > 3) {
-          while (previousPointIndex < 0) {
-            previousPointIndex += numPoints - 1;
-          }
-          previousPointIndex = previousPointIndex % (numPoints - 1);
-          previousPoint = points.getPoint(previousPointIndex);
-
-          while (nextPointIndex < 0) {
-            nextPointIndex += numPoints - 1;
-          }
-          nextPointIndex = nextPointIndex % (numPoints - 1);
-          nextPoint = points.getPoint(nextPointIndex);
-        }
+        nextPoint = vertex.getLineNext();
       }
 
       final List<LineString> lines = new ArrayList<LineString>();
@@ -733,7 +732,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
               } else {
                 final Point p1 = geometryFactory.point(previousPoint);
                 final Point p3 = geometryFactory.point(firstPoint);
-                final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+                final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
                 xorGeometry = viewportGeometryFactory.lineString(p1, point, p3);
               }
             }
@@ -772,7 +771,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     if (event.getButton() == moveGeometryButton) {
       if (clearOverlayAction(ACTION_MOVE_GEOMETRY)) {
         for (final CloseLocation location : moveGeometryLocations) {
-          final com.revolsys.jts.geom.GeometryFactory geometryFactory = location.getGeometryFactory();
+          final GeometryFactory geometryFactory = location.getGeometryFactory();
           final Point startPoint = (Point)getViewportPoint(
             this.moveGeometryStart).copy(geometryFactory);
           final Point endPoint = (Point)getViewportPoint(event).copy(
@@ -930,7 +929,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   @Override
   public void paintComponent(final Graphics2D graphics) {
     final Viewport2D viewport = getViewport();
-    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
 
     if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
       final AffineTransform transform = graphics.getTransform();
@@ -1097,7 +1096,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         final MultipleUndo edit = new MultipleUndo();
         for (final CloseLocation location : getMouseOverLocations()) {
           final Geometry geometry = location.getGeometry();
-          final com.revolsys.jts.geom.GeometryFactory geometryFactory = location.getGeometryFactory();
+          final GeometryFactory geometryFactory = location.getGeometryFactory();
           final Point point;
           if (getSnapPoint() == null) {
             point = getPoint(geometryFactory, event);

@@ -39,7 +39,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
@@ -123,7 +123,7 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
  * @version 1.7
  */
 class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
-  private final PointList rectSeq;
+  private final LineString rectSeq;
 
   private final BoundingBox rectEnv;
 
@@ -305,7 +305,7 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
   }
 
   private void checkIntersectionWithSegments(final LineString testLine) {
-    final PointList seq1 = testLine;
+    final LineString seq1 = testLine;
     for (int j = 1; j < seq1.getVertexCount(); j++) {
       final Point p0 = seq1.getPoint(j - 1);
       final Point p1 = seq1.getPoint(j);

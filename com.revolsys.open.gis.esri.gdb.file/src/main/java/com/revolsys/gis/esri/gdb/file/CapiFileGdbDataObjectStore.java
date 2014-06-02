@@ -46,6 +46,8 @@ import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.RightUnaryCondition;
 import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.gis.data.query.Value;
+import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
+import com.revolsys.gis.data.query.functions.WithinDistance;
 import com.revolsys.gis.esri.gdb.file.capi.FileGdbDomainCodeTable;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Envelope;
@@ -262,14 +264,15 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  private void appendQueryValue(final StringBuffer buffer,
+  @Override
+  public void appendQueryValue(final Query query, final StringBuffer buffer,
     final QueryValue condition) {
     if (condition instanceof Like || condition instanceof ILike) {
       final BinaryCondition like = (BinaryCondition)condition;
       final QueryValue left = like.getLeft();
       final QueryValue right = like.getRight();
       buffer.append("UPPER(CAST(");
-      appendQueryValue(buffer, left);
+      appendQueryValue(query, buffer, left);
       buffer.append(" AS VARCHAR(4000))) LIKE ");
       if (right instanceof Value) {
         final Value valueCondition = (Value)right;
@@ -281,7 +284,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         }
         buffer.append("'");
       } else {
-        appendQueryValue(buffer, right);
+        appendQueryValue(query, buffer, right);
       }
     } else if (condition instanceof LeftUnaryCondition) {
       final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
@@ -289,12 +292,12 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       final QueryValue right = unaryCondition.getQueryValue();
       buffer.append(operator);
       buffer.append(" ");
-      appendQueryValue(buffer, right);
+      appendQueryValue(query, buffer, right);
     } else if (condition instanceof RightUnaryCondition) {
       final RightUnaryCondition unaryCondition = (RightUnaryCondition)condition;
       final QueryValue left = unaryCondition.getValue();
       final String operator = unaryCondition.getOperator();
-      appendQueryValue(buffer, left);
+      appendQueryValue(query, buffer, left);
       buffer.append(" ");
       buffer.append(operator);
     } else if (condition instanceof BinaryCondition) {
@@ -302,11 +305,11 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       final QueryValue left = binaryCondition.getLeft();
       final String operator = binaryCondition.getOperator();
       final QueryValue right = binaryCondition.getRight();
-      appendQueryValue(buffer, left);
+      appendQueryValue(query, buffer, left);
       buffer.append(" ");
       buffer.append(operator);
       buffer.append(" ");
-      appendQueryValue(buffer, right);
+      appendQueryValue(query, buffer, right);
     } else if (condition instanceof AbstractMultiCondition) {
       final AbstractMultiCondition multipleCondition = (AbstractMultiCondition)condition;
       buffer.append("(");
@@ -320,7 +323,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           buffer.append(operator);
           buffer.append(" ");
         }
-        appendQueryValue(buffer, subCondition);
+        appendQueryValue(query, buffer, subCondition);
       }
       buffer.append(")");
     } else if (condition instanceof Value) {
@@ -372,9 +375,12 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
         }
         matcher.appendTail(buffer);
       }
-
+    } else if (condition instanceof EnvelopeIntersects) {
+      buffer.append("1 = 1");
+    } else if (condition instanceof WithinDistance) {
+      buffer.append("1 = 1");
     } else {
-      condition.appendSql(buffer);
+      condition.appendDefaultSql(query, this, buffer);
     }
   }
 
@@ -518,7 +524,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       typePath = metaData.getPath();
     }
-    final BoundingBox boundingBox = query.getBoundingBox();
+    final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
     final Map<String, Boolean> orderBy = query.getOrderBy();
     final StringBuffer whereClause = getWhereClause(query);
     StringBuffer sql = new StringBuffer();
@@ -946,7 +952,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           typePath = metaData.getPath();
         }
         final StringBuffer whereClause = getWhereClause(query);
-        final BoundingBox boundingBox = query.getBoundingBox();
+        final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
 
         if (boundingBox == null) {
           final StringBuffer sql = new StringBuffer();
@@ -1040,7 +1046,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     final StringBuffer whereClause = new StringBuffer();
     final Condition whereCondition = query.getWhereCondition();
     if (whereCondition != null) {
-      appendQueryValue(whereClause, whereCondition);
+      appendQueryValue(query, whereClause, whereCondition);
     }
     return whereClause;
   }

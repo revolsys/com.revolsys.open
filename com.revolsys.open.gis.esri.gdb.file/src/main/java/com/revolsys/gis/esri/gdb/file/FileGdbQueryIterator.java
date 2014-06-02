@@ -3,7 +3,6 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -16,6 +15,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbAttribute;
 import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
@@ -175,6 +175,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     final DataObjectMetaData metaData = this.metaData;
     if (metaData != null) {
       this.boundingBox = boundingBox;
+
       if (boundingBox != null) {
         final Attribute geometryAttribute = metaData.getGeometryAttribute();
         if (geometryAttribute != null) {

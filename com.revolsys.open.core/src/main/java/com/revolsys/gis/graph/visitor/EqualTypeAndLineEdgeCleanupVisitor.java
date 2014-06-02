@@ -26,7 +26,7 @@ import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
@@ -53,8 +53,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
 
   public boolean fixMissingZValues(final LineString line1,
     final LineString line2) {
-    final PointList points1 = line1;
-    final PointList points2 = line2;
+    final LineString points1 = line1;
+    final LineString points2 = line2;
     final int axisCount = points1.getAxisCount();
     if (axisCount > 2) {
       final int vertexCount = points1.getVertexCount();
@@ -80,8 +80,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  public boolean fixZValues(final PointList points1, final int index1,
-    final PointList points2, final int index2) {
+  public boolean fixZValues(final LineString points1, final int index1,
+    final LineString points2, final int index2) {
     // TODO
     // final double z1 = points1.getZ(index2);
     // final double z2 = points2.getZ(index1);

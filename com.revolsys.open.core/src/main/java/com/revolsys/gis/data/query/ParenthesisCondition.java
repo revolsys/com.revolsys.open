@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class ParenthesisCondition extends Condition {
@@ -21,15 +22,16 @@ public class ParenthesisCondition extends Condition {
   }
 
   @Override
-  public int appendParameters(final int index, final PreparedStatement statement) {
-    return condition.appendParameters(index, statement);
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    buffer.append("(");
+    condition.appendSql(query, dataStore, buffer);
+    buffer.append(")");
   }
 
   @Override
-  public void appendSql(final StringBuffer buffer) {
-    buffer.append("(");
-    condition.appendSql(buffer);
-    buffer.append(")");
+  public int appendParameters(final int index, final PreparedStatement statement) {
+    return condition.appendParameters(index, statement);
   }
 
   @Override

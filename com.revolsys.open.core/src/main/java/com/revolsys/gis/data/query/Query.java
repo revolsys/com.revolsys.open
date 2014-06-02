@@ -13,8 +13,6 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
 
 public class Query extends AbstractObjectWithProperties implements Cloneable {
   private static void addFilter(final Query query,
@@ -84,11 +82,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   private List<String> attributeNames = Collections.emptyList();
 
-  private BoundingBox boundingBox;
-
   private String fromClause;
-
-  private Geometry geometry;
 
   private int limit = -1;
 
@@ -176,16 +170,12 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     return attributeNames;
   }
 
-  public BoundingBox getBoundingBox() {
-    return boundingBox;
-  }
-
   public String getFromClause() {
     return fromClause;
   }
 
-  public Geometry getGeometry() {
-    return geometry;
+  public Attribute getGeometryAttribute() {
+    return getMetaData().getGeometryAttribute();
   }
 
   public int getLimit() {
@@ -236,16 +226,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     setAttributeNames(Arrays.asList(attributeNames));
   }
 
-  public void setBoundingBox(final BoundingBox boundingBox) {
-    this.boundingBox = boundingBox;
-  }
-
   public void setFromClause(final String fromClause) {
     this.fromClause = fromClause;
-  }
-
-  public void setGeometry(final Geometry geometry) {
-    this.geometry = geometry;
   }
 
   public void setLimit(final int limit) {
@@ -258,6 +240,9 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public void setMetaData(final DataObjectMetaData metaData) {
     this.metaData = metaData;
+    if (whereCondition != null) {
+      whereCondition.setMetaData(metaData);
+    }
   }
 
   public void setOffset(final int offset) {

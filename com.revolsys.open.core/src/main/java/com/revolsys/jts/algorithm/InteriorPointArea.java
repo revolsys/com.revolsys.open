@@ -34,7 +34,7 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -246,7 +246,7 @@ public class InteriorPointArea {
 	  }
 
 	private void process(LineString line) {
-		PointList seq = line;
+		LineString seq = line;
 		for (int i = 0; i < seq.getVertexCount(); i++) {
 			double y = seq.getY(i);
 			updateInterval(y);

@@ -38,6 +38,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;
@@ -127,8 +128,9 @@ public class MCIndexSnapRounder implements Noder {
    * Snaps segments to the vertices of a Segment String.  
    */
   private void computeVertexSnaps(final NodedSegmentString segment) {
-    final int i = 0;
-    for (final Point point : segment.getPoints().toPointList()) {
+    final LineString points = segment.getPoints();
+    for (int i = 0; i < points.getVertexCount(); i++) {
+      final Point point = points.getPoint(i);
       final HotPixel hotPixel = new HotPixel(point, scaleFactor, li);
       final boolean isNodeAdded = pointSnapper.snap(hotPixel, segment, i);
       // if a node is created for a vertex, that vertex must be noded too

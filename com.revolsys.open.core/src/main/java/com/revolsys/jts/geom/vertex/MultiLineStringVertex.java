@@ -16,6 +16,42 @@ public class MultiLineStringVertex extends AbstractVertex {
     setVertexId(vertexId);
   }
 
+  @Override
+  public double getCoordinate(final int index) {
+    final LineString lineString = getLineString();
+    if (lineString == null) {
+      return Double.NaN;
+    } else {
+      return lineString.getCoordinate(vertexIndex, index);
+    }
+  }
+
+  @Override
+  public Vertex getLineNext() {
+    final LineString line = getLineString();
+    if (line != null) {
+      final int newVertexIndex = vertexIndex + 1;
+      if (newVertexIndex < line.getVertexCount() - 1) {
+        return new MultiLineStringVertex(getMultiLineString(), partIndex,
+          newVertexIndex);
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public Vertex getLinePrevious() {
+    final LineString line = getLineString();
+    if (line != null) {
+      final int newVertexIndex = vertexIndex - 1;
+      if (newVertexIndex >= 0) {
+        return new MultiLineStringVertex(getMultiLineString(), partIndex,
+          newVertexIndex);
+      }
+    }
+    return null;
+  }
+
   public LineString getLineString() {
     final MultiLineString multiLineString = getMultiLineString();
     return multiLineString.getLineString(partIndex);
@@ -28,16 +64,6 @@ public class MultiLineStringVertex extends AbstractVertex {
   @Override
   public int getPartIndex() {
     return super.getPartIndex();
-  }
-
-  @Override
-  public double getCoordinate(final int index) {
-    final LineString lineString = getLineString();
-    if (lineString == null) {
-      return Double.NaN;
-    } else {
-      return lineString.getCoordinate(vertexIndex, index);
-    }
   }
 
   @Override

@@ -26,8 +26,8 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
@@ -39,8 +39,8 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.util.PasswordUtil;
 
 public class ArcSdeBinaryGeometryDataStoreUtil {
@@ -113,7 +113,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
   public AbstractIterator<DataObject> createIterator(
     final OracleDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
-    final BoundingBox boundingBox = query.getBoundingBox();
+    final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
     if (boundingBox == null) {
       return null;
     } else {
@@ -148,7 +148,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     }
   }
 
-  public PointList getCoordinates(final SeShape shape,
+  public LineString getCoordinates(final SeShape shape,
     final double[][][] allCoordinates, final int partIndex,
     final int ringIndex, final int axisCount) {
     try {
@@ -163,7 +163,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount,
           coordinateIndex, x, y);
       }
-      return new DoubleCoordinatesList(axisCount, coordinates);
+      return new LineStringDouble(axisCount, coordinates);
     } catch (final SeException e) {
       throw new RuntimeException("Unable to get coordinates", e);
     }
@@ -284,7 +284,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
           for (int partIndex = 0; partIndex < numParts; partIndex++) {
             final int numRings = shape.getNumSubParts(partIndex + 1);
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final PointList coordinates = getCoordinates(shape,
+              final LineString coordinates = getCoordinates(shape,
                 allCoordinates, partIndex, ringIndex, axisCount);
               final Point point = geometryFactory.point(coordinates);
               if (!point.isEmpty()) {
@@ -303,7 +303,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
           for (int partIndex = 0; partIndex < numParts; partIndex++) {
             final int numRings = shape.getNumSubParts(partIndex + 1);
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final PointList coordinates = getCoordinates(shape,
+              final LineString coordinates = getCoordinates(shape,
                 allCoordinates, partIndex, ringIndex, axisCount);
               final LineString line = geometryFactory.lineString(coordinates);
               if (!line.isEmpty()) {
@@ -321,9 +321,9 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
           final List<Polygon> polygons = new ArrayList<Polygon>();
           for (int partIndex = 0; partIndex < numParts; partIndex++) {
             final int numRings = shape.getNumSubParts(partIndex + 1);
-            final List<PointList> rings = new ArrayList<PointList>();
+            final List<LineString> rings = new ArrayList<LineString>();
             for (int ringIndex = 0; ringIndex < numRings; ringIndex++) {
-              final PointList coordinates = getCoordinates(shape,
+              final LineString coordinates = getCoordinates(shape,
                 allCoordinates, partIndex, ringIndex, axisCount);
               rings.add(coordinates);
             }

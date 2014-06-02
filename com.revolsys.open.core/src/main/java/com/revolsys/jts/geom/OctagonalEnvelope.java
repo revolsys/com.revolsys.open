@@ -201,7 +201,7 @@ public class OctagonalEnvelope {
       expandToInclude(point);
     }
     for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
-      expandToInclude((PointList)line);
+      expandToInclude((LineString)line);
     }
   }
 
@@ -253,7 +253,7 @@ public class OctagonalEnvelope {
     return this;
   }
 
-  public OctagonalEnvelope expandToInclude(final PointList seq) {
+  public OctagonalEnvelope expandToInclude(final LineString seq) {
     for (int i = 0; i < seq.getVertexCount(); i++) {
       final double x = seq.getX(i);
       final double y = seq.getY(i);
@@ -382,7 +382,7 @@ public class OctagonalEnvelope {
 
   public Geometry toGeometry(final GeometryFactory geometryFactory) {
     if (isNull()) {
-      return geometryFactory.point((PointList)null);
+      return geometryFactory.point((LineString)null);
     }
 
     final Point px00 = new PointDouble(geometryFactory.makePrecise(0, minX),

@@ -244,7 +244,7 @@ public class OverlayOp extends GeometryGraphOperation {
 
   private List<LineString> resultLineList = new ArrayList<>();
 
-  private List<Point> resultPointList = new ArrayList<>();
+  private List<Point> resultLineString = new ArrayList<>();
 
   /**
    * Constructs an instance to compute a single overlay operation
@@ -280,12 +280,12 @@ public class OverlayOp extends GeometryGraphOperation {
     }
   }
 
-  private Geometry computeGeometry(final List<Point> resultPointList,
+  private Geometry computeGeometry(final List<Point> resultLineString,
     final List<LineString> resultLineList, final List<Polygon> resultPolyList,
     final int opcode) {
     final List<Geometry> geometries = new ArrayList<>();
     // element geometries of the result are always in the order P,L,A
-    geometries.addAll(resultPointList);
+    geometries.addAll(resultLineString);
     geometries.addAll(resultLineList);
     geometries.addAll(resultPolyList);
 
@@ -438,11 +438,11 @@ public class OverlayOp extends GeometryGraphOperation {
 
     final PointBuilder pointBuilder = new PointBuilder(this, geomFact,
       ptLocator);
-    resultPointList = pointBuilder.build(opCode);
+    resultLineString = pointBuilder.build(opCode);
 
     // gather the results from all calculations into a single Geometry for the
     // result set
-    resultGeom = computeGeometry(resultPointList, resultLineList,
+    resultGeom = computeGeometry(resultLineString, resultLineList,
       resultPolyList, opCode);
   }
 

@@ -36,7 +36,7 @@ package com.revolsys.jts.simplify;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Simplifies a linestring (sequence of points) using
@@ -45,7 +45,7 @@ import com.revolsys.jts.geom.PointList;
  * @version 1.7
  */
 class DouglasPeuckerLineSimplifier {
-  public static Point[] simplify(final PointList pts,
+  public static Point[] simplify(final LineString pts,
     final double distanceTolerance) {
     final DouglasPeuckerLineSimplifier simp = new DouglasPeuckerLineSimplifier(
       pts);
@@ -53,13 +53,13 @@ class DouglasPeuckerLineSimplifier {
     return simp.simplify();
   }
 
-  private final PointList pts;
+  private final LineString pts;
 
   private boolean[] usePt;
 
   private double distanceTolerance;
 
-  public DouglasPeuckerLineSimplifier(final PointList pts) {
+  public DouglasPeuckerLineSimplifier(final LineString pts) {
     this.pts = pts;
   }
 

@@ -6,7 +6,9 @@ import java.util.concurrent.CancellationException;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.functions.F;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -31,9 +33,10 @@ public class LoadingWorker extends
     final DataObjectQuadTree index = new DataObjectQuadTree(geometryFactory);
     final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
     Query query = this.layer.getQuery();
-    if (query != null) {
+    final Attribute geometryAttribute = layer.getGeometryAttribute();
+    if (query != null && geometryAttribute != null) {
       query = query.clone();
-      query.setBoundingBox(queryBoundingBox);
+      query.and(F.envelopeIntersects(geometryAttribute, queryBoundingBox));
       final List<LayerDataObject> records = this.layer.query(query);
       index.insertAll(records);
     }

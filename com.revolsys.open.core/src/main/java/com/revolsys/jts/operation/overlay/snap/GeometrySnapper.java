@@ -36,14 +36,13 @@ package com.revolsys.jts.operation.overlay.snap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.util.GeometryTransformer;
 import com.revolsys.jts.geom.vertex.Vertex;
 
@@ -264,8 +263,7 @@ class SnapTransformer extends GeometryTransformer {
     this.isSelfSnap = isSelfSnap;
   }
 
-  private Point[] snapLine(final PointList srcPts,
-    final Point[] snapPts) {
+  private Point[] snapLine(final LineString srcPts, final Point[] snapPts) {
     final LineStringSnapper snapper = new LineStringSnapper(srcPts,
       snapTolerance);
     snapper.setAllowSnappingToSourceVertices(isSelfSnap);
@@ -273,9 +271,20 @@ class SnapTransformer extends GeometryTransformer {
   }
 
   @Override
-  protected PointList transformCoordinates(final PointList coords,
+  protected LineString transformCoordinates(final LineString coords,
     final Geometry parent) {
     final Point[] newPts = snapLine(coords, snapPts);
-    return new DoubleCoordinatesList(newPts);
+    return new LineStringDouble(newPts);
+  }
+
+  @Override
+  protected Geometry transformPoint(final Point point, final Geometry parent) {
+    final Point snapVert = LineStringSnapper.findSnapForVertex(point, snapPts,
+      snapTolerance);
+    if (snapVert == null) {
+      return point;
+    } else {
+      return snapVert;
+    }
   }
 }

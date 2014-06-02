@@ -1,7 +1,7 @@
 package com.revolsys.jts.testold.geom;
 
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -42,7 +42,7 @@ public class SegmentDensifier {
   public Geometry densify(final double segLength) {
     this.newCoords = new CoordinateList();
 
-    final PointList seq = this.inputLine;
+    final LineString seq = this.inputLine;
 
     this.newCoords.add(seq.getPoint(0).cloneCoordinates());
 

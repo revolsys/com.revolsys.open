@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.gis.algorithm.index.visitor.LineSegmentIntersectionVisitor;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
@@ -31,10 +30,8 @@ public class LineSegmentIndex extends QuadTree<LineSegment> {
   }
 
   public void insert(final LineString line) {
-    final CoordinatesListIndexLineSegmentIterator segments = new CoordinatesListIndexLineSegmentIterator(
-      line);
-    for (final LineSegment lineSegment : segments) {
-      insert(lineSegment);
+    for (final LineSegment lineSegment : line.segments()) {
+      insert(lineSegment.clone());
     }
   }
 

@@ -38,7 +38,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
 
@@ -157,7 +157,7 @@ public class RectangleContains {
    * @return true if the linestring is contained in the boundary
    */
   private boolean isLineStringContainedInBoundary(final LineString line) {
-    final PointList seq = line;
+    final LineString seq = line;
     for (int i = 0; i < seq.getVertexCount() - 1; i++) {
       final Point p0 = seq.getPoint(i);
       final Point p1 = seq.getPoint(i + 1);

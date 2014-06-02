@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Dissolves a noded collection of {@link SegmentString}s to produce
@@ -136,8 +136,8 @@ public class SegmentStringDissolver {
     }
   }
 
-  private boolean equals(final PointList points1, final int axisCount,
-    final PointList points2) {
+  private boolean equals(final LineString points1, final int axisCount,
+    final LineString points2) {
     double maxAxis = Math.max(points1.getAxisCount(), points2.getAxisCount());
     if (maxAxis > axisCount) {
       maxAxis = axisCount;

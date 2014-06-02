@@ -35,7 +35,7 @@ package com.revolsys.jts.index.chain;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geomgraph.Quadrant;
 
 /**
@@ -55,7 +55,7 @@ public class MonotoneChainBuilder {
    * @return the index of the last point in the monotone chain 
    * starting at <code>start</code>.
    */
-  private static int findChainEnd(final PointList points, final int start) {
+  private static int findChainEnd(final LineString points, final int start) {
     int safeStart = start;
     // skip any zero-length segments at the start of the sequence
     // (since they cannot be used to establish a quadrant)
@@ -87,7 +87,7 @@ public class MonotoneChainBuilder {
     return last - 1;
   }
 
-  public static List<MonotoneChain> getChains(final PointList pts) {
+  public static List<MonotoneChain> getChains(final LineString pts) {
     return getChains(pts, null);
   }
 
@@ -95,7 +95,7 @@ public class MonotoneChainBuilder {
    * Return a list of the {@link MonotoneChain}s
    * for the given list of coordinates.
    */
-  public static List<MonotoneChain> getChains(final PointList points,
+  public static List<MonotoneChain> getChains(final LineString points,
     final Object context) {
     final List<MonotoneChain> mcList = new ArrayList<>();
     final List<Integer> indices = getChainStartIndices(points);
@@ -116,7 +116,7 @@ public class MonotoneChainBuilder {
    * The last entry in the array points to the end point of the point array,
    * for use as a sentinel.
    */
-  public static List<Integer> getChainStartIndices(final PointList points) {
+  public static List<Integer> getChainStartIndices(final LineString points) {
     // find the startpoint (and endpoints) of all monotone chains in this edge
     int start = 0;
     final List<Integer> startIndexList = new ArrayList<>();

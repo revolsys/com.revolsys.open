@@ -38,7 +38,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.
@@ -55,7 +55,7 @@ import com.revolsys.jts.geom.PointList;
  *
  * @version 1.7
  */
-public class LinearRingImpl extends LineStringImpl implements LinearRing {
+public class LinearRingImpl extends LineStringDoubleGF implements LinearRing {
   private static final long serialVersionUID = -4261142084085851829L;
 
   public LinearRingImpl(final GeometryFactory factory) {
@@ -64,7 +64,7 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
 
   /**
    * Constructs a <code>LinearRing</code> with the vertices
-   * specifed by the given {@link PointList}.
+   * specifed by the given {@link LineString}.
    *
    *@param  points  a sequence points forming a closed and simple linestring, or
    *      <code>null</code> to create the empty geometry.
@@ -97,7 +97,7 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
 
   /**
    * Constructs a <code>LinearRing</code> with the vertices
-   * specifed by the given {@link PointList}.
+   * specifed by the given {@link LineString}.
    *
    *@param  points  a sequence points forming a closed and simple linestring, or
    *      <code>null</code> to create the empty geometry.
@@ -105,7 +105,7 @@ public class LinearRingImpl extends LineStringImpl implements LinearRing {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingImpl(final GeometryFactory factory, final PointList points) {
+  public LinearRingImpl(final GeometryFactory factory, final LineString points) {
     super(factory, points);
     if (isClosed()) {
       final int vertexCount = getVertexCount();

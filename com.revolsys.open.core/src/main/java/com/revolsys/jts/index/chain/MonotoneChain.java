@@ -33,7 +33,7 @@
 package com.revolsys.jts.index.chain;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.LineSegment;
@@ -84,7 +84,7 @@ import com.revolsys.jts.util.EnvelopeUtil;
  */
 public class MonotoneChain {
 
-  private final PointList points;
+  private final LineString points;
 
   private final int start, end;
 
@@ -94,7 +94,7 @@ public class MonotoneChain {
 
   private int id;// useful for optimizing chain comparisons
 
-  public MonotoneChain(final PointList pts, final int start,
+  public MonotoneChain(final LineString pts, final int start,
     final int end, final Object context) {
     this.points = pts;
     this.start = start;

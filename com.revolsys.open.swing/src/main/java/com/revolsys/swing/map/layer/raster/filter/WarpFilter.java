@@ -4,11 +4,11 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import com.jhlabs.image.WholeImageFilter;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.overlay.MappedLocation;
 
@@ -52,8 +52,8 @@ public abstract class WarpFilter extends WholeImageFilter {
     return new WarpAffineFilter(boundingBox, imageWidth, imageHeight);
   }
 
-  public static PointList targetPointsToPixels(final BoundingBox boundingBox,
-    final PointList points, final int imageWidth, final int imageHeight) {
+  public static LineString targetPointsToPixels(final BoundingBox boundingBox,
+    final LineString points, final int imageWidth, final int imageHeight) {
     final int numPoints = points.getVertexCount();
     final double[] coordinates = new double[numPoints * 2];
     int j = 0;
@@ -64,7 +64,7 @@ public abstract class WarpFilter extends WholeImageFilter {
       coordinates[j++] = imagePoint.getX();
       coordinates[j++] = imagePoint.getY();
     }
-    return new DoubleCoordinatesList(2, coordinates);
+    return new LineStringDouble(2, coordinates);
   }
 
   public static Point targetPointToPixel(final BoundingBox boundingBox,

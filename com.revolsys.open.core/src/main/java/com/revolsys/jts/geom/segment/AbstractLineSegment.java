@@ -14,7 +14,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.AbstractLineString;
 import com.revolsys.jts.geom.impl.PointDoubleGF;
@@ -357,11 +357,11 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     Point intersection = null;
     final Polygon polygon = boundingBox.toPolygon(1);
     final LineString ring = polygon.getExteriorRing();
-    final PointList points = ring;
+    final LineString points = ring;
     for (int i = 0; i < 4; i++) {
       final Point ringC1 = points.getPoint(i);
       final Point ringC2 = points.getPoint(i);
-      final PointList currentIntersections = LineSegmentUtil.getIntersection(
+      final LineString currentIntersections = LineSegmentUtil.getIntersection(
         geometryFactory, coordinates1, coordinates2, ringC1, ringC2);
       if (currentIntersections.getVertexCount() == 1) {
         final Point currentIntersection = currentIntersections.getPoint(0);

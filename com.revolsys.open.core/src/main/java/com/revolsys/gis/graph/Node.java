@@ -19,7 +19,7 @@ import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -185,7 +185,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
         Point coordinates = null;
         for (final Edge<T> edge : edges) {
           final LineString line = edge.getLine();
-          final PointList points = line;
+          final LineString points = line;
           Point point = null;
           if (edge.getFromNode() == this) {
             point = points.getPoint(0);

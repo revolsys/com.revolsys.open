@@ -3,6 +3,7 @@ package com.revolsys.gis.data.query;
 import java.sql.PreparedStatement;
 import java.util.Map;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class Cast extends QueryValue {
@@ -25,9 +26,9 @@ public class Cast extends QueryValue {
   }
 
   @Override
-  public void appendSql(final StringBuffer buffer) {
+  public void appendDefaultSql(Query query, DataObjectStore dataStore, final StringBuffer buffer) {
     buffer.append("CAST(");
-    value.appendSql(buffer);
+    value.appendSql(query, dataStore, buffer);
     buffer.append(" AS ");
     buffer.append(dataType);
     buffer.append(")");

@@ -15,11 +15,12 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
 
 public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
   private final ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
 
@@ -33,7 +34,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
     final ArcSdeBinaryGeometryDataStoreUtil sdeUtil, final String dbName,
     final String name, final DataType type, final boolean required,
     final String description, final Map<String, Object> properties,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactory) {
     super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.sdeUtil = sdeUtil;
     this.geometryFactory = geometryFactory;

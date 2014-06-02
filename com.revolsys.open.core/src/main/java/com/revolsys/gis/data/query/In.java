@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
@@ -61,6 +62,19 @@ public class In extends Condition {
   }
 
   @Override
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    if (left == null) {
+      buffer.append("NULL");
+    } else {
+      left.appendSql(query, dataStore, buffer);
+    }
+    buffer.append(" ");
+    buffer.append(" IN ");
+    values.appendSql(query, dataStore, buffer);
+  }
+
+  @Override
   public int appendParameters(int index, final PreparedStatement statement) {
     if (left != null) {
       index = left.appendParameters(index, statement);
@@ -69,18 +83,6 @@ public class In extends Condition {
       index = values.appendParameters(index, statement);
     }
     return index;
-  }
-
-  @Override
-  public void appendSql(final StringBuffer buffer) {
-    if (left == null) {
-      buffer.append("NULL");
-    } else {
-      left.appendSql(buffer);
-    }
-    buffer.append(" ");
-    buffer.append(" IN ");
-    values.appendSql(buffer);
   }
 
   @Override

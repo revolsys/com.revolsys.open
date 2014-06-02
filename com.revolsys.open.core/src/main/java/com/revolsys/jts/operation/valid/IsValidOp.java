@@ -352,7 +352,7 @@ public class IsValidOp {
    */
   private Point checkShellInsideHole(final LinearRing shell,
     final LinearRing hole, final GeometryGraph graph) {
-    // TODO: improve performance of this - by sorting pointlists for instance?
+    // TODO: improve performance of this - by sorting LineStrings for instance?
     final Point shellPt = findPtNotNode(shell.vertices(), hole, graph);
     // if point is on shell but not hole, check that the shell is inside the
     // hole

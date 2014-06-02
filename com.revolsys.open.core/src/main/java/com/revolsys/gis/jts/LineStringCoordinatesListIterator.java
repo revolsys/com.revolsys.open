@@ -3,7 +3,7 @@ package com.revolsys.gis.jts;
 import java.util.Iterator;
 
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 
 public class LineStringCoordinatesListIterator implements Iterator<LineString>,
   Iterable<LineString> {
@@ -11,10 +11,10 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
 
   private int index = 0;
 
-  private final PointList points;
+  private final LineString points;
 
   public LineStringCoordinatesListIterator(
-    final com.revolsys.jts.geom.GeometryFactory factory, final PointList points) {
+    final com.revolsys.jts.geom.GeometryFactory factory, final LineString points) {
     this.factory = factory;
     this.points = points;
   }

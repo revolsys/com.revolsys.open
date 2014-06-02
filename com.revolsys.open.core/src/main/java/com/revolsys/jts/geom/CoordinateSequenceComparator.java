@@ -36,7 +36,7 @@ package com.revolsys.jts.geom;
 import java.util.Comparator;
 
 /**
- * Compares two {@link PointList}s.
+ * Compares two {@link LineString}s.
  * For sequences of the same dimension, the ordering is lexicographic.
  * Otherwise, lower dimensions are sorted before higher.
  * The dimensions compared can be limited; if this is done
@@ -95,16 +95,16 @@ public class CoordinateSequenceComparator
   }
 
   /**
-   * Compares two {@link PointList}s for relative order.
+   * Compares two {@link LineString}s for relative order.
    *
-   * @param o1 a {@link PointList}
-   * @param o2 a {@link PointList}
+   * @param o1 a {@link LineString}
+   * @param o2 a {@link LineString}
    * @return -1, 0, or 1 depending on whether o1 is less than, equal to, or greater than o2
    */
   public int compare(Object o1, Object o2)
   {
-    PointList s1 = (PointList) o1;
-    PointList s2 = (PointList) o2;
+    LineString s1 = (LineString) o1;
+    LineString s2 = (LineString) o2;
 
     int size1 = s1.getVertexCount();
     int size2 = s2.getVertexCount();
@@ -141,16 +141,16 @@ public class CoordinateSequenceComparator
   }
 
   /**
-   * Compares the same coordinate of two {@link PointList}s
+   * Compares the same coordinate of two {@link LineString}s
    * along the given number of dimensions.
    *
-   * @param s1 a {@link PointList}
-   * @param s2 a {@link PointList}
+   * @param s1 a {@link LineString}
+   * @param s2 a {@link LineString}
    * @param i the index of the coordinate to test
    * @param dimension the number of dimensiosn to test
    * @return -1, 0, or 1 depending on whether s1[i] is less than, equal to, or greater than s2[i]
    */
-  protected int compareCoordinate(PointList s1, PointList s2, int i, int dimension)
+  protected int compareCoordinate(LineString s1, LineString s2, int i, int dimension)
   {
     for (int d = 0; d < dimension; d++) {
       double ord1 = s1.getCoordinate(i, d);

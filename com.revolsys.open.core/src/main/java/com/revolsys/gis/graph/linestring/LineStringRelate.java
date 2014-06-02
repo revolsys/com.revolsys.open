@@ -14,7 +14,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.segment.LineSegment;
 
 public class LineStringRelate {
@@ -89,7 +89,7 @@ public class LineStringRelate {
 
   public MultiLineString getOverlap() {
     final List<List<Point>> intersections = new ArrayList<>();
-    final PointList points1 = line1;
+    final LineString points1 = line1;
     final List<Point> currentCoordinates = new ArrayList<>();
     Node<LineSegment> previousNode = graph1.getNode(fromPoint1);
     do {

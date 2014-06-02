@@ -7,11 +7,11 @@ import org.junit.Test;
 
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 public class LineStringTest {
@@ -179,11 +179,11 @@ public class LineStringTest {
         0));
       assertEmpty(pointCoordinatesSize0);
 
-      // PointList Constructor
-      final LineString pointCoordinatesListNull = geometryFactory.lineString((PointList)null);
+      // LineString Constructor
+      final LineString pointCoordinatesListNull = geometryFactory.lineString((LineString)null);
       assertEmpty(pointCoordinatesListNull);
 
-      final LineString pointCoordinatesListSize0 = geometryFactory.lineString(new DoubleCoordinatesList(
+      final LineString pointCoordinatesListSize0 = geometryFactory.lineString(new LineStringDouble(
         0, axisCount));
       assertEmpty(pointCoordinatesListSize0);
 
@@ -270,12 +270,12 @@ public class LineStringTest {
         pointCoordinatesAllAxis, pointCoordinatesExtraAxis,
         pointCoordinatesLessAxis);
 
-      // PointList
-      final Point pointCoordinatesListAllAxis = geometryFactory.point(new DoubleCoordinatesList(
+      // LineString
+      final Point pointCoordinatesListAllAxis = geometryFactory.point(new LineStringDouble(
         axisCount, coordinates));
-      final Point pointCoordinatesListExtraAxis = geometryFactory.point(new DoubleCoordinatesList(
+      final Point pointCoordinatesListExtraAxis = geometryFactory.point(new LineStringDouble(
         axisCount, coordinatesExtra));
-      final Point pointCoordinatesListLessAxis = geometryFactory.point(new DoubleCoordinatesList(
+      final Point pointCoordinatesListLessAxis = geometryFactory.point(new LineStringDouble(
         axisCountLess, coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN,
         pointCoordinatesListAllAxis, pointCoordinatesListExtraAxis,

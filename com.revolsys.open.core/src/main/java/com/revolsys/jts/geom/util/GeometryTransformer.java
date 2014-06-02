@@ -45,7 +45,6 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 
 /**
@@ -84,7 +83,7 @@ import com.revolsys.jts.geom.Polygon;
  * @version 1.7
  *
  */
-public class GeometryTransformer {
+public abstract class GeometryTransformer {
 
   /**
    * Possible extensions:
@@ -122,11 +121,11 @@ public class GeometryTransformer {
   }
 
   /**
-   * Convenience method which provides statndard way of copying {@link PointList}s
+   * Convenience method which provides statndard way of copying {@link LineString}s
    * @param seq the sequence to copy
    * @return a deep copy of the sequence
    */
-  protected final PointList copy(final PointList seq) {
+  protected final LineString copy(final LineString seq) {
     return seq.clone();
   }
 
@@ -173,7 +172,7 @@ public class GeometryTransformer {
   }
 
   /**
-   * Transforms a {@link PointList}.
+   * Transforms a {@link LineString}.
    * This method should always return a valid coordinate list for
    * the desired result type.  (E.g. a coordinate list for a LineString
    * must have 0 or at least 2 points).
@@ -184,7 +183,7 @@ public class GeometryTransformer {
    * @param parent the parent geometry
    * @return the transformed coordinates
    */
-  protected PointList transformCoordinates(final PointList coords,
+  protected LineString transformCoordinates(final LineString coords,
     final Geometry parent) {
     return copy(coords);
   }
@@ -226,7 +225,7 @@ public class GeometryTransformer {
     if (geometry == null) {
       return factory.linearRing();
     } else {
-      final PointList points = transformCoordinates(geometry, geometry);
+      final LineString points = transformCoordinates(geometry, geometry);
       if (points == null) {
         return factory.linearRing();
       } else {
@@ -305,9 +304,8 @@ public class GeometryTransformer {
     return factory.buildGeometry(transGeomList);
   }
 
-  protected Geometry transformPoint(final Point point, final Geometry parent) {
-    return factory.point(transformCoordinates(point.getCoordinatesList(), point));
-  }
+  protected abstract Geometry transformPoint(final Point point,
+    final Geometry parent);
 
   protected Geometry transformPolygon(final Polygon geom, final Geometry parent) {
     boolean isAllValidLinearRings = true;

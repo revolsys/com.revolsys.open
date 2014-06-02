@@ -2,6 +2,7 @@ package com.revolsys.jts.geom.vertex;
 
 import java.util.NoSuchElementException;
 
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 
@@ -15,20 +16,6 @@ public class PolygonVertex extends AbstractVertex {
     setVertexId(vertexId);
   }
 
-  public Polygon getPolygon() {
-    return (Polygon)getGeometry();
-  }
-
-  public LinearRing getRing() {
-    final Polygon polygon = getPolygon();
-    return polygon.getRing(ringIndex);
-  }
-
-  @Override
-  public int getRingIndex() {
-    return ringIndex;
-  }
-
   @Override
   public double getCoordinate(final int index) {
     final Polygon polygon = getPolygon();
@@ -38,6 +25,49 @@ public class PolygonVertex extends AbstractVertex {
     } else {
       return ring.getCoordinate(vertexIndex, index);
     }
+  }
+
+  @Override
+  public Vertex getLineNext() {
+    final LineString ring = getRing();
+    if (ring != null) {
+      int newVertexIndex = vertexIndex + 1;
+      if (newVertexIndex >= ring.getVertexCount() - 1) {
+        newVertexIndex -= ring.getVertexCount();
+      }
+      if (newVertexIndex < ring.getVertexCount() - 1) {
+        return new PolygonVertex(getPolygon(), ringIndex, newVertexIndex);
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public Vertex getLinePrevious() {
+    final LineString ring = getRing();
+    if (ring != null) {
+      int newVertexIndex = vertexIndex - 1;
+      if (newVertexIndex == -1) {
+        newVertexIndex = ring.getVertexCount() - 2;
+      }
+      return new PolygonVertex(getPolygon(), ringIndex, newVertexIndex);
+    }
+    return null;
+  }
+
+  public Polygon getPolygon() {
+    return (Polygon)getGeometry();
+  }
+
+  public LinearRing getRing() {
+    final Polygon polygon = getPolygon();
+    return polygon.getRing(ringIndex);
+
+  }
+
+  @Override
+  public int getRingIndex() {
+    return ringIndex;
   }
 
   @Override

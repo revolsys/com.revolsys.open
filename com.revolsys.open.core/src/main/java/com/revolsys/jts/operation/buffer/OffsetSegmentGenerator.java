@@ -41,7 +41,7 @@ import com.revolsys.jts.algorithm.NotRepresentableException;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
@@ -572,7 +572,7 @@ class OffsetSegmentGenerator {
     }
   }
 
-  public void addSegments(final PointList points, final boolean isForward) {
+  public void addSegments(final LineString points, final boolean isForward) {
     segList.addPts(points, isForward);
   }
 
@@ -655,7 +655,7 @@ class OffsetSegmentGenerator {
     segList.closeRing();
   }
 
-  public PointList getPoints() {
+  public LineString getPoints() {
     return segList.getPoints();
   }
 

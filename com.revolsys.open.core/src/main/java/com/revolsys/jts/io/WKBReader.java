@@ -37,8 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -49,6 +48,7 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 
 /**
  * Reads a {@link Geometry}from a byte stream in Well-Known Binary format.
@@ -73,7 +73,7 @@ import com.revolsys.jts.geom.Polygon;
 public class WKBReader {
   private static final String INVALID_GEOM_TYPE_MSG = "Invalid geometry type encountered in ";
 
-  public static PointList createClosedRing(final PointList seq,
+  public static LineString createClosedRing(final LineString seq,
     final int size) {
     final int axisCount = seq.getAxisCount();
     final double[] coordinates = new double[size * axisCount];
@@ -83,11 +83,11 @@ public class WKBReader {
     for (int i = n; i < size; i++) {
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq, 0, 1);
     }
-    return new DoubleCoordinatesList(axisCount, coordinates);
+    return new LineStringDouble(axisCount, coordinates);
   }
 
   /**
-   * Ensures that a PointList forms a valid ring, 
+   * Ensures that a LineString forms a valid ring, 
    * returning a new closed sequence of the correct length if required.
    * If the input sequence is already a valid ring, it is returned 
    * without modification.
@@ -98,7 +98,7 @@ public class WKBReader {
    * 
    * @return the original sequence, if it was a valid ring, or a new sequence which is valid.
    */
-  public static PointList ensureValidRing(final PointList seq) {
+  public static LineString ensureValidRing(final LineString seq) {
     final int n = seq.getVertexCount();
     // empty sequence is valid
     if (n == 0) {
@@ -120,7 +120,7 @@ public class WKBReader {
     return createClosedRing(seq, n + 1);
   }
 
-  public static PointList extend(final PointList seq, final int size) {
+  public static LineString extend(final LineString seq, final int size) {
     final int axisCount = seq.getAxisCount();
     final double[] coordinates = new double[size * axisCount];
     final int n = seq.getVertexCount();
@@ -133,7 +133,7 @@ public class WKBReader {
           n - 1, 1);
       }
     }
-    return new DoubleCoordinatesList(axisCount, coordinates);
+    return new LineStringDouble(axisCount, coordinates);
   }
 
   /**
@@ -170,19 +170,19 @@ public class WKBReader {
   }
 
   /**
-   * Tests whether two {@link PointList}s are equal.
+   * Tests whether two {@link LineString}s are equal.
    * To be equal, the sequences must be the same length.
    * They do not need to be of the same dimension, 
    * but the ordinate values for the smallest dimension of the two
    * must be equal.
    * Two <code>NaN</code> ordinates values are considered to be equal. 
    * 
-   * @param cs1 a PointList
-   * @param cs2 a PointList
+   * @param cs1 a LineString
+   * @param cs2 a LineString
    * @return true if the sequences are equal in the common dimensions
    */
-  public static boolean isEqual(final PointList cs1,
-    final PointList cs2) {
+  public static boolean isEqual(final LineString cs1,
+    final LineString cs2) {
     final int cs1Size = cs1.getVertexCount();
     final int cs2Size = cs2.getVertexCount();
     if (cs1Size != cs2Size) {
@@ -207,7 +207,7 @@ public class WKBReader {
   }
 
   /**
-   * Tests whether a {@link PointList} forms a valid {@link LinearRing},
+   * Tests whether a {@link LineString} forms a valid {@link LinearRing},
    * by checking the sequence length and closure
    * (whether the first and last points are identical in 2D). 
    * Self-intersection is not checked.
@@ -216,7 +216,7 @@ public class WKBReader {
    * @return true if the sequence is a ring
    * @see LinearRing
    */
-  public static boolean isRing(final PointList seq) {
+  public static boolean isRing(final LineString seq) {
     final int n = seq.getVertexCount();
     if (n == 0) {
       return true;
@@ -304,7 +304,7 @@ public class WKBReader {
     }
   }
 
-  private PointList readCoordinateSequence(final int size)
+  private LineString readCoordinateSequence(final int size)
     throws IOException {
     final double[] coordinates = new double[size * inputDimension];
 
@@ -314,12 +314,12 @@ public class WKBReader {
         coordinates[i * inputDimension + j] = ordValues[j];
       }
     }
-    return new DoubleCoordinatesList(inputDimension, coordinates);
+    return new LineStringDouble(inputDimension, coordinates);
   }
 
-  private PointList readCoordinateSequenceLineString(final int size)
+  private LineString readCoordinateSequenceLineString(final int size)
     throws IOException {
-    final PointList seq = readCoordinateSequence(size);
+    final LineString seq = readCoordinateSequence(size);
     if (isStrict) {
       return seq;
     }
@@ -329,9 +329,9 @@ public class WKBReader {
     return WKBReader.extend(seq, 2);
   }
 
-  private PointList readCoordinateSequenceRing(final int size)
+  private LineString readCoordinateSequenceRing(final int size)
     throws IOException {
-    final PointList seq = readCoordinateSequence(size);
+    final LineString seq = readCoordinateSequence(size);
     if (isStrict) {
       return seq;
     }
@@ -424,13 +424,13 @@ public class WKBReader {
 
   private LinearRing readLinearRing() throws IOException {
     final int size = dis.readInt();
-    final PointList pts = readCoordinateSequenceRing(size);
+    final LineString pts = readCoordinateSequenceRing(size);
     return factory.linearRing(pts);
   }
 
   private LineString readLineString() throws IOException {
     final int size = dis.readInt();
-    final PointList pts = readCoordinateSequenceLineString(size);
+    final LineString pts = readCoordinateSequenceLineString(size);
     return factory.lineString(pts);
   }
 
@@ -476,7 +476,7 @@ public class WKBReader {
   }
 
   private Point readPoint() throws IOException {
-    final PointList pts = readCoordinateSequence(1);
+    final LineString pts = readCoordinateSequence(1);
     return factory.point(pts);
   }
 

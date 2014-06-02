@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.noding;
 
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
 /**
@@ -52,7 +52,7 @@ public interface SegmentString {
    */
   Object getData();
 
-  PointList getPoints();
+  LineString getPoints();
 
   boolean isClosed();
 

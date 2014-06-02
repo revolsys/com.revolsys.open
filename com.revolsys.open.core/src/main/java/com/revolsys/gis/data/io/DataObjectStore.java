@@ -13,12 +13,12 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 
@@ -31,6 +31,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
   void addStatistic(String name, DataObject object);
 
   void addStatistic(String name, String typePath, int count);
+
+  void appendQueryValue(Query query, StringBuffer sql, QueryValue queryValue);
 
   @Override
   void close();
@@ -132,21 +134,11 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   ResultPager<DataObject> page(Query query);
 
-  Reader<DataObject> query(DataObjectFactory dataObjectFactory,
-    String typePath, Geometry geometry);
-
-  Reader<DataObject> query(DataObjectFactory dataObjectFactory,
-    String typePath, Geometry geometry, double distance);
-
   Reader<DataObject> query(List<?> queries);
 
   Reader<DataObject> query(Query... queries);
 
   Reader<DataObject> query(String typePath);
-
-  Reader<DataObject> query(String typePath, Geometry geometry);
-
-  Reader<DataObject> query(String typePath, Geometry geometry, double distance);
 
   DataObject queryFirst(Query query);
 

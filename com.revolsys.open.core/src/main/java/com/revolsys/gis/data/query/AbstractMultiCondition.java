@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.CollectionUtil;
 
@@ -35,15 +36,8 @@ public abstract class AbstractMultiCondition extends Condition {
   }
 
   @Override
-  public int appendParameters(int index, final PreparedStatement statement) {
-    for (final QueryValue value : getQueryValues()) {
-      index = value.appendParameters(index, statement);
-    }
-    return index;
-  }
-
-  @Override
-  public void appendSql(final StringBuffer buffer) {
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
     buffer.append("(");
     boolean first = true;
 
@@ -55,9 +49,17 @@ public abstract class AbstractMultiCondition extends Condition {
         buffer.append(operator);
         buffer.append(" ");
       }
-      value.appendSql(buffer);
+      value.appendSql(query, dataStore, buffer);
     }
     buffer.append(")");
+  }
+
+  @Override
+  public int appendParameters(int index, final PreparedStatement statement) {
+    for (final QueryValue value : getQueryValues()) {
+      index = value.appendParameters(index, statement);
+    }
+    return index;
   }
 
   public void clear() {

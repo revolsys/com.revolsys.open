@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class ILike extends BinaryCondition {
@@ -43,7 +44,8 @@ public class ILike extends BinaryCondition {
   }
 
   @Override
-  public void appendSql(final StringBuffer buffer) {
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
     final QueryValue left = getLeft();
     final QueryValue right = getRight();
 
@@ -51,13 +53,13 @@ public class ILike extends BinaryCondition {
     if (left == null) {
       buffer.append("NULL");
     } else {
-      left.appendSql(buffer);
+      left.appendSql(query, dataStore, buffer);
     }
     buffer.append(" AS VARCHAR(4000))) LIKE UPPER(");
     if (right == null) {
       buffer.append("NULL");
     } else {
-      right.appendSql(buffer);
+      right.appendSql(query, dataStore, buffer);
     }
     buffer.append(")");
   }

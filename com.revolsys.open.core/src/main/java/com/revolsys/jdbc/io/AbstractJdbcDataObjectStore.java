@@ -38,7 +38,6 @@ import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -48,14 +47,10 @@ import com.revolsys.gis.data.model.GlobalIdProperty;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.SqlCondition;
 import com.revolsys.io.PathUtil;
-import com.revolsys.io.Reader;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 
@@ -893,27 +888,6 @@ public abstract class AbstractJdbcDataObjectStore extends
     for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
       attributeAdder.initialize(schema);
     }
-  }
-
-  @Override
-  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
-    final String typePath, Geometry geometry) {
-    final DataObjectMetaData metaData = getMetaData(typePath);
-    final JdbcAttribute geometryAttribute = (JdbcAttribute)metaData.getGeometryAttribute();
-    final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-    geometry = geometry.convert(geometryFactory);
-
-    final SqlFunction intersectsFunction = geometryAttribute.getProperty(JdbcConstants.FUNCTION_INTERSECTS);
-    final StringBuffer qArg = new StringBuffer();
-    geometryAttribute.addSelectStatementPlaceHolder(qArg);
-
-    final Query query = new Query(metaData);
-    query.setProperty("dataObjectFactory", dataObjectFactory);
-    query.setWhereCondition(new SqlCondition(intersectsFunction.toSql(
-      geometryAttribute.getName(), qArg), geometryAttribute, geometry));
-    final DataObjectStoreQueryReader reader = createReader();
-    reader.addQuery(query);
-    return reader;
   }
 
   protected void releaseConnection(final Connection connection) {

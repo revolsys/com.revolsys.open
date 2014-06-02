@@ -36,7 +36,6 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.Segment;
@@ -68,6 +67,7 @@ import com.revolsys.jts.geom.segment.Segment;
  *
  */
 public class RayCrossingCounter implements Visitor<LineSegment> {
+
   /**
   * Determines the {@link Location} of a point in a ring. 
   * 
@@ -114,34 +114,6 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
       if (counter.isOnSegment()) {
         return counter.getLocation();
       }
-    }
-    return counter.getLocation();
-  }
-
-  /**
-  * Determines the {@link Location} of a point in a ring. 
-  * 
-  * @param p
-  *            the point to test
-  * @param ring
-  *            a coordinate sequence forming a ring
-  * @return the location of the point in the ring
-  */
-  public static Location locatePointInRing(final Point coordinates,
-    final PointList ring) {
-    final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
-
-    double x0 = ring.getX(0);
-    double y0 = ring.getY(0);
-    for (int i = 1; i < ring.getVertexCount(); i++) {
-      final double x1 = ring.getX(i);
-      final double y1 = ring.getY(i);
-      counter.countSegment(x1, y1, x0, y0);
-      if (counter.isOnSegment()) {
-        return counter.getLocation();
-      }
-      x0 = x1;
-      y0 = y1;
     }
     return counter.getLocation();
   }

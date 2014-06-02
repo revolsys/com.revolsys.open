@@ -50,6 +50,16 @@ public abstract class AbstractVertex extends AbstractPoint implements Vertex {
   }
 
   @Override
+  public Vertex getLineNext() {
+    return null;
+  }
+
+  @Override
+  public Vertex getLinePrevious() {
+    return null;
+  }
+
+  @Override
   public int getPartIndex() {
     return -1;
   }
@@ -77,6 +87,16 @@ public abstract class AbstractVertex extends AbstractPoint implements Vertex {
   @Override
   public boolean isEmpty() {
     return false;
+  }
+
+  @Override
+  public boolean isFrom() {
+    return getVertexIndex() == 0;
+  }
+
+  @Override
+  public boolean isTo() {
+    return getVertexIndex() == getVertexCount() - 1;
   }
 
   @Override

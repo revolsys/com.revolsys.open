@@ -11,10 +11,12 @@ import javax.annotation.PreDestroy;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.SqlCondition;
+import com.revolsys.gis.data.query.functions.F;
 import com.revolsys.jts.geom.BoundingBox;
 
 public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
@@ -61,7 +63,9 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
         query.and(new SqlCondition(whereClause));
       }
       if (boundingBox != null) {
-        query.setBoundingBox(boundingBox);
+        final Attribute geometryAttribute = query.getMetaData()
+          .getGeometryAttribute();
+        query.and(F.envelopeIntersects(geometryAttribute, boundingBox));
       }
 
       final AbstractIterator<DataObject> iterator = dataStore.createIterator(
@@ -105,7 +109,9 @@ public class DataObjectStoreQueryReader extends IteratorReader<DataObject>
             query.setWhereCondition(new SqlCondition(whereClause));
           } else {
             query = new Query(metaData);
-            query.setBoundingBox(boundingBox);
+            query.setWhereCondition(F.envelopeIntersects(
+              metaData.getGeometryAttribute(), boundingBox));
+            ;
           }
           addQuery(query);
         }

@@ -12,7 +12,6 @@ import com.revolsys.gis.algorithm.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -20,8 +19,8 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class GeometryEditUtil {
@@ -90,12 +89,12 @@ public class GeometryEditUtil {
     return (T)geometry;
   }
 
-  protected static PointList appendVertex(
-    final GeometryFactory geometryFactory, final PointList points,
+  protected static LineString appendVertex(
+    final GeometryFactory geometryFactory, final LineString points,
     final Point newPoint) {
     final int axisCount = geometryFactory.getAxisCount();
     if (points == null) {
-      return new DoubleCoordinatesList(axisCount);
+      return new LineStringDouble(axisCount);
     } else {
       final int vertexCount = points.getVertexCount();
       final double[] coordinates = new double[(vertexCount + 1) * axisCount];
@@ -105,7 +104,7 @@ public class GeometryEditUtil {
       }
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount,
         newPoint);
-      return new DoubleCoordinatesList(axisCount, coordinates);
+      return new LineStringDouble(axisCount, coordinates);
     }
   }
 
@@ -198,7 +197,7 @@ public class GeometryEditUtil {
     return geometry;
   }
 
-  public static PointList deleteVertex(final GeometryFactory geometryFactory,
+  public static LineString deleteVertex(final GeometryFactory geometryFactory,
     final LineString points, final int pointIndex) {
     final int vertexCount = points.getVertexCount();
     if (pointIndex >= 0 && pointIndex < vertexCount) {
@@ -208,8 +207,7 @@ public class GeometryEditUtil {
           newPoints.add(points.getPoint(i));
         }
       }
-      return new DoubleCoordinatesList(geometryFactory.getAxisCount(),
-        newPoints);
+      return new LineStringDouble(geometryFactory.getAxisCount(), newPoints);
     }
     return points;
   }
@@ -220,7 +218,7 @@ public class GeometryEditUtil {
     final GeometryFactory geometryFactory = ring.getGeometryFactory();
     final int vertexCount = ring.getVertexCount();
     final int axisCount = ring.getAxisCount();
-    PointList newPoints;
+    LineString newPoints;
     if (pointIndex == 0 || pointIndex == vertexCount - 1) {
       final double[] coordinates = new double[(vertexCount - 1) * axisCount];
       int i = 0;
@@ -231,7 +229,7 @@ public class GeometryEditUtil {
         }
         i++;
       }
-      newPoints = new DoubleCoordinatesList(axisCount, coordinates);
+      newPoints = new LineStringDouble(axisCount, coordinates);
     } else {
       newPoints = deleteVertex(geometryFactory, ring, pointIndex);
     }
@@ -245,7 +243,7 @@ public class GeometryEditUtil {
   public static LineString deleteVertex(final LineString line,
     final int pointIndex) {
     final GeometryFactory geometryFactory = line.getGeometryFactory();
-    final PointList newPoints = deleteVertex(geometryFactory, line, pointIndex);
+    final LineString newPoints = deleteVertex(geometryFactory, line, pointIndex);
     if (newPoints.getVertexCount() == 1) {
       return line;
     } else {
@@ -360,50 +358,6 @@ public class GeometryEditUtil {
     }
   }
 
-  public static PointList getPoints(final Geometry geometry,
-    final int[] vertexId) {
-    if (geometry == null) {
-      return null;
-    } else {
-      if (geometry instanceof Point) {
-        final Point point = (Point)geometry;
-        final PointList points = point.getCoordinatesList();
-        return points;
-      } else if (geometry instanceof LineString) {
-        final LineString line = (LineString)geometry;
-        final PointList points = line;
-        return points;
-      } else if (geometry instanceof Polygon) {
-        final Polygon polygon = (Polygon)geometry;
-        final int ringIndex = vertexId[0];
-        final LinearRing ring = polygon.getRing(ringIndex);
-        final PointList points = ring;
-        return points;
-      } else {
-        final int partIndex = vertexId[0];
-        if (partIndex >= 0 && partIndex < geometry.getGeometryCount()) {
-          final Geometry part = geometry.getGeometry(partIndex);
-          if (part instanceof Point) {
-            final Point point = (Point)part;
-            final PointList points = point.getCoordinatesList();
-            return points;
-          } else if (part instanceof LineString) {
-            final LineString line = (LineString)part;
-            final PointList points = line;
-            return points;
-          } else if (part instanceof Polygon) {
-            final Polygon polygon = (Polygon)part;
-            final int ringIndex = vertexId[1];
-            final LinearRing ring = polygon.getRing(ringIndex);
-            final PointList points = ring;
-            return points;
-          }
-        }
-      }
-      return null;
-    }
-  }
-
   public static Point getVertex(final Geometry geometry, final int[] partId,
     final int pointIndex) {
     final int[] vertexId = new int[partId.length + 1];
@@ -471,24 +425,24 @@ public class GeometryEditUtil {
     return (T)geometry;
   }
 
-  public static PointList insertVertex(final GeometryFactory geometryFactory,
+  public static LineString insertVertex(final GeometryFactory geometryFactory,
+    final LineString points, final int pointIndex, final Point newPoint) {
+    final List<Point> newPoints = new ArrayList<Point>();
+    for (int i = 0; i < points.getVertexCount(); i++) {
+      newPoints.add(points.getPoint(i));
+    }
+    newPoints.add(pointIndex, newPoint);
+    return new LineStringDouble(geometryFactory.getAxisCount(), newPoints);
+  }
+
+  public static LineString insertVertex(final GeometryFactory geometryFactory,
     final List<Point> points, final int pointIndex, final Point newPoint) {
     final List<Point> newPoints = new ArrayList<Point>();
     for (int i = 0; i < points.size(); i++) {
       newPoints.add(points.get(i));
     }
     newPoints.add(pointIndex, newPoint);
-    return new DoubleCoordinatesList(geometryFactory.getAxisCount(), newPoints);
-  }
-
-  public static PointList insertVertex(final GeometryFactory geometryFactory,
-    final PointList points, final int pointIndex, final Point newPoint) {
-    final List<Point> newPoints = new ArrayList<Point>();
-    for (int i = 0; i < points.getVertexCount(); i++) {
-      newPoints.add(points.getPoint(i));
-    }
-    newPoints.add(pointIndex, newPoint);
-    return new DoubleCoordinatesList(geometryFactory.getAxisCount(), newPoints);
+    return new LineStringDouble(geometryFactory.getAxisCount(), newPoints);
   }
 
   public static LinearRing insertVertex(final LinearRing line,
@@ -527,7 +481,7 @@ public class GeometryEditUtil {
     final int pointIndex, final Point newPoint) {
     final List<Point> coordinatesList = multiPoint.getPoints();
     final GeometryFactory geometryFactory = multiPoint.getGeometryFactory();
-    final PointList points = insertVertex(geometryFactory, coordinatesList,
+    final LineString points = insertVertex(geometryFactory, coordinatesList,
       pointIndex, newPoint);
     return geometryFactory.multiPoint(points);
   }
@@ -546,19 +500,21 @@ public class GeometryEditUtil {
 
   public static boolean isFromPoint(final Geometry geometry,
     final int[] vertexId) {
-    final PointList points = getPoints(geometry, vertexId);
-    if (points != null && points.getVertexCount() > 0 && vertexId.length > 0) {
-      final int index = vertexId[vertexId.length - 1];
-      return index == 0;
+    if (geometry != null) {
+      final Vertex vertex = geometry.getVertex(vertexId);
+      if (vertex != null) {
+        return vertex.isFrom();
+      }
     }
     return false;
   }
 
   public static boolean isToPoint(final Geometry geometry, final int[] vertexId) {
-    final PointList points = getPoints(geometry, vertexId);
-    if (points != null && points.getVertexCount() > 0 && vertexId.length > 0) {
-      final int index = vertexId[vertexId.length - 1];
-      return index == points.getVertexCount() - 1;
+    if (geometry != null) {
+      final Vertex vertex = geometry.getVertex(vertexId);
+      if (vertex != null) {
+        return vertex.isTo();
+      }
     }
     return false;
   }

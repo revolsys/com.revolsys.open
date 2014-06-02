@@ -7,7 +7,7 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.gml.GmlConstants;
 import com.revolsys.io.gml.GmlDataObjectWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -36,7 +36,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(GmlConstants.COORDINATES);
   }
 
-  private void coordinates(final XmlWriter out, final PointList points) {
+  private void coordinates(final XmlWriter out, final LineString points) {
     out.startTag(GmlConstants.COORDINATES);
     final int axisCount = points.getAxisCount();
     boolean first = true;
@@ -106,7 +106,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   private void linearRing(final XmlWriter out, final LineString line,
     final boolean writeSrsName) {
     out.startTag(LINEAR_RING);
-    final PointList points = line;
+    final LineString points = line;
     coordinates(out, points);
     out.endTag(LINEAR_RING);
   }
@@ -116,7 +116,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.startTag(LINE_STRING);
     srsName(out, line, writeSrsName);
     if (!line.isEmpty()) {
-      final PointList points = line;
+      final LineString points = line;
       coordinates(out, points);
     }
     out.endTag(LINE_STRING);
@@ -204,7 +204,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(GmlConstants.POS);
   }
 
-  private void posList(final XmlWriter out, final PointList points) {
+  private void posList(final XmlWriter out, final LineString points) {
     out.startTag(GmlConstants.POS_LIST);
     final int axisCount = points.getAxisCount();
     out.attribute(GmlConstants.DIMENSION, axisCount);

@@ -12,14 +12,15 @@ public class PointVertex extends AbstractVertex {
     setVertexId(vertexId);
   }
 
-  public Point getPoint() {
-    return (Point)getGeometry();
-  }
-
   @Override
   public double getCoordinate(final int vertexIndex) {
     final Point point = getPoint();
     return point.getCoordinate(vertexIndex);
+  }
+
+  @Override
+  public Point getPoint() {
+    return (Point)getGeometry();
   }
 
   @Override
@@ -44,6 +45,16 @@ public class PointVertex extends AbstractVertex {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public boolean isFrom() {
+    return vertexIndex == 0;
+  }
+
+  @Override
+  public boolean isTo() {
+    return vertexIndex == 0;
   }
 
   @Override

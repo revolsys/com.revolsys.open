@@ -52,9 +52,9 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.wkt.WktParser;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDoubleGF;
 import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.util.CollectionUtil;
@@ -234,6 +234,22 @@ public class Envelope implements Serializable, BoundingBox {
     this.bounds = bounds;
   }
 
+  public Envelope(final GeometryFactory geometryFactory, final LineString points) {
+    this.geometryFactory = geometryFactory;
+    double[] bounds = null;
+    if (points != null) {
+      for (int i = 0; i < points.getVertexCount(); i++) {
+        final Point point = points.getPoint(0);
+        if (bounds == null) {
+          bounds = EnvelopeUtil.createBounds(geometryFactory, point);
+        } else {
+          EnvelopeUtil.expand(geometryFactory, bounds, point);
+        }
+      }
+    }
+    this.bounds = bounds;
+  }
+
   public Envelope(final GeometryFactory geometryFactory, final Point... points) {
     this(geometryFactory, CollectionUtil.toList(points));
   }
@@ -246,13 +262,12 @@ public class Envelope implements Serializable, BoundingBox {
     this(null, points);
   }
 
-  public Envelope(final Point... points) {
+  public Envelope(final LineString points) {
     this(null, points);
   }
 
-  @Deprecated
-  public Envelope(final PointList points) {
-    this(points.toPointList());
+  public Envelope(final Point... points) {
+    this(null, points);
   }
 
   @Override
@@ -640,7 +655,7 @@ public class Envelope implements Serializable, BoundingBox {
 
   @Override
   public BoundingBox expandToInclude(final BoundingBox other) {
-    if (other.isEmpty()) {
+    if (other == null || other.isEmpty()) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -810,13 +825,13 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   @Override
-  public PointList getCornerPoints() {
+  public LineString getCornerPoints() {
     final double minX = getMinX();
     final double maxX = getMaxX();
     final double minY = getMinY();
     final double maxY = getMaxY();
-    return new DoubleCoordinatesList(2, maxX, minY, minX, minY, minX, maxY,
-      maxX, maxY);
+    return new LineStringDouble(2, maxX, minY, minX, minY, minX, maxY, maxX,
+      maxY);
   }
 
   @Override

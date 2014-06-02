@@ -31,10 +31,15 @@ import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
 import com.revolsys.gis.data.query.functions.Function;
+import com.revolsys.gis.data.query.functions.WithinDistance;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class QueryValue implements Cloneable {
@@ -277,10 +282,20 @@ public abstract class QueryValue implements Cloneable {
     }
   }
 
+  public abstract void appendDefaultSql(Query query, DataObjectStore dataStore,
+    StringBuffer sql);
+
   // TODO wrap in a more generic structure
   public abstract int appendParameters(int index, PreparedStatement statement);
 
-  public abstract void appendSql(StringBuffer buffer);
+  public void appendSql(final Query query, final DataObjectStore dataStore,
+    final StringBuffer sql) {
+    if (dataStore == null) {
+      appendDefaultSql(query, null, sql);
+    } else {
+      dataStore.appendQueryValue(query, sql, this);
+    }
+  }
 
   @Override
   public QueryValue clone() {
@@ -304,8 +319,63 @@ public abstract class QueryValue implements Cloneable {
 
   public abstract <V> V getValue(Map<String, Object> record);
 
+  public void setMetaData(final DataObjectMetaData metaData) {
+    for (final QueryValue queryValue : getQueryValues()) {
+      queryValue.setMetaData(metaData);
+    }
+  }
+
   public String toFormattedString() {
     return toString();
+  }
+
+  public static BoundingBox expand(final BoundingBox boundingBox,
+    final BoundingBox newBoundingBox) {
+    if (boundingBox == null) {
+      return newBoundingBox;
+    } else if (newBoundingBox == null) {
+      return boundingBox;
+    } else {
+      return boundingBox.expandToInclude(newBoundingBox);
+    }
+  }
+
+  public static BoundingBox getBoundingBox(final Query query) {
+    final Condition whereCondition = query.getWhereCondition();
+    return getBoundingBox(whereCondition);
+  }
+
+  public static BoundingBox getBoundingBox(final QueryValue queryValue) {
+    BoundingBox boundingBox = null;
+    if (queryValue != null) {
+      for (final QueryValue childValue : queryValue.getQueryValues()) {
+        if (childValue instanceof EnvelopeIntersects) {
+          final EnvelopeIntersects intersects = (EnvelopeIntersects)childValue;
+          boundingBox = expand(boundingBox,
+            getBoundingBox(intersects.getBoundingBox1Value()));
+          boundingBox = expand(boundingBox,
+            getBoundingBox(intersects.getBoundingBox2Value()));
+        } else if (childValue instanceof WithinDistance) {
+          final WithinDistance withinDistance = (WithinDistance)childValue;
+          BoundingBox withinBoundingBox = getBoundingBox(withinDistance.getGeometry1Value());
+          withinBoundingBox = expand(withinBoundingBox,
+            getBoundingBox(withinDistance.getGeometry2Value()));
+          final double distance = ((Number)((Value)withinDistance.getDistanceValue()).getValue()).doubleValue();
+  
+          boundingBox = expand(boundingBox, withinBoundingBox.expand(distance));
+        } else if (childValue instanceof Value) {
+          final Value valueContainer = (Value)childValue;
+          final Object value = valueContainer.getValue();
+          if (value instanceof BoundingBox) {
+            boundingBox = expand(boundingBox, (BoundingBox)value);
+          } else if (value instanceof Geometry) {
+            final Geometry geometry = (Geometry)value;
+            boundingBox = expand(boundingBox, geometry.getBoundingBox());
+          }
+        }
+      }
+    }
+    return boundingBox;
   }
 
 }

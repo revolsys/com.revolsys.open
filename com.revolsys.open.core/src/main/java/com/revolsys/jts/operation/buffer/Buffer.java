@@ -49,7 +49,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geom.segment.LineSegment;
@@ -297,7 +297,7 @@ public class Buffer {
           segment.getCoordinate(1)))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
-        final PointList points = segment.getPoints();
+        final LineString points = segment.getPoints();
         final Edge edge = new Edge(points, label);
         insertUniqueEdge(edges, edge);
       }

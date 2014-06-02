@@ -81,9 +81,70 @@ public class CoordinateList extends ArrayList<Point> {
     add(coord, allowRepeated);
   }
 
-  public CoordinateList(final PointList points) {
+  public CoordinateList(final LineString points) {
     ensureCapacity(points.getVertexCount());
-    add(points.toPointList(), true, true);
+    add(points, true, true);
+  }
+
+  /**
+   * Inserts the specified coordinate at the specified position in this list.
+   * 
+   * @param i the position at which to insert
+   * @param coord the coordinate to insert
+   * @param allowRepeated if set to false, repeated coordinates are collapsed
+   */
+  public void add(final int i, final Point coord, final boolean allowRepeated) {
+    // don't add duplicate coordinates
+    if (!allowRepeated) {
+      final int size = size();
+      if (size > 0) {
+        if (i > 0) {
+          final Point prev = get(i - 1);
+          if (prev.equals(2, coord)) {
+            return;
+          }
+        }
+        if (i < size) {
+          final Point next = get(i);
+          if (next.equals(2, coord)) {
+            return;
+          }
+        }
+      }
+    }
+    super.add(i, coord);
+  }
+
+  /** 
+   * Adds an array of coordinates to the list.
+   * @param coord The coordinates
+   * @param allowRepeated if set to false, repeated coordinates are collapsed
+   * @param direction if false, the array is added in reverse order
+   * @return true (as by general collection contract)
+   */
+  public boolean add(final List<Point> coord, final boolean allowRepeated,
+    final boolean direction) {
+    if (direction) {
+      for (int i = 0; i < coord.size(); i++) {
+        add(coord.get(i), allowRepeated);
+      }
+    } else {
+      for (int i = coord.size() - 1; i >= 0; i--) {
+        add(coord.get(i), allowRepeated);
+      }
+    }
+    return true;
+  }
+
+  /** 
+   * Adds a coordinate to the list.
+   * @param obj The coordinate to add
+   * @param allowRepeated if set to false, repeated coordinates are collapsed
+   * @return true (as by general collection contract)
+   */
+  public boolean add(final Object obj, final boolean allowRepeated) {
+    add((Point)obj, allowRepeated);
+    return true;
   }
 
   /**
@@ -97,7 +158,7 @@ public class CoordinateList extends ArrayList<Point> {
     if (!allowRepeated) {
       if (size() >= 1) {
         final Point last = get(size() - 1);
-        if (last.equals(2,coord)) {
+        if (last.equals(2, coord)) {
           return;
         }
       }
@@ -158,65 +219,17 @@ public class CoordinateList extends ArrayList<Point> {
     return true;
   }
 
-  /**
-   * Inserts the specified coordinate at the specified position in this list.
-   * 
-   * @param i the position at which to insert
-   * @param coord the coordinate to insert
-   * @param allowRepeated if set to false, repeated coordinates are collapsed
-   */
-  public void add(final int i, final Point coord,
-    final boolean allowRepeated) {
-    // don't add duplicate coordinates
-    if (!allowRepeated) {
-      final int size = size();
-      if (size > 0) {
-        if (i > 0) {
-          final Point prev = get(i - 1);
-          if (prev.equals(2,coord)) {
-            return;
-          }
-        }
-        if (i < size) {
-          final Point next = get(i);
-          if (next.equals(2,coord)) {
-            return;
-          }
-        }
-      }
-    }
-    super.add(i, coord);
-  }
-
-  /** 
-   * Adds an array of coordinates to the list.
-   * @param coord The coordinates
-   * @param allowRepeated if set to false, repeated coordinates are collapsed
-   * @param direction if false, the array is added in reverse order
-   * @return true (as by general collection contract)
-   */
-  public boolean add(final List<Point> coord,
-    final boolean allowRepeated, final boolean direction) {
+  public boolean add(final LineString coord, final boolean allowRepeated,
+    final boolean direction) {
     if (direction) {
-      for (int i = 0; i < coord.size(); i++) {
-        add(coord.get(i), allowRepeated);
+      for (int i = 0; i < coord.getVertexCount(); i++) {
+        add(coord.getPoint(i), allowRepeated);
       }
     } else {
-      for (int i = coord.size() - 1; i >= 0; i--) {
-        add(coord.get(i), allowRepeated);
+      for (int i = coord.getVertexCount() - 1; i >= 0; i--) {
+        add(coord.getPoint(i), allowRepeated);
       }
     }
-    return true;
-  }
-
-  /** 
-   * Adds a coordinate to the list.
-   * @param obj The coordinate to add
-   * @param allowRepeated if set to false, repeated coordinates are collapsed
-   * @return true (as by general collection contract)
-   */
-  public boolean add(final Object obj, final boolean allowRepeated) {
-    add((Point)obj, allowRepeated);
     return true;
   }
 

@@ -1,29 +1,27 @@
-package com.revolsys.gis.model.coordinates.list;
+package com.revolsys.jts.geom.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.util.MathUtil;
 
-public class DoubleCoordinatesList extends AbstractCoordinatesList {
-  /**
-   * 
-   */
+public class LineStringDouble extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
 
   private double[] coordinates;
 
   private final int axisCount;
 
-  public DoubleCoordinatesList(final int axisCount) {
+  public LineStringDouble(final int axisCount) {
     this(0, axisCount);
   }
 
-  public DoubleCoordinatesList(final int axisCount,
-    final Collection<Point> points) {
+  public LineStringDouble(final int axisCount, final Collection<Point> points) {
     this(points.size(), axisCount);
     int i = 0;
     for (final Point point : points) {
@@ -32,10 +30,10 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     }
   }
 
-  public DoubleCoordinatesList(final int axisCount, final double... coordinates) {
+  public LineStringDouble(final int axisCount, final double... coordinates) {
     if (coordinates == null || coordinates.length == 0) {
       this.axisCount = 2;
-      this.coordinates = new double[0];
+      this.coordinates = null;
     } else {
       assert axisCount >= 2;
       this.axisCount = axisCount;
@@ -43,18 +41,18 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     }
   }
 
-  public DoubleCoordinatesList(final int size, final int axisCount) {
+  public LineStringDouble(final int size, final int axisCount) {
     assert axisCount >= 2;
     assert size >= 0;
     this.coordinates = new double[size * axisCount];
     this.axisCount = (byte)axisCount;
   }
 
-  public DoubleCoordinatesList(final int axisCount, final int vertexCount,
+  public LineStringDouble(final int axisCount, final int vertexCount,
     final double... coordinates) {
     if (coordinates == null || coordinates.length == 0) {
       this.axisCount = 2;
-      this.coordinates = new double[0];
+      this.coordinates = null;
     } else {
       assert axisCount >= 2;
       this.axisCount = (byte)axisCount;
@@ -76,32 +74,34 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
     }
   }
 
-  public DoubleCoordinatesList(final int axisCount,
-    final List<? extends Number> coordinates) {
-    this(axisCount, MathUtil.toDoubleArray(coordinates));
-  }
-
-  public DoubleCoordinatesList(final int axisCount, final Point... points) {
-    this(axisCount, Arrays.asList(points));
-  }
-
-  public DoubleCoordinatesList(final int axisCount, final PointList points) {
+  public LineStringDouble(final int axisCount, final LineString points) {
     this(points.getVertexCount(), axisCount);
     CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, 0, points,
       0, points.getVertexCount());
   }
 
-  public DoubleCoordinatesList(final Point... coordinates) {
-    this(3, coordinates);
+  public LineStringDouble(final int axisCount,
+    final List<? extends Number> coordinates) {
+    this(axisCount, MathUtil.toDoubleArray(coordinates));
   }
 
-  public DoubleCoordinatesList(final PointList coordinatesList) {
+  public LineStringDouble(final int axisCount, final Point... points) {
+    this(axisCount, Arrays.asList(points));
+  }
+
+  public LineStringDouble(final LineString coordinatesList) {
     this(coordinatesList.getAxisCount(), coordinatesList);
   }
 
+  public LineStringDouble(final Point... coordinates) {
+    this(3, coordinates);
+  }
+
   @Override
-  public DoubleCoordinatesList clone() {
-    return new DoubleCoordinatesList(this);
+  public LineStringDouble clone() {
+    final LineStringDouble clone = (LineStringDouble)super.clone();
+    clone.coordinates = coordinates.clone();
+    return clone;
   }
 
   @Override
@@ -127,11 +127,21 @@ public class DoubleCoordinatesList extends AbstractCoordinatesList {
   }
 
   @Override
+  public GeometryFactory getGeometryFactory() {
+    return GeometryFactory.floating(0, axisCount);
+  }
+
+  @Override
   public int getVertexCount() {
     if (axisCount < 2 || coordinates == null) {
       return 0;
     } else {
       return coordinates.length / axisCount;
     }
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return coordinates == null;
   }
 }

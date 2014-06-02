@@ -50,7 +50,6 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
@@ -127,7 +126,7 @@ public class OffsetCurveSetBuilder {
    * <br>Left: Location.EXTERIOR
    * <br>Right: Location.INTERIOR
    */
-  private void addCurve(final PointList points, final Location leftLoc,
+  private void addCurve(final LineString points, final Location leftLoc,
     final Location rightLoc) {
     if (points != null && points.getVertexCount() >= 2) {
       final Label label = new Label(0, Location.BOUNDARY, leftLoc, rightLoc);
@@ -141,8 +140,8 @@ public class OffsetCurveSetBuilder {
     if (distance <= 0.0 && !curveBuilder.getBufferParameters().isSingleSided()) {
       return;
     } else {
-      final PointList points = CleanDuplicatePoints.clean(line);
-      final PointList curve = curveBuilder.getLineCurve(points, distance);
+      final LineString points = CleanDuplicatePoints.clean(line);
+      final LineString curve = curveBuilder.getLineCurve(points, distance);
       addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
   }
@@ -150,11 +149,10 @@ public class OffsetCurveSetBuilder {
   /**
    * Add a Point to the graph.
    */
-  private void addPoint(final Point p) {
+  private void addPoint(final Point point) {
     // a zero or negative width buffer of a line/point is empty
     if (distance > 0.0) {
-      final PointList coord = p.getCoordinatesList();
-      final PointList curve = curveBuilder.getLineCurve(coord, distance);
+      final LineString curve = curveBuilder.getPointCurve(point, distance);
       addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
   }
@@ -214,7 +212,7 @@ public class OffsetCurveSetBuilder {
    * @param cwLeftLoc the location on the L side of the ring (if it is CW)
    * @param cwRightLoc the location on the R side of the ring (if it is CW)
    */
-  private void addPolygonRing(final PointList points, final boolean clockwise,
+  private void addPolygonRing(final LineString points, final boolean clockwise,
     final double offsetDistance, int side, final Location cwLeftLoc,
     final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
@@ -230,7 +228,7 @@ public class OffsetCurveSetBuilder {
       rightLoc = cwLeftLoc;
       side = Position.opposite(side);
     }
-    final PointList curve = curveBuilder.getRingCurve(points, side,
+    final LineString curve = curveBuilder.getRingCurve(points, side,
       offsetDistance);
     addCurve(curve, leftLoc, rightLoc);
   }

@@ -1,9 +1,45 @@
 package com.revolsys.gis.data.query.functions;
 
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.QueryValue;
+import com.revolsys.gis.data.query.Value;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
 
 public class F {
+  public static WithinDistance dWithin(final Attribute attribute,
+    final Geometry geometry, final double distance) {
+    return new WithinDistance(new Column(attribute), new Value(attribute,
+      geometry), new Value(distance));
+  }
+
+  public static WithinDistance dWithin(final String name,
+    final Geometry geometry, double distance) {
+    if (distance < 0) {
+      distance = 0;
+    }
+    return new WithinDistance(new Column(name), new Value(geometry), new Value(
+      distance));
+  }
+
+  public static EnvelopeIntersects envelopeIntersects(
+    final Attribute attribute, final BoundingBox boundingBox) {
+    return new EnvelopeIntersects(new Column(attribute), new Value(attribute,
+      boundingBox));
+  }
+
+  public static EnvelopeIntersects envelopeIntersects(
+    final Attribute attribute, final Geometry geometry) {
+    return new EnvelopeIntersects(new Column(attribute), new Value(attribute,
+      geometry.getBoundingBox()));
+  }
+
+  public static EnvelopeIntersects envelopeIntersects(final String name,
+    final BoundingBox boundingBox) {
+    return new EnvelopeIntersects(new Column(name), new Value(boundingBox));
+  }
+
   public static Lower lower(final QueryValue value) {
 
     return new Lower(value);

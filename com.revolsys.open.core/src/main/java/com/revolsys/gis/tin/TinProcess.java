@@ -17,7 +17,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.MathUtil;
@@ -95,17 +95,17 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
     if (tin == null) {
       LOG.info("Loading tin from database");
       tin = new TriangulatedIrregularNetwork(boundingBox);
-      List<PointList> lines = new ArrayList<PointList>();
+      List<LineString> lines = new ArrayList<LineString>();
       if (tinIn != null) {
         readTinFeatures(tin, lines, tinIn);
       }
       if (tinReader != null) {
         readTinFeatures(tin, lines, tinReader);
       }
-      for (final PointList line : lines) {
-        tin.insertNodes(line.toPointList());
+      for (final LineString line : lines) {
+        tin.insertNodes(line);
       }
-      for (final PointList line : lines) {
+      for (final LineString line : lines) {
         tin.insertEdge(line);
       }
       lines = null;
@@ -169,7 +169,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   private void readTinFeatures(final TriangulatedIrregularNetwork tin,
-    final List<PointList> lines, final Iterable<DataObject> iterable) {
+    final List<LineString> lines, final Iterable<DataObject> iterable) {
     for (final DataObject object : iterable) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry instanceof Point) {
@@ -177,7 +177,7 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
         tin.insertNode(point);
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
-        final PointList points = line;
+        final LineString points = line;
         lines.add(points);
       }
     }

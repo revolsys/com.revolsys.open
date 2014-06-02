@@ -3,8 +3,11 @@ package com.revolsys.gis.data.io;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.functions.F;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.parallel.process.AbstractProcess;
@@ -38,10 +41,12 @@ public class DataStoreQueryTask extends AbstractProcess {
   @Override
   public void run() {
     objects = new ArrayList<DataObject>();
-    final Query query = new Query(path);
-    query.setBoundingBox(boundingBox);
-    final Reader<DataObject> reader = dataStore.query(query);
-    try {
+    final DataObjectMetaData metaData = dataStore.getMetaData(path);
+    final Query query = new Query(metaData);
+    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    query.setWhereCondition(F.envelopeIntersects(geometryAttribute, boundingBox));
+    try (
+      final Reader<DataObject> reader = dataStore.query(query)) {
       for (final DataObject object : reader) {
         try {
           objects.add(object);
@@ -49,8 +54,6 @@ public class DataStoreQueryTask extends AbstractProcess {
           return;
         }
       }
-    } finally {
-      reader.close();
     }
   }
 

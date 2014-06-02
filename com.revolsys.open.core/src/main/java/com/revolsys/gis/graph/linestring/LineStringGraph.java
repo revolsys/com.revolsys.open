@@ -29,14 +29,12 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.filter.CrossingLineSegmentFilter;
 import com.revolsys.gis.model.coordinates.filter.PointOnLineSegment;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListIndexLineSegmentIterator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
@@ -68,7 +66,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   private GeometryFactory geometryFactory;
 
-  private PointList points;
+  private LineString points;
 
   private Point fromPoint;
 
@@ -81,11 +79,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     setLineString(line);
   }
 
-  public LineStringGraph(final LineString lineString) {
-    this(lineString.getGeometryFactory(), lineString);
-  }
-
-  public LineStringGraph(final PointList points) {
+  public LineStringGraph(final LineString points) {
     super(false);
     setGeometryFactory(GeometryFactory.floating3());
     setPoints(points);
@@ -208,9 +202,9 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   public Geometry getSelfIntersections() {
-    final GeometryFactory precisionModel = getPrecisionModel();
     final Set<Point> intersectionPoints = new HashSet<Point>();
-    for (final Point point : points.toPointList()) {
+    for (int i = 0; i < points.getVertexCount(); i++) {
+      final Point point = points.getPoint(i);
       final Node<LineSegment> node = getNode(point);
       if (node.getDegree() > 2 || hasTouchingEdges(node)) {
         intersectionPoints.add(point);
@@ -282,7 +276,7 @@ public class LineStringGraph extends Graph<LineSegment> {
     }
     envelope = envelope.expand(maxDistance);
     if (envelope.intersects(this.envelope)) {
-      final PointList points = line;
+      final LineString points = line;
       final int numPoints = points.getVertexCount();
       final Point fromPoint = points.getPoint(0);
       final Point toPoint = points.getPoint(numPoints - 1);
@@ -423,19 +417,18 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   private void setLineString(final LineString lineString) {
-    final PointList points = lineString;
+    final LineString points = lineString;
     setPoints(points);
   }
 
-  private void setPoints(final PointList points) {
+  private void setPoints(final LineString points) {
     this.points = points;
-    final CoordinatesListIndexLineSegmentIterator iterator = new CoordinatesListIndexLineSegmentIterator(
-      geometryFactory, points);
     int index = 0;
-    for (final LineSegment lineSegment : iterator) {
+    for (final LineSegment lineSegment : points.segments()) {
       final Point from = lineSegment.getPoint(0);
       final Point to = lineSegment.getPoint(1);
-      final Edge<LineSegment> edge = addEdge(lineSegment, from, to);
+      final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(),
+        from, to);
 
       edge.setAttribute(INDEX, Arrays.asList(index++));
     }

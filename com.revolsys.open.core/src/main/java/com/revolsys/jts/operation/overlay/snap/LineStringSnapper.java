@@ -37,7 +37,6 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -51,7 +50,21 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * @version 1.7
  */
 public class LineStringSnapper {
-  public static boolean isClosed(final PointList pts) {
+  public static Point findSnapForVertex(final Point pt, final Point[] snapPts,
+    final double snapTolerance) {
+    for (int i = 0; i < snapPts.length; i++) {
+      // if point is already equal to a src pt, don't snap
+      if (pt.equals(2, snapPts[i])) {
+        return null;
+      }
+      if (pt.distance(snapPts[i]) < snapTolerance) {
+        return snapPts[i];
+      }
+    }
+    return null;
+  }
+
+  public static boolean isClosed(final LineString pts) {
     if (pts.getVertexCount() <= 1) {
       return false;
     }
@@ -60,22 +73,11 @@ public class LineStringSnapper {
 
   private double snapTolerance = 0.0;
 
-  private final PointList srcPts;
+  private final LineString srcPts;
 
   private boolean allowSnappingToSourceVertices = false;
 
   private boolean isClosed = false;
-
-  /**
-   * Creates a new snapper using the points in the given {@link LineString}
-   * as source snap points.
-   * 
-   * @param srcLine a LineString to snap (may be empty)
-   * @param snapTolerance the snap tolerance to use
-   */
-  public LineStringSnapper(final LineString srcLine, final double snapTolerance) {
-    this((PointList)srcLine, snapTolerance);
-  }
 
   /**
    * Creates a new snapper using the given points
@@ -84,7 +86,7 @@ public class LineStringSnapper {
    * @param srcPts the points to snap 
    * @param snapTolerance the snap tolerance to use
    */
-  public LineStringSnapper(final PointList srcPts, final double snapTolerance) {
+  public LineStringSnapper(final LineString srcPts, final double snapTolerance) {
     this.srcPts = srcPts;
     isClosed = isClosed(srcPts);
     this.snapTolerance = snapTolerance;
@@ -137,19 +139,6 @@ public class LineStringSnapper {
       }
     }
     return snapIndex;
-  }
-
-  private Point findSnapForVertex(final Point pt, final Point[] snapPts) {
-    for (int i = 0; i < snapPts.length; i++) {
-      // if point is already equal to a src pt, don't snap
-      if (pt.equals(2, snapPts[i])) {
-        return null;
-      }
-      if (pt.distance(snapPts[i]) < snapTolerance) {
-        return snapPts[i];
-      }
-    }
-    return null;
   }
 
   public void setAllowSnappingToSourceVertices(
@@ -232,7 +221,7 @@ public class LineStringSnapper {
     final int end = isClosed ? srcCoords.size() - 1 : srcCoords.size();
     for (int i = 0; i < end; i++) {
       final Point srcPt = srcCoords.get(i);
-      final Point snapVert = findSnapForVertex(srcPt, snapPts);
+      final Point snapVert = findSnapForVertex(srcPt, snapPts, snapTolerance);
       if (snapVert != null) {
         // update src with snap pt
         srcCoords.set(i, new PointDouble(snapVert));

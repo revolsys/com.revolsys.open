@@ -7,7 +7,7 @@ import java.util.List;
 import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
@@ -26,7 +26,7 @@ public class WarpPolynomialFilter extends WholeImageFilter {
   private int degree;
 
   public WarpPolynomialFilter(final BoundingBox boundingBox,
-    final PointList imagePoints, final List<Point> destinationPoints) {
+    final LineString imagePoints, final List<Point> destinationPoints) {
     this.boundingBox = boundingBox;
   }
 

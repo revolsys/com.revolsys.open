@@ -18,7 +18,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
@@ -411,7 +410,7 @@ public class TriangulatedIrregularNetwork {
 
   public LineString getElevation(final LineString line) {
     final GeometryFactory geometryFactory = line.getGeometryFactory();
-    final PointList oldPoints = line;
+    final LineString oldPoints = line;
     final int vertexCount = line.getVertexCount();
     final int axisCount = line.getAxisCount();
     final double[] newCoordinates = new double[vertexCount * axisCount];
@@ -492,7 +491,7 @@ public class TriangulatedIrregularNetwork {
     return Collections.unmodifiableSet(nodes);
   }
 
-  private Point getOtherCoordinates(final PointList coords, final int i1,
+  private Point getOtherCoordinates(final LineString coords, final int i1,
     final int i2) {
     final int index = getOtherIndex(i1, i2);
     return coords.getPoint(index);
@@ -587,12 +586,7 @@ public class TriangulatedIrregularNetwork {
     }
   }
 
-  public void insertEdge(final LineString breakline) {
-    final PointList coordinates = breakline;
-    insertEdge(coordinates);
-  }
-
-  public void insertEdge(final PointList coordinates) {
+  public void insertEdge(final LineString coordinates) {
     Point previousCoordinates = coordinates.getPoint(0);
     for (int i = 1; i < coordinates.getVertexCount(); i++) {
       final Point coordinate = coordinates.getPoint(i);

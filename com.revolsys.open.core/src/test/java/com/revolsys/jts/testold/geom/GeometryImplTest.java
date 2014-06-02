@@ -44,7 +44,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;
@@ -238,8 +238,8 @@ public class GeometryImplTest extends TestCase {
       0.0, 0, 100.0, 0, 100.0, 100, 0.0, 0);
     final LinearRing somethingNotEqualButSameClass = this.geometryFactory.linearRing(
       2, 0.0, 0, 100.0, 0, 100.0, 555, 0.0, 0);
-    final LinearRing sameClassButEmpty = this.geometryFactory.linearRing((PointList)null);
-    final LinearRing anotherSameClassButEmpty = this.geometryFactory.linearRing((PointList)null);
+    final LinearRing sameClassButEmpty = this.geometryFactory.linearRing((LineString)null);
+    final LinearRing anotherSameClassButEmpty = this.geometryFactory.linearRing((LineString)null);
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry createCollection(final Geometry[] geometries) {

@@ -33,14 +33,12 @@
 
 package com.revolsys.jts.operation.distance3d;
 
-import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.impl.AbstractLineString;
 
 /**
- * A PointList wrapper which 
+ * A LineString wrapper which 
  * projects 3D coordinates into one of the
  * three Cartesian axis planes,
  * using the standard orthonormal projection
@@ -50,7 +48,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * @author mdavis
  *
  */
-public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
+public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   private static final int[] XY_INDEX = new int[] {
     0, 1
@@ -70,7 +68,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
-  public static PointList projectToXY(final PointList seq) {
+  public static LineString projectToXY(final LineString seq) {
     /**
      * This is just a no-op, but return a wrapper
      * to allow better testing
@@ -84,7 +82,7 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
-  public static PointList projectToXZ(final PointList seq) {
+  public static LineString projectToXZ(final LineString seq) {
     return new AxisPlaneCoordinateSequence(seq, XZ_INDEX);
   }
 
@@ -94,15 +92,15 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
-  public static PointList projectToYZ(final PointList seq) {
+  public static LineString projectToYZ(final LineString seq) {
     return new AxisPlaneCoordinateSequence(seq, YZ_INDEX);
   }
 
-  private final PointList seq;
+  private final LineString seq;
 
   private final int[] indexMap;
 
-  private AxisPlaneCoordinateSequence(final PointList seq, final int[] indexMap) {
+  private AxisPlaneCoordinateSequence(final LineString seq, final int[] indexMap) {
     this.seq = seq;
     this.indexMap = indexMap;
   }
@@ -127,8 +125,8 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   }
 
   @Override
-  public Point getPoint(final int i) {
-    return new PointDouble(getX(i), getY(i), getZ(i));
+  public double[] getCoordinates() {
+    return seq.getCoordinates();
   }
 
   @Override
@@ -149,6 +147,11 @@ public class AxisPlaneCoordinateSequence extends AbstractCoordinatesList {
   @Override
   public double getZ(final int index) {
     return getCoordinate(index, Geometry.Z);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return seq.isEmpty();
   }
 
 }

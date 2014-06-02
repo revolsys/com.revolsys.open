@@ -12,14 +12,35 @@ public class LineStringVertex extends AbstractVertex {
     setVertexId(vertexId);
   }
 
-  public LineString getLineString() {
-    return (LineString)getGeometry();
-  }
-
   @Override
   public double getCoordinate(final int index) {
     final LineString line = getGeometry();
     return line.getCoordinate(vertexIndex, index);
+  }
+
+  @Override
+  public Vertex getLineNext() {
+    final int newVertexIndex = vertexIndex + 1;
+    final int vertexCount = getLineString().getVertexCount();
+    if (newVertexIndex < vertexCount - 1) {
+      return new LineStringVertex(getLineString(), newVertexIndex);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public Vertex getLinePrevious() {
+    final int newVertexIndex = vertexIndex - 1;
+    if (newVertexIndex < 0) {
+      return null;
+    } else {
+      return new LineStringVertex(getLineString(), newVertexIndex);
+    }
+  }
+
+  public LineString getLineString() {
+    return (LineString)getGeometry();
   }
 
   @Override

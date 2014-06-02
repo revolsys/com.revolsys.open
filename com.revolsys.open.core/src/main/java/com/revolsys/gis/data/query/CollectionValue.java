@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ctc.wstx.util.ExceptionUtil;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -42,6 +43,30 @@ public class CollectionValue extends QueryValue {
   }
 
   @Override
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    buffer.append('(');
+    for (int i = 0; i < queryValues.size(); i++) {
+      if (i > 0) {
+        buffer.append(", ");
+      }
+
+      final QueryValue queryValue = queryValues.get(i);
+      if (queryValue instanceof Value) {
+        if (jdbcAttribute == null) {
+          queryValue.appendSql(query, dataStore, buffer);
+        } else {
+          jdbcAttribute.addSelectStatementPlaceHolder(buffer);
+        }
+      } else {
+        queryValue.appendSql(query, dataStore, buffer);
+      }
+
+    }
+    buffer.append(')');
+  }
+
+  @Override
   public int appendParameters(int index, final PreparedStatement statement) {
     for (final QueryValue queryValue : queryValues) {
       JdbcAttribute jdbcAttribute = this.jdbcAttribute;
@@ -62,29 +87,6 @@ public class CollectionValue extends QueryValue {
       }
     }
     return index;
-  }
-
-  @Override
-  public void appendSql(final StringBuffer buffer) {
-    buffer.append('(');
-    for (int i = 0; i < queryValues.size(); i++) {
-      if (i > 0) {
-        buffer.append(", ");
-      }
-
-      final QueryValue queryValue = queryValues.get(i);
-      if (queryValue instanceof Value) {
-        if (jdbcAttribute == null) {
-          queryValue.appendSql(buffer);
-        } else {
-          jdbcAttribute.addSelectStatementPlaceHolder(buffer);
-        }
-      } else {
-        queryValue.appendSql(buffer);
-      }
-
-    }
-    buffer.append(')');
   }
 
   @Override

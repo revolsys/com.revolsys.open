@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class BinaryCondition extends Condition {
@@ -28,6 +29,24 @@ public class BinaryCondition extends Condition {
   }
 
   @Override
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    if (left == null) {
+      buffer.append("NULL");
+    } else {
+      left.appendSql(query, dataStore, buffer);
+    }
+    buffer.append(" ");
+    buffer.append(operator);
+    buffer.append(" ");
+    if (right == null) {
+      buffer.append("NULL");
+    } else {
+      right.appendSql(query, dataStore, buffer);
+    }
+  }
+
+  @Override
   public int appendParameters(int index, final PreparedStatement statement) {
     if (left != null) {
       index = left.appendParameters(index, statement);
@@ -36,23 +55,6 @@ public class BinaryCondition extends Condition {
       index = right.appendParameters(index, statement);
     }
     return index;
-  }
-
-  @Override
-  public void appendSql(final StringBuffer buffer) {
-    if (left == null) {
-      buffer.append("NULL");
-    } else {
-      left.appendSql(buffer);
-    }
-    buffer.append(" ");
-    buffer.append(operator);
-    buffer.append(" ");
-    if (right == null) {
-      buffer.append("NULL");
-    } else {
-      right.appendSql(buffer);
-    }
   }
 
   @Override

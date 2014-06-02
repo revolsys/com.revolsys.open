@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.math.Angle;
 
 /**
@@ -201,7 +201,7 @@ public final class MathUtil {
    * @param i2
    * @return
    */
-  public static double getAngle(final PointList points, final int i1,
+  public static double getAngle(final LineString points, final int i1,
     final int i2, final boolean start) {
     final double x1 = points.getX(i1);
     final double y1 = points.getY(i1);

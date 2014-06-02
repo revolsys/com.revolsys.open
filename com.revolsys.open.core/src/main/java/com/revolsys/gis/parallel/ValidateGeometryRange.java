@@ -3,11 +3,11 @@ package com.revolsys.gis.parallel;
 import org.apache.log4j.Logger;
 
 import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
@@ -73,30 +73,6 @@ public class ValidateGeometryRange extends
     return (value >= min && value <= max);
   }
 
-  private boolean isValid(final String type, final Point coordinate) {
-    if (!isValid(minX, maxY, coordinate.getX())
-      || !isValid(minY, maxY, coordinate.getY())
-      || !isValid(minZ, maxZ, coordinate.getZ())) {
-      LOG.warn(type + " has invalid coordinate at " + coordinate);
-      return false;
-    } else {
-      return true;
-    }
-
-  }
-
-  private boolean isValid(final String type,
-    final PointList coordinates) {
-    boolean valid = true;
-    for (int j = 0; j < coordinates.getVertexCount(); j++) {
-      final Point coordinate = coordinates.getPoint(j);
-      if (!isValid(type, coordinate)) {
-        valid = false;
-      }
-    }
-    return valid;
-  }
-
   private boolean isValid(final String type, final Geometry geometry) {
     boolean valid = true;
     for (int i = 0; i < geometry.getGeometryCount(); i++) {
@@ -129,11 +105,25 @@ public class ValidateGeometryRange extends
   }
 
   private boolean isValid(final String type, final LineString line) {
-    final PointList coordinates = line;
-    if (!isValid(type, coordinates)) {
-      return false;
+    boolean valid = true;
+    for (final Vertex point : line.vertices()) {
+      if (!isValid(type, point)) {
+        valid = false;
+      }
     }
-    return true;
+    return valid;
+  }
+
+  private boolean isValid(final String type, final Point coordinate) {
+    if (!isValid(minX, maxY, coordinate.getX())
+      || !isValid(minY, maxY, coordinate.getY())
+      || !isValid(minZ, maxZ, coordinate.getZ())) {
+      LOG.warn(type + " has invalid coordinate at " + coordinate);
+      return false;
+    } else {
+      return true;
+    }
+
   }
 
   @Override

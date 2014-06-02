@@ -23,12 +23,14 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.functions.F;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
@@ -362,21 +364,17 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     } else {
       final boolean enabled = setEventsEnabled(false);
       try {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-
-        final Geometry queryGeometry = geometry.copy(geometryFactory);
-        BoundingBox boundingBox = queryGeometry.getBoundingBox();
-        boundingBox = boundingBox.expand(distance);
-        final String typePath = getTypePath();
+        final DataObjectMetaData metaData = getMetaData();
+        final Attribute geometryAttribute = getGeometryAttribute();
+        final Query query = new Query(metaData, F.dWithin(geometryAttribute,
+          geometry, distance));
+        query.setProperty("dataObjectFactory", this);
         final DataObjectStore dataStore = getDataStore();
-        final Reader reader = dataStore.query(this, typePath, queryGeometry,
-          distance);
-        try {
+        try (
+          Reader reader = dataStore.query(query)) {
           final List<LayerDataObject> results = reader.read();
           final List<LayerDataObject> records = getCachedRecords(results);
           return records;
-        } finally {
-          reader.close();
         }
       } finally {
         setEventsEnabled(enabled);
@@ -570,6 +568,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return this.dataStore;
   }
 
+  public Attribute getGeometryAttribute() {
+    final DataObjectMetaData metaData = getMetaData();
+    if (metaData == null) {
+      return null;
+    } else {
+      return metaData.getGeometryAttribute();
+    }
+  }
+
   protected String getId(final LayerDataObject record) {
     if (isLayerRecord(record)) {
       return StringConverterRegistry.toString(record.getIdValue());
@@ -661,14 +668,14 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     if (isExists()) {
       final DataObjectStore dataStore = getDataStore();
       if (dataStore != null) {
-        final Query query = new Query(getTypePath());
-        query.setBoundingBox(boundingBox);
+        final DataObjectMetaData metaData = getMetaData();
+        final Attribute geometryAttribute = getGeometryAttribute();
+        final Query query = new Query(metaData, F.envelopeIntersects(
+          geometryAttribute, boundingBox));
         query.setProperty("dataObjectFactory", this);
-        final Reader reader = dataStore.query(query);
-        try {
+        try (
+          final Reader reader = dataStore.query(query)) {
           return reader.read();
-        } finally {
-          reader.close();
         }
       }
     }

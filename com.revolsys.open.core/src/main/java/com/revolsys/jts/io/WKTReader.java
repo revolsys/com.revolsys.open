@@ -92,9 +92,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
  *
  * <i>WKTPoint:</i> <b>POINT ( </b><i>Coordinate</i> <b>)</b>
  *
- * <i>WKTLineString:</i> <b>LINESTRING</b> <i>PointList</i>
+ * <i>WKTLineString:</i> <b>LINESTRING</b> <i>LineString</i>
  *
- * <i>WKTLinearRing:</i> <b>LINEARRING</b> <i>PointList</i>
+ * <i>WKTLinearRing:</i> <b>LINEARRING</b> <i>LineString</i>
  *
  * <i>WKTPolygon:</i> <b>POLYGON</b> <i>CoordinateSequenceList</i>
  *
@@ -117,10 +117,10 @@ import com.revolsys.jts.geom.impl.PointDouble;
  *         | <b>EMPTY</b>
  *
  * <i>CoordinateSequenceList:</i>
- *         <b>(</b> <i>PointList {</i> <b>,</b> <i>PointList }</i> <b>)</b>
+ *         <b>(</b> <i>LineString {</i> <b>,</b> <i>LineString }</i> <b>)</b>
  *         | <b>EMPTY</b>
  *
- * <i>PointList:</i>
+ * <i>LineString:</i>
  *         <b>(</b> <i>Coordinate {</i> , <i>Coordinate }</i> <b>)</b>
  *         | <b>EMPTY</b>
  *

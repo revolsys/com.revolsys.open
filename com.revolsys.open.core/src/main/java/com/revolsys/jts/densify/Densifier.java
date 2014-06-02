@@ -46,7 +46,6 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.geom.util.GeometryTransformer;
 
 /**
  * Densifies a {@link Geometry} by inserting extra vertices along the line segments
@@ -62,7 +61,7 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * 
  * @author Martin Davis
  */
-public class Densifier extends GeometryTransformer {
+public class Densifier {
 
   private static GeometryCollection densify(
     final GeometryCollection geometryCollection, final double distanceTolerance) {

@@ -4,7 +4,9 @@ import java.sql.PreparedStatement;
 import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class Column extends QueryValue {
@@ -23,13 +25,14 @@ public class Column extends QueryValue {
   }
 
   @Override
-  public int appendParameters(final int index, final PreparedStatement statement) {
-    return index;
+  public void appendDefaultSql(final Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    buffer.append(toString());
   }
 
   @Override
-  public void appendSql(final StringBuffer buffer) {
-    buffer.append(toString());
+  public int appendParameters(final int index, final PreparedStatement statement) {
+    return index;
   }
 
   @Override
@@ -71,6 +74,11 @@ public class Column extends QueryValue {
   public <V> V getValue(final Map<String, Object> record) {
     final String name = getName();
     return (V)record.get(name);
+  }
+
+  @Override
+  public void setMetaData(final DataObjectMetaData metaData) {
+    attribute = metaData.getAttribute(getName());
   }
 
   @Override

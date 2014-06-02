@@ -21,7 +21,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.linemerge.LineMerger;
@@ -60,7 +59,7 @@ public final class LineStringUtil {
   // public static LineString cleanShortSegments(final LineString line) {
   // final GeometryFactory factory = GeometryFactory.getFactory(line);
   // if (line.getLength() > 2) {
-  // final PointList points = CoordinatesListUtil.get(line);
+  // final LineString points = CoordinatesListUtil.get(line);
   // DoubleListCoordinatesList newPoints = null;
   // int numRemoved = 0;
   // for (int i = 1; i < points.size(); i++) {
@@ -133,11 +132,11 @@ public final class LineStringUtil {
   // }
 
   public static void addLineString(final GeometryFactory geometryFactory,
-    final PointList points, final Point startPoint, final int startIndex,
+    final LineString points, final Point startPoint, final int startIndex,
     final int endIndex, final Point endPoint, final List<LineString> lines) {
     final int length = endIndex - startIndex + 1;
-    final PointList newPoints = CoordinatesListUtil.subList(points, startPoint,
-      startIndex, length, endPoint);
+    final LineString newPoints = points.subLine(startPoint, startIndex, length,
+      endPoint);
     if (newPoints.getVertexCount() > 1) {
       final LineString newLine = geometryFactory.lineString(newPoints);
       if (newLine.getLength() > 0) {
@@ -220,7 +219,7 @@ public final class LineStringUtil {
 
   public static double distance(final double x, final double y,
     final LineString line, final double tolerance) {
-    final PointList coordinates = line;
+    final LineString coordinates = line;
     double minDistance = Double.MAX_VALUE;
     double x1 = coordinates.getX(0);
     double y1 = coordinates.getY(0);
@@ -250,8 +249,8 @@ public final class LineStringUtil {
       return Double.MAX_VALUE;
     } else {
       double minDistance = Double.MAX_VALUE;
-      final PointList coordinates1 = line1;
-      final PointList coordinates2 = line2;
+      final LineString coordinates1 = line1;
+      final LineString coordinates2 = line2;
       double previousX1 = coordinates1.getCoordinate(0, 0);
       double previousY1 = coordinates1.getCoordinate(0, 1);
       for (int i = 1; i < coordinates1.getVertexCount(); i++) {
@@ -392,7 +391,7 @@ public final class LineStringUtil {
 
   public static Map<String, Number> findClosestSegmentAndCoordinate(
     final LineString line, final Point point) {
-    final PointList points = line;
+    final LineString points = line;
     return CoordinatesListUtil.findClosestSegmentAndCoordinate(points, point);
   }
 
@@ -403,7 +402,7 @@ public final class LineStringUtil {
       line, point);
     final int segmentIndex = result.get(SEGMENT_INDEX).intValue();
     if (segmentIndex != -1) {
-      final PointList coordinates = line;
+      final LineString coordinates = line;
       final int coordinateIndex = result.get(COORDINATE_INDEX).intValue();
       final double coordinateDistance = result.get(COORDINATE_DISTANCE)
         .doubleValue();
@@ -486,8 +485,8 @@ public final class LineStringUtil {
     final LineString line2) {
     final RobustLineIntersector intersector = new RobustLineIntersector();
 
-    final PointList coordinates1 = line1;
-    final PointList coordinates2 = line2;
+    final LineString coordinates1 = line1;
+    final LineString coordinates2 = line2;
     final int numCoordinates1 = coordinates1.getVertexCount();
     final int numCoordinates2 = coordinates2.getVertexCount();
     final Point firstCoord1 = coordinates1.getPoint(0);
@@ -769,7 +768,7 @@ public final class LineStringUtil {
       final int numPoints = line.getVertexCount();
       if (numPoints > 1) {
         final double totalLength = line.getLength();
-        final PointList points = line;
+        final LineString points = line;
         final double midPointLength = totalLength / 2;
         double currentLength = 0;
         for (int i = 1; i < numPoints && currentLength < midPointLength; i++) {
@@ -794,7 +793,7 @@ public final class LineStringUtil {
 
   public static List<LineString> split(final GeometryFactory geometryFactory,
     final LineString line, final LineSegmentIndex index, final double tolerance) {
-    final PointList points = line;
+    final LineString points = line;
     final Point firstCoordinate = points.getPoint(0);
     final int lastIndex = points.getVertexCount() - 1;
     final Point lastCoordinate = points.getPoint(lastIndex);
@@ -867,7 +866,7 @@ public final class LineStringUtil {
   public static List<LineString> split(final LineString line,
     final int segmentIndex, final Point point) {
     final List<LineString> lines = new ArrayList<LineString>();
-    final PointList points = line;
+    final LineString points = line;
     final boolean containsPoint = point.equals(points.getPoint(segmentIndex));
     final int axisCount = points.getAxisCount();
     int coords1Size;

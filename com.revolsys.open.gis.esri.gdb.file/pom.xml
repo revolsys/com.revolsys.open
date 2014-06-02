@@ -20,6 +20,12 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
+<!--  Microsoft Access support
+ <dependency>
+      <groupId>com.healthmarketscience.jackcess</groupId>
+      <artifactId>jackcess</artifactId>
+      <version>2.0.4</version>
+    </dependency> -->  
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>com.revolsys.open.core</artifactId>

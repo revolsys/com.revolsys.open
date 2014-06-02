@@ -35,11 +35,11 @@ package com.revolsys.jts.operation.buffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -78,7 +78,7 @@ class OffsetSegmentString {
     addPt(point.getX(), point.getY());
   }
 
-  public void addPts(final PointList points, final boolean isForward) {
+  public void addPts(final LineString points, final boolean isForward) {
     if (isForward) {
       for (int i = 0; i < points.getVertexCount(); i++) {
         addPt(points.getPoint(i));
@@ -106,8 +106,8 @@ class OffsetSegmentString {
     points.add(startPt);
   }
 
-  public PointList getPoints() {
-    return new DoubleCoordinatesList(2, points);
+  public LineString getPoints() {
+    return new LineStringDouble(2, points);
   }
 
   /**

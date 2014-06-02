@@ -165,9 +165,6 @@ public class MultiGenerator extends GeometryGenerator {
     return this.numberGeometries;
   }
 
-  /**
-   * @see com.revolsys.jts.testold.generator.GeometryGenerator#setBoundingBox(com.revolsys.jts.testold.geom.Envelope)
-   */
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
     super.setBoundingBox(boundingBox);

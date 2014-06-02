@@ -18,8 +18,6 @@ import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeShapeFilter;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
@@ -27,8 +25,11 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.query.Query;
+import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeBinaryGeometryQueryIterator extends
   AbstractIterator<DataObject> {
@@ -125,7 +126,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       final SeSqlConstruct sqlConstruct = new SeSqlConstruct(tableName);
       final String[] columnNames = attributeNames.toArray(new String[0]);
       this.seQuery = new SeQuery(connection, columnNames, sqlConstruct);
-      BoundingBox boundingBox = this.query.getBoundingBox();
+      BoundingBox boundingBox = QueryValue.getBoundingBox(this.query);
       if (boundingBox != null) {
         final SeLayer layer = new SeLayer(connection, tableName,
           this.metaData.getGeometryAttributeName());

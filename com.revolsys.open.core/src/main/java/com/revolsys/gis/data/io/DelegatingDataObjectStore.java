@@ -21,7 +21,6 @@ import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class DelegatingDataObjectStore extends AbstractDataObjectStore {
@@ -288,12 +287,6 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   @Override
   public ResultPager<DataObject> page(final Query query) {
     return dataStore.page(query);
-  }
-
-  @Override
-  public Reader<DataObject> query(final DataObjectFactory dataObjectFactory,
-    final String typePath, final Geometry geometry) {
-    return dataStore.query(dataObjectFactory, typePath, geometry);
   }
 
   @Override

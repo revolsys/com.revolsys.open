@@ -5,11 +5,11 @@ import org.junit.Test;
 
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.TestConstants;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 public class PointTest implements TestConstants {
@@ -148,10 +148,10 @@ public class PointTest implements TestConstants {
         1));
       assertEmpty(pointCoordinatesSize1);
 
-      final Point pointCoordinatesListNull = geometryFactory.point((PointList)null);
+      final Point pointCoordinatesListNull = geometryFactory.point((LineString)null);
       assertEmpty(pointCoordinatesListNull);
 
-      final Point pointCoordinatesListSize0 = geometryFactory.point(new DoubleCoordinatesList(
+      final Point pointCoordinatesListSize0 = geometryFactory.point(new LineStringDouble(
         0, axisCount));
       assertEmpty(pointCoordinatesListSize0);
 
@@ -231,12 +231,12 @@ public class PointTest implements TestConstants {
         pointCoordinatesAllAxis, pointCoordinatesExtraAxis,
         pointCoordinatesLessAxis);
 
-      // PointList
-      final Point pointCoordinatesListAllAxis = geometryFactory.point(new DoubleCoordinatesList(
+      // LineString
+      final Point pointCoordinatesListAllAxis = geometryFactory.point(new LineStringDouble(
         axisCount, coordinates));
-      final Point pointCoordinatesListExtraAxis = geometryFactory.point(new DoubleCoordinatesList(
+      final Point pointCoordinatesListExtraAxis = geometryFactory.point(new LineStringDouble(
         axisCount, coordinatesExtra));
-      final Point pointCoordinatesListLessAxis = geometryFactory.point(new DoubleCoordinatesList(
+      final Point pointCoordinatesListLessAxis = geometryFactory.point(new LineStringDouble(
         axisCountLess, coordinatesLess));
       assertEquals(coordinates, coordinatesLessNaN,
         pointCoordinatesListAllAxis, pointCoordinatesListExtraAxis,

@@ -16,7 +16,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -133,7 +133,7 @@ public class GpxWriter extends AbstractWriter<DataObject> {
     out.startTag(GpxConstants.TRACK_ELEMENT);
     LineString line = object.getGeometryValue();
     line = line.convert(GpxConstants.GEOMETRY_FACTORY);
-    final PointList coordinatesList = line;
+    final LineString coordinatesList = line;
     writeAttributes(object);
     out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
 

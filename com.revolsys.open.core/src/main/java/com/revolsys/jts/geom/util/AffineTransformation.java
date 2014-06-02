@@ -441,11 +441,11 @@ public class AffineTransformation implements Cloneable
   /**
    * Transforms the i'th coordinate in the input sequence
    * 
-   *@param seq  a <code>PointList</code>
+   *@param seq  a <code>LineString</code>
    *@param i the index of the coordinate to transform
    */
   // @Override
-  // public void filter(final PointList seq, final int i) {
+  // public void filter(final LineString seq, final int i) {
   // transform(seq, i);
   // }
 
@@ -1077,12 +1077,12 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Applies this transformation to the i'th coordinate
-   * in the given PointList.
+   * in the given LineString.
    * 
-   *@param seq  a <code>PointList</code>
+   *@param seq  a <code>LineString</code>
    *@param i the index of the coordinate to transform
    */
-  // public void transform(final PointList seq, final int i) {
+  // public void transform(final LineString seq, final int i) {
   // final double xp = m00 * seq.getValue(i, 0) + m01 * seq.getValue(i, 1) +
   // m02;
   // final double yp = m10 * seq.getValue(i, 0) + m11 * seq.getValue(i, 1) +

@@ -51,7 +51,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
@@ -235,7 +235,7 @@ public class GeometryGraph extends PlanarGraph {
     if (ring.isEmpty()) {
       return;
     }
-    final PointList coordinatesList = CleanDuplicatePoints.clean(ring);
+    final LineString coordinatesList = CleanDuplicatePoints.clean(ring);
 
     if (coordinatesList.getVertexCount() < 4) {
       hasTooFewPoints = true;

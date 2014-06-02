@@ -13,7 +13,7 @@ package com.revolsys.swing.map.layer.raster.filter;
 
 import java.util.Random;
 
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 
 /**
  * A utility class to fit a polynomial to a set of corresponding
@@ -45,8 +45,8 @@ public class PolyWarpSolver {
    *         points.  The coefficients for the X polynomial are returned
    *         first, followed by those for the Y polynomial.
    */
-  public static double[] getCoeffs(final PointList sourcePixels,
-    final PointList targetPixels, final int degree) {
+  public static double[] getCoeffs(final LineString sourcePixels,
+    final LineString targetPixels, final int degree) {
 
     final int pointCount = Math.min(sourcePixels.getVertexCount(), targetPixels.getVertexCount());
     final int equations = pointCount / 2;

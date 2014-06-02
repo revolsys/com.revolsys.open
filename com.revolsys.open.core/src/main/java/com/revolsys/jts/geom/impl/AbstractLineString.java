@@ -56,7 +56,7 @@ import com.revolsys.jts.geom.GeometryComponent;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.prep.PreparedLineString;
 import com.revolsys.jts.geom.segment.LineStringSegment;
 import com.revolsys.jts.geom.segment.Segment;
@@ -321,7 +321,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   public abstract double[] getCoordinates();
 
   @Override
-  public PointList getCoordinatesList() {
+  public LineString getCoordinatesList() {
     return this;
   }
 
@@ -757,7 +757,12 @@ public abstract class AbstractLineString extends AbstractGeometry implements
 
   @Override
   public Iterable<Point> points() {
-    return getCoordinatesList().toPointList();
+    final List<Point> points = new ArrayList<>();
+    for (int i = 0; i < getVertexCount(); i++) {
+      final Point point = getPoint(i);
+      points.add(point);
+    }
+    return points;
   }
 
   @Override
@@ -894,17 +899,6 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       GeometryProperties.copyUserData(this, newLine);
       return newLine;
     }
-
-  }
-
-  @Override
-  public List<Point> toPointList() {
-    final List<Point> points = new ArrayList<>();
-    for (int i = 0; i < getVertexCount(); i++) {
-      final Point point = getPoint(i);
-      points.add(point.cloneCoordinates());
-    }
-    return points;
   }
 
   @Override

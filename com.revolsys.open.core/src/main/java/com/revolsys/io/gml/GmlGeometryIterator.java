@@ -12,10 +12,9 @@ import javax.xml.stream.XMLStreamReader;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -25,12 +24,13 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.util.MathUtil;
 
 public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   GmlConstants {
 
-  public static final PointList parse(final String value,
+  public static final LineString parse(final String value,
     final String separator, final int axisCount) {
     final String[] values = value.split(separator);
     final double[] coordinates = new double[values.length];
@@ -38,10 +38,10 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
       final String string = values[i];
       coordinates[i] = Double.parseDouble(string);
     }
-    return new DoubleCoordinatesList(axisCount, coordinates);
+    return new LineStringDouble(axisCount, coordinates);
   }
 
-  public static PointList parse(final String value, final String decimal,
+  public static LineString parse(final String value, final String decimal,
     String coordSeperator, String toupleSeperator) {
 
     toupleSeperator = toupleSeperator.replaceAll("\\\\", "\\\\\\\\");
@@ -73,7 +73,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return toCoordinateList(axisCount, listOfCoordinateArrays);
   }
 
-  public static PointList toCoordinateList(final int axisCount,
+  public static LineString toCoordinateList(final int axisCount,
     final List<double[]> listOfCoordinateArrays) {
     final int vertexCount = listOfCoordinateArrays.size();
     final double[] coordinates = new double[vertexCount * axisCount];
@@ -89,7 +89,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
         coordinates[i * axisCount + j] = value;
       }
     }
-    return new DoubleCoordinatesList(axisCount, coordinates);
+    return new LineStringDouble(axisCount, coordinates);
   }
 
   private com.revolsys.jts.geom.GeometryFactory geometryFactory;
@@ -158,7 +158,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
 
   }
 
-  private PointList readCoordinates() throws XMLStreamException {
+  private LineString readCoordinates() throws XMLStreamException {
     String decimal = in.getAttributeValue(null, "decimal");
     if (decimal == null) {
       decimal = ".";
@@ -173,7 +173,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     }
     final String value = in.getElementText();
 
-    final PointList points = GmlGeometryIterator.parse(value, decimal,
+    final LineString points = GmlGeometryIterator.parse(value, decimal,
       coordSeperator, toupleSeperator);
     StaxUtils.skipToEndElement(in);
     return points;
@@ -204,7 +204,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   private LinearRing readLinearRing(final GeometryFactory geometryFactory)
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
-    PointList points = null;
+    LineString points = null;
     if (StaxUtils.skipToChildStartElements(in, POS_LIST, COORDINATES)) {
       final QName elementName = in.getName();
       if (elementName.equals(POS_LIST)) {
@@ -227,7 +227,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   private LineString readLineString(final GeometryFactory geometryFactory)
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
-    PointList points = null;
+    LineString points = null;
     if (StaxUtils.skipToChildStartElements(in, POS_LIST, COORDINATES)) {
       if (in.getName().equals(POS)) {
         points = readPosList();
@@ -304,7 +304,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   private Point readPoint(final GeometryFactory geometryFactory)
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
-    PointList points = null;
+    LineString points = null;
     if (StaxUtils.skipToChildStartElements(in, POS, COORDINATES)) {
       if (in.getName().equals(POS)) {
         points = readPosList();
@@ -343,7 +343,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return polygon;
   }
 
-  private PointList readPosList() throws XMLStreamException {
+  private LineString readPosList() throws XMLStreamException {
     final String dimension = in.getAttributeValue(null, "dimension");
     if (dimension == null) {
       StaxUtils.skipSubTree(in);
@@ -351,7 +351,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     } else {
       final int axisCount = Integer.parseInt(dimension);
       final String value = in.getElementText();
-      final PointList points = GmlGeometryIterator.parse(value, "\\s+",
+      final LineString points = GmlGeometryIterator.parse(value, "\\s+",
         axisCount);
       StaxUtils.skipToEndElement(in);
       return points;

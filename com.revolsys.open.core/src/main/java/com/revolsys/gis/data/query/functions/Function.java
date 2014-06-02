@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.CollectionUtil;
@@ -31,15 +33,8 @@ public class Function extends QueryValue {
   }
 
   @Override
-  public int appendParameters(int index, final PreparedStatement statement) {
-    for (final QueryValue value : getParameters()) {
-      index = value.appendParameters(index, statement);
-    }
-    return index;
-  }
-
-  @Override
-  public void appendSql(final StringBuffer buffer) {
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
     buffer.append(name);
     buffer.append("(");
     boolean first = true;
@@ -49,9 +44,17 @@ public class Function extends QueryValue {
       } else {
         buffer.append(", ");
       }
-      parameter.appendSql(buffer);
+      parameter.appendSql(query, dataStore, buffer);
     }
     buffer.append(")");
+  }
+
+  @Override
+  public int appendParameters(int index, final PreparedStatement statement) {
+    for (final QueryValue value : getParameters()) {
+      index = value.appendParameters(index, statement);
+    }
+    return index;
   }
 
   public void clear() {

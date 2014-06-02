@@ -6,14 +6,14 @@ import java.util.Set;
 
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.coordinates.list.AbstractCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.AbstractLineString;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
@@ -21,7 +21,7 @@ import com.revolsys.jts.util.EnvelopeUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
-public class Triangle extends AbstractCoordinatesList {
+public class Triangle extends AbstractLineString {
   private static final long serialVersionUID = -4513931832875328029L;
 
   public static Triangle createClockwiseTriangle(final Point c0,
@@ -62,9 +62,10 @@ public class Triangle extends AbstractCoordinatesList {
   private void addIntersection(final GeometryFactory geometryFactory,
     final Set<Point> coordinates, final Point line1Start, final Point line1End,
     final Point line2Start, final Point line2End) {
-    final PointList intersections = LineSegmentUtil.getIntersection(
+    final LineString intersections = LineSegmentUtil.getIntersection(
       geometryFactory, line1Start, line1End, line2Start, line2End);
-    for (final Point point : intersections.toPointList()) {
+    for (int i = 0; i < intersections.getVertexCount(); i++) {
+      final Point point = intersections.getPoint(i);
       coordinates.add(point);
     }
   }
@@ -111,6 +112,11 @@ public class Triangle extends AbstractCoordinatesList {
   public double getCoordinate(final int index, final int axisIndex) {
     final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
     return coordinates[coordinateIndex];
+  }
+
+  @Override
+  public double[] getCoordinates() {
+    return coordinates;
   }
 
   private int getCoordinatesIndex(final int index, int axisIndex) {
@@ -251,6 +257,11 @@ public class Triangle extends AbstractCoordinatesList {
 
   public boolean intersectsCircumCircle(final Point point) {
     return getCircumcircle().contains(point);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return coordinates == null;
   }
 
   @Override

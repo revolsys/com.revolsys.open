@@ -107,6 +107,8 @@ public interface Point extends Geometry, Puntal, Serializable {
 
   void copyCoordinates(GeometryFactory geometryFactory, double[] coordinates);
 
+  double distance(double x, double y);
+
   /**
    * Computes the 2-dimensional Euclidean distance to another location.
    * The Z-ordinate is ignored.
@@ -151,8 +153,6 @@ public interface Point extends Geometry, Puntal, Serializable {
 
   double[] getCoordinates();
 
-  PointList getCoordinatesList();
-
   double getM();
 
   long getTime();
@@ -169,5 +169,6 @@ public interface Point extends Geometry, Puntal, Serializable {
   @Override
   Point normalize();
 
+  @Override
   Point prepare();
 }

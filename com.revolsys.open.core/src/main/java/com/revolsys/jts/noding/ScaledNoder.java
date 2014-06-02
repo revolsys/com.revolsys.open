@@ -38,9 +38,9 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 
 /**
  * Wraps a {@link Noder} and transforms its input
@@ -112,7 +112,7 @@ public class ScaledNoder implements Noder {
   }
 
   private NodedSegmentString rescale(final NodedSegmentString segment) {
-    final PointList points = segment.getPoints();
+    final LineString points = segment.getPoints();
     final int axisCount = points.getAxisCount();
     final int vertexCount = points.getVertexCount();
     final double[] coordinates = new double[vertexCount * axisCount];
@@ -125,7 +125,7 @@ public class ScaledNoder implements Noder {
         coordinates[i * axisCount + axisIndex] = value;
       }
     }
-    final DoubleCoordinatesList newPoints = new DoubleCoordinatesList(
+    final LineStringDouble newPoints = new LineStringDouble(
       axisCount, coordinates);
     final Object data = segment.getData();
     return new NodedSegmentString(newPoints, data);
@@ -136,7 +136,7 @@ public class ScaledNoder implements Noder {
     final List<NodedSegmentString> result = new ArrayList<>();
     for (final NodedSegmentString segment : segments) {
       final Object data = segment.getData();
-      final PointList scale = scale(segment);
+      final LineString scale = scale(segment);
       final NodedSegmentString nodedSegmentString = new NodedSegmentString(
         scale, data);
       result.add(nodedSegmentString);
@@ -144,7 +144,7 @@ public class ScaledNoder implements Noder {
     return result;
   }
 
-  private PointList scale(final NodedSegmentString segment) {
+  private LineString scale(final NodedSegmentString segment) {
     final int vertexCount = segment.size();
     final int axisCount = segment.getPoints().getAxisCount();
     final double[] coordinates = new double[vertexCount * axisCount];
@@ -162,7 +162,7 @@ public class ScaledNoder implements Noder {
       previousX = x;
       previousY = y;
     }
-    final PointList points = new DoubleCoordinatesList(axisCount, j,
+    final LineString points = new LineStringDouble(axisCount, j,
       coordinates);
     return points;
   }

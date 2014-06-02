@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -139,7 +139,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     if (useIntPt1) {
       pts[ipt] = ei1.coord;
     }
-    final DoubleCoordinatesList points = new DoubleCoordinatesList(pts);
+    final LineStringDouble points = new LineStringDouble(pts);
     return new Edge(points, new Label(edge.label));
   }
 

@@ -8,7 +8,10 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
@@ -40,6 +43,12 @@ public class Value extends QueryValue {
   }
 
   @Override
+  public void appendDefaultSql(final Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    buffer.append('?');
+  }
+
+  @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
     try {
       return jdbcAttribute.setPreparedStatementValue(statement, index,
@@ -47,11 +56,6 @@ public class Value extends QueryValue {
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to set value: " + this.queryValue, e);
     }
-  }
-
-  @Override
-  public void appendSql(final StringBuffer buffer) {
-    buffer.append('?');
   }
 
   @Override
@@ -125,9 +129,7 @@ public class Value extends QueryValue {
 
   public void setAttribute(final Attribute attribute) {
     this.attribute = attribute;
-    if (attribute == null) {
-
-    } else {
+    if (attribute != null) {
       if (attribute instanceof JdbcAttribute) {
         jdbcAttribute = (JdbcAttribute)attribute;
       } else {
@@ -162,6 +164,15 @@ public class Value extends QueryValue {
           }
         }
       }
+    }
+  }
+
+  @Override
+  public void setMetaData(final DataObjectMetaData metaData) {
+    final String attributeName = attribute.getName();
+    if (StringUtils.hasText(attributeName)) {
+      final Attribute attribute = metaData.getAttribute(attributeName);
+      setAttribute(attribute);
     }
   }
 

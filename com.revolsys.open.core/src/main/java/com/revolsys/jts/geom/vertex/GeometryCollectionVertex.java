@@ -16,15 +16,6 @@ public class GeometryCollectionVertex extends AbstractVertex {
     setVertexId(vertexId);
   }
 
-  public Geometry getGeometryCollection() {
-    return getGeometry();
-  }
-
-  @Override
-  public int getPartIndex() {
-    return super.getPartIndex();
-  }
-
   @Override
   public double getCoordinate(final int axisIndex) {
     if (vertex == null) {
@@ -32,6 +23,33 @@ public class GeometryCollectionVertex extends AbstractVertex {
     } else {
       return vertex.getCoordinate(axisIndex);
     }
+  }
+
+  public Geometry getGeometryCollection() {
+    return getGeometry();
+  }
+
+  @Override
+  public Vertex getLineNext() {
+    if (vertex == null) {
+      return null;
+    } else {
+      return vertex.getLineNext();
+    }
+  }
+
+  @Override
+  public Vertex getLinePrevious() {
+    if (vertex == null) {
+      return null;
+    } else {
+      return vertex.getLinePrevious();
+    }
+  }
+
+  @Override
+  public int getPartIndex() {
+    return super.getPartIndex();
   }
 
   @Override

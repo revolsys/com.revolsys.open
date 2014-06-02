@@ -20,7 +20,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
@@ -84,7 +84,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
   private void add(final LineString line, final int index) {
     if (line.getLength() > 0) {
-      final PointList coords = line;
+      final LineString coords = line;
       final Point coordinate0 = coords.getPoint(0);
       final Node<LineSegmentMatch> node = getNode(coordinate0);
       final Set<Node<LineSegmentMatch>> indexStartNodes = getStartNodes(index);
@@ -241,7 +241,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     final LineString line, final int index) {
     final Set<Edge<LineSegmentMatch>> edges = new LinkedHashSet<Edge<LineSegmentMatch>>();
 
-    final PointList coordinatesList = line;
+    final LineString coordinatesList = line;
     final Point coordinate0 = coordinatesList.getPoint(0);
     Point previousCoordinate = coordinate0;
     for (int i = 1; i < coordinatesList.getVertexCount(); i++) {

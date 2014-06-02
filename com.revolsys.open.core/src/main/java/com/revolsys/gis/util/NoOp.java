@@ -6,7 +6,7 @@ import com.revolsys.gis.graph.Edge;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 
 public class NoOp {
   public static void equals(final DataObject object, final double x,
@@ -32,7 +32,7 @@ public class NoOp {
 
   public static boolean equals(final LineString line, final double x1,
     final double y1, final double x2, final double y2) {
-    final PointList points = line;
+    final LineString points = line;
     if (points.getPoint(0).equals(x1, y1)
       && points.getPoint(points.getVertexCount() - 1).equals(x2, y2)) {
       noOp();

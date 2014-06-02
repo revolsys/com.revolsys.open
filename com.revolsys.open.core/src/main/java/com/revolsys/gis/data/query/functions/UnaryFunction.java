@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.io.DataObjectStore;
+import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
@@ -19,18 +21,19 @@ public abstract class UnaryFunction extends QueryValue {
   }
 
   @Override
-  public int appendParameters(final int index, final PreparedStatement statement) {
-    final QueryValue parameter = getParameter();
-    return parameter.appendParameters(index, statement);
-  }
-
-  @Override
-  public void appendSql(final StringBuffer buffer) {
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
     buffer.append(getName());
     buffer.append("(");
     final QueryValue parameter = getParameter();
-    parameter.appendSql(buffer);
+    parameter.appendSql(query, dataStore, buffer);
     buffer.append(")");
+  }
+
+  @Override
+  public int appendParameters(final int index, final PreparedStatement statement) {
+    final QueryValue parameter = getParameter();
+    return parameter.appendParameters(index, statement);
   }
 
   @Override

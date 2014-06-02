@@ -10,7 +10,6 @@ import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.PointList;
 
 public class PackedGeometry {
   public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
@@ -28,7 +27,7 @@ public class PackedGeometry {
     final Double mScale = null;
     final Double mOffset = null;
 
-    final List<List<PointList>> parts = ArcSdeStGeometryAttribute.getParts(
+    final List<List<Geometry>> parts = ArcSdeStGeometryAttribute.getParts(
       geometry, false);
 
     final int numPoints = PackedCoordinateUtil.getNumPoints(parts);

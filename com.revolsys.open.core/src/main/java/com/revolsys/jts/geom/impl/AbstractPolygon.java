@@ -47,7 +47,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.prep.PreparedPolygon;
 import com.revolsys.jts.geom.segment.PolygonSegment;
@@ -112,7 +112,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
    *@param  firstCoordinate  the coordinate to make first
    */
   public static LinearRing scroll(final LinearRing ring, final int index) {
-    final PointList points = ring;
+    final LineString points = ring;
     final int vertexCount = ring.getVertexCount();
     final int axisCount = ring.getAxisCount();
     final double[] coordinates = new double[vertexCount * axisCount];

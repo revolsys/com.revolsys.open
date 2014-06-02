@@ -33,14 +33,9 @@
 
 package com.revolsys.jts.operation.distance;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.PointList;
 import com.revolsys.jts.index.strtree.STRtree;
 
 public class FacetSequenceTreeBuilder {
@@ -50,51 +45,28 @@ public class FacetSequenceTreeBuilder {
   // Seems to be better to use a minimum node capacity
   private static final int STR_TREE_NODE_CAPACITY = 4;
 
-  private static void addFacetSequences(final PointList pts,
-    final List<FacetSequence> sections) {
-    int i = 0;
-    final int size = pts.getVertexCount();
-    while (i <= size - 1) {
-      int end = i + FACET_SEQUENCE_SIZE + 1;
-      // if only one point remains after this section, include it in this
-      // section
-      if (end >= size - 1) {
-        end = size;
-      }
-      final FacetSequence sect = new FacetSequence(pts, i, end);
-      sections.add(sect);
-      i = i + FACET_SEQUENCE_SIZE;
-    }
-  }
-
   public static STRtree build(final Geometry g) {
     final STRtree tree = new STRtree(STR_TREE_NODE_CAPACITY);
-    final List sections = computeFacetSequences(g);
-    for (final Iterator i = sections.iterator(); i.hasNext();) {
-      final FacetSequence section = (FacetSequence)i.next();
-      tree.insert(section.getEnvelope(), section);
+    for (final LineString line : g.getGeometryComponents(LineString.class)) {
+      int i = 0;
+      final int size = line.getVertexCount();
+      while (i <= size - 1) {
+        int end = i + FACET_SEQUENCE_SIZE + 1;
+        // if only one point remains after this section, include it in this
+        // section
+        if (end >= size - 1) {
+          end = size;
+        }
+        final FacetSequence facetSequence = new LineFacetSequence(line, i, end);
+        tree.insert(facetSequence.getEnvelope(), facetSequence);
+        i = i + FACET_SEQUENCE_SIZE;
+      }
+    }
+    for (final Point point : g.getGeometries(Point.class)) {
+      final PointFacetSequence facetSequence = new PointFacetSequence(point);
+      tree.insert(facetSequence.getEnvelope(), facetSequence);
     }
     tree.build();
     return tree;
-  }
-
-  /**
-   * Creates facet sequences
-   * 
-   * @param geometry
-   * @return List<GeometryFacetSequence>
-   */
-  private static List<FacetSequence> computeFacetSequences(
-    final Geometry geometry) {
-    final List<FacetSequence> sections = new ArrayList<>();
-    for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
-      final PointList seq = line;
-      addFacetSequences(seq, sections);
-    }
-    for (final Point point : geometry.getGeometries(Point.class)) {
-      final PointList seq = point.getCoordinatesList();
-      addFacetSequences(seq, sections);
-    }
-    return sections;
   }
 }

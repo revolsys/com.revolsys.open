@@ -34,11 +34,11 @@ package com.revolsys.jts.operation.buffer;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.CGAlgorithmsDD;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 
 /**
  * Simplifies a buffer input line to 
@@ -88,14 +88,14 @@ public class BufferInputLineSimplifier {
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public static PointList simplify(final PointList inputLine,
+  public static LineString simplify(final LineString inputLine,
     final double distanceTol) {
     final BufferInputLineSimplifier simp = new BufferInputLineSimplifier(
       inputLine);
     return simp.simplify(distanceTol);
   }
 
-  private final PointList inputLine;
+  private final LineString inputLine;
 
   private double distanceTol;
 
@@ -105,11 +105,11 @@ public class BufferInputLineSimplifier {
 
   private final int deleteCount = 0;
 
-  public BufferInputLineSimplifier(final PointList inputLine) {
+  public BufferInputLineSimplifier(final LineString inputLine) {
     this.inputLine = inputLine;
   }
 
-  private PointList collapseLine() {
+  private LineString collapseLine() {
     final int axisCount = inputLine.getAxisCount();
     final int vertexCount = inputLine.getVertexCount();
     final double[] coordinates = new double[(vertexCount - deleteCount)
@@ -121,7 +121,7 @@ public class BufferInputLineSimplifier {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, point);
       }
     }
-    return new DoubleCoordinatesList(axisCount, coordinates);
+    return new LineStringDouble(axisCount, coordinates);
   }
 
   /**
@@ -246,7 +246,7 @@ public class BufferInputLineSimplifier {
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
-  public PointList simplify(final double distanceTol) {
+  public LineString simplify(final double distanceTol) {
     this.distanceTol = Math.abs(distanceTol);
     if (distanceTol < 0) {
       angleOrientation = CGAlgorithms.CLOCKWISE;

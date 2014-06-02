@@ -9,17 +9,17 @@ import java.util.NoSuchElementException;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.model.coordinates.list.DoubleCoordinatesList;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.io.json.JsonParser.EventType;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.LineStringDouble;
 
 public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   implements GeoJsonConstants {
@@ -74,7 +74,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     throw new NoSuchElementException();
   }
 
-  private PointList readCoordinatesList(final boolean cogo,
+  private LineString readCoordinatesList(final boolean cogo,
     final boolean ring) {
     final List<Double> coordinates = new ArrayList<>();
     final int axisCount = readCoordinatesList(coordinates);
@@ -103,7 +103,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
         }
       }
     }
-    return new DoubleCoordinatesList(axisCount, coordinates);
+    return new LineStringDouble(axisCount, coordinates);
   }
 
   private int readCoordinatesList(final List<Double> coordinates) {
@@ -162,12 +162,12 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     }
   }
 
-  private List<PointList> readCoordinatesListList(final boolean cogo,
+  private List<LineString> readCoordinatesListList(final boolean cogo,
     final boolean ring) {
     if (in.getEvent() == EventType.startArray || in.hasNext()
       && in.next() == EventType.startArray) {
       EventType event = in.next();
-      final List<PointList> coordinatesLists = new ArrayList<PointList>();
+      final List<LineString> coordinatesLists = new ArrayList<LineString>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readCoordinatesList(cogo, ring));
@@ -184,12 +184,12 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     }
   }
 
-  private List<List<PointList>> readCoordinatesListListList(
+  private List<List<LineString>> readCoordinatesListListList(
     final boolean cogo) {
     if (in.getEvent() == EventType.startArray || in.hasNext()
       && in.next() == EventType.startArray) {
       EventType event = in.next();
-      final List<List<PointList>> coordinatesLists = new ArrayList<List<PointList>>();
+      final List<List<LineString>> coordinatesLists = new ArrayList<List<LineString>>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readCoordinatesListList(cogo, true));
@@ -296,7 +296,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private LineString readLineString(final boolean cogo) {
-    PointList points = null;
+    LineString points = null;
     GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
@@ -318,7 +318,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Geometry readMultiLineString(final boolean cogo) {
-    List<PointList> lineStrings = null;
+    List<LineString> lineStrings = null;
     GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
@@ -330,7 +330,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
     int axisCount = 2;
-    for (final PointList points : lineStrings) {
+    for (final LineString points : lineStrings) {
       axisCount = Math.max(axisCount, points.getAxisCount());
     }
     factory = factory.convertAxisCount(axisCount);
@@ -338,7 +338,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Geometry readMultiPoint() {
-    List<PointList> pointsList = null;
+    List<LineString> pointsList = null;
     GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
@@ -350,7 +350,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
     int axisCount = 2;
-    for (final PointList points : pointsList) {
+    for (final LineString points : pointsList) {
       axisCount = Math.max(axisCount, points.getAxisCount());
     }
     factory = factory.convertAxisCount(axisCount);
@@ -359,7 +359,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry readMultiPolygon(final boolean cogo) {
     final List<Polygon> polygons = new ArrayList<Polygon>();
-    List<List<PointList>> polygonRings = null;
+    List<List<LineString>> polygonRings = null;
     GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
@@ -372,8 +372,8 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       && in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     if (polygonRings != null) {
-      for (final List<PointList> rings : polygonRings) {
-        for (final PointList points : rings) {
+      for (final List<LineString> rings : polygonRings) {
+        for (final LineString points : rings) {
           axisCount = Math.max(axisCount, points.getAxisCount());
         }
         factory = factory.convertAxisCount(axisCount);
@@ -386,7 +386,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Point readPoint() {
-    PointList coordinates = null;
+    LineString coordinates = null;
     GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
@@ -406,20 +406,20 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     }
   }
 
-  private PointList readPointCoordinatesList() {
+  private LineString readPointCoordinatesList() {
     final double[] values = JsonParser.getDoubleArray(in);
     if (values == null) {
       return null;
     } else {
-      return new DoubleCoordinatesList(values.length, values);
+      return new LineStringDouble(values.length, values);
     }
   }
 
-  private List<PointList> readPointCoordinatesListList() {
+  private List<LineString> readPointCoordinatesListList() {
     if (in.getEvent() == EventType.startArray || in.hasNext()
       && in.next() == EventType.startArray) {
       EventType event = in.next();
-      final List<PointList> coordinatesLists = new ArrayList<PointList>();
+      final List<LineString> coordinatesLists = new ArrayList<LineString>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readPointCoordinatesList());
@@ -437,7 +437,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Polygon readPolygon(final boolean cogo) {
-    List<PointList> rings = null;
+    List<LineString> rings = null;
     GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);
@@ -449,7 +449,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     } while (in.getEvent() != EventType.endObject
       && in.getEvent() != EventType.endDocument);
     int axisCount = 2;
-    for (final PointList points : rings) {
+    for (final LineString points : rings) {
       axisCount = Math.max(axisCount, points.getAxisCount());
     }
     factory = factory.convertAxisCount(axisCount);

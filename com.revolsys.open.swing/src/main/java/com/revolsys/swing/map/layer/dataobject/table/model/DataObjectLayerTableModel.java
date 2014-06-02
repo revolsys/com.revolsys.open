@@ -23,7 +23,7 @@ import javax.swing.SwingWorker;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
@@ -34,8 +34,10 @@ import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.Value;
+import com.revolsys.gis.data.query.functions.F;
 import com.revolsys.gis.data.query.functions.Function;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
@@ -182,7 +184,11 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (this.filterByBoundingBox) {
         final Project project = this.layer.getProject();
         final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-        query.setBoundingBox(viewBoundingBox);
+        final DataObjectMetaData metaData = layer.getMetaData();
+        final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        if (geometryAttribute != null) {
+          query.and(F.envelopeIntersects(geometryAttribute, viewBoundingBox));
+        }
       }
       return query;
     }

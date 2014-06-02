@@ -38,7 +38,7 @@ import java.util.List;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.PointList;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -61,7 +61,7 @@ class MCIndexedGeometry {
     init(geom);
   }
 
-  private void addLine(final PointList points) {
+  private void addLine(final LineString points) {
     final SegmentString segStr = new BasicSegmentString(points, null);
     final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(
       segStr.getPoints(), segStr);
@@ -73,7 +73,7 @@ class MCIndexedGeometry {
   private void init(final Geometry geom) {
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      final PointList points = line;
+      final LineString points = line;
       addLine(points);
     }
   }

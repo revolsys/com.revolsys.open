@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
@@ -86,7 +87,7 @@ public class SqlCondition extends Condition {
   }
 
   @Override
-  public void appendSql(final StringBuffer buffer) {
+  public void appendDefaultSql(Query query, DataObjectStore dataStore, final StringBuffer buffer) {
     buffer.append(sql);
   }
 

@@ -81,9 +81,9 @@ public class EdgeString {
         } else {
           reverseDirectedEdges++;
         }
-        coordinateList.add(((LineMergeEdge)directedEdge.getEdge()).getLine()
-          
-          .toPointList(), false, directedEdge.getEdgeDirection());
+        final LineMergeEdge edge = (LineMergeEdge)directedEdge.getEdge();
+        coordinateList.add(edge.getLine(), false,
+          directedEdge.getEdgeDirection());
       }
       line = factory.lineString(coordinateList);
       if (reverseDirectedEdges > forwardDirectedEdges) {

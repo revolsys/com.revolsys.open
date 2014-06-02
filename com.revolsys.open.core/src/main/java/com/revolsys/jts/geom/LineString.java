@@ -51,17 +51,17 @@ import java.util.List;
  *
  *@version 1.7
  */
-public interface LineString extends Lineal, PointList {
+public interface LineString extends Lineal {
   /**
    * Creates and returns a full copy of this {@link LineString} object.
    * (including all coordinates contained by it).
    *
    * @return a clone of this instance
    */
+
   @Override
   LineString clone();
 
-  @Override
   double distance(int index, Point point);
 
   boolean equals(int axisIndex, int vertexIndex, Point point);
@@ -74,45 +74,38 @@ public interface LineString extends Lineal, PointList {
   boolean equalsVertex(int axisCount, final int vertexIndex,
     final LineString line2, int vertexIndex2);
 
-  @Override
   boolean equalsVertex(int axisCount, final int vertexIndex, final Point point);
 
   boolean equalsVertex(final int vertexIndex, final Point point);
 
-  @Override
   double getCoordinate(int vertexIndex, final int axisIndex);
 
-  PointList getCoordinatesList();
+  double[] getCoordinates();
+
+  LineString getCoordinatesList();
 
   Point getEndPoint();
 
-  @Override
   double getM(int vertexIndex);
 
-  @Override
   Point getPoint(final int vertexIndex);
 
   int getSegmentCount();
 
   Point getStartPoint();
 
-  @Override
   double getX(int vertexIndex);
 
-  @Override
   double getY(int vertexIndex);
 
-  @Override
   double getZ(int vertexIndex);
 
-  @Override
   boolean hasVertex(Point point);
 
   boolean isClockwise();
 
   boolean isClosed();
 
-  @Override
   boolean isCounterClockwise();
 
   boolean isRing();
@@ -140,6 +133,7 @@ public interface LineString extends Lineal, PointList {
    * has the first point which is not equal to it's reflected point
    * less than the reflected point.
    */
+
   @Override
   LineString normalize();
 
@@ -153,10 +147,8 @@ public interface LineString extends Lineal, PointList {
 
   List<LineString> split(Point point);
 
-  @Override
   LineString subLine(final int vertexCount);
 
-  @Override
   LineString subLine(final int fromVertexIndex, int vertexCount);
 
   LineString subLine(final int vertexCount, final Point toPoint);

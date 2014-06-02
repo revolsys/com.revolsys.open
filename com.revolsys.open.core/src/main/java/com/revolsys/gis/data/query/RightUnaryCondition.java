@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 
 public class RightUnaryCondition extends Condition {
@@ -18,15 +19,16 @@ public class RightUnaryCondition extends Condition {
   }
 
   @Override
-  public int appendParameters(final int index, final PreparedStatement statement) {
-    return value.appendParameters(index, statement);
+  public void appendDefaultSql(Query query,
+    final DataObjectStore dataStore, final StringBuffer buffer) {
+    value.appendSql(query, dataStore, buffer);
+    buffer.append(" ");
+    buffer.append(operator);
   }
 
   @Override
-  public void appendSql(final StringBuffer buffer) {
-    value.appendSql(buffer);
-    buffer.append(" ");
-    buffer.append(operator);
+  public int appendParameters(final int index, final PreparedStatement statement) {
+    return value.appendParameters(index, statement);
   }
 
   @Override
