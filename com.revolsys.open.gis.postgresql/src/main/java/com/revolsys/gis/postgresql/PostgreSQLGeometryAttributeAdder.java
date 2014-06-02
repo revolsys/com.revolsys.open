@@ -18,8 +18,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.jdbc.io.JdbcConstants;
-import com.revolsys.jdbc.io.SqlFunction;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
@@ -89,12 +87,6 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
         name, dataType, required, description, null, srid, axisCount,
         geometryFactory);
       metaData.addAttribute(attribute);
-      attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
-        "intersects(", ")"));
-      attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
-        "st_buffer(", ")"));
-      attribute.setProperty(JdbcConstants.FUNCTION_EQUAL, new SqlFunction(
-        "st_equals(", ")"));
       attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         geometryFactory);
       return attribute;

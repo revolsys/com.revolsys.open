@@ -10,8 +10,6 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
-import com.revolsys.jdbc.io.JdbcConstants;
-import com.revolsys.jdbc.io.SqlFunction;
 
 public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
   private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryAttributeAdder.class);
@@ -63,10 +61,6 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
       dataType, required, description, null, spatialReference, axisCount);
 
     metaData.addAttribute(attribute);
-    attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
-      "SDE.ST_ENVINTERSECTS(", ") = 1"));
-    attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
-      "SDE.ST_BUFFER(", ")"));
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return attribute;
   }

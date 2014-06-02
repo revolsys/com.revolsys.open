@@ -22,6 +22,7 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
+import com.revolsys.gis.data.query.functions.GeometryEqual2d;
 import com.revolsys.gis.data.query.functions.WithinDistance;
 import com.revolsys.gis.oracle.esri.ArcSdeBinaryGeometryDataStoreExtension;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
@@ -116,10 +117,54 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
+  private void appendGeometryEqual2d(final Query query, final StringBuffer sql,
+    final GeometryEqual2d equals) {
+    final Attribute geometryAttribute = query.getGeometryAttribute();
+
+    if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
+      sql.append("MDSYS.SDO_EQUALS(");
+      final QueryValue geometry1Value = equals.getGeometry1Value();
+      if (geometry1Value == null) {
+        sql.append("NULL");
+      } else {
+        geometry1Value.appendSql(query, this, sql);
+      }
+      sql.append(",");
+      final QueryValue geometry2Value = equals.getGeometry2Value();
+      if (geometry2Value == null) {
+        sql.append("NULL");
+      } else {
+        geometry2Value.appendSql(query, this, sql);
+      }
+      sql.append(") = 'TRUE'");
+    } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
+      sql.append("SDE.ST_EQUALS(");
+      final QueryValue geometry1Value = equals.getGeometry1Value();
+      if (geometry1Value == null) {
+        sql.append("NULL");
+      } else {
+        geometry1Value.appendSql(query, this, sql);
+      }
+      sql.append(",");
+      final QueryValue geometry2Value = equals.getGeometry2Value();
+      if (geometry2Value == null) {
+        sql.append("NULL");
+      } else {
+        geometry2Value.appendSql(query, this, sql);
+      }
+      sql.append(") = 1");
+    } else {
+      throw new IllegalArgumentException("Unknown geometry attribute type "
+        + geometryAttribute.getClass());
+    }
+  }
+
   @Override
   public void appendQueryValue(final Query query, final StringBuffer sql,
     final QueryValue queryValue) {
-    if (queryValue instanceof EnvelopeIntersects) {
+    if (queryValue instanceof GeometryEqual2d) {
+      appendGeometryEqual2d(query, sql, (GeometryEqual2d)queryValue);
+    } else if (queryValue instanceof EnvelopeIntersects) {
       appendEnvelopeIntersects(query, sql, (EnvelopeIntersects)queryValue);
     } else if (queryValue instanceof WithinDistance) {
       appendWithinDistance(query, sql, (WithinDistance)queryValue);

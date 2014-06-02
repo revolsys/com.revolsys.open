@@ -26,8 +26,6 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
-import com.revolsys.jdbc.io.JdbcConstants;
-import com.revolsys.jdbc.io.SqlFunction;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
@@ -151,12 +149,6 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
       name, dataType, sqlType, required, description, null, geometryFactory,
       axisCount);
     metaData.addAttribute(attribute);
-    attribute.setProperty(JdbcConstants.FUNCTION_INTERSECTS, new SqlFunction(
-      "SDO_RELATE(", ",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'"));
-    attribute.setProperty(JdbcConstants.FUNCTION_BUFFER, new SqlFunction(
-      "SDO_GEOM.SDO_BUFFER(", "," + 1 / geometryFactory.getScaleXY() + ")"));
-    attribute.setProperty(JdbcConstants.FUNCTION_EQUAL, new SqlFunction(
-      "SDO_EQUAL(", ") = 'TRUE'"));
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return attribute;
 
