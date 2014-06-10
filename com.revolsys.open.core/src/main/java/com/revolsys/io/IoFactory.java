@@ -13,4 +13,6 @@ public interface IoFactory {
   Set<String> getMediaTypes();
 
   String getName();
+
+  boolean isAvailable();
 }

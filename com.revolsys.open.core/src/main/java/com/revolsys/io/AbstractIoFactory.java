@@ -35,6 +35,10 @@ public abstract class AbstractIoFactory implements IoFactory {
     set.add(value);
   }
 
+  public void addMediaType(final String mediaType) {
+    mediaTypes.add(mediaType);
+  }
+
   protected void addMediaTypeAndFileExtension(final String mediaType,
     final String fileExtension) {
     addMediaType(mediaType);
@@ -43,10 +47,6 @@ public abstract class AbstractIoFactory implements IoFactory {
     add(mediaTypeToFileExtension, fileExtension, fileExtension);
     add(fileExtensionToMediaType, fileExtension, mediaType);
     add(fileExtensionToMediaType, mediaType, mediaType);
-  }
-
-  public void addMediaType(final String mediaType) {
-    mediaTypes.add(mediaType);
   }
 
   @Override
@@ -94,6 +94,11 @@ public abstract class AbstractIoFactory implements IoFactory {
   @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public boolean isAvailable() {
+    return true;
   }
 
   @Override
