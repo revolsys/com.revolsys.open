@@ -33,15 +33,16 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     }
   }
 
-  public List<Entry<Point, T>> findEntriesWithinDistance(
-    final Point from, final Point to, final double maxDistance) {
+  public List<Entry<Point, T>> findEntriesWithinDistance(final Point from,
+    final Point to, final double maxDistance) {
     final Envelope boundingBox = new Envelope(geometryFactory, from, to);
     final List<Entry<Point, T>> entries = new ArrayList<Entry<Point, T>>();
     root.findEntriesWithin(entries, boundingBox);
     for (final Iterator<Entry<Point, T>> iterator = entries.iterator(); iterator.hasNext();) {
       final Entry<Point, T> entry = iterator.next();
       final Point coordinates = entry.getKey();
-      final double distance = LineSegmentUtil.distanceLinePoint(from, to, coordinates);
+      final double distance = LineSegmentUtil.distanceLinePoint(from, to,
+        coordinates);
       if (distance >= maxDistance) {
         iterator.remove();
       }
@@ -60,20 +61,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     return results;
   }
 
-  public List<T> findWithinDistance(final Point from,
-    final Point to, final double maxDistance) {
-    final List<Entry<Point, T>> entries = findEntriesWithinDistance(from,
-      to, maxDistance);
-    final List<T> results = new ArrayList<T>();
-    for (final Entry<Point, T> entry : entries) {
-      final T value = entry.getValue();
-      results.add(value);
-    }
-    return results;
-  }
-
-  public List<T> findWithinDistance(final Point point,
-    final double maxDistance) {
+  public List<T> findWithinDistance(final Point point, final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
     BoundingBox envelope = new Envelope(2, x, y);
@@ -85,11 +73,16 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     return results;
   }
 
-  @Override
-  public void put(final Point point, final T value) {
-    final double x = point.getX();
-    final double y = point.getY();
-    put(x, y, value);
+  public List<T> findWithinDistance(final Point from, final Point to,
+    final double maxDistance) {
+    final List<Entry<Point, T>> entries = findEntriesWithinDistance(from, to,
+      maxDistance);
+    final List<T> results = new ArrayList<T>();
+    for (final Entry<Point, T> entry : entries) {
+      final T value = entry.getValue();
+      results.add(value);
+    }
+    return results;
   }
 
   public void put(final double x, final double y, final T value) {
@@ -102,10 +95,12 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   @Override
-  public boolean remove(final Point point, final T value) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return remove(x, y, value);
+  public void put(final Point point, final T value) {
+    if (!point.isEmpty()) {
+      final double x = point.getX();
+      final double y = point.getY();
+      put(x, y, value);
+    }
   }
 
   public boolean remove(final double x, final double y, final T value) {
@@ -116,6 +111,13 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
       // TODO change so it returns if the item was removed
       return true;
     }
+  }
+
+  @Override
+  public boolean remove(final Point point, final T value) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return remove(x, y, value);
   }
 
   @Override
