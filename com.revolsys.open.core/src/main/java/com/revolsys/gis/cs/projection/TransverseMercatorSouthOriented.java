@@ -3,6 +3,7 @@ package com.revolsys.gis.cs.projection;
 import com.revolsys.gis.cs.Datum;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
+import com.revolsys.gis.cs.ProjectionParameterNames;
 import com.revolsys.gis.cs.Spheroid;
 
 public class TransverseMercatorSouthOriented extends
@@ -43,12 +44,12 @@ public class TransverseMercatorSouthOriented extends
   public TransverseMercatorSouthOriented(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
-    final double centralMeridian = cs.getDoubleParameter("longitude_of_natural_origin");
-    final double scaleFactor = cs.getDoubleParameter("scale_factor_at_natural_origin");
+    final double centralMeridian = cs.getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
+    final double scaleFactor = cs.getDoubleParameter(ProjectionParameterNames.SCALE_FACTOR);
 
     this.spheroid = datum.getSpheroid();
-    this.x0 = cs.getDoubleParameter("false_easting");
-    this.y0 = cs.getDoubleParameter("false_northing");
+    this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
+    this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
     this.a = spheroid.getSemiMajorAxis();
     this.k0 = scaleFactor;

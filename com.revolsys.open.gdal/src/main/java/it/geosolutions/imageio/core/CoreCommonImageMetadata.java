@@ -1,0 +1,806 @@
+/*
+ *    ImageI/O-Ext - OpenSource Java Image translation Library
+ *    http://www.geo-solutions.it/
+ *    http://java.net/projects/imageio-ext/
+ *    (C) 2007 - 2009, GeoSolutions
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    either version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package it.geosolutions.imageio.core;
+
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.SampleModel;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.imageio.metadata.IIOInvalidTreeException;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
+
+import org.w3c.dom.Node;
+
+/**
+ * Class needed to store all available information of a 2D Dataset with the add
+ * of additional information. For convenience and future re-use this class also
+ * represents an {@link IIOMetadata}. A wide set of getters method allow to
+ * retrieve several information directly from the metadata instance, without
+ * need of getting the XML DOM nodes tree.
+ * 
+ * @author Simone Giannecchini, GeoSolutions.
+ * @author Daniele Romagnoli, GeoSolutions.
+ */
+public abstract class CoreCommonImageMetadata extends IIOMetadata {
+
+  /**
+   * The name of the native metadata format for this object.
+   */
+  public static final String nativeMetadataFormatName = "it_geosolutions_imageio_core_commonImageMetadata_1.0";
+
+  /**
+   * The name of the class implementing <code>IIOMetadataFormat</code> and
+   * representing the native metadata format for this object.
+   */
+  public static final String nativeMetadataFormatClassName = "it.geosolutions.imageio.core.CommonImageMetadataFormat";
+
+  /**
+   * the name of the driver which has opened the dataset represented by this
+   * common metadata object.
+   */
+  private String driverName;
+
+  /**
+   * The description of the driver which has opened the dataset represented by
+   * this common metadata object.
+   */
+  private String driverDescription;
+
+  /** The dataset name */
+  private String datasetName;
+
+  /** The dataset description */
+  private String datasetDescription;
+
+  /** The dataset projection. */
+  private String projection;
+
+  /** The number of Ground Control Points */
+  private int gcpNumber;
+
+  /** The GCP's Projection */
+  private String gcpProjection;
+
+  /** The grid to world transformation. */
+  private double[] geoTransformation;
+
+  /**
+  * The list of Ground Control Points. <BR>
+  * Any Ground Control Point has the following fields:<BR>
+  * <UL>
+  * <LI>ID: Unique Identifier</LI>
+  * <LI>Info: Informational message/description</LI>
+  * <LI>x: GCPPixel -----> Pixel (x) location of GCP on Raster</LI>
+  * <LI>y: GCPLine ------> Line(y) location of GCP on Raster</LI>
+  * <LI>lon: GCPX -------> X position of GCP in Georeferenced Space</LI>
+  * <LI>lat: GCPY -------> Y position of GCP in Georeferenced Space</LI>
+  * <LI>elevation: GCPZ -> elevation of GCP in Georeferenced Space</LI>
+  * </UL>
+  */
+  private List<GCP> gcps = Collections.emptyList();
+
+  /** The raster width */
+  private int width;
+
+  /** The raster height */
+  private int height;
+
+  /** The raster tile height */
+  private int tileHeight;
+
+  /** The raster tile width */
+  private int tileWidth;
+
+  /** The <code>ColorModel</code> used for the dataset */
+  private ColorModel colorModel;
+
+  /** The <code>SampleModel</code> used for the dataset */
+  private SampleModel sampleModel;
+
+  // ////////////////////////////////////////////////
+  //
+  // Band Properties
+  //
+  // ////////////////////////////////////////////////
+
+  /** Number of bands */
+  private int numBands;
+
+  /** Array to store the maximum value for each band */
+  private Double[] maximums;
+
+  /** Array to store the minimum value for each band */
+  private Double[] minimums;
+
+  /** Array to store the noData value for each band */
+  private Double[] noDataValues;
+
+  /** Array to store the scale value for each band */
+  private Double[] scales;
+
+  /** Array to store the offset value for each band */
+  private Double[] offsets;
+
+  /** Array to store the number of numOverviews for each band */
+  private int[] numOverviews;
+
+  /** Array to store the color interpretation for each band */
+  private int[] colorInterpretations;
+
+  /**
+   * Private constructor
+   */
+  protected CoreCommonImageMetadata(
+    final boolean standardMetadataFormatSupported,
+    final String nativeMetadataFormatName,
+    final String nativeMetadataFormatClassName,
+    final String[] extraMetadataFormatNames,
+    final String[] extraMetadataFormatClassNames) {
+    super(standardMetadataFormatSupported, nativeMetadataFormatName,
+      nativeMetadataFormatClassName, extraMetadataFormatNames,
+      extraMetadataFormatClassNames);
+  }
+
+  /**
+   * Check the validity of the specified band index. Band indexes are in the
+   * range [0, numBands -1 ]
+   * 
+   * @param bandIndex
+   *                the band index to be validated.
+   * @throws IllegalArgumentException
+   *                 in case the specified band index isn't in the valid range
+   */
+  private void checkBandIndex(final int bandIndex)
+    throws IllegalArgumentException {
+    if (bandIndex < 0 || bandIndex > numBands) {
+      final StringBuilder sb = new StringBuilder("Specified band index (").append(
+        bandIndex)
+        .append(") is out of range. It should be in the range [0,")
+        .append(numBands - 1)
+        .append("]");
+      throw new IllegalArgumentException(sb.toString());
+    }
+  }
+
+  /**
+   * Returns the XML DOM <code>Node</code> object that represents the root
+   * of a tree of metadata contained within this object on its native format.
+   * 
+   * @return a root node containing common metadata exposed on its native
+   *         format.
+   */
+  protected Node createCommonNativeTree() {
+    // Create root node
+    final IIOMetadataNode root = new IIOMetadataNode(nativeMetadataFormatName);
+
+    // ////////////////////////////////////////////////////////////////////
+    //
+    // DatasetDescriptor
+    //
+    // ////////////////////////////////////////////////////////////////////
+    IIOMetadataNode node = new IIOMetadataNode("DatasetDescriptor");
+    node.setAttribute("name", datasetName);
+    node.setAttribute("description", datasetDescription);
+    node.setAttribute("driverName", driverName);
+    node.setAttribute("driverDescription", driverDescription);
+    node.setAttribute("projection", projection);
+    node.setAttribute("numGCPs", Integer.toString(gcpNumber));
+    node.setAttribute("gcpProjection", gcpProjection);
+    root.appendChild(node);
+
+    // ////////////////////////////////////////////////////////////////////
+    //
+    // RasterDimensions
+    //
+    // ////////////////////////////////////////////////////////////////////
+    node = new IIOMetadataNode("RasterDimensions");
+    node.setAttribute("width", Integer.toString(width));
+    node.setAttribute("height", Integer.toString(height));
+    node.setAttribute("tileWidth", Integer.toString(tileWidth));
+    node.setAttribute("tileHeight", Integer.toString(tileHeight));
+    node.setAttribute("numBands", Integer.toString(numBands));
+    root.appendChild(node);
+
+    // ////////////////////////////////////////////////////////////////////
+    //
+    // GeoTransform
+    //
+    // ////////////////////////////////////////////////////////////////////
+    node = new IIOMetadataNode("GeoTransform");
+    final boolean hasgeoTransform = geoTransformation != null
+      && geoTransformation.length > 0;
+    node.setAttribute("m0",
+      hasgeoTransform ? Double.toString(geoTransformation[0]) : null);
+    node.setAttribute("m1",
+      hasgeoTransform ? Double.toString(geoTransformation[1]) : null);
+    node.setAttribute("m2",
+      hasgeoTransform ? Double.toString(geoTransformation[2]) : null);
+    node.setAttribute("m3",
+      hasgeoTransform ? Double.toString(geoTransformation[3]) : null);
+    node.setAttribute("m4",
+      hasgeoTransform ? Double.toString(geoTransformation[4]) : null);
+    node.setAttribute("m5",
+      hasgeoTransform ? Double.toString(geoTransformation[5]) : null);
+    root.appendChild(node);
+
+    // ////////////////////////////////////////////////////////////////////
+    //
+    // GCPS
+    //
+    // ////////////////////////////////////////////////////////////////////
+    if (gcpNumber > 0) {
+      final IIOMetadataNode nodeGCPs = new IIOMetadataNode("GCPS");
+      final List<? extends GCP> gcps = getGCPs();
+      if (gcps != null && !gcps.isEmpty()) {
+        final Iterator<? extends GCP> it = gcps.iterator();
+        while (it.hasNext()) {
+          node = new IIOMetadataNode("GCP");
+          final GCP gcp = it.next();
+          node.setAttribute("column", Double.toString(gcp.getColumn()));
+          node.setAttribute("row", Double.toString(gcp.getRow()));
+          node.setAttribute("id", gcp.getId());
+          node.setAttribute("info", gcp.getDescription());
+          node.setAttribute("easting", Double.toString(gcp.getEasting()));
+          node.setAttribute("northing", Double.toString(gcp.getNorthing()));
+          node.setAttribute("elevation", Double.toString(gcp.getElevation()));
+          nodeGCPs.appendChild(node);
+        }
+      }
+      root.appendChild(nodeGCPs);
+    }
+
+    // ////////////////////////////////////////////////////////////////////
+    //
+    // BandsInfo
+    //
+    // ////////////////////////////////////////////////////////////////////
+    final IIOMetadataNode bandsNode = new IIOMetadataNode("BandsInfo");
+
+    // //
+    //
+    // BandsInfo -> BandInfo
+    //
+    // //
+    for (int i = 0; i < numBands; i++) {
+      node = new IIOMetadataNode("BandInfo");
+      node.setAttribute("index", Integer.toString(i));
+      node.setAttribute(
+        "colorInterpretation",
+        colorInterpretations != null && colorInterpretations.length > i ? Integer.toBinaryString(colorInterpretations[i])
+          : "");
+      node.setAttribute("noData",
+        noDataValues != null && noDataValues.length > i
+          && noDataValues[i] != null ? noDataValues[i].toString() : null);
+      node.setAttribute("maximum", maximums != null && maximums.length > i
+        && maximums[i] != null ? maximums[i].toString() : null);
+      node.setAttribute("minimum", minimums != null && minimums.length > i
+        && minimums[i] != null ? minimums[i].toString() : null);
+      node.setAttribute("scale", scales != null && scales.length > i
+        && scales[i] != null ? scales[i].toString() : null);
+      node.setAttribute("offset", offsets != null && offsets.length > i
+        && offsets[i] != null ? offsets[i].toString() : null);
+      node.setAttribute("numOverviews", numOverviews != null
+        && numOverviews.length > i ? Integer.toString(numOverviews[i]) : null);
+      bandsNode.appendChild(node);
+    }
+
+    // ////////////////////////////////////////////////////////////////////
+    //
+    // BandsInfo -> BandInfo -> ColorTable
+    //
+    // ////////////////////////////////////////////////////////////////////
+    if (colorModel instanceof IndexColorModel) {
+      final IndexColorModel icm = (IndexColorModel)colorModel;
+      final int mapSize = icm.getMapSize();
+      final boolean hasAlpha = icm.hasAlpha();
+      final IIOMetadataNode node1 = new IIOMetadataNode("ColorTable");
+      node1.setAttribute("sizeOfLocalColorTable", Integer.toString(mapSize));
+      final byte rgb[][] = new byte[3 + (hasAlpha ? 1 : 0)][mapSize];
+      icm.getReds(rgb[0]);
+      icm.getGreens(rgb[1]);
+      icm.getBlues(rgb[2]);
+      if (hasAlpha) {
+        icm.getAlphas(rgb[3]);
+      }
+      for (int i = 0; i < mapSize; i++) {
+        final IIOMetadataNode nodeEntry = new IIOMetadataNode("ColorTableEntry");
+        nodeEntry.setAttribute("index", Integer.toString(i));
+        nodeEntry.setAttribute("red", Byte.toString(rgb[0][i]));
+        nodeEntry.setAttribute("green", Byte.toString(rgb[1][i]));
+        nodeEntry.setAttribute("blue", Byte.toString(rgb[2][i]));
+        if (hasAlpha) {
+          nodeEntry.setAttribute("alpha", Byte.toString(rgb[3][i]));
+        }
+        node1.appendChild(nodeEntry);
+      }
+      node.appendChild(node1);
+    }
+    root.appendChild(bandsNode);
+    return root;
+  }
+
+  /**
+   * Returns an XML DOM <code>Node</code> object that represents the root of
+   * a tree of common stream metadata contained within this object according
+   * to the conventions defined by a given metadata format name.
+   * 
+   * @param formatName
+   *                the name of the requested metadata format. Note that
+   *                actually, the only supported format name is the
+   *                {@link CoreCommonImageMetadata#nativeMetadataFormatName}.
+   *                Requesting other format names will result in an
+   *                <code>IllegalArgumentException</code>
+   */
+  @Override
+  public Node getAsTree(final String formatName) {
+    if (nativeMetadataFormatName.equalsIgnoreCase(formatName)) {
+      return createCommonNativeTree();
+    }
+    throw new IllegalArgumentException(formatName
+      + " is not a supported format name");
+  }
+
+  protected int[] getColorInterpretations() {
+    return colorInterpretations.clone();
+  }
+
+  /**
+   * Returns the colorInterpretation for the specified band
+   * 
+   * @param bandIndex
+   *                the index of the required band
+   * @throws IllegalArgumentException
+   *                 in case the specified band number is out of range
+   */
+  public int getColorInterpretations(final int bandIndex) {
+    checkBandIndex(bandIndex);
+    return colorInterpretations[bandIndex];
+  }
+
+  /**
+   * Returns the <code>ColorModel</code> for the dataset held by this
+   * object.
+   */
+  public ColorModel getColorModel() {
+    return colorModel;
+  }
+
+  public String getDatasetDescription() {
+    return datasetDescription;
+  }
+
+  // ////////////////////////////////////////////////////////////////////////
+  //
+  // Dataset and Driver Properties
+  //
+  // ////////////////////////////////////////////////////////////////////////
+  /**
+   * Returns the name of the dataset which is the source for this
+   * <code>IIOMetadata</code>
+   */
+  public String getDatasetName() {
+    return datasetName;
+  }
+
+  /**
+   * Returns the description of the dataset which is the source for this
+   * <code>IIOMetadata</code>
+   */
+  public String getDescription() {
+    return datasetDescription;
+  }
+
+  /**
+   * Returns the description of the GDAL driver used to open the source
+   * dataset for this <code>IIOMetadata</code>
+   */
+  public String getDriverDescription() {
+    return driverDescription;
+  }
+
+  /**
+   * Returns the name of the GDAL driver used to open the source dataset for
+   * this <code>IIOMetadata</code>
+   */
+  public String getDriverName() {
+    return driverName;
+  }
+
+  /** Returns the number of Ground Control Points */
+  public int getGcpNumber() {
+    return gcpNumber;
+  }
+
+  /** Returns the Ground Control Point's projection */
+  public String getGcpProjection() {
+    return gcpProjection;
+  }
+
+  /** Returns the Ground Control Points */
+  public List<GCP> getGCPs() {
+    return Collections.unmodifiableList(gcps);
+  }
+
+  /** Returns the grid to world transformation of the image */
+  public double[] getGeoTransformation() {
+    return geoTransformation.clone();
+  }
+
+  /** Returns the height of the image */
+  public int getHeight() {
+    return height;
+  }
+
+  /**
+   * Returns the maximum value for the specified band
+   * 
+   * @param bandIndex
+   *                the index of the required band
+   * @throws IllegalArgumentException
+   *                 in case the specified band number is out of range or
+   *                 maximum value has not been found
+   */
+  public double getMaximum(final int bandIndex) throws IllegalArgumentException {
+    checkBandIndex(bandIndex);
+    if (maximums != null) {
+      final Double maximum = maximums[bandIndex];
+      if (maximum != null) {
+        return maximum.doubleValue();
+      }
+    }
+    throw new IllegalArgumentException(
+      "no maximum value available for the specified band " + bandIndex);
+  }
+
+  // ////////////////////////////////////////////////////////////////////////
+  //
+  // Bands Properties
+  //
+  // ////////////////////////////////////////////////////////////////////////
+  public Double[] getMaximums() {
+    return maximums.clone();
+  }
+
+  /**
+   * Returns the minimum value for the specified band
+   * 
+   * @param bandIndex
+   *                the index of the required band
+   * @throws IllegalArgumentException
+   *                 in case the specified band number is out of range or
+   *                 minimum value has not been found
+   */
+  public double getMinimum(final int bandIndex) throws IllegalArgumentException {
+    checkBandIndex(bandIndex);
+    if (minimums != null) {
+      final Double minimum = minimums[bandIndex];
+      if (minimum != null) {
+        return minimum.doubleValue();
+      }
+    }
+    throw new IllegalArgumentException(
+      "no minimum value available for the specified band " + bandIndex);
+  }
+
+  public Double[] getMinimums() {
+    return minimums.clone();
+  }
+
+  /**
+   * Returns the noDataValue value for the specified band
+   * 
+   * @param bandIndex
+   *                the index of the required band
+   * @throws IllegalArgumentException
+   *                 in case the specified band number is out of range or
+   *                 noDataValue has not been found
+   */
+  public double getNoDataValue(final int bandIndex)
+    throws IllegalArgumentException {
+    checkBandIndex(bandIndex);
+    if (noDataValues != null) {
+      final Double noDataValue = noDataValues[bandIndex];
+      if (noDataValue != null) {
+        return noDataValue.doubleValue();
+      }
+    }
+    throw new IllegalArgumentException(
+      "no noDataValue available for the specified band " + bandIndex);
+  }
+
+  public Double[] getNoDataValues() {
+    return noDataValues.clone();
+  }
+
+  // ////////////////////////////////////////////////////////////////////////
+  //
+  // Raster Properties
+  //
+  // ////////////////////////////////////////////////////////////////////////
+  /**
+   * Returns the number of bands of the dataset which is the source for this
+   * <code>IIOMetadata</code>
+   */
+  public int getNumBands() {
+    return numBands;
+  }
+
+  public int[] getNumOverviews() {
+    return numOverviews.clone();
+  }
+
+  /**
+   * Returns the number of overviews for the specified band
+   * 
+   * @param bandIndex
+   *                the index of the required band
+   * @throws IllegalArgumentException
+   *                 in case the specified band number is out of range
+   */
+  public int getNumOverviews(final int bandIndex) {
+    checkBandIndex(bandIndex);
+    return numOverviews[bandIndex];
+  }
+
+  /**
+   * Returns the offset value for the specified band
+   * 
+   * @param bandIndex
+   *                the index of the required band
+   * @throws IllegalArgumentException
+   *                 in case the specified band number is out of range or
+   *                 offset value has not been found
+   */
+  public double getOffset(final int bandIndex) throws IllegalArgumentException {
+    checkBandIndex(bandIndex);
+    if (offsets != null) {
+      final Double offset = offsets[bandIndex];
+      if (offset != null) {
+        return offset.doubleValue();
+      }
+    }
+    throw new IllegalArgumentException(
+      "no Offset value available for the specified band " + bandIndex);
+  }
+
+  public Double[] getOffsets() {
+    return offsets.clone();
+  }
+
+  // ////////////////////////////////////////////////////////////////////////
+  //
+  // Referencing
+  //
+  // ////////////////////////////////////////////////////////////////////////
+  /** Returns the projection */
+  public String getProjection() {
+    return projection;
+  }
+
+  /**
+   * Returns the <code>SampleModel</code> for the dataset held by this
+   * object.
+   */
+  public SampleModel getSampleModel() {
+    return sampleModel;
+  }
+
+  /**
+   * Returns the scale value for the specified band
+   * 
+   * @param bandIndex
+   *                the index of the required band
+   * @throws IllegalArgumentException
+   *                 in case the specified band number is out of range or
+   *                 scale value has not been found
+   */
+  public double getScale(final int bandIndex) throws IllegalArgumentException {
+    checkBandIndex(bandIndex);
+    if (scales != null) {
+      final Double scale = scales[bandIndex];
+      if (scale != null) {
+        return scale.doubleValue();
+      }
+    }
+    throw new IllegalArgumentException(
+      "no scale value available for the specified band " + bandIndex);
+  }
+
+  public Double[] getScales() {
+    return scales.clone();
+  }
+
+  /** Returns the tile height of the image */
+  public int getTileHeight() {
+    return tileHeight;
+  }
+
+  /** Returns the tile width of the image */
+  public int getTileWidth() {
+    return tileWidth;
+  }
+
+  /** Returns the width of the image */
+  public int getWidth() {
+    return width;
+  }
+
+  /**
+   * Returns <code>true</code> since this object does not support the
+   * <code>mergeTree</code>, <code>setFromTree</code>, and
+   * <code>reset</code> methods.
+   * 
+   * @return <code>true</code> since this <code>IIOMetadata</code> object
+   *         cannot be modified.
+   */
+  @Override
+  public boolean isReadOnly() {
+    return true;
+  }
+
+  /**
+   * Method unsupported. Calling this method will throws an
+   * <code>UnsupportedOperationException</code>
+   * 
+   * @see javax.imageio.metadata.IIOMetadata#mergeTree()
+   * 
+   * @see #isReadOnly()
+   */
+  @Override
+  public void mergeTree(final String formatName, final Node root)
+    throws IIOInvalidTreeException {
+    throw new UnsupportedOperationException(
+      "mergeTree operation is not allowed");
+  }
+
+  /**
+   * Method unsupported. Calling this method will throws an
+   * <code>UnsupportedOperationException</code>
+   * 
+   * @see javax.imageio.metadata.IIOMetadata#reset()
+   * 
+   * @see #isReadOnly()
+   */
+  @Override
+  public void reset() {
+    throw new UnsupportedOperationException("reset operation is not allowed");
+  }
+
+  protected void setColorInterpretations(final int[] colorInterpretations) {
+    if (this.colorInterpretations != null) {
+      throw new UnsupportedOperationException(
+        "colorInterpretations have already been defined");
+    }
+    this.colorInterpretations = colorInterpretations;
+  }
+
+  protected void setColorModel(final ColorModel colorModel) {
+    this.colorModel = colorModel;
+  }
+
+  protected void setDatasetDescription(final String datasetDescription) {
+    this.datasetDescription = datasetDescription;
+  }
+
+  protected void setDatasetName(final String datasetName) {
+    this.datasetName = datasetName;
+  }
+
+  protected void setDriverDescription(final String driverDescription) {
+    this.driverDescription = driverDescription;
+  }
+
+  protected void setDriverName(final String driverName) {
+    this.driverName = driverName;
+  }
+
+  protected void setGcpNumber(final int gcpNumber) {
+    this.gcpNumber = gcpNumber;
+  }
+
+  protected void setGcpProjection(final String gcpProjection) {
+    this.gcpProjection = gcpProjection;
+  }
+
+  protected void setGcps(final List<GCP> gcps) {
+    this.gcps = gcps;
+  }
+
+  protected void setGeoTransformation(final double[] geoTransformation) {
+    if (this.geoTransformation != null) {
+      throw new UnsupportedOperationException(
+        "geoTransformation have already been defined");
+    }
+    this.geoTransformation = geoTransformation;
+  }
+
+  protected void setHeight(final int height) {
+    this.height = height;
+  }
+
+  protected void setMaximums(final Double[] maximums) {
+    if (this.maximums != null) {
+      throw new UnsupportedOperationException(
+        "maximums have already been defined");
+    }
+    this.maximums = maximums;
+  }
+
+  protected void setMinimums(final Double[] minimums) {
+    if (this.minimums != null) {
+      throw new UnsupportedOperationException(
+        "minimums have already been defined");
+    }
+    this.minimums = minimums;
+  }
+
+  protected void setNoDataValues(final Double[] noDataValues) {
+    if (this.noDataValues != null) {
+      throw new UnsupportedOperationException(
+        "noDataValues have already been defined");
+    }
+    this.noDataValues = noDataValues;
+  }
+
+  protected void setNumBands(final int numBands) {
+    this.numBands = numBands;
+  }
+
+  protected void setNumOverviews(final int[] numOverviews) {
+    this.numOverviews = numOverviews.clone();
+  }
+
+  protected void setOffsets(final Double[] offsets) {
+    if (this.offsets != null) {
+      throw new UnsupportedOperationException(
+        "offsets have already been defined");
+    }
+    this.offsets = offsets;
+  }
+
+  protected void setProjection(final String projection) {
+    this.projection = projection;
+  }
+
+  protected void setSampleModel(final SampleModel sampleModel) {
+    this.sampleModel = sampleModel;
+  }
+
+  protected void setScales(final Double[] scales) {
+    if (this.scales != null) {
+      throw new UnsupportedOperationException(
+        "scales have already been defined");
+    }
+    this.scales = scales;
+  }
+
+  protected void setTileHeight(final int tileHeight) {
+    this.tileHeight = tileHeight;
+  }
+
+  protected void setTileWidth(final int tileWidth) {
+    this.tileWidth = tileWidth;
+  }
+
+  protected void setWidth(final int width) {
+    this.width = width;
+  }
+}

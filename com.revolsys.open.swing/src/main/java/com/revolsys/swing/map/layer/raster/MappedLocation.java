@@ -1,5 +1,6 @@
-package com.revolsys.swing.map.overlay;
+package com.revolsys.swing.map.layer.raster;
 
+import java.awt.geom.AffineTransform;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -10,12 +11,42 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.util.CollectionUtil;
 
 public class MappedLocation extends AbstractPropertyChangeObject implements
   MapSerializer {
+  public static double[] toModelCoordinates(final GeoReferencedImage image,
+    final BoundingBox boundingBox, final boolean useTransform,
+    final double... coordinates) {
+    double[] targetCoordinates;
+    if (useTransform) {
+      targetCoordinates = new double[10];
+      final AffineTransform transform = image.getAffineTransformation(boundingBox);
+      transform.transform(coordinates, 0, targetCoordinates, 0,
+        coordinates.length / 2);
+    } else {
+      targetCoordinates = coordinates.clone();
+    }
+    final int imageWidth = image.getImageWidth();
+    final int imageHeight = image.getImageHeight();
+    for (int vertexIndex = 0; vertexIndex < coordinates.length / 2; vertexIndex++) {
+      final int vertexOffset = vertexIndex * 2;
+      final double xPercent = targetCoordinates[vertexOffset] / imageWidth;
+      final double yPercent = (imageHeight - targetCoordinates[vertexOffset + 1])
+        / imageHeight;
+
+      final double modelWidth = boundingBox.getWidth();
+      final double modelHeight = boundingBox.getHeight();
+
+      final double modelX = boundingBox.getMinX() + modelWidth * xPercent;
+      final double modelY = boundingBox.getMinY() + modelHeight * yPercent;
+      targetCoordinates[vertexOffset] = modelX;
+      targetCoordinates[vertexOffset + 1] = modelY;
+    }
+    return targetCoordinates;
+  }
+
   private Point sourcePixel;
 
   private Point targetPoint;
@@ -26,7 +57,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
     final double sourceX = CollectionUtil.getDouble(map, "sourceX", 0.0);
     final double sourceY = CollectionUtil.getDouble(map, "sourceY", 0.0);
     this.sourcePixel = new PointDouble(sourceX, sourceY);
-    this.targetPoint = geometryFactory.geometry((String)map.get("target"));
+    this.targetPoint = this.geometryFactory.geometry((String)map.get("target"));
   }
 
   public MappedLocation(final Point sourcePixel, final Point targetPoint) {
@@ -36,11 +67,21 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public Point getSourcePixel() {
-    return sourcePixel;
+    return this.sourcePixel;
+  }
+
+  public Point getSourcePoint(final GeoReferencedImage image,
+    final BoundingBox boundingBox, final boolean useTransform) {
+    final Point sourcePixel = getSourcePixel();
+    final double[] sourcePoint = toModelCoordinates(image, boundingBox,
+      useTransform, sourcePixel.getX(),
+      image.getImageHeight() - sourcePixel.getY());
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    return geometryFactory.point(sourcePoint[0], sourcePoint[1]);
   }
 
   public Point getSourcePoint(final WarpFilter filter,
@@ -54,6 +95,19 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final GeometryFactory geometryFactory = filter.getGeometryFactory();
       return geometryFactory.point(sourcePoint);
     }
+  }
+
+  public LineString getSourceToTargetLine(final GeoReferencedImage image,
+    final BoundingBox boundingBox, final boolean useTransform) {
+
+    final Point sourcePixel = getSourcePixel();
+    final double[] sourcePoint = toModelCoordinates(image, boundingBox,
+      useTransform, sourcePixel.getX(),
+      image.getImageHeight() - sourcePixel.getY());
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    final Point targetPoint = getTargetPoint();
+    return geometryFactory.lineString(2, sourcePoint[0], sourcePoint[1],
+      targetPoint.getX(), targetPoint.getY());
   }
 
   public LineString getSourceToTargetLine(final WarpFilter filter) {
@@ -85,19 +139,19 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
   public Point getTargetPixel(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Point targetPointCoordinates = (Point)targetPoint.convert(
+    final Point targetPointCoordinates = (Point)this.targetPoint.convert(
       geometryFactory, 2);
-    return WarpAffineFilter.targetPointToPixel(boundingBox,
-      targetPointCoordinates, imageWidth, imageHeight);
+    return WarpFilter.targetPointToPixel(boundingBox, targetPointCoordinates,
+      imageWidth, imageHeight);
   }
 
   public Point getTargetPoint() {
-    return targetPoint;
+    return this.targetPoint;
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory.convertAxisCount(2);
-    this.targetPoint = targetPoint.convert(this.geometryFactory);
+    this.targetPoint = this.targetPoint.convert(this.geometryFactory);
   }
 
   public void setSourcePixel(final Point sourcePixel) {
@@ -115,15 +169,14 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
-    map.put("sourceX", sourcePixel.getX());
-    map.put("sourceY", sourcePixel.getY());
-    map.put("target", targetPoint.toWkt());
+    map.put("sourceX", this.sourcePixel.getX());
+    map.put("sourceY", this.sourcePixel.getY());
+    map.put("target", this.targetPoint.toWkt());
     return map;
   }
 
   @Override
   public String toString() {
-    return sourcePixel + "->" + targetPoint;
+    return this.sourcePixel + "->" + this.targetPoint;
   }
-
 }

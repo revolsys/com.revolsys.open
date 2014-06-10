@@ -1,9 +1,11 @@
 package com.revolsys.gis.cs.esri;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.gis.cs.Authority;
@@ -57,6 +59,10 @@ public class EsriCoordinateSystems {
       }
       return coordinateSystem2;
     }
+  }
+
+  public static CoordinateSystem getCoordinateSystem(final File file) {
+    return getCoordinateSystem(new FileSystemResource(file));
   }
 
   public static CoordinateSystem getCoordinateSystem(final int crsId) {

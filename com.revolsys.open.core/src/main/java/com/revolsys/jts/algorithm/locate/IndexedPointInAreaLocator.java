@@ -62,24 +62,16 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
   public static class IntervalIndexedGeometry {
     private final SortedPackedIntervalRTree<LineSegment> index = new SortedPackedIntervalRTree<>();
 
-    public IntervalIndexedGeometry(final Geometry geom) {
-      init(geom);
-    }
-
-    private void addLine(final LineString line) {
-      for (final Segment segment : line.segments()) {
-        final double y1 = segment.getY(0);
-        final double y2 = segment.getY(1);
-        final double min = Math.min(y1, y2);
-        final double max = Math.max(y1, y2);
-        this.index.insert(min, max, segment.clone());
-      }
-    }
-
-    private void init(final Geometry geometry) {
+    public IntervalIndexedGeometry(final Geometry geometry) {
       final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
       for (final LineString line : lines) {
-        addLine(line);
+        for (final Segment segment : line.segments()) {
+          final double y1 = segment.getY(0);
+          final double y2 = segment.getY(1);
+          final double min = Math.min(y1, y2);
+          final double max = Math.max(y1, y2);
+          this.index.insert(min, max, segment.clone());
+        }
       }
     }
 

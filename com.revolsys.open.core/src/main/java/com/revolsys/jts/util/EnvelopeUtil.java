@@ -81,6 +81,15 @@ public class EnvelopeUtil {
   }
 
   public static void expand(final double[] bounds, final int axisCount,
+    final double... coordinates) {
+    for (int axisIndex = 0; axisIndex < axisCount
+      && axisIndex < coordinates.length; axisIndex++) {
+      final double coordinate = coordinates[axisIndex];
+      expand(bounds, axisCount, axisIndex, coordinate);
+    }
+  }
+
+  public static void expand(final double[] bounds, final int axisCount,
     final int axisIndex, final double value) {
     final double min = bounds[axisIndex];
     if (value < min || Double.isNaN(min)) {

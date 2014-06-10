@@ -10,7 +10,8 @@ CXX=clang++
 
 include ${ESRI_FILE_GBD_INCLUDE}/make.include
 TARGET_OBJ=target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
-TARGET_LIB=src/main/resources/native/libEsriFileGdbJni-${ARCH}-${OS}.${EXT}
+TARGET_DIR=src/main/resources/native/${OS}/${ARCH}
+TARGET_LIB=${TARGET_DIR}/libEsriFileGdbJni.${EXT}
 
 all: clean ${TARGET_LIB}
 	
@@ -33,6 +34,7 @@ ${TARGET_OBJ}: src/main/cxx/EsriFileGdb_wrap.cxx
 	
 
 ${TARGET_LIB}: target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
+  mkdir -p ${TARGET_DIR}
 	clang++ \
 		${LDFLAGS} \
     -stdlib=libstdc++ \

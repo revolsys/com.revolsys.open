@@ -10,7 +10,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.impl.PointDouble2D;
-import com.revolsys.swing.map.overlay.MappedLocation;
+import com.revolsys.swing.map.layer.raster.MappedLocation;
 import com.revolsys.util.ExceptionUtil;
 
 /**
@@ -52,18 +52,9 @@ public class WarpAffineFilter extends WarpFilter {
   public static AffineTransform getAffineTransform(
     final BoundingBox boundingBox, final int imageWidth, final int imageHeight,
     final List<MappedLocation> mappings) {
-
-    final double[] affineTransformMatrix = calculateLSM(boundingBox,
-      imageWidth, imageHeight, mappings);
-    final double translateX = affineTransformMatrix[2];
-    final double translateY = affineTransformMatrix[5];
-    final double scaleX = affineTransformMatrix[0];
-    final double scaleY = affineTransformMatrix[4];
-    final double shearX = affineTransformMatrix[1];
-    final double shearY = affineTransformMatrix[3];
     try {
-      return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX,
-        translateY).createInverse();
+      return getForwardAffineTransform(boundingBox, imageWidth, imageHeight,
+        mappings).createInverse();
     } catch (final NoninvertibleTransformException e) {
       ExceptionUtil.throwUncheckedException(e);
       return null;
@@ -89,6 +80,38 @@ public class WarpAffineFilter extends WarpFilter {
         sourcePoint.getY(), 1.0D);
     }
     return A;
+  }
+
+  public static AffineTransform getForwardAffineTransform(
+    final BoundingBox boundingBox, final int imageWidth, final int imageHeight,
+    final List<MappedLocation> mappings) {
+
+    final double[] affineTransformMatrix = calculateLSM(boundingBox,
+      imageWidth, imageHeight, mappings);
+    final double translateX = affineTransformMatrix[2];
+    final double translateY = affineTransformMatrix[5];
+    final double scaleX = affineTransformMatrix[0];
+    final double scaleY = affineTransformMatrix[4];
+    final double shearX = affineTransformMatrix[1];
+    final double shearY = affineTransformMatrix[3];
+    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX,
+      translateY);
+  }
+
+  public static AffineTransform getForwardAffineTransform2(
+    final BoundingBox boundingBox, final int imageWidth, final int imageHeight,
+    final List<MappedLocation> mappings) {
+
+    final double[] affineTransformMatrix = calculateLSM(boundingBox,
+      imageWidth, imageHeight, mappings);
+    final double translateX = affineTransformMatrix[2];
+    final double translateY = -affineTransformMatrix[5];
+    final double scaleX = affineTransformMatrix[0];
+    final double scaleY = affineTransformMatrix[4];
+    final double shearX = affineTransformMatrix[1];
+    final double shearY = affineTransformMatrix[3];
+    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX,
+      translateY);
   }
 
   public static GeneralMatrix getWeights(final int size) {

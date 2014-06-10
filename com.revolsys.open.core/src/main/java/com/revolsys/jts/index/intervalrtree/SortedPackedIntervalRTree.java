@@ -83,7 +83,7 @@ public class SortedPackedIntervalRTree<V> {
     }
   }
 
-  private void init() {
+  private synchronized void init() {
     if (this.root == null) {
       try {
         // sort the leaf nodes

@@ -3,6 +3,7 @@ package com.revolsys.gis.cs.projection;
 import com.revolsys.gis.cs.Datum;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
+import com.revolsys.gis.cs.ProjectionParameterNames;
 import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.math.Angle;
 
@@ -69,6 +70,7 @@ import com.revolsys.math.Angle;
  * @author paustin
  */
 public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
+
   /** Constant c = sq(m(phi1) + n * q(phi1) */
   private final double c;
 
@@ -101,39 +103,21 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
   private final Spheroid spheroid;
 
   /** The false Easting. */
-  private double x0;
+  private final double x0;
 
   /** The false Northing. */
-  private double y0;
+  private final double y0;
 
   public AlbersConicEqualArea(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
-    double centralMeridian = cs.getDoubleParameter("longitude_of_false_origin");
-    if (Double.isNaN(centralMeridian)) {
-      centralMeridian = cs.getDoubleParameter("central_meridian");
-    }
-    double firstStandardParallel = cs.getDoubleParameter("latitude_of_1st_standard_parallel");
-    if (Double.isNaN(firstStandardParallel)) {
-      firstStandardParallel = cs.getDoubleParameter("standard_parallel_1");
-    }
-    double secondStandardParallel = cs.getDoubleParameter("latitude_of_2nd_standard_parallel");
-    if (Double.isNaN(secondStandardParallel)) {
-      secondStandardParallel = cs.getDoubleParameter("standard_parallel_2");
-    }
-    double latitudeOfProjection = cs.getDoubleParameter("latitude_of_false_origin");
-    if (Double.isNaN(latitudeOfProjection)) {
-      latitudeOfProjection = cs.getDoubleParameter("latitude_of_origin");
-    }
+    final double centralMeridian = cs.getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
+    final double firstStandardParallel = cs.getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_1);
+    final double secondStandardParallel = cs.getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_2);
+    final double latitudeOfProjection = cs.getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
     this.spheroid = datum.getSpheroid();
-    this.x0 = cs.getDoubleParameter("easting_at_false_origin");
-    if (Double.isNaN(this.x0)) {
-      this.x0 = cs.getDoubleParameter("false_easting");
-    }
-    this.y0 = cs.getDoubleParameter("northing_at_false_origin");
-    if (Double.isNaN(this.y0)) {
-      this.y0 = cs.getDoubleParameter("false_northing");
-    }
+    this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
+    this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
     this.phi0 = Math.toRadians(latitudeOfProjection);
     this.phi1 = Math.toRadians(firstStandardParallel);

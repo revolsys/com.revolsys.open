@@ -3,6 +3,7 @@ package com.revolsys.gis.cs.projection;
 import com.revolsys.gis.cs.Datum;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
+import com.revolsys.gis.cs.ProjectionParameterNames;
 import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.math.Angle;
 
@@ -29,14 +30,14 @@ public class LambertConicConformal extends AbstractCoordinatesProjection {
   public LambertConicConformal(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
-    final double latitudeOfProjection = cs.getDoubleParameter("latitude_of_false_origin");
-    final double centralMeridian = cs.getDoubleParameter("longitude_of_false_origin");
-    final double firstStandardParallel = cs.getDoubleParameter("latitude_of_1st_standard_parallel");
-    final double secondStandardParallel = cs.getDoubleParameter("latitude_of_2nd_standard_parallel");
+    final double latitudeOfProjection = cs.getDoubleParameter(ProjectionParameterNames.LATITUDE_OF_CENTER);
+    final double centralMeridian = cs.getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
+    final double firstStandardParallel = cs.getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_1);
+    final double secondStandardParallel = cs.getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_2);
 
     final Spheroid spheroid = datum.getSpheroid();
-    this.x0 = cs.getDoubleParameter("easting_at_false_origin");
-    this.y0 = cs.getDoubleParameter("northing_at_false_origin");
+    this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
+    this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
     this.a = spheroid.getSemiMajorAxis();
     this.e = spheroid.getEccentricity();

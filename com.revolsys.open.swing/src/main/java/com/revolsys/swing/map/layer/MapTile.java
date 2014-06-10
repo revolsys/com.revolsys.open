@@ -4,9 +4,11 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
+import com.revolsys.swing.map.layer.raster.JaiGeoReferencedImage;
 
 public abstract class MapTile {
   private final double resolution;
@@ -27,6 +29,15 @@ public abstract class MapTile {
     this.resolution = resolution;
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj instanceof MapTile) {
+      final MapTile tile = (MapTile)obj;
+      return tile.getBoundingBox().equals(this.boundingBox);
+    }
+    return false;
+  }
+
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
   }
@@ -40,7 +51,7 @@ public abstract class MapTile {
   }
 
   public GeoReferencedImage getImage() {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     return getImage(geometryFactory);
   }
 
@@ -49,7 +60,7 @@ public abstract class MapTile {
     return projectedImage;
   }
 
-  public GeoReferencedImage getImage(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public GeoReferencedImage getImage(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
 
     return getImage(coordinateSystem);
@@ -71,7 +82,7 @@ public abstract class MapTile {
       return null;
     } else {
       final BoundingBox boundingBox = getBoundingBox();
-      return new GeoReferencedImage(boundingBox, bufferedImage);
+      return new JaiGeoReferencedImage(boundingBox, bufferedImage);
     }
   }
 
@@ -79,7 +90,7 @@ public abstract class MapTile {
     synchronized (this.projectedImages) {
       GeoReferencedImage projectedImage = this.projectedImages.get(coordinateSystem);
       if (projectedImage == null) {
-        final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+        final GeometryFactory geometryFactory = getGeometryFactory();
         GeoReferencedImage image = getImage();
         if (image == null) {
           image = loadImage();
@@ -94,7 +105,7 @@ public abstract class MapTile {
     }
   }
 
-  public GeoReferencedImage loadImage(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public GeoReferencedImage loadImage(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     return loadImage(coordinateSystem);
   }

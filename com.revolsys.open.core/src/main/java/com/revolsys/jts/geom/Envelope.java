@@ -807,20 +807,24 @@ public class Envelope implements Serializable, BoundingBox {
 
   @Override
   public Point getCornerPoint(int index) {
-    final double minX = getMinX();
-    final double maxX = getMaxX();
-    final double minY = getMinY();
-    final double maxY = getMaxY();
-    index = index % 4;
-    switch (index) {
-      case 0:
-        return new PointDoubleGF(getGeometryFactory(), maxX, minY);
-      case 1:
-        return new PointDoubleGF(getGeometryFactory(), minX, minY);
-      case 2:
-        return new PointDoubleGF(getGeometryFactory(), minX, maxY);
-      default:
-        return new PointDoubleGF(getGeometryFactory(), maxX, maxY);
+    if (isEmpty()) {
+      return null;
+    } else {
+      final double minX = getMinX();
+      final double maxX = getMaxX();
+      final double minY = getMinY();
+      final double maxY = getMaxY();
+      index = index % 4;
+      switch (index) {
+        case 0:
+          return new PointDoubleGF(getGeometryFactory(), maxX, minY);
+        case 1:
+          return new PointDoubleGF(getGeometryFactory(), minX, minY);
+        case 2:
+          return new PointDoubleGF(getGeometryFactory(), minX, maxY);
+        default:
+          return new PointDoubleGF(getGeometryFactory(), maxX, maxY);
+      }
     }
   }
 

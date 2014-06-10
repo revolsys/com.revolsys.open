@@ -40,8 +40,9 @@ public class BaseMain implements UncaughtExceptionHandler {
       final Class<?> clazz = Class.forName("com.apple.eawt.Application");
       final Method appMethod = clazz.getMethod("getApplication");
       final Object application = appMethod.invoke(clazz);
-      MethodUtils.invokeMethod(application, "setDockIconImage", image);
-
+      if (image != null) {
+        MethodUtils.invokeMethod(application, "setDockIconImage", image);
+      }
       final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
       final Object closeAllWindows = quitStrategyClass.getField(
         "CLOSE_ALL_WINDOWS").get(quitStrategyClass);

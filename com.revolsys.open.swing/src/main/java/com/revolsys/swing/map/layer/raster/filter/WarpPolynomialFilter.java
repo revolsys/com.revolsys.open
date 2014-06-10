@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;

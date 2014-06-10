@@ -37,8 +37,9 @@ public class LayerRendererOverlaySwingWorker extends
         final int imageHeight = this.referencedImage.getImageHeight();
         if (imageWidth > 0 && imageHeight > 0 && project != null) {
           final BoundingBox boundingBox = this.referencedImage.getBoundingBox();
-          final ImageViewport viewport = new ImageViewport(project, imageWidth,
-            imageHeight, boundingBox);
+          final ImageViewport viewport = new ImageViewport(
+            this.overlay.getViewport(), project, imageWidth, imageHeight,
+            boundingBox);
 
           final Graphics2D graphics = viewport.getGraphics();
           if (layer != null && layer.isExists() && layer.isVisible()) {

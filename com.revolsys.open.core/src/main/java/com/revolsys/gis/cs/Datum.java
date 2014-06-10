@@ -57,8 +57,8 @@ public class Datum implements Serializable {
         if (datum.name != null) {
           return false;
         }
-      } else if (!name.equalsIgnoreCase(datum.name)) {
-        return false;
+        // } else if (!name.equalsIgnoreCase(datum.name)) {
+        // return false;
       } else if (!EqualsRegistry.equal(spheroid, datum.spheroid)) {
         return false;
       } else {

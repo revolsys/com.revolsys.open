@@ -114,7 +114,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public Query(final DataObjectMetaData metaData, final Condition whereCondition) {
     this(metaData);
-    this.whereCondition = whereCondition;
+    setWhereCondition(whereCondition);
   }
 
   public Query(final String typePath) {
@@ -287,6 +287,10 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public void setWhereCondition(final Condition whereCondition) {
     this.whereCondition = whereCondition;
+    final DataObjectMetaData metaData = getMetaData();
+    if (whereCondition != null && metaData != null) {
+      whereCondition.setMetaData(metaData);
+    }
   }
 
   @Override

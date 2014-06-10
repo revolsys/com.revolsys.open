@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.collection.IntHashMap;
 import com.revolsys.gis.cs.AngularUnit;
 import com.revolsys.gis.cs.Area;
 import com.revolsys.gis.cs.Authority;
@@ -36,7 +37,7 @@ import com.revolsys.jts.geom.Geometry;
 public final class EpsgCoordinateSystems {
   private static Set<CoordinateSystem> coordinateSystems;
 
-  private static Map<CoordinateSystem, CoordinateSystem> coordinateSystemsByCoordinateSystem = new LinkedHashMap<CoordinateSystem, CoordinateSystem>();
+  private static IntHashMap<List<CoordinateSystem>> coordinateSystemsByCoordinateSystem = new IntHashMap<>();
 
   private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<Integer, CoordinateSystem>();
 
@@ -46,12 +47,20 @@ public final class EpsgCoordinateSystems {
 
   private static int nextSrid = 2000000;
 
+  private static final IntHashMap<LinearUnit> linearUnits = new IntHashMap<>();
+
   private static void addCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
     final Integer id = coordinateSystem.getId();
     final String name = coordinateSystem.getName();
     coordinateSystemsById.put(id, coordinateSystem);
-    coordinateSystemsByCoordinateSystem.put(coordinateSystem, coordinateSystem);
+    final int hashCode = coordinateSystem.hashCode();
+    List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem.get(hashCode);
+    if (coordinateSystems == null) {
+      coordinateSystems = new ArrayList<>();
+      coordinateSystemsByCoordinateSystem.put(hashCode, coordinateSystems);
+    }
+    coordinateSystems.add(coordinateSystem);
     coordinateSystemsByName.put(name, coordinateSystem);
   }
 
@@ -69,12 +78,32 @@ public final class EpsgCoordinateSystems {
       return null;
     } else {
       int srid = coordinateSystem.getId();
-      CoordinateSystem coordinateSystem2 = coordinateSystemsById.get(srid);
-      if (coordinateSystem2 == null) {
-        coordinateSystem2 = coordinateSystemsByName.get(coordinateSystem.getName());
-        if (coordinateSystem2 == null) {
-          coordinateSystem2 = coordinateSystemsByCoordinateSystem.get(coordinateSystem);
-          if (coordinateSystem2 == null) {
+      CoordinateSystem matchedCoordinateSystem = coordinateSystemsById.get(srid);
+      if (matchedCoordinateSystem == null) {
+        matchedCoordinateSystem = coordinateSystemsByName.get(coordinateSystem.getName());
+        if (matchedCoordinateSystem == null) {
+          final int hashCode = coordinateSystem.hashCode();
+          int matchCoordinateSystemId = 0;
+          final List<CoordinateSystem> coordinateSystems = coordinateSystemsByCoordinateSystem.get(hashCode);
+          if (coordinateSystems != null) {
+            for (final CoordinateSystem coordinateSystem3 : coordinateSystems) {
+              if (coordinateSystem3.equals(coordinateSystem)) {
+                final int srid3 = coordinateSystem3.getId();
+                if (matchedCoordinateSystem == null) {
+                  matchedCoordinateSystem = coordinateSystem3;
+                  matchCoordinateSystemId = srid3;
+                } else if (srid3 < matchCoordinateSystemId) {
+                  if (!coordinateSystem3.isDeprecated()
+                    || matchedCoordinateSystem.isDeprecated()) {
+                    matchedCoordinateSystem = coordinateSystem3;
+                    matchCoordinateSystemId = srid3;
+                  }
+                }
+              }
+            }
+          }
+
+          if (matchedCoordinateSystem == null) {
             if (srid <= 0) {
               srid = nextSrid++;
             }
@@ -110,7 +139,7 @@ public final class EpsgCoordinateSystems {
           }
         }
       }
-      return coordinateSystem2;
+      return matchedCoordinateSystem;
     }
   }
 
@@ -215,6 +244,11 @@ public final class EpsgCoordinateSystems {
     }
   }
 
+  public static LinearUnit getLinearUnit(final int id) {
+    initialize();
+    return linearUnits.get(id);
+  }
+
   private static Map<String, Object> getParameters(final String parametersString) {
     final Map<String, Object> parameters = new TreeMap<String, Object>();
     final Map<String, Object> jsonParams = JsonMapIoFactory.toObjectMap(parametersString);
@@ -258,7 +292,7 @@ public final class EpsgCoordinateSystems {
         final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)coordinateSystemsById.get(3857);
         coordinateSystemsById.put(900913, worldMercator);
         coordinateSystems = Collections.unmodifiableSet(new LinkedHashSet<CoordinateSystem>(
-          coordinateSystemsByCoordinateSystem.values()));
+          coordinateSystemsById.values()));
         initialized = true;
       } catch (final Throwable t) {
         t.printStackTrace();
@@ -434,7 +468,6 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, LinearUnit> loadLinearUnits() {
-    final Map<Integer, LinearUnit> linearUnits = new LinkedHashMap<Integer, LinearUnit>();
     final InputStream resource = EpsgCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/epsg/linearunit.csv");
     if (resource != null) {
       try {

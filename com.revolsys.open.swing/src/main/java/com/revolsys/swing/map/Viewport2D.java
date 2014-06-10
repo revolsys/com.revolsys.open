@@ -10,7 +10,10 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.measure.Measurable;
 import javax.measure.Measure;
@@ -31,6 +34,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.Project;
 
 public class Viewport2D implements PropertyChangeSupportProxy {
@@ -77,6 +81,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     }
   }
 
+  private final Map<Layer, Map<String, Object>> layerValueCache = new WeakHashMap<Layer, Map<String, Object>>();
+
   private double pixelsPerXUnit;
 
   private double pixelsPerYUnit;
@@ -90,8 +96,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   private GeometryFactory geometryFactory = GeometryFactory.floating3(3005);
 
-  private GeometryFactory geometryFactory2d = GeometryFactory.floating(3005,
-    2);
+  private GeometryFactory geometryFactory2d = GeometryFactory.floating(3005, 2);
 
   private Reference<Project> project;
 
@@ -132,6 +137,10 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     this.viewHeight = height;
     setBoundingBox(boundingBox);
     setGeometryFactory(boundingBox.getGeometryFactory());
+  }
+
+  public void clearLayerCache(final Layer layer) {
+    layerValueCache.remove(layer);
   }
 
   public AffineTransform createModelToScreenTransform(
@@ -194,6 +203,16 @@ public class Viewport2D implements PropertyChangeSupportProxy {
    */
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> V getLayerCacheValue(final Layer layer, final String name) {
+    final Map<String, Object> cache = layerValueCache.get(layer);
+    if (cache == null) {
+      return null;
+    } else {
+      return (V)cache.get(name);
+    }
   }
 
   public double getModelHeight() {
@@ -535,6 +554,16 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   public void setInitialized(final boolean initialized) {
     this.initialized = initialized;
+  }
+
+  public void setLayerCacheValue(final Layer layer, final String name,
+    final Object value) {
+    Map<String, Object> cache = layerValueCache.get(layer);
+    if (cache == null) {
+      cache = new HashMap<String, Object>();
+      layerValueCache.put(layer, cache);
+    }
+    cache.put(name, value);
   }
 
   public void setScale(final double scale) {

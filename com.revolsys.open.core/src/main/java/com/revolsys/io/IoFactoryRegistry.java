@@ -24,9 +24,10 @@ import com.revolsys.gis.data.io.DataObjectWriterFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class IoFactoryRegistry {
-  private static IoFactoryRegistry instance = new IoFactoryRegistry();
 
   private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
+
+  private static IoFactoryRegistry instance = new IoFactoryRegistry();
 
   public static void clearInstance() {
     instance = null;

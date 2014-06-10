@@ -92,9 +92,9 @@ public class ClasspathNativeLibraryUtil {
 
   private static void loadLibrary(final String prefix, final String name,
     final String arch, final String operatingSystemName, final String ext) {
-    final String fileName = prefix + name + "-" + arch + "-"
-      + operatingSystemName + "." + ext;
-    final String libraryName = "/native/" + fileName;
+    final String fileName = prefix + name + "." + ext;
+    final String libraryName = "/native/" + operatingSystemName + "/" + arch
+      + "/" + fileName;
     final URL url = ClasspathNativeLibraryUtil.class.getResource(libraryName);
     if (url == null) {
       if (arch.equals("x86_64")) {

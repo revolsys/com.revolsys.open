@@ -3,6 +3,7 @@ package com.revolsys.gis.cs.projection;
 import com.revolsys.gis.cs.Datum;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
+import com.revolsys.gis.cs.ProjectionParameterNames;
 import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.math.Angle;
 
@@ -27,16 +28,16 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
   public Mercator2SP(final ProjectedCoordinateSystem cs) {
     final GeographicCoordinateSystem geographicCS = cs.getGeographicCoordinateSystem();
     final Datum datum = geographicCS.getDatum();
-    final double centralMeridian = cs.getDoubleParameter("longitude_of_natural_origin");
+    final double centralMeridian = cs.getDoubleParameter(ProjectionParameterNames.LONGITUDE_OF_CENTER);
 
     final Spheroid spheroid = datum.getSpheroid();
-    this.x0 = cs.getDoubleParameter("false_easting");
-    this.y0 = cs.getDoubleParameter("false_northing");
+    this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
+    this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
     this.a = spheroid.getSemiMajorAxis();
     this.e = spheroid.getEccentricity();
     this.eOver2 = e / 2;
-    this.phi1 = cs.getDoubleParameter("latitude_of_1st_standard_parallel");
+    this.phi1 = cs.getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_1);
     final double sinPhi1 = Math.sin(phi1);
     this.multiple = Math.cos(phi1) / Math.sqrt(1 - e * e * sinPhi1 * sinPhi1);
   }

@@ -20,7 +20,7 @@ public class ManifestUtil {
     if (manifest != null) {
       return manifest.getMainAttributes().getValue(Name.IMPLEMENTATION_VERSION);
     } else {
-      return null;
+      return "0.0.0";
     }
 
   }

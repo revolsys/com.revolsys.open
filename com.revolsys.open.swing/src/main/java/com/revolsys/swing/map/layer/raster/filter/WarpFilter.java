@@ -6,11 +6,11 @@ import java.util.List;
 import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.swing.map.overlay.MappedLocation;
+import com.revolsys.swing.map.layer.raster.MappedLocation;
 
 public abstract class WarpFilter extends WholeImageFilter {
   private static final long serialVersionUID = 1L;

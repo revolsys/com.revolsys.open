@@ -12,7 +12,6 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
-import com.revolsys.swing.map.overlay.MappedLocation;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.NumberTableCellRenderer;

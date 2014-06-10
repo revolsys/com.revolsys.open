@@ -31,6 +31,7 @@ import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.functions.F;
+import com.revolsys.gis.data.query.functions.WithinDistance;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
@@ -362,23 +363,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     if (geometry == null) {
       return Collections.emptyList();
     } else {
-      final boolean enabled = setEventsEnabled(false);
-      try {
-        final DataObjectMetaData metaData = getMetaData();
-        final Attribute geometryAttribute = getGeometryAttribute();
-        final Query query = new Query(metaData, F.dWithin(geometryAttribute,
-          geometry, distance));
-        query.setProperty("dataObjectFactory", this);
-        final DataObjectStore dataStore = getDataStore();
-        try (
-          Reader reader = dataStore.query(query)) {
-          final List<LayerDataObject> results = reader.read();
-          final List<LayerDataObject> records = getCachedRecords(results);
-          return records;
-        }
-      } finally {
-        setEventsEnabled(enabled);
-      }
+      final DataObjectMetaData metaData = getMetaData();
+      final Attribute geometryAttribute = getGeometryAttribute();
+      final WithinDistance where = F.dWithin(geometryAttribute, geometry,
+        distance);
+      final Query query = new Query(metaData, where);
+      return query(query);
     }
   }
 
@@ -394,8 +384,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         try {
           final Statistics statistics = query.getProperty("statistics");
           query.setProperty("dataObjectFactory", this);
-          final Reader<LayerDataObject> reader = (Reader)dataStore.query(query);
-          try {
+          try (
+            final Reader<LayerDataObject> reader = (Reader)dataStore.query(query)) {
             final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
             for (final LayerDataObject record : reader) {
               final boolean added = addCachedRecord(records, record);
@@ -405,8 +395,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
             }
             return records;
 
-          } finally {
-            reader.close();
           }
         } finally {
           setEventsEnabled(enabled);

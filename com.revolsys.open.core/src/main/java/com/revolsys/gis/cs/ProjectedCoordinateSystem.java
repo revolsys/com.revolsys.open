@@ -39,7 +39,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
 
-  private final Map<String, Object> lowerParameters = new TreeMap<String, Object>();
+  private final Map<String, Object> normalizedParameters = new TreeMap<String, Object>();
 
   private final Projection projection;
 
@@ -103,11 +103,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!EqualsRegistry.equal(projection, cs.projection)) {
         return false;
-      } else if (!EqualsRegistry.equal(lowerParameters, cs.lowerParameters)) {
+      } else if (!EqualsRegistry.equal(normalizedParameters,
+        cs.normalizedParameters)) {
         return false;
       } else if (!EqualsRegistry.equal(linearUnit, cs.linearUnit)) {
-        return false;
-      } else if (!EqualsRegistry.equal(axis, cs.axis)) {
         return false;
       } else {
         return true;
@@ -219,7 +218,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   @SuppressWarnings("unchecked")
   public <V> V getParameter(final String key) {
-    return (V)parameters.get(key);
+    return (V)normalizedParameters.get(key);
   }
 
   public Map<String, Object> getParameters() {
@@ -246,7 +245,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     if (projection != null) {
       result = prime * result + projection.hashCode();
     }
-    for (final Entry<String, Object> entry : lowerParameters.entrySet()) {
+    for (final Entry<String, Object> entry : normalizedParameters.entrySet()) {
       final String key = entry.getKey();
       result = prime * result + key.hashCode();
       result = prime * result + entry.getValue().hashCode();
@@ -254,7 +253,6 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     if (linearUnit != null) {
       result = prime * result + linearUnit.hashCode();
     }
-    result = prime * result + axis.hashCode();
     return result;
   }
 
@@ -268,9 +266,14 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   }
 
   public void setParameters(final Map<String, Object> parameters) {
-    this.parameters.putAll(parameters);
     for (final Entry<String, Object> param : parameters.entrySet()) {
-      lowerParameters.put(param.getKey().toLowerCase(), param.getValue());
+      final String name = param.getKey().intern();
+      final Object value = param.getValue();
+
+      parameters.put(name, value);
+
+      final String normalizedName = ProjectionParameterNames.getParameterName(name);
+      normalizedParameters.put(normalizedName, value);
     }
   }
 

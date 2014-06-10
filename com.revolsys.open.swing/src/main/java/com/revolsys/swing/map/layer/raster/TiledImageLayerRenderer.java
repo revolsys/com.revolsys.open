@@ -1,6 +1,9 @@
 package com.revolsys.swing.map.layer.raster;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -12,6 +15,7 @@ import java.util.Map;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
@@ -23,12 +27,55 @@ public class TiledImageLayerRenderer extends
   AbstractLayerRenderer<AbstractTiledImageLayer> implements
   PropertyChangeListener {
 
+  public static void render(final Viewport2D viewport,
+    final Graphics2D graphics, final GeoReferencedImage geoReferencedImage) {
+    if (geoReferencedImage != null) {
+      final BufferedImage image = geoReferencedImage.getImage();
+      if (image != null) {
+        final int imageWidth = geoReferencedImage.getImageWidth();
+        final int imageHeight = geoReferencedImage.getImageHeight();
+        if (imageWidth != -1 && imageHeight != -1) {
+          final BoundingBox boundingBox = geoReferencedImage.getBoundingBox();
+          if (boundingBox != null && !boundingBox.isEmpty()) {
+            final Point point = boundingBox.getTopLeftPoint();
+            final double minX = point.getX();
+            final double maxY = point.getY();
+
+            final AffineTransform transform = graphics.getTransform();
+            try {
+              final double[] location = viewport.toViewCoordinates(minX, maxY);
+              final double screenX = location[0];
+              final double screenY = location[1];
+              graphics.translate(screenX, screenY);
+              final int imageScreenWidth = (int)Math.ceil(Viewport2D.toDisplayValue(
+                viewport, boundingBox.getWidthLength()));
+              final int imageScreenHeight = (int)Math.ceil(Viewport2D.toDisplayValue(
+                viewport, boundingBox.getHeightLength()));
+              if (imageScreenWidth > 0 && imageScreenHeight > 0) {
+                graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                  RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                if (imageScreenWidth > 0 && imageScreenHeight > 0) {
+                  graphics.drawImage(image, 0, 0, imageScreenWidth,
+                    imageScreenHeight, null);
+                }
+              }
+            } catch (final NegativeArraySizeException e) {
+            } catch (final OutOfMemoryError e) {
+            } finally {
+              graphics.setTransform(transform);
+            }
+          }
+        }
+      }
+    }
+  }
+
   private final Map<MapTile, MapTile> cachedTiles = new HashMap<MapTile, MapTile>();
 
   private static RunnableSwingWorkerManager tileLoaderManager = new RunnableSwingWorkerManager(
     "Load Map Tiles");
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private double resolution;
 
@@ -70,7 +117,7 @@ public class TiledImageLayerRenderer extends
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics,
     final AbstractTiledImageLayer layer) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = viewport.getGeometryFactory();
+    final GeometryFactory geometryFactory = viewport.getGeometryFactory();
     final double resolution = layer.getResolution(viewport);
     synchronized (this.cachedTiles) {
       if (resolution != this.resolution
@@ -98,7 +145,7 @@ public class TiledImageLayerRenderer extends
           }
         }
         final GeoReferencedImage image = cachedTile.getImage(geometryFactory);
-        GeoReferencedImageLayerRenderer.render(viewport, graphics, image);
+        render(viewport, graphics, image);
       }
     }
     synchronized (loadingTasks) {

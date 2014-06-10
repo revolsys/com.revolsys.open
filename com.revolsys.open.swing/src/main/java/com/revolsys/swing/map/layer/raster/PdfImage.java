@@ -15,15 +15,14 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.swing.PdfUtil;
 
-public class PdfImage extends GeoReferencedImage {
+public class PdfImage extends JaiGeoReferencedImage {
 
   public PdfImage(final Resource imageResource) {
     super(imageResource);
+    setImage(createBufferedImage());
   }
 
-  @Override
   protected BufferedImage createBufferedImage() {
     final Resource imageResource = getImageResource();
     try {
