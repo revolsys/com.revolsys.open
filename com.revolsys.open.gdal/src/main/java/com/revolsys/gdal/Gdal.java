@@ -53,20 +53,12 @@ public class Gdal {
     osr.UseExceptions();
     ogr.UseExceptions();
 
-    String driverPath = System.getenv("GDAL_DRIVER_PATH");
-    if (!StringUtils.hasText(driverPath)) {
-      if (OS.isMac()) {
-        driverPath = "/usr/local/lib/gdalplugins";
-      }
+    String defaultDriverPath = null;
+    if (OS.isMac()) {
+      defaultDriverPath = "/usr/local/lib/gdalplugins";
     }
-    if (StringUtils.hasText(driverPath)) {
-      gdal.SetConfigOption("GDAL_DRIVER_PATH", driverPath);
-    }
-
-    final String dataPath = System.getenv("GDAL_DATA");
-    if (StringUtils.hasText(dataPath)) {
-      gdal.SetConfigOption("GDAL_DATA", dataPath);
-    }
+    setGdalProperty("GDAL_DRIVER_PATH", defaultDriverPath);
+    setGdalProperty("GDAL_DATA", null);
 
     gdal.SetConfigOption("GDAL_PAM", "Yes");
 
@@ -74,25 +66,24 @@ public class Gdal {
 
     ogr.RegisterAll();
 
-    if (isAvailable()) {
-      addImageReaderSpi("ECW", "ECW", "ecw", "image/ecw");
-      addImageReaderSpi("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
-    }
+    addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
+    addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
   }
 
-  private static void addImageReaderSpi(final GdalImageFactory readerSpi) {
-    if (readerSpi.isAvailable()) {
+  private static void addGeoreferencedImageFactory(
+    final GdalImageFactory georeferencedImageFactory) {
+    if (georeferencedImageFactory.isAvailable()) {
 
       final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-      ioFactoryRegistry.addFactory(readerSpi);
+      ioFactoryRegistry.addFactory(georeferencedImageFactory);
     }
   }
 
-  private static void addImageReaderSpi(final String driverName,
+  private static void addGeoreferencedImageFactory(final String driverName,
     final String formatName, final String fileExtension, final String mimeType) {
     final GdalImageFactory readerSpi = new GdalImageFactory(driverName,
       formatName, fileExtension, mimeType);
-    addImageReaderSpi(readerSpi);
+    addGeoreferencedImageFactory(readerSpi);
   }
 
   public static Dataset closeDataSet(final Dataset dataSet) {
@@ -473,6 +464,20 @@ public class Gdal {
       }
     } else {
       return -1;
+    }
+  }
+
+  private static void setGdalProperty(final String name,
+    final String defaultValue) {
+    String value = System.getProperty(name);
+    if (!StringUtils.hasText(value)) {
+      value = System.getenv(name);
+      if (!StringUtils.hasText(value)) {
+        value = defaultValue;
+      }
+    }
+    if (StringUtils.hasText(value)) {
+      gdal.SetConfigOption(name, value);
     }
   }
 
