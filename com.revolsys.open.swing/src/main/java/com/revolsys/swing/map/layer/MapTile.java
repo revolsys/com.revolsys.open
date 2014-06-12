@@ -7,8 +7,8 @@ import java.util.Map;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
-import com.revolsys.swing.map.layer.raster.JaiGeoReferencedImage;
+import com.revolsys.raster.BufferedGeoReferencedImage;
+import com.revolsys.raster.GeoReferencedImage;
 
 public abstract class MapTile {
   private final double resolution;
@@ -82,7 +82,7 @@ public abstract class MapTile {
       return null;
     } else {
       final BoundingBox boundingBox = getBoundingBox();
-      return new JaiGeoReferencedImage(boundingBox, bufferedImage);
+      return new BufferedGeoReferencedImage(boundingBox, bufferedImage);
     }
   }
 

@@ -15,6 +15,12 @@ public class ImageViewport extends Viewport2D {
 
   private final Viewport2D parentViewport;
 
+  public ImageViewport(final Viewport2D parentViewport) {
+    this(parentViewport, parentViewport.getProject(),
+      parentViewport.getViewWidthPixels(),
+      parentViewport.getViewHeightPixels(), parentViewport.getBoundingBox());
+  }
+
   public ImageViewport(final Viewport2D parentViewport, final Project project,
     final int width, final int height, final BoundingBox boundingBox) {
     super(project, width, height, boundingBox);

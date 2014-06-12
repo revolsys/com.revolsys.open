@@ -352,6 +352,11 @@ public final class MathUtil {
     return getPercent(new BigDecimal(decimalPercent));
   }
 
+  public static int hashCode(final double d) {
+    final long f = Double.doubleToLongBits(d);
+    return (int)(f ^ (f >>> 32));
+  }
+
   /**
    * Convert a BigDecimal integer to a string.
    * 
@@ -705,11 +710,6 @@ public final class MathUtil {
    * Construct a new MathUtil.
    */
   private MathUtil() {
-  }
-
-  public static int hashCode(final double d) {
-    final long f = Double.doubleToLongBits(d);
-    return (int)(f ^ (f >>> 32));
   }
 
 }

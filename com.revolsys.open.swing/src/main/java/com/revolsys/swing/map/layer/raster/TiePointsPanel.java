@@ -8,10 +8,11 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.MappedLocation;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.NumberTableCellRenderer;
@@ -101,13 +102,11 @@ public class TiePointsPanel extends TablePanel {
     return getImage().getTiePoints();
   }
 
-  public WarpFilter getWarpFilter() {
-    return getImage().getWarpFilter();
-  }
-
   public void zoomToTiePoint() {
     final MappedLocation object = getEventRowObject();
-    final Geometry geometry = object.getSourceToTargetLine(getWarpFilter());
+    final GeoReferencedImage image = layer.getImage();
+    final Geometry geometry = object.getSourceToTargetLine(image,
+      layer.getBoundingBox(), !layer.isShowOriginalImage());
     if (geometry != null) {
       final Project project = Project.get();
       final GeometryFactory geometryFactory = project.getGeometryFactory();

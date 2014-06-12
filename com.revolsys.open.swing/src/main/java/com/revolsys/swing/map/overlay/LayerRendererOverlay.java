@@ -2,24 +2,21 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
+import com.revolsys.raster.BufferedGeoReferencedImage;
+import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
-import com.revolsys.swing.map.layer.raster.JaiGeoReferencedImage;
+import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -87,7 +84,7 @@ public class LayerRendererOverlay extends JComponent implements
           final BoundingBox boundingBox = this.viewport.getBoundingBox();
           final int viewWidthPixels = this.viewport.getViewWidthPixels();
           final int viewHeightPixels = this.viewport.getViewHeightPixels();
-          final GeoReferencedImage loadImage = new JaiGeoReferencedImage(
+          final GeoReferencedImage loadImage = new BufferedGeoReferencedImage(
             boundingBox, viewWidthPixels, viewHeightPixels);
           this.imageWorker = new LayerRendererOverlaySwingWorker(this,
             loadImage);
@@ -131,46 +128,8 @@ public class LayerRendererOverlay extends JComponent implements
     }
   }
 
-  public void render(final Graphics2D graphics) {
-    if (this.image != null) {
-      final BufferedImage bufferedImage = this.image.getImage();
-      if (bufferedImage != null) {
-        final int imageWidth = this.image.getImageWidth();
-        final int imageHeight = this.image.getImageHeight();
-        if (imageWidth != -1 && imageHeight != -1) {
-          final BoundingBox boundingBox = this.image.getBoundingBox();
-          if (boundingBox != null && !boundingBox.isEmpty()) {
-            final Point point = boundingBox.getTopLeftPoint();
-            final double minX = point.getX();
-            final double maxY = point.getY();
-
-            final AffineTransform transform = graphics.getTransform();
-            try {
-              final double[] location = viewport.toViewCoordinates(minX, maxY);
-              final double screenX = location[0];
-              final double screenY = location[1];
-              graphics.translate(screenX, screenY);
-              final int imageScreenWidth = (int)Math.ceil(Viewport2D.toDisplayValue(
-                viewport, boundingBox.getWidthLength()));
-              final int imageScreenHeight = (int)Math.ceil(Viewport2D.toDisplayValue(
-                viewport, boundingBox.getHeightLength()));
-              if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-                graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                  RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-                  graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth,
-                    imageScreenHeight, null);
-                }
-              }
-            } catch (final NegativeArraySizeException e) {
-            } catch (final OutOfMemoryError e) {
-            } finally {
-              graphics.setTransform(transform);
-            }
-          }
-        }
-      }
-    }
+  private void render(final Graphics2D graphics) {
+    GeoReferencedImageLayerRenderer.render(viewport, graphics, image, false);
   }
 
   public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {

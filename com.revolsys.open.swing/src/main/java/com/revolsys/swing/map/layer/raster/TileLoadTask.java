@@ -2,23 +2,24 @@ package com.revolsys.swing.map.layer.raster;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class TileLoadTask implements Runnable {
   private final MapTile mapTile;
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
   private final TiledImageLayerRenderer renderer;
 
   public TileLoadTask(final TiledImageLayerRenderer renderer,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, final MapTile mapTile) {
+    final GeometryFactory geometryFactory, final MapTile mapTile) {
     this.renderer = renderer;
     this.geometryFactory = geometryFactory;
     this.mapTile = mapTile;
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 

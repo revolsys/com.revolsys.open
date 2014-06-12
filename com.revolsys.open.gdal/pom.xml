@@ -17,10 +17,5 @@
       <artifactId>com.revolsys.open.core</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_imageio</artifactId>
-      <version>1.1</version>
-    </dependency>
   </dependencies>
 </project>

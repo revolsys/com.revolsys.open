@@ -6,11 +6,11 @@ import java.awt.image.BufferedImage;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImage;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class LayerRendererOverlaySwingWorker extends
@@ -50,7 +50,7 @@ public class LayerRendererOverlaySwingWorker extends
           }
           graphics.dispose();
           final BufferedImage image = viewport.getImage();
-          this.referencedImage.setImage(image);
+          this.referencedImage.setRenderedImage(image);
         }
       }
       return null;

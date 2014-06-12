@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.FileUtil;
 
 public class CoordinateSystemParser {
   public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems(
     final String authorityName, final InputStream in) {
+    final Map<String, AngularUnit> angularUnitsByName = new TreeMap<String, AngularUnit>();
     final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<GeographicCoordinateSystem>();
     final BufferedReader reader = new BufferedReader(
       FileUtil.createUtf8Reader(in));
@@ -35,8 +38,13 @@ public class CoordinateSystemParser {
         final Datum datum = new Datum(datumName, spheroid, null);
         final PrimeMeridian primeMeridian = new PrimeMeridian(
           primeMeridianName, longitude, null);
-        final AngularUnit angularUnit = new AngularUnit(angularUnitName,
-          conversionFactor, null);
+
+        AngularUnit angularUnit = angularUnitsByName.get(angularUnitName);
+        if (angularUnit == null) {
+          angularUnit = new AngularUnit(angularUnitName, conversionFactor, null);
+          angularUnitsByName.put(angularUnitName, angularUnit);
+        }
+
         final Authority authority = new BaseAuthority(authorityName, id);
         final GeographicCoordinateSystem cs = new GeographicCoordinateSystem(
           Integer.parseInt(id), csName, datum, primeMeridian, angularUnit,
@@ -57,6 +65,7 @@ public class CoordinateSystemParser {
   public static List<ProjectedCoordinateSystem> getProjectedCoordinateSystems(
     final Map<Integer, CoordinateSystem> geoCsById, final String authorityName,
     final InputStream in) {
+    final Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
     final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<ProjectedCoordinateSystem>();
     final BufferedReader reader = new BufferedReader(
       FileUtil.createUtf8Reader(in));
@@ -84,9 +93,12 @@ public class CoordinateSystemParser {
             }
           }
 
-          final Projection projection = new Projection(projectionName);
-          final LinearUnit unit = new LinearUnit(unitName, conversionFactor,
-            null);
+          final Projection projection = EpsgCoordinateSystems.getProjection(projectionName);
+          LinearUnit unit = linearUnitsByName.get(unitName);
+          if (unit == null) {
+            unit = new LinearUnit(unitName, conversionFactor, null);
+            linearUnitsByName.put(unitName, unit);
+          }
           final Authority authority = new BaseAuthority(authorityName, id);
           final ProjectedCoordinateSystem cs = new ProjectedCoordinateSystem(
             Integer.parseInt(id), csName, geoCs, projection, parameters, unit,

@@ -43,11 +43,17 @@ public final class EpsgCoordinateSystems {
 
   private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
 
+  private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
+
+  private static Map<Integer, Projection> projectionsByCode = new TreeMap<Integer, Projection>();
+
   private static boolean initialized = false;
 
   private static int nextSrid = 2000000;
 
   private static final IntHashMap<LinearUnit> linearUnits = new IntHashMap<>();
+
+  private static Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
 
   private static void addCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
@@ -249,6 +255,11 @@ public final class EpsgCoordinateSystems {
     return linearUnits.get(id);
   }
 
+  public static LinearUnit getLinearUnit(final String name) {
+    initialize();
+    return linearUnitsByName.get(name);
+  }
+
   private static Map<String, Object> getParameters(final String parametersString) {
     final Map<String, Object> parameters = new TreeMap<String, Object>();
     final Map<String, Object> jsonParams = JsonMapIoFactory.toObjectMap(parametersString);
@@ -274,6 +285,32 @@ public final class EpsgCoordinateSystems {
       }
     }
     return coordinateSystems;
+  }
+
+  private static Projection getProjection(final int code, final String name) {
+    Projection projection = projectionsByCode.get(code);
+    if (projection == null) {
+      final EpsgAuthority authority = new EpsgAuthority(code);
+      projection = new Projection(name, authority);
+      projectionsByCode.put(code, projection);
+      projectionsByName.put(name, projection);
+    } else {
+      if (!projection.getName().equals(name)) {
+        final EpsgAuthority authority = new EpsgAuthority(code);
+        return new Projection(name, authority);
+      }
+    }
+    return projection;
+  }
+
+  public static synchronized Projection getProjection(final String name) {
+    initialize();
+    Projection projection = projectionsByName.get(name);
+    if (projection == null) {
+      projection = new Projection(name);
+      projectionsByName.put(name, projection);
+    }
+    return projection;
   }
 
   private static String getString(final String string) {
@@ -487,6 +524,7 @@ public final class EpsgCoordinateSystems {
             final LinearUnit unit = new LinearUnit(name, baseUnit,
               conversionFactor, authority, deprecated);
             linearUnits.put(id, unit);
+            linearUnitsByName.put(name, unit);
           }
         }
       } finally {
@@ -551,10 +589,8 @@ public final class EpsgCoordinateSystems {
               final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)referencedCoordinateSystem;
               EpsgAuthority authority = new EpsgAuthority(id);
               final LinearUnit linearUnit = linearUnits.get(unitId);
-              final Authority projectionAuthority = new EpsgAuthority(
-                methodCode);
-              final Projection projection = new Projection(methodName,
-                projectionAuthority);
+              final Projection projection = getProjection(methodCode,
+                methodName);
               final Map<String, Object> parameters = getParameters(parametersString);
               final List<Axis> axis = axisMap.get(axisId);
               final Area area = areas.get(areaId);

@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.raster;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.util.Map;
 
 import javax.swing.SwingUtilities;
@@ -22,6 +24,12 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.raster.AbstractGeoReferencedImageFactory;
+import com.revolsys.raster.GeoReferencedImage;
+import com.revolsys.raster.GeoReferencedImageFactory;
+import com.revolsys.raster.MappedLocation;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
@@ -34,8 +42,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.raster.filter.WarpAffineFilter;
-import com.revolsys.swing.map.layer.raster.filter.WarpFilter;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
@@ -251,15 +257,6 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     return this.image;
   }
 
-  public WarpFilter getWarpFilter() {
-    if (isShowOriginalImage()) {
-      return new WarpAffineFilter(getBoundingBox(), image.getImageWidth(),
-        image.getImageHeight());
-    } else {
-      return image.getWarpFilter();
-    }
-  }
-
   @Override
   public boolean isHasChanges() {
     if (image == null) {
@@ -356,6 +353,61 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     } else {
       Invoke.later(this, "showTiePointsTable");
     }
+  }
+
+  public Point sourcePixelToTargetPoint(final MappedLocation tiePoint) {
+    final Point sourcePixel = tiePoint.getSourcePixel();
+    return sourcePixelToTargetPoint(sourcePixel);
+  }
+
+  public Point sourcePixelToTargetPoint(final Point sourcePixel) {
+    final BoundingBox boundingBox = getBoundingBox();
+    final double[] coordinates = sourcePixel.getCoordinates();
+    final AffineTransform transform = image.getAffineTransformation(boundingBox);
+    transform.transform(coordinates, 0, coordinates, 0, 1);
+    final double imageX = coordinates[0];
+    final double imageY = coordinates[0];
+    final GeoReferencedImage image = getImage();
+    final double xPercent = imageX / image.getImageWidth();
+    final double yPercent = imageY / image.getImageHeight();
+
+    final double modelWidth = boundingBox.getWidth();
+    final double modelHeight = boundingBox.getHeight();
+
+    final double modelX = boundingBox.getMinX() + modelWidth * xPercent;
+    final double modelY = boundingBox.getMinY() + modelHeight * yPercent;
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    final Point imagePoint = geometryFactory.point(modelX, modelY);
+    return imagePoint;
+  }
+
+  public Point targetPointToSourcePixel(Point targetPoint) {
+    final GeoReferencedImage image = getImage();
+    final BoundingBox boundingBox = getBoundingBox();
+    targetPoint = targetPoint.convert(boundingBox.getGeometryFactory(), 2);
+    final double modelX = targetPoint.getX();
+    final double modelY = targetPoint.getY();
+    final double modelDeltaX = modelX - boundingBox.getMinX();
+    final double modelDeltaY = modelY - boundingBox.getMinY();
+
+    final double modelWidth = boundingBox.getWidth();
+    final double modelHeight = boundingBox.getHeight();
+
+    final double xRatio = modelDeltaX / modelWidth;
+    final double yRatio = modelDeltaY / modelHeight;
+
+    final double imageX = image.getImageWidth() * xRatio;
+    final double imageY = image.getImageHeight() * yRatio;
+    final double[] coordinates = new double[] {
+      imageX, imageY
+    };
+    try {
+      final AffineTransform transform = image.getAffineTransformation(
+        boundingBox).createInverse();
+      transform.transform(coordinates, 0, coordinates, 0, 1);
+    } catch (final NoninvertibleTransformException e) {
+    }
+    return new PointDouble(coordinates);
   }
 
   public void toggleShowOriginalImage() {

@@ -66,6 +66,11 @@ public class IoFactoryRegistry {
   private final Map<String, String> extensionMimeTypeMap = new HashMap<String, String>();
 
   public IoFactoryRegistry() {
+    synchronized (IoFactoryRegistry.class) {
+      if (instance == null) {
+        instance = this;
+      }
+    }
     final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
     try {
       final Enumeration<URL> urls = classLoader.getResources("META-INF/com.revolsys.io.IoFactory.properties");

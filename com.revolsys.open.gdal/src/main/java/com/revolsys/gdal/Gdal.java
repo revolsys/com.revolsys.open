@@ -18,139 +18,303 @@ import java.nio.ByteOrder;
 import java.util.Map;
 
 import org.gdal.gdal.Band;
+import org.gdal.gdal.ColorTable;
 import org.gdal.gdal.Dataset;
+import org.gdal.gdal.Driver;
 import org.gdal.gdal.gdal;
+import org.gdal.gdal.gdalJNI;
 import org.gdal.gdalconst.gdalconst;
 import org.gdal.gdalconst.gdalconstConstants;
 import org.gdal.ogr.ogr;
 import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.OS;
 
 public class Gdal {
   static {
-    osr.UseExceptions();
+    gdal.SetConfigOption("CPL_TMPDIR", System.getProperty("java.io.tmpdir"));
 
-    gdal.SetConfigOption("GDAL_DRIVER_PATH", "/usr/local/lib/gdalplugins");
+    osr.UseExceptions();
+    ogr.UseExceptions();
+
+    String driverPath = System.getenv("GDAL_DRIVER_PATH");
+    if (!StringUtils.hasText(driverPath)) {
+      if (OS.isMac()) {
+        driverPath = "/usr/local/lib/gdalplugins";
+      }
+    }
+    if (StringUtils.hasText(driverPath)) {
+      gdal.SetConfigOption("GDAL_DRIVER_PATH", driverPath);
+    }
+
+    final String dataPath = System.getenv("GDAL_DATA");
+    if (StringUtils.hasText(dataPath)) {
+      gdal.SetConfigOption("GDAL_DATA", dataPath);
+    }
+
+    gdal.SetConfigOption("GDAL_PAM", "Yes");
 
     gdal.AllRegister();
 
     ogr.RegisterAll();
-    ogr.UseExceptions();
+
+    if (isAvailable()) {
+      addImageReaderSpi("ECW", "ECW", "ecw", "image/ecw");
+      addImageReaderSpi("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
+    }
+  }
+
+  private static void addImageReaderSpi(final GdalImageFactory readerSpi) {
+    if (readerSpi.isAvailable()) {
+
+      final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+      ioFactoryRegistry.addFactory(readerSpi);
+    }
+  }
+
+  private static void addImageReaderSpi(final String driverName,
+    final String formatName, final String fileExtension, final String mimeType) {
+    final GdalImageFactory readerSpi = new GdalImageFactory(driverName,
+      formatName, fileExtension, mimeType);
+    addImageReaderSpi(readerSpi);
+  }
+
+  public static Dataset closeDataSet(final Dataset dataSet) {
+    if (dataSet != null) {
+      try {
+        dataSet.delete();
+      } catch (final Throwable e) {
+      }
+    }
+    return null;
   }
 
   public static BufferedImage getBufferedImage(final Dataset dataset) {
-    Band band = null;
-    final int bandCount = dataset.getRasterCount();
-    final ByteBuffer[] bands = new ByteBuffer[bandCount];
-    final int[] banks = new int[bandCount];
-    final int[] offsets = new int[bandCount];
+    return getBufferedImage(dataset, -1);
+  }
 
-    final int width = dataset.getRasterXSize();
-    final int height = dataset.getRasterYSize();
-    final int pixels = width * height;
-    int bandDataType = 0;
+  /**
+   * <p>Convert the overview raster from {@link Dataset} to a {@link BufferedImage}.
+   * The result image will be the dimensions of the overview raster.</p>
 
-    for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
-      /* Bands are not 0-base indexed, so we must add 1 */
-      band = dataset.GetRasterBand(bandIndex + 1);
+   * @param dataset The image dataset.
+   * @param overviewIndex The index of the overview raster data. Use -1 for the whole image.
+   * @return The buffered image
+   */
+  public static BufferedImage getBufferedImage(final Dataset dataset,
+    final int overviewIndex) {
+    return getBufferedImage(dataset, overviewIndex, 0, 0, -1, -1, -1, -1);
+  }
 
-      bandDataType = band.getDataType();
-      final int bufferSize = pixels * gdal.GetDataTypeSize(bandDataType) / 8;
+  /**
+   * <p>Convert the overview raster from {@link Dataset} to a {@link BufferedImage}. The raster
+   * will be clipped to the sourceOffsetX,sourceOffsetY -> sourceWidth, sourceHeight rectangle.
+   * The clip rectangle will be adjusted to fit inside the bounds of the source image.
+   * The result image will be the dimensions of sourceWidth, sourceHeight.</p>
 
-      final ByteBuffer data = ByteBuffer.allocateDirect(bufferSize);
-      data.order(ByteOrder.nativeOrder());
+   * @param dataset The image dataset.
+   * @param overviewIndex The index of the overview raster data. Use -1 for the whole image.
+   * @param sourceOffsetX The x location of the clip rectangle. 
+   * @param sourceOffsetY The y location of the clip rectangle. 
+   * @param sourceWidth The width of the clip rectangle. Use -1 to auto calculate.
+   * @param sourceHeight The height of the clip rectangle. Use -1 to auto calculate.
+   * @return The buffered image.
+   */
+  public static BufferedImage getBufferedImage(final Dataset dataset,
+    final int overviewIndex, final int sourceOffsetX, final int sourceOffsetY,
+    final int sourceWidth, final int sourceHeight) {
+    return getBufferedImage(dataset, overviewIndex, sourceOffsetX,
+      sourceOffsetY, sourceWidth, sourceHeight, -1, -1);
+  }
 
-      final int bandWidth = band.getXSize();
-      final int bandHeight = band.getYSize();
-      final int result = band.ReadRaster_Direct(0, 0, bandWidth, bandHeight,
-        width, height, bandDataType, data);
-      if (result == gdalconstConstants.CE_None) {
-        bands[bandIndex] = data;
+  /**
+   * <p>Convert the overview raster from {@link Dataset} to a {@link BufferedImage}. The raster
+   * will be clipped to the sourceOffsetX,sourceOffsetY -> sourceWidth, sourceHeight rectangle.
+   * The clip rectangle will be adjusted to fit inside the bounds of the source image.
+   * The result image will scaled to the the dimensions of targetWidth, targetHeight.</p>
+
+   * @param dataset The image dataset.
+   * @param overviewIndex The index of the overview raster data. Use -1 for the whole image.
+   * @param sourceOffsetX The x location of the clip rectangle. 
+   * @param sourceOffsetY The y location of the clip rectangle. 
+   * @param sourceWidth The width of the clip rectangle. Use -1 to auto calculate.
+   * @param sourceHeight The height of the clip rectangle. Use -1 to auto calculate.
+  * @param targetWidth The width of the result image. Use -1 to auto calculate.
+   * @param targetHeight The height of the result image. Use -1 to auto calculate.
+   * @return The buffered image.
+   */
+  public static BufferedImage getBufferedImage(final Dataset dataset,
+    final int overviewIndex, int sourceOffsetX, int sourceOffsetY,
+    int sourceWidth, int sourceHeight, int targetWidth, int targetHeight) {
+    synchronized (dataset) {
+
+      final int bandCount = dataset.getRasterCount();
+      final ByteBuffer[] bandData = new ByteBuffer[bandCount];
+      final int[] banks = new int[bandCount];
+      final int[] offsets = new int[bandCount];
+
+      int pixels = 0;
+      int bandDataType = 0;
+      int rasterColorInterpretation = -1;
+      ColorTable rasterColorTable = null;
+
+      for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
+        final Band band = dataset.GetRasterBand(bandIndex + 1);
+        try {
+          Band overviewBand;
+          if (overviewIndex == -1) {
+            overviewBand = band;
+          } else {
+            overviewBand = band.GetOverview(overviewIndex);
+          }
+          try {
+            if (rasterColorTable == null) {
+              rasterColorTable = band.GetRasterColorTable();
+              rasterColorInterpretation = band.GetRasterColorInterpretation();
+              bandDataType = band.getDataType();
+              final int overviewWidth = overviewBand.getXSize();
+              final int overviewHeight = overviewBand.getYSize();
+              if (sourceOffsetX < 0) {
+                sourceOffsetX = 0;
+              }
+              if (sourceOffsetY < 0) {
+                sourceOffsetY = 0;
+              }
+              if (sourceOffsetX >= overviewWidth
+                || sourceOffsetY >= overviewHeight) {
+                return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+              }
+
+              if (sourceWidth < 0) {
+                sourceWidth = overviewWidth;
+              }
+              if (sourceOffsetX + sourceWidth > overviewWidth) {
+                sourceWidth = overviewWidth - sourceOffsetX;
+              }
+              if (targetWidth < 0) {
+                targetWidth = sourceWidth;
+              }
+
+              if (sourceHeight < 0) {
+                sourceHeight = overviewHeight;
+              }
+              if (sourceOffsetY + sourceHeight > overviewHeight) {
+                sourceHeight = overviewHeight - sourceOffsetY;
+              }
+              if (targetHeight < 0) {
+                targetHeight = sourceHeight;
+              }
+
+              pixels = targetWidth * targetHeight;
+            }
+            if (pixels > 0 && sourceHeight > 0 && sourceWidth > 0) {
+              final int bufferSize = pixels
+                * gdal.GetDataTypeSize(bandDataType) / 8;
+
+              final ByteBuffer data = ByteBuffer.allocateDirect(bufferSize);
+              data.order(ByteOrder.nativeOrder());
+
+              final int result = overviewBand.ReadRaster_Direct(sourceOffsetX,
+                sourceOffsetY, sourceWidth, sourceHeight, targetWidth,
+                targetHeight, bandDataType, data);
+              if (result == gdalconstConstants.CE_None) {
+                bandData[bandIndex] = data;
+              } else {
+                throw new RuntimeException("Error converting image");
+              }
+            } else {
+              return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+            }
+            banks[bandIndex] = bandIndex;
+            offsets[bandIndex] = 0;
+          } finally {
+            overviewBand.delete();
+          }
+        } finally {
+          band.delete();
+        }
+      }
+
+      DataBuffer imageBuffer = null;
+      SampleModel sampleModel = null;
+      int dataType = 0;
+      int dataBufferType = 0;
+
+      if (bandDataType == gdalconstConstants.GDT_Byte) {
+        final byte[][] bytes = new byte[bandCount][];
+        for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
+          bytes[bandIndex] = new byte[pixels];
+          bandData[bandIndex].get(bytes[bandIndex]);
+        }
+        imageBuffer = new DataBufferByte(bytes, pixels);
+        dataBufferType = DataBuffer.TYPE_BYTE;
+        sampleModel = new BandedSampleModel(dataBufferType, targetWidth,
+          targetHeight, targetWidth, banks, offsets);
+        dataType = (rasterColorInterpretation == gdalconstConstants.GCI_PaletteIndex) ? BufferedImage.TYPE_BYTE_INDEXED
+          : BufferedImage.TYPE_BYTE_GRAY;
+      } else if (bandDataType == gdalconstConstants.GDT_Int16) {
+        final short[][] shorts = new short[bandCount][];
+        for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
+          shorts[bandIndex] = new short[pixels];
+          bandData[bandIndex].asShortBuffer().get(shorts[bandIndex]);
+        }
+        imageBuffer = new DataBufferShort(shorts, pixels);
+        dataBufferType = DataBuffer.TYPE_USHORT;
+        sampleModel = new BandedSampleModel(dataBufferType, targetWidth,
+          targetHeight, targetWidth, banks, offsets);
+        dataType = BufferedImage.TYPE_USHORT_GRAY;
+      } else if (bandDataType == gdalconstConstants.GDT_Int32) {
+        final int[][] ints = new int[bandCount][];
+        for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
+          ints[bandIndex] = new int[pixels];
+          bandData[bandIndex].asIntBuffer().get(ints[bandIndex]);
+        }
+        imageBuffer = new DataBufferInt(ints, pixels);
+        dataBufferType = DataBuffer.TYPE_INT;
+        sampleModel = new BandedSampleModel(dataBufferType, targetWidth,
+          targetHeight, targetWidth, banks, offsets);
+        dataType = BufferedImage.TYPE_CUSTOM;
+      }
+
+      final WritableRaster raster = Raster.createWritableRaster(sampleModel,
+        imageBuffer, null);
+      BufferedImage image = null;
+      ColorModel colorModel = null;
+
+      if (rasterColorInterpretation == gdalconstConstants.GCI_PaletteIndex) {
+        dataType = BufferedImage.TYPE_BYTE_INDEXED;
+        colorModel = rasterColorTable.getIndexColorModel(gdal.GetDataTypeSize(bandDataType));
+        image = new BufferedImage(colorModel, raster, false, null);
       } else {
-        throw new GdalException();
+        ColorSpace colorSpace = null;
+        if (bandCount > 2) {
+          colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+          colorModel = new ComponentColorModel(colorSpace, false, false,
+            ColorModel.OPAQUE, dataBufferType);
+          image = new BufferedImage(colorModel, raster, true, null);
+        } else {
+          image = new BufferedImage(targetWidth, targetHeight, dataType);
+          image.setData(raster);
+        }
       }
-      banks[bandIndex] = bandIndex;
-      offsets[bandIndex] = 0;
+      return image;
     }
-
-    DataBuffer imageBuffer = null;
-    SampleModel sampleModel = null;
-    int dataType = 0;
-    int dataBufferType = 0;
-
-    if (bandDataType == gdalconstConstants.GDT_Byte) {
-      final byte[][] bytes = new byte[bandCount][];
-      for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
-        bytes[bandIndex] = new byte[pixels];
-        bands[bandIndex].get(bytes[bandIndex]);
-      }
-      imageBuffer = new DataBufferByte(bytes, pixels);
-      dataBufferType = DataBuffer.TYPE_BYTE;
-      sampleModel = new BandedSampleModel(dataBufferType, width, height, width,
-        banks, offsets);
-      dataType = (band.GetRasterColorInterpretation() == gdalconstConstants.GCI_PaletteIndex) ? BufferedImage.TYPE_BYTE_INDEXED
-        : BufferedImage.TYPE_BYTE_GRAY;
-    } else if (bandDataType == gdalconstConstants.GDT_Int16) {
-      final short[][] shorts = new short[bandCount][];
-      for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
-        shorts[bandIndex] = new short[pixels];
-        bands[bandIndex].asShortBuffer().get(shorts[bandIndex]);
-      }
-      imageBuffer = new DataBufferShort(shorts, pixels);
-      dataBufferType = DataBuffer.TYPE_USHORT;
-      sampleModel = new BandedSampleModel(dataBufferType, width, height, width,
-        banks, offsets);
-      dataType = BufferedImage.TYPE_USHORT_GRAY;
-    } else if (bandDataType == gdalconstConstants.GDT_Int32) {
-      final int[][] ints = new int[bandCount][];
-      for (int bandIndex = 0; bandIndex < bandCount; bandIndex++) {
-        ints[bandIndex] = new int[pixels];
-        bands[bandIndex].asIntBuffer().get(ints[bandIndex]);
-      }
-      imageBuffer = new DataBufferInt(ints, pixels);
-      dataBufferType = DataBuffer.TYPE_INT;
-      sampleModel = new BandedSampleModel(dataBufferType, width, height, width,
-        banks, offsets);
-      dataType = BufferedImage.TYPE_CUSTOM;
-    }
-
-    final WritableRaster raster = Raster.createWritableRaster(sampleModel,
-      imageBuffer, null);
-    BufferedImage image = null;
-    ColorModel colorModel = null;
-
-    if (band.GetRasterColorInterpretation() == gdalconstConstants.GCI_PaletteIndex) {
-      dataType = BufferedImage.TYPE_BYTE_INDEXED;
-      colorModel = band.GetRasterColorTable().getIndexColorModel(
-        gdal.GetDataTypeSize(bandDataType));
-      image = new BufferedImage(colorModel, raster, false, null);
-    } else {
-      ColorSpace colorSpace = null;
-      if (bandCount > 2) {
-        colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-        colorModel = new ComponentColorModel(colorSpace, false, false,
-          ColorModel.OPAQUE, dataBufferType);
-        image = new BufferedImage(colorModel, raster, true, null);
-      } else {
-        image = new BufferedImage(width, height, dataType);
-        image.setData(raster);
-      }
-    }
-    return image;
   }
 
   public static BufferedImage getBufferedImage(final File file) {
@@ -164,23 +328,45 @@ public class Gdal {
   }
 
   public static Dataset getDataset(final File file) {
-    final Dataset dataset = gdal.Open(file.getAbsolutePath(),
-      gdalconst.GA_ReadOnly);
-    if (dataset == null) {
-      throw new GdalException();
-    } else {
-      final Resource resource = new FileSystemResource(file);
-      setProjectionFromPrjFile(dataset, resource);
-      final long modifiedTime = loadSettings(dataset, resource);
-      // loadAuxXmlFile(modifiedTime);
+    final int mode = gdalconst.GA_ReadOnly;
+    return getDataset(file, mode);
+  }
 
-      return dataset;
+  public static Dataset getDataset(final File file, final int mode) {
+    if (isAvailable()) {
+      final String path = file.getAbsolutePath();
+      if (file.exists()) {
+        final Dataset dataset = gdal.Open(path, mode);
+        if (dataset == null) {
+          throw new GdalException();
+        } else {
+          final Resource resource = new FileSystemResource(file);
+          setProjectionFromPrjFile(dataset, resource);
+          final long modifiedTime = loadSettings(dataset, resource);
+          // loadAuxXmlFile(modifiedTime);
+
+          return dataset;
+        }
+      } else {
+        throw new IllegalArgumentException("File no found: " + path);
+      }
+    } else {
+      throw new IllegalStateException("GDAL is not available");
     }
   }
 
   public static Dataset getDataset(final String fileName) {
     final File file = FileUtil.getFile(fileName);
     return getDataset(file);
+  }
+
+  public static Dataset getDataset(final String name, final int mode) {
+    if (StringUtils.hasText(name)) {
+      final File file = new File(name);
+      return getDataset(file, mode);
+    } else {
+      throw new IllegalArgumentException("File name must not be null or empty");
+    }
   }
 
   public static SpatialReference getSpatialReference(
@@ -206,7 +392,53 @@ public class Gdal {
     return spatialReference;
   }
 
+  public static String getSpatialReferenceWkt(final int srid) {
+    final SpatialReference spatialReference = getSpatialReference(srid);
+    return spatialReference.ExportToWkt();
+  }
+
+  public static String getVersion() {
+    if (Gdal.isAvailable()) {
+      return gdal.VersionInfo();
+    } else {
+      return "0.0.0";
+    }
+  }
+
   public static void init() {
+  }
+
+  public static boolean isAvailable() {
+    return gdalJNI.isAvailable();
+  }
+
+  /**
+   * Returns <code>true</code> if a driver for the specific format is
+   * available. <code>false</code> otherwise.<BR>
+   * It is worth to point out that a successful loading of the native library
+   * is not sufficient to grant the support for a specific format. We should
+   * also check if the proper driver is available.
+   * 
+   * @return <code>true</code> if a driver for the specific format is
+   *         available. <code>false</code> otherwise.<BR>
+   */
+  public static boolean isDriverAvailable(final String driverName) {
+    if (isAvailable()) {
+      try {
+        final Driver driver = gdal.GetDriverByName(driverName);
+        if (driver == null) {
+          return false;
+        } else {
+          return true;
+        }
+      } catch (final UnsatisfiedLinkError e) {
+        LoggerFactory.getLogger(Gdal.class).debug(
+          "Error loading driver: " + driverName, e);
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   public static long loadSettings(final Dataset dataset, final Resource resource) {
@@ -215,13 +447,11 @@ public class Gdal {
       try {
         System.out.println(dataset.GetGCPCount());
 
-        GeometryFactory geometryFactory = null;
         final Map<String, Object> settings = JsonMapIoFactory.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (StringUtils.hasText(boundingBoxWkt)) {
           final BoundingBox boundingBox = Envelope.create(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
-            geometryFactory = boundingBox.getGeometryFactory();
             setSpatialReference(dataset, boundingBox.getCoordinateSystem());
             final double x = boundingBox.getMinX();
             final double width = boundingBox.getWidth();
