@@ -134,9 +134,9 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
     final int parameterIndex, Object value) throws SQLException {
     int index = parameterIndex;
 
-    if (value instanceof Point) {
-      final Point coordinates = (Point)value;
-      value = this.geometryFactory.point(coordinates);
+    if (value instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)value;
+      value = boundingBox.convert(geometryFactory).toPolygon(1);
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
