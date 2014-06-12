@@ -11,14 +11,7 @@ package org.gdal.osr;
 class osrJNI {
   private static boolean available = false;
   static {
-    try {
-      com.revolsys.jar.ClasspathNativeLibraryUtil.loadLibrary("osrjni");
-      available = true;
-    } catch (final UnsatisfiedLinkError e) {
-      available = false;
-      System.err.println("Native library load failed.");
-      System.err.println(e);
-    }
+    available = com.revolsys.jar.ClasspathNativeLibraryUtil.loadLibrary("osrjni");
   }
 
   public final static native void CoordinateTransformation_TransformPoint__SWIG_0(

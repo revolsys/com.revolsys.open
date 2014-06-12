@@ -13,14 +13,7 @@ class gdalconstJNI {
   private static boolean available = false;
 
   static {
-    try {
-      com.revolsys.jar.ClasspathNativeLibraryUtil.loadLibrary("gdalconstjni");
-      available = true;
-    } catch (final UnsatisfiedLinkError e) {
-      available = false;
-      System.err.println("Native library load failed.");
-      System.err.println(e);
-    }
+    available = com.revolsys.jar.ClasspathNativeLibraryUtil.loadLibrary("gdalconstjni");
   }
 
   public final static native int CE_Debug_get();

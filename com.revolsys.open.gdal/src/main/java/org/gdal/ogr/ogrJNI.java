@@ -14,18 +14,11 @@ import org.gdal.osr.SpatialReference;
 class ogrJNI {
   private static boolean available = false;
   static {
-    try {
-      com.revolsys.jar.ClasspathNativeLibraryUtil.loadLibrary("ogrjni");
-      available = true;
-
+    available = com.revolsys.jar.ClasspathNativeLibraryUtil.loadLibrary("ogrjni");
+    if (available) {
       if (org.gdal.gdal.gdal.HasThreadSupport() == 0) {
         System.err.println("WARNING : GDAL should be compiled with thread support for safe execution in Java.");
       }
-
-    } catch (final UnsatisfiedLinkError e) {
-      available = false;
-      System.err.println("Native library load failed.");
-      System.err.println(e);
     }
   }
 

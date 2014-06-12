@@ -49,7 +49,7 @@ public class ClasspathNativeLibraryUtil {
     }
   }
 
-  public static void loadLibrary(final String name) {
+  public static boolean loadLibrary(final String name) {
     synchronized (LIBRARY_LOADED_MAP) {
       final Boolean loaded = LIBRARY_LOADED_MAP.get(name);
       if (loaded == null) {
@@ -57,22 +57,22 @@ public class ClasspathNativeLibraryUtil {
         final String ext = getLibraryExtension();
         final String arch = OS.getArch();
         final String operatingSystemName = getOperatingSystemName();
-        loadLibrary(prefix, name, arch, operatingSystemName, ext);
-      } else if (!loaded) {
-        throw new RuntimeException("Unable to load shared library " + name);
+        return loadLibrary(prefix, name, arch, operatingSystemName, ext);
+      } else {
+        return loaded;
       }
     }
   }
 
-  public static void loadLibrary(final String path, final String name) {
+  public static boolean loadLibrary(final String path, final String name) {
     final URL url = ClasspathNativeLibraryUtil.class.getResource(path);
+    boolean loaded = false;
     if (url == null) {
       try {
         System.loadLibrary(name);
+        loaded = true;
       } catch (final Throwable e) {
-        LOG.error("Unable to load shared library " + name, e);
-        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-        throw new RuntimeException("Unable to load shared library " + name, e);
+        LOG.debug("Unable to load shared library " + name, e);
       }
     } else {
       try {
@@ -81,33 +81,33 @@ public class ClasspathNativeLibraryUtil {
         file.deleteOnExit();
         FileUtil.copy(url.openStream(), file);
         System.load(file.getCanonicalPath());
-        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+        loaded = true;
       } catch (final Throwable e) {
         LOG.error("Unable to load shared library from classpath " + url, e);
-        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-        throw new RuntimeException("Unable to load shared library " + url, e);
       }
     }
+    LIBRARY_LOADED_MAP.put(name, loaded);
+    return loaded;
   }
 
-  private static void loadLibrary(final String prefix, final String name,
+  private static boolean loadLibrary(final String prefix, final String name,
     final String arch, final String operatingSystemName, final String ext) {
+    boolean loaded = false;
     final String fileName = prefix + name + "." + ext;
     final String libraryName = "/native/" + operatingSystemName + "/" + arch
       + "/" + fileName;
     final URL url = ClasspathNativeLibraryUtil.class.getResource(libraryName);
     if (url == null) {
       if (arch.equals("x86_64")) {
-        loadLibrary(prefix, libraryName, "x86", operatingSystemName, ext);
+        loaded = loadLibrary(prefix, libraryName, "x86", operatingSystemName,
+          ext);
       } else {
         try {
           System.loadLibrary(name);
+          loaded = true;
         } catch (final Throwable e) {
-          LOG.error("Unable to load shared library " + libraryName + " "
-            + fileName, e);
-          LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-          throw new RuntimeException("Unable to load shared library "
-            + fileName, e);
+          LOG.debug("Unable to load shared library from classpath "
+            + libraryName + " " + fileName, e);
         }
       }
     } else {
@@ -117,15 +117,14 @@ public class ClasspathNativeLibraryUtil {
         file.deleteOnExit();
         FileUtil.copy(url.openStream(), file);
         System.load(file.getCanonicalPath());
-        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
+        loaded = true;
       } catch (final Throwable e) {
-        LOG.error("Unable to load shared library from classpath " + libraryName
+        LOG.debug("Unable to load shared library from classpath " + libraryName
           + " " + fileName, e);
-        LIBRARY_LOADED_MAP.put(name, Boolean.FALSE);
-        throw new RuntimeException("Unable to load shared library " + fileName,
-          e);
       }
     }
+    LIBRARY_LOADED_MAP.put(name, loaded);
+    return loaded;
   }
 
 }

@@ -13,18 +13,11 @@ public class gdalJNI {
   private static boolean available = false;
 
   static {
-    try {
-      com.revolsys.jar.ClasspathNativeLibraryUtil.loadLibrary("gdaljni");
-      available = true;
-
+    available = com.revolsys.jar.ClasspathNativeLibraryUtil.loadLibrary("gdaljni");
+    if (available) {
       if (gdal.HasThreadSupport() == 0) {
         System.err.println("WARNING : GDAL should be compiled with thread support for safe execution in Java.");
       }
-
-    } catch (final UnsatisfiedLinkError e) {
-      available = false;
-      System.err.println("Native library load failed.");
-      System.err.println(e);
     }
   }
 
