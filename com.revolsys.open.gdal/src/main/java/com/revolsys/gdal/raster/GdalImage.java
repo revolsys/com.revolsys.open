@@ -43,11 +43,11 @@ public class GdalImage extends AbstractGeoReferencedImage {
       if (srid > 0 && srid < 2000000) {
         setGeometryFactory(GeometryFactory.floating(srid, 2));
       } else {
-        setGeometryFactory(GeometryFactory.fixed(3005, 2, -1));
+        setGeometryFactory(GeometryFactory.fixed(epsgCoordinateSystem, 2, -1));
       }
     }
     setBoundingBox(geoTransform[0], geoTransform[3], geoTransform[1],
-      geoTransform[5]);
+      -geoTransform[5]);
     postConstruct();
   }
 

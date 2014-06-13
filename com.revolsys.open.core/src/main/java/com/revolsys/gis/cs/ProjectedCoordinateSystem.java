@@ -10,6 +10,8 @@ import java.util.TreeMap;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
+import com.revolsys.gis.cs.projection.CoordinatesProjection;
+import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
@@ -42,6 +44,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   private final Map<String, Object> normalizedParameters = new TreeMap<String, Object>();
 
   private final Projection projection;
+
+  private CoordinatesProjection coordinatesProjection;
 
   public ProjectedCoordinateSystem(final int id, final String name,
     final GeographicCoordinateSystem geographicCoordinateSystem,
@@ -137,7 +141,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!EqualsRegistry.equal(name, cs.name)) {
         return false;
-      } else if (!EqualsRegistry.equal(parameters, cs.parameters)) {
+      } else if (!EqualsRegistry.equal(normalizedParameters,
+        cs.normalizedParameters)) {
         return false;
       } else if (!EqualsRegistry.equal(projection, cs.projection)) {
         return false;
@@ -177,6 +182,14 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
   @Override
   public List<Axis> getAxis() {
     return axis;
+  }
+
+  @Override
+  public synchronized CoordinatesProjection getCoordinatesProjection() {
+    if (coordinatesProjection == null) {
+      coordinatesProjection = ProjectionFactory.createCoordinatesProjection(this);
+    }
+    return coordinatesProjection;
   }
 
   public double getDoubleParameter(final String key) {
@@ -270,10 +283,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       final String name = param.getKey().intern();
       final Object value = param.getValue();
 
-      parameters.put(name, value);
+      this.parameters.put(name, value);
 
       final String normalizedName = ProjectionParameterNames.getParameterName(name);
-      normalizedParameters.put(normalizedName, value);
+      this.normalizedParameters.put(normalizedName, value);
     }
   }
 

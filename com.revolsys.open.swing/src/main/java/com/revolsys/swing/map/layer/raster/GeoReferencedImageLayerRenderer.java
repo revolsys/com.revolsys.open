@@ -58,7 +58,7 @@ public class GeoReferencedImageLayerRenderer extends
           if (boundingBox == null || boundingBox.isEmpty()) {
             boundingBox = layer.fitToViewport();
           }
-          renderAlpha(graphics, viewport, image, 0.5, false);
+          renderAlpha(graphics, viewport, image, 1.0, true);
         }
       }
     }

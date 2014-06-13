@@ -1,6 +1,5 @@
 package com.revolsys.gis.cs.projection;
 
-
 public class ProjectOperation implements CoordinatesOperation {
   private final CoordinatesProjection projection;
 
@@ -27,5 +26,10 @@ public class ProjectOperation implements CoordinatesOperation {
         targetCoordinates[vertexIndex * sourceAxisCount + axisIndex] = value;
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return "geographics -> " + projection;
   }
 }

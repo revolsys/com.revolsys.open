@@ -9,6 +9,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.gis.cs.projection.CoordinatesProjection;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -205,6 +206,11 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   @Override
   public List<Axis> getAxis() {
     return axis;
+  }
+
+  @Override
+  public CoordinatesProjection getCoordinatesProjection() {
+    return null;
   }
 
   public Datum getDatum() {
