@@ -414,7 +414,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       int length;
       if (i + 3 < elemInfo.length) {
         final long nextOffset = elemInfo[i + 3];
-        length = (int)(nextOffset - offset) + 1;
+        length = (int)(nextOffset - offset);
       } else {
         length = (int)(coordinatesArray.length() - offset) + 1;
       }
@@ -451,7 +451,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final ARRAY elemInfoArray = (ARRAY)resultSet.getArray(columnIndex + 4);
     final long[] elemInfo = elemInfoArray.getLongArray();
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
-
+    int coordinateCount = coordinatesArray.length();
+    
     List<LinearRing> rings = Collections.emptyList();
 
     for (int i = 0; i < elemInfo.length; i += 3) {
@@ -461,9 +462,9 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       int length;
       if (i + 3 < elemInfo.length) {
         final long nextOffset = elemInfo[i + 3];
-        length = (int)(nextOffset - offset) + 1;
+        length = (int)(nextOffset - offset);
       } else {
-        length = (int)(coordinatesArray.length() - offset) + 1;
+        length = (int)((coordinateCount +1) - offset);
       }
       if (interpretation == 1) {
         final double[] coordinates = coordinatesArray.getDoubleArray(offset,
@@ -530,7 +531,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       int length;
       if (i + 3 < elemInfo.length) {
         final long nextOffset = elemInfo[i + 3];
-        length = (int)(nextOffset - offset) + 1;
+        length = (int)(nextOffset - offset);
       } else {
         length = (int)(coordinatesArray.length() - offset) + 1;
       }
