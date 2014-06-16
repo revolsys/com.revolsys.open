@@ -1,6 +1,7 @@
 package com.revolsys.util;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,20 +72,35 @@ public final class JavaProcess {
     final String javaHome = System.getProperty("java.home");
     final String javaBin = javaHome + File.separator + "bin" + File.separator
       + "java";
-    final String classpath = System.getProperty("java.class.path");
-    final String className = klass.getCanonicalName();
 
     final List<String> params = new ArrayList<String>();
     params.add(javaBin);
+
     params.add("-cp");
+    final String classpath = System.getProperty("java.class.path");
     params.add(classpath);
+
+    final String libraryPath = System.getProperty("java.library.path");
+    params.add("-Djava.library.path=" + libraryPath);
+
+    final List<String> inputArguments = ManagementFactory.getRuntimeMXBean()
+      .getInputArguments();
+    for (final String argument : inputArguments) {
+      if (argument.startsWith("-D")) {
+        params.add(argument);
+      }
+    }
     if (javaArguments != null) {
       params.addAll(javaArguments);
     }
+
+    final String className = klass.getCanonicalName();
     params.add(className);
+
     if (programArguments != null) {
       params.addAll(programArguments);
     }
+
     final ProcessBuilder builder = new ProcessBuilder(params);
     return builder;
   }
