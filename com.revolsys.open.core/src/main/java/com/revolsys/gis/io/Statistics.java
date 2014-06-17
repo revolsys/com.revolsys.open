@@ -92,6 +92,14 @@ public class Statistics {
     sb.append("\n");
   }
 
+  public synchronized void clearCounts() {
+    counts.clear();
+  }
+
+  public synchronized void clearCounts(final String typeName) {
+    counts.remove(typeName);
+  }
+
   public synchronized void connect() {
     providerCount++;
   }
