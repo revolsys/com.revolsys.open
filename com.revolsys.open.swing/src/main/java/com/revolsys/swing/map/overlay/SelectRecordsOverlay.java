@@ -9,9 +9,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jdesktop.swingx.color.ColorUtil;
 
@@ -71,6 +73,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private int selectBoxButton;
 
   private Cursor selectBoxCursor;
+
+  private BufferedImage selectImage;
+
+  private final AtomicLong redrawCount = new AtomicLong();
+
+  private long redrawId = -1;
 
   public SelectRecordsOverlay(final MapPanel map) {
     super(map);
@@ -217,15 +225,38 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   @Override
   public void paintComponent(final Graphics2D graphics) {
     final LayerGroup layerGroup = getProject();
-    paintSelected(graphics, layerGroup);
-    paintHighlighted(graphics, layerGroup);
+    final long redrawId = redrawCount.longValue();
+    if (redrawId != this.redrawId) {
+      final Viewport2D viewport = getViewport();
+      final int width = viewport.getViewWidthPixels();
+      final int height = viewport.getViewHeightPixels();
+      if (width > 0 && height > 0) {
+
+        final Cursor oldCursor = getMapCursor();
+        try {
+          setMapCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          final BufferedImage image = new BufferedImage(width, height,
+            BufferedImage.TYPE_INT_ARGB);
+          final Graphics2D imageGraphics = (Graphics2D)image.getGraphics();
+          paintSelected(imageGraphics, layerGroup);
+          paintHighlighted(imageGraphics, layerGroup);
+          this.selectImage = image;
+          this.redrawId = redrawId;
+        } finally {
+          setMapCursor(oldCursor);
+        }
+      }
+    }
+    if (selectImage != null) {
+      graphics.drawImage(selectImage, 0, 0, null);
+    }
     paintSelectBox(graphics);
   }
 
   protected void paintHighlighted(final Graphics2D graphics2d,
     final LayerGroup layerGroup) {
     final Viewport2D viewport = getViewport();
-    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
@@ -259,7 +290,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   protected void paintSelected(final Graphics2D graphics2d,
     final LayerGroup layerGroup) {
     final Viewport2D viewport = getViewport();
-    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
@@ -289,19 +320,33 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final String propertyName = event.getPropertyName();
-    if ("layers".equals(propertyName)) {
-      repaint();
+    if ("viewBoundingBox".equals(propertyName)) {
+      redraw();
+    } else if ("layers".equals(propertyName)) {
+      redrawAndRepaint();
     } else if ("selectable".equals(propertyName)) {
-      repaint();
+      redrawAndRepaint();
     } else if ("visible".equals(propertyName)) {
-      repaint();
+      redrawAndRepaint();
     } else if ("editable".equals(propertyName)) {
-      repaint();
+      redrawAndRepaint();
     } else if ("updateRecord".equals(propertyName)) {
-      repaint();
+      redrawAndRepaint();
     } else if ("hasSelectedRecords".equals(propertyName)) {
+      redrawAndRepaint();
       clearUndoHistory();
+    } else if ("hasHighlightedRecords".equals(propertyName)) {
+      redrawAndRepaint();
     }
+  }
+
+  public void redraw() {
+    redrawCount.incrementAndGet();
+  }
+
+  public void redrawAndRepaint() {
+    redrawCount.incrementAndGet();
+    repaint();
   }
 
   private void selectBoxClear(final InputEvent event) {

@@ -34,9 +34,7 @@ package com.revolsys.jts.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
@@ -50,9 +48,6 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.Segment;
-import com.revolsys.jts.geomgraph.Edge;
-import com.revolsys.jts.geomgraph.EdgeIntersection;
-import com.revolsys.jts.geomgraph.GeometryGraph;
 
 /**
  * Tests whether a <code>Geometry</code> is simple.
@@ -96,32 +91,8 @@ import com.revolsys.jts.geomgraph.GeometryGraph;
  * @version 1.7
  */
 public class IsSimpleOp {
-  private static class EndpointInfo {
-    int degree;
-
-    boolean isClosed;
-
-    Point pt;
-
-    public EndpointInfo(final Point pt) {
-      this.pt = pt;
-      isClosed = false;
-      degree = 0;
-    }
-
-    public void addEndpoint(final boolean isClosed) {
-      degree++;
-      this.isClosed |= isClosed;
-    }
-
-    public Point getCoordinate() {
-      return pt;
-    }
-  }
 
   private final Geometry geometry;
-
-  private final boolean isClosedEndpointsInInterior = true;
 
   private final List<Point> nonSimplePoints = new ArrayList<Point>();
 
@@ -139,19 +110,6 @@ public class IsSimpleOp {
   public IsSimpleOp(final Geometry geometry, final boolean shortCircuit) {
     this.geometry = geometry;
     this.shortCircuit = shortCircuit;
-  }
-
-  /**
-   * Add an endpoint to the map, creating an entry for it if none exists
-   */
-  private void addEndpoint(final Map<Point, EndpointInfo> endPoints,
-    final Point p, final boolean isClosed) {
-    EndpointInfo eiInfo = endPoints.get(p);
-    if (eiInfo == null) {
-      eiInfo = new EndpointInfo(p);
-      endPoints.put(p, eiInfo);
-    }
-    eiInfo.addEndpoint(isClosed);
   }
 
   /**
@@ -173,50 +131,6 @@ public class IsSimpleOp {
 
   public List<Point> getNonSimplePoints() {
     return nonSimplePoints;
-  }
-
-  /**
-   * Tests that no edge intersection is the endpoint of a closed line.
-   * This ensures that closed lines are not touched at their endpoint,
-   * which is an interior point according to the Mod-2 rule
-   * To check this we compute the degree of each endpoint.
-   * The degree of endpoints of closed lines
-   * must be exactly 2.
-   */
-  private boolean hasClosedEndpointIntersection(final GeometryGraph graph) {
-    final Map<Point, EndpointInfo> endPoints = new TreeMap<>();
-    for (final Edge e : graph.edges()) {
-      final boolean isClosed = e.isClosed();
-      final Point p0 = e.getCoordinate(0);
-      addEndpoint(endPoints, p0, isClosed);
-      final Point p1 = e.getCoordinate(e.getNumPoints() - 1);
-      addEndpoint(endPoints, p1, isClosed);
-    }
-
-    for (final EndpointInfo eiInfo : endPoints.values()) {
-      if (eiInfo.isClosed && eiInfo.degree != 2) {
-        nonSimplePoints.add(eiInfo.getCoordinate());
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * For all edges, check if there are any intersections which are NOT at an endpoint.
-   * The Geometry is not simple if there are intersections not at endpoints.
-   */
-  private boolean hasNonEndpointIntersection(final GeometryGraph graph) {
-    for (final Edge edge : graph.edges()) {
-      final int maxSegmentIndex = edge.getMaximumSegmentIndex();
-      for (final EdgeIntersection ei : edge.getEdgeIntersectionList()) {
-        if (!ei.isEndPoint(maxSegmentIndex)) {
-          nonSimplePoints.add(ei.getCoordinate());
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   private boolean isEndIntersection(final Segment segment, final Point point) {
@@ -280,8 +194,6 @@ public class IsSimpleOp {
   private boolean isSimple(final Lineal lineal) {
     final Segment segment2 = (Segment)lineal.segments().iterator();
     for (final Segment segment : lineal.segments()) {
-      final boolean segment1Start = segment.isLineStart();
-      final boolean segment1End = segment.isLineEnd();
       segment2.setSegmentId(segment.getSegmentId());
       boolean nextSegment = true;
       while (segment2.hasNext()) {

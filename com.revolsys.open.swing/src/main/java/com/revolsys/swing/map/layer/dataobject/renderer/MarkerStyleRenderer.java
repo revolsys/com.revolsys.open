@@ -249,13 +249,13 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
         graphics);
       final Paint paint = graphics.getPaint();
       try {
-        final int pointCount = line.getVertexCount();
-        if (pointCount > 1) {
-          for (int i = 0; i < pointCount; i++) {
+        final int vertexCount = line.getVertexCount();
+        if (vertexCount > 1) {
+          for (int i = 0; i < vertexCount; i++) {
             MarkerStyle style;
             if (i == 0) {
               style = styleFirst;
-            } else if (i == pointCount - 1) {
+            } else if (i == vertexCount - 1) {
               style = styleLast;
             } else {
               style = styleVertex;

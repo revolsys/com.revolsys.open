@@ -245,28 +245,31 @@ public class ShapeMarker extends AbstractMarker {
     double orientation) {
 
     final AffineTransform savedTransform = graphics.getTransform();
-    final Measure<Length> markerWidth = style.getMarkerWidth();
-    final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
-    final Measure<Length> markerHeight = style.getMarkerHeight();
-    final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
-    final String orientationType = style.getMarkerOrientationType();
-    if ("none".equals(orientationType)) {
-      orientation = 0;
-    }
+    try {
+      final Measure<Length> markerWidth = style.getMarkerWidth();
+      final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
+      final Measure<Length> markerHeight = style.getMarkerHeight();
+      final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
+      final String orientationType = style.getMarkerOrientationType();
+      if ("none".equals(orientationType)) {
+        orientation = 0;
+      }
 
-    translateMarker(viewport, graphics, style, modelX, modelY, mapWidth,
-      mapHeight, orientation);
+      translateMarker(viewport, graphics, style, modelX, modelY, mapWidth,
+        mapHeight, orientation);
 
-    final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
-      mapWidth, mapHeight);
-    final Shape newShape = new GeneralPath(this.getShape()).createTransformedShape(shapeTransform);
-    if (style.setMarkerFillStyle(viewport, graphics)) {
-      graphics.fill(newShape);
+      final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
+        mapWidth, mapHeight);
+      final Shape newShape = new GeneralPath(this.getShape()).createTransformedShape(shapeTransform);
+      if (style.setMarkerFillStyle(viewport, graphics)) {
+        graphics.fill(newShape);
+      }
+      if (style.setMarkerLineStyle(viewport, graphics)) {
+        graphics.draw(newShape);
+      }
+    } finally {
+      graphics.setTransform(savedTransform);
     }
-    if (style.setMarkerLineStyle(viewport, graphics)) {
-      graphics.draw(newShape);
-    }
-    graphics.setTransform(savedTransform);
   }
 
   @Override

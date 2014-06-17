@@ -105,11 +105,7 @@ public final class JdbcUtils {
         where.appendSql(query, null, sql);
       } else {
         final DataObjectStore dataStore = metaData.getDataStore();
-        if (dataStore == null) {
-          where.appendSql(query, dataStore, sql);
-        } else {
-          where.appendSql(query, dataStore, sql);
-        }
+        where.appendSql(query, dataStore, sql);
       }
     }
   }
