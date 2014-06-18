@@ -16,6 +16,10 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.spring.SpringUtil;
 
 public class WktCsParser {
+  public static CoordinateSystem read(final String wkt) {
+    return new WktCsParser(wkt).parse();
+  }
+
   private int index = 0;
 
   private final Stack<String> nameStack = new Stack<String>();
@@ -53,7 +57,7 @@ public class WktCsParser {
     while (value.charAt(index) != '[' && value.charAt(index) != ']') {
       index++;
     }
-    final String name = new String(value.substring(startIndex, index));
+    final String name = new String(value.substring(startIndex, index)).trim();
     return name;
   }
 
@@ -191,7 +195,7 @@ public class WktCsParser {
     final AngularUnit angularUnit = (AngularUnit)values.get(3);
     int index = 4;
     List<Axis> axis = null;
-    if (index < values.size() && (values.get(index) instanceof Axis)) {
+    if (index < values.size() && values.get(index) instanceof Axis) {
       axis = Arrays.asList((Axis)values.get(index++), (Axis)values.get(index++));
 
     }

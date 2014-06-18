@@ -101,7 +101,7 @@ public final class ProjectionFactory {
 
   public static CoordinatesOperation getCoordinatesOperation(
     final CoordinateSystem cs1, final CoordinateSystem cs2) {
-    if (cs1 == null || cs2 == null || cs1.equals(cs2)) {
+    if (cs1 == null || cs2 == null || cs1 == cs2) {
       return null;
     } else {
       final List<CoordinatesOperation> operations = new ArrayList<CoordinatesOperation>();

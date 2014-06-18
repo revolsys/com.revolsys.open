@@ -45,7 +45,11 @@ public class Value extends QueryValue {
   @Override
   public void appendDefaultSql(final Query query,
     final DataObjectStore dataStore, final StringBuffer buffer) {
+    if (jdbcAttribute == null) {
     buffer.append('?');
+    } else {
+      jdbcAttribute.addSelectStatementPlaceHolder(buffer);
+    }
   }
 
   @Override

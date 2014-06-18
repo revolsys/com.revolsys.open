@@ -303,7 +303,7 @@ public class Envelope implements Serializable, BoundingBox {
       }
     } else if (geometryFactory == null) {
       return new Envelope(getAxisCount(), getBounds());
-    } else if (factory.equals(geometryFactory)) {
+    } else if (factory == geometryFactory) {
       return this;
     } else if (isEmpty()) {
       return new Envelope(geometryFactory);

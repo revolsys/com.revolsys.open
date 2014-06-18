@@ -23,6 +23,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.util.MathUtil;
 
 public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
@@ -152,7 +153,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       final Double mOffset = this.spatialReference.getMOffset();
 
       final BoundingBox envelope = geometry.getBoundingBox();
-      final double minX = envelope.getMinX();
+       
+      double minX = envelope.getMinX();
       final double minY = envelope.getMinY();
       final double maxX = envelope.getMaxX();
       final double maxY = envelope.getMaxY();
@@ -175,19 +177,15 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
       statement.setInt(index++, entityType);
       statement.setInt(index++, numPoints);
-      statement.setFloat(index++, (float)minX);
-      statement.setFloat(index++, (float)minY);
-      statement.setFloat(index++, (float)maxX);
-      statement.setFloat(index++, (float)maxY);
+      setFloat(statement,index++, minX,0);
+      setFloat(statement,index++, minY,0);
+      setFloat(statement,index++, maxX,0);
+      setFloat(statement,index++, maxY,0);
       if (hasZ) {
         double minZ = envelope.getMin(2);
         double maxZ = envelope.getMax(2);
-        if (minZ == Double.MAX_VALUE && maxZ == -Double.MAX_VALUE) {
-          minZ = 0;
-          maxZ = 0;
-        }
-        statement.setFloat(index++, (float)minZ);
-        statement.setFloat(index++, (float)maxZ);
+        setFloat(statement, index++, minZ, 0);
+        setFloat(statement, index++, maxZ, 0);
       } else {
         statement.setNull(index++, Types.FLOAT);
         statement.setNull(index++, Types.FLOAT);
@@ -195,12 +193,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       if (hasM) {
         double minM = envelope.getMin(3);
         double maxM = envelope.getMax(3);
-        if (minM == Double.MAX_VALUE && maxM == -Double.MAX_VALUE) {
-          minM = 0;
-          maxM = 0;
-        }
-        statement.setFloat(index++, (float)minM);
-        statement.setFloat(index++, (float)maxM);
+        setFloat(statement, index++, minM, 0);
+        setFloat(statement, index++, maxM, 0);
       } else {
         statement.setNull(index++, Types.FLOAT);
         statement.setNull(index++, Types.FLOAT);
@@ -213,5 +207,17 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       throw new IllegalArgumentException("Geometry cannot be null");
     }
     return index;
+  }
+  
+  public void setFloat(PreparedStatement statement, int index, Double value, Number defaultValue) throws SQLException {
+    if (value == null || Double.isInfinite(value) || Double.isNaN(value)) {
+      if (defaultValue == null ) {
+        statement.setNull(index++, Types.FLOAT);
+      } else {
+        statement.setFloat(index, defaultValue.floatValue());
+      }
+    } else {
+      statement.setFloat(index, value.floatValue());
+    }
   }
 }

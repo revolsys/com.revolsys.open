@@ -34,7 +34,7 @@ public class LoadingWorker extends
     final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
     Query query = this.layer.getQuery();
     final Attribute geometryAttribute = layer.getGeometryAttribute();
-    if (query != null && geometryAttribute != null) {
+    if (query != null && geometryAttribute != null && !queryBoundingBox.isEmpty()) {
       query = query.clone();
       query.and(F.envelopeIntersects(geometryAttribute, queryBoundingBox));
       final List<LayerDataObject> records = this.layer.query(query);

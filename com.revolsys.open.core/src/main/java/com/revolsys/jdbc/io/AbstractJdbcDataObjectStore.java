@@ -253,8 +253,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       }
     }
     final String sql = JdbcUtils.getDeleteSql(query);
-    try (
-      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+    try (Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
@@ -782,9 +781,8 @@ public abstract class AbstractJdbcDataObjectStore extends
         metaDataMap.put(typePath, metaData);
       }
 
-      try (
-        final ResultSet columnsRs = databaseMetaData.getColumns(null,
-          dbSchemaName, "%", "%")) {
+      try (final ResultSet columnsRs = databaseMetaData.getColumns(null,
+        dbSchemaName, "%", "%")) {
         while (columnsRs.next()) {
           final String tableName = columnsRs.getString("TABLE_NAME")
             .toUpperCase();
@@ -944,7 +942,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected void setSchemaPermissionsSql(final String scehmaPermissionsSql) {
-    this.schemaPermissionsSql = scehmaPermissionsSql;
+    schemaPermissionsSql = scehmaPermissionsSql;
   }
 
   public void setSqlPrefix(final String sqlPrefix) {
@@ -970,13 +968,11 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected void write(final DataObject record, final DataObjectState state) {
-    try (
-      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+    try (Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
-      try (
-        JdbcWriter writer = getWriter(true)) {
+      try (JdbcWriter writer = getWriter(true)) {
         write(writer, record, state);
       } catch (final RuntimeException e) {
         transaction.setRollbackOnly();
@@ -1010,13 +1006,11 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   protected void writeAll(final Collection<DataObject> records,
     final DataObjectState state) {
-    try (
-      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+    try (Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
-      try (
-        final JdbcWriter writer = getWriter(true)) {
+      try (final JdbcWriter writer = getWriter(true)) {
         for (final DataObject record : records) {
           write(writer, record, state);
         }

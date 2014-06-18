@@ -8,10 +8,15 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.IntHashMap;
 import com.revolsys.collection.ResultPager;
+import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.WktCsParser;
+import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.data.model.ArrayDataObjectFactory;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
@@ -32,6 +37,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean initialized;
@@ -44,6 +50,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     "PERFSTAT", "SDE", "SYS", "SYSTEM", "TRACESVR", "TSMSYS", "WMSYS", "XDB");
 
   private boolean useSchemaSequencePrefix = true;
+
+  private final IntHashMap<CoordinateSystem> oracleCoordinateSystems = new IntHashMap<>();
 
   public OracleDataObjectStore() {
     this(new ArrayDataObjectFactory());
@@ -233,10 +241,48 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     return new OracleJdbcQueryIterator(dataStore, query, properties);
   }
 
+  public synchronized CoordinateSystem getCoordinateSystem(final int oracleSrid) {
+    CoordinateSystem coordinateSystem = oracleCoordinateSystems.get(oracleSrid);
+    if (coordinateSystem == null) {
+      try {
+        final Map<String, Object> result = JdbcUtils.selectMap(getDataSource(),
+          "SELECT * FROM MDSYS.SDO_CS_SRS WHERE SRID = ?", oracleSrid);
+        if (result == null) {
+          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(oracleSrid);
+        } else {
+          final String wkt = (String)result.get("WKTEXT");
+          coordinateSystem = WktCsParser.read(wkt);
+          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
+        }
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to load coordinate system: " + oracleSrid, e);
+        return null;
+      }
+      oracleCoordinateSystems.put(oracleSrid, coordinateSystem);
+    }
+    return coordinateSystem;
+  }
+
   @Override
   public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
     final String sequenceName = getSequenceName(metaData);
     return sequenceName + ".NEXTVAL";
+  }
+
+  public GeometryFactory getGeometryFactory(final int oracleSrid,
+    final int axisCount, final double... scales) {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem(oracleSrid);
+    if (coordinateSystem == null) {
+      return GeometryFactory.fixed(0, axisCount, scales);
+    } else {
+      final int srid = coordinateSystem.getId();
+      if (srid <= 0) {
+        return GeometryFactory.fixed(coordinateSystem, axisCount, scales);
+      } else {
+        return GeometryFactory.fixed(srid, axisCount, scales);
+      }
+    }
   }
 
   @Override
@@ -265,14 +311,14 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       final String shortName = ShortNameProperty.getShortName(metaData);
       final String sequenceName;
       if (StringUtils.hasText(shortName)) {
-        if (this.useSchemaSequencePrefix) {
+        if (useSchemaSequencePrefix) {
           sequenceName = schema + "." + shortName.toLowerCase() + "_SEQ";
         } else {
           sequenceName = shortName.toLowerCase() + "_SEQ";
         }
       } else {
         final String tableName = getDatabaseTableName(typePath);
-        if (this.useSchemaSequencePrefix) {
+        if (useSchemaSequencePrefix) {
           sequenceName = schema + "." + tableName + "_SEQ";
         } else {
           sequenceName = tableName + "_SEQ";
@@ -286,8 +332,8 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   @PostConstruct
   public void initialize() {
     super.initialize();
-    if (!this.initialized) {
-      this.initialized = true;
+    if (!initialized) {
+      initialized = true;
       final JdbcAttributeAdder attributeAdder = new JdbcAttributeAdder();
       addAttributeAdder("NUMBER", attributeAdder);
 
@@ -343,7 +389,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   public boolean isUseSchemaSequencePrefix() {
-    return this.useSchemaSequencePrefix;
+    return useSchemaSequencePrefix;
   }
 
   @Override

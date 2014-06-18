@@ -29,15 +29,16 @@ import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
-  private final DataSource dataSource;
+
+  private static final Map<DataType, Integer> DATA_TYPE_TO_2D_ID = new HashMap<DataType, Integer>();
+
+  private static final Map<String, Integer> GEOMETRY_TYPE_TO_ID = new HashMap<String, Integer>();
 
   private static final Map<Integer, String> ID_TO_GEOMETRY_TYPE = new HashMap<Integer, String>();
 
   private static final Map<Integer, DataType> ID_TO_DATA_TYPE = new HashMap<Integer, DataType>();
 
-  private static final Map<DataType, Integer> DATA_TYPE_TO_2D_ID = new HashMap<DataType, Integer>();
-
-  private static final Map<String, Integer> GEOMETRY_TYPE_TO_ID = new HashMap<String, Integer>();
+  public static final String ORACLE_SRID = "ORACLE_SRID";
 
   static {
     addGeometryType(DataTypes.GEOMETRY, "GEOMETRY", 0);
@@ -86,6 +87,8 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     addGeometryType(null, "POLYHEDRALSURFACEZM", 3015);
   }
 
+  private static final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
+
   private static void addGeometryType(final DataType dataType,
     final String name, final Integer id) {
     ID_TO_GEOMETRY_TYPE.put(id, name);
@@ -108,7 +111,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     }
   }
 
-  private final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
+  private final DataSource dataSource;
 
   private final AbstractJdbcDataObjectStore dataStore;
 
@@ -144,10 +147,14 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     if (axisCount == -1) {
       axisCount = geometryFactory.getAxisCount();
     }
-
+    int oracleSrid = getIntegerColumnProperty(schema, typePath, columnName,
+      ORACLE_SRID);
+    if (oracleSrid == -1) {
+      oracleSrid = 0;
+    }
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(dbName,
       name, dataType, sqlType, required, description, null, geometryFactory,
-      axisCount);
+      axisCount, oracleSrid);
     metaData.addAttribute(attribute);
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return attribute;
@@ -173,9 +180,9 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   @Override
   public void initialize(final DataObjectStoreSchema schema) {
     try {
-      final Connection connection = JdbcUtils.getConnection(this.dataSource);
+      final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
-        final String schemaName = this.dataStore.getDatabaseSchemaName(schema);
+        final String schemaName = dataStore.getDatabaseSchemaName(schema);
         final String sridSql = "select M.TABLE_NAME, M.COLUMN_NAME, M.SRID, M.DIMINFO, C.GEOMETRY_TYPE "
           + "from ALL_SDO_GEOM_METADATA M "
           + "LEFT OUTER JOIN ALL_GEOMETRY_COLUMNS C ON (M.OWNER = C.F_TABLE_SCHEMA AND M.TABLE_NAME = C.F_TABLE_NAME AND M.COLUMN_NAME = C.F_GEOMETRY_COLUMN) "
@@ -206,10 +213,12 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
               final Datum[] values = dimInfo.getOracleArray();
               final double scaleXy = getScale(values, 0);
               final double scaleZ = getScale(values, 2);
-              final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixed(
+              final GeometryFactory geometryFactory = ((OracleDataObjectStore)dataStore).getGeometryFactory(
                 srid, axisCount, scaleXy, scaleZ);
               setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
                 geometryFactory);
+
+              setColumnProperty(schema, typePath, columnName, ORACLE_SRID, srid);
 
               final int geometryType = resultSet.getInt(5);
               DataType geometryDataType;
@@ -231,10 +240,10 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
           JdbcUtils.close(statement);
         }
       } finally {
-        JdbcUtils.release(connection, this.dataSource);
+        JdbcUtils.release(connection, dataSource);
       }
     } catch (final SQLException e) {
-      this.LOG.error("Unable to initialize", e);
+      LOG.error("Unable to initialize", e);
     }
   }
 

@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreExtension;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.oracle.io.OracleSdoGeometryJdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 
@@ -47,14 +49,17 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
         final String columnName = columnEntry.getKey();
         final Map<String, Object> columnProperties = columnEntry.getValue();
         if (ArcSdeConstants.SDEBINARY.equals(columnProperties.get(ArcSdeConstants.GEOMETRY_COLUMN_TYPE))) {
-          if (sdeUtil == null) {
-            LoggerFactory.getLogger(getClass())
-              .error(
-                "SDE Binary columns not supported without the ArcSDE Java API jars");
-          } else {
-            ((ArcSdeBinaryGeometryDataStoreUtil)sdeUtil).createGeometryColumn(
-              dataStore, schema, metaData, typePath, columnName,
-              columnProperties);
+          final Attribute attribute = metaData.getAttribute(columnName);
+          if (!(attribute instanceof OracleSdoGeometryJdbcAttribute)) {
+            if (sdeUtil == null) {
+              LoggerFactory.getLogger(getClass())
+                .error(
+                  "SDE Binary columns not supported without the ArcSDE Java API jars");
+            } else {
+              ((ArcSdeBinaryGeometryDataStoreUtil)sdeUtil).createGeometryColumn(
+                dataStore, schema, metaData, typePath, columnName,
+                columnProperties);
+            }
           }
         }
       }

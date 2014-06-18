@@ -36,13 +36,17 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private final GeometryFactory geometryFactory;
 
+  private final int oracleSrid;
+
   public OracleSdoGeometryJdbcAttribute(final String dbName, final String name,
     final DataType type, final int sqlType, final boolean required,
     final String description, final Map<String, Object> properties,
-    final GeometryFactory geometryFactory, final int axisCount) {
+    final GeometryFactory geometryFactory, final int axisCount,
+    final int oracleSrid) {
     super(dbName, name, type, sqlType, 0, 0, required, description, properties);
     this.geometryFactory = geometryFactory;
     this.axisCount = axisCount;
+    this.oracleSrid = oracleSrid;
     setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
   }
 
@@ -66,7 +70,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   public OracleSdoGeometryJdbcAttribute clone() {
     return new OracleSdoGeometryJdbcAttribute(getDbName(), getName(),
       getType(), getSqlType(), isRequired(), getDescription(), getProperties(),
-      this.geometryFactory, this.axisCount);
+      geometryFactory, axisCount, oracleSrid);
   }
 
   @Override
@@ -115,7 +119,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     } else {
       synchronized (STRUCT.class) {
         final Connection connection = statement.getConnection();
-        final STRUCT oracleValue = toJdbc(connection, value, this.axisCount);
+        final STRUCT oracleValue = toJdbc(connection, value, axisCount);
         ((OraclePreparedStatement)statement).setSTRUCT(parameterIndex,
           oracleValue);
       }
@@ -232,7 +236,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     JGeometry jGeometry;
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
-      geometry = geometry.copy(this.geometryFactory);
+      geometry = geometry.copy(geometryFactory);
       // TODO direct convert to SDO Geometry from JTS Geometry
       if (object instanceof Polygon) {
         final Polygon polygon = (Polygon)geometry;
@@ -245,7 +249,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         jGeometry = toJGeometry(point, dimension);
       } else if (object instanceof Point) {
         final Point coordinates = (Point)object;
-        final Point point = this.geometryFactory.point(coordinates);
+        final Point point = geometryFactory.point(coordinates);
         jGeometry = toJGeometry(point, dimension);
       } else if (object instanceof MultiPoint) {
         final MultiPoint multiPoint = (MultiPoint)geometry;
@@ -267,7 +271,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       final double minY = boundingBox.getMinY();
       final double maxX = boundingBox.getMaxX();
       final double maxY = boundingBox.getMaxY();
-      final int srid = geometryFactory.getSrid();
+      final int srid = oracleSrid;
       jGeometry = new JGeometry(minX, minY, maxX, maxY, srid);
     } else {
       throw new IllegalArgumentException("Unable to convert to SDO_GEOMETRY "
@@ -284,13 +288,13 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private JGeometry toJGeometry(final LineString lineString, final int dimension) {
     final double[] ordinates = toCoordinateArray(lineString, dimension);
-    final int srid = this.geometryFactory.getSrid();
+    final int srid = oracleSrid;
     return JGeometry.createLinearLineString(ordinates, dimension, srid);
   }
 
   private JGeometry toJGeometry(final MultiLineString multiLineString,
     final int dimension) {
-    final int srid = this.geometryFactory.getSrid();
+    final int srid = oracleSrid;
     final int numGeometries = multiLineString.getGeometryCount();
     final Object[] parts = new Object[numGeometries];
     for (int i = 0; i < numGeometries; i++) {
@@ -317,7 +321,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         k++;
       }
     }
-    final int srid = this.geometryFactory.getSrid();
+    final int srid = oracleSrid;
     final int[] elemInfo = new int[] {
       1, 1, numPoints
     };
@@ -331,7 +335,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     if (multiPolygon.getGeometryCount() == 1) {
       return toJGeometry((Polygon)multiPolygon.getGeometry(0), dimension);
     } else {
-      final int srid = this.geometryFactory.getSrid();
+      final int srid = oracleSrid;
       int numCoordinates = 0;
       int numParts = 0;
       final List<double[][]> coordinateArraysList = new ArrayList<double[][]>();
@@ -372,7 +376,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   private JGeometry toJGeometry(final Point point, final int axisCount) {
-    final int srid = this.geometryFactory.getSrid();
+    final int srid = oracleSrid;
     final double x = point.getX();
     final double y = point.getY();
     if (axisCount == 3) {
@@ -388,7 +392,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
 
   private JGeometry toJGeometry(final Polygon polygon, final int dimension) {
     final Object[] coordinateArray = toCoordinateArrays(polygon, dimension);
-    final int srid = this.geometryFactory.getSrid();
+    final int srid = oracleSrid;
     return JGeometry.createLinearPolygon(coordinateArray, dimension, srid);
   }
 
@@ -396,7 +400,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final int columnIndex, final int axisCount) throws SQLException {
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
     final double[] coordinates = coordinatesArray.getDoubleArray();
-    return this.geometryFactory.lineString(axisCount, coordinates);
+    return geometryFactory.lineString(axisCount, coordinates);
   }
 
   private MultiLineString toMultiLineString(final ResultSet resultSet,
@@ -421,7 +425,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       if (interpretation == 1) {
         final double[] coordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final LineString points = this.geometryFactory.lineString(axisCount,
+        final LineString points = geometryFactory.lineString(axisCount,
           coordinates);
         lines.add(points);
       } else {
@@ -430,7 +434,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       }
     }
 
-    return this.geometryFactory.multiLineString(lines);
+    return geometryFactory.multiLineString(lines);
   }
 
   private MultiPoint toMultiPoint(final ResultSet resultSet,
@@ -441,7 +445,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final LineString coordinatesList = new LineStringDouble(axisCount,
       coordinates);
 
-    return this.geometryFactory.multiPoint(coordinatesList);
+    return geometryFactory.multiPoint(coordinatesList);
   }
 
   private MultiPolygon toMultiPolygon(final ResultSet resultSet,
@@ -451,8 +455,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final ARRAY elemInfoArray = (ARRAY)resultSet.getArray(columnIndex + 4);
     final long[] elemInfo = elemInfoArray.getLongArray();
     final ARRAY coordinatesArray = (ARRAY)resultSet.getArray(columnIndex + 5);
-    int coordinateCount = coordinatesArray.length();
-    
+    final int coordinateCount = coordinatesArray.length();
+
     List<LinearRing> rings = Collections.emptyList();
 
     for (int i = 0; i < elemInfo.length; i += 3) {
@@ -464,18 +468,18 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
         final long nextOffset = elemInfo[i + 3];
         length = (int)(nextOffset - offset);
       } else {
-        length = (int)((coordinateCount +1) - offset);
+        length = (int)(coordinateCount + 1 - offset);
       }
       if (interpretation == 1) {
         final double[] coordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final LinearRing ring = this.geometryFactory.linearRing(axisCount,
+        final LinearRing ring = geometryFactory.linearRing(axisCount,
           coordinates);
 
         switch ((int)type) {
           case 1003:
             if (!rings.isEmpty()) {
-              final Polygon polygon = this.geometryFactory.polygon(rings);
+              final Polygon polygon = geometryFactory.polygon(rings);
               polygons.add(polygon);
             }
             rings = new ArrayList<>();
@@ -496,11 +500,11 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       }
     }
     if (!rings.isEmpty()) {
-      final Polygon polygon = this.geometryFactory.polygon(rings);
+      final Polygon polygon = geometryFactory.polygon(rings);
       polygons.add(polygon);
     }
 
-    return this.geometryFactory.multiPolygon(polygons);
+    return geometryFactory.multiPolygon(polygons);
   }
 
   private Point toPoint(final ResultSet resultSet, final int columnIndex,
@@ -508,10 +512,10 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
     final double x = resultSet.getDouble(columnIndex + 1);
     final double y = resultSet.getDouble(columnIndex + 2);
     if (axisCount == 2) {
-      return this.geometryFactory.point(x, y);
+      return geometryFactory.point(x, y);
     } else {
       final double z = resultSet.getDouble(columnIndex + 3);
-      return this.geometryFactory.point(x, y, z);
+      return geometryFactory.point(x, y, z);
     }
   }
 
@@ -538,7 +542,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
       if (interpretation == 1) {
         final double[] coordinates = coordinatesArray.getDoubleArray(offset,
           length);
-        final LinearRing ring = this.geometryFactory.linearRing(axisCount,
+        final LinearRing ring = geometryFactory.linearRing(axisCount,
           coordinates);
 
         switch ((int)type) {
@@ -568,7 +572,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
           + " interpretation " + interpretation);
       }
     }
-    final Polygon polygon = this.geometryFactory.polygon(rings);
+    final Polygon polygon = geometryFactory.polygon(rings);
     return polygon;
   }
 }
