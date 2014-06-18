@@ -62,6 +62,7 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktParser;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.GeometryCollectionImpl;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.LineStringDoubleGf;
@@ -358,6 +359,10 @@ public class GeometryFactory implements Serializable, MapSerializer {
         }
       }
     }
+  }
+
+  public BoundingBox boundingBox() {
+    return new BoundingBoxDoubleGf(this);
   }
 
   /**
