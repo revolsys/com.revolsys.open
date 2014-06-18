@@ -1,9 +1,10 @@
 package com.revolsys.jts.util;
 
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
-public class EnvelopeUtil {
+public class BoundingBoxUtil {
   public static boolean covers(final double minX1, final double minY1,
     final double maxX1, final double maxY1, final double minX2,
     final double minY2, final double maxX2, final double maxY2) {
@@ -315,5 +316,13 @@ public class EnvelopeUtil {
     final double line2y2 = line2End.getY();
     return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
       line2x2, line2y2);
+  }
+
+  public static boolean isEmpty(final BoundingBox boundingBox) {
+    if (boundingBox == null) {
+      return true;
+    } else {
+      return boundingBox.isEmpty();
+    }
   }
 }

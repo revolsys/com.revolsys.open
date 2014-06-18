@@ -38,9 +38,9 @@ import java.util.List;
 import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.index.bintree.Bintree;
@@ -87,7 +87,7 @@ public class MCPointInRing implements PointInRing {
   }
 
   private void buildIndex() {
-    // Envelope env = ring.getEnvelopeInternal();
+    // BoundingBoxDoubleGf env = ring.getEnvelopeInternal();
     tree = new Bintree();
 
     final LineString points = CleanDuplicatePoints.clean(ring);
@@ -108,7 +108,7 @@ public class MCPointInRing implements PointInRing {
 
     // test all segments intersected by ray from pt in positive x direction
     final double y = pt.getY();
-    final BoundingBox rayEnv = new Envelope(2, Double.NEGATIVE_INFINITY, y,
+    final BoundingBox rayEnv = new BoundingBoxDoubleGf(2, Double.NEGATIVE_INFINITY, y,
       Double.POSITIVE_INFINITY, y);
 
     interval.min = y;

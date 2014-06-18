@@ -4,7 +4,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class LineSegmentMatchWithinDistanceFilter implements
   Filter<Edge<LineSegmentMatch>> {
@@ -18,7 +18,7 @@ public class LineSegmentMatchWithinDistanceFilter implements
     final Node<LineSegmentMatch> node, final double maxDistance) {
     this.node = node;
     this.maxDistance = maxDistance;
-    this.boundingBox = new Envelope(node);
+    this.boundingBox = new BoundingBoxDoubleGf(node);
     boundingBox = boundingBox.expand(maxDistance);
   }
 

@@ -16,7 +16,6 @@ import com.revolsys.gis.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.gis.graph.linestring.EdgeLessThanDistance;
 import com.revolsys.gis.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -25,6 +24,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
@@ -50,7 +50,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public GeometryGraph(final GeometryFactory geometryFactory) {
     super(false);
     setGeometryFactory(geometryFactory);
-    boundingBox = new Envelope(geometryFactory);
+    boundingBox = new BoundingBoxDoubleGf(geometryFactory);
     final double scaleXY = getGeometryFactory().getScaleXY();
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
@@ -225,7 +225,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public BoundingBox getBoundingBox(final Geometry geometry) {
     if (geometry == null) {
-      return new Envelope();
+      return new BoundingBoxDoubleGf();
     } else {
       BoundingBox boundingBox = geometry.getBoundingBox();
       boundingBox = boundingBox.expand(maxDistance);

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -43,7 +43,7 @@ public class TiledImageLayerRenderer extends
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object newValue = event.getNewValue();
-    if (newValue instanceof Envelope) {
+    if (newValue instanceof BoundingBoxDoubleGf) {
       final BoundingBox newBoundingBox = (BoundingBox)newValue;
       synchronized (this.cachedTiles) {
         final List<MapTile> mapTiles = new ArrayList<MapTile>(

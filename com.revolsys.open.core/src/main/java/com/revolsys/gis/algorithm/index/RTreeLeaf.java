@@ -7,7 +7,7 @@ import java.util.List;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class RTreeLeaf<T> extends RTreeNode<T> {
 
@@ -22,7 +22,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
 
   public RTreeLeaf(final int size) {
     this.objects = new Object[size];
-    this.envelopes = new Envelope[size];
+    this.envelopes = new BoundingBoxDoubleGf[size];
   }
 
   public void add(final BoundingBox envelope, final T object) {
@@ -88,7 +88,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
 
   @Override
   protected void updateEnvelope() {
-    BoundingBox boundingBox = new Envelope();
+    BoundingBox boundingBox = new BoundingBoxDoubleGf();
     for (int i = 0; i < size; i++) {
       final BoundingBox envelope = envelopes[i];
       boundingBox = boundingBox.expandToInclude(envelope);

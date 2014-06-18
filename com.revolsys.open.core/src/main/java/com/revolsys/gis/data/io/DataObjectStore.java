@@ -18,7 +18,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 
@@ -48,7 +48,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
   <T> T createPrimaryIdValue(String typePath);
 
   Query createQuery(final String typePath, String whereClause,
-    final Envelope boundingBox);
+    final BoundingBoxDoubleGf boundingBox);
 
   Transaction createTransaction(Propagation propagation);
 

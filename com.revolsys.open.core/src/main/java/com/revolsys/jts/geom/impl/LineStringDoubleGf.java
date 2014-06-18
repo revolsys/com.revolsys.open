@@ -34,7 +34,6 @@ package com.revolsys.jts.geom.impl;
 
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LineString;
@@ -56,7 +55,7 @@ import com.revolsys.jts.geom.LineString;
  *
  *@version 1.7
  */
-public class LineStringDoubleGF extends AbstractLineString implements LineString {
+public class LineStringDoubleGf extends AbstractLineString implements LineString {
 
   public static double[] getNewCoordinates(
     final GeometryFactory geometryFactory, final int axisCount,
@@ -121,12 +120,12 @@ public class LineStringDoubleGF extends AbstractLineString implements LineString
    */
   private double[] coordinates;
 
-  public LineStringDoubleGF(final GeometryFactory geometryFactory) {
+  public LineStringDoubleGf(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     this.coordinates = null;
   }
 
-  public LineStringDoubleGF(final GeometryFactory geometryFactory,
+  public LineStringDoubleGf(final GeometryFactory geometryFactory,
     final int axisCount, final double... points) {
     this.geometryFactory = geometryFactory;
     if (axisCount < 0 || axisCount == 1) {
@@ -165,14 +164,14 @@ public class LineStringDoubleGF extends AbstractLineString implements LineString
     }
   }
 
-  public LineStringDoubleGF(final GeometryFactory geometryFactory,
+  public LineStringDoubleGf(final GeometryFactory geometryFactory,
     final int axisCount, final int vertexCount, final double... coordinates) {
     this.geometryFactory = geometryFactory;
     this.coordinates = getNewCoordinates(geometryFactory, axisCount,
       vertexCount, coordinates);
   }
 
-  public LineStringDoubleGF(final GeometryFactory geometryFactory,
+  public LineStringDoubleGf(final GeometryFactory geometryFactory,
     final LineString points) {
     this.geometryFactory = geometryFactory;
     if (points == null) {
@@ -206,8 +205,8 @@ public class LineStringDoubleGF extends AbstractLineString implements LineString
    * @return a clone of this instance
    */
   @Override
-  public LineStringDoubleGF clone() {
-    final LineStringDoubleGF line = (LineStringDoubleGF)super.clone();
+  public LineStringDoubleGf clone() {
+    final LineStringDoubleGf line = (LineStringDoubleGf)super.clone();
     if (coordinates != null) {
       line.coordinates = coordinates.clone();
     }
@@ -240,7 +239,7 @@ public class LineStringDoubleGF extends AbstractLineString implements LineString
   public BoundingBox getBoundingBox() {
     if (boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new Envelope(getGeometryFactory());
+        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
         boundingBox = computeBoundingBox();
       }

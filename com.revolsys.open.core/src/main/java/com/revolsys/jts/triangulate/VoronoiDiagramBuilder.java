@@ -38,11 +38,11 @@ import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
 
 /**
@@ -102,7 +102,7 @@ public class VoronoiDiagramBuilder {
       return;
     }
 
-    final Envelope siteEnv = DelaunayTriangulationBuilder.envelope(siteCoords);
+    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(siteCoords);
     diagramEnv = siteEnv;
     // add a buffer around the final envelope
     final double expandBy = Math.max(diagramEnv.getWidth(),

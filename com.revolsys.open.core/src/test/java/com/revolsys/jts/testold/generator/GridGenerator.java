@@ -35,9 +35,9 @@ package com.revolsys.jts.testold.generator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 /**
  * This class should be used to generate a grid of bounding boxes, 
@@ -88,7 +88,7 @@ public class GridGenerator extends GeometryGenerator {
 
   /**
    * 
-   * @return Envelope 
+   * @return BoundingBoxDoubleGf 
    * 
    * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
    * 
@@ -125,7 +125,7 @@ public class GridGenerator extends GeometryGenerator {
     minx = x + col * sx;
     miny = y + row * sy;
 
-    final BoundingBox box = new Envelope(2, this.geometryFactory.makePrecise(0,
+    final BoundingBox box = new BoundingBoxDoubleGf(2, this.geometryFactory.makePrecise(0,
       minx), this.geometryFactory.makePrecise(1, miny),
       this.geometryFactory.makePrecise(0, minx + sx),
       this.geometryFactory.makePrecise(1, miny + sy));

@@ -42,8 +42,8 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -390,7 +390,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new Envelope(geometryFactory);
+    return new BoundingBoxDoubleGf(geometryFactory);
   }
 
   @Override
@@ -399,7 +399,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       return getBoundingBox();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return new Envelope(geometryFactory);
+      return new BoundingBoxDoubleGf(geometryFactory);
     }
   }
 
@@ -504,7 +504,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public BoundingBox getSelectedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new Envelope(geometryFactory);
+    return new BoundingBoxDoubleGf(geometryFactory);
   }
 
   protected String getSettingsFileName() {

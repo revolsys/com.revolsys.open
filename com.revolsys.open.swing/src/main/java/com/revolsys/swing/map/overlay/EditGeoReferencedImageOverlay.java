@@ -15,11 +15,11 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.raster.BufferedGeoReferencedImage;
 import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.raster.MappedLocation;
@@ -204,7 +204,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         }
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
-      moveImageBoundingBox = new Envelope(geometryFactory, 2, minX, minY, maxX,
+      moveImageBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX,
         maxY);
     }
   }
@@ -297,7 +297,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   public BoundingBox getImageBoundingBox() {
     if (image == null) {
-      return new Envelope();
+      return new BoundingBoxDoubleGf();
     } else {
       return this.layer.getBoundingBox();
     }
@@ -525,7 +525,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     } else {
       final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
       final Point mousePoint = getViewportPoint(event);
-      moveImageBoundingBox = new Envelope(viewportGeometryFactory, mousePoint,
+      moveImageBoundingBox = new BoundingBoxDoubleGf(viewportGeometryFactory, mousePoint,
         this.moveCornerOppositePoint);
 
       if (SwingUtil.isShiftDown(event)) {
@@ -964,7 +964,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   public void setImageBoundingBox(BoundingBox boundingBox) {
     if (boundingBox == null) {
-      boundingBox = new Envelope(getGeometryFactory());
+      boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
     }
     if (image != null) {
       image.setBoundingBox(boundingBox);

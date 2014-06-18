@@ -43,7 +43,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Dimension;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -121,7 +120,7 @@ public abstract class AbstractMultiLineString extends
   public BoundingBox getBoundingBox() {
     if (boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new Envelope(getGeometryFactory());
+        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
         boundingBox = computeBoundingBox();
       }

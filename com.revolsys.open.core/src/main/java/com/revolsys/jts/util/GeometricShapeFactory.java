@@ -33,13 +33,13 @@
 package com.revolsys.jts.util;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.AffineTransformation;
 
@@ -85,14 +85,14 @@ public class GeometricShapeFactory {
 
     public BoundingBox getEnvelope() {
       if (base != null) {
-        return new Envelope(2, base.getX(), base.getY(), base.getX() + width,
+        return new BoundingBoxDoubleGf(2, base.getX(), base.getY(), base.getX() + width,
           base.getY() + height);
       }
       if (centre != null) {
-        return new Envelope(2, centre.getX() - width / 2, centre.getY()
+        return new BoundingBoxDoubleGf(2, centre.getX() - width / 2, centre.getY()
           - height / 2, centre.getX() + width / 2, centre.getY() + height / 2);
       }
-      return new Envelope(2, 0, 0, width, height);
+      return new BoundingBoxDoubleGf(2, 0, 0, width, height);
     }
 
     public double getHeight() {

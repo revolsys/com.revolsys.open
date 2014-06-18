@@ -25,9 +25,10 @@ import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.CollectionUtil;
@@ -58,7 +59,7 @@ public class Project extends LayerGroup {
 
   private Resource resource;
 
-  private BoundingBox viewBoundingBox = new Envelope();
+  private BoundingBox viewBoundingBox = new BoundingBoxDoubleGf();
 
   private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<String, BoundingBox>();
 
@@ -421,8 +422,8 @@ public class Project extends LayerGroup {
       }
     } else if ("viewBoundingBox".equals(name)) {
       if (value != null) {
-        final BoundingBox viewBoundingBox = Envelope.create(value.toString());
-        if (!Envelope.isEmpty(viewBoundingBox)) {
+        final BoundingBox viewBoundingBox = BoundingBoxDoubleGf.create(value.toString());
+        if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
           this.initialBoundingBox = viewBoundingBox;
           setGeometryFactory(viewBoundingBox.getGeometryFactory());
           setViewBoundingBox(viewBoundingBox);
@@ -440,7 +441,7 @@ public class Project extends LayerGroup {
   }
 
   public void setViewBoundingBox(BoundingBox viewBoundingBox) {
-    if (!Envelope.isEmpty(viewBoundingBox)) {
+    if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
       // TODO really should be min scale
       double minDimension;
       if (viewBoundingBox.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
@@ -472,14 +473,14 @@ public class Project extends LayerGroup {
         if (object != null && name != null) {
           try {
             BoundingBox boundingBox = null;
-            if (object instanceof Envelope) {
+            if (object instanceof BoundingBoxDoubleGf) {
               boundingBox = (BoundingBox)object;
             } else if (object instanceof Geometry) {
               final Geometry geometry = (Geometry)object;
               boundingBox = geometry.getBoundingBox();
             } else if (object != null) {
               final String wkt = object.toString();
-              boundingBox = Envelope.create(wkt);
+              boundingBox = BoundingBoxDoubleGf.create(wkt);
             }
             if (boundingBox != null) {
               bookmarks.put(name, boundingBox);
@@ -499,7 +500,7 @@ public class Project extends LayerGroup {
     final Map<String, Object> map = super.toMap();
 
     BoundingBox boundingBox = getViewBoundingBox();
-    if (!Envelope.isEmpty(boundingBox)) {
+    if (!BoundingBoxUtil.isEmpty(boundingBox)) {
       BoundingBox defaultBoundingBox = null;
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (geometryFactory != null) {

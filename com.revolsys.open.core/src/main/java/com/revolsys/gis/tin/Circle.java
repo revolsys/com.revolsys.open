@@ -16,10 +16,10 @@
 package com.revolsys.gis.tin;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 public class Circle extends PointDouble {
@@ -33,7 +33,7 @@ public class Circle extends PointDouble {
   public Circle(final Point centre, final double radius) {
     super(centre);
     this.radius = radius;
-    this.envelope = new Envelope(2, getX(), getY());
+    this.envelope = new BoundingBoxDoubleGf(2, getX(), getY());
     envelope = envelope.expand(radius);
   }
 

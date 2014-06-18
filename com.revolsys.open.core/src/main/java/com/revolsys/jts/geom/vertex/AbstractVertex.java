@@ -3,10 +3,10 @@ package com.revolsys.jts.geom.vertex;
 import com.revolsys.gis.data.io.IteratorReader;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.AbstractPoint;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public abstract class AbstractVertex extends AbstractPoint implements Vertex {
 
@@ -30,7 +30,7 @@ public abstract class AbstractVertex extends AbstractPoint implements Vertex {
   @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new Envelope(geometryFactory, this);
+    return new BoundingBoxDoubleGf(geometryFactory, this);
   }
 
   @Override

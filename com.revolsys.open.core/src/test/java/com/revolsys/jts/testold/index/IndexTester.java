@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.Assert;
 import com.revolsys.jts.util.Stopwatch;
 
@@ -73,7 +73,7 @@ public class IndexTester {
       for (int j = 0; j < gridSize; j++) {
         final double x = EXTENT_MIN + gridInc * i;
         final double y = EXTENT_MIN + gridInc * j;
-        final Envelope env = new Envelope(2, x, y, x + cellSize, y + cellSize);
+        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize, y + cellSize);
         items.add(env);
       }
     }
@@ -88,7 +88,7 @@ public class IndexTester {
 
   void loadGrid(final List items) {
     for (final Iterator i = items.iterator(); i.hasNext();) {
-      final Envelope item = (Envelope)i.next();
+      final BoundingBoxDoubleGf item = (BoundingBoxDoubleGf)i.next();
       this.index.insert(item, item);
     }
     this.index.finishInserting();
@@ -105,7 +105,7 @@ public class IndexTester {
       for (int j = 0; j < gridSize; j++) {
         final double x = EXTENT_MIN + gridInc * i;
         final double y = EXTENT_MIN + gridInc * j;
-        final Envelope env = new Envelope(2, x, y, x + cellSize, y + cellSize);
+        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize, y + cellSize);
         this.index.query(env);
       }
     }
@@ -123,7 +123,7 @@ public class IndexTester {
   void runSelfQuery(final List items) {
     double querySize = 0.0;
     for (int i = 0; i < items.size(); i++) {
-      final Envelope env = (Envelope)items.get(i);
+      final BoundingBoxDoubleGf env = (BoundingBoxDoubleGf)items.get(i);
       final List list = this.index.query(env);
       Assert.isTrue(!list.isEmpty());
       querySize += list.size();

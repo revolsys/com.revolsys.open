@@ -3,13 +3,13 @@ package com.revolsys.jtstest.function;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class FunctionsUtil {
 
-  public static final BoundingBox DEFAULT_ENVELOPE = new Envelope(2, 0, 0, 100,
+  public static final BoundingBox DEFAULT_ENVELOPE = new BoundingBoxDoubleGf(2, 0, 0, 100,
     100);
 
   public static Geometry buildGeometry(final List geoms,

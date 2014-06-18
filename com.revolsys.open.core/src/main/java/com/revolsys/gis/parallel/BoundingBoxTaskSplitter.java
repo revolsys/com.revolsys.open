@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.parallel.process.AbstractProcess;
 
 public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
@@ -69,7 +69,7 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
         for (int j = 0; j < numX; j++) {
           double x = boundingBox.getMinX();
           for (int i = 0; i < numX; i++) {
-            final BoundingBox cellBoundingBox = new Envelope(geometryFactory,
+            final BoundingBox cellBoundingBox = new BoundingBoxDoubleGf(geometryFactory,
               2, x, y, x + xInc, y + yInc);
             if (preparedBoundary == null
               || preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {

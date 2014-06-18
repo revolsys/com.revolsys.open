@@ -12,8 +12,8 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.map.Viewport2D;
@@ -27,7 +27,7 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
-  private static final BoundingBox MAX_BOUNDING_BOX = new Envelope(
+  private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(
     GEOMETRY_FACTORY, 2, -180, -85, 180, 85);
 
   public static BingLayer create(final Map<String, Object> properties) {

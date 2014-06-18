@@ -6,7 +6,7 @@ import java.util.Arrays;
 import com.revolsys.collection.Visitor;
 import com.revolsys.jts.index.DoubleBits;
 import com.revolsys.jts.index.IntervalSize;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.util.BoundingBoxUtil;
 
 public abstract class AbstractNode<T> implements Serializable {
   private static int computeQuadLevel(final double... bounds) {
@@ -99,10 +99,10 @@ public abstract class AbstractNode<T> implements Serializable {
     double[] bounds) {
     bounds = bounds.clone();
     if (node != null) {
-      EnvelopeUtil.expand(bounds, 2, 0, node.minX);
-      EnvelopeUtil.expand(bounds, 2, 0, node.maxX);
-      EnvelopeUtil.expand(bounds, 2, 1, node.minY);
-      EnvelopeUtil.expand(bounds, 2, 1, node.maxY);
+      BoundingBoxUtil.expand(bounds, 2, 0, node.minX);
+      BoundingBoxUtil.expand(bounds, 2, 0, node.maxX);
+      BoundingBoxUtil.expand(bounds, 2, 1, node.minY);
+      BoundingBoxUtil.expand(bounds, 2, 1, node.maxY);
     }
 
     final AbstractNode<T> largerNode = createNode(bounds);
@@ -120,7 +120,7 @@ public abstract class AbstractNode<T> implements Serializable {
     final double maxY = bounds[3];
     int level = computeQuadLevel(bounds);
     setBounds(minX, minY, newBounds, level);
-    while (!EnvelopeUtil.covers(newBounds[0], newBounds[1], newBounds[2],
+    while (!BoundingBoxUtil.covers(newBounds[0], newBounds[1], newBounds[2],
       newBounds[3], minX, minY, maxX, maxY)) {
       level++;
       setBounds(minX, minY, newBounds, level);
@@ -311,7 +311,7 @@ public abstract class AbstractNode<T> implements Serializable {
       final double maxY2 = bounds[3];
       AbstractNode<T> node = getNode(index);
       if (node == null
-        || !EnvelopeUtil.covers(node.minX, node.minY, node.maxX, node.maxY,
+        || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY,
           minX2, minY2, maxX2, maxY2)) {
         final AbstractNode<T> largerNode = createExpanded(node, bounds);
         setNode(index, largerNode);
@@ -348,7 +348,7 @@ public abstract class AbstractNode<T> implements Serializable {
     } else if (bounds == null) {
       return false;
     } else {
-      return EnvelopeUtil.intersects(this.minX, this.minY, this.maxX,
+      return BoundingBoxUtil.intersects(this.minX, this.minY, this.maxX,
         this.maxY, bounds[0], bounds[1], bounds[2], bounds[3]);
     }
   }
@@ -417,7 +417,7 @@ public abstract class AbstractNode<T> implements Serializable {
       final int itemCount = getItemCount();
       for (int i = 0; i < itemCount; i++) {
         final double[] itemBounds = getBounds(tree, i);
-        if (EnvelopeUtil.intersects(bounds, itemBounds)) {
+        if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
           final T item = getItem(tree, i);
           if (!visitor.visit(item)) {
             return false;

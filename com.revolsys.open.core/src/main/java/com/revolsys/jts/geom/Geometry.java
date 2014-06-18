@@ -41,6 +41,7 @@ import java.util.List;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.types.DataTypeProxy;
 import com.revolsys.io.Reader;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.buffer.Buffer;
@@ -714,9 +715,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   int getBoundaryDimension();
 
   /**
-   * Gets an {@link Envelope} containing 
+   * Gets an {@link BoundingBoxDoubleGf} containing 
    * the minimum and maximum x and y values in this <code>Geometry</code>.
-   * If the geometry is empty, an empty <code>Envelope</code> 
+   * If the geometry is empty, an empty <code>BoundingBoxDoubleGf</code> 
    * is returned.
    * <p>
    * The returned object is a copy of the one maintained internally,
@@ -783,7 +784,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *
    *@return a Geometry representing the envelope of this Geometry
    *      
-   * @see GeometryFactory#toLineString(Envelope) 
+   * @see GeometryFactory#toLineString(BoundingBoxDoubleGf) 
    */
   Geometry getEnvelope();
 

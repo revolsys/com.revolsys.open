@@ -39,12 +39,12 @@ import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygonal;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.index.chain.MonotoneChain;
@@ -78,7 +78,7 @@ class MCIndexedGeometry {
     }
   }
 
-  public List query(final Envelope searchEnv) {
+  public List query(final BoundingBoxDoubleGf searchEnv) {
     return this.index.query(searchEnv);
   }
 }
@@ -146,7 +146,7 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
   public Location locate(final Point p) {
     final RayCrossingCounter rcc = new RayCrossingCounter(p);
     final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
-    final Envelope rayEnv = new Envelope(2, p.getX(), p.getY(),
+    final BoundingBoxDoubleGf rayEnv = new BoundingBoxDoubleGf(2, p.getX(), p.getY(),
       this.maxXExtent, p.getY());
     final List mcs = this.index.query(rayEnv);
     countSegs(rcc, rayEnv, mcs, mcSegCounter);

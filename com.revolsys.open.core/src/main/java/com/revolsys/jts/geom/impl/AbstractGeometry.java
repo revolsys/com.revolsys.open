@@ -51,7 +51,6 @@ import com.revolsys.jts.algorithm.InteriorPointPoint;
 import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -465,13 +464,13 @@ public abstract class AbstractGeometry implements Geometry {
 
   /**
    *  Returns the minimum and maximum x and y values in this <code>Geometry</code>
-   *  , or a null <code>Envelope</code> if this <code>Geometry</code> is empty.
-   *  Unlike <code>getEnvelopeInternal</code>, this method calculates the <code>Envelope</code>
+   *  , or a null <code>BoundingBoxDoubleGf</code> if this <code>Geometry</code> is empty.
+   *  Unlike <code>getEnvelopeInternal</code>, this method calculates the <code>BoundingBoxDoubleGf</code>
    *  each time it is called; <code>getEnvelopeInternal</code> caches the result
    *  of this method.
    *
    *@return    this <code>Geometry</code>s bounding box; if the <code>Geometry</code>
-   *      is empty, <code>Envelope#isNull</code> will return <code>true</code>
+   *      is empty, <code>BoundingBoxDoubleGf#isNull</code> will return <code>true</code>
    */
   protected abstract BoundingBox computeBoundingBox();
 
@@ -1060,9 +1059,9 @@ public abstract class AbstractGeometry implements Geometry {
   public abstract int getBoundaryDimension();
 
   /**
-   * Gets an {@link Envelope} containing 
+   * Gets an {@link BoundingBoxDoubleGf} containing 
    * the minimum and maximum x and y values in this <code>Geometry</code>.
-   * If the geometry is empty, an empty <code>Envelope</code> 
+   * If the geometry is empty, an empty <code>BoundingBoxDoubleGf</code> 
    * is returned.
    * <p>
    * The returned object is a copy of the one maintained internally,
@@ -1153,7 +1152,7 @@ public abstract class AbstractGeometry implements Geometry {
    *
    *@return a Geometry representing the boundingBox of this Geometry
    *      
-   * @see GeometryFactory#toLineString(Envelope) 
+   * @see GeometryFactory#toLineString(BoundingBoxDoubleGf) 
    */
   @Override
   public Geometry getEnvelope() {

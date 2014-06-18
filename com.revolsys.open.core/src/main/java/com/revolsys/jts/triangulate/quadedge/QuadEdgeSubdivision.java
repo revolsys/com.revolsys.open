@@ -45,7 +45,6 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -54,6 +53,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Triangle;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 /**
  * A class that contains the {@link QuadEdge}s representing a planar
@@ -223,7 +223,7 @@ public class QuadEdgeSubdivision {
 
   private final Vertex[] frameVertex = new Vertex[3];
 
-  private Envelope frameEnv;
+  private BoundingBoxDoubleGf frameEnv;
 
   private QuadEdgeLocator locator = null;
 
@@ -285,7 +285,7 @@ public class QuadEdgeSubdivision {
     frameVertex[1] = new Vertex(env.getMinX() - offset, env.getMinY() - offset);
     frameVertex[2] = new Vertex(env.getMaxX() + offset, env.getMinY() - offset);
 
-    frameEnv = new Envelope(frameVertex[0].getCoordinate(),
+    frameEnv = new BoundingBoxDoubleGf(frameVertex[0].getCoordinate(),
       frameVertex[1].getCoordinate(), frameVertex[2].getCoordinate());
   }
 

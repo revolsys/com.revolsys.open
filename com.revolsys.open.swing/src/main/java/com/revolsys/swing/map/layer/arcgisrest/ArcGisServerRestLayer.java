@@ -11,8 +11,8 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
@@ -69,7 +69,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   public BoundingBox getBoundingBox() {
     final MapServer mapServer = getMapServer();
     if (mapServer == null) {
-      return new Envelope();
+      return new BoundingBoxDoubleGf();
     } else {
       return mapServer.getFullExtent();
     }

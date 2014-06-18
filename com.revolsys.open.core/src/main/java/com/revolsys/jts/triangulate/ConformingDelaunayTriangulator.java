@@ -40,10 +40,10 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.kdtree.KdNode;
 import com.revolsys.jts.index.kdtree.KdTree;
@@ -90,7 +90,7 @@ public class ConformingDelaunayTriangulator {
   private final static int MAX_SPLIT_ITER = 99;
 
   private static BoundingBox computeVertexEnvelope(final Collection vertices) {
-    BoundingBox env = new Envelope();
+    BoundingBox env = new BoundingBoxDoubleGf();
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
       final Vertex v = (Vertex)i.next();
       env = env.expand(v.getCoordinate());
@@ -316,7 +316,7 @@ public class ConformingDelaunayTriangulator {
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle
-    final BoundingBox env = new Envelope(midPt).expand(segRadius);
+    final BoundingBox env = new BoundingBoxDoubleGf(midPt).expand(segRadius);
     // Find all points in envelope
     final List result = kdt.query(env);
 

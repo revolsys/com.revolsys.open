@@ -17,9 +17,9 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -102,7 +102,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
             final DataObjectMetaData metaData = reader.getMetaData();
             setMetaData(metaData);
             final GeometryFactory geometryFactory = metaData.getGeometryFactory();
-            BoundingBox boundingBox = new Envelope(geometryFactory);
+            BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
             for (final DataObject record : reader) {
               final Geometry geometry = record.getGeometryValue();
               boundingBox = boundingBox.expandToInclude(geometry);

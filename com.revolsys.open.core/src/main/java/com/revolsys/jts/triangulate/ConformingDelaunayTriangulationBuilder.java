@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -47,6 +46,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.jts.triangulate.quadedge.Vertex;
 
@@ -95,7 +95,7 @@ public class ConformingDelaunayTriangulationBuilder {
       return;
     }
 
-    final Envelope siteEnv = DelaunayTriangulationBuilder.envelope(siteCoords);
+    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(siteCoords);
 
     List segments = new ArrayList();
     if (constraintLines != null) {

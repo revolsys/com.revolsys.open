@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.geom;
 
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -79,7 +80,7 @@ public class OctagonalEnvelope {
   }
 
   /**
-   * Creates a new null bounding octagon bounding an {@link Envelope}
+   * Creates a new null bounding octagon bounding an {@link BoundingBoxDoubleGf}
    */
   public OctagonalEnvelope(final BoundingBox env) {
     expandToInclude(env);

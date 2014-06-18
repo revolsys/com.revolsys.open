@@ -34,11 +34,11 @@ package com.revolsys.jts.index.chain;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.util.BoundingBoxUtil;
 
 /**
  * Monotone Chains are a way of partitioning the segments of a linestring to
@@ -66,7 +66,7 @@ import com.revolsys.jts.util.EnvelopeUtil;
  *
  * MonotoneChains support the following kinds of queries:
  * <ul>
- * <li>Envelope select: determine all the segments in the chain which
+ * <li>BoundingBoxDoubleGf select: determine all the segments in the chain which
  * intersect a given envelope
  * <li>Overlap: determine all the pairs of segments in two chains whose
  * envelopes overlap
@@ -88,7 +88,7 @@ public class MonotoneChain {
 
   private final int start, end;
 
-  private Envelope env = null;
+  private BoundingBoxDoubleGf env = null;
 
   private Object context = null;// user-defined information
 
@@ -115,7 +115,7 @@ public class MonotoneChain {
       return;
     }
     // nothing to do if the envelopes of these chains don't overlap
-    if (EnvelopeUtil.intersects(p00, p01, p10, p11)) {
+    if (BoundingBoxUtil.intersects(p00, p01, p10, p11)) {
 
       // the chains overlap, so split each in half and iterate (binary search)
       final int mid0 = (start0 + end0) / 2;
@@ -165,7 +165,7 @@ public class MonotoneChain {
     final int end0, final MonotoneChainSelectAction mcs) {
     final Point p0 = points.getPoint(start0);
     final Point p1 = points.getPoint(end0);
-    mcs.tempEnv1 = new Envelope(p0, p1);
+    mcs.tempEnv1 = new BoundingBoxDoubleGf(p0, p1);
 
     // Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
     // terminating condition for the recursion
@@ -213,11 +213,11 @@ public class MonotoneChain {
     return end;
   }
 
-  public Envelope getEnvelope() {
+  public BoundingBoxDoubleGf getEnvelope() {
     if (env == null) {
       final Point p0 = points.getPoint(start);
       final Point p1 = points.getPoint(end);
-      env = new Envelope(p0, p1);
+      env = new BoundingBoxDoubleGf(p0, p1);
     }
     return env;
   }

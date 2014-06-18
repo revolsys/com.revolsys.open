@@ -31,8 +31,8 @@ import com.revolsys.gis.cs.Spheroid;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.csv.CsvIterator;
 import com.revolsys.io.json.JsonMapIoFactory;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public final class EpsgCoordinateSystems {
   private static Set<CoordinateSystem> coordinateSystems;
@@ -389,7 +389,7 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(6));
             final Authority authority = new EpsgAuthority(code);
 
-            final Area area = new Area(name, new Envelope(2, minX, minY, maxX,
+            final Area area = new Area(name, new BoundingBoxDoubleGf(2, minX, minY, maxX,
               maxY), authority, deprecated);
             areas.put(code, area);
           }

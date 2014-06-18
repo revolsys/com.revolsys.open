@@ -68,11 +68,11 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.ByteArrayResource;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
@@ -273,7 +273,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   private final List<LayerDataObject> highlightedRecords = new ArrayList<LayerDataObject>();
 
-  private BoundingBox boundingBox = new Envelope();
+  private BoundingBox boundingBox = new BoundingBoxDoubleGf();
 
   private boolean canAddRecords = true;
 

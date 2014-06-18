@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
@@ -67,7 +67,7 @@ public class QuadtreeCorrectTest {
 
   private final EnvelopeList envList = new EnvelopeList();
 
-  private final QuadTree<Envelope> index = new QuadTree<>();
+  private final QuadTree<BoundingBoxDoubleGf> index = new QuadTree<>();
 
   public QuadtreeCorrectTest() {
   }
@@ -83,7 +83,7 @@ public class QuadtreeCorrectTest {
       for (int j = 0; j < gridSize; j++) {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
-        final Envelope env = new Envelope(2, x, y, x + cellSize, y + cellSize);
+        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize, y + cellSize);
         this.index.insert(env, env);
         this.envList.add(env);
       }
@@ -94,10 +94,10 @@ public class QuadtreeCorrectTest {
     createGrid(NUM_ITEMS);
   }
 
-  private List getOverlapping(final List items, final Envelope searchEnv) {
+  private List getOverlapping(final List items, final BoundingBoxDoubleGf searchEnv) {
     final List result = new ArrayList();
     for (int i = 0; i < items.size(); i++) {
-      final Envelope env = (Envelope)items.get(i);
+      final BoundingBoxDoubleGf env = (BoundingBoxDoubleGf)items.get(i);
       if (env.intersects(searchEnv)) {
         result.add(env);
       }
@@ -118,7 +118,7 @@ public class QuadtreeCorrectTest {
       for (int j = 0; j < gridSize; j++) {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
-        final Envelope env = new Envelope(2, x, y, x + cellSize, y + cellSize);
+        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize, y + cellSize);
         queryTest(env);
         // queryTime(env);
       }
@@ -126,7 +126,7 @@ public class QuadtreeCorrectTest {
     // System.out.println("Time = " + sw.getTimeString());
   }
 
-  void queryTest(final Envelope env) {
+  void queryTest(final BoundingBoxDoubleGf env) {
     final List candidateList = this.index.query(env);
     final List finalList = getOverlapping(candidateList, env);
 
@@ -138,7 +138,7 @@ public class QuadtreeCorrectTest {
     }
   }
 
-  void queryTime(final Envelope env) {
+  void queryTime(final BoundingBoxDoubleGf env) {
     // List finalList = getOverlapping(q.query(env), env);
 
     final List eList = this.envList.query(env);

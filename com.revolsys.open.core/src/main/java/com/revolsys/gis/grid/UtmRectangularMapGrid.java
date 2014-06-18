@@ -6,9 +6,9 @@ import java.util.List;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.MathUtil;
 
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
@@ -30,7 +30,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new Envelope(GEOMETRY_FACTORY, 2, lon, lat, lon - tileWidth, lat
+    return new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2, lon, lat, lon - tileWidth, lat
       + tileHeight);
   }
 

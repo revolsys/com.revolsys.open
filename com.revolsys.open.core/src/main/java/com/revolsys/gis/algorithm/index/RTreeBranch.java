@@ -10,7 +10,7 @@ import com.revolsys.collection.ArrayUtil;
 import com.revolsys.collection.Visitor;
 import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class RTreeBranch<T> extends RTreeNode<T> implements
   Iterable<RTreeNode<T>> {
@@ -124,7 +124,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
 
   @Override
   protected void updateEnvelope() {
-    BoundingBox boundingBox = new Envelope();
+    BoundingBox boundingBox = new BoundingBoxDoubleGf();
     for (int i = 0; i < size; i++) {
       final BoundingBox envelope = nodes[i].getBoundingBox();
       boundingBox = boundingBox.expandToInclude(envelope);

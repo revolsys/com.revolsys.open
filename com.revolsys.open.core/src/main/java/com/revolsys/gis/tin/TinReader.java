@@ -8,9 +8,9 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.IntHashMap;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;
@@ -85,7 +85,7 @@ public class TinReader {
     if (!line.startsWith("VERT ")) {
       throw new IllegalArgumentException("Expecting VERT not " + line);
     }
-    BoundingBox boundingBox = new Envelope(geometryFactory);
+    BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
 
     final int numNodes = Integer.parseInt(line.substring(5));
     for (int i = 1; i <= numNodes; i++) {

@@ -42,7 +42,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
@@ -157,7 +156,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
   @Override
   protected BoundingBox computeBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = new Envelope(geometryFactory);
+    BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
     for (final LinearRing ring : rings()) {
       boundingBox = boundingBox.expandToInclude(ring);
     }

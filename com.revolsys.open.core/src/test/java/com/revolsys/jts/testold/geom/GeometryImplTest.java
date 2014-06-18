@@ -335,7 +335,7 @@ public class GeometryImplTest extends TestCase {
   // public void testInvalidateEnvelope() throws Exception {
   // final Geometry g =
   // this.reader.read("POLYGON((0 0, 0 50, 50 50, 50 0, 0 0))");
-  // assertEquals(new Envelope(0, 50, 0, 50), g.getEnvelopeInternal());
+  // assertEquals(new BoundingBoxDoubleGf(0, 50, 0, 50), g.getEnvelopeInternal());
   // g.apply(new CoordinateFilter() {
   // @Override
   // public void filter(final Point coord) {
@@ -343,9 +343,9 @@ public class GeometryImplTest extends TestCase {
   // coord.setY(coord.getY() + 1);
   // }
   // });
-  // assertEquals(new Envelope(0, 50, 0, 50), g.getEnvelopeInternal());
+  // assertEquals(new BoundingBoxDoubleGf(0, 50, 0, 50), g.getEnvelopeInternal());
   // g.geometryChanged();
-  // assertEquals(new Envelope(1, 51, 1, 51), g.getEnvelopeInternal());
+  // assertEquals(new BoundingBoxDoubleGf(1, 51, 1, 51), g.getEnvelopeInternal());
   // }
 
   public void testNoOutgoingDirEdgeFound() throws Exception {

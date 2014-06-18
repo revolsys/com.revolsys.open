@@ -45,9 +45,9 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.xbase.FieldDefinition;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.MathUtil;
@@ -57,7 +57,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
-  private BoundingBox envelope = new Envelope();
+  private BoundingBox envelope = new BoundingBoxDoubleGf();
 
   private GeometryFactory geometryFactory;
 

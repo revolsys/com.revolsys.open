@@ -13,11 +13,11 @@ import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.comparator.AngleFromPointComparator;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
@@ -263,7 +263,7 @@ public class TriangulatedIrregularNetwork {
       circumCircleIndex.put(envelope, triangle);
     }
     if (triangleIndex != null) {
-      final Envelope envelope = triangle.getEnvelopeInternal();
+      final BoundingBoxDoubleGf envelope = triangle.getEnvelopeInternal();
       triangleIndex.put(envelope, triangle);
     }
   }
@@ -549,14 +549,14 @@ public class TriangulatedIrregularNetwork {
   }
 
   public List<Triangle> getTriangles(final Point coordinate) {
-    final BoundingBox envelope = new Envelope(coordinate);
+    final BoundingBox envelope = new BoundingBoxDoubleGf(coordinate);
     final TriangleContainsPointFilter filter = new TriangleContainsPointFilter(
       coordinate);
     return getTriangleIndex().find(envelope, filter);
   }
 
   private List<Triangle> getTrianglesCircumcircleIntersections(final Point point) {
-    final BoundingBox envelope = new Envelope(point);
+    final BoundingBox envelope = new BoundingBoxDoubleGf(point);
     final List<Triangle> triangles = getCircumcircleIndex().find(envelope);
     for (final Iterator<Triangle> iterator = triangles.iterator(); iterator.hasNext();) {
       final Triangle triangle = iterator.next();
@@ -649,7 +649,7 @@ public class TriangulatedIrregularNetwork {
 
   private void removeTriangle(final Triangle triangle) {
     if (triangleIndex != null) {
-      final Envelope envelope = triangle.getEnvelopeInternal();
+      final BoundingBoxDoubleGf envelope = triangle.getEnvelopeInternal();
       triangleIndex.remove(envelope, triangle);
     }
     if (circumCircleIndex != null) {

@@ -41,10 +41,10 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -64,13 +64,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return new DataObjectStoreLayer(properties);
   }
 
-  private BoundingBox boundingBox = new Envelope();
+  private BoundingBox boundingBox = new BoundingBoxDoubleGf();
 
   private Map<String, LayerDataObject> cachedRecords = new HashMap<String, LayerDataObject>();
 
   private DataObjectStore dataStore;
 
-  private BoundingBox loadingBoundingBox = new Envelope();
+  private BoundingBox loadingBoundingBox = new BoundingBoxDoubleGf();
 
   private SwingWorker<DataObjectQuadTree, Void> loadingWorker;
 
@@ -231,7 +231,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (loadedBoundingBox == this.loadingBoundingBox) {
         firePropertyChange("loaded", false, true);
         this.boundingBox = this.loadingBoundingBox;
-        this.loadingBoundingBox = new Envelope();
+        this.loadingBoundingBox = new BoundingBoxDoubleGf();
         this.loadingWorker = null;
       }
 
@@ -262,9 +262,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       this.dataStore = null;
     }
     final SwingWorker<DataObjectQuadTree, Void> loadingWorker = this.loadingWorker;
-    this.boundingBox = new Envelope();
+    this.boundingBox = new BoundingBoxDoubleGf();
     this.cachedRecords = new HashMap<String, LayerDataObject>();
-    this.loadingBoundingBox = new Envelope();
+    this.loadingBoundingBox = new BoundingBoxDoubleGf();
     this.loadingWorker = null;
     this.typePath = null;
     super.delete();
@@ -739,7 +739,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (this.loadingWorker != null) {
         this.loadingWorker.cancel(true);
       }
-      this.boundingBox = new Envelope();
+      this.boundingBox = new BoundingBoxDoubleGf();
       this.loadingBoundingBox = this.boundingBox;
       setIndex(null);
       cleanCachedRecords();

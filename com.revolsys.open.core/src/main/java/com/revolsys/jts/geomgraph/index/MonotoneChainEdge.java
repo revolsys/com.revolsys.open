@@ -33,8 +33,8 @@
 package com.revolsys.jts.geomgraph.index;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geomgraph.Edge;
 
 /**
@@ -91,8 +91,8 @@ public class MonotoneChainEdge {
       return;
     }
     // nothing to do if the envelopes of these chains don't overlap
-    final BoundingBox env1 = new Envelope(p00, p01);
-    final BoundingBox env2 = new Envelope(p10, p11);
+    final BoundingBox env1 = new BoundingBoxDoubleGf(p00, p01);
+    final BoundingBox env2 = new BoundingBoxDoubleGf(p10, p11);
     if (!env1.intersects(env2)) {
       return;
     }

@@ -44,7 +44,7 @@ public interface Boundable {
    * not much bigger than this Boundable's boundary yet fast to test for intersection
    * with the bounds of other Boundables. The class of object returned depends
    * on the subclass of AbstractSTRtree.
-   * @return an Envelope (for STRtrees), an Interval (for SIRtrees), or other object
+   * @return an BoundingBoxDoubleGf (for STRtrees), an Interval (for SIRtrees), or other object
    * (for other subclasses of AbstractSTRtree)
    */
   Object getBounds();

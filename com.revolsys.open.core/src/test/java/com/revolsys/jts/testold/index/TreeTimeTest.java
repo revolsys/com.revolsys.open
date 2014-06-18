@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.index.strtree.STRtree;
 
 /**
@@ -51,12 +51,12 @@ public class TreeTimeTest {
     }
 
     @Override
-    public void insert(final Envelope itemEnv, final Object item) {
+    public void insert(final BoundingBoxDoubleGf itemEnv, final Object item) {
       this.index.add(itemEnv);
     }
 
     @Override
-    public List query(final Envelope searchEnv) {
+    public List query(final BoundingBoxDoubleGf searchEnv) {
       return this.index.query(searchEnv);
     }
 
@@ -74,12 +74,12 @@ public class TreeTimeTest {
     }
 
     @Override
-    public void insert(final Envelope itemEnv, final Object item) {
+    public void insert(final BoundingBoxDoubleGf itemEnv, final Object item) {
       this.index.insert(itemEnv, item);
     }
 
     @Override
-    public List query(final Envelope searchEnv) {
+    public List query(final BoundingBoxDoubleGf searchEnv) {
       return this.index.query(searchEnv);
     }
 
@@ -103,12 +103,12 @@ public class TreeTimeTest {
     }
 
     @Override
-    public void insert(final Envelope itemEnv, final Object item) {
+    public void insert(final BoundingBoxDoubleGf itemEnv, final Object item) {
       this.index.insert(itemEnv, item);
     }
 
     @Override
-    public List query(final Envelope searchEnv) {
+    public List query(final BoundingBoxDoubleGf searchEnv) {
       return this.index.query(searchEnv);
     }
 

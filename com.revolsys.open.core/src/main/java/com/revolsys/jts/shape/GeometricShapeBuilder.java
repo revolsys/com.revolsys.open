@@ -34,16 +34,16 @@
 package com.revolsys.jts.shape;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
 public abstract class GeometricShapeBuilder {
-  protected BoundingBox extent = new Envelope(2, 0, 0, 1, 1);
+  protected BoundingBox extent = new BoundingBoxDoubleGf(2, 0, 0, 1, 1);
 
   protected int numPts = 0;
 
@@ -91,7 +91,7 @@ public abstract class GeometricShapeBuilder {
     final double radius = getRadius();
 
     final Point centre = getCentre();
-    return new Envelope(2, centre.getX() - radius, centre.getY() - radius,
+    return new BoundingBoxDoubleGf(2, centre.getX() - radius, centre.getY() - radius,
       centre.getX() + radius, centre.getY() + radius);
   }
 

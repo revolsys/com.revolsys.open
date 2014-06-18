@@ -30,7 +30,7 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package com.revolsys.jts.geom;
+package com.revolsys.jts.geom.impl;
 
 import java.io.Serializable;
 
@@ -54,9 +54,14 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.wkt.WktParser;
-import com.revolsys.jts.geom.impl.LineStringDouble;
-import com.revolsys.jts.geom.impl.PointDoubleGF;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
@@ -68,12 +73,12 @@ import com.revolsys.util.MathUtil;
  *  Note that Envelopes support infinite or half-infinite regions, by using the values of
  *  <code>Double.POSITIVE_INFINITY</code> and <code>Double.NEGATIVE_INFINITY</code>.
  *  <p>
- *  When Envelope objects are created or initialized,
+ *  When BoundingBoxDoubleGf objects are created or initialized,
  *  the supplies extent values are automatically sorted into the correct order.
  *
  *@version 1.7
  */
-public class Envelope implements Serializable, BoundingBox {
+public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   static {
     ConvertUtils.register(new Converter() {
@@ -146,7 +151,7 @@ public class Envelope implements Serializable, BoundingBox {
           final Double x2 = WktParser.parseDouble(text);
           if (WktParser.hasText(text, ",")) {
             final Double y2 = WktParser.parseDouble(text);
-            return new Envelope(geometryFactory, 2, x1, y1, x2, y2);
+            return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
           } else {
             throw new IllegalArgumentException("Expecting a ',' not " + text);
           }
@@ -155,40 +160,18 @@ public class Envelope implements Serializable, BoundingBox {
           throw new IllegalArgumentException("Expecting a ',' not " + text);
         }
       } else if (WktParser.hasText(text, "BBOX EMPTY")) {
-        return new Envelope(geometryFactory);
+        return new BoundingBoxDoubleGf(geometryFactory);
       }
     }
 
-    return new Envelope();
-  }
-
-  public static boolean isEmpty(final BoundingBox boundingBox) {
-    if (boundingBox == null) {
-      return true;
-    } else {
-      return boundingBox.isEmpty();
-    }
-  }
-
-  public static Envelope parse(final String bbox) {
-    final String[] args = bbox.split(",");
-    if (args.length == 4) {
-      final double x1 = Double.valueOf(args[0]);
-      final double y1 = Double.valueOf(args[1]);
-      final double x2 = Double.valueOf(args[2]);
-      final double y2 = Double.valueOf(args[3]);
-      return new Envelope(GeometryFactory.floating3(4326), 2, x1, y1, x2, y2);
-    } else {
-      throw new IllegalArgumentException(
-        "BBOX must have match <minX>,<minY>,<maxX>,<maxY> not " + bbox);
-    }
+    return new BoundingBoxDoubleGf();
   }
 
   private final double[] bounds;
 
   private GeometryFactory geometryFactory;
 
-  public Envelope() {
+  public BoundingBoxDoubleGf() {
     this.bounds = null;
   }
 
@@ -197,26 +180,26 @@ public class Envelope implements Serializable, BoundingBox {
    * 
    * @param geometryFactory The geometry factory.
    */
-  public Envelope(final GeometryFactory geometryFactory) {
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     this.bounds = null;
   }
 
-  public Envelope(final GeometryFactory geometryFactory, final int axisCount,
-    final double... bounds) {
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory,
+    final int axisCount, final double... bounds) {
     this.geometryFactory = geometryFactory;
     if (bounds == null || bounds.length == 0 || axisCount < 1) {
       this.bounds = null;
     } else if (bounds.length % axisCount == 0) {
-      this.bounds = EnvelopeUtil.createBounds(axisCount);
-      EnvelopeUtil.expand(geometryFactory, this.bounds, bounds);
+      this.bounds = BoundingBoxUtil.createBounds(axisCount);
+      BoundingBoxUtil.expand(geometryFactory, this.bounds, bounds);
     } else {
       throw new IllegalArgumentException("Expecting a multiple of " + axisCount
         + " not " + bounds.length);
     }
   }
 
-  public Envelope(final GeometryFactory geometryFactory,
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory,
     final Iterable<? extends Point> points) {
     this.geometryFactory = geometryFactory;
     double[] bounds = null;
@@ -224,9 +207,9 @@ public class Envelope implements Serializable, BoundingBox {
       for (final Point point : points) {
         if (point != null) {
           if (bounds == null) {
-            bounds = EnvelopeUtil.createBounds(geometryFactory, point);
+            bounds = BoundingBoxUtil.createBounds(geometryFactory, point);
           } else {
-            EnvelopeUtil.expand(geometryFactory, bounds, point);
+            BoundingBoxUtil.expand(geometryFactory, bounds, point);
           }
         }
       }
@@ -234,39 +217,41 @@ public class Envelope implements Serializable, BoundingBox {
     this.bounds = bounds;
   }
 
-  public Envelope(final GeometryFactory geometryFactory, final LineString points) {
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory,
+    final LineString points) {
     this.geometryFactory = geometryFactory;
     double[] bounds = null;
     if (points != null) {
       for (int i = 0; i < points.getVertexCount(); i++) {
         final Point point = points.getPoint(0);
         if (bounds == null) {
-          bounds = EnvelopeUtil.createBounds(geometryFactory, point);
+          bounds = BoundingBoxUtil.createBounds(geometryFactory, point);
         } else {
-          EnvelopeUtil.expand(geometryFactory, bounds, point);
+          BoundingBoxUtil.expand(geometryFactory, bounds, point);
         }
       }
     }
     this.bounds = bounds;
   }
 
-  public Envelope(final GeometryFactory geometryFactory, final Point... points) {
+  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory,
+    final Point... points) {
     this(geometryFactory, CollectionUtil.toList(points));
   }
 
-  public Envelope(final int axisCount, final double... bounds) {
+  public BoundingBoxDoubleGf(final int axisCount, final double... bounds) {
     this(null, axisCount, bounds);
   }
 
-  public Envelope(final Iterable<? extends Point> points) {
+  public BoundingBoxDoubleGf(final Iterable<? extends Point> points) {
     this(null, points);
   }
 
-  public Envelope(final LineString points) {
+  public BoundingBoxDoubleGf(final LineString points) {
     this(null, points);
   }
 
-  public Envelope(final Point... points) {
+  public BoundingBoxDoubleGf(final Point... points) {
     this(null, points);
   }
 
@@ -299,14 +284,15 @@ public class Envelope implements Serializable, BoundingBox {
       if (geometryFactory == null) {
         return this;
       } else {
-        return new Envelope(geometryFactory, getAxisCount(), getBounds());
+        return new BoundingBoxDoubleGf(geometryFactory, getAxisCount(),
+          getBounds());
       }
     } else if (geometryFactory == null) {
-      return new Envelope(getAxisCount(), getBounds());
+      return new BoundingBoxDoubleGf(getAxisCount(), getBounds());
     } else if (factory == geometryFactory) {
       return this;
     } else if (isEmpty()) {
-      return new Envelope(geometryFactory);
+      return new BoundingBoxDoubleGf(geometryFactory);
     } else {
       final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
         factory, geometryFactory);
@@ -355,7 +341,7 @@ public class Envelope implements Serializable, BoundingBox {
             expand(geometryFactory, bounds, operation, to, maxX, y);
           }
         }
-        return new Envelope(geometryFactory, axisCount, bounds);
+        return new BoundingBoxDoubleGf(geometryFactory, axisCount, bounds);
       } else {
         return this;
       }
@@ -409,16 +395,16 @@ public class Envelope implements Serializable, BoundingBox {
     final double minY2 = getMinY();
     final double maxX2 = getMaxX();
     final double maxY2 = getMaxY();
-    return EnvelopeUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2,
-      maxY2);
+    return BoundingBoxUtil.covers(minX1, minY1, maxX1, maxY1, minX2, minY2,
+      maxX2, maxY2);
   }
 
   /**
-   * Tests if the <code>Envelope other</code>
-   * lies wholely inside this <code>Envelope</code> (inclusive of the boundary).
+   * Tests if the <code>BoundingBoxDoubleGf other</code>
+   * lies wholely inside this <code>BoundingBoxDoubleGf</code> (inclusive of the boundary).
    *
-   *@param  other the <code>Envelope</code> to check
-   *@return true if this <code>Envelope</code> covers the <code>other</code> 
+   *@param  other the <code>BoundingBoxDoubleGf</code> to check
+   *@return true if this <code>BoundingBoxDoubleGf</code> covers the <code>other</code> 
    */
   @Override
   public boolean covers(BoundingBox other) {
@@ -438,12 +424,12 @@ public class Envelope implements Serializable, BoundingBox {
   /**
    * Tests if the given point lies in or on the envelope.
    *
-   *@param  x  the x-coordinate of the point which this <code>Envelope</code> is
+   *@param  x  the x-coordinate of the point which this <code>BoundingBoxDoubleGf</code> is
    *      being checked for containing
-   *@param  y  the y-coordinate of the point which this <code>Envelope</code> is
+   *@param  y  the y-coordinate of the point which this <code>BoundingBoxDoubleGf</code> is
    *      being checked for containing
    *@return    <code>true</code> if <code>(x, y)</code> lies in the interior or
-   *      on the boundary of this <code>Envelope</code>.
+   *      on the boundary of this <code>BoundingBoxDoubleGf</code>.
    */
   @Override
   public boolean covers(final double x, final double y) {
@@ -455,7 +441,7 @@ public class Envelope implements Serializable, BoundingBox {
       final double maxX = getMaxX();
       final double maxY = getMaxY();
 
-      return EnvelopeUtil.covers(minX, minY, maxX, maxY, x, y, x, y);
+      return BoundingBoxUtil.covers(minX, minY, maxX, maxY, x, y, x, y);
     }
   }
 
@@ -472,10 +458,10 @@ public class Envelope implements Serializable, BoundingBox {
   /**
    * Tests if the given point lies in or on the envelope.
    *
-   *@param  p  the point which this <code>Envelope</code> is
+   *@param  p  the point which this <code>BoundingBoxDoubleGf</code> is
    *      being checked for containing
    *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>Envelope</code>.
+   *      on the boundary of this <code>BoundingBoxDoubleGf</code>.
    */
   @Override
   public boolean covers(final Point point) {
@@ -492,7 +478,7 @@ public class Envelope implements Serializable, BoundingBox {
 
   /**
    * Computes the distance between this and another
-   * <code>Envelope</code>.
+   * <code>BoundingBoxDoubleGf</code>.
    * The distance between overlapping Envelopes is 0.  Otherwise, the
    * distance is the Euclidean distance between the closest points.
    */
@@ -592,9 +578,9 @@ public class Envelope implements Serializable, BoundingBox {
       final double y2 = getMaxY() + deltaY;
 
       if (x1 > x2 || y1 > y2) {
-        return new Envelope(geometryFactory);
+        return new BoundingBoxDoubleGf(geometryFactory);
       } else {
-        return new Envelope(geometryFactory, 2, x1, y1, x2, y2);
+        return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
       }
     }
   }
@@ -604,14 +590,14 @@ public class Envelope implements Serializable, BoundingBox {
     final double[] to, final double... from) {
 
     operation.perform(2, from, 2, to);
-    EnvelopeUtil.expand(geometryFactory, bounds, to);
+    BoundingBoxUtil.expand(geometryFactory, bounds, to);
   }
 
   @Override
   public BoundingBox expand(final Point coordinates) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return new Envelope(geometryFactory, coordinates);
+      return new BoundingBoxDoubleGf(geometryFactory, coordinates);
     } else {
       final double x = coordinates.getX();
       final double y = coordinates.getY();
@@ -633,7 +619,7 @@ public class Envelope implements Serializable, BoundingBox {
       if (y > maxY) {
         maxY = y;
       }
-      return new Envelope(geometryFactory, 2, minX, minY, maxX, maxY);
+      return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX, maxY);
     }
   }
 
@@ -669,7 +655,8 @@ public class Envelope implements Serializable, BoundingBox {
         final double maxX = Math.max(getMaxX(), convertedOther.getMaxX());
         final double minY = Math.min(getMinY(), convertedOther.getMinY());
         final double maxY = Math.max(getMaxY(), convertedOther.getMaxY());
-        return new Envelope(geometryFactory, 2, minX, minY, maxX, maxY);
+        return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX,
+          maxY);
       }
     }
   }
@@ -817,13 +804,13 @@ public class Envelope implements Serializable, BoundingBox {
       index = index % 4;
       switch (index) {
         case 0:
-          return new PointDoubleGF(getGeometryFactory(), maxX, minY);
+          return new PointDoubleGf(getGeometryFactory(), maxX, minY);
         case 1:
-          return new PointDoubleGF(getGeometryFactory(), minX, minY);
+          return new PointDoubleGf(getGeometryFactory(), minX, minY);
         case 2:
-          return new PointDoubleGF(getGeometryFactory(), minX, maxY);
+          return new PointDoubleGf(getGeometryFactory(), minX, maxY);
         default:
-          return new PointDoubleGF(getGeometryFactory(), maxX, maxY);
+          return new PointDoubleGf(getGeometryFactory(), maxX, maxY);
       }
     }
   }
@@ -846,7 +833,7 @@ public class Envelope implements Serializable, BoundingBox {
   /**
    *  Returns the difference between the maximum and minimum y values.
    *
-   *@return    max y - min y, or 0 if this is a null <code>Envelope</code>
+   *@return    max y - min y, or 0 if this is a null <code>BoundingBoxDoubleGf</code>
    */
   @Override
   public double getHeight() {
@@ -873,7 +860,7 @@ public class Envelope implements Serializable, BoundingBox {
     if (bounds == null || axisIndex >= getAxisCount()) {
       return Double.NaN;
     } else {
-      return EnvelopeUtil.getMax(bounds, axisIndex);
+      return BoundingBoxUtil.getMax(bounds, axisIndex);
     }
   }
 
@@ -895,8 +882,8 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   /**
-   *  Returns the <code>Envelope</code>s maximum x-value. min x > max x
-   *  indicates that this is a null <code>Envelope</code>.
+   *  Returns the <code>BoundingBoxDoubleGf</code>s maximum x-value. min x > max x
+   *  indicates that this is a null <code>BoundingBoxDoubleGf</code>.
    *
    *@return    the maximum x-coordinate
    */
@@ -906,8 +893,8 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   /**
-   *  Returns the <code>Envelope</code>s maximum y-value. min y > max y
-   *  indicates that this is a null <code>Envelope</code>.
+   *  Returns the <code>BoundingBoxDoubleGf</code>s maximum y-value. min y > max y
+   *  indicates that this is a null <code>BoundingBoxDoubleGf</code>.
    *
    *@return    the maximum y-coordinate
    */
@@ -921,7 +908,7 @@ public class Envelope implements Serializable, BoundingBox {
     if (bounds == null) {
       return Double.NaN;
     } else {
-      return EnvelopeUtil.getMin(bounds, axisIndex);
+      return BoundingBoxUtil.getMin(bounds, axisIndex);
     }
   }
 
@@ -943,8 +930,8 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   /**
-   *  Returns the <code>Envelope</code>s minimum x-value. min x > max x
-   *  indicates that this is a null <code>Envelope</code>.
+   *  Returns the <code>BoundingBoxDoubleGf</code>s minimum x-value. min x > max x
+   *  indicates that this is a null <code>BoundingBoxDoubleGf</code>.
    *
    *@return    the minimum x-coordinate
    */
@@ -954,8 +941,8 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   /**
-   *  Returns the <code>Envelope</code>s minimum y-value. min y > max y
-   *  indicates that this is a null <code>Envelope</code>.
+   *  Returns the <code>BoundingBoxDoubleGf</code>s minimum y-value. min y > max y
+   *  indicates that this is a null <code>BoundingBoxDoubleGf</code>.
    *
    *@return    the minimum y-coordinate
    */
@@ -996,7 +983,7 @@ public class Envelope implements Serializable, BoundingBox {
   /**
    *  Returns the difference between the maximum and minimum x values.
    *
-   *@return    max x - min x, or 0 if this is a null <code>Envelope</code>
+   *@return    max x - min x, or 0 if this is a null <code>BoundingBoxDoubleGf</code>
    */
   @Override
   public double getWidth() {
@@ -1036,7 +1023,7 @@ public class Envelope implements Serializable, BoundingBox {
   }
 
   /**
-   * Computes the intersection of two {@link Envelope}s.
+   * Computes the intersection of two {@link BoundingBoxDoubleGf}s.
    *
    * @param env the envelope to intersect with
    * @return a new BoundingBox representing the intersection of the envelopes (this will be
@@ -1048,24 +1035,24 @@ public class Envelope implements Serializable, BoundingBox {
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (isEmpty() || convertedBoundingBox.isEmpty()
       || !intersects(convertedBoundingBox)) {
-      return new Envelope(geometryFactory);
+      return new BoundingBoxDoubleGf(geometryFactory);
     } else {
       final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
       final double intMinY = Math.max(getMinY(), convertedBoundingBox.getMinY());
       final double intMaxX = Math.min(getMaxX(), convertedBoundingBox.getMaxX());
       final double intMaxY = Math.min(getMaxY(), convertedBoundingBox.getMaxY());
-      return new Envelope(geometryFactory, 2, intMinX, intMinY, intMaxX,
-        intMaxY);
+      return new BoundingBoxDoubleGf(geometryFactory, 2, intMinX, intMinY,
+        intMaxX, intMaxY);
     }
   }
 
   /**
    *  Check if the region defined by <code>other</code>
-   *  overlaps (intersects) the region of this <code>Envelope</code>.
+   *  overlaps (intersects) the region of this <code>BoundingBoxDoubleGf</code>.
    *
-   *@param  other  the <code>Envelope</code> which this <code>Envelope</code> is
+   *@param  other  the <code>BoundingBoxDoubleGf</code> which this <code>BoundingBoxDoubleGf</code> is
    *          being checked for overlapping
-   *@return        <code>true</code> if the <code>Envelope</code>s overlap
+   *@return        <code>true</code> if the <code>BoundingBoxDoubleGf</code>s overlap
    */
   @Override
   public boolean intersects(final BoundingBox other) {
@@ -1087,11 +1074,11 @@ public class Envelope implements Serializable, BoundingBox {
 
   /**
    *  Check if the point <code>(x, y)</code>
-   *  overlaps (lies inside) the region of this <code>Envelope</code>.
+   *  overlaps (lies inside) the region of this <code>BoundingBoxDoubleGf</code>.
    *
    *@param  x  the x-ordinate of the point
    *@param  y  the y-ordinate of the point
-   *@return        <code>true</code> if the point overlaps this <code>Envelope</code>
+   *@return        <code>true</code> if the point overlaps this <code>BoundingBoxDoubleGf</code>
    */
   @Override
   public boolean intersects(final double x, final double y) {
@@ -1142,10 +1129,10 @@ public class Envelope implements Serializable, BoundingBox {
 
   /**
    *  Check if the point <code>p</code>
-   *  overlaps (lies inside) the region of this <code>Envelope</code>.
+   *  overlaps (lies inside) the region of this <code>BoundingBoxDoubleGf</code>.
    *
    *@param  p  the <code>Coordinate</code> to be tested
-   *@return        <code>true</code> if the point overlaps this <code>Envelope</code>
+   *@return        <code>true</code> if the point overlaps this <code>BoundingBoxDoubleGf</code>
    */
   @Override
   public boolean intersects(final Point point) {
@@ -1184,7 +1171,7 @@ public class Envelope implements Serializable, BoundingBox {
       final double x2 = getMaxX() + xDisplacement;
       final double y1 = getMinY() + yDisplacement;
       final double y2 = getMaxY() + yDisplacement;
-      return new Envelope(geometryFactory, 2, x1, y1, x2, y2);
+      return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
     }
   }
 

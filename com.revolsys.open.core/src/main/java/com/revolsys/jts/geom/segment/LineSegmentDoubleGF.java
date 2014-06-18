@@ -3,7 +3,7 @@ package com.revolsys.jts.geom.segment;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.PointDoubleGF;
+import com.revolsys.jts.geom.impl.PointDoubleGf;
 
 public class LineSegmentDoubleGF extends LineSegmentDouble {
   private static final long serialVersionUID = 3905321662159212931L;
@@ -58,7 +58,7 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   @Override
   protected Point createPoint(final GeometryFactory geometryFactory,
     final double... coordinates) {
-    return new PointDoubleGF(geometryFactory, coordinates);
+    return new PointDoubleGf(geometryFactory, coordinates);
   }
 
   @Override

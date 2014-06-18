@@ -33,7 +33,6 @@
 package com.revolsys.jts.geom.impl;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
@@ -48,7 +47,7 @@ import com.revolsys.jts.geom.Point;
  * 
  *@version 1.7
  */
-public class PointDoubleGF extends PointDouble {
+public class PointDoubleGf extends PointDouble {
   private static final long serialVersionUID = 4902022702746614570L;
 
   /**
@@ -67,7 +66,7 @@ public class PointDoubleGF extends PointDouble {
   */
   private final GeometryFactory geometryFactory;
 
-  public PointDoubleGF(final GeometryFactory geometryFactory) {
+  public PointDoubleGf(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
@@ -75,7 +74,7 @@ public class PointDoubleGF extends PointDouble {
    *@param  coordinates      contains the single coordinate on which to base this <code>Point</code>
    *      , or <code>null</code> to create the empty geometry.
    */
-  public PointDoubleGF(final GeometryFactory geometryFactory,
+  public PointDoubleGf(final GeometryFactory geometryFactory,
     final double... coordinates) {
     super(geometryFactory, coordinates);
     this.geometryFactory = geometryFactory;
@@ -90,7 +89,7 @@ public class PointDoubleGF extends PointDouble {
   public BoundingBox getBoundingBox() {
     if (boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new Envelope(getGeometryFactory());
+        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
         boundingBox = computeBoundingBox();
       }

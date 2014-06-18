@@ -38,10 +38,10 @@ import java.util.List;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.util.BoundingBoxUtil;
 
 /**
  * An spatial index on a set of {@link LineSegmentDouble}s.
@@ -58,7 +58,7 @@ class LineSegmentIndex {
   }
 
   public void add(final LineSegment seg) {
-    index.insert(new Envelope(seg.getP0(), seg.getP1()), seg);
+    index.insert(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
   }
 
   public void add(final TaggedLineString line) {
@@ -70,7 +70,7 @@ class LineSegmentIndex {
   }
 
   public List query(final LineSegment querySeg) {
-    final Envelope env = new Envelope(querySeg.getP0(), querySeg.getP1());
+    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(querySeg.getP0(), querySeg.getP1());
 
     final LineSegmentVisitor visitor = new LineSegmentVisitor(querySeg);
     index.visit(env, visitor);
@@ -85,7 +85,7 @@ class LineSegmentIndex {
   }
 
   public void remove(final LineSegment seg) {
-    index.remove(new Envelope(seg.getP0(), seg.getP1()), seg);
+    index.remove(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
   }
 }
 
@@ -109,7 +109,7 @@ class LineSegmentVisitor implements Visitor<LineSegment> {
 
   @Override
   public boolean visit(final LineSegment seg) {
-    if (EnvelopeUtil.intersects(seg.getP0(), seg.getP1(), querySeg.getP0(),
+    if (BoundingBoxUtil.intersects(seg.getP0(), seg.getP1(), querySeg.getP0(),
       querySeg.getP1())) {
       items.add(seg);
     }

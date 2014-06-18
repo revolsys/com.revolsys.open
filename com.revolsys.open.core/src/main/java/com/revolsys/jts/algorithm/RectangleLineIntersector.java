@@ -33,8 +33,8 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -68,10 +68,10 @@ public class RectangleLineIntersector {
 
   /**
    * Creates a new intersector for the given query rectangle,
-   * specified as an {@link Envelope}.
+   * specified as an {@link BoundingBoxDoubleGf}.
    * 
    * 
-   * @param rectEnv the query rectangle, specified as an Envelope
+   * @param rectEnv the query rectangle, specified as an BoundingBoxDoubleGf
    */
   public RectangleLineIntersector(final BoundingBox rectEnv) {
     this.rectEnv = rectEnv;
@@ -106,7 +106,7 @@ public class RectangleLineIntersector {
      * If the segment envelope is disjoint from the
      * rectangle envelope, there is no intersection
      */
-    final BoundingBox segEnv = new Envelope(p0, p1);
+    final BoundingBox segEnv = new BoundingBoxDoubleGf(p0, p1);
     if (!rectEnv.intersects(segEnv)) {
       return false;
     }

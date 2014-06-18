@@ -17,8 +17,8 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.AbstractLineString;
-import com.revolsys.jts.geom.impl.PointDoubleGF;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.geom.impl.PointDoubleGf;
+import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
@@ -253,7 +253,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
 
   protected Point createPoint(final GeometryFactory geometryFactory,
     final double... coordinates) {
-    return new PointDoubleGF(geometryFactory, coordinates);
+    return new PointDoubleGf(geometryFactory, coordinates);
   }
 
   @Override
@@ -422,7 +422,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     final double line2y1 = lineSegment2.getY(0);
     final double line2x2 = lineSegment2.getX(1);
     final double line2y2 = lineSegment2.getY(1);
-    if (EnvelopeUtil.intersects(line1x1, line1y1, line1x2, line1y2, line2x1,
+    if (BoundingBoxUtil.intersects(line1x1, line1y1, line1x2, line1y2, line2x1,
       line2y1, line2x2, line2y2)) {
       int intersectionCount = 0;
       final int axisCount = geometryFactory.getAxisCount();

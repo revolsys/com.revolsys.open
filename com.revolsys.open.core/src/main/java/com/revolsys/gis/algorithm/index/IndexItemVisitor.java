@@ -3,7 +3,7 @@ package com.revolsys.gis.algorithm.index;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.index.ItemVisitor;
 
 /**
@@ -16,9 +16,9 @@ import com.revolsys.jts.index.ItemVisitor;
 public class IndexItemVisitor implements ItemVisitor {
   private final Visitor<DataObject> visitor;
 
-  private final Envelope envelope;
+  private final BoundingBoxDoubleGf envelope;
 
-  public IndexItemVisitor(final Envelope envelope,
+  public IndexItemVisitor(final BoundingBoxDoubleGf envelope,
     final Visitor<DataObject> visitor) {
     this.envelope = envelope;
     this.visitor = visitor;

@@ -40,10 +40,10 @@ import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RectangleLineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 public class RectangleLineIntersectorTest extends TestCase {
@@ -89,7 +89,7 @@ class RectangleLineIntersectorValidator {
   }
 
   private BoundingBox createRectangle() {
-    final BoundingBox rectEnv = new Envelope(new PointDouble(this.baseX,
+    final BoundingBox rectEnv = new BoundingBoxDoubleGf(new PointDouble(this.baseX,
       this.baseY, Point.NULL_ORDINATE), new PointDouble(this.baseX
       + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
     return rectEnv;
@@ -175,7 +175,7 @@ class SimpleRectangleIntersector {
   }
 
   public boolean intersects(final Point p0, final Point p1) {
-    final Envelope segEnv = new Envelope(p0, p1);
+    final BoundingBoxDoubleGf segEnv = new BoundingBoxDoubleGf(p0, p1);
     if (!this.rectEnv.intersects(segEnv)) {
       return false;
     }

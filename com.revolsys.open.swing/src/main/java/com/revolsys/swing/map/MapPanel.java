@@ -33,9 +33,9 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
@@ -80,7 +80,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     500000L, 250000L, 100000L, 50000L, 25000L, 10000L, 5000L, 2500L, 1000L,
     500L, 250L, 100L, 50L, 25L, 10L, 5L);
 
-  public static final BoundingBox BC_ENVELOPE = new Envelope(
+  public static final BoundingBox BC_ENVELOPE = new BoundingBoxDoubleGf(
     GeometryFactory.fixed(3005, 1000.0), 2, 25000, 340000, 1900000, 1750000);
 
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
@@ -849,7 +849,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final double newY1 = y - newDeltaY;
 
     final GeometryFactory newGeometryFactory = extent.getGeometryFactory();
-    final BoundingBox newBoundingBox = new Envelope(newGeometryFactory, 2,
+    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(newGeometryFactory, 2,
       newX1, newY1, newX1 + newWidth, newY1 + newHeight);
     setBoundingBox(newBoundingBox);
   }

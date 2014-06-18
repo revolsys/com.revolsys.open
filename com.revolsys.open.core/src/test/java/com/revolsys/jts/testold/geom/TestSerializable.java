@@ -44,9 +44,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 /**
  * @version 1.7
@@ -68,7 +68,7 @@ public class TestSerializable {
   boolean compare(final Object o1, final Object o2) {
     boolean matched = false;
     if (o1 instanceof BoundingBox) {
-      if (!((Envelope)o1).equals(o2)) {
+      if (!((BoundingBoxDoubleGf)o1).equals(o2)) {
         // System.out.println("expected " + o1 + ", found " + o2);
       } else {
         matched = true;
@@ -89,7 +89,7 @@ public class TestSerializable {
   List createData() {
     final List objList = new ArrayList();
 
-    final Envelope env = new Envelope(2, 123, 123, 456, 456);
+    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, 123, 123, 456, 456);
     objList.add(env);
 
     objList.add(GeometryTestFactory.createBox(fact, 0.0, 100.0, 10, 10.0));

@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
@@ -140,7 +139,7 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
   public BoundingBox getBoundingBox() {
     if (boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new Envelope(getGeometryFactory());
+        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
         boundingBox = computeBoundingBox();
       }

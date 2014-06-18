@@ -15,11 +15,11 @@ import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.Segment;
@@ -271,7 +271,7 @@ public class CoordinatesListUtil {
 
   public static BoundingBox getBoundingBox(
     final GeometryFactory geometryFactory, final LineString points) {
-    final BoundingBox boundingBox = new Envelope(geometryFactory, points);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, points);
     return boundingBox;
   }
 

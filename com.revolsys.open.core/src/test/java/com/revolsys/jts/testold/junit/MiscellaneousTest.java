@@ -37,7 +37,6 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -48,6 +47,7 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.MultiLineStringImpl;
 import com.revolsys.jts.geom.impl.MultiPointImpl;
 import com.revolsys.jts.geom.impl.PointDouble;
@@ -195,14 +195,14 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyGeometryCollection() throws Exception {
     final GeometryCollection g = this.geometryFactory.geometryCollection();
     assertEquals(-1, g.getDimension());
-    assertEquals(new Envelope(), g.getBoundingBox());
+    assertEquals(new BoundingBoxDoubleGf(), g.getBoundingBox());
     assertTrue(g.isSimple());
   }
 
   public void testEmptyLinearRing() throws Exception {
     final LineString l = this.geometryFactory.linearRing();
     assertEquals(1, l.getDimension());
-    assertEquals(new Envelope(), l.getBoundingBox());
+    assertEquals(new BoundingBoxDoubleGf(), l.getBoundingBox());
     assertTrue(l.isSimple());
     assertEquals(null, l.getStartPoint());
     assertEquals(null, l.getEndPoint());
@@ -213,7 +213,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyLineString() throws Exception {
     final LineString l = this.geometryFactory.lineString();
     assertEquals(1, l.getDimension());
-    assertEquals(new Envelope(), l.getBoundingBox());
+    assertEquals(new BoundingBoxDoubleGf(), l.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -227,7 +227,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiLineString() throws Exception {
     final MultiLineString g = this.geometryFactory.multiLineString();
     assertEquals(1, g.getDimension());
-    assertEquals(new Envelope(), g.getBoundingBox());
+    assertEquals(new BoundingBoxDoubleGf(), g.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -238,7 +238,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiPoint() throws Exception {
     final MultiPoint g = this.geometryFactory.multiPoint();
     assertEquals(0, g.getDimension());
-    assertEquals(new Envelope(), g.getBoundingBox());
+    assertEquals(new BoundingBoxDoubleGf(), g.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -248,14 +248,14 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyMultiPolygon() throws Exception {
     final MultiPolygon g = this.geometryFactory.multiPolygon();
     assertEquals(2, g.getDimension());
-    assertEquals(new Envelope(), g.getBoundingBox());
+    assertEquals(new BoundingBoxDoubleGf(), g.getBoundingBox());
     assertTrue(g.isSimple());
   }
 
   public void testEmptyPoint() throws Exception {
     final Point p = this.geometryFactory.point((Point)null);
     assertEquals(0, p.getDimension());
-    assertEquals(new Envelope(), p.getBoundingBox());
+    assertEquals(new BoundingBoxDoubleGf(), p.getBoundingBox());
     assertTrue(p.isSimple());
 
     assertEquals("POINT EMPTY", p.toString());
@@ -265,7 +265,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyPolygon() throws Exception {
     final Polygon p = this.geometryFactory.polygon();
     assertEquals(2, p.getDimension());
-    assertEquals(new Envelope(), p.getBoundingBox());
+    assertEquals(new BoundingBoxDoubleGf(), p.getBoundingBox());
     assertTrue(p.isSimple());
   }
 

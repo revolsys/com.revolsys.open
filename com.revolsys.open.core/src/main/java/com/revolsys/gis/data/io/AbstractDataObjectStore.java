@@ -43,8 +43,8 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
@@ -334,7 +334,7 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public Query createQuery(final String typePath, final String whereClause,
-    final Envelope boundingBox) {
+    final BoundingBoxDoubleGf boundingBox) {
     throw new UnsupportedOperationException();
   }
 

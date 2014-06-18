@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.PriorityQueue;
 
 /**
@@ -100,7 +100,7 @@ class BoundablePair
     }
     // otherwise compute distance between bounds of boundables
     return ((BoundingBox) boundable1.getBounds()).distance(
-        ((Envelope) boundable2.getBounds()));
+        ((BoundingBoxDoubleGf) boundable2.getBounds()));
   }
 
   
@@ -117,11 +117,11 @@ class BoundablePair
   private double maxDistance()
   {
     return maximumDistance( 
-        (Envelope) boundable1.getBounds(),
-        (Envelope) boundable2.getBounds());      	
+        (BoundingBoxDoubleGf) boundable1.getBounds(),
+        (BoundingBoxDoubleGf) boundable2.getBounds());      	
   }
   
-  private static double maximumDistance(Envelope env1, Envelope env2)
+  private static double maximumDistance(BoundingBoxDoubleGf env1, BoundingBoxDoubleGf env2)
   {
   	double minx = Math.min(env1.getMinX(), env2.getMinX());
   	double miny = Math.min(env1.getMinY(), env2.getMinY());

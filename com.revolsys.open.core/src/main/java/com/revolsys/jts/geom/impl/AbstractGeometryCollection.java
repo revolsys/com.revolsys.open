@@ -43,7 +43,6 @@ import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Dimension;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -85,7 +84,7 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
 
   @Override
   protected BoundingBox computeBoundingBox() {
-    BoundingBox envelope = new Envelope(getGeometryFactory());
+    BoundingBox envelope = new BoundingBoxDoubleGf(getGeometryFactory());
     for (final Geometry geometry : geometries()) {
       envelope = envelope.expandToInclude(geometry);
     }

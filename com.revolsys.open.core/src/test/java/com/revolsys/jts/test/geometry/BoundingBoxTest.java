@@ -14,11 +14,11 @@ import org.junit.Test;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.TestConstants;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
@@ -220,20 +220,20 @@ public class BoundingBoxTest implements TestConstants {
 
   @Test
   public void testConstructorCoordinatesArray() {
-    final BoundingBox emptyNull = new Envelope((Point[])null);
+    final BoundingBox emptyNull = new BoundingBoxDoubleGf((Point[])null);
     assertEnvelope(emptyNull, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyList = new Envelope(new Point[0]);
+    final BoundingBox emptyList = new BoundingBoxDoubleGf(new Point[0]);
     assertEnvelope(emptyList, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyListWithNulls = new Envelope((Point)null);
+    final BoundingBox emptyListWithNulls = new BoundingBoxDoubleGf((Point)null);
     assertEnvelope(emptyListWithNulls, null, true, 0, NULL_BOUNDS);
 
     // Different number of axis and values
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         Point[] points = new Point[valueCount];
-        final double[] bounds = EnvelopeUtil.createBounds(axisCount);
+        final double[] bounds = BoundingBoxUtil.createBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
@@ -250,12 +250,12 @@ public class BoundingBoxTest implements TestConstants {
           }
           points[i] = new PointDouble(values);
         }
-        final Envelope noGeometryFactory = new Envelope(points);
+        final BoundingBoxDoubleGf noGeometryFactory = new BoundingBoxDoubleGf(points);
         assertEnvelope(noGeometryFactory, null, false, axisCount, bounds);
 
         final GeometryFactory gfFloating = GeometryFactory.floating(4326,
           axisCount);
-        assertEnvelope(new Envelope(gfFloating, points), gfFloating, false,
+        assertEnvelope(new BoundingBoxDoubleGf(gfFloating, points), gfFloating, false,
           axisCount, bounds);
 
         final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
@@ -263,7 +263,7 @@ public class BoundingBoxTest implements TestConstants {
 
         points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-        assertEnvelope(new Envelope(gfFixed, points), gfFixed, false,
+        assertEnvelope(new BoundingBoxDoubleGf(gfFixed, points), gfFixed, false,
           axisCount, boundsPrecise);
       }
     }
@@ -272,16 +272,16 @@ public class BoundingBoxTest implements TestConstants {
   @Test
   public void testConstructorDoubleArray() {
     // Empty
-    assertEnvelope(new Envelope(0), null, true, 0, NULL_BOUNDS);
-    assertEnvelope(new Envelope(-1), null, true, 0, NULL_BOUNDS);
-    assertEnvelope(new Envelope(2), null, true, 0, NULL_BOUNDS);
-    assertEnvelope(new Envelope(2, NULL_BOUNDS), null, true, 0, NULL_BOUNDS);
+    assertEnvelope(new BoundingBoxDoubleGf(0), null, true, 0, NULL_BOUNDS);
+    assertEnvelope(new BoundingBoxDoubleGf(-1), null, true, 0, NULL_BOUNDS);
+    assertEnvelope(new BoundingBoxDoubleGf(2), null, true, 0, NULL_BOUNDS);
+    assertEnvelope(new BoundingBoxDoubleGf(2, NULL_BOUNDS), null, true, 0, NULL_BOUNDS);
 
     // Different number of axis and values
     for (int axisCount = 1; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         final double[] values = new double[axisCount * valueCount];
-        final double[] bounds = EnvelopeUtil.createBounds(axisCount);
+        final double[] bounds = BoundingBoxUtil.createBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
             final double value = Math.random() * 360 - 180;
@@ -296,20 +296,20 @@ public class BoundingBoxTest implements TestConstants {
             }
           }
         }
-        final Envelope noGeometryFactory = new Envelope(axisCount, values);
+        final BoundingBoxDoubleGf noGeometryFactory = new BoundingBoxDoubleGf(axisCount, values);
         assertEnvelope(noGeometryFactory, null, false, axisCount, bounds);
 
         if (axisCount > 1) {
           final GeometryFactory gfFloating = GeometryFactory.floating(4326,
             axisCount);
-          assertEnvelope(new Envelope(gfFloating, axisCount, values),
+          assertEnvelope(new BoundingBoxDoubleGf(gfFloating, axisCount, values),
             gfFloating, false, axisCount, bounds);
 
           final GeometryFactory gfFixed = GeometryFactory.fixed(4326,
             axisCount, 10.0, 10.0);
           final double[] valuesPrecise = gfFixed.copyPrecise(values);
           final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-          assertEnvelope(new Envelope(gfFixed, axisCount, valuesPrecise),
+          assertEnvelope(new BoundingBoxDoubleGf(gfFixed, axisCount, valuesPrecise),
             gfFixed, false, axisCount, boundsPrecise);
         }
       }
@@ -318,14 +318,14 @@ public class BoundingBoxTest implements TestConstants {
 
   @Test
   public void testConstructorEmpty() {
-    final BoundingBox empty = new Envelope();
+    final BoundingBox empty = new BoundingBoxDoubleGf();
     assertEnvelope(empty, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyNullGeometryFactory = new Envelope(
+    final BoundingBox emptyNullGeometryFactory = new BoundingBoxDoubleGf(
       (GeometryFactory)null);
     assertEnvelope(emptyNullGeometryFactory, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyWithGeometryFactory = new Envelope(
+    final BoundingBox emptyWithGeometryFactory = new BoundingBoxDoubleGf(
       UTM10_GF_2_FLOATING);
     assertEnvelope(emptyWithGeometryFactory, UTM10_GF_2_FLOATING, true, 0,
       NULL_BOUNDS);
@@ -333,21 +333,21 @@ public class BoundingBoxTest implements TestConstants {
 
   @Test
   public void testConstructorIterable() {
-    final BoundingBox emptyNull = new Envelope((Iterable<Point>)null);
+    final BoundingBox emptyNull = new BoundingBoxDoubleGf((Iterable<Point>)null);
     assertEnvelope(emptyNull, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyList = new Envelope(new ArrayList<Point>());
+    final BoundingBox emptyList = new BoundingBoxDoubleGf(new ArrayList<Point>());
     assertEnvelope(emptyList, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyListWithNulls = new Envelope(
+    final BoundingBox emptyListWithNulls = new BoundingBoxDoubleGf(
       Collections.<Point> singleton(null));
     assertEnvelope(emptyListWithNulls, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyNullCoordinatesList = new Envelope(
+    final BoundingBox emptyNullCoordinatesList = new BoundingBoxDoubleGf(
       (Iterable<Point>)null);
     assertEnvelope(emptyNullCoordinatesList, null, true, 0, NULL_BOUNDS);
 
-    final BoundingBox emptyCoordinatesList = new Envelope(
+    final BoundingBox emptyCoordinatesList = new BoundingBoxDoubleGf(
       new ArrayList<Point>());
     assertEnvelope(emptyCoordinatesList, null, true, 0, NULL_BOUNDS);
 
@@ -355,7 +355,7 @@ public class BoundingBoxTest implements TestConstants {
     for (int axisCount = 2; axisCount < 6; axisCount++) {
       for (int valueCount = 1; valueCount < 10; valueCount++) {
         final List<Point> points = new ArrayList<>();
-        final double[] bounds = EnvelopeUtil.createBounds(axisCount);
+        final double[] bounds = BoundingBoxUtil.createBounds(axisCount);
         for (int i = 0; i < valueCount; i++) {
           final double[] values = new double[axisCount];
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
@@ -372,19 +372,19 @@ public class BoundingBoxTest implements TestConstants {
           }
           points.add(new PointDouble(values));
         }
-        final Envelope noGeometryFactory = new Envelope(points);
+        final BoundingBoxDoubleGf noGeometryFactory = new BoundingBoxDoubleGf(points);
         assertEnvelope(noGeometryFactory, null, false, axisCount, bounds);
 
         final GeometryFactory gfFloating = GeometryFactory.floating(4326,
           axisCount);
-        assertEnvelope(new Envelope(gfFloating, points), gfFloating, false,
+        assertEnvelope(new BoundingBoxDoubleGf(gfFloating, points), gfFloating, false,
           axisCount, bounds);
 
         final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount,
           10.0, 10.0);
 
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-        assertEnvelope(new Envelope(gfFixed, points), gfFixed, false,
+        assertEnvelope(new BoundingBoxDoubleGf(gfFixed, points), gfFixed, false,
           axisCount, boundsPrecise);
       }
     }

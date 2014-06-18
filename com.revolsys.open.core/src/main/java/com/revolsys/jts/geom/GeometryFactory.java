@@ -64,13 +64,13 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktParser;
 import com.revolsys.jts.geom.impl.GeometryCollectionImpl;
 import com.revolsys.jts.geom.impl.LineStringDouble;
-import com.revolsys.jts.geom.impl.LineStringDoubleGF;
-import com.revolsys.jts.geom.impl.LinearRingImpl;
+import com.revolsys.jts.geom.impl.LineStringDoubleGf;
+import com.revolsys.jts.geom.impl.LinearRingDoubleGf;
 import com.revolsys.jts.geom.impl.MultiLineStringImpl;
 import com.revolsys.jts.geom.impl.MultiPointImpl;
 import com.revolsys.jts.geom.impl.MultiPolygonImpl;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.geom.impl.PointDoubleGF;
+import com.revolsys.jts.geom.impl.PointDoubleGf;
 import com.revolsys.jts.geom.impl.PolygonImpl;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
@@ -1016,7 +1016,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   public LinearRing linearRing() {
-    return new LinearRingImpl(this);
+    return new LinearRingDoubleGf(this);
   }
 
   public LinearRing linearRing(final Collection<?> points) {
@@ -1029,12 +1029,12 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   public LinearRing linearRing(final int axisCount, final double... coordinates) {
-    return new LinearRingImpl(this, axisCount, coordinates);
+    return new LinearRingDoubleGf(this, axisCount, coordinates);
   }
 
   public LinearRing linearRing(final int axisCount, final int vertexCount,
     final double... coordinates) {
-    return new LinearRingImpl(this, axisCount, vertexCount, coordinates);
+    return new LinearRingDoubleGf(this, axisCount, vertexCount, coordinates);
   }
 
   /**
@@ -1047,7 +1047,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    */
   public LinearRing linearRing(final LineString points) {
-    return new LinearRingImpl(this, points);
+    return new LinearRingDoubleGf(this, points);
   }
 
   /**
@@ -1071,7 +1071,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   public LineString lineString() {
-    return new LineStringDoubleGF(this);
+    return new LineStringDoubleGf(this);
   }
 
   public LineString lineString(final Collection<?> points) {
@@ -1084,19 +1084,19 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   public LineString lineString(final int axisCount, final double... coordinates) {
-    return new LineStringDoubleGF(this, axisCount, coordinates);
+    return new LineStringDoubleGf(this, axisCount, coordinates);
   }
 
   public LineString lineString(final int axisCount, final int vertexCount,
     final double... coordinates) {
-    return new LineStringDoubleGF(this, axisCount, vertexCount, coordinates);
+    return new LineStringDoubleGf(this, axisCount, vertexCount, coordinates);
   }
 
   public LineString lineString(final LineString lineString) {
     if (lineString == null || lineString.isEmpty()) {
       return lineString();
     } else {
-      return new LineStringDoubleGF(this, lineString);
+      return new LineStringDoubleGf(this, lineString);
     }
   }
 
@@ -1247,7 +1247,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @return The point.
    */
   public Point point() {
-    return new PointDoubleGF(this);
+    return new PointDoubleGf(this);
   }
 
   /**
@@ -1264,7 +1264,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     if (coordinates == null || coordinates.length < 2) {
       return point();
     } else {
-      return new PointDoubleGF(this, coordinates);
+      return new PointDoubleGf(this, coordinates);
     }
   }
 

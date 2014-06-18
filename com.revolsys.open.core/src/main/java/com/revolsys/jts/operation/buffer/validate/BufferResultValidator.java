@@ -163,7 +163,7 @@ public class BufferResultValidator {
       GeometryFactory r = input.getGeometryFactory();
       errorIndicator = bufEnv.toGeometry();
     }
-    report("Envelope");
+    report("BoundingBoxDoubleGf");
   }
 
   private void checkExpectedEmpty() {

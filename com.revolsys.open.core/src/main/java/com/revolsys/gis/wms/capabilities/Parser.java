@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.io.xml.XmlProcessor;
 import com.revolsys.io.xml.XmlProcessorContext;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class Parser extends XmlProcessor {
   private static final Logger log = Logger.getLogger(Parser.class);
@@ -78,7 +78,7 @@ public class Parser extends XmlProcessor {
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(2, minX,
+    final com.revolsys.jts.geom.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX,
       minY, maxX, maxY);
     boundingBox.setEnvelope(envelope);
     final double resX = StaxUtils.getDoubleAttribute(parser, null, "resx");
@@ -341,7 +341,7 @@ public class Parser extends XmlProcessor {
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.jts.geom.BoundingBox envelope = new Envelope(2, minX,
+    final com.revolsys.jts.geom.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX,
       minY, maxX, maxY);
     StaxUtils.skipSubTree(parser);
     return envelope;

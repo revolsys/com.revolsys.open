@@ -50,7 +50,6 @@ import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Dimension;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryComponent;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -127,9 +126,9 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   protected BoundingBox computeBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return new Envelope(geometryFactory);
+      return new BoundingBoxDoubleGf(geometryFactory);
     } else {
-      return new Envelope(geometryFactory, vertices());
+      return new BoundingBoxDoubleGf(geometryFactory, vertices());
     }
   }
 

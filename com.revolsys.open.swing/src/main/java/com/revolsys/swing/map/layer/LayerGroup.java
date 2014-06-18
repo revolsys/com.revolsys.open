@@ -28,8 +28,8 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
@@ -306,7 +306,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = new Envelope(geometryFactory);
+    BoundingBox boudingBox = new BoundingBoxDoubleGf(geometryFactory);
     for (final Layer layer : this) {
       final BoundingBox layerBoundingBox = layer.getBoundingBox();
       if (!layerBoundingBox.isEmpty()) {
@@ -319,7 +319,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = new Envelope(geometryFactory);
+    BoundingBox boudingBox = new BoundingBoxDoubleGf(geometryFactory);
     if (isExists() && (!visibleLayersOnly || isVisible())) {
       for (final Layer layer : this) {
         if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {

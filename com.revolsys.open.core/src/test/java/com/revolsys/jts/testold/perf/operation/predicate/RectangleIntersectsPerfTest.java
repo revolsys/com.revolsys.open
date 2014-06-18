@@ -37,10 +37,10 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.util.SineStarFactory;
 import com.revolsys.jts.io.WKTReader;
@@ -106,7 +106,7 @@ public class RectangleIntersectsPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final BoundingBox envRect = new Envelope(2, baseX, baseY, baseX + dx,
+        final BoundingBox envRect = new BoundingBoxDoubleGf(2, baseX, baseY, baseX + dx,
           baseY + dy);
         final Geometry rect = envRect.toGeometry();
         rectList.add(rect);

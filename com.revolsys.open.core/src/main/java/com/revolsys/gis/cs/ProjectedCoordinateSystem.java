@@ -14,8 +14,8 @@ import com.revolsys.gis.cs.projection.CoordinatesProjection;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
   /**
@@ -164,10 +164,10 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     BoundingBox boundingBox;
     final GeometryFactory geographicGeometryFactory = geographicCoordinateSystem.getGeometryFactory();
     if (area == null) {
-      boundingBox = new Envelope(geographicGeometryFactory, 2, -180, -90, 180,
+      boundingBox = new BoundingBoxDoubleGf(geographicGeometryFactory, 2, -180, -90, 180,
         90);
     } else {
-      final Envelope latLonBounds = area.getLatLonBounds();
+      final BoundingBoxDoubleGf latLonBounds = area.getLatLonBounds();
       boundingBox = latLonBounds.convert(geographicGeometryFactory);
     }
     final BoundingBox projectedBoundingBox = boundingBox.convert(getGeometryFactory());

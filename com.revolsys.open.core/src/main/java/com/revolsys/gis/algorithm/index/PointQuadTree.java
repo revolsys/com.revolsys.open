@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 import com.revolsys.collection.Visitor;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
@@ -35,7 +35,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<Entry<Point, T>> findEntriesWithinDistance(final Point from,
     final Point to, final double maxDistance) {
-    final Envelope boundingBox = new Envelope(geometryFactory, from, to);
+    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(geometryFactory, from, to);
     final List<Entry<Point, T>> entries = new ArrayList<Entry<Point, T>>();
     root.findEntriesWithin(entries, boundingBox);
     for (final Iterator<Entry<Point, T>> iterator = entries.iterator(); iterator.hasNext();) {
@@ -64,7 +64,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   public List<T> findWithinDistance(final Point point, final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
-    BoundingBox envelope = new Envelope(2, x, y);
+    BoundingBox envelope = new BoundingBoxDoubleGf(2, x, y);
     envelope = envelope.expand(maxDistance);
     final List<T> results = new ArrayList<T>();
     if (root != null) {

@@ -40,7 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.index.ItemVisitor;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.util.Assert;
@@ -109,7 +109,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
   private static IntersectsOp intersectsOp = new IntersectsOp() {
     @Override
     public boolean intersects(final Object aBounds, final Object bBounds) {
-      return ((BoundingBox)aBounds).intersects((Envelope)bBounds);
+      return ((BoundingBox)aBounds).intersects((BoundingBoxDoubleGf)bBounds);
     }
   };
 
@@ -346,7 +346,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
   @Override
   public List query(final BoundingBox searchEnv) {
     // Yes this method does something. It specifies that the bounds is an
-    // Envelope. super.query takes an Object, not an Envelope. [Jon Aquino
+    // BoundingBoxDoubleGf. super.query takes an Object, not an BoundingBoxDoubleGf. [Jon Aquino
     // 10/24/2003]
     return super.query(searchEnv);
   }
@@ -356,7 +356,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
    */
   public void query(final BoundingBox searchEnv, final ItemVisitor visitor) {
     // Yes this method does something. It specifies that the bounds is an
-    // Envelope. super.query takes an Object, not an Envelope. [Jon Aquino
+    // BoundingBoxDoubleGf. super.query takes an Object, not an BoundingBoxDoubleGf. [Jon Aquino
     // 10/24/2003]
     super.query(searchEnv, visitor);
   }
@@ -364,7 +364,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
   /**
    * Removes a single item from the tree.
    *
-   * @param itemEnv the Envelope of the item to remove
+   * @param itemEnv the BoundingBoxDoubleGf of the item to remove
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */

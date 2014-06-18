@@ -20,10 +20,10 @@ import org.jdesktop.swingx.color.ColorUtil;
 import com.revolsys.awt.WebColors;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -175,7 +175,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       final int y = event.getY();
       final double[] location = getViewport().toModelCoordinates(x, y);
       final GeometryFactory geometryFactory = getViewportGeometryFactory();
-      BoundingBox boundingBox = new Envelope(geometryFactory, 2, location[0],
+      BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, location[0],
         location[1]);
       final double modelUnitsPerViewUnit = getViewport().getModelUnitsPerViewUnit();
       boundingBox = boundingBox.expand(modelUnitsPerViewUnit * 5);
@@ -398,7 +398,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final Point bottomRight = getViewport().toModelPoint(maxX, maxY);
 
         final GeometryFactory geometryFactory = getMap().getGeometryFactory();
-        final BoundingBox boundingBox = new Envelope(geometryFactory, 2,
+        final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2,
           topLeft.getX(), topLeft.getY(), bottomRight.getX(),
           bottomRight.getY());
 

@@ -8,11 +8,11 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
@@ -40,7 +40,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   double bufferWidth = 1.0;
 
-  BoundingBox rectEnv = new Envelope(2, this.baseX, this.baseY, this.baseX
+  BoundingBox rectEnv = new BoundingBoxDoubleGf(2, this.baseX, this.baseY, this.baseX
     + this.rectSize, this.baseY + this.rectSize);
 
   Geometry rect = this.rectEnv.toGeometry();
@@ -93,7 +93,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   }
 
   private List<Geometry> getTestGeometries() {
-    final BoundingBox testEnv = new Envelope(2, this.rectEnv.getMinX()
+    final BoundingBox testEnv = new BoundingBoxDoubleGf(2, this.rectEnv.getMinX()
       - this.bufSize, this.rectEnv.getMinY() - this.bufSize,
       this.rectEnv.getMaxX() + this.bufSize, this.rectEnv.getMaxY()
         + this.bufSize);

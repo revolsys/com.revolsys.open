@@ -17,7 +17,7 @@ public interface GmlConstants {
 
   QName DIMENSION = new QName("dimension");
 
-  QName ENVELOPE = new QName(_NS_URI, "Envelope", _NS_PREFIX);
+  QName ENVELOPE = new QName(_NS_URI, "BoundingBoxDoubleGf", _NS_PREFIX);
 
   QName BOX = new QName(_NS_URI, "Box", _NS_PREFIX);
 

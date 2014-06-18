@@ -29,10 +29,10 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.Project;
@@ -92,7 +92,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   private double originY;
 
   /** The current bounding box of the project. */
-  private BoundingBox boundingBox = new Envelope();
+  private BoundingBox boundingBox = new BoundingBoxDoubleGf();
 
   private GeometryFactory geometryFactory = GeometryFactory.floating3(3005);
 
@@ -171,7 +171,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final int x, final int y, final int pixels) {
     final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
     final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
-    final BoundingBox boundingBox = new Envelope(geometryFactory, p1, p2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, p1, p2);
     return boundingBox;
   }
 
@@ -523,7 +523,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double y1 = centreY - bottomOffset;
     final double x2 = centreX + rightOffset;
     final double y2 = centreY + topOffset;
-    final BoundingBox newBoundingBox = new Envelope(geometryFactory, 2, x1, y1,
+    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1,
       x2, y2);
     internalSetBoundingBox(newBoundingBox, unitsPerPixel);
     return newBoundingBox;

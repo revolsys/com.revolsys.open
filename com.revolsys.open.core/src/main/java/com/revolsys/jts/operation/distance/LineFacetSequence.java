@@ -35,10 +35,10 @@ package com.revolsys.jts.operation.distance;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -146,7 +146,7 @@ public class LineFacetSequence implements FacetSequence {
 
   @Override
   public BoundingBox getEnvelope() {
-    final Envelope env = new Envelope(line);
+    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(line);
     return env;
   }
 

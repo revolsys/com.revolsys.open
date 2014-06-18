@@ -45,16 +45,16 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geomgraph.DirectedEdge;
 import com.revolsys.jts.geomgraph.DirectedEdgeStar;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.Node;
 import com.revolsys.jts.geomgraph.Position;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.util.BoundingBoxUtil;
 
 //import debug.*;
 
@@ -302,13 +302,13 @@ class BufferSubgraph implements Comparable {
         for (int i = 0; i < points.getVertexCount(); i++) {
           final Point point = points.getPoint(i);
           if (bounds == null) {
-            bounds = EnvelopeUtil.createBounds(2, point);
+            bounds = BoundingBoxUtil.createBounds(2, point);
           } else {
-            EnvelopeUtil.expand(bounds, 2, point);
+            BoundingBoxUtil.expand(bounds, 2, point);
           }
         }
       }
-      env = new Envelope(2, bounds);
+      env = new BoundingBoxDoubleGf(2, bounds);
     }
     return env;
   }

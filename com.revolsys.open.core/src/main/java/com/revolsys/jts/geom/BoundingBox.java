@@ -231,7 +231,7 @@ public interface BoundingBox {
    * The Geometry returned is guaranteed to be valid.  
    * To provide this behaviour, the following cases occur:
    * <p>
-   * If the <code>Envelope</code> is:
+   * If the <code>BoundingBoxDoubleGf</code> is:
    * <ul>
    * <li>null : returns an empty {@link Point}
    * <li>a point : returns a non-empty {@link Point}
@@ -240,8 +240,8 @@ public interface BoundingBox {
    *  (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny).
    * </ul>
    * 
-   *@param  envelope the <code>Envelope</code> to convert
-   *@return an empty <code>Point</code> (for null <code>Envelope</code>s), 
+   *@param  envelope the <code>BoundingBoxDoubleGf</code> to convert
+   *@return an empty <code>Point</code> (for null <code>BoundingBoxDoubleGf</code>s), 
    *  a <code>Point</code> (when min x = max x and min y = max y) or a
    *      <code>Polygon</code> (in all other cases)
    */

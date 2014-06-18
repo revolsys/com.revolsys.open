@@ -37,9 +37,9 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geomgraph.GeometryGraph;
 import com.revolsys.jts.index.SpatialIndex;
 import com.revolsys.jts.index.strtree.STRtree;
@@ -56,7 +56,7 @@ public class IndexedNestedRingTester {
 
   private final List rings = new ArrayList();
 
-  private final Envelope totalEnv = new Envelope();
+  private final BoundingBoxDoubleGf totalEnv = new BoundingBoxDoubleGf();
 
   private SpatialIndex index;
 

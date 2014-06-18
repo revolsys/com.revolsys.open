@@ -14,9 +14,9 @@ import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.query.Condition;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.dataobject.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectListLayerTableModel;
@@ -169,7 +169,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
 
   @Override
   public BoundingBox getBoundingBox() {
-    BoundingBox boundingBox = new Envelope(getGeometryFactory());
+    BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
     for (final LayerDataObject record : getRecords()) {
       boundingBox = boundingBox.expandToInclude(record);
     }

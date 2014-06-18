@@ -143,7 +143,7 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName EDIATBLE = new QName(_NAMESPACE_URI, "Editable", _NAMESPACE_PREFIX);
 
-  QName ENVELOPE = new QName(_NAMESPACE_URI, "Envelope", _NAMESPACE_PREFIX);
+  QName ENVELOPE = new QName(_NAMESPACE_URI, "BoundingBoxDoubleGf", _NAMESPACE_PREFIX);
 
   QName ENVELOPE_N = new QName(_NAMESPACE_URI, "EnvelopeN", _NAMESPACE_PREFIX);
 

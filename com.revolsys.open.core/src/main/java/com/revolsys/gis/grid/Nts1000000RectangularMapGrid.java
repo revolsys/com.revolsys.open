@@ -10,8 +10,8 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.MathUtil;
 
 public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
@@ -44,7 +44,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new Envelope(getGeometryFactory(), 2, lon, lat, lon - tileWidth, lat
+    return new BoundingBoxDoubleGf(getGeometryFactory(), 2, lon, lat, lon - tileWidth, lat
       + tileHeight);
   }
 

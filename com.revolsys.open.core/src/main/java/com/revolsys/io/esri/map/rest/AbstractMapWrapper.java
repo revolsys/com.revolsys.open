@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.CollectionUtil;
 
 public class AbstractMapWrapper {
@@ -37,7 +37,7 @@ public class AbstractMapWrapper {
         }
         geometryFactory = GeometryFactory.floating3(srid);
       }
-      return new Envelope(geometryFactory, 2, minX, minY, maxX, maxY);
+      return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX, maxY);
     }
   }
 

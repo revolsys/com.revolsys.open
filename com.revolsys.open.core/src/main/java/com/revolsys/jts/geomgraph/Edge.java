@@ -35,9 +35,9 @@ package com.revolsys.jts.geomgraph;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geomgraph.index.MonotoneChainEdge;
@@ -64,7 +64,7 @@ public class Edge extends GraphComponent {
 
   private final LineString points;
 
-  private Envelope env;
+  private BoundingBoxDoubleGf env;
 
   private final EdgeIntersectionList eiList = new EdgeIntersectionList(this);
 
@@ -207,7 +207,7 @@ public class Edge extends GraphComponent {
 
   public BoundingBox getEnvelope() {
     if (env == null) {
-      env = new Envelope(points);
+      env = new BoundingBoxDoubleGf(points);
     }
     return env;
   }

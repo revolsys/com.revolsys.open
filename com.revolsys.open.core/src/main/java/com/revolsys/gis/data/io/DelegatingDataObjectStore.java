@@ -20,8 +20,8 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class DelegatingDataObjectStore extends AbstractDataObjectStore {
   private final AbstractDataObjectStore dataStore;
@@ -84,7 +84,7 @@ public class DelegatingDataObjectStore extends AbstractDataObjectStore {
 
   @Override
   public Query createQuery(final String typePath, final String whereClause,
-    final Envelope boundingBox) {
+    final BoundingBoxDoubleGf boundingBox) {
     return dataStore.createQuery(typePath, whereClause, boundingBox);
   }
 

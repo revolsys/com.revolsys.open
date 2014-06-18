@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -119,7 +118,7 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
   public BoundingBox getBoundingBox() {
     if (boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new Envelope(getGeometryFactory());
+        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
         boundingBox = computeBoundingBox();
       }

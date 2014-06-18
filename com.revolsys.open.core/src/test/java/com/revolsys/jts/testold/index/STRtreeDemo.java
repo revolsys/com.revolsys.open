@@ -38,11 +38,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.index.strtree.AbstractNode;
 import com.revolsys.jts.index.strtree.Boundable;
@@ -110,7 +110,7 @@ public class STRtreeDemo {
 
   private static void initTree(final TestTree t, final List sourceEnvelopes) {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
-      final Envelope sourceEnvelope = (Envelope)i.next();
+      final BoundingBoxDoubleGf sourceEnvelope = (BoundingBoxDoubleGf)i.next();
       t.insert(sourceEnvelope, sourceEnvelope);
     }
     t.build();

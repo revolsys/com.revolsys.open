@@ -20,9 +20,9 @@ import javax.swing.SwingUtilities;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.preferences.PreferencesDialog;
@@ -325,7 +325,7 @@ public class ZoomOverlay extends AbstractOverlay {
       final Point bottomRight = getViewport().toModelPoint(maxX, maxY);
 
       final GeometryFactory geometryFactory = getMap().getGeometryFactory();
-      final BoundingBox boundingBox = new Envelope(geometryFactory,
+      final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory,
         2, topLeft.getX(), topLeft.getY(), bottomRight.getX(), bottomRight.getY());
 
       this.zoomBoxFirstPoint = null;

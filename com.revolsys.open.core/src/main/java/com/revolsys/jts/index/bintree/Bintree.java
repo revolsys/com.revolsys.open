@@ -147,7 +147,7 @@ if (newSize <= oldSize) {
   /**
    * Removes a single item from the tree.
    *
-   * @param itemEnv the Envelope of the item to be removed
+   * @param itemEnv the BoundingBoxDoubleGf of the item to be removed
    * @param item the item to remove
    * @return <code>true</code> if the item was found (and thus removed)
    */

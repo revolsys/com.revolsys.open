@@ -2,7 +2,7 @@ package com.revolsys.jts.testold.index;
 
 import java.util.List;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 /**
  * Adapter for different kinds of indexes
@@ -11,7 +11,7 @@ import com.revolsys.jts.geom.Envelope;
 public interface Index {
   void finishInserting();
 
-  void insert(Envelope itemEnv, Object item);
+  void insert(BoundingBoxDoubleGf itemEnv, Object item);
 
-  List query(Envelope searchEnv);
+  List query(BoundingBoxDoubleGf searchEnv);
 }

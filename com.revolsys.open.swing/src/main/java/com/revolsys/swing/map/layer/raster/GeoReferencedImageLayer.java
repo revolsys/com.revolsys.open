@@ -22,9 +22,9 @@ import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.raster.GeoReferencedImage;
@@ -195,7 +195,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   public BoundingBox fitToViewport() {
     final Project project = getProject();
     if (project == null || this.image == null || !isInitialized()) {
-      return new Envelope();
+      return new BoundingBoxDoubleGf();
     } else {
       final BoundingBox oldValue = this.image.getBoundingBox();
       final BoundingBox viewBoundingBox = project.getViewBoundingBox();
@@ -225,7 +225,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   public BoundingBox getBoundingBox() {
     final GeoReferencedImage image = getImage();
     if (image == null) {
-      return new Envelope();
+      return new BoundingBoxDoubleGf();
     } else {
       final BoundingBox boundingBox = image.getBoundingBox();
       if (boundingBox.isEmpty()) {
@@ -240,7 +240,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return new Envelope(getGeometryFactory());
+      return new BoundingBoxDoubleGf(getGeometryFactory());
     }
   }
 

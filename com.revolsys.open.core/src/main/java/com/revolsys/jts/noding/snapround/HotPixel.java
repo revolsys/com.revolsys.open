@@ -35,8 +35,8 @@ package com.revolsys.jts.noding.snapround;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.util.Assert;
@@ -151,7 +151,7 @@ public class HotPixel {
   public BoundingBox getSafeEnvelope() {
     if (safeEnv == null) {
       final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / scaleFactor;
-      safeEnv = new Envelope(2, originalPt.getX() - safeTolerance,
+      safeEnv = new BoundingBoxDoubleGf(2, originalPt.getX() - safeTolerance,
         originalPt.getY() - safeTolerance, originalPt.getX() + safeTolerance,
         originalPt.getY() + safeTolerance);
     }

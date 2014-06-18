@@ -42,13 +42,13 @@ import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateArrays;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.jts.triangulate.quadedge.Vertex;
 
@@ -62,13 +62,13 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
  */
 public class DelaunayTriangulationBuilder {
   /**
-   * Computes the {@link Envelope} of a collection of {@link Coordinates}s.
+   * Computes the {@link BoundingBoxDoubleGf} of a collection of {@link Coordinates}s.
    * 
    * @param coords a List of Coordinates
    * @return the envelope of the set of coordinates
    */
-  public static Envelope envelope(final Collection<Point> coords) {
-    return new Envelope(coords);
+  public static BoundingBoxDoubleGf envelope(final Collection<Point> coords) {
+    return new BoundingBoxDoubleGf(coords);
   }
 
   /**

@@ -38,10 +38,10 @@ import com.revolsys.gis.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geom.vertex.VertexIndexComparator;
@@ -343,7 +343,7 @@ public class AbstractOverlay extends JComponent implements
       boundingBox = viewport.getBoundingBox(geometryFactory, event,
         hotspotPixels);
     } else {
-      boundingBox = new Envelope();
+      boundingBox = new BoundingBoxDoubleGf();
     }
     return boundingBox;
   }

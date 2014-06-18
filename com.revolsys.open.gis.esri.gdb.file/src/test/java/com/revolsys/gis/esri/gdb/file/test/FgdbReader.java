@@ -26,8 +26,8 @@ import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class FgdbReader {
 
@@ -236,7 +236,7 @@ public class FgdbReader {
         final double maxY = in.readLEDouble();
         final GeometryFactory geometryFactory = GeometryFactory.fixed(
           coordinateSystem, axisCount, xyScale, zScale);
-        final BoundingBox boundingBox = new Envelope(geometryFactory, 2,
+        final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2,
           minX, minY, maxX, maxY);
         boolean run = true;
         while (run) {

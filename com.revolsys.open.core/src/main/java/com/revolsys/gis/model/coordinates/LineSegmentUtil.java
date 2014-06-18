@@ -14,7 +14,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 
 public class LineSegmentUtil {
@@ -96,7 +96,7 @@ public class LineSegmentUtil {
        */
 
       boolean noIntersection = false;
-      if (!EnvelopeUtil.intersects(line1X1, line1Y1, line1X2, line1Y2, line2X1,
+      if (!BoundingBoxUtil.intersects(line1X1, line1Y1, line1X2, line1Y2, line2X1,
         line2Y1, line2X2, line2Y2)) {
         noIntersection = true;
       } else {
@@ -355,7 +355,7 @@ public class LineSegmentUtil {
     line1End = geometryFactory.createCoordinates(line1End);
     line2Start = geometryFactory.createCoordinates(line2Start);
     line2End = geometryFactory.createCoordinates(line2End);
-    if (EnvelopeUtil.intersects(line1Start, line1End, line2Start, line2End)) {
+    if (BoundingBoxUtil.intersects(line1Start, line1End, line2Start, line2End)) {
       final Set<Point> intersections = new TreeSet<Point>(
         new CoordinatesDistanceComparator(line1Start));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End,

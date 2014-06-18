@@ -3,7 +3,7 @@ package com.revolsys.gis.cs;
 import java.io.Serializable;
 
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class Area implements Serializable {
   /**
@@ -15,11 +15,11 @@ public class Area implements Serializable {
 
   private final boolean deprecated;
 
-  private final Envelope latLonBounds;
+  private final BoundingBoxDoubleGf latLonBounds;
 
   private final String name;
 
-  public Area(final String name, final Envelope latLonBounds,
+  public Area(final String name, final BoundingBoxDoubleGf latLonBounds,
     final Authority authority, final boolean deprecated) {
     this.name = name;
     this.latLonBounds = latLonBounds;
@@ -45,7 +45,7 @@ public class Area implements Serializable {
     return authority;
   }
 
-  public Envelope getLatLonBounds() {
+  public BoundingBoxDoubleGf getLatLonBounds() {
     return latLonBounds;
   }
 

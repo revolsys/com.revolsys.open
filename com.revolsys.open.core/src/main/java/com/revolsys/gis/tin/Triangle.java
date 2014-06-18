@@ -7,17 +7,17 @@ import java.util.Set;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.algorithm.CGAlgorithms;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.AbstractLineString;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
-import com.revolsys.jts.util.EnvelopeUtil;
+import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
@@ -135,18 +135,18 @@ public class Triangle extends AbstractLineString {
    * 
    * @return The envelope.
    */
-  public Envelope getEnvelopeInternal() {
+  public BoundingBoxDoubleGf getEnvelopeInternal() {
     double[] bounds = null;
     for (int i = 0; i < 3; i++) {
       final double x = getX(i);
       final double y = getY(i);
       if (bounds == null) {
-        bounds = EnvelopeUtil.createBounds(2, x, y);
+        bounds = BoundingBoxUtil.createBounds(2, x, y);
       } else {
-        EnvelopeUtil.expand(null, bounds, 2, x, y);
+        BoundingBoxUtil.expand(null, bounds, 2, x, y);
       }
     }
-    return new Envelope(2, bounds);
+    return new BoundingBoxDoubleGf(2, bounds);
   }
 
   public Point getInCentre() {

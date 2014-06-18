@@ -42,7 +42,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
@@ -499,7 +499,7 @@ public class Gdal {
 				final String boundingBoxWkt = (String) settings
 						.get("boundingBox");
 				if (StringUtils.hasText(boundingBoxWkt)) {
-					final BoundingBox boundingBox = Envelope
+					final BoundingBox boundingBox = BoundingBoxDoubleGf
 							.create(boundingBoxWkt);
 					if (!boundingBox.isEmpty()) {
 						setSpatialReference(dataset,

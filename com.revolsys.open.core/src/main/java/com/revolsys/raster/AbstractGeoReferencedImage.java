@@ -44,9 +44,9 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.io.xml.DomUtil;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Envelope;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -167,7 +167,7 @@ public abstract class AbstractGeoReferencedImage extends
 
   private List<Dimension> overviewSizes = new ArrayList<>();
 
-  private BoundingBox boundingBox = new Envelope();
+  private BoundingBox boundingBox = new BoundingBoxDoubleGf();
 
   private int imageWidth = -1;
 
@@ -615,7 +615,7 @@ public abstract class AbstractGeoReferencedImage extends
         final Map<String, Object> settings = JsonMapIoFactory.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (StringUtils.hasText(boundingBoxWkt)) {
-          final BoundingBox boundingBox = Envelope.create(boundingBoxWkt);
+          final BoundingBox boundingBox = BoundingBoxDoubleGf.create(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setBoundingBox(boundingBox);
           }
@@ -672,7 +672,7 @@ public abstract class AbstractGeoReferencedImage extends
           setResolution(pixelWidth);
           // TODO rotation using a warp filter
           setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
-          // worldWarpFilter = new WarpAffineFilter(new Envelope(
+          // worldWarpFilter = new WarpAffineFilter(new BoundingBoxDoubleGf(
           // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
           // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
           // yRotation);
@@ -758,7 +758,7 @@ public abstract class AbstractGeoReferencedImage extends
 
     final int imageHeight = getImageHeight();
     final double y2 = y1 - pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new Envelope(geometryFactory, 2, x1, y1,
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1,
       x2, y2);
     setBoundingBox(boundingBox);
   }

@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.geom.Envelope;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 /**
  * @version 1.7
@@ -47,14 +47,14 @@ public class EnvelopeList {
   public EnvelopeList() {
   }
 
-  public void add(final Envelope env) {
+  public void add(final BoundingBoxDoubleGf env) {
     this.envList.add(env);
   }
 
-  public List query(final Envelope searchEnv) {
+  public List query(final BoundingBoxDoubleGf searchEnv) {
     final List result = new ArrayList();
     for (final Iterator i = this.envList.iterator(); i.hasNext();) {
-      final Envelope env = (Envelope)i.next();
+      final BoundingBoxDoubleGf env = (BoundingBoxDoubleGf)i.next();
       if (env.intersects(searchEnv)) {
         result.add(env);
       }

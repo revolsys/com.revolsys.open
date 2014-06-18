@@ -55,10 +55,10 @@ import com.revolsys.jts.geom.LineString;
  *
  * @version 1.7
  */
-public class LinearRingImpl extends LineStringDoubleGF implements LinearRing {
+public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing {
   private static final long serialVersionUID = -4261142084085851829L;
 
-  public LinearRingImpl(final GeometryFactory factory) {
+  public LinearRingDoubleGf(final GeometryFactory factory) {
     super(factory);
   }
 
@@ -72,7 +72,7 @@ public class LinearRingImpl extends LineStringDoubleGF implements LinearRing {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingImpl(final GeometryFactory factory, final int axisCount,
+  public LinearRingDoubleGf(final GeometryFactory factory, final int axisCount,
     final double... points) {
     super(factory, axisCount, points);
     if (isClosed()) {
@@ -88,7 +88,7 @@ public class LinearRingImpl extends LineStringDoubleGF implements LinearRing {
     }
   }
 
-  public LinearRingImpl(final GeometryFactory geometryFactory,
+  public LinearRingDoubleGf(final GeometryFactory geometryFactory,
     final int axisCount, final int vertexCount, final double... coordinates) {
     super(geometryFactory, axisCount, getNewCoordinates(geometryFactory,
       axisCount, vertexCount, coordinates));
@@ -105,7 +105,7 @@ public class LinearRingImpl extends LineStringDoubleGF implements LinearRing {
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingImpl(final GeometryFactory factory, final LineString points) {
+  public LinearRingDoubleGf(final GeometryFactory factory, final LineString points) {
     super(factory, points);
     if (isClosed()) {
       final int vertexCount = getVertexCount();
@@ -121,8 +121,8 @@ public class LinearRingImpl extends LineStringDoubleGF implements LinearRing {
   }
 
   @Override
-  public LinearRingImpl clone() {
-    return (LinearRingImpl)super.clone();
+  public LinearRingDoubleGf clone() {
+    return (LinearRingDoubleGf)super.clone();
   }
 
   @SuppressWarnings("unchecked")
