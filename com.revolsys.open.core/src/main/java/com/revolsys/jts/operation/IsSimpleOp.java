@@ -194,6 +194,8 @@ public class IsSimpleOp {
   private boolean isSimple(final Lineal lineal) {
     final Segment segment2 = (Segment)lineal.segments().iterator();
     for (final Segment segment : lineal.segments()) {
+      final int partIndex = segment.getPartIndex();
+      final int segmentIndex = segment.getSegmentIndex();
       segment2.setSegmentId(segment.getSegmentId());
       boolean nextSegment = true;
       while (segment2.hasNext()) {
@@ -201,17 +203,36 @@ public class IsSimpleOp {
         final Geometry intersection = segment.getIntersection(segment2);
         if (intersection instanceof Point) {
           final Point pointIntersection = (Point)intersection;
-          final boolean segment1EndIntersection = isEndIntersection(segment,
-            pointIntersection);
-          final boolean segment2EndIntersection = isEndIntersection(segment2,
-            pointIntersection);
-
           boolean isIntersection = true;
-          if (segment1EndIntersection && segment2EndIntersection) {
-            isIntersection = false;
-          } else if (nextSegment && !segment2.isLineStart()) {
-            if (segment2.equalsVertex(2, 0, pointIntersection)) {
-              isIntersection = false;
+
+          final int partIndex2 = segment2.getPartIndex();
+          // Process segments on the same linestring part
+          if (partIndex == partIndex2) {
+            final int segmentIndex2 = segment2.getSegmentIndex();
+            // The end of the current segment can touch the start of the next
+            // segment
+            if (segmentIndex + 1 == segmentIndex2) {
+              if (segment2.equalsVertex(2, 0, pointIntersection)) {
+                isIntersection = false;
+              }
+              // A loop can touch itself at the start/end
+            } else if (segment.isLineClosed()) {
+              if (segment.isLineStart() && segment2.isLineEnd()) {
+                if (segment.equalsVertex(2, 0, pointIntersection)) {
+                  isIntersection = false;
+                }
+              }
+            }
+          } else {
+            if (!segment.isLineClosed() && !segment2.isLineClosed()) {
+              final boolean segment1EndIntersection = isEndIntersection(
+                segment, pointIntersection);
+              final boolean segment2EndIntersection = isEndIntersection(
+                segment2, pointIntersection);
+
+              if (segment1EndIntersection && segment2EndIntersection) {
+                isIntersection = false;
+              }
             }
           }
           if (isIntersection) {
@@ -220,7 +241,6 @@ public class IsSimpleOp {
               return false;
             }
           }
-          // TODO touching loops
         } else if (intersection instanceof LineSegment) {
           final LineSegment lineIntersection = (LineSegment)intersection;
           nonSimplePoints.add(lineIntersection.getPoint(0));
