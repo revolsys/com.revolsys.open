@@ -1,5 +1,0 @@
-[
-  {
-    "jdbcFactoryClassName" : "com.revolsys.gis.spatialite.io.SpatiaLiteDatabaseFactory"
-  }
-]

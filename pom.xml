@@ -47,7 +47,6 @@
     <module>com.revolsys.open.orm</module>
     <module>com.revolsys.open.gis.oracle</module>
     <module>com.revolsys.open.gis.postgresql</module>
-    <module>com.revolsys.open.gis.spatialite</module>
     <module>com.revolsys.open.gdal</module>
     <module>com.revolsys.open.gis.esri.gdb.file</module>
     <module>com.revolsys.open.doclet</module>
