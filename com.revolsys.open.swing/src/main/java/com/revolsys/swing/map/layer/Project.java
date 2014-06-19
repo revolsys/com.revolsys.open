@@ -69,7 +69,7 @@ public class Project extends LayerGroup {
 
   public Project(final String name) {
     super(name);
-    this.baseMapLayers.setLayerGroup(this);
+    baseMapLayers.setLayerGroup(this);
     setGeometryFactory(GeometryFactory.worldMercator());
   }
 
@@ -95,9 +95,9 @@ public class Project extends LayerGroup {
   @Override
   public void delete() {
     super.delete();
-    this.baseMapLayers = null;
-    this.viewBoundingBox = null;
-    this.zoomBookmarks = null;
+    baseMapLayers = null;
+    viewBoundingBox = null;
+    zoomBookmarks = null;
   }
 
   @Override
@@ -119,11 +119,11 @@ public class Project extends LayerGroup {
   }
 
   public LayerGroup getBaseMapLayers() {
-    return this.baseMapLayers;
+    return baseMapLayers;
   }
 
   public DataObjectStoreConnectionRegistry getDataStores() {
-    return this.dataStores;
+    return dataStores;
   }
 
   @Override
@@ -140,7 +140,7 @@ public class Project extends LayerGroup {
   }
 
   public FolderConnectionRegistry getFolderConnections() {
-    return this.folderConnections;
+    return folderConnections;
   }
 
   @Override
@@ -156,7 +156,7 @@ public class Project extends LayerGroup {
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final String name) {
     if (name.equals("Base Maps")) {
-      return (V)this.baseMapLayers;
+      return (V)baseMapLayers;
     } else {
       return (V)super.getLayer(name);
     }
@@ -168,8 +168,8 @@ public class Project extends LayerGroup {
   }
 
   public File getProjectDirectory() {
-    if (this.resource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)this.resource;
+    if (resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)resource;
       final File directory = fileResource.getFile();
       if (!directory.exists()) {
         directory.mkdirs();
@@ -182,7 +182,7 @@ public class Project extends LayerGroup {
   }
 
   public BoundingBox getViewBoundingBox() {
-    return this.viewBoundingBox;
+    return viewBoundingBox;
   }
 
   public Map<String, BoundingBox> getZoomBookmarks() {
@@ -198,9 +198,9 @@ public class Project extends LayerGroup {
       final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
       try {
         final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
-        this.baseMapLayers.loadLayers(properties);
-        if (this.baseMapLayers != null && !this.baseMapLayers.isEmpty()) {
-          this.baseMapLayers.get(0).setVisible(true);
+        baseMapLayers.loadLayers(properties);
+        if (baseMapLayers != null && !baseMapLayers.isEmpty()) {
+          baseMapLayers.get(0).setVisible(true);
         }
       } finally {
         SpringUtil.setBaseResource(oldResource);
@@ -231,6 +231,7 @@ public class Project extends LayerGroup {
   public void readProject(final Resource resource) {
     this.resource = resource;
     if (resource.exists()) {
+      setEventsEnabled(false);
       final Resource layersDir = SpringUtil.getResource(resource, "Layers");
       readProperties(layersDir);
       final DataObjectStoreConnectionRegistry oldDataStoreConnections = DataObjectStoreConnectionRegistry.getForThread();
@@ -246,13 +247,14 @@ public class Project extends LayerGroup {
 
         final Resource folderConnectionsDirectory = SpringUtil.getResource(
           resource, "Folder Connections");
-        this.folderConnections = new FolderConnectionRegistry("Project",
+        folderConnections = new FolderConnectionRegistry("Project",
           folderConnectionsDirectory, readOnly);
 
         readLayers(layersDir);
 
         readBaseMapsLayers(resource);
       } finally {
+        setEventsEnabled(true);
         DataObjectStoreConnectionRegistry.setForThread(oldDataStoreConnections);
       }
     }
@@ -424,7 +426,7 @@ public class Project extends LayerGroup {
       if (value != null) {
         final BoundingBox viewBoundingBox = BoundingBoxDoubleGf.create(value.toString());
         if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
-          this.initialBoundingBox = viewBoundingBox;
+          initialBoundingBox = viewBoundingBox;
           setGeometryFactory(viewBoundingBox.getGeometryFactory());
           setViewBoundingBox(viewBoundingBox);
         }

@@ -165,33 +165,33 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public MapPanel(final Project project) {
     super(new BorderLayout());
     this.project = project;
-    this.baseMapLayers = project.getBaseMapLayers();
+    baseMapLayers = project.getBaseMapLayers();
     project.setProperty(MAP_PANEL, this);
-    this.layeredPane = new JLayeredPane();
-    this.layeredPane.setOpaque(true);
-    this.layeredPane.setBackground(Color.WHITE);
-    this.layeredPane.setVisible(true);
-    this.layeredPane.setLayout(new FullSizeLayoutManager());
+    layeredPane = new JLayeredPane();
+    layeredPane.setOpaque(true);
+    layeredPane.setBackground(Color.WHITE);
+    layeredPane.setVisible(true);
+    layeredPane.setLayout(new FullSizeLayoutManager());
 
-    add(this.layeredPane, BorderLayout.CENTER);
+    add(layeredPane, BorderLayout.CENTER);
 
-    this.viewport = new ComponentViewport2D(project, this.layeredPane);
-    Property.addListener(this.viewport, this);
+    viewport = new ComponentViewport2D(project, layeredPane);
+    Property.addListener(viewport, this);
 
     createScales();
-    this.viewport.setScales(getScales());
+    viewport.setScales(getScales());
 
-    this.layeredPane.setBorder(new MapRulerBorder(this.viewport));
+    layeredPane.setBorder(new MapRulerBorder(viewport));
 
-    this.baseMapOverlay = new LayerRendererOverlay(this);
+    baseMapOverlay = new LayerRendererOverlay(this);
     baseMapOverlay.setLayer(NullLayer.INSTANCE);
-    this.layeredPane.add(this.baseMapOverlay, new Integer(0));
-    Property.addListener(this.baseMapOverlay, "layer", this);
+    layeredPane.add(baseMapOverlay, new Integer(0));
+    Property.addListener(baseMapOverlay, "layer", this);
 
-    this.layerOverlay = new LayerRendererOverlay(this, project);
-    this.layeredPane.add(this.layerOverlay, new Integer(1));
+    layerOverlay = new LayerRendererOverlay(this, project);
+    layeredPane.add(layerOverlay, new Integer(1));
 
-    Property.addListener(this.baseMapLayers, this);
+    Property.addListener(baseMapLayers, this);
     Property.addListener(project, this);
 
     addMapOverlays();
@@ -202,15 +202,15 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
     zoomToWorld();
 
-    this.fileDropListener = new FileDropTargetListener(this);
-    this.undoManager.addKeyMap(this);
+    fileDropListener = new FileDropTargetListener(this);
+    undoManager.addKeyMap(this);
   }
 
   public void addBaseMap(final Layer layer) {
     if (layer != null) {
-      this.baseMapLayers.add(layer);
+      baseMapLayers.add(layer);
     }
-    if (this.baseMapLayers.size() == 1) {
+    if (baseMapLayers.size() == 1) {
       if (layer.isVisible()) {
         setBaseMapLayer(layer);
       }
@@ -218,42 +218,42 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   private void addLayerControls() {
-    this.toolBar.addButtonTitleIcon("layers", "Refresh All Layers",
-      "arrow_refresh", this, "refresh");
+    toolBar.addButtonTitleIcon("layers", "Refresh All Layers", "arrow_refresh",
+      this, "refresh");
 
     final SelectMapCoordinateSystem selectCoordinateSystem = new SelectMapCoordinateSystem(
       this);
-    this.toolBar.addComponent("layers", selectCoordinateSystem);
+    toolBar.addComponent("layers", selectCoordinateSystem);
 
     final LayerGroupListModel baseMapLayersModel = new LayerGroupListModel(
-      this.baseMapLayers, true);
+      baseMapLayers, true);
     baseMapLayerField = new ComboBox(baseMapLayersModel);
     baseMapLayerField.setMaximumSize(new Dimension(200, 22));
     baseMapLayerField.addItemListener(new InvokeMethodSelectedItemListener(
       this, "setBaseMapLayer"));
-    if (this.baseMapLayers.size() > 0) {
+    if (baseMapLayers.size() > 0) {
       baseMapLayerField.setSelectedIndex(1);
     }
     baseMapLayerField.setToolTipText("Base Map");
-    this.toolBar.addComponent("layers", baseMapLayerField);
-    Property.addListener(this.baseMapOverlay, "layer", this);
-    this.toolBar.addButtonTitleIcon("layers", "Refresh Base Map",
-      "map_refresh", baseMapOverlay, "refresh");
+    toolBar.addComponent("layers", baseMapLayerField);
+    Property.addListener(baseMapOverlay, "layer", this);
+    toolBar.addButtonTitleIcon("layers", "Refresh Base Map", "map_refresh",
+      baseMapOverlay, "refresh");
   }
 
   public void addMapOverlay(final int zIndex, final JComponent overlay) {
-    this.layeredPane.add(overlay, new Integer(zIndex));
+    layeredPane.add(overlay, new Integer(zIndex));
     if (overlay instanceof PropertyChangeListener) {
       final PropertyChangeListener listener = (PropertyChangeListener)overlay;
       Property.addListener(this, listener);
-      Property.addListener(this.project, listener);
-      Property.addListener(this.baseMapLayers, listener);
+      Property.addListener(project, listener);
+      Property.addListener(baseMapLayers, listener);
     }
     Property.addListener(overlay, this);
   }
 
   public void addMapOverlay(final JComponent overlay) {
-    final int zIndex = 100 * this.overlayIndex++;
+    final int zIndex = 100 * overlayIndex++;
     addMapOverlay(zIndex, overlay);
   }
 
@@ -261,23 +261,23 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     new ZoomOverlay(this);
     new SelectRecordsOverlay(this);
     new EditGeometryOverlay(this);
-    this.mouseOverlay = new MouseOverlay(this.layeredPane);
+    mouseOverlay = new MouseOverlay(layeredPane);
     new EditGeoReferencedImageOverlay(this);
-    this.toolTipOverlay = new ToolTipOverlay(this);
+    toolTipOverlay = new ToolTipOverlay(this);
   }
 
   private void addPointerLocation(final boolean geographics) {
     final MapPointerLocation location = new MapPointerLocation(this,
       geographics);
-    this.leftStatusBar.add(location);
+    leftStatusBar.add(location);
   }
 
   protected void addStatusBar() {
     statusBarPanel = new JPanel(new BorderLayout());
     statusBarPanel.setMinimumSize(new Dimension(200, 42));
     add(statusBarPanel, BorderLayout.SOUTH);
-    statusBarPanel.add(this.leftStatusBar, BorderLayout.WEST);
-    statusBarPanel.add(this.rightStatusBar, BorderLayout.EAST);
+    statusBarPanel.add(leftStatusBar, BorderLayout.WEST);
+    statusBarPanel.add(rightStatusBar, BorderLayout.EAST);
 
     addPointerLocation(false);
     addPointerLocation(true);
@@ -289,14 +289,14 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     overlayActionLabel.setMinimumSize(new Dimension(20, 30));
     overlayActionLabel.setVisible(false);
     overlayActionLabel.setForeground(WebColors.Green);
-    this.leftStatusBar.add(overlayActionLabel);
+    leftStatusBar.add(overlayActionLabel);
 
-    this.progressBar = new SwingWorkerProgressBar();
-    this.rightStatusBar.add(progressBar);
+    progressBar = new SwingWorkerProgressBar();
+    rightStatusBar.add(progressBar);
   }
 
   protected void addToolBar() {
-    add(this.toolBar, BorderLayout.NORTH);
+    add(toolBar, BorderLayout.NORTH);
 
     addZoomButtons();
 
@@ -307,19 +307,19 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void addUndo(final UndoableEdit edit) {
-    this.undoManager.addEdit(edit);
+    undoManager.addEdit(edit);
   }
 
   protected void addUndoButtons() {
-    final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
+    final EnableCheck canUndo = new ObjectPropertyEnableCheck(undoManager,
       "canUndo");
-    final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
+    final EnableCheck canRedo = new ObjectPropertyEnableCheck(undoManager,
       "canRedo");
 
-    this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
-      this.undoManager, "undo");
-    this.toolBar.addButton("undo", "Redo", "arrow_redo", canRedo,
-      this.undoManager, "redo");
+    toolBar.addButton("undo", "Undo", "arrow_undo", canUndo, undoManager,
+      "undo");
+    toolBar.addButton("undo", "Redo", "arrow_redo", canRedo, undoManager,
+      "redo");
   }
 
   public void addZoomBookmark() {
@@ -336,38 +336,38 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   private void addZoomButtons() {
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom to World",
-      "magnifier_zoom_world", this, "zoomToWorld");
+    toolBar.addButtonTitleIcon("zoom", "Zoom to World", "magnifier_zoom_world",
+      this, "zoomToWorld");
 
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom to British Columbia",
-      "zoom_bc", this, "setBoundingBox", MapPanel.BC_ENVELOPE);
+    toolBar.addButtonTitleIcon("zoom", "Zoom to British Columbia", "zoom_bc",
+      this, "setBoundingBox", MapPanel.BC_ENVELOPE);
 
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom In", "magnifier_zoom_in",
-      this, "zoomIn");
+    toolBar.addButtonTitleIcon("zoom", "Zoom In", "magnifier_zoom_in", this,
+      "zoomIn");
 
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom Out", "magnifier_zoom_out",
-      this, "zoomOut");
+    toolBar.addButtonTitleIcon("zoom", "Zoom Out", "magnifier_zoom_out", this,
+      "zoomOut");
 
-    final JButton zoomPreviousButton = this.toolBar.addButtonTitleIcon("zoom",
+    final JButton zoomPreviousButton = toolBar.addButtonTitleIcon("zoom",
       "Zoom Previous", "magnifier_zoom_left", this, "zoomPrevious");
     zoomPreviousButton.setEnabled(false);
     Property.addListener(this, "zoomPreviousEnabled",
       new EnableComponentListener(zoomPreviousButton));
 
-    final JButton zoomNextButton = this.toolBar.addButtonTitleIcon("zoom",
+    final JButton zoomNextButton = toolBar.addButtonTitleIcon("zoom",
       "Zoom Next", "magnifier_zoom_right", this, "zoomNext");
     zoomNextButton.setEnabled(false);
     Property.addListener(this, "zoomNextEnabled", new EnableComponentListener(
       zoomNextButton));
 
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom To Selected",
+    toolBar.addButtonTitleIcon("zoom", "Zoom To Selected",
       "magnifier_zoom_selected", this, "zoomToSelected");
 
-    zoomBookmarkButton = this.toolBar.addButtonTitleIcon("zoom",
-      "Zoom Bookmarks", "zoom_bookmark", this, "showZoomBookmarkMenu");
+    zoomBookmarkButton = toolBar.addButtonTitleIcon("zoom", "Zoom Bookmarks",
+      "zoom_bookmark", this, "showZoomBookmarkMenu");
 
-    this.toolBar.addComponent("zoom", new SelectMapScale(this));
-    this.toolBar.addComponent("zoom", new SelectMapUnitsPerPixel(this));
+    toolBar.addComponent("zoom", new SelectMapScale(this));
+    toolBar.addComponent("zoom", new SelectMapUnitsPerPixel(this));
   }
 
   public boolean clearOverlayAction(final String overlayAction) {
@@ -381,12 +381,12 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void clearToolTipText() {
-    this.toolTipOverlay.clearText();
+    toolTipOverlay.clearText();
   }
 
   public void clearZoomHistory() {
-    this.zoomHistory.clear();
-    this.zoomHistoryIndex = -1;
+    zoomHistory.clear();
+    zoomHistoryIndex = -1;
   }
 
   public void createScales() {
@@ -398,13 +398,13 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     // multiplier *= 10;
     // }
     // Collections.reverse(this.scales);
-    this.scales = SCALES;
+    scales = SCALES;
   }
 
   public void destroy() {
     Property.removeAllListeners(this);
     setDropTarget(null);
-    this.layerOverlay.dispose();
+    layerOverlay.dispose();
     for (final Component overlay : layeredPane.getComponents()) {
       if (overlay instanceof AbstractOverlay) {
         final AbstractOverlay abstractOverlay = (AbstractOverlay)overlay;
@@ -413,7 +413,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
     removeAll();
 
-    this.layeredPane.removeAll();
+    layeredPane.removeAll();
     statusBarPanel.removeAll();
     leftStatusBar = null;
     rightStatusBar = null;
@@ -437,54 +437,54 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   @Override
   protected void finalize() throws Throwable {
-    this.layerOverlay.dispose();
+    layerOverlay.dispose();
     super.finalize();
   }
 
   public Layer getBaseMapLayer() {
-    return this.baseMapOverlay.getLayer();
+    return baseMapOverlay.getLayer();
   }
 
   public LayerGroup getBaseMapLayers() {
-    return this.baseMapLayers;
+    return baseMapLayers;
   }
 
   public LayerRendererOverlay getBaseMapOverlay() {
-    return this.baseMapOverlay;
+    return baseMapOverlay;
   }
 
   public BoundingBox getBoundingBox() {
-    return this.viewport.getBoundingBox();
+    return viewport.getBoundingBox();
   }
 
   public FileDropTargetListener getFileDropListener() {
-    return this.fileDropListener;
+    return fileDropListener;
   }
 
   public GeometryFactory getGeometryFactory() {
-    return this.project.getGeometryFactory();
+    return project.getGeometryFactory();
   }
 
   public LayerRendererOverlay getLayerOverlay() {
-    return this.layerOverlay;
+    return layerOverlay;
   }
 
   public JPanel getLeftStatusBar() {
-    return this.leftStatusBar;
+    return leftStatusBar;
   }
 
   public Point getMapMousePosition() {
-    final Point mousePosition = this.layeredPane.getMousePosition();
+    final Point mousePosition = layeredPane.getMousePosition();
     if (mousePosition != null) {
-      mousePosition.x -= this.layeredPane.getInsets().left;
-      mousePosition.y -= this.layeredPane.getInsets().top;
+      mousePosition.x -= layeredPane.getInsets().left;
+      mousePosition.y -= layeredPane.getInsets().top;
     }
     return mousePosition;
   }
 
   @SuppressWarnings("unchecked")
   public <T extends JComponent> T getMapOverlay(final Class<T> overlayClass) {
-    for (final Component component : this.layeredPane.getComponents()) {
+    for (final Component component : layeredPane.getComponents()) {
       if (overlayClass.isAssignableFrom(component.getClass())) {
         return (T)component;
       }
@@ -496,7 +496,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public <T extends JComponent> List<T> getMapOverlays(
     final Class<T> overlayClass) {
     final List<T> overlays = new ArrayList<T>();
-    for (final Component component : this.layeredPane.getComponents()) {
+    for (final Component component : layeredPane.getComponents()) {
       if (overlayClass.isAssignableFrom(component.getClass())) {
         overlays.add((T)component);
       }
@@ -505,7 +505,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public MouseOverlay getMouseOverlay() {
-    return this.mouseOverlay;
+    return mouseOverlay;
   }
 
   public String getOverlayAction() {
@@ -517,7 +517,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public Project getProject() {
-    return this.project;
+    return project;
   }
 
   public JPanel getRightStatusBar() {
@@ -525,19 +525,19 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public double getScale() {
-    return this.scale;
+    return scale;
   }
 
   public List<Long> getScales() {
-    return this.scales;
+    return scales;
   }
 
   public ToolBar getToolBar() {
-    return this.toolBar;
+    return toolBar;
   }
 
   public UndoManager getUndoManager() {
-    return this.undoManager;
+    return undoManager;
   }
 
   public double getUnitsPerPixel() {
@@ -549,18 +549,18 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public Viewport2D getViewport() {
-    return this.viewport;
+    return viewport;
   }
 
   public double getZoomInScale(final double scale) {
     final long scaleCeil = (long)Math.floor(scale);
-    for (final double nextScale : this.scales) {
+    for (final double nextScale : scales) {
       final long newScale = (long)Math.floor(nextScale);
       if (newScale < scaleCeil) {
         return nextScale;
       }
     }
-    return this.scales.get(this.scales.size() - 1);
+    return scales.get(scales.size() - 1);
   }
 
   public double getZoomOutScale(final double scale) {
@@ -581,15 +581,15 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public boolean isZoomNextEnabled() {
-    return this.zoomHistoryIndex < this.zoomHistory.size() - 1;
+    return zoomHistoryIndex < zoomHistory.size() - 1;
   }
 
   public boolean isZoomPreviousEnabled() {
-    return this.zoomHistoryIndex > 0;
+    return zoomHistoryIndex > 0;
   }
 
   public void moveToFront(final JComponent overlay) {
-    this.layeredPane.moveToFront(overlay);
+    layeredPane.moveToFront(overlay);
   }
 
   @Override
@@ -602,25 +602,25 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if ("viewBoundingBox".equals(propertyName)) {
       final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
       setBoundingBox(boundingBox);
-    } else if (source == this.viewport) {
+    } else if (source == viewport) {
       if ("scale".equals(propertyName)) {
-        final double scale = this.viewport.getScale();
+        final double scale = viewport.getScale();
         setScale(scale);
       }
-    } else if (source == this.baseMapOverlay) {
+    } else if (source == baseMapOverlay) {
       if ("layer".equals(propertyName)) {
         final Layer layer = (Layer)event.getNewValue();
         if (layer != null && baseMapLayerField != null) {
           baseMapLayerField.setSelectedItem(layer);
         }
       }
-    } else if (source == this.baseMapLayers) {
+    } else if (source == baseMapLayers) {
       if ("layers".equals(propertyName)) {
-        if (this.baseMapOverlay != null
-          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(baseMapOverlay.getLayer()))) {
+        if (baseMapOverlay != null
+          && (baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
-            this.baseMapOverlay.setLayer(layer);
+            baseMapOverlay.setLayer(layer);
           }
         }
       }
@@ -636,9 +636,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public synchronized void setBaseMapLayer(final Layer layer) {
-    if (layer == NullLayer.INSTANCE || this.baseMapLayers.contains(layer)) {
+    if (layer == NullLayer.INSTANCE || baseMapLayers.contains(layer)) {
       final Layer oldValue = getBaseMapLayer();
-      this.baseMapOverlay.setLayer(layer);
+      baseMapOverlay.setLayer(layer);
       firePropertyChange("baseMapLayer", oldValue, layer);
     }
   }
@@ -652,34 +652,34 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
         final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
         final boolean zoomNextEnabled = isZoomNextEnabled();
-        final BoundingBox resizedBoundingBox = this.viewport.setBoundingBox(boundingBox);
-        if (this.project != null) {
-          this.project.setViewBoundingBox(resizedBoundingBox);
+        final BoundingBox resizedBoundingBox = viewport.setBoundingBox(boundingBox);
+        if (project != null) {
+          project.setViewBoundingBox(resizedBoundingBox);
 
-          setScale(this.viewport.getScale());
-          synchronized (this.zoomHistory) {
-            if (this.updateZoomHistory) {
+          setScale(viewport.getScale());
+          synchronized (zoomHistory) {
+            if (updateZoomHistory) {
               BoundingBox currentBoundingBox = null;
-              if (this.zoomHistoryIndex > -1) {
-                currentBoundingBox = this.zoomHistory.get(this.zoomHistoryIndex);
+              if (zoomHistoryIndex > -1) {
+                currentBoundingBox = zoomHistory.get(zoomHistoryIndex);
                 if (!currentBoundingBox.equals(resizedBoundingBox)) {
-                  while (this.zoomHistory.size() > this.zoomHistoryIndex + 1) {
-                    this.zoomHistory.removeLast();
+                  while (zoomHistory.size() > zoomHistoryIndex + 1) {
+                    zoomHistory.removeLast();
                   }
-                  for (int i = this.zoomHistory.size() - 1; i > this.zoomHistoryIndex; i++) {
-                    this.zoomHistory.remove(i);
+                  for (int i = zoomHistory.size() - 1; i > zoomHistoryIndex; i++) {
+                    zoomHistory.remove(i);
                   }
-                  this.zoomHistory.add(resizedBoundingBox);
-                  this.zoomHistoryIndex = this.zoomHistory.size() - 1;
-                  if (this.zoomHistory.size() > 50) {
-                    this.zoomHistory.removeFirst();
+                  zoomHistory.add(resizedBoundingBox);
+                  zoomHistoryIndex = zoomHistory.size() - 1;
+                  if (zoomHistory.size() > 50) {
+                    zoomHistory.removeFirst();
 
-                    this.zoomHistoryIndex--;
+                    zoomHistoryIndex--;
                   }
                 }
               } else {
-                this.zoomHistory.add(resizedBoundingBox);
-                this.zoomHistoryIndex = 0;
+                zoomHistory.add(resizedBoundingBox);
+                zoomHistoryIndex = 0;
               }
             }
           }
@@ -703,7 +703,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final GeometryFactory oldValue = getGeometryFactory();
     if (geometryFactory != oldValue) {
 
-      this.project.setGeometryFactory(geometryFactory);
+      project.setGeometryFactory(geometryFactory);
       firePropertyChange("geometryFactory", oldValue, geometryFactory);
       repaint();
     }
@@ -740,7 +740,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
           final double oldValue = this.scale;
           final double oldUnitsPerPixel = getUnitsPerPixel();
           if (scale != oldValue) {
-            this.viewport.setScale(scale);
+            viewport.setScale(scale);
             this.scale = scale;
             firePropertyChange("scale", oldValue, scale);
             final double unitsPerPixel = getUnitsPerPixel();
@@ -762,7 +762,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       text = "";
     }
     if (SwingUtilities.isEventDispatchThread()) {
-      this.toolTipOverlay.setText(location, text);
+      toolTipOverlay.setText(location, text);
     } else {
       Invoke.later(toolTipOverlay, "setText", location, text);
     }
@@ -780,28 +780,28 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   private void setZoomHistoryIndex(int zoomHistoryIndex) {
-    synchronized (this.zoomHistory) {
-      this.updateZoomHistory = false;
+    synchronized (zoomHistory) {
+      updateZoomHistory = false;
       try {
         final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
         final boolean zoomNextEnabled = isZoomNextEnabled();
-        final int zoomHistorySize = this.zoomHistory.size();
+        final int zoomHistorySize = zoomHistory.size();
         if (zoomHistoryIndex < 1) {
           zoomHistoryIndex = 0;
         } else if (zoomHistoryIndex >= zoomHistorySize) {
           zoomHistoryIndex = zoomHistorySize - 2;
         }
         this.zoomHistoryIndex = zoomHistoryIndex;
-        final BoundingBox boundingBox = this.zoomHistory.get(zoomHistoryIndex);
-        this.viewport.setBoundingBox(boundingBox);
+        final BoundingBox boundingBox = zoomHistory.get(zoomHistoryIndex);
+        viewport.setBoundingBox(boundingBox);
 
-        this.project.setViewBoundingBox(boundingBox);
+        project.setViewBoundingBox(boundingBox);
         firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled,
           isZoomPreviousEnabled());
         firePropertyChange("zoomNextEnabled", zoomNextEnabled,
           isZoomNextEnabled());
       } finally {
-        this.updateZoomHistory = true;
+        updateZoomHistory = true;
       }
     }
   }
@@ -849,8 +849,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final double newY1 = y - newDeltaY;
 
     final GeometryFactory newGeometryFactory = extent.getGeometryFactory();
-    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(newGeometryFactory, 2,
-      newX1, newY1, newX1 + newWidth, newY1 + newHeight);
+    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(
+      newGeometryFactory, 2, newX1, newY1, newX1 + newWidth, newY1 + newHeight);
     setBoundingBox(newBoundingBox);
   }
 
@@ -861,7 +861,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomNext() {
-    setZoomHistoryIndex(this.zoomHistoryIndex + 1);
+    setZoomHistoryIndex(zoomHistoryIndex + 1);
   }
 
   public void zoomOut() {
@@ -871,7 +871,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomPrevious() {
-    setZoomHistoryIndex(this.zoomHistoryIndex - 1);
+    setZoomHistoryIndex(zoomHistoryIndex - 1);
   }
 
   /**

@@ -24,8 +24,10 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.data.query.Column;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.QueryValue;
+import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
 import com.revolsys.gis.data.query.functions.GeometryEqual2d;
 import com.revolsys.gis.data.query.functions.WithinDistance;
@@ -37,6 +39,8 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
@@ -193,7 +197,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
         geometry1Value.appendSql(query, this, sql);
       }
       sql.append(", ");
-      final QueryValue geometry2Value = withinDistance.getGeometry1Value();
+      final QueryValue geometry2Value = withinDistance.getGeometry2Value();
       if (geometry2Value == null) {
         sql.append("NULL");
       } else {
@@ -208,27 +212,42 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
       }
       sql.append("') = 'TRUE'");
     } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
-      sql.append("SDE.ST_DISTANCE(");
-      final QueryValue geometry1Value = withinDistance.getGeometry1Value();
-      if (geometry1Value == null) {
-        sql.append("NULL");
+      final Column column = (Column)withinDistance.getGeometry1Value();
+      final GeometryFactory geometryFactory = column.getAttribute()
+        .getMetaData()
+        .getGeometryFactory();
+      final Value geometry2Value = (Value)withinDistance.getGeometry2Value();
+      final Value distanceValue = (Value)withinDistance.getDistanceValue();
+      final Number distance = (Number)distanceValue.getValue();
+      final Object geometryObject = geometry2Value.getValue();
+      BoundingBox boundingBox;
+      if (geometryObject instanceof BoundingBox) {
+        boundingBox = (BoundingBox)geometryObject;
+      } else if (geometryObject instanceof Geometry) {
+        final Geometry geometry = (Geometry)geometryObject;
+        boundingBox = geometry.getBoundingBox();
       } else {
-        geometry1Value.appendSql(query, this, sql);
+        boundingBox = geometryFactory.boundingBox();
       }
+      boundingBox = boundingBox.expand(distance.doubleValue());
+      boundingBox = boundingBox.convert(geometryFactory);
+      sql.append("(SDE.ST_ENVINTERSECTS(");
+      column.appendSql(query, this, sql);
+      sql.append(",");
+      sql.append(boundingBox.getMinX());
+      sql.append(",");
+      sql.append(boundingBox.getMinY());
+      sql.append(",");
+      sql.append(boundingBox.getMaxX());
+      sql.append(",");
+      sql.append(boundingBox.getMaxY());
+      sql.append(") = 1 AND SDE.ST_DISTANCE(");
+      column.appendSql(query, this, sql);
       sql.append(", ");
-      final QueryValue geometry2Value = withinDistance.getGeometry1Value();
-      if (geometry2Value == null) {
-        sql.append("NULL");
-      } else {
-        geometry2Value.appendSql(query, this, sql);
-      }
+      geometry2Value.appendSql(query, this, sql);
       sql.append(") <= ");
-      final QueryValue distanceValue = withinDistance.getDistanceValue();
-      if (distanceValue == null) {
-        sql.append("0");
-      } else {
-        distanceValue.appendSql(query, this, sql);
-      }
+      distanceValue.appendSql(query, this, sql);
+      sql.append(")");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
         + geometryAttribute.getClass());
