@@ -144,24 +144,30 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       repaint();
     } else if (keyCode == KeyEvent.VK_CONTROL || keyCode == KeyEvent.VK_META) {
       if (!hasOverlayAction()) {
+        setSelectCursor(CURSOR_SELECT_BOX);
+      }
+    } else if (isOverlayAction(ACTION_SELECT_RECORDS)) {
+      if (keyCode == KeyEvent.VK_SHIFT) {
+        setSelectCursor(event);
+      } else if (keyCode == KeyEvent.VK_ALT) {
         setSelectCursor(event);
       }
-    } else if (keyCode == KeyEvent.VK_SHIFT) {
-      setSelectCursor(event);
-    } else if (keyCode == KeyEvent.VK_ALT) {
-      setSelectCursor(event);
     }
   }
 
   @Override
   public void keyReleased(final KeyEvent event) {
     final int keyCode = event.getKeyCode();
-    if (keyCode == KeyEvent.VK_CONTROL || keyCode == KeyEvent.VK_META) {
-      setSelectCursor(event);
-    } else if (keyCode == KeyEvent.VK_SHIFT) {
-      setSelectCursor(event);
-    } else if (keyCode == KeyEvent.VK_ALT) {
-      setSelectCursor(event);
+    if (isOverlayAction(ACTION_SELECT_RECORDS)) {
+      if (keyCode == KeyEvent.VK_SHIFT) {
+        setSelectCursor(event);
+      } else if (keyCode == KeyEvent.VK_ALT) {
+        setSelectCursor(event);
+      }
+    } else {
+      if (keyCode == KeyEvent.VK_CONTROL || keyCode == KeyEvent.VK_META) {
+        setSelectCursor((Cursor)null);
+      }
     }
   }
 
@@ -461,6 +467,15 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
+  private void setSelectCursor(final Cursor cursor) {
+    if (cursor == null) {
+      clearMapCursor(selectCursor);
+    } else {
+      setMapCursor(cursor);
+    }
+    selectCursor = cursor;
+  }
+
   protected void setSelectCursor(final InputEvent event) {
     Cursor cursor = null;
     if (SwingUtil.isControlOrMetaDown(event)
@@ -475,12 +490,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     } else {
       cursor = null;
     }
-    if (cursor == null) {
-      clearMapCursor(selectCursor);
-    } else {
-      setMapCursor(cursor);
-    }
-    selectCursor = cursor;
+    setSelectCursor(cursor);
   }
 
   public void unSelectRecords(final BoundingBox boundingBox) {
