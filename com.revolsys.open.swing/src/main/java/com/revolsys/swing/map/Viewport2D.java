@@ -10,10 +10,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import javax.measure.Measurable;
 import javax.measure.Measure;
@@ -34,7 +31,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.Project;
 
 public class Viewport2D implements PropertyChangeSupportProxy {
@@ -80,8 +76,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       return viewport.toDisplayValue(measure);
     }
   }
-
-  private final Map<Layer, Map<String, Object>> layerValueCache = new WeakHashMap<Layer, Map<String, Object>>();
 
   private double pixelsPerXUnit;
 
@@ -139,10 +133,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     setGeometryFactory(boundingBox.getGeometryFactory());
   }
 
-  public void clearLayerCache(final Layer layer) {
-    layerValueCache.remove(layer);
-  }
-
   public AffineTransform createModelToScreenTransform(
     final BoundingBox boundingBox, final double viewWidth,
     final double viewHeight) {
@@ -171,7 +161,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final int x, final int y, final int pixels) {
     final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
     final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, p1, p2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory,
+      p1, p2);
     return boundingBox;
   }
 
@@ -203,16 +194,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
    */
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V> V getLayerCacheValue(final Layer layer, final String name) {
-    final Map<String, Object> cache = layerValueCache.get(layer);
-    if (cache == null) {
-      return null;
-    } else {
-      return (V)cache.get(name);
-    }
   }
 
   public double getModelHeight() {
@@ -523,8 +504,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double y1 = centreY - bottomOffset;
     final double x2 = centreX + rightOffset;
     final double y2 = centreY + topOffset;
-    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1,
-      x2, y2);
+    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(geometryFactory,
+      2, x1, y1, x2, y2);
     internalSetBoundingBox(newBoundingBox, unitsPerPixel);
     return newBoundingBox;
   }
@@ -554,16 +535,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   public void setInitialized(final boolean initialized) {
     this.initialized = initialized;
-  }
-
-  public void setLayerCacheValue(final Layer layer, final String name,
-    final Object value) {
-    Map<String, Object> cache = layerValueCache.get(layer);
-    if (cache == null) {
-      cache = new HashMap<String, Object>();
-      layerValueCache.put(layer, cache);
-    }
-    cache.put(name, value);
   }
 
   public void setScale(final double scale) {
