@@ -196,6 +196,11 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return this.geometryFactory;
   }
 
+  @Deprecated
+  public Graphics2D getGraphics() {
+    throw new UnsupportedOperationException();
+  }
+
   public double getModelHeight() {
     final double height = getBoundingBox().getHeight();
     return height;

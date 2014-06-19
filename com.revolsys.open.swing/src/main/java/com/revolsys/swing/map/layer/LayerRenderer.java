@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer;
 
-import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public interface LayerRenderer<T extends Layer> extends PropertyChangeListener,
 
   boolean isVisible();
 
-  void render(Viewport2D viewport, Graphics2D graphics);
+  void render(Viewport2D viewport);
 
   void setEditing(boolean editing);
 

@@ -30,7 +30,7 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
             try {
               final LayerRenderer<Layer> renderer = childLayer.getRenderer();
               if (renderer != null) {
-                renderer.render(viewport, graphics);
+                renderer.render(viewport);
               }
             } catch (final Throwable e) {
               LoggerFactory.getLogger(getClass()).error(
