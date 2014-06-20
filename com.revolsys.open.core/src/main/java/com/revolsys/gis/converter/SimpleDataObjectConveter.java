@@ -50,7 +50,7 @@ public class SimpleDataObjectConveter implements
   public DataObject convert(final DataObject sourceObject) {
     final DataObject targetObject = factory.createDataObject(dataObjectMetaData);
     final Geometry sourceGeometry = sourceObject.getGeometryValue();
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = sourceGeometry.getGeometryFactory();
+    final GeometryFactory geometryFactory = sourceGeometry.getGeometryFactory();
     final Geometry targetGeometry = geometryFactory.geometry(sourceGeometry);
     GeometryProperties.copyUserData(sourceGeometry, targetGeometry);
     targetObject.setGeometryValue(targetGeometry);

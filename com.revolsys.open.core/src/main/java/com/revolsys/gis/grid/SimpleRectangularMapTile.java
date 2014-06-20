@@ -43,25 +43,25 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
   }
 
   @Override
-  public Polygon getPolygon(final com.revolsys.jts.geom.GeometryFactory factory, final int numPoints) {
+  public Polygon getPolygon(final GeometryFactory factory, final int numPoints) {
     return boundingBox.toPolygon(factory, numPoints);
   }
 
   @Override
-  public Polygon getPolygon(final com.revolsys.jts.geom.GeometryFactory factory,
+  public Polygon getPolygon(final GeometryFactory factory,
     final int numXPoints, final int numYPoints) {
     return boundingBox.toPolygon(factory, numXPoints, numYPoints);
   }
 
   @Override
   public Polygon getPolygon(final int numPoints) {
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.floating3(4326);
+    final GeometryFactory factory = GeometryFactory.floating3(4326);
     return getPolygon(factory, numPoints);
   }
 
   @Override
   public Polygon getPolygon(final int numXPoints, final int numYPoints) {
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.floating3(4326);
+    final GeometryFactory factory = GeometryFactory.floating3(4326);
     return getPolygon(factory, numXPoints, numYPoints);
   }
 

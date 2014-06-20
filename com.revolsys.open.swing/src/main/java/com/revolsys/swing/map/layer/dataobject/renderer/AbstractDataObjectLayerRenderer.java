@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
-import java.awt.Graphics2D;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -180,34 +179,28 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics,
+  public void render(final Viewport2D viewport,
     final AbstractDataObjectLayer layer) {
     if (layer.hasGeometryAttribute()) {
-      final boolean saved = viewport.setUseModelCoordinates(true, graphics);
-      try {
-        final BoundingBox boundingBox = viewport.getBoundingBox();
-        final List<LayerDataObject> dataObjects = layer.queryBackground(boundingBox);
-        renderRecords(viewport, graphics, layer, dataObjects);
-      } finally {
-        viewport.setUseModelCoordinates(saved, graphics);
-      }
+      final BoundingBox boundingBox = viewport.getBoundingBox();
+      final List<LayerDataObject> dataObjects = layer.queryBackground(boundingBox);
+      renderRecords(viewport, layer, dataObjects);
     }
   }
 
   public void renderRecord(final Viewport2D viewport,
-    final Graphics2D graphics, final BoundingBox visibleArea,
-    final AbstractDataObjectLayer layer, final LayerDataObject record) {
+    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final LayerDataObject record) {
   }
 
   protected void renderRecords(final Viewport2D viewport,
-    final Graphics2D graphics, final AbstractDataObjectLayer layer,
-    final List<LayerDataObject> records) {
+    final AbstractDataObjectLayer layer, final List<LayerDataObject> records) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final LayerDataObject record : records) {
       if (record != null) {
         if (isVisible(record) && !layer.isHidden(record)) {
           try {
-            renderRecord(viewport, graphics, visibleArea, layer, record);
+            renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
             ExceptionUtil.log(
@@ -221,12 +214,11 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public void renderSelectedRecord(final Viewport2D viewport,
-    final Graphics2D graphics, final AbstractDataObjectLayer layer,
-    final LayerDataObject record) {
+    final AbstractDataObjectLayer layer, final LayerDataObject record) {
     final BoundingBox boundingBox = viewport.getBoundingBox();
     if (isVisible(record)) {
       try {
-        renderRecord(viewport, graphics, boundingBox, layer, record);
+        renderRecord(viewport, boundingBox, layer, record);
       } catch (final TopologyException e) {
       }
     }

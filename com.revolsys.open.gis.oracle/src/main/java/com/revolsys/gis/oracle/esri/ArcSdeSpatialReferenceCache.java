@@ -90,7 +90,7 @@ public class ArcSdeSpatialReferenceCache {
             final BigDecimal mScale = resultSet.getBigDecimal(9);
             int srid = resultSet.getInt(10);
             final String wkt = resultSet.getString(11);
-            final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+            final GeometryFactory geometryFactory;
             if (srid <= 0) {
               final CoordinateSystem coordinateSystem = new WktCsParser(wkt).parse();
               final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);

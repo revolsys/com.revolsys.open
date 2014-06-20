@@ -1077,7 +1077,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           if (geometryAttribute != null) {
             DataType geometryDataType = null;
             Class<?> layerGeometryClass = null;
-            final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+            final GeometryFactory geometryFactory = getGeometryFactory();
             geometryDataType = geometryAttribute.getType();
             layerGeometryClass = geometryDataType.getJavaClass();
 
@@ -1512,7 +1512,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         final Attribute geometryAttribute = metaData.getGeometryAttribute();
         DataType geometryDataType = null;
         Class<?> layerGeometryClass = null;
-        final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+        final GeometryFactory geometryFactory = getGeometryFactory();
         if (geometryAttribute != null) {
           geometryDataType = geometryAttribute.getType();
           layerGeometryClass = geometryDataType.getJavaClass();

@@ -42,7 +42,7 @@ public abstract class MapTile {
     return this.boundingBox;
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return this.boundingBox.getGeometryFactory();
   }
 

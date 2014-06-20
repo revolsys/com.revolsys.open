@@ -1,6 +1,7 @@
 package com.revolsys.io.esri.gdb.xml.model;
 
 import com.revolsys.io.esri.gdb.xml.model.enums.GeometryType;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class GeometryDef {
   private int avgNumPoints;
@@ -26,7 +27,7 @@ public class GeometryDef {
     final SpatialReference spatialReference) {
     this.geometryType = geometryType;
     this.spatialReference = spatialReference;
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+    final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
     this.hasZ = geometryFactory.hasZ();
     this.hasM = geometryFactory.hasM();
   }

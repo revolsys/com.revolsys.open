@@ -204,8 +204,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
         }
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
-      moveImageBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX,
-        maxY);
+      moveImageBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, minX,
+        minY, maxX, maxY);
     }
   }
 
@@ -279,18 +279,20 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     final BoundingBox viewBoundingBox = viewport.getBoundingBox();
     if (cachedImage == null
       || !cachedImage.getBoundingBox().equals(viewBoundingBox)) {
-      final ImageViewport imageViewport = new ImageViewport(viewport);
+      try (
+        final ImageViewport imageViewport = new ImageViewport(viewport)) {
 
-      final BufferedImage image = imageViewport.getImage();
-      final Graphics2D graphics = (Graphics2D)image.getGraphics();
+        final BufferedImage image = imageViewport.getImage();
+        final Graphics2D graphics = (Graphics2D)image.getGraphics();
 
-      this.image.drawImage(graphics, viewBoundingBox,
-        viewport.getViewWidthPixels(), viewport.getViewHeightPixels(),
-        !layer.isShowOriginalImage());
-      GeoReferencedImageLayerRenderer.render(imageViewport, graphics,
-        this.image, !layer.isShowOriginalImage());
-      cachedImage = new BufferedGeoReferencedImage(
-        imageViewport.getBoundingBox(), image);
+        this.image.drawImage(graphics, viewBoundingBox,
+          viewport.getViewWidthPixels(), viewport.getViewHeightPixels(),
+          !layer.isShowOriginalImage());
+        GeoReferencedImageLayerRenderer.render(imageViewport, graphics,
+          this.image, !layer.isShowOriginalImage());
+        cachedImage = new BufferedGeoReferencedImage(
+          imageViewport.getBoundingBox(), image);
+      }
     }
     return cachedImage;
   }
@@ -525,8 +527,8 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     } else {
       final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
       final Point mousePoint = getViewportPoint(event);
-      moveImageBoundingBox = new BoundingBoxDoubleGf(viewportGeometryFactory, mousePoint,
-        this.moveCornerOppositePoint);
+      moveImageBoundingBox = new BoundingBoxDoubleGf(viewportGeometryFactory,
+        mousePoint, this.moveCornerOppositePoint);
 
       if (SwingUtil.isShiftDown(event)) {
         adjustBoundingBoxAspectRatio();

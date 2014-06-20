@@ -34,7 +34,7 @@ public class DataObjectHttpMessageConverter extends
       .getMediaTypes(DataObjectWriterFactory.class));
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return readerConverter.getGeometryFactory();
   }
 

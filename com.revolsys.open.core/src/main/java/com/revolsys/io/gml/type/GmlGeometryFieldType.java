@@ -236,7 +236,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   private void srsName(final XmlWriter out, final Geometry geometry,
     final boolean writeSrsName) {
     if (writeSrsName) {
-      final com.revolsys.jts.geom.GeometryFactory factory = geometry.getGeometryFactory();
+      final GeometryFactory factory = geometry.getGeometryFactory();
       GmlDataObjectWriter.srsName(out, factory);
     }
   }

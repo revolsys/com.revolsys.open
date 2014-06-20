@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.map.layer.Project;
 
-public class ImageViewport extends Viewport2D {
+public class ImageViewport extends Viewport2D implements AutoCloseable {
 
   private final BufferedImage image;
 
@@ -26,13 +26,19 @@ public class ImageViewport extends Viewport2D {
   }
 
   @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
+  public void close() {
     if (graphics != null) {
       graphics.dispose();
     }
   }
 
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    close();
+  }
+
+  @Override
   public Graphics2D getGraphics() {
     return this.graphics;
   }

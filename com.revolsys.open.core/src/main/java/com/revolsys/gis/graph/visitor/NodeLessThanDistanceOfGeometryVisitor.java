@@ -37,7 +37,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements
 
   private final double maxDistance;
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
   public NodeLessThanDistanceOfGeometryVisitor(final Geometry geometry,
     final double maxDistance, final Visitor<Node<T>> matchVisitor) {

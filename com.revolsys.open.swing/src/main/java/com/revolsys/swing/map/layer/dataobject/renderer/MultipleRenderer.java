@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
-import java.awt.Graphics2D;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,15 +44,14 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   // Needed for filter styles
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final Graphics2D graphics, final BoundingBox visibleArea,
-    final AbstractDataObjectLayer layer, final LayerDataObject record) {
+    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final LayerDataObject record) {
     if (isVisible(record)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
         if (renderer.isVisible(scale)) {
           try {
-            renderer.renderRecord(viewport, graphics, visibleArea, layer,
-              record);
+            renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
             ExceptionUtil.log(
@@ -68,8 +66,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   protected void renderRecords(final Viewport2D viewport,
-    final Graphics2D graphics, final AbstractDataObjectLayer layer,
-    final List<LayerDataObject> records) {
+    final AbstractDataObjectLayer layer, final List<LayerDataObject> records) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
       final long scale = (long)viewport.getScale();
@@ -78,8 +75,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
           if (isVisible(record) && renderer.isVisible(record)
             && !layer.isHidden(record)) {
             try {
-              renderer.renderRecord(viewport, graphics, visibleArea, layer,
-                record);
+              renderer.renderRecord(viewport, visibleArea, layer, record);
             } catch (final TopologyException e) {
             } catch (final Throwable e) {
               ExceptionUtil.log(
@@ -95,14 +91,13 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void renderSelectedRecord(final Viewport2D viewport,
-    final Graphics2D graphics, final AbstractDataObjectLayer layer,
-    final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
     if (isVisible(object)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
         if (renderer.isVisible(scale)) {
           try {
-            renderer.renderSelectedRecord(viewport, graphics, layer, object);
+            renderer.renderSelectedRecord(viewport, layer, object);
           } catch (final Throwable e) {
             ExceptionUtil.log(
               getClass(),

@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
-import java.awt.Graphics2D;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -70,12 +69,12 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics,
+  public void render(final Viewport2D viewport,
     final AbstractDataObjectLayer layer) {
     if (layer.hasGeometryAttribute()) {
       final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
       if (renderer != null) {
-        renderer.render(viewport, graphics, layer);
+        renderer.render(viewport, layer);
       }
     }
   }
@@ -83,13 +82,13 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   // NOTE: Needed for filter styles
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final Graphics2D graphics, final BoundingBox visibleArea,
-    final AbstractDataObjectLayer layer, final LayerDataObject object) {
+    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final LayerDataObject object) {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(object)) {
         try {
-          renderer.renderRecord(viewport, graphics, visibleArea, layer, object);
+          renderer.renderRecord(viewport, visibleArea, layer, object);
         } catch (final TopologyException e) {
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName()
@@ -102,16 +101,14 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   // NOTE: Needed for multiple styles
   protected void renderRecords(final Viewport2D viewport,
-    final Graphics2D graphics, final AbstractDataObjectLayer layer,
-    final List<LayerDataObject> objects) {
+    final AbstractDataObjectLayer layer, final List<LayerDataObject> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       for (final LayerDataObject object : objects) {
         if (isVisible(object)) {
           try {
-            renderer.renderRecord(viewport, graphics, visibleArea, layer,
-              object);
+            renderer.renderRecord(viewport, visibleArea, layer, object);
           } catch (final TopologyException e) {
           }
         }
@@ -121,13 +118,12 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void renderSelectedRecord(final Viewport2D viewport,
-    final Graphics2D graphics, final AbstractDataObjectLayer layer,
-    final LayerDataObject object) {
+    final AbstractDataObjectLayer layer, final LayerDataObject object) {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(object)) {
         try {
-          renderer.renderSelectedRecord(viewport, graphics, layer, object);
+          renderer.renderSelectedRecord(viewport, layer, object);
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName()
             + " #" + object.getIdString(), e);

@@ -112,11 +112,16 @@ public class SelectedRecordsRenderer {
   }
 
   public void paintSelected(final Viewport2D viewport,
-    final GeometryFactory viewportGeometryFactory, final Graphics2D graphics,
+    final GeometryFactory viewportGeometryFactory, final Geometry geometry) {
+    final Graphics2D graphics = viewport.getGraphics();
+    paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
+  }
+
+  public void paintSelected(final Viewport2D viewport,
+    final Graphics2D graphics, final GeometryFactory viewportGeometryFactory,
     Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
-
       GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry,
         highlightStyle);
       GeometryStyleRenderer.renderOutline(viewport, graphics, geometry,

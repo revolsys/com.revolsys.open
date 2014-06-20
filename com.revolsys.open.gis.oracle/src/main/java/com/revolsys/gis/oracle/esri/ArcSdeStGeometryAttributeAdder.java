@@ -10,6 +10,7 @@ import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
   private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryAttributeAdder.class);
@@ -54,7 +55,7 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     final ArcSdeSpatialReference spatialReference = JdbcAttributeAdder.getColumnProperty(
       schema, typePath, columnName, ArcSdeConstants.SPATIAL_REFERENCE);
 
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+    final GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
       schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
 
     final Attribute attribute = new ArcSdeStGeometryAttribute(dbName, name,

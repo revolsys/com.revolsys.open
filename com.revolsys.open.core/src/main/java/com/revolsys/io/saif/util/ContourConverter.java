@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class ContourConverter extends ArcConverter {
@@ -14,7 +15,7 @@ public class ContourConverter extends ArcConverter {
 
   private final OsnConverterRegistry converters;
 
-  public ContourConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public ContourConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
     super(geometryFactory, SaifConstants.ARC);
     this.converters = converters;

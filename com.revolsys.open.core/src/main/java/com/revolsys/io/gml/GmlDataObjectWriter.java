@@ -22,7 +22,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
   GmlConstants {
   public static final void srsName(final XmlWriter out,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     final int csId = coordinateSystem.getId();
     out.attribute(SRS_NAME, "EPSG:" + csId);
@@ -30,7 +30,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
 
   private final GmlFieldTypeRegistry fieldTypes = GmlFieldTypeRegistry.INSTANCE;
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private final DataObjectMetaData metaData;
 
@@ -80,7 +80,7 @@ public class GmlDataObjectWriter extends AbstractWriter<DataObject> implements
   }
 
   private void envelope(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final GeometryFactory geometryFactory,
     final BoundingBox areaBoundingBox) {
     out.startTag(ENVELOPE);
     srsName(out, geometryFactory);

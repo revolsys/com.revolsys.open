@@ -98,14 +98,11 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final GeometryStyle style) {
     final Shape shape = getShape(viewport, style, lineString);
     if (shape != null) {
-      final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
-        graphics);
       final Paint paint = graphics.getPaint();
       try {
         style.setLineStyle(viewport, graphics);
         graphics.draw(shape);
       } finally {
-        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
         graphics.setPaint(paint);
       }
     }
@@ -139,8 +136,6 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final Graphics2D graphics, final Polygon polygon, final GeometryStyle style) {
     final Shape shape = getShape(viewport, style, polygon);
     if (shape != null) {
-      final boolean savedUseModelUnits = viewport.setUseModelCoordinates(false,
-        graphics);
       final Paint paint = graphics.getPaint();
       try {
         style.setFillStyle(viewport, graphics);
@@ -148,7 +143,6 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
         style.setLineStyle(viewport, graphics);
         graphics.draw(shape);
       } finally {
-        viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
         graphics.setPaint(paint);
       }
     }
@@ -244,9 +238,10 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final Graphics2D graphics, final BoundingBox visibleArea,
-    final AbstractDataObjectLayer layer, final LayerDataObject object) {
+    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();
+    final Graphics2D graphics = viewport.getGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
     renderGeometry(viewport, graphics, geometry, this.style);

@@ -242,7 +242,7 @@ public class Graph<T> {
   }
 
   public Edge<T> createEdge(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final GeometryFactory geometryFactory,
     final T object, final LineString points) {
     final LineString newLine = geometryFactory.lineString(points);
     final T newObject = clone(object, newLine);
@@ -565,7 +565,7 @@ public class Graph<T> {
     return edges;
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
@@ -1157,7 +1157,7 @@ public class Graph<T> {
         }
       }
       final T object = edge.getObject();
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = line.getGeometryFactory();
+      final GeometryFactory geometryFactory = line.getGeometryFactory();
       final Map<Integer, Set<Point>> segmentSplitNodes = new TreeMap<Integer, Set<Point>>();
       for (final Entry<Point, Integer> entry : nodeSegment.entrySet()) {
         final Point node = entry.getKey();

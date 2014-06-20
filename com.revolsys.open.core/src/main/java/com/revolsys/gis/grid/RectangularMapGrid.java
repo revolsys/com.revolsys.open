@@ -21,10 +21,10 @@ public interface RectangularMapGrid {
   String getName();
 
   Polygon getPolygon(final String mapTileName,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory);
+    final GeometryFactory geometryFactory);
 
   Polygon getPolygon(final String mapTileName,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory, int numX,
+    final GeometryFactory geometryFactory, int numX,
     int numY);
 
   Polygon getPolygon(final String mapTileName,

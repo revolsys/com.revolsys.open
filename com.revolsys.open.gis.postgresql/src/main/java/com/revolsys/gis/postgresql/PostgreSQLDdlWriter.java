@@ -17,6 +17,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class PostgreSQLDdlWriter extends JdbcDdlWriter {
   public PostgreSQLDdlWriter() {
@@ -57,7 +58,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryAttribute.getType();
@@ -92,9 +93,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     }
   }
 
-  public void writeAlterOwner(
-    final String objectType,
-    final String objectName,
+  public void writeAlterOwner(final String objectType, final String objectName,
     final String owner) {
     final PrintWriter out = getOut();
     out.print("ALTER ");
@@ -183,7 +182,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryAttribute.getType();
@@ -218,8 +217,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public void writeResetSequence(
-    final DataObjectMetaData metaData,
+  public void writeResetSequence(final DataObjectMetaData metaData,
     final List<DataObject> values) {
     final PrintWriter out = getOut();
     Long nextValue = 0L;

@@ -26,6 +26,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
@@ -242,12 +243,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final Cursor oldCursor = getMapCursor();
         try {
           setMapCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          final BufferedImage image = new BufferedImage(width, height,
-            BufferedImage.TYPE_INT_ARGB);
-          final Graphics2D imageGraphics = (Graphics2D)image.getGraphics();
-          paintSelected(imageGraphics, layerGroup);
-          paintHighlighted(imageGraphics, layerGroup);
-          selectImage = image;
+
+          try (
+            final ImageViewport imageViewport = new ImageViewport(viewport)) {
+            paintSelected(imageViewport, layerGroup);
+            paintHighlighted(imageViewport, layerGroup);
+            selectImage = imageViewport.getImage();
+          }
+
           this.redrawId = redrawId;
         } finally {
           setMapCursor(oldCursor);
@@ -260,24 +263,22 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     paintSelectBox(graphics);
   }
 
-  protected void paintHighlighted(final Graphics2D graphics2d,
+  protected void paintHighlighted(final ImageViewport vieport,
     final LayerGroup layerGroup) {
-    final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        paintHighlighted(graphics2d, childGroup);
+        paintHighlighted(vieport, childGroup);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
         for (final LayerDataObject record : dataObjectLayer.getHighlightedRecords()) {
           if (record != null && dataObjectLayer.isVisible(record)) {
             final Geometry geometry = record.getGeometryValue();
             final AbstractDataObjectLayerRenderer layerRenderer = layer.getRenderer();
-            layerRenderer.renderSelectedRecord(viewport, graphics2d,
-              dataObjectLayer, record);
-            HIGHLIGHT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
-              graphics2d, geometry);
+            layerRenderer.renderSelectedRecord(vieport, dataObjectLayer, record);
+            HIGHLIGHT_RENDERER.paintSelected(vieport, viewportGeometryFactory,
+              geometry);
           }
         }
       }
@@ -294,14 +295,13 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
-  protected void paintSelected(final Graphics2D graphics2d,
+  protected void paintSelected(final ImageViewport viewport,
     final LayerGroup layerGroup) {
-    final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        paintSelected(graphics2d, childGroup);
+        paintSelected(viewport, childGroup);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
         final AbstractDataObjectLayerRenderer layerRenderer = layer.getRenderer();
@@ -311,10 +311,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
               if (!dataObjectLayer.isHighlighted(record)) {
                 if (!dataObjectLayer.isDeleted(record)) {
                   final Geometry geometry = record.getGeometryValue();
-                  layerRenderer.renderSelectedRecord(viewport, graphics2d,
-                    dataObjectLayer, record);
+                  layerRenderer.renderSelectedRecord(viewport, dataObjectLayer,
+                    record);
                   SELECT_RENDERER.paintSelected(viewport,
-                    viewportGeometryFactory, graphics2d, geometry);
+                    viewportGeometryFactory, geometry);
                 }
               }
             }

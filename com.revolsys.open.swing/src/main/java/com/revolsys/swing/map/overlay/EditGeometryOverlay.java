@@ -941,16 +941,16 @@ public class EditGeometryOverlay extends AbstractOverlay implements
           graphics.translate(deltaX, deltaY);
           for (final CloseLocation location : moveGeometryLocations) {
             final Geometry geometry = location.getGeometry();
-            MOVE_GEOMETRY_RENDERER.paintSelected(viewport,
-              viewportGeometryFactory, graphics, geometry);
+            MOVE_GEOMETRY_RENDERER.paintSelected(viewport, graphics,
+              viewportGeometryFactory, geometry);
           }
         }
       } finally {
         graphics.setTransform(transform);
       }
     } else {
-      SelectRecordsOverlay.SELECT_RENDERER.paintSelected(viewport,
-        viewportGeometryFactory, graphics, this.addGeometry);
+      SelectRecordsOverlay.SELECT_RENDERER.paintSelected(viewport, graphics,
+        viewportGeometryFactory, this.addGeometry);
     }
     drawXorGeometry(graphics);
   }

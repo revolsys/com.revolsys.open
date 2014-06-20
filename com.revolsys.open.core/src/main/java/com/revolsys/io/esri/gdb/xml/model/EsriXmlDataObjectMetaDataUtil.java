@@ -239,7 +239,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
       table = featureClass;
       featureClass.setShapeType(shapeType);
       featureClass.setShapeFieldName(geometryAttribute.getName());
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       featureClass.setSpatialReference(spatialReference);
       featureClass.setHasM(geometryFactory.hasM());
       featureClass.setHasZ(geometryFactory.hasZ());
@@ -363,7 +363,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
       final String shapeFieldName = featureClass.getShapeFieldName();
       metaData.setGeometryAttributeName(shapeFieldName);
       final SpatialReference spatialReference = featureClass.getSpatialReference();
-      com.revolsys.jts.geom.GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
+      GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       if (featureClass.isHasM()) {
         geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
           4, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());

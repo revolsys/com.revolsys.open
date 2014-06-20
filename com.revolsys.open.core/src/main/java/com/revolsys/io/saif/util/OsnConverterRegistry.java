@@ -9,16 +9,16 @@ import com.revolsys.jts.geom.GeometryFactory;
 public class OsnConverterRegistry {
   private final Map<String, OsnConverter> converters = new HashMap<String, OsnConverter>();
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   public OsnConverterRegistry() {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(
+    final GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(
       1.0, 1.0);
     init(geometryFactory);
   }
 
   public OsnConverterRegistry(final int srid) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixed(
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(
       srid, 1.0, 1.0);
 
     init(geometryFactory);
@@ -39,11 +39,11 @@ public class OsnConverterRegistry {
     }
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
-  public void init(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public void init(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     addConverter("Date", new DateConverter());
     addConverter("SpatialObject", new SpatialObjectConverter(this));

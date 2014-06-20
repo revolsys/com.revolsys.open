@@ -40,7 +40,7 @@ public class Triangle extends AbstractLineString {
 
   private final double[] coordinates = new double[9];
 
-  private static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
     0, 1.0);
 
   public Triangle() {
@@ -181,7 +181,7 @@ public class Triangle extends AbstractLineString {
   }
 
   public Polygon getPolygon(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactory) {
     final LinearRing shell = geometryFactory.linearRing(getP0(), getP1(),
       getP2(), getP0());
     return geometryFactory.polygon(shell);

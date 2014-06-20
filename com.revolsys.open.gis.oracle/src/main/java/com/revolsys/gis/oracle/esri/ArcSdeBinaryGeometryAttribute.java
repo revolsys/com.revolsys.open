@@ -41,7 +41,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
     setProperty(AttributeProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 

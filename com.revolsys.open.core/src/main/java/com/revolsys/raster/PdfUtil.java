@@ -145,7 +145,7 @@ public class PdfUtil {
             } else {
               geometryFactory = GeometryFactory.floating3(srid);
             }
-            final com.revolsys.jts.geom.GeometryFactory geoGeometryFactory = geometryFactory.getGeographicGeometryFactory();
+            final GeometryFactory geoGeometryFactory = geometryFactory.getGeographicGeometryFactory();
 
             BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
             final COSArray geoPoints = PdfUtil.getArray(measure, "GPTS");

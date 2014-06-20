@@ -93,7 +93,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
       dataType = DataTypes.GEOMETRY;
     }
 
-    com.revolsys.jts.geom.GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+    GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
       schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
     if (geometryFactory == null) {
       geometryFactory = schema.getGeometryFactory();
@@ -269,7 +269,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
       if (shape.isMeasured()) {
         axisCount = 4;
       }
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.fixed(
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(
         srid, axisCount, scaleXy, scaleZ);
 
       final int numParts = shape.getNumParts();

@@ -12,11 +12,11 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class PackedGeometry {
-  public static final com.revolsys.jts.geom.GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
     3005, 1.0, 1.0);
 
   public static void checkGeometry(final Geometry geometry) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometry.getGeometryFactory();
+    final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     final Double xOffset = 0.0;
     final Double yOffset = 0.0;
     final Double xyScale = geometryFactory.getScaleXY();

@@ -36,7 +36,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   private Geometry geometry;
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private int columnCount = 0;
 

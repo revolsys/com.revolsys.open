@@ -100,8 +100,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
-  private final ThreadLocal<AffineTransform> savedTransform = new ThreadLocal<AffineTransform>();
-
   private AffineTransform screenToModelTransform;
 
   private int viewWidth;
@@ -277,8 +275,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     }
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getRoundedGeometryFactory(
-    com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public GeometryFactory getRoundedGeometryFactory(
+    GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final double resolution = getUnitsPerPixel();
@@ -416,10 +414,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return initialized;
   }
 
-  public boolean isUseModelCoordinates() {
-    return this.savedTransform.get() != null;
-  }
-
   public BoundingBox setBoundingBox(final BoundingBox boundingBox) {
     if (boundingBox != null && !boundingBox.isEmpty()) {
       double unitsPerPixel = 0;
@@ -554,23 +548,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     this.scales = scales;
   }
 
-  public boolean setUseModelCoordinates(final boolean useModelCoordinates,
-    final Graphics2D graphics) {
-    boolean savedUseModelCoordinates = false;
-    final AffineTransform previousTransform = this.savedTransform.get();
-    if (previousTransform != null) {
-      graphics.setTransform(previousTransform);
-      savedUseModelCoordinates = true;
-    }
-    if (useModelCoordinates && this.modelToScreenTransform != null) {
-      this.savedTransform.set(graphics.getTransform());
-      graphics.transform(this.modelToScreenTransform);
-    } else {
-      this.savedTransform.remove();
-    }
-    return savedUseModelCoordinates;
-  }
-
   protected void setViewHeight(final int height) {
     this.viewHeight = height;
   }
@@ -582,12 +559,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   public double toDisplayValue(final Measure<Length> value) {
     double convertedValue;
     final Unit<Length> unit = value.getUnit();
-    final double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
     if (unit.equals(NonSI.PIXEL)) {
       convertedValue = value.doubleValue(NonSI.PIXEL);
-      if (isUseModelCoordinates()) {
-        convertedValue = convertedValue * modelUnitsPerViewUnit;
-      }
     } else {
       convertedValue = value.doubleValue(SI.METRE);
       final CoordinateSystem coordinateSystem = this.geometryFactory2d.getCoordinateSystem();
@@ -597,9 +570,8 @@ public class Viewport2D implements PropertyChangeSupportProxy {
         convertedValue = Math.toDegrees(convertedValue / radius);
 
       }
-      if (!isUseModelCoordinates()) {
-        convertedValue = convertedValue / modelUnitsPerViewUnit;
-      }
+      final double modelUnitsPerViewUnit = getModelUnitsPerViewUnit();
+      convertedValue = convertedValue / modelUnitsPerViewUnit;
     }
     return convertedValue;
   }
@@ -655,8 +627,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return toModelPoint(x, y);
   }
 
-  public Point toModelPointRounded(
-    com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public Point toModelPointRounded(GeometryFactory geometryFactory,
     final java.awt.Point point) {
     final double x = point.getX();
     final double y = point.getY();

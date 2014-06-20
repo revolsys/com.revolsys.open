@@ -296,7 +296,7 @@ public class LineSegmentUtil {
   }
 
   public static Point getElevation(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final GeometryFactory geometryFactory,
     final Point lineStart, final Point lineEnd, final Point point) {
     final int axisCount = geometryFactory.getAxisCount();
     final double[] coordinates = point.getCoordinates();

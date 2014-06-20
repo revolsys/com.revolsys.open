@@ -69,7 +69,7 @@ public class ArcSdeStGeometryDataStoreExtension implements
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
 
-          com.revolsys.jts.geom.GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
+          GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
             schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
           int srid = spatialReference.getSrid();
           final double scaleXy = spatialReference.getXyScale();

@@ -83,7 +83,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     if (viewport == null) {
       return new PointWithOrientation(new PointDouble(0.0, 0.0), 0);
     }
-    final com.revolsys.jts.geom.GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
@@ -210,10 +210,6 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
       if (point != null) {
         final double orientation = point.getOrientation();
 
-        boolean savedUseModelUnits = false;
-        if (viewport != null) {
-          savedUseModelUnits = viewport.setUseModelCoordinates(false, graphics);
-        }
         final Paint paint = graphics.getPaint();
         try {
           graphics.setBackground(Color.BLACK);
@@ -357,9 +353,6 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
         } finally {
           graphics.setPaint(paint);
-          if (viewport != null) {
-            viewport.setUseModelCoordinates(savedUseModelUnits, graphics);
-          }
         }
       }
     }
@@ -397,9 +390,10 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final Graphics2D graphics, final BoundingBox visibleArea,
-    final AbstractDataObjectLayer layer, final LayerDataObject object) {
+    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();
+    final Graphics2D graphics = viewport.getGraphics();
     renderText(viewport, graphics, object, geometry, this.style);
   }
 

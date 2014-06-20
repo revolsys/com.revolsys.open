@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 public class TextLineConverter implements OsnConverter {
@@ -15,7 +16,7 @@ public class TextLineConverter implements OsnConverter {
 
   private final OsnConverterRegistry converters;
 
-  public TextLineConverter(final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public TextLineConverter(final GeometryFactory geometryFactory,
     final OsnConverterRegistry converters) {
     this.converters = converters;
   }

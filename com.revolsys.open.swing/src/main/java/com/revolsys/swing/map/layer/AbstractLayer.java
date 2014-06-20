@@ -162,7 +162,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   protected JPanel addPropertiesTabCoordinateSystem(
     final TabbedValuePanel tabPanel) {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
       final JPanel panel = new JPanel(new VerticalLayout(5));
       tabPanel.addTab("Spatial", panel);

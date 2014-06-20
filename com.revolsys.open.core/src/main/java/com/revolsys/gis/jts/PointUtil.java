@@ -10,7 +10,7 @@ import com.revolsys.jts.geom.Polygon;
 public class PointUtil {
 
   public static Point createRandomPoint(
-    final com.revolsys.jts.geom.GeometryFactory factory,
+    final GeometryFactory factory,
     final BoundingBox envelope) {
     final double x = envelope.getMinX() + envelope.getWidth() * Math.random();
     final double y = envelope.getMinY() + envelope.getHeight() * Math.random();

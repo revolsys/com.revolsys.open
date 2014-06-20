@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer;
 
-import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
@@ -207,13 +206,12 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     if (layer != null) {
       final double scale = viewport.getScale();
       if (isVisible(scale)) {
-        final Graphics2D graphics = viewport.getGraphics();
-        render(viewport, graphics, layer);
+        render(viewport, layer);
       }
     }
   }
 
-  public abstract void render(Viewport2D viewport, Graphics2D graphics, T layer);
+  public abstract void render(Viewport2D viewport, T layer);
 
   @Override
   public void setEditing(final boolean editing) {

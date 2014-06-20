@@ -10,7 +10,7 @@ public class GeometryProjection extends
   BaseInOutProcess<DataObject, DataObject> {
   private GeometryFactory geometryFactory;
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 

@@ -87,7 +87,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private final MoepDirectoryReader directoryReader;
 
-  private com.revolsys.jts.geom.GeometryFactory factory;
+  private GeometryFactory factory;
 
   private String featureCode;
 

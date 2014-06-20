@@ -169,7 +169,7 @@ public class MapRulerBorder extends AbstractBorder implements
     return insets;
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getRulerGeometryFactory() {
+  public GeometryFactory getRulerGeometryFactory() {
     return this.rulerGeometryFactory;
   }
 

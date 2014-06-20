@@ -60,7 +60,7 @@ public class DataObjectReaderHttpMessageConverter extends
         DataObjectWriterFactory.class));
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 

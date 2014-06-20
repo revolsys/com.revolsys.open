@@ -92,7 +92,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     return new LineStringDouble(axisCount, coordinates);
   }
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private XMLStreamReader in;
 
@@ -119,7 +119,7 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
     }
   }
 
-  private com.revolsys.jts.geom.GeometryFactory getGeometryFactory(
+  private GeometryFactory getGeometryFactory(
     final GeometryFactory geometryFactory) {
     final String srsName = in.getAttributeValue(SRS_NAME.getNamespaceURI(),
       SRS_NAME.getLocalPart());

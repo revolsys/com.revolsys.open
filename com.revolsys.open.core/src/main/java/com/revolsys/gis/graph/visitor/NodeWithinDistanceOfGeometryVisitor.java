@@ -32,7 +32,7 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
 
   private final Geometry geometry;
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
   private final Visitor<Node<T>> matchVisitor;
 

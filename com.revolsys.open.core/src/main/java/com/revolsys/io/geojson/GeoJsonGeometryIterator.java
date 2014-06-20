@@ -24,7 +24,7 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
 public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   implements GeoJsonConstants {
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private JsonParser in;
 
@@ -206,7 +206,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
     }
   }
 
-  private com.revolsys.jts.geom.GeometryFactory readCoordinateSystem() {
+  private GeometryFactory readCoordinateSystem() {
     GeometryFactory factory = geometryFactory;
     do {
       final String attributeName = JsonParser.skipToNextAttribute(in);

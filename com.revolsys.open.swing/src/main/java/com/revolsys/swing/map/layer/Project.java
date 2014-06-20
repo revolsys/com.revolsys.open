@@ -199,8 +199,15 @@ public class Project extends LayerGroup {
       try {
         final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
         baseMapLayers.loadLayers(properties);
-        if (baseMapLayers != null && !baseMapLayers.isEmpty()) {
-          baseMapLayers.get(0).setVisible(true);
+        boolean hasVisible = false;
+        if (baseMapLayers != null) {
+          for (final Layer layer : baseMapLayers) {
+            if (hasVisible) {
+              layer.setVisible(false);
+            } else {
+              hasVisible = layer.isVisible();
+            }
+          }
         }
       } finally {
         SpringUtil.setBaseResource(oldResource);

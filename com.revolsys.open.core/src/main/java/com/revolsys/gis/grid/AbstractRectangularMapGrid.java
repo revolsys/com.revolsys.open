@@ -38,7 +38,7 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
 
   @Override
   public Polygon getPolygon(final String mapTileName,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactory) {
     final RectangularMapTile mapTile = getTileByName(mapTileName);
     final BoundingBox boundingBox = mapTile.getBoundingBox();
     final Polygon polygon = boundingBox.toPolygon(geometryFactory);
@@ -47,7 +47,7 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
 
   @Override
   public Polygon getPolygon(final String mapTileName,
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+    final GeometryFactory geometryFactory,
     final int numX, final int numY) {
     final RectangularMapTile mapTile = getTileByName(mapTileName);
     final BoundingBox boundingBox = mapTile.getBoundingBox();

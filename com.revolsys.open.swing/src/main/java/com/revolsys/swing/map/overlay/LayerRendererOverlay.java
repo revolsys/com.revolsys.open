@@ -150,7 +150,7 @@ public class LayerRendererOverlay extends JComponent implements
     if (old != layer) {
       if (old != null) {
         old.setVisible(false);
-        Property.addListener(old, this);
+        Property.removeListener(old, this);
       }
       this.layer = layer;
       if (layer != null) {

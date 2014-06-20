@@ -262,12 +262,15 @@ public class ZoomOverlay extends AbstractOverlay {
           this.panImage = new BufferedImage(width, height,
             BufferedImage.TYPE_INT_RGB);
           final Graphics2D graphics = (Graphics2D)this.panImage.getGraphics();
-          final Insets insets = parent.getInsets();
-          graphics.translate(-insets.left, -insets.top);
-          graphics.setColor(Color.WHITE);
-          graphics.fillRect(insets.left, insets.top, width, height);
-          parent.paintComponents(graphics);
-          graphics.dispose();
+          try {
+            final Insets insets = parent.getInsets();
+            graphics.translate(-insets.left, -insets.top);
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(insets.left, insets.top, width, height);
+            parent.paintComponents(graphics);
+          } finally {
+            graphics.dispose();
+          }
           this.panning = true;
           setMapCursor(CURSOR_PAN);
           this.panFirstPoint = event.getPoint();
@@ -326,7 +329,8 @@ public class ZoomOverlay extends AbstractOverlay {
 
       final GeometryFactory geometryFactory = getMap().getGeometryFactory();
       final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory,
-        2, topLeft.getX(), topLeft.getY(), bottomRight.getX(), bottomRight.getY());
+        2, topLeft.getX(), topLeft.getY(), bottomRight.getX(),
+        bottomRight.getY());
 
       this.zoomBoxFirstPoint = null;
       this.zoomBox = null;

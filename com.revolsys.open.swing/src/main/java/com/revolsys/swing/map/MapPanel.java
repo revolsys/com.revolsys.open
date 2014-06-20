@@ -237,6 +237,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     baseMapLayerField.setToolTipText("Base Map");
     toolBar.addComponent("layers", baseMapLayerField);
     Property.addListener(baseMapOverlay, "layer", this);
+    baseMapLayerField.setSelectedIndex(0);
     toolBar.addButtonTitleIcon("layers", "Refresh Base Map", "map_refresh",
       baseMapOverlay, "refresh");
   }
@@ -919,7 +920,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public void zoomToWorld() {
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
     setBoundingBox(boundingBox);

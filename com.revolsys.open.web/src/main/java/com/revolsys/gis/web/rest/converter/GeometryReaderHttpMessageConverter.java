@@ -23,7 +23,7 @@ import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 public class GeometryReaderHttpMessageConverter extends
   AbstractHttpMessageConverter<GeometryReader> {
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
@@ -32,7 +32,7 @@ public class GeometryReaderHttpMessageConverter extends
       GeometryReaderFactory.class), null);
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
@@ -59,7 +59,7 @@ public class GeometryReaderHttpMessageConverter extends
         final InputStreamResource resource = new InputStreamResource(
           "geometryInput", body);
         final GeometryReader reader = readerFactory.createGeometryReader(resource);
-        com.revolsys.jts.geom.GeometryFactory factory = geometryFactory;
+        GeometryFactory factory = geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
@@ -73,7 +73,7 @@ public class GeometryReaderHttpMessageConverter extends
     }
   }
 
-  public void setGeometryFactory(final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 }

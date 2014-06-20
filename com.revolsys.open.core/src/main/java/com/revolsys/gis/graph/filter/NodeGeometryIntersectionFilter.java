@@ -3,11 +3,12 @@ package com.revolsys.gis.graph.filter;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 public class NodeGeometryIntersectionFilter<T> implements Filter<Node<T>> {
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private Geometry preparedGeometry;
 

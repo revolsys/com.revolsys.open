@@ -43,7 +43,6 @@ public class BingLayer extends AbstractTiledImageLayer {
   public BingLayer(final Map<String, Object> properties) {
     super(properties);
     setType("bing");
-    setVisible(true);
   }
 
   @Override

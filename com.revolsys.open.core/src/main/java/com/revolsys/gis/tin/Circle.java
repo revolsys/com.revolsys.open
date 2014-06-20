@@ -51,7 +51,7 @@ public class Circle extends PointDouble {
   }
 
   public Geometry toGeometry() {
-    final com.revolsys.jts.geom.GeometryFactory factory = GeometryFactory.floating3();
+    final GeometryFactory factory = GeometryFactory.floating3();
     final Point point = factory.point(this);
     return point.buffer(radius);
   }

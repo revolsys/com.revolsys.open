@@ -10,6 +10,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class WktDataObjectWriter extends AbstractWriter<DataObject> {
 
@@ -25,7 +26,7 @@ public class WktDataObjectWriter extends AbstractWriter<DataObject> {
     this.out = new PrintWriter(new BufferedWriter(out));
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
     }
 

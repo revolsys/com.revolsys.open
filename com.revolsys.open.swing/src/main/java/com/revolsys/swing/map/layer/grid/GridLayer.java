@@ -7,12 +7,13 @@ import javax.swing.JOptionPane;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -67,7 +68,7 @@ public class GridLayer extends AbstractLayer {
   }
 
   @Override
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return this.grid.getGeometryFactory();
   }
 

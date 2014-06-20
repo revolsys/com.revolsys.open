@@ -2,19 +2,19 @@ package com.revolsys.gis.jts;
 
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStringCoordinatesListIterator implements Iterator<LineString>,
   Iterable<LineString> {
-  private final com.revolsys.jts.geom.GeometryFactory factory;
+  private final GeometryFactory factory;
 
   private int index = 0;
 
   private final LineString points;
 
-  public LineStringCoordinatesListIterator(
-    final com.revolsys.jts.geom.GeometryFactory factory, final LineString points) {
+  public LineStringCoordinatesListIterator(final GeometryFactory factory,
+    final LineString points) {
     this.factory = factory;
     this.points = points;
   }

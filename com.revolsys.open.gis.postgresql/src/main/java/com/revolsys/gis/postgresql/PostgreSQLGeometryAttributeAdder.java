@@ -75,8 +75,8 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
-      final com.revolsys.jts.geom.GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+      final GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
+      final GeometryFactory geometryFactory;
       if (storeGeometryFactory == null) {
         geometryFactory = GeometryFactory.floating(srid, axisCount);
       } else {

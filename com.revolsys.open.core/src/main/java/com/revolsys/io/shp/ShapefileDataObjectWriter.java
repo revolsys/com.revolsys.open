@@ -118,7 +118,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   private void createPrjFile(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory)
+    final GeometryFactory geometryFactory)
     throws IOException {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();

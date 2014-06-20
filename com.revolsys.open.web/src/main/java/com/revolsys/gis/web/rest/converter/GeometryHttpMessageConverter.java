@@ -43,7 +43,7 @@ public class GeometryHttpMessageConverter extends
       .getMediaTypes(GeometryWriterFactory.class));
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 

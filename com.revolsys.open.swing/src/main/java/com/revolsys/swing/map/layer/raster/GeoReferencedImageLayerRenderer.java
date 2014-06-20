@@ -47,7 +47,7 @@ public class GeoReferencedImageLayerRenderer extends
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics,
+  public void render(final Viewport2D viewport,
     final GeoReferencedImageLayer layer) {
     final double scale = viewport.getScale();
     if (layer.isVisible(scale)) {
@@ -58,6 +58,7 @@ public class GeoReferencedImageLayerRenderer extends
           if (boundingBox == null || boundingBox.isEmpty()) {
             boundingBox = layer.fitToViewport();
           }
+          final Graphics2D graphics = viewport.getGraphics();
           renderAlpha(graphics, viewport, image, 1.0, true);
         }
       }

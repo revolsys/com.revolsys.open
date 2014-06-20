@@ -17,6 +17,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleDdlWriter extends JdbcDdlWriter {
   public OracleDdlWriter() {
@@ -56,7 +57,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryAttribute.getType();
@@ -176,7 +177,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute != null) {
-      final com.revolsys.jts.geom.GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
       final int axisCount = geometryFactory.getAxisCount();
       final DataType dataType = geometryAttribute.getType();

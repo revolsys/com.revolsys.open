@@ -69,8 +69,8 @@ public class ProjectionImageFilter extends WholeImageFilter {
 
     final int newImageWidth = transformedSpace.width;
     final int newImageHeight = transformedSpace.height;
-    final com.revolsys.jts.geom.GeometryFactory sourceGeometryFactory = this.sourceBoundingBox.getGeometryFactory();
-    final com.revolsys.jts.geom.GeometryFactory destGeometryFactory = this.destBoundingBox.getGeometryFactory();
+    final GeometryFactory sourceGeometryFactory = this.sourceBoundingBox.getGeometryFactory();
+    final GeometryFactory destGeometryFactory = this.destBoundingBox.getGeometryFactory();
 
     final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(
       destGeometryFactory, sourceGeometryFactory);

@@ -7,21 +7,20 @@ import java.util.TreeMap;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.saif.SaifConstants;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 public class PointConverter implements OsnConverter {
   private String geometryClass = SaifConstants.POINT;
 
-  private final com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private final GeometryFactory geometryFactory;
 
-  public PointConverter(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public PointConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public PointConverter(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory,
+  public PointConverter(final GeometryFactory geometryFactory,
     final String geometryClass) {
     this.geometryFactory = geometryFactory;
     this.geometryClass = geometryClass;

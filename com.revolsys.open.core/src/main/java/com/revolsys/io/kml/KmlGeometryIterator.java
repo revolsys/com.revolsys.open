@@ -26,7 +26,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 public class KmlGeometryIterator extends AbstractIterator<Geometry> implements
   Kml22Constants {
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory = GeometryFactory.floating3(COORDINATE_SYSTEM_ID);
+  private GeometryFactory geometryFactory = GeometryFactory.floating3(COORDINATE_SYSTEM_ID);
 
   private XMLStreamReader in;
 

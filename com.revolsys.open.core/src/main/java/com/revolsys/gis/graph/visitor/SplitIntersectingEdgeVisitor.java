@@ -51,7 +51,7 @@ public class SplitIntersectingEdgeVisitor implements Visitor<Edge<DataObject>> {
     boolean started = false;
     boolean matched = false;
     final List<Point> coordinates = new ArrayList<Point>();
-    final com.revolsys.jts.geom.GeometryFactory factory = line.getGeometryFactory();
+    final GeometryFactory factory = line.getGeometryFactory();
     final List<LineString> lines = new ArrayList<LineString>();
 
     while (currentNode != null) {

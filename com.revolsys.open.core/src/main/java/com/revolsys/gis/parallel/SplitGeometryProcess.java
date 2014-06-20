@@ -9,6 +9,7 @@ import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
@@ -27,7 +28,7 @@ public class SplitGeometryProcess extends
 
   private double tolerance = 2.0;
 
-  private com.revolsys.jts.geom.GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   protected DataObject createSplitObject(final DataObject object,
     final LineString newLine) {
@@ -50,7 +51,7 @@ public class SplitGeometryProcess extends
     return geometry;
   }
 
-  public com.revolsys.jts.geom.GeometryFactory getGeometryFactory() {
+  public GeometryFactory getGeometryFactory() {
     return geometryFactory;
   }
 
@@ -131,8 +132,7 @@ public class SplitGeometryProcess extends
     index.insert(geometry);
   }
 
-  public void setGeometryFactory(
-    final com.revolsys.jts.geom.GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 

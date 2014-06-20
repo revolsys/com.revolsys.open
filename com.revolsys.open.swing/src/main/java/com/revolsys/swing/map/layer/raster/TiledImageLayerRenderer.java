@@ -69,7 +69,7 @@ public class TiledImageLayerRenderer extends
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Graphics2D graphics,
+  public void render(final Viewport2D viewport,
     final AbstractTiledImageLayer layer) {
     final GeometryFactory geometryFactory = viewport.getGeometryFactory();
     final double resolution = layer.getResolution(viewport);
@@ -99,7 +99,7 @@ public class TiledImageLayerRenderer extends
           }
         }
         final GeoReferencedImage image = cachedTile.getImage(geometryFactory);
-        // render(viewport, graphics, image);
+        final Graphics2D graphics = viewport.getGraphics();
         GeoReferencedImageLayerRenderer.render(viewport, graphics, image, false);
       }
     }
