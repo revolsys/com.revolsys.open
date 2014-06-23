@@ -353,8 +353,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void addHighlightedRecord(final LayerDataObject record) {
     if (isLayerRecord(record)) {
-      synchronized (highlightedRecords) {
-        if (!containsSame(highlightedRecords, record)) {
+      synchronized (this.highlightedRecords) {
+        if (!containsSame(this.highlightedRecords, record)) {
           this.highlightedRecords.add(record);
         }
       }
@@ -373,7 +373,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void addModifiedRecord(final LayerDataObject record) {
     synchronized (this.modifiedRecords) {
-      if (!containsSame(modifiedRecords, record)) {
+      if (!containsSame(this.modifiedRecords, record)) {
         this.modifiedRecords.add(record);
       }
     }
@@ -399,7 +399,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   protected void addSelectedRecord(final LayerDataObject record) {
     if (isLayerRecord(record)) {
       synchronized (this.selectedRecords) {
-        if (!containsSame(selectedRecords, record)) {
+        if (!containsSame(this.selectedRecords, record)) {
           this.selectedRecords.add(record);
         }
       }
@@ -463,9 +463,9 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       final boolean eventsEnabled = setEventsEnabled(false);
       boolean cancelled = true;
       try {
-        cancelled &= internalCancelChanges(newRecords);
-        cancelled &= internalCancelChanges(deletedRecords);
-        cancelled &= internalCancelChanges(modifiedRecords);
+        cancelled &= internalCancelChanges(this.newRecords);
+        cancelled &= internalCancelChanges(this.deletedRecords);
+        cancelled &= internalCancelChanges(this.modifiedRecords);
       } finally {
         setEventsEnabled(eventsEnabled);
         fireRecordsChanged();
@@ -489,7 +489,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public void clearSelectedRecords() {
     synchronized (this.selectedRecords) {
-      selectedRecords.clear();
+      this.selectedRecords.clear();
       clearSelectedRecordsIndex();
     }
     synchronized (this.highlightedRecords) {
@@ -656,17 +656,17 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         }
       }
     }
-    columnNameOrder.clear();
-    deletedRecords.clear();
-    forms.clear();
-    formWindows.clear();
-    highlightedRecords.clear();
-    index.clear();
-    modifiedRecords.clear();
-    newRecords.clear();
-    selectedRecords.clear();
-    if (selectedRecordsIndex != null) {
-      selectedRecordsIndex.clear();
+    this.columnNameOrder.clear();
+    this.deletedRecords.clear();
+    this.forms.clear();
+    this.formWindows.clear();
+    this.highlightedRecords.clear();
+    this.index.clear();
+    this.modifiedRecords.clear();
+    this.newRecords.clear();
+    this.selectedRecords.clear();
+    if (this.selectedRecordsIndex != null) {
+      this.selectedRecordsIndex.clear();
     }
   }
 
@@ -688,7 +688,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
           }
           if (trackDeletions) {
             synchronized (this.deletedRecords) {
-              if (!containsSame(deletedRecords, record)) {
+              if (!containsSame(this.deletedRecords, record)) {
                 this.deletedRecords.add(record);
               }
             }
@@ -919,10 +919,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public synchronized Object getEditSync() {
-    if (editSync == null) {
-      editSync = new Object();
+    if (this.editSync == null) {
+      this.editSync = new Object();
     }
-    return editSync;
+    return this.editSync;
   }
 
   public String getFieldTitle(final String fieldName) {
@@ -962,7 +962,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public Collection<LayerDataObject> getHighlightedRecords() {
     synchronized (this.highlightedRecords) {
-      return new ArrayList<LayerDataObject>(highlightedRecords);
+      return new ArrayList<LayerDataObject>(this.highlightedRecords);
     }
   }
 
@@ -971,7 +971,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public DataObjectQuadTree getIndex() {
-    return index;
+    return this.index;
   }
 
   public List<LayerDataObject> getMergeableSelectedRecords() {
@@ -986,9 +986,10 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   /**
-   * Get a record containing the values of the two records if they can be merged. The
-   * new record is not a layer data object so would need to be added, likewise the old records
-   * are not removed so they would need to be deleted.
+   * Get a record containing the values of the two records if they can be
+   * merged. The new record is not a layer data object so would need to be
+   * added, likewise the old records are not removed so they would need to be
+   * deleted.
    * 
    * @param point
    * @param record1
@@ -1215,7 +1216,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public Collection<String> getUserReadOnlyFieldNames() {
-    return Collections.unmodifiableSet(userReadOnlyFieldNames);
+    return Collections.unmodifiableSet(this.userReadOnlyFieldNames);
   }
 
   public boolean hasGeometryAttribute() {
@@ -1238,7 +1239,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   /**
    * Cancel changes for one of the lists of changes {@link #deletedRecords},
-   *  {@link #newRecords}, {@link #modifiedRecords}.
+   * {@link #newRecords}, {@link #modifiedRecords}.
+   * 
    * @param records
    */
   private boolean internalCancelChanges(
@@ -1273,6 +1275,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   /**
    * Revert the values of the record to the last values loaded from the database
+   * 
    * @param record
    */
   protected LayerDataObject internalCancelChanges(final LayerDataObject record) {
@@ -1287,11 +1290,12 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   protected boolean internalIsDeleted(final LayerDataObject record) {
-    return containsSame(deletedRecords, record);
+    return containsSame(this.deletedRecords, record);
   }
 
   /**
    * Revert the values of the record to the last values loaded from the database
+   * 
    * @param record
    */
   protected LayerDataObject internalPostSaveChanges(final LayerDataObject record) {
@@ -1405,7 +1409,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   public boolean isHighlighted(final LayerDataObject record) {
     synchronized (this.highlightedRecords) {
-      return containsSame(highlightedRecords, record);
+      return containsSame(this.highlightedRecords, record);
     }
   }
 
@@ -1459,11 +1463,11 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   }
 
   public boolean isSnapToAllLayers() {
-    return snapToAllLayers;
+    return this.snapToAllLayers;
   }
 
   public boolean isUseFieldTitles() {
-    return useFieldTitles;
+    return this.useFieldTitles;
   }
 
   public boolean isVisible(final LayerDataObject record) {
@@ -1568,8 +1572,8 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     } finally {
       setEventsEnabled(eventsEnabled);
     }
-    firePropertyChange("recordsInserted", null, newRecords);
-    addSelectedRecords(newRecords);
+    firePropertyChange("recordsInserted", null, this.newRecords);
+    addSelectedRecords(this.newRecords);
   }
 
   protected void postSaveChanges(final DataObjectState originalState,
@@ -1761,7 +1765,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   protected void removeSelectedRecord(final LayerDataObject record) {
     synchronized (this.selectedRecords) {
-      for (final Iterator<LayerDataObject> iterator = selectedRecords.iterator(); iterator.hasNext();) {
+      for (final Iterator<LayerDataObject> iterator = this.selectedRecords.iterator(); iterator.hasNext();) {
         final LayerDataObject selectedRecord = iterator.next();
         if (selectedRecord != null && selectedRecord.isSame(record)) {
           iterator.remove();
@@ -1781,7 +1785,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       if (isLayerRecord(record)) {
         postSaveModifiedRecord(record);
         synchronized (this.deletedRecords) {
-          for (final Iterator<LayerDataObject> iterator = deletedRecords.iterator(); iterator.hasNext();) {
+          for (final Iterator<LayerDataObject> iterator = this.deletedRecords.iterator(); iterator.hasNext();) {
             final LayerDataObject deletedRecord = iterator.next();
             if (deletedRecord.isSame(deletedRecord)) {
               iterator.remove();
@@ -1939,7 +1943,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         setRenderer(null);
       }
       updateColumnNames();
-      if (query == null) {
+      if (this.query == null) {
         setQuery(null);
       }
     }
@@ -2003,7 +2007,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
     synchronized (this.highlightedRecords) {
-      highlightedRecords.retainAll(selectedRecords);
+      this.highlightedRecords.retainAll(selectedRecords);
     }
     fireSelected();
   }

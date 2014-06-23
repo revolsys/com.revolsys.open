@@ -55,7 +55,6 @@ import com.revolsys.jts.geom.GeometryComponent;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.prep.PreparedLineString;
 import com.revolsys.jts.geom.segment.LineStringSegment;
 import com.revolsys.jts.geom.segment.Segment;
@@ -67,21 +66,18 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
 /**
- *  Models an OGC-style <code>LineString</code>.
- *  A LineString consists of a sequence of two or more vertices,
- *  along with all points along the linearly-interpolated curves
- *  (line segments) between each 
- *  pair of consecutive vertices.
- *  Consecutive vertices may be equal.
- *  The line segments in the line may intersect each other (in other words, 
- *  the linestring may "curl back" in itself and self-intersect.
- *  Linestrings with exactly two identical points are invalid. 
- *  <p> 
- * A linestring must have either 0 or 2 or more points.  
- * If these conditions are not met, the constructors throw 
- * an {@link IllegalArgumentException}
- *
- *@version 1.7
+ * Models an OGC-style <code>LineString</code>. A LineString consists of a
+ * sequence of two or more vertices, along with all points along the
+ * linearly-interpolated curves (line segments) between each pair of consecutive
+ * vertices. Consecutive vertices may be equal. The line segments in the line
+ * may intersect each other (in other words, the linestring may "curl back" in
+ * itself and self-intersect. Linestrings with exactly two identical points are
+ * invalid.
+ * <p>
+ * A linestring must have either 0 or 2 or more points. If these conditions are
+ * not met, the constructors throw an {@link IllegalArgumentException}
+ * 
+ * @version 1.7
  */
 public abstract class AbstractLineString extends AbstractGeometry implements
   LineString {
@@ -91,7 +87,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   /**
    * Creates and returns a full copy of this {@link LineString} object.
    * (including all coordinates contained by it).
-   *
+   * 
    * @return a clone of this instance
    */
   @Override
@@ -297,15 +293,15 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   /**
-   * Gets the boundary of this geometry.
-   * The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
-   *
+   * Gets the boundary of this geometry. The boundary of a lineal geometry is
+   * always a zero-dimensional geometry (which may be empty).
+   * 
    * @return the boundary geometry
    * @see Geometry#getBoundary
    */
   @Override
   public Geometry getBoundary() {
-    return (new BoundaryOp(this)).getBoundary();
+    return new BoundaryOp(this).getBoundary();
   }
 
   @Override
@@ -343,9 +339,9 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   /**
-   *  Returns the length of this <code>LineString</code>
-   *
-   *@return the length of the linestring
+   * Returns the length of this <code>LineString</code>
+   * 
+   * @return the length of the linestring
    */
   @Override
   public double getLength() {
@@ -587,10 +583,10 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       // poly is CCW if prev x is right of next x
       final double prevX = getX(iPrev);
       final double nextX = getX(iNext);
-      counterClockwise = (prevX > nextX);
+      counterClockwise = prevX > nextX;
     } else {
       // if area is positive, points are ordered CCW
-      counterClockwise = (disc > 0);
+      counterClockwise = disc > 0;
     }
     return counterClockwise;
   }
@@ -721,9 +717,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   /**
-   * Normalizes a LineString.  A normalized linestring
-   * has the first point which is not equal to it's reflected point
-   * less than the reflected point.
+   * Normalizes a LineString. A normalized linestring has the first point which
+   * is not equal to it's reflected point less than the reflected point.
    */
   @Override
   public LineString normalize() {
@@ -771,9 +766,9 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   /**
-   * Creates a {@link LineString} whose coordinates are in the reverse
-   * order of this objects
-   *
+   * Creates a {@link LineString} whose coordinates are in the reverse order of
+   * this objects
+   * 
    * @return a {@link LineString} with coordinates in the reverse order
    */
   @Override
@@ -835,7 +830,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       } else if (geometryComponent instanceof Segment) {
         final Segment segment = (Segment)geometryComponent;
         final int segmentIndex = segment.getSegmentIndex();
-        final LineString line1 = subLine(segmentIndex + 1, point);
+        final LineString line1 = subLine(segmentIndex, point);
         final LineString line2 = subLine(point, segmentIndex + 1, vertexCount
           - segmentIndex - 1, null);
         return Arrays.asList(line1, line2);
