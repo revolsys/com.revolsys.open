@@ -36,63 +36,65 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
         final RectangularMapGrid grid = layer.getGrid();
         final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
         final Graphics2D graphics = viewport.getGraphics();
-        final Font font = graphics.getFont();
-        for (final RectangularMapTile tile : tiles) {
-          final BoundingBox tileBoundingBox = tile.getBoundingBox();
-          final BoundingBox intersectBoundingBox = boundingBox.intersection(tileBoundingBox);
-          if (!intersectBoundingBox.isEmpty()) {
-            final String tileName = tile.getName().toUpperCase();
+        if (graphics != null) {
+          final Font font = graphics.getFont();
+          for (final RectangularMapTile tile : tiles) {
+            final BoundingBox tileBoundingBox = tile.getBoundingBox();
+            final BoundingBox intersectBoundingBox = boundingBox.intersection(tileBoundingBox);
+            if (!intersectBoundingBox.isEmpty()) {
+              final String tileName = tile.getName().toUpperCase();
 
-            final Polygon polygon = tile.getPolygon(
-              viewport.getGeometryFactory(), 50);
-            GeometryStyleRenderer.renderOutline(viewport, graphics, polygon,
-              GeometryStyle.line(Color.LIGHT_GRAY));
+              final Polygon polygon = tile.getPolygon(
+                viewport.getGeometryFactory(), 50);
+              GeometryStyleRenderer.renderOutline(viewport, graphics, polygon,
+                GeometryStyle.line(Color.LIGHT_GRAY));
 
-            final Point centroid = polygon.getCentroid();
-            final double centreX = centroid.getX();
-            final double centreY = centroid.getY();
+              final Point centroid = polygon.getCentroid();
+              final double centreX = centroid.getX();
+              final double centreY = centroid.getY();
 
-            final Font newFont = new Font(font.getName(), font.getStyle(), 12);
-            graphics.setFont(newFont);
+              final Font newFont = new Font(font.getName(), font.getStyle(), 12);
+              graphics.setFont(newFont);
 
-            final FontMetrics metrics = graphics.getFontMetrics();
-            final double[] coord = new double[2];
-            viewport.getModelToScreenTransform().transform(new double[] {
-              centreX, centreY
-            }, 0, coord, 0, 1);
-            int x = (int)(coord[0] - metrics.stringWidth(tileName) / 2);
-            int y = (int)(coord[1] + metrics.getHeight() / 2);
-            final Rectangle2D bounds = metrics.getStringBounds(tileName,
-              graphics);
-            final double width = bounds.getWidth();
-            final double height = bounds.getHeight();
+              final FontMetrics metrics = graphics.getFontMetrics();
+              final double[] coord = new double[2];
+              viewport.getModelToScreenTransform().transform(new double[] {
+                centreX, centreY
+              }, 0, coord, 0, 1);
+              int x = (int)(coord[0] - metrics.stringWidth(tileName) / 2);
+              int y = (int)(coord[1] + metrics.getHeight() / 2);
+              final Rectangle2D bounds = metrics.getStringBounds(tileName,
+                graphics);
+              final double width = bounds.getWidth();
+              final double height = bounds.getHeight();
 
-            if (x < 0) {
-              x = 1;
+              if (x < 0) {
+                x = 1;
+              }
+              final int viewWidth = viewport.getViewWidthPixels();
+              if (x + width > viewWidth) {
+                x = (int)(viewWidth - width - 1);
+              }
+              if (y < height) {
+                y = (int)height + 1;
+              }
+              final int viewHeight = viewport.getViewHeightPixels();
+              if (y > viewHeight) {
+                y = viewHeight - 1;
+              }
+
+              graphics.setColor(WebColors.LightGray);
+              graphics.fill(new Rectangle2D.Double(x - 2,
+                y + bounds.getY() - 1, width + 4, height + 2));
+
+              graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+              graphics.setColor(Color.BLACK);
+              graphics.drawString(tileName, x, y);
             }
-            final int viewWidth = viewport.getViewWidthPixels();
-            if (x + width > viewWidth) {
-              x = (int)(viewWidth - width - 1);
-            }
-            if (y < height) {
-              y = (int)height + 1;
-            }
-            final int viewHeight = viewport.getViewHeightPixels();
-            if (y > viewHeight) {
-              y = viewHeight - 1;
-            }
-
-            graphics.setColor(WebColors.LightGray);
-            graphics.fill(new Rectangle2D.Double(x - 2, y + bounds.getY() - 1,
-              width + 4, height + 2));
-
-            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-              RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-            graphics.setColor(Color.BLACK);
-            graphics.drawString(tileName, x, y);
+            graphics.setFont(font);
           }
-          graphics.setFont(font);
         }
       }
     } catch (final IllegalArgumentException e) {

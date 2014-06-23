@@ -100,7 +100,10 @@ public class TiledImageLayerRenderer extends
         }
         final GeoReferencedImage image = cachedTile.getImage(geometryFactory);
         final Graphics2D graphics = viewport.getGraphics();
-        GeoReferencedImageLayerRenderer.render(viewport, graphics, image, false);
+        if (graphics != null) {
+          GeoReferencedImageLayerRenderer.render(viewport, graphics, image,
+            false);
+        }
       }
     }
     synchronized (loadingTasks) {

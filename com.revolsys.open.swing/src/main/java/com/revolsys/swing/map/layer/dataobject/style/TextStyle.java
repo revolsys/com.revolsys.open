@@ -153,6 +153,19 @@ public class TextStyle implements MapSerializer, Cloneable {
     }
   }
 
+  public Font getFont(final Viewport2D viewport) {
+    final int style = 0;
+    // if (textStyle.getFontWeight() == FontWeight.BOLD) {
+    // style += Font.BOLD;
+    // }
+    // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
+    // style += Font.ITALIC;
+    // }
+    final double fontSize = Viewport2D.toDisplayValue(viewport,
+      this.textSizeMeasure);
+    return new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
+  }
+
   public Color getTextBoxColor() {
     return this.textBoxColor;
   }

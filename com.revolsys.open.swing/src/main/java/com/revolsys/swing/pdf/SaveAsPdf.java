@@ -4,41 +4,34 @@ import java.io.File;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 
 public class SaveAsPdf {
-  private static void render(final PDPage page, final BoundingBox boundingBox,
-    final Layer layer) {
-    if (layer.isVisible()) {
-      if (layer instanceof LayerGroup) {
-        final LayerGroup layerGroup = (LayerGroup)layer;
-        for (final Layer childLayer : layerGroup) {
-          render(page, boundingBox, childLayer);
-        }
-      } else if (layer instanceof AbstractDataObjectLayer) {
-        final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
-
-      }
-    }
-  }
 
   public static void save() {
     try {
       final PDDocument document = new PDDocument();
 
       final Project project = Project.get();
-      final BoundingBox boundingBox = project.getViewBoundingBox();
-      final double aspectRatio = boundingBox.getAspectRatio();
-      final PDPage page = new PDPage(PDPage.PAGE_SIZE_LETTER);
-      if (aspectRatio > 1) {
-        page.setRotation(90);
+      final Viewport2D viewport = MapPanel.get(project).getViewport();
+      final BoundingBox boundingBox = viewport.getBoundingBox();
+      final int width = viewport.getViewWidthPixels();
+      final int height = viewport.getViewHeightPixels();
+      final PDRectangle pageSize = new PDRectangle(width, height);
+      final PDPage page = new PDPage(pageSize);
+      try (
+        PdfViewport pdfViewport = new PdfViewport(document, page, project,
+          width, height, boundingBox)) {
+        final LayerRenderer<? extends Layer> renderer = project.getRenderer();
+        renderer.render(pdfViewport);
       }
-      render(page, boundingBox, project);
       document.addPage(page);
 
       document.save(new File("/Users/paustin/Downloads/map.pdf"));

@@ -241,10 +241,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
     final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
     final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    final Graphics2D graphics = viewport.getGraphics();
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-      RenderingHints.VALUE_ANTIALIAS_ON);
-    renderGeometry(viewport, graphics, geometry, this.style);
+    viewport.drawGeometry(geometry, style);
   }
 
   public void setStyle(final GeometryStyle style) {

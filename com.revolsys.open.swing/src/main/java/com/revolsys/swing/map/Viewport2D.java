@@ -1,6 +1,7 @@
 package com.revolsys.swing.map;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -32,6 +33,12 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.renderer.TextStyleRenderer;
+import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
 
 public class Viewport2D implements PropertyChangeSupportProxy {
 
@@ -151,6 +158,22 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return modelToScreenTransform;
   }
 
+  public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
+    final Graphics2D graphics = getGraphics();
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+      RenderingHints.VALUE_ANTIALIAS_ON);
+    GeometryStyleRenderer.renderGeometry(this, graphics, geometry, style);
+  }
+
+  public void drawText(final LayerDataObject object, final Geometry geometry,
+    final TextStyle style) {
+    final Graphics2D graphics = getGraphics();
+    if (graphics != null) {
+      TextStyleRenderer.renderText(this, graphics, object, geometry, style);
+    }
+
+  }
+
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
   }
@@ -196,7 +219,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   @Deprecated
   public Graphics2D getGraphics() {
-    throw new UnsupportedOperationException();
+    return null;
   }
 
   public double getModelHeight() {
@@ -408,6 +431,11 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       this.propertyChangeSupport.firePropertyChange("scale", oldScale,
         this.scale);
     }
+  }
+
+  public boolean isHidden(final AbstractDataObjectLayer layer,
+    final LayerDataObject record) {
+    return layer.isHidden(record);
   }
 
   public boolean isInitialized() {

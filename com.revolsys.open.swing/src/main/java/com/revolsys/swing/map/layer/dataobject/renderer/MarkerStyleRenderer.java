@@ -129,20 +129,22 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
   public static void renderMarker(final Viewport2D viewport,
     final Geometry geometry, final MarkerStyle style) {
     final Graphics2D graphics = viewport.getGraphics();
-    if ("line".equals(style.getMarkerPlacement())) {
-      renderMarkerVertices(viewport, graphics, geometry, style);
-    } else {
-      for (int i = 0; i < geometry.getGeometryCount(); i++) {
-        final Geometry part = geometry.getGeometry(i);
-        if (part instanceof Point) {
-          final Point point = (Point)part;
-          renderMarker(viewport, graphics, point, style);
-        } else if (part instanceof LineString) {
-          final LineString line = (LineString)part;
-          renderMarker(viewport, graphics, line, style);
-        } else if (part instanceof Polygon) {
-          final Polygon polygon = (Polygon)part;
-          renderMarker(viewport, graphics, polygon, style);
+    if (graphics != null) {
+      if ("line".equals(style.getMarkerPlacement())) {
+        renderMarkerVertices(viewport, graphics, geometry, style);
+      } else {
+        for (int i = 0; i < geometry.getGeometryCount(); i++) {
+          final Geometry part = geometry.getGeometry(i);
+          if (part instanceof Point) {
+            final Point point = (Point)part;
+            renderMarker(viewport, graphics, point, style);
+          } else if (part instanceof LineString) {
+            final LineString line = (LineString)part;
+            renderMarker(viewport, graphics, line, style);
+          } else if (part instanceof Polygon) {
+            final Polygon polygon = (Polygon)part;
+            renderMarker(viewport, graphics, polygon, style);
+          }
         }
       }
     }

@@ -48,7 +48,7 @@ import com.revolsys.swing.map.layer.dataobject.style.panel.TextStylePanel;
 
 public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
-  private static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
+  public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
     0, 0);
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_text");
@@ -393,8 +393,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
     final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
     final LayerDataObject object) {
     final Geometry geometry = object.getGeometryValue();
-    final Graphics2D graphics = viewport.getGraphics();
-    renderText(viewport, graphics, object, geometry, this.style);
+    viewport.drawText(object, geometry, this.style);
   }
 
   public void setStyle(final TextStyle style) {

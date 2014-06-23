@@ -59,7 +59,9 @@ public class GeoReferencedImageLayerRenderer extends
             boundingBox = layer.fitToViewport();
           }
           final Graphics2D graphics = viewport.getGraphics();
-          renderAlpha(graphics, viewport, image, 1.0, true);
+          if (graphics != null) {
+            renderAlpha(graphics, viewport, image, 1.0, true);
+          }
         }
       }
     }

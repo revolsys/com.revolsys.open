@@ -11,8 +11,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jdesktop.swingx.color.ColorUtil;
@@ -81,6 +84,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private final AtomicLong redrawCount = new AtomicLong();
 
   private long redrawId = -1;
+
+  private static final Set<String> REDRAW_PROPERTY_NAMES = new HashSet<>(
+    Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
+
+  private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(
+    Arrays.asList("layers", "selectable", "visible", "editable",
+      "recordsChanged", "updateRecord", "hasSelectedRecords",
+      "hasHighlightedRecords"));
 
   public SelectRecordsOverlay(final MapPanel map) {
     super(map);
@@ -330,22 +341,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     final Object source = event.getSource();
     if (source instanceof DataObject) {
       redraw();
-    } else if ("viewBoundingBox".equals(propertyName)) {
+    } else if (REDRAW_PROPERTY_NAMES.contains(propertyName)) {
       redraw();
-    } else if ("layers".equals(propertyName)) {
-      redrawAndRepaint();
-    } else if ("selectable".equals(propertyName)) {
-      redrawAndRepaint();
-    } else if ("visible".equals(propertyName)) {
-      redrawAndRepaint();
-    } else if ("editable".equals(propertyName)) {
-      redrawAndRepaint();
-    } else if ("updateRecord".equals(propertyName)) {
-      redrawAndRepaint();
-    } else if ("hasSelectedRecords".equals(propertyName)) {
-      redrawAndRepaint();
-      clearUndoHistory();
-    } else if ("hasHighlightedRecords".equals(propertyName)) {
+    } else if (REDRAW_REPAINT_PROPERTY_NAMES.contains(propertyName)) {
       redrawAndRepaint();
     }
   }

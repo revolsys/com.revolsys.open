@@ -196,7 +196,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       final int column = getEventColumn();
       final Object value = model.getValueAt(row, column);
 
-      final String displayValue = model.toDisplayValue(row, column, value);
+      final String displayValue = model.toCopyValue(row, column, value);
       final StringSelection transferable = new StringSelection(displayValue);
       ClipboardUtil.setContents(transferable);
     }

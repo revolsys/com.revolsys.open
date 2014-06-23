@@ -114,7 +114,9 @@ public class SelectedRecordsRenderer {
   public void paintSelected(final Viewport2D viewport,
     final GeometryFactory viewportGeometryFactory, final Geometry geometry) {
     final Graphics2D graphics = viewport.getGraphics();
-    paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
+    if (graphics != null) {
+      paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
+    }
   }
 
   public void paintSelected(final Viewport2D viewport,
