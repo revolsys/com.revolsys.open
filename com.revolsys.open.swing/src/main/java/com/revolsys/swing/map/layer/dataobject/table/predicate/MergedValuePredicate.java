@@ -34,15 +34,15 @@ public class MergedValuePredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToView(adapter.row);
       final int columnIndex = adapter.convertColumnIndexToView(adapter.column);
-      final DataObject object = model.getRecord(rowIndex);
-      final DataObject mergedObject = model.getMergedObject();
+      final DataObject record = model.getRecord(rowIndex);
+      final DataObject mergedRecord = model.getMergedObject();
 
-      if (object == mergedObject) {
+      if (record == mergedRecord) {
         return false;
       } else {
         final String attributeName = this.model.getFieldName(columnIndex);
-        final Object value = object.getValue(attributeName);
-        final Object mergedValue = mergedObject.getValue(attributeName);
+        final Object value = record.getValue(attributeName);
+        final Object mergedValue = mergedRecord.getValue(attributeName);
         if (value instanceof Geometry) {
           return false;
         } else if (mergedValue instanceof Geometry) {

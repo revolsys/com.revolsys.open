@@ -54,29 +54,33 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
     boolean highlighted = false;
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final DataObject object = this.model.getRecord(rowIndex);
-      if (object instanceof LayerDataObject) {
-        final LayerDataObject layerObject = (LayerDataObject)object;
-        final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-        final String attributeName = this.model.getFieldName(columnIndex);
-        highlighted = layerObject.isModified(attributeName);
-        if (highlighted) {
-          final DataObjectMetaData metaData = layerObject.getMetaData();
-          final String fieldName = metaData.getAttributeName(columnIndex);
-          final Object originalValue = layerObject.getOriginalValue(fieldName);
-          final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
-          String text;
-          if (originalValue == null) {
-            text = "-";
-          } else if (codeTable == null) {
-            text = StringConverterRegistry.toString(originalValue);
-          } else {
-            text = codeTable.getValue(originalValue);
-            if (text == null) {
+      final DataObject record = this.model.getRecord(rowIndex);
+      if (record instanceof LayerDataObject) {
+        final LayerDataObject layerRecord = (LayerDataObject)record;
+        if (layerRecord.isDeleted()) {
+          highlighted = false;
+        } else {
+          final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
+          final String attributeName = this.model.getFieldName(columnIndex);
+          highlighted = layerRecord.isModified(attributeName);
+          if (highlighted) {
+            final DataObjectMetaData metaData = layerRecord.getMetaData();
+            final String fieldName = metaData.getAttributeName(columnIndex);
+            final Object originalValue = layerRecord.getOriginalValue(fieldName);
+            final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
+            String text;
+            if (originalValue == null) {
               text = "-";
+            } else if (codeTable == null) {
+              text = StringConverterRegistry.toString(originalValue);
+            } else {
+              text = codeTable.getValue(originalValue);
+              if (text == null) {
+                text = "-";
+              }
             }
+            toolTip = text;
           }
-          toolTip = text;
         }
       }
     } catch (final IndexOutOfBoundsException e) {
