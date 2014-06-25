@@ -20,7 +20,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
 import com.revolsys.jts.geom.Geometry;
 
-public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
+public class ShapefileDirectoryWriter extends AbstractWriter<DataObject> {
   private File directory;
 
   private boolean useZeroForNull = true;
@@ -35,10 +35,10 @@ public class ShapeDirectoryWriter extends AbstractWriter<DataObject> {
 
   private String nameSuffix = "";
 
-  public ShapeDirectoryWriter() {
+  public ShapefileDirectoryWriter() {
   }
 
-  public ShapeDirectoryWriter(final File baseDirectory) {
+  public ShapefileDirectoryWriter(final File baseDirectory) {
     setDirectory(baseDirectory);
   }
 

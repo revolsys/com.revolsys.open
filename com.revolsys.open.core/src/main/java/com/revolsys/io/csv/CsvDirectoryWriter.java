@@ -9,14 +9,16 @@ import java.util.Map;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   private File directory;
 
   private final Map<DataObjectMetaData, CsvDataObjectWriter> writers = new HashMap<DataObjectMetaData, CsvDataObjectWriter>();
+
+  private final Map<String, DataObjectMetaData> metaDataMap = new HashMap<>();
 
   public CsvDirectoryWriter() {
   }
@@ -28,12 +30,10 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   @Override
   public void close() {
     for (final CsvDataObjectWriter writer : writers.values()) {
-      try {
-        writer.close();
-      } catch (final RuntimeException e) {
-        e.printStackTrace();
-      }
+      FileUtil.closeSilent(writer);
     }
+    writers.clear();
+    metaDataMap.clear();
   }
 
   @Override
@@ -47,21 +47,25 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
     return directory;
   }
 
-  private CsvDataObjectWriter getWriter(final DataObject object) {
-    final DataObjectMetaData metaData = object.getMetaData();
+  public DataObjectMetaData getMetaData(final String path) {
+    return metaDataMap.get(path);
+  }
+
+  private CsvDataObjectWriter getWriter(final DataObject record) {
+    final DataObjectMetaData metaData = record.getMetaData();
     CsvDataObjectWriter writer = writers.get(metaData);
     if (writer == null) {
       try {
-
-        final File file = new File(directory, metaData.getPath().toString()
-          + ".csv");
+        final String path = metaData.getPath();
+        final File file = new File(directory, path.toString() + ".csv");
         writer = new CsvDataObjectWriter(metaData, new FileWriter(file));
-        final Geometry geometry = object.getGeometryValue();
+        final Geometry geometry = record.getGeometryValue();
         if (geometry != null) {
           writer.setProperty(IoConstants.GEOMETRY_FACTORY,
             geometry.getGeometryFactory());
         }
         writers.put(metaData, writer);
+        metaDataMap.put(path, metaData);
       } catch (final IOException e) {
         throw new IllegalArgumentException(e.getMessage(), e);
       }
@@ -81,7 +85,6 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
 
   @Override
   public void write(final DataObject object) {
-
     final CsvDataObjectWriter writer = getWriter(object);
     writer.write(object);
   }

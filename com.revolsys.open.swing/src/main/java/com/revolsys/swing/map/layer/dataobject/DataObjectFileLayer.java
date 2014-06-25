@@ -99,6 +99,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
           return false;
         } else {
           try {
+            reader.setProperties(getProperties());
             final DataObjectMetaData metaData = reader.getMetaData();
             setMetaData(metaData);
             final GeometryFactory geometryFactory = metaData.getGeometryFactory();

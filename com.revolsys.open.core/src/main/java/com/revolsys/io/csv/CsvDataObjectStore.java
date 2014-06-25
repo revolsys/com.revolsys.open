@@ -1,4 +1,4 @@
-package com.revolsys.io.shp;
+package com.revolsys.io.csv;
 
 import java.io.File;
 import java.util.Map;
@@ -12,17 +12,16 @@ import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class ShapefileDataObjectStore extends AbstractDataObjectStore {
+public class CsvDataObjectStore extends AbstractDataObjectStore {
 
   private final File directory;
 
-  private ShapefileDirectoryWriter writer;
+  private CsvDirectoryWriter writer;
 
-  public ShapefileDataObjectStore(final File directory) {
+  public CsvDataObjectStore(final File directory) {
     this.directory = directory;
     directory.mkdirs();
-    writer = new ShapefileDirectoryWriter(directory);
-    writer.setLogCounts(false);
+    writer = new CsvDirectoryWriter(directory);
   }
 
   @Override
@@ -72,6 +71,11 @@ public class ShapefileDataObjectStore extends AbstractDataObjectStore {
 
   @Override
   protected void loadSchemas(final Map<String, DataObjectStoreSchema> schemaMap) {
+  }
+
+  @Override
+  public String toString() {
+    return directory.toString();
   }
 
 }

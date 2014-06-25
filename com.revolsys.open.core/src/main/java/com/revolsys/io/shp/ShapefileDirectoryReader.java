@@ -19,7 +19,7 @@ import com.revolsys.spring.SpringUtil;
 
 /**
  * <p>
- * The ShapeDirectoryReader is a that can read .shp
+ * The ShapefileDirectoryReader is a that can read .shp
  * data files contained in a single directory. The reader will iterate through
  * the .shp files in alpabetical order returning all features.
  * </p>
@@ -31,21 +31,21 @@ import com.revolsys.spring.SpringUtil;
  * @author Paul Austin
  * @see AbstractDirectoryReader
  */
-public class ShapeDirectoryReader extends DataObjectDirectoryReader {
+public class ShapefileDirectoryReader extends DataObjectDirectoryReader {
   private final Map<String, String> fileNameTypeMap = new HashMap<String, String>();
 
   private Map<String, DataObjectMetaData> typeNameMetaDataMap = new HashMap<String, DataObjectMetaData>();
 
-  public ShapeDirectoryReader() {
+  public ShapefileDirectoryReader() {
     setFileExtensions(ShapefileConstants.FILE_EXTENSION);
   }
 
   /**
-   * Construct a new ShapeDirectoryReader.
+   * Construct a new ShapefileDirectoryReader.
    * 
    * @param directory The containing the .shp files.
    */
-  public ShapeDirectoryReader(final File directory) {
+  public ShapefileDirectoryReader(final File directory) {
     this();
     setDirectory(directory);
   }

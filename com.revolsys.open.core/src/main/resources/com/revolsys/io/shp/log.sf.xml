@@ -13,7 +13,7 @@
 >
   <bean
     id="shapeLogWriter"
-    class="com.revolsys.io.shp.ShapeDirectoryWriter"
+    class="com.revolsys.io.shp.ShapefileDirectoryWriter"
     lazy-init="true"
     p:directory="."
     p:useZeroForNull="false"

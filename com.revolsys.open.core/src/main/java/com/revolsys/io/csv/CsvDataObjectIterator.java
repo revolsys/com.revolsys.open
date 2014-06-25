@@ -79,9 +79,17 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
 
   private void createMetaData(final String[] fieldNames) throws IOException {
     final List<Attribute> attributes = new ArrayList<Attribute>();
+    Attribute geometryAttribute = null;
     for (final String name : fieldNames) {
-      final DataType type = DataTypes.STRING;
-      attributes.add(new Attribute(name, type, false));
+      DataType type = DataTypes.STRING;
+      if (name.equals(geometryColumnName)) {
+        type = DataTypes.GEOMETRY;
+      }
+      final Attribute attribute = new Attribute(name, type, false);
+      if (name.equals(geometryColumnName)) {
+        geometryAttribute = attribute;
+      }
+      attributes.add(attribute);
     }
     hasPointFields = StringUtils.hasText(pointXAttributeName)
       && StringUtils.hasText(pointYAttributeName);
@@ -95,9 +103,11 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
       if (!StringUtils.hasText(geometryColumnName)) {
         geometryColumnName = "GEOMETRY";
       }
-      final Attribute geometryAttribute = new Attribute(geometryColumnName,
-        geometryType, true);
-      attributes.add(geometryAttribute);
+      if (geometryAttribute == null) {
+        geometryAttribute = new Attribute(geometryColumnName, geometryType,
+          true);
+        attributes.add(geometryAttribute);
+      }
       if (geometryFactory == null) {
         geometryFactory = GeometryFactory.wgs84();
       }
@@ -128,7 +138,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
       pointYAttributeName = getProperty("pointYAttributeName");
       geometryColumnName = getProperty("geometryColumnName");
       geometrySrid = StringConverterRegistry.toObject(DataTypes.INT,
-        getProperty("geometryColumnName"));
+        getProperty("geometrySrid"));
       if (geometrySrid != null) {
         geometryFactory = GeometryFactory.floating3(geometrySrid);
       }
