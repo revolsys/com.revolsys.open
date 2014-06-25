@@ -24,8 +24,7 @@ import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectListLayerTa
 public class DataObjectListLayer extends AbstractDataObjectLayer {
 
   public static DataObjectMetaDataImpl createMetaData(final String name,
-    final GeometryFactory geometryFactory,
-    final DataType geometryType) {
+    final GeometryFactory geometryFactory, final DataType geometryType) {
     final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name);
     metaData.addAttribute("GEOMETRY", geometryType, true);
     metaData.setGeometryFactory(geometryFactory);
@@ -47,8 +46,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   }
 
   public DataObjectListLayer(final String name,
-    final GeometryFactory geometryFactory,
-    final DataType geometryType) {
+    final GeometryFactory geometryFactory, final DataType geometryType) {
     super(name);
     final DataObjectMetaDataImpl metaData = createMetaData(name,
       geometryFactory, geometryType);
@@ -84,9 +82,10 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void deleteRecord(final LayerDataObject record) {
+  protected void deleteRecord(final LayerDataObject record,
+    final boolean trackDeletions) {
     this.records.remove(record);
-    super.deleteRecord(record);
+    super.deleteRecord(record, trackDeletions);
     saveChanges(record);
     fireEmpty();
   }

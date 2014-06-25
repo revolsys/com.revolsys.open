@@ -14,6 +14,9 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.property.DirectionalAttributes;
+import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -24,6 +27,7 @@ import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
+import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -125,6 +129,35 @@ public class DataObjectLayerTablePanel extends TablePanel implements
       menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
         new AndEnableCheck(editableEnableCheck, new InvokeMethodEnableCheck(
           this, "canPasteRecordGeometry")), this, "pasteGeometry");
+
+      final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
+      final DataType geometryDataType = metaData.getGeometryAttribute()
+        .getType();
+      if (geometryDataType == DataTypes.LINE_STRING
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        if (DirectionalAttributes.getProperty(metaData)
+          .hasDirectionalAttributes()) {
+          editMenu.addMenuItemTitleIcon("geometry",
+            DataObjectLayerForm.FLIP_RECORD_NAME,
+            DataObjectLayerForm.FLIP_RECORD_ICON, editableEnableCheck, this,
+            "flipRecordOrientation");
+          editMenu.addMenuItemTitleIcon("geometry",
+            DataObjectLayerForm.FLIP_LINE_ORIENTATION_NAME,
+            DataObjectLayerForm.FLIP_LINE_ORIENTATION_ICON,
+            editableEnableCheck, this, "flipLineOrientation");
+          editMenu.addMenuItemTitleIcon("geometry",
+            DataObjectLayerForm.FLIP_FIELDS_NAME,
+            DataObjectLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this,
+            "flipFields");
+        } else {
+          editMenu.addMenuItemTitleIcon("geometry", "Flip Line Orientation",
+            "flip_line", editableEnableCheck, this, "flipLineOrientation");
+        }
+      }
+      if (editMenu.getItemCount() > 0) {
+        menu.addComponentFactory("record", 2, editMenu);
+      }
+
     }
 
     // Toolbar
@@ -224,6 +257,23 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     if (object != null && !object.isDeleted()) {
       this.layer.showForm(object);
     }
+  }
+
+  public void flipFields() {
+    final LayerDataObject record = getEventRowObject();
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
+    property.reverseAttributes(record);
+  }
+
+  public void flipLineOrientation() {
+    final LayerDataObject record = getEventRowObject();
+    final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
+    property.reverseGeometry(record);
+  }
+
+  public void flipRecordOrientation() {
+    final LayerDataObject record = getEventRowObject();
+    DirectionalAttributes.reverse(record);
   }
 
   public Collection<? extends String> getColumnNames() {

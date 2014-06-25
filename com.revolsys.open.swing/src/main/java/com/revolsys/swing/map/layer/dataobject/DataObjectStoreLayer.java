@@ -274,7 +274,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public void deleteRecord(final LayerDataObject record) {
+  public void deleteRecord(final LayerDataObject record,
+    final boolean trackDeletions) {
     if (isLayerRecord(record)) {
       record.setState(DataObjectState.Deleted);
       unSelectRecords(record);
@@ -282,12 +283,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       if (StringUtils.hasText(id)) {
         final LayerDataObject cacheRecord = removeCacheRecord(id, record);
         this.deletedRecordIds.add(id);
-        deleteRecord(cacheRecord, true);
+        super.deleteRecord(cacheRecord, true);
         removeFromIndex(record);
         removeFromIndex(cacheRecord);
       } else {
         removeFromIndex(record);
-        super.deleteRecord(record);
+        super.deleteRecord(record, trackDeletions);
       }
     }
   }

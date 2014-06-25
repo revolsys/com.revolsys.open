@@ -23,7 +23,6 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.util.MathUtil;
 
 public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
@@ -45,7 +44,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
             boolean partClockwise = clockwise;
             for (LinearRing ring : polygon.rings()) {
-              final boolean ringClockwise = !ring.isCounterClockwise();
+              final boolean ringClockwise = ring.isClockwise();
               if (ringClockwise != partClockwise) {
                 ring = ring.reverse();
               }
@@ -130,6 +129,19 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
     return columnIndex + 3;
   }
 
+  public void setFloat(final PreparedStatement statement, int index,
+    final Double value, final Number defaultValue) throws SQLException {
+    if (value == null || Double.isInfinite(value) || Double.isNaN(value)) {
+      if (defaultValue == null) {
+        statement.setNull(index++, Types.FLOAT);
+      } else {
+        statement.setFloat(index, defaultValue.floatValue());
+      }
+    } else {
+      statement.setFloat(index, value.floatValue());
+    }
+  }
+
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement,
     final int parameterIndex, Object value) throws SQLException {
@@ -153,8 +165,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       final Double mOffset = this.spatialReference.getMOffset();
 
       final BoundingBox envelope = geometry.getBoundingBox();
-       
-      double minX = envelope.getMinX();
+
+      final double minX = envelope.getMinX();
       final double minY = envelope.getMinY();
       final double maxX = envelope.getMaxX();
       final double maxY = envelope.getMaxY();
@@ -177,13 +189,13 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
 
       statement.setInt(index++, entityType);
       statement.setInt(index++, numPoints);
-      setFloat(statement,index++, minX,0);
-      setFloat(statement,index++, minY,0);
-      setFloat(statement,index++, maxX,0);
-      setFloat(statement,index++, maxY,0);
+      setFloat(statement, index++, minX, 0);
+      setFloat(statement, index++, minY, 0);
+      setFloat(statement, index++, maxX, 0);
+      setFloat(statement, index++, maxY, 0);
       if (hasZ) {
-        double minZ = envelope.getMin(2);
-        double maxZ = envelope.getMax(2);
+        final double minZ = envelope.getMin(2);
+        final double maxZ = envelope.getMax(2);
         setFloat(statement, index++, minZ, 0);
         setFloat(statement, index++, maxZ, 0);
       } else {
@@ -191,8 +203,8 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
         statement.setNull(index++, Types.FLOAT);
       }
       if (hasM) {
-        double minM = envelope.getMin(3);
-        double maxM = envelope.getMax(3);
+        final double minM = envelope.getMin(3);
+        final double maxM = envelope.getMax(3);
         setFloat(statement, index++, minM, 0);
         setFloat(statement, index++, maxM, 0);
       } else {
@@ -207,17 +219,5 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
       throw new IllegalArgumentException("Geometry cannot be null");
     }
     return index;
-  }
-  
-  public void setFloat(PreparedStatement statement, int index, Double value, Number defaultValue) throws SQLException {
-    if (value == null || Double.isInfinite(value) || Double.isNaN(value)) {
-      if (defaultValue == null ) {
-        statement.setNull(index++, Types.FLOAT);
-      } else {
-        statement.setFloat(index, defaultValue.floatValue());
-      }
-    } else {
-      statement.setFloat(index, value.floatValue());
-    }
   }
 }

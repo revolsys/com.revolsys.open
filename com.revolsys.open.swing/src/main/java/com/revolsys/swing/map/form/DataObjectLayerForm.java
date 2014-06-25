@@ -464,6 +464,9 @@ public class DataObjectLayerForm extends JPanel implements
     this.toolBar.addButton("dnd", "Copy Record", "page_copy",
       (EnableCheck)null, this, "dataTransferCopy");
 
+    this.toolBar.addButton("dnd", "Copy Geometry", "geometry_copy",
+      (EnableCheck)null, this, "copyGeometry");
+
     this.toolBar.addButton("dnd", "Paste Record", "paste_plain", editable,
       this, "dataTransferPaste");
 
@@ -555,6 +558,16 @@ public class DataObjectLayerForm extends JPanel implements
   public void closeWindow() {
     final Window window = SwingUtilities.windowForComponent(this);
     SwingUtil.setVisible(window, false);
+  }
+
+  public void copyGeometry() {
+    final LayerDataObject record = getObject();
+    final AbstractDataObjectLayer layer = getLayer();
+    if (layer != null) {
+      if (record != null) {
+        layer.copyRecordGeometry(record);
+      }
+    }
   }
 
   protected JPanel createPanel(final JPanel container, final String title) {

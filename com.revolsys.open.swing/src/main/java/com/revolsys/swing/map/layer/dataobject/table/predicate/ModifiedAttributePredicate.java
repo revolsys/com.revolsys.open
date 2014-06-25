@@ -50,6 +50,8 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
   @Override
   public boolean isHighlighted(final Component renderer,
     final ComponentAdapter adapter) {
+    String toolTip = null;
+    boolean highlighted = false;
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final DataObject object = this.model.getRecord(rowIndex);
@@ -57,7 +59,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
         final LayerDataObject layerObject = (LayerDataObject)object;
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
         final String attributeName = this.model.getFieldName(columnIndex);
-        final boolean highlighted = layerObject.isModified(attributeName);
+        highlighted = layerObject.isModified(attributeName);
         if (highlighted) {
           final DataObjectMetaData metaData = layerObject.getMetaData();
           final String fieldName = metaData.getAttributeName(columnIndex);
@@ -74,13 +76,17 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
               text = "-";
             }
           }
-          final JComponent component = adapter.getComponent();
-          component.setToolTipText(text);
+          toolTip = text;
         }
-        return highlighted;
       }
     } catch (final IndexOutOfBoundsException e) {
+      highlighted = false;
     }
-    return false;
+    final JComponent component = adapter.getComponent();
+    if (toolTip != null && toolTip.length() > 100) {
+      toolTip = toolTip.substring(0, 100) + "...";
+    }
+    component.setToolTipText(toolTip);
+    return highlighted;
   }
 }

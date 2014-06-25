@@ -130,7 +130,14 @@ public abstract class AbstractSingleDataObjectTableModel extends
           return false;
         } else {
           final String attributeName = getFieldName(rowIndex);
-          return !isReadOnly(attributeName);
+          if (metaData.getIdAttributeNames().contains(attributeName)) {
+            return false;
+          } else if (metaData.getGeometryAttributeNames().contains(
+            attributeName)) {
+            return false;
+          } else {
+            return !isReadOnly(attributeName);
+          }
         }
       } else {
         return false;

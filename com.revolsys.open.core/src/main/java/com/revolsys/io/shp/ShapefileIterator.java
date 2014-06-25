@@ -113,27 +113,33 @@ public class ShapefileIterator extends AbstractIterator<DataObject> implements
           xbaseIterator.setCloseFile(closeFile);
         }
         loadHeader();
-        int axisCount = 3;
+        int axisCount;
         int srid = 0;
         switch (shapeType) {
-          case ShapefileConstants.POINT_Z_SHAPE:
-            axisCount = 4;
+          case ShapefileConstants.POINT_SHAPE: // 1
+          case ShapefileConstants.POLYLINE_SHAPE: // 3
+          case ShapefileConstants.POLYGON_SHAPE: // 5
+          case ShapefileConstants.MULTI_POINT_SHAPE: // 8
+            axisCount = 2;
           break;
-          case ShapefileConstants.POINT_M_SHAPE:
-          case ShapefileConstants.POINT_ZM_SHAPE:
+          case ShapefileConstants.POINT_Z_SHAPE: // 9
+          case ShapefileConstants.POLYLINE_Z_SHAPE: // 10
+          case ShapefileConstants.POLYGON_Z_SHAPE: // 19
+          case ShapefileConstants.MULTI_POINT_Z_SHAPE: // 20
+            axisCount = 3;
+          break;
+          case ShapefileConstants.POINT_ZM_SHAPE: // 11
+          case ShapefileConstants.POLYLINE_ZM_SHAPE: // 13
+          case ShapefileConstants.POLYGON_ZM_SHAPE: // 15
+          case ShapefileConstants.MULTI_POINT_ZM_SHAPE: // 18
+          case ShapefileConstants.POINT_M_SHAPE: // 21
+          case ShapefileConstants.POLYLINE_M_SHAPE: // 23
+          case ShapefileConstants.POLYGON_M_SHAPE: // 25
+          case ShapefileConstants.MULTI_POINT_M_SHAPE: // 28
             axisCount = 4;
           break;
           default:
-            if (shapeType < 10) {
-              axisCount = 2;
-            } else if (shapeType < 20) {
-              axisCount = 3;
-            } else if (shapeType < 30) {
-              axisCount = 4;
-            } else {
-              axisCount = 4;
-            }
-          break;
+            throw new RuntimeException("Unknown shape type:" + shapeType);
         }
         geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         final Resource projResource = this.resource.createRelative(name

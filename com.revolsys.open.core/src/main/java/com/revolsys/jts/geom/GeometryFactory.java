@@ -1181,6 +1181,25 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return multiPoint(pointArray);
   }
 
+  public MultiPoint multiPoint(final int axisCount, final double... coordinates) {
+    if (coordinates == null || coordinates.length == 0 || axisCount < 2) {
+      return multiPoint();
+    } else if (coordinates.length % axisCount != 0) {
+      throw new IllegalArgumentException("Coordinates length="
+        + coordinates.length + " must be a multiple of " + axisCount);
+    } else {
+      final Point[] points = new Point[coordinates.length / axisCount];
+      for (int i = 0; i < points.length; i++) {
+        final double[] newCoordinates = new double[axisCount];
+        System.arraycopy(coordinates, i * axisCount, newCoordinates, 0,
+          axisCount);
+        final Point point = point(newCoordinates);
+        points[i] = point;
+      }
+      return new MultiPointImpl(this, points);
+    }
+  }
+
   /**
    * Creates a {@link MultiPoint} using the 
    * points in the given {@link LineString}.

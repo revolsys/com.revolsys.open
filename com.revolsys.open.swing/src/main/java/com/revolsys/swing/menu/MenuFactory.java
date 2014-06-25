@@ -199,12 +199,6 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     return menu;
   }
 
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
   public JPopupMenu createJPopupMenu() {
     final JPopupMenu menu = new JPopupMenu(this.name);
     boolean first = true;
@@ -233,6 +227,12 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     return menu;
   }
 
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
   public InvokeMethodAction createMenuItem(final String name,
     final String title, final Icon icon, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
@@ -257,6 +257,14 @@ public class MenuFactory extends AbstractObjectWithProperties implements
   @Override
   public Icon getIcon() {
     return null;
+  }
+
+  public int getItemCount() {
+    int count = 0;
+    for (final List<ComponentFactory<?>> factories : groups.values()) {
+      count += factories.size();
+    }
+    return count;
   }
 
   @Override

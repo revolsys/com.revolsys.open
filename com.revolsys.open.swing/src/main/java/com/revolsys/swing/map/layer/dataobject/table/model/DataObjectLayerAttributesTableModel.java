@@ -96,7 +96,11 @@ public class DataObjectLayerAttributesTableModel extends
             return false;
           }
         }
-        return this.form.get().isEditable(attributeName);
+        if (metaData.getGeometryAttributeNames().contains(attributeName)) {
+          return false;
+        } else {
+          return this.form.get().isEditable(attributeName);
+        }
       } else {
         return false;
       }

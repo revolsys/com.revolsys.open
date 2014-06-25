@@ -320,8 +320,12 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   protected int getRowCountInternal() {
     if (this.attributeFilterMode.equals(MODE_SELECTED)) {
       synchronized (selectedSync) {
-        this.selectedRecords = new ArrayList<LayerDataObject>(
-          getLayerSelectedRecords());
+        this.selectedRecords = new ArrayList<LayerDataObject>();
+        for (final LayerDataObject record : getLayerSelectedRecords()) {
+          if (!record.isDeleted()) {
+            this.selectedRecords.add(record);
+          }
+        }
         return this.selectedRecords.size();
       }
     } else if (this.attributeFilterMode.equals(MODE_EDITS)) {

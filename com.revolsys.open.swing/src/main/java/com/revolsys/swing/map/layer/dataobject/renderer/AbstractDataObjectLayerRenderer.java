@@ -1,7 +1,9 @@
 package com.revolsys.swing.map.layer.dataobject.renderer;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,18 @@ import com.revolsys.util.JavaBeanUtil;
 public abstract class AbstractDataObjectLayerRenderer extends
   AbstractLayerRenderer<AbstractDataObjectLayer> {
 
+  private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
+
+  private static final Map<String, Constructor<? extends AbstractDataObjectLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
+
   static {
+    addRendererClass("geometryStyle", GeometryStyleRenderer.class);
+    addRendererClass("textStyle", TextStyleRenderer.class);
+    addRendererClass("markerStyle", MarkerStyleRenderer.class);
+    addRendererClass("multipleStyle", MultipleRenderer.class);
+    addRendererClass("scaleStyle", ScaleMultipleRenderer.class);
+    addRendererClass("filterStyle", FilterMultipleRenderer.class);
+
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
     menu.addMenuItem("layer", TreeItemRunnable.createAction("View/Edit Style",
       "palette", new TreeItemPropertyEnableCheck("editing", false),
@@ -55,9 +68,21 @@ public abstract class AbstractDataObjectLayerRenderer extends
         "Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
       menu.addMenuItem("wrap", action);
     }
+
   }
 
-  private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
+  public static void addRendererClass(final String name,
+    final Class<? extends AbstractDataObjectLayerRenderer> clazz) {
+    try {
+      final Constructor<? extends AbstractDataObjectLayerRenderer> constructor = clazz.getConstructor(
+        AbstractDataObjectLayer.class, LayerRenderer.class, Map.class);
+      RENDERER_CONSTRUCTORS.put(name, constructor);
+    } catch (final NoSuchMethodException e) {
+      throw new IllegalArgumentException("Invalid constructor", e);
+    } catch (final SecurityException e) {
+      throw new IllegalArgumentException("No permissions for constructor", e);
+    }
+  }
 
   public static Filter<DataObject> getFilter(
     final AbstractDataObjectLayer layer, final Map<String, Object> style) {
@@ -101,22 +126,20 @@ public abstract class AbstractDataObjectLayerRenderer extends
     final AbstractDataObjectLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
     final String type = (String)style.remove("type");
-    if ("geometryStyle".equals(type)) {
-      return new GeometryStyleRenderer(layer, parent, style);
-    } else if ("textStyle".equals(type)) {
-      return new TextStyleRenderer(layer, parent, style);
-    } else if ("markerStyle".equals(type)) {
-      return new MarkerStyleRenderer(layer, parent, style);
-    } else if ("multipleStyle".equals(type)) {
-      return new MultipleRenderer(layer, parent, style);
-    } else if ("scaleStyle".equals(type)) {
-      return new ScaleMultipleRenderer(layer, parent, style);
-    } else if ("filterStyle".equals(type)) {
-      return new FilterMultipleRenderer(layer, parent, style);
+    final Constructor<? extends AbstractDataObjectLayerRenderer> constructor = RENDERER_CONSTRUCTORS.get(type);
+    if (constructor == null) {
+      LoggerFactory.getLogger(AbstractDataObjectLayerRenderer.class).error(
+        "Unknown style type: " + style);
+      return null;
+    } else {
+      try {
+        return constructor.newInstance(layer, parent, style);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(AbstractDataObjectLayerRenderer.class,
+          "Unable to create renderer", e);
+        return null;
+      }
     }
-    LoggerFactory.getLogger(AbstractDataObjectLayerRenderer.class).error(
-      "Unknown style type: " + style);
-    return null;
   }
 
   public static LayerRenderer<AbstractDataObjectLayer> getRenderer(

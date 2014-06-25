@@ -43,6 +43,13 @@ public class LayerDataObject extends ArrayDataObject {
     setState(newState);
   }
 
+  public void clearChanges() {
+    DataObjectState state = getState();
+    if (state == DataObjectState.Persisted) {
+      this.originalValues = null;
+    }
+  }
+
   public void firePropertyChange(final String attributeName,
     final Object oldValue, final Object newValue) {
     final AbstractDataObjectLayer layer = getLayer();
