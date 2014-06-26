@@ -198,14 +198,18 @@ public abstract class DataObjectRowTableModel extends
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
       final DataObject record = getRecord(rowIndex);
-      if (record != null && record.getState() != DataObjectState.Initalizing) {
-        final String attributeName = getFieldName(rowIndex, columnIndex);
-        if (attributeName != null) {
-          if (!isReadOnly(attributeName)) {
-            final Class<?> attributeClass = getMetaData().getAttributeClass(
-              attributeName);
-            if (!Geometry.class.isAssignableFrom(attributeClass)) {
-              return true;
+      if (record != null) {
+        final DataObjectState state = record.getState();
+        if (state != DataObjectState.Initalizing
+          && state != DataObjectState.Deleted) {
+          final String attributeName = getFieldName(rowIndex, columnIndex);
+          if (attributeName != null) {
+            if (!isReadOnly(attributeName)) {
+              final Class<?> attributeClass = getMetaData().getAttributeClass(
+                attributeName);
+              if (!Geometry.class.isAssignableFrom(attributeClass)) {
+                return true;
+              }
             }
           }
         }

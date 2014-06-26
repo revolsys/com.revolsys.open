@@ -56,13 +56,13 @@ import com.revolsys.transaction.Transaction;
 
 public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "dataStore", "Data Store", DataObjectStoreLayer.class, "create");
-
   public static AbstractDataObjectLayer create(
     final Map<String, Object> properties) {
     return new DataObjectStoreLayer(properties);
   }
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "dataStore", "Data Store", DataObjectStoreLayer.class, "create");
 
   private BoundingBox boundingBox = new BoundingBoxDoubleGf();
 
@@ -169,7 +169,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     if (username != null) {
       SwingUtil.addReadOnlyTextField(panel, "Data Store Username", username);
     }
-    SwingUtil.addReadOnlyTextField(panel, "Type Path", typePath);
+    SwingUtil.addReadOnlyTextField(panel, "Type Path", this.typePath);
 
     GroupLayoutUtil.makeColumns(panel, 2, true);
     return panel;
@@ -252,7 +252,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   @Override
   public void delete() {
-    if (dataStore != null) {
+    if (this.dataStore != null) {
       final Map<String, String> connectionProperties = getProperty("connection");
       if (connectionProperties != null) {
         final Map<String, Object> config = new HashMap<String, Object>();
@@ -298,8 +298,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final Map<String, String> connectionProperties = getProperty("connection");
     if (connectionProperties == null) {
       LoggerFactory.getLogger(getClass())
-        .error(
-          "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
+      .error(
+        "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
             + getPath());
     } else {
       final Map<String, Object> config = new HashMap<String, Object>();
@@ -386,7 +386,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           final Statistics statistics = query.getProperty("statistics");
           query.setProperty("dataObjectFactory", this);
           try (
-            final Reader<LayerDataObject> reader = (Reader)dataStore.query(query)) {
+              final Reader<LayerDataObject> reader = (Reader)dataStore.query(query)) {
             final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
             for (final LayerDataObject record : reader) {
               final boolean added = addCachedRecord(records, record);
@@ -417,7 +417,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       synchronized (this.sync) {
         final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
         if (!this.boundingBox.covers(boundingBox)
-          && !this.loadingBoundingBox.covers(boundingBox)) {
+            && !this.loadingBoundingBox.covers(boundingBox)) {
           if (this.loadingWorker != null) {
             this.loadingWorker.cancel(true);
           }
@@ -450,8 +450,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final boolean deleted = isDeleted(record);
     final PlatformTransactionManager transactionManager = getDataStore().getTransactionManager();
     try (
-      Transaction transaction = new Transaction(transactionManager,
-        Propagation.REQUIRES_NEW)) {
+        Transaction transaction = new Transaction(transactionManager,
+          Propagation.REQUIRES_NEW)) {
       try {
 
         if (isExists()) {
@@ -462,7 +462,8 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
               final String idAttributeName = getMetaData().getIdAttributeName();
               final String idString = record.getIdString();
               if (this.deletedRecordIds.contains(idString)
-                || super.isDeleted(record)) {
+                  || super.isDeleted(record)) {
+                preDeleteRecord(record);
                 record.setState(DataObjectState.Deleted);
                 writer.write(record);
               } else if (super.isModified(record)) {
@@ -470,7 +471,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
               } else if (isNew(record)) {
                 Object id = record.getIdValue();
                 if (id == null && StringUtils.hasText(idAttributeName)) {
-                  id = dataStore.createPrimaryIdValue(typePath);
+                  id = dataStore.createPrimaryIdValue(this.typePath);
                   record.setValue(idAttributeName, id);
                 }
 
@@ -501,7 +502,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     "unchecked", "rawtypes"
   })
   protected <V extends LayerDataObject> List<V> getCachedRecords() {
-    synchronized (cachedRecords) {
+    synchronized (this.cachedRecords) {
       final List<V> cachedRecords = new ArrayList(this.cachedRecords.values());
       return cachedRecords;
 
@@ -663,7 +664,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           geometryAttribute, boundingBox));
         query.setProperty("dataObjectFactory", this);
         try (
-          final Reader reader = dataStore.query(query)) {
+            final Reader reader = dataStore.query(query)) {
           return reader.read();
         }
       }
@@ -722,9 +723,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     final boolean deleted = super.postSaveDeletedRecord(record);
     if (deleted) {
       final String id = record.getIdString();
-      deletedRecordIds.remove(id);
+      this.deletedRecordIds.remove(id);
     }
     return deleted;
+  }
+
+  protected void preDeleteRecord(final LayerDataObject record) {
   }
 
   public List<LayerDataObject> query(final Map<String, ? extends Object> filter) {

@@ -16,6 +16,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -57,7 +58,8 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
       final DataObject record = this.model.getRecord(rowIndex);
       if (record instanceof LayerDataObject) {
         final LayerDataObject layerRecord = (LayerDataObject)record;
-        if (layerRecord.isDeleted()) {
+        final AbstractDataObjectLayer layer = layerRecord.getLayer();
+        if (layer.isDeleted(layerRecord)) {
           highlighted = false;
         } else {
           final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);

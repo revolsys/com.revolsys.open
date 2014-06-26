@@ -116,7 +116,7 @@ public abstract class AbstractDataObjectStore extends
       addCodeTable(alias, codeTable);
     }
     final String codeTableName = codeTable.getName();
-    final List<String> columnNames = codeTableColumNames.get(codeTableName);
+    final List<String> columnNames = this.codeTableColumNames.get(codeTableName);
     if (columnNames != null) {
       for (final String columnName : columnNames) {
         addCodeTable(columnName, codeTable);
@@ -156,7 +156,7 @@ public abstract class AbstractDataObjectStore extends
       try {
         final Map<String, Object> connectionProperties = getConnectionProperties();
         extension.initialize(this, connectionProperties);
-        dataStoreExtensions.add(extension);
+        this.dataStoreExtensions.add(extension);
       } catch (final Throwable e) {
         ExceptionUtil.log(extension.getClass(), "Unable to initialize", e);
       }
@@ -172,7 +172,7 @@ public abstract class AbstractDataObjectStore extends
     for (final Attribute attribute : metaData.getAttributes()) {
       final String fieldName = attribute.getName();
       if (!fieldName.equals(idFieldName)) {
-        final CodeTable codeTable = columnToTableMap.get(fieldName);
+        final CodeTable codeTable = this.columnToTableMap.get(fieldName);
         if (codeTable != null) {
           attribute.setCodeTable(codeTable);
         }
@@ -182,30 +182,30 @@ public abstract class AbstractDataObjectStore extends
 
   protected void addMetaDataProperties(final DataObjectMetaDataImpl metaData) {
     final String typePath = metaData.getPath();
-    for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
+    for (final DataObjectMetaDataProperty property : this.commonMetaDataProperties) {
       final DataObjectMetaDataProperty clonedProperty = property.clone();
       clonedProperty.setMetaData(metaData);
     }
-    final Map<String, Object> properties = typeMetaDataProperties.get(typePath);
+    final Map<String, Object> properties = this.typeMetaDataProperties.get(typePath);
     metaData.setProperties(properties);
   }
 
   protected void addSchema(final DataObjectStoreSchema schema) {
-    schemaMap.put(schema.getPath(), schema);
+    this.schemaMap.put(schema.getPath(), schema);
   }
 
   @Override
   public void addStatistic(final String statisticName, final DataObject object) {
-    if (statistics != null) {
-      statistics.add(statisticName, object);
+    if (this.statistics != null) {
+      this.statistics.add(statisticName, object);
     }
   }
 
   @Override
   public void addStatistic(final String statisticName, final String typePath,
     final int count) {
-    if (statistics != null) {
-      statistics.add(statisticName, typePath, count);
+    if (this.statistics != null) {
+      this.statistics.add(statisticName, typePath, count);
     }
   }
 
@@ -220,27 +220,27 @@ public abstract class AbstractDataObjectStore extends
   public void close() {
     try {
       super.close();
-      if (statistics != null) {
-        statistics.disconnect();
+      if (this.statistics != null) {
+        this.statistics.disconnect();
       }
-      if (schemaMap != null) {
-        for (final DataObjectStoreSchema schema : schemaMap.values()) {
+      if (this.schemaMap != null) {
+        for (final DataObjectStoreSchema schema : this.schemaMap.values()) {
           schema.close();
         }
-        schemaMap.clear();
+        this.schemaMap.clear();
       }
     } finally {
-      codeTableColumNames.clear();
-      columnToTableMap.clear();
-      commonMetaDataProperties.clear();
-      connectionProperties.clear();
-      dataObjectFactory = null;
-      dataStoreExtensions.clear();
-      iteratorFactory = null;
-      label = "deleted";
-      schemaMap.clear();
-      statistics.clear();
-      typeMetaDataProperties.clear();
+      this.codeTableColumNames.clear();
+      this.columnToTableMap.clear();
+      this.commonMetaDataProperties.clear();
+      this.connectionProperties.clear();
+      this.dataObjectFactory = null;
+      this.dataStoreExtensions.clear();
+      this.iteratorFactory = null;
+      this.label = "deleted";
+      this.schemaMap.clear();
+      this.statistics.clear();
+      this.typeMetaDataProperties.clear();
     }
   }
 
@@ -415,22 +415,22 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public CodeTable getCodeTableByColumn(final String columnName) {
-    final CodeTable codeTable = columnToTableMap.get(columnName);
+    final CodeTable codeTable = this.columnToTableMap.get(columnName);
     return codeTable;
 
   }
 
   @Override
   public Map<String, CodeTable> getCodeTableByColumnMap() {
-    return new HashMap<String, CodeTable>(columnToTableMap);
+    return new HashMap<String, CodeTable>(this.columnToTableMap);
   }
 
   public Map<String, List<String>> getCodeTableColumNames() {
-    return codeTableColumNames;
+    return this.codeTableColumNames;
   }
 
   protected Map<String, Object> getConnectionProperties() {
-    return connectionProperties;
+    return this.connectionProperties;
   }
 
   @Override
@@ -439,20 +439,20 @@ public abstract class AbstractDataObjectStore extends
   }
 
   public Collection<DataObjectStoreExtension> getDataStoreExtensions() {
-    return dataStoreExtensions;
+    return this.dataStoreExtensions;
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public DataStoreIteratorFactory getIteratorFactory() {
-    return iteratorFactory;
+    return this.iteratorFactory;
   }
 
   @Override
   public String getLabel() {
-    return label;
+    return this.label;
   }
 
   @Override
@@ -475,32 +475,32 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public DataObjectStoreSchema getSchema(String schemaName) {
-    if (schemaName == null || schemaMap == null) {
+    if (schemaName == null || this.schemaMap == null) {
       return null;
     } else {
-      synchronized (schemaMap) {
-        if (schemaMap.isEmpty()) {
-          loadSchemas(schemaMap);
+      synchronized (this.schemaMap) {
+        if (this.schemaMap.isEmpty()) {
+          loadSchemas(this.schemaMap);
         }
         if (!schemaName.startsWith("/")) {
           schemaName = "/" + schemaName;
         }
-        return schemaMap.get(schemaName.toUpperCase());
+        return this.schemaMap.get(schemaName.toUpperCase());
       }
     }
   }
 
   public Map<String, DataObjectStoreSchema> getSchemaMap() {
-    return schemaMap;
+    return this.schemaMap;
   }
 
   @Override
   public List<DataObjectStoreSchema> getSchemas() {
-    synchronized (schemaMap) {
-      if (schemaMap.isEmpty()) {
-        loadSchemas(schemaMap);
+    synchronized (this.schemaMap) {
+      if (this.schemaMap.isEmpty()) {
+        loadSchemas(this.schemaMap);
       }
-      return new ArrayList<DataObjectStoreSchema>(schemaMap.values());
+      return new ArrayList<DataObjectStoreSchema>(this.schemaMap.values());
     }
   }
 
@@ -522,12 +522,12 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public StatisticsMap getStatistics() {
-    return statistics;
+    return this.statistics;
   }
 
   @Override
   public Statistics getStatistics(final String name) {
-    return statistics.getStatistics(name);
+    return this.statistics.getStatistics(name);
   }
 
   public String getString(final Object name) {
@@ -564,12 +564,12 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public String getUrl() {
-    return (String)connectionProperties.get("url");
+    return (String)this.connectionProperties.get("url");
   }
 
   @Override
   public String getUsername() {
-    return (String)connectionProperties.get("username");
+    return (String)this.connectionProperties.get("username");
   }
 
   @Override
@@ -590,7 +590,7 @@ public abstract class AbstractDataObjectStore extends
   @Override
   @PostConstruct
   public void initialize() {
-    statistics.connect();
+    this.statistics.connect();
   }
 
   @Override
@@ -674,6 +674,8 @@ public abstract class AbstractDataObjectStore extends
       if (object instanceof Query) {
         final Query query = (Query)object;
         queryObjects.add(query);
+        System.out.println(query.getTypeName() + " "
+          + query.getWhereCondition());
       } else {
         final Query query = new Query(object.toString());
         queryObjects.add(query);
@@ -681,6 +683,7 @@ public abstract class AbstractDataObjectStore extends
     }
     final DataObjectStoreQueryReader reader = createReader();
     reader.setQueries(queryObjects);
+
     return reader;
   }
 
@@ -728,7 +731,7 @@ public abstract class AbstractDataObjectStore extends
   }
 
   protected void refreshSchema() {
-    schemaMap.clear();
+    this.schemaMap.clear();
   }
 
   public void setCodeTableColumNames(
@@ -762,12 +765,12 @@ public abstract class AbstractDataObjectStore extends
   @Override
   public void setLabel(final String label) {
     this.label = label;
-    statistics.setPrefix(label);
+    this.statistics.setPrefix(label);
   }
 
   @Override
   public void setLogCounts(final boolean logCounts) {
-    statistics.setLogCounts(logCounts);
+    this.statistics.setLogCounts(logCounts);
   }
 
   public void setSchemaMap(final Map<String, DataObjectStoreSchema> schemaMap) {
@@ -798,8 +801,8 @@ public abstract class AbstractDataObjectStore extends
 
   @Override
   public String toString() {
-    if (StringUtils.hasText(label)) {
-      return label;
+    if (StringUtils.hasText(this.label)) {
+      return this.label;
     } else {
       return super.toString();
     }

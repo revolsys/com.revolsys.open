@@ -6,6 +6,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -52,20 +53,11 @@ import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.swing.table.filter.ContainsFilter;
 import com.revolsys.swing.table.filter.EqualFilter;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class DataObjectLayerTableModel extends DataObjectRowTableModel
-  implements SortableTableModel, PropertyChangeListener,
-  PropertyChangeSupportProxy {
-
-  private static final long serialVersionUID = 1L;
-
-  public static final String MODE_ALL = "all";
-
-  public static final String MODE_SELECTED = "selected";
-
-  public static final String MODE_EDITS = "edits";
+implements SortableTableModel, PropertyChangeListener,
+PropertyChangeSupportProxy {
 
   public static DataObjectLayerTable createTable(
     final AbstractDataObjectLayer layer) {
@@ -99,6 +91,14 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     }
   }
 
+  private static final long serialVersionUID = 1L;
+
+  public static final String MODE_ALL = "all";
+
+  public static final String MODE_SELECTED = "selected";
+
+  public static final String MODE_EDITS = "edits";
+
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
@@ -120,7 +120,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   private SwingWorker<?, ?> loadObjectsWorker;
 
   private Map<Integer, List<LayerDataObject>> pageCache = new LruMap<Integer, List<LayerDataObject>>(
-    5);
+      5);
 
   private String attributeFilterMode = MODE_ALL;
 
@@ -136,7 +136,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   private final Object sync = new Object();
 
-  private final Set<Integer> loadingPageNumbers = new LinkedHashSet<Integer>();
+  private final Set<Integer> loadingPageNumbers = new LinkedHashSet<>();
+
+  private final Set<Integer> loadingPageNumbersToProcess = new LinkedHashSet<>();
 
   private Map<String, Boolean> orderBy = new LinkedHashMap<String, Boolean>();
 
@@ -166,7 +168,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   @Override
   public String getColumnName(final int columnIndex) {
     final String fieldName = getFieldName(columnIndex);
-    return layer.getFieldTitle(fieldName);
+    return this.layer.getFieldTitle(fieldName);
   }
 
   public Condition getFilter() {
@@ -184,7 +186,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (this.filterByBoundingBox) {
         final Project project = this.layer.getProject();
         final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-        final DataObjectMetaData metaData = layer.getMetaData();
+        final DataObjectMetaData metaData = this.layer.getMetaData();
         final Attribute geometryAttribute = metaData.getGeometryAttribute();
         if (geometryAttribute != null) {
           query.and(F.envelopeIntersects(geometryAttribute, viewBoundingBox));
@@ -195,7 +197,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   public final ListSelectionModel getHighlightedModel() {
-    return highlightedModel;
+    return this.highlightedModel;
   }
 
   public AbstractDataObjectLayer getLayer() {
@@ -223,16 +225,19 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   private Integer getNextPageNumber(final int refreshIndex) {
     synchronized (getSync()) {
       if (this.refreshIndex == refreshIndex) {
-        if (this.loadingPageNumbers.isEmpty()) {
+        if (this.loadingPageNumbersToProcess.isEmpty()) {
           this.loadObjectsWorker = null;
-          return null;
         } else {
-          return CollectionUtil.get(this.loadingPageNumbers, 0);
+          final Iterator<Integer> iterator = this.loadingPageNumbersToProcess.iterator();
+          if (iterator.hasNext()) {
+            final Integer pageNumber = iterator.next();
+            iterator.remove();
+            return pageNumber;
+          }
         }
-      } else {
-        return null;
       }
     }
+    return null;
   }
 
   public Map<String, Boolean> getOrderBy() {
@@ -244,14 +249,15 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     synchronized (getSync()) {
       final List<LayerDataObject> page = this.pageCache.get(pageNumber);
       if (page == null) {
-        this.loadingPageNumbers.add(pageNumber);
-        synchronized (getSync()) {
+        if (!this.loadingPageNumbers.contains(pageNumber)) {
+          this.loadingPageNumbers.add(pageNumber);
+          this.loadingPageNumbersToProcess.add(pageNumber);
           if (this.loadObjectsWorker == null) {
             this.loadObjectsWorker = Invoke.background("Loading records "
-              + getTypeName(), this, "loadPages", refreshIndex);
+                + getTypeName(), this, "loadPages", this.refreshIndex);
           }
         }
-        return loadingRecord;
+        return this.loadingRecord;
       } else {
         if (recordNumber < page.size()) {
           final LayerDataObject object = page.get(recordNumber);
@@ -269,7 +275,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   @SuppressWarnings("unchecked")
@@ -299,7 +305,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         if (this.countLoaded) {
           int count = this.rowCount;
           if (!this.attributeFilterMode.equals(MODE_SELECTED)
-            && !this.attributeFilterMode.equals(MODE_EDITS)) {
+              && !this.attributeFilterMode.equals(MODE_EDITS)) {
             final AbstractDataObjectLayer layer = getLayer();
             final int newRecordCount = layer.getNewRecordCount();
             count += newRecordCount;
@@ -309,7 +315,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
         } else {
           if (this.rowCountWorker == null) {
             this.rowCountWorker = Invoke.background("Query row count "
-              + this.layer.getName(), this, "loadRowCount", this.refreshIndex);
+                + this.layer.getName(), this, "loadRowCount", this.refreshIndex);
           }
           return 0;
         }
@@ -319,7 +325,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   protected int getRowCountInternal() {
     if (this.attributeFilterMode.equals(MODE_SELECTED)) {
-      synchronized (selectedSync) {
+      synchronized (this.selectedSync) {
         this.selectedRecords = new ArrayList<LayerDataObject>();
         for (final LayerDataObject record : getLayerSelectedRecords()) {
           if (!record.isDeleted()) {
@@ -336,9 +342,9 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   }
 
   protected LayerDataObject getSelectedRecord(final int index) {
-    synchronized (selectedSync) {
-      if (index < selectedRecords.size()) {
-        return selectedRecords.get(index);
+    synchronized (this.selectedSync) {
+      if (index < this.selectedRecords.size()) {
+        return this.selectedRecords.get(index);
       } else {
         return null;
       }
@@ -364,7 +370,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   @Override
   public boolean isEditable() {
-    return super.isEditable() && layer.isEditable();
+    return super.isEditable() && this.layer.isEditable();
   }
 
   public boolean isFilterByBoundingBox() {
@@ -379,7 +385,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
   public boolean isSelected(final boolean selected, final int rowIndex,
     final int columnIndex) {
     final LayerDataObject object = getRecord(rowIndex);
-    return layer.isSelected(object);
+    return this.layer.isSelected(object);
   }
 
   protected LayerDataObject loadLayerRecord(int row) {
@@ -433,7 +439,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       final String propertyName = e.getPropertyName();
       if (Arrays.asList("query", "editable", "recordInserted",
         "recordsInserted", "recordDeleted", "recordsChanged").contains(
-        propertyName)) {
+          propertyName)) {
         refresh();
       } else if ("recordUpdated".equals(propertyName)) {
         repaint();
@@ -458,6 +464,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
           this.rowCountWorker = null;
         }
         this.loadingPageNumbers.clear();
+        this.loadingPageNumbersToProcess.clear();
         this.rowCount = 0;
         this.pageCache = new LruMap<Integer, List<LayerDataObject>>(5);
         this.countLoaded = false;
@@ -515,9 +522,10 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       } else {
         refresh();
       }
-      propertyChangeSupport.firePropertyChange("filter", oldValue, this.filter);
+      this.propertyChangeSupport.firePropertyChange("filter", oldValue,
+        this.filter);
       final boolean hasFilter = isHasFilter();
-      propertyChangeSupport.firePropertyChange("hasFilter", !hasFilter,
+      this.propertyChangeSupport.firePropertyChange("hasFilter", !hasFilter,
         hasFilter);
       return true;
     }
@@ -538,7 +546,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     final List<LayerDataObject> records) {
     synchronized (getSync()) {
       if (this.refreshIndex == refreshIndex) {
-        pageCache.put(pageNumber, records);
+        this.pageCache.put(pageNumber, records);
         this.loadingPageNumbers.remove(pageNumber);
         fireTableRowsUpdated(pageNumber * this.pageSize,
           Math.min(getRowCount(), (pageNumber + 1) * this.pageSize - 1));
@@ -633,7 +641,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
     } else {
       orderBy = Collections.emptyMap();
     }
-    if (sync == null) {
+    if (this.sync == null) {
       this.orderBy = orderBy;
     } else {
       synchronized (getSync()) {

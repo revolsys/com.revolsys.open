@@ -57,13 +57,13 @@ import com.revolsys.util.CollectionUtil;
 public abstract class AbstractJdbcDataObjectStore extends
   AbstractDataObjectStore implements JdbcDataObjectStore,
   DataObjectStoreExtension {
-  public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
-
   public static final AbstractIterator<DataObject> createJdbcIterator(
     final AbstractJdbcDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
     return new JdbcQueryIterator(dataStore, query, properties);
   }
+
+  public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
   private final Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
 
@@ -134,14 +134,14 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected void addAllSchemaNames(final String schemaName) {
-    allSchemaNames.add(schemaName.toUpperCase());
+    this.allSchemaNames.add(schemaName.toUpperCase());
   }
 
   protected JdbcAttribute addAttribute(final DataObjectMetaDataImpl metaData,
     final String dbColumnName, final String name, final String dataType,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    JdbcAttributeAdder attributeAdder = attributeAdders.get(dataType);
+    JdbcAttributeAdder attributeAdder = this.attributeAdders.get(dataType);
     if (attributeAdder == null) {
       attributeAdder = new JdbcAttributeAdder(DataTypes.OBJECT);
     }
@@ -163,7 +163,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   public void addAttributeAdder(final String sqlTypeName,
     final JdbcAttributeAdder adder) {
-    attributeAdders.put(sqlTypeName, adder);
+    this.attributeAdders.put(sqlTypeName, adder);
   }
 
   public void addExcludeTablePaths(final String tableName) {
@@ -175,28 +175,28 @@ public abstract class AbstractJdbcDataObjectStore extends
   public synchronized void close() {
     try {
       super.close();
-      if (connection != null) {
-        if (dataSource != null) {
-          JdbcUtils.release(connection, dataSource);
+      if (this.connection != null) {
+        if (this.dataSource != null) {
+          JdbcUtils.release(this.connection, this.dataSource);
         }
       }
-      if (databaseFactory != null && dataSource != null) {
-        databaseFactory.closeDataSource(dataSource);
+      if (this.databaseFactory != null && this.dataSource != null) {
+        this.databaseFactory.closeDataSource(this.dataSource);
       }
     } finally {
-      allSchemaNames.clear();
-      attributeAdders.clear();
-      transactionManager = null;
-      connection = null;
-      databaseFactory = null;
-      dataSource = null;
-      excludeTablePatterns.clear();
-      hints = null;
-      schemaNameMap.clear();
-      sequenceTypeSqlMap.clear();
-      sqlPrefix = null;
-      sqlSuffix = null;
-      tableNameMap.clear();
+      this.allSchemaNames.clear();
+      this.attributeAdders.clear();
+      this.transactionManager = null;
+      this.connection = null;
+      this.databaseFactory = null;
+      this.dataSource = null;
+      this.excludeTablePatterns.clear();
+      this.hints = null;
+      this.schemaNameMap.clear();
+      this.sequenceTypeSqlMap.clear();
+      this.sqlPrefix = null;
+      this.sqlSuffix = null;
+      this.tableNameMap.clear();
     }
   }
 
@@ -220,18 +220,18 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public JdbcWriter createWriter() {
-    final int size = batchSize;
+    final int size = this.batchSize;
     return createWriter(size);
   }
 
   public JdbcWriter createWriter(final int batchSize) {
     final JdbcWriterImpl writer = new JdbcWriterImpl(this);
-    writer.setSqlPrefix(sqlPrefix);
-    writer.setSqlSuffix(sqlSuffix);
+    writer.setSqlPrefix(this.sqlPrefix);
+    writer.setSqlSuffix(this.sqlSuffix);
     writer.setBatchSize(batchSize);
-    writer.setHints(hints);
+    writer.setHints(this.hints);
     writer.setLabel(getLabel());
-    writer.setFlushBetweenTypes(flushBetweenTypes);
+    writer.setFlushBetweenTypes(this.flushBetweenTypes);
     writer.setQuoteColumnNames(false);
     return writer;
   }
@@ -253,7 +253,8 @@ public abstract class AbstractJdbcDataObjectStore extends
       }
     }
     final String sql = JdbcUtils.getDeleteSql(query);
-    try (Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+    try (
+        Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
@@ -307,7 +308,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public Set<String> getAllSchemaNames() {
-    return allSchemaNames;
+    return this.allSchemaNames;
   }
 
   // protected Set<String> getDatabaseSchemaNames() {
@@ -376,7 +377,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   // }
 
   public int getBatchSize() {
-    return batchSize;
+    return this.batchSize;
   }
 
   public List<String> getColumnNames(final String typePath) {
@@ -386,7 +387,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public Connection getConnection() {
-    return connection;
+    return this.connection;
   }
 
   @Override
@@ -407,7 +408,7 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public String getDatabaseSchemaName(final String schemaPath) {
-    return schemaNameMap.get(schemaPath);
+    return this.schemaNameMap.get(schemaPath);
   }
 
   protected Set<String> getDatabaseSchemaNames() {
@@ -415,7 +416,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     try {
       final Connection connection = getDbConnection();
       try {
-        final PreparedStatement statement = connection.prepareStatement(schemaPermissionsSql);
+        final PreparedStatement statement = connection.prepareStatement(this.schemaPermissionsSql);
         final ResultSet resultSet = statement.executeQuery();
 
         try {
@@ -441,24 +442,24 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public String getDatabaseTableName(final String typePath) {
-    return tableNameMap.get(typePath);
+    return this.tableNameMap.get(typePath);
   }
 
   @Override
   public DataSource getDataSource() {
-    return dataSource;
+    return this.dataSource;
   }
 
   protected Connection getDbConnection() {
-    if (dataSource != null) {
-      return JdbcUtils.getConnection(dataSource);
+    if (this.dataSource != null) {
+      return JdbcUtils.getConnection(this.dataSource);
     } else {
-      return connection;
+      return this.connection;
     }
   }
 
   public Set<String> getExcludeTablePaths() {
-    return excludeTablePaths;
+    return this.excludeTablePaths;
   }
 
   @Override
@@ -468,7 +469,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public String getHints() {
-    return hints;
+    return this.hints;
   }
 
   public String getIdAttributeName(final String typePath) {
@@ -550,7 +551,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   protected String getSequenceInsertSql(final DataObjectMetaData metaData) {
     final String typePath = metaData.getPath();
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
-    String sql = sequenceTypeSqlMap.get(typePath);
+    String sql = this.sequenceTypeSqlMap.get(typePath);
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
       sqlBuffer.append("insert ");
@@ -582,7 +583,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       }
       sqlBuffer.append(")");
       sql = sqlBuffer.toString();
-      sequenceTypeSqlMap.put(typePath, sql);
+      this.sequenceTypeSqlMap.put(typePath, sql);
     }
     return sql;
   }
@@ -597,20 +598,20 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public String getSqlPrefix() {
-    return sqlPrefix;
+    return this.sqlPrefix;
   }
 
   public String getSqlSuffix() {
-    return sqlSuffix;
+    return this.sqlSuffix;
   }
 
   public String getTablePermissionsSql() {
-    return tablePermissionsSql;
+    return this.tablePermissionsSql;
   }
 
   @Override
   public PlatformTransactionManager getTransactionManager() {
-    return transactionManager;
+    return this.transactionManager;
   }
 
   @Override
@@ -622,7 +623,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   public JdbcWriter getWriter(final boolean throwExceptions) {
     Object writerKey;
     if (throwExceptions) {
-      writerKey = exceptionWriterKey;
+      writerKey = this.exceptionWriterKey;
     } else {
       writerKey = this.writerKey;
     }
@@ -666,7 +667,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     super.initialize();
     final DataSource dataSource = getDataSource();
     if (dataSource != null) {
-      transactionManager = new DataSourceTransactionManager(dataSource);
+      this.transactionManager = new DataSourceTransactionManager(dataSource);
     }
   }
 
@@ -699,10 +700,10 @@ public abstract class AbstractJdbcDataObjectStore extends
   protected boolean isExcluded(final String dbSchemaName, final String tableName) {
     final String path = ("/" + dbSchemaName + "/" + tableName).toUpperCase()
       .replaceAll("/+", "/");
-    if (excludeTablePaths.contains(path)) {
+    if (this.excludeTablePaths.contains(path)) {
       return true;
     } else {
-      for (final String pattern : excludeTablePatterns) {
+      for (final String pattern : this.excludeTablePatterns) {
         if (path.matches(pattern) || tableName.matches(pattern)) {
           return true;
         }
@@ -712,7 +713,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   public boolean isFlushBetweenTypes() {
-    return flushBetweenTypes;
+    return this.flushBetweenTypes;
   }
 
   public abstract boolean isSchemaExcluded(String schemaName);
@@ -723,7 +724,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final Map<String, List<String>> idColumnNames = new HashMap<String, List<String>>();
     final Connection connection = getDbConnection();
     try {
-      final PreparedStatement statement = connection.prepareStatement(primaryKeySql);
+      final PreparedStatement statement = connection.prepareStatement(this.primaryKeySql);
       try {
         statement.setString(1, dbSchemaName);
         final ResultSet rs = statement.executeQuery();
@@ -770,7 +771,7 @@ public abstract class AbstractJdbcDataObjectStore extends
       for (final String dbTableName : tableNames) {
         final String tableName = dbTableName.toUpperCase();
         final String typePath = PathUtil.toPath(schemaName, tableName);
-        tableNameMap.put(typePath, dbTableName);
+        this.tableNameMap.put(typePath, dbTableName);
         final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
           this, schema, typePath);
         final String description = tableDescriptionMap.get(dbTableName);
@@ -781,8 +782,9 @@ public abstract class AbstractJdbcDataObjectStore extends
         metaDataMap.put(typePath, metaData);
       }
 
-      try (final ResultSet columnsRs = databaseMetaData.getColumns(null,
-        dbSchemaName, "%", "%")) {
+      try (
+          final ResultSet columnsRs = databaseMetaData.getColumns(null,
+            dbSchemaName, "%", "%")) {
         while (columnsRs.next()) {
           final String tableName = columnsRs.getString("TABLE_NAME")
             .toUpperCase();
@@ -831,7 +833,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     final Set<String> databaseSchemaNames = getDatabaseSchemaNames();
     for (final String dbSchemaName : databaseSchemaNames) {
       final String schemaName = "/" + dbSchemaName.toUpperCase();
-      schemaNameMap.put(schemaName, dbSchemaName);
+      this.schemaNameMap.put(schemaName, dbSchemaName);
       final DataObjectStoreSchema schema = new DataObjectStoreSchema(this,
         schemaName);
       schemaMap.put(schemaName, schema);
@@ -844,7 +846,7 @@ public abstract class AbstractJdbcDataObjectStore extends
     try {
       final Connection connection = getDbConnection();
       try {
-        final PreparedStatement statement = connection.prepareStatement(tablePermissionsSql);
+        final PreparedStatement statement = connection.prepareStatement(this.tablePermissionsSql);
         statement.setString(1, schemaName);
         final ResultSet resultSet = statement.executeQuery();
 
@@ -883,13 +885,13 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   @Override
   public void preProcess(final DataObjectStoreSchema schema) {
-    for (final JdbcAttributeAdder attributeAdder : attributeAdders.values()) {
+    for (final JdbcAttributeAdder attributeAdder : this.attributeAdders.values()) {
       attributeAdder.initialize(schema);
     }
   }
 
   protected void releaseConnection(final Connection connection) {
-    JdbcUtils.release(connection, dataSource);
+    JdbcUtils.release(connection, this.dataSource);
   }
 
   public void releaseSqlConnection(final Connection connection) {
@@ -942,7 +944,7 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected void setSchemaPermissionsSql(final String scehmaPermissionsSql) {
-    schemaPermissionsSql = scehmaPermissionsSql;
+    this.schemaPermissionsSql = scehmaPermissionsSql;
   }
 
   public void setSqlPrefix(final String sqlPrefix) {
@@ -968,11 +970,13 @@ public abstract class AbstractJdbcDataObjectStore extends
   }
 
   protected void write(final DataObject record, final DataObjectState state) {
-    try (Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+    try (
+        Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
-      try (JdbcWriter writer = getWriter(true)) {
+      try (
+          JdbcWriter writer = getWriter(true)) {
         write(writer, record, state);
       } catch (final RuntimeException e) {
         transaction.setRollbackOnly();
@@ -1006,11 +1010,13 @@ public abstract class AbstractJdbcDataObjectStore extends
 
   protected void writeAll(final Collection<DataObject> records,
     final DataObjectState state) {
-    try (Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+    try (
+        Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
-      try (final JdbcWriter writer = getWriter(true)) {
+      try (
+          final JdbcWriter writer = getWriter(true)) {
         for (final DataObject record : records) {
           write(writer, record, state);
         }
