@@ -31,6 +31,7 @@ import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.data.query.Q;
@@ -636,6 +637,33 @@ public abstract class AbstractDataObjectStore extends
     }
   }
 
+  @Override
+  public DataObject load(final String typePath, final RecordIdentifier id) {
+    final DataObjectMetaData metaData = getMetaData(typePath);
+    if (metaData == null) {
+      return null;
+    } else {
+      final List<Object> values = id.getValues();
+      final List<String> idAttributeNames = metaData.getIdAttributeNames();
+      if (idAttributeNames.isEmpty()) {
+        throw new IllegalArgumentException(typePath
+          + " does not have a primary key");
+      } else if (values.size() != idAttributeNames.size()) {
+        throw new IllegalArgumentException(id + " not a valid id for "
+          + typePath + " requires " + idAttributeNames);
+      } else {
+        final Query query = new Query(metaData);
+        for (int i = 0; i < idAttributeNames.size(); i++) {
+          final String name = idAttributeNames.get(i);
+          final Object value = values.get(i);
+          final Attribute attribute = metaData.getAttribute(name);
+          query.and(Q.equal(attribute, value));
+        }
+        return queryFirst(query);
+      }
+    }
+  }
+
   protected abstract void loadSchemaDataObjectMetaData(
     DataObjectStoreSchema schema, Map<String, DataObjectMetaData> metaDataMap);
 
@@ -674,8 +702,8 @@ public abstract class AbstractDataObjectStore extends
       if (object instanceof Query) {
         final Query query = (Query)object;
         queryObjects.add(query);
-        System.out.println(query.getTypeName() + " "
-          + query.getWhereCondition());
+        // System.out.println(query.getTypeName() + " "
+        // + query.getWhereCondition());
       } else {
         final Query query = new Query(object.toString());
         queryObjects.add(query);

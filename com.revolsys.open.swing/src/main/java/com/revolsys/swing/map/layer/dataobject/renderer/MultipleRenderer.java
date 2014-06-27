@@ -57,7 +57,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
             ExceptionUtil.log(
               getClass(),
               "Unabled to render " + layer.getName() + " #"
-                + record.getIdString(), e);
+                  + record.getIdentifier(), e);
           }
         }
       }
@@ -73,7 +73,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
       if (renderer.isVisible(scale)) {
         for (final LayerDataObject record : records) {
           if (isVisible(record) && renderer.isVisible(record)
-            && !layer.isHidden(record)) {
+              && !layer.isHidden(record)) {
             try {
               renderer.renderRecord(viewport, visibleArea, layer, record);
             } catch (final TopologyException e) {
@@ -81,7 +81,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
               ExceptionUtil.log(
                 getClass(),
                 "Unabled to render " + layer.getName() + " #"
-                  + record.getIdString(), e);
+                    + record.getIdentifier(), e);
             }
           }
         }
@@ -102,7 +102,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
             ExceptionUtil.log(
               getClass(),
               "Unabled to render " + layer.getName() + " #"
-                + object.getIdString(), e);
+                  + object.getIdentifier(), e);
           }
         }
       }

@@ -15,6 +15,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
@@ -34,8 +35,8 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
 
     table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
       predicate, HighlightPredicate.EVEN), ColorUtil.setAlpha(
-      WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
-      Color.WHITE));
+        WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
+        Color.WHITE));
 
     table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
       predicate, HighlightPredicate.ODD), WebColors.YellowGreen,
@@ -76,7 +77,8 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
             } else if (codeTable == null) {
               text = StringConverterRegistry.toString(originalValue);
             } else {
-              text = codeTable.getValue(originalValue);
+              text = codeTable.getValue(SingleRecordIdentifier.create(
+                originalValue));
               if (text == null) {
                 text = "-";
               }

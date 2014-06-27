@@ -2,6 +2,7 @@ package com.revolsys.gis.data.model.codes;
 
 import java.util.Comparator;
 
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.util.CompareUtil;
 
 public class CodeTableCoparator implements Comparator<Object> {
@@ -23,14 +24,16 @@ public class CodeTableCoparator implements Comparator<Object> {
     } else if (value2 == null) {
       return -1;
     } else {
-      final Object codeValue1 = codeTable.getValue(value1);
-      final Object codeValue2 = codeTable.getValue(value2);
+      final Object codeValue1 = this.codeTable.getValue(SingleRecordIdentifier.create(
+        value1));
+      final Object codeValue2 = this.codeTable.getValue(SingleRecordIdentifier.create(
+        value2));
       return CompareUtil.compare(codeValue1, codeValue2);
     }
   }
 
   @Override
   public String toString() {
-    return codeTable.toString();
+    return this.codeTable.toString();
   }
 }

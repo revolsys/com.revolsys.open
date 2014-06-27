@@ -10,6 +10,7 @@ import com.revolsys.gis.data.model.ArrayDataObject;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.util.Property;
@@ -27,7 +28,7 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   /**
-   * Internal method to revert the records values to the original 
+   * Internal method to revert the records values to the original
    */
   protected synchronized void cancelChanges() {
     DataObjectState newState = getState();
@@ -44,7 +45,7 @@ public class LayerDataObject extends ArrayDataObject {
   }
 
   public void clearChanges() {
-    DataObjectState state = getState();
+    final DataObjectState state = getState();
     if (state == DataObjectState.Persisted) {
       this.originalValues = null;
     }
@@ -119,8 +120,8 @@ public class LayerDataObject extends ArrayDataObject {
     } else {
       final AbstractDataObjectLayer layer = getLayer();
       if (layer.isLayerRecord(record)) {
-        final Object id = getIdValue();
-        final Object otherId = record.getIdValue();
+        final RecordIdentifier id = getIdentifier();
+        final RecordIdentifier otherId = record.getIdentifier();
         if (id == null || otherId == null) {
           return false;
         } else if (EqualsRegistry.equal(id, otherId)) {
@@ -154,7 +155,7 @@ public class LayerDataObject extends ArrayDataObject {
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-          && !StringUtils.hasText((String)value)) {
+            && !StringUtils.hasText((String)value)) {
           return false;
         }
       }
@@ -177,7 +178,7 @@ public class LayerDataObject extends ArrayDataObject {
     for (final String fieldName : getMetaData().getAttributeNames()) {
       final Object value = getValue(fieldName);
       if (Property.isEmpty(value)) {
-        if (!layer.isFieldUserReadOnly(fieldName)) {
+        if (!this.layer.isFieldUserReadOnly(fieldName)) {
           final Object originalValue = getOriginalValue(fieldName);
           if (!Property.isEmpty(originalValue)) {
             setValue(fieldName, originalValue);

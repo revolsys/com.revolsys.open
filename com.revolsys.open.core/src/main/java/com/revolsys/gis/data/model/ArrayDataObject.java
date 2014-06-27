@@ -9,7 +9,7 @@ import com.revolsys.gis.model.data.equals.EqualsInstance;
 /**
  * The ArrayDataObject is an implementation of {@link DataObject} which uses an
  * array of Objects as the storage for the attribute values.
- * 
+ *
  * @author Paul Austin
  */
 public class ArrayDataObject extends BaseDataObject {
@@ -23,7 +23,7 @@ public class ArrayDataObject extends BaseDataObject {
    * Construct a new ArrayDataObject as a deep clone of the attribute values.
    * Objects can only be cloned if they have a publicly accessible
    * {@link #clone()} method.
-   * 
+   *
    * @param object The object to clone.
    */
   public ArrayDataObject(final DataObject object) {
@@ -32,7 +32,7 @@ public class ArrayDataObject extends BaseDataObject {
 
   /**
    * Construct a new empty ArrayDataObject using the metaData.
-   * 
+   *
    * @param metaData The metaData defining the object type.
    */
   public ArrayDataObject(final DataObjectMetaData metaData) {
@@ -43,10 +43,10 @@ public class ArrayDataObject extends BaseDataObject {
     final Map<String, ? extends Object> values) {
     super(metaData);
     if (metaData == null) {
-      attributes = new Object[0];
+      this.attributes = new Object[0];
     } else {
       final int attributeCount = metaData.getAttributeCount();
-      attributes = new Object[attributeCount];
+      this.attributes = new Object[attributeCount];
       final Map<String, Object> defaultValues = metaData.getDefaultValues();
       setValuesByPath(defaultValues);
       setValues(values);
@@ -56,19 +56,19 @@ public class ArrayDataObject extends BaseDataObject {
 
   /**
    * Create a clone of the object.
-   * 
+   *
    * @return The cloned object.
    */
   @Override
   public ArrayDataObject clone() {
     final ArrayDataObject clone = (ArrayDataObject)super.clone();
-    clone.attributes = attributes.clone();
+    clone.attributes = this.attributes.clone();
     return clone;
   }
 
   /**
    * Get the value of the attribute with the specified index.
-   * 
+   *
    * @param index The index of the attribute.
    * @return The attribute value.
    */
@@ -78,39 +78,43 @@ public class ArrayDataObject extends BaseDataObject {
     if (index < 0) {
       return null;
     } else {
-      return (T)attributes[index];
+      return (T)this.attributes[index];
     }
   }
 
   /**
    * Get the values of all attributes.
-   * 
+   *
    * @return The attribute value.
    */
   @Override
   public List<Object> getValues() {
-    return Arrays.asList(attributes);
+    return Arrays.asList(this.attributes);
   }
 
   @Override
   public int hashCode() {
-    return attributes.hashCode();
+    return this.attributes.hashCode();
   }
 
   /**
    * Set the value of the attribute with the specified name.
-   * 
+   *
    * @param index The index of the attribute. param value The attribute value.
    * @param value The new value.
    */
   @Override
   public void setValue(final int index, final Object value) {
     if (index >= 0) {
-      final Object oldValue = attributes[index];
+      if (value instanceof SingleRecordIdentifier) {
+        final SingleRecordIdentifier new_name = (SingleRecordIdentifier)value;
+        System.out.println(value);
+      }
+      final Object oldValue = this.attributes[index];
       if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
         updateState();
       }
-      attributes[index] = value;
+      this.attributes[index] = value;
     }
   }
 }

@@ -49,7 +49,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
                 ExceptionUtil.log(
                   getClass(),
                   "Unabled to render " + layer.getName() + " #"
-                    + record.getIdString(), e);
+                    + record.getIdentifier(), e);
               }
             }
           }
@@ -75,7 +75,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
                 ExceptionUtil.log(
                   getClass(),
                   "Unabled to render " + layer.getName() + " #"
-                    + record.getIdString(), e);
+                    + record.getIdentifier(), e);
               }
             }
           }

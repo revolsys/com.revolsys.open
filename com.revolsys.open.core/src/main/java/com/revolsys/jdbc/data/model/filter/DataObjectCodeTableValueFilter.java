@@ -8,11 +8,12 @@ import java.util.List;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 
 /**
  * Filter DataObjects by the value of the attributeName.
- * 
+ *
  * @author Paul Austin
  */
 public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
@@ -40,22 +41,23 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
 
   /**
    * Match the attributeName on the data object with the required value.
-   * 
+   *
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
   @Override
   public boolean accept(final DataObject object) {
-    final Object propertyValue = object.getValue(attributeName);
-    if (values.contains(propertyValue)) {
+    final Object propertyValue = object.getValue(this.attributeName);
+    if (this.values.contains(propertyValue)) {
       return true;
     } else {
       final DataObjectMetaData metaData = object.getMetaData();
-      final CodeTable codeTable = metaData.getCodeTableByColumn(attributeName);
+      final CodeTable codeTable = metaData.getCodeTableByColumn(this.attributeName);
       if (codeTable != null) {
-        final Object codeValue = codeTable.getValue((Number)propertyValue);
-        if (values.contains(codeValue)) {
-          values.add(propertyValue);
+        final Object codeValue = codeTable.getValue(SingleRecordIdentifier.create(
+          propertyValue));
+        if (this.values.contains(codeValue)) {
+          this.values.add(propertyValue);
           return true;
         } else {
           return false;
@@ -69,18 +71,18 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
 
   /**
    * Get the attributeName name, or path to match.
-   * 
+   *
    * @return The attributeName name, or path to match.
    */
   public String getAttributeName() {
-    return attributeName;
+    return this.attributeName;
   }
 
   /**
    * @return the values
    */
   public List<Object> getValues() {
-    return values;
+    return this.values;
   }
 
   public void setAttributeName(final String attributeName) {
@@ -111,10 +113,10 @@ public class DataObjectCodeTableValueFilter implements Filter<DataObject> {
    */
   @Override
   public String toString() {
-    if (name == null) {
-      return attributeName + " in " + values;
+    if (this.name == null) {
+      return this.attributeName + " in " + this.values;
     } else {
-      return name;
+      return this.name;
     }
   }
 

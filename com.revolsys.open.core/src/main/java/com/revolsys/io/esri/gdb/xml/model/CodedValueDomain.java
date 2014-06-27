@@ -9,44 +9,47 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
+import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 
 public class CodedValueDomain extends Domain implements CodeTable {
   private List<CodedValue> codedValues = new ArrayList<CodedValue>();
 
-  private Map<Object, List<Object>> idValueMap = new HashMap<Object, List<Object>>();
+  private Map<RecordIdentifier, List<Object>> idValueMap = new HashMap<>();
 
-  private Map<String, Object> stringIdMap = new HashMap<String, Object>();
+  private Map<String, RecordIdentifier> stringIdMap = new HashMap<>();
 
-  private Map<String, Object> valueIdMap = new HashMap<String, Object>();
+  private Map<String, RecordIdentifier> valueIdMap = new HashMap<>();
 
   private int maxId = 0;
 
   private JComponent swingEditor;
 
   public synchronized void addCodedValue(final Object code, final String name) {
+    final RecordIdentifier identifier = SingleRecordIdentifier.create(code);
     final CodedValue value = new CodedValue(code, name);
-    codedValues.add(value);
+    this.codedValues.add(value);
     final List<Object> values = Collections.<Object> singletonList(name);
-    idValueMap.put(code, values);
-    stringIdMap.put(code.toString(), code);
-    valueIdMap.put(name.toLowerCase(), code);
+    this.idValueMap.put(identifier, values);
+    this.stringIdMap.put(code.toString(), identifier);
+    this.valueIdMap.put(name.toLowerCase(), identifier);
     if (code instanceof Number) {
       final int id = ((Number)code).intValue();
-      if (maxId < id) {
-        maxId = id;
+      if (this.maxId < id) {
+        this.maxId = id;
       }
     }
   }
 
-  public synchronized Object addCodedValue(final String name) {
+  public synchronized RecordIdentifier addCodedValue(final String name) {
     Object id;
     switch (getFieldType()) {
       case esriFieldTypeInteger:
-        id = (int)++maxId;
+        id = (int)++this.maxId;
       break;
       case esriFieldTypeSmallInteger:
-        id = (short)++maxId;
+        id = (short)++this.maxId;
       break;
 
       default:
@@ -54,17 +57,17 @@ public class CodedValueDomain extends Domain implements CodeTable {
           + getFieldType());
     }
     addCodedValue(id, name);
-    return id;
+    return SingleRecordIdentifier.create(id);
   }
 
   @Override
   public CodedValueDomain clone() {
     final CodedValueDomain clone = (CodedValueDomain)super.clone();
-    clone.idValueMap = new HashMap<Object, List<Object>>();
-    clone.stringIdMap = new HashMap<String, Object>();
-    clone.valueIdMap = new HashMap<String, Object>();
+    clone.idValueMap = new HashMap<>();
+    clone.stringIdMap = new HashMap<>();
+    clone.valueIdMap = new HashMap<>();
     clone.codedValues = new ArrayList<CodedValue>();
-    for (final CodedValue codedValue : codedValues) {
+    for (final CodedValue codedValue : this.codedValues) {
       clone.addCodedValue(codedValue.getCode(), codedValue.getName());
     }
     return clone;
@@ -76,34 +79,34 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   public List<CodedValue> getCodedValues() {
-    return codedValues;
+    return this.codedValues;
   }
 
   @Override
-  public Map<Object, List<Object>> getCodes() {
-    return Collections.unmodifiableMap(idValueMap);
+  public Map<RecordIdentifier, List<Object>> getCodes() {
+    return Collections.unmodifiableMap(this.idValueMap);
   }
 
   @Override
-  public <T> T getId(final Map<String, ? extends Object> values) {
+  public RecordIdentifier getId(final Map<String, ? extends Object> values) {
     final Object name = getName(values);
-    return (T)getId(name);
+    return getId(name);
   }
 
   @Override
-  public <T> T getId(final Object... values) {
+  public RecordIdentifier getId(final Object... values) {
     if (values.length == 1) {
       final Object value = values[0];
       if (value == null) {
         return null;
-      } else if (idValueMap.containsKey(value)) {
-        return (T)value;
-      } else if (stringIdMap.containsKey(value.toString())) {
-        return (T)stringIdMap.get(value.toString());
+      } else if (this.idValueMap.containsKey(value)) {
+        return SingleRecordIdentifier.create(value);
+      } else if (this.stringIdMap.containsKey(value.toString())) {
+        return this.stringIdMap.get(value.toString());
       } else {
         final String lowerValue = ((String)value).toLowerCase();
-        final Object id = valueIdMap.get(lowerValue);
-        return (T)id;
+        final RecordIdentifier id = this.valueIdMap.get(lowerValue);
+        return id;
       }
     } else {
       throw new IllegalArgumentException("Expecting only a single value "
@@ -117,7 +120,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
-  public Map<String, ? extends Object> getMap(final Object id) {
+  public Map<String, ? extends Object> getMap(final RecordIdentifier id) {
     final Object value = getValue(id);
     return Collections.singletonMap("NAME", value);
   }
@@ -133,12 +136,17 @@ public class CodedValueDomain extends Domain implements CodeTable {
 
   @Override
   public JComponent getSwingEditor() {
-    return swingEditor;
+    return this.swingEditor;
+  }
+
+  @Override
+  public <V> V getValue(final Object id) {
+    return getValue(SingleRecordIdentifier.create(id));
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V getValue(final Object id) {
+  public <V> V getValue(final RecordIdentifier id) {
     final List<Object> values = getValues(id);
     if (values == null) {
       return null;
@@ -154,17 +162,17 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
-  public List<Object> getValues(final Object id) {
+  public List<Object> getValues(final RecordIdentifier id) {
     if (id == null) {
       return null;
     } else {
-      List<Object> values = idValueMap.get(id);
+      List<Object> values = this.idValueMap.get(id);
       if (values == null) {
-        final Object objectId = stringIdMap.get(id.toString());
+        final RecordIdentifier objectId = this.stringIdMap.get(id.toString());
         if (objectId == null) {
           return null;
         } else {
-          values = idValueMap.get(objectId);
+          values = this.idValueMap.get(objectId);
         }
       }
       return Collections.unmodifiableList(values);

@@ -37,15 +37,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
-  implements DataObjectMetaData, Cloneable {
-  private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
-
-  private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakCache<Integer, DataObjectMetaDataImpl>();
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "dataRecordDefinition", "Data Record Definition",
-    DataObjectMetaDataImpl.class, "create");
-
+implements DataObjectMetaData, Cloneable {
   public static DataObjectMetaDataImpl create(
     final Map<String, Object> properties) {
     return new DataObjectMetaDataImpl(properties);
@@ -60,6 +52,14 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   public static DataObjectMetaData getMetaData(final int instanceId) {
     return METADATA_CACHE.get(instanceId);
   }
+
+  private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
+
+  private static final Map<Integer, DataObjectMetaDataImpl> METADATA_CACHE = new WeakCache<Integer, DataObjectMetaDataImpl>();
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "dataRecordDefinition", "Data Record Definition",
+    DataObjectMetaDataImpl.class, "create");
 
   private final Map<String, Integer> attributeIdMap = new HashMap<String, Integer>();
 
@@ -82,15 +82,15 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   /** The index of the primary geometry attribute. */
   private int geometryAttributeIndex = -1;
 
-  private final List<Integer> geometryAttributeIndexes = new ArrayList<Integer>();
+  private final List<Integer> geometryAttributeIndexes = new ArrayList<>();
 
-  private final List<String> geometryAttributeNames = new ArrayList<String>();
+  private final List<String> geometryAttributeNames = new ArrayList<>();
 
-  private final List<Integer> idAttributeIndexes = new ArrayList<Integer>();
+  private final List<Integer> idAttributeIndexes = new ArrayList<>();
 
-  private final List<String> idAttributeNames = new ArrayList<String>();
+  private final List<String> idAttributeNames = new ArrayList<>();
 
-  private final List<Attribute> idAttributes = new ArrayList<Attribute>();
+  private final List<Attribute> idAttributes = new ArrayList<>();
 
   /** The index of the ID attribute. */
   private int idAttributeIndex = -1;
@@ -114,7 +114,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   public DataObjectMetaDataImpl(final DataObjectMetaData metaData) {
     this(metaData.getPath(), metaData.getProperties(), metaData.getAttributes());
     setIdAttributeIndex(metaData.getIdAttributeIndex());
-    METADATA_CACHE.put(instanceId, this);
+    METADATA_CACHE.put(this.instanceId, this);
   }
 
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
@@ -123,7 +123,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     this.dataStore = new WeakReference<DataObjectStore>(dataObjectStore);
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
-    METADATA_CACHE.put(instanceId, this);
+    METADATA_CACHE.put(this.instanceId, this);
   }
 
   public DataObjectMetaDataImpl(final DataObjectStore dataObjectStore,
@@ -132,7 +132,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     this.dataStore = new WeakReference<DataObjectStore>(dataObjectStore);
     this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
     this.schema = schema;
-    METADATA_CACHE.put(instanceId, this);
+    METADATA_CACHE.put(this.instanceId, this);
   }
 
   @SuppressWarnings("unchecked")
@@ -158,7 +158,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   public DataObjectMetaDataImpl(final String name) {
     this.path = name;
-    METADATA_CACHE.put(instanceId, this);
+    METADATA_CACHE.put(this.instanceId, this);
   }
 
   public DataObjectMetaDataImpl(final String name,
@@ -183,11 +183,11 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
       addAttribute(attribute.clone());
     }
     cloneProperties(properties);
-    METADATA_CACHE.put(instanceId, this);
+    METADATA_CACHE.put(this.instanceId, this);
   }
 
   public void addAttribute(final Attribute attribute) {
-    final int index = attributeNames.size();
+    final int index = this.attributeNames.size();
     final String name = attribute.getName();
     String lowerName;
     if (name == null) {
@@ -196,20 +196,20 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
       lowerName = name.toLowerCase();
 
     }
-    attributeNames.add(name);
-    attributes.add(attribute);
-    attributeMap.put(lowerName, attribute);
-    attributeIdMap.put(lowerName, attributeIdMap.size());
+    this.attributeNames.add(name);
+    this.attributes.add(attribute);
+    this.attributeMap.put(lowerName, attribute);
+    this.attributeIdMap.put(lowerName, this.attributeIdMap.size());
     final DataType dataType = attribute.getType();
     if (dataType == null) {
       LoggerFactory.getLogger(getClass()).debug(attribute.toString());
     } else {
       final Class<?> dataClass = dataType.getJavaClass();
       if (Geometry.class.isAssignableFrom(dataClass)) {
-        geometryAttributeIndexes.add(index);
-        geometryAttributeNames.add(name);
-        if (geometryAttributeIndex == -1) {
-          geometryAttributeIndex = index;
+        this.geometryAttributeIndexes.add(index);
+        this.geometryAttributeNames.add(name);
+        if (this.geometryAttributeIndex == -1) {
+          this.geometryAttributeIndex = index;
         }
       }
     }
@@ -219,7 +219,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   /**
    * Adds an attribute with the given case-sensitive name.
-   * 
+   *
    */
   public Attribute addAttribute(final String attributeName, final DataType type) {
     return addAttribute(attributeName, type, false);
@@ -248,31 +248,31 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   public void addColumnCodeTable(final String column, final CodeTable codeTable) {
-    codeTableByColumnMap.put(column, codeTable);
+    this.codeTableByColumnMap.put(column, codeTable);
   }
 
   @Override
   public void addDefaultValue(final String attributeName,
     final Object defaultValue) {
-    defaultValues.put(attributeName, defaultValue);
+    this.defaultValues.put(attributeName, defaultValue);
   }
 
   public void addRestriction(final String attributePath,
     final Collection<Object> values) {
-    restrictions.put(attributePath, values);
+    this.restrictions.put(attributePath, values);
   }
 
   public void addSuperClass(final DataObjectMetaData superClass) {
-    if (!superClasses.contains(superClass)) {
-      superClasses.add(superClass);
+    if (!this.superClasses.contains(superClass)) {
+      this.superClasses.add(superClass);
     }
   }
 
   @Override
   public DataObjectMetaDataImpl clone() {
-    final DataObjectMetaDataImpl clone = new DataObjectMetaDataImpl(path,
-      getProperties(), attributes);
-    clone.setIdAttributeIndex(idAttributeIndex);
+    final DataObjectMetaDataImpl clone = new DataObjectMetaDataImpl(this.path,
+      getProperties(), this.attributes);
+    clone.setIdAttributeIndex(this.idAttributeIndex);
     clone.setProperties(getProperties());
     return clone;
   }
@@ -296,14 +296,14 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   @Override
   public int compareTo(final DataObjectMetaData other) {
     final String otherPath = other.getPath();
-    if (otherPath == path) {
+    if (otherPath == this.path) {
       return 0;
-    } else if (path == null) {
+    } else if (this.path == null) {
       return 1;
     } else if (otherPath == null) {
       return -1;
     } else {
-      return path.compareTo(otherPath);
+      return this.path.compareTo(otherPath);
     }
   }
 
@@ -331,23 +331,23 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   @PreDestroy
   public void destroy() {
     super.close();
-    METADATA_CACHE.remove(instanceId);
-    attributeIdMap.clear();
-    attributeMap.clear();
-    attributeNames.clear();
-    attributes.clear();
-    codeTableByColumnMap.clear();
-    dataObjectFactory = null;
-    dataObjectMetaDataFactory = new DataObjectMetaDataFactoryImpl();
-    dataStore = null;
-    defaultValues.clear();
-    description = "";
-    geometryAttributeIndex = -1;
-    geometryAttributeIndexes.clear();
-    geometryAttributeNames.clear();
-    restrictions.clear();
-    schema = new DataObjectStoreSchema();
-    superClasses.clear();
+    METADATA_CACHE.remove(this.instanceId);
+    this.attributeIdMap.clear();
+    this.attributeMap.clear();
+    this.attributeNames.clear();
+    this.attributes.clear();
+    this.codeTableByColumnMap.clear();
+    this.dataObjectFactory = null;
+    this.dataObjectMetaDataFactory = new DataObjectMetaDataFactoryImpl();
+    this.dataStore = null;
+    this.defaultValues.clear();
+    this.description = "";
+    this.geometryAttributeIndex = -1;
+    this.geometryAttributeIndexes.clear();
+    this.geometryAttributeNames.clear();
+    this.restrictions.clear();
+    this.schema = new DataObjectStoreSchema();
+    this.superClasses.clear();
   }
 
   @Override
@@ -361,13 +361,13 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
       return null;
     } else {
       final String lowerName = name.toString().toLowerCase();
-      return attributeMap.get(lowerName);
+      return this.attributeMap.get(lowerName);
     }
   }
 
   @Override
   public Attribute getAttribute(final int i) {
-    return attributes.get(i);
+    return this.attributes.get(i);
   }
 
   @Override
@@ -392,7 +392,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public int getAttributeCount() {
-    return attributes.size();
+    return this.attributes.size();
   }
 
   @Override
@@ -401,7 +401,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
       return -1;
     } else {
       final String lowerName = name.toString().toLowerCase();
-      final Integer attributeId = attributeIdMap.get(lowerName);
+      final Integer attributeId = this.attributeIdMap.get(lowerName);
       if (attributeId == null) {
         return -1;
       } else {
@@ -413,7 +413,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   @Override
   public int getAttributeLength(final int i) {
     try {
-      final Attribute attribute = attributes.get(i);
+      final Attribute attribute = this.attributes.get(i);
       return attribute.getLength();
     } catch (final ArrayIndexOutOfBoundsException e) {
       throw e;
@@ -425,10 +425,10 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     try {
       if (i == -1) {
         return null;
-      } else if (attributes == null) {
+      } else if (this.attributes == null) {
         return null;
       } else {
-        final Attribute attribute = attributes.get(i);
+        final Attribute attribute = this.attributes.get(i);
         return attribute.getName();
       }
     } catch (final ArrayIndexOutOfBoundsException e) {
@@ -438,17 +438,17 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public List<String> getAttributeNames() {
-    return new ArrayList<String>(attributeNames);
+    return new ArrayList<String>(this.attributeNames);
   }
 
   @Override
   public List<Attribute> getAttributes() {
-    return new ArrayList<Attribute>(attributes);
+    return new ArrayList<Attribute>(this.attributes);
   }
 
   @Override
   public int getAttributeScale(final int i) {
-    final Attribute attribute = attributes.get(i);
+    final Attribute attribute = this.attributes.get(i);
     return attribute.getScale();
   }
 
@@ -483,7 +483,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public DataType getAttributeType(final int i) {
-    final Attribute attribute = attributes.get(i);
+    final Attribute attribute = this.attributes.get(i);
     return attribute.getType();
   }
 
@@ -493,7 +493,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     if (dataStore == null) {
       return null;
     } else {
-      CodeTable codeTable = codeTableByColumnMap.get(column);
+      CodeTable codeTable = this.codeTableByColumnMap.get(column);
       if (codeTable == null && dataStore != null) {
         codeTable = dataStore.getCodeTableByColumn(column);
       }
@@ -503,69 +503,69 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public DataObjectFactory getDataObjectFactory() {
-    return dataObjectFactory;
+    return this.dataObjectFactory;
   }
 
   @Override
   public DataObjectMetaDataFactory getDataObjectMetaDataFactory() {
-    if (dataObjectMetaDataFactory == null) {
+    if (this.dataObjectMetaDataFactory == null) {
       final DataObjectStore dataStore = getDataStore();
       return dataStore;
     } else {
-      return dataObjectMetaDataFactory;
+      return this.dataObjectMetaDataFactory;
     }
   }
 
   @Override
   public DataObjectStore getDataStore() {
-    if (dataStore == null) {
+    if (this.dataStore == null) {
       return null;
     } else {
-      return dataStore.get();
+      return this.dataStore.get();
     }
   }
 
   @Override
   public Object getDefaultValue(final String attributeName) {
-    return defaultValues.get(attributeName);
+    return this.defaultValues.get(attributeName);
   }
 
   @Override
   public Map<String, Object> getDefaultValues() {
-    return defaultValues;
+    return this.defaultValues;
   }
 
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
   @Override
   public Attribute getGeometryAttribute() {
-    if (geometryAttributeIndex == -1) {
+    if (this.geometryAttributeIndex == -1) {
       return null;
     } else {
-      return attributes.get(geometryAttributeIndex);
+      return this.attributes.get(this.geometryAttributeIndex);
     }
   }
 
   @Override
   public int getGeometryAttributeIndex() {
-    return geometryAttributeIndex;
+    return this.geometryAttributeIndex;
   }
 
   @Override
   public List<Integer> getGeometryAttributeIndexes() {
-    return Collections.unmodifiableList(geometryAttributeIndexes);
+    return Collections.unmodifiableList(this.geometryAttributeIndexes);
   }
 
   @Override
   public String getGeometryAttributeName() {
-    return getAttributeName(geometryAttributeIndex);
+    return getAttributeName(this.geometryAttributeIndex);
   }
 
   @Override
   public List<String> getGeometryAttributeNames() {
-    return Collections.unmodifiableList(geometryAttributeNames);
+    return Collections.unmodifiableList(this.geometryAttributeNames);
   }
 
   @Override
@@ -581,8 +581,8 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public Attribute getIdAttribute() {
-    if (idAttributeIndex >= 0) {
-      return attributes.get(idAttributeIndex);
+    if (this.idAttributeIndex >= 0) {
+      return this.attributes.get(this.idAttributeIndex);
     } else {
       return null;
     }
@@ -590,64 +590,64 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public int getIdAttributeIndex() {
-    return idAttributeIndex;
+    return this.idAttributeIndex;
   }
 
   @Override
   public List<Integer> getIdAttributeIndexes() {
-    return Collections.unmodifiableList(idAttributeIndexes);
+    return Collections.unmodifiableList(this.idAttributeIndexes);
   }
 
   @Override
   public String getIdAttributeName() {
-    return getAttributeName(idAttributeIndex);
+    return getAttributeName(this.idAttributeIndex);
   }
 
   @Override
   public List<String> getIdAttributeNames() {
-    return Collections.unmodifiableList(idAttributeNames);
+    return Collections.unmodifiableList(this.idAttributeNames);
   }
 
   @Override
   public List<Attribute> getIdAttributes() {
-    return Collections.unmodifiableList(idAttributes);
+    return Collections.unmodifiableList(this.idAttributes);
   }
 
   @Override
   public int getInstanceId() {
-    return instanceId;
+    return this.instanceId;
   }
 
   @Override
   public String getPath() {
-    return path;
+    return this.path;
   }
 
   public Map<String, Collection<Object>> getRestrictions() {
-    return restrictions;
+    return this.restrictions;
   }
 
   public DataObjectStoreSchema getSchema() {
-    return schema;
+    return this.schema;
   }
 
   @Override
   public String getTypeName() {
-    return PathUtil.getName(path);
+    return PathUtil.getName(this.path);
   }
 
   @Override
   public boolean hasAttribute(final CharSequence name) {
     final String lowerName = name.toString().toLowerCase();
-    return attributeMap.containsKey(lowerName);
+    return this.attributeMap.containsKey(lowerName);
   }
 
   @Override
   public int hashCode() {
-    if (path == null) {
+    if (this.path == null) {
       return super.hashCode();
     } else {
-      return path.hashCode();
+      return this.path.hashCode();
     }
   }
 
@@ -671,7 +671,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     if (equals(classDefinition)) {
       return true;
     }
-    for (final DataObjectMetaData superClass : superClasses) {
+    for (final DataObjectMetaData superClass : this.superClasses) {
       if (superClass.isInstanceOf(classDefinition)) {
         return true;
       }
@@ -680,9 +680,9 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   private void readObject(final ObjectInputStream ois)
-    throws ClassNotFoundException, IOException {
+      throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
-    METADATA_CACHE.put(instanceId, this);
+    METADATA_CACHE.put(this.instanceId, this);
   }
 
   public void replaceAttribute(final Attribute attribute,
@@ -690,10 +690,10 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
     final String name = attribute.getName();
     final String lowerName = name.toLowerCase();
     final String newName = newAttribute.getName();
-    if (attributes.contains(attribute) && name.equals(newName)) {
+    if (this.attributes.contains(attribute) && name.equals(newName)) {
       final int index = attribute.getIndex();
-      attributes.set(index, newAttribute);
-      attributeMap.put(lowerName, newAttribute);
+      this.attributes.set(index, newAttribute);
+      this.attributeMap.put(lowerName, newAttribute);
       newAttribute.setIndex(index);
     } else {
       addAttribute(newAttribute);
@@ -736,8 +736,7 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
   }
 
   @Override
-  public void setGeometryFactory(
-    final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final Attribute geometryAttribute = getGeometryAttribute();
     if (geometryAttribute != null) {
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
@@ -775,9 +774,9 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
             LoggerFactory.getLogger(getClass()).error(
               "Cannot set ID " + getPath() + "." + name + " does not exist");
           } else {
-            idAttributeIndexes.add(index);
-            idAttributeNames.add(name);
-            idAttributes.add(getAttribute(index));
+            this.idAttributeIndexes.add(index);
+            this.idAttributeNames.add(name);
+            this.idAttributes.add(getAttribute(index));
           }
         }
       }
@@ -832,6 +831,6 @@ public class DataObjectMetaDataImpl extends AbstractObjectWithProperties
 
   @Override
   public String toString() {
-    return path.toString();
+    return this.path.toString();
   }
 }

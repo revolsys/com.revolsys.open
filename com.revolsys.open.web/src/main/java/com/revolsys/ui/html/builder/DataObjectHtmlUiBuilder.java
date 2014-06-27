@@ -16,6 +16,7 @@ import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.data.query.Or;
 import com.revolsys.gis.data.query.Q;
 import com.revolsys.gis.data.query.Query;
@@ -131,13 +132,13 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   @Override
   protected DataObject createObject() {
-    return dataStore.create(tableName);
+    return this.dataStore.create(this.tableName);
   }
 
   public void deleteObject(final Object id) {
     final DataObject object = loadObject(id);
     if (object != null) {
-      dataStore.delete(object);
+      this.dataStore.delete(object);
     }
   }
 
@@ -145,12 +146,12 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   @PreDestroy
   public void destroy() {
     super.destroy();
-    dataStore = null;
-    tableName = null;
+    this.dataStore = null;
+    this.tableName = null;
   }
 
   public DataObjectStore getDataStore() {
-    return dataStore;
+    return this.dataStore;
   }
 
   protected DataObjectMetaData getMetaData() {
@@ -158,26 +159,26 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
   }
 
   public ResultPager<DataObject> getResultPager(final Query query) {
-    return dataStore.page(query);
+    return this.dataStore.page(query);
   }
 
   public String getTableName() {
-    return tableName;
+    return this.tableName;
   }
 
   @Override
   protected void insertObject(final DataObject object) {
-    if (object.getIdValue() == null) {
-      object.setIdValue(dataStore.createPrimaryIdValue(tableName));
+    if (object.getIdentifier() == null) {
+      object.setIdValue(this.dataStore.createPrimaryIdValue(this.tableName));
     }
-    dataStore.insert(object);
+    this.dataStore.insert(object);
   }
 
   protected boolean isPropertyUnique(final DataObject object,
     final String attributeName) {
     final String value = object.getValue(attributeName);
     final DataObjectStore dataStore = getDataStore();
-    final DataObjectMetaData metaData = dataStore.getMetaData(tableName);
+    final DataObjectMetaData metaData = dataStore.getMetaData(this.tableName);
     if (metaData == null) {
       return true;
     } else {
@@ -187,10 +188,10 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
       if (object.getState() == DataObjectState.New) {
         return objects.isEmpty();
       } else {
-        final Object id = object.getIdValue();
+        final RecordIdentifier id = object.getIdentifier();
         for (final Iterator<DataObject> iterator = objects.iterator(); iterator.hasNext();) {
           final DataObject matchedObject = iterator.next();
-          final Object matchedId = matchedObject.getIdValue();
+          final RecordIdentifier matchedId = matchedObject.getIdentifier();
           if (EqualsInstance.INSTANCE.equals(id, matchedId)) {
             iterator.remove();
           }
@@ -202,11 +203,11 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   @Override
   public DataObject loadObject(final Object id) {
-    return loadObject(tableName, id);
+    return loadObject(this.tableName, id);
   }
 
   public DataObject loadObject(final String typeName, final Object id) {
-    final DataObject object = dataStore.load(typeName, id);
+    final DataObject object = this.dataStore.load(typeName, id);
     return object;
   }
 
@@ -220,6 +221,6 @@ public class DataObjectHtmlUiBuilder extends HtmlUiBuilder<DataObject> {
 
   @Override
   protected void updateObject(final DataObject object) {
-    dataStore.update(object);
+    this.dataStore.update(object);
   }
 }

@@ -7,11 +7,12 @@ import java.util.List;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.data.query.functions.F;
 
 public class Q {
 
-  private static Add add(final QueryValue left, final QueryValue right) {
+  public static Add add(final QueryValue left, final QueryValue right) {
     return new Add(left, right);
   }
 
@@ -117,6 +118,43 @@ public class Q {
 
   public static Equal equal(final QueryValue left, final QueryValue right) {
     return new Equal(left, right);
+  }
+
+  public static Condition equal(final RecordIdentifier identifier,
+    final List<?> attributes) {
+    final And and = new And();
+    List<Object> values;
+    if (identifier == null) {
+      values = Arrays.asList(new Object[attributes.size()]);
+    } else {
+      values = identifier.getValues();
+    }
+    if (attributes.size() == values.size()) {
+      for (int i = 0; i < attributes.size(); i++) {
+        final Object attributeKey = attributes.get(i);
+        final Object value = values.get(i);
+
+        Condition condition;
+        if (value == null) {
+          if (attributeKey instanceof Attribute) {
+            condition = isNull((Attribute)attributeKey);
+          } else {
+            condition = isNull(attributeKey.toString());
+          }
+        } else {
+          if (attributeKey instanceof Attribute) {
+            condition = equal((Attribute)attributeKey, value);
+          } else {
+            condition = equal(attributeKey.toString(), value);
+          }
+        }
+        and.add(condition);
+      }
+    } else {
+      throw new IllegalArgumentException("Attribute count for " + attributes
+        + " != count for values " + values);
+    }
+    return and;
   }
 
   public static Equal equal(final String name, final Object value) {
@@ -313,7 +351,7 @@ public class Q {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");
     }
     final String right = "%"
-      + StringConverterRegistry.toString(value)
+        + StringConverterRegistry.toString(value)
         .toUpperCase()
         .replaceAll("[^A-Z0-9]", "") + "%";
     return Q.like(left, right);

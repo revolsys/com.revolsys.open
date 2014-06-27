@@ -37,39 +37,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractDataObjectLayerRenderer extends
-  AbstractLayerRenderer<AbstractDataObjectLayer> {
-
-  private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
-
-  private static final Map<String, Constructor<? extends AbstractDataObjectLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
-
-  static {
-    addRendererClass("geometryStyle", GeometryStyleRenderer.class);
-    addRendererClass("textStyle", TextStyleRenderer.class);
-    addRendererClass("markerStyle", MarkerStyleRenderer.class);
-    addRendererClass("multipleStyle", MultipleRenderer.class);
-    addRendererClass("scaleStyle", ScaleMultipleRenderer.class);
-    addRendererClass("filterStyle", FilterMultipleRenderer.class);
-
-    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
-    menu.addMenuItem("layer", TreeItemRunnable.createAction("View/Edit Style",
-      "palette", new TreeItemPropertyEnableCheck("editing", false),
-      "showProperties"));
-    menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete", "delete",
-      new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
-
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(true));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
-
-    for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
-      final String iconName = ("style_" + type + "_wrap").toLowerCase();
-      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-      final InvokeMethodAction action = TreeItemRunnable.createAction(
-        "Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
-      menu.addMenuItem("wrap", action);
-    }
-
-  }
+AbstractLayerRenderer<AbstractDataObjectLayer> {
 
   public static void addRendererClass(final String name,
     final Class<? extends AbstractDataObjectLayerRenderer> clazz) {
@@ -101,12 +69,12 @@ public abstract class AbstractDataObjectLayerRenderer extends
           query = query.replaceAll("==", "=");
           query = query.replaceAll("!=", "<>");
           query = query.replaceAll("\\{(.*)\\}.contains\\((.*)\\)",
-            "$2 IN ($1)");
+              "$2 IN ($1)");
           query = query.replaceAll("\\[(.*)\\]", "$1");
           query = query.replaceAll("(.*).startsWith\\('(.*)'\\)",
-            "$1 LIKE '$2%'");
+              "$1 LIKE '$2%'");
           query = query.replaceAll("#systemProperties\\['user.name'\\]",
-            "'{gbaUsername}'");
+              "'{gbaUsername}'");
           return new SqlLayerFilter(layer, query);
         }
       } else if ("sqlFilter".equals(type)) {
@@ -147,6 +115,38 @@ public abstract class AbstractDataObjectLayerRenderer extends
     return getRenderer(layer, null, style);
   }
 
+  private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
+
+  private static final Map<String, Constructor<? extends AbstractDataObjectLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
+
+  static {
+    addRendererClass("geometryStyle", GeometryStyleRenderer.class);
+    addRendererClass("textStyle", TextStyleRenderer.class);
+    addRendererClass("markerStyle", MarkerStyleRenderer.class);
+    addRendererClass("multipleStyle", MultipleRenderer.class);
+    addRendererClass("scaleStyle", ScaleMultipleRenderer.class);
+    addRendererClass("filterStyle", FilterMultipleRenderer.class);
+
+    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayerRenderer.class);
+    menu.addMenuItem("layer", TreeItemRunnable.createAction("View/Edit Style",
+      "palette", new TreeItemPropertyEnableCheck("editing", false),
+        "showProperties"));
+    menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete", "delete",
+      new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
+
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(true));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
+
+    for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
+      final String iconName = ("style_" + type + "_wrap").toLowerCase();
+      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+      final InvokeMethodAction action = TreeItemRunnable.createAction(
+        "Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
+      menu.addMenuItem("wrap", action);
+    }
+
+  }
+
   private Filter<DataObject> filter = DEFAULT_FILTER;
 
   public AbstractDataObjectLayerRenderer(final String type, final String name,
@@ -164,7 +164,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
   @Override
   public AbstractDataObjectLayerRenderer clone() {
     final AbstractDataObjectLayerRenderer clone = (AbstractDataObjectLayerRenderer)super.clone();
-    clone.filter = JavaBeanUtil.clone(filter);
+    clone.filter = JavaBeanUtil.clone(this.filter);
     return clone;
   }
 
@@ -177,8 +177,8 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public String getQueryFilter() {
-    if (filter instanceof SqlLayerFilter) {
-      final SqlLayerFilter layerFilter = (SqlLayerFilter)filter;
+    if (this.filter instanceof SqlLayerFilter) {
+      final SqlLayerFilter layerFilter = (SqlLayerFilter)this.filter;
       return layerFilter.getQuery();
     } else {
       return null;
@@ -195,7 +195,8 @@ public abstract class AbstractDataObjectLayerRenderer extends
 
   public boolean isVisible(final LayerDataObject record) {
     if (isVisible() && !record.isDeleted()) {
-      return isFilterAccept(record);
+      final boolean filterAccept = isFilterAccept(record);
+      return filterAccept;
     } else {
       return false;
     }
@@ -229,7 +230,7 @@ public abstract class AbstractDataObjectLayerRenderer extends
             ExceptionUtil.log(
               getClass(),
               "Unabled to render " + layer.getName() + " #"
-                + record.getIdString(), e);
+                  + record.getIdentifier(), e);
           }
         }
       }
@@ -278,12 +279,13 @@ public abstract class AbstractDataObjectLayerRenderer extends
   }
 
   public void setQueryFilter(final String query) {
-    if (filter instanceof SqlLayerFilter || filter instanceof AcceptAllFilter) {
+    if (this.filter instanceof SqlLayerFilter
+      || this.filter instanceof AcceptAllFilter) {
       if (StringUtils.hasText(query)) {
         final AbstractDataObjectLayer layer = getLayer();
-        filter = new SqlLayerFilter(layer, query);
+        this.filter = new SqlLayerFilter(layer, query);
       } else {
-        filter = new AcceptAllFilter<DataObject>();
+        this.filter = new AcceptAllFilter<DataObject>();
       }
     }
   }

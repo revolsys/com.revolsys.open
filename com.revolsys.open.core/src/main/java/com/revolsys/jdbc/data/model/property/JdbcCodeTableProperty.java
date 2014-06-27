@@ -10,6 +10,8 @@ import javax.sql.DataSource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
@@ -32,16 +34,17 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   }
 
   @Override
-  protected synchronized Object createId(final List<Object> values) {
+  protected synchronized RecordIdentifier createId(final List<Object> values) {
     try {
-      final Connection connection = JdbcUtils.getConnection(dataSource);
+      final Connection connection = JdbcUtils.getConnection(this.dataSource);
       try {
-        Object id = loadId(values, false);
+        RecordIdentifier id = loadId(values, false);
         boolean retry = true;
         while (id == null) {
-          final PreparedStatement statement = connection.prepareStatement(insertSql);
+          final PreparedStatement statement = connection.prepareStatement(this.insertSql);
           try {
-            id = dataStore.getNextPrimaryKey(getMetaData());
+            id = SingleRecordIdentifier.create(
+              this.dataStore.getNextPrimaryKey(getMetaData()));
             int index = 1;
             index = JdbcUtils.setValue(statement, index, id);
             for (int i = 0; i < getValueAttributeNames().size(); i++) {
@@ -56,7 +59,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
               retry = false;
               id = loadId(values, false);
             } else {
-              throw new RuntimeException(tableName
+              throw new RuntimeException(this.tableName
                 + ": Unable to create ID for  " + values, e);
             }
           } finally {
@@ -66,30 +69,30 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
         return id;
 
       } finally {
-        JdbcUtils.release(connection, dataSource);
+        JdbcUtils.release(connection, this.dataSource);
       }
 
     } catch (final SQLException e) {
-      throw new RuntimeException(tableName + ": Unable to create ID for  "
-        + values, e);
+      throw new RuntimeException(this.tableName + ": Unable to create ID for  "
+          + values, e);
     }
 
   }
 
   public DataSource getDataSource() {
-    return dataSource;
+    return this.dataSource;
   }
 
   @Override
   public JdbcDataObjectStore getDataStore() {
-    return dataStore;
+    return this.dataStore;
   }
 
   @Override
   public void setMetaData(final DataObjectMetaData metaData) {
     super.setMetaData(metaData);
-    dataStore = (JdbcDataObjectStore)metaData.getDataStore();
-    dataSource = dataStore.getDataSource();
+    this.dataStore = (JdbcDataObjectStore)metaData.getDataStore();
+    this.dataSource = this.dataStore.getDataSource();
     if (metaData != null) {
       this.tableName = JdbcUtils.getQualifiedTableName(metaData.getPath());
 
@@ -98,28 +101,28 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
       if (!StringUtils.hasText(idColumn)) {
         idColumn = metaData.getAttributeName(0);
       }
-      this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
+      this.insertSql = "INSERT INTO " + this.tableName + " (" + idColumn;
       for (int i = 0; i < valueAttributeNames.size(); i++) {
         final String columnName = valueAttributeNames.get(i);
         this.insertSql += ", " + columnName;
       }
-      if (useAuditColumns) {
-        insertSql += ", WHO_CREATED, WHEN_CREATED, WHO_UPDATED, WHEN_UPDATED";
+      if (this.useAuditColumns) {
+        this.insertSql += ", WHO_CREATED, WHEN_CREATED, WHO_UPDATED, WHEN_UPDATED";
       }
-      insertSql += ") VALUES (?";
+      this.insertSql += ") VALUES (?";
       for (int i = 0; i < valueAttributeNames.size(); i++) {
-        insertSql += ", ?";
+        this.insertSql += ", ?";
       }
-      if (useAuditColumns) {
-        if (dataStore.getClass()
-          .getName()
-          .equals("com.revolsys.gis.oracle.io.OracleDataObjectStore")) {
-          insertSql += ", USER, SYSDATE, USER, SYSDATE";
+      if (this.useAuditColumns) {
+        if (this.dataStore.getClass()
+            .getName()
+            .equals("com.revolsys.gis.oracle.io.OracleDataObjectStore")) {
+          this.insertSql += ", USER, SYSDATE, USER, SYSDATE";
         } else {
-          insertSql += ", current_user, current_timestamp, current_user, current_timestamp";
+          this.insertSql += ", current_user, current_timestamp, current_user, current_timestamp";
         }
       }
-      insertSql += ")";
+      this.insertSql += ")";
     }
   }
 

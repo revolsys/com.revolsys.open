@@ -67,6 +67,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.And;
 import com.revolsys.gis.data.query.Between;
@@ -97,10 +98,6 @@ import com.revolsys.util.CollectionUtil;
 
 public class QueryWhereConditionField extends ValueField implements
   MouseListener, CaretListener, ItemListener {
-
-  private static final ImageIcon ICON = SilkIconLoader.getIcon("add");
-
-  private static final long serialVersionUID = 1L;
 
   public static JComponent createSearchField(final Attribute attribute,
     final CodeTable codeTable) {
@@ -137,6 +134,10 @@ public class QueryWhereConditionField extends ValueField implements
       }
     }
   }
+
+  private static final ImageIcon ICON = SilkIconLoader.getIcon("add");
+
+  private static final long serialVersionUID = 1L;
 
   private JComponent binaryConditionField;
 
@@ -188,48 +189,49 @@ public class QueryWhereConditionField extends ValueField implements
     setTitle("Advanced Search");
     this.originalFilter = filter;
     this.listener = listener;
-    metaData = layer.getMetaData();
-    final List<Attribute> attributes = metaData.getAttributes();
+    this.metaData = layer.getMetaData();
+    final List<Attribute> attributes = this.metaData.getAttributes();
 
-    fieldNamesList = new ComboBox(new AttributeTitleStringConveter(layer),
+    this.fieldNamesList = new ComboBox(new AttributeTitleStringConveter(layer),
       false, attributes);
-    fieldNamesList.addItemListener(this);
-    fieldNamesList.addMouseListener(this);
+    this.fieldNamesList.addItemListener(this);
+    this.fieldNamesList.addMouseListener(this);
 
-    final BasePanel fieldNamePanel = new BasePanel(fieldNamesList);
+    final BasePanel fieldNamePanel = new BasePanel(this.fieldNamesList);
     GroupLayoutUtil.makeColumns(fieldNamePanel, 1, false);
 
-    binaryConditionOperator = new ComboBox("=", "<>", "<", "<=", ">", ">=");
+    this.binaryConditionOperator = new ComboBox("=", "<>", "<", "<=", ">", ">=");
     final JButton binaryConditionAddButton = InvokeMethodAction.createButton(
       "", "Add Binary Condition", ICON, this, "actionAddBinaryCondition");
-    binaryConditionPanel = new BasePanel(binaryConditionOperator,
+    this.binaryConditionPanel = new BasePanel(this.binaryConditionOperator,
       binaryConditionAddButton);
     setBinaryConditionField(null);
 
-    rightUnaryConditionOperator = new ComboBox("IS NULL", "IS NOT NULL");
+    this.rightUnaryConditionOperator = new ComboBox("IS NULL", "IS NOT NULL");
     final JButton rightUnaryConditionAddButton = InvokeMethodAction.createButton(
       "", "Add Unary Condition", ICON, this, "actionAddRightUnaryCondition");
     final BasePanel rightUnaryConditionPanel = new BasePanel(
-      rightUnaryConditionOperator, rightUnaryConditionAddButton);
+      this.rightUnaryConditionOperator, rightUnaryConditionAddButton);
     GroupLayoutUtil.makeColumns(rightUnaryConditionPanel, false);
 
     final JButton likeConditionAddButton = InvokeMethodAction.createButton("",
       "Add Unary Condition", ICON, this, "actionAddLikeCondition");
-    likeConditionField = new TextField(20);
-    likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(" '%"),
-      likeConditionField, new JLabel("%' "), likeConditionAddButton);
-    GroupLayoutUtil.makeColumns(likePanel, false);
+    this.likeConditionField = new TextField(20);
+    this.likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(
+        " '%"), this.likeConditionField, new JLabel("%' "),
+        likeConditionAddButton);
+    GroupLayoutUtil.makeColumns(this.likePanel, false);
 
     final JButton inConditionAddButton = InvokeMethodAction.createButton("",
       "Add Unary Condition", ICON, this, "actionAddInCondition");
-    inConditionField = new TextField(20);
-    inConditionPanel = new BasePanel(SwingUtil.createLabel("IN"),
-      inConditionField, inConditionAddButton);
+    this.inConditionField = new TextField(20);
+    this.inConditionPanel = new BasePanel(SwingUtil.createLabel("IN"),
+      this.inConditionField, inConditionAddButton);
     setInConditionField(null);
 
     final BasePanel operatorPanel = new BasePanel(new VerticalLayout(),
-      binaryConditionPanel, rightUnaryConditionPanel, likePanel,
-      inConditionPanel);
+      this.binaryConditionPanel, rightUnaryConditionPanel, this.likePanel,
+      this.inConditionPanel);
 
     final BasePanel fieldConditions = new BasePanel(fieldNamePanel,
       operatorPanel);
@@ -257,21 +259,21 @@ public class QueryWhereConditionField extends ValueField implements
     final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5),
       fieldConditions, buttonsPanel);
 
-    whereTextField = new TextPane(5, 20);
-    whereTextField.setFont(new Font("Monospaced", Font.PLAIN, 11));
-    selectionColor = whereTextField.getSelectionColor();
-    whereTextField.addCaretListener(this);
+    this.whereTextField = new TextPane(5, 20);
+    this.whereTextField.setFont(new Font("Monospaced", Font.PLAIN, 11));
+    this.selectionColor = this.whereTextField.getSelectionColor();
+    this.whereTextField.addCaretListener(this);
 
-    final JScrollPane whereScroll = new JScrollPane(whereTextField);
+    final JScrollPane whereScroll = new JScrollPane(this.whereTextField);
     // whereTextField.setContentType("text/sql"); // Requires the above scroll
     // pane
 
-    sqlPrefix = "SELECT * FROM "
-      + metaData.getPath().substring(1).replace('/', '.') + " WHERE";
+    this.sqlPrefix = "SELECT * FROM "
+      + this.metaData.getPath().substring(1).replace('/', '.') + " WHERE";
 
     final JPanel filterTextPanel = new JPanel(new BorderLayout());
     filterTextPanel.setOpaque(false);
-    filterTextPanel.add(new JLabel(sqlPrefix), BorderLayout.NORTH);
+    filterTextPanel.add(new JLabel(this.sqlPrefix), BorderLayout.NORTH);
     filterTextPanel.add(whereScroll, BorderLayout.CENTER);
 
     final ToolBar statusToolBar = new ToolBar();
@@ -288,9 +290,9 @@ public class QueryWhereConditionField extends ValueField implements
     queryPanel.add(statusToolBar, BorderLayout.SOUTH);
     queryPanel.setPreferredSize(new Dimension(500, 400));
 
-    statusLabel = new TextArea();
-    statusLabel.setEditable(false);
-    final JScrollPane statusPane = new JScrollPane(statusLabel);
+    this.statusLabel = new TextArea();
+    this.statusLabel.setEditable(false);
+    final JScrollPane statusPane = new JScrollPane(this.statusLabel);
     statusPane.setPreferredSize(new Dimension(500, 100));
 
     final JPanel statusPanel = new JPanel(new BorderLayout());
@@ -308,17 +310,17 @@ public class QueryWhereConditionField extends ValueField implements
 
     setFieldValue(filter);
     if (filter != null) {
-      whereTextField.setText(filter.toFormattedString());
+      this.whereTextField.setText(filter.toFormattedString());
     }
     if (StringUtils.hasText(query)) {
-      whereTextField.setText(query);
+      this.whereTextField.setText(query);
     }
     final String searchField = layer.getProperty("searchField");
-    final Attribute searchAttribute = metaData.getAttribute(searchField);
+    final Attribute searchAttribute = this.metaData.getAttribute(searchField);
     if (searchAttribute == null) {
-      fieldNamesList.setSelectedIndex(0);
+      this.fieldNamesList.setSelectedIndex(0);
     } else {
-      fieldNamesList.setSelectedItem(searchAttribute);
+      this.fieldNamesList.setSelectedItem(searchAttribute);
     }
   }
 
@@ -328,15 +330,15 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   public void actionAddBinaryCondition() {
-    final Attribute attribute = (Attribute)fieldNamesList.getSelectedItem();
+    final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
-      final String operator = (String)binaryConditionOperator.getSelectedItem();
+      final String operator = (String)this.binaryConditionOperator.getSelectedItem();
       if (StringUtils.hasText(operator)) {
-        Object fieldValue = ((Field)binaryConditionField).getFieldValue();
+        Object fieldValue = ((Field)this.binaryConditionField).getFieldValue();
         if (fieldValue != null) {
-          final int position = whereTextField.getCaretPosition();
+          final int position = this.whereTextField.getCaretPosition();
           Class<?> attributeClass = attribute.getTypeClass();
-          if (codeTable == null) {
+          if (this.codeTable == null) {
             try {
               fieldValue = StringConverterRegistry.toObject(attributeClass,
                 fieldValue);
@@ -346,7 +348,8 @@ public class QueryWhereConditionField extends ValueField implements
               return;
             }
           } else {
-            final List<Object> values = codeTable.getValues(fieldValue);
+            final List<Object> values = this.codeTable.getValues(SingleRecordIdentifier.create(
+              fieldValue));
             if (values.size() == 1) {
               fieldValue = values.get(0);
             } else {
@@ -358,7 +361,7 @@ public class QueryWhereConditionField extends ValueField implements
           }
           if (fieldValue != null) {
 
-            final Document document = whereTextField.getDocument();
+            final Document document = this.whereTextField.getDocument();
             final StringBuffer text = new StringBuffer();
             if (position > 0) {
               text.append(" ");
@@ -382,14 +385,14 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   public void actionAddInCondition() {
-    final Attribute attribute = (Attribute)fieldNamesList.getSelectedItem();
+    final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
-      Object fieldValue = ((Field)inConditionField).getFieldValue();
+      Object fieldValue = ((Field)this.inConditionField).getFieldValue();
       if (fieldValue != null) {
-        int position = whereTextField.getCaretPosition();
+        int position = this.whereTextField.getCaretPosition();
         Class<?> attributeClass = attribute.getTypeClass();
         if (fieldValue != null) {
-          if (codeTable == null) {
+          if (this.codeTable == null) {
             try {
               fieldValue = StringConverterRegistry.toObject(attributeClass,
                 fieldValue);
@@ -399,7 +402,8 @@ public class QueryWhereConditionField extends ValueField implements
               return;
             }
           } else {
-            fieldValue = codeTable.getValue(fieldValue);
+            fieldValue = this.codeTable.getValue(SingleRecordIdentifier.create(
+              fieldValue));
             if (fieldValue != null) {
               attributeClass = fieldValue.getClass();
             }
@@ -407,7 +411,7 @@ public class QueryWhereConditionField extends ValueField implements
           if (fieldValue != null) {
             final StringBuffer text = new StringBuffer();
             try {
-              final Document document = whereTextField.getDocument();
+              final Document document = this.whereTextField.getDocument();
               final String currentText = document.getText(0, position);
               final String endText = attribute.getName() + " IN (.+) $";
               if (currentText.matches(endText)) {
@@ -437,18 +441,18 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   public void actionAddLikeCondition() {
-    final Attribute attribute = (Attribute)fieldNamesList.getSelectedItem();
+    final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
-      final Object fieldValue = ((Field)likeConditionField).getFieldValue();
+      final Object fieldValue = ((Field)this.likeConditionField).getFieldValue();
       if (fieldValue != null) {
-        if (codeTable == null) {
-          final int position = whereTextField.getCaretPosition();
+        if (this.codeTable == null) {
+          final int position = this.whereTextField.getCaretPosition();
           final Class<?> attributeClass = attribute.getTypeClass();
           if (fieldValue != null) {
             final String valueString = StringConverterRegistry.toString(
               attributeClass, fieldValue);
 
-            final Document document = whereTextField.getDocument();
+            final Document document = this.whereTextField.getDocument();
             final StringBuffer text = new StringBuffer();
             if (position > 0) {
               text.append(" ");
@@ -470,13 +474,13 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   public void actionAddRightUnaryCondition() {
-    final Attribute attribute = (Attribute)fieldNamesList.getSelectedItem();
+    final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
-      final String operator = (String)rightUnaryConditionOperator.getSelectedItem();
+      final String operator = (String)this.rightUnaryConditionOperator.getSelectedItem();
       if (StringUtils.hasText(operator)) {
-        final int position = whereTextField.getCaretPosition();
+        final int position = this.whereTextField.getCaretPosition();
 
-        final Document document = whereTextField.getDocument();
+        final Document document = this.whereTextField.getDocument();
         final StringBuffer text = new StringBuffer();
         if (position > 0) {
           text.append(" ");
@@ -518,18 +522,18 @@ public class QueryWhereConditionField extends ValueField implements
 
   @Override
   public void caretUpdate(final CaretEvent e) {
-    if (!validating) {
-      whereTextField.setSelectionColor(selectionColor);
+    if (!this.validating) {
+      this.whereTextField.setSelectionColor(this.selectionColor);
       repaint();
     }
   }
 
   public void insertText(final String operator) {
     if (StringUtils.hasText(operator)) {
-      int position = whereTextField.getCaretPosition();
+      int position = this.whereTextField.getCaretPosition();
       String previousText;
       try {
-        previousText = whereTextField.getText(0, position);
+        previousText = this.whereTextField.getText(0, position);
       } catch (final BadLocationException e) {
         previousText = "";
       }
@@ -539,7 +543,7 @@ public class QueryWhereConditionField extends ValueField implements
             .replaceAll("\\)", "\\\\)")
             .replaceAll("\\*", "\\\\*")
             .replaceAll("\\+", "\\\\+") + "\\s*$")) {
-        final Document document = whereTextField.getDocument();
+        final Document document = this.whereTextField.getDocument();
         try {
           if (StringUtils.hasText(previousText)
             && !previousText.substring(previousText.length() - 1).matches(
@@ -551,37 +555,37 @@ public class QueryWhereConditionField extends ValueField implements
         }
       }
     }
-    whereTextField.requestFocusInWindow();
+    this.whereTextField.requestFocusInWindow();
   }
 
   @Override
   public void itemStateChanged(final ItemEvent event) {
-    if (event.getSource() == fieldNamesList) {
+    if (event.getSource() == this.fieldNamesList) {
       if (event.getStateChange() == ItemEvent.SELECTED) {
         final Attribute attribute = (Attribute)event.getItem();
         final String name = attribute.getName();
-        codeTable = metaData.getCodeTableByColumn(name);
+        this.codeTable = this.metaData.getCodeTableByColumn(name);
         final JComponent binaryConditionField = createSearchField(attribute,
-          codeTable);
+          this.codeTable);
         if (binaryConditionField instanceof DataStoreQueryTextField) {
           final DataStoreQueryTextField queryField = (DataStoreQueryTextField)binaryConditionField;
           queryField.setBelow(true);
         }
         final JComponent inConditionField = createSearchField(attribute,
-          codeTable);
+          this.codeTable);
         if (inConditionField instanceof DataStoreQueryTextField) {
           final DataStoreQueryTextField queryField = (DataStoreQueryTextField)inConditionField;
           queryField.setBelow(true);
         }
 
-        if (codeTable == null) {
+        if (this.codeTable == null) {
           if (binaryConditionField instanceof DateField) {
-            likePanel.setVisible(false);
+            this.likePanel.setVisible(false);
           } else {
-            likePanel.setVisible(true);
+            this.likePanel.setVisible(true);
           }
         } else {
-          likePanel.setVisible(false);
+          this.likePanel.setVisible(false);
         }
         setBinaryConditionField(binaryConditionField);
         setInConditionField(inConditionField);
@@ -591,20 +595,20 @@ public class QueryWhereConditionField extends ValueField implements
 
   @Override
   public void mouseClicked(final MouseEvent event) {
-    if (event.getSource() == fieldNamesList) {
+    if (event.getSource() == this.fieldNamesList) {
       if (SwingUtilities.isLeftMouseButton(event) && event.getClickCount() == 2) {
-        final String fieldName = (String)fieldNamesList.getSelectedItem();
+        final String fieldName = (String)this.fieldNamesList.getSelectedItem();
         if (StringUtils.hasText(fieldName)) {
-          int position = whereTextField.getCaretPosition();
+          int position = this.whereTextField.getCaretPosition();
           String previousText;
           try {
-            previousText = whereTextField.getText(0, position);
+            previousText = this.whereTextField.getText(0, position);
           } catch (final BadLocationException e) {
             previousText = "";
           }
           if (!StringUtils.hasText(previousText)
             || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
-            final Document document = whereTextField.getDocument();
+            final Document document = this.whereTextField.getDocument();
             try {
               if (StringUtils.hasText(previousText)
                 && !previousText.substring(previousText.length() - 1).matches(
@@ -623,7 +627,7 @@ public class QueryWhereConditionField extends ValueField implements
           }
         }
       }
-      whereTextField.requestFocusInWindow();
+      this.whereTextField.requestFocusInWindow();
     }
   }
 
@@ -647,14 +651,14 @@ public class QueryWhereConditionField extends ValueField implements
   public void save() {
     super.save();
     final Condition condition = getFieldValue();
-    listener.propertyChange(new PropertyChangeEvent(this, "filter",
-      originalFilter, condition));
+    this.listener.propertyChange(new PropertyChangeEvent(this, "filter",
+      this.originalFilter, condition));
   }
 
   @Override
   public void save(final JDialog dialog) {
     verifyCondition();
-    if (valid) {
+    if (this.valid) {
       super.save(dialog);
     } else {
       JOptionPane.showMessageDialog(
@@ -665,14 +669,14 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   private void setBinaryConditionField(JComponent field) {
-    if (binaryConditionField != null) {
-      binaryConditionPanel.remove(1);
+    if (this.binaryConditionField != null) {
+      this.binaryConditionPanel.remove(1);
     }
     if (field == null) {
       field = new TextField(20);
     }
-    binaryConditionPanel.add(field, 1);
-    GroupLayoutUtil.makeColumns(binaryConditionPanel, false);
+    this.binaryConditionPanel.add(field, 1);
+    GroupLayoutUtil.makeColumns(this.binaryConditionPanel, false);
     this.binaryConditionField = field;
   }
 
@@ -684,34 +688,34 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   private void setInConditionField(JComponent field) {
-    if (inConditionField != null) {
-      inConditionPanel.remove(1);
+    if (this.inConditionField != null) {
+      this.inConditionPanel.remove(1);
     }
     if (field == null) {
       field = new TextField(20);
     }
 
-    inConditionPanel.add(field, 1);
-    GroupLayoutUtil.makeColumns(inConditionPanel, false);
+    this.inConditionPanel.add(field, 1);
+    GroupLayoutUtil.makeColumns(this.inConditionPanel, false);
     this.inConditionField = field;
   }
 
   protected void setInvalidMessage(final int offset, final String message) {
     if (offset >= 0) {
-      whereTextField.setSelectionColor(WebColors.Pink);
-      whereTextField.setSelectionStart(offset);
-      final Document document = whereTextField.getDocument();
-      whereTextField.setSelectionEnd(document.getLength());
-      whereTextField.requestFocusInWindow();
+      this.whereTextField.setSelectionColor(WebColors.Pink);
+      this.whereTextField.setSelectionStart(offset);
+      final Document document = this.whereTextField.getDocument();
+      this.whereTextField.setSelectionEnd(document.getLength());
+      this.whereTextField.requestFocusInWindow();
     }
     setInvalidMessage(message);
   }
 
   protected void setInvalidMessage(final String message) {
-    statusLabel.setForeground(WebColors.Red);
-    statusLabel.append(message + "\n");
-    valid = false;
-    statusLabel.setCaretPosition(0);
+    this.statusLabel.setForeground(WebColors.Red);
+    this.statusLabel.append(message + "\n");
+    this.valid = false;
+    this.statusLabel.setCaretPosition(0);
   }
 
   @SuppressWarnings("unchecked")
@@ -741,7 +745,7 @@ public class QueryWhereConditionField extends ValueField implements
       final Column column = toQueryValue(leftValueNode);
       final Value min = toQueryValue(betweenExpressionStart);
       final Value max = toQueryValue(betweenExpressionEnd);
-      final Attribute attribute = metaData.getAttribute(column.getName());
+      final Attribute attribute = this.metaData.getAttribute(column.getName());
       min.convert(attribute);
       max.convert(attribute);
       return (V)new Between(column, min, max);
@@ -780,9 +784,10 @@ public class QueryWhereConditionField extends ValueField implements
               final Column column = (Column)leftCondition;
 
               final String name = column.getName();
-              final Attribute attribute = metaData.getAttribute(name);
-              final CodeTable codeTable = metaData.getCodeTableByColumn(name);
-              if (codeTable == null || attribute == metaData.getIdAttribute()) {
+              final Attribute attribute = this.metaData.getAttribute(name);
+              final CodeTable codeTable = this.metaData.getCodeTableByColumn(name);
+              if (codeTable == null
+                  || attribute == this.metaData.getIdAttribute()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(
@@ -836,7 +841,7 @@ public class QueryWhereConditionField extends ValueField implements
       final ColumnReference column = (ColumnReference)expression;
       String columnName = column.getColumnName();
       columnName = columnName.replaceAll("\"", "");
-      final Attribute attribute = metaData.getAttribute(columnName);
+      final Attribute attribute = this.metaData.getAttribute(columnName);
       if (attribute == null) {
         setInvalidMessage("Invalid column name " + columnName);
       } else {
@@ -922,11 +927,11 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   public void verifyCondition() {
-    validating = true;
-    valid = true;
-    statusLabel.setText("");
+    this.validating = true;
+    this.valid = true;
+    this.statusLabel.setText("");
     try {
-      final String whereClause = whereTextField.getText();
+      final String whereClause = this.whereTextField.getText();
       if (StringUtils.hasText(whereClause)) {
         final String sql = "SELECT * FROM X WHERE " + "\n" + whereClause;
         try {
@@ -938,30 +943,30 @@ public class QueryWhereConditionField extends ValueField implements
               final SelectNode selectNode = (SelectNode)resultSetNode;
               final ValueNode where = selectNode.getWhereClause();
               final Condition condition = toQueryValue(where);
-              if (valid) {
+              if (this.valid) {
                 setFieldValue(condition);
-                statusLabel.setForeground(WebColors.DarkGreen);
-                statusLabel.setText("Valid");
+                this.statusLabel.setForeground(WebColors.DarkGreen);
+                this.statusLabel.setText("Valid");
               }
             }
           }
         } catch (final SQLParserException e) {
           final int offset = e.getErrorPosition();
-          setInvalidMessage(offset - sqlPrefix.length(), "Error parsing SQL: "
-            + e.getMessage());
+          setInvalidMessage(offset - this.sqlPrefix.length(),
+            "Error parsing SQL: " + e.getMessage());
         } catch (final StandardException e) {
           LoggerFactory.getLogger(getClass()).error(
             "Error parsing SQL: " + whereClause, e);
         }
       } else {
-        statusLabel.setForeground(WebColors.DarkGreen);
-        statusLabel.setText("Valid");
+        this.statusLabel.setForeground(WebColors.DarkGreen);
+        this.statusLabel.setText("Valid");
       }
     } finally {
-      if (!valid) {
+      if (!this.valid) {
         setFieldValue(null);
       }
-      validating = false;
+      this.validating = false;
     }
   }
 }

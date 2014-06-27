@@ -15,6 +15,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.gis.data.query.Value;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
@@ -27,20 +28,20 @@ import com.revolsys.util.MathUtil;
 /**
  * The Attribute class defines the name, type and other properties about each
  * attribute on a {@link DataObject} in the {@link DataObjectMetaData}.
- * 
+ *
  * @author Paul Austin
  * @see DataObject
  * @see DataObjectMetaData
  */
 public class Attribute extends AbstractObjectWithProperties implements
-  Cloneable, MapSerializer {
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "field", "Data Record Field", Attribute.class, "create");
+Cloneable, MapSerializer {
 
   public static Attribute create(final Map<String, Object> properties) {
     return new Attribute(properties);
   }
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "field", "Data Record Field", Attribute.class, "create");
 
   private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
 
@@ -100,31 +101,31 @@ public class Attribute extends AbstractObjectWithProperties implements
   public Attribute(final Map<String, Object> properties) {
     this.name = CollectionUtil.getString(properties, "name");
     this.title = CollectionUtil.getString(properties, "title");
-    if (!StringUtils.hasText(title)) {
-      this.title = CaseConverter.toCapitalizedWords(name);
+    if (!StringUtils.hasText(this.title)) {
+      this.title = CaseConverter.toCapitalizedWords(this.name);
     }
     this.description = CollectionUtil.getString(properties, "description");
     this.type = DataTypes.getType(CollectionUtil.getString(properties,
-      "dataType"));
+        "dataType"));
     this.required = CollectionUtil.getBool(properties, "required");
     this.length = CollectionUtil.getInteger(properties, "length", 0);
     this.scale = CollectionUtil.getInteger(properties, "scale", 0);
     this.minValue = properties.get("minValue");
-    if (minValue == null) {
+    if (this.minValue == null) {
       this.minValue = MathUtil.getMinValue(getTypeClass());
     } else {
-      this.minValue = StringConverterRegistry.toString(type, minValue);
+      this.minValue = StringConverterRegistry.toString(this.type, this.minValue);
     }
-    if (maxValue == null) {
+    if (this.maxValue == null) {
       this.maxValue = MathUtil.getMaxValue(getTypeClass());
     } else {
-      this.maxValue = StringConverterRegistry.toString(type, maxValue);
+      this.maxValue = StringConverterRegistry.toString(this.type, this.maxValue);
     }
   }
 
   /**
    * Construct a new attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @param type The data type of the attribute value.
    * @param required The flag indicating if a value is required for the
@@ -137,7 +138,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /**
    * Construct a new attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @param type The data type of the attribute value.
    * @param length The maximum length of an attribute value, 0 for no maximum.
@@ -157,7 +158,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /**
    * Construct a new attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @param type The data type of the attribute value.
    * @param length The maximum length of an attribute value, 0 for no maximum.
@@ -171,7 +172,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /**
    * Construct a new attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @param type The data type of the attribute value.
    * @param length The maximum length of an attribute value, 0 for no maximum.
@@ -192,7 +193,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /**
    * Construct a new attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @param type The data type of the attribute value.
    * @param required The flag indicating if a value is required for the
@@ -206,7 +207,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /**
    * Construct a new attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @param type The data type of the attribute value.
    * @param length The maximum length of an attribute value, 0 for no maximum.
@@ -224,7 +225,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /**
    * Construct a new attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @param type The data type of the attribute value.
    * @param length The maximum length of an attribute value, 0 for no maximum.
@@ -256,7 +257,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /**
    * Construct a new attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @param type The data type of the attribute value.
    * @param length The maximum length of an attribute value, 0 for no maximum.
@@ -292,13 +293,13 @@ public class Attribute extends AbstractObjectWithProperties implements
   }
 
   public void appendType(final StringBuffer string) {
-    string.append(type);
-    if (length > 0) {
+    string.append(this.type);
+    if (this.length > 0) {
       string.append('(');
-      string.append(length);
-      if (scale > 0) {
+      string.append(this.length);
+      if (this.scale > 0) {
         string.append(',');
-        string.append(scale);
+        string.append(this.scale);
       }
       string.append(')');
     }
@@ -313,52 +314,52 @@ public class Attribute extends AbstractObjectWithProperties implements
   public boolean equals(final Object object) {
     if (object instanceof Attribute) {
       final Attribute attribute = (Attribute)object;
-      return (name.equals(attribute.getName()));
+      return this.name.equals(attribute.getName());
     } else {
       return false;
     }
   }
 
   public Map<Object, Object> getAllowedValues() {
-    return allowedValues;
+    return this.allowedValues;
   }
 
   public CodeTable getCodeTable() {
-    return codeTable;
+    return this.codeTable;
   }
 
   @SuppressWarnings("unchecked")
   public <T> T getDefaultValue() {
-    return (T)defaultValue;
+    return (T)this.defaultValue;
   }
 
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
   public int getIndex() {
-    return index;
+    return this.index;
   }
 
   /**
    * Get the maximum length of the attribute value. The length 0 should be used
    * if there is no maximum.
-   * 
+   *
    * @return The maximum length of an attribute value.
    */
   public int getLength() {
-    return length;
+    return this.length;
   }
 
   public int getMaxStringLength() {
     int length = this.length;
-    if (scale > 0) {
+    if (this.scale > 0) {
       length += 1;
-      length += scale;
+      length += this.scale;
     }
-    if (Number.class.isAssignableFrom(type.getJavaClass())) {
+    if (Number.class.isAssignableFrom(this.type.getJavaClass())) {
       length += 1;
-    } else if (DataTypes.DATE.equals(type)) {
+    } else if (DataTypes.DATE.equals(this.type)) {
       return 10;
     }
     return length;
@@ -366,38 +367,38 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   @SuppressWarnings("unchecked")
   public <V> V getMaxValue() {
-    return (V)maxValue;
+    return (V)this.maxValue;
   }
 
   public DataObjectMetaData getMetaData() {
-    if (metaData == null) {
+    if (this.metaData == null) {
       return null;
     } else {
-      return metaData.get();
+      return this.metaData.get();
     }
   }
 
   @SuppressWarnings("unchecked")
   public <V> V getMinValue() {
-    return (V)minValue;
+    return (V)this.minValue;
   }
 
   /**
    * Get the name of the attribute.
-   * 
+   *
    * @return The name of the attribute.
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
   /**
    * Get the maximum number of decimal places of the attribute value.
-   * 
+   *
    * @return The maximum number of decimal places.
    */
   public int getScale() {
-    return scale;
+    return this.scale;
   }
 
   public String getSimpleType() {
@@ -408,15 +409,15 @@ public class Attribute extends AbstractObjectWithProperties implements
     } else if (CharSequence.class.isAssignableFrom(getTypeClass())) {
       typeName = "CHARACTER";
     } else {
-      typeName = type.getName().toUpperCase();
+      typeName = this.type.getName().toUpperCase();
     }
     string.append(typeName);
-    if (length > 0) {
+    if (this.length > 0) {
       string.append('(');
-      string.append(length);
-      if (scale > 0) {
+      string.append(this.length);
+      if (this.scale > 0) {
         string.append(',');
-        string.append(scale);
+        string.append(this.scale);
       }
       string.append(')');
     }
@@ -424,34 +425,34 @@ public class Attribute extends AbstractObjectWithProperties implements
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   /**
    * Get the data type of the attribute value.
-   * 
+   *
    * @return The data type of the attribute value.
    */
   public DataType getType() {
-    return type;
+    return this.type;
   }
 
   /**
    * Get the data type class of the attribute value.
-   * 
+   *
    * @return The data type of the attribute value.
    */
   public Class<?> getTypeClass() {
-    if (type == null) {
+    if (this.type == null) {
       return Object.class;
     } else {
-      return type.getJavaClass();
+      return this.type.getJavaClass();
     }
   }
 
   /**
    * Get the data type of the attribute value.
-   * 
+   *
    * @return The data type of the attribute value.
    */
   public String getTypeDescription() {
@@ -462,21 +463,21 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   /**
    * Return the hash code of the attribute.
-   * 
+   *
    * @return The hash code.
    */
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return this.name.hashCode();
   }
 
   /**
    * Get the flag indicating if a value is required for the attribute.
-   * 
+   *
    * @return True if a value is required, false otherwise.
    */
   public boolean isRequired() {
-    return required;
+    return this.required;
   }
 
   public void setAllowedValues(final Collection<?> allowedValues) {
@@ -543,7 +544,7 @@ public class Attribute extends AbstractObjectWithProperties implements
       if (value != null) {
         final CodeTable codeTable = getCodeTable();
         if (codeTable != null) {
-          value = codeTable.getId(value);
+          value = Value.getValue(codeTable.getId(value));
         }
       }
       record.setValue(index, value);
@@ -572,7 +573,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   @Override
   public String toString() {
-    final StringBuffer string = new StringBuffer(name);
+    final StringBuffer string = new StringBuffer(this.name);
     string.append(':');
     appendType(string);
     return string.toString();
@@ -583,7 +584,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
     if (isRequired()) {
       if (value == null || value instanceof String
-        && !StringUtils.hasText((String)value)) {
+          && !StringUtils.hasText((String)value)) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     }
@@ -648,10 +649,11 @@ public class Attribute extends AbstractObjectWithProperties implements
             }
           }
         }
-        if (!allowedValues.isEmpty()) {
-          if (!allowedValues.containsKey(value)) {
+        if (!this.allowedValues.isEmpty()) {
+          if (!this.allowedValues.containsKey(value)) {
             throw new IllegalArgumentException(fieldName + "=" + value
-              + " not in (" + CollectionUtil.toString(",", allowedValues) + ")");
+              + " not in (" + CollectionUtil.toString(",", this.allowedValues)
+              + ")");
           }
         }
       }

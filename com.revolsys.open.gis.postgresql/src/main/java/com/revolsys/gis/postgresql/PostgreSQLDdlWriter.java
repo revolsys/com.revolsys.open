@@ -10,6 +10,7 @@ import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.data.model.ShortNameProperty;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.gis.data.model.types.DataTypes;
@@ -222,12 +223,14 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     final PrintWriter out = getOut();
     Long nextValue = 0L;
     for (final DataObject object : values) {
-      final Object id = object.getIdValue();
-      if (id instanceof Number) {
-        final Number number = (Number)id;
-        final long longValue = number.longValue();
-        if (longValue > nextValue) {
-          nextValue = longValue;
+      final RecordIdentifier id = object.getIdentifier();
+      for (final Object value : id.getValues()) {
+        if (value instanceof Number) {
+          final Number number = (Number)value;
+          final long longValue = number.longValue();
+          if (longValue > nextValue) {
+            nextValue = longValue;
+          }
         }
       }
     }

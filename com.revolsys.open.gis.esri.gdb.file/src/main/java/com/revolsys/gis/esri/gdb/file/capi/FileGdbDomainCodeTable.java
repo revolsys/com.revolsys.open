@@ -8,6 +8,8 @@ import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.io.esri.gdb.xml.model.CodedValueDomain;
@@ -40,83 +42,86 @@ public class FileGdbDomainCodeTable implements CodeTable {
     }
   }
 
-  private Object createValue(final String name) {
-    synchronized (dataStore) {
-      final Object id = domain.addCodedValue(name);
-      dataStore.alterDomain(domain);
-      LOG.info(domain.getDomainName() + " created code " + id + "=" + name);
+  private RecordIdentifier createValue(final String name) {
+    synchronized (this.dataStore) {
+      final RecordIdentifier id = this.domain.addCodedValue(name);
+      this.dataStore.alterDomain(this.domain);
+      LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
       return id;
     }
   }
 
   @Override
   public List<String> getAttributeAliases() {
-    return domain.getAttributeAliases();
+    return this.domain.getAttributeAliases();
   }
 
   @Override
-  public Map<Object, List<Object>> getCodes() {
-    return domain.getCodes();
+  public Map<RecordIdentifier, List<Object>> getCodes() {
+    return this.domain.getCodes();
   }
 
   public Domain getDomain() {
-    return domain;
+    return this.domain;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <T> T getId(final Map<String, ? extends Object> values) {
-    final Object id = domain.getId(values);
+  public RecordIdentifier getId(final Map<String, ? extends Object> values) {
+    final RecordIdentifier id = this.domain.getId(values);
     if (id == null) {
-      return (T)createValue(domain.getName(values));
+      return createValue(this.domain.getName(values));
     }
-    return (T)id;
+    return id;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <T> T getId(final Object... values) {
-    final Object id = domain.getId(values);
+  public RecordIdentifier getId(final Object... values) {
+    final RecordIdentifier id = this.domain.getId(values);
     if (id == null) {
-      return (T)createValue((String)values[0]);
+      return createValue((String)values[0]);
     }
-    return (T)id;
+    return id;
   }
 
   @Override
   public String getIdAttributeName() {
-    return domain.getIdAttributeName();
+    return this.domain.getIdAttributeName();
   }
 
   @Override
-  public Map<String, ? extends Object> getMap(final Object id) {
-    return domain.getMap(id);
+  public Map<String, ? extends Object> getMap(final RecordIdentifier id) {
+    return this.domain.getMap(id);
   }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public JComponent getSwingEditor() {
-    return swingEditor;
+    return this.swingEditor;
+  }
+
+  @Override
+  public <V> V getValue(final Object id) {
+    return getValue(SingleRecordIdentifier.create(id));
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V getValue(final Object id) {
-    return (V)domain.getValue(id);
+  public <V> V getValue(final RecordIdentifier id) {
+    return (V)this.domain.getValue(id);
   }
 
   @Override
   public List<String> getValueAttributeNames() {
-    return domain.getValueAttributeNames();
+    return this.domain.getValueAttributeNames();
   }
 
   @Override
-  public List<Object> getValues(final Object id) {
-    return domain.getValues(id);
+  public List<Object> getValues(final RecordIdentifier id) {
+    return this.domain.getValues(id);
   }
 
   @Override
@@ -129,6 +134,6 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public String toString() {
-    return domain.toString();
+    return this.domain.toString();
   }
 }

@@ -15,6 +15,8 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.data.model.codes.AbstractCodeTable;
 import com.revolsys.jdbc.JdbcUtils;
 
@@ -100,31 +102,32 @@ public class JdbcCodeTable extends AbstractCodeTable {
 
   @Override
   public AbstractCodeTable clone() {
-    final JdbcCodeTable codeTable = new JdbcCodeTable(tableName, sequenceName,
-      idColumn, auditColumns, isCapitalizeWords(), loadAll, valueColumns);
-    codeTable.setColumnAliases(columnAliases);
+    final JdbcCodeTable codeTable = new JdbcCodeTable(this.tableName,
+      this.sequenceName, this.idColumn, this.auditColumns, isCapitalizeWords(),
+      this.loadAll, this.valueColumns);
+    codeTable.setColumnAliases(this.columnAliases);
     return codeTable;
   }
 
-  protected Object createId(final List<Object> values) {
+  protected RecordIdentifier createId(final List<Object> values) {
     try {
       init();
-      final Connection connection = JdbcUtils.getConnection(dataSource);
+      final Connection connection = JdbcUtils.getConnection(this.dataSource);
       try {
-        JdbcUtils.lockTable(connection, tableName);
+        JdbcUtils.lockTable(connection, this.tableName);
         Object id = loadId(values, false);
         if (id == null) {
-          final PreparedStatement statement = connection.prepareStatement(insertSql);
+          final PreparedStatement statement = connection.prepareStatement(this.insertSql);
           try {
-            id = dataStore.getNextPrimaryKey(sequenceName);
+            id = this.dataStore.getNextPrimaryKey(this.sequenceName);
             int index = 1;
             index = JdbcUtils.setValue(statement, index, id);
-            for (int i = 0; i < valueColumns.size(); i++) {
+            for (int i = 0; i < this.valueColumns.size(); i++) {
               final Object value = values.get(i);
               index = JdbcUtils.setValue(statement, index, value);
             }
             if (statement.executeUpdate() > 0) {
-              return id;
+              return SingleRecordIdentifier.create(id);
             } else {
               return null;
             }
@@ -132,7 +135,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
             JdbcUtils.close(statement);
           }
         } else {
-          return id;
+          return SingleRecordIdentifier.create(id);
         }
 
       } finally {
@@ -141,100 +144,101 @@ public class JdbcCodeTable extends AbstractCodeTable {
         } catch (final SQLException e) {
           LOG.error(e.getMessage(), e);
         }
-        JdbcUtils.release(connection, dataSource);
+        JdbcUtils.release(connection, this.dataSource);
       }
 
     } catch (final SQLException e) {
-      throw new RuntimeException(tableName + ": Unable to create ID for  "
+      throw new RuntimeException(this.tableName + ": Unable to create ID for  "
         + values, e);
     }
 
   }
 
   public Map<String, String> getAuditColumns() {
-    return auditColumns;
+    return this.auditColumns;
   }
 
   public List<String> getColumnAliases() {
-    return columnAliases;
+    return this.columnAliases;
   }
 
   public DataSource getDataSource() {
-    return dataSource;
+    return this.dataSource;
   }
 
   public JdbcDataObjectStore getDataStore() {
-    return dataStore;
+    return this.dataStore;
   }
 
   @Override
   public String getIdAttributeName() {
-    return idColumn;
+    return this.idColumn;
   }
 
   public String getSequenceName() {
-    return sequenceName;
+    return this.sequenceName;
   }
 
   public String getTableName() {
-    return tableName;
+    return this.tableName;
   }
 
   public List<String> getValueColumns() {
-    return valueColumns;
+    return this.valueColumns;
   }
 
   protected synchronized void init() {
-    if (!initialized) {
+    if (!this.initialized) {
 
-      this.allSql = "SELECT " + idColumn + ", " + toString(valueColumns)
-        + " FROM " + tableName;
-      this.valueByIdSql = "SELECT " + toString(valueColumns) + " FROM "
-        + tableName + " WHERE " + idColumn + " = ?";
-      this.idByValueSql = "SELECT " + idColumn + " FROM " + tableName
+      this.allSql = "SELECT " + this.idColumn + ", "
+          + toString(this.valueColumns) + " FROM " + this.tableName;
+      this.valueByIdSql = "SELECT " + toString(this.valueColumns) + " FROM "
+        + this.tableName + " WHERE " + this.idColumn + " = ?";
+      this.idByValueSql = "SELECT " + this.idColumn + " FROM " + this.tableName
         + " WHERE ";
-      this.insertSql = "INSERT INTO " + tableName + " (" + idColumn;
-      for (int i = 0; i < valueColumns.size(); i++) {
-        final String columnName = valueColumns.get(i);
+      this.insertSql = "INSERT INTO " + this.tableName + " (" + this.idColumn;
+      for (int i = 0; i < this.valueColumns.size(); i++) {
+        final String columnName = this.valueColumns.get(i);
         if (i > 0) {
           this.idByValueSql += " AND ";
         }
         this.idByValueSql += columnName + " = ?";
         this.insertSql += ", " + columnName;
       }
-      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-        insertSql += ", " + auditColumn.getKey();
+      for (final Entry<String, String> auditColumn : this.auditColumns.entrySet()) {
+        this.insertSql += ", " + auditColumn.getKey();
       }
-      insertSql += ") VALUES (?";
-      for (int i = 0; i < valueColumns.size(); i++) {
-        insertSql += ", ?";
+      this.insertSql += ") VALUES (?";
+      for (int i = 0; i < this.valueColumns.size(); i++) {
+        this.insertSql += ", ?";
       }
-      for (final Entry<String, String> auditColumn : auditColumns.entrySet()) {
-        insertSql += ", " + auditColumn.getValue();
+      for (final Entry<String, String> auditColumn : this.auditColumns.entrySet()) {
+        this.insertSql += ", " + auditColumn.getValue();
       }
-      insertSql += ")";
+      this.insertSql += ")";
     }
 
-    initialized = true;
+    this.initialized = true;
   }
 
   public boolean isLoadAll() {
-    return loadAll;
+    return this.loadAll;
   }
 
   private void loadAll() {
     try {
-      final Connection connection = JdbcUtils.getConnection(dataSource);
+      final Connection connection = JdbcUtils.getConnection(this.dataSource);
 
       try {
-        final PreparedStatement statement = connection.prepareStatement(allSql);
+        final PreparedStatement statement = connection.prepareStatement(this.allSql);
         try {
           final ResultSet rs = statement.executeQuery();
           try {
             while (rs.next()) {
-              final Number id = rs.getLong(1);
+              final RecordIdentifier id = SingleRecordIdentifier.create(
+                rs.getLong(1));
               final List<Object> values = new ArrayList<Object>();
-              for (int i = 0; i < valueColumns.size(); i++) {
+              for (int i = 0; i < this.valueColumns.size(); i++) {
                 values.add(rs.getObject(2 + i));
               }
               addValue(id, values);
@@ -246,48 +250,47 @@ public class JdbcCodeTable extends AbstractCodeTable {
           JdbcUtils.close(statement);
         }
       } finally {
-        JdbcUtils.release(connection, dataSource);
+        JdbcUtils.release(connection, this.dataSource);
       }
     } catch (final SQLException e) {
-      throw new RuntimeException("Unable to load all values for: " + tableName,
-        e);
+      throw new RuntimeException("Unable to load all values for: "
+          + this.tableName, e);
     }
   }
 
   @Override
-  protected Object loadId(final List<Object> values, final boolean createId) {
+  protected RecordIdentifier loadId(final List<Object> values,
+    final boolean createId) {
     init();
-    Object id = null;
-    if (createId && loadAll) {
+    RecordIdentifier id = null;
+    if (createId && this.loadAll) {
       loadAll();
       id = getIdByValue(values);
     } else {
       try {
-        final Connection connection = JdbcUtils.getConnection(dataSource);
+        final Connection connection = JdbcUtils.getConnection(this.dataSource);
         try {
-          final PreparedStatement statement = connection.prepareStatement(idByValueSql);
+          final PreparedStatement statement = connection.prepareStatement(this.idByValueSql);
           try {
             int index = 1;
-            for (int i = 0; i < valueColumns.size(); i++) {
+            for (int i = 0; i < this.valueColumns.size(); i++) {
               final Object value = values.get(i);
               index = JdbcUtils.setValue(statement, index, value);
             }
-            final ResultSet resultSet = statement.executeQuery();
-            try {
+            try (
+              final ResultSet resultSet = statement.executeQuery()) {
               if (resultSet.next()) {
-                id = resultSet.getLong(1);
+                id = SingleRecordIdentifier.create(resultSet.getLong(1));
               }
-            } finally {
-              JdbcUtils.close(resultSet);
             }
           } finally {
             JdbcUtils.close(statement);
           }
         } finally {
-          JdbcUtils.release(connection, dataSource);
+          JdbcUtils.release(connection, this.dataSource);
         }
       } catch (final SQLException e) {
-        throw new RuntimeException(tableName + ": Unable to load ID: ", e);
+        throw new RuntimeException(this.tableName + ": Unable to load ID: ", e);
       }
     }
     if (createId && id == null) {
@@ -301,14 +304,14 @@ public class JdbcCodeTable extends AbstractCodeTable {
   protected List<Object> loadValues(final Object id) {
     init();
     List<Object> values = null;
-    if (loadAll) {
+    if (this.loadAll) {
       loadAll();
       values = getValueById(id);
     } else {
       try {
-        final Connection connection = JdbcUtils.getConnection(dataSource);
+        final Connection connection = JdbcUtils.getConnection(this.dataSource);
         try {
-          final PreparedStatement statement = connection.prepareStatement(valueByIdSql);
+          final PreparedStatement statement = connection.prepareStatement(this.valueByIdSql);
           try {
             JdbcUtils.setValue(statement, 1, id);
             final ResultSet rs = statement.executeQuery();
@@ -327,10 +330,10 @@ public class JdbcCodeTable extends AbstractCodeTable {
             JdbcUtils.close(statement);
           }
         } finally {
-          JdbcUtils.release(connection, dataSource);
+          JdbcUtils.release(connection, this.dataSource);
         }
       } catch (final SQLException e) {
-        throw new IllegalArgumentException(tableName + " " + id
+        throw new IllegalArgumentException(this.tableName + " " + id
           + " does not exist", e);
       }
     }
@@ -338,11 +341,11 @@ public class JdbcCodeTable extends AbstractCodeTable {
   }
 
   public void setAuditColumns(final boolean useAuditColumns) {
-    auditColumns = new HashMap<String, String>();
-    auditColumns.put("WHO_CREATED", "USER");
-    auditColumns.put("WHEN_CREATED", "SYSDATE");
-    auditColumns.put("WHO_UPDATED", "USER");
-    auditColumns.put("WHEN_UPDATED", "SYSDATE");
+    this.auditColumns = new HashMap<String, String>();
+    this.auditColumns.put("WHO_CREATED", "USER");
+    this.auditColumns.put("WHEN_CREATED", "SYSDATE");
+    this.auditColumns.put("WHO_UPDATED", "USER");
+    this.auditColumns.put("WHEN_UPDATED", "SYSDATE");
   }
 
   public void setAuditColumns(final Map<String, String> auditColumns) {
@@ -401,7 +404,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
 
   @Override
   public String toString() {
-    return tableName + " " + idColumn + " " + valueColumns;
+    return this.tableName + " " + this.idColumn + " " + this.valueColumns;
 
   }
 

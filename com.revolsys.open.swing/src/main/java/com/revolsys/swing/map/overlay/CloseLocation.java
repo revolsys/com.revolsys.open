@@ -1,6 +1,8 @@
 package com.revolsys.swing.map.overlay;
 
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -45,24 +47,24 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public <G extends Geometry> G getGeometry() {
-    if (vertex == null) {
-      return segment.getGeometry();
+    if (this.vertex == null) {
+      return this.segment.getGeometry();
     } else {
-      return vertex.getGeometry();
+      return this.vertex.getGeometry();
     }
   }
 
   public GeometryFactory getGeometryFactory() {
-    return layer.getGeometryFactory();
+    return this.layer.getGeometryFactory();
   }
 
   public Object getId() {
-    Object id = null;
+    RecordIdentifier id = null;
     if (this.object != null) {
-      id = this.object.getIdValue();
+      id = this.object.getIdentifier();
     }
     if (id == null) {
-      id = "NEW";
+      id = SingleRecordIdentifier.create("NEW");
     }
     return id;
   }
@@ -73,8 +75,8 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   public String getIndexString() {
     int[] index;
-    if (vertex != null) {
-      index = vertex.getVertexId();
+    if (this.vertex != null) {
+      index = this.vertex.getVertexId();
     } else {
       index = this.segment.getSegmentId();
     }
@@ -82,11 +84,11 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public AbstractDataObjectLayer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   public DataObjectMetaData getMetaData() {
-    return layer.getMetaData();
+    return this.layer.getMetaData();
   }
 
   public LayerDataObject getObject() {
@@ -109,7 +111,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
     final Geometry geometry = getGeometry();
     if (geometry instanceof Point) {
       return "Point";
-    } else if (segment != null) {
+    } else if (this.segment != null) {
       return "Edge";
     } else {
       if (GeometryEditUtil.isFromPoint(geometry, getVertexIndex())
@@ -127,11 +129,11 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public Vertex getVertex() {
-    return vertex;
+    return this.vertex;
   }
 
   public int[] getVertexIndex() {
-    if (vertex == null) {
+    if (this.vertex == null) {
       return null;
     } else {
       return this.vertex.getVertexId();

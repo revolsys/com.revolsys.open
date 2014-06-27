@@ -14,6 +14,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectStore;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.codes.CodeTableProperty;
 import com.revolsys.gis.data.model.types.DataType;
@@ -23,6 +24,25 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 
 public class Value extends QueryValue {
+  public static Object getValue(final Object value) {
+    Object newValue;
+    if (value instanceof RecordIdentifier) {
+      final RecordIdentifier identifier = (RecordIdentifier)value;
+      final List<Object> values = identifier.getValues();
+      if (values.size() == 0) {
+        newValue = null;
+      } else if (values.size() == 1) {
+        newValue = values.get(0);
+      } else {
+        throw new IllegalArgumentException(
+          "Cannot create value for identifier with multiple parts " + value);
+      }
+    } else {
+      newValue = value;
+    }
+    return newValue;
+  }
+
   private JdbcAttribute jdbcAttribute;
 
   private Object queryValue;
@@ -32,10 +52,9 @@ public class Value extends QueryValue {
   private Attribute attribute;
 
   public Value(final Attribute attribute, final Object value) {
-    this.queryValue = value;
-    this.displayValue = value;
+    setQueryValue(value);
+    this.displayValue = this.queryValue;
     setAttribute(attribute);
-
   }
 
   public Value(final Object value) {
@@ -45,17 +64,17 @@ public class Value extends QueryValue {
   @Override
   public void appendDefaultSql(final Query query,
     final DataObjectStore dataStore, final StringBuffer buffer) {
-    if (jdbcAttribute == null) {
-    buffer.append('?');
+    if (this.jdbcAttribute == null) {
+      buffer.append('?');
     } else {
-      jdbcAttribute.addSelectStatementPlaceHolder(buffer);
+      this.jdbcAttribute.addSelectStatementPlaceHolder(buffer);
     }
   }
 
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
     try {
-      return jdbcAttribute.setPreparedStatementValue(statement, index,
+      return this.jdbcAttribute.setPreparedStatementValue(statement, index,
         this.queryValue);
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to set value: " + this.queryValue, e);
@@ -81,9 +100,9 @@ public class Value extends QueryValue {
       final Class<?> typeClass = dataType.getJavaClass();
       if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
         throw new IllegalArgumentException(this.queryValue + " is not a valid "
-          + typeClass);
+            + typeClass);
       } else {
-        this.queryValue = newValue;
+        setQueryValue(newValue);
       }
     }
   }
@@ -99,24 +118,24 @@ public class Value extends QueryValue {
   }
 
   public Object getDisplayValue() {
-    return displayValue;
+    return this.displayValue;
   }
 
   public JdbcAttribute getJdbcAttribute() {
-    return jdbcAttribute;
+    return this.jdbcAttribute;
   }
 
   public Object getQueryValue() {
-    return queryValue;
+    return this.queryValue;
   }
 
   @Override
   public String getStringValue(final Map<String, Object> record) {
     final Object value = getValue(record);
-    if (attribute == null) {
+    if (this.attribute == null) {
       return StringConverterRegistry.toString(value);
     } else {
-      final Class<?> typeClass = attribute.getTypeClass();
+      final Class<?> typeClass = this.attribute.getTypeClass();
       return StringConverterRegistry.toString(typeClass, value);
     }
   }
@@ -135,9 +154,9 @@ public class Value extends QueryValue {
     this.attribute = attribute;
     if (attribute != null) {
       if (attribute instanceof JdbcAttribute) {
-        jdbcAttribute = (JdbcAttribute)attribute;
+        this.jdbcAttribute = (JdbcAttribute)attribute;
       } else {
-        jdbcAttribute = JdbcAttribute.createAttribute(this.queryValue);
+        this.jdbcAttribute = JdbcAttribute.createAttribute(this.queryValue);
       }
 
       CodeTable codeTable = null;
@@ -153,11 +172,11 @@ public class Value extends QueryValue {
             }
           }
           if (codeTable != null) {
-            final Object id = codeTable.getId(this.queryValue);
+            final RecordIdentifier id = codeTable.getId(this.queryValue);
             if (id == null) {
               this.displayValue = this.queryValue;
             } else {
-              this.queryValue = id;
+              setQueryValue(id);
               final List<Object> values = codeTable.getValues(id);
               if (values.size() == 1) {
                 this.displayValue = values.get(0);
@@ -173,15 +192,19 @@ public class Value extends QueryValue {
 
   @Override
   public void setMetaData(final DataObjectMetaData metaData) {
-    final String attributeName = attribute.getName();
+    final String attributeName = this.attribute.getName();
     if (StringUtils.hasText(attributeName)) {
       final Attribute attribute = metaData.getAttribute(attributeName);
       setAttribute(attribute);
     }
   }
 
+  protected void setQueryValue(final Object value) {
+    this.queryValue = getValue(value);
+  }
+
   public void setValue(final Object value) {
-    this.queryValue = value;
+    setQueryValue(value);
   }
 
   @Override

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Geometry;
@@ -14,7 +15,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class ExcludeSavedObjectsInOutProcess extends
-  BaseInOutProcess<DataObject, DataObject> {
+BaseInOutProcess<DataObject, DataObject> {
 
   private Set<String> originalIds = new HashSet<String>();
 
@@ -23,13 +24,13 @@ public class ExcludeSavedObjectsInOutProcess extends
 
   @Override
   protected void destroy() {
-    statistics.disconnect();
-    originalIds = null;
-    statistics = null;
+    this.statistics.disconnect();
+    this.originalIds = null;
+    this.statistics = null;
   }
 
   private String getId(final DataObject object) {
-    final Object id = object.getIdValue();
+    final RecordIdentifier id = object.getIdentifier();
     if (id == null) {
       return null;
     } else {
@@ -39,12 +40,12 @@ public class ExcludeSavedObjectsInOutProcess extends
   }
 
   public StatisticsMap getStatistics() {
-    return statistics;
+    return this.statistics;
   }
 
   @Override
   protected void init() {
-    statistics.connect();
+    this.statistics.connect();
   }
 
   @Override
@@ -53,8 +54,9 @@ public class ExcludeSavedObjectsInOutProcess extends
     final String id = getId(object);
     if (id == null) {
       out.write(object);
-    } else if (originalIds.contains(id.toString())) {
-      statistics.add("Excluded as already loaded from previous area", object);
+    } else if (this.originalIds.contains(id.toString())) {
+      this.statistics.add("Excluded as already loaded from previous area",
+        object);
     } else {
       final Set<String> ids = Collections.singleton(id);
       final Geometry geometry = object.getGeometryValue();
@@ -67,7 +69,7 @@ public class ExcludeSavedObjectsInOutProcess extends
     for (final DataObject object : objects) {
       final Set<String> ids = object.getValueByPath("GEOMETRY.ORIGINAL_IDS");
       if (ids != null) {
-        originalIds.addAll(ids);
+        this.originalIds.addAll(ids);
       }
     }
   }

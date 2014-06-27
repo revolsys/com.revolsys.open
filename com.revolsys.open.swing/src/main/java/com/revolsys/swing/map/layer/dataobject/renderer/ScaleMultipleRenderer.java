@@ -92,7 +92,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
         } catch (final TopologyException e) {
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName()
-            + " #" + object.getIdString(), e);
+            + " #" + object.getIdentifier(), e);
         }
       }
     }
@@ -126,7 +126,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
           renderer.renderSelectedRecord(viewport, layer, object);
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unabled to render " + layer.getName()
-            + " #" + object.getIdString(), e);
+            + " #" + object.getIdentifier(), e);
         }
       }
     }

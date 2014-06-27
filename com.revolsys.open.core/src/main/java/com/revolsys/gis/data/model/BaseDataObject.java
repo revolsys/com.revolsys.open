@@ -8,6 +8,7 @@ import java.sql.Clob;
 import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.gis.data.query.Value;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.gis.model.data.equals.EqualsRegistry;
@@ -30,7 +32,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
 
 public abstract class BaseDataObject extends AbstractMap<String, Object>
-  implements DataObject, Cloneable, Serializable {
+implements DataObject, Cloneable, Serializable {
   /** Seialization version */
   private static final long serialVersionUID = 2704226494490082708L;
 
@@ -41,7 +43,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   /**
    * Construct a new empty BaseDataObject using the metaData.
-   * 
+   *
    * @param metaData The metaData defining the object type.
    */
   public BaseDataObject(final DataObjectMetaData metaData) {
@@ -50,7 +52,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   /**
    * Create a clone of the object.
-   * 
+   *
    * @return The cloned object.
    */
   @Override
@@ -64,7 +66,6 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public int compareTo(final DataObject other) {
     if (this == other) {
@@ -72,10 +73,14 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     } else {
       final int metaDataCompare = getMetaData().compareTo(other.getMetaData());
       if (metaDataCompare == 0) {
-        final Object id1 = getIdValue();
-        final Object id2 = other.getIdValue();
-        if (id1 instanceof Comparable<?>) {
-          final int idCompare = ((Comparable<Object>)id1).compareTo(id2);
+        final RecordIdentifier id1 = getIdentifier();
+        final RecordIdentifier id2 = other.getIdentifier();
+        if (id1 == null) {
+          if (id2 != null) {
+            return -1;
+          }
+        } else {
+          final int idCompare = id1.compareTo(id2);
           if (idCompare != 0) {
             return idCompare;
           }
@@ -110,7 +115,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   @Override
   public Set<Entry<String, Object>> entrySet() {
     final Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String, Object>>();
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+    for (int i = 0; i < this.metaData.getAttributeCount(); i++) {
       entries.add(new DataObjectEntry(this, i));
     }
     return entries;
@@ -159,7 +164,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   /**
    * Get the factory which created the instance.
-   * 
+   *
    * @return The factory.
    */
   @Override
@@ -184,35 +189,96 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   /**
    * Get the value of the primary geometry attribute.
-   * 
+   *
    * @return The primary geometry.
    */
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T getGeometryValue() {
-    final int index = metaData.getGeometryAttributeIndex();
+    final int index = this.metaData.getGeometryAttributeIndex();
     return (T)getValue(index);
   }
 
   @Override
-  public Integer getIdInteger() {
-    return getInteger(metaData.getIdAttributeName());
+  public RecordIdentifier getIdentifier() {
+    final DataObjectMetaData metaData = getMetaData();
+    final List<Integer> idAttributeIndexes = metaData.getIdAttributeIndexes();
+    final int idCount = idAttributeIndexes.size();
+    if (idCount == 0) {
+      return null;
+    } else if (idCount == 1) {
+      final Integer idAttributeIndex = idAttributeIndexes.get(0);
+      final Object idValue = getValue(idAttributeIndex);
+      if (idValue == null) {
+        return null;
+      } else {
+        return SingleRecordIdentifier.create(idValue);
+      }
+    } else {
+      boolean notNull = false;
+      final Object[] idValues = new Object[idCount];
+      for (int i = 0; i < idValues.length; i++) {
+        final Integer idAttributeIndex = idAttributeIndexes.get(i);
+        final Object value = getValue(idAttributeIndex);
+        if (value != null) {
+          notNull = true;
+        }
+        idValues[i] = value;
+      }
+      if (notNull) {
+        return new ListRecordIdentifier(idValues);
+      } else {
+        return null;
+      }
+    }
   }
 
   @Override
-  public String getIdString() {
-    return getString(metaData.getIdAttributeName());
+  public RecordIdentifier getIdentifier(final List<String> attributeNames) {
+    final int idCount = attributeNames.size();
+    if (idCount == 0) {
+      return null;
+    } else if (idCount == 1) {
+      final String idAttributeName = attributeNames.get(0);
+      final Object idValue = getValue(idAttributeName);
+      if (idValue == null) {
+        return null;
+      } else {
+        return SingleRecordIdentifier.create(idValue);
+      }
+    } else {
+      boolean notNull = false;
+      final Object[] idValues = new Object[idCount];
+      for (int i = 0; i < idValues.length; i++) {
+        final String idAttributeName = attributeNames.get(i);
+        final Object value = getValue(idAttributeName);
+        if (value != null) {
+          notNull = true;
+        }
+        idValues[i] = value;
+      }
+      if (notNull) {
+        return new ListRecordIdentifier(idValues);
+      } else {
+        return null;
+      }
+    }
+  }
+
+  @Override
+  public RecordIdentifier getIdentifier(final String... attributeNames) {
+    return getIdentifier(Arrays.asList(attributeNames));
   }
 
   /**
    * Get the value of the unique identifier attribute.
-   * 
+   *
    * @return The unique identifier.
    */
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Object> T getIdValue() {
-    final int index = metaData.getIdAttributeIndex();
+    final int index = this.metaData.getIdAttributeIndex();
     return (T)getValue(index);
   }
 
@@ -241,12 +307,12 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   /**
    * Get the metd data describing the DataObject and it's attributes.
-   * 
+   *
    * @return The meta data.
    */
   @Override
   public DataObjectMetaData getMetaData() {
-    return metaData;
+    return this.metaData;
   }
 
   @Override
@@ -261,7 +327,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   @Override
   public DataObjectState getState() {
-    return state;
+    return this.state;
   }
 
   @Override
@@ -290,7 +356,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   /**
    * Get the value of the attribute with the specified name.
-   * 
+   *
    * @param name The name of the attribute.
    * @return The attribute value.
    */
@@ -298,11 +364,13 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   @SuppressWarnings("unchecked")
   public <T extends Object> T getValue(final CharSequence name) {
     try {
-      final int index = metaData.getAttributeIndex(name);
+      final int index = this.metaData.getAttributeIndex(name);
       return (T)getValue(index);
     } catch (final NullPointerException e) {
-      LoggerFactory.getLogger(getClass()).warn(
-        "Attribute " + metaData.getPath() + "." + name + " does not exist");
+      LoggerFactory.getLogger(getClass())
+      .warn(
+        "Attribute " + this.metaData.getPath() + "." + name
+        + " does not exist");
       return null;
     }
   }
@@ -322,9 +390,9 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
+            final CodeTable codeTable = this.metaData.getCodeTableByColumn(propertyName);
             if (codeTable != null) {
-              propertyValue = codeTable.getMap(propertyValue);
+              propertyValue = codeTable.getMap(SingleRecordIdentifier.create(propertyValue));
             }
           }
         } else {
@@ -340,9 +408,9 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
+          final CodeTable codeTable = this.metaData.getCodeTableByColumn(propertyName);
           if (codeTable != null) {
-            propertyValue = codeTable.getMap(propertyValue);
+            propertyValue = codeTable.getMap(SingleRecordIdentifier.create(propertyValue));
           }
         }
       } else {
@@ -374,7 +442,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   @Override
   public List<Object> getValues() {
     final List<Object> values = new ArrayList<Object>();
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+    for (int i = 0; i < this.metaData.getAttributeCount(); i++) {
       final Object value = getValue(i);
       values.add(value);
     }
@@ -384,13 +452,13 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   /**
    * Checks to see if the metadata for this DataObject has an attribute with the
    * specified name.
-   * 
+   *
    * @param name The name of the attribute.
    * @return True if the DataObject has an attribute with the specified name.
    */
   @Override
   public boolean hasAttribute(final CharSequence name) {
-    return metaData.hasAttribute(name);
+    return this.metaData.hasAttribute(name);
   }
 
   @Override
@@ -422,39 +490,47 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   }
 
   private void readObject(final ObjectInputStream ois)
-    throws ClassNotFoundException, IOException {
+      throws ClassNotFoundException, IOException {
     final int metaDataInstanceId = ois.readInt();
-    metaData = DataObjectMetaDataImpl.getMetaData(metaDataInstanceId);
+    this.metaData = DataObjectMetaDataImpl.getMetaData(metaDataInstanceId);
     ois.defaultReadObject();
   }
 
   /**
    * Set the value of the primary geometry attribute.
-   * 
+   *
    * @param geometry The primary geometry.
    */
   @Override
   public void setGeometryValue(final Geometry geometry) {
-    final int index = metaData.getGeometryAttributeIndex();
+    final int index = this.metaData.getGeometryAttributeIndex();
     setValue(index, geometry);
+  }
+
+  @Override
+  public void setIdentifier(final RecordIdentifier identifier) {
+    final DataObjectMetaData metaData = getMetaData();
+    final List<String> idAttributeNames = metaData.getIdAttributeNames();
+    AbstractRecordIdentifier.setIdentifier(this, idAttributeNames, identifier);
   }
 
   /**
    * Set the value of the unique identifier attribute. param id The unique
    * identifier.
-   * 
+   *
    * @param id The unique identifier.
    */
   @Override
   public void setIdValue(final Object id) {
-    final int index = metaData.getIdAttributeIndex();
-    if (state == DataObjectState.New || state == DataObjectState.Initalizing) {
+    final int index = this.metaData.getIdAttributeIndex();
+    if (this.state == DataObjectState.New
+        || this.state == DataObjectState.Initalizing) {
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);
       if (oldId != null && !EqualsRegistry.equal(id, oldId)) {
         throw new IllegalStateException(
-          "Cannot change the ID on a persisted object");
+            "Cannot change the ID on a persisted object");
       }
     }
   }
@@ -467,13 +543,13 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   /**
    * Set the value of the attribute with the specified name.
-   * 
+   *
    * @param name The name of the attribute.
    * @param value The new value.
    */
   @Override
   public void setValue(final CharSequence name, final Object value) {
-    final int index = metaData.getAttributeIndex(name);
+    final int index = this.metaData.getAttributeIndex(name);
     if (index >= 0) {
       setValue(index, value);
     } else {
@@ -487,11 +563,11 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
           name.length());
         final Object objectValue = getValue(key);
         if (objectValue == null) {
-          final DataType attributeType = metaData.getAttributeType(key);
+          final DataType attributeType = this.metaData.getAttributeType(key);
           if (attributeType != null) {
             if (attributeType.getJavaClass() == DataObject.class) {
               final String typePath = attributeType.getName();
-              final DataObjectMetaDataFactory metaDataFactory = metaData.getDataObjectMetaDataFactory();
+              final DataObjectMetaDataFactory metaDataFactory = this.metaData.getDataObjectMetaDataFactory();
               final DataObjectMetaData subMetaData = metaDataFactory.getMetaData(typePath);
               final DataObjectFactory dataObjectFactory = subMetaData.getDataObjectFactory();
               final DataObject subObject = dataObjectFactory.createDataObject(subMetaData);
@@ -540,11 +616,11 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
       codeTableAttributeName = name.substring(0, dotIndex);
       codeTableValueName = name.substring(dotIndex + 1);
     }
-    final CodeTable codeTable = metaData.getCodeTableByColumn(codeTableAttributeName);
+    final CodeTable codeTable = this.metaData.getCodeTableByColumn(codeTableAttributeName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(
-          "Cannot get code table for " + metaData.getPath() + "." + name);
+          "Cannot get code table for " + this.metaData.getPath() + "." + name);
         return;
       }
       setValue(name, value);
@@ -553,11 +629,17 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
     } else {
       Object targetValue;
       if (codeTableValueName == null) {
+        RecordIdentifier id;
         if (value instanceof List) {
           final List list = (List)value;
-          targetValue = codeTable.getId(list.toArray());
+          id = codeTable.getId(list.toArray());
         } else {
-          targetValue = codeTable.getId(value);
+          id = codeTable.getId(value);
+        }
+        if (id == null) {
+          targetValue = value;
+        } else {
+          targetValue = Value.getValue(id);
         }
       } else {
         targetValue = codeTable.getId(Collections.singletonMap(
@@ -596,7 +678,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   public void setValues(final Map<String, ? extends Object> values) {
     if (values != null) {
       for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-        values).entrySet()) {
+          values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValue(name, value);
@@ -608,7 +690,7 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   public void setValuesByPath(final Map<String, ? extends Object> values) {
     if (values != null) {
       for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-        values).entrySet()) {
+          values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValueByPath(name, value);
@@ -619,20 +701,20 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
   /**
    * Return a String representation of the Object. There is no guarantee as to
    * the format of this string.
-   * 
+   *
    * @return The string value.
    */
   @Override
   public String toString() {
     final StringBuffer s = new StringBuffer();
-    s.append(metaData.getPath()).append("(\n");
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+    s.append(this.metaData.getPath()).append("(\n");
+    for (int i = 0; i < this.metaData.getAttributeCount(); i++) {
       final Object value = getValue(i);
       if (value != null) {
-        s.append(metaData.getAttributeName(i))
-          .append('=')
-          .append(value)
-          .append('\n');
+        s.append(this.metaData.getAttributeName(i))
+        .append('=')
+        .append(value)
+        .append('\n');
       }
     }
     s.append(')');
@@ -641,18 +723,18 @@ public abstract class BaseDataObject extends AbstractMap<String, Object>
 
   @SuppressWarnings("incomplete-switch")
   protected void updateState() {
-    switch (state) {
+    switch (this.state) {
       case Persisted:
-        state = DataObjectState.Modified;
-      break;
+        this.state = DataObjectState.Modified;
+        break;
       case Deleted:
         throw new IllegalStateException(
-          "Cannot modify an object which has been deleted");
+            "Cannot modify an object which has been deleted");
     }
   }
 
   private void writeObject(final ObjectOutputStream oos) throws IOException {
-    oos.writeInt(metaData.getInstanceId());
+    oos.writeInt(this.metaData.getInstanceId());
     oos.defaultWriteObject();
   }
 }

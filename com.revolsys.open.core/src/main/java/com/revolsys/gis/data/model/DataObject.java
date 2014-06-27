@@ -9,7 +9,7 @@ import com.revolsys.jts.geom.Geometry;
 public interface DataObject extends Map<String, Object>, Comparable<DataObject> {
   /**
    * Create a clone of the data object.
-   * 
+   *
    * @return The data object.
    */
   DataObject clone();
@@ -24,7 +24,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Get the factory which created the instance.
-   * 
+   *
    * @return The factory.
    */
   DataObjectFactory getFactory();
@@ -33,18 +33,20 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Get the value of the primary geometry attribute.
-   * 
+   *
    * @return The primary geometry.
    */
   <T extends Geometry> T getGeometryValue();
 
-  Integer getIdInteger();
+  RecordIdentifier getIdentifier();
 
-  String getIdString();
+  RecordIdentifier getIdentifier(List<String> attributeNames);
+
+  RecordIdentifier getIdentifier(String... attributeNames);
 
   /**
    * Get the value of the unique identifier attribute.
-   * 
+   *
    * @return The unique identifier.
    */
   <T extends Object> T getIdValue();
@@ -55,7 +57,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Get the meta data describing the DataObject and it's attributes.
-   * 
+   *
    * @return The meta data.
    */
   DataObjectMetaData getMetaData();
@@ -70,7 +72,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Get the value of the attribute with the specified name.
-   * 
+   *
    * @param name The name of the attribute.
    * @return The attribute value.
    */
@@ -78,7 +80,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Get the value of the attribute with the specified index.
-   * 
+   *
    * @param index The index of the attribute.
    * @return The attribute value.
    */
@@ -91,7 +93,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Get the values of all attributes.
-   * 
+   *
    * @return The attribute value.
    */
   List<Object> getValues();
@@ -99,7 +101,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
   /**
    * Checks to see if the metadata for this DataObject has an attribute with the
    * specified name.
-   * 
+   *
    * @param name The name of the attribute.
    * @return True if the DataObject has an attribute with the specified name.
    */
@@ -113,14 +115,16 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Set the value of the primary geometry attribute.
-   * 
+   *
    * @param geometry The primary geometry.
    */
   void setGeometryValue(Geometry geometry);
 
+  void setIdentifier(RecordIdentifier identifier);
+
   /**
    * Set the value of the unique identifier attribute.
-   * 
+   *
    * @param id The unique identifier.
    */
   void setIdValue(Object id);
@@ -129,7 +133,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Set the value of the attribute with the specified name.
-   * 
+   *
    * @param name The name of the attribute. param value The attribute value.
    * @param value The new value;
    */
@@ -137,7 +141,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Set the value of the attribute with the specified name.
-   * 
+   *
    * @param index The index of the attribute. param value The attribute value.
    * @param value The new value;
    */
@@ -156,7 +160,7 @@ public interface DataObject extends Map<String, Object>, Comparable<DataObject> 
 
   /**
    * Set the values on the object based on the values in the map.
-   * 
+   *
    * @param values The values to set.
    */
   void setValuesByPath(Map<String, ? extends Object> values);

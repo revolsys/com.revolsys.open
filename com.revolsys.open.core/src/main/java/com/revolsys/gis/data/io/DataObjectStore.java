@@ -11,6 +11,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.Query;
 import com.revolsys.gis.data.query.QueryValue;
@@ -23,7 +24,7 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 
 public interface DataObjectStore extends DataObjectMetaDataFactory,
-  AutoCloseable {
+AutoCloseable {
   void addCodeTable(CodeTable codeTable);
 
   void addCodeTables(Collection<CodeTable> codeTables);
@@ -76,7 +77,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   /**
    * Get the meta data for the specified type.
-   * 
+   *
    * @param typePath The type name.
    * @return The meta data.
    */
@@ -89,7 +90,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   /**
    * Get the list of name space names provided by the data store.
-   * 
+   *
    * @return The name space names.
    */
   List<DataObjectStoreSchema> getSchemas();
@@ -102,7 +103,7 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
 
   /**
    * Get the list of type names (including name space) in the name space.
-   * 
+   *
    * @param namespace The name space.
    * @return The type names.
    */
@@ -129,6 +130,8 @@ public interface DataObjectStore extends DataObjectMetaDataFactory,
   boolean isEditable(String typePath);
 
   DataObject load(String typePath, Object... id);
+
+  DataObject load(String typePath, RecordIdentifier id);
 
   DataObject lock(String typePath, Object id);
 

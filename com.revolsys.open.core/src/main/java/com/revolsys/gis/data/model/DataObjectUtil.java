@@ -5,13 +5,13 @@
  * $Revision$
 
  * Copyright 2004-2007 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,7 +52,7 @@ public final class DataObjectUtil {
    * Create a copy of the data object replacing the geometry with the new
    * geometry. If the existing geometry on the object has user data it will be
    * cloned to the new geometry.
-   * 
+   *
    * @param object The object to copy.
    * @param geometry The new geometry.
    * @return The copied object.
@@ -106,7 +106,8 @@ public final class DataObjectUtil {
           } else if (i + 1 < propertyPath.length) {
             final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
             if (codeTable != null) {
-              propertyValue = codeTable.getMap(propertyValue);
+              propertyValue = codeTable.getMap(SingleRecordIdentifier.create(
+                propertyValue));
             }
           }
         } else {
@@ -124,7 +125,8 @@ public final class DataObjectUtil {
         } else if (i + 1 < propertyPath.length) {
           final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
           if (codeTable != null) {
-            propertyValue = codeTable.getMap(propertyValue);
+            propertyValue = codeTable.getMap(SingleRecordIdentifier.create(
+              propertyValue));
           }
         }
       } else {
@@ -246,7 +248,7 @@ public final class DataObjectUtil {
             object.setValue(name, value);
           } else {
             final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-              .getConverter(dataTypeClass);
+                .getConverter(dataTypeClass);
             if (converter == null) {
               object.setValue(name, value);
             } else {

@@ -13,8 +13,6 @@ import com.revolsys.io.Writer;
 
 public class DataObjectLog {
 
-  private static final String KEY = DataObjectLog.class.getName();
-
   public static DataObjectLog dataObjectLog() {
     DataObjectLog dataObjectLog = getForThread();
     if (dataObjectLog == null) {
@@ -33,7 +31,7 @@ public class DataObjectLog {
     } else if (dataObjectLog == null) {
       final DataObjectMetaData metaData = object.getMetaData();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.error(message + "\t" + metaData.getPath() + object.getIdValue());
+      log.error(message + "\t" + metaData.getPath() + object.getIdentifier());
     } else {
       dataObjectLog.error(message, object);
     }
@@ -53,7 +51,7 @@ public class DataObjectLog {
     } else if (dataObjectLog == null) {
       final DataObjectMetaData metaData = object.getMetaData();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.info(message + "\t" + metaData.getPath() + object.getIdValue());
+      log.info(message + "\t" + metaData.getPath() + object.getIdentifier());
     } else {
       dataObjectLog.info(message, object);
     }
@@ -68,11 +66,13 @@ public class DataObjectLog {
     } else if (dataObjectLog == null) {
       final DataObjectMetaData metaData = object.getMetaData();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\t" + metaData.getPath() + object.getIdValue());
+      log.warn(message + "\t" + metaData.getPath() + object.getIdentifier());
     } else {
       dataObjectLog.warn(message, object);
     }
   }
+
+  private static final String KEY = DataObjectLog.class.getName();
 
   private Writer<DataObject> writer;
 
@@ -96,7 +96,7 @@ public class DataObjectLog {
   }
 
   private DataObjectMetaData getLogMetaData(final DataObjectMetaData metaData) {
-    DataObjectMetaDataImpl logMetaData = logMetaDataMap.get(metaData);
+    DataObjectMetaDataImpl logMetaData = this.logMetaDataMap.get(metaData);
     if (logMetaData == null) {
       final String path = metaData.getPath();
       final String parentPath = PathUtil.getPath(path);
@@ -116,13 +116,13 @@ public class DataObjectLog {
         logMetaData.addAttribute(logAttribute);
 
       }
-      logMetaDataMap.put(metaData, logMetaData);
+      this.logMetaDataMap.put(metaData, logMetaData);
     }
     return logMetaData;
   }
 
   public Writer<DataObject> getWriter() {
-    return writer;
+    return this.writer;
   }
 
   public synchronized void info(final Object message, final DataObject object) {
@@ -131,13 +131,13 @@ public class DataObjectLog {
 
   private void log(final String logLevel, final Object message,
     final DataObject object) {
-    if (writer != null) {
+    if (this.writer != null) {
       final DataObjectMetaData logMetaData = getLogMetaData(object);
       final DataObject logObject = new ArrayDataObject(logMetaData, object);
       logObject.setValue("LOGMESSAGE", message);
       logObject.setValue("LOGLEVEL", logLevel);
-      synchronized (writer) {
-        writer.write(logObject);
+      synchronized (this.writer) {
+        this.writer.write(logObject);
       }
     }
   }

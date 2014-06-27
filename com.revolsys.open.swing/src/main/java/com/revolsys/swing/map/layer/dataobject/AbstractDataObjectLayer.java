@@ -58,6 +58,7 @@ import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectFactory;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.gis.data.model.RecordIdentifier;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
 import com.revolsys.gis.data.model.property.DirectionalAttributes;
@@ -118,73 +119,6 @@ import com.revolsys.util.ExceptionUtil;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   DataObjectFactory, AddGeometryCompleteAction {
-
-  public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
-
-  private static AtomicInteger formCount = new AtomicInteger();
-
-  static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
-    menu.setName("Layer");
-    menu.addGroup(0, "table");
-    menu.addGroup(2, "edit");
-    menu.addGroup(3, "dnd");
-
-    final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
-
-    menu.addMenuItem("table", TreeItemRunnable.createAction("View Records",
-      "table_go", exists, "showRecordsTable"));
-
-    final EnableCheck hasSelectedRecords = new TreeItemPropertyEnableCheck(
-      "hasSelectedRecords");
-    final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
-      "hasGeometry");
-    menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Selected",
-      "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry,
-        hasSelectedRecords), "zoomToSelected"));
-
-    final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
-    final EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly",
-      false);
-    final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
-    final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddRecords");
-    final EnableCheck canDelete = new TreeItemPropertyEnableCheck(
-      "canDeleteRecords");
-    final EnableCheck canMergeRecords = new TreeItemPropertyEnableCheck(
-      "canMergeRecords");
-    final EnableCheck canPaste = new TreeItemPropertyEnableCheck("canPaste");
-
-    menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
-      "pencil", readonly, "toggleEditable"), editable);
-
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
-      "table_save", hasChanges, "saveChanges"));
-
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("Cancel Changes",
-      "table_cancel", hasChanges, "cancelChanges"));
-
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("Add New Record",
-      "table_row_insert", canAdd, "addNewRecord"));
-
-    menu.addMenuItem("edit", TreeItemRunnable.createAction(
-      "Delete Selected Records", "table_row_delete", new AndEnableCheck(
-        hasSelectedRecords, canDelete), "deleteSelectedRecords"));
-
-    menu.addMenuItem("edit", TreeItemRunnable.createAction(
-      "Merge Selected Records", "shape_group", canMergeRecords,
-      "mergeSelectedRecords"));
-
-    menu.addMenuItem("dnd", TreeItemRunnable.createAction(
-      "Copy Selected Records", "page_copy", hasSelectedRecords,
-      "copySelectedRecords"));
-
-    menu.addMenuItem("dnd", TreeItemRunnable.createAction("Paste New Records",
-      "paste_plain", new AndEnableCheck(canAdd, canPaste), "pasteRecords"));
-
-    menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
-      "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
-      "Style"));
-  }
 
   public static void addVisibleLayers(
     final List<AbstractDataObjectLayer> layers, final LayerGroup group) {
@@ -263,6 +197,73 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
       }
     }
     return false;
+  }
+
+  public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
+
+  private static AtomicInteger formCount = new AtomicInteger();
+
+  static {
+    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
+    menu.setName("Layer");
+    menu.addGroup(0, "table");
+    menu.addGroup(2, "edit");
+    menu.addGroup(3, "dnd");
+
+    final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
+
+    menu.addMenuItem("table", TreeItemRunnable.createAction("View Records",
+      "table_go", exists, "showRecordsTable"));
+
+    final EnableCheck hasSelectedRecords = new TreeItemPropertyEnableCheck(
+      "hasSelectedRecords");
+    final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
+      "hasGeometry");
+    menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Selected",
+      "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry,
+        hasSelectedRecords), "zoomToSelected"));
+
+    final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
+    final EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly",
+      false);
+    final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
+    final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddRecords");
+    final EnableCheck canDelete = new TreeItemPropertyEnableCheck(
+      "canDeleteRecords");
+    final EnableCheck canMergeRecords = new TreeItemPropertyEnableCheck(
+      "canMergeRecords");
+    final EnableCheck canPaste = new TreeItemPropertyEnableCheck("canPaste");
+
+    menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
+      "pencil", readonly, "toggleEditable"), editable);
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
+      "table_save", hasChanges, "saveChanges"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Cancel Changes",
+      "table_cancel", hasChanges, "cancelChanges"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction("Add New Record",
+      "table_row_insert", canAdd, "addNewRecord"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction(
+      "Delete Selected Records", "table_row_delete", new AndEnableCheck(
+        hasSelectedRecords, canDelete), "deleteSelectedRecords"));
+
+    menu.addMenuItem("edit", TreeItemRunnable.createAction(
+      "Merge Selected Records", "shape_group", canMergeRecords,
+      "mergeSelectedRecords"));
+
+    menu.addMenuItem("dnd", TreeItemRunnable.createAction(
+      "Copy Selected Records", "page_copy", hasSelectedRecords,
+      "copySelectedRecords"));
+
+    menu.addMenuItem("dnd", TreeItemRunnable.createAction("Paste New Records",
+      "paste_plain", new AndEnableCheck(canAdd, canPaste), "pasteRecords"));
+
+    menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
+      "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
+      "Style"));
   }
 
   private boolean useFieldTitles = false;
@@ -1003,7 +1004,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
    * merged. The new record is not a layer data object so would need to be
    * added, likewise the old records are not removed so they would need to be
    * deleted.
-   * 
+   *
    * @param point
    * @param record1
    * @param record2
@@ -1180,7 +1181,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
     throw new UnsupportedOperationException();
   }
 
-  public LayerDataObject getRecordById(final Object id) {
+  public LayerDataObject getRecordById(final RecordIdentifier id) {
     return null;
   }
 
@@ -1266,7 +1267,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
   /**
    * Cancel changes for one of the lists of changes {@link #deletedRecords},
    * {@link #newRecords}, {@link #modifiedRecords}.
-   * 
+   *
    * @param records
    */
   private boolean internalCancelChanges(
@@ -1301,7 +1302,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   /**
    * Revert the values of the record to the last values loaded from the database
-   * 
+   *
    * @param record
    */
   protected LayerDataObject internalCancelChanges(final LayerDataObject record) {
@@ -1321,7 +1322,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
 
   /**
    * Revert the values of the record to the last values loaded from the database
-   * 
+   *
    * @param record
    */
   protected LayerDataObject internalPostSaveChanges(final LayerDataObject record) {
@@ -2109,7 +2110,7 @@ public abstract class AbstractDataObjectLayer extends AbstractLayer implements
         Window window = this.formWindows.get(record);
         if (window == null) {
           final Component form = createForm(record);
-          final Object id = record.getIdValue();
+          final RecordIdentifier id = record.getIdentifier();
           if (form == null) {
             return null;
           } else {

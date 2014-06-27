@@ -116,15 +116,15 @@ public class DataStoreQueryTextField extends TextField implements
     addKeyListener(this);
     addMouseListener(this);
 
-    menu.setLayout(new BorderLayout(2, 2));
+    this.menu.setLayout(new BorderLayout(2, 2));
     this.oldValueItem = new JLabel();
-    oldValueItem.addMouseListener(this);
-    oldValueItem.setForeground(new Color(128, 128, 128));
-    oldValueItem.setFont(SwingUtil.FONT);
-    oldValueItem.setHorizontalAlignment(SwingConstants.LEFT);
-    this.menu.add(oldValueItem, BorderLayout.NORTH);
+    this.oldValueItem.addMouseListener(this);
+    this.oldValueItem.setForeground(new Color(128, 128, 128));
+    this.oldValueItem.setFont(SwingUtil.FONT);
+    this.oldValueItem.setHorizontalAlignment(SwingConstants.LEFT);
+    this.menu.add(this.oldValueItem, BorderLayout.NORTH);
 
-    this.listModel = new DataStoreQueryListModel(dataStore,
+    this.listModel = new DataStoreQueryListModel(this.dataStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
     this.list.setCellRenderer(new DataObjectListCellRenderer(
@@ -200,7 +200,7 @@ public class DataStoreQueryTextField extends TextField implements
   @Override
   public void focusLost(final FocusEvent e) {
     final Component oppositeComponent = e.getOppositeComponent();
-    if (oppositeComponent != list) {
+    if (oppositeComponent != this.list) {
       this.menu.setVisible(false);
     }
   }
@@ -208,14 +208,14 @@ public class DataStoreQueryTextField extends TextField implements
   @Override
   protected String getDisplayText(final Object value) {
     final String stringValue = StringConverterRegistry.toString(value);
-    String displayText = valueToDisplayMap.get(stringValue);
+    String displayText = this.valueToDisplayMap.get(stringValue);
     if (!StringUtils.hasText(displayText) && StringUtils.hasText(stringValue)) {
-      final DataObject record = dataStore.queryFirst(Query.equal(metaData,
-        idAttributeName, stringValue));
+      final DataObject record = this.dataStore.queryFirst(Query.equal(
+        this.metaData, this.idAttributeName, stringValue));
       if (record == null) {
         displayText = stringValue;
       } else {
-        displayText = record.getString(displayAttributeName);
+        displayText = record.getString(this.displayAttributeName);
       }
     }
     return displayText;
@@ -227,7 +227,7 @@ public class DataStoreQueryTextField extends TextField implements
     if (this.selectedItem == null) {
       return (T)super.getFieldValue();
     } else {
-      return (T)this.selectedItem.getIdValue();
+      return (T)this.selectedItem.getIdentifier();
     }
   }
 
@@ -276,7 +276,7 @@ public class DataStoreQueryTextField extends TextField implements
     final ComponentAdapter adapter) {
     final DataObject object = this.listModel.getElementAt(adapter.row);
     final String text = getText();
-    final String value = object.getString(displayAttributeName);
+    final String value = object.getString(this.displayAttributeName);
     if (StringEqualsIgnoreCase.equal(text, value)) {
       return true;
     } else {
@@ -350,13 +350,13 @@ public class DataStoreQueryTextField extends TextField implements
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (e.getSource() == oldValueItem) {
+    if (e.getSource() == this.oldValueItem) {
       if (e.getX() < 18) {
         setFieldValue(null);
       } else {
-        setFieldValue(originalValue);
+        setFieldValue(this.originalValue);
       }
-      menu.setVisible(false);
+      this.menu.setVisible(false);
     }
   }
 
@@ -430,8 +430,8 @@ public class DataStoreQueryTextField extends TextField implements
       originalText = getDisplayText(value);
       icon = ICON_DELETE;
     }
-    oldValueItem.setIcon(icon);
-    oldValueItem.setText(originalText);
+    this.oldValueItem.setIcon(icon);
+    this.oldValueItem.setText(originalText);
   }
 
   public void setMaxResults(final int maxResults) {
@@ -441,7 +441,7 @@ public class DataStoreQueryTextField extends TextField implements
   @Override
   public void setText(final String text) {
     super.setText(text);
-    if (listModel != null) {
+    if (this.listModel != null) {
       search();
     }
   }
@@ -454,13 +454,13 @@ public class DataStoreQueryTextField extends TextField implements
       this.menu.setVisible(true);
       int x;
       int y;
-      if (below) {
+      if (this.below) {
         x = 0;
         final Insets screenInsets = Toolkit.getDefaultToolkit()
           .getScreenInsets(getGraphicsConfiguration());
 
         final Rectangle bounds = getGraphicsConfiguration().getBounds();
-        final int menuHeight = menu.getBounds().height;
+        final int menuHeight = this.menu.getBounds().height;
         final int screenY = getLocationOnScreen().y;
         final int componentHeight = getHeight();
         final int bottomOfMenu = screenY + menuHeight + componentHeight;
@@ -491,10 +491,10 @@ public class DataStoreQueryTextField extends TextField implements
       if (value != null) {
         final String label = value.getString(this.displayAttributeName);
         if (!EqualsRegistry.equal(label, getText())) {
-          setFieldValue(value.getIdInteger());
+          setFieldValue(value.getIdentifier());
         }
       }
-      menu.setVisible(false);
+      this.menu.setVisible(false);
       requestFocus();
     }
 

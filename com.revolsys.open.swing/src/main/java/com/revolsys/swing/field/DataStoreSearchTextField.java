@@ -167,7 +167,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   @Override
   public void focusLost(final FocusEvent e) {
     final Component oppositeComponent = e.getOppositeComponent();
-    if (oppositeComponent != list) {
+    if (oppositeComponent != this.list) {
       this.menu.setVisible(false);
     }
   }
@@ -187,7 +187,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
     if (this.selectedItem == null) {
       return null;
     } else {
-      return this.selectedItem.getIdValue();
+      return (T)this.selectedItem.getIdentifier();
     }
   }
 
@@ -236,7 +236,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
     final ComponentAdapter adapter) {
     final DataObject object = this.listModel.getElementAt(adapter.row);
     final String text = getText();
-    final String value = object.getString(displayAttributeName);
+    final String value = object.getString(this.displayAttributeName);
     if (StringEqualsIgnoreCase.equal(text, value)) {
       return true;
     } else {
@@ -476,7 +476,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
           setText(label);
         }
       }
-      menu.setVisible(false);
+      this.menu.setVisible(false);
       requestFocus();
     }
 

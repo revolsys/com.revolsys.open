@@ -17,13 +17,14 @@ import org.springframework.util.StringUtils;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.gis.data.model.SingleRecordIdentifier;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractDataObjectTableModel extends AbstractTableModel
-  implements PropertyChangeSupportProxy {
+implements PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -61,18 +62,19 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
   }
 
   protected void firePropertyChange(final PropertyChangeEvent event) {
-    propertyChangeSupport.firePropertyChange(event);
+    this.propertyChangeSupport.firePropertyChange(event);
   }
 
   protected void firePropertyChange(final String propertyName, final int index,
     final Object oldValue, final Object newValue) {
-    propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
+    this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
       oldValue, newValue);
   }
 
   protected void firePropertyChange(final String propertyName,
     final Object oldValue, final Object newValue) {
-    propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    this.propertyChangeSupport.firePropertyChange(propertyName, oldValue,
+      newValue);
   }
 
   public String getFieldName(final int attributeIndex) {
@@ -83,12 +85,12 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
   public abstract String getFieldName(int rowIndex, int columnIndex);
 
   public DataObjectMetaData getMetaData() {
-    return metaData;
+    return this.metaData;
   }
 
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   public Set<String> getReadOnlyFieldNames() {
@@ -150,7 +152,8 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(objectValue);
+        final List<Object> values = codeTable.getValues(SingleRecordIdentifier.create(
+          objectValue));
         if (values == null || values.isEmpty()) {
           return null;
         } else {
@@ -188,7 +191,8 @@ public abstract class AbstractDataObjectTableModel extends AbstractTableModel
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(objectValue);
+        final List<Object> values = codeTable.getValues(SingleRecordIdentifier.create(
+          objectValue));
         if (values == null || values.isEmpty()) {
           text = "-";
         } else {

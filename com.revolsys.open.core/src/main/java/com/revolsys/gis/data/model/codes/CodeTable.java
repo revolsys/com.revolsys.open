@@ -5,18 +5,20 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
+import com.revolsys.gis.data.model.RecordIdentifier;
+
 public interface CodeTable extends Cloneable {
   List<String> getAttributeAliases();
 
-  Map<Object, List<Object>> getCodes();
+  Map<RecordIdentifier, List<Object>> getCodes();
 
-  <T> T getId(final Map<String, ? extends Object> values);
+  RecordIdentifier getId(final Map<String, ? extends Object> values);
 
-  <T> T getId(final Object... values);
+  RecordIdentifier getId(final Object... values);
 
   String getIdAttributeName();
 
-  Map<String, ? extends Object> getMap(final Object id);
+  Map<String, ? extends Object> getMap(final RecordIdentifier id);
 
   String getName();
 
@@ -24,9 +26,11 @@ public interface CodeTable extends Cloneable {
 
   <V> V getValue(final Object id);
 
+  <V> V getValue(final RecordIdentifier id);
+
   List<String> getValueAttributeNames();
 
-  List<Object> getValues(final Object id);
+  List<Object> getValues(final RecordIdentifier id);
 
   void refresh();
 }
