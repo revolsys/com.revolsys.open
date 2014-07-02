@@ -31,7 +31,7 @@ import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.list.BaseListModel;
 import com.revolsys.swing.list.filter.StringContainsRowFilter;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
 import com.revolsys.swing.toolbar.ToolBar;
 
 public class SnapLayersPanel extends ValueField implements ActionListener,

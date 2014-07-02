@@ -18,8 +18,8 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 

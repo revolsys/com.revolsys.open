@@ -37,11 +37,11 @@ import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.renderer.TextStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
-import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.style.TextStyle;
 
 public class PdfViewport extends Viewport2D implements AutoCloseable {
 
@@ -160,7 +160,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
   }
 
   @Override
-  public void drawText(final LayerDataObject object, final Geometry geometry,
+  public void drawText(final LayerRecord object, final Geometry geometry,
     final TextStyle style) {
     try {
       final String label = TextStyleRenderer.getLabel(object, style);
@@ -317,7 +317,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
 
   @Override
   public boolean isHidden(final AbstractDataObjectLayer layer,
-    final LayerDataObject record) {
+    final LayerRecord record) {
     return false;
   }
 

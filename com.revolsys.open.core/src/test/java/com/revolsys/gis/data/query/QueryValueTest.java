@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -33,7 +33,7 @@ public class QueryValueTest {
     this.descriptionAttribute = this.metaData.addAttribute("DESCRIPTION",
       DataTypes.STRING, 255, false);
 
-    this.record = new ArrayDataObject(this.metaData);
+    this.record = new ArrayRecord(this.metaData);
     this.record.setValue("ID", 10);
     this.record.setValue("NAME", "foobar");
   }

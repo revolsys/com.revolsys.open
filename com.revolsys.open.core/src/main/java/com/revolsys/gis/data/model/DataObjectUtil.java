@@ -43,7 +43,7 @@ public final class DataObjectUtil {
 
   public static DataObject copy(final DataObjectMetaData metaData,
     final DataObject object) {
-    final DataObject copy = new ArrayDataObject(metaData);
+    final DataObject copy = new ArrayRecord(metaData);
     copy.setValues(object);
     return copy;
   }
@@ -234,7 +234,7 @@ public final class DataObjectUtil {
 
   public static DataObject getObject(final DataObjectMetaData metaData,
     final Map<String, Object> values) {
-    final DataObject object = new ArrayDataObject(metaData);
+    final DataObject object = new ArrayRecord(metaData);
     for (final Entry<String, Object> entry : values.entrySet()) {
       final String name = entry.getKey();
       final Attribute attribute = metaData.getAttribute(name);

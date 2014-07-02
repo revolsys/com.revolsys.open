@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -383,7 +383,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     final CodedValueDomain domain) {
     final List<DataObject> values = new ArrayList<DataObject>();
     for (final CodedValue codedValue : domain.getCodedValues()) {
-      final DataObject value = new ArrayDataObject(metaData);
+      final DataObject value = new ArrayRecord(metaData);
       value.setIdValue(codedValue.getCode());
       value.setValue("DESCRIPTION", codedValue.getName());
       values.add(value);

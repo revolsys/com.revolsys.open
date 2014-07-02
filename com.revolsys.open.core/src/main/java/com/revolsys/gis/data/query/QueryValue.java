@@ -17,6 +17,8 @@ import com.akiban.sql.parser.ConstantNode;
 import com.akiban.sql.parser.CursorNode;
 import com.akiban.sql.parser.InListOperatorNode;
 import com.akiban.sql.parser.IsNullNode;
+import com.akiban.sql.parser.JavaToSQLValueNode;
+import com.akiban.sql.parser.JavaValueNode;
 import com.akiban.sql.parser.LikeEscapeOperatorNode;
 import com.akiban.sql.parser.NodeTypes;
 import com.akiban.sql.parser.NotNode;
@@ -24,9 +26,11 @@ import com.akiban.sql.parser.NumericConstantNode;
 import com.akiban.sql.parser.ResultSetNode;
 import com.akiban.sql.parser.RowConstructorNode;
 import com.akiban.sql.parser.SQLParser;
+import com.akiban.sql.parser.SQLToJavaValueNode;
 import com.akiban.sql.parser.SelectNode;
 import com.akiban.sql.parser.SimpleStringOperatorNode;
 import com.akiban.sql.parser.StatementNode;
+import com.akiban.sql.parser.StaticMethodCallNode;
 import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
@@ -37,17 +41,13 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.codes.CodeTable;
 import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
 import com.revolsys.gis.data.query.functions.Function;
+import com.revolsys.gis.data.query.functions.GetMapValue;
 import com.revolsys.gis.data.query.functions.WithinDistance;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class QueryValue implements Cloneable {
-  /** Must be in upper case */
-  public static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList(
-    "AND", "OR", "+", "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE",
-    "+", "-", "/", "*", "%", "MOD");
-
   public static <V extends QueryValue> List<V> cloneQueryValues(
     final List<V> values) {
     final List<V> clonedValues = new ArrayList<V>();
@@ -59,11 +59,61 @@ public abstract class QueryValue implements Cloneable {
     return clonedValues;
   }
 
+  public static BoundingBox expand(final BoundingBox boundingBox,
+    final BoundingBox newBoundingBox) {
+    if (boundingBox == null) {
+      return newBoundingBox;
+    } else if (newBoundingBox == null) {
+      return boundingBox;
+    } else {
+      return boundingBox.expandToInclude(newBoundingBox);
+    }
+  }
+
+  public static BoundingBox getBoundingBox(final Query query) {
+    final Condition whereCondition = query.getWhereCondition();
+    return getBoundingBox(whereCondition);
+  }
+
+  public static BoundingBox getBoundingBox(final QueryValue queryValue) {
+    BoundingBox boundingBox = null;
+    if (queryValue != null) {
+      for (final QueryValue childValue : queryValue.getQueryValues()) {
+        if (childValue instanceof EnvelopeIntersects) {
+          final EnvelopeIntersects intersects = (EnvelopeIntersects)childValue;
+          boundingBox = expand(boundingBox,
+            getBoundingBox(intersects.getBoundingBox1Value()));
+          boundingBox = expand(boundingBox,
+            getBoundingBox(intersects.getBoundingBox2Value()));
+        } else if (childValue instanceof WithinDistance) {
+          final WithinDistance withinDistance = (WithinDistance)childValue;
+          BoundingBox withinBoundingBox = getBoundingBox(withinDistance.getGeometry1Value());
+          withinBoundingBox = expand(withinBoundingBox,
+            getBoundingBox(withinDistance.getGeometry2Value()));
+          final double distance = ((Number)((Value)withinDistance.getDistanceValue()).getValue()).doubleValue();
+
+          boundingBox = expand(boundingBox, withinBoundingBox.expand(distance));
+        } else if (childValue instanceof Value) {
+          final Value valueContainer = (Value)childValue;
+          final Object value = valueContainer.getValue();
+          if (value instanceof BoundingBox) {
+            boundingBox = expand(boundingBox, (BoundingBox)value);
+          } else if (value instanceof Geometry) {
+            final Geometry geometry = (Geometry)value;
+            boundingBox = expand(boundingBox, geometry.getBoundingBox());
+          }
+        }
+      }
+    }
+    return boundingBox;
+  }
+
   public static Condition parseWhere(final DataObjectMetaData metaData,
     final String whereClause) {
     try {
-      final StatementNode statement = new SQLParser().parseStatement("SELECT * FROM "
-        + metaData.getTypeName() + " WHERE " + whereClause);
+      final SQLParser sqlParser = new SQLParser();
+      final StatementNode statement = sqlParser.parseStatement("SELECT * FROM "
+          + metaData.getTypeName() + " WHERE " + whereClause);
       if (statement instanceof CursorNode) {
         final CursorNode selectStatement = (CursorNode)statement;
         final ResultSetNode resultSetNode = selectStatement.getResultSetNode();
@@ -123,7 +173,7 @@ public abstract class QueryValue implements Cloneable {
         return (V)new Or(leftCondition, rightCondition);
       } else {
         throw new IllegalArgumentException("Binary logical operator "
-          + operator + " not supported.");
+            + operator + " not supported.");
       }
     } else if (expression instanceof BinaryOperatorNode) {
       final BinaryOperatorNode binaryOperatorNode = (BinaryOperatorNode)expression;
@@ -143,7 +193,7 @@ public abstract class QueryValue implements Cloneable {
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
               throw new IllegalArgumentException("Values can't be null for "
-                + operator + " use IS NULL or IS NOT NULL instead.");
+                  + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
               final CodeTable codeTable = metaData.getCodeTableByColumn(name);
               if (codeTable == null || attribute == metaData.getIdAttribute()) {
@@ -152,15 +202,15 @@ public abstract class QueryValue implements Cloneable {
                   final Object convertedValue = StringConverterRegistry.toObject(
                     typeClass, value);
                   if (convertedValue == null
-                    || !typeClass.isAssignableFrom(typeClass)) {
+                      || !typeClass.isAssignableFrom(typeClass)) {
                     throw new IllegalArgumentException(name + " requires a "
-                      + attribute.getType() + " not the value " + value);
+                        + attribute.getType() + " not the value " + value);
                   } else {
                     rightCondition = new Value(attribute, convertedValue);
                   }
                 } catch (final Throwable t) {
                   throw new IllegalArgumentException(name + " requires a "
-                    + attribute.getType() + " not the value " + value);
+                      + attribute.getType() + " not the value " + value);
                 }
               } else {
                 Object id;
@@ -192,7 +242,7 @@ public abstract class QueryValue implements Cloneable {
         }
       } else {
         throw new IllegalArgumentException("Unsupported binary operator "
-          + operator);
+            + operator);
       }
     } else if (expression instanceof ColumnReference) {
       final ColumnReference column = (ColumnReference)expression;
@@ -274,13 +324,40 @@ public abstract class QueryValue implements Cloneable {
       final ValueNode operand = castNode.getCastOperand();
       final QueryValue condition = toQueryValue(metaData, operand);
       return (V)new Cast(condition, typeName);
+    } else if (expression instanceof JavaToSQLValueNode) {
+      final JavaToSQLValueNode node = (JavaToSQLValueNode)expression;
+      final JavaValueNode javaValueNode = node.getJavaValueNode();
+      if (javaValueNode instanceof StaticMethodCallNode) {
+        final StaticMethodCallNode methodNode = (StaticMethodCallNode)javaValueNode;
+        final List<QueryValue> parameters = new ArrayList<>();
+
+        final String methodName = methodNode.getMethodName();
+        for (final JavaValueNode parameter : methodNode.getMethodParameters()) {
+          if (parameter instanceof SQLToJavaValueNode) {
+            final SQLToJavaValueNode sqlNode = (SQLToJavaValueNode)parameter;
+            final QueryValue param = toQueryValue(metaData,
+              sqlNode.getSQLValueNode());
+            parameters.add(param);
+          }
+        }
+        if (methodName.equals("get_map_value")) {
+          return (V)new GetMapValue(parameters);
+        }
+
+      }
+      return null;
     } else if (expression == null) {
       return null;
     } else {
       throw new IllegalArgumentException("Unsupported expression"
-        + expression.getClass() + " " + expression);
+          + expression.getClass() + " " + expression);
     }
   }
+
+  /** Must be in upper case */
+  public static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList(
+    "AND", "OR", "+", "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE",
+    "+", "-", "/", "*", "%", "MOD");
 
   public abstract void appendDefaultSql(Query query, DataObjectStore dataStore,
     StringBuffer sql);
@@ -327,55 +404,6 @@ public abstract class QueryValue implements Cloneable {
 
   public String toFormattedString() {
     return toString();
-  }
-
-  public static BoundingBox expand(final BoundingBox boundingBox,
-    final BoundingBox newBoundingBox) {
-    if (boundingBox == null) {
-      return newBoundingBox;
-    } else if (newBoundingBox == null) {
-      return boundingBox;
-    } else {
-      return boundingBox.expandToInclude(newBoundingBox);
-    }
-  }
-
-  public static BoundingBox getBoundingBox(final Query query) {
-    final Condition whereCondition = query.getWhereCondition();
-    return getBoundingBox(whereCondition);
-  }
-
-  public static BoundingBox getBoundingBox(final QueryValue queryValue) {
-    BoundingBox boundingBox = null;
-    if (queryValue != null) {
-      for (final QueryValue childValue : queryValue.getQueryValues()) {
-        if (childValue instanceof EnvelopeIntersects) {
-          final EnvelopeIntersects intersects = (EnvelopeIntersects)childValue;
-          boundingBox = expand(boundingBox,
-            getBoundingBox(intersects.getBoundingBox1Value()));
-          boundingBox = expand(boundingBox,
-            getBoundingBox(intersects.getBoundingBox2Value()));
-        } else if (childValue instanceof WithinDistance) {
-          final WithinDistance withinDistance = (WithinDistance)childValue;
-          BoundingBox withinBoundingBox = getBoundingBox(withinDistance.getGeometry1Value());
-          withinBoundingBox = expand(withinBoundingBox,
-            getBoundingBox(withinDistance.getGeometry2Value()));
-          final double distance = ((Number)((Value)withinDistance.getDistanceValue()).getValue()).doubleValue();
-  
-          boundingBox = expand(boundingBox, withinBoundingBox.expand(distance));
-        } else if (childValue instanceof Value) {
-          final Value valueContainer = (Value)childValue;
-          final Object value = valueContainer.getValue();
-          if (value instanceof BoundingBox) {
-            boundingBox = expand(boundingBox, (BoundingBox)value);
-          } else if (value instanceof Geometry) {
-            final Geometry geometry = (Geometry)value;
-            boundingBox = expand(boundingBox, geometry.getBoundingBox());
-          }
-        }
-      }
-    }
-    return boundingBox;
   }
 
 }

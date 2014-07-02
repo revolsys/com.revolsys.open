@@ -15,8 +15,8 @@ import org.jdesktop.swingx.VerticalLayout;
 import com.revolsys.swing.component.ShapeIcon;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
-import com.revolsys.swing.map.layer.dataobject.style.marker.Marker;
-import com.revolsys.swing.map.layer.dataobject.style.marker.ShapeMarker;
+import com.revolsys.swing.map.layer.record.style.marker.Marker;
+import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
 import com.revolsys.util.Property;
 
 public class MarkerField extends ValueField implements PropertyChangeListener {

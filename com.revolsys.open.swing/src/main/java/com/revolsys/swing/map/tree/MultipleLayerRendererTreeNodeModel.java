@@ -16,8 +16,8 @@ import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
-import com.revolsys.swing.map.layer.dataobject.renderer.AbstractMultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class MultipleLayerRendererTreeNodeModel

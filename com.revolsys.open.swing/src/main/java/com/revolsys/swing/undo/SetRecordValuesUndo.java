@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.revolsys.gis.model.data.equals.MapEquals;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class SetRecordValuesUndo extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1L;
 
-  private final LayerDataObject record;
+  private final LayerRecord record;
 
   private final Map<String, Object> originalValues = new HashMap<String, Object>();
 
   private final Map<String, Object> newValues = new HashMap<String, Object>();
 
-  public SetRecordValuesUndo(final LayerDataObject record,
+  public SetRecordValuesUndo(final LayerRecord record,
     final Map<String, Object> newValues) {
     this.record = record;
     if (record != null) {

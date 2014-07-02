@@ -15,7 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.core.io.FileSystemResource;
 
 import com.revolsys.gis.data.io.AbstractDataObjectWriterFactory;
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataType;
@@ -120,7 +120,7 @@ public class IoTestSuite {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
-      final ArrayDataObject record = new ArrayDataObject(metaData);
+      final ArrayRecord record = new ArrayRecord(metaData);
       record.setValue("ID", 1);
       record.setGeometryValue(geometry);
       writer.write(record);

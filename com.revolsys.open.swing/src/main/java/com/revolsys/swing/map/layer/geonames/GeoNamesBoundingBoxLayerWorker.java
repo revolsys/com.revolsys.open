@@ -15,10 +15,10 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.swing.map.layer.dataobject.DataObjectBoundingBoxLayer;
-import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
-import com.revolsys.swing.map.layer.dataobject.style.marker.ImageMarker;
+import com.revolsys.swing.map.layer.record.DataObjectBoundingBoxLayer;
+import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class GeoNamesBoundingBoxLayerWorker extends

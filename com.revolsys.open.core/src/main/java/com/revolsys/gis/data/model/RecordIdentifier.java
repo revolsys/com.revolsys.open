@@ -6,6 +6,8 @@ import java.util.Map;
 public interface RecordIdentifier extends Comparable<RecordIdentifier> {
   Integer getInteger(int index);
 
+  Long getLong(int index);
+
   String getString(int index);
 
   <V> V getValue(int index);

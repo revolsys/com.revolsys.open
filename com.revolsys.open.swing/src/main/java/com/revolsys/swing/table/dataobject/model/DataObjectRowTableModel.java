@@ -20,7 +20,7 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectState;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 
@@ -150,10 +150,10 @@ public abstract class DataObjectRowTableModel extends
 
   public abstract <V extends DataObject> V getRecord(final int row);
 
-  public List<LayerDataObject> getRecords(final int[] rows) {
-    final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
+  public List<LayerRecord> getRecords(final int[] rows) {
+    final List<LayerRecord> objects = new ArrayList<LayerRecord>();
     for (final int row : rows) {
-      final LayerDataObject record = getRecord(row);
+      final LayerRecord record = getRecord(row);
       if (record != null) {
         objects.add(record);
       }

@@ -133,7 +133,7 @@ public class DataObjectLog {
     final DataObject object) {
     if (this.writer != null) {
       final DataObjectMetaData logMetaData = getLogMetaData(object);
-      final DataObject logObject = new ArrayDataObject(logMetaData, object);
+      final DataObject logObject = new ArrayRecord(logMetaData, object);
       logObject.setValue("LOGMESSAGE", message);
       logObject.setValue("LOGLEVEL", logLevel);
       synchronized (this.writer) {

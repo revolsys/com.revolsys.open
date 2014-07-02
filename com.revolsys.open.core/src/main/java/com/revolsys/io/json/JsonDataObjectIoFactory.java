@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryWriterFactory;
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.FileUtil;
@@ -70,7 +70,7 @@ public class JsonDataObjectIoFactory extends
     final JsonDataObjectWriter dataObjectWriter = new JsonDataObjectWriter(
       metaData, writer);
     for (final Map<String, Object> map : list) {
-      final DataObject object = new ArrayDataObject(metaData);
+      final DataObject object = new ArrayRecord(metaData);
       object.setValues(map);
       dataObjectWriter.write(object);
     }
@@ -80,7 +80,7 @@ public class JsonDataObjectIoFactory extends
 
   public static String toString(final DataObjectMetaData metaData,
     final Map<String, ? extends Object> parameters) {
-    final DataObject object = new ArrayDataObject(metaData);
+    final DataObject object = new ArrayRecord(metaData);
     object.setValues(parameters);
     return toString(object);
   }

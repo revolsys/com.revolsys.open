@@ -9,15 +9,15 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.CollectionUtil;
 
 public class CloseLocation implements Comparable<CloseLocation> {
 
   private final AbstractDataObjectLayer layer;
 
-  private final LayerDataObject object;
+  private final LayerRecord object;
 
   private Vertex vertex;
 
@@ -26,7 +26,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
   private final Point point;
 
   public CloseLocation(final AbstractDataObjectLayer layer,
-    final LayerDataObject object, final Segment segment, final Point point) {
+    final LayerRecord object, final Segment segment, final Point point) {
     this.layer = layer;
     this.object = object;
     this.segment = segment;
@@ -34,7 +34,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public CloseLocation(final AbstractDataObjectLayer layer,
-    final LayerDataObject object, final Vertex vertex) {
+    final LayerRecord object, final Vertex vertex) {
     this.layer = layer;
     this.object = object;
     this.vertex = vertex;
@@ -91,7 +91,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return this.layer.getMetaData();
   }
 
-  public LayerDataObject getObject() {
+  public LayerRecord getObject() {
     return this.object;
   }
 

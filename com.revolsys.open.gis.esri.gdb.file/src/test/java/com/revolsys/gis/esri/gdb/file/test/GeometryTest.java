@@ -2,7 +2,7 @@ package com.revolsys.gis.esri.gdb.file.test;
 
 import java.io.File;
 
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.AttributeProperties;
 import com.revolsys.gis.data.model.DataObject;
@@ -47,7 +47,7 @@ public class GeometryTest {
     final FileGdbDataObjectStore dataStore = FileGdbDataObjectStoreFactory.create(file);
     dataStore.initialize();
     metaData = (DataObjectMetaDataImpl)dataStore.getMetaData(metaData);
-    final DataObject object = new ArrayDataObject(metaData);
+    final DataObject object = new ArrayRecord(metaData);
     object.setIdValue(1);
     object.setGeometryValue(geometry);
 

@@ -33,12 +33,12 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.renderer.TextStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
-import com.revolsys.swing.map.layer.dataobject.style.TextStyle;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.style.TextStyle;
 
 public class Viewport2D implements PropertyChangeSupportProxy {
 
@@ -165,7 +165,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     GeometryStyleRenderer.renderGeometry(this, graphics, geometry, style);
   }
 
-  public void drawText(final LayerDataObject object, final Geometry geometry,
+  public void drawText(final LayerRecord object, final Geometry geometry,
     final TextStyle style) {
     final Graphics2D graphics = getGraphics();
     if (graphics != null) {
@@ -434,7 +434,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   }
 
   public boolean isHidden(final AbstractDataObjectLayer layer,
-    final LayerDataObject record) {
+    final LayerRecord record) {
     return layer.isHidden(record);
   }
 

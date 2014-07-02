@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
@@ -115,7 +115,7 @@ public class FgdbReader {
       final double opt = Math.ceil(optionalFieldCount / 8.0);
       final byte[] nullFields = new byte[(int)opt];
       in.read(nullFields);
-      final DataObject record = new ArrayDataObject(metaData);
+      final DataObject record = new ArrayRecord(metaData);
       record.setIdValue(objectId++);
       int fieldIndex = 0;
       int optionalFieldIndex = 0;

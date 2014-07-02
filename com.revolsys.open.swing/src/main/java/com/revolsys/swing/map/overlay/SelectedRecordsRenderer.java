@@ -17,10 +17,10 @@ import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.valid.IsValidOp;
 import com.revolsys.jts.operation.valid.TopologyValidationError;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.renderer.MarkerStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
-import com.revolsys.swing.map.layer.dataobject.style.MarkerStyle;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 
 public class SelectedRecordsRenderer {
 

@@ -10,7 +10,7 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.data.io.DataObjectIterator;
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -60,7 +60,7 @@ public class JsonDataObjectIterator extends AbstractIterator<DataObject>
   protected DataObject getNext() throws NoSuchElementException {
     if (iterator.hasNext()) {
       final Map<String, Object> map = iterator.next();
-      final DataObject object = new ArrayDataObject(metaData);
+      final DataObject object = new ArrayRecord(metaData);
       for (final Attribute attribute : metaData.getAttributes()) {
         final String name = attribute.getName();
         final Object value = map.get(name);

@@ -11,7 +11,7 @@ import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.context.HashMapContext;
 
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMap;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -145,7 +145,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends
       final DataObjectMetaData newMetaData = metaDataGeometry.getKey();
       final Geometry intersectsGeometry = metaDataGeometry.getValue();
       if (intersectsGeometry.intersects(geometryValue)) {
-        final DataObject newObject = new ArrayDataObject(newMetaData, object);
+        final DataObject newObject = new ArrayRecord(newMetaData, object);
         out.write(newObject);
       }
     }

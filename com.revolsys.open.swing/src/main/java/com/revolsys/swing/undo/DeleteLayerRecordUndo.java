@@ -3,18 +3,18 @@ package com.revolsys.swing.undo;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
 
   private static final long serialVersionUID = 1L;
 
-  private final LayerDataObject record;
+  private final LayerRecord record;
 
   private Map<String, Object> values;
 
-  public DeleteLayerRecordUndo(final LayerDataObject record) {
+  public DeleteLayerRecordUndo(final LayerRecord record) {
     this.record = record;
     if (record != null) {
       this.values = new HashMap<String, Object>(record);
@@ -24,10 +24,10 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      if (record != null) {
-        final AbstractDataObjectLayer layer = record.getLayer();
+      if (this.record != null) {
+        final AbstractDataObjectLayer layer = this.record.getLayer();
         if (layer != null) {
-          return !layer.isDeleted(record);
+          return !layer.isDeleted(this.record);
         }
       }
     }
@@ -37,10 +37,10 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      if (record != null) {
-        final AbstractDataObjectLayer layer = record.getLayer();
+      if (this.record != null) {
+        final AbstractDataObjectLayer layer = this.record.getLayer();
         if (layer != null) {
-          return layer.isDeleted(record);
+          return layer.isDeleted(this.record);
         }
       }
     }
@@ -49,20 +49,20 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    if (record != null) {
-      final AbstractDataObjectLayer layer = record.getLayer();
+    if (this.record != null) {
+      final AbstractDataObjectLayer layer = this.record.getLayer();
       if (layer != null) {
-        layer.deleteRecords(record);
-        layer.unSelectRecords(record);
+        layer.deleteRecords(this.record);
+        layer.unSelectRecords(this.record);
       }
     }
   }
 
   @Override
   protected void doUndo() {
-    if (record != null) {
-      final LayerDataObject sourceRecord = record.revertChanges();
-      sourceRecord.setValues(values);
+    if (this.record != null) {
+      final LayerRecord sourceRecord = this.record.revertChanges();
+      sourceRecord.setValues(this.values);
       final AbstractDataObjectLayer layer = sourceRecord.getLayer();
       layer.addSelectedRecords(sourceRecord);
     }

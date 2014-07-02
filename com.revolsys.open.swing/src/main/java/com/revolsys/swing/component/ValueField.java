@@ -125,6 +125,9 @@ public class ValueField extends JPanel implements Field {
       if (component instanceof ValueField) {
         final ValueField valuePanel = (ValueField)component;
         valuePanel.save();
+      } else if (component instanceof Field) {
+        final Field field = (Field)component;
+        field.updateFieldValue();
       } else if (component instanceof Container) {
         final Container childContainer = (Container)component;
         save(childContainer);

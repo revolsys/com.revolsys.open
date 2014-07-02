@@ -13,7 +13,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.util.ExceptionUtil;
 

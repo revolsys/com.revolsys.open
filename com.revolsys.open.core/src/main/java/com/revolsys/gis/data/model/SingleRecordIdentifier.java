@@ -23,7 +23,7 @@ public class SingleRecordIdentifier extends AbstractRecordIdentifier {
 
   private final Object value;
 
-  private SingleRecordIdentifier(final Object value) {
+  protected SingleRecordIdentifier(final Object value) {
     this.value = value;
   }
 

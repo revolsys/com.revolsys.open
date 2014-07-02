@@ -48,10 +48,10 @@ import com.revolsys.jts.geom.vertex.VertexIndexComparator;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.renderer.GeometryStyleRenderer;
-import com.revolsys.swing.map.layer.dataobject.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
 
@@ -230,7 +230,7 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected CloseLocation findCloseLocation(
-    final AbstractDataObjectLayer layer, final LayerDataObject object,
+    final AbstractDataObjectLayer layer, final LayerRecord object,
     final Geometry geometry, final BoundingBox boundingBox) {
     CloseLocation closeLocation = findCloseVertexLocation(layer, object,
       geometry, boundingBox);
@@ -241,7 +241,7 @@ public class AbstractOverlay extends JComponent implements
     return closeLocation;
   }
 
-  protected CloseLocation findCloseLocation(final LayerDataObject object,
+  protected CloseLocation findCloseLocation(final LayerRecord object,
     final BoundingBox boundingBox) {
     if (object.isGeometryEditable()) {
       final AbstractDataObjectLayer layer = object.getLayer();
@@ -253,7 +253,7 @@ public class AbstractOverlay extends JComponent implements
   }
 
   private CloseLocation findCloseSegmentLocation(
-    final AbstractDataObjectLayer layer, final LayerDataObject object,
+    final AbstractDataObjectLayer layer, final LayerRecord object,
     final Geometry geometry, final BoundingBox boundingBox) {
 
     final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
@@ -283,7 +283,7 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected CloseLocation findCloseVertexLocation(
-    final AbstractDataObjectLayer layer, final LayerDataObject object,
+    final AbstractDataObjectLayer layer, final LayerRecord object,
     final Geometry geometry, final BoundingBox boundingBox) {
     final GeometryVertexQuadTree index = GeometryEditUtil.getGeometryVertexIndex(geometry);
     if (index != null) {
@@ -463,8 +463,8 @@ public class AbstractOverlay extends JComponent implements
     final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<Point, Set<CloseLocation>>();
     this.snapPoint = null;
     for (final AbstractDataObjectLayer layer : layers) {
-      final List<LayerDataObject> objects = layer.queryBackground(boundingBox);
-      for (final LayerDataObject object : objects) {
+      final List<LayerRecord> objects = layer.queryBackground(boundingBox);
+      for (final LayerRecord object : objects) {
         if (layer.isVisible(object)) {
           final CloseLocation closeLocation = findCloseLocation(object,
             boundingBox);

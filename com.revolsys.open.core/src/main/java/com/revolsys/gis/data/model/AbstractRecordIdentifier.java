@@ -80,6 +80,19 @@ public abstract class AbstractRecordIdentifier implements RecordIdentifier {
   }
 
   @Override
+  public Long getLong(final int index) {
+    final Object value = getValue(index);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.longValue();
+    } else {
+      return Long.valueOf(value.toString());
+    }
+  }
+
+  @Override
   public String getString(final int index) {
     final Object value = getValue(index);
     if (value == null) {
@@ -124,7 +137,7 @@ public abstract class AbstractRecordIdentifier implements RecordIdentifier {
       }
     } else {
       throw new IllegalArgumentException("Attribute names count for "
-        + attributeNames + " != count for values " + values);
+          + attributeNames + " != count for values " + values);
     }
   }
 

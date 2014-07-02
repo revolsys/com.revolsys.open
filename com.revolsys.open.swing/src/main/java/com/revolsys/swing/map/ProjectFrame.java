@@ -65,12 +65,13 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer;
 import com.revolsys.swing.map.layer.bing.BingLayer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectFileLayer;
-import com.revolsys.swing.map.layer.dataobject.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
 import com.revolsys.swing.map.layer.grid.GridLayer;
+import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapApiLayer;
 import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
+import com.revolsys.swing.map.layer.record.DataObjectFileLayer;
+import com.revolsys.swing.map.layer.record.DataObjectStoreLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.menu.MenuFactory;
@@ -89,29 +90,6 @@ import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class ProjectFrame extends BaseFrame {
-  public static final String SAVE_PROJECT_KEY = "Save Project";
-
-  public static final String SAVE_CHANGES_KEY = "Save Changes";
-
-  private static final long serialVersionUID = 1L;
-
-  static {
-    ResponseCache.setDefault(new FileResponseCache());
-
-    // TODO move to a file config
-    MapObjectFactoryRegistry.addFactory(LayerGroup.FACTORY);
-    MapObjectFactoryRegistry.addFactory(DataObjectStoreLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(ArcGisServerRestLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(BingLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(OpenStreetMapLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(DataObjectFileLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(GridLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
-    MapObjectFactoryRegistry.addFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
-    MapObjectFactoryRegistry.addFactory(GeoReferencedImageLayer.FACTORY);
-
-  }
-
   public static void addSaveActions(final JComponent component,
     final Project project) {
     final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -134,6 +112,30 @@ public class ProjectFrame extends BaseFrame {
       project, "saveAllSettings"));
     actionMap.put(SAVE_CHANGES_KEY, new InvokeMethodAction(SAVE_CHANGES_KEY,
       project, "saveChanges"));
+  }
+
+  public static final String SAVE_PROJECT_KEY = "Save Project";
+
+  public static final String SAVE_CHANGES_KEY = "Save Changes";
+
+  private static final long serialVersionUID = 1L;
+
+  static {
+    ResponseCache.setDefault(new FileResponseCache());
+
+    // TODO move to a file config
+    MapObjectFactoryRegistry.addFactory(LayerGroup.FACTORY);
+    MapObjectFactoryRegistry.addFactory(DataObjectStoreLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(ArcGisServerRestLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(BingLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(OpenStreetMapLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(OpenStreetMapApiLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(DataObjectFileLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(GridLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
+    MapObjectFactoryRegistry.addFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
+    MapObjectFactoryRegistry.addFactory(GeoReferencedImageLayer.FACTORY);
+
   }
 
   private ObjectTreePanel tocPanel;
@@ -170,7 +172,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-      .getTheme();
+        .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -182,11 +184,11 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void addCatalogPanel() {
-    catalogTree = LayerChooserPanel.createTree();
+    this.catalogTree = LayerChooserPanel.createTree();
     final LayerGroup project = getProject();
 
     DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,
-      "catalog", "Catalog", new JScrollPane(catalogTree));
+      "catalog", "Catalog", new JScrollPane(this.catalogTree));
 
     ((DefaultSingleCDockable)getDockControl().getSingleDockable("toc")).toFront();
 
@@ -256,10 +258,10 @@ public class ProjectFrame extends BaseFrame {
     final DefaultSingleCDockable dockable = DockingFramesUtil.addDockable(
       this.project, MapPanel.MAP_TABLE_WORKING_AREA, "tasks",
       "Background Tasks", panel);
-    final SwingWorkerProgressBar progressBar = mapPanel.getProgressBar();
+    final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
       "View Running Tasks", SilkIconLoader.getIcon("time_go"), dockable,
-      "toFront");
+        "toFront");
     viewTasksAction.setBorderPainted(false);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
@@ -317,23 +319,23 @@ public class ProjectFrame extends BaseFrame {
           Project.set(null);
         }
       }
-      if (tocPanel != null) {
-        tocPanel.destroy();
+      if (this.tocPanel != null) {
+        this.tocPanel.destroy();
       }
 
       this.tocPanel = null;
       this.project = null;
-      if (dockControl != null) {
+      if (this.dockControl != null) {
         int i = 0;
-        while (i < dockControl.getCDockableCount()) {
-          final CDockable dockable = dockControl.getCDockable(i);
+        while (i < this.dockControl.getCDockableCount()) {
+          final CDockable dockable = this.dockControl.getCDockable(i);
           if (dockable instanceof MultipleCDockable) {
             final MultipleCDockable multiple = (MultipleCDockable)dockable;
-            dockControl.remove(multiple);
+            this.dockControl.remove(multiple);
 
           } else if (dockable instanceof SingleCDockable) {
             final SingleCDockable multiple = (SingleCDockable)dockable;
-            dockControl.remove(multiple);
+            this.dockControl.remove(multiple);
 
           } else {
             i++;
@@ -343,8 +345,8 @@ public class ProjectFrame extends BaseFrame {
         this.dockControl.setRootWindow(null);
         this.dockControl = null;
       }
-      if (mapPanel != null) {
-        mapPanel.destroy();
+      if (this.mapPanel != null) {
+        this.mapPanel.destroy();
         this.mapPanel = null;
       }
       setMenuBar(null);
@@ -373,7 +375,7 @@ public class ProjectFrame extends BaseFrame {
   public void expandLayers(final Layer layer) {
     if (SwingUtilities.isEventDispatchThread()) {
       final List<Layer> pathList = layer.getPathList();
-      final ObjectTree tree = tocPanel.getTree();
+      final ObjectTree tree = this.tocPanel.getTree();
       final TreePath treePath = ObjectTree.createTreePath(pathList);
       if (layer instanceof LayerGroup) {
         final LayerGroup layerGroup = (LayerGroup)layer;
@@ -458,16 +460,16 @@ public class ProjectFrame extends BaseFrame {
 
     final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();
     dataStoreConnectionManager.removeConnectionRegistry("Project");
-    dataStoreConnectionManager.addConnectionRegistry(project.getDataStores());
+    dataStoreConnectionManager.addConnectionRegistry(this.project.getDataStores());
 
     final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
     folderConnectionManager.removeConnectionRegistry("Project");
-    folderConnectionManager.addConnectionRegistry(project.getFolderConnections());
+    folderConnectionManager.addConnectionRegistry(this.project.getFolderConnections());
 
-    final BoundingBox initialBoundingBox = project.getInitialBoundingBox();
+    final BoundingBox initialBoundingBox = this.project.getInitialBoundingBox();
     if (!BoundingBoxUtil.isEmpty(initialBoundingBox)) {
-      project.setGeometryFactory(initialBoundingBox.getGeometryFactory());
-      project.setViewBoundingBox(initialBoundingBox);
+      this.project.setGeometryFactory(initialBoundingBox.getGeometryFactory());
+      this.project.setViewBoundingBox(initialBoundingBox);
     }
     getMapPanel().getViewport().setInitialized(true);
   }
@@ -502,7 +504,7 @@ public class ProjectFrame extends BaseFrame {
 
   @Override
   public void windowClosing(final WindowEvent e) {
-    if (exitOnClose) {
+    if (this.exitOnClose) {
       exit();
     } else {
       dispose();

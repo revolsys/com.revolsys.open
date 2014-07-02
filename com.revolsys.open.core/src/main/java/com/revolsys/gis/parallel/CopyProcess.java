@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
@@ -33,7 +33,7 @@ public class CopyProcess extends BaseInOutProcess<DataObject, DataObject> {
     if (metaData == null) {
       targetObject = object;
     } else {
-      targetObject = new ArrayDataObject(metaData);
+      targetObject = new ArrayRecord(metaData);
       for (final String attributeName : metaData.getAttributeNames()) {
         copyAttribute(object, attributeName, targetObject, attributeName);
       }

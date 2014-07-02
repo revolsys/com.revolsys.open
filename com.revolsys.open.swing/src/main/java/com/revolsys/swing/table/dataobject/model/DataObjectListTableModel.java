@@ -17,8 +17,8 @@ import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
 import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 import com.revolsys.util.Reorderable;
@@ -28,17 +28,17 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   private static final long serialVersionUID = 1L;
 
   public static TablePanel createPanel(final AbstractDataObjectLayer layer) {
-    return createPanel(layer.getMetaData(), new ArrayList<LayerDataObject>(),
+    return createPanel(layer.getMetaData(), new ArrayList<LayerRecord>(),
       layer.getColumnNames());
   }
 
   public static TablePanel createPanel(final AbstractDataObjectLayer layer,
-    final Collection<LayerDataObject> objects) {
+    final Collection<LayerRecord> objects) {
     return createPanel(layer.getMetaData(), objects, layer.getColumnNames());
   }
 
   public static TablePanel createPanel(final DataObjectMetaData metaData,
-    final Collection<LayerDataObject> objects,
+    final Collection<LayerRecord> objects,
     final Collection<String> attributeNames) {
     final DataObjectListTableModel model = new DataObjectListTableModel(
       metaData, objects, attributeNames);
@@ -47,14 +47,14 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   public static TablePanel createPanel(final DataObjectMetaData metaData,
-    final List<LayerDataObject> objects, final String... attributeNames) {
+    final List<LayerRecord> objects, final String... attributeNames) {
     return createPanel(metaData, objects, Arrays.asList(attributeNames));
   }
 
-  private final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
+  private final List<LayerRecord> records = new ArrayList<LayerRecord>();
 
   public DataObjectListTableModel(final DataObjectMetaData metaData,
-    final Collection<LayerDataObject> objects,
+    final Collection<LayerRecord> objects,
     final Collection<String> columnNames) {
     super(metaData, columnNames);
     if (objects != null) {
@@ -63,19 +63,19 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     setEditable(true);
   }
 
-  public void add(final int index, final LayerDataObject object) {
+  public void add(final int index, final LayerRecord object) {
     this.records.add(index, object);
     fireTableRowsInserted(index, index + 1);
   }
 
-  public void add(final LayerDataObject... objects) {
-    for (final LayerDataObject object : objects) {
+  public void add(final LayerRecord... objects) {
+    for (final LayerRecord object : objects) {
       this.records.add(object);
       fireTableRowsInserted(this.records.size() - 1, this.records.size());
     }
   }
 
-  public void addAll(final Collection<LayerDataObject> objects) {
+  public void addAll(final Collection<LayerRecord> objects) {
     this.records.clear();
     this.records.addAll(objects);
   }
@@ -105,7 +105,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   /**
    * @return the records
    */
-  public List<LayerDataObject> getRecords() {
+  public List<LayerRecord> getRecords() {
     return this.records;
   }
 
@@ -137,12 +137,12 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   }
 
   public void remove(final int... rows) {
-    final List<LayerDataObject> rowsToRemove = getRecords(rows);
+    final List<LayerRecord> rowsToRemove = getRecords(rows);
     removeAll(rowsToRemove);
   }
 
-  public void removeAll(final Collection<LayerDataObject> objects) {
-    for (final LayerDataObject object : objects) {
+  public void removeAll(final Collection<LayerRecord> objects) {
+    for (final LayerRecord object : objects) {
       final int row = this.records.indexOf(object);
       if (row != -1) {
         this.records.remove(row);
@@ -151,7 +151,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     }
   }
 
-  public void removeAll(final LayerDataObject... removedFeatures) {
+  public void removeAll(final LayerRecord... removedFeatures) {
     removeAll(Arrays.asList(removedFeatures));
   }
 
@@ -161,8 +161,8 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
       toIndex--;
     }
     final DataObject object = getRecord(fromIndex);
-    if (object instanceof LayerDataObject) {
-      final LayerDataObject layerDataObject = (LayerDataObject)object;
+    if (object instanceof LayerRecord) {
+      final LayerRecord layerDataObject = (LayerRecord)object;
       removeAll(layerDataObject);
       add(toIndex, layerDataObject);
       clearSortedColumns();
@@ -173,7 +173,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   /**
    * @param records the records to set
    */
-  public void setRecords(final List<LayerDataObject> objects) {
+  public void setRecords(final List<LayerRecord> objects) {
     this.records.clear();
     if (objects != null) {
       this.records.addAll(objects);

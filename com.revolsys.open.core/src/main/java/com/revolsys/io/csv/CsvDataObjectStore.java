@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.revolsys.gis.data.io.AbstractDataObjectStore;
 import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.data.query.Query;
@@ -36,9 +36,9 @@ public class CsvDataObjectStore extends AbstractDataObjectStore {
     final String typePath = metaData.getPath();
     final DataObjectMetaData savedMetaData = getMetaData(typePath);
     if (savedMetaData == null) {
-      return new ArrayDataObject(metaData);
+      return new ArrayRecord(metaData);
     } else {
-      return new ArrayDataObject(savedMetaData);
+      return new ArrayRecord(savedMetaData);
     }
   }
 

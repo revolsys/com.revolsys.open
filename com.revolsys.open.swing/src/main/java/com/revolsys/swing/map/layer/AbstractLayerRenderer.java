@@ -18,7 +18,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.dataobject.style.panel.BaseStylePanel;
+import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 

@@ -82,12 +82,12 @@ import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.ProjectFrame;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerAttributesTableModel;
-import com.revolsys.swing.map.layer.dataobject.table.model.DataObjectLayerTableModel;
-import com.revolsys.swing.map.layer.dataobject.table.predicate.FormAllFieldsErrorPredicate;
-import com.revolsys.swing.map.layer.dataobject.table.predicate.FormAllFieldsModifiedPredicate;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPredicate;
+import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsModifiedPredicate;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
@@ -104,8 +104,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class DataObjectLayerForm extends JPanel implements
-PropertyChangeListener, CellEditorListener, FocusListener,
-PropertyChangeSupportProxy, WindowListener {
+  PropertyChangeListener, CellEditorListener, FocusListener,
+  PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -155,7 +155,7 @@ PropertyChangeSupportProxy, WindowListener {
 
   private DataObjectMetaData metaData;
 
-  private LayerDataObject object;
+  private LayerRecord object;
 
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
@@ -205,14 +205,14 @@ PropertyChangeSupportProxy, WindowListener {
   }
 
   public DataObjectLayerForm(final AbstractDataObjectLayer layer,
-    final LayerDataObject object) {
+    final LayerRecord object) {
     this(layer);
     setObject(object);
   }
 
   public void actionAddCancel() {
     final AbstractDataObjectLayer layer = getLayer();
-    final LayerDataObject object = getObject();
+    final LayerRecord object = getObject();
     layer.deleteRecords(object);
     this.object = null;
     closeWindow();
@@ -220,7 +220,7 @@ PropertyChangeSupportProxy, WindowListener {
 
   public void actionAddOk() {
     final AbstractDataObjectLayer layer = getLayer();
-    final LayerDataObject record = getObject();
+    final LayerRecord record = getObject();
     layer.saveChanges(record);
     layer.setSelectedRecords(record);
     layer.showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
@@ -279,8 +279,8 @@ PropertyChangeSupportProxy, WindowListener {
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
       comboBox.getEditor()
-      .getEditorComponent()
-      .addFocusListener(new WeakFocusListener(this));
+        .getEditorComponent()
+        .addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -412,7 +412,7 @@ PropertyChangeSupportProxy, WindowListener {
     final JScrollPane scrollPane = addTab("All Fields", table);
     int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-        .getScreenDevices()) {
+      .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
 
@@ -477,12 +477,12 @@ PropertyChangeSupportProxy, WindowListener {
 
     }
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
-        "modifiedOrDeleted");
+      "modifiedOrDeleted");
 
     this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
       modifiedOrDeleted, this, "revertChanges");
@@ -506,9 +506,9 @@ PropertyChangeSupportProxy, WindowListener {
     if (hasGeometry) {
       final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(metaData)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
             FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
@@ -541,7 +541,7 @@ PropertyChangeSupportProxy, WindowListener {
     if (layer == null) {
       return false;
     } else {
-      final LayerDataObject record = getObject();
+      final LayerRecord record = getObject();
       return layer.canPasteRecordGeometry(record);
     }
   }
@@ -562,7 +562,7 @@ PropertyChangeSupportProxy, WindowListener {
   }
 
   public void copyGeometry() {
-    final LayerDataObject record = getObject();
+    final LayerRecord record = getObject();
     final AbstractDataObjectLayer layer = getLayer();
     if (layer != null) {
       if (record != null) {
@@ -588,7 +588,7 @@ PropertyChangeSupportProxy, WindowListener {
   }
 
   public void deleteRecord() {
-    final LayerDataObject object = getObject();
+    final LayerRecord object = getObject();
     if (object != null) {
       getLayer().deleteRecords(object);
     }
@@ -700,8 +700,7 @@ PropertyChangeSupportProxy, WindowListener {
     } else if (codeTable == null) {
       string = StringConverterRegistry.toString(value);
     } else {
-      final List<Object> values = codeTable.getValues(SingleRecordIdentifier.create(
-        value));
+      final List<Object> values = codeTable.getValues(SingleRecordIdentifier.create(value));
       if (values == null || values.isEmpty()) {
         string = "-";
       } else {
@@ -825,12 +824,12 @@ PropertyChangeSupportProxy, WindowListener {
     return this.metaData;
   }
 
-  public LayerDataObject getObject() {
+  public LayerRecord getObject() {
     return this.object;
   }
 
   public <T> T getOriginalValue(final String fieldName) {
-    final LayerDataObject object = getObject();
+    final LayerRecord object = getObject();
     return object.getOriginalValue(fieldName);
   }
 
@@ -907,7 +906,7 @@ PropertyChangeSupportProxy, WindowListener {
   }
 
   public boolean isDeletable() {
-    final LayerDataObject object = getObject();
+    final LayerRecord object = getObject();
     if (object == null) {
       return false;
     } else {
@@ -943,7 +942,7 @@ PropertyChangeSupportProxy, WindowListener {
   }
 
   public boolean isModifiedOrDeleted() {
-    final LayerDataObject object = getObject();
+    final LayerRecord object = getObject();
     if (object == null) {
       return false;
     } else {
@@ -960,7 +959,7 @@ PropertyChangeSupportProxy, WindowListener {
   }
 
   public void pasteGeometry() {
-    final LayerDataObject record = getObject();
+    final LayerRecord record = getObject();
     final AbstractDataObjectLayer layer = getLayer();
     if (layer != null) {
       if (record != null) {
@@ -973,7 +972,7 @@ PropertyChangeSupportProxy, WindowListener {
     final AbstractDataObjectLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-          map);
+        map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
       if (ignorePasteFields != null) {
         newValues.keySet().removeAll(ignorePasteFields);
@@ -994,7 +993,7 @@ PropertyChangeSupportProxy, WindowListener {
   public void propertyChange(final PropertyChangeEvent event) {
     final AbstractDataObjectLayer layer = getLayer();
     if (layer != null) {
-      final LayerDataObject object = getObject();
+      final LayerRecord object = getObject();
       if (object != null) {
         final Object source = event.getSource();
         if (source instanceof Field) {
@@ -1042,7 +1041,7 @@ PropertyChangeSupportProxy, WindowListener {
   }
 
   public void revertChanges() {
-    final LayerDataObject object = getObject();
+    final LayerRecord object = getObject();
     if (object != null) {
       object.revertChanges();
       setValues(object);
@@ -1050,7 +1049,7 @@ PropertyChangeSupportProxy, WindowListener {
   }
 
   public void revertEmptyFields() {
-    final LayerDataObject record = getObject();
+    final LayerRecord record = getObject();
     if (record != null) {
       record.revertEmptyFields();
     }
@@ -1176,7 +1175,7 @@ PropertyChangeSupportProxy, WindowListener {
     this.fieldValues.put(fieldName, value);
     final JComponent field = (JComponent)getField(fieldName);
     if (oldValue == null & value != null
-        || !EqualsRegistry.equal(value, oldValue)) {
+      || !EqualsRegistry.equal(value, oldValue)) {
       changed = true;
     }
     final Object objectValue = this.object.getValue(fieldName);
@@ -1213,7 +1212,7 @@ PropertyChangeSupportProxy, WindowListener {
     }
   }
 
-  public void setObject(final LayerDataObject object) {
+  public void setObject(final LayerRecord object) {
     final boolean undo = this.undoManager.setEventsEnabled(false);
     final boolean validate = setFieldValidationEnabled(false);
     try {
@@ -1280,7 +1279,7 @@ PropertyChangeSupportProxy, WindowListener {
 
   }
 
-  public LayerDataObject showAddDialog() {
+  public LayerRecord showAddDialog() {
     final String title = "Add New " + getName();
     final Window window = SwingUtil.getActiveWindow();
     final JDialog dialog = new JDialog(window, title,
@@ -1296,14 +1295,14 @@ PropertyChangeSupportProxy, WindowListener {
       this, "actionAddCancel");
     buttons.add(addCancelButton);
     this.addOkButton = InvokeMethodAction.createButton("OK", this,
-        "actionAddOk");
+      "actionAddOk");
     buttons.add(this.addOkButton);
 
     dialog.pack();
     dialog.setLocation(50, 50);
     dialog.addWindowListener(this);
     dialog.setVisible(true);
-    final LayerDataObject object = getObject();
+    final LayerRecord object = getObject();
     dialog.dispose();
     return object;
   }

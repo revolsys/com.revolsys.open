@@ -31,14 +31,14 @@ import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 
 public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
-  public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(
-    "information_schema", "pg_catalog", "pg_toast_temp_1");
-
   public static final AbstractIterator<DataObject> createPostgreSQLIterator(
     final PostgreSQLDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
     return new PostgreSQLJdbcQueryIterator(dataStore, query, properties);
   }
+
+  public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(
+    "information_schema", "pg_catalog", "pg_toast_temp_1");
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -138,7 +138,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     final String shortName = ShortNameProperty.getShortName(metaData);
     final String sequenceName;
     if (StringUtils.hasText(shortName)) {
-      if (useSchemaSequencePrefix) {
+      if (this.useSchemaSequencePrefix) {
         sequenceName = schema + "." + shortName.toLowerCase() + "_seq";
       } else {
         sequenceName = shortName.toLowerCase() + "_seq";
@@ -146,10 +146,10 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     } else {
       final String tableName = getDatabaseTableName(typePath);
       final String idAttributeName = metaData.getIdAttributeName()
-        .toLowerCase();
-      if (useSchemaSequencePrefix) {
+          .toLowerCase();
+      if (this.useSchemaSequencePrefix) {
         sequenceName = schema + "." + tableName + "_" + idAttributeName
-          + "_seq";
+            + "_seq";
       } else {
         sequenceName = tableName + "_" + idAttributeName + "_seq";
       }
@@ -208,17 +208,22 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     final JdbcAttributeAdder geometryAttributeAdder = new PostgreSQLGeometryAttributeAdder(
       this, getDataSource());
     addAttributeAdder("geometry", geometryAttributeAdder);
-    setPrimaryKeySql("select p.table_name,c.column_name from information_schema.table_constraints p join information_schema.key_column_usage c using (constraint_catalog, constraint_schema, constraint_name) where p.constraint_type = 'PRIMARY KEY' and p.table_schema = ?");
+    setPrimaryKeySql("SELECT t.relname \"TABLE_NAME\", c.attname \"COLUMN_NAME\"" //
+      + " FROM pg_namespace s" //
+      + " join pg_class t on t.relnamespace = s.oid" //
+      + " join pg_index i on i.indrelid = t.oid " //
+      + " join pg_attribute c on c.attrelid = t.oid" //
+      + " WHERE s.nspname = ? AND c.attnum = any(i.indkey) AND i.indisprimary");
     setSchemaPermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\" "
-      + "from information_schema.role_table_grants t  "
-      + "where (t.grantee  in (current_user, 'PUBLIC') or "
-      + "t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) and "
-      + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') ");
+        + "from information_schema.role_table_grants t  "
+        + "where (t.grantee  in (current_user, 'PUBLIC') or "
+        + "t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) and "
+        + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') ");
     setTablePermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description as \"REMARKS\" from information_schema.role_table_grants t join pg_namespace n on t.table_schema = n.nspname join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname) left join pg_description d on d.objoid = c.oid "
-      + "where t.table_schema = ? and "
-      + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
-      + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
-      + "order by t.table_schema, t.table_name, t.privilege_type");
+        + "where t.table_schema = ? and "
+        + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
+        + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
+        + "order by t.table_schema, t.table_name, t.privilege_type");
   }
 
   protected void initSettings() {
@@ -232,7 +237,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   public boolean isUseSchemaSequencePrefix() {
-    return useSchemaSequencePrefix;
+    return this.useSchemaSequencePrefix;
   }
 
   @Override

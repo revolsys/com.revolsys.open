@@ -52,8 +52,8 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.util.CollectionUtil;
@@ -213,7 +213,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
-  private void addRecords(final List<LayerDataObject> results,
+  private void addRecords(final List<LayerRecord> results,
     final LayerGroup group, final Geometry boundingBox) {
     final double scale = getViewport().getScale();
     final List<Layer> layers = group.getLayers();
@@ -225,8 +225,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
         if (dataObjectLayer.isSelectable(scale)) {
-          final List<LayerDataObject> selectedRecords = dataObjectLayer.getSelectedRecords();
-          for (final LayerDataObject selectedRecord : selectedRecords) {
+          final List<LayerRecord> selectedRecords = dataObjectLayer.getSelectedRecords();
+          for (final LayerRecord selectedRecord : selectedRecords) {
             final Geometry geometry = selectedRecord.getGeometryValue();
             if (boundingBox.intersects(geometry)) {
               results.add(selectedRecord);
@@ -237,7 +237,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
-  protected void addSelectedObjects(final List<LayerDataObject> objects,
+  protected void addSelectedObjects(final List<LayerRecord> objects,
     final LayerGroup group, final BoundingBox boundingBox) {
     final double scale = getViewport().getScale();
     for (final Layer layer : group.getLayers()) {
@@ -247,7 +247,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
         if (dataObjectLayer.isEditable(scale)) {
-          final List<LayerDataObject> selectedObjects = dataObjectLayer.getSelectedRecords(boundingBox);
+          final List<LayerRecord> selectedObjects = dataObjectLayer.getSelectedRecords(boundingBox);
           objects.addAll(selectedObjects);
         }
       }
@@ -455,9 +455,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return point;
   }
 
-  protected List<LayerDataObject> getSelectedObjects(
+  protected List<LayerRecord> getSelectedObjects(
     final BoundingBox boundingBox) {
-    final List<LayerDataObject> objects = new ArrayList<LayerDataObject>();
+    final List<LayerRecord> objects = new ArrayList<LayerRecord>();
     addSelectedObjects(objects, getProject(), boundingBox);
     return objects;
   }
@@ -816,7 +816,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     if (modeAddMouseClick(event)) {
     } else if (SwingUtil.isLeftButtonAndNoModifiers(event)
       && event.getClickCount() == 2) {
-      final List<LayerDataObject> records = new ArrayList<LayerDataObject>();
+      final List<LayerRecord> records = new ArrayList<LayerRecord>();
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
       final Geometry boundary = boundingBox.toPolygon().prepare();
       addRecords(records, getProject(), boundary);
@@ -825,7 +825,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (size == 0) {
 
       } else if (size < 10) {
-        for (final LayerDataObject record : records) {
+        for (final LayerRecord record : records) {
           final AbstractDataObjectLayer layer = record.getLayer();
           layer.showForm(record);
 
@@ -970,7 +970,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         // setEditingObject(null, null);
         // }
       }
-    } else if (source instanceof LayerDataObject) {
+    } else if (source instanceof LayerRecord) {
       if (event.getNewValue() instanceof Geometry) {
         // TODO update mouse over locations
         // clearMouseOverLocations();
@@ -1000,7 +1000,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         return new AddGeometryUndoEdit(newGeometry);
       }
     } else {
-      final LayerDataObject object = location.getObject();
+      final LayerRecord object = location.getObject();
       final DataObjectMetaData metaData = location.getMetaData();
       final String geometryAttributeName = metaData.getGeometryAttributeName();
       final Geometry oldValue = object.getValue(geometryAttributeName);
@@ -1052,7 +1052,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     if (keyCode == KeyEvent.VK_K) {
       if (!isModeAddGeometry() && !getMouseOverLocations().isEmpty()) {
         for (final CloseLocation mouseLocation : getMouseOverLocations()) {
-          final LayerDataObject record = mouseLocation.getObject();
+          final LayerRecord record = mouseLocation.getObject();
           final AbstractDataObjectLayer layer = record.getLayer();
           layer.splitRecord(record, mouseLocation);
         }
@@ -1077,9 +1077,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   protected boolean updateMouseOverGeometry(final java.awt.Point eventPoint,
     final Graphics2D graphics, final BoundingBox boundingBox) {
-    final List<LayerDataObject> selectedObjects = getSelectedObjects(boundingBox);
+    final List<LayerRecord> selectedObjects = getSelectedObjects(boundingBox);
     final List<CloseLocation> closeLocations = new ArrayList<CloseLocation>();
-    for (final LayerDataObject object : selectedObjects) {
+    for (final LayerRecord object : selectedObjects) {
       final CloseLocation closeLocation = findCloseLocation(object, boundingBox);
       if (closeLocation != null) {
         closeLocations.add(closeLocation);

@@ -34,9 +34,9 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
-import com.revolsys.swing.map.layer.dataobject.AbstractDataObjectLayer;
-import com.revolsys.swing.map.layer.dataobject.LayerDataObject;
-import com.revolsys.swing.map.layer.dataobject.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.renderer.AbstractDataObjectLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 
 public class SelectRecordsOverlay extends AbstractOverlay {
@@ -283,7 +283,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         paintHighlighted(vieport, childGroup);
       } else if (layer instanceof AbstractDataObjectLayer) {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
-        for (final LayerDataObject record : dataObjectLayer.getHighlightedRecords()) {
+        for (final LayerRecord record : dataObjectLayer.getHighlightedRecords()) {
           if (record != null && dataObjectLayer.isVisible(record)) {
             final Geometry geometry = record.getGeometryValue();
             final AbstractDataObjectLayerRenderer layerRenderer = layer.getRenderer();
@@ -317,7 +317,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
         final AbstractDataObjectLayerRenderer layerRenderer = layer.getRenderer();
         if (dataObjectLayer.isSelectable()) {
-          for (final LayerDataObject record : dataObjectLayer.getSelectedRecords()) {
+          for (final LayerRecord record : dataObjectLayer.getSelectedRecords()) {
             if (record != null && dataObjectLayer.isVisible(record)) {
               if (!dataObjectLayer.isHighlighted(record)) {
                 if (!dataObjectLayer.isDeleted(record)) {

@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.ArrayDataObject;
+import com.revolsys.gis.data.model.ArrayRecord;
 import com.revolsys.gis.data.model.Attribute;
 import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.data.model.DataObjectMetaData;
@@ -56,7 +56,7 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<DataObject>
   public DataObject next() {
     if (hasNext()) {
       final DataObject source = iterator.next();
-      final DataObject target = new ArrayDataObject(metaData);
+      final DataObject target = new ArrayRecord(metaData);
       for (final Attribute attribute : metaData.getAttributes()) {
         final String name = attribute.getName();
         final Object value = source.getValue(name);
