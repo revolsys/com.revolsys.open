@@ -7,7 +7,7 @@ import javax.swing.JTabbedPane;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 
 public class TabbedValuePanel extends ValueField {
   private static final long serialVersionUID = 1L;

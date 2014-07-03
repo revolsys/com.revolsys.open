@@ -16,10 +16,10 @@ import javax.swing.tree.TreeNode;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreConnectionMapProxy;
-import com.revolsys.gis.data.io.DataObjectStoreProxy;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreConnectionMapProxy;
+import com.revolsys.data.io.DataObjectStoreProxy;
+import com.revolsys.data.io.DataObjectStoreSchema;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
 import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;

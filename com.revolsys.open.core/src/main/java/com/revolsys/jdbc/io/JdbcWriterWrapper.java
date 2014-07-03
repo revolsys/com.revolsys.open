@@ -1,6 +1,6 @@
 package com.revolsys.jdbc.io;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.io.DelegatingObjectWithProperties;
 
 public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
@@ -32,7 +32,7 @@ public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
   }
 
   @Override
-  public void write(final DataObject record) {
+  public void write(final Record record) {
     if (writer != null) {
       writer.write(record);
     }

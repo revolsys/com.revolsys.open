@@ -3,12 +3,12 @@ package com.revolsys.io.csv;
 import java.io.File;
 import java.util.Map;
 
-import com.revolsys.gis.data.io.AbstractDataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.io.AbstractDataObjectStore;
+import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
@@ -32,9 +32,9 @@ public class CsvDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public DataObject create(final DataObjectMetaData metaData) {
+  public Record create(final RecordDefinition metaData) {
     final String typePath = metaData.getPath();
-    final DataObjectMetaData savedMetaData = getMetaData(typePath);
+    final RecordDefinition savedMetaData = getRecordDefinition(typePath);
     if (savedMetaData == null) {
       return new ArrayRecord(metaData);
     } else {
@@ -43,12 +43,12 @@ public class CsvDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public Writer<DataObject> createWriter() {
+  public Writer<Record> createWriter() {
     return writer;
   }
 
   @Override
-  public DataObjectMetaData getMetaData(final String typePath) {
+  public RecordDefinition getRecordDefinition(final String typePath) {
     return writer.getMetaData(typePath);
   }
 
@@ -59,14 +59,14 @@ public class CsvDataObjectStore extends AbstractDataObjectStore {
   }
 
   @Override
-  public void insert(final DataObject dataObject) {
+  public void insert(final Record dataObject) {
     writer.write(dataObject);
   }
 
   @Override
   protected void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
-    final Map<String, DataObjectMetaData> metaDataMap) {
+    final Map<String, RecordDefinition> metaDataMap) {
   }
 
   @Override

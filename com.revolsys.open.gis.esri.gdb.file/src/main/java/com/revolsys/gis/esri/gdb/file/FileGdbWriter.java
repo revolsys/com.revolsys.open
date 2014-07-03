@@ -10,11 +10,11 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
@@ -22,7 +22,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.OidAttribute;
 import com.revolsys.io.AbstractWriter;
 
-public class FileGdbWriter extends AbstractWriter<DataObject> {
+public class FileGdbWriter extends AbstractWriter<Record> {
   private Map<String, Table> tables = new HashMap<String, Table>();
 
   private CapiFileGdbDataObjectStore dataStore;
@@ -52,8 +52,8 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  private void delete(final DataObject object) {
-    final DataObjectMetaData objectMetaData = object.getMetaData();
+  private void delete(final Record object) {
+    final RecordDefinition objectMetaData = object.getMetaData();
     final String typePath = objectMetaData.getPath();
     final Table table = getTable(typePath);
     final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
@@ -64,7 +64,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
         if (row != null) {
           try {
             dataStore.deletedRow(table, row);
-            object.setState(DataObjectState.Deleted);
+            object.setState(RecordState.Deleted);
           } finally {
             dataStore.closeRow(row);
             dataStore.addStatistic("Delete", object);
@@ -88,9 +88,9 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
     return table;
   }
 
-  private void insert(final DataObject object) {
-    final DataObjectMetaData sourceMetaData = object.getMetaData();
-    final DataObjectMetaData metaData = dataStore.getMetaData(sourceMetaData);
+  private void insert(final Record object) {
+    final RecordDefinition sourceMetaData = object.getMetaData();
+    final RecordDefinition metaData = dataStore.getMetaData(sourceMetaData);
     final String typePath = sourceMetaData.getPath();
     for (final Attribute attribute : metaData.getAttributes()) {
       final String name = attribute.getName();
@@ -120,7 +120,7 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
           esriAttribute.setPostInsertValue(object, row);
         }
-        object.setState(DataObjectState.Persisted);
+        object.setState(RecordState.Persisted);
       } finally {
         dataStore.closeRow(row);
         dataStore.addStatistic("Insert", object);
@@ -138,13 +138,13 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
 
   }
 
-  private void update(final DataObject object) {
+  private void update(final Record object) {
     final Object objectId = object.getValue("OBJECTID");
     if (objectId == null) {
       insert(object);
     } else {
-      final DataObjectMetaData sourceMetaData = object.getMetaData();
-      final DataObjectMetaData metaData = dataStore.getMetaData(sourceMetaData);
+      final RecordDefinition sourceMetaData = object.getMetaData();
+      final RecordDefinition metaData = dataStore.getMetaData(sourceMetaData);
       final String typePath = sourceMetaData.getPath();
       final Table table = getTable(typePath);
       final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
@@ -191,9 +191,9 @@ public class FileGdbWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     try {
-      final DataObjectMetaData metaData = object.getMetaData();
+      final RecordDefinition metaData = object.getMetaData();
       final DataObjectStore dataObjectStore = metaData.getDataStore();
       if (dataObjectStore == this.dataStore) {
         switch (object.getState()) {

@@ -20,7 +20,7 @@ import javax.swing.tree.TreePath;
 
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;

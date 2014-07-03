@@ -2,28 +2,28 @@ package com.revolsys.gis.converter;
 
 import org.springframework.core.convert.converter.Converter;
 
+import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.data.model.DataObject;
 
 public class FilterDataObjectConverter {
-  private Converter<DataObject, DataObject> converter;
+  private Converter<Record, Record> converter;
 
-  private Filter<DataObject> filter;
+  private Filter<Record> filter;
 
   public FilterDataObjectConverter() {
   }
 
-  public FilterDataObjectConverter(final Filter<DataObject> filter,
-    final Converter<DataObject, DataObject> converter) {
+  public FilterDataObjectConverter(final Filter<Record> filter,
+    final Converter<Record, Record> converter) {
     this.filter = filter;
     this.converter = converter;
   }
 
-  public Converter<DataObject, DataObject> getConverter() {
+  public Converter<Record, Record> getConverter() {
     return converter;
   }
 
-  public Filter<DataObject> getFilter() {
+  public Filter<Record> getFilter() {
     return filter;
   }
 

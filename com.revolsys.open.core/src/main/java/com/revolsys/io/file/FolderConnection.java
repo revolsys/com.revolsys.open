@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 

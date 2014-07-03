@@ -6,7 +6,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
 @SuppressWarnings("serial")
 public class DataObjectListCellRenderer extends DefaultListCellRenderer {
@@ -27,8 +27,8 @@ public class DataObjectListCellRenderer extends DefaultListCellRenderer {
     final boolean cellHasFocus) {
     super.getListCellRendererComponent(list, cellValue, index, isSelected,
       cellHasFocus);
-    if (cellValue instanceof DataObject) {
-      final DataObject object = (DataObject)cellValue;
+    if (cellValue instanceof Record) {
+      final Record object = (Record)cellValue;
       final Object value = object.getValue(this.attributeName);
       final String text = StringConverterRegistry.toString(value);
       setText(text);

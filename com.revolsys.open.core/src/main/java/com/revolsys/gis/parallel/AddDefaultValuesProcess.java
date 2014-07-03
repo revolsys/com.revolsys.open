@@ -30,34 +30,34 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionFactory;
+import com.revolsys.data.types.DataType;
 import com.revolsys.io.PathUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
 public class AddDefaultValuesProcess extends
-  AbstractInOutProcess<DataObject, DataObject> {
+  AbstractInOutProcess<Record, Record> {
   private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);
 
   private Set<String> excludedAttributeNames = new HashSet<String>();
 
-  private DataObjectMetaDataFactory metaDataFactory;
+  private RecordDefinitionFactory metaDataFactory;
 
   private String schemaName;
 
-  private final Map<DataObjectMetaData, Map<String, Object>> typeDefaultValues = new HashMap<DataObjectMetaData, Map<String, Object>>();
+  private final Map<RecordDefinition, Map<String, Object>> typeDefaultValues = new HashMap<RecordDefinition, Map<String, Object>>();
 
   private void addDefaultValues(final Map<String, Object> defaultValues,
-    final DataObjectMetaData type) {
+    final RecordDefinition type) {
     if (PathUtil.getPath(type.getPath()).equals(schemaName)) {
       defaultValues.putAll(type.getDefaultValues());
     }
   }
 
-  private Map<String, Object> getDefaultValues(final DataObjectMetaData type) {
+  private Map<String, Object> getDefaultValues(final RecordDefinition type) {
     if (schemaName == null) {
       return type.getDefaultValues();
     } else {
@@ -81,7 +81,7 @@ public class AddDefaultValuesProcess extends
     return excludedAttributeNames;
   }
 
-  public DataObjectMetaDataFactory getMetaDataFactory() {
+  public RecordDefinitionFactory getMetaDataFactory() {
     return metaDataFactory;
   }
 
@@ -94,8 +94,8 @@ public class AddDefaultValuesProcess extends
     return schemaName;
   }
 
-  private void process(final DataObject dataObject) {
-    final DataObjectMetaData type = dataObject.getMetaData();
+  private void process(final Record dataObject) {
+    final RecordDefinition type = dataObject.getMetaData();
 
     boolean process = true;
     if (schemaName != null) {
@@ -109,13 +109,13 @@ public class AddDefaultValuesProcess extends
 
     for (int i = 0; i < type.getAttributeCount(); i++) {
       final Object value = dataObject.getValue(i);
-      if (value instanceof DataObject) {
-        process((DataObject)value);
+      if (value instanceof Record) {
+        process((Record)value);
       }
     }
   }
 
-  private void processDefaultValues(final DataObject dataObject,
+  private void processDefaultValues(final Record dataObject,
     final Map<String, Object> defaultValues) {
     for (final Iterator<Entry<String, Object>> defaults = defaultValues.entrySet()
       .iterator(); defaults.hasNext();) {
@@ -127,14 +127,14 @@ public class AddDefaultValuesProcess extends
   }
 
   @Override
-  protected void run(final Channel<DataObject> in, final Channel<DataObject> out) {
-    for (DataObject dataObject = in.read(); dataObject != null; dataObject = in.read()) {
+  protected void run(final Channel<Record> in, final Channel<Record> out) {
+    for (Record dataObject = in.read(); dataObject != null; dataObject = in.read()) {
       process(dataObject);
       out.write(dataObject);
     }
   }
 
-  private void setDefaultValue(final DataObject dataObject, final String key,
+  private void setDefaultValue(final Record dataObject, final String key,
     final Object value) {
     final int dotIndex = key.indexOf('.');
     if (dotIndex == -1) {
@@ -150,24 +150,24 @@ public class AddDefaultValuesProcess extends
         final String subKey = key.substring(dotIndex + 1);
         final Object attributeValue = dataObject.getValue(attributeName);
         if (attributeValue == null) {
-          final DataObjectMetaData type = dataObject.getMetaData();
+          final RecordDefinition type = dataObject.getMetaData();
           final int attrIndex = type.getAttributeIndex(attributeName);
           final DataType dataType = type.getAttributeType(attrIndex);
           final Class<?> typeClass = dataType.getJavaClass();
-          if (typeClass == DataObject.class) {
+          if (typeClass == Record.class) {
 
-            final DataObjectMetaData subClass = metaDataFactory.getMetaData(dataType.getName());
-            final DataObject subObject = subClass.createDataObject();
+            final RecordDefinition subClass = metaDataFactory.getRecordDefinition(dataType.getName());
+            final Record subObject = subClass.createDataObject();
             setDefaultValue(subObject, subKey, value);
             dataObject.setValue(attributeName, subObject);
             process(subObject);
           }
-        } else if (attributeValue instanceof DataObject) {
-          final DataObject subObject = (DataObject)attributeValue;
+        } else if (attributeValue instanceof Record) {
+          final Record subObject = (Record)attributeValue;
           setDefaultValue(subObject, subKey, value);
         } else if (!attributeName.equals(dataObject.getMetaData()
           .getGeometryAttributeName())) {
-          log.error("Attribute '" + attributeName + "' must be a DataObject");
+          log.error("Attribute '" + attributeName + "' must be a Record");
         }
       } finally {
         NDC.pop();
@@ -185,7 +185,7 @@ public class AddDefaultValuesProcess extends
     this.excludedAttributeNames = excludedAttributeNames;
   }
 
-  public void setMetaDataFactory(final DataObjectMetaDataFactory metaDataFactory) {
+  public void setMetaDataFactory(final RecordDefinitionFactory metaDataFactory) {
     this.metaDataFactory = metaDataFactory;
   }
 

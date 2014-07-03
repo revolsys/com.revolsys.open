@@ -1,8 +1,8 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.property.DirectionalAttributes;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.jts.geom.Geometry;
 
 public class ReverseDataObjectAttributesUndo extends AbstractUndoableEdit {
@@ -12,11 +12,11 @@ public class ReverseDataObjectAttributesUndo extends AbstractUndoableEdit {
    */
   private static final long serialVersionUID = 1L;
 
-  private final DataObject object;
+  private final Record object;
 
   private final Geometry oldValue;
 
-  public ReverseDataObjectAttributesUndo(final DataObject object) {
+  public ReverseDataObjectAttributesUndo(final Record object) {
     this.object = object;
     this.oldValue = object.getGeometryValue();
   }

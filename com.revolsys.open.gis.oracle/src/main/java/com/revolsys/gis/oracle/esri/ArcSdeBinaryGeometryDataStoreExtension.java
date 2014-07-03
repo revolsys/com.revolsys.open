@@ -5,11 +5,11 @@ import java.util.Map.Entry;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreExtension;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreExtension;
+import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.oracle.io.OracleSdoGeometryJdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
@@ -41,7 +41,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   @Override
   public void postProcess(final DataObjectStoreSchema schema) {
     final AbstractJdbcDataObjectStore dataStore = (AbstractJdbcDataObjectStore)schema.getDataStore();
-    for (final DataObjectMetaData metaData : schema.getTypes()) {
+    for (final RecordDefinition metaData : schema.getTypes()) {
       final String typePath = metaData.getPath();
       final Map<String, Map<String, Object>> typeColumnProperties = JdbcAttributeAdder.getTypeColumnProperties(
         schema, typePath);

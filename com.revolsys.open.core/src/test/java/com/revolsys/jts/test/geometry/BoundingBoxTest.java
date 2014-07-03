@@ -40,7 +40,7 @@ import com.revolsys.util.MathUtil;
 //expandPercent(double)
 //expandPercent(double, double)
 //expandToInclude(BoundingBox)
-//expandToInclude(DataObject)
+//expandToInclude(Record)
 //expandToInclude(Geometry)
 //expandToInclude(Point)
 //getBottomLeftPoint()

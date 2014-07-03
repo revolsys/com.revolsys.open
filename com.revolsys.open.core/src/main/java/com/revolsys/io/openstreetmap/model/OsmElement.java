@@ -9,11 +9,11 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.model.AbstractRecord;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.AbstractRecord;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.Property;
@@ -37,10 +37,10 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
 
   private Geometry geometry;
 
-  public static final DataObjectMetaData META_DATA;
+  public static final RecordDefinition META_DATA;
 
   static {
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
+    final RecordDefinitionImpl metaData = new RecordDefinitionImpl(
         "osm.record");
     metaData.addAttribute("id", DataTypes.LONG);
     metaData.addAttribute("visible", DataTypes.BOOLEAN);
@@ -117,13 +117,13 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
   }
 
   @Override
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return META_DATA;
   }
 
   @Override
-  public DataObjectState getState() {
-    return DataObjectState.New;
+  public RecordState getState() {
+    return RecordState.New;
   }
 
   public String getTag(final String name) {
@@ -227,7 +227,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
   }
 
   @Override
-  public void setState(final DataObjectState state) {
+  public void setState(final RecordState state) {
   }
 
   public void setTags(final Map<String, String> tags) {

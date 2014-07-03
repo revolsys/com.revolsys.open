@@ -9,8 +9,8 @@ import javax.swing.ImageIcon;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.layer.LayerRenderer;

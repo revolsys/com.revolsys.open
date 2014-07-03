@@ -1,14 +1,14 @@
 package com.revolsys.gis.esri.gdb.file;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public interface FileGdbDataObjectStore extends DataObjectStore {
 
   void deleteGeodatabase();
 
   @Override
-  DataObjectMetaData getMetaData(DataObjectMetaData metaData);
+  RecordDefinition getMetaData(RecordDefinition metaData);
 
   @Override
   void initialize();

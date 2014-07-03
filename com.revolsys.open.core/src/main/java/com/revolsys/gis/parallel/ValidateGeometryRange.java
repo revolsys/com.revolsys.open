@@ -2,7 +2,7 @@ package com.revolsys.gis.parallel;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
@@ -12,7 +12,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class ValidateGeometryRange extends
-  BaseInOutProcess<DataObject, DataObject> {
+  BaseInOutProcess<Record, Record> {
   private static final Logger LOG = Logger.getLogger(ValidateGeometryRange.class);
 
   private double maxX = Double.MAX_VALUE;
@@ -127,8 +127,8 @@ public class ValidateGeometryRange extends
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(final Channel<Record> in,
+    final Channel<Record> out, final Record object) {
     // TODO Auto-generated method stub
     final Geometry geometry = object.getGeometryValue();
     isValid(object.getMetaData().getPath().toString(), geometry);

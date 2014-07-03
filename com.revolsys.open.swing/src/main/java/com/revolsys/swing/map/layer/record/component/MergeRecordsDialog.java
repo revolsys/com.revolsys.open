@@ -27,10 +27,10 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
@@ -63,13 +63,13 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   private final AbstractDataObjectLayer layer;
 
-  private final Map<DataObject, LayerRecord> mergeableToOiginalRecordMap = new HashMap<DataObject, LayerRecord>();
+  private final Map<Record, LayerRecord> mergeableToOiginalRecordMap = new HashMap<Record, LayerRecord>();
 
   private JPanel mergedObjectsPanel;
 
   private final Set<LayerRecord> replacedOriginalRecords = new LinkedHashSet<LayerRecord>();
 
-  private HashMap<DataObject, Set<LayerRecord>> mergedRecords;
+  private HashMap<Record, Set<LayerRecord>> mergedRecords;
 
   private final UndoManager undoManager;
 
@@ -91,7 +91,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   public void finish() {
     final MultipleUndo multipleUndo = new MultipleUndo();
-    for (final DataObject mergedRecord : mergedRecords.keySet()) {
+    for (final Record mergedRecord : mergedRecords.keySet()) {
       final CreateRecordUndo createRecordUndo = new CreateRecordUndo(layer,
         mergedRecord);
       multipleUndo.addEdit(createRecordUndo);
@@ -141,8 +141,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     SwingUtil.autoAdjustPosition(this);
   }
 
-  protected void replaceRecord(final DataObject mergedRecord,
-    final DataObject record) {
+  protected void replaceRecord(final Record mergedRecord,
+    final Record record) {
     if (mergedRecord != record) {
       final LayerRecord originalRecord = mergeableToOiginalRecordMap.remove(record);
       if (originalRecord != null) {
@@ -157,7 +157,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
       String errorMessage = "";
       final DataType geometryType = this.layer.getGeometryType();
-      mergedRecords = new HashMap<DataObject, Set<LayerRecord>>();
+      mergedRecords = new HashMap<Record, Set<LayerRecord>>();
       if (originalRecords.size() < 2) {
         errorMessage = " at least two records must be selected to merge.";
       } else if (!DataTypes.LINE_STRING.equals(geometryType)) {
@@ -165,20 +165,20 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       } else {
         final DataObjectGraph graph = new DataObjectGraph();
         for (final LayerRecord originalRecord : originalRecords) {
-          final DataObject mergeableRecord = new ArrayRecord(originalRecord);
+          final Record mergeableRecord = new ArrayRecord(originalRecord);
           mergeableToOiginalRecordMap.put(mergeableRecord, originalRecord);
           graph.addEdge(mergeableRecord);
         }
-        for (final Node<DataObject> node : graph.nodes()) {
+        for (final Node<Record> node : graph.nodes()) {
           if (node != null) {
-            final List<Edge<DataObject>> edges = node.getEdges();
+            final List<Edge<Record>> edges = node.getEdges();
             if (edges.size() == 2) {
-              final Edge<DataObject> edge1 = edges.get(0);
-              final DataObject record1 = edge1.getObject();
-              final Edge<DataObject> edge2 = edges.get(1);
-              final DataObject record2 = edge2.getObject();
+              final Edge<Record> edge1 = edges.get(0);
+              final Record record1 = edge1.getObject();
+              final Edge<Record> edge2 = edges.get(1);
+              final Record record2 = edge2.getObject();
               if (record1 != record2) {
-                final DataObject mergedRecord = layer.getMergedRecord(node,
+                final Record mergedRecord = layer.getMergedRecord(node,
                   record1, record2);
 
                 graph.addEdge(mergedRecord);
@@ -213,7 +213,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     }
   }
 
-  public void setMergedRecord(final int i, final DataObject mergedObject,
+  public void setMergedRecord(final int i, final Record mergedObject,
     final Collection<LayerRecord> objects) {
 
     this.okButton.setEnabled(true);
@@ -230,15 +230,15 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   }
 
   public void setMergedRecords(String errorMessage,
-    final Map<DataObject, Set<LayerRecord>> mergedRecords) {
-    final Set<DataObject> unMergeableRecords = new HashSet<DataObject>(
+    final Map<Record, Set<LayerRecord>> mergedRecords) {
+    final Set<Record> unMergeableRecords = new HashSet<Record>(
       mergeableToOiginalRecordMap.keySet());
     unMergeableRecords.removeAll(mergedRecords.keySet());
     if (!mergedRecords.isEmpty()) {
       int i = 0;
 
-      for (final Entry<DataObject, Set<LayerRecord>> mergedEntry : mergedRecords.entrySet()) {
-        final DataObject mergedObject = mergedEntry.getKey();
+      for (final Entry<Record, Set<LayerRecord>> mergedEntry : mergedRecords.entrySet()) {
+        final Record mergedObject = mergedEntry.getKey();
         final Set<LayerRecord> originalObjects = mergedEntry.getValue();
         setMergedRecord(i, mergedObject, originalObjects);
         i++;
@@ -246,7 +246,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     }
     if (!unMergeableRecords.isEmpty()) {
       final Set<LayerRecord> records = new LinkedHashSet<LayerRecord>();
-      for (final DataObject record : unMergeableRecords) {
+      for (final Record record : unMergeableRecords) {
         final LayerRecord originalRecord = mergeableToOiginalRecordMap.get(record);
         if (originalRecord != null) {
           records.add(originalRecord);

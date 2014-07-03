@@ -4,22 +4,22 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.BeanNameAware;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.Writer;
 
-public class StatisticsWriter extends AbstractWriter<DataObject> implements
+public class StatisticsWriter extends AbstractWriter<Record> implements
   BeanNameAware {
   private String beanName;
 
   private Statistics statistics;
 
-  private Writer<DataObject> writer;
+  private Writer<Record> writer;
 
   public StatisticsWriter() {
   }
 
-  public StatisticsWriter(final Writer<DataObject> writer) {
+  public StatisticsWriter(final Writer<Record> writer) {
     setWriter(writer);
   }
 
@@ -41,7 +41,7 @@ public class StatisticsWriter extends AbstractWriter<DataObject> implements
     return statistics;
   }
 
-  public Writer<DataObject> getWriter() {
+  public Writer<Record> getWriter() {
     return writer;
   }
 
@@ -65,7 +65,7 @@ public class StatisticsWriter extends AbstractWriter<DataObject> implements
     this.statistics = statistics;
   }
 
-  public void setWriter(final Writer<DataObject> writer) {
+  public void setWriter(final Writer<Record> writer) {
     this.writer = writer;
   }
 
@@ -75,7 +75,7 @@ public class StatisticsWriter extends AbstractWriter<DataObject> implements
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     if (object != null) {
       writer.write(object);
       statistics.add(object);

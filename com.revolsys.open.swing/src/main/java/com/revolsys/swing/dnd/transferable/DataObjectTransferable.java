@@ -8,21 +8,21 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.io.csv.CsvUtil;
 
 public class DataObjectTransferable implements Transferable {
 
   public static final DataFlavor DATA_OBJECT_FLAVOR = new DataFlavor(
-    DataObject.class, "Data Object");
+    Record.class, "Data Object");
 
-  private final DataObject object;
+  private final Record object;
 
   private static final DataFlavor[] DATA_FLAVORS = {
     DATA_OBJECT_FLAVOR, MapTransferable.MAP_FLAVOR, DataFlavor.stringFlavor
   };
 
-  public DataObjectTransferable(final DataObject object) {
+  public DataObjectTransferable(final Record object) {
     this.object = object;
   }
 

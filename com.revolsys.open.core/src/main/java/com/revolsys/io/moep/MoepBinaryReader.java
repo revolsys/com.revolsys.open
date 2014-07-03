@@ -8,13 +8,13 @@ import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractReader;
 
-public class MoepBinaryReader extends AbstractReader<DataObject> implements
+public class MoepBinaryReader extends AbstractReader<Record> implements
   DataObjectReader {
 
   private MoepBinaryIterator iterator;
@@ -24,10 +24,10 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
    * 
    * @param moepDirectoryReader
    * @param file The the file.
-   * @param factory The factory used to create DataObject instances.
+   * @param factory The factory used to create Record instances.
    */
   public MoepBinaryReader(final MoepDirectoryReader moepDirectoryReader,
-    final Resource resource, final DataObjectFactory factory) {
+    final Resource resource, final RecordFactory factory) {
     try {
       final InputStream in = resource.getInputStream();
       this.iterator = new MoepBinaryIterator(moepDirectoryReader,
@@ -40,9 +40,9 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
    * Construct a new MoepBinaryReader.
    * 
    * @param url The url to the file.
-   * @param factory The factory used to create DataObject instances.
+   * @param factory The factory used to create Record instances.
    */
-  public MoepBinaryReader(final URL url, final DataObjectFactory factory) {
+  public MoepBinaryReader(final URL url, final RecordFactory factory) {
     try {
       final InputStream in = url.openStream();
       final String path = url.getPath();
@@ -62,7 +62,7 @@ public class MoepBinaryReader extends AbstractReader<DataObject> implements
   }
 
   @Override
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return MoepConstants.META_DATA;
   }
 

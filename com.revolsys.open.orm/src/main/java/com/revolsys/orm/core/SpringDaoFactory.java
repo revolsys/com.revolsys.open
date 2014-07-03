@@ -18,7 +18,7 @@ package com.revolsys.orm.core;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
-import com.revolsys.gis.data.io.DataAccessObject;
+import com.revolsys.data.io.DataAccessObject;
 
 public class SpringDaoFactory implements BeanFactoryAware,
   DataAccessObjectFactory {

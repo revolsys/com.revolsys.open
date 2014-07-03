@@ -4,13 +4,13 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public class DataObjectMapTableModel extends AbstractSingleDataObjectTableModel {
 
   private static final long serialVersionUID = 1L;
 
-  public static JComponent create(final DataObjectMetaData metaData,
+  public static JComponent create(final RecordDefinition metaData,
     final Map<String, Object> values, final boolean editable) {
     final DataObjectMapTableModel model = new DataObjectMapTableModel(metaData,
       values, editable);
@@ -19,7 +19,7 @@ public class DataObjectMapTableModel extends AbstractSingleDataObjectTableModel 
 
   private Map<String, Object> values;
 
-  public DataObjectMapTableModel(final DataObjectMetaData metaData,
+  public DataObjectMapTableModel(final RecordDefinition metaData,
     final Map<String, Object> values, final boolean editable) {
     super(metaData, editable);
     this.values = values;

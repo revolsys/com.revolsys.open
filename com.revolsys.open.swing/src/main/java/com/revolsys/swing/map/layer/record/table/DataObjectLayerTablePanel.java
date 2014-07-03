@@ -12,11 +12,11 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.property.DirectionalAttributes;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.DirectionalAttributes;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -70,7 +70,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     this.tableModel = getTableModel();
-    final DataObjectMetaData metaData = layer.getMetaData();
+    final RecordDefinition metaData = layer.getMetaData();
     final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
     final EnableCheck deletableEnableCheck = new DataObjectRowPropertyEnableCheck(
       "deletable");
@@ -354,7 +354,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
   }
 
   public void zoomToRecord() {
-    final DataObject object = getEventRowObject();
+    final Record object = getEventRowObject();
     final Project project = this.layer.getProject();
     final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {

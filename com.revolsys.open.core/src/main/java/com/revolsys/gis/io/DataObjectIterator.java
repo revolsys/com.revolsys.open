@@ -22,7 +22,7 @@ package com.revolsys.gis.io;
 
 import java.util.Iterator;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
 /**
  * <p>
@@ -41,10 +41,10 @@ import com.revolsys.gis.data.model.DataObject;
  * 
  * <pre>
  *         DataObjectIterator reader = new ...;
- *         Writer<DataObject> writer = new ...;
+ *         Writer<Record> writer = new ...;
  *         writer.setSchema(reader.getSchema());
  *         while (reader.hasNext()) {
- *           DataObject object = reader.next();
+ *           Record object = reader.next();
  *           ... // Process the object
  *           writer.write(object;
  *         }
@@ -53,9 +53,9 @@ import com.revolsys.gis.data.model.DataObject;
  * </pre>
  * 
  * @author Paul Austin
- * @see Writer<DataObject>
+ * @see Writer<Record>
  */
-public interface DataObjectIterator extends Iterator<DataObject> {
+public interface DataObjectIterator extends Iterator<Record> {
 
   /**
    * Close the connection to the data store.
@@ -63,7 +63,7 @@ public interface DataObjectIterator extends Iterator<DataObject> {
   void close();
 
   @Override
-  DataObject next();
+  Record next();
 
   void open();
 

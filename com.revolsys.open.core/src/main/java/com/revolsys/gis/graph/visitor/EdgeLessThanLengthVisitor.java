@@ -1,18 +1,18 @@
 package com.revolsys.gis.graph.visitor;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.util.ObjectProcessor;
 
 public class EdgeLessThanLengthVisitor extends
-  AbstractEdgeListenerVisitor<DataObject> implements
+  AbstractEdgeListenerVisitor<Record> implements
   ObjectProcessor<DataObjectGraph> {
 
   private double minLength;
 
-  private Visitor<Edge<DataObject>> visitor;
+  private Visitor<Edge<Record>> visitor;
 
   public EdgeLessThanLengthVisitor() {
   }
@@ -22,7 +22,7 @@ public class EdgeLessThanLengthVisitor extends
   }
 
   public EdgeLessThanLengthVisitor(final double minLength,
-    final Visitor<Edge<DataObject>> visitor) {
+    final Visitor<Edge<Record>> visitor) {
     this.minLength = minLength;
     this.visitor = visitor;
   }
@@ -41,7 +41,7 @@ public class EdgeLessThanLengthVisitor extends
   }
 
   @Override
-  public boolean visit(final Edge<DataObject> edge) {
+  public boolean visit(final Edge<Record> edge) {
     final double length = edge.getLength();
     if (length < minLength) {
       edgeEvent(edge, "Edge less than length", "Review", length + " < "

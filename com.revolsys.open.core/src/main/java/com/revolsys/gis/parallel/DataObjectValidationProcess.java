@@ -2,20 +2,20 @@ package com.revolsys.gis.parallel;
 
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.model.data.validator.AttributeValueValidator;
-import com.revolsys.gis.model.data.validator.DataObjectValidator;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.validator.AttributeValueValidator;
+import com.revolsys.data.validator.DataObjectValidator;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class DataObjectValidationProcess extends
-  BaseInOutProcess<DataObject, DataObject> {
+  BaseInOutProcess<Record, Record> {
   private final DataObjectValidator validator = new DataObjectValidator();
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(final Channel<Record> in,
+    final Channel<Record> out, final Record object) {
     validator.isValid(object);
     out.write(object);
   }

@@ -8,11 +8,11 @@ import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 
-public class KmzDataObjectWriter extends AbstractWriter<DataObject> {
+public class KmzDataObjectWriter extends AbstractWriter<Record> {
 
   private final KmlDataObjectWriter kmlWriter;
 
@@ -69,7 +69,7 @@ public class KmzDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     kmlWriter.write(object);
   }
 

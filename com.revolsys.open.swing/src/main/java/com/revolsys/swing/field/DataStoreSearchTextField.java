@@ -36,16 +36,16 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Equal;
-import com.revolsys.gis.data.query.Q;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.Value;
-import com.revolsys.gis.data.query.functions.F;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.gis.model.data.equals.StringEqualsIgnoreCase;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.StringEqualsIgnoreCase;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.query.Equal;
+import com.revolsys.data.query.Q;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.Value;
+import com.revolsys.data.query.functions.F;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
@@ -66,7 +66,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   private final DataStoreQueryListModel listModel;
 
-  public DataObject selectedItem;
+  public Record selectedItem;
 
   private String errorMessage;
 
@@ -74,7 +74,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
-  public DataStoreSearchTextField(final DataObjectMetaData metaData,
+  public DataStoreSearchTextField(final RecordDefinition metaData,
     final String displayAttributeName) {
     this(metaData.getDataStore(), displayAttributeName, new Query(metaData,
       new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
@@ -195,13 +195,13 @@ public class DataStoreSearchTextField extends JXSearchField implements
     return this.listenerList.getListeners(ItemListener.class);
   }
 
-  public DataObject getSelectedItem() {
+  public Record getSelectedItem() {
     return this.selectedItem;
   }
 
   @Override
   public Object[] getSelectedObjects() {
-    final DataObject selectedItem = getSelectedItem();
+    final Record selectedItem = getSelectedItem();
     if (selectedItem == null) {
       return null;
     } else {
@@ -234,7 +234,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   @Override
   public boolean isHighlighted(final Component renderer,
     final ComponentAdapter adapter) {
-    final DataObject object = this.listModel.getElementAt(adapter.row);
+    final Record object = this.listModel.getElementAt(adapter.row);
     final String text = getText();
     final String value = object.getString(this.displayAttributeName);
     if (StringEqualsIgnoreCase.equal(text, value)) {
@@ -283,7 +283,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
-            final DataObject selectedItem = this.listModel.getElementAt(selectedIndex);
+            final Record selectedItem = this.listModel.getElementAt(selectedIndex);
             final String text = selectedItem.getString(this.displayAttributeName);
             if (!text.equals(this.getText())) {
               this.selectedItem = selectedItem;
@@ -320,7 +320,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
     // final int index = this.list.locationToIndex(point);
     // if (index > -1) {
     // this.list.setSelectedIndex(index);
-    // final DataObject value = this.listModel.getElementAt(index);
+    // final Record value = this.listModel.getElementAt(index);
     // if (value != null) {
     // final String label = value.getString(this.displayAttributeName);
     // setText(label);
@@ -361,7 +361,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
 
   protected void search() {
     if (this.selectedItem != null) {
-      final DataObject oldValue = this.selectedItem;
+      final Record oldValue = this.selectedItem;
       this.selectedItem = null;
       fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
         oldValue, ItemEvent.DESELECTED));
@@ -446,7 +446,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   }
 
   private void showMenu() {
-    final List<DataObject> objects = this.listModel.getObjects();
+    final List<Record> objects = this.listModel.getObjects();
     if (objects.isEmpty()) {
       this.menu.setVisible(false);
     } else {
@@ -469,7 +469,7 @@ public class DataStoreSearchTextField extends JXSearchField implements
   @Override
   public void valueChanged(final ListSelectionEvent e) {
     if (!e.getValueIsAdjusting()) {
-      final DataObject value = (DataObject)this.list.getSelectedValue();
+      final Record value = (Record)this.list.getSelectedValue();
       if (value != null) {
         final String label = value.getString(this.displayAttributeName);
         if (!EqualsRegistry.equal(label, getText())) {

@@ -1,6 +1,6 @@
 package com.revolsys.gis.io;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
 public class StatisticsDataObjectIterator implements DataObjectIterator {
   private DataObjectIterator reader;
@@ -40,8 +40,8 @@ public class StatisticsDataObjectIterator implements DataObjectIterator {
   }
 
   @Override
-  public DataObject next() {
-    final DataObject object = reader.next();
+  public Record next() {
+    final Record object = reader.next();
     if (object != null) {
       statistics.add(object);
     }

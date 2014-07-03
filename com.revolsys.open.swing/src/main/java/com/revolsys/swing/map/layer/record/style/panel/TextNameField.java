@@ -14,8 +14,8 @@ import javax.swing.text.Document;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -40,7 +40,7 @@ public class TextNameField extends ValueField {
 
     final ArrayList<String> fieldNames = new ArrayList<String>(
       layer.getColumnNames());
-    final DataObjectMetaData metaData = layer.getMetaData();
+    final RecordDefinition metaData = layer.getMetaData();
     fieldNames.remove(metaData.getGeometryAttributeName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
       layer);

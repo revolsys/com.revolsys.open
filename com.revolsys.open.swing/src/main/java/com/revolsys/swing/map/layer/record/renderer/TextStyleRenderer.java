@@ -26,8 +26,8 @@ import javax.swing.Icon;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.jts.PointUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.PointWithOrientation;
@@ -53,7 +53,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_text");
 
-  public static String getLabel(final DataObject object, final TextStyle style) {
+  public static String getLabel(final Record object, final TextStyle style) {
     if (object == null) {
       return "Text";
     } else {
@@ -201,7 +201,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
   }
 
   public static final void renderText(final Viewport2D viewport,
-    final Graphics2D graphics, final DataObject object,
+    final Graphics2D graphics, final Record object,
     final Geometry geometry, final TextStyle style) {
     final String label = getLabel(object, style);
     if (StringUtils.hasText(label) && geometry != null || viewport == null) {

@@ -7,9 +7,9 @@ import java.util.Map;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.Record;
 import com.revolsys.util.Property;
 
 public class DataStoreIteratorFactory {
@@ -26,7 +26,7 @@ public class DataStoreIteratorFactory {
     this.methodName = methodName;
   }
 
-  public AbstractIterator<DataObject> createIterator(
+  public AbstractIterator<Record> createIterator(
     final DataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
     final Object factory = this.factory.get();

@@ -7,14 +7,14 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
@@ -31,7 +31,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
 
   public static final EsriGeodatabaseXmlFieldTypeRegistry FIELD_TYPES = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 
-  private static void addField(final DataObjectMetaDataImpl metaData,
+  private static void addField(final RecordDefinitionImpl metaData,
     final DETable deTable, final String tableName, final Field field,
     final String fieldName) {
     final FieldType fieldType = field.getType();
@@ -187,7 +187,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return datasets;
   }
 
-  public static DETable createDETable(final DataObjectMetaData metaData,
+  public static DETable createDETable(final RecordDefinition metaData,
     final SpatialReference spatialReference) {
     final String typePath = metaData.getPath();
     final String schemaPath = PathUtil.getPath(typePath)
@@ -197,7 +197,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
   }
 
   public static DETable createDETable(final String schemaPath,
-    final DataObjectMetaData metaData, final SpatialReference spatialReference) {
+    final RecordDefinition metaData, final SpatialReference spatialReference) {
     DETable table;
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     boolean hasGeometry = false;
@@ -284,7 +284,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return table;
   }
 
-  public static DETable getDETable(final DataObjectMetaData metaData,
+  public static DETable getDETable(final RecordDefinition metaData,
     final SpatialReference spatialReference) {
     DETable table = metaData.getProperty(DE_TABLE_PROPERTY);
     if (table == null) {
@@ -293,7 +293,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return table;
   }
 
-  public static DataObjectMetaData getMetaData(final String schemaName,
+  public static RecordDefinition getMetaData(final String schemaName,
     final CodedValueDomain domain, final boolean appendIdToName) {
     final String tableName;
     if (appendIdToName) {
@@ -302,7 +302,7 @@ public class EsriXmlDataObjectMetaDataUtil implements
       tableName = domain.getName();
     }
     final String typePath = PathUtil.toPath(schemaName, tableName);
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typePath);
+    final RecordDefinitionImpl metaData = new RecordDefinitionImpl(typePath);
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
     int length = 0;
@@ -323,16 +323,16 @@ public class EsriXmlDataObjectMetaDataUtil implements
    * @param deTable
    * @return
    */
-  public static DataObjectMetaData getMetaData(final String schemaName,
+  public static RecordDefinition getMetaData(final String schemaName,
     final DETable deTable) {
     return getMetaData(schemaName, deTable, true);
   }
 
-  public static DataObjectMetaData getMetaData(final String schemaName,
+  public static RecordDefinition getMetaData(final String schemaName,
     final DETable deTable, final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
     final String typePath = PathUtil.toPath(schemaName, tableName);
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(typePath);
+    final RecordDefinitionImpl metaData = new RecordDefinitionImpl(typePath);
     final List<String> ignoreFieldNames = new ArrayList<String>();
     if (ignoreEsriFields) {
       ignoreFieldNames.add(deTable.getOIDFieldName());
@@ -379,11 +379,11 @@ public class EsriXmlDataObjectMetaDataUtil implements
     return metaData;
   }
 
-  public static List<DataObject> getValues(final DataObjectMetaData metaData,
+  public static List<Record> getValues(final RecordDefinition metaData,
     final CodedValueDomain domain) {
-    final List<DataObject> values = new ArrayList<DataObject>();
+    final List<Record> values = new ArrayList<Record>();
     for (final CodedValue codedValue : domain.getCodedValues()) {
-      final DataObject value = new ArrayRecord(metaData);
+      final Record value = new ArrayRecord(metaData);
       value.setIdValue(codedValue.getCode());
       value.setValue("DESCRIPTION", codedValue.getName());
       values.add(value);

@@ -3,7 +3,7 @@ package com.revolsys.io.openstreetmap.model;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.io.xml.StaxUtils;
 
 public class OsmRelation extends OsmElement {
@@ -24,7 +24,7 @@ public class OsmRelation extends OsmElement {
   }
 
   @Override
-  public RecordIdentifier getIdentifier() {
+  public Identifier getIdentifier() {
     final long id = getId();
     return new OsmRelationIdentifier(id);
   }

@@ -7,8 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.types.DataTypes;
 
 public class JdbcBigIntegerAttribute extends JdbcAttribute {
   public JdbcBigIntegerAttribute(final String dbName, final String name,
@@ -26,7 +26,7 @@ public class JdbcBigIntegerAttribute extends JdbcAttribute {
 
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final DataObject object) throws SQLException {
+    final int columnIndex, final Record object) throws SQLException {
     Object value;
     final int length = getLength();
     if (length <= 2) {

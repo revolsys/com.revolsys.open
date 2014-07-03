@@ -7,16 +7,16 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
@@ -35,7 +35,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.DateUtil;
 
 public class EsriGeodatabaseXmlDataObjectWriter extends
-  AbstractWriter<DataObject> implements EsriGeodatabaseXmlConstants {
+  AbstractWriter<Record> implements EsriGeodatabaseXmlConstants {
   private static final Logger LOG = LoggerFactory.getLogger(EsriGeodatabaseXmlDataObjectWriter.class);
 
   private int datasetId = 1;
@@ -46,7 +46,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
 
   private boolean opened;
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
   private String datasetType;
 
@@ -54,7 +54,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
 
   private String geometryType;
 
-  public EsriGeodatabaseXmlDataObjectWriter(final DataObjectMetaData metaData,
+  public EsriGeodatabaseXmlDataObjectWriter(final RecordDefinition metaData,
     final Writer out) {
     this.metaData = metaData;
     this.out = new XmlWriter(out);
@@ -76,7 +76,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     if (!opened) {
       writeHeader(object.getGeometryValue());
       writeWorkspaceDataHeader();
@@ -106,7 +106,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     out.endTag(RECORD);
   }
 
-  private void writeDataElement(final DataObjectMetaData metaData,
+  private void writeDataElement(final RecordDefinition metaData,
     final Geometry geometry) {
     final String dataElementType;
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
@@ -297,7 +297,7 @@ public class EsriGeodatabaseXmlDataObjectWriter extends
     }
   }
 
-  private void writeFields(final DataObjectMetaData metaData) {
+  private void writeFields(final RecordDefinition metaData) {
     out.startTag(FIELDS);
     out.attribute(XsiConstants.TYPE, FIELDS_TYPE);
 

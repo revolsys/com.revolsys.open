@@ -18,29 +18,29 @@ import com.esri.sde.sdk.client.SeShape;
 import com.esri.sde.sdk.client.SeShapeFilter;
 import com.esri.sde.sdk.client.SeSqlConstruct;
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.QueryValue;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeBinaryGeometryQueryIterator extends
-  AbstractIterator<DataObject> {
+  AbstractIterator<Record> {
 
   private SeConnection connection;
 
-  private DataObjectFactory dataObjectFactory;
+  private RecordFactory dataObjectFactory;
 
   private JdbcDataObjectStore dataStore;
 
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
   private SeQuery seQuery;
 
@@ -92,7 +92,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     this.metaData = this.query.getMetaData();
     if (this.metaData == null) {
       if (tableName != null) {
-        this.metaData = this.dataStore.getMetaData(tableName);
+        this.metaData = this.dataStore.getRecordDefinition(tableName);
         this.query.setMetaData(this.metaData);
 
       }
@@ -151,7 +151,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
       final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {
-        final DataObjectMetaDataImpl newMetaData = ((DataObjectMetaDataImpl)this.metaData).clone();
+        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.metaData).clone();
         newMetaData.setName(typePath);
         this.metaData = newMetaData;
       }
@@ -161,7 +161,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     }
   }
 
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     if (this.metaData == null) {
       hasNext();
     }
@@ -169,12 +169,12 @@ public class ArcSdeBinaryGeometryQueryIterator extends
   }
 
   @Override
-  protected DataObject getNext() throws NoSuchElementException {
+  protected Record getNext() throws NoSuchElementException {
     try {
       if (this.seQuery != null) {
         final SeRow row = this.seQuery.fetch();
         if (row != null) {
-          final DataObject object = getNextRecord(metaData, row);
+          final Record object = getNextRecord(metaData, row);
           if (this.statistics != null) {
             this.statistics.add(object);
           }
@@ -195,15 +195,15 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     }
   }
 
-  private DataObject getNextRecord(final DataObjectMetaData metaData,
+  private Record getNextRecord(final RecordDefinition metaData,
     final SeRow row) {
-    final DataObject object = this.dataObjectFactory.createDataObject(metaData);
+    final Record object = this.dataObjectFactory.createRecord(metaData);
     if (object != null) {
-      object.setState(DataObjectState.Initalizing);
+      object.setState(RecordState.Initalizing);
       for (int columnIndex = 0; columnIndex < this.attributes.size(); columnIndex++) {
         sdeUtil.setValueFromRow(object, row, columnIndex);
       }
-      object.setState(DataObjectState.Persisted);
+      object.setState(RecordState.Persisted);
       this.dataStore.addStatistic("query", object);
     }
     return object;

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.jts.LineStringUtil;
@@ -30,9 +30,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 public class Node<T> extends AbstractPoint implements AttributedObject,
   Externalizable {
   public static List<Point> getCoordinates(
-    final Collection<Node<DataObject>> nodes) {
+    final Collection<Node<Record>> nodes) {
     final List<Point> points = new ArrayList<Point>(nodes.size());
-    for (final Node<DataObject> node : nodes) {
+    for (final Node<Record> node : nodes) {
       final Point point = node.cloneCoordinates();
       points.add(point);
     }

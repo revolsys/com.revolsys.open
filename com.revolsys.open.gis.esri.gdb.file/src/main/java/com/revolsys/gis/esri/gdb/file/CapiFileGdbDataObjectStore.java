@@ -25,29 +25,29 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.io.AbstractDataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.query.AbstractMultiCondition;
-import com.revolsys.gis.data.query.BinaryCondition;
-import com.revolsys.gis.data.query.CollectionValue;
-import com.revolsys.gis.data.query.Column;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.ILike;
-import com.revolsys.gis.data.query.LeftUnaryCondition;
-import com.revolsys.gis.data.query.Like;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.QueryValue;
-import com.revolsys.gis.data.query.RightUnaryCondition;
-import com.revolsys.gis.data.query.SqlCondition;
-import com.revolsys.gis.data.query.Value;
-import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
-import com.revolsys.gis.data.query.functions.WithinDistance;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.io.AbstractDataObjectStore;
+import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.query.AbstractMultiCondition;
+import com.revolsys.data.query.BinaryCondition;
+import com.revolsys.data.query.CollectionValue;
+import com.revolsys.data.query.Column;
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.ILike;
+import com.revolsys.data.query.LeftUnaryCondition;
+import com.revolsys.data.query.Like;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.query.RightUnaryCondition;
+import com.revolsys.data.query.SqlCondition;
+import com.revolsys.data.query.Value;
+import com.revolsys.data.query.functions.EnvelopeIntersects;
+import com.revolsys.data.query.functions.WithinDistance;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
 import com.revolsys.gis.esri.gdb.file.capi.FileGdbDomainCodeTable;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Envelope;
@@ -245,7 +245,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
       synchronized (API_SYNC) {
         if (this.geodatabase != null) {
           final String tableDefinition = this.geodatabase.getTableDefinition(path);
-          final DataObjectMetaData metaData = getMetaData(schemaName, path,
+          final RecordDefinition metaData = getMetaData(schemaName, path,
             tableDefinition);
           addMetaData(metaData);
         }
@@ -510,13 +510,13 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public AbstractIterator<DataObject> createIterator(final Query query,
+  public AbstractIterator<Record> createIterator(final Query query,
     final Map<String, Object> properties) {
     String typePath = query.getTypeName();
-    DataObjectMetaData metaData = query.getMetaData();
+    RecordDefinition metaData = query.getMetaData();
     if (metaData == null) {
       typePath = query.getTypeName();
-      metaData = getMetaData(typePath);
+      metaData = getRecordDefinition(typePath);
       if (metaData == null) {
         throw new IllegalArgumentException("Type name does not exist "
           + typePath);
@@ -589,7 +589,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   public <T> T createPrimaryIdValue(final String typePath) {
     synchronized (this.apiSync) {
-      final DataObjectMetaData metaData = getMetaData(typePath);
+      final RecordDefinition metaData = getRecordDefinition(typePath);
       if (metaData == null) {
         return null;
       } else {
@@ -600,7 +600,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           AtomicLong idGenerator = this.idGenerators.get(typePath);
           if (idGenerator == null) {
             long maxId = 0;
-            for (final DataObject object : query(typePath)) {
+            for (final Record object : query(typePath)) {
               final Object id = object.getIdValue();
               if (id instanceof Number) {
                 final Number number = (Number)id;
@@ -685,7 +685,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  private DataObjectMetaData createTable(final DataObjectMetaData objectMetaData) {
+  private RecordDefinition createTable(final RecordDefinition objectMetaData) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
         final GeometryFactory geometryFactory = objectMetaData.getGeometryFactory();
@@ -693,7 +693,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
 
         final DETable deTable = EsriXmlDataObjectMetaDataUtil.getDETable(
           objectMetaData, spatialReference);
-        final DataObjectMetaDataImpl tableMetaData = createTable(deTable);
+        final RecordDefinitionImpl tableMetaData = createTable(deTable);
         final String idAttributeName = objectMetaData.getIdAttributeName();
         if (idAttributeName != null) {
           tableMetaData.setIdAttributeName(idAttributeName);
@@ -703,7 +703,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  protected DataObjectMetaDataImpl createTable(final DETable deTable) {
+  protected RecordDefinitionImpl createTable(final DETable deTable) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
         if (this.geodatabase == null) {
@@ -746,7 +746,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           try {
             final Table table = this.geodatabase.createTable(tableDefinition,
               schemaPath);
-            final DataObjectMetaDataImpl metaData = getMetaData(schemaName,
+            final RecordDefinitionImpl metaData = getMetaData(schemaName,
               schemaPath, tableDefinition);
             addMetaData(metaData);
             if (this.loadOnly) {
@@ -769,18 +769,18 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public Writer<DataObject> createWriter() {
+  public Writer<Record> createWriter() {
     return new FileGdbWriter(this);
   }
 
   @Override
-  public void delete(final DataObject object) {
+  public void delete(final Record object) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
-    if (object.getState() == DataObjectState.Persisted
-      || object.getState() == DataObjectState.Modified) {
-      object.setState(DataObjectState.Deleted);
-      final Writer<DataObject> writer = getWriter();
+    if (object.getState() == RecordState.Persisted
+      || object.getState() == RecordState.Modified) {
+      object.setState(RecordState.Deleted);
+      final Writer<Record> writer = getWriter();
       writer.write(object);
     }
   }
@@ -856,9 +856,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public DataObjectMetaData getMetaData(final DataObjectMetaData objectMetaData) {
+  public RecordDefinition getMetaData(final RecordDefinition objectMetaData) {
     synchronized (this.apiSync) {
-      DataObjectMetaData metaData = super.getMetaData(objectMetaData);
+      RecordDefinition metaData = super.getMetaData(objectMetaData);
       if (this.createMissingTables && metaData == null) {
         metaData = createTable(objectMetaData);
       }
@@ -866,7 +866,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     }
   }
 
-  public DataObjectMetaDataImpl getMetaData(final String schemaName,
+  public RecordDefinitionImpl getMetaData(final String schemaName,
     final String path, final String tableDefinition) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
@@ -876,7 +876,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
           final String tableName = deTable.getName();
           final String typePath = PathUtil.toPath(schemaName, tableName);
           final DataObjectStoreSchema schema = getSchema(schemaName);
-          final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
+          final RecordDefinitionImpl metaData = new RecordDefinitionImpl(
             this, schema, typePath);
           for (final Field field : deTable.getFields()) {
             final String fieldName = field.getName();
@@ -941,10 +941,10 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
     } else {
       synchronized (this.apiSync) {
         String typePath = query.getTypeName();
-        DataObjectMetaData metaData = query.getMetaData();
+        RecordDefinition metaData = query.getMetaData();
         if (metaData == null) {
           typePath = query.getTypeName();
-          metaData = getMetaData(typePath);
+          metaData = getRecordDefinition(typePath);
           if (metaData == null) {
             return 0;
           }
@@ -1017,7 +1017,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   protected Table getTable(final String typePath) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase == null || getMetaData(typePath) == null) {
+        if (this.geodatabase == null || getRecordDefinition(typePath) == null) {
           return null;
         } else {
           final String path = typePath.replaceAll("/", "\\\\");
@@ -1052,9 +1052,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public Writer<DataObject> getWriter() {
+  public Writer<Record> getWriter() {
     synchronized (this.apiSync) {
-      Writer<DataObject> writer = getSharedAttribute("writer");
+      Writer<Record> writer = getSharedAttribute("writer");
       if (writer == null) {
         writer = createWriter();
         setSharedAttribute("writer", writer);
@@ -1142,7 +1142,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public void insert(final DataObject object) {
+  public void insert(final Record object) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
     getWriter().write(object);
@@ -1195,9 +1195,9 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public DataObject load(final String typePath, final Object... id) {
+  public Record load(final String typePath, final Object... id) {
     synchronized (this.apiSync) {
-      final DataObjectMetaData metaData = getMetaData(typePath);
+      final RecordDefinition metaData = getRecordDefinition(typePath);
       if (metaData == null) {
         throw new IllegalArgumentException("Unknown type " + typePath);
       } else {
@@ -1242,7 +1242,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   @Override
   protected void loadSchemaDataObjectMetaData(
     final DataObjectStoreSchema schema,
-    final Map<String, DataObjectMetaData> metaDataMap) {
+    final Map<String, RecordDefinition> metaDataMap) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
         final String schemaName = schema.getPath();
@@ -1260,7 +1260,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   public void loadSchemaDataObjectMetaData(
-    final Map<String, DataObjectMetaData> metaDataMap, final String schemaName,
+    final Map<String, RecordDefinition> metaDataMap, final String schemaName,
     final String path, final String datasetType) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
@@ -1443,7 +1443,7 @@ public class CapiFileGdbDataObjectStore extends AbstractDataObjectStore
   }
 
   @Override
-  public void update(final DataObject object) {
+  public void update(final Record object) {
     // Don't synchronize to avoid deadlock as that is done lower down in the
     // methods
     getWriter().write(object);

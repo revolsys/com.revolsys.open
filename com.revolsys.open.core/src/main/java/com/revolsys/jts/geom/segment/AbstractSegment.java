@@ -1,6 +1,6 @@
 package com.revolsys.jts.geom.segment;
 
-import com.revolsys.gis.data.io.IteratorReader;
+import com.revolsys.data.io.IteratorReader;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;

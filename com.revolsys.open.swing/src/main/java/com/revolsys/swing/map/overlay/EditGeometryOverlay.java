@@ -27,13 +27,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.data.equals.GeometryEqualsExact3d;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -183,7 +183,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   public void addRecord(final AbstractDataObjectLayer layer,
     final AddGeometryCompleteAction addCompleteAction) {
     if (layer != null) {
-      final DataObjectMetaData metaData = layer.getMetaData();
+      final RecordDefinition metaData = layer.getMetaData();
       final Attribute geometryAttribute = metaData.getGeometryAttribute();
       if (geometryAttribute != null) {
         this.addLayer = layer;
@@ -1001,7 +1001,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       }
     } else {
       final LayerRecord object = location.getObject();
-      final DataObjectMetaData metaData = location.getMetaData();
+      final RecordDefinition metaData = location.getMetaData();
       final String geometryAttributeName = metaData.getGeometryAttributeName();
       final Geometry oldValue = object.getValue(geometryAttributeName);
       if (GeometryEqualsExact3d.equal(newGeometry, oldValue)) {

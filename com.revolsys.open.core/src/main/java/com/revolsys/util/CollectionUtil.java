@@ -138,6 +138,20 @@ public final class CollectionUtil {
     return list;
   }
 
+  public static <V> boolean collectionContains(
+    final Map<Object, Collection<V>> map, final Object key, final V value) {
+    if (map == null) {
+      return false;
+    } else {
+      final Collection<V> collection = map.get(key);
+      if (collection == null) {
+        return false;
+      } else {
+        return collection.contains(key);
+      }
+    }
+  }
+
   public static <T> boolean containsReference(
     final List<WeakReference<T>> list, final T object) {
     for (int i = 0; i < list.size(); i++) {
@@ -213,7 +227,7 @@ public final class CollectionUtil {
   /**
    * Get the value for the key from the map. If the value was null return
    * default Value instead.
-   * 
+   *
    * @param map The map.
    * @param key The key to return the value for.
    * @param defaultValue The default value.
@@ -574,6 +588,20 @@ public final class CollectionUtil {
     }
   }
 
+  public static <K, V> boolean setContains(final Map<K, Set<V>> map,
+    final K key, final V value) {
+    if (map == null) {
+      return false;
+    } else {
+      final Collection<? extends V> collection = map.get(key);
+      if (collection == null) {
+        return false;
+      } else {
+        return collection.contains(key);
+      }
+    }
+  }
+
   public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
     final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(
@@ -674,7 +702,7 @@ public final class CollectionUtil {
   /**
    * Convert the collection to a string, using the "," separator between each
    * value. Nulls will be the empty string "".
-   * 
+   *
    * @param values The values.
    * @param separator The separator.
    * @return The string.
@@ -686,7 +714,7 @@ public final class CollectionUtil {
   /**
    * Convert the collection to a string, using the separator between each value.
    * Nulls will be the empty string "".
-   * 
+   *
    * @param separator The separator.
    * @param values The values.
    * @return The string.

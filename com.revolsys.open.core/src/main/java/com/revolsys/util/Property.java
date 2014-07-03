@@ -27,7 +27,7 @@ import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.io.ObjectWithProperties;
 
 public final class Property {
@@ -114,8 +114,8 @@ public final class Property {
     if (object == null) {
       return null;
     } else {
-      if (object instanceof DataObject) {
-        final DataObject dataObject = (DataObject)object;
+      if (object instanceof Record) {
+        final Record dataObject = (Record)object;
         return dataObject.getValueByPath(key);
       } else if (object instanceof Map) {
         final Map<String, ?> map = (Map<String, ?>)object;
@@ -224,8 +224,8 @@ public final class Property {
     if (object == null) {
       return null;
     } else {
-      if (object instanceof DataObject) {
-        final DataObject dataObject = (DataObject)object;
+      if (object instanceof Record) {
+        final Record dataObject = (Record)object;
         return dataObject.getValue(key);
       } else if (object instanceof Map) {
         final Map<String, ?> map = (Map<String, ?>)object;
@@ -460,8 +460,8 @@ public final class Property {
   public static void set(final Object object, final String propertyName,
     final Object value) {
     if (object != null) {
-      if (object instanceof DataObject) {
-        final DataObject dataObject = (DataObject)object;
+      if (object instanceof Record) {
+        final Record dataObject = (Record)object;
         dataObject.setValueByPath(propertyName, value);
       } else if (object instanceof Map) {
         @SuppressWarnings("unchecked")

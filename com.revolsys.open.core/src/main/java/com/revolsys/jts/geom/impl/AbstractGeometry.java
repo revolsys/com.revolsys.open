@@ -38,10 +38,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.algorithm.Centroid;
 import com.revolsys.jts.algorithm.ConvexHull;

@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.jdesktop.swingx.color.ColorUtil;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -339,7 +339,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public void propertyChange(final PropertyChangeEvent event) {
     final String propertyName = event.getPropertyName();
     final Object source = event.getSource();
-    if (source instanceof DataObject) {
+    if (source instanceof Record) {
       redraw();
     } else if (REDRAW_PROPERTY_NAMES.contains(propertyName)) {
       redraw();

@@ -41,7 +41,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.spring.InvokeMethodAfterCommit;
@@ -1733,8 +1733,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public void setValue(final Object object, final String key, final Object value) {
-    if (object instanceof DataObject) {
-      final DataObject dataObject = (DataObject)object;
+    if (object instanceof Record) {
+      final Record dataObject = (Record)object;
       dataObject.setValueByPath(key, value);
     } else if (object instanceof Map) {
       @SuppressWarnings("unchecked")

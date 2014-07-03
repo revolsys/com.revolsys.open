@@ -2,7 +2,7 @@ package com.revolsys.gis.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 
 public class PrimeMeridian implements Serializable {
   /**

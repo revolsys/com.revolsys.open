@@ -18,10 +18,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
@@ -30,7 +30,7 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
 
-public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
+public class XbaseDataObjectWriter extends AbstractWriter<Record> {
   private static final Logger log = Logger.getLogger(XbaseDataObjectWriter.class);
 
   private final List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
@@ -39,7 +39,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private final Resource resource;
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
   private int numRecords = 0;
 
@@ -53,7 +53,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
 
   private Charset charset = FileUtil.UTF8;
 
-  public XbaseDataObjectWriter(final DataObjectMetaData metaData,
+  public XbaseDataObjectWriter(final RecordDefinition metaData,
     final Resource resource) {
     this.metaData = metaData;
     this.resource = resource;
@@ -169,7 +169,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return charset;
   }
 
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return metaData;
   }
 
@@ -213,7 +213,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     return useZeroForNull;
   }
 
-  protected void preFirstWrite(final DataObject object) throws IOException {
+  protected void preFirstWrite(final Record object) throws IOException {
   }
 
   public void setCharset(final Charset charset) {
@@ -234,7 +234,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     try {
       if (!initialized) {
         init();
@@ -256,7 +256,7 @@ public class XbaseDataObjectWriter extends AbstractWriter<DataObject> {
     }
   }
 
-  protected boolean writeField(final DataObject object,
+  protected boolean writeField(final Record object,
     final FieldDefinition field) throws IOException {
     if (out == null) {
       return true;

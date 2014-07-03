@@ -6,23 +6,23 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.BeanNameAware;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
-public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
+public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
   private String statsName;
 
-  private Iterable<DataObject> iterable;
+  private Iterable<Record> iterable;
 
   private Statistics statistics;
 
   public StatisticsIterable() {
   }
 
-  public StatisticsIterable(final Iterable<DataObject> iterable) {
+  public StatisticsIterable(final Iterable<Record> iterable) {
     setIterable(iterable);
   }
 
-  public Iterable<DataObject> getIterable() {
+  public Iterable<Record> getIterable() {
     return iterable;
   }
 
@@ -46,7 +46,7 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
   }
 
   @Override
-  public Iterator<DataObject> iterator() {
+  public Iterator<Record> iterator() {
     if (this.statistics == null) {
       setStatistics(new Statistics("Read " + statsName + " "
         + iterable.toString()));
@@ -61,7 +61,7 @@ public class StatisticsIterable implements Iterable<DataObject>, BeanNameAware {
     }
   }
 
-  public void setIterable(final Iterable<DataObject> iterable) {
+  public void setIterable(final Iterable<Record> iterable) {
     this.iterable = iterable;
   }
 

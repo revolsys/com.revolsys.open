@@ -4,12 +4,12 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.jts.geom.BoundingBox;
@@ -68,8 +68,8 @@ public class GeoNamesBoundingBoxLayerWorker extends
       geometryFactory = geoCs.getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
     }
-    final List<DataObject> results = this.geoNamesService.getNames(boundingBox);
-    for (final DataObject dataObject : results) {
+    final List<Record> results = this.geoNamesService.getNames(boundingBox);
+    for (final Record dataObject : results) {
       final String name = dataObject.getValue("name");
       final Point point = dataObject.getGeometryValue();
       final String text = "<html><b>" + name + "</b><br /></html>";

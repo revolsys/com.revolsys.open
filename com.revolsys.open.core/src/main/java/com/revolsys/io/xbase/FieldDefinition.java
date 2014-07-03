@@ -24,8 +24,8 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 
 public class FieldDefinition {
   public static final char CHARACTER_TYPE = 'C';

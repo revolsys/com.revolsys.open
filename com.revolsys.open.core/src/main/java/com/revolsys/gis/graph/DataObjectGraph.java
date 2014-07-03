@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.data.filter.DataObjectGeometryFilter;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.property.DirectionalAttributes;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
-import com.revolsys.gis.data.model.property.DirectionalAttributes;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.Geometry;
@@ -17,13 +17,13 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
-public class DataObjectGraph extends Graph<DataObject> {
+public class DataObjectGraph extends Graph<Record> {
 
-  public static <T extends Geometry> Filter<Edge<DataObject>> getEdgeFilter(
+  public static <T extends Geometry> Filter<Edge<Record>> getEdgeFilter(
     final Filter<T> geometryFilter) {
-    final Filter<DataObject> objectFilter = new DataObjectGeometryFilter<T>(
+    final Filter<Record> objectFilter = new DataObjectGeometryFilter<T>(
       geometryFilter);
-    final EdgeObjectFilter<DataObject> edgeFilter = new EdgeObjectFilter<DataObject>(
+    final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(
       objectFilter);
     return edgeFilter;
   }
@@ -32,20 +32,20 @@ public class DataObjectGraph extends Graph<DataObject> {
     super(false);
   }
 
-  public DataObjectGraph(final Collection<? extends DataObject> objects) {
+  public DataObjectGraph(final Collection<? extends Record> objects) {
     addEdges(objects);
   }
 
-  public Edge<DataObject> addEdge(final DataObject object) {
+  public Edge<Record> addEdge(final Record object) {
     final LineString line = object.getGeometryValue();
     return addEdge(object, line);
   }
 
-  public List<Edge<DataObject>> addEdges(
-    final Collection<? extends DataObject> objects) {
-    final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
-    for (final DataObject object : objects) {
-      final Edge<DataObject> edge = addEdge(object);
+  public List<Edge<Record>> addEdges(
+    final Collection<? extends Record> objects) {
+    final List<Edge<Record>> edges = new ArrayList<Edge<Record>>();
+    for (final Record object : objects) {
+      final Edge<Record> edge = addEdge(object);
       edges.add(edge);
     }
     return edges;
@@ -59,17 +59,17 @@ public class DataObjectGraph extends Graph<DataObject> {
    * @return The new object.
    */
   @Override
-  protected DataObject clone(final DataObject object, final LineString line) {
+  protected Record clone(final Record object, final LineString line) {
     if (object == null) {
       return null;
     } else {
-      return DataObjectUtil.copy(object, line);
+      return RecordUtil.copy(object, line);
     }
   }
 
   @Override
   public LineString getEdgeLine(final int edgeId) {
-    final DataObject object = getEdgeObject(edgeId);
+    final Record object = getEdgeObject(edgeId);
     if (object == null) {
       return null;
     } else {
@@ -79,15 +79,15 @@ public class DataObjectGraph extends Graph<DataObject> {
   }
 
   @Override
-  public Node<DataObject> getNode(final Point point) {
+  public Node<Record> getNode(final Point point) {
     return super.getNode(point);
   }
 
-  public List<DataObject> getObjects(final Collection<Integer> edgeIds) {
-    final List<DataObject> objects = new ArrayList<DataObject>();
+  public List<Record> getObjects(final Collection<Integer> edgeIds) {
+    final List<Record> objects = new ArrayList<Record>();
     for (final Integer edgeId : edgeIds) {
-      final Edge<DataObject> edge = getEdge(edgeId);
-      final DataObject object = edge.getObject();
+      final Edge<Record> edge = getEdge(edgeId);
+      final Record object = edge.getObject();
       objects.add(object);
     }
     return objects;
@@ -100,27 +100,27 @@ public class DataObjectGraph extends Graph<DataObject> {
    * @return The type name.
    */
   @Override
-  public String getTypeName(final Edge<DataObject> edge) {
-    final DataObject object = edge.getObject();
+  public String getTypeName(final Edge<Record> edge) {
+    final Record object = edge.getObject();
     if (object == null) {
       return null;
     } else {
-      final DataObjectMetaData metaData = object.getMetaData();
+      final RecordDefinition metaData = object.getMetaData();
       final String typePath = metaData.getPath();
       return typePath;
     }
   }
 
-  public boolean hasEdge(final DataObject object) {
+  public boolean hasEdge(final Record object) {
     final LineString line = object.getGeometryValue();
     final Point fromPoint = line.getPoint(0);
     final Point toPoint = line.getPoint(-1);
-    final Node<DataObject> fromNode = findNode(fromPoint);
-    final Node<DataObject> toNode = findNode(toPoint);
+    final Node<Record> fromNode = findNode(fromPoint);
+    final Node<Record> toNode = findNode(toPoint);
     if (fromNode != null && toNode != null) {
-      final Collection<Edge<DataObject>> edges = Node.getEdgesBetween(fromNode,
+      final Collection<Edge<Record>> edges = Node.getEdgesBetween(fromNode,
         toNode);
-      for (final Edge<DataObject> edge : edges) {
+      for (final Edge<Record> edge : edges) {
         final LineString updateLine = edge.getLine();
         if (updateLine.equals(line)) {
           return true;
@@ -131,24 +131,24 @@ public class DataObjectGraph extends Graph<DataObject> {
   }
 
   @Override
-  public Edge<DataObject> merge(final Node<DataObject> node,
-    final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
-    final DataObject object1 = edge1.getObject();
-    final DataObject object2 = edge2.getObject();
-    final DataObject mergedObject = DirectionalAttributes.merge(node, object1,
+  public Edge<Record> merge(final Node<Record> node,
+    final Edge<Record> edge1, final Edge<Record> edge2) {
+    final Record object1 = edge1.getObject();
+    final Record object2 = edge2.getObject();
+    final Record mergedObject = DirectionalAttributes.merge(node, object1,
       object2);
-    final Edge<DataObject> mergedEdge = addEdge(mergedObject);
+    final Edge<Record> mergedEdge = addEdge(mergedObject);
     remove(edge1);
     remove(edge2);
     return mergedEdge;
   }
 
-  public List<Edge<DataObject>> splitEdges(final Point point,
+  public List<Edge<Record>> splitEdges(final Point point,
     final double distance) {
-    final List<Edge<DataObject>> edges = new ArrayList<Edge<DataObject>>();
-    for (final Edge<DataObject> edge : findEdges(point, distance)) {
+    final List<Edge<Record>> edges = new ArrayList<Edge<Record>>();
+    for (final Edge<Record> edge : findEdges(point, distance)) {
       final LineString line = edge.getLine();
-      final List<Edge<DataObject>> splitEdges = edge.split(new PointDouble(
+      final List<Edge<Record>> splitEdges = edge.split(new PointDouble(
         point));
       DirectionalAttributes.edgeSplitAttributes(line, point, splitEdges);
       edges.addAll(splitEdges);

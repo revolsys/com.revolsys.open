@@ -14,11 +14,11 @@ import javax.swing.event.ChangeEvent;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.SortableTableModel;
@@ -43,7 +43,7 @@ public abstract class DataObjectRowTableModel extends
   /** The columnIndex that the attribute start. Allows for extra columns in subclasses.*/
   private int attributesOffset;
 
-  public DataObjectRowTableModel(final DataObjectMetaData metaData,
+  public DataObjectRowTableModel(final RecordDefinition metaData,
     final Collection<String> attributeNames) {
     super(metaData);
     setAttributeNames(attributeNames);
@@ -87,7 +87,7 @@ public abstract class DataObjectRowTableModel extends
       return null;
     } else {
       final String name = getFieldName(columnIndex);
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       return metaData.getAttribute(name);
     }
   }
@@ -98,7 +98,7 @@ public abstract class DataObjectRowTableModel extends
       return Object.class;
     } else {
       final String name = getFieldName(columnIndex);
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       final DataType type = metaData.getAttributeType(name);
       if (type == null) {
         return Object.class;
@@ -148,7 +148,7 @@ public abstract class DataObjectRowTableModel extends
     return getFieldName(columnIndex);
   }
 
-  public abstract <V extends DataObject> V getRecord(final int row);
+  public abstract <V extends Record> V getRecord(final int row);
 
   public List<LayerRecord> getRecords(final int[] rows) {
     final List<LayerRecord> objects = new ArrayList<LayerRecord>();
@@ -181,10 +181,10 @@ public abstract class DataObjectRowTableModel extends
     if (columnIndex < attributesOffset) {
       return null;
     } else {
-      final DataObject record = getRecord(rowIndex);
+      final Record record = getRecord(rowIndex);
       if (record == null) {
         return LOADING_VALUE;
-      } else if (record.getState() == DataObjectState.Initalizing) {
+      } else if (record.getState() == RecordState.Initalizing) {
         return LOADING_VALUE;
       } else {
         final String name = getFieldName(columnIndex);
@@ -197,11 +197,11 @@ public abstract class DataObjectRowTableModel extends
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
-      final DataObject record = getRecord(rowIndex);
+      final Record record = getRecord(rowIndex);
       if (record != null) {
-        final DataObjectState state = record.getState();
-        if (state != DataObjectState.Initalizing
-          && state != DataObjectState.Deleted) {
+        final RecordState state = record.getState();
+        if (state != RecordState.Initalizing
+          && state != RecordState.Deleted) {
           final String attributeName = getFieldName(rowIndex, columnIndex);
           if (attributeName != null) {
             if (!isReadOnly(attributeName)) {
@@ -233,7 +233,7 @@ public abstract class DataObjectRowTableModel extends
 
   public void setAttributeNames(final Collection<String> attributeNames) {
     if (attributeNames == null || attributeNames.isEmpty()) {
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       this.attributeNames = new ArrayList<String>(metaData.getAttributeNames());
     } else {
       this.attributeNames = new ArrayList<String>(attributeNames);
@@ -252,7 +252,7 @@ public abstract class DataObjectRowTableModel extends
         title = attributeTitles.get(i);
       } else {
         final String attributeName = getFieldName(i);
-        final DataObjectMetaData metaData = getMetaData();
+        final RecordDefinition metaData = getMetaData();
         final Attribute attribute = metaData.getAttribute(attributeName);
         title = attribute.getTitle();
       }
@@ -297,7 +297,7 @@ public abstract class DataObjectRowTableModel extends
     if (isCellEditable(rowIndex, columnIndex)) {
 
       if (columnIndex >= attributesOffset) {
-        final DataObject object = getRecord(rowIndex);
+        final Record object = getRecord(rowIndex);
         if (object != null) {
           final String name = getFieldName(columnIndex);
           final Object objectValue = toObjectValue(columnIndex, value);
@@ -313,12 +313,12 @@ public abstract class DataObjectRowTableModel extends
     final int attributeIndex, final Object objectValue) {
     int rowHeight = table.getRowHeight();
     String displayValue;
-    final DataObject record = getRecord(rowIndex);
+    final Record record = getRecord(rowIndex);
     if (record == null) {
       rowHeight = 1;
       displayValue = null;
     } else {
-      if (record.getState() == DataObjectState.Initalizing) {
+      if (record.getState() == RecordState.Initalizing) {
         displayValue = LOADING_VALUE;
       } else {
         displayValue = toDisplayValueInternal(rowIndex, attributeIndex,

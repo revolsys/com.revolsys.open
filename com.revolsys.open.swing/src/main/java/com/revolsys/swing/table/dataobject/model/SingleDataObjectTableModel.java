@@ -3,14 +3,14 @@ package com.revolsys.swing.table.dataobject.model;
 import javax.swing.JComponent;
 import javax.swing.table.JTableHeader;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.swing.table.BaseJxTable;
 
 public class SingleDataObjectTableModel extends
   AbstractSingleDataObjectTableModel {
   private static final long serialVersionUID = 1L;
 
-  public static JComponent create(final DataObject object,
+  public static JComponent create(final Record object,
     final boolean editable) {
     final SingleDataObjectTableModel model = new SingleDataObjectTableModel(
       object, editable);
@@ -20,15 +20,15 @@ public class SingleDataObjectTableModel extends
     return table;
   }
 
-  private DataObject object;
+  private Record object;
 
-  public SingleDataObjectTableModel(final DataObject object,
+  public SingleDataObjectTableModel(final Record object,
     final boolean editable) {
     super(object.getMetaData(), editable);
     this.object = object;
   }
 
-  public DataObject getObject() {
+  public Record getObject() {
     return this.object;
   }
 
@@ -41,7 +41,7 @@ public class SingleDataObjectTableModel extends
     }
   }
 
-  public void setObject(final DataObject object) {
+  public void setObject(final Record object) {
     if (object != this.object) {
       setMetaData(object.getMetaData());
       this.object = object;

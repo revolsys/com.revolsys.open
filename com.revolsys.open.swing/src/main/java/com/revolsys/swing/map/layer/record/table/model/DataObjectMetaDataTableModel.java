@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.table.BaseJxTable;
 
 public class DataObjectMetaDataTableModel extends AbstractTableModel {
@@ -19,7 +19,7 @@ public class DataObjectMetaDataTableModel extends AbstractTableModel {
     Integer.class, String.class, String.class, Integer.class, Integer.class,
     Object.class, Object.class, Boolean.class, String.class);
 
-  public static BaseJxTable createTable(final DataObjectMetaData metaData) {
+  public static BaseJxTable createTable(final RecordDefinition metaData) {
     if (metaData == null) {
       return null;
     } else {
@@ -31,9 +31,9 @@ public class DataObjectMetaDataTableModel extends AbstractTableModel {
     }
   }
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
-  public DataObjectMetaDataTableModel(final DataObjectMetaData metaData) {
+  public DataObjectMetaDataTableModel(final RecordDefinition metaData) {
     this.metaData = metaData;
   }
 

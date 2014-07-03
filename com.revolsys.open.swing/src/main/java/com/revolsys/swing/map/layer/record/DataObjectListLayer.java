@@ -7,12 +7,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -23,9 +23,9 @@ import com.revolsys.swing.map.layer.record.table.model.DataObjectListLayerTableM
 
 public class DataObjectListLayer extends AbstractDataObjectLayer {
 
-  public static DataObjectMetaDataImpl createMetaData(final String name,
+  public static RecordDefinitionImpl createMetaData(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name);
+    final RecordDefinitionImpl metaData = new RecordDefinitionImpl(name);
     metaData.addAttribute("GEOMETRY", geometryType, true);
     metaData.setGeometryFactory(geometryFactory);
     return metaData;
@@ -36,7 +36,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   public DataObjectListLayer() {
   }
 
-  public DataObjectListLayer(final DataObjectMetaData metaData) {
+  public DataObjectListLayer(final RecordDefinition metaData) {
     super(metaData);
     setEditable(true);
   }
@@ -48,7 +48,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   public DataObjectListLayer(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     super(name);
-    final DataObjectMetaDataImpl metaData = createMetaData(name,
+    final RecordDefinitionImpl metaData = createMetaData(name,
       geometryFactory, geometryType);
     setMetaData(metaData);
   }
@@ -62,12 +62,12 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   }
 
   protected void createRecordInternal(final Map<String, Object> values) {
-    final LayerRecord record = createDataObject(getMetaData());
-    record.setState(DataObjectState.Initalizing);
+    final LayerRecord record = createRecord(getMetaData());
+    record.setState(RecordState.Initalizing);
     try {
       record.setValues(values);
     } finally {
-      record.setState(DataObjectState.Persisted);
+      record.setState(RecordState.Persisted);
     }
     synchronized (records) {
       this.records.add(record);

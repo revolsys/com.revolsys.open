@@ -9,9 +9,9 @@ import javax.annotation.PreDestroy;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.AbstractDataObjectWriterFactory;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.AbstractDataObjectWriterFactory;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
@@ -20,14 +20,14 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.xbase.XbaseDataObjectWriter;
 import com.revolsys.jts.geom.Geometry;
 
-public class ShapefileDirectoryWriter extends AbstractWriter<DataObject> {
+public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
   private File directory;
 
   private boolean useZeroForNull = true;
 
-  private Map<String, Writer<DataObject>> writers = new HashMap<>();
+  private Map<String, Writer<Record>> writers = new HashMap<>();
 
-  private Map<String, DataObjectMetaData> metaDataMap = new HashMap<>();
+  private Map<String, RecordDefinition> metaDataMap = new HashMap<>();
 
   private boolean useNamespaceAsSubDirectory;
 
@@ -46,7 +46,7 @@ public class ShapefileDirectoryWriter extends AbstractWriter<DataObject> {
   @PreDestroy
   public void close() {
     if (writers != null) {
-      for (final Writer<DataObject> writer : writers.values()) {
+      for (final Writer<Record> writer : writers.values()) {
         try {
           writer.close();
         } catch (final RuntimeException e) {
@@ -64,7 +64,7 @@ public class ShapefileDirectoryWriter extends AbstractWriter<DataObject> {
 
   @Override
   public void flush() {
-    for (final Writer<DataObject> writer : writers.values()) {
+    for (final Writer<Record> writer : writers.values()) {
       try {
         writer.flush();
       } catch (final RuntimeException e) {
@@ -77,7 +77,7 @@ public class ShapefileDirectoryWriter extends AbstractWriter<DataObject> {
     return directory;
   }
 
-  private File getDirectory(final DataObjectMetaData metaData) {
+  private File getDirectory(final RecordDefinition metaData) {
     if (useNamespaceAsSubDirectory) {
       final String typePath = metaData.getPath();
       final String schemaName = PathUtil.getPath(typePath);
@@ -95,11 +95,11 @@ public class ShapefileDirectoryWriter extends AbstractWriter<DataObject> {
     return directory;
   }
 
-  private String getFileName(final DataObjectMetaData metaData) {
+  private String getFileName(final RecordDefinition metaData) {
     return metaData.getTypeName();
   }
 
-  public DataObjectMetaData getMetaData(final String path) {
+  public RecordDefinition getMetaData(final String path) {
     return metaDataMap.get(path);
   }
 
@@ -111,10 +111,10 @@ public class ShapefileDirectoryWriter extends AbstractWriter<DataObject> {
     return statistics;
   }
 
-  private Writer<DataObject> getWriter(final DataObject object) {
-    final DataObjectMetaData metaData = object.getMetaData();
+  private Writer<Record> getWriter(final Record object) {
+    final RecordDefinition metaData = object.getMetaData();
     final String path = metaData.getPath();
-    Writer<DataObject> writer = writers.get(path);
+    Writer<Record> writer = writers.get(path);
     if (writer == null) {
       final File directory = getDirectory(metaData);
       directory.mkdirs();
@@ -180,8 +180,8 @@ public class ShapefileDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
-    final Writer<DataObject> writer = getWriter(object);
+  public void write(final Record object) {
+    final Writer<Record> writer = getWriter(object);
     writer.write(object);
     statistics.add(object);
   }

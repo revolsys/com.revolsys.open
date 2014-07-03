@@ -8,15 +8,15 @@ import java.util.Properties;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.QueryValue;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.UriTemplate;
 
-public class SqlLayerFilter implements Filter<DataObject>, MapSerializer {
+public class SqlLayerFilter implements Filter<Record>, MapSerializer {
   private final String query;
 
   private Condition condition;
@@ -31,7 +31,7 @@ public class SqlLayerFilter implements Filter<DataObject>, MapSerializer {
   }
 
   @Override
-  public boolean accept(final DataObject record) {
+  public boolean accept(final Record record) {
     final Condition condition = getCondition();
     if (condition == null) {
       return false;
@@ -47,7 +47,7 @@ public class SqlLayerFilter implements Filter<DataObject>, MapSerializer {
   private synchronized Condition getCondition() {
     if (condition == null) {
       if (!initialized) {
-        final DataObjectMetaData metaData = layer.getMetaData();
+        final RecordDefinition metaData = layer.getMetaData();
         if (metaData != null) {
           initialized = true;
           try {

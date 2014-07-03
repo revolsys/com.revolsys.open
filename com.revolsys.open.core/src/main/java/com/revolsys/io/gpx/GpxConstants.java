@@ -2,9 +2,9 @@ package com.revolsys.io.gpx;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public final class GpxConstants {
@@ -28,16 +28,16 @@ public final class GpxConstants {
 
   public static final QName GPX_ELEMENT = new QName(GPX_NS_URI, "gpx");
 
-  public static final DataObjectMetaDataImpl GPX_TYPE = new DataObjectMetaDataImpl(
+  public static final RecordDefinitionImpl GPX_TYPE = new RecordDefinitionImpl(
     "gpx");
 
-  public static final DataObjectMetaDataImpl GPX_WAYPOINT = new DataObjectMetaDataImpl(
+  public static final RecordDefinitionImpl GPX_WAYPOINT = new RecordDefinitionImpl(
     "/gpx/waypoint");
 
-  public static final DataObjectMetaDataImpl GPX_TRACK = new DataObjectMetaDataImpl(
+  public static final RecordDefinitionImpl GPX_TRACK = new RecordDefinitionImpl(
     "/gpx/track");
 
-  public static final DataObjectMetaDataImpl GPX_ROUTE = new DataObjectMetaDataImpl(
+  public static final RecordDefinitionImpl GPX_ROUTE = new RecordDefinitionImpl(
     "/gpx/route");
 
   public static final QName LAT_ATTRIBUTE = new QName(null, "lat");

@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Set;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.model.data.equals.EqualsInstance;
 
-public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
+public class NodeRemovalVisitor implements Visitor<Node<Record>> {
 
   /** The relationship between an Edge and it's next edge. */
   private enum EdgeType {
@@ -31,7 +31,7 @@ public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
 
   private final DataObjectGraph graph;
 
-  public NodeRemovalVisitor(final DataObjectMetaData metaData,
+  public NodeRemovalVisitor(final RecordDefinition metaData,
     final DataObjectGraph graph, final Collection<String> excludedAttributes) {
     super();
     this.graph = graph;
@@ -48,14 +48,14 @@ public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
    * @param edge The edge.
    * @return The type of edge.
    */
-  private EdgeType checkDirection(final Node<DataObject> node,
-    final Edge<DataObject> edge) {
-    final Node<DataObject> toNode = edge.getToNode();
+  private EdgeType checkDirection(final Node<Record> node,
+    final Edge<Record> edge) {
+    final Node<Record> toNode = edge.getToNode();
     final int degree = toNode.getDegree();
     if (degree == 1) {
       return EdgeType.END_DEGREE_1;
     } else if (degree == 2) {
-      final Edge<DataObject> nextEdge = toNode.getNextEdge(edge);
+      final Edge<Record> nextEdge = toNode.getNextEdge(edge);
       if (nextEdge.isForwards(toNode) == edge.isForwards(toNode)) {
         return EdgeType.BACKWARDS;
       } else {
@@ -82,9 +82,9 @@ public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
    * @param edge2 The second edge.
    * @return True if one of the edges can be reversed, false otherwise.
    */
-  private boolean fixReversedEdges(final Node<DataObject> node,
-    final Set<Edge<DataObject>> reversedEdges, final Edge<DataObject> edge1,
-    final Edge<DataObject> edge2) {
+  private boolean fixReversedEdges(final Node<Record> node,
+    final Set<Edge<Record>> reversedEdges, final Edge<Record> edge1,
+    final Edge<Record> edge2) {
     final EdgeType edge1Direction = checkDirection(node, edge1);
     final EdgeType edge2Direction = checkDirection(node, edge2);
     if (edge1Direction == edge2Direction) {
@@ -104,15 +104,15 @@ public class NodeRemovalVisitor implements Visitor<Node<DataObject>> {
   }
 
   @Override
-  public boolean visit(final Node<DataObject> node) {
+  public boolean visit(final Node<Record> node) {
     if (node.getDegree() == 2) {
-      final List<Edge<DataObject>> edges = node.getEdges();
+      final List<Edge<Record>> edges = node.getEdges();
       if (edges.size() == 2) {
-        final Edge<DataObject> edge1 = edges.get(0);
-        final Edge<DataObject> edge2 = edges.get(1);
+        final Edge<Record> edge1 = edges.get(0);
+        final Edge<Record> edge2 = edges.get(1);
         if (edge1 != edge2) {
-          final DataObject object1 = edge1.getObject();
-          final DataObject object2 = edge2.getObject();
+          final Record object1 = edge1.getObject();
+          final Record object2 = edge2.getObject();
           if (EqualsInstance.INSTANCE.equals(object1, object2,
             excludedAttributes)) {
             if (edge1.isForwards(node) == edge2.isForwards(node)) {

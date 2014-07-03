@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.property.DirectionalAttributes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
 import com.revolsys.gis.graph.Node;
@@ -19,40 +19,40 @@ import com.revolsys.jts.geom.LineString;
 public class PseudoNodeAttribute {
   private final Set<String> equalExcludeAttributes = new HashSet<String>();
 
-  private final List<EdgePair<DataObject>> edgePairs = new ArrayList<EdgePair<DataObject>>();
+  private final List<EdgePair<Record>> edgePairs = new ArrayList<EdgePair<Record>>();
 
-  private final List<EdgePair<DataObject>> reversedEdgePairs = new ArrayList<EdgePair<DataObject>>();
+  private final List<EdgePair<Record>> reversedEdgePairs = new ArrayList<EdgePair<Record>>();
 
   private final String typePath;
 
-  public PseudoNodeAttribute(final Node<DataObject> node,
+  public PseudoNodeAttribute(final Node<Record> node,
     final String typePath, final Collection<String> equalExcludeAttributes) {
     this.typePath = typePath;
     if (equalExcludeAttributes != null) {
       this.equalExcludeAttributes.addAll(equalExcludeAttributes);
     }
-    final Map<String, Map<LineString, Set<Edge<DataObject>>>> edgesByTypeNameAndLine = NodeAttributes.getEdgesByTypeNameAndLine(node);
-    final Map<LineString, Set<Edge<DataObject>>> edgesByLine = edgesByTypeNameAndLine.get(typePath);
+    final Map<String, Map<LineString, Set<Edge<Record>>>> edgesByTypeNameAndLine = NodeAttributes.getEdgesByTypeNameAndLine(node);
+    final Map<LineString, Set<Edge<Record>>> edgesByLine = edgesByTypeNameAndLine.get(typePath);
     init(node, edgesByLine);
   }
 
-  private EdgePair<DataObject> createEdgePair(final Node<DataObject> node,
-    final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
-    final DataObject object1 = edge1.getObject();
-    final DataObject object2 = edge2.getObject();
+  private EdgePair<Record> createEdgePair(final Node<Record> node,
+    final Edge<Record> edge1, final Edge<Record> edge2) {
+    final Record object1 = edge1.getObject();
+    final Record object2 = edge2.getObject();
     if (DirectionalAttributes.canMergeObjects(node, object1, object2,
       equalExcludeAttributes)) {
-      return new EdgePair<DataObject>(edge1, edge2);
+      return new EdgePair<Record>(edge1, edge2);
     } else {
       return null;
     }
   }
 
-  public List<EdgePair<DataObject>> getEdgePairs() {
+  public List<EdgePair<Record>> getEdgePairs() {
     return edgePairs;
   }
 
-  public List<EdgePair<DataObject>> getReversedEdgePairs() {
+  public List<EdgePair<Record>> getReversedEdgePairs() {
     return reversedEdgePairs;
   }
 
@@ -60,29 +60,29 @@ public class PseudoNodeAttribute {
     return typePath;
   }
 
-  private void init(final Node<DataObject> node,
-    final Map<LineString, Set<Edge<DataObject>>> edgesByLine) {
+  private void init(final Node<Record> node,
+    final Map<LineString, Set<Edge<Record>>> edgesByLine) {
     if (isPseudoNode(node, edgesByLine)) {
 
     }
   }
 
-  protected boolean isPseudoNode(final Node<DataObject> node,
-    final Map<LineString, Set<Edge<DataObject>>> edgesByLine) {
+  protected boolean isPseudoNode(final Node<Record> node,
+    final Map<LineString, Set<Edge<Record>>> edgesByLine) {
     final Set<LineString> lines = edgesByLine.keySet();
     if (!LineStringUtil.hasLoop(lines)) {
       if (edgesByLine.size() == 2) {
-        final Iterator<Set<Edge<DataObject>>> edgeIter = edgesByLine.values()
+        final Iterator<Set<Edge<Record>>> edgeIter = edgesByLine.values()
           .iterator();
-        final Set<Edge<DataObject>> edges1 = edgeIter.next();
-        final Set<Edge<DataObject>> edges2 = edgeIter.next();
+        final Set<Edge<Record>> edges1 = edgeIter.next();
+        final Set<Edge<Record>> edges2 = edgeIter.next();
         final int size1 = edges1.size();
         final int size2 = edges2.size();
         if (size1 == size2) {
           if (size1 == 1) {
-            final Edge<DataObject> edge1 = edges1.iterator().next();
-            final Edge<DataObject> edge2 = edges2.iterator().next();
-            final EdgePair<DataObject> edgePair = createEdgePair(node, edge1,
+            final Edge<Record> edge1 = edges1.iterator().next();
+            final Edge<Record> edge2 = edges2.iterator().next();
+            final EdgePair<Record> edgePair = createEdgePair(node, edge1,
               edge2);
             if (edgePair != null) {
               if (edge1.isForwards(node) == edge2.isForwards(node)) {
@@ -93,9 +93,9 @@ public class PseudoNodeAttribute {
               return true;
             }
           } else {
-            final List<Edge<DataObject>> unmatchedEdges1 = new ArrayList<Edge<DataObject>>(
+            final List<Edge<Record>> unmatchedEdges1 = new ArrayList<Edge<Record>>(
               edges1);
-            final List<Edge<DataObject>> unmatchedEdges2 = new ArrayList<Edge<DataObject>>(
+            final List<Edge<Record>> unmatchedEdges2 = new ArrayList<Edge<Record>>(
               edges2);
             // Find non-reversed matches
             matchEdges(node, unmatchedEdges1, unmatchedEdges2, edgePairs, false);
@@ -116,16 +116,16 @@ public class PseudoNodeAttribute {
     return false;
   }
 
-  private void matchEdges(final Node<DataObject> node,
-    final List<Edge<DataObject>> edges1, final List<Edge<DataObject>> edges2,
-    final List<EdgePair<DataObject>> pairedEdges, final boolean reversed) {
-    final Iterator<Edge<DataObject>> edgeIter1 = edges1.iterator();
+  private void matchEdges(final Node<Record> node,
+    final List<Edge<Record>> edges1, final List<Edge<Record>> edges2,
+    final List<EdgePair<Record>> pairedEdges, final boolean reversed) {
+    final Iterator<Edge<Record>> edgeIter1 = edges1.iterator();
     while (edgeIter1.hasNext()) {
-      final Edge<DataObject> edge1 = edgeIter1.next();
+      final Edge<Record> edge1 = edgeIter1.next();
       boolean matched = false;
-      final Iterator<Edge<DataObject>> edgeIter2 = edges2.iterator();
+      final Iterator<Edge<Record>> edgeIter2 = edges2.iterator();
       while (!matched && edgeIter2.hasNext()) {
-        final Edge<DataObject> edge2 = edgeIter2.next();
+        final Edge<Record> edge2 = edgeIter2.next();
         boolean match = false;
         if (edge1.isForwards(node) == edge2.isForwards(node)) {
           match = reversed;
@@ -133,7 +133,7 @@ public class PseudoNodeAttribute {
           match = !reversed;
         }
         if (match) {
-          final EdgePair<DataObject> edgePair = createEdgePair(node, edge1,
+          final EdgePair<Record> edgePair = createEdgePair(node, edge1,
             edge2);
           if (edgePair != null) {
             matched = true;

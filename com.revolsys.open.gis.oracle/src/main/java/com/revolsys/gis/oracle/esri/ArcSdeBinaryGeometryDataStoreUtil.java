@@ -17,16 +17,16 @@ import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeShape;
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.QueryValue;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.FileUtil;
@@ -82,7 +82,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
   }
 
   public void createGeometryColumn(final AbstractJdbcDataObjectStore dataStore,
-    final DataObjectStoreSchema schema, final DataObjectMetaData metaData,
+    final DataObjectStoreSchema schema, final RecordDefinition metaData,
     final String typePath, final String columnName,
     final Map<String, Object> columnProperties) {
     final Attribute attribute = metaData.getAttribute(columnName);
@@ -102,15 +102,15 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     final ArcSdeBinaryGeometryAttribute sdeAttribute = new ArcSdeBinaryGeometryAttribute(
       this, columnName, columnName, dataType, attribute.isRequired(),
       "The GEOMETRY reference", attribute.getProperties(), geometryFactory);
-    ((DataObjectMetaDataImpl)metaData).replaceAttribute(attribute, sdeAttribute);
+    ((RecordDefinitionImpl)metaData).replaceAttribute(attribute, sdeAttribute);
     sdeAttribute.setMetaData(metaData);
 
     metaData.setProperty("dataStoreIteratorFactory", this.iteratorFactory);
 
-    ((DataObjectMetaDataImpl)metaData).setGeometryAttributeName(columnName);
+    ((RecordDefinitionImpl)metaData).setGeometryAttributeName(columnName);
   }
 
-  public AbstractIterator<DataObject> createIterator(
+  public AbstractIterator<Record> createIterator(
     final OracleDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
     final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
@@ -169,12 +169,12 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     }
   }
 
-  public String getTableName(final DataObjectMetaData metaData) {
+  public String getTableName(final RecordDefinition metaData) {
     final String typePath = metaData.getPath();
     return this.dataStore.getDatabaseQualifiedTableName(typePath);
   }
 
-  public void setValueFromRow(final DataObject object, final SeRow row,
+  public void setValueFromRow(final Record object, final SeRow row,
     final int columnIndex) {
     if (object != null && row != null) {
       try {

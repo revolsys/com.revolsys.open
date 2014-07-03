@@ -22,8 +22,8 @@ package com.revolsys.gis.jts.filter;
 
 import java.util.Collections;
 
+import com.revolsys.data.equals.Geometry2DEquals;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.model.data.equals.Geometry2DEquals;
 import com.revolsys.jts.geom.Geometry;
 
 public class Equals2DFilter<T extends Geometry> implements Filter<T> {

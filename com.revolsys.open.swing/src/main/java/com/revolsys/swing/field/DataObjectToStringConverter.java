@@ -7,7 +7,7 @@ import java.util.List;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
@@ -28,8 +28,8 @@ public class DataObjectToStringConverter extends ObjectToStringConverter {
   public String getPreferredStringForItem(final Object value) {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       return "";
-    } else if (value instanceof DataObject) {
-      final DataObject object = (DataObject)value;
+    } else if (value instanceof Record) {
+      final Record object = (Record)value;
       final List<String> values = new ArrayList<String>();
       for (final String attributeName : this.attributeNames) {
         final String text = StringConverterRegistry.toString(Property.get(

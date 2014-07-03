@@ -1,6 +1,8 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordState;
 
 public class LoadingRecord extends AbstractLayerRecord {
 
@@ -9,24 +11,31 @@ public class LoadingRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public DataObjectState getState() {
-    return DataObjectState.Initalizing;
+  public Identifier getIdentifier() {
+    return null;
+  }
+
+  @Override
+  public RecordState getState() {
+    return RecordState.Initalizing;
   }
 
   @Override
   public <T> T getValue(final int index) {
-    throw new UnsupportedOperationException(
-        "Cannot get values for a loading record");
+    return null;
   }
 
   @Override
-  public void setState(final DataObjectState state) {
-    throw new UnsupportedOperationException("Cannot modify a loading record");
+  public boolean isSame(final Record record) {
+    return record instanceof LoadingRecord;
+  }
+
+  @Override
+  public void setState(final RecordState state) {
   }
 
   @Override
   public void setValue(final int index, final Object value) {
-    throw new UnsupportedOperationException("Cannot modify a loading record");
   }
 
 }

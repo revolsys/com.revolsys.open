@@ -3,9 +3,9 @@ package com.revolsys.gis.parallel;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordUtil;
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectUtil;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.Geometry;
@@ -15,7 +15,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class SplitGeometryProcess extends
-  BaseInOutProcess<DataObject, DataObject> {
+  BaseInOutProcess<Record, Record> {
   /** The statistics to record the number new observations created. */
   private Statistics createdStatistics;
 
@@ -30,9 +30,9 @@ public class SplitGeometryProcess extends
 
   private GeometryFactory geometryFactory;
 
-  protected DataObject createSplitObject(final DataObject object,
+  protected Record createSplitObject(final Record object,
     final LineString newLine) {
-    return DataObjectUtil.copy(object, newLine);
+    return RecordUtil.copy(object, newLine);
   }
 
   /**
@@ -67,8 +67,8 @@ public class SplitGeometryProcess extends
   }
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
-    final Channel<DataObject> out) {
+  protected void postRun(final Channel<Record> in,
+    final Channel<Record> out) {
     if (createdStatistics != null) {
       createdStatistics.disconnect();
     }
@@ -78,8 +78,8 @@ public class SplitGeometryProcess extends
   }
 
   @Override
-  protected void preRun(final Channel<DataObject> in,
-    final Channel<DataObject> out) {
+  protected void preRun(final Channel<Record> in,
+    final Channel<Record> out) {
     if (createdStatistics != null) {
       createdStatistics.connect();
     }
@@ -89,14 +89,14 @@ public class SplitGeometryProcess extends
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(final Channel<Record> in,
+    final Channel<Record> out, final Record object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       if (line.isWithinDistance(this.geometry, 0)) {
-        final List<DataObject> newObjects = split(object, line);
-        for (final DataObject newObject : newObjects) {
+        final List<Record> newObjects = split(object, line);
+        for (final Record newObject : newObjects) {
           out.write(newObject);
         }
         if (newObjects.size() > 1) {
@@ -144,9 +144,9 @@ public class SplitGeometryProcess extends
     this.tolerance = tolerance;
   }
 
-  protected List<DataObject> split(final DataObject object,
+  protected List<Record> split(final Record object,
     final LineString line) {
-    final List<DataObject> newObjects = new ArrayList<DataObject>();
+    final List<Record> newObjects = new ArrayList<Record>();
     final List<LineString> newLines = LineStringUtil.split(geometryFactory,
       line, index, tolerance);
     if (newLines.size() == 1) {
@@ -154,12 +154,12 @@ public class SplitGeometryProcess extends
       if (newLine == line) {
         newObjects.add(object);
       } else {
-        final DataObject newObject = createSplitObject(object, newLine);
+        final Record newObject = createSplitObject(object, newLine);
         newObjects.add(newObject);
       }
     } else {
       for (final LineString newLine : newLines) {
-        final DataObject newObject = createSplitObject(object, newLine);
+        final Record newObject = createSplitObject(object, newLine);
         newObjects.add(newObject);
       }
     }

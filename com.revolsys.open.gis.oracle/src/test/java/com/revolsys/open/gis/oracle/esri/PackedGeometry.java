@@ -3,7 +3,7 @@ package com.revolsys.open.gis.oracle.esri;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
+import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
 import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;

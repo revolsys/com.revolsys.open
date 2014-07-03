@@ -12,8 +12,8 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.spring.config.BeanConfigurrer;
 

@@ -7,8 +7,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -34,8 +34,8 @@ public class MergedValuePredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToView(adapter.row);
       final int columnIndex = adapter.convertColumnIndexToView(adapter.column);
-      final DataObject record = model.getRecord(rowIndex);
-      final DataObject mergedRecord = model.getMergedObject();
+      final Record record = model.getRecord(rowIndex);
+      final Record mergedRecord = model.getMergedObject();
 
       if (record == mergedRecord) {
         return false;

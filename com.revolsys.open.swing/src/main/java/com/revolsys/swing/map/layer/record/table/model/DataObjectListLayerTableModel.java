@@ -9,10 +9,10 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.layer.record.DataObjectListLayer;
@@ -66,7 +66,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     this.layer = null;
   }
 
-  private void firePropertyChange(final DataObject object, final String name,
+  private void firePropertyChange(final Record object, final String name,
     final Object oldValue, final Object newValue) {
     final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
       oldValue, newValue);
@@ -95,7 +95,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
       final String columnName = getColumnName(columnIndex);
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       final DataType dataType = metaData.getAttributeType(columnName);
       if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
         return false;
@@ -125,7 +125,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final DataObject record = getRecord(rowIndex);
+    final Record record = getRecord(rowIndex);
     if (record != null) {
       final String name = getColumnName(columnIndex);
       final Object oldValue = record.getValueByPath(name);

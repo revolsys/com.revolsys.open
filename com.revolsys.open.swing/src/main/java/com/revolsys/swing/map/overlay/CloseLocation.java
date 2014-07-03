@@ -1,8 +1,8 @@
 package com.revolsys.swing.map.overlay;
 
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -59,12 +59,12 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public Object getId() {
-    RecordIdentifier id = null;
+    Identifier id = null;
     if (this.object != null) {
       id = this.object.getIdentifier();
     }
     if (id == null) {
-      id = SingleRecordIdentifier.create("NEW");
+      id = SingleIdentifier.create("NEW");
     }
     return id;
   }
@@ -87,7 +87,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return this.layer;
   }
 
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return this.layer.getMetaData();
   }
 
@@ -124,7 +124,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public String getTypePath() {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     return metaData.getPath();
   }
 
@@ -145,7 +145,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
     final StringBuffer string = new StringBuffer();
     string.append(getTypePath());
     string.append(", ");
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     string.append(metaData.getIdAttributeName());
     string.append("=");
     final Object id = getId();

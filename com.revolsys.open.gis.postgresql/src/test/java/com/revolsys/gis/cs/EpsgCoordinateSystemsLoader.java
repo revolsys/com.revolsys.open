@@ -16,11 +16,11 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.epsg.EpsgUtil;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.query.Query;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.csv.CsvWriter;
@@ -53,7 +53,7 @@ public final class EpsgCoordinateSystemsLoader {
     dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(parameters);
   }
 
-  protected Double getDoubleNaN(final DataObject object, final String name) {
+  protected Double getDoubleNaN(final Record object, final String name) {
     Double value = object.getDouble(name);
     if (value == null) {
       value = Double.NaN;
@@ -61,7 +61,7 @@ public final class EpsgCoordinateSystemsLoader {
     return value;
   }
 
-  protected boolean isDeprecated(final DataObject object) {
+  protected boolean isDeprecated(final Record object) {
     return object.getInteger("deprecated") == 1;
   }
 
@@ -83,7 +83,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadAreas() throws IOException {
     final Query query = new Query("/public/epsg_area");
     query.addOrderBy("area_code", true);
-    final Reader<DataObject> reader = dataStore.query(query);
+    final Reader<Record> reader = dataStore.query(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/area.csv");
     final CsvWriter writer = new CsvWriter(
@@ -91,7 +91,7 @@ public final class EpsgCoordinateSystemsLoader {
     try {
       writer.write("ID", "NAME", "MIN_X", "MIN_Y", "MAX_X", "MAX_Y",
         "DEPRECATED");
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("area_code");
         final String name = object.getValue("area_name");
         final Double minY = object.getDouble("area_south_bound_lat");
@@ -114,10 +114,10 @@ public final class EpsgCoordinateSystemsLoader {
     final Query query = new Query("/public/epsg_coordinateaxis");
     query.addOrderBy("coord_sys_code", true);
     query.addOrderBy("coord_axis_order", true);
-    final Reader<DataObject> reader = dataStore.query(query);
+    final Reader<Record> reader = dataStore.query(query);
 
     try {
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer coordSysCode = object.getInteger("coord_sys_code");
         final Integer nameCode = object.getInteger("coord_axis_name_code");
         final String direction = object.getValue("coord_axis_orientation");
@@ -171,9 +171,9 @@ public final class EpsgCoordinateSystemsLoader {
 
   private Map<Integer, String> loadCoordinateAxisNames() {
     final Map<Integer, String> coordinateAxisNames = new HashMap<Integer, String>();
-    final Reader<DataObject> reader = dataStore.query("/public/epsg_coordinateaxisname");
+    final Reader<Record> reader = dataStore.query("/public/epsg_coordinateaxisname");
     try {
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("coord_axis_name_code");
         final String name = object.getValue("coord_axis_name");
         coordinateAxisNames.put(code, name);
@@ -187,9 +187,9 @@ public final class EpsgCoordinateSystemsLoader {
 
   private Map<Integer, String> loadCoordinateOperationMethodNames() {
     final Map<Integer, String> coordinateOperationMethodNames = new HashMap<Integer, String>();
-    final Reader<DataObject> reader = dataStore.query("/public/epsg_coordoperationmethod");
+    final Reader<Record> reader = dataStore.query("/public/epsg_coordoperationmethod");
     try {
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("coord_op_method_code");
         final String name = ((String)object.getValue("coord_op_method_name")).replace(
           " ", "_");
@@ -204,9 +204,9 @@ public final class EpsgCoordinateSystemsLoader {
 
   private Map<Integer, String> loadCoordinateOperationParamNames() {
     final Map<Integer, String> names = new HashMap<Integer, String>();
-    final Reader<DataObject> reader = dataStore.query("/public/epsg_coordoperationparam");
+    final Reader<Record> reader = dataStore.query("/public/epsg_coordoperationparam");
     try {
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("parameter_code");
         final String name = object.getValue("parameter_name".replace(" ", "_")
           .toLowerCase());
@@ -222,9 +222,9 @@ public final class EpsgCoordinateSystemsLoader {
   private Map<Integer, Map<String, Object>> loadCoordinateOperationParamValues(
     final Map<Integer, String> coordinateOperationParamNames) {
     final Map<Integer, Map<String, Object>> coordinateOperationParamValues = new HashMap<Integer, Map<String, Object>>();
-    final Reader<DataObject> reader = dataStore.query("/public/epsg_coordoperationparamvalue");
+    final Reader<Record> reader = dataStore.query("/public/epsg_coordoperationparamvalue");
     try {
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("coord_op_code");
         final Integer nameCode = object.getInteger("parameter_code");
         final Integer uomCode = object.getInteger("uom_code");
@@ -251,9 +251,9 @@ public final class EpsgCoordinateSystemsLoader {
     final Map<Integer, Integer> coordinateOperationMethods = new HashMap<Integer, Integer>();
     final Query query = new Query("/public/epsg_coordoperation");
     query.addOrderBy("coord_op_code", true);
-    final Reader<DataObject> reader = dataStore.query(query);
+    final Reader<Record> reader = dataStore.query(query);
     try {
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("coord_op_code");
         final Integer methodCode = object.getInteger("coord_op_method_code");
         coordinateOperationMethods.put(code, methodCode);
@@ -268,7 +268,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadDatums() throws IOException {
     final Query query = new Query("/public/epsg_datum");
     query.addOrderBy("datum_code", true);
-    final Reader<DataObject> reader = dataStore.query(query);
+    final Reader<Record> reader = dataStore.query(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/datum.csv");
     final CsvWriter writer = new CsvWriter(
@@ -276,7 +276,7 @@ public final class EpsgCoordinateSystemsLoader {
     try {
       writer.write("ID", "NAME", "SPHEROID_ID", "PRIME_MERIDIAN_ID",
         "DEPRECATED");
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final String datumType = object.getValue("datum_type");
         final boolean deprecated = isDeprecated(object);
         if (datumType.equals("geodetic")) {
@@ -296,7 +296,7 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private void loadGeographicCoordinateSystems() throws IOException {
-    final Reader<DataObject> reader = dataStore.query("/public/epsg_coordinatereferencesystem");
+    final Reader<Record> reader = dataStore.query("/public/epsg_coordinatereferencesystem");
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/geographic.csv");
     final CsvWriter writer = new CsvWriter(
@@ -304,7 +304,7 @@ public final class EpsgCoordinateSystemsLoader {
     try {
       writer.write("ID", "NAME", "DATUM_ID", "UNIT_ID", "AXIS_ID", "AREA_ID",
         "DEPRECATED");
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final String type = object.getValue("coord_ref_sys_kind");
         final boolean deprecated = isDeprecated(object);
         if (type.equals("geographic 2D")) {
@@ -330,14 +330,14 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadPrimeMeridians() throws IOException {
     final Query query = new Query("/public/epsg_primemeridian");
     query.addOrderBy("prime_meridian_code", true);
-    final Reader<DataObject> reader = dataStore.query(query);
+    final Reader<Record> reader = dataStore.query(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/primemeridian.csv");
     final CsvWriter writer = new CsvWriter(
       FileUtil.createUtf8Writer(new FileOutputStream(file)));
     try {
       writer.write("ID", "NAME", "LONGITUDE", "DEPRECATED");
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("prime_meridian_code");
         final int uomCode = object.getInteger("uom_code");
         final String name = object.getValue("prime_meridian_name");
@@ -358,7 +358,7 @@ public final class EpsgCoordinateSystemsLoader {
     final Map<Integer, String> coordinateOperationParamNames = loadCoordinateOperationParamNames();
     final Map<Integer, Map<String, Object>> coordinateOperationParamValues = loadCoordinateOperationParamValues(coordinateOperationParamNames);
     final Map<Integer, Integer> coordinateOperationMethods = loadCoordinateOperations();
-    final Reader<DataObject> reader = dataStore.query("/public/epsg_coordinatereferencesystem");
+    final Reader<Record> reader = dataStore.query("/public/epsg_coordinatereferencesystem");
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/projected.csv");
     final CsvWriter writer = new CsvWriter(
@@ -366,7 +366,7 @@ public final class EpsgCoordinateSystemsLoader {
     try {
       writer.write("ID", "NAME", "GEO_CS_ID", "UNIT_ID", "PROJECTION_ID",
         "PROJECTION_NAME", "PARAMETERS", "AXIS_ID", "AREA_ID", "DEPRECATED");
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
 
         final String type = object.getValue("coord_ref_sys_kind");
         if (type.equals("projected")) {
@@ -402,7 +402,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadSpheroids() throws IOException {
     final Query query = new Query("/public/epsg_ellipsoid");
     query.addOrderBy("ellipsoid_code", true);
-    final Reader<DataObject> reader = dataStore.query(query);
+    final Reader<Record> reader = dataStore.query(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/spheroid.csv");
     final CsvWriter writer = new CsvWriter(
@@ -410,7 +410,7 @@ public final class EpsgCoordinateSystemsLoader {
     try {
       writer.write("ID", "NAME", "SEMI_MAJOR_AXIS", "SEMI_MINOR_AXIS",
         "INVERSE_FLATTENING", "DEPRECATED");
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("ellipsoid_code");
         final boolean deprecated = isDeprecated(object);
         final String name = object.getValue("ellipsoid_name");
@@ -435,7 +435,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadUnits() throws IOException {
     final Query query = new Query("/public/epsg_unitofmeasure");
     query.addOrderBy("uom_code", true);
-    final Reader<DataObject> reader = dataStore.query(query);
+    final Reader<Record> reader = dataStore.query(query);
     final File linearFile = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/linearunit.csv");
     final CsvWriter linearWriter = new CsvWriter(
@@ -449,7 +449,7 @@ public final class EpsgCoordinateSystemsLoader {
         "DEPRECATED");
       angularWriter.write("ID", "NAME", "BASE_ID", "CONVERSION_FACTOR",
         "DEPRECATED");
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final Integer code = object.getInteger("uom_code");
         final String name = object.getValue("unit_of_meas_name");
         final String type = object.getValue("unit_of_meas_type");

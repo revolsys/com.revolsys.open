@@ -5,10 +5,10 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.form.DataObjectLayerForm;
 import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -83,12 +83,12 @@ public class DataObjectLayerAttributesTableModel extends
     if (columnIndex == 2) {
       if (this.form.get().isEditable()) {
         final String attributeName = getFieldName(rowIndex);
-        final DataObjectMetaData metaData = getMetaData();
+        final RecordDefinition metaData = getMetaData();
         final Attribute idAttribute = metaData.getIdAttribute();
         if (idAttribute != null) {
           final String idAttributeName = idAttribute.getName();
           if (attributeName.equals(idAttributeName)) {
-            if (object.getState() == DataObjectState.New) {
+            if (object.getState() == RecordState.New) {
               if (!Number.class.isAssignableFrom(idAttribute.getTypeClass())) {
                 return true;
               }
@@ -121,7 +121,7 @@ public class DataObjectLayerAttributesTableModel extends
     final Object source = event.getSource();
     if (source == this.object) {
       final String propertyName = event.getPropertyName();
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       final int index = metaData.getAttributeIndex(propertyName);
       if (index > -1) {
         try {

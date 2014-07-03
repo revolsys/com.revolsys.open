@@ -36,19 +36,19 @@ import java.util.TreeSet;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
-import com.revolsys.gis.data.model.DataObjectMetaDataFactoryImpl;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.DataObjectMetaDataProperty;
-import com.revolsys.gis.data.model.types.CollectionDataType;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.data.model.types.EnumerationDataType;
-import com.revolsys.gis.data.model.types.SimpleDataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.property.RecordDefinitionProperty;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionFactory;
+import com.revolsys.data.record.schema.RecordDefinitionFactoryImpl;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.CollectionDataType;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
+import com.revolsys.data.types.EnumerationDataType;
+import com.revolsys.data.types.SimpleDataType;
 import com.revolsys.io.saif.util.CsnIterator;
 
 public class SaifSchemaReader {
@@ -87,16 +87,16 @@ public class SaifSchemaReader {
     nameTypeMap.put(String.valueOf(typePath), dataType);
   }
 
-  private List<DataObjectMetaDataProperty> commonMetaDataProperties = new ArrayList<DataObjectMetaDataProperty>();
+  private List<RecordDefinitionProperty> commonMetaDataProperties = new ArrayList<RecordDefinitionProperty>();
 
-  private DataObjectMetaDataImpl currentClass;
+  private RecordDefinitionImpl currentClass;
 
-  private final Set<DataObjectMetaData> currentSuperClasses = new LinkedHashSet<DataObjectMetaData>();
+  private final Set<RecordDefinition> currentSuperClasses = new LinkedHashSet<RecordDefinition>();
 
-  private DataObjectMetaDataFactoryImpl schema;
+  private RecordDefinitionFactoryImpl schema;
 
   private void addExportedObjects() {
-    final DataObjectMetaDataImpl exportedObjectHandle = new DataObjectMetaDataImpl(
+    final RecordDefinitionImpl exportedObjectHandle = new RecordDefinitionImpl(
       "ExportedObjectHandle");
     schema.addMetaData(exportedObjectHandle);
     exportedObjectHandle.addAttribute("referenceID", DataTypes.STRING, true);
@@ -105,8 +105,8 @@ public class SaifSchemaReader {
     exportedObjectHandle.addAttribute("sharable", DataTypes.BOOLEAN, true);
   }
 
-  public void addSuperClass(final DataObjectMetaDataImpl currentClass,
-    final DataObjectMetaData superClass) {
+  public void addSuperClass(final RecordDefinitionImpl currentClass,
+    final RecordDefinition superClass) {
     currentClass.addSuperClass(superClass);
     for (final String name : superClass.getAttributeNames()) {
       final Attribute attribute = superClass.getAttribute(name);
@@ -135,7 +135,7 @@ public class SaifSchemaReader {
     }
   }
 
-  public void attributes(final DataObjectMetaData type,
+  public void attributes(final RecordDefinition type,
     final CsnIterator iterator) throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_NAME
       || iterator.getNextEventType() == CsnIterator.OPTIONAL_ATTRIBUTE) {
@@ -155,7 +155,7 @@ public class SaifSchemaReader {
                 dataType = DataTypes.GEOMETRY;
                 currentClass.setGeometryAttributeIndex(currentClass.getAttributeCount());
               } else if (dataType == null) {
-                dataType = new SimpleDataType(typePath, DataObject.class);
+                dataType = new SimpleDataType(typePath, Record.class);
               }
 
               currentClass.addAttribute(attributeName, dataType, required);
@@ -197,18 +197,18 @@ public class SaifSchemaReader {
     }
   }
 
-  public void classAttributes(final DataObjectMetaData type,
+  public void classAttributes(final RecordDefinition type,
     final CsnIterator iterator) throws IOException {
   }
 
-  public void comments(final DataObjectMetaData type, final CsnIterator iterator)
+  public void comments(final RecordDefinition type, final CsnIterator iterator)
     throws IOException {
     if (iterator.next() == CsnIterator.VALUE) {
       iterator.getStringValue();
     }
   }
 
-  public void defaults(final DataObjectMetaData type, final CsnIterator iterator)
+  public void defaults(final RecordDefinition type, final CsnIterator iterator)
     throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_PATH) {
       iterator.next();
@@ -222,7 +222,7 @@ public class SaifSchemaReader {
     }
   }
 
-  public List<DataObjectMetaDataProperty> getCommonMetaDataProperties() {
+  public List<RecordDefinitionProperty> getCommonMetaDataProperties() {
     return commonMetaDataProperties;
   }
 
@@ -236,7 +236,7 @@ public class SaifSchemaReader {
             nameTypeMap.put(enumeration.getName(), enumeration);
             return enumeration;
           }
-          final DataObjectMetaData superClass = schema.getMetaData(superClassName);
+          final RecordDefinition superClass = schema.getRecordDefinition(superClassName);
           if (superClass == null) {
             throw new IllegalStateException("Cannot find super class '"
               + superClassName + "'");
@@ -249,7 +249,7 @@ public class SaifSchemaReader {
           try {
             final Method method = getClass().getMethod(componentName,
               new Class[] {
-                DataObjectMetaData.class, CsnIterator.class
+                RecordDefinition.class, CsnIterator.class
               });
             method.invoke(this, new Object[] {
               currentClass, iterator
@@ -281,13 +281,13 @@ public class SaifSchemaReader {
     return currentClass;
   }
 
-  private DataObjectMetaDataFactory loadSchema(final CsnIterator iterator)
+  private RecordDefinitionFactory loadSchema(final CsnIterator iterator)
     throws IOException {
     if (schema == null) {
-      schema = new DataObjectMetaDataFactoryImpl();
+      schema = new RecordDefinitionFactoryImpl();
 
-      schema.addMetaData(new DataObjectMetaDataImpl("/AggregateType"));
-      schema.addMetaData(new DataObjectMetaDataImpl("/PrimitiveType"));
+      schema.addMetaData(new RecordDefinitionImpl("/AggregateType"));
+      schema.addMetaData(new RecordDefinitionImpl("/PrimitiveType"));
 
       addExportedObjects();
     }
@@ -295,8 +295,8 @@ public class SaifSchemaReader {
       currentSuperClasses.clear();
       currentClass = null;
       final Object definition = getDefinition(iterator);
-      if (definition instanceof DataObjectMetaData) {
-        final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)definition;
+      if (definition instanceof RecordDefinition) {
+        final RecordDefinitionImpl metaData = (RecordDefinitionImpl)definition;
         setMetaDataProperties(metaData);
         metaData.setDataObjectMetaDataFactory(schema);
         schema.addMetaData(metaData);
@@ -305,25 +305,25 @@ public class SaifSchemaReader {
     return schema;
   }
 
-  public DataObjectMetaDataFactory loadSchema(final File file)
+  public RecordDefinitionFactory loadSchema(final File file)
     throws IOException {
     final CsnIterator iterator = new CsnIterator(file);
     return loadSchema(iterator);
   }
 
-  public DataObjectMetaDataFactory loadSchema(final Resource resource)
+  public RecordDefinitionFactory loadSchema(final Resource resource)
     throws IOException {
     return loadSchema(new CsnIterator(resource.getFilename(),
       resource.getInputStream()));
 
   }
 
-  public DataObjectMetaDataFactory loadSchema(final String fileName,
+  public RecordDefinitionFactory loadSchema(final String fileName,
     final InputStream in) throws IOException {
     return loadSchema(new CsnIterator(fileName, in));
   }
 
-  public DataObjectMetaDataFactory loadSchemas(final List<Resource> resources)
+  public RecordDefinitionFactory loadSchemas(final List<Resource> resources)
     throws IOException {
     for (final Resource resource : resources) {
       if (resource.exists()) {
@@ -362,7 +362,7 @@ public class SaifSchemaReader {
     return new EnumerationDataType(name, String.class, allowedValues);
   }
 
-  public void restricted(final DataObjectMetaData type,
+  public void restricted(final RecordDefinition type,
     final CsnIterator iterator) throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_PATH) {
       iterator.next();
@@ -446,23 +446,23 @@ public class SaifSchemaReader {
   }
 
   public void setCommonMetaDataProperties(
-    final List<DataObjectMetaDataProperty> commonMetaDataProperties) {
+    final List<RecordDefinitionProperty> commonMetaDataProperties) {
     this.commonMetaDataProperties = commonMetaDataProperties;
   }
 
-  private void setMetaDataProperties(final DataObjectMetaDataImpl metaData) {
-    for (final DataObjectMetaDataProperty property : commonMetaDataProperties) {
-      final DataObjectMetaDataProperty clonedProperty = property.clone();
-      clonedProperty.setMetaData(metaData);
+  private void setMetaDataProperties(final RecordDefinitionImpl metaData) {
+    for (final RecordDefinitionProperty property : commonMetaDataProperties) {
+      final RecordDefinitionProperty clonedProperty = property.clone();
+      clonedProperty.setRecordDefinition(metaData);
     }
   }
 
-  public void subclass(final DataObjectMetaData type, final CsnIterator iterator)
+  public void subclass(final RecordDefinition type, final CsnIterator iterator)
     throws IOException {
     if (iterator.next() == CsnIterator.CLASS_NAME) {
       final String className = iterator.getPathValue();
-      currentClass = new DataObjectMetaDataImpl(className);
-      for (final DataObjectMetaData superClassDef : currentSuperClasses) {
+      currentClass = new RecordDefinitionImpl(className);
+      for (final RecordDefinition superClassDef : currentSuperClasses) {
         addSuperClass(currentClass, superClassDef);
       }
       // currentClass.setName(className);

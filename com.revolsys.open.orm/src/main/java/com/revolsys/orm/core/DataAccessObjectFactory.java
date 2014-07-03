@@ -15,7 +15,7 @@
  */
 package com.revolsys.orm.core;
 
-import com.revolsys.gis.data.io.DataAccessObject;
+import com.revolsys.data.io.DataAccessObject;
 
 /**
  * The DataAccessObjectFactory interface defines the methods that factories that

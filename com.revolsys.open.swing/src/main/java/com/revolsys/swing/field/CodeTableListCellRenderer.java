@@ -6,8 +6,8 @@ import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.util.CollectionUtil;
 
 @SuppressWarnings("serial")
@@ -29,7 +29,7 @@ public class CodeTableListCellRenderer extends DefaultListCellRenderer {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       value = "-";
     } else if (index >= 0) {
-      final List<Object> values = this.codeTable.getValues(SingleRecordIdentifier.create(
+      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(
         value));
       if (values == null || values.isEmpty()) {
         value = "-";

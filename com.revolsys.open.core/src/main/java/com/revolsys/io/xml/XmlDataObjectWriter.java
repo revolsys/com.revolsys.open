@@ -7,18 +7,18 @@ import java.util.Map.Entry;
 import javax.xml.namespace.QName;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataProperties;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.RecordProperties;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.NamedObject;
 
-public class XmlDataObjectWriter extends AbstractWriter<DataObject> {
+public class XmlDataObjectWriter extends AbstractWriter<Record> {
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
   private XmlWriter out;
 
@@ -28,7 +28,7 @@ public class XmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   private boolean opened;
 
-  public XmlDataObjectWriter(final DataObjectMetaData metaData,
+  public XmlDataObjectWriter(final RecordDefinition metaData,
     final java.io.Writer out) {
     this.metaData = metaData;
     if (out instanceof XmlWriter) {
@@ -122,11 +122,11 @@ public class XmlDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     if (!opened) {
       writeHeader();
     }
-    QName qualifiedName = metaData.getProperty(DataObjectMetaDataProperties.QUALIFIED_NAME);
+    QName qualifiedName = metaData.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
       qualifiedName = new QName(metaData.getTypeName());
     }

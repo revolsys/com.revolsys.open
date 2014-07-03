@@ -12,10 +12,10 @@ import javax.annotation.PreDestroy;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.comparator.DataObjectAttributeComparator;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.comparator.RecordAttributeComparator;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -37,7 +37,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     return createPanel(layer.getMetaData(), objects, layer.getColumnNames());
   }
 
-  public static TablePanel createPanel(final DataObjectMetaData metaData,
+  public static TablePanel createPanel(final RecordDefinition metaData,
     final Collection<LayerRecord> objects,
     final Collection<String> attributeNames) {
     final DataObjectListTableModel model = new DataObjectListTableModel(
@@ -46,14 +46,14 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     return new TablePanel(table);
   }
 
-  public static TablePanel createPanel(final DataObjectMetaData metaData,
+  public static TablePanel createPanel(final RecordDefinition metaData,
     final List<LayerRecord> objects, final String... attributeNames) {
     return createPanel(metaData, objects, Arrays.asList(attributeNames));
   }
 
   private final List<LayerRecord> records = new ArrayList<LayerRecord>();
 
-  public DataObjectListTableModel(final DataObjectMetaData metaData,
+  public DataObjectListTableModel(final RecordDefinition metaData,
     final Collection<LayerRecord> objects,
     final Collection<String> columnNames) {
     super(metaData, columnNames);
@@ -94,7 +94,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends DataObject> V getRecord(final int index) {
+  public <V extends Record> V getRecord(final int index) {
     if (index >= 0 && index < this.records.size()) {
       return (V)this.records.get(index);
     } else {
@@ -121,7 +121,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
       if (isReadOnly(attributeName)) {
         return false;
       } else {
-        final DataObjectMetaData metaData = getMetaData();
+        final RecordDefinition metaData = getMetaData();
         final DataType dataType = metaData.getAttributeType(attributeName);
         if (dataType == null) {
           return false;
@@ -160,7 +160,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     if (fromIndex < toIndex) {
       toIndex--;
     }
-    final DataObject object = getRecord(fromIndex);
+    final Record object = getRecord(fromIndex);
     if (object instanceof LayerRecord) {
       final LayerRecord layerDataObject = (LayerRecord)object;
       removeAll(layerDataObject);
@@ -186,7 +186,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
     final SortOrder sortOrder = super.setSortOrder(column);
     if (this.records != null) {
       final String attributeName = getFieldName(column);
-      final Comparator<DataObject> comparitor = new DataObjectAttributeComparator(
+      final Comparator<Record> comparitor = new RecordAttributeComparator(
         sortOrder == SortOrder.ASCENDING, attributeName);
       Collections.sort(this.records, comparitor);
       fireTableDataChanged();
@@ -197,7 +197,7 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final DataObject object = getRecord(rowIndex);
+    final Record object = getRecord(rowIndex);
     if (object != null) {
       final String name = getColumnName(columnIndex);
       final Object oldValue = object.getValueByPath(name);

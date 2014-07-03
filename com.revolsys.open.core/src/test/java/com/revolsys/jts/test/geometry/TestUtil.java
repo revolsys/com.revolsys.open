@@ -4,10 +4,10 @@ import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.data.io.AbstractDataObjectAndGeometryReaderFactory;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -28,9 +28,9 @@ public class TestUtil {
     boolean valid = true;
     final Resource resource = new ClassPathResource(file, clazz);
     try (
-      Reader<DataObject> reader = AbstractDataObjectAndGeometryReaderFactory.dataObjectReader(resource)) {
+      Reader<Record> reader = AbstractDataObjectAndGeometryReaderFactory.dataObjectReader(resource)) {
       int i = 0;
-      for (final DataObject object : reader) {
+      for (final Record object : reader) {
         final int srid = object.getInteger("srid");
         final int axisCount = object.getInteger("axisCount");
         final double scaleXy = object.getInteger("scaleXy");
@@ -89,7 +89,7 @@ public class TestUtil {
     }
   }
 
-  public static boolean equalsExpectedWkt(final int i, final DataObject object,
+  public static boolean equalsExpectedWkt(final int i, final Record object,
     final Geometry actualGeometry) {
     final GeometryFactory geometryFactory = GeometryFactory.floating3();
     final String wkt = object.getValue("expectedWkt");

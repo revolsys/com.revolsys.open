@@ -11,7 +11,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.data.model.DataObjectState;
+import com.revolsys.data.record.RecordState;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -45,8 +45,8 @@ public class NewPredicate implements HighlightPredicate {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final LayerRecord object = this.model.getRecord(rowIndex);
       if (object != null) {
-        final DataObjectState state = object.getState();
-        return state.equals(DataObjectState.New);
+        final RecordState state = object.getState();
+        return state.equals(RecordState.New);
       }
     } catch (final Throwable e) {
     }

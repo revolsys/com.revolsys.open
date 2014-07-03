@@ -5,9 +5,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.data.types.DataType;
 import com.revolsys.gis.converter.string.BoundingBoxStringConverter;
 import com.revolsys.gis.converter.string.GeometryStringConverter;
-import com.revolsys.gis.data.model.types.DataType;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;

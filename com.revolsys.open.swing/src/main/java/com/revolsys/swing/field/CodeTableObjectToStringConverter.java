@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.util.CollectionUtil;
 
 public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
@@ -21,7 +21,7 @@ public class CodeTableObjectToStringConverter extends ObjectToStringConverter {
     if (value == null || value == CodeTableComboBoxModel.NULL) {
       return null;
     } else {
-      final List<Object> values = this.codeTable.getValues(SingleRecordIdentifier.create(
+      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(
         value));
       if (values == null || values.isEmpty()) {
         return null;

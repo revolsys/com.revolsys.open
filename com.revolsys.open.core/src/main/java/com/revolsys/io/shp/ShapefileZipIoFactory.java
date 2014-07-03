@@ -7,12 +7,12 @@ import java.nio.charset.Charset;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryIoFactory;
-import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.io.ZipDataObjectReader;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.AbstractDataObjectAndGeometryIoFactory;
+import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.ZipDataObjectReader;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.ZipWriter;
@@ -27,14 +27,14 @@ public class ShapefileZipIoFactory extends
 
   @Override
   public DataObjectReader createDataObjectReader(final Resource resource,
-    final DataObjectFactory factory) {
+    final RecordFactory factory) {
     return new ZipDataObjectReader(resource, ShapefileConstants.FILE_EXTENSION,
       factory);
   }
 
   @Override
-  public Writer<DataObject> createDataObjectWriter(final String baseName,
-    final DataObjectMetaData metaData, final OutputStream outputStream,
+  public Writer<Record> createDataObjectWriter(final String baseName,
+    final RecordDefinition metaData, final OutputStream outputStream,
     final Charset charset) {
     File directory;
     try {
@@ -44,9 +44,9 @@ public class ShapefileZipIoFactory extends
     }
     final Resource tempResource = new FileSystemResource(new File(directory,
       baseName + ".shp"));
-    final Writer<DataObject> shapeWriter = new ShapefileDataObjectWriter(
+    final Writer<Record> shapeWriter = new ShapefileDataObjectWriter(
       metaData, tempResource);
-    return new ZipWriter<DataObject>(directory, shapeWriter, outputStream);
+    return new ZipWriter<Record>(directory, shapeWriter, outputStream);
   }
 
 }

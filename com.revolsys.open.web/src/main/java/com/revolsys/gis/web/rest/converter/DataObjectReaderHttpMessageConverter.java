@@ -22,11 +22,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.io.DataObjectReaderFactory;
-import com.revolsys.gis.data.io.DataObjectWriterFactory;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.DataObjectReaderFactory;
+import com.revolsys.data.io.DataObjectWriterFactory;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
@@ -88,7 +88,7 @@ public class DataObjectReaderHttpMessageConverter extends
         throw new HttpMessageNotReadableException("Cannot read data in format"
           + mediaType);
       } else {
-        final Reader<DataObject> reader = readerFactory.createDataObjectReader(new InputStreamResource(
+        final Reader<Record> reader = readerFactory.createDataObjectReader(new InputStreamResource(
           "dataObjectInput", body));
 
         GeometryFactory factory = geometryFactory;
@@ -139,7 +139,7 @@ public class DataObjectReaderHttpMessageConverter extends
           throw new IllegalArgumentException("Media type " + actualMediaType
             + " not supported");
         } else {
-          final DataObjectMetaData metaData = reader.getMetaData();
+          final RecordDefinition metaData = reader.getMetaData();
           final HttpHeaders headers = outputMessage.getHeaders();
           headers.setContentType(actualMediaType);
           final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
@@ -159,7 +159,7 @@ public class DataObjectReaderHttpMessageConverter extends
             + fileName);
 
           final OutputStream body = outputMessage.getBody();
-          final Writer<DataObject> writer = writerFactory.createDataObjectWriter(
+          final Writer<Record> writer = writerFactory.createDataObjectWriter(
             baseName, metaData, body, charset);
           if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
             RequestAttributes.SCOPE_REQUEST))) {
@@ -182,9 +182,9 @@ public class DataObjectReaderHttpMessageConverter extends
             }
           }
 
-          final Iterator<DataObject> iterator = reader.iterator();
+          final Iterator<Record> iterator = reader.iterator();
           if (iterator.hasNext()) {
-            DataObject dataObject = iterator.next();
+            Record dataObject = iterator.next();
             final Geometry geometry = dataObject.getGeometryValue();
             if (geometry != null) {
               final GeometryFactory geometryFactory = geometry.getGeometryFactory();

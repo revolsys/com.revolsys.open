@@ -8,9 +8,9 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
+import com.revolsys.data.io.DataObjectStoreSchema;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.CollectionUtil;

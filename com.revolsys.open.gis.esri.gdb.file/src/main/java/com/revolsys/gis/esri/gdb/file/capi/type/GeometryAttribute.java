@@ -8,10 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.io.EndianInputStream;
@@ -162,7 +162,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final DataObject object, final Row row,
+  public Object setValue(final Record object, final Row row,
     final Object value) {
     final String name = getName();
     if (value == null) {

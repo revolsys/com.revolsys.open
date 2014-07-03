@@ -2,7 +2,7 @@ package com.revolsys.gis.esri.gdb.file.test.field;
 
 import java.io.IOException;
 
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.EndianInput;
 
 public class DateTimeField extends FgdbField {

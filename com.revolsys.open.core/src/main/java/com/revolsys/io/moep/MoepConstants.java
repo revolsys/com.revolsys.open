@@ -1,8 +1,8 @@
 package com.revolsys.io.moep;
 
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataTypes;
 
 public final class MoepConstants {
   public static final String ADMIT_INTEGRATION_DATE = "A_DATE";
@@ -31,7 +31,7 @@ public final class MoepConstants {
 
   public static final String MAPSHEET_NAME = "MAPSHEET";
 
-  public static final DataObjectMetaData META_DATA;
+  public static final RecordDefinition META_DATA;
 
   public static final String ORIGINAL_FILE_TYPE = "FILE_TYPE";
 
@@ -59,8 +59,8 @@ public final class MoepConstants {
     META_DATA = createMetaData(TYPE_NAME);
   }
 
-  public static DataObjectMetaDataImpl createMetaData(final String typePath) {
-    final DataObjectMetaDataImpl type = new DataObjectMetaDataImpl(typePath);
+  public static RecordDefinitionImpl createMetaData(final String typePath) {
+    final RecordDefinitionImpl type = new RecordDefinitionImpl(typePath);
     type.addAttribute(FEATURE_CODE, DataTypes.STRING, 10, true);
     type.addAttribute(MAPSHEET_NAME, DataTypes.STRING, 7, false);
     type.addAttribute(DISPLAY_TYPE, DataTypes.STRING, 20, true);

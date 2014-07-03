@@ -8,10 +8,10 @@ import junit.framework.TestSuite;
 
 import org.junit.Assert;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory;
 import com.revolsys.gis.util.NoOp;
@@ -61,25 +61,25 @@ public class FileGdbIoTest {
       dataStore.initialize();
 
       final String typePath = "/" + geometryTypeString;
-      final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
+      final RecordDefinitionImpl metaData = new RecordDefinitionImpl(
         typePath);
       metaData.addAttribute("ID", DataTypes.INT, true);
       metaData.addAttribute("GEOMETRY", dataType, true);
       metaData.setGeometryFactory(geometryFactory);
       dataStore.getMetaData(metaData);
       try (
-        Writer<DataObject> writer = dataStore.createWriter()) {
+        Writer<Record> writer = dataStore.createWriter()) {
         writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
-        final DataObject record = dataStore.create(typePath);
+        final Record record = dataStore.create(typePath);
         record.setValue("ID", 1);
         record.setGeometryValue(geometry);
         writer.write(record);
       }
       try (
-        Reader<DataObject> reader = dataStore.query(typePath)) {
-        final List<DataObject> objects = reader.read();
+        Reader<Record> reader = dataStore.query(typePath)) {
+        final List<Record> objects = reader.read();
         Assert.assertEquals("Geometry Count", 1, objects.size());
         final Geometry actual = objects.get(0).getGeometryValue();
         Assert.assertEquals("Empty", geometry.isEmpty(), actual.isEmpty());

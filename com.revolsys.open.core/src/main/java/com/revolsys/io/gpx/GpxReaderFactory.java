@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
-import com.revolsys.gis.data.io.DataObjectIterator;
-import com.revolsys.gis.data.io.DataObjectIteratorReader;
-import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.AbstractDataObjectAndGeometryReaderFactory;
+import com.revolsys.data.io.DataObjectIterator;
+import com.revolsys.data.io.DataObjectIteratorReader;
+import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public class GpxReaderFactory extends
   AbstractDataObjectAndGeometryReaderFactory {
@@ -21,8 +21,8 @@ public class GpxReaderFactory extends
   }
 
   public DataObjectReader createDataObjectReader(
-    final DataObjectMetaData metaData, final Resource resource,
-    final DataObjectFactory factory) {
+    final RecordDefinition metaData, final Resource resource,
+    final RecordFactory factory) {
     throw new UnsupportedOperationException();
   }
 
@@ -35,7 +35,7 @@ public class GpxReaderFactory extends
    */
   @Override
   public DataObjectReader createDataObjectReader(final Resource resource,
-    final DataObjectFactory dataObjectFactory) {
+    final RecordFactory dataObjectFactory) {
     try {
       final DataObjectIterator iterator = new GpxIterator(resource,
         dataObjectFactory, null);

@@ -1,6 +1,6 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.util.Property;
 
 public class SetObjectProperty extends AbstractUndoableEdit {

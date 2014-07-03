@@ -24,11 +24,11 @@ import com.revolsys.collection.IntHashMap;
 import com.revolsys.collection.Visitor;
 import com.revolsys.collection.bplus.BPlusTreeMap;
 import com.revolsys.comparator.ComparatorProxy;
+import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
 import com.revolsys.filter.FilterUtil;
 import com.revolsys.gis.algorithm.index.IdObjectIndex;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.graph.attribute.ObjectAttributeProxy;
 import com.revolsys.gis.graph.comparator.NodeDistanceComparator;
@@ -807,14 +807,14 @@ public class Graph<T> {
     return newEdge;
   }
 
-  public void moveNode(final String typePath, final Node<DataObject> fromNode,
-    final Node<DataObject> toNode, final Point newPoint) {
+  public void moveNode(final String typePath, final Node<Record> fromNode,
+    final Node<Record> toNode, final Point newPoint) {
     if (!fromNode.isRemoved() && !toNode.isRemoved()) {
       if (!fromNode.equals(toNode)) {
-        final List<Edge<DataObject>> edges = NodeAttributes.getEdgesByType(
+        final List<Edge<Record>> edges = NodeAttributes.getEdgesByType(
           fromNode, typePath);
 
-        for (final Edge<DataObject> edge : edges) {
+        for (final Edge<Record> edge : edges) {
           if (!edge.isRemoved()) {
             final LineString line = edge.getLine();
             LineString newLine;
@@ -825,7 +825,7 @@ public class Graph<T> {
               newLine = line.subLine(null, 0, line.getVertexCount() - 1,
                 newPoint);
             }
-            final Graph<DataObject> graph = edge.getGraph();
+            final Graph<Record> graph = edge.getGraph();
             graph.replaceEdge(edge, newLine);
           }
         }
@@ -834,11 +834,11 @@ public class Graph<T> {
   }
 
   public boolean moveNodesToMidpoint(final String typePath,
-    final Node<DataObject> node1, final Node<DataObject> node2) {
+    final Node<Record> node1, final Node<Record> node2) {
     final Point point1 = node1.get3dCoordinates(typePath);
     final Point point2 = node2.get3dCoordinates(typePath);
 
-    final Graph<DataObject> graph = node1.getGraph();
+    final Graph<Record> graph = node1.getGraph();
     final Point midPoint = LineSegmentUtil.midPoint(
       GeometryFactory.fixed(0, 1000.0, 1.0), node2, node1);
     final double x = midPoint.getX();
@@ -854,7 +854,7 @@ public class Graph<T> {
       z = Double.NaN;
     }
     final Point newPoint = new PointDouble(x, y, z);
-    final Node<DataObject> newNode = graph.getNode(midPoint);
+    final Node<Record> newNode = graph.getNode(midPoint);
     if (!Node.hasEdgesBetween(typePath, node1, newNode)
       && !Node.hasEdgesBetween(typePath, node2, newNode)) {
       if (node1.equals(2, newNode)) {

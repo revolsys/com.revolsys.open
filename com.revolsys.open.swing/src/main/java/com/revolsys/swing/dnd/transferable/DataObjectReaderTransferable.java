@@ -8,8 +8,8 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.record.Record;
 import com.revolsys.io.csv.CsvUtil;
 
 public class DataObjectReaderTransferable implements Transferable {
@@ -40,7 +40,7 @@ public class DataObjectReaderTransferable implements Transferable {
       final Collection<String> attributeNames = this.reader.getMetaData()
         .getAttributeNames();
       CsvUtil.writeColumns(out, attributeNames, '\t', '\n');
-      for (final DataObject object : this.reader) {
+      for (final Record object : this.reader) {
         if (object != null) {
           final Collection<Object> values = object.values();
           CsvUtil.writeColumns(out, values, '\t', '\n');

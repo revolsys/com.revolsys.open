@@ -5,9 +5,9 @@ import java.sql.ResultSetMetaData;
 
 import javax.sql.DataSource;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreQueryReader;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreQueryReader;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
 
 public interface JdbcDataObjectStore extends DataObjectStore {
@@ -27,15 +27,15 @@ public interface JdbcDataObjectStore extends DataObjectStore {
 
   DataSource getDataSource();
 
-  String getGeneratePrimaryKeySql(DataObjectMetaData metaData);
+  String getGeneratePrimaryKeySql(RecordDefinition metaData);
 
   @Override
   String getLabel();
 
-  DataObjectMetaData getMetaData(String tableName,
+  RecordDefinition getMetaData(String tableName,
     ResultSetMetaData resultSetMetaData);
 
-  Object getNextPrimaryKey(DataObjectMetaData metaData);
+  Object getNextPrimaryKey(RecordDefinition metaData);
 
   Object getNextPrimaryKey(String typePath);
 

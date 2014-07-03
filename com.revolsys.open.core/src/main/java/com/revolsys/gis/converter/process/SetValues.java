@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
 public class SetValues extends
-  AbstractSourceToTargetProcess<DataObject, DataObject> {
+  AbstractSourceToTargetProcess<Record, Record> {
   private Map<String, ? extends Object> values = Collections.emptyMap();
 
   public SetValues(final Map<String, ? extends Object> values) {
@@ -19,7 +19,7 @@ public class SetValues extends
   }
 
   @Override
-  public void process(final DataObject source, final DataObject target) {
+  public void process(final Record source, final Record target) {
     for (final Entry<String, ? extends Object> entry : values.entrySet()) {
       final String name = entry.getKey();
       final Object value = entry.getValue();

@@ -9,14 +9,14 @@ import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractDataObjectIoFactory;
-import com.revolsys.gis.data.io.DataObjectIteratorReader;
-import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreFactory;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.AbstractDataObjectIoFactory;
+import com.revolsys.data.io.DataObjectIteratorReader;
+import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreFactory;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.DirectoryDataObjectStore;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
@@ -31,7 +31,7 @@ public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory
 
   @Override
   public DataObjectReader createDataObjectReader(final Resource resource,
-    final DataObjectFactory dataObjectFactory) {
+    final RecordFactory dataObjectFactory) {
     final CsvDataObjectIterator iterator = new CsvDataObjectIterator(resource,
       dataObjectFactory);
     return new DataObjectIteratorReader(iterator);
@@ -47,8 +47,8 @@ public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory
   }
 
   @Override
-  public Writer<DataObject> createDataObjectWriter(final String baseName,
-    final DataObjectMetaData metaData, final OutputStream outputStream,
+  public Writer<Record> createDataObjectWriter(final String baseName,
+    final RecordDefinition metaData, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);

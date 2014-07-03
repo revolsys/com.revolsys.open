@@ -11,23 +11,23 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.io.DataObjectIterator;
-import com.revolsys.gis.data.model.ArrayDataObjectFactory;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.io.DataObjectIterator;
+import com.revolsys.data.record.ArrayRecordFactory;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
-public class CsvDataObjectIterator extends AbstractIterator<DataObject>
+public class CsvDataObjectIterator extends AbstractIterator<Record>
   implements DataObjectIterator {
 
   private final char fieldSeparator;
@@ -44,34 +44,34 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
 
   private GeometryFactory geometryFactory;
 
-  private DataObjectFactory dataObjectFactory;
+  private RecordFactory dataObjectFactory;
 
   /** The reader to */
   private BufferedReader in;
 
   /** The metadata for the data being read by this iterator. */
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
   private Resource resource;
 
   private boolean hasPointFields;
 
   public CsvDataObjectIterator(final Resource resource) {
-    this(resource, new ArrayDataObjectFactory(), CsvConstants.FIELD_SEPARATOR);
+    this(resource, new ArrayRecordFactory(), CsvConstants.FIELD_SEPARATOR);
   }
 
   public CsvDataObjectIterator(final Resource resource,
     final char fieldSeparator) {
-    this(resource, new ArrayDataObjectFactory(), fieldSeparator);
+    this(resource, new ArrayRecordFactory(), fieldSeparator);
   }
 
   public CsvDataObjectIterator(final Resource resource,
-    final DataObjectFactory dataObjectFactory) {
+    final RecordFactory dataObjectFactory) {
     this(resource, dataObjectFactory, CsvConstants.FIELD_SEPARATOR);
   }
 
   public CsvDataObjectIterator(final Resource resource,
-    final DataObjectFactory dataObjectFactory, final char fieldSeparator) {
+    final RecordFactory dataObjectFactory, final char fieldSeparator) {
     this.resource = resource;
     this.dataObjectFactory = dataObjectFactory;
     this.fieldSeparator = fieldSeparator;
@@ -115,7 +115,7 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
         geometryFactory);
     }
     final String filename = FileUtil.getBaseName(resource.getFilename());
-    metaData = new DataObjectMetaDataImpl(filename, getProperties(), attributes);
+    metaData = new RecordDefinitionImpl(filename, getProperties(), attributes);
   }
 
   /**
@@ -160,12 +160,12 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   }
 
   @Override
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return metaData;
   }
 
   @Override
-  protected DataObject getNext() {
+  protected Record getNext() {
     try {
       final String[] record = readNextRecord();
       if (record != null && record.length > 0) {
@@ -193,14 +193,14 @@ public class CsvDataObjectIterator extends AbstractIterator<DataObject>
   }
 
   /**
-   * Parse a record containing an array of String values into a DataObject with
+   * Parse a record containing an array of String values into a Record with
    * the strings converted to the objects based on the attribute data type.
    * 
    * @param record The record.
-   * @return The DataObject.
+   * @return The Record.
    */
-  private DataObject parseDataObject(final String[] record) {
-    final DataObject object = dataObjectFactory.createDataObject(metaData);
+  private Record parseDataObject(final String[] record) {
+    final Record object = dataObjectFactory.createRecord(metaData);
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       String value = null;
       if (i < record.length) {

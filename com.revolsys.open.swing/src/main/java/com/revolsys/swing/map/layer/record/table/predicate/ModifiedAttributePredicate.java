@@ -13,10 +13,10 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
@@ -35,8 +35,8 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
 
     table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
       predicate, HighlightPredicate.EVEN), ColorUtil.setAlpha(
-        WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
-        Color.WHITE));
+      WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
+      Color.WHITE));
 
     table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
       predicate, HighlightPredicate.ODD), WebColors.YellowGreen,
@@ -56,7 +56,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
     boolean highlighted = false;
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final DataObject record = this.model.getRecord(rowIndex);
+      final Record record = this.model.getRecord(rowIndex);
       if (record instanceof LayerRecord) {
         final LayerRecord layerRecord = (LayerRecord)record;
         final AbstractDataObjectLayer layer = layerRecord.getLayer();
@@ -67,7 +67,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
           final String attributeName = this.model.getFieldName(columnIndex);
           highlighted = layerRecord.isModified(attributeName);
           if (highlighted) {
-            final DataObjectMetaData metaData = layerRecord.getMetaData();
+            final RecordDefinition metaData = layerRecord.getMetaData();
             final String fieldName = metaData.getAttributeName(columnIndex);
             final Object originalValue = layerRecord.getOriginalValue(fieldName);
             final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
@@ -77,8 +77,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
             } else if (codeTable == null) {
               text = StringConverterRegistry.toString(originalValue);
             } else {
-              text = codeTable.getValue(SingleRecordIdentifier.create(
-                originalValue));
+              text = codeTable.getValue(SingleIdentifier.create(originalValue));
               if (text == null) {
                 text = "-";
               }

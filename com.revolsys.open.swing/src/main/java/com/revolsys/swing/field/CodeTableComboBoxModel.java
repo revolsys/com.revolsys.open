@@ -10,8 +10,8 @@ import java.util.Set;
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
@@ -68,8 +68,8 @@ ComboBoxModel<Object>, PropertyChangeListener, Closeable {
       index--;
     }
     if (index < getSize()) {
-      final Map<RecordIdentifier, List<Object>> codes = this.codeTable.getCodes();
-      final Set<RecordIdentifier> keys = codes.keySet();
+      final Map<Identifier, List<Object>> codes = this.codeTable.getCodes();
+      final Set<Identifier> keys = codes.keySet();
       return CollectionUtil.get(keys, index);
     } else {
       return null;

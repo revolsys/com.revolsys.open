@@ -9,7 +9,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 
@@ -38,7 +38,7 @@ public class ErrorPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final DataObject record = this.model.getRecord(rowIndex);
+      final Record record = this.model.getRecord(rowIndex);
       if (record != null) {
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
         final String attributeName = model.getFieldName(columnIndex);

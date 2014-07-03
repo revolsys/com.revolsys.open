@@ -7,35 +7,35 @@ import java.util.NoSuchElementException;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.data.io.DataObjectIterator;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectUtil;
+import com.revolsys.data.io.DataObjectIterator;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class WktDataObjectIterator extends AbstractIterator<DataObject>
+public class WktDataObjectIterator extends AbstractIterator<Record>
   implements DataObjectIterator {
 
-  private DataObjectFactory factory;
+  private RecordFactory factory;
 
   private BufferedReader in;
 
   private WktParser wktParser;
 
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
-  public WktDataObjectIterator(final DataObjectFactory factory,
+  public WktDataObjectIterator(final RecordFactory factory,
     final Resource resource) throws IOException {
     this.factory = factory;
     this.in = new BufferedReader(
       FileUtil.createUtf8Reader(resource.getInputStream()));
-    this.metaData = DataObjectUtil.createGeometryMetaData();
+    this.metaData = RecordUtil.createGeometryMetaData();
   }
 
   @Override
@@ -68,19 +68,19 @@ public class WktDataObjectIterator extends AbstractIterator<DataObject>
   }
 
   @Override
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return metaData;
   }
 
   @Override
-  protected DataObject getNext() {
+  protected Record getNext() {
     try {
       final String wkt = in.readLine();
       final Geometry geometry = wktParser.parseGeometry(wkt);
       if (geometry == null) {
         throw new NoSuchElementException();
       } else {
-        final DataObject object = factory.createDataObject(getMetaData());
+        final Record object = factory.createRecord(getMetaData());
         object.setGeometryValue(geometry);
         return object;
       }

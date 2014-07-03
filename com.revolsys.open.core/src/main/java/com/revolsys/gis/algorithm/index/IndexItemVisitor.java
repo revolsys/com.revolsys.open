@@ -1,7 +1,7 @@
 package com.revolsys.gis.algorithm.index;
 
 import com.revolsys.collection.Visitor;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.index.ItemVisitor;
@@ -14,19 +14,19 @@ import com.revolsys.jts.index.ItemVisitor;
  * @param <T> The type of item to visit.
  */
 public class IndexItemVisitor implements ItemVisitor {
-  private final Visitor<DataObject> visitor;
+  private final Visitor<Record> visitor;
 
   private final BoundingBoxDoubleGf envelope;
 
   public IndexItemVisitor(final BoundingBoxDoubleGf envelope,
-    final Visitor<DataObject> visitor) {
+    final Visitor<Record> visitor) {
     this.envelope = envelope;
     this.visitor = visitor;
   }
 
   @Override
   public void visitItem(final Object item) {
-    final DataObject object = (DataObject)item;
+    final Record object = (Record)item;
     final BoundingBox envelope = object.getGeometryValue().getBoundingBox();
     if (envelope.intersects(this.envelope)) {
       visitor.visit(object);

@@ -1,6 +1,6 @@
 package com.revolsys.io.gml.type;
 
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.types.DataType;
 import com.revolsys.io.xml.XmlWriter;
 
 public interface GmlFieldType {

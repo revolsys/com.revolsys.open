@@ -1,13 +1,13 @@
 package com.revolsys.gis.cs.parallel;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class GeometryProjection extends
-  BaseInOutProcess<DataObject, DataObject> {
+  BaseInOutProcess<Record, Record> {
   private GeometryFactory geometryFactory;
 
   public GeometryFactory getGeometryFactory() {
@@ -15,8 +15,8 @@ public class GeometryProjection extends
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(final Channel<Record> in,
+    final Channel<Record> out, final Record object) {
     final Geometry geometry = object.getGeometryValue();
 
     if (geometry != null) {

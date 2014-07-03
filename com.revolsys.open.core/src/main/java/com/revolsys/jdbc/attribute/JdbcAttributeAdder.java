@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
 
 public class JdbcAttributeAdder {
   private DataType dataType;
@@ -151,7 +151,7 @@ public class JdbcAttributeAdder {
     this.dataType = dataType;
   }
 
-  public Attribute addAttribute(final DataObjectMetaDataImpl metaData,
+  public Attribute addAttribute(final RecordDefinitionImpl metaData,
     final String dbName, final String name, final String dataType,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {

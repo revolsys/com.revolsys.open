@@ -3,8 +3,8 @@ package com.revolsys.io.xbase;
 import java.io.IOException;
 import java.util.List;
 
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.io.EndianInput;
 
 public class XbaseSchemaReader {
@@ -12,7 +12,7 @@ public class XbaseSchemaReader {
 
   private final EndianInput in;
 
-  private DataObjectMetaDataImpl metaData;
+  private RecordDefinitionImpl metaData;
 
   private final String typePath;
 
@@ -23,9 +23,9 @@ public class XbaseSchemaReader {
     this.fieldDefinitions = fieldDefinitions;
   }
 
-  protected DataObjectMetaData getMetaData() throws IOException {
+  protected RecordDefinition getMetaData() throws IOException {
     if (metaData == null) {
-      metaData = new DataObjectMetaDataImpl(typePath);
+      metaData = new RecordDefinitionImpl(typePath);
       int b = in.read();
       while (b != 0x0D) {
         final StringBuffer fieldName = new StringBuffer();

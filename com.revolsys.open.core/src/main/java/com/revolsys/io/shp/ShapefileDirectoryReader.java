@@ -8,12 +8,12 @@ import java.util.Map.Entry;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractDirectoryReader;
-import com.revolsys.gis.data.io.DataObjectDirectoryReader;
-import com.revolsys.gis.data.io.DataObjectIteratorReader;
-import com.revolsys.gis.data.model.ArrayDataObjectFactory;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.AbstractDirectoryReader;
+import com.revolsys.data.io.DataObjectDirectoryReader;
+import com.revolsys.data.io.DataObjectIteratorReader;
+import com.revolsys.data.record.ArrayRecordFactory;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
 
@@ -34,7 +34,7 @@ import com.revolsys.spring.SpringUtil;
 public class ShapefileDirectoryReader extends DataObjectDirectoryReader {
   private final Map<String, String> fileNameTypeMap = new HashMap<String, String>();
 
-  private Map<String, DataObjectMetaData> typeNameMetaDataMap = new HashMap<String, DataObjectMetaData>();
+  private Map<String, RecordDefinition> typeNameMetaDataMap = new HashMap<String, RecordDefinition>();
 
   public ShapefileDirectoryReader() {
     setFileExtensions(ShapefileConstants.FILE_EXTENSION);
@@ -51,9 +51,9 @@ public class ShapefileDirectoryReader extends DataObjectDirectoryReader {
   }
 
   @Override
-  protected Reader<DataObject> createReader(final Resource resource) {
+  protected Reader<Record> createReader(final Resource resource) {
     try {
-      final ArrayDataObjectFactory factory = new ArrayDataObjectFactory();
+      final ArrayRecordFactory factory = new ArrayRecordFactory();
       final ShapefileIterator iterator = new ShapefileIterator(resource,
         factory);
       final String baseName = SpringUtil.getBaseName(resource).toUpperCase();
@@ -69,7 +69,7 @@ public class ShapefileDirectoryReader extends DataObjectDirectoryReader {
     return fileNameTypeMap;
   }
 
-  public Map<String, DataObjectMetaData> getTypeNameMetaDataMap() {
+  public Map<String, RecordDefinition> getTypeNameMetaDataMap() {
     return typeNameMetaDataMap;
   }
 
@@ -84,7 +84,7 @@ public class ShapefileDirectoryReader extends DataObjectDirectoryReader {
   }
 
   public void setTypeNameMetaDataMap(
-    final Map<String, DataObjectMetaData> typeNameMetaDataMap) {
+    final Map<String, RecordDefinition> typeNameMetaDataMap) {
     this.typeNameMetaDataMap = typeNameMetaDataMap;
   }
 

@@ -3,7 +3,7 @@ package com.revolsys.swing.preferences;
 import javax.swing.JComponent;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.util.OS;

@@ -4,16 +4,17 @@ import java.beans.PropertyChangeEvent;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.model.AbstractRecord;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.record.AbstractRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayerRecord extends AbstractRecord implements
-LayerRecord {
+  LayerRecord {
 
   private final AbstractDataObjectLayer layer;
 
@@ -49,7 +50,7 @@ LayerRecord {
   }
 
   @Override
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     final AbstractDataObjectLayer layer = getLayer();
     return layer.getMetaData();
   }
@@ -70,7 +71,7 @@ LayerRecord {
 
   @Override
   public boolean isDeleted() {
-    return getState() == DataObjectState.Deleted;
+    return getState() == RecordState.Deleted;
   }
 
   @Override
@@ -95,7 +96,7 @@ LayerRecord {
   }
 
   @Override
-  public boolean isSame(final LayerRecord record) {
+  public boolean isSame(final Record record) {
     if (record == null) {
       return false;
     } else if (this == record) {
@@ -103,8 +104,8 @@ LayerRecord {
     } else {
       final AbstractDataObjectLayer layer = getLayer();
       if (layer.isLayerRecord(record)) {
-        final RecordIdentifier id = getIdentifier();
-        final RecordIdentifier otherId = record.getIdentifier();
+        final Identifier id = getIdentifier();
+        final Identifier otherId = record.getIdentifier();
         if (id == null || otherId == null) {
           return false;
         } else if (EqualsRegistry.equal(id, otherId)) {
@@ -120,10 +121,10 @@ LayerRecord {
 
   @Override
   public boolean isValid(final int index) {
-    if (getState() == DataObjectState.Initalizing) {
+    if (getState() == RecordState.Initalizing) {
       return true;
     } else {
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       final String name = metaData.getAttributeName(index);
       return isValid(name);
     }
@@ -131,14 +132,14 @@ LayerRecord {
 
   @Override
   public boolean isValid(final String name) {
-    if (getState() == DataObjectState.Initalizing) {
+    if (getState() == RecordState.Initalizing) {
       return true;
     } else {
       final Attribute attribute = getMetaData().getAttribute(name);
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-            && !StringUtils.hasText((String)value)) {
+          && !StringUtils.hasText((String)value)) {
           return false;
         }
       }

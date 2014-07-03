@@ -5,8 +5,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreFactory;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreFactory;
 
 public interface JdbcDatabaseFactory extends DataObjectStoreFactory {
 

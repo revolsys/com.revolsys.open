@@ -8,9 +8,9 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -18,11 +18,11 @@ import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 
-public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
+public class XhtmlDataObjectWriter extends AbstractWriter<Record> {
 
   private String cssClass;
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
   private boolean opened = false;
 
@@ -35,7 +35,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
 
   private boolean wrap = true;
 
-  public XhtmlDataObjectWriter(final DataObjectMetaData metaData,
+  public XhtmlDataObjectWriter(final RecordDefinition metaData,
     final Writer out) {
     this.metaData = metaData;
     this.out = new XmlWriter(out);
@@ -79,7 +79,7 @@ public class XhtmlDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     if (!opened) {
       writeHeader();
     }

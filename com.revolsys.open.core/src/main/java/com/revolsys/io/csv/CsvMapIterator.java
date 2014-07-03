@@ -48,9 +48,9 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
   }
 
   /**
-   * Return the next DataObject from the iterator.
+   * Return the next Record from the iterator.
    * 
-   * @return The DataObject
+   * @return The Record
    */
   @Override
   public Map<String, Object> next() {

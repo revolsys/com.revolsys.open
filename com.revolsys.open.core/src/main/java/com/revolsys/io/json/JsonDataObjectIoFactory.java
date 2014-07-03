@@ -9,18 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryWriterFactory;
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.AbstractDataObjectAndGeometryWriterFactory;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Writer;
 
 public class JsonDataObjectIoFactory extends
   AbstractDataObjectAndGeometryWriterFactory {
-  public static final DataObject toDataObject(
-    final DataObjectMetaData metaData, final String string) {
+  public static final Record toDataObject(
+    final RecordDefinition metaData, final String string) {
     final StringReader in = new StringReader(string);
     final JsonDataObjectIterator iterator = new JsonDataObjectIterator(
       metaData, in, true);
@@ -35,15 +35,15 @@ public class JsonDataObjectIoFactory extends
     }
   }
 
-  public static List<DataObject> toDataObjectList(
-    final DataObjectMetaData metaData, final String string) {
+  public static List<Record> toDataObjectList(
+    final RecordDefinition metaData, final String string) {
     final StringReader in = new StringReader(string);
     final JsonDataObjectIterator iterator = new JsonDataObjectIterator(
       metaData, in);
     try {
-      final List<DataObject> objects = new ArrayList<DataObject>();
+      final List<Record> objects = new ArrayList<Record>();
       while (iterator.hasNext()) {
-        final DataObject object = iterator.next();
+        final Record object = iterator.next();
         objects.add(object);
       }
       return objects;
@@ -52,8 +52,8 @@ public class JsonDataObjectIoFactory extends
     }
   }
 
-  public static final String toString(final DataObject object) {
-    final DataObjectMetaData metaData = object.getMetaData();
+  public static final String toString(final Record object) {
+    final RecordDefinition metaData = object.getMetaData();
     final StringWriter writer = new StringWriter();
     final JsonDataObjectWriter dataObjectWriter = new JsonDataObjectWriter(
       metaData, writer);
@@ -64,13 +64,13 @@ public class JsonDataObjectIoFactory extends
     return writer.toString();
   }
 
-  public static String toString(final DataObjectMetaData metaData,
+  public static String toString(final RecordDefinition metaData,
     final List<? extends Map<String, Object>> list) {
     final StringWriter writer = new StringWriter();
     final JsonDataObjectWriter dataObjectWriter = new JsonDataObjectWriter(
       metaData, writer);
     for (final Map<String, Object> map : list) {
-      final DataObject object = new ArrayRecord(metaData);
+      final Record object = new ArrayRecord(metaData);
       object.setValues(map);
       dataObjectWriter.write(object);
     }
@@ -78,9 +78,9 @@ public class JsonDataObjectIoFactory extends
     return writer.toString();
   }
 
-  public static String toString(final DataObjectMetaData metaData,
+  public static String toString(final RecordDefinition metaData,
     final Map<String, ? extends Object> parameters) {
-    final DataObject object = new ArrayRecord(metaData);
+    final Record object = new ArrayRecord(metaData);
     object.setValues(parameters);
     return toString(object);
   }
@@ -91,8 +91,8 @@ public class JsonDataObjectIoFactory extends
   }
 
   @Override
-  public Writer<DataObject> createDataObjectWriter(final String baseName,
-    final DataObjectMetaData metaData, final OutputStream outputStream,
+  public Writer<Record> createDataObjectWriter(final String baseName,
+    final RecordDefinition metaData, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new JsonDataObjectWriter(metaData, writer);

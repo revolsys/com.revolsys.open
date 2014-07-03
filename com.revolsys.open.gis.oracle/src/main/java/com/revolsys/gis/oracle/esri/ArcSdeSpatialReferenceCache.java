@@ -8,11 +8,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.data.io.DataObjectStoreSchema;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 

@@ -38,10 +38,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.EnumerationDataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.EnumerationDataType;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.saif.SaifConstants;
@@ -149,7 +149,7 @@ public class OsnSerializer {
         }
         this.scope.removeLast();
       } else if (scope != DOCUMENT_SCOPE
-        && (scope instanceof DataObject || scope instanceof String)) {
+        && (scope instanceof Record || scope instanceof String)) {
         endObject();
       } else {
         if (indentEnabled) {
@@ -225,7 +225,7 @@ public class OsnSerializer {
     openFile();
   }
 
-  public void serialize(final DataObject object) throws IOException {
+  public void serialize(final Record object) throws IOException {
     serializeStartObject(object);
     serializeAttributes(object);
     endObject();
@@ -314,8 +314,8 @@ public class OsnSerializer {
     }
   }
 
-  public void serializeAttributes(final DataObject object) throws IOException {
-    final DataObjectMetaData type = object.getMetaData();
+  public void serializeAttributes(final Record object) throws IOException {
+    final RecordDefinition type = object.getMetaData();
     final int attributeCount = type.getAttributeCount();
     for (int i = 0; i < attributeCount; i++) {
       final Object value = object.getValue(i);
@@ -338,8 +338,8 @@ public class OsnSerializer {
           } else if (type.getTypeName().equals("/Coord3D")) {
             for (final Iterator<Object> scopes = scope.iterator(); scopes.hasNext();) {
               final Object parent = scopes.next();
-              if (parent instanceof DataObject) {
-                final DataObject parentObject = (DataObject)parent;
+              if (parent instanceof Record) {
+                final Record parentObject = (Record)parent;
                 if (parentObject.getMetaData()
                   .getTypeName()
                   .equals(SaifConstants.TEXT_ON_CURVE)) {
@@ -367,7 +367,7 @@ public class OsnSerializer {
     endCollection();
   }
 
-  public void serializeDataObject(final DataObject object) throws IOException {
+  public void serializeDataObject(final Record object) throws IOException {
     if (size >= maxSize) {
       openNextFile();
       size = 0;
@@ -381,8 +381,8 @@ public class OsnSerializer {
     }
   }
 
-  public void serializeStartObject(final DataObject object) throws IOException {
-    final DataObjectMetaData type = object.getMetaData();
+  public void serializeStartObject(final Record object) throws IOException {
+    final RecordDefinition type = object.getMetaData();
     final String path = type.getPath();
     startObject(path);
   }
@@ -401,8 +401,8 @@ public class OsnSerializer {
         serialize((Set<Object>)value);
       } else if (value instanceof String) {
         serialize((String)value);
-      } else if (value instanceof DataObject) {
-        serialize((DataObject)value);
+      } else if (value instanceof Record) {
+        serialize((Record)value);
       } else if (value instanceof Date) {
         serialize((Date)value);
       } else if (value instanceof Geometry) {

@@ -5,15 +5,15 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.property.ShortNameProperty;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.model.ShortNameProperty;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
@@ -29,7 +29,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public String getSequenceName(final DataObjectMetaData metaData) {
+  public String getSequenceName(final RecordDefinition metaData) {
     final String typePath = metaData.getPath();
     final ShortNameProperty shortNameProperty = ShortNameProperty.getProperty(metaData);
     String shortName = null;
@@ -48,7 +48,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     }
   }
 
-  public void writeAddGeometryColumn(final DataObjectMetaData metaData) {
+  public void writeAddGeometryColumn(final RecordDefinition metaData) {
     final PrintWriter out = getOut();
     final String typePath = metaData.getPath();
     String schemaName = JdbcUtils.getSchemaName(typePath);
@@ -164,14 +164,14 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public String writeCreateSequence(final DataObjectMetaData metaData) {
+  public String writeCreateSequence(final RecordDefinition metaData) {
     final String sequenceName = getSequenceName(metaData);
     writeCreateSequence(sequenceName);
     return sequenceName;
   }
 
   @Override
-  public void writeGeometryMetaData(final DataObjectMetaData metaData) {
+  public void writeGeometryMetaData(final RecordDefinition metaData) {
     final PrintWriter out = getOut();
     final String typePath = metaData.getPath();
     final String schemaName = JdbcUtils.getSchemaName(typePath);
@@ -221,12 +221,12 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public void writeResetSequence(final DataObjectMetaData metaData,
-    final List<DataObject> values) {
+  public void writeResetSequence(final RecordDefinition metaData,
+    final List<Record> values) {
     final PrintWriter out = getOut();
     Long nextValue = 0L;
-    for (final DataObject object : values) {
-      final RecordIdentifier id = object.getIdentifier();
+    for (final Record object : values) {
+      final Identifier id = object.getIdentifier();
       for (final Object value : id.getValues()) {
         if (value instanceof Number) {
           final Number number = (Number)value;

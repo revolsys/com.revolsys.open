@@ -24,19 +24,19 @@ import javax.swing.SwingWorker;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.BinaryCondition;
-import com.revolsys.gis.data.query.Cast;
-import com.revolsys.gis.data.query.Column;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.QueryValue;
-import com.revolsys.gis.data.query.Value;
-import com.revolsys.gis.data.query.functions.F;
-import com.revolsys.gis.data.query.functions.Function;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.query.BinaryCondition;
+import com.revolsys.data.query.Cast;
+import com.revolsys.data.query.Column;
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.query.Value;
+import com.revolsys.data.query.functions.F;
+import com.revolsys.data.query.functions.Function;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.layer.Project;
@@ -61,7 +61,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   public static DataObjectLayerTable createTable(
     final AbstractDataObjectLayer layer) {
-    final DataObjectMetaData metaData = layer.getMetaData();
+    final RecordDefinition metaData = layer.getMetaData();
     if (metaData == null) {
       return null;
     } else {
@@ -185,7 +185,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
       if (this.filterByBoundingBox) {
         final Project project = this.layer.getProject();
         final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-        final DataObjectMetaData metaData = this.layer.getMetaData();
+        final RecordDefinition metaData = this.layer.getMetaData();
         final Attribute geometryAttribute = metaData.getGeometryAttribute();
         if (geometryAttribute != null) {
           query.and(F.envelopeIntersects(geometryAttribute, viewBoundingBox));
@@ -279,7 +279,7 @@ public class DataObjectLayerTableModel extends DataObjectRowTableModel
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends DataObject> V getRecord(final int row) {
+  public <V extends Record> V getRecord(final int row) {
     if (row < 0) {
       return null;
     } else if (this.attributeFilterMode.equals(MODE_SELECTED)) {

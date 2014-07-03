@@ -7,8 +7,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public class Statistics {
   private final Map<String, Long> counts = new TreeMap<String, Long>();
@@ -34,25 +34,25 @@ public class Statistics {
     this.message = message;
   }
 
-  public void add(final DataObject object) {
+  public void add(final Record object) {
     if (object != null) {
-      final DataObjectMetaData type = object.getMetaData();
+      final RecordDefinition type = object.getMetaData();
       add(type);
     }
   }
 
-  public void add(final DataObject object, final long count) {
-    final DataObjectMetaData type = object.getMetaData();
+  public void add(final Record object, final long count) {
+    final RecordDefinition type = object.getMetaData();
     add(type, count);
 
   }
 
-  public void add(final DataObjectMetaData type) {
+  public void add(final RecordDefinition type) {
     final String path = type.getPath();
     add(path);
   }
 
-  public void add(final DataObjectMetaData type, final long count) {
+  public void add(final RecordDefinition type, final long count) {
     final String path = type.getPath();
     add(path, count);
   }

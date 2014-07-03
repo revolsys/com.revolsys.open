@@ -11,7 +11,7 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodListener;

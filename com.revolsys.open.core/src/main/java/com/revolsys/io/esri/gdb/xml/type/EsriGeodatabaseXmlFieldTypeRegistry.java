@@ -3,8 +3,8 @@ package com.revolsys.io.esri.gdb.xml.type;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 

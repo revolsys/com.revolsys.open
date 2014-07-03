@@ -13,7 +13,7 @@ import javax.swing.table.TableCellRenderer;
 import org.jdesktop.swingx.JXTable;
 
 import com.revolsys.converter.string.BigDecimalStringConverter;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.table.dataobject.model.AbstractSingleDataObjectTableModel;
 
@@ -42,7 +42,7 @@ public class SingleDataObjectTableCellRenderer implements TableCellRenderer {
       columnIndex = jxTable.convertColumnIndexToModel(columnIndex);
     }
     final AbstractSingleDataObjectTableModel model = (AbstractSingleDataObjectTableModel)table.getModel();
-    final DataObjectMetaData metaData = model.getMetaData();
+    final RecordDefinition metaData = model.getMetaData();
 
     JComponent component = null;
     final String name = model.getFieldName(rowIndex, columnIndex);

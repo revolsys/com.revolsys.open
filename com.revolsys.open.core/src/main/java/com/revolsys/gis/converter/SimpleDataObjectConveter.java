@@ -6,75 +6,75 @@ import java.util.List;
 
 import org.springframework.core.convert.converter.Converter;
 
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.converter.process.SourceToTargetProcess;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class SimpleDataObjectConveter implements
-  Converter<DataObject, DataObject> {
-  private DataObjectMetaData dataObjectMetaData;
+  Converter<Record, Record> {
+  private RecordDefinition dataObjectMetaData;
 
-  private DataObjectFactory factory;
+  private RecordFactory factory;
 
-  private List<SourceToTargetProcess<DataObject, DataObject>> processors = new ArrayList<SourceToTargetProcess<DataObject, DataObject>>();
+  private List<SourceToTargetProcess<Record, Record>> processors = new ArrayList<SourceToTargetProcess<Record, Record>>();
 
   public SimpleDataObjectConveter() {
   }
 
-  public SimpleDataObjectConveter(final DataObjectMetaData dataObjectMetaData) {
+  public SimpleDataObjectConveter(final RecordDefinition dataObjectMetaData) {
     setDataObjectMetaData(dataObjectMetaData);
   }
 
-  public SimpleDataObjectConveter(final DataObjectMetaData dataObjectMetaData,
-    final List<SourceToTargetProcess<DataObject, DataObject>> processors) {
+  public SimpleDataObjectConveter(final RecordDefinition dataObjectMetaData,
+    final List<SourceToTargetProcess<Record, Record>> processors) {
     setDataObjectMetaData(dataObjectMetaData);
     this.processors = processors;
   }
 
-  public SimpleDataObjectConveter(final DataObjectMetaData dataObjectMetaData,
-    final SourceToTargetProcess<DataObject, DataObject>... processors) {
+  public SimpleDataObjectConveter(final RecordDefinition dataObjectMetaData,
+    final SourceToTargetProcess<Record, Record>... processors) {
     this(dataObjectMetaData, Arrays.asList(processors));
   }
 
   public void addProcessor(
-    final SourceToTargetProcess<DataObject, DataObject> processor) {
+    final SourceToTargetProcess<Record, Record> processor) {
     processors.add(processor);
   }
 
   @Override
-  public DataObject convert(final DataObject sourceObject) {
-    final DataObject targetObject = factory.createDataObject(dataObjectMetaData);
+  public Record convert(final Record sourceObject) {
+    final Record targetObject = factory.createRecord(dataObjectMetaData);
     final Geometry sourceGeometry = sourceObject.getGeometryValue();
     final GeometryFactory geometryFactory = sourceGeometry.getGeometryFactory();
     final Geometry targetGeometry = geometryFactory.geometry(sourceGeometry);
     GeometryProperties.copyUserData(sourceGeometry, targetGeometry);
     targetObject.setGeometryValue(targetGeometry);
-    for (final SourceToTargetProcess<DataObject, DataObject> processor : processors) {
+    for (final SourceToTargetProcess<Record, Record> processor : processors) {
       processor.process(sourceObject, targetObject);
     }
     return targetObject;
   }
 
-  public DataObjectMetaData getDataObjectMetaData() {
+  public RecordDefinition getDataObjectMetaData() {
     return dataObjectMetaData;
   }
 
-  public List<SourceToTargetProcess<DataObject, DataObject>> getProcessors() {
+  public List<SourceToTargetProcess<Record, Record>> getProcessors() {
     return processors;
   }
 
-  public void setDataObjectMetaData(final DataObjectMetaData dataObjectMetaData) {
+  public void setDataObjectMetaData(final RecordDefinition dataObjectMetaData) {
     this.dataObjectMetaData = dataObjectMetaData;
     this.factory = dataObjectMetaData.getDataObjectFactory();
   }
 
   public void setProcessors(
-    final List<SourceToTargetProcess<DataObject, DataObject>> processors) {
+    final List<SourceToTargetProcess<Record, Record>> processors) {
     this.processors = processors;
   }
 

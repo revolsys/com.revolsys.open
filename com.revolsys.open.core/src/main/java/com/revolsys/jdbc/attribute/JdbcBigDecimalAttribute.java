@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
 public class JdbcBigDecimalAttribute extends JdbcDecimalAttribute {
   public JdbcBigDecimalAttribute(final String dbName, final String name,
@@ -24,7 +24,7 @@ public class JdbcBigDecimalAttribute extends JdbcDecimalAttribute {
 
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final DataObject object) throws SQLException {
+    final int columnIndex, final Record object) throws SQLException {
     final BigDecimal value = resultSet.getBigDecimal(columnIndex);
     setValue(object, value);
     return columnIndex + 1;

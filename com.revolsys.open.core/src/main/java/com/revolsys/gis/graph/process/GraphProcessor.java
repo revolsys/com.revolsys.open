@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.jts.geom.Geometry;
@@ -16,7 +16,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.ObjectProcessor;
 
-public class GraphProcessor extends BaseInOutProcess<DataObject, DataObject> {
+public class GraphProcessor extends BaseInOutProcess<Record, Record> {
   private static final Logger LOG = LoggerFactory.getLogger(GraphProcessor.class);
 
   private DataObjectGraph graph;
@@ -43,20 +43,20 @@ public class GraphProcessor extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
-    final Channel<DataObject> out) {
+  protected void postRun(final Channel<Record> in,
+    final Channel<Record> out) {
     if (out != null) {
       processGraph();
-      for (final Edge<DataObject> edge : graph.getEdges()) {
-        final DataObject object = edge.getObject();
+      for (final Edge<Record> edge : graph.getEdges()) {
+        final Record object = edge.getObject();
         out.write(object);
       }
     }
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(final Channel<Record> in,
+    final Channel<Record> out, final Record object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;

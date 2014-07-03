@@ -36,7 +36,7 @@ package com.revolsys.jts.testold.junit;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;

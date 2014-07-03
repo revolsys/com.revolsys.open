@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.jts.LineStringUtil;
@@ -51,13 +51,13 @@ public class NodeAttributes {
       return anglesByType;
     }
 
-    public static Set<DataObjectMetaData> edgeMetaDatas(final Node<?> node) {
-      final Set<DataObjectMetaData> metaDatas = new HashSet<DataObjectMetaData>();
+    public static Set<RecordDefinition> edgeMetaDatas(final Node<?> node) {
+      final Set<RecordDefinition> metaDatas = new HashSet<RecordDefinition>();
       for (final Edge<?> edge : node.getEdges()) {
         final Object object = edge.getObject();
-        if (object instanceof DataObject) {
-          final DataObject dataObject = (DataObject)object;
-          final DataObjectMetaData metaData = dataObject.getMetaData();
+        if (object instanceof Record) {
+          final Record dataObject = (Record)object;
+          final RecordDefinition metaData = dataObject.getMetaData();
           metaDatas.add(metaData);
         }
       }
@@ -194,7 +194,7 @@ public class NodeAttributes {
     return angles;
   }
 
-  public static Set<DataObjectMetaData> getEdgeMetaDatas(
+  public static Set<RecordDefinition> getEdgeMetaDatas(
     final Node<? extends Object> node) {
     return getAttribute(node, EDGE_META_DATAS);
   }

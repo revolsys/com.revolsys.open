@@ -1,20 +1,20 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class CreateRecordUndo extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1L;
 
-  private final DataObject record;
+  private final Record record;
 
   private LayerRecord layerRecord;
 
   private final AbstractDataObjectLayer layer;
 
   public CreateRecordUndo(final AbstractDataObjectLayer layer,
-    final DataObject record) {
+    final Record record) {
     this.layer = layer;
     this.record = record;
   }

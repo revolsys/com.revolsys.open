@@ -19,7 +19,7 @@ import java.lang.reflect.Proxy;
 
 import javax.persistence.EntityManagerFactory;
 
-import com.revolsys.gis.data.io.DataAccessObject;
+import com.revolsys.data.io.DataAccessObject;
 import com.revolsys.orm.core.DaoProxyFactory;
 import com.revolsys.orm.core.DomainClass;
 

@@ -2,8 +2,8 @@ package com.revolsys.swing.table.dataobject.row;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.record.Record;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
@@ -37,13 +37,13 @@ public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {
     this(false, propertyName, value);
   }
 
-  private DataObject getObject() {
+  private Record getObject() {
     final DataObjectRowTable table = TablePanel.getEventTable();
     if (table != null) {
       final int eventRow = TablePanel.getEventRow();
       if (eventRow != -1) {
         final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
-        final DataObject object = model.getRecord(eventRow);
+        final Record object = model.getRecord(eventRow);
         return object;
       }
     }
@@ -53,7 +53,7 @@ public class DataObjectRowPropertyEnableCheck extends AbstractEnableCheck {
   @Override
   public boolean isEnabled() {
     try {
-      final DataObject object = getObject();
+      final Record object = getObject();
       final Object value = JavaBeanUtil.getSimpleProperty(object,
         this.propertyName);
       final boolean equal = EqualsRegistry.equal(value, this.value);

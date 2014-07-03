@@ -30,14 +30,14 @@ import javax.xml.namespace.QName;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.CoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.FileUtil;
@@ -79,7 +79,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
 
   private DataType geometryDataType;
 
-  public ShapefileDataObjectWriter(final DataObjectMetaData metaData,
+  public ShapefileDataObjectWriter(final RecordDefinition metaData,
     final Resource resource) {
     super(metaData, SpringUtil.getResourceWithExtension(resource, "dbf"));
     this.resource = resource;
@@ -151,7 +151,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   @Override
   protected void init() throws IOException {
     super.init();
-    final DataObjectMetaDataImpl metaData = (DataObjectMetaDataImpl)getMetaData();
+    final RecordDefinitionImpl metaData = (RecordDefinitionImpl)getMetaData();
     if (metaData != null) {
       geometryPropertyName = metaData.getGeometryAttributeName();
       if (geometryPropertyName != null) {
@@ -180,7 +180,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   @Override
-  protected void preFirstWrite(final DataObject object) throws IOException {
+  protected void preFirstWrite(final Record object) throws IOException {
     if (geometryPropertyName != null) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
@@ -227,7 +227,7 @@ public class ShapefileDataObjectWriter extends XbaseDataObjectWriter {
   }
 
   @Override
-  protected boolean writeField(final DataObject object,
+  protected boolean writeField(final Record object,
     final FieldDefinition field) throws IOException {
     if (field.getFullName().equals(geometryPropertyName)) {
       final long recordIndex = out.getFilePointer();

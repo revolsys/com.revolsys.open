@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.core.io.FileSystemResource;
 
-import com.revolsys.gis.data.io.GeometryReader;
+import com.revolsys.data.io.GeometryReader;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;

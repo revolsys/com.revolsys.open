@@ -22,7 +22,7 @@
 
   <bean
     id="shapeLog"
-    class="com.revolsys.gis.data.model.DataObjectLog"
+    class="com.revolsys.data.record.RecordLog"
     factory-method="dataObjectLog"
     p:writer-ref="shapeLogWriter" />
 </beans>

@@ -64,27 +64,27 @@ import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.query.And;
+import com.revolsys.data.query.Between;
+import com.revolsys.data.query.Cast;
+import com.revolsys.data.query.CollectionValue;
+import com.revolsys.data.query.Column;
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.ILike;
+import com.revolsys.data.query.In;
+import com.revolsys.data.query.IsNotNull;
+import com.revolsys.data.query.IsNull;
+import com.revolsys.data.query.Not;
+import com.revolsys.data.query.Or;
+import com.revolsys.data.query.Q;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.query.Value;
+import com.revolsys.data.query.functions.Function;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.gis.data.query.And;
-import com.revolsys.gis.data.query.Between;
-import com.revolsys.gis.data.query.Cast;
-import com.revolsys.gis.data.query.CollectionValue;
-import com.revolsys.gis.data.query.Column;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.ILike;
-import com.revolsys.gis.data.query.In;
-import com.revolsys.gis.data.query.IsNotNull;
-import com.revolsys.gis.data.query.IsNull;
-import com.revolsys.gis.data.query.Not;
-import com.revolsys.gis.data.query.Or;
-import com.revolsys.gis.data.query.Q;
-import com.revolsys.gis.data.query.QueryValue;
-import com.revolsys.gis.data.query.Value;
-import com.revolsys.gis.data.query.functions.Function;
 import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -107,7 +107,7 @@ public class QueryWhereConditionField extends ValueField implements
       final String name = attribute.getName();
       final Class<?> typeClass = attribute.getTypeClass();
       final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
-      final DataObjectMetaData metaData = attribute.getMetaData();
+      final RecordDefinition metaData = attribute.getMetaData();
       if (metaData == null) {
         return new TextField(20);
       } else {
@@ -153,7 +153,7 @@ public class QueryWhereConditionField extends ValueField implements
 
   private final PropertyChangeListener listener;
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
   private final ComboBox rightUnaryConditionOperator;
 
@@ -348,7 +348,7 @@ public class QueryWhereConditionField extends ValueField implements
               return;
             }
           } else {
-            final List<Object> values = this.codeTable.getValues(SingleRecordIdentifier.create(
+            final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(
               fieldValue));
             if (values.size() == 1) {
               fieldValue = values.get(0);
@@ -402,7 +402,7 @@ public class QueryWhereConditionField extends ValueField implements
               return;
             }
           } else {
-            fieldValue = this.codeTable.getValue(SingleRecordIdentifier.create(
+            fieldValue = this.codeTable.getValue(SingleIdentifier.create(
               fieldValue));
             if (fieldValue != null) {
               attributeClass = fieldValue.getClass();

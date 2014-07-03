@@ -14,8 +14,8 @@ import oracle.sql.BLOB;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.spring.SpringUtil;
 
@@ -29,7 +29,7 @@ public class OracleJdbcBlobAttribute extends JdbcAttribute {
 
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final DataObject object) throws SQLException {
+    final int columnIndex, final Record object) throws SQLException {
     final Blob value = resultSet.getBlob(columnIndex);
     object.setValue(getIndex(), value);
     return columnIndex + 1;

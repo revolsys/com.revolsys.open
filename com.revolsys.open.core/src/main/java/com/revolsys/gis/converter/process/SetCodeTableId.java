@@ -7,15 +7,15 @@ import java.util.Map.Entry;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public class SetCodeTableId extends
-  AbstractSourceToTargetProcess<DataObject, DataObject> {
+  AbstractSourceToTargetProcess<Record, Record> {
   private final CodeTable codeTable;
 
-  private final Map<String, Converter<DataObject, Object>> codeTableValueConverters = new HashMap<String, Converter<DataObject, Object>>();
+  private final Map<String, Converter<Record, Object>> codeTableValueConverters = new HashMap<String, Converter<Record, Object>>();
 
   private final String targetAttributeName;
 
@@ -26,15 +26,15 @@ public class SetCodeTableId extends
   }
 
   @Override
-  public void process(final DataObject source, final DataObject target) {
+  public void process(final Record source, final Record target) {
     final Map<String, Object> codeTableValues = new HashMap<String, Object>();
 
-    for (final Entry<String, Converter<DataObject, Object>> entry : codeTableValueConverters.entrySet()) {
+    for (final Entry<String, Converter<Record, Object>> entry : codeTableValueConverters.entrySet()) {
       String codeTableAttributeName = entry.getKey();
-      final Converter<DataObject, Object> sourceAttributeConverter = entry.getValue();
+      final Converter<Record, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
       if (sourceValue != null) {
-        final DataObjectMetaData targetMetaData = target.getMetaData();
+        final RecordDefinition targetMetaData = target.getMetaData();
         String codeTableValueName = null;
         final int dotIndex = codeTableAttributeName.indexOf(".");
         if (dotIndex != -1) {
@@ -58,7 +58,7 @@ public class SetCodeTableId extends
   }
 
   public void setValueMapping(final String codeTableAttribute,
-    final Converter<DataObject, Object> valueConverter) {
+    final Converter<Record, Object> valueConverter) {
     codeTableValueConverters.put(codeTableAttribute, valueConverter);
 
   }

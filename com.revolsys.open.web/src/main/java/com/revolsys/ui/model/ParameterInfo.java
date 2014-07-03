@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.types.DataType;
 
 public class ParameterInfo {
   private final String name;

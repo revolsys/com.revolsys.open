@@ -5,10 +5,10 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.parallel.process.AbstractProcess;
@@ -71,11 +71,11 @@ public class CopyRecords extends AbstractProcess {
     try {
       final Query query = new Query(typePath);
       query.setOrderBy(orderBy);
-      final Reader<DataObject> reader = sourceDataStore.query(query);
+      final Reader<Record> reader = sourceDataStore.query(query);
       try {
-        final Writer<DataObject> targetWriter = targetDataStore.createWriter();
+        final Writer<Record> targetWriter = targetDataStore.createWriter();
         try {
-          final DataObjectMetaData targetMetaData = targetDataStore.getMetaData(typePath);
+          final RecordDefinition targetMetaData = targetDataStore.getRecordDefinition(typePath);
           if (targetMetaData == null) {
             LoggerFactory.getLogger(getClass()).error(
               "Cannot find target table: " + typePath);
@@ -83,7 +83,7 @@ public class CopyRecords extends AbstractProcess {
             if (hasSequence) {
               final String idAttributeName = targetMetaData.getIdAttributeName();
               Object maxId = targetDataStore.createPrimaryIdValue(typePath);
-              for (final DataObject sourceRecord : reader) {
+              for (final Record sourceRecord : reader) {
                 final Object sourceId = sourceRecord.getValue(idAttributeName);
                 while (CompareUtil.compare(maxId, sourceId) < 0) {
                   maxId = targetDataStore.createPrimaryIdValue(typePath);
@@ -91,7 +91,7 @@ public class CopyRecords extends AbstractProcess {
                 targetWriter.write(sourceRecord);
               }
             } else {
-              for (final DataObject sourceRecord : reader) {
+              for (final Record sourceRecord : reader) {
                 targetWriter.write(sourceRecord);
               }
             }

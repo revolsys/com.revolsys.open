@@ -5,34 +5,34 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.comparator.DataObjectMetaDataNameComparator;
+import com.revolsys.data.comparator.RecordDefinitionNameComparator;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class SortByType extends BaseInOutProcess<DataObject, DataObject> {
+public class SortByType extends BaseInOutProcess<Record, Record> {
 
-  private final Map<DataObjectMetaData, Collection<DataObject>> objectsByType = new TreeMap<DataObjectMetaData, Collection<DataObject>>(
-    new DataObjectMetaDataNameComparator());
+  private final Map<RecordDefinition, Collection<Record>> objectsByType = new TreeMap<RecordDefinition, Collection<Record>>(
+    new RecordDefinitionNameComparator());
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
-    final Channel<DataObject> out) {
-    for (final Collection<DataObject> objects : objectsByType.values()) {
-      for (final DataObject object : objects) {
+  protected void postRun(final Channel<Record> in,
+    final Channel<Record> out) {
+    for (final Collection<Record> objects : objectsByType.values()) {
+      for (final Record object : objects) {
         out.write(object);
       }
     }
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
-    final DataObjectMetaData metaData = object.getMetaData();
-    Collection<DataObject> objects = objectsByType.get(metaData);
+  protected void process(final Channel<Record> in,
+    final Channel<Record> out, final Record object) {
+    final RecordDefinition metaData = object.getMetaData();
+    Collection<Record> objects = objectsByType.get(metaData);
     if (objects == null) {
-      objects = new ArrayList<DataObject>();
+      objects = new ArrayList<Record>();
       objectsByType.put(metaData, objects);
     }
     objects.add(object);

@@ -1,21 +1,20 @@
 package com.revolsys.swing.map.layer.record;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.functions.F;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.functions.F;
+import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
-public class LoadingWorker extends
-  AbstractSwingWorker<DataObjectQuadTree, Void> {
+public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
   private final BoundingBox viewportBoundingBox;
 
   private final DataObjectStoreLayer layer;
@@ -28,19 +27,19 @@ public class LoadingWorker extends
   }
 
   @Override
-  protected DataObjectQuadTree doInBackground() throws Exception {
+  protected List<LayerRecord> doInBackground() throws Exception {
     final GeometryFactory geometryFactory = this.layer.getGeometryFactory();
-    final DataObjectQuadTree index = new DataObjectQuadTree(geometryFactory);
     final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
     Query query = this.layer.getQuery();
-    final Attribute geometryAttribute = layer.getGeometryAttribute();
-    if (query != null && geometryAttribute != null && !queryBoundingBox.isEmpty()) {
+    final Attribute geometryAttribute = this.layer.getGeometryAttribute();
+    if (query != null && geometryAttribute != null
+      && !queryBoundingBox.isEmpty()) {
       query = query.clone();
       query.and(F.envelopeIntersects(geometryAttribute, queryBoundingBox));
       final List<LayerRecord> records = this.layer.query(query);
-      index.insertAll(records);
+      return records;
     }
-    return index;
+    return Collections.emptyList();
   }
 
   public AbstractLayer getLayer() {
@@ -61,9 +60,9 @@ public class LoadingWorker extends
   protected void uiTask() {
     try {
       if (!isCancelled()) {
-        final DataObjectQuadTree index = get();
+        final List<LayerRecord> records = get();
 
-        this.layer.setIndex(this.viewportBoundingBox, index);
+        this.layer.setRecords(this.viewportBoundingBox, records);
       }
     } catch (final CancellationException e) {
       this.layer.clearLoading(this.viewportBoundingBox);

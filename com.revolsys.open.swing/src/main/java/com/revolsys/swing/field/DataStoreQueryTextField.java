@@ -45,17 +45,17 @@ import org.springframework.util.StringUtils;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.StringEqualsIgnoreCase;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.query.Equal;
+import com.revolsys.data.query.Q;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.Value;
+import com.revolsys.data.query.functions.F;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Equal;
-import com.revolsys.gis.data.query.Q;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.Value;
-import com.revolsys.gis.data.query.functions.F;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
-import com.revolsys.gis.model.data.equals.StringEqualsIgnoreCase;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.DataObjectListCellRenderer;
@@ -81,11 +81,11 @@ public class DataStoreQueryTextField extends TextField implements
 
   private final JPopupMenu menu = new JPopupMenu();
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
   private final JLabel oldValueItem;
 
-  public DataObject selectedItem;
+  public Record selectedItem;
 
   private final Map<String, String> valueToDisplayMap = new LruMap<String, String>(
     100);
@@ -94,7 +94,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   private boolean below = false;
 
-  public DataStoreQueryTextField(final DataObjectMetaData metaData,
+  public DataStoreQueryTextField(final RecordDefinition metaData,
     final String displayAttributeName) {
     this(metaData, displayAttributeName, new Query(metaData, new Equal(
       F.upper(displayAttributeName), new Value(null))), new Query(metaData,
@@ -102,7 +102,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   }
 
-  public DataStoreQueryTextField(final DataObjectMetaData metaData,
+  public DataStoreQueryTextField(final RecordDefinition metaData,
     final String displayAttributeName, final List<Query> queries) {
     super(displayAttributeName);
     this.metaData = metaData;
@@ -149,7 +149,7 @@ public class DataStoreQueryTextField extends TextField implements
     setPreferredSize(new Dimension(100, 22));
   }
 
-  public DataStoreQueryTextField(final DataObjectMetaData metaData,
+  public DataStoreQueryTextField(final RecordDefinition metaData,
     final String displayAttributeName, final Query... queries) {
     this(metaData, displayAttributeName, Arrays.asList(queries));
 
@@ -157,7 +157,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   public DataStoreQueryTextField(final DataObjectStore dataStore,
     final String typeName, final String displayAttributeName) {
-    this(dataStore.getMetaData(typeName), displayAttributeName, new Query(
+    this(dataStore.getRecordDefinition(typeName), displayAttributeName, new Query(
       typeName, new Equal(F.upper(displayAttributeName), new Value(null))),
       new Query(typeName, Q.iLike(displayAttributeName, "")));
   }
@@ -210,7 +210,7 @@ public class DataStoreQueryTextField extends TextField implements
     final String stringValue = StringConverterRegistry.toString(value);
     String displayText = this.valueToDisplayMap.get(stringValue);
     if (!StringUtils.hasText(displayText) && StringUtils.hasText(stringValue)) {
-      final DataObject record = this.dataStore.queryFirst(Query.equal(
+      final Record record = this.dataStore.queryFirst(Query.equal(
         this.metaData, this.idAttributeName, stringValue));
       if (record == null) {
         displayText = stringValue;
@@ -235,13 +235,13 @@ public class DataStoreQueryTextField extends TextField implements
     return this.listenerList.getListeners(ItemListener.class);
   }
 
-  public DataObject getSelectedItem() {
+  public Record getSelectedItem() {
     return this.selectedItem;
   }
 
   @Override
   public Object[] getSelectedObjects() {
-    final DataObject selectedItem = getSelectedItem();
+    final Record selectedItem = getSelectedItem();
     if (selectedItem == null) {
       return null;
     } else {
@@ -274,7 +274,7 @@ public class DataStoreQueryTextField extends TextField implements
   @Override
   public boolean isHighlighted(final Component renderer,
     final ComponentAdapter adapter) {
-    final DataObject object = this.listModel.getElementAt(adapter.row);
+    final Record object = this.listModel.getElementAt(adapter.row);
     final String text = getText();
     final String value = object.getString(this.displayAttributeName);
     if (StringEqualsIgnoreCase.equal(text, value)) {
@@ -323,7 +323,7 @@ public class DataStoreQueryTextField extends TextField implements
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
-            final DataObject selectedItem = this.listModel.getElementAt(selectedIndex);
+            final Record selectedItem = this.listModel.getElementAt(selectedIndex);
             final String text = selectedItem.getString(this.displayAttributeName);
             if (!text.equals(this.getText())) {
               this.selectedItem = selectedItem;
@@ -391,7 +391,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   protected void search() {
     if (this.selectedItem != null) {
-      final DataObject oldValue = this.selectedItem;
+      final Record oldValue = this.selectedItem;
       this.selectedItem = null;
       fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
         oldValue, ItemEvent.DESELECTED));
@@ -447,7 +447,7 @@ public class DataStoreQueryTextField extends TextField implements
   }
 
   private void showMenu() {
-    final List<DataObject> objects = this.listModel.getObjects();
+    final List<Record> objects = this.listModel.getObjects();
     if (objects.isEmpty()) {
       this.menu.setVisible(false);
     } else {
@@ -487,7 +487,7 @@ public class DataStoreQueryTextField extends TextField implements
   @Override
   public void valueChanged(final ListSelectionEvent e) {
     if (!e.getValueIsAdjusting()) {
-      final DataObject value = (DataObject)this.list.getSelectedValue();
+      final Record value = (Record)this.list.getSelectedValue();
       if (value != null) {
         final String label = value.getString(this.displayAttributeName);
         if (!EqualsRegistry.equal(label, getText())) {

@@ -22,8 +22,8 @@ package com.revolsys.io.xbase;
 
 import java.io.File;
 
-import com.revolsys.gis.data.io.AbstractDirectoryReader;
-import com.revolsys.gis.data.io.DataObjectDirectoryReader;
+import com.revolsys.data.io.AbstractDirectoryReader;
+import com.revolsys.data.io.DataObjectDirectoryReader;
 
 /**
  * <p>

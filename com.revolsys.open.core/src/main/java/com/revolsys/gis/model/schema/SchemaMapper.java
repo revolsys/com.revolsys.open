@@ -3,23 +3,23 @@ package com.revolsys.gis.model.schema;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.converter.ObjectConverter;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
 
 public class SchemaMapper {
   private final Map<Attribute, Attribute> attributeMapping = new LinkedHashMap<Attribute, Attribute>();
 
-  private final Map<DataObjectMetaData, ObjectConverter> typeConverter = new LinkedHashMap<DataObjectMetaData, ObjectConverter>();
+  private final Map<RecordDefinition, ObjectConverter> typeConverter = new LinkedHashMap<RecordDefinition, ObjectConverter>();
 
-  private final Map<DataObjectMetaData, DataObjectMetaData> typeMapping = new LinkedHashMap<DataObjectMetaData, DataObjectMetaData>();
+  private final Map<RecordDefinition, RecordDefinition> typeMapping = new LinkedHashMap<RecordDefinition, RecordDefinition>();
 
   public SchemaMapper() {
   }
 
   /**
-   * Add a forward and reverse mapping from one DataObjectMetaData to another.
+   * Add a forward and reverse mapping from one RecordDefinition to another.
    * 
    * @param from The type.
    * @param to The mapped type.
@@ -35,8 +35,8 @@ public class SchemaMapper {
    * @param from The attribute.
    * @param to The mapped type.
    */
-  public void addAttributeMapping(final DataObjectMetaData fromClass,
-    final String fromName, final DataObjectMetaData toClass, final String toName) {
+  public void addAttributeMapping(final RecordDefinition fromClass,
+    final String fromName, final RecordDefinition toClass, final String toName) {
     final Attribute fromAttribute = fromClass.getAttribute(fromName);
     final Attribute toAttribute = toClass.getAttribute(toName);
     addAttributeMapping(fromAttribute, toAttribute);
@@ -48,28 +48,28 @@ public class SchemaMapper {
    * @param from The type.
    * @param converter The converter.
    */
-  public void addTypeConverter(final DataObjectMetaData type,
+  public void addTypeConverter(final RecordDefinition type,
     final ObjectConverter converter) {
     typeConverter.put(type, converter);
   }
 
   /**
-   * Add a forward and reverse mapping from one DataObjectMetaData to another.
+   * Add a forward and reverse mapping from one RecordDefinition to another.
    * 
    * @param from The type.
    * @param to The mapped type.
    */
-  public void addTypeMapping(final DataObjectMetaData from,
-    final DataObjectMetaData to) {
+  public void addTypeMapping(final RecordDefinition from,
+    final RecordDefinition to) {
     typeMapping.put(from, to);
     typeMapping.put(to, from);
   }
 
-  public DataObject convert(final DataObject object) {
-    final DataObjectMetaData type = object.getMetaData();
-    final DataObjectMetaData newType = getClassMapping(type);
+  public Record convert(final Record object) {
+    final RecordDefinition type = object.getMetaData();
+    final RecordDefinition newType = getClassMapping(type);
     if (newType != null) {
-      final DataObject newObject = newType.createDataObject();
+      final Record newObject = newType.createDataObject();
       for (int i = 0; i < type.getAttributeCount(); i++) {
         final Attribute attribute = type.getAttribute(i);
         final Attribute newAttribute = getAttributeMapping(attribute);
@@ -96,12 +96,12 @@ public class SchemaMapper {
   }
 
   /**
-   * Get the DataObjectMetaData that the specified class maps to.
+   * Get the RecordDefinition that the specified class maps to.
    * 
    * @param type The class to map.
    * @return The mapped class.
    */
-  public DataObjectMetaData getClassMapping(final DataObjectMetaData type) {
+  public RecordDefinition getClassMapping(final RecordDefinition type) {
     return typeMapping.get(type);
   }
 
@@ -111,17 +111,17 @@ public class SchemaMapper {
    * @param type The type to convert.
    * @return The converter
    */
-  public ObjectConverter getTypeConverter(final DataObjectMetaData type) {
+  public ObjectConverter getTypeConverter(final RecordDefinition type) {
     return typeConverter.get(type);
   }
 
   /**
-   * Get the DataObjectMetaData that the specified type maps to.
+   * Get the RecordDefinition that the specified type maps to.
    * 
    * @param type The type to map.
    * @return The mapped type.
    */
-  public DataObjectMetaData getTypeMapping(final DataObjectMetaData type) {
+  public RecordDefinition getTypeMapping(final RecordDefinition type) {
     return typeMapping.get(type);
   }
 
@@ -131,7 +131,7 @@ public class SchemaMapper {
    * @param type The type to convert.
    * @return The converter
    */
-  public boolean hasTypeConverter(final DataObjectMetaData type) {
+  public boolean hasTypeConverter(final RecordDefinition type) {
     return typeConverter.containsKey(type);
   }
 }

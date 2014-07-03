@@ -1,49 +1,47 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordState;
 
 public class ProxyLayerRecord extends AbstractLayerRecord {
 
-  private final RecordIdentifier recordIdentifier;
+  private final Identifier recordIdentifier;
 
   public ProxyLayerRecord(final AbstractDataObjectLayer layer,
-    final RecordIdentifier recordIdentifier) {
+    final Identifier recordIdentifier) {
     super(layer);
     this.recordIdentifier = recordIdentifier;
   }
 
-  /**
-   * Internal method to revert the records values to the original
-   */
   @Override
   public synchronized void cancelChanges() {
-    final LayerRecord layerRecord = getLayerRecord();
-    layerRecord.cancelChanges();
+    final LayerRecord record = getLayerRecord();
+    record.cancelChanges();
   }
 
   @Override
   public void clearChanges() {
-    final LayerRecord layerRecord = getLayerRecord();
-    layerRecord.clearChanges();
+    final LayerRecord record = getLayerRecord();
+    record.clearChanges();
   }
 
   @Override
   public void firePropertyChange(final String propertyName,
     final Object oldValue, final Object newValue) {
-    final LayerRecord layerRecord = getLayerRecord();
-    layerRecord.firePropertyChange(propertyName, oldValue, newValue);
+    final LayerRecord record = getLayerRecord();
+    record.firePropertyChange(propertyName, oldValue, newValue);
   }
 
   @Override
-  public RecordIdentifier getIdentifier() {
+  public Identifier getIdentifier() {
     return this.recordIdentifier;
   }
 
   protected LayerRecord getLayerRecord() {
     final AbstractDataObjectLayer layer = getLayer();
-    final RecordIdentifier identifier = getIdentifier();
-    final LayerRecord record = layer.getRecordById(identifier);
+    final Identifier identifier = getIdentifier();
+    final LayerRecord record = layer.getCachedRecord(identifier);
     if (record == null) {
       throw new IllegalStateException("Cannot find record " + getTypeName()
         + " #" + identifier);
@@ -53,98 +51,72 @@ public class ProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public <T> T getOriginalValue(final String name) {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.getOriginalValue(name);
+    final LayerRecord record = getLayerRecord();
+    return record.getOriginalValue(name);
+  }
+
+  protected Record getRecord() {
+    return getLayerRecord();
   }
 
   @Override
-  public DataObjectState getState() {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.getState();
+  public RecordState getState() {
+    final Record record = getRecord();
+    return record.getState();
   }
 
   @Override
   public <T> T getValue(final int index) {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.getValue(index);
-  }
-
-  @Override
-  public boolean isDeletable() {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isDeletable();
+    final Record record = getRecord();
+    return record.getValue(index);
   }
 
   @Override
   public boolean isDeleted() {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isDeleted();
+    final LayerRecord record = getLayerRecord();
+    return record.isDeleted();
   }
 
   @Override
   public boolean isGeometryEditable() {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isGeometryEditable();
+    final LayerRecord record = getLayerRecord();
+    return record.isGeometryEditable();
   }
 
   @Override
   public boolean isModified() {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isModified();
-  }
-
-  @Override
-  public boolean isModified(final int index) {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isModified(index);
+    final LayerRecord record = getLayerRecord();
+    return record.isModified();
   }
 
   @Override
   public boolean isModified(final String name) {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isModified(name);
+    final LayerRecord record = getLayerRecord();
+    return record.isModified(name);
   }
 
   @Override
-  public boolean isSame(final LayerRecord record) {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isSame(record);
-  }
-
-  @Override
-  public boolean isValid(final int index) {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isValid(index);
-  }
-
-  @Override
-  public boolean isValid(final String attributeName) {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord.isValid(attributeName);
+  public boolean isSame(final Record record) {
+    final LayerRecord record2 = getLayerRecord();
+    return record2.isSame(record);
   }
 
   @Override
   public LayerRecord revertChanges() {
-    final LayerRecord layerRecord = getLayerRecord();
-    return layerRecord;
+    final LayerRecord record = getLayerRecord();
+    return record;
   }
 
   @Override
-  public void revertEmptyFields() {
-    final LayerRecord layerRecord = getLayerRecord();
-    layerRecord.revertEmptyFields();
-  }
-
-  @Override
-  public void setState(final DataObjectState state) {
-    final LayerRecord layerRecord = getLayerRecord();
-    layerRecord.setState(state);
+  public void setState(final RecordState state) {
+    final Record record = getRecord();
+    record.setState(state);
   }
 
   @Override
   public void setValue(final int index, final Object value) {
-    final LayerRecord layerRecord = getLayerRecord();
-    layerRecord.setValue(index, value);
+    final Record record = getRecord();
+    record.setValue(index, value);
   }
 
 }

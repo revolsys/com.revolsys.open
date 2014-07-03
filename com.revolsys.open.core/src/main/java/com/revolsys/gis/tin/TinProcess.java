@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -22,14 +22,14 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.MathUtil;
 
-public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
+public class TinProcess extends BaseInOutProcess<Record, Record> {
   private static final Logger LOG = LoggerFactory.getLogger(TinProcess.class);
 
   private TriangulatedIrregularNetwork tin;
 
-  private Channel<DataObject> tinIn;
+  private Channel<Record> tinIn;
 
-  private Reader<DataObject> tinReader;
+  private Reader<Record> tinReader;
 
   private BoundingBox boundingBox;
 
@@ -59,11 +59,11 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
     return tinCache;
   }
 
-  public Channel<DataObject> getTinIn() {
+  public Channel<Record> getTinIn() {
     return tinIn;
   }
 
-  public Reader<DataObject> getTinReader() {
+  public Reader<Record> getTinReader() {
     return tinReader;
   }
 
@@ -124,8 +124,8 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void postRun(final Channel<DataObject> in,
-    final Channel<DataObject> out) {
+  protected void postRun(final Channel<Record> in,
+    final Channel<Record> out) {
     if (tin == null) {
       LOG.info("Tin not created as there were no features");
     }
@@ -140,8 +140,8 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(final Channel<Record> in,
+    final Channel<Record> out, final Record object) {
     if (tin == null) {
       loadTin();
     }
@@ -169,8 +169,8 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
   }
 
   private void readTinFeatures(final TriangulatedIrregularNetwork tin,
-    final List<LineString> lines, final Iterable<DataObject> iterable) {
-    for (final DataObject object : iterable) {
+    final List<LineString> lines, final Iterable<Record> iterable) {
+    for (final Record object : iterable) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry instanceof Point) {
         final Point point = (Point)geometry;
@@ -191,11 +191,11 @@ public class TinProcess extends BaseInOutProcess<DataObject, DataObject> {
     this.tinCache = tinCache;
   }
 
-  public void setTinIn(final Channel<DataObject> tinIn) {
+  public void setTinIn(final Channel<Record> tinIn) {
     this.tinIn = tinIn;
   }
 
-  public void setTinReader(final Reader<DataObject> tinReader) {
+  public void setTinReader(final Reader<Record> tinReader) {
     this.tinReader = tinReader;
   }
 

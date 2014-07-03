@@ -2,11 +2,11 @@ package com.revolsys.gis.converter.process;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
 public class SourceValueConverter extends
-  AbstractSourceToTargetProcess<DataObject, DataObject> {
-  private Converter<DataObject, ? extends Object> sourceValueConverter;
+  AbstractSourceToTargetProcess<Record, Record> {
+  private Converter<Record, ? extends Object> sourceValueConverter;
 
   private String targetAttributeName;
 
@@ -14,13 +14,13 @@ public class SourceValueConverter extends
   }
 
   public SourceValueConverter(final String targetAttributeName,
-    final Converter<DataObject, ? extends Object> sourceValueConverter) {
+    final Converter<Record, ? extends Object> sourceValueConverter) {
     this.targetAttributeName = targetAttributeName;
     this.sourceValueConverter = sourceValueConverter;
   }
 
   @Override
-  public void process(final DataObject source, final DataObject target) {
+  public void process(final Record source, final Record target) {
     final Object value = sourceValueConverter.convert(source);
     if (value != null && (!(value instanceof String) || !("".equals(value)))) {
       target.setValueByPath(targetAttributeName, value);

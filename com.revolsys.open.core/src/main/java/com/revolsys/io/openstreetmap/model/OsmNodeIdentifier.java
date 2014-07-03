@@ -1,8 +1,8 @@
 package com.revolsys.io.openstreetmap.model;
 
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
+import com.revolsys.data.identifier.SingleIdentifier;
 
-public class OsmNodeIdentifier extends SingleRecordIdentifier {
+public class OsmNodeIdentifier extends SingleIdentifier {
 
   public OsmNodeIdentifier(final long id) {
     super(id);

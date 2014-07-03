@@ -15,7 +15,7 @@
  */
 package com.revolsys.orm.core;
 
-import com.revolsys.gis.data.io.DataAccessObject;
+import com.revolsys.data.io.DataAccessObject;
 
 public interface DaoProxyFactory {
   <T> DataAccessObject<T> createDataAccessObject(String daoInterfaceClassName);

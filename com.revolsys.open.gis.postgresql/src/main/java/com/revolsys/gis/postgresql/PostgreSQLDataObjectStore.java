@@ -12,16 +12,16 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
-import com.revolsys.gis.data.model.ArrayDataObjectFactory;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.ShortNameProperty;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.QueryValue;
-import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.query.functions.EnvelopeIntersects;
+import com.revolsys.data.record.ArrayRecordFactory;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.property.ShortNameProperty;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
@@ -31,7 +31,7 @@ import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 
 public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
 
-  public static final AbstractIterator<DataObject> createPostgreSQLIterator(
+  public static final AbstractIterator<Record> createPostgreSQLIterator(
     final PostgreSQLDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
     return new PostgreSQLJdbcQueryIterator(dataStore, query, properties);
@@ -43,15 +43,15 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   private boolean useSchemaSequencePrefix = true;
 
   public PostgreSQLDataObjectStore() {
-    this(new ArrayDataObjectFactory());
+    this(new ArrayRecordFactory());
   }
 
-  public PostgreSQLDataObjectStore(final DataObjectFactory dataObjectFactory) {
+  public PostgreSQLDataObjectStore(final RecordFactory dataObjectFactory) {
     super(dataObjectFactory);
     initSettings();
   }
 
-  public PostgreSQLDataObjectStore(final DataObjectFactory dataObjectFactory,
+  public PostgreSQLDataObjectStore(final RecordFactory dataObjectFactory,
     final DataSource dataSource) {
     this(dataObjectFactory);
     setDataSource(dataSource);
@@ -73,7 +73,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  protected JdbcAttribute addAttribute(final DataObjectMetaDataImpl metaData,
+  protected JdbcAttribute addAttribute(final RecordDefinitionImpl metaData,
     final String dbColumnName, final String name, final String dataType,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
@@ -109,13 +109,13 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
+  public String getGeneratePrimaryKeySql(final RecordDefinition metaData) {
     final String sequenceName = getSequenceName(metaData);
     return "nextval('" + sequenceName + "')";
   }
 
   @Override
-  public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
+  public Object getNextPrimaryKey(final RecordDefinition metaData) {
     final String sequenceName = getSequenceName(metaData);
     return getNextPrimaryKey(sequenceName);
   }
@@ -132,7 +132,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  public String getSequenceName(final DataObjectMetaData metaData) {
+  public String getSequenceName(final RecordDefinition metaData) {
     final String typePath = metaData.getPath();
     final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
     final String shortName = ShortNameProperty.getShortName(metaData);
@@ -241,7 +241,7 @@ public class PostgreSQLDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  public ResultPager<DataObject> page(final Query query) {
+  public ResultPager<Record> page(final Query query) {
     return new PostgreSQLJdbcQueryResultPager(this, getProperties(), query);
   }
 

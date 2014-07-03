@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.DataObjectWriterFactory;
+import com.revolsys.data.io.DataObjectWriterFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class IoFactoryRegistry {

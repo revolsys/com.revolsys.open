@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.IteratorReader;
+import com.revolsys.data.io.IteratorReader;
 import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.MapWriter;

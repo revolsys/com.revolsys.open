@@ -3,7 +3,7 @@ package com.revolsys.swing.action.enablecheck;
 import java.util.concurrent.Callable;
 
 import com.revolsys.beans.InvokeMethodCallable;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.util.ExceptionUtil;
 
 public class InvokeMethodEnableCheck extends AbstractEnableCheck {

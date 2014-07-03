@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
 
-import com.revolsys.gis.data.io.DataAccessObject;
+import com.revolsys.data.io.DataAccessObject;
 
 public class ObjectPropertyValuesController implements Controller {
 

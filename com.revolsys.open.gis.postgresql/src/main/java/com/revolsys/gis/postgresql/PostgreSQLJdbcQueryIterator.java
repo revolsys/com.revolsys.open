@@ -2,7 +2,7 @@ package com.revolsys.gis.postgresql;
 
 import java.util.Map;
 
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.query.Query;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
 

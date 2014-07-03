@@ -6,8 +6,8 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.data.model.DataObject;
 
 public interface BoundingBox {
 
@@ -74,7 +74,7 @@ public interface BoundingBox {
 
   BoundingBox expandToInclude(BoundingBox boundingBox);
 
-  BoundingBox expandToInclude(DataObject record);
+  BoundingBox expandToInclude(Record record);
 
   BoundingBox expandToInclude(Geometry geometry);
 

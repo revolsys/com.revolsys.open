@@ -10,10 +10,10 @@ import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeQuery;
 import com.esri.sde.sdk.client.SeRow;
 import com.esri.sde.sdk.client.SeSqlConstruct;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
@@ -47,7 +47,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final DataObject object) throws SQLException {
+    final int columnIndex, final Record object) throws SQLException {
     if (valid) {
       final int geometryId = resultSet.getInt(columnIndex);
       if (!resultSet.wasNull()) {
@@ -81,7 +81,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected void setMetaData(final DataObjectMetaData metaData) {
+  protected void setMetaData(final RecordDefinition metaData) {
     tableName = sdeUtil.getTableName(metaData);
     geometryColumns = new String[] {
       getName()

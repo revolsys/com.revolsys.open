@@ -3,8 +3,8 @@ package com.revolsys.swing.table.dataobject.row;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -45,7 +45,7 @@ public class DataObjectRowRunnable extends InvokeMethodRunnable {
       final int eventRow = TablePanel.getEventRow();
       if (eventRow != -1) {
         final DataObjectRowTableModel model = table.getTableModel();
-        final DataObject object = model.getRecord(eventRow);
+        final Record object = model.getRecord(eventRow);
         return object;
       }
     }

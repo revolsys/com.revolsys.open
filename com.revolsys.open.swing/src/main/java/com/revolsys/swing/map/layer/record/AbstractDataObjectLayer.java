@@ -45,28 +45,28 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
+import com.revolsys.data.filter.DataObjectGeometryDistanceFilter;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.ListDataObjectReader;
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.property.DirectionalAttributes;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
-import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.ListDataObjectReader;
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.model.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
-import com.revolsys.gis.data.model.filter.DataObjectGeometryDistanceFilter;
-import com.revolsys.gis.data.model.property.DirectionalAttributes;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
@@ -118,7 +118,7 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class AbstractDataObjectLayer extends AbstractLayer implements
-DataObjectFactory, AddGeometryCompleteAction {
+RecordFactory, AddGeometryCompleteAction {
 
   public static void addVisibleLayers(
     final List<AbstractDataObjectLayer> layers, final LayerGroup group) {
@@ -284,11 +284,11 @@ DataObjectFactory, AddGeometryCompleteAction {
 
   private Object editSync;
 
-  private final Map<DataObject, Component> forms = new HashMap<DataObject, Component>();
+  private final Map<Record, Component> forms = new HashMap<Record, Component>();
 
-  private final Map<DataObject, Window> formWindows = new HashMap<DataObject, Window>();
+  private final Map<Record, Window> formWindows = new HashMap<Record, Window>();
 
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
   private final List<LayerRecord> modifiedRecords = new ArrayList<LayerRecord>();
 
@@ -308,7 +308,7 @@ DataObjectFactory, AddGeometryCompleteAction {
     this("");
   }
 
-  public AbstractDataObjectLayer(final DataObjectMetaData metaData) {
+  public AbstractDataObjectLayer(final RecordDefinition metaData) {
     this(metaData.getTypeName());
     setMetaData(metaData);
   }
@@ -342,7 +342,7 @@ DataObjectFactory, AddGeometryCompleteAction {
   @Override
   public void addComplete(final AbstractOverlay overlay, final Geometry geometry) {
     if (geometry != null) {
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       final String geometryAttributeName = metaData.getGeometryAttributeName();
       final Map<String, Object> parameters = new HashMap<String, Object>();
       parameters.put(geometryAttributeName, geometry);
@@ -379,7 +379,7 @@ DataObjectFactory, AddGeometryCompleteAction {
   }
 
   public void addNewRecord() {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
     if (geometryAttribute == null) {
       showAddForm(null);
@@ -517,8 +517,8 @@ DataObjectFactory, AddGeometryCompleteAction {
 
   public void copyRecordsToClipboard(final List<LayerRecord> records) {
     if (!records.isEmpty()) {
-      final DataObjectMetaData metaData = getMetaData();
-      final List<DataObject> copies = new ArrayList<DataObject>();
+      final RecordDefinition metaData = getMetaData();
+      final List<Record> copies = new ArrayList<Record>();
       for (final LayerRecord record : records) {
         copies.add(new ArrayRecord(record));
       }
@@ -535,7 +535,7 @@ DataObjectFactory, AddGeometryCompleteAction {
   }
 
   @Override
-  public LayerRecord createDataObject(final DataObjectMetaData metaData) {
+  public LayerRecord createRecord(final RecordDefinition metaData) {
     if (metaData.equals(getMetaData())) {
       return new ArrayLayerRecord(this);
     } else {
@@ -578,7 +578,7 @@ DataObjectFactory, AddGeometryCompleteAction {
 
   protected void createPropertiesPanelFields(
     final TabbedValuePanel propertiesPanel) {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     final BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
 
     final BasePanel fieldPanel = new BasePanel(new BorderLayout());
@@ -616,15 +616,15 @@ DataObjectFactory, AddGeometryCompleteAction {
   public LayerRecord createRecord(final Map<String, Object> values) {
 
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
-      final LayerRecord record = createDataObject(getMetaData());
-      record.setState(DataObjectState.Initalizing);
+      final LayerRecord record = createRecord(getMetaData());
+      record.setState(RecordState.Initalizing);
       try {
         if (values != null && !values.isEmpty()) {
           record.setValues(values);
           record.setIdValue(null);
         }
       } finally {
-        record.setState(DataObjectState.New);
+        record.setState(RecordState.New);
       }
       synchronized (this.newRecords) {
         this.newRecords.add(record);
@@ -703,7 +703,7 @@ DataObjectFactory, AddGeometryCompleteAction {
           }
         }
       }
-      record.setState(DataObjectState.Deleted);
+      record.setState(RecordState.Deleted);
       unSelectRecords(record);
       removeFromIndex(record);
     }
@@ -723,7 +723,7 @@ DataObjectFactory, AddGeometryCompleteAction {
           synchronized (this.newRecords) {
             if (removeSame(this.newRecords, record)) {
               unSelectRecords(record);
-              record.setState(DataObjectState.Deleted);
+              record.setState(RecordState.Deleted);
             }
           }
         }
@@ -861,6 +861,10 @@ DataObjectFactory, AddGeometryCompleteAction {
     return this.boundingBox;
   }
 
+  public LayerRecord getCachedRecord(final Identifier identifier) {
+    return getRecordById(identifier);
+  }
+
   public int getChangeCount() {
     int changeCount = 0;
     synchronized (this.newRecords) {
@@ -896,7 +900,7 @@ DataObjectFactory, AddGeometryCompleteAction {
       if (this.columnNames == null) {
         final Set<String> columnNames = new LinkedHashSet<String>(
             this.columnNameOrder);
-        final DataObjectMetaData metaData = getMetaData();
+        final RecordDefinition metaData = getMetaData();
         final List<String> attributeNames = metaData.getAttributeNames();
         columnNames.addAll(attributeNames);
         this.columnNames = new ArrayList<String>(columnNames);
@@ -935,7 +939,7 @@ DataObjectFactory, AddGeometryCompleteAction {
 
   public String getFieldTitle(final String fieldName) {
     if (isUseFieldTitles()) {
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       return metaData.getAttributeTitle(fieldName);
     } else {
       return fieldName;
@@ -951,7 +955,7 @@ DataObjectFactory, AddGeometryCompleteAction {
   }
 
   public DataType getGeometryType() {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     if (metaData == null) {
       return null;
     } else {
@@ -1004,8 +1008,8 @@ DataObjectFactory, AddGeometryCompleteAction {
    * @param record2
    * @return
    */
-  public DataObject getMergedRecord(final Point point,
-    final DataObject record1, final DataObject record2) {
+  public Record getMergedRecord(final Point point, final Record record1,
+    final Record record2) {
     if (record1 == record2) {
       return record1;
     } else {
@@ -1045,7 +1049,7 @@ DataObjectFactory, AddGeometryCompleteAction {
     }
   }
 
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return this.metaData;
   }
 
@@ -1069,7 +1073,7 @@ DataObjectFactory, AddGeometryCompleteAction {
       if (record == null) {
         return null;
       } else {
-        final DataObjectMetaData metaData = getMetaData();
+        final RecordDefinition metaData = getMetaData();
         final Attribute geometryAttribute = metaData.getGeometryAttribute();
         if (geometryAttribute != null) {
           final MapPanel parentComponent = MapPanel.get(getProject());
@@ -1101,7 +1105,7 @@ DataObjectFactory, AddGeometryCompleteAction {
           if (reader != null) {
             try {
 
-              for (final DataObject sourceRecord : reader) {
+              for (final Record sourceRecord : reader) {
                 if (geometry == null) {
                   final Geometry sourceGeometry = sourceRecord.getGeometryValue();
                   if (sourceGeometry == null) {
@@ -1175,7 +1179,7 @@ DataObjectFactory, AddGeometryCompleteAction {
     throw new UnsupportedOperationException();
   }
 
-  public LayerRecord getRecordById(final RecordIdentifier id) {
+  public LayerRecord getRecordById(final Identifier id) {
     return null;
   }
 
@@ -1184,7 +1188,7 @@ DataObjectFactory, AddGeometryCompleteAction {
   }
 
   public int getRowCount() {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     final Query query = new Query(metaData);
     return getRowCount(query);
   }
@@ -1197,7 +1201,7 @@ DataObjectFactory, AddGeometryCompleteAction {
   @Override
   public BoundingBox getSelectedBoundingBox() {
     BoundingBox boundingBox = super.getSelectedBoundingBox();
-    for (final DataObject record : getSelectedRecords()) {
+    for (final Record record : getSelectedRecords()) {
       final Geometry geometry = record.getGeometryValue();
       boundingBox = boundingBox.expandToInclude(geometry);
     }
@@ -1300,7 +1304,7 @@ DataObjectFactory, AddGeometryCompleteAction {
    */
   protected LayerRecord internalCancelChanges(final LayerRecord record) {
     if (record != null) {
-      final boolean isNew = record.getState() == DataObjectState.New;
+      final boolean isNew = record.getState() == RecordState.New;
       record.cancelChanges();
       if (!isNew) {
         return record;
@@ -1328,7 +1332,7 @@ DataObjectFactory, AddGeometryCompleteAction {
 
   protected boolean internalSaveChanges(final LayerRecord record) {
     try {
-      final DataObjectState originalState = record.getState();
+      final RecordState originalState = record.getState();
       final boolean saved = doSaveChanges(record);
       if (saved) {
         postSaveChanges(originalState, record);
@@ -1433,7 +1437,7 @@ DataObjectFactory, AddGeometryCompleteAction {
     }
   }
 
-  public boolean isLayerRecord(final DataObject record) {
+  public boolean isLayerRecord(final Record record) {
     if (record == null) {
       return false;
     } else if (record.getMetaData() == getMetaData()) {
@@ -1530,9 +1534,9 @@ DataObjectFactory, AddGeometryCompleteAction {
         }
       }
       final List<LayerRecord> newRecords = new ArrayList<LayerRecord>();
-      final List<DataObject> regectedRecords = new ArrayList<DataObject>();
+      final List<Record> regectedRecords = new ArrayList<Record>();
       if (reader != null) {
-        final DataObjectMetaData metaData = getMetaData();
+        final RecordDefinition metaData = getMetaData();
         final Attribute geometryAttribute = metaData.getGeometryAttribute();
         DataType geometryDataType = null;
         Class<?> layerGeometryClass = null;
@@ -1545,7 +1549,7 @@ DataObjectFactory, AddGeometryCompleteAction {
         if (ignorePasteFields == null) {
           ignorePasteFields = Collections.emptySet();
         }
-        for (final DataObject sourceRecord : reader) {
+        for (final Record sourceRecord : reader) {
           final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
               sourceRecord);
 
@@ -1596,7 +1600,7 @@ DataObjectFactory, AddGeometryCompleteAction {
     addSelectedRecords(this.newRecords);
   }
 
-  protected void postSaveChanges(final DataObjectState originalState,
+  protected void postSaveChanges(final RecordState originalState,
     final LayerRecord record) {
     postSaveDeletedRecord(record);
     postSaveModifiedRecord(record);
@@ -1953,7 +1957,7 @@ DataObjectFactory, AddGeometryCompleteAction {
     }
   }
 
-  protected void setMetaData(final DataObjectMetaData metaData) {
+  protected void setMetaData(final RecordDefinition metaData) {
     this.metaData = metaData;
     if (metaData != null) {
       setGeometryFactory(metaData.getGeometryFactory());
@@ -1989,7 +1993,7 @@ DataObjectFactory, AddGeometryCompleteAction {
   public void setQuery(final Query query) {
     final Query oldValue = this.query;
     if (query == null) {
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       if (metaData == null) {
         this.query = null;
       } else {
@@ -2036,7 +2040,7 @@ DataObjectFactory, AddGeometryCompleteAction {
   }
 
   public void setSelectedRecordsById(final Object id) {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     if (metaData != null) {
       final String idAttributeName = metaData.getIdAttributeName();
       if (idAttributeName == null) {
@@ -2101,12 +2105,12 @@ DataObjectFactory, AddGeometryCompleteAction {
         Window window = this.formWindows.get(record);
         if (window == null) {
           final Component form = createForm(record);
-          final RecordIdentifier id = record.getIdentifier();
+          final Identifier id = record.getIdentifier();
           if (form == null) {
             return null;
           } else {
             String title;
-            if (record.getState() == DataObjectState.New) {
+            if (record.getState() == RecordState.New) {
               title = "Add NEW " + getName();
             } else if (isCanEditRecords()) {
               title = "Edit " + getName() + " #" + id;
@@ -2359,10 +2363,10 @@ DataObjectFactory, AddGeometryCompleteAction {
   }
 
   protected void updateRecordState(final LayerRecord record) {
-    final DataObjectState state = record.getState();
-    if (state == DataObjectState.Modified) {
+    final RecordState state = record.getState();
+    if (state == RecordState.Modified) {
       addModifiedRecord(record);
-    } else if (state == DataObjectState.Persisted) {
+    } else if (state == RecordState.Persisted) {
       postSaveModifiedRecord(record);
     }
   }
@@ -2391,7 +2395,7 @@ DataObjectFactory, AddGeometryCompleteAction {
     }
   }
 
-  public void zoomToObject(final DataObject record) {
+  public void zoomToObject(final Record record) {
     final Geometry geometry = record.getGeometryValue();
 
     zoomTo(geometry);

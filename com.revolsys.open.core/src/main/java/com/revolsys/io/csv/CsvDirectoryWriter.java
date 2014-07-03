@@ -6,19 +6,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
 
-public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
+public class CsvDirectoryWriter extends AbstractWriter<Record> {
   private File directory;
 
-  private final Map<DataObjectMetaData, CsvDataObjectWriter> writers = new HashMap<DataObjectMetaData, CsvDataObjectWriter>();
+  private final Map<RecordDefinition, CsvDataObjectWriter> writers = new HashMap<RecordDefinition, CsvDataObjectWriter>();
 
-  private final Map<String, DataObjectMetaData> metaDataMap = new HashMap<>();
+  private final Map<String, RecordDefinition> metaDataMap = new HashMap<>();
 
   public CsvDirectoryWriter() {
   }
@@ -47,12 +47,12 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
     return directory;
   }
 
-  public DataObjectMetaData getMetaData(final String path) {
+  public RecordDefinition getMetaData(final String path) {
     return metaDataMap.get(path);
   }
 
-  private CsvDataObjectWriter getWriter(final DataObject record) {
-    final DataObjectMetaData metaData = record.getMetaData();
+  private CsvDataObjectWriter getWriter(final Record record) {
+    final RecordDefinition metaData = record.getMetaData();
     CsvDataObjectWriter writer = writers.get(metaData);
     if (writer == null) {
       try {
@@ -84,7 +84,7 @@ public class CsvDirectoryWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     final CsvDataObjectWriter writer = getWriter(object);
     writer.write(object);
   }

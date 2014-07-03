@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreFactory;
-import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreFactory;
+import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.CollectionUtil;
 

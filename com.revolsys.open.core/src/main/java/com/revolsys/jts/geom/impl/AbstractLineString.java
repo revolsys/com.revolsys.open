@@ -39,14 +39,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.data.io.IteratorReader;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
-import com.revolsys.gis.data.io.IteratorReader;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Dimension;

@@ -1,8 +1,8 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Guid;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
@@ -28,7 +28,7 @@ public class GlobalIdAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public void setPostInsertValue(final DataObject object, final Row row) {
+  public void setPostInsertValue(final Record object, final Row row) {
     synchronized (getDataStore()) {
       final Guid guid = row.getGlobalId();
       final String name = getName();
@@ -38,7 +38,7 @@ public class GlobalIdAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final DataObject object, final Row row,
+  public Object setValue(final Record object, final Row row,
     final Object value) {
     return null;
   }

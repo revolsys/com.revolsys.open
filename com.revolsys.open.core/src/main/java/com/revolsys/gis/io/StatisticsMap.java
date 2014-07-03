@@ -7,8 +7,8 @@ import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.util.CollectionUtil;
 
 public class StatisticsMap {
@@ -27,24 +27,24 @@ public class StatisticsMap {
     this.prefix = prefix;
   }
 
-  public void add(final String statisticName, final DataObject object) {
+  public void add(final String statisticName, final Record object) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(object);
 
   }
 
-  public void add(final String statisticName, final DataObject object,
+  public void add(final String statisticName, final Record object,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(object, count);
   }
 
-  public void add(final String statisticName, final DataObjectMetaData type) {
+  public void add(final String statisticName, final RecordDefinition type) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(type);
   }
 
-  public void add(final String statisticName, final DataObjectMetaData type,
+  public void add(final String statisticName, final RecordDefinition type,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(type, count);

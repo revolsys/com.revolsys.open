@@ -2,7 +2,7 @@ package com.revolsys.swing.tree;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.util.Property;
 

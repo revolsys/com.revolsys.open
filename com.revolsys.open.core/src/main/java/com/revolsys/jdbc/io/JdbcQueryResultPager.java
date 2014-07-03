@@ -13,15 +13,15 @@ import javax.sql.DataSource;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcUtils;
 
-public class JdbcQueryResultPager implements ResultPager<DataObject> {
+public class JdbcQueryResultPager implements ResultPager<Record> {
   /** The objects in the current page. */
-  private List<DataObject> results;
+  private List<Record> results;
 
   /** The number of objects in a page. */
   private int pageSize = 10;
@@ -39,11 +39,11 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
 
   private DataSource dataSource;
 
-  private DataObjectFactory dataObjectFactory;
+  private RecordFactory dataObjectFactory;
 
   private JdbcDataObjectStore dataStore;
 
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
   private PreparedStatement statement;
 
@@ -78,7 +78,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     final String tableName = query.getTypeName();
     metaData = query.getMetaData();
     if (metaData == null) {
-      metaData = dataStore.getMetaData(tableName);
+      metaData = dataStore.getRecordDefinition(tableName);
       query.setMetaData(metaData);
     }
 
@@ -111,7 +111,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     return connection;
   }
 
-  public DataObjectFactory getDataObjectFactory() {
+  public RecordFactory getDataObjectFactory() {
     return dataObjectFactory;
   }
 
@@ -143,7 +143,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * @return The list of objects in the current page.
    */
   @Override
-  public List<DataObject> getList() {
+  public List<Record> getList() {
     if (results == null) {
       throw new IllegalStateException(
         "The page number must be set using setPageNumber");
@@ -151,7 +151,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     return results;
   }
 
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return metaData;
   }
 
@@ -343,7 +343,7 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
     updateResults();
   }
 
-  protected void setResults(final List<DataObject> results) {
+  protected void setResults(final List<Record> results) {
     this.results = results;
   }
 
@@ -355,14 +355,14 @@ public class JdbcQueryResultPager implements ResultPager<DataObject> {
    * Update the cached results for the current page.
    */
   protected void updateResults() {
-    results = new ArrayList<DataObject>();
+    results = new ArrayList<Record>();
     try {
       initResultSet();
       if (pageNumber != -1 && resultSet != null) {
         if (resultSet.absolute(pageNumber * pageSize + 1)) {
           int i = 0;
           do {
-            final DataObject object = JdbcQueryIterator.getNextObject(
+            final Record object = JdbcQueryIterator.getNextObject(
               dataStore, metaData, metaData.getAttributes(), dataObjectFactory,
               resultSet);
             results.add(object);

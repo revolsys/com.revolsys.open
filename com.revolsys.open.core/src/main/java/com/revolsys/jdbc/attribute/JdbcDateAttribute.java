@@ -6,8 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.types.DataTypes;
 
 public class JdbcDateAttribute extends JdbcAttribute {
   public JdbcDateAttribute(final String dbName, final String name,
@@ -25,7 +25,7 @@ public class JdbcDateAttribute extends JdbcAttribute {
 
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final DataObject object) throws SQLException {
+    final int columnIndex, final Record object) throws SQLException {
     final Date value = resultSet.getDate(columnIndex);
     setValue(object, value);
     return columnIndex + 1;

@@ -14,12 +14,12 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.core.io.FileSystemResource;
 
-import com.revolsys.gis.data.io.AbstractDataObjectWriterFactory;
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.io.AbstractDataObjectWriterFactory;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Reader;
@@ -103,7 +103,7 @@ public class IoTestSuite {
   public static void doWriteReadTest(final GeometryFactory geometryFactory,
     final DataType dataType, final Geometry geometry, final String fileExtension) {
     final String geometryTypeString = dataType.toString();
-    final DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(
+    final RecordDefinitionImpl metaData = new RecordDefinitionImpl(
       geometryTypeString);
     metaData.addAttribute("ID", DataTypes.INT, true);
     metaData.addAttribute("GEOMETRY", dataType, true);
@@ -115,7 +115,7 @@ public class IoTestSuite {
     file.getParentFile().mkdirs();
     final FileSystemResource resource = new FileSystemResource(file);
     try (
-      Writer<DataObject> writer = AbstractDataObjectWriterFactory.dataObjectWriter(
+      Writer<Record> writer = AbstractDataObjectWriterFactory.dataObjectWriter(
         metaData, resource)) {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);

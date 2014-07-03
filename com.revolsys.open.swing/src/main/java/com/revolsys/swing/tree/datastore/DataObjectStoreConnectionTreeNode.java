@@ -9,11 +9,11 @@ import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.tree.TreeNode;
 
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreConnectionMapProxy;
+import com.revolsys.data.io.DataObjectStoreProxy;
+import com.revolsys.data.io.DataObjectStoreSchema;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreConnectionMapProxy;
-import com.revolsys.gis.data.io.DataObjectStoreProxy;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
 import com.revolsys.io.datastore.DataObjectStoreConnection;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;

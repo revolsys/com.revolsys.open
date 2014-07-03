@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.openstreetmap.model.OsmConstants;
@@ -51,7 +51,7 @@ public class OpenStreetMapApiLayer extends AbstractDataObjectLayer {
 
   @Override
   protected List<LayerRecord> doQuery(final BoundingBox boundingBox) {
-    final Map<RecordIdentifier, LayerRecord> recordMap = new HashMap<>();
+    final Map<Identifier, LayerRecord> recordMap = new HashMap<>();
     final List<BoundingBox> boundingBoxes = getTileBoundingBoxes(boundingBox);
     for (final BoundingBox tileBoundingBox : boundingBoxes) {
       final OsmDocument document = getTile(tileBoundingBox);
@@ -59,7 +59,7 @@ public class OpenStreetMapApiLayer extends AbstractDataObjectLayer {
         final Geometry geometry = record.getGeometryValue();
         if (geometry != null && !geometry.isEmpty()) {
           if (boundingBox.intersects(geometry.getBoundingBox())) {
-            final RecordIdentifier identifier = record.getIdentifier();
+            final Identifier identifier = record.getIdentifier();
             final OsmProxyLayerRecord layerRecord = new OsmProxyLayerRecord(
               this, document, identifier);
             recordMap.put(identifier, layerRecord);
@@ -77,7 +77,7 @@ public class OpenStreetMapApiLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return OsmElement.META_DATA;
   }
 

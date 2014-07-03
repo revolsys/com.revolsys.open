@@ -13,8 +13,8 @@ import java.awt.geom.GeneralPath;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class GeometryStylePreview extends JPanel {

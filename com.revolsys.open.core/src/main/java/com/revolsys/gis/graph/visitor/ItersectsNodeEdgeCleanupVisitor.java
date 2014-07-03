@@ -12,19 +12,19 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.equals.DataObjectEquals;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.model.data.equals.DataObjectEquals;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class ItersectsNodeEdgeCleanupVisitor extends
-  AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {
+  AbstractVisitor<Edge<Record>> implements ObjectProcessor<DataObjectGraph> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ItersectsNodeEdgeCleanupVisitor.class);
 
@@ -53,7 +53,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends
   }
 
   private boolean moveEndUndershoots(final String typePath,
-    final Node<DataObject> node1, final Node<DataObject> node2) {
+    final Node<Record> node1, final Node<Record> node2) {
     boolean matched = false;
     if (!node2.hasEdgeTo(node1)) {
       final Set<Double> angles1 = NodeAttributes.getEdgeAnglesByType(node2,
@@ -74,16 +74,16 @@ public class ItersectsNodeEdgeCleanupVisitor extends
   }
 
   @Override
-  public boolean visit(final Edge<DataObject> edge) {
+  public boolean visit(final Edge<Record> edge) {
     final String typePath = edge.getTypeName();
-    final Node<DataObject> fromNode = edge.getFromNode();
-    final Node<DataObject> toNode = edge.getToNode();
+    final Node<Record> fromNode = edge.getFromNode();
+    final Node<Record> toNode = edge.getToNode();
 
-    final Graph<DataObject> graph = edge.getGraph();
-    final List<Node<DataObject>> nodes = graph.findNodes(edge, 2);
-    for (final Iterator<Node<DataObject>> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
-      final Node<DataObject> node = nodeIter.next();
-      final List<Edge<DataObject>> edges = NodeAttributes.getEdgesByType(node,
+    final Graph<Record> graph = edge.getGraph();
+    final List<Node<Record>> nodes = graph.findNodes(edge, 2);
+    for (final Iterator<Node<Record>> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
+      final Node<Record> node = nodeIter.next();
+      final List<Edge<Record>> edges = NodeAttributes.getEdgesByType(node,
         typePath);
       if (edges.isEmpty()) {
         nodeIter.remove();
@@ -92,9 +92,9 @@ public class ItersectsNodeEdgeCleanupVisitor extends
     if (!nodes.isEmpty()) {
       if (nodes.size() > 1) {
         for (int i = 0; i < nodes.size(); i++) {
-          Node<DataObject> node1 = nodes.get(i);
+          Node<Record> node1 = nodes.get(i);
           for (int j = i + 1; j < nodes.size(); j++) {
-            final Node<DataObject> node2 = nodes.get(j);
+            final Node<Record> node2 = nodes.get(j);
             if (node1.distance(node2) < 2) {
               if (edge.distance(node1) <= edge.distance(node2)) {
                 nodes.remove(j);
@@ -107,7 +107,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends
         }
       }
       if (nodes.size() == 1) {
-        final Node<DataObject> node = nodes.get(0);
+        final Node<Record> node = nodes.get(0);
         if (node.distance(fromNode) <= 10) {
           moveEndUndershoots(typePath, fromNode, node);
         } else if (node.distance(toNode) <= 10) {

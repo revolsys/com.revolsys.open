@@ -7,7 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.BeanFactory;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.gis.data.io.DataAccessObject;
+import com.revolsys.data.io.DataAccessObject;
 import com.revolsys.orm.core.SpringDaoFactory;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 

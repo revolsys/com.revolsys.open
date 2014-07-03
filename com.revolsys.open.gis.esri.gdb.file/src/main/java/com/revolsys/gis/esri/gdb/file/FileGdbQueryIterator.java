@@ -3,13 +3,13 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
@@ -18,9 +18,9 @@ import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
+public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
-  private DataObjectFactory dataObjectFactory;
+  private RecordFactory dataObjectFactory;
 
   private Table table;
 
@@ -30,7 +30,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
 
   private BoundingBox boundingBox;
 
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
   private CapiFileGdbDataObjectStore dataStore;
 
@@ -59,7 +59,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     final BoundingBox boundingBox, final Query query, final int offset,
     final int limit) {
     this(dataStore, typePath, "*", whereClause, boundingBox, offset, limit);
-    final DataObjectFactory factory = query.getProperty("dataObjectFactory");
+    final RecordFactory factory = query.getProperty("dataObjectFactory");
     if (factory != null) {
       this.dataObjectFactory = factory;
     }
@@ -70,7 +70,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     final BoundingBox boundingBox, final int offset, final int limit) {
     this.dataStore = dataStore;
     this.typePath = typePath;
-    this.metaData = dataStore.getMetaData(typePath);
+    this.metaData = dataStore.getRecordDefinition(typePath);
     this.table = dataStore.getTable(typePath);
     this.fields = fields;
     this.sql = sql;
@@ -123,7 +123,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
     }
   }
 
-  protected DataObjectMetaData getMetaData() {
+  protected RecordDefinition getMetaData() {
     if (metaData == null) {
       hasNext();
     }
@@ -131,7 +131,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   }
 
   @Override
-  protected DataObject getNext() throws NoSuchElementException {
+  protected Record getNext() throws NoSuchElementException {
     if (rows == null || metaData == null) {
       throw new NoSuchElementException();
     } else {
@@ -149,9 +149,9 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
         throw new NoSuchElementException();
       } else {
         try {
-          final DataObject object = dataObjectFactory.createDataObject(metaData);
+          final Record object = dataObjectFactory.createRecord(metaData);
           dataStore.addStatistic("query", object);
-          object.setState(DataObjectState.Initalizing);
+          object.setState(RecordState.Initalizing);
           for (final Attribute attribute : metaData.getAttributes()) {
             final String name = attribute.getName();
             final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
@@ -161,7 +161,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
             }
             object.setValue(name, value);
           }
-          object.setState(DataObjectState.Persisted);
+          object.setState(RecordState.Persisted);
           return object;
 
         } finally {
@@ -172,7 +172,7 @@ public class FileGdbQueryIterator extends AbstractIterator<DataObject> {
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
-    final DataObjectMetaData metaData = this.metaData;
+    final RecordDefinition metaData = this.metaData;
     if (metaData != null) {
       this.boundingBox = boundingBox;
 

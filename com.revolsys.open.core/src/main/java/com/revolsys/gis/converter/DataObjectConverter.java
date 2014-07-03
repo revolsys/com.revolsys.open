@@ -22,11 +22,11 @@ package com.revolsys.gis.converter;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
-public interface DataObjectConverter<T> extends Converter<DataObject, T> {
+public interface DataObjectConverter<T> extends Converter<Record, T> {
 
   @Override
-  T convert(DataObject object);
+  T convert(Record object);
 
 }

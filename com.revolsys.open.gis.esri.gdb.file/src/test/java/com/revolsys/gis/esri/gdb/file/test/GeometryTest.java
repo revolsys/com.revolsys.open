@@ -2,16 +2,16 @@ package com.revolsys.gis.esri.gdb.file.test;
 
 import java.io.File;
 
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory;
-import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -36,7 +36,7 @@ public class GeometryTest {
     final File file = new File("target/test-data/" + name + ".gdb");
     FileUtil.deleteDirectory(file);
 
-    DataObjectMetaDataImpl metaData = new DataObjectMetaDataImpl(name);
+    RecordDefinitionImpl metaData = new RecordDefinitionImpl(name);
     metaData.addAttribute("ID", DataTypes.INT, true);
     final Attribute geometryAttribute = metaData.addAttribute("Geometry",
       geometryDataType, true);
@@ -46,14 +46,14 @@ public class GeometryTest {
 
     final FileGdbDataObjectStore dataStore = FileGdbDataObjectStoreFactory.create(file);
     dataStore.initialize();
-    metaData = (DataObjectMetaDataImpl)dataStore.getMetaData(metaData);
-    final DataObject object = new ArrayRecord(metaData);
+    metaData = (RecordDefinitionImpl)dataStore.getMetaData(metaData);
+    final Record object = new ArrayRecord(metaData);
     object.setIdValue(1);
     object.setGeometryValue(geometry);
 
     dataStore.insert(object);
 
-    final DataObject object2 = dataStore.load(name, 1);
+    final Record object2 = dataStore.load(name, 1);
     if (!EqualsInstance.INSTANCE.equals(object, object2)) {
       System.out.println("Not Equal");
       System.out.println(object);

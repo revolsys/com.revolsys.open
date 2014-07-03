@@ -9,10 +9,10 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreExtension;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreExtension;
+import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.oracle.io.OracleDataObjectStore;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
@@ -137,7 +137,7 @@ public class ArcSdeStGeometryDataStoreExtension implements
   @Override
   public void postProcess(final DataObjectStoreSchema schema) {
     final String schemaName = schema.getName();
-    for (final DataObjectMetaData metaData : schema.getTypes()) {
+    for (final RecordDefinition metaData : schema.getTypes()) {
       final String typePath = metaData.getPath();
       final Integer registrationId = JdbcAttributeAdder.getTableProperty(
         schema, typePath, ArcSdeConstants.REGISTRATION_ID);

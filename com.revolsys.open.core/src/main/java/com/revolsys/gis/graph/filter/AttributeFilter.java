@@ -1,8 +1,8 @@
 package com.revolsys.gis.graph.filter;
 
+import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.AttributedObject;
-import com.revolsys.gis.model.data.equals.EqualsInstance;
 
 public class AttributeFilter<T extends AttributedObject> implements Filter<T> {
   private final String attributeName;

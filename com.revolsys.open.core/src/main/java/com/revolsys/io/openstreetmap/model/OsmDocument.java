@@ -11,7 +11,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.LongHashMap;
-import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.io.file.UrlResource;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.BoundingBox;
@@ -187,7 +187,7 @@ public class OsmDocument implements OsmConstants {
     return this.preferences;
   }
 
-  public OsmElement getRecord(final RecordIdentifier identifier) {
+  public OsmElement getRecord(final Identifier identifier) {
     if (identifier instanceof OsmNodeIdentifier) {
       final Long id = identifier.getLong(0);
       return getNode(id);

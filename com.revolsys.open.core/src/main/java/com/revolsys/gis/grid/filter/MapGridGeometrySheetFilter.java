@@ -1,7 +1,7 @@
 package com.revolsys.gis.grid.filter;
 
+import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -13,7 +13,7 @@ import com.revolsys.jts.geom.Point;
  * 
  * @author Paul Austin
  */
-public class MapGridGeometrySheetFilter implements Filter<DataObject> {
+public class MapGridGeometrySheetFilter implements Filter<Record> {
   /** Set the grid to check the mapsheet for. */
   private RectangularMapGrid grid;
 
@@ -23,7 +23,7 @@ public class MapGridGeometrySheetFilter implements Filter<DataObject> {
   private String sheet;
 
   @Override
-  public boolean accept(final DataObject object) {
+  public boolean accept(final Record object) {
     if (sheet != null && grid != null) {
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {

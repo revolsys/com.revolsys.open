@@ -3,8 +3,8 @@ package com.revolsys.io.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.json.JsonWriter;
@@ -20,7 +20,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
-public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
+public class GeoJsonDataObjectWriter extends AbstractWriter<Record>
   implements GeoJsonConstants {
 
   boolean initialized = false;
@@ -312,7 +312,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     if (initialized) {
       out.endAttribute();
     } else {
@@ -327,7 +327,7 @@ public class GeoJsonDataObjectWriter extends AbstractWriter<DataObject>
       mainGeometry = mainGeometry.convert(geometryFactory);
     }
     writeSrid(mainGeometry);
-    final DataObjectMetaData metaData = object.getMetaData();
+    final RecordDefinition metaData = object.getMetaData();
     final int geometryIndex = metaData.getGeometryAttributeIndex();
     boolean geometryWritten = false;
     out.endAttribute();

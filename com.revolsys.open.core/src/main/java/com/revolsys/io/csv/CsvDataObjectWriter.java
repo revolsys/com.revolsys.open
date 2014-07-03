@@ -5,28 +5,28 @@ import java.io.Writer;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 
-public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
+public class CsvDataObjectWriter extends AbstractWriter<Record> {
   private final char fieldSeparator = ',';
 
   /** The writer */
   private final PrintWriter out;
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
   private final boolean useQuotes;
 
-  public CsvDataObjectWriter(final DataObjectMetaData metaData, final Writer out) {
+  public CsvDataObjectWriter(final RecordDefinition metaData, final Writer out) {
     this(metaData, out, CsvConstants.FIELD_SEPARATOR, true);
 
   }
 
-  public CsvDataObjectWriter(final DataObjectMetaData metaData,
+  public CsvDataObjectWriter(final RecordDefinition metaData,
     final Writer out, final char fieldSeparator, final boolean useQuotes) {
     this.metaData = metaData;
     this.out = new PrintWriter(out);
@@ -67,7 +67,7 @@ public class CsvDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i > 0) {
         out.print(fieldSeparator);

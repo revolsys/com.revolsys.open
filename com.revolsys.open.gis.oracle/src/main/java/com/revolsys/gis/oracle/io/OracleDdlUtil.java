@@ -2,16 +2,16 @@ package com.revolsys.gis.oracle.io;
 
 import java.io.PrintWriter;
 
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.jdbc.JdbcUtils;
 
 public class OracleDdlUtil {
 
   public static void createTable(final PrintWriter out,
-    final DataObjectMetaData metaData) {
+    final RecordDefinition metaData) {
     final String typePath = metaData.getPath();
     out.println();
     out.print("CREATE TABLE ");

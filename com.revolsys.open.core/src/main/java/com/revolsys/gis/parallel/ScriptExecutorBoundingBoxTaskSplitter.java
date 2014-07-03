@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.parallel.channel.ChannelInput;
 import com.revolsys.parallel.channel.ChannelOutput;
@@ -33,7 +33,7 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
       scriptName, attributes);
     executor.setLogScriptInfo(isLogScriptInfo());
     executor.addBean("boundingBox", boundingBox);
-    final Set<DataObject> objects = this.outsideBoundaryObjects.getAndClearObjects();
+    final Set<Record> objects = this.outsideBoundaryObjects.getAndClearObjects();
     executor.addBean("outsideBoundaryObjects", objects);
     executor.addBeans(beans);
     executor.addBeans(inChannels);

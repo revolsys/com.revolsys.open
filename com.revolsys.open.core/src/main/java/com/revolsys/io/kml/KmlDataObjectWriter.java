@@ -9,8 +9,8 @@ import java.util.Map;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.BoundingBox;
@@ -18,7 +18,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
-public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
+public class KmlDataObjectWriter extends AbstractWriter<Record> implements
   Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<Class<?>, String>();
 
@@ -96,10 +96,10 @@ public class KmlDataObjectWriter extends AbstractWriter<DataObject> implements
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     open();
     writer.startTag(PLACEMARK);
-    final DataObjectMetaData metaData = object.getMetaData();
+    final RecordDefinition metaData = object.getMetaData();
     final int geometryIndex = metaData.getGeometryAttributeIndex();
     final int idIndex = metaData.getIdAttributeIndex();
 

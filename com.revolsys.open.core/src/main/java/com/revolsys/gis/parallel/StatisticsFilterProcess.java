@@ -1,10 +1,10 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.process.FilterProcess;
 
-public class StatisticsFilterProcess extends FilterProcess<DataObject> {
+public class StatisticsFilterProcess extends FilterProcess<Record> {
 
   private Statistics acceptStatistics;
 
@@ -40,14 +40,14 @@ public class StatisticsFilterProcess extends FilterProcess<DataObject> {
   }
 
   @Override
-  protected void postAccept(final DataObject object) {
+  protected void postAccept(final Record object) {
     if (acceptStatistics != null) {
       acceptStatistics.add(object);
     }
   }
 
   @Override
-  protected void postReject(final DataObject object) {
+  protected void postReject(final Record object) {
     if (rejectStatistics != null) {
       rejectStatistics.add(object);
     }

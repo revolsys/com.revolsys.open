@@ -5,7 +5,7 @@ import javax.swing.JTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
 import com.revolsys.swing.table.dataobject.renderer.SingleDataObjectTableCellRenderer;
@@ -29,7 +29,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
     final DataObjectTableCellEditor cellEditor = new DataObjectTableCellEditor(
       table);
 
-    final DataObjectMetaData metaData = model.getMetaData();
+    final RecordDefinition metaData = model.getMetaData();
 
     int maxTitleWidth = 100;
     for (final String fieldName : metaData.getAttributeNames()) {
@@ -70,7 +70,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
     return table;
   }
 
-  public AbstractSingleDataObjectTableModel(final DataObjectMetaData metaData,
+  public AbstractSingleDataObjectTableModel(final RecordDefinition metaData,
     final boolean editable) {
     super(metaData);
     setEditable(editable);
@@ -92,7 +92,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
   }
 
   public String getFieldTitle(final String fieldName) {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     return metaData.getAttributeTitle(fieldName);
   }
 
@@ -100,7 +100,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
 
   @Override
   public int getRowCount() {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     final int attributeCount = metaData.getAttributeCount();
     return attributeCount;
   }
@@ -125,7 +125,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (columnIndex == 2) {
       if (isEditable()) {
-        final DataObjectMetaData metaData = getMetaData();
+        final RecordDefinition metaData = getMetaData();
         if (rowIndex == metaData.getIdAttributeIndex()) {
           return false;
         } else {
@@ -160,7 +160,7 @@ public abstract class AbstractSingleDataObjectTableModel extends
   }
 
   @Override
-  public void setMetaData(final DataObjectMetaData metaData) {
+  public void setMetaData(final RecordDefinition metaData) {
     super.setMetaData(metaData);
   }
 

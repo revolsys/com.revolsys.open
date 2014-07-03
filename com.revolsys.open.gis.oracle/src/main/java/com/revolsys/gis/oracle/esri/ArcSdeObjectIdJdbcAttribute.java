@@ -4,15 +4,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   public static void replaceAttribute(final String schemaName,
-    final DataObjectMetaData metaData, final Integer registrationId,
+    final RecordDefinition metaData, final Integer registrationId,
     final String rowIdColumn) {
     final JdbcAttribute objectIdAttribute = (JdbcAttribute)metaData.getAttribute(rowIdColumn);
     if (objectIdAttribute != null
@@ -25,7 +25,7 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
         objectIdAttribute.getDbName(), name, description, properties,
         schemaName, registrationId);
       newObjectIdAttribute.setMetaData(metaData);
-      final DataObjectMetaDataImpl metaDataImpl = (DataObjectMetaDataImpl)metaData;
+      final RecordDefinitionImpl metaDataImpl = (RecordDefinitionImpl)metaData;
       metaDataImpl.replaceAttribute(objectIdAttribute, newObjectIdAttribute);
       if (metaData.getIdAttributeName() == null
         && metaData.getIdAttributeNames().isEmpty()) {
@@ -73,7 +73,7 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
    */
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final DataObject object) throws SQLException {
+    final int parameterIndex, final Record object) throws SQLException {
     return parameterIndex;
   }
 }

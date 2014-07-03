@@ -4,11 +4,11 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.jts.geom.BoundingBox;
@@ -71,8 +71,8 @@ public class WikipediaBoundingBoxLayerWorker extends
         .getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
     }
-    final List<DataObject> results = this.geoNamesService.getWikipediaArticles(boundingBox);
-    for (final DataObject dataObject : results) {
+    final List<Record> results = this.geoNamesService.getWikipediaArticles(boundingBox);
+    for (final Record dataObject : results) {
       final String title = dataObject.getValue("title");
       final String wikipediaUrl = dataObject.getValue("wikipediaUrl");
       final String thumbnailImage = dataObject.getValue("thumbnailImg");

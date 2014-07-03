@@ -2,20 +2,20 @@ package com.revolsys.gis.parallel;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.io.DataObjectIterator;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.process.AbstractOutProcess;
 
-public class ReaderProcess extends AbstractOutProcess<DataObject> {
+public class ReaderProcess extends AbstractOutProcess<Record> {
   private DataObjectIterator reader;
 
   public ReaderProcess() {
 
   }
 
-  public ReaderProcess(final Channel<DataObject> out,
+  public ReaderProcess(final Channel<Record> out,
     final DataObjectIterator reader) {
     super(out);
     this.reader = reader;
@@ -38,14 +38,14 @@ public class ReaderProcess extends AbstractOutProcess<DataObject> {
   }
 
   @Override
-  protected void run(final Channel<DataObject> out) {
+  protected void run(final Channel<Record> out) {
     final Logger log = Logger.getLogger(getClass());
     try {
       reader.open();
 
       log.debug("Opened");
       while (reader.hasNext()) {
-        final DataObject object = reader.next();
+        final Record object = reader.next();
         out.write(object);
       }
 

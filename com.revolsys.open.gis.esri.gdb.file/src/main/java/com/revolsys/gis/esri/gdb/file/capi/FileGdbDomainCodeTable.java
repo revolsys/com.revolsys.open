@@ -8,9 +8,9 @@ import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.io.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.io.esri.gdb.xml.model.Domain;
@@ -42,9 +42,9 @@ public class FileGdbDomainCodeTable implements CodeTable {
     }
   }
 
-  private RecordIdentifier createValue(final String name) {
+  private Identifier createValue(final String name) {
     synchronized (this.dataStore) {
-      final RecordIdentifier id = this.domain.addCodedValue(name);
+      final Identifier id = this.domain.addCodedValue(name);
       this.dataStore.alterDomain(this.domain);
       LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
       return id;
@@ -57,7 +57,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public Map<RecordIdentifier, List<Object>> getCodes() {
+  public Map<Identifier, List<Object>> getCodes() {
     return this.domain.getCodes();
   }
 
@@ -66,8 +66,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public RecordIdentifier getId(final Map<String, ? extends Object> values) {
-    final RecordIdentifier id = this.domain.getId(values);
+  public Identifier getId(final Map<String, ? extends Object> values) {
+    final Identifier id = this.domain.getId(values);
     if (id == null) {
       return createValue(this.domain.getName(values));
     }
@@ -75,8 +75,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public RecordIdentifier getId(final Object... values) {
-    final RecordIdentifier id = this.domain.getId(values);
+  public Identifier getId(final Object... values) {
+    final Identifier id = this.domain.getId(values);
     if (id == null) {
       return createValue((String)values[0]);
     }
@@ -89,7 +89,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public Map<String, ? extends Object> getMap(final RecordIdentifier id) {
+  public Map<String, ? extends Object> getMap(final Identifier id) {
     return this.domain.getMap(id);
   }
 
@@ -105,12 +105,12 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public <V> V getValue(final Object id) {
-    return getValue(SingleRecordIdentifier.create(id));
+    return getValue(SingleIdentifier.create(id));
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V getValue(final RecordIdentifier id) {
+  public <V> V getValue(final Identifier id) {
     return (V)this.domain.getValue(id);
   }
 
@@ -120,7 +120,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public List<Object> getValues(final RecordIdentifier id) {
+  public List<Object> getValues(final Identifier id) {
     return this.domain.getValues(id);
   }
 

@@ -7,17 +7,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.util.MathUtil;
 
-public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
+public class JsonDataObjectWriter extends AbstractWriter<Record> {
 
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
   private PrintWriter out;
 
@@ -31,7 +31,7 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
 
   private boolean written;
 
-  public JsonDataObjectWriter(final DataObjectMetaData metaData,
+  public JsonDataObjectWriter(final RecordDefinition metaData,
     final java.io.Writer out) {
     this.metaData = metaData;
     if (out instanceof PrintWriter) {
@@ -211,7 +211,7 @@ public class JsonDataObjectWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     if (written) {
       out.print(",\n");
     } else {

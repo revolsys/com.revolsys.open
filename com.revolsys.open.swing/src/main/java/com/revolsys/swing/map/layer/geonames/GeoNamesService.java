@@ -10,11 +10,11 @@ import java.util.Map;
 
 import javax.measure.unit.SI;
 
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.jts.geom.BoundingBox;
@@ -24,12 +24,12 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.UrlUtil;
 
 public class GeoNamesService {
-  public static final DataObjectMetaData NAME_METADATA;
+  public static final RecordDefinition NAME_METADATA;
 
-  public static final DataObjectMetaData WIKIPEDIA_METADATA;
+  public static final RecordDefinition WIKIPEDIA_METADATA;
 
   static {
-    final DataObjectMetaDataImpl meta = new DataObjectMetaDataImpl(
+    final RecordDefinitionImpl meta = new RecordDefinitionImpl(
       PathUtil.toPath("/geoname.org", "name"));
     meta.addAttribute("geonameId", DataTypes.STRING, false);
     meta.addAttribute("name", DataTypes.STRING, false);
@@ -49,7 +49,7 @@ public class GeoNamesService {
     meta.addAttribute("geometry", DataTypes.POINT, false);
     NAME_METADATA = meta;
 
-    final DataObjectMetaDataImpl wikipediaMetaData = new DataObjectMetaDataImpl(
+    final RecordDefinitionImpl wikipediaMetaData = new RecordDefinitionImpl(
       PathUtil.toPath("/geoname.org", "wikipedia"));
     wikipediaMetaData.addAttribute("summary", DataTypes.STRING, false);
     wikipediaMetaData.addAttribute("title", DataTypes.STRING, false);
@@ -83,7 +83,7 @@ public class GeoNamesService {
     init(url);
   }
 
-  public List<DataObject> getNames(final BoundingBox boundingBox) {
+  public List<Record> getNames(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
     final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)geometryFactory.getCoordinateSystem();
     final BoundingBox geographicBoundingBox = boundingBox.convert(geometryFactory);
@@ -114,7 +114,7 @@ public class GeoNamesService {
     }
   }
 
-  public List<DataObject> getWikipediaArticles(final BoundingBox boundingBox) {
+  public List<Record> getWikipediaArticles(final BoundingBox boundingBox) {
     final BoundingBox geographicBoundingBox = boundingBox.convert(GeometryFactory.floating3(4326));
     final Map<String, Object> params = new HashMap<String, Object>();
 
@@ -147,12 +147,12 @@ public class GeoNamesService {
     }
   }
 
-  private List<DataObject> mapToObjects(final DataObjectMetaData metaData,
+  private List<Record> mapToObjects(final RecordDefinition metaData,
     final Map<String, Object> result) {
-    final List<DataObject> results = new ArrayList<DataObject>();
+    final List<Record> results = new ArrayList<Record>();
     final List<Map<String, Object>> names = (List<Map<String, Object>>)result.get("geonames");
     for (final Map<String, Object> name : names) {
-      final DataObject dataObject = metaData.createDataObject();
+      final Record dataObject = metaData.createDataObject();
       for (final String attributeName : metaData.getAttributeNames()) {
         final Object value = name.get(attributeName);
         if (value != null) {
@@ -176,11 +176,11 @@ public class GeoNamesService {
     return results;
   }
 
-  public List<DataObject> searchByName(final String name) {
+  public List<Record> searchByName(final String name) {
     return searchByName(name, null);
   }
 
-  public List<DataObject> searchByName(final String name,
+  public List<Record> searchByName(final String name,
     final String countryCode) {
     final Map<String, String> params = new HashMap<String, String>();
     params.put("name", name);

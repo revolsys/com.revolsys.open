@@ -4,8 +4,8 @@ import java.util.Set;
 
 import org.springframework.core.io.Resource;
 
+import com.revolsys.data.io.GeometryReader;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.data.io.GeometryReader;
 import com.revolsys.io.IoFactory;
 
 public interface GeometryReaderFactory extends IoFactory {

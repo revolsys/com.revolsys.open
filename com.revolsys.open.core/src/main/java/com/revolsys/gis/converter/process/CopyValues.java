@@ -4,12 +4,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public class CopyValues extends
-  AbstractSourceToTargetProcess<DataObject, DataObject> {
+  AbstractSourceToTargetProcess<Record, Record> {
   private Map<String, String> attributeNames = new LinkedHashMap<String, String>();
 
   public CopyValues() {
@@ -32,7 +32,7 @@ public class CopyValues extends
   }
 
   @Override
-  public void process(final DataObject source, final DataObject target) {
+  public void process(final Record source, final Record target) {
     for (final Entry<String, String> entry : attributeNames.entrySet()) {
       final String sourceName = entry.getKey();
       final String targetName = entry.getValue();
@@ -43,7 +43,7 @@ public class CopyValues extends
         value = source.getValueByPath(sourceName);
       }
       if (value != null) {
-        final DataObjectMetaData targetMetaData = target.getMetaData();
+        final RecordDefinition targetMetaData = target.getMetaData();
         final CodeTable codeTable = targetMetaData.getCodeTableByColumn(targetName);
         if (codeTable == null) {
           target.setValue(targetName, value);

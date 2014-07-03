@@ -10,11 +10,11 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
@@ -38,7 +38,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
       setNumResults(dataStore.getRowCount(query));
       updateNumPages();
 
-      final ArrayList<DataObject> results = new ArrayList<DataObject>();
+      final ArrayList<Record> results = new ArrayList<Record>();
       final int pageSize = getPageSize();
       final int pageNumber = getPageNumber();
       if (pageNumber != -1) {
@@ -51,8 +51,8 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
         final Connection connection = getConnection();
         try {
-          final DataObjectFactory dataObjectFactory = getDataObjectFactory();
-          final DataObjectMetaData metaData = getMetaData();
+          final RecordFactory dataObjectFactory = getDataObjectFactory();
+          final RecordDefinition metaData = getMetaData();
           final List<Attribute> attributes = new ArrayList<>();
 
           final List<String> attributeNames = query.getAttributeNames();
@@ -77,7 +77,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
             if (resultSet.next()) {
               int i = 0;
               do {
-                final DataObject object = JdbcQueryIterator.getNextObject(
+                final Record object = JdbcQueryIterator.getNextObject(
                   dataStore, metaData, attributes, dataObjectFactory, resultSet);
                 results.add(object);
                 i++;

@@ -12,7 +12,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 
@@ -40,7 +40,7 @@ public class MergedObjectPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final DataObject object = this.model.getRecord(rowIndex);
+      final Record object = this.model.getRecord(rowIndex);
       if (object == model.getMergedObject()) {
         return true;
       } else {

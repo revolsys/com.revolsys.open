@@ -21,7 +21,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.list.BaseListModel;
 import com.revolsys.swing.listener.InvokeMethodListener;

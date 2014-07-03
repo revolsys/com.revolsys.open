@@ -28,21 +28,21 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.gis.data.query.BinaryCondition;
-import com.revolsys.gis.data.query.Column;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.ILike;
-import com.revolsys.gis.data.query.IsNotNull;
-import com.revolsys.gis.data.query.IsNull;
-import com.revolsys.gis.data.query.Not;
-import com.revolsys.gis.data.query.Q;
-import com.revolsys.gis.data.query.QueryValue;
-import com.revolsys.gis.data.query.RightUnaryCondition;
-import com.revolsys.gis.data.query.Value;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.query.BinaryCondition;
+import com.revolsys.data.query.Column;
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.ILike;
+import com.revolsys.data.query.IsNotNull;
+import com.revolsys.data.query.IsNull;
+import com.revolsys.data.query.Not;
+import com.revolsys.data.query.Q;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.query.RightUnaryCondition;
+import com.revolsys.data.query.Value;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DataStoreQueryTextField;
@@ -77,7 +77,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private final TextField searchTextField;
 
-  private final DataObjectMetaData metaData;
+  private final RecordDefinition metaData;
 
   private final AbstractDataObjectLayer layer;
 
@@ -470,7 +470,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
       this.previousSearchFieldName = searchFieldName;
       this.layer.setProperty("searchField", searchFieldName);
       this.codeTable = this.metaData.getCodeTableByColumn(searchFieldName);
-      final DataObjectMetaData metaData = this.tableModel.getMetaData();
+      final RecordDefinition metaData = this.tableModel.getMetaData();
       this.attribute = metaData.getAttribute(searchFieldName);
       final Class<?> attributeClass = this.attribute.getTypeClass();
       if (!EqualsRegistry.equal(searchFieldName,

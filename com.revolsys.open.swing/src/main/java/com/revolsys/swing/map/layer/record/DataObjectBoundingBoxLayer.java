@@ -10,9 +10,9 @@ import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.query.Query;
 import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.parallel.Invoke;

@@ -3,9 +3,9 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.types.DataType;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
@@ -37,18 +37,18 @@ public abstract class AbstractFileGdbAttribute extends Attribute {
     this.dataStore = new WeakReference<CapiFileGdbDataObjectStore>(dataStore);
   }
 
-  public Object setInsertValue(final DataObject object, final Row row,
+  public Object setInsertValue(final Record object, final Row row,
     final Object value) {
     return setValue(object, row, value);
   }
 
-  public void setPostInsertValue(final DataObject object, final Row row) {
+  public void setPostInsertValue(final Record object, final Row row) {
   }
 
-  public Object setUpdateValue(final DataObject object, final Row row,
+  public Object setUpdateValue(final Record object, final Row row,
     final Object value) {
     return setValue(object, row, value);
   }
 
-  public abstract Object setValue(DataObject object, Row row, Object value);
+  public abstract Object setValue(Record object, Row row, Object value);
 }

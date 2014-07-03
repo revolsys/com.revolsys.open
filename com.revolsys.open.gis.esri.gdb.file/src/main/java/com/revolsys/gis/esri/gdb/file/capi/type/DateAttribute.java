@@ -3,9 +3,9 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import java.util.Date;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectLog;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordLog;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
@@ -50,7 +50,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final DataObject object, final Row row, Object value) {
+  public Object setValue(final Record object, final Row row, Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -72,7 +72,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
       if (value instanceof Date) {
         Date date = (Date)value;
         if (date.before(MIN_DATE)) {
-          DataObjectLog.warn(getClass(), name + "=" + date + " is before "
+          RecordLog.warn(getClass(), name + "=" + date + " is before "
             + MIN_DATE + " which is not supported by ESRI File Geodatabases",
             object);
           if (isRequired()) {
@@ -82,7 +82,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
             return null;
           }
         } else if (date.after(MAX_DATE)) {
-          DataObjectLog.warn(getClass(), name + "=" + date + " is after "
+          RecordLog.warn(getClass(), name + "=" + date + " is after "
             + MAX_DATE + " which is not supported by ESRI File Geodatabases",
             object);
           if (isRequired()) {

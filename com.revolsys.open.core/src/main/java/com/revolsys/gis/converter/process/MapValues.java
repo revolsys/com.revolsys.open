@@ -3,13 +3,13 @@ package com.revolsys.gis.converter.process;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectUtil;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public class MapValues extends
-  AbstractSourceToTargetProcess<DataObject, DataObject> {
+  AbstractSourceToTargetProcess<Record, Record> {
   private String sourceAttributeName;
 
   private String targetAttributeName;
@@ -49,13 +49,13 @@ public class MapValues extends
   }
 
   @Override
-  public void process(final DataObject source, final DataObject target) {
-    final Object sourceValue = DataObjectUtil.getAttributeByPath(source,
+  public void process(final Record source, final Record target) {
+    final Object sourceValue = RecordUtil.getAttributeByPath(source,
       sourceAttributeName);
     if (sourceValue != null) {
       final Object targetValue = valueMap.get(sourceValue);
       if (targetValue != null) {
-        final DataObjectMetaData targetMetaData = target.getMetaData();
+        final RecordDefinition targetMetaData = target.getMetaData();
         final CodeTable codeTable = targetMetaData.getCodeTableByColumn(targetAttributeName);
         if (codeTable == null) {
           target.setValue(targetAttributeName, targetValue);

@@ -10,13 +10,13 @@ import javax.swing.tree.TreeNode;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.DataObjectStoreConnectionMapProxy;
+import com.revolsys.data.io.DataObjectStoreProxy;
+import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.io.DataObjectStoreConnectionMapProxy;
-import com.revolsys.gis.data.io.DataObjectStoreProxy;
-import com.revolsys.gis.data.io.DataObjectStoreSchema;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
 import com.revolsys.io.PathUtil;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 
@@ -30,7 +30,7 @@ public class DataObjectStoreSchemaTreeNode extends LazyLoadTreeNode implements
   public DataObjectStoreSchemaTreeNode(final TreeNode parent,
     final String schemaPath) {
     super(parent, schemaPath);
-    setType("Data Store Schema");
+    setType("Data Store RecordDefinition");
     setAllowsChildren(true);
     setIcon(ICON_SCHEMA);
     setParent(parent);
@@ -49,7 +49,7 @@ public class DataObjectStoreSchemaTreeNode extends LazyLoadTreeNode implements
     if (dataStore != null) {
       final DataObjectStoreSchema schema = dataStore.getSchema(schemaPath);
       if (schema != null) {
-        for (final DataObjectMetaData metaData : schema.getTypes()) {
+        for (final RecordDefinition metaData : schema.getTypes()) {
           final String typeName = metaData.getPath();
           String geometryType = null;
           final Attribute geometryAttribute = metaData.getGeometryAttribute();

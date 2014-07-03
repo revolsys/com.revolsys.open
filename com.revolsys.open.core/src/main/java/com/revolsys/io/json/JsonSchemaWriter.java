@@ -14,9 +14,9 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.spring.SpringUtil;
 
 public class JsonSchemaWriter {
@@ -86,7 +86,7 @@ public class JsonSchemaWriter {
     return jsonValue;
   }
 
-  public void write(final DataObjectMetaData metaData) {
+  public void write(final RecordDefinition metaData) {
     final Map<String, Object> metaDataMap = new LinkedHashMap<String, Object>();
     metaDataMap.put("name", metaData.getPath());
 

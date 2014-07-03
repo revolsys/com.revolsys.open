@@ -17,11 +17,11 @@ import javax.swing.tree.TreeNode;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.data.io.DataObjectReaderFactory;
+import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
-import com.revolsys.gis.data.io.DataObjectReaderFactory;
-import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;

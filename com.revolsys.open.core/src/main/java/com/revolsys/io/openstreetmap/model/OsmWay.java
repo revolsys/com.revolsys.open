@@ -7,7 +7,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
@@ -48,7 +48,7 @@ public class OsmWay extends OsmElement {
   }
 
   @Override
-  public RecordIdentifier getIdentifier() {
+  public Identifier getIdentifier() {
     final long id = getId();
     return new OsmWayIdentifier(id);
   }

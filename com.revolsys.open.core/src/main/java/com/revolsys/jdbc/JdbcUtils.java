@@ -25,12 +25,12 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.io.DataObjectStore;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.query.Condition;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
@@ -49,7 +49,7 @@ public final class JdbcUtils {
   }
 
   public static void addColumnNames(final StringBuffer sql,
-    final DataObjectMetaData metaData, final String tablePrefix) {
+    final RecordDefinition metaData, final String tablePrefix) {
     for (int i = 0; i < metaData.getAttributeCount(); i++) {
       if (i > 0) {
         sql.append(", ");
@@ -60,7 +60,7 @@ public final class JdbcUtils {
   }
 
   public static void addColumnNames(final StringBuffer sql,
-    final DataObjectMetaData metaData, final String tablePrefix,
+    final RecordDefinition metaData, final String tablePrefix,
     final List<String> attributeNames, boolean hasColumns) {
     for (final String attributeName : attributeNames) {
       if (hasColumns) {
@@ -100,7 +100,7 @@ public final class JdbcUtils {
     final Condition where = query.getWhereCondition();
     if (where != null && !where.isEmpty()) {
       sql.append(" WHERE ");
-      final DataObjectMetaData metaData = query.getMetaData();
+      final RecordDefinition metaData = query.getMetaData();
       if (metaData == null) {
         where.appendSql(query, null, sql);
       } else {
@@ -150,7 +150,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static String createSelectSql(final DataObjectMetaData metaData,
+  public static String createSelectSql(final RecordDefinition metaData,
     final String tablePrefix, final String fromClause,
     final boolean lockResults, final List<String> attributeNames,
     final Query query, final Map<String, Boolean> orderBy) {
@@ -309,10 +309,10 @@ public final class JdbcUtils {
 
     String sql = query.getSql();
     final Map<String, Boolean> orderBy = query.getOrderBy();
-    DataObjectMetaData metaData = query.getMetaData();
+    RecordDefinition metaData = query.getMetaData();
     if (sql == null) {
       if (metaData == null) {
-        metaData = new DataObjectMetaDataImpl(tableName);
+        metaData = new RecordDefinitionImpl(tableName);
         // throw new IllegalArgumentException("Unknown table name " +
         // tableName);
       }

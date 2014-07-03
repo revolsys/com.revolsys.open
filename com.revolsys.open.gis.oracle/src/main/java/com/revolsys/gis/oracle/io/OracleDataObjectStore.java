@@ -14,23 +14,23 @@ import org.springframework.util.StringUtils;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.IntHashMap;
 import com.revolsys.collection.ResultPager;
+import com.revolsys.data.query.Column;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.query.Value;
+import com.revolsys.data.query.functions.EnvelopeIntersects;
+import com.revolsys.data.query.functions.GeometryEqual2d;
+import com.revolsys.data.query.functions.WithinDistance;
+import com.revolsys.data.record.ArrayRecordFactory;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.property.ShortNameProperty;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.data.model.ArrayDataObjectFactory;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.ShortNameProperty;
-import com.revolsys.gis.data.model.types.DataTypes;
-import com.revolsys.gis.data.query.Column;
-import com.revolsys.gis.data.query.Query;
-import com.revolsys.gis.data.query.QueryValue;
-import com.revolsys.gis.data.query.Value;
-import com.revolsys.gis.data.query.functions.EnvelopeIntersects;
-import com.revolsys.gis.data.query.functions.GeometryEqual2d;
-import com.revolsys.gis.data.query.functions.WithinDistance;
 import com.revolsys.gis.oracle.esri.ArcSdeBinaryGeometryDataStoreExtension;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryDataStoreExtension;
@@ -58,15 +58,15 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   private final IntHashMap<CoordinateSystem> oracleCoordinateSystems = new IntHashMap<>();
 
   public OracleDataObjectStore() {
-    this(new ArrayDataObjectFactory());
+    this(new ArrayRecordFactory());
   }
 
-  public OracleDataObjectStore(final DataObjectFactory dataObjectFactory) {
+  public OracleDataObjectStore(final RecordFactory dataObjectFactory) {
     super(dataObjectFactory);
     initSettings();
   }
 
-  public OracleDataObjectStore(final DataObjectFactory dataObjectFactory,
+  public OracleDataObjectStore(final RecordFactory dataObjectFactory,
     final DataSource dataSource) {
     this(dataObjectFactory);
     setDataSource(dataSource);
@@ -254,7 +254,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  public AbstractIterator<DataObject> createOracleIterator(
+  public AbstractIterator<Record> createOracleIterator(
     final OracleDataObjectStore dataStore, final Query query,
     final Map<String, Object> properties) {
     return new OracleJdbcQueryIterator(dataStore, query, properties);
@@ -284,7 +284,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  public String getGeneratePrimaryKeySql(final DataObjectMetaData metaData) {
+  public String getGeneratePrimaryKeySql(final RecordDefinition metaData) {
     final String sequenceName = getSequenceName(metaData);
     return sequenceName + ".NEXTVAL";
   }
@@ -305,7 +305,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  public Object getNextPrimaryKey(final DataObjectMetaData metaData) {
+  public Object getNextPrimaryKey(final RecordDefinition metaData) {
     final String sequenceName = getSequenceName(metaData);
     return getNextPrimaryKey(sequenceName);
   }
@@ -321,7 +321,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
     }
   }
 
-  public String getSequenceName(final DataObjectMetaData metaData) {
+  public String getSequenceName(final RecordDefinition metaData) {
     if (metaData == null) {
       return null;
     } else {
@@ -412,7 +412,7 @@ public class OracleDataObjectStore extends AbstractJdbcDataObjectStore {
   }
 
   @Override
-  public ResultPager<DataObject> page(final Query query) {
+  public ResultPager<Record> page(final Query query) {
     return new OracleJdbcQueryResultPager(this, getProperties(), query);
   }
 

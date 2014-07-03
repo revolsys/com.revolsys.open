@@ -2,10 +2,10 @@ package com.revolsys.io.moep;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.io.AbstractDataObjectAndGeometryReaderFactory;
-import com.revolsys.gis.data.io.DataObjectReader;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
+import com.revolsys.data.io.AbstractDataObjectAndGeometryReaderFactory;
+import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.RecordDefinition;
 
 public class MoepBinaryReaderFactory extends
   AbstractDataObjectAndGeometryReaderFactory {
@@ -16,14 +16,14 @@ public class MoepBinaryReaderFactory extends
   }
 
   public DataObjectReader createDataObjectReader(
-    final DataObjectMetaData metaData, final Resource resource,
-    final DataObjectFactory dataObjectFactory) {
+    final RecordDefinition metaData, final Resource resource,
+    final RecordFactory dataObjectFactory) {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public DataObjectReader createDataObjectReader(final Resource resource,
-    final DataObjectFactory dataObjectFactory) {
+    final RecordFactory dataObjectFactory) {
     return new MoepBinaryReader(null, resource, dataObjectFactory);
   }
 }

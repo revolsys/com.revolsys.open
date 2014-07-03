@@ -5,8 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.types.DataTypes;
 
 public class JdbcStringAttribute extends JdbcAttribute {
   public JdbcStringAttribute(final String dbName, final String name,
@@ -24,7 +24,7 @@ public class JdbcStringAttribute extends JdbcAttribute {
 
   @Override
   public int setAttributeValueFromResultSet(final ResultSet resultSet,
-    final int columnIndex, final DataObject object) throws SQLException {
+    final int columnIndex, final Record object) throws SQLException {
     final String value = resultSet.getString(columnIndex);
     setValue(object, value);
     return columnIndex + 1;

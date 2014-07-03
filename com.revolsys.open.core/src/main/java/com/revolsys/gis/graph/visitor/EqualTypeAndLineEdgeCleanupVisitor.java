@@ -11,11 +11,13 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import com.revolsys.data.equals.DataObjectEquals;
+import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.data.filter.DataObjectGeometryFilter;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordLog;
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectLog;
-import com.revolsys.gis.data.model.filter.DataObjectGeometryFilter;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
@@ -23,15 +25,13 @@ import com.revolsys.gis.graph.filter.EdgeObjectFilter;
 import com.revolsys.gis.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.filter.LineEqualIgnoreDirectionFilter;
-import com.revolsys.gis.model.data.equals.DataObjectEquals;
-import com.revolsys.gis.model.data.equals.EqualsInstance;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class EqualTypeAndLineEdgeCleanupVisitor extends
-  AbstractVisitor<Edge<DataObject>> implements ObjectProcessor<DataObjectGraph> {
+  AbstractVisitor<Edge<Record>> implements ObjectProcessor<DataObjectGraph> {
 
   /** Flag indicating that the edge has been processed. */
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
@@ -135,17 +135,17 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     graph.visitEdges(this);
   }
 
-  private void processEqualEdge(final Edge<DataObject> edge1,
-    final Edge<DataObject> edge2) {
-    final DataObject object1 = edge1.getObject();
-    final DataObject object2 = edge2.getObject();
+  private void processEqualEdge(final Edge<Record> edge1,
+    final Edge<Record> edge2) {
+    final Record object1 = edge1.getObject();
+    final Record object2 = edge2.getObject();
 
     final boolean equalAttributes = EqualsInstance.INSTANCE.equals(object1,
       object2, equalExcludeAttributes);
 
     final LineString line1 = edge1.getLine();
     int compare = 0;
-    final Comparator<Edge<DataObject>> comparator = getComparator();
+    final Comparator<Edge<Record>> comparator = getComparator();
     if (comparator != null) {
       compare = comparator.compare(edge1, edge2);
     }
@@ -164,15 +164,15 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
           if (equalZ) {
             removeDuplicate(edge2, edge1);
           } else {
-            DataObjectLog.error(getClass(),
+            RecordLog.error(getClass(),
               "Equal geometry with different coordinates or Z-values", object1);
           }
         } else {
-          DataObjectLog.error(getClass(),
+          RecordLog.error(getClass(),
             "Equal geometry with different attributes: ", object1);
         }
       } else {
-        DataObjectLog.error(getClass(),
+        RecordLog.error(getClass(),
           "Equal geometry with different attributes: ", object1);
       }
     } else {
@@ -180,13 +180,13 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  private void processEqualEdges(final List<Edge<DataObject>> equalEdges) {
-    final Iterator<Edge<DataObject>> edgeIter = equalEdges.iterator();
-    final Edge<DataObject> edge1 = edgeIter.next();
+  private void processEqualEdges(final List<Edge<Record>> equalEdges) {
+    final Iterator<Edge<Record>> edgeIter = equalEdges.iterator();
+    final Edge<Record> edge1 = edgeIter.next();
     edge1.setAttribute(EDGE_PROCESSED, Boolean.TRUE);
 
     while (edgeIter.hasNext()) {
-      final Edge<DataObject> edge2 = edgeIter.next();
+      final Edge<Record> edge2 = edgeIter.next();
 
       edge2.setAttribute(EDGE_PROCESSED, Boolean.TRUE);
       processEqualEdge(edge1, edge2);
@@ -196,8 +196,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     }
   }
 
-  protected void removeDuplicate(final Edge<DataObject> removeEdge,
-    final Edge<DataObject> keepEdge) {
+  protected void removeDuplicate(final Edge<Record> removeEdge,
+    final Edge<Record> keepEdge) {
     removeEdge.remove();
     if (duplicateStatistics != null) {
       duplicateStatistics.add(removeEdge.getObject());
@@ -216,29 +216,29 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
   }
 
   @Override
-  public boolean visit(final Edge<DataObject> edge) {
+  public boolean visit(final Edge<Record> edge) {
     if (edge.getAttribute(EDGE_PROCESSED) == null) {
       final String typePath = edge.getTypeName();
-      final Graph<DataObject> graph = edge.getGraph();
+      final Graph<Record> graph = edge.getGraph();
       final LineString line = edge.getLine();
 
-      final AndFilter<Edge<DataObject>> attributeAndGeometryFilter = new AndFilter<Edge<DataObject>>();
+      final AndFilter<Edge<Record>> attributeAndGeometryFilter = new AndFilter<Edge<Record>>();
 
-      attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<DataObject>(
+      attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(
         typePath));
 
-      final Filter<Edge<DataObject>> filter = getFilter();
+      final Filter<Edge<Record>> filter = getFilter();
       if (filter != null) {
         attributeAndGeometryFilter.addFilter(filter);
       }
 
-      final Filter<DataObject> equalLineFilter = new DataObjectGeometryFilter<LineString>(
+      final Filter<Record> equalLineFilter = new DataObjectGeometryFilter<LineString>(
         new LineEqualIgnoreDirectionFilter(line, 2));
-      final EdgeObjectFilter<DataObject> edgeFilter = new EdgeObjectFilter<DataObject>(
+      final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(
         equalLineFilter);
       attributeAndGeometryFilter.addFilter(edgeFilter);
 
-      final List<Edge<DataObject>> equalEdges;
+      final List<Edge<Record>> equalEdges;
       if (getComparator() == null) {
         equalEdges = graph.getEdges(attributeAndGeometryFilter, line);
       } else {

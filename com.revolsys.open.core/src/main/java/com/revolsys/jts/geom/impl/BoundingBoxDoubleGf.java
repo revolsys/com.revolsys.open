@@ -46,13 +46,13 @@ import org.apache.commons.beanutils.Converter;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.data.equals.NumberEquals;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
-import com.revolsys.gis.data.model.DataObject;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.io.wkt.WktParser;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -662,7 +662,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public BoundingBox expandToInclude(final DataObject object) {
+  public BoundingBox expandToInclude(final Record object) {
     if (object != null) {
       final Geometry geometry = object.getGeometryValue();
       return expandToInclude(geometry);

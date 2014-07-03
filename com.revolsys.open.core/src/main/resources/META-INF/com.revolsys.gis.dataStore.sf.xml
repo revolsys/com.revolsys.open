@@ -10,7 +10,7 @@
   "
 >
   <bean
-    class="com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry"
+    class="com.revolsys.data.io.DataObjectStoreFactoryRegistry"
     factory-method="register"
   >
     <constructor-arg>

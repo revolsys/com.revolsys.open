@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.gis.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.data.io.AbstractDataObjectReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonMapIoFactory;

@@ -2,9 +2,9 @@ package com.revolsys.io;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
-public class DirectoryDataObjectStoreWriter extends AbstractWriter<DataObject> {
+public class DirectoryDataObjectStoreWriter extends AbstractWriter<Record> {
 
   private DirectoryDataObjectStore dataStore;
 
@@ -20,7 +20,7 @@ public class DirectoryDataObjectStoreWriter extends AbstractWriter<DataObject> {
   }
 
   @Override
-  public void write(final DataObject object) {
+  public void write(final Record object) {
     if (object != null) {
       try {
         final boolean currentDataStore = object.getMetaData()

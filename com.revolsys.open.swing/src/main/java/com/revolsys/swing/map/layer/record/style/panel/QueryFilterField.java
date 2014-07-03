@@ -10,7 +10,7 @@ import javax.swing.JScrollPane;
 import org.jdesktop.swingx.VerticalLayout;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.query.Condition;
+import com.revolsys.data.query.Condition;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextArea;

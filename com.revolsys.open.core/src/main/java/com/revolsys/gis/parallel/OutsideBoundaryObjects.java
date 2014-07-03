@@ -6,23 +6,23 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 
 public class OutsideBoundaryObjects {
   private static final Logger LOG = LoggerFactory.getLogger(OutsideBoundaryObjects.class);
 
-  private Set<DataObject> objects = new LinkedHashSet<DataObject>();
+  private Set<Record> objects = new LinkedHashSet<Record>();
 
   private Geometry boundary;
 
   private Geometry preparedBoundary;
 
-  public boolean addObject(final DataObject object) {
+  public boolean addObject(final Record object) {
     return objects.add(object);
   }
 
-  public boolean boundaryContains(final DataObject object) {
+  public boolean boundaryContains(final Record object) {
     final Geometry geometry = object.getGeometryValue();
     return boundaryContains(geometry);
   }
@@ -33,7 +33,7 @@ public class OutsideBoundaryObjects {
   }
 
   public void clear() {
-    objects = new LinkedHashSet<DataObject>();
+    objects = new LinkedHashSet<Record>();
   }
 
   public void expandBoundary(final Geometry geometry) {
@@ -44,8 +44,8 @@ public class OutsideBoundaryObjects {
     }
   }
 
-  public Set<DataObject> getAndClearObjects() {
-    final Set<DataObject> objects = this.objects;
+  public Set<Record> getAndClearObjects() {
+    final Set<Record> objects = this.objects;
     LOG.info("Outside boundary objects size=" + this.objects.size());
     clear();
     return objects;
@@ -55,11 +55,11 @@ public class OutsideBoundaryObjects {
     return boundary;
   }
 
-  public Set<DataObject> getObjects() {
+  public Set<Record> getObjects() {
     return objects;
   }
 
-  public boolean removeObject(final DataObject object) {
+  public boolean removeObject(final Record object) {
     return objects.remove(object);
   }
 
@@ -68,7 +68,7 @@ public class OutsideBoundaryObjects {
     this.preparedBoundary = boundary.prepare();
   }
 
-  public void setObjects(final Set<DataObject> objects) {
+  public void setObjects(final Set<Record> objects) {
     this.objects = objects;
   }
 }

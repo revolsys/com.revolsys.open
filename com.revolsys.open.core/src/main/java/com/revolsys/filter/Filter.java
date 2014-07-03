@@ -8,7 +8,7 @@ package com.revolsys.filter;
  * <pre>
  *   public void process(List objects) {
  *     for (Iterator iter = objects.iterator; iter.hasNext();; ) {
- *       DataObject object = (DataObject)iter.next(); 
+ *       Record object = (Record)iter.next(); 
  *       if (filter.accept(object) {
  *         // perform action
  *       }

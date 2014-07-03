@@ -4,29 +4,31 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.query.Condition;
+import com.revolsys.data.query.Q;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.types.DataTypes;
 
 public class QueryValueTest {
   public static void main(final String[] args) {
     new QueryValueTest().run();
   }
 
-  private final DataObjectMetaDataImpl metaData;
+  private final RecordDefinitionImpl metaData;
 
   private final Attribute idAttribute;
 
-  private final DataObject record;
+  private final Record record;
 
   private final Attribute nameAttribute;
 
   private final Attribute descriptionAttribute;
 
   public QueryValueTest() {
-    this.metaData = new DataObjectMetaDataImpl("Test");
+    this.metaData = new RecordDefinitionImpl("Test");
     this.idAttribute = this.metaData.addAttribute("ID", DataTypes.INT, true);
     this.nameAttribute = this.metaData.addAttribute("NAME", DataTypes.STRING,
       255, true);
@@ -39,13 +41,13 @@ public class QueryValueTest {
   }
 
   public void assertConditionFalse(final Condition trueCondition1,
-    final DataObject record) {
+    final Record record) {
     final boolean result1 = trueCondition1.accept(record);
     Assert.assertFalse(result1);
   }
 
   public void assertConditionTrue(final Condition trueCondition1,
-    final DataObject record) {
+    final Record record) {
     final boolean result1 = trueCondition1.accept(record);
     Assert.assertTrue(result1);
   }

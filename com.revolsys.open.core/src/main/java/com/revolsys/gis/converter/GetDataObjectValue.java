@@ -4,10 +4,10 @@ import java.util.Map;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectUtil;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordUtil;
 
-public class GetDataObjectValue implements Converter<DataObject, Object> {
+public class GetDataObjectValue implements Converter<Record, Object> {
   private String attributePath;
 
   private Map<? extends Object, ? extends Object> valueMap;
@@ -26,8 +26,8 @@ public class GetDataObjectValue implements Converter<DataObject, Object> {
   }
 
   @Override
-  public Object convert(final DataObject source) {
-    Object value = DataObjectUtil.getAttributeByPath(source, attributePath);
+  public Object convert(final Record source) {
+    Object value = RecordUtil.getAttributeByPath(source, attributePath);
     if (!valueMap.isEmpty()) {
       if (valueMap.containsKey(value)) {
         value = valueMap.get(value);

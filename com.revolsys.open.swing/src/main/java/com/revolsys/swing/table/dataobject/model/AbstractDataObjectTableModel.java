@@ -16,9 +16,9 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTable;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
@@ -28,7 +28,7 @@ implements PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
   private Set<String> readOnlyFieldNames = new HashSet<String>();
 
@@ -41,7 +41,7 @@ implements PropertyChangeSupportProxy {
     this(null);
   }
 
-  public AbstractDataObjectTableModel(final DataObjectMetaData metaData) {
+  public AbstractDataObjectTableModel(final RecordDefinition metaData) {
     this.metaData = metaData;
   }
 
@@ -78,13 +78,13 @@ implements PropertyChangeSupportProxy {
   }
 
   public String getFieldName(final int attributeIndex) {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     return metaData.getAttributeName(attributeIndex);
   }
 
   public abstract String getFieldName(int rowIndex, int columnIndex);
 
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     return this.metaData;
   }
 
@@ -117,7 +117,7 @@ implements PropertyChangeSupportProxy {
     this.editable = editable;
   }
 
-  protected void setMetaData(final DataObjectMetaData metaData) {
+  protected void setMetaData(final RecordDefinition metaData) {
     if (metaData != this.metaData) {
       this.metaData = metaData;
       fireTableStructureChanged();
@@ -135,7 +135,7 @@ implements PropertyChangeSupportProxy {
   public String toCopyValue(final int rowIndex, final int attributeIndex,
     final Object objectValue) {
     String text;
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     final String idFieldName = metaData.getIdAttributeName();
     final String name = getFieldName(attributeIndex);
     if (objectValue == null) {
@@ -152,7 +152,7 @@ implements PropertyChangeSupportProxy {
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(SingleRecordIdentifier.create(
+        final List<Object> values = codeTable.getValues(SingleIdentifier.create(
           objectValue));
         if (values == null || values.isEmpty()) {
           return null;
@@ -170,7 +170,7 @@ implements PropertyChangeSupportProxy {
   public String toDisplayValue(final int rowIndex, final int attributeIndex,
     final Object objectValue) {
     String text;
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     final String idFieldName = metaData.getIdAttributeName();
     final String name = getFieldName(attributeIndex);
     if (objectValue == null) {
@@ -191,7 +191,7 @@ implements PropertyChangeSupportProxy {
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(SingleRecordIdentifier.create(
+        final List<Object> values = codeTable.getValues(SingleIdentifier.create(
           objectValue));
         if (values == null || values.isEmpty()) {
           text = "-";
@@ -217,7 +217,7 @@ implements PropertyChangeSupportProxy {
         return null;
       }
     }
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     final String name = getFieldName(attributeIndex);
     final CodeTable codeTable = metaData.getCodeTableByColumn(name);
     if (codeTable == null) {

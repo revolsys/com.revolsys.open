@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.RecordIdentifier;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Geometry;
@@ -15,7 +15,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class ExcludeSavedObjectsInOutProcess extends
-BaseInOutProcess<DataObject, DataObject> {
+BaseInOutProcess<Record, Record> {
 
   private Set<String> originalIds = new HashSet<String>();
 
@@ -29,12 +29,12 @@ BaseInOutProcess<DataObject, DataObject> {
     this.statistics = null;
   }
 
-  private String getId(final DataObject object) {
-    final RecordIdentifier id = object.getIdentifier();
+  private String getId(final Record object) {
+    final Identifier id = object.getIdentifier();
     if (id == null) {
       return null;
     } else {
-      final DataObjectMetaData metaData = object.getMetaData();
+      final RecordDefinition metaData = object.getMetaData();
       return metaData.getPath() + "." + id;
     }
   }
@@ -49,8 +49,8 @@ BaseInOutProcess<DataObject, DataObject> {
   }
 
   @Override
-  protected void process(final Channel<DataObject> in,
-    final Channel<DataObject> out, final DataObject object) {
+  protected void process(final Channel<Record> in,
+    final Channel<Record> out, final Record object) {
     final String id = getId(object);
     if (id == null) {
       out.write(object);
@@ -65,8 +65,8 @@ BaseInOutProcess<DataObject, DataObject> {
     }
   }
 
-  public void setObjects(final Collection<? extends DataObject> objects) {
-    for (final DataObject object : objects) {
+  public void setObjects(final Collection<? extends Record> objects) {
+    for (final Record object : objects) {
       final Set<String> ids = object.getValueByPath("GEOMETRY.ORIGINAL_IDS");
       if (ids != null) {
         this.originalIds.addAll(ids);

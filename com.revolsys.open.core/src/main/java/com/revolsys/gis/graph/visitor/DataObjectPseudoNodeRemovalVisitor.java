@@ -5,12 +5,12 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.property.DirectionalAttributes;
+import com.revolsys.data.record.property.PseudoNodeProperty;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterProxy;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.property.DirectionalAttributes;
-import com.revolsys.gis.data.model.property.PseudoNodeProperty;
 import com.revolsys.gis.graph.DataObjectGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.EdgePair;
@@ -27,10 +27,10 @@ import com.revolsys.util.ObjectProcessor;
  * @author Paul Austin
  */
 public class DataObjectPseudoNodeRemovalVisitor extends
-  AbstractNodeListenerVisitor<DataObject> implements
-  FilterProxy<Node<DataObject>>, ObjectProcessor<DataObjectGraph> {
+  AbstractNodeListenerVisitor<Record> implements
+  FilterProxy<Node<Record>>, ObjectProcessor<DataObjectGraph> {
 
-  private Filter<Node<DataObject>> filter;
+  private Filter<Node<Record>> filter;
 
   private Statistics mergedStatistics;
 
@@ -46,7 +46,7 @@ public class DataObjectPseudoNodeRemovalVisitor extends
   }
 
   @Override
-  public Filter<Node<DataObject>> getFilter() {
+  public Filter<Node<Record>> getFilter() {
     return filter;
   }
 
@@ -56,13 +56,13 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     mergedStatistics.connect();
   }
 
-  private void mergeEdgePairs(final Node<DataObject> node,
-    final List<EdgePair<DataObject>> edgePairs) {
+  private void mergeEdgePairs(final Node<Record> node,
+    final List<EdgePair<Record>> edgePairs) {
     if (edgePairs != null) {
-      for (final EdgePair<DataObject> edgePair : edgePairs) {
-        final Edge<DataObject> edge1 = edgePair.getEdge1();
-        final Edge<DataObject> edge2 = edgePair.getEdge2();
-        final DataObject object = edge1.getObject();
+      for (final EdgePair<Record> edgePair : edgePairs) {
+        final Edge<Record> edge1 = edgePair.getEdge1();
+        final Edge<Record> edge2 = edgePair.getEdge2();
+        final Record object = edge1.getObject();
         if (mergeEdges(node, edge1, edge2) != null) {
           mergedStatistics.add(object);
         }
@@ -70,24 +70,24 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     }
   }
 
-  protected Edge<DataObject> mergeEdges(final Node<DataObject> node,
-    final Edge<DataObject> edge1, final Edge<DataObject> edge2) {
-    final DataObject object1 = edge1.getObject();
+  protected Edge<Record> mergeEdges(final Node<Record> node,
+    final Edge<Record> edge1, final Edge<Record> edge2) {
+    final Record object1 = edge1.getObject();
 
-    final DataObject object2 = edge2.getObject();
+    final Record object2 = edge2.getObject();
 
-    final DataObject newObject = mergeObjects(node, object1, object2);
+    final Record newObject = mergeObjects(node, object1, object2);
     // newObject.setIdValue(null);
 
     final DataObjectGraph graph = (DataObjectGraph)edge1.getGraph();
-    final Edge<DataObject> newEdge = graph.addEdge(newObject);
+    final Edge<Record> newEdge = graph.addEdge(newObject);
     graph.remove(edge1);
     graph.remove(edge2);
     return newEdge;
   }
 
-  protected DataObject mergeObjects(final Node<DataObject> node,
-    final DataObject object1, final DataObject object2) {
+  protected Record mergeObjects(final Node<Record> node,
+    final Record object1, final Record object2) {
     return DirectionalAttributes.merge(node, object1, object2);
   }
 
@@ -96,8 +96,8 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     graph.visitNodes(this);
   }
 
-  private void processPseudoNodes(final Node<DataObject> node) {
-    for (final DataObjectMetaData metaData : NodeAttributes.getEdgeMetaDatas(node)) {
+  private void processPseudoNodes(final Node<Record> node) {
+    for (final RecordDefinition metaData : NodeAttributes.getEdgeMetaDatas(node)) {
       final PseudoNodeProperty property = PseudoNodeProperty.getProperty(metaData);
 
       final PseudoNodeAttribute pseudoNodeAttribute = property.getAttribute(node);
@@ -105,21 +105,21 @@ public class DataObjectPseudoNodeRemovalVisitor extends
     }
   }
 
-  private void processPseudoNodesForType(final Node<DataObject> node,
+  private void processPseudoNodesForType(final Node<Record> node,
     final PseudoNodeAttribute pseudoNodeAttribute) {
-    final List<EdgePair<DataObject>> reversedEdgePairs = pseudoNodeAttribute.getReversedEdgePairs();
+    final List<EdgePair<Record>> reversedEdgePairs = pseudoNodeAttribute.getReversedEdgePairs();
     mergeEdgePairs(node, reversedEdgePairs);
 
-    final List<EdgePair<DataObject>> edgePairs = pseudoNodeAttribute.getEdgePairs();
+    final List<EdgePair<Record>> edgePairs = pseudoNodeAttribute.getEdgePairs();
     mergeEdgePairs(node, edgePairs);
   }
 
-  public void setFilter(final Filter<Node<DataObject>> filter) {
+  public void setFilter(final Filter<Node<Record>> filter) {
     this.filter = filter;
   }
 
   @Override
-  public boolean visit(final Node<DataObject> node) {
+  public boolean visit(final Node<Record> node) {
     if (node.getEdges().size() > 1) {
       processPseudoNodes(node);
     }

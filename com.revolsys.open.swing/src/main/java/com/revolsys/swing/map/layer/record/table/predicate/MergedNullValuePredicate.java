@@ -7,7 +7,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 
@@ -33,8 +33,8 @@ public class MergedNullValuePredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToView(adapter.row);
       final int columnIndex = adapter.convertColumnIndexToView(adapter.column);
-      final DataObject object = model.getRecord(rowIndex);
-      final DataObject mergedObject = model.getMergedObject();
+      final Record object = model.getRecord(rowIndex);
+      final Record mergedObject = model.getMergedObject();
 
       if (object != mergedObject) {
         final String attributeName = this.model.getFieldName(columnIndex);

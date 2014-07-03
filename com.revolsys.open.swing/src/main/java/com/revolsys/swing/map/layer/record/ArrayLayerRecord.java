@@ -8,13 +8,14 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.model.ArrayRecord;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.model.data.equals.EqualsInstance;
-import com.revolsys.gis.model.data.equals.EqualsRegistry;
+import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.record.ArrayRecord;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
@@ -24,7 +25,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   private Map<String, Object> originalValues;
 
-  private Reference<RecordIdentifier> identifier = new WeakReference<>(null);
+  private Reference<Identifier> identifier = new WeakReference<>(null);
 
   public ArrayLayerRecord(final AbstractDataObjectLayer layer) {
     super(layer.getMetaData());
@@ -34,9 +35,9 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   public ArrayLayerRecord(final AbstractDataObjectLayer layer,
     final Map<String, Object> values) {
     super(layer.getMetaData());
-    setState(DataObjectState.Initalizing);
+    setState(RecordState.Initalizing);
     setValues(values);
-    setState(DataObjectState.Persisted);
+    setState(RecordState.Persisted);
     this.layer = layer;
   }
 
@@ -45,11 +46,11 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
    */
   @Override
   public synchronized void cancelChanges() {
-    DataObjectState newState = getState();
-    if (newState != DataObjectState.New) {
-      newState = DataObjectState.Persisted;
+    RecordState newState = getState();
+    if (newState != RecordState.New) {
+      newState = RecordState.Persisted;
     }
-    setState(DataObjectState.Initalizing);
+    setState(RecordState.Initalizing);
 
     if (this.originalValues != null) {
       super.setValues(this.originalValues);
@@ -60,8 +61,8 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public void clearChanges() {
-    final DataObjectState state = getState();
-    if (state == DataObjectState.Persisted) {
+    final RecordState state = getState();
+    if (state == RecordState.Persisted) {
       this.originalValues = null;
     }
   }
@@ -78,8 +79,8 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public synchronized RecordIdentifier getIdentifier() {
-    RecordIdentifier identifier = this.identifier.get();
+  public synchronized Identifier getIdentifier() {
+    Identifier identifier = this.identifier.get();
     if (identifier == null) {
       identifier = super.getIdentifier();
       this.identifier = new WeakReference<>(identifier);
@@ -113,7 +114,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public boolean isDeleted() {
-    return getState() == DataObjectState.Deleted;
+    return getState() == RecordState.Deleted;
   }
 
   @Override
@@ -146,7 +147,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public boolean isSame(final LayerRecord record) {
+  public boolean isSame(final Record record) {
     if (record == null) {
       return false;
     } else if (this == record) {
@@ -154,8 +155,8 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     } else {
       final AbstractDataObjectLayer layer = getLayer();
       if (layer.isLayerRecord(record)) {
-        final RecordIdentifier id = getIdentifier();
-        final RecordIdentifier otherId = record.getIdentifier();
+        final Identifier id = getIdentifier();
+        final Identifier otherId = record.getIdentifier();
         if (id == null || otherId == null) {
           return false;
         } else if (EqualsRegistry.equal(id, otherId)) {
@@ -171,10 +172,10 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public boolean isValid(final int index) {
-    if (getState() == DataObjectState.Initalizing) {
+    if (getState() == RecordState.Initalizing) {
       return true;
     } else {
-      final DataObjectMetaData metaData = getMetaData();
+      final RecordDefinition metaData = getMetaData();
       final String name = metaData.getAttributeName(index);
       return isValid(name);
     }
@@ -182,14 +183,14 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public boolean isValid(final String name) {
-    if (getState() == DataObjectState.Initalizing) {
+    if (getState() == RecordState.Initalizing) {
       return true;
     } else {
       final Attribute attribute = getMetaData().getAttribute(name);
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-            && !StringUtils.hasText((String)value)) {
+          && !StringUtils.hasText((String)value)) {
           return false;
         }
       }
@@ -199,12 +200,12 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public LayerRecord revertChanges() {
-    if (this.originalValues != null || getState() == DataObjectState.Deleted) {
+    if (this.originalValues != null || getState() == RecordState.Deleted) {
       cancelChanges();
       final AbstractDataObjectLayer layer = getLayer();
       layer.revertChanges(this);
-      firePropertyChange("state", DataObjectState.Modified,
-        DataObjectState.Persisted);
+      firePropertyChange("state", RecordState.Modified,
+        RecordState.Persisted);
     }
     return this;
   }
@@ -226,21 +227,21 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public void setValue(final int index, final Object value) {
-    final DataObjectMetaData metaData = getMetaData();
+    final RecordDefinition metaData = getMetaData();
     final String attributeName = metaData.getAttributeName(index);
 
     final Object oldValue = getValue(index);
     if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
       final AbstractDataObjectLayer layer = getLayer();
-      final DataObjectState state = getState();
-      if (DataObjectState.Initalizing.equals(state)) {
+      final RecordState state = getState();
+      if (RecordState.Initalizing.equals(state)) {
         // Allow modification on initialization
-      } else if (DataObjectState.New.equals(state)) {
+      } else if (RecordState.New.equals(state)) {
         if (!layer.isCanAddRecords()) {
           throw new IllegalStateException(
             "Adding new objects is not supported for layer " + layer);
         }
-      } else if (DataObjectState.Deleted.equals(state)) {
+      } else if (RecordState.Deleted.equals(state)) {
         throw new IllegalStateException(
           "Cannot edit a deleted object for layer " + layer);
       } else {
@@ -251,7 +252,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
               this.originalValues.remove(attributeName);
               if (this.originalValues.isEmpty()) {
                 this.originalValues = null;
-                setState(DataObjectState.Persisted);
+                setState(RecordState.Persisted);
               }
             }
           } else {
@@ -266,7 +267,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         }
       }
       super.setValue(index, value);
-      if (!DataObjectState.Initalizing.equals(state)) {
+      if (!RecordState.Initalizing.equals(state)) {
         firePropertyChange(attributeName, oldValue, value);
         layer.updateRecordState(this);
       }

@@ -3,9 +3,9 @@ package com.revolsys.gis.model.coordinates;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.gis.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.algorithm.RobustLineIntersector;

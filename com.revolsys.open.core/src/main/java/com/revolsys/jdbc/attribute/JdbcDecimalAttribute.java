@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataTypes;
 
 public class JdbcDecimalAttribute extends JdbcAttribute {
   public JdbcDecimalAttribute(final String dbName, final String name,

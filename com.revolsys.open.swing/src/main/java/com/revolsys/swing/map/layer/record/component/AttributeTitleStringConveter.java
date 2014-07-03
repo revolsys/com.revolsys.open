@@ -9,7 +9,7 @@ import javax.swing.ListCellRenderer;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.Attribute;
+import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
 
 public class AttributeTitleStringConveter extends ObjectToStringConverter

@@ -13,11 +13,11 @@ import javax.swing.ImageIcon;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.data.filter.MultipleAttributeValuesFilter;
+import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.filter.AcceptAllFilter;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.filter.MultipleAttributeValuesFilter;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
@@ -52,7 +52,7 @@ AbstractLayerRenderer<AbstractDataObjectLayer> {
     }
   }
 
-  public static Filter<DataObject> getFilter(
+  public static Filter<Record> getFilter(
     final AbstractDataObjectLayer layer, final Map<String, Object> style) {
     @SuppressWarnings("unchecked")
     Map<String, Object> filterDefinition = (Map<String, Object>)style.get("filter");
@@ -115,7 +115,7 @@ AbstractLayerRenderer<AbstractDataObjectLayer> {
     return getRenderer(layer, null, style);
   }
 
-  private static final AcceptAllFilter<DataObject> DEFAULT_FILTER = new AcceptAllFilter<DataObject>();
+  private static final AcceptAllFilter<Record> DEFAULT_FILTER = new AcceptAllFilter<Record>();
 
   private static final Map<String, Constructor<? extends AbstractDataObjectLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
 
@@ -147,7 +147,7 @@ AbstractLayerRenderer<AbstractDataObjectLayer> {
 
   }
 
-  private Filter<DataObject> filter = DEFAULT_FILTER;
+  private Filter<Record> filter = DEFAULT_FILTER;
 
   public AbstractDataObjectLayerRenderer(final String type, final String name,
     final AbstractDataObjectLayer layer, final LayerRenderer<?> parent) {
@@ -285,7 +285,7 @@ AbstractLayerRenderer<AbstractDataObjectLayer> {
         final AbstractDataObjectLayer layer = getLayer();
         this.filter = new SqlLayerFilter(layer, query);
       } else {
-        this.filter = new AcceptAllFilter<DataObject>();
+        this.filter = new AcceptAllFilter<Record>();
       }
     }
   }

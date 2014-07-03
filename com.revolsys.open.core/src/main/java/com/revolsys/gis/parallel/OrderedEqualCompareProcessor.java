@@ -9,10 +9,10 @@ import java.util.TreeSet;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectLog;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.model.data.equals.EqualsInstance;
+import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordLog;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.parallel.channel.Channel;
@@ -21,9 +21,9 @@ import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInProcess;
 import com.revolsys.util.CollectionUtil;
 
-public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> {
+public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
-  private Channel<DataObject> otherIn;
+  private Channel<Record> otherIn;
 
   private int otherInBufferSize = 0;
 
@@ -37,9 +37,9 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
 
   private List<String> equalExclude = new ArrayList<String>();
 
-  private DataObjectMetaData metaData1;
+  private RecordDefinition metaData1;
 
-  private DataObjectMetaData metaData2;
+  private RecordDefinition metaData2;
 
   private final Set<String> attributeNames = new TreeSet<String>();
 
@@ -70,8 +70,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     }
   }
 
-  protected boolean geometryEquals(final DataObject object1,
-    final DataObject object2) {
+  protected boolean geometryEquals(final Record object1,
+    final Record object2) {
     final Geometry geometry1 = object1.getGeometryValue();
     final Geometry geometry2 = object2.getGeometryValue();
 
@@ -86,8 +86,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     return equalExclude;
   }
 
-  protected Set<String> getNotEqualAttributeNames(final DataObject object1,
-    final DataObject object2) {
+  protected Set<String> getNotEqualAttributeNames(final Record object1,
+    final Record object2) {
     final Set<String> notEqualAttributeNames = new LinkedHashSet<String>();
     final String geometryAttributeName1 = metaData1.getGeometryAttributeName();
     final String geometryAttributeName2 = metaData2.getGeometryAttributeName();
@@ -108,14 +108,14 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
   /**
    * @return the in
    */
-  public Channel<DataObject> getOtherIn() {
+  public Channel<Record> getOtherIn() {
     if (otherIn == null) {
       if (otherInBufferSize < 1) {
-        setOtherIn(new Channel<DataObject>());
+        setOtherIn(new Channel<Record>());
       } else {
-        final Buffer<DataObject> buffer = new Buffer<DataObject>(
+        final Buffer<Record> buffer = new Buffer<Record>(
           otherInBufferSize);
-        setOtherIn(new Channel<DataObject>(buffer));
+        setOtherIn(new Channel<Record>(buffer));
       }
     }
     return otherIn;
@@ -154,18 +154,18 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     }
   }
 
-  protected void logNoMatch(final DataObject object, final boolean other) {
+  protected void logNoMatch(final Record object, final boolean other) {
     if (other) {
-      DataObjectLog.warn(getClass(), otherName + " has no match in "
+      RecordLog.warn(getClass(), otherName + " has no match in "
         + sourceName, object);
     } else {
-      DataObjectLog.warn(getClass(), sourceName + " has no match in "
+      RecordLog.warn(getClass(), sourceName + " has no match in "
         + otherName, object);
     }
   }
 
-  private void logNoMatch(final DataObject[] objects,
-    final Channel<DataObject> channel, final boolean other) {
+  private void logNoMatch(final Record[] objects,
+    final Channel<Record> channel, final boolean other) {
     if (objects[0] != null) {
       logNoMatch(objects[0], false);
     }
@@ -173,23 +173,23 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
       logNoMatch(objects[1], true);
     }
     while (running) {
-      final DataObject object = readObject(channel);
+      final Record object = readObject(channel);
       logNoMatch(object, other);
     }
   }
 
-  protected void logNotEqual(final DataObject sourceObject,
-    final DataObject otherObject, final Set<String> notEqualAttributeNames,
+  protected void logNotEqual(final Record sourceObject,
+    final Record otherObject, final Set<String> notEqualAttributeNames,
     final boolean geometryEquals) {
     final String attributeNames = CollectionUtil.toString(",",
       notEqualAttributeNames);
-    DataObjectLog.error(getClass(), sourceName + " " + attributeNames,
+    RecordLog.error(getClass(), sourceName + " " + attributeNames,
       sourceObject);
-    DataObjectLog.error(getClass(), otherName + " " + attributeNames,
+    RecordLog.error(getClass(), otherName + " " + attributeNames,
       otherObject);
   }
 
-  protected DataObject readObject(final Channel<DataObject> channel) {
+  protected Record readObject(final Channel<Record> channel) {
     return channel.read();
   }
 
@@ -197,14 +197,14 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     "unchecked", "rawtypes"
   })
   @Override
-  protected void run(final Channel<DataObject> in) {
+  protected void run(final Channel<Record> in) {
     running = true;
-    final Channel<DataObject>[] channels = new Channel[] {
+    final Channel<Record>[] channels = new Channel[] {
       in, otherIn
     };
-    DataObject previousEqualObject = null;
+    Record previousEqualObject = null;
 
-    final DataObject[] objects = new DataObject[2];
+    final Record[] objects = new Record[2];
     final boolean[] guard = new boolean[] {
       true, true
     };
@@ -221,8 +221,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
         } else {
         }
       } else {
-        final Channel<DataObject> channel = channels[index];
-        final DataObject readObject = readObject(channel);
+        final Channel<Record> channel = channels[index];
+        final Record readObject = readObject(channel);
         if (index == 0 && metaData1 == null) {
           setMetaData1(readObject.getMetaData());
         } else if (index == 1 && metaData2 == null) {
@@ -233,15 +233,15 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
           if (previousEqualObject != null
             && EqualsInstance.INSTANCE.equals(previousEqualObject, readObject)) {
             if (index == 0) {
-              DataObjectLog.error(getClass(), "Duplicate in " + sourceName,
+              RecordLog.error(getClass(), "Duplicate in " + sourceName,
                 readObject);
             } else {
-              DataObjectLog.error(getClass(), "Duplicate in " + otherName,
+              RecordLog.error(getClass(), "Duplicate in " + otherName,
                 readObject);
             }
           } else {
-            DataObject sourceObject;
-            DataObject otherObject;
+            Record sourceObject;
+            Record otherObject;
             final int oppositeIndex = (index + 1) % 2;
             if (index == 0) {
               sourceObject = readObject;
@@ -252,7 +252,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
             }
             final Object value = readObject.getValue(attributeName);
             if (value == null) {
-              DataObjectLog.error(getClass(), "Missing key value for "
+              RecordLog.error(getClass(), "Missing key value for "
                 + attributeName, readObject);
             } else if (objects[oppositeIndex] == null) {
               objects[index] = readObject;
@@ -325,14 +325,14 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
     this.equalExclude = equalExclude;
   }
 
-  public void setMetaData1(final DataObjectMetaData metaData1) {
+  public void setMetaData1(final RecordDefinition metaData1) {
     this.metaData1 = metaData1;
     if (metaData2 != null) {
       initAttributes();
     }
   }
 
-  public void setMetaData2(final DataObjectMetaData metaData2) {
+  public void setMetaData2(final RecordDefinition metaData2) {
     this.metaData2 = metaData2;
     if (metaData1 != null) {
       initAttributes();
@@ -342,7 +342,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<DataObject> 
   /**
    * @param in the in to set
    */
-  public void setOtherIn(final Channel<DataObject> in) {
+  public void setOtherIn(final Channel<Record> in) {
     this.otherIn = in;
     in.readConnect();
   }

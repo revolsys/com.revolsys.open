@@ -9,10 +9,10 @@ import javax.sql.DataSource;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTableProperty;
+import com.revolsys.data.codes.CodeTableProperty;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDataObjectStore;
 
@@ -34,17 +34,16 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   }
 
   @Override
-  protected synchronized RecordIdentifier createId(final List<Object> values) {
+  protected synchronized Identifier createId(final List<Object> values) {
     try {
       final Connection connection = JdbcUtils.getConnection(this.dataSource);
       try {
-        RecordIdentifier id = loadId(values, false);
+        Identifier id = loadId(values, false);
         boolean retry = true;
         while (id == null) {
           final PreparedStatement statement = connection.prepareStatement(this.insertSql);
           try {
-            id = SingleRecordIdentifier.create(
-              this.dataStore.getNextPrimaryKey(getMetaData()));
+            id = SingleIdentifier.create(this.dataStore.getNextPrimaryKey(getRecordDefinition()));
             int index = 1;
             index = JdbcUtils.setValue(statement, index, id);
             for (int i = 0; i < getValueAttributeNames().size(); i++) {
@@ -74,7 +73,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
 
     } catch (final SQLException e) {
       throw new RuntimeException(this.tableName + ": Unable to create ID for  "
-          + values, e);
+        + values, e);
     }
 
   }
@@ -89,8 +88,8 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   }
 
   @Override
-  public void setMetaData(final DataObjectMetaData metaData) {
-    super.setMetaData(metaData);
+  public void setRecordDefinition(final RecordDefinition metaData) {
+    super.setRecordDefinition(metaData);
     this.dataStore = (JdbcDataObjectStore)metaData.getDataStore();
     this.dataSource = this.dataStore.getDataSource();
     if (metaData != null) {
@@ -115,8 +114,8 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
       }
       if (this.useAuditColumns) {
         if (this.dataStore.getClass()
-            .getName()
-            .equals("com.revolsys.gis.oracle.io.OracleDataObjectStore")) {
+          .getName()
+          .equals("com.revolsys.gis.oracle.io.OracleDataObjectStore")) {
           this.insertSql += ", USER, SYSDATE, USER, SYSDATE";
         } else {
           this.insertSql += ", current_user, current_timestamp, current_user, current_timestamp";

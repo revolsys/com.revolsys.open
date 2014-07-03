@@ -2,7 +2,7 @@ package com.revolsys.gis.oracle.io;
 
 import java.util.Map;
 
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.query.Query;
 import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
 

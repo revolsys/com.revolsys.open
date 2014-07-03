@@ -38,8 +38,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.data.types.DataTypeProxy;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.data.model.types.DataTypeProxy;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.Segment;

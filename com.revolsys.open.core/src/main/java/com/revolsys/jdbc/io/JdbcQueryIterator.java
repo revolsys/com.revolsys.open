@@ -15,27 +15,27 @@ import javax.sql.DataSource;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.gis.data.io.DataObjectIterator;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
-import com.revolsys.gis.data.model.DataObjectState;
-import com.revolsys.gis.data.query.Query;
+import com.revolsys.data.io.DataObjectIterator;
+import com.revolsys.data.query.Query;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
-public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
+public class JdbcQueryIterator extends AbstractIterator<Record> implements
   DataObjectIterator {
 
-  public static DataObject getNextObject(final JdbcDataObjectStore dataStore,
-    final DataObjectMetaData metaData, final List<Attribute> attributes,
-    final DataObjectFactory dataObjectFactory, final ResultSet resultSet) {
-    final DataObject object = dataObjectFactory.createDataObject(metaData);
+  public static Record getNextObject(final JdbcDataObjectStore dataStore,
+    final RecordDefinition metaData, final List<Attribute> attributes,
+    final RecordFactory dataObjectFactory, final ResultSet resultSet) {
+    final Record object = dataObjectFactory.createRecord(metaData);
     if (object != null) {
-      object.setState(DataObjectState.Initalizing);
+      object.setState(RecordState.Initalizing);
       int columnIndex = 1;
 
       for (final Attribute attribute : attributes) {
@@ -48,13 +48,13 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
             + " from result set", e);
         }
       }
-      object.setState(DataObjectState.Persisted);
+      object.setState(RecordState.Persisted);
       dataStore.addStatistic("query", object);
     }
     return object;
   }
 
-  public static ResultSet getResultSet(final DataObjectMetaData metaData,
+  public static ResultSet getResultSet(final RecordDefinition metaData,
     final PreparedStatement statement, final Query query) throws SQLException {
     JdbcUtils.setPreparedStatementParameters(statement, query);
 
@@ -65,7 +65,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private final int currentQueryIndex = -1;
 
-  private DataObjectFactory dataObjectFactory;
+  private RecordFactory dataObjectFactory;
 
   private DataSource dataSource;
 
@@ -73,7 +73,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
   private final int fetchSize = 10;
 
-  private DataObjectMetaData metaData;
+  private RecordDefinition metaData;
 
   private List<Query> queries;
 
@@ -150,7 +150,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   }
 
   @Override
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     if (metaData == null) {
       hasNext();
     }
@@ -158,10 +158,10 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
   }
 
   @Override
-  protected DataObject getNext() throws NoSuchElementException {
+  protected Record getNext() throws NoSuchElementException {
     try {
       if (resultSet != null && resultSet.next()) {
-        final DataObject object = getNextObject(dataStore, metaData,
+        final Record object = getNextObject(dataStore, metaData,
           attributes, dataObjectFactory, resultSet);
         if (statistics != null) {
           statistics.add(object);
@@ -188,7 +188,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
     metaData = query.getMetaData();
     if (metaData == null) {
       if (tableName != null) {
-        metaData = dataStore.getMetaData(tableName);
+        metaData = dataStore.getRecordDefinition(tableName);
         query.setMetaData(metaData);
       }
     }
@@ -222,7 +222,7 @@ public class JdbcQueryIterator extends AbstractIterator<DataObject> implements
 
       final String typePath = query.getTypeNameAlias();
       if (typePath != null) {
-        final DataObjectMetaDataImpl newMetaData = ((DataObjectMetaDataImpl)metaData).clone();
+        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)metaData).clone();
         newMetaData.setName(typePath);
         this.metaData = newMetaData;
       }

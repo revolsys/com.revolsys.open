@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.InvokeMethodVisitor;
+import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.linestring.LineStringGraph;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.gis.model.data.equals.NumberEquals;
 import com.revolsys.jts.algorithm.RobustDeterminant;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;

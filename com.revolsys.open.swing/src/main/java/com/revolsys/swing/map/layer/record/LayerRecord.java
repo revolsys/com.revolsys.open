@@ -1,8 +1,8 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
-public interface LayerRecord extends DataObject {
+public interface LayerRecord extends Record {
   void cancelChanges();
 
   void clearChanges();
@@ -23,7 +23,7 @@ public interface LayerRecord extends DataObject {
 
   boolean isModified(String name);
 
-  boolean isSame(LayerRecord record);
+  boolean isSame(Record record);
 
   LayerRecord revertChanges();
 

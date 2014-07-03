@@ -3,7 +3,7 @@ package com.revolsys.gis.graph;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
 public class EdgePair<T> {
   private final Edge<T> edge1;
@@ -28,12 +28,12 @@ public class EdgePair<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends DataObject> V getObject1() {
+  public <V extends Record> V getObject1() {
     return (V)edge1.getObject();
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends DataObject> V getObject2() {
+  public <V extends Record> V getObject2() {
     return (V)edge2.getObject();
   }
 

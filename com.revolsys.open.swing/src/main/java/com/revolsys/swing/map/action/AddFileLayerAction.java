@@ -16,10 +16,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.revolsys.data.io.DataObjectReaderFactory;
+import com.revolsys.data.io.DataObjectStoreFactory;
+import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.data.io.DataObjectReaderFactory;
-import com.revolsys.gis.data.io.DataObjectStoreFactory;
-import com.revolsys.gis.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;

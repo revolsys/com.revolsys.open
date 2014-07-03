@@ -42,14 +42,14 @@ import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.gis.data.model.ArrayDataObjectFactory;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.AttributeProperties;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectFactory;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.DataObjectMetaDataFactory;
-import com.revolsys.gis.data.model.DataObjectMetaDataFactoryImpl;
+import com.revolsys.data.record.ArrayRecordFactory;
+import com.revolsys.data.record.Record;
+import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordDefinitionFactory;
+import com.revolsys.data.record.schema.RecordDefinitionFactoryImpl;
 import com.revolsys.gis.io.DataObjectIterator;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
@@ -66,25 +66,25 @@ import com.revolsys.spring.SpringUtil;
  * @author Paul Austin
  * @see SaifWriter
  */
-public class SaifReader extends AbstractReader<DataObject> implements
-  DataObjectIterator, DataObjectMetaDataFactory,
-  com.revolsys.gis.data.io.DataObjectReader {
+public class SaifReader extends AbstractReader<Record> implements
+  DataObjectIterator, RecordDefinitionFactory,
+  com.revolsys.data.io.DataObjectReader {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);
 
   /** The current data object that was read. */
-  private DataObject currentDataObject;
+  private Record currentDataObject;
 
   /** The schema definition declared in the SAIF archive. */
-  private DataObjectMetaDataFactory declaredMetaDataFactory;
+  private RecordDefinitionFactory declaredMetaDataFactory;
 
   /** List of type names to exclude from reading. */
   private final Set<String> excludeTypeNames = new LinkedHashSet<String>();
 
   /** The list of exported objects. */
-  private DataObject exportedObjects;
+  private Record exportedObjects;
 
-  private DataObjectFactory factory = new ArrayDataObjectFactory();
+  private RecordFactory factory = new ArrayRecordFactory();
 
   /** The SAIF archive file. */
   private File file;
@@ -93,25 +93,25 @@ public class SaifReader extends AbstractReader<DataObject> implements
   private final Map<String, String> fileNameTypeNameMap = new HashMap<String, String>();
 
   /** The global metatdata for the archive. */
-  private DataObject globalMetadata;
+  private Record globalMetadata;
 
   /** Flag indicating if the iterator has more objects. */
   private boolean hasNext;
 
   /** The list of imported objects. */
-  private DataObject importedObjects;
+  private Record importedObjects;
 
   /** List of type names to include for reading. */
   private final Set<String> includeTypeNames = new LinkedHashSet<String>();
 
   /** The list of internally referenced objects. */
-  private DataObject internallyReferencedObjects;
+  private Record internallyReferencedObjects;
 
   /** Flag indicating if a new data object should be read. */
   private boolean loadNewObject = true;
 
   /** The schema definition that will be set on each data object. */
-  private DataObjectMetaDataFactory metaDataFactory;
+  private RecordDefinitionFactory metaDataFactory;
 
   /** The iterator for the current object set. */
   private OsnReader osnReader;
@@ -196,7 +196,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @return The schema definition.
    */
-  public DataObjectMetaDataFactory getDeclaredMetaDataFactory() {
+  public RecordDefinitionFactory getDeclaredMetaDataFactory() {
     return declaredMetaDataFactory;
   }
 
@@ -205,14 +205,14 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @return The exported objects.
    */
-  public DataObject getExportedObjects() {
+  public Record getExportedObjects() {
     return exportedObjects;
   }
 
   /**
    * @return the factory
    */
-  public DataObjectFactory getFactory() {
+  public RecordFactory getFactory() {
     return factory;
   }
 
@@ -229,7 +229,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @return The global metadata.
    */
-  public DataObject getGlobalMetadata() {
+  public Record getGlobalMetadata() {
     if (globalMetadata == null) {
       try {
         loadGlobalMetadata();
@@ -246,7 +246,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @return The imported objects.
    */
-  public DataObject getImportedObjects() {
+  public Record getImportedObjects() {
     if (importedObjects == null) {
       try {
         loadImportedObjects();
@@ -272,7 +272,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @return The internally referenced objects.
    */
-  public DataObject getInternallyReferencedObjects() {
+  public Record getInternallyReferencedObjects() {
     if (internallyReferencedObjects == null) {
       try {
         loadInternallyReferencedObjects();
@@ -285,14 +285,14 @@ public class SaifReader extends AbstractReader<DataObject> implements
   }
 
   @Override
-  public DataObjectMetaData getMetaData() {
+  public RecordDefinition getMetaData() {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public DataObjectMetaData getMetaData(final String typePath) {
-    return metaDataFactory.getMetaData(typePath);
+  public RecordDefinition getRecordDefinition(final String typePath) {
+    return metaDataFactory.getRecordDefinition(typePath);
   }
 
   /**
@@ -300,13 +300,13 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @return The schema definition.
    */
-  public DataObjectMetaDataFactory getMetaDataFactory() {
+  public RecordDefinitionFactory getMetaDataFactory() {
     return metaDataFactory;
   }
 
-  private <D extends DataObject> OsnReader getOsnReader(
-    final DataObjectMetaDataFactory metaDataFactory,
-    final DataObjectFactory factory, final String className) throws IOException {
+  private <D extends Record> OsnReader getOsnReader(
+    final RecordDefinitionFactory metaDataFactory,
+    final RecordFactory factory, final String className) throws IOException {
     String fileName = typePathFileNameMap.get(className);
     if (fileName == null) {
       fileName = PathUtil.getName(className);
@@ -326,9 +326,9 @@ public class SaifReader extends AbstractReader<DataObject> implements
     return getOsnReader(className, factory);
   }
 
-  public <D extends DataObject> OsnReader getOsnReader(final String className,
-    final DataObjectFactory factory) throws IOException {
-    final DataObjectMetaDataFactory metaDataFactory = this.metaDataFactory;
+  public <D extends Record> OsnReader getOsnReader(final String className,
+    final RecordFactory factory) throws IOException {
+    final RecordDefinitionFactory metaDataFactory = this.metaDataFactory;
     return getOsnReader(metaDataFactory, factory, className);
 
   }
@@ -377,7 +377,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
   }
 
   @Override
-  public Iterator<DataObject> iterator() {
+  public Iterator<Record> iterator() {
     open();
     return this;
   }
@@ -392,14 +392,14 @@ public class SaifReader extends AbstractReader<DataObject> implements
     final boolean setNames = includeTypeNames.isEmpty();
     final ClassPathResource resource = new ClassPathResource(
       "com/revolsys/io/saif/saifzip.csn");
-    final DataObjectMetaDataFactory schema = new SaifSchemaReader().loadSchema(resource);
+    final RecordDefinitionFactory schema = new SaifSchemaReader().loadSchema(resource);
     final OsnReader reader = getOsnReader(schema, factory, "/exports.dir");
     try {
       final Map<String, String> names = new TreeMap<String, String>();
       if (reader.hasNext()) {
         exportedObjects = reader.next();
-        final Set<DataObject> handles = ((Set<DataObject>)exportedObjects.getValue("handles"));
-        for (final DataObject exportedObject : handles) {
+        final Set<Record> handles = ((Set<Record>)exportedObjects.getValue("handles"));
+        for (final Record exportedObject : handles) {
           final String fileName = (String)exportedObject.getValue("objectSubset");
           if (fileName != null && !fileName.equals("globmeta.osn")) {
             String typePath = getTypeName(fileName);
@@ -536,8 +536,8 @@ public class SaifReader extends AbstractReader<DataObject> implements
     final OsnReader reader = getOsnReader("/refsys00.osn", factory);
     try {
       if (reader.hasNext()) {
-        final DataObject spatialReferencing = reader.next();
-        final DataObject coordinateSystem = spatialReferencing.getValue("coordSystem");
+        final Record spatialReferencing = reader.next();
+        final Record coordinateSystem = spatialReferencing.getValue("coordSystem");
         if (coordinateSystem.getMetaData().getPath().equals("/UTM")) {
           final Number srid = coordinateSystem.getValue("zone");
           setSrid(26900 + srid.intValue());
@@ -551,11 +551,11 @@ public class SaifReader extends AbstractReader<DataObject> implements
   /**
    * Get the next data object read by this reader. .
    * 
-   * @return The next DataObject.
+   * @return The next Record.
    * @exception NoSuchElementException If the reader has no more data objects.
    */
   @Override
-  public DataObject next() {
+  public Record next() {
     if (hasNext()) {
       loadNewObject = true;
       return currentDataObject;
@@ -593,7 +593,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
         final GeometryFactory geometryFactory = GeometryFactory.fixed(
           srid, 1.0, 1.0);
 
-        for (final DataObjectMetaData metaData : ((DataObjectMetaDataFactoryImpl)this.metaDataFactory).getTypes()) {
+        for (final RecordDefinition metaData : ((RecordDefinitionFactoryImpl)this.metaDataFactory).getRecordDefinitions()) {
           final Attribute geometryAttribute = metaData.getGeometryAttribute();
           if (geometryAttribute != null) {
             geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
@@ -636,11 +636,11 @@ public class SaifReader extends AbstractReader<DataObject> implements
     return false;
   }
 
-  protected DataObject readObject(final String className,
-    final DataObjectFactory factory) throws IOException {
+  protected Record readObject(final String className,
+    final RecordFactory factory) throws IOException {
     final OsnReader reader = getOsnReader(className, factory);
     try {
-      final DataObject object = reader.next();
+      final Record object = reader.next();
       return object;
     } finally {
       reader.close();
@@ -664,7 +664,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * @param declaredSchema The schema definition.
    */
   public void setDeclaredMetaDataFactory(
-    final DataObjectMetaDataFactory declaredMetaDataFactory) {
+    final RecordDefinitionFactory declaredMetaDataFactory) {
     this.declaredMetaDataFactory = declaredMetaDataFactory;
   }
 
@@ -681,7 +681,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
   /**
    * @param factory the factory to set
    */
-  public void setFactory(final DataObjectFactory factory) {
+  public void setFactory(final RecordFactory factory) {
     this.factory = factory;
   }
 
@@ -704,7 +704,7 @@ public class SaifReader extends AbstractReader<DataObject> implements
    * 
    * @param schema The schema definition.
    */
-  public void setMetaDataFactory(final DataObjectMetaDataFactory metaDataFactory) {
+  public void setMetaDataFactory(final RecordDefinitionFactory metaDataFactory) {
     if (metaDataFactory != null) {
       this.metaDataFactory = metaDataFactory;
     } else {

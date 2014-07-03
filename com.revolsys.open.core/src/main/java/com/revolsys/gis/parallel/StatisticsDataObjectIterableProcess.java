@@ -1,11 +1,11 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 
 public class StatisticsDataObjectIterableProcess extends
-  IterableProcess<DataObject> {
+  IterableProcess<Record> {
 
   private Statistics statistics;
 
@@ -33,7 +33,7 @@ public class StatisticsDataObjectIterableProcess extends
   }
 
   @Override
-  protected void write(final Channel<DataObject> out, final DataObject record) {
+  protected void write(final Channel<Record> out, final Record record) {
     if (record != null) {
       statistics.add(record);
       out.write(record);

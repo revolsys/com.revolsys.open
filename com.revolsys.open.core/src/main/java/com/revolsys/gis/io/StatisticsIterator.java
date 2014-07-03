@@ -2,14 +2,14 @@ package com.revolsys.gis.io;
 
 import java.util.Iterator;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 
-public class StatisticsIterator implements Iterator<DataObject> {
-  private final Iterator<DataObject> iterator;
+public class StatisticsIterator implements Iterator<Record> {
+  private final Iterator<Record> iterator;
 
   private Statistics statistics;
 
-  public StatisticsIterator(final Iterator<DataObject> iterator,
+  public StatisticsIterator(final Iterator<Record> iterator,
     final Statistics statistics) {
     this.iterator = iterator;
     setStatistics(statistics);
@@ -32,8 +32,8 @@ public class StatisticsIterator implements Iterator<DataObject> {
   }
 
   @Override
-  public DataObject next() {
-    final DataObject object = iterator.next();
+  public Record next() {
+    final Record object = iterator.next();
     if (object != null) {
       statistics.add(object);
     }

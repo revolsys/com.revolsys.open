@@ -53,12 +53,12 @@ import org.springframework.util.StringUtils;
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.MethodInvoker;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.gis.data.model.Attribute;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.model.codes.CodeTable;
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -178,7 +178,7 @@ public class SwingUtil {
         comboBox.setSelectedIndex(0);
       }
       int longestLength = -1;
-      for (final Entry<RecordIdentifier, List<Object>> codes : codeTable.getCodes()
+      for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes()
           .entrySet()) {
         final List<Object> values = codes.getValue();
         if (values != null && !values.isEmpty()) {
@@ -279,7 +279,7 @@ public class SwingUtil {
 
   @SuppressWarnings("unchecked")
   public static <T extends Field> T createField(
-    final DataObjectMetaData metaData, final String fieldName,
+    final RecordDefinition metaData, final String fieldName,
     final boolean editable) {
     Field field;
     final Attribute attribute = metaData.getAttribute(fieldName);

@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.model.data.equals.GeometryEqualsExact3d;
+import com.revolsys.data.equals.GeometryEqualsExact3d;
+import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
 
@@ -49,8 +49,8 @@ public class GeometryProperties {
     }
   }
 
-  public static DataObject getGeometryFeature(final Geometry geometry) {
-    return (DataObject)getGeometryProperty(geometry, FEATURE_PROPERTY);
+  public static Record getGeometryFeature(final Geometry geometry) {
+    return (Record)getGeometryProperty(geometry, FEATURE_PROPERTY);
   }
 
   @SuppressWarnings("unchecked")
@@ -72,7 +72,7 @@ public class GeometryProperties {
   }
 
   public static void setGeometryFeature(final Geometry geometry,
-    final DataObject feature) {
+    final Record feature) {
     setGeometryProperty(geometry, FEATURE_PROPERTY, feature);
   }
 

@@ -23,8 +23,8 @@ import javax.swing.table.TableCellEditor;
 import org.jdesktop.swingx.JXTable;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.gis.data.model.DataObjectMetaData;
-import com.revolsys.gis.data.model.types.DataType;
+import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.types.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.listener.Listener;
@@ -34,7 +34,7 @@ import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.dataobject.model.AbstractDataObjectTableModel;
 
 public class DataObjectTableCellEditor extends AbstractCellEditor implements
-  TableCellEditor, KeyListener, MouseListener, TableModelListener {
+TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -63,7 +63,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   public synchronized void addMouseListener(final MouseListener l) {
     if (l != null) {
-      mouseListener = AWTEventMulticaster.add(mouseListener, l);
+      this.mouseListener = AWTEventMulticaster.add(this.mouseListener, l);
     }
   }
 
@@ -78,19 +78,19 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   }
 
   public int getColumnIndex() {
-    return columnIndex;
+    return this.columnIndex;
   }
 
   public JComponent getEditorComponent() {
-    return editorComponent;
+    return this.editorComponent;
   }
 
   public Object getOldValue() {
-    return oldValue;
+    return this.oldValue;
   }
 
   public int getRowIndex() {
-    return rowIndex;
+    return this.rowIndex;
   }
 
   @Override
@@ -101,11 +101,11 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       rowIndex = jxTable.convertRowIndexToModel(rowIndex);
       columnIndex = jxTable.convertColumnIndexToModel(columnIndex);
     }
-    oldValue = value;
+    this.oldValue = value;
     final AbstractDataObjectTableModel model = (AbstractDataObjectTableModel)table.getModel();
     this.attributeName = model.getFieldName(rowIndex, columnIndex);
-    final DataObjectMetaData metaData = model.getMetaData();
-    dataType = metaData.getAttributeType(attributeName);
+    final RecordDefinition metaData = model.getMetaData();
+    this.dataType = metaData.getAttributeType(this.attributeName);
     this.editorComponent = (JComponent)SwingUtil.createField(metaData,
       this.attributeName, true);
     if (this.editorComponent instanceof JTextField) {
@@ -114,22 +114,22 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
         BorderFactory.createLineBorder(WebColors.LightSteelBlue),
         BorderFactory.createEmptyBorder(1, 2, 1, 2)));
     }
-    editorComponent.setOpaque(false);
+    this.editorComponent.setOpaque(false);
     SwingUtil.setFieldValue(this.editorComponent, value);
 
     this.rowIndex = rowIndex;
     this.columnIndex = columnIndex;
-    editorComponent.addKeyListener(this);
-    editorComponent.addMouseListener(this);
-    if (editorComponent instanceof JComboBox) {
-      final JComboBox comboBox = (JComboBox)editorComponent;
+    this.editorComponent.addKeyListener(this);
+    this.editorComponent.addMouseListener(this);
+    if (this.editorComponent instanceof JComboBox) {
+      final JComboBox comboBox = (JComboBox)this.editorComponent;
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component comboEditorComponent = editor.getEditorComponent();
       comboEditorComponent.addKeyListener(this);
       comboEditorComponent.addMouseListener(this);
     }
-    if (popupMenu != null) {
-      popupMenu.addToComponent(editorComponent);
+    if (this.popupMenu != null) {
+      this.popupMenu.addToComponent(this.editorComponent);
     }
     return this.editorComponent;
   }
@@ -154,16 +154,16 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
     final int keyCode = event.getKeyCode();
     if (keyCode == KeyEvent.VK_ENTER) {
       if (SwingUtil.isShiftDown(event)) {
-        table.editCell(rowIndex - 1, columnIndex);
+        this.table.editCell(this.rowIndex - 1, this.columnIndex);
       } else {
-        table.editCell(rowIndex + 1, columnIndex);
+        this.table.editCell(this.rowIndex + 1, this.columnIndex);
       }
       event.consume();
     } else if (keyCode == KeyEvent.VK_TAB) {
       if (SwingUtil.isShiftDown(event)) {
-        table.editCell(rowIndex, columnIndex - 1);
+        this.table.editCell(this.rowIndex, this.columnIndex - 1);
       } else {
-        table.editCell(rowIndex, columnIndex + 1);
+        this.table.editCell(this.rowIndex, this.columnIndex + 1);
       }
       event.consume();
     }
@@ -179,32 +179,32 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    Listener.mouseEvent(mouseListener, e);
+    Listener.mouseEvent(this.mouseListener, e);
   }
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    Listener.mouseEvent(mouseListener, e);
+    Listener.mouseEvent(this.mouseListener, e);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    Listener.mouseEvent(mouseListener, e);
+    Listener.mouseEvent(this.mouseListener, e);
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    Listener.mouseEvent(mouseListener, e);
+    Listener.mouseEvent(this.mouseListener, e);
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    Listener.mouseEvent(mouseListener, e);
+    Listener.mouseEvent(this.mouseListener, e);
   }
 
   public synchronized void removeMouseListener(final MouseListener l) {
     if (l != null) {
-      mouseListener = AWTEventMulticaster.remove(mouseListener, l);
+      this.mouseListener = AWTEventMulticaster.remove(this.mouseListener, l);
     }
   }
 
@@ -221,17 +221,19 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
   public boolean stopCellEditing() {
     boolean stopped = false;
     try {
-      if (editorComponent instanceof Field) {
-        final Field field = (Field)editorComponent;
+      if (this.editorComponent instanceof Field) {
+        final Field field = (Field)this.editorComponent;
         field.updateFieldValue();
       }
       stopped = super.stopCellEditing();
     } catch (final IndexOutOfBoundsException e) {
       return true;
     } catch (final Throwable t) {
-      final int result = JOptionPane.showConfirmDialog(editorComponent,
-        "<html><p><b>'" + getCellEditorValue() + "' is not a valid " + dataType
-          + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>",
+      t.printStackTrace();
+      final int result = JOptionPane.showConfirmDialog(this.editorComponent,
+        "<html><p><b>'" + getCellEditorValue() + "' is not a valid "
+          + this.dataType
+        + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>",
         "Invalid value", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
       if (result == JOptionPane.YES_OPTION) {
         cancelCellEditing();
@@ -241,18 +243,18 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
       }
     } finally {
       if (stopped) {
-        if (editorComponent != null) {
-          editorComponent.removeMouseListener(this);
-          editorComponent.removeKeyListener(this);
-          if (editorComponent instanceof JComboBox) {
-            final JComboBox comboBox = (JComboBox)editorComponent;
+        if (this.editorComponent != null) {
+          this.editorComponent.removeMouseListener(this);
+          this.editorComponent.removeKeyListener(this);
+          if (this.editorComponent instanceof JComboBox) {
+            final JComboBox comboBox = (JComboBox)this.editorComponent;
             final ComboBoxEditor editor = comboBox.getEditor();
             final Component comboEditorComponent = editor.getEditorComponent();
             comboEditorComponent.removeKeyListener(this);
             comboEditorComponent.removeMouseListener(this);
           }
-          if (popupMenu != null) {
-            PopupMenu.removeFromComponent(editorComponent);
+          if (this.popupMenu != null) {
+            PopupMenu.removeFromComponent(this.editorComponent);
           }
         }
       }
@@ -262,7 +264,7 @@ public class DataObjectTableCellEditor extends AbstractCellEditor implements
 
   @Override
   public void tableChanged(final TableModelEvent e) {
-    if (e.getFirstRow() <= rowIndex && rowIndex <= e.getLastRow()) {
+    if (e.getFirstRow() <= this.rowIndex && this.rowIndex <= e.getLastRow()) {
       if (e.getColumn() == TableModelEvent.ALL_COLUMNS) {
         cancelCellEditing();
       }

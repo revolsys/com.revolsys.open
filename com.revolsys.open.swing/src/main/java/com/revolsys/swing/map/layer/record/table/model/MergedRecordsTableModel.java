@@ -3,7 +3,7 @@ package com.revolsys.swing.map.layer.record.table.model;
 import java.util.Collection;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.DataObject;
+import com.revolsys.data.record.Record;
 import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.predicate.MergedNullValuePredicate;
@@ -19,7 +19,7 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
   private static final long serialVersionUID = 1L;
 
   public static TablePanel createPanel(final AbstractDataObjectLayer layer,
-    final DataObject mergedObject, final Collection<LayerRecord> objects) {
+    final Record mergedObject, final Collection<LayerRecord> objects) {
     final MergedRecordsTableModel model = new MergedRecordsTableModel(layer,
       mergedObject, objects);
     final DataObjectRowTable table = new DataObjectRowTable(model);
@@ -32,14 +32,14 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
     return new TablePanel(table);
   }
 
-  private final DataObject mergedObject;
+  private final Record mergedObject;
 
   public MergedRecordsTableModel(final AbstractDataObjectLayer layer) {
     this(layer, null, null);
   }
 
   public MergedRecordsTableModel(final AbstractDataObjectLayer layer,
-    final DataObject mergedObject, final Collection<LayerRecord> objects) {
+    final Record mergedObject, final Collection<LayerRecord> objects) {
     super(layer.getMetaData(), objects, layer.getColumnNames());
     setAttributesOffset(1);
     this.mergedObject = mergedObject;
@@ -56,13 +56,13 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
     }
   }
 
-  public DataObject getMergedObject() {
+  public Record getMergedObject() {
     return mergedObject;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends DataObject> V getRecord(final int index) {
+  public <V extends Record> V getRecord(final int index) {
     if (index == super.getRowCount()) {
       return (V)mergedObject;
     } else {

@@ -23,8 +23,8 @@ package com.revolsys.io.shp;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.gis.data.model.types.DataType;
-import com.revolsys.gis.data.model.types.DataTypes;
+import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
 
 public class ShapefileConstants {
   public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<Integer, DataType>();

@@ -15,9 +15,9 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.gis.data.model.RecordIdentifier;
-import com.revolsys.gis.data.model.SingleRecordIdentifier;
-import com.revolsys.gis.data.model.codes.AbstractCodeTable;
+import com.revolsys.data.codes.AbstractCodeTable;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.jdbc.JdbcUtils;
 
 @Deprecated
@@ -109,7 +109,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
     return codeTable;
   }
 
-  protected RecordIdentifier createId(final List<Object> values) {
+  protected Identifier createId(final List<Object> values) {
     try {
       init();
       final Connection connection = JdbcUtils.getConnection(this.dataSource);
@@ -127,7 +127,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
               index = JdbcUtils.setValue(statement, index, value);
             }
             if (statement.executeUpdate() > 0) {
-              return SingleRecordIdentifier.create(id);
+              return SingleIdentifier.create(id);
             } else {
               return null;
             }
@@ -135,7 +135,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
             JdbcUtils.close(statement);
           }
         } else {
-          return SingleRecordIdentifier.create(id);
+          return SingleIdentifier.create(id);
         }
 
       } finally {
@@ -235,7 +235,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
           final ResultSet rs = statement.executeQuery();
           try {
             while (rs.next()) {
-              final RecordIdentifier id = SingleRecordIdentifier.create(
+              final Identifier id = SingleIdentifier.create(
                 rs.getLong(1));
               final List<Object> values = new ArrayList<Object>();
               for (int i = 0; i < this.valueColumns.size(); i++) {
@@ -259,10 +259,10 @@ public class JdbcCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  protected RecordIdentifier loadId(final List<Object> values,
+  protected Identifier loadId(final List<Object> values,
     final boolean createId) {
     init();
-    RecordIdentifier id = null;
+    Identifier id = null;
     if (createId && this.loadAll) {
       loadAll();
       id = getIdByValue(values);
@@ -280,7 +280,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
             try (
               final ResultSet resultSet = statement.executeQuery()) {
               if (resultSet.next()) {
-                id = SingleRecordIdentifier.create(resultSet.getLong(1));
+                id = SingleIdentifier.create(resultSet.getLong(1));
               }
             }
           } finally {
