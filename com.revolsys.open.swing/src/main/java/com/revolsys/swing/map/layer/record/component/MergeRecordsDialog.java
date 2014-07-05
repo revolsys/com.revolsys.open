@@ -31,7 +31,7 @@ import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.gis.graph.DataObjectGraph;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.swing.SwingUtil;
@@ -42,7 +42,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.swing.table.dataobject.model.DataObjectListTableModel;
+import com.revolsys.swing.table.record.model.RecordListTableModel;
 import com.revolsys.swing.undo.CreateRecordUndo;
 import com.revolsys.swing.undo.DeleteLayerRecordUndo;
 import com.revolsys.swing.undo.MultipleUndo;
@@ -163,7 +163,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       } else if (!DataTypes.LINE_STRING.equals(geometryType)) {
         errorMessage = "Merging " + geometryType + " not currently supported";
       } else {
-        final DataObjectGraph graph = new DataObjectGraph();
+        final RecordGraph graph = new RecordGraph();
         for (final LayerRecord originalRecord : originalRecords) {
           final Record mergeableRecord = new ArrayRecord(originalRecord);
           mergeableToOiginalRecordMap.put(mergeableRecord, originalRecord);
@@ -252,9 +252,9 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
           records.add(originalRecord);
         }
       }
-      final TablePanel tablePanel = DataObjectListTableModel.createPanel(layer,
+      final TablePanel tablePanel = RecordListTableModel.createPanel(layer,
         records);
-      final DataObjectListTableModel tableModel = tablePanel.getTableModel();
+      final RecordListTableModel tableModel = tablePanel.getTableModel();
       tableModel.setEditable(false);
       tablePanel.setPreferredSize(new Dimension(100,
         50 + unMergeableRecords.size() * 22));

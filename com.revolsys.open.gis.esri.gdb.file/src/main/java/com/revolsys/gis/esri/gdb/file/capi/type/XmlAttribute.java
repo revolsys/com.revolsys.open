@@ -3,7 +3,7 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
+import com.revolsys.gis.esri.gdb.file.CapiFileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
 
@@ -18,7 +18,7 @@ public class XmlAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbDataObjectStore dataStore = getDataStore();
+    CapiFileGdbRecordStore dataStore = getDataStore();
     if (dataStore.isNull(row, name)) {
       return null;
     } else {

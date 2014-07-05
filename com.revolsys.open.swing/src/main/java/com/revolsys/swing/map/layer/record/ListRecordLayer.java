@@ -17,9 +17,9 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.swing.map.layer.record.table.DataObjectLayerTable;
-import com.revolsys.swing.map.layer.record.table.DataObjectLayerTablePanel;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectListLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
+import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
+import com.revolsys.swing.map.layer.record.table.model.RecordListLayerTableModel;
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
@@ -77,8 +77,8 @@ public class ListRecordLayer extends AbstractRecordLayer {
 
   @Override
   public Component createTablePanel() {
-    final DataObjectLayerTable table = DataObjectListLayerTableModel.createTable(this);
-    return new DataObjectLayerTablePanel(this, table);
+    final RecordLayerTable table = RecordListLayerTableModel.createTable(this);
+    return new RecordLayerTablePanel(this, table);
   }
 
   @Override

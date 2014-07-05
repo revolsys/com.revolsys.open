@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.io.DataObjectIterator;
+import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -28,9 +28,9 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements
-  DataObjectIterator {
+  RecordIterator {
 
-  public static Record getNextObject(final JdbcDataObjectStore dataStore,
+  public static Record getNextObject(final JdbcRecordStore dataStore,
     final RecordDefinition metaData, final List<Attribute> attributes,
     final RecordFactory dataObjectFactory, final ResultSet resultSet) {
     final Record object = dataObjectFactory.createRecord(metaData);
@@ -69,7 +69,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
 
   private DataSource dataSource;
 
-  private JdbcDataObjectStore dataStore;
+  private JdbcRecordStore dataStore;
 
   private final int fetchSize = 10;
 
@@ -87,7 +87,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
 
   private Statistics statistics;
 
-  public JdbcQueryIterator(final JdbcDataObjectStore dataStore,
+  public JdbcQueryIterator(final JdbcRecordStore dataStore,
     final Query query, final Map<String, Object> properties) {
     super();
     this.connection = dataStore.getConnection();
@@ -107,7 +107,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
     }
     this.dataObjectFactory = query.getProperty("dataObjectFactory");
     if (this.dataObjectFactory == null) {
-      this.dataObjectFactory = dataStore.getDataObjectFactory();
+      this.dataObjectFactory = dataStore.getRecordFactory();
     }
     this.dataStore = dataStore;
     this.query = query;
@@ -137,7 +137,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
     this.resultSet = getResultSet();
   }
 
-  public JdbcDataObjectStore getDataStore() {
+  public JdbcRecordStore getDataStore() {
     return dataStore;
   }
 

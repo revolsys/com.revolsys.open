@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractDataObjectAndGeometryIoFactory;
+import com.revolsys.data.io.AbstractRecordAndGeometryIoFactory;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.io.ZipRecordReader;
 import com.revolsys.data.record.Record;
@@ -18,7 +18,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.ZipWriter;
 
 public class ShapefileZipIoFactory extends
-AbstractDataObjectAndGeometryIoFactory {
+AbstractRecordAndGeometryIoFactory {
 
   public ShapefileZipIoFactory() {
     super("ESRI Shapefile inside a ZIP archive", true, true);
@@ -26,7 +26,7 @@ AbstractDataObjectAndGeometryIoFactory {
   }
 
   @Override
-  public Writer<Record> createDataObjectWriter(final String baseName,
+  public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition metaData, final OutputStream outputStream,
     final Charset charset) {
     File directory;
@@ -37,7 +37,7 @@ AbstractDataObjectAndGeometryIoFactory {
     }
     final Resource tempResource = new FileSystemResource(new File(directory,
       baseName + ".shp"));
-    final Writer<Record> shapeWriter = new ShapefileDataObjectWriter(metaData,
+    final Writer<Record> shapeWriter = new ShapefileRecordWriter(metaData,
       tempResource);
     return new ZipWriter<Record>(directory, shapeWriter, outputStream);
   }

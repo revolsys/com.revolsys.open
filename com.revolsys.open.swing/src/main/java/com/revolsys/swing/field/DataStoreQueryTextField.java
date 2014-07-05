@@ -47,7 +47,7 @@ import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.equals.StringEqualsIgnoreCase;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Equal;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
@@ -58,7 +58,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
-import com.revolsys.swing.map.list.DataObjectListCellRenderer;
+import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 
 public class DataStoreQueryTextField extends TextField implements
@@ -69,7 +69,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   private static final long serialVersionUID = 1L;
 
-  private final DataObjectStore dataStore;
+  private final RecordStore dataStore;
 
   private final String displayAttributeName;
 
@@ -127,7 +127,7 @@ public class DataStoreQueryTextField extends TextField implements
     this.listModel = new DataStoreQueryListModel(this.dataStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
-    this.list.setCellRenderer(new DataObjectListCellRenderer(
+    this.list.setCellRenderer(new RecordListCellRenderer(
       displayAttributeName));
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
@@ -155,7 +155,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   }
 
-  public DataStoreQueryTextField(final DataObjectStore dataStore,
+  public DataStoreQueryTextField(final RecordStore dataStore,
     final String typeName, final String displayAttributeName) {
     this(dataStore.getRecordDefinition(typeName), displayAttributeName, new Query(
       typeName, new Equal(F.upper(displayAttributeName), new Value(null))),

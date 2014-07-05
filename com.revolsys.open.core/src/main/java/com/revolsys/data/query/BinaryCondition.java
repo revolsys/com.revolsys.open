@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 
 public class BinaryCondition extends Condition {
 
@@ -30,7 +30,7 @@ public class BinaryCondition extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final DataObjectStore dataStore, final StringBuffer buffer) {
+    final RecordStore dataStore, final StringBuffer buffer) {
     if (left == null) {
       buffer.append("NULL");
     } else {

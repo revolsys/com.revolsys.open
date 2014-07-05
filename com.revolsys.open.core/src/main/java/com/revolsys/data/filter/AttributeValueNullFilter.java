@@ -4,8 +4,8 @@ import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
 
 /**
- * Filter DataObjects by the the attribute having a null value.
- * 
+ * Filter Records by the the attribute having a null value.
+ *
  * @author Paul Austin
  */
 public class AttributeValueNullFilter implements Filter<Record> {
@@ -22,18 +22,18 @@ public class AttributeValueNullFilter implements Filter<Record> {
 
   /**
    * Match the property on the data object with the required value.
-   * 
+   *
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
   @Override
   public boolean accept(final Record object) {
-    final Object propertyValue = object.getValue(attributeName);
+    final Object propertyValue = object.getValue(this.attributeName);
     return propertyValue == null;
   }
 
   public String getAttributeName() {
-    return attributeName;
+    return this.attributeName;
   }
 
   public void setAttributeName(final String attributeName) {
@@ -45,6 +45,6 @@ public class AttributeValueNullFilter implements Filter<Record> {
    */
   @Override
   public String toString() {
-    return attributeName + " == null ";
+    return this.attributeName + " == null ";
   }
 }

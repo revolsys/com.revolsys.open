@@ -14,14 +14,37 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
 
 public abstract class AbstractRecordReaderFactory extends
-  AbstractMapReaderFactory implements RecordReaderFactory {
+AbstractMapReaderFactory implements RecordReaderFactory {
+  public static RecordReaderFactory getRecordReaderFactory(
+    final Resource resource) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
+      RecordReaderFactory.class, resource);
+    return readerFactory;
+  }
+
+  public static RecordReaderFactory getRecordReaderFactory(final String fileName) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByFileName(
+      RecordReaderFactory.class, fileName);
+    return readerFactory;
+  }
+
+  public static boolean hasRecordReaderFactory(final Resource resource) {
+    return getRecordReaderFactory(resource) != null;
+  }
+
+  public static boolean hasRecordReaderFactory(final String fileName) {
+    return getRecordReaderFactory(fileName) != null;
+  }
+
   public static RecordReader recordReader(final File file) {
     final FileSystemResource resource = new FileSystemResource(file);
     return recordReader(resource);
   }
 
   public static RecordReader recordReader(final Resource resource) {
-    final RecordReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    final RecordReaderFactory readerFactory = getRecordReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
@@ -32,38 +55,14 @@ public abstract class AbstractRecordReaderFactory extends
 
   public static RecordReader recordReader(final Resource resource,
     final RecordFactory factory) {
-    final RecordReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    final RecordReaderFactory readerFactory = getRecordReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
-      final RecordReader reader = readerFactory.createRecordReader(
-        resource, factory);
+      final RecordReader reader = readerFactory.createRecordReader(resource,
+        factory);
       return reader;
     }
-  }
-
-  public static RecordReaderFactory getDataObjectReaderFactory(
-    final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
-      RecordReaderFactory.class, resource);
-    return readerFactory;
-  }
-
-  public static RecordReaderFactory getDataObjectReaderFactory(
-    final String fileName) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByFileName(
-      RecordReaderFactory.class, fileName);
-    return readerFactory;
-  }
-
-  public static boolean hasDataObjectReaderFactory(final Resource resource) {
-    return getDataObjectReaderFactory(resource) != null;
-  }
-
-  public static boolean hasDataObjectReaderFactory(final String fileName) {
-    return getDataObjectReaderFactory(fileName) != null;
   }
 
   private final RecordFactory dataObjectFactory = new ArrayRecordFactory();
@@ -76,26 +75,13 @@ public abstract class AbstractRecordReaderFactory extends
   }
 
   /**
-   * Create a reader for the resource using the ({@link ArrayRecordFactory}
-   * ).
-   * 
-   * @param file The file to read.
-   * @return The reader for the file.
-   */
-  @Override
-  public RecordReader createRecordReader(final Resource resource) {
-    return createRecordReader(resource, dataObjectFactory);
-
-  }
-
-  /**
    * Create a directory reader using the ({@link ArrayRecordFactory}).
-   * 
+   *
    * @return The reader.
    */
   @Override
   public Reader<Record> createDirectoryRecordReader() {
-    final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
+    final RecordDirectoryReader directoryReader = new RecordDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     return directoryReader;
   }
@@ -103,28 +89,28 @@ public abstract class AbstractRecordReaderFactory extends
   /**
    * Create a reader for the directory using the ({@link ArrayRecordFactory}
    * ).
-   * 
+   *
    * @param directory The directory to read.
    * @return The reader for the file.
    */
   @Override
   public Reader<Record> createDirectoryRecordReader(final File directory) {
-    return createDirectoryRecordReader(directory, dataObjectFactory);
+    return createDirectoryRecordReader(directory, this.dataObjectFactory);
 
   }
 
   /**
    * Create a reader for the directory using the specified data object
    * dataObjectFactory.
-   * 
+   *
    * @param directory directory file to read.
    * @param dataObjectFactory The dataObjectFactory used to create data objects.
    * @return The reader for the file.
    */
   @Override
-  public Reader<Record> createDirectoryRecordReader(
-    final File directory, final RecordFactory dataObjectFactory) {
-    final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
+  public Reader<Record> createDirectoryRecordReader(final File directory,
+    final RecordFactory dataObjectFactory) {
+    final RecordDirectoryReader directoryReader = new RecordDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);
     return directoryReader;
@@ -139,8 +125,21 @@ public abstract class AbstractRecordReaderFactory extends
     return reader;
   }
 
+  /**
+   * Create a reader for the resource using the ({@link ArrayRecordFactory}
+   * ).
+   *
+   * @param file The file to read.
+   * @return The reader for the file.
+   */
+  @Override
+  public RecordReader createRecordReader(final Resource resource) {
+    return createRecordReader(resource, this.dataObjectFactory);
+
+  }
+
   @Override
   public boolean isBinary() {
-    return binary;
+    return this.binary;
   }
 }

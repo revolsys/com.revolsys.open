@@ -10,12 +10,12 @@
   "
 >
   <bean
-    class="com.revolsys.data.io.DataObjectStoreFactoryRegistry"
+    class="com.revolsys.data.io.RecordStoreFactoryRegistry"
     factory-method="register"
   >
     <constructor-arg>
       <bean
-        class="com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory" />
+        class="com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory" />
     </constructor-arg>
   </bean>
 </beans>

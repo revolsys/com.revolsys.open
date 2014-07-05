@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractDataObjectAndGeometryWriterFactory;
+import com.revolsys.data.io.AbstractRecordAndGeometryWriterFactory;
 import com.revolsys.data.io.GeometryReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -15,11 +15,11 @@ import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.geojson.GeoJsonConstants;
-import com.revolsys.io.geojson.GeoJsonDataObjectWriter;
+import com.revolsys.io.geojson.GeoJsonRecordWriter;
 import com.revolsys.io.geojson.GeoJsonGeometryIterator;
 
 public class CogoJsonIoFactory extends
-  AbstractDataObjectAndGeometryWriterFactory implements GeometryReaderFactory {
+  AbstractRecordAndGeometryWriterFactory implements GeometryReaderFactory {
 
   public CogoJsonIoFactory() {
     super(GeoJsonConstants.COGO_DESCRIPTION, true, true);
@@ -28,11 +28,11 @@ public class CogoJsonIoFactory extends
   }
 
   @Override
-  public Writer<Record> createDataObjectWriter(final String baseName,
+  public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition metaData, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
-    return new GeoJsonDataObjectWriter(writer, true);
+    return new GeoJsonRecordWriter(writer, true);
   }
 
   @Override

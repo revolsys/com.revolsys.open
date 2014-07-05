@@ -45,8 +45,8 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.io.datastore.DataObjectStoreConnectionManager;
-import com.revolsys.io.datastore.DataObjectStoreConnectionRegistry;
+import com.revolsys.io.datastore.RecordStoreConnectionManager;
+import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
@@ -312,8 +312,8 @@ public class ProjectFrame extends BaseFrame {
       super.dispose();
       Property.removeAllListeners(this);
       if (this.project != null) {
-        final DataObjectStoreConnectionRegistry dataStores = this.project.getDataStores();
-        DataObjectStoreConnectionManager.get().removeConnectionRegistry(
+        final RecordStoreConnectionRegistry dataStores = this.project.getDataStores();
+        RecordStoreConnectionManager.get().removeConnectionRegistry(
           dataStores);
         if (Project.get() == this.project) {
           Project.set(null);
@@ -458,7 +458,7 @@ public class ProjectFrame extends BaseFrame {
     final FileSystemResource resource = new FileSystemResource(projectDirectory);
     this.project.readProject(resource);
 
-    final DataObjectStoreConnectionManager dataStoreConnectionManager = DataObjectStoreConnectionManager.get();
+    final RecordStoreConnectionManager dataStoreConnectionManager = RecordStoreConnectionManager.get();
     dataStoreConnectionManager.removeConnectionRegistry("Project");
     dataStoreConnectionManager.addConnectionRegistry(this.project.getDataStores());
 

@@ -25,7 +25,7 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.schema.Attribute;
@@ -33,7 +33,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.jdbc.io.JdbcRecordStore;
 
 public final class JdbcUtils {
   private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
@@ -104,7 +104,7 @@ public final class JdbcUtils {
       if (metaData == null) {
         where.appendSql(query, null, sql);
       } else {
-        final DataObjectStore dataStore = metaData.getDataStore();
+        final RecordStore dataStore = metaData.getDataStore();
         where.appendSql(query, dataStore, sql);
       }
     }
@@ -363,10 +363,10 @@ public final class JdbcUtils {
     }
   }
 
-  public static void lockTable(final DataObjectStore dataStore,
+  public static void lockTable(final RecordStore dataStore,
     final String typePath) {
-    if (dataStore instanceof JdbcDataObjectStore) {
-      final JdbcDataObjectStore jdbcDataStore = (JdbcDataObjectStore)dataStore;
+    if (dataStore instanceof JdbcRecordStore) {
+      final JdbcRecordStore jdbcDataStore = (JdbcRecordStore)dataStore;
       final DataSource dataSource = jdbcDataStore.getDataSource();
       final String tableName = getQualifiedTableName(typePath);
       final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";

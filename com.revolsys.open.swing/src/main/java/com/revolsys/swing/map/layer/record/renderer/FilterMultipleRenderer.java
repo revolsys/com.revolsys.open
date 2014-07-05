@@ -37,11 +37,11 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
     setIcon(ICON);
   }
 
-  protected AbstractDataObjectLayerRenderer getRenderer(
+  protected AbstractRecordLayerRenderer getRenderer(
     final AbstractRecordLayer layer,
-    final List<AbstractDataObjectLayerRenderer> renderers,
+    final List<AbstractRecordLayerRenderer> renderers,
     final LayerRecord record, final double scale) {
-    for (final AbstractDataObjectLayerRenderer renderer : renderers) {
+    for (final AbstractRecordLayerRenderer renderer : renderers) {
       if (renderer.isFilterAccept(record)) {
         if (renderer.isVisible(record) && !layer.isHidden(record)) {
           if (renderer.isVisible(scale)) {
@@ -63,26 +63,26 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   protected void renderRecords(final Viewport2D viewport,
     final AbstractRecordLayer layer, final List<LayerRecord> records) {
-    final Map<AbstractDataObjectLayerRenderer, List<LayerRecord>> rendererToRecordMap = new LinkedHashMap<>();
+    final Map<AbstractRecordLayerRenderer, List<LayerRecord>> rendererToRecordMap = new LinkedHashMap<>();
     final BoundingBox visibleArea = viewport.getBoundingBox();
     final double scale = viewport.getScale();
     if (isVisible(scale)) {
-      final List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<>(
+      final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>(
           getRenderers());
-      for (final AbstractDataObjectLayerRenderer renderer : renderers) {
+      for (final AbstractRecordLayerRenderer renderer : renderers) {
         rendererToRecordMap.put(renderer, new ArrayList<LayerRecord>());
       }
       for (final LayerRecord record : records) {
         if (isFilterAccept(record) && !layer.isHidden(record)) {
-          final AbstractDataObjectLayerRenderer renderer = getRenderer(layer,
+          final AbstractRecordLayerRenderer renderer = getRenderer(layer,
             renderers, record, scale);
           if (renderer != null) {
             CollectionUtil.addToList(rendererToRecordMap, renderer, record);
           }
         }
       }
-      for (final Entry<AbstractDataObjectLayerRenderer, List<LayerRecord>> entry : rendererToRecordMap.entrySet()) {
-        final AbstractDataObjectLayerRenderer renderer = entry.getKey();
+      for (final Entry<AbstractRecordLayerRenderer, List<LayerRecord>> entry : rendererToRecordMap.entrySet()) {
+        final AbstractRecordLayerRenderer renderer = entry.getKey();
         final List<LayerRecord> rendererRecords = entry.getValue();
         for (final LayerRecord record : rendererRecords) {
           try {
@@ -105,7 +105,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
     final AbstractRecordLayer layer, final LayerRecord record) {
     if (isVisible(record)) {
       final double scale = viewport.getScale();
-      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+      for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         if (renderer.isFilterAccept(record)) {
           if (renderer.isVisible(record)) {
             if (renderer.isVisible(scale)) {

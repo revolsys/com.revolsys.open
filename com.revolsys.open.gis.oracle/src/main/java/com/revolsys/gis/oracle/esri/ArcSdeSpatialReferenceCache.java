@@ -8,18 +8,18 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
+import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 
 public class ArcSdeSpatialReferenceCache {
 
   public static ArcSdeSpatialReferenceCache get(
-    final AbstractJdbcDataObjectStore dataStore) {
+    final AbstractJdbcRecordStore dataStore) {
     ArcSdeSpatialReferenceCache spatialReferences = dataStore.getProperty("esriSpatialReferences");
     if (spatialReferences == null) {
       spatialReferences = new ArcSdeSpatialReferenceCache(dataStore);
@@ -29,25 +29,25 @@ public class ArcSdeSpatialReferenceCache {
   }
 
   public static ArcSdeSpatialReferenceCache get(
-    final DataObjectStoreSchema schema) {
-    final AbstractJdbcDataObjectStore dataStore = (AbstractJdbcDataObjectStore)schema.getDataStore();
+    final RecordStoreSchema schema) {
+    final AbstractJdbcRecordStore dataStore = (AbstractJdbcRecordStore)schema.getDataStore();
     return get(dataStore);
 
   }
 
   public static ArcSdeSpatialReference getSpatialReference(
-    final DataObjectStoreSchema schema, final int esriSrid) {
+    final RecordStoreSchema schema, final int esriSrid) {
     return get(schema).getSpatialReference(esriSrid);
   }
 
   private final Map<Integer, ArcSdeSpatialReference> spatialReferences = new HashMap<Integer, ArcSdeSpatialReference>();
 
-  private AbstractJdbcDataObjectStore dataStore;
+  private AbstractJdbcRecordStore dataStore;
 
   public ArcSdeSpatialReferenceCache() {
   }
 
-  public ArcSdeSpatialReferenceCache(final AbstractJdbcDataObjectStore dataStore) {
+  public ArcSdeSpatialReferenceCache(final AbstractJdbcRecordStore dataStore) {
     this.dataStore = dataStore;
   }
 

@@ -10,7 +10,7 @@ import java.util.Map;
 import com.ctc.wstx.util.ExceptionUtil;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
@@ -44,7 +44,7 @@ public class CollectionValue extends QueryValue {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final DataObjectStore dataStore, final StringBuffer buffer) {
+    final RecordStore dataStore, final StringBuffer buffer) {
     buffer.append('(');
     for (int i = 0; i < this.queryValues.size(); i++) {
       if (i > 0) {

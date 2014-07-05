@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
@@ -87,7 +87,7 @@ public class SqlCondition extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(Query query, DataObjectStore dataStore, final StringBuffer buffer) {
+  public void appendDefaultSql(Query query, RecordStore dataStore, final StringBuffer buffer) {
     buffer.append(sql);
   }
 

@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.WeakCache;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.io.DataObjectStore;
-import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -78,9 +78,9 @@ RecordDefinition, Cloneable {
 
   private RecordFactory dataObjectFactory = new ArrayRecordFactory();
 
-  private RecordDefinitionFactory dataObjectMetaDataFactory;
+  private RecordDefinitionFactory recordDefinitionFactory;
 
-  private Reference<DataObjectStore> dataStore;
+  private Reference<RecordStore> dataStore;
 
   private Map<String, Object> defaultValues = new HashMap<String, Object>();
 
@@ -107,7 +107,7 @@ RecordDefinition, Cloneable {
 
   private final Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
 
-  private DataObjectStoreSchema schema;
+  private RecordStoreSchema schema;
 
   private final List<RecordDefinition> superClasses = new ArrayList<RecordDefinition>();
 
@@ -116,20 +116,20 @@ RecordDefinition, Cloneable {
   public RecordDefinitionImpl() {
   }
 
-  public RecordDefinitionImpl(final DataObjectStore dataObjectStore,
-    final DataObjectStoreSchema schema, final RecordDefinition metaData) {
+  public RecordDefinitionImpl(final RecordStore dataObjectStore,
+    final RecordStoreSchema schema, final RecordDefinition metaData) {
     this(metaData);
-    this.dataStore = new WeakReference<DataObjectStore>(dataObjectStore);
-    this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
+    this.dataStore = new WeakReference<RecordStore>(dataObjectStore);
+    this.dataObjectFactory = dataObjectStore.getRecordFactory();
     this.schema = schema;
     METADATA_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final DataObjectStore dataObjectStore,
-    final DataObjectStoreSchema schema, final String typePath) {
+  public RecordDefinitionImpl(final RecordStore dataObjectStore,
+    final RecordStoreSchema schema, final String typePath) {
     this(typePath);
-    this.dataStore = new WeakReference<DataObjectStore>(dataObjectStore);
-    this.dataObjectFactory = dataObjectStore.getDataObjectFactory();
+    this.dataStore = new WeakReference<RecordStore>(dataObjectStore);
+    this.dataObjectFactory = dataObjectStore.getRecordFactory();
     this.schema = schema;
     METADATA_CACHE.put(this.instanceId, this);
   }
@@ -311,7 +311,7 @@ RecordDefinition, Cloneable {
   }
 
   @Override
-  public Record createDataObject() {
+  public Record createRecord() {
     final RecordFactory dataObjectFactory = this.dataObjectFactory;
     if (dataObjectFactory == null) {
       return null;
@@ -322,7 +322,7 @@ RecordDefinition, Cloneable {
 
   @Override
   public void delete(final Record dataObject) {
-    final DataObjectStore dataStore = getDataStore();
+    final RecordStore dataStore = getDataStore();
     if (dataStore == null) {
       throw new UnsupportedOperationException();
     } else {
@@ -341,7 +341,7 @@ RecordDefinition, Cloneable {
     this.attributes.clear();
     this.codeTableByColumnMap.clear();
     this.dataObjectFactory = null;
-    this.dataObjectMetaDataFactory = new RecordDefinitionFactoryImpl();
+    this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
     this.dataStore = null;
     this.defaultValues.clear();
     this.description = "";
@@ -349,7 +349,7 @@ RecordDefinition, Cloneable {
     this.geometryAttributeIndexes.clear();
     this.geometryAttributeNames.clear();
     this.restrictions.clear();
-    this.schema = new DataObjectStoreSchema();
+    this.schema = new RecordStoreSchema();
     this.superClasses.clear();
   }
 
@@ -492,7 +492,7 @@ RecordDefinition, Cloneable {
 
   @Override
   public CodeTable getCodeTableByColumn(final String column) {
-    final DataObjectStore dataStore = getDataStore();
+    final RecordStore dataStore = getDataStore();
     if (dataStore == null) {
       return null;
     } else {
@@ -505,22 +505,22 @@ RecordDefinition, Cloneable {
   }
 
   @Override
-  public RecordFactory getDataObjectFactory() {
+  public RecordFactory getRecordFactory() {
     return this.dataObjectFactory;
   }
 
   @Override
-  public RecordDefinitionFactory getDataObjectMetaDataFactory() {
-    if (this.dataObjectMetaDataFactory == null) {
-      final DataObjectStore dataStore = getDataStore();
+  public RecordDefinitionFactory getRecordDefinitionFactory() {
+    if (this.recordDefinitionFactory == null) {
+      final RecordStore dataStore = getDataStore();
       return dataStore;
     } else {
-      return this.dataObjectMetaDataFactory;
+      return this.recordDefinitionFactory;
     }
   }
 
   @Override
-  public DataObjectStore getDataStore() {
+  public RecordStore getDataStore() {
     if (this.dataStore == null) {
       return null;
     } else {
@@ -630,7 +630,7 @@ RecordDefinition, Cloneable {
     return this.restrictions;
   }
 
-  public DataObjectStoreSchema getSchema() {
+  public RecordStoreSchema getSchema() {
     return this.schema;
   }
 
@@ -708,9 +708,9 @@ RecordDefinition, Cloneable {
     this.codeTableByColumnMap = codeTableByColumnMap;
   }
 
-  public void setDataObjectMetaDataFactory(
-    final RecordDefinitionFactory dataObjectMetaDataFactory) {
-    this.dataObjectMetaDataFactory = dataObjectMetaDataFactory;
+  public void setRecordDefinitionFactory(
+    final RecordDefinitionFactory recordDefinitionFactory) {
+    this.recordDefinitionFactory = recordDefinitionFactory;
   }
 
   @Override

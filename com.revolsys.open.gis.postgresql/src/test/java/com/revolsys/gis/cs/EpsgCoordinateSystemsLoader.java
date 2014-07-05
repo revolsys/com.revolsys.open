@@ -16,8 +16,8 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.data.io.DataObjectStore;
-import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
+import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.epsg.EpsgUtil;
@@ -37,7 +37,7 @@ public final class EpsgCoordinateSystemsLoader {
     new EpsgCoordinateSystemsLoader().load();
   }
 
-  private final DataObjectStore dataStore;
+  private final RecordStore dataStore;
 
   private final Map<Integer, Integer> coordinateSystemUnitMap = new HashMap<Integer, Integer>();
 
@@ -50,7 +50,7 @@ public final class EpsgCoordinateSystemsLoader {
     parameters.put("url", "jdbc:postgresql://localhost:5432/epsg");
     parameters.put("username", "epsg");
     parameters.put("password", "epsg");
-    dataStore = DataObjectStoreFactoryRegistry.createDataObjectStore(parameters);
+    dataStore = RecordStoreFactoryRegistry.createRecordStore(parameters);
   }
 
   protected Double getDoubleNaN(final Record object, final String name) {

@@ -9,21 +9,21 @@ import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractDataObjectAndGeometryIoFactory;
-import com.revolsys.data.io.DataObjectIteratorReader;
+import com.revolsys.data.io.AbstractRecordAndGeometryIoFactory;
+import com.revolsys.data.io.RecordIteratorReader;
 import com.revolsys.data.io.RecordReader;
-import com.revolsys.data.io.DataObjectStore;
-import com.revolsys.data.io.DataObjectStoreFactory;
+import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.io.RecordStoreFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.DirectoryDataObjectStore;
+import com.revolsys.io.DirectoryRecordStore;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.OutputStreamResource;
 import com.revolsys.spring.SpringUtil;
 
-public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
-  implements DataObjectStoreFactory {
+public class ShapefileIoFactory extends AbstractRecordAndGeometryIoFactory
+  implements RecordStoreFactory {
   public ShapefileIoFactory() {
     super(ShapefileConstants.DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(ShapefileConstants.MIME_TYPE,
@@ -37,40 +37,40 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
     try {
       final ShapefileIterator iterator = new ShapefileIterator(resource,
         dataObjectFactory);
-      return new DataObjectIteratorReader(iterator);
+      return new RecordIteratorReader(iterator);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }
   }
 
   @Override
-  public DataObjectStore createDataObjectStore(
+  public RecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
     final Resource resource = SpringUtil.getResource(url);
     final File directory = SpringUtil.getFile(resource);
-    return new DirectoryDataObjectStore(directory,
+    return new DirectoryRecordStore(directory,
       ShapefileConstants.FILE_EXTENSION);
   }
 
   @Override
-  public Writer<Record> createDataObjectWriter(
+  public Writer<Record> createRecordWriter(
     final RecordDefinition metaData, final Resource resource) {
-    return new ShapefileDataObjectWriter(metaData, resource);
+    return new ShapefileRecordWriter(metaData, resource);
   }
 
   @Override
-  public Writer<Record> createDataObjectWriter(final String baseName,
+  public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition metaData, final OutputStream outputStream,
     final Charset charset) {
-    return createDataObjectWriter(metaData, new OutputStreamResource(baseName,
+    return createRecordWriter(metaData, new OutputStreamResource(baseName,
       outputStream));
   }
 
   @Override
-  public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
+  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
-    return DataObjectStore.class;
+    return RecordStore.class;
   }
 
   @Override

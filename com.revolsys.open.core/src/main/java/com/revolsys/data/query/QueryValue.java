@@ -36,7 +36,7 @@ import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.Function;
 import com.revolsys.data.query.functions.GetMapValue;
@@ -359,13 +359,13 @@ public abstract class QueryValue implements Cloneable {
     "AND", "OR", "+", "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE",
     "+", "-", "/", "*", "%", "MOD");
 
-  public abstract void appendDefaultSql(Query query, DataObjectStore dataStore,
+  public abstract void appendDefaultSql(Query query, RecordStore dataStore,
     StringBuffer sql);
 
   // TODO wrap in a more generic structure
   public abstract int appendParameters(int index, PreparedStatement statement);
 
-  public void appendSql(final Query query, final DataObjectStore dataStore,
+  public void appendSql(final Query query, final RecordStore dataStore,
     final StringBuffer sql) {
     if (dataStore == null) {
       appendDefaultSql(query, null, sql);

@@ -11,24 +11,24 @@ import org.springframework.util.StringUtils;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.swing.map.form.LayerRecordForm;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerAttributesTableModel;
 import com.revolsys.swing.table.BaseJxTable;
 
 public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
 
   public static void add(final LayerRecordForm form, final BaseJxTable table) {
-    final DataObjectLayerAttributesTableModel model = table.getTableModel();
+    final RecordLayerAttributesTableModel model = table.getTableModel();
     final FormAllFieldsModifiedPredicate predicate = new FormAllFieldsModifiedPredicate(
       form, model);
     ModifiedAttributePredicate.addModifiedHighlighters(table, predicate);
   }
 
-  private final DataObjectLayerAttributesTableModel model;
+  private final RecordLayerAttributesTableModel model;
 
   private final Reference<LayerRecordForm> form;
 
   public FormAllFieldsModifiedPredicate(final LayerRecordForm form,
-    final DataObjectLayerAttributesTableModel model) {
+    final RecordLayerAttributesTableModel model) {
     this.form = new WeakReference<>(form);
     this.model = model;
   }

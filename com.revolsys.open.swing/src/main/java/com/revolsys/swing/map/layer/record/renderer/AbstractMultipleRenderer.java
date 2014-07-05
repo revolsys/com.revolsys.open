@@ -23,7 +23,7 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractMultipleRenderer extends
-  AbstractDataObjectLayerRenderer {
+  AbstractRecordLayerRenderer {
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractMultipleRenderer.class);
 
@@ -54,7 +54,7 @@ public abstract class AbstractMultipleRenderer extends
     menu.addMenuItem("convert", action);
   }
 
-  private List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
+  private List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
 
   public AbstractMultipleRenderer(final String type,
     final AbstractRecordLayer layer, final LayerRenderer<?> parent,
@@ -63,9 +63,9 @@ public abstract class AbstractMultipleRenderer extends
     @SuppressWarnings("unchecked")
     final List<Map<String, Object>> styles = (List<Map<String, Object>>)style.get("styles");
     if (styles != null) {
-      final List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
+      final List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
       for (final Map<String, Object> childStyle : styles) {
-        final AbstractDataObjectLayerRenderer renderer = AbstractDataObjectLayerRenderer.getRenderer(
+        final AbstractRecordLayerRenderer renderer = AbstractRecordLayerRenderer.getRenderer(
           layer, this, childStyle);
         renderers.add(renderer);
       }
@@ -100,12 +100,12 @@ public abstract class AbstractMultipleRenderer extends
     return renderer;
   }
 
-  public int addRenderer(final AbstractDataObjectLayerRenderer renderer) {
+  public int addRenderer(final AbstractRecordLayerRenderer renderer) {
     return addRenderer(-1, renderer);
   }
 
   public int addRenderer(int index,
-    final AbstractDataObjectLayerRenderer renderer) {
+    final AbstractRecordLayerRenderer renderer) {
     if (renderer == null) {
       return -1;
     } else {
@@ -146,7 +146,7 @@ public abstract class AbstractMultipleRenderer extends
   public AbstractMultipleRenderer clone() {
     final AbstractMultipleRenderer clone = (AbstractMultipleRenderer)super.clone();
     clone.renderers = JavaBeanUtil.clone(renderers);
-    for (final AbstractDataObjectLayerRenderer renderer : clone.renderers) {
+    for (final AbstractRecordLayerRenderer renderer : clone.renderers) {
       renderer.setParent(clone);
     }
     return clone;
@@ -154,7 +154,7 @@ public abstract class AbstractMultipleRenderer extends
 
   public FilterMultipleRenderer convertToFilterStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final List<AbstractDataObjectLayerRenderer> renderers = getRenderers();
+    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
@@ -173,7 +173,7 @@ public abstract class AbstractMultipleRenderer extends
 
   public MultipleRenderer convertToMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final List<AbstractDataObjectLayerRenderer> renderers = getRenderers();
+    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
@@ -192,7 +192,7 @@ public abstract class AbstractMultipleRenderer extends
 
   public ScaleMultipleRenderer convertToScaleStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final List<AbstractDataObjectLayerRenderer> renderers = getRenderers();
+    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
@@ -245,15 +245,15 @@ public abstract class AbstractMultipleRenderer extends
     return null;
   }
 
-  public List<AbstractDataObjectLayerRenderer> getRenderers() {
+  public List<AbstractRecordLayerRenderer> getRenderers() {
     synchronized (renderers) {
-      return new ArrayList<AbstractDataObjectLayerRenderer>(this.renderers);
+      return new ArrayList<AbstractRecordLayerRenderer>(this.renderers);
     }
   }
 
   public boolean hasRendererWithSameName(final LayerRenderer<?> renderer,
     final String name) {
-    for (final AbstractDataObjectLayerRenderer otherRenderer : renderers) {
+    for (final AbstractRecordLayerRenderer otherRenderer : renderers) {
       if (renderer != otherRenderer) {
         final String layerName = otherRenderer.getName();
         if (name.equals(layerName)) {
@@ -267,7 +267,7 @@ public abstract class AbstractMultipleRenderer extends
   @Override
   public boolean isVisible(final LayerRecord object) {
     if (super.isVisible() && super.isVisible(object)) {
-      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+      for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         if (renderer.isVisible(object)) {
           return true;
         }
@@ -276,7 +276,7 @@ public abstract class AbstractMultipleRenderer extends
     return false;
   }
 
-  public int removeRenderer(final AbstractDataObjectLayerRenderer renderer) {
+  public int removeRenderer(final AbstractRecordLayerRenderer renderer) {
     boolean removed = false;
     synchronized (renderers) {
       final int index = renderers.indexOf(renderer);
@@ -294,16 +294,16 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   public void setRenderers(
-    final List<? extends AbstractDataObjectLayerRenderer> renderers) {
+    final List<? extends AbstractRecordLayerRenderer> renderers) {
     synchronized (this.renderers) {
-      for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
+      for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         renderer.setParent(null);
       }
       if (renderers == null) {
         this.renderers.clear();
       }
-      this.renderers = new ArrayList<AbstractDataObjectLayerRenderer>(renderers);
-      for (final AbstractDataObjectLayerRenderer renderer : this.renderers) {
+      this.renderers = new ArrayList<AbstractRecordLayerRenderer>(renderers);
+      for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         renderer.setParent(this);
       }
     }
@@ -312,10 +312,10 @@ public abstract class AbstractMultipleRenderer extends
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    final List<AbstractDataObjectLayerRenderer> renderers = getRenderers();
+    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     if (!renderers.isEmpty()) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<Map<String, Object>>();
-      for (final AbstractDataObjectLayerRenderer renderer : renderers) {
+      for (final AbstractRecordLayerRenderer renderer : renderers) {
         rendererMaps.add(renderer.toMap());
       }
       MapSerializerUtil.add(map, "styles", rendererMaps);

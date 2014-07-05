@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractDataObjectAndGeometryWriterFactory;
+import com.revolsys.data.io.AbstractRecordAndGeometryWriterFactory;
 import com.revolsys.data.io.GeometryReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -16,7 +16,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
 public class GeoJsonIoFactory extends
-  AbstractDataObjectAndGeometryWriterFactory implements GeometryReaderFactory {
+  AbstractRecordAndGeometryWriterFactory implements GeometryReaderFactory {
 
   public GeoJsonIoFactory() {
     super(GeoJsonConstants.DESCRIPTION, true, true);
@@ -26,11 +26,11 @@ public class GeoJsonIoFactory extends
   }
 
   @Override
-  public Writer<Record> createDataObjectWriter(final String baseName,
+  public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition metaData, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
-    return new GeoJsonDataObjectWriter(writer);
+    return new GeoJsonRecordWriter(writer);
   }
 
   @Override

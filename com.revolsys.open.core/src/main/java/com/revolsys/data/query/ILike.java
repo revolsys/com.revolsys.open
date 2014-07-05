@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 
 public class ILike extends BinaryCondition {
 
@@ -45,7 +45,7 @@ public class ILike extends BinaryCondition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final DataObjectStore dataStore, final StringBuffer buffer) {
+    final RecordStore dataStore, final StringBuffer buffer) {
     final QueryValue left = getLeft();
     final QueryValue right = getRight();
 

@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Map;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 
 public class Cast extends QueryValue {
   private final QueryValue value;
@@ -26,7 +26,7 @@ public class Cast extends QueryValue {
   }
 
   @Override
-  public void appendDefaultSql(Query query, DataObjectStore dataStore, final StringBuffer buffer) {
+  public void appendDefaultSql(Query query, RecordStore dataStore, final StringBuffer buffer) {
     buffer.append("CAST(");
     value.appendSql(query, dataStore, buffer);
     buffer.append(" AS ");

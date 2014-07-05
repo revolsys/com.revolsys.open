@@ -13,13 +13,13 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.DataObjectEquals;
-import com.revolsys.data.filter.DataObjectGeometryFilter;
+import com.revolsys.data.equals.RecordEquals;
+import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.NotFilter;
-import com.revolsys.gis.graph.DataObjectGraph;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -34,13 +34,13 @@ import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
-  AbstractVisitor<Edge<Record>> implements ObjectProcessor<DataObjectGraph> {
+  AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
 
   private static final Logger LOG = LoggerFactory.getLogger(LinearIntersectionNotEqualLineEdgeCleanupVisitor.class);
 
   private Set<String> equalExcludeAttributes = new HashSet<String>(
-    Arrays.asList(DataObjectEquals.EXCLUDE_ID,
-      DataObjectEquals.EXCLUDE_GEOMETRY));
+    Arrays.asList(RecordEquals.EXCLUDE_ID,
+      RecordEquals.EXCLUDE_GEOMETRY));
 
   private Statistics duplicateStatistics;
 
@@ -88,7 +88,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
   }
 
   @Override
-  public void process(final DataObjectGraph graph) {
+  public void process(final RecordGraph graph) {
     graph.visitEdges(this);
   }
 
@@ -104,8 +104,8 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
 
   public void setEqualExcludeAttributes(final Set<String> equalExcludeAttributes) {
     this.equalExcludeAttributes = new HashSet<String>(equalExcludeAttributes);
-    this.equalExcludeAttributes.add(DataObjectEquals.EXCLUDE_ID);
-    this.equalExcludeAttributes.add(DataObjectEquals.EXCLUDE_GEOMETRY);
+    this.equalExcludeAttributes.add(RecordEquals.EXCLUDE_ID);
+    this.equalExcludeAttributes.add(RecordEquals.EXCLUDE_GEOMETRY);
   }
 
   public void setNewerComparator(final Comparator<Record> newerComparator) {
@@ -131,10 +131,10 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     }
 
     final Filter<Record> notEqualLineFilter = new NotFilter<Record>(
-      new DataObjectGeometryFilter<LineString>(
+      new RecordGeometryFilter<LineString>(
         new EqualFilter<LineString>(line)));
 
-    final DataObjectGeometryFilter<LineString> linearIntersectionFilter = new DataObjectGeometryFilter<LineString>(
+    final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
       new LinearIntersectionFilter(line));
 
     attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(

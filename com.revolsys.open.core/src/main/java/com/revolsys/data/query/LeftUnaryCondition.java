@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 
 public class LeftUnaryCondition extends Condition {
 
@@ -20,7 +20,7 @@ public class LeftUnaryCondition extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final DataObjectStore dataStore, final StringBuffer buffer) {
+    final RecordStore dataStore, final StringBuffer buffer) {
     buffer.append(operator);
     buffer.append(" ");
     value.appendSql(query, dataStore, buffer);

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 
@@ -49,7 +49,7 @@ public class Between extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final DataObjectStore dataStore, final StringBuffer buffer) {
+    final RecordStore dataStore, final StringBuffer buffer) {
     column.appendSql(query, dataStore, buffer);
     buffer.append(" BETWEEN ");
     min.appendSql(query, dataStore, buffer);

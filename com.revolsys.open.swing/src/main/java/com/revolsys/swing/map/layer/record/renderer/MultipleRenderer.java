@@ -48,7 +48,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
     final BoundingBox visibleArea, final AbstractRecordLayer layer,
     final LayerRecord record) {
     if (isVisible(record)) {
-      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+      for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
         if (renderer.isVisible(scale)) {
           try {
@@ -75,7 +75,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
       }
     }
 
-    for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+    for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
       final long scale = (long)viewport.getScale();
       if (renderer.isVisible(scale)) {
         try {
@@ -90,7 +90,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   public void renderSelectedRecord(final Viewport2D viewport,
     final AbstractRecordLayer layer, final LayerRecord object) {
     if (isVisible(object)) {
-      for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
+      for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();
         if (renderer.isVisible(scale)) {
           try {

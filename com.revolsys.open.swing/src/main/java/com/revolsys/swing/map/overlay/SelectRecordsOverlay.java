@@ -36,7 +36,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 
 public class SelectRecordsOverlay extends AbstractOverlay {
@@ -286,7 +286,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         for (final LayerRecord record : dataObjectLayer.getHighlightedRecords()) {
           if (record != null && dataObjectLayer.isVisible(record)) {
             final Geometry geometry = record.getGeometryValue();
-            final AbstractDataObjectLayerRenderer layerRenderer = layer.getRenderer();
+            final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
             layerRenderer.renderSelectedRecord(vieport, dataObjectLayer, record);
             HIGHLIGHT_RENDERER.paintSelected(vieport, viewportGeometryFactory,
               geometry);
@@ -315,7 +315,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         paintSelected(viewport, childGroup);
       } else if (layer instanceof AbstractRecordLayer) {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
-        final AbstractDataObjectLayerRenderer layerRenderer = layer.getRenderer();
+        final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
         if (recordLayer.isSelectable()) {
           for (final LayerRecord record : recordLayer.getSelectedRecords()) {
             if (record != null && recordLayer.isVisible(record)) {

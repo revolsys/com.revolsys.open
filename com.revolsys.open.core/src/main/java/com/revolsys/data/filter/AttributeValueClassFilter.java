@@ -5,8 +5,8 @@ import com.revolsys.data.record.RecordUtil;
 import com.revolsys.filter.Filter;
 
 /**
- * Filter DataObjects by the type (Java class) of the attributeName value.
- * 
+ * Filter Records by the type (Java class) of the attributeName value.
+ *
  * @author Paul Austin
  */
 public class AttributeValueClassFilter implements Filter<Record> {
@@ -18,38 +18,38 @@ public class AttributeValueClassFilter implements Filter<Record> {
 
   /**
    * Match the attributeName on the data object with the required value.
-   * 
+   *
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
    */
   @Override
   public boolean accept(final Record object) {
     final Object propertyValue = RecordUtil.getAttributeByPath(object,
-      attributeName);
-    return type.isInstance(propertyValue);
+      this.attributeName);
+    return this.type.isInstance(propertyValue);
   }
 
   /**
    * Get the attributeName name, or path to match.
-   * 
+   *
    * @return The attributeName name, or path to match.
    */
   public String getAttributeName() {
-    return attributeName;
+    return this.attributeName;
   }
 
   /**
    * Get the type to match.
-   * 
+   *
    * @return The type to match.
    */
   public String getType() {
-    return type.getName();
+    return this.type.getName();
   }
 
   /**
    * Set the attributeName name, or path to match.
-   * 
+   *
    * @param attributeName The attributeName name, or path to match.
    */
   public void setAttributeName(final String attributeName) {
@@ -58,7 +58,7 @@ public class AttributeValueClassFilter implements Filter<Record> {
 
   /**
    * Set the type to match.
-   * 
+   *
    * @param type The type to match.
    */
   public void setType(final String type) {
@@ -74,6 +74,6 @@ public class AttributeValueClassFilter implements Filter<Record> {
    */
   @Override
   public String toString() {
-    return attributeName + " type " + type;
+    return this.attributeName + " type " + this.type;
   }
 }

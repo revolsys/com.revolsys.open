@@ -30,7 +30,7 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.panel.MarkerStylePanel;
 
-public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
+public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
   private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
     .geometry();

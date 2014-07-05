@@ -21,7 +21,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.DataObjectIterator;
+import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -36,12 +36,12 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
 
-public class GpxIterator implements DataObjectIterator {
+public class GpxIterator implements RecordIterator {
   private static final DateTimeFormatter XML_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeParser();
 
   private static final Logger LOG = Logger.getLogger(GpxIterator.class);
 
-  private Record currentDataObject;
+  private Record currentRecord;
 
   private RecordFactory dataObjectFactory;
 
@@ -131,14 +131,14 @@ public class GpxIterator implements DataObjectIterator {
   protected boolean loadNextRecord() {
     try {
       do {
-        this.currentDataObject = parseDataObject();
-      } while (this.currentDataObject != null
+        this.currentRecord = parseRecord();
+      } while (this.currentRecord != null
           && this.typePath != null
-        && !this.currentDataObject.getMetaData()
+        && !this.currentRecord.getMetaData()
           .getPath()
           .equals(this.typePath));
       this.loadNextObject = false;
-      if (this.currentDataObject == null) {
+      if (this.currentRecord == null) {
         close();
         this.hasNext = false;
       }
@@ -152,7 +152,7 @@ public class GpxIterator implements DataObjectIterator {
   public Record next() {
     if (hasNext()) {
       this.loadNextObject = true;
-      return this.currentDataObject;
+      return this.currentRecord;
     } else {
       throw new NoSuchElementException();
     }
@@ -210,7 +210,7 @@ public class GpxIterator implements DataObjectIterator {
   // return attribute;
   // }
 
-  private Record parseDataObject() throws XMLStreamException {
+  private Record parseRecord() throws XMLStreamException {
     if (!this.objects.isEmpty()) {
       return this.objects.remove();
     } else {

@@ -18,10 +18,10 @@ import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
@@ -73,14 +73,14 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcDataObjectStore createDataObjectStore(final DataSource dataSource) {
-    return new OracleDataObjectStore(dataSource);
+  public JdbcRecordStore createRecordStore(final DataSource dataSource) {
+    return new OracleRecordStore(dataSource);
   }
 
   @Override
-  public JdbcDataObjectStore createDataObjectStore(
+  public JdbcRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
-    return new OracleDataObjectStore(this, connectionProperties);
+    return new OracleRecordStore(this, connectionProperties);
   }
 
   @Override
@@ -130,9 +130,9 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
-  public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
+  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
-    return JdbcDataObjectStore.class;
+    return JdbcRecordStore.class;
   }
 
   @Override

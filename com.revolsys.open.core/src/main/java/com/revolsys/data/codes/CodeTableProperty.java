@@ -15,7 +15,7 @@ import com.revolsys.data.comparator.RecordAttributeComparator;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.ListIdentifier;
 import com.revolsys.data.identifier.SingleIdentifier;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.And;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
@@ -47,7 +47,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private List<String> attributeAliases = new ArrayList<String>();
 
-  private DataObjectStore dataStore;
+  private RecordStore dataStore;
 
   private boolean loadAll = true;
 
@@ -160,7 +160,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return this.creationTimestampAttributeName;
   }
 
-  public DataObjectStore getDataStore() {
+  public RecordStore getDataStore() {
     return this.dataStore;
   }
 

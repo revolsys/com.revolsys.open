@@ -23,11 +23,11 @@ package com.revolsys.io.xbase;
 import java.io.File;
 
 import com.revolsys.data.io.AbstractDirectoryReader;
-import com.revolsys.data.io.DataObjectDirectoryReader;
+import com.revolsys.data.io.RecordDirectoryReader;
 
 /**
  * <p>
- * The XbaseDatasetReader is a {@link DataObjectIterator} that can read .dbf data
+ * The XbaseDatasetReader is a {@link RecordIterator} that can read .dbf data
  * files contained in a single directory. The reader will iterate through the
  * .dbf files in alphabetical order returning all features.
  * </p>
@@ -39,7 +39,7 @@ import com.revolsys.data.io.DataObjectDirectoryReader;
  * @author Paul Austin
  * @see AbstractDirectoryReader
  */
-public class XbaseDatasetReader extends DataObjectDirectoryReader {
+public class XbaseDatasetReader extends RecordDirectoryReader {
   /**
    * Construct a new XbaseDatasetReader to read .dbf files from the specified
    * directory.

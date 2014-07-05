@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.data.io.DataObjectIterator;
+import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordUtil;
@@ -34,11 +34,11 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.spring.SpringUtil;
 
 public class ShapefileIterator extends AbstractIterator<Record> implements
-  DataObjectIterator {
+  RecordIterator {
 
   private boolean closeFile = true;
 
-  private RecordFactory dataObjectFactory;
+  private RecordFactory recordDefinitionFactory;
 
   private GeometryFactory geometryFactory;
 
@@ -66,7 +66,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
 
   public ShapefileIterator(final Resource resource,
     final RecordFactory factory) throws IOException {
-    this.dataObjectFactory = factory;
+    this.recordDefinitionFactory = factory;
     final String baseName = FileUtil.getBaseName(resource.getFilename());
     name = baseName;
     this.typeName = "/" + name;
@@ -106,7 +106,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
           + ".dbf");
         if (xbaseResource.exists()) {
           xbaseIterator = new XbaseIterator(xbaseResource,
-            this.dataObjectFactory, new InvokeMethodRunnable(this,
+            this.recordDefinitionFactory, new InvokeMethodRunnable(this,
               "updateMetaData"));
           xbaseIterator.setTypeName(typeName);
           xbaseIterator.setProperty("memoryMapped", memoryMapped);
@@ -179,7 +179,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
     if (xbaseIterator != null) {
       xbaseIterator.forceClose();
     }
-    dataObjectFactory = null;
+    recordDefinitionFactory = null;
     geometryFactory = null;
     in = null;
     indexIn = null;
@@ -188,8 +188,8 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
     xbaseIterator = null;
   }
 
-  public RecordFactory getDataObjectFactory() {
-    return dataObjectFactory;
+  public RecordFactory getRecordDefinitionFactory() {
+    return recordDefinitionFactory;
   }
 
   @Override
@@ -212,7 +212,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
           throw new NoSuchElementException();
         }
       } else {
-        record = dataObjectFactory.createRecord(metaData);
+        record = recordDefinitionFactory.createRecord(metaData);
       }
 
       final Geometry geometry = readGeometry();
@@ -225,7 +225,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
     if (returnMetaData == null) {
       return record;
     } else {
-      final Record copy = dataObjectFactory.createRecord(returnMetaData);
+      final Record copy = recordDefinitionFactory.createRecord(returnMetaData);
       copy.setValues(record);
       return copy;
     }

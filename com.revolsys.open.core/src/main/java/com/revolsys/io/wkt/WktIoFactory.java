@@ -7,8 +7,8 @@ import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractDataObjectAndGeometryIoFactory;
-import com.revolsys.data.io.DataObjectIteratorReader;
+import com.revolsys.data.io.AbstractRecordAndGeometryIoFactory;
+import com.revolsys.data.io.RecordIteratorReader;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -16,7 +16,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
-public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
+public class WktIoFactory extends AbstractRecordAndGeometryIoFactory
   implements WktConstants {
   public WktIoFactory() {
     super(WktConstants.DESCRIPTION, false, false);
@@ -27,20 +27,20 @@ public class WktIoFactory extends AbstractDataObjectAndGeometryIoFactory
   public RecordReader createRecordReader(final Resource resource,
     final RecordFactory factory) {
     try {
-      final WktDataObjectIterator iterator = new WktDataObjectIterator(factory,
+      final WktRecordIterator iterator = new WktRecordIterator(factory,
         resource);
 
-      return new DataObjectIteratorReader(iterator);
+      return new RecordIteratorReader(iterator);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }
   }
 
   @Override
-  public Writer<Record> createDataObjectWriter(final String baseName,
+  public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition metaData, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
-    return new WktDataObjectWriter(metaData, writer);
+    return new WktRecordWriter(metaData, writer);
   }
 }

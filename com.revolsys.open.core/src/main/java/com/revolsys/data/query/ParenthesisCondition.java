@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 
 public class ParenthesisCondition extends Condition {
 
@@ -23,7 +23,7 @@ public class ParenthesisCondition extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final DataObjectStore dataStore, final StringBuffer buffer) {
+    final RecordStore dataStore, final StringBuffer buffer) {
     buffer.append("(");
     condition.appendSql(query, dataStore, buffer);
     buffer.append(")");

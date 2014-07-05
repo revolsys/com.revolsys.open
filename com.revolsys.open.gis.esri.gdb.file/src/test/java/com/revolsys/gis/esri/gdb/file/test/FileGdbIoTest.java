@@ -12,8 +12,8 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.gis.esri.gdb.file.CapiFileGdbDataObjectStore;
-import com.revolsys.gis.esri.gdb.file.FileGdbDataObjectStoreFactory;
+import com.revolsys.gis.esri.gdb.file.CapiFileGdbRecordStore;
+import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.gis.util.NoOp;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -55,7 +55,7 @@ public class FileGdbIoTest {
     FileUtil.deleteDirectory(file);
     file.getParentFile().mkdirs();
     try (
-      final CapiFileGdbDataObjectStore dataStore = FileGdbDataObjectStoreFactory.create(file)) {
+      final CapiFileGdbRecordStore dataStore = FileGdbRecordStoreFactory.create(file)) {
       dataStore.setCreateMissingTables(true);
       dataStore.setCreateMissingDataStore(true);
       dataStore.initialize();

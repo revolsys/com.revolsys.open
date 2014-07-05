@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -16,9 +16,9 @@ import com.revolsys.util.CompareUtil;
 
 public class CopyRecords extends AbstractProcess {
 
-  private DataObjectStore targetDataStore;
+  private RecordStore targetDataStore;
 
-  private DataObjectStore sourceDataStore;
+  private RecordStore sourceDataStore;
 
   private String typePath;
 
@@ -29,16 +29,16 @@ public class CopyRecords extends AbstractProcess {
   public CopyRecords() {
   }
 
-  public CopyRecords(final DataObjectStore sourceDataStore,
-    final String typePath, final DataObjectStore targetDataStore,
+  public CopyRecords(final RecordStore sourceDataStore,
+    final String typePath, final RecordStore targetDataStore,
     final boolean hasSequence) {
     this(sourceDataStore, typePath, new HashMap<String, Boolean>(),
       targetDataStore, hasSequence);
   }
 
-  public CopyRecords(final DataObjectStore sourceDataStore,
+  public CopyRecords(final RecordStore sourceDataStore,
     final String typePath, final Map<String, Boolean> orderBy,
-    final DataObjectStore targetDataStore, final boolean hasSequence) {
+    final RecordStore targetDataStore, final boolean hasSequence) {
     this.sourceDataStore = sourceDataStore;
     this.typePath = typePath;
     this.orderBy = orderBy;
@@ -50,11 +50,11 @@ public class CopyRecords extends AbstractProcess {
     return orderBy;
   }
 
-  public DataObjectStore getSourceDataStore() {
+  public RecordStore getSourceDataStore() {
     return sourceDataStore;
   }
 
-  public DataObjectStore getTargetDataStore() {
+  public RecordStore getTargetDataStore() {
     return targetDataStore;
   }
 
@@ -111,11 +111,11 @@ public class CopyRecords extends AbstractProcess {
     this.hasSequence = hasSequence;
   }
 
-  public void setSourceDataStore(final DataObjectStore sourceDataStore) {
+  public void setSourceDataStore(final RecordStore sourceDataStore) {
     this.sourceDataStore = sourceDataStore;
   }
 
-  public void setTargetDataStore(final DataObjectStore targetDataStore) {
+  public void setTargetDataStore(final RecordStore targetDataStore) {
     this.targetDataStore = targetDataStore;
   }
 

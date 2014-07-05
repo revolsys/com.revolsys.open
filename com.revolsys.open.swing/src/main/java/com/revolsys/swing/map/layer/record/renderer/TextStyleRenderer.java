@@ -46,7 +46,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
 
-public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
+public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
   public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
     0, 0);

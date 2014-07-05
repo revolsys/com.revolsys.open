@@ -367,7 +367,7 @@ public class OsnSerializer {
     endCollection();
   }
 
-  public void serializeDataObject(final Record object) throws IOException {
+  public void serializeRecord(final Record object) throws IOException {
     if (size >= maxSize) {
       openNextFile();
       size = 0;

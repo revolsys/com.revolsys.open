@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.gis.graph.DataObjectGraph;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -19,24 +19,24 @@ import com.revolsys.util.ObjectProcessor;
 public class GraphProcessor extends BaseInOutProcess<Record, Record> {
   private static final Logger LOG = LoggerFactory.getLogger(GraphProcessor.class);
 
-  private DataObjectGraph graph;
+  private RecordGraph graph;
 
   private GeometryFactory precisionModel;
 
-  private List<ObjectProcessor<DataObjectGraph>> processors = new ArrayList<ObjectProcessor<DataObjectGraph>>();
+  private List<ObjectProcessor<RecordGraph>> processors = new ArrayList<ObjectProcessor<RecordGraph>>();
 
   public GeometryFactory getPrecisionModel() {
     return precisionModel;
   }
 
-  public List<ObjectProcessor<DataObjectGraph>> getProcessors() {
+  public List<ObjectProcessor<RecordGraph>> getProcessors() {
     return processors;
   }
 
   @Override
   protected void init() {
     super.init();
-    graph = new DataObjectGraph();
+    graph = new RecordGraph();
     if (precisionModel != null) {
       graph.setPrecisionModel(precisionModel);
     }
@@ -70,7 +70,7 @@ public class GraphProcessor extends BaseInOutProcess<Record, Record> {
 
   private void processGraph() {
     if (graph != null) {
-      for (final ObjectProcessor<DataObjectGraph> processor : processors) {
+      for (final ObjectProcessor<RecordGraph> processor : processors) {
         LOG.info(processor.getClass().getName());
         processor.process(graph);
       }
@@ -82,7 +82,7 @@ public class GraphProcessor extends BaseInOutProcess<Record, Record> {
   }
 
   public void setProcessors(
-    final List<ObjectProcessor<DataObjectGraph>> processors) {
+    final List<ObjectProcessor<RecordGraph>> processors) {
     this.processors = processors;
   }
 }

@@ -12,7 +12,7 @@ public class LineEqualWithinDistance implements Filter<LineString> {
     final LineString line = object.getGeometryValue();
     final LineEqualWithinDistance lineFilter = new LineEqualWithinDistance(
       line, maxDistance);
-    return new DataObjectGeometryFilter<LineString>(lineFilter);
+    return new RecordGeometryFilter<LineString>(lineFilter);
   }
 
   private final double maxDistance;

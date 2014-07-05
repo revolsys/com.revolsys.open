@@ -159,7 +159,7 @@ implements Record, Cloneable {
     if (metaData == null) {
       return null;
     } else {
-      return metaData.getDataObjectFactory();
+      return metaData.getRecordFactory();
     }
   }
 
@@ -533,9 +533,9 @@ implements Record, Cloneable {
             if (attributeType.getJavaClass() == Record.class) {
               final String typePath = attributeType.getName();
               final RecordDefinitionFactory metaDataFactory = this.getMetaData()
-                  .getDataObjectMetaDataFactory();
+                  .getRecordDefinitionFactory();
               final RecordDefinition subMetaData = metaDataFactory.getRecordDefinition(typePath);
-              final RecordFactory dataObjectFactory = subMetaData.getDataObjectFactory();
+              final RecordFactory dataObjectFactory = subMetaData.getRecordFactory();
               final Record subObject = dataObjectFactory.createRecord(subMetaData);
               subObject.setValue(subKey, value);
               setValue(key, subObject);

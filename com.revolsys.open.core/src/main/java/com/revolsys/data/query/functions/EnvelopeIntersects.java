@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
@@ -38,7 +38,7 @@ public class EnvelopeIntersects extends Condition {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final DataObjectStore dataStore, final StringBuffer buffer) {
+    final RecordStore dataStore, final StringBuffer buffer) {
     buffer.append("ST_INTERSECTS(");
     if (boundingBox1Value == null) {
       buffer.append("NULL");

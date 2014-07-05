@@ -63,7 +63,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.SingleIdentifier;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.DirectionalAttributes;
@@ -75,7 +75,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
-import com.revolsys.swing.dnd.transferhandler.DataObjectLayerFormTransferHandler;
+import com.revolsys.swing.dnd.transferhandler.RecordLayerFormTransferHandler;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.NumberTextField;
@@ -85,21 +85,21 @@ import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerAttributesTableModel;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsModifiedPredicate;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
-import com.revolsys.swing.table.dataobject.editor.DataObjectTableCellEditor;
-import com.revolsys.swing.table.dataobject.model.AbstractSingleDataObjectTableModel;
+import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
+import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
-import com.revolsys.swing.undo.ReverseDataObjectAttributesUndo;
-import com.revolsys.swing.undo.ReverseDataObjectGeometryUndo;
-import com.revolsys.swing.undo.ReverseDataObjectUndo;
+import com.revolsys.swing.undo.ReverseRecordAttributesUndo;
+import com.revolsys.swing.undo.ReverseRecordGeometryUndo;
+import com.revolsys.swing.undo.ReverseRecordUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
@@ -123,9 +123,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   private JButton addOkButton;
 
-  private DataObjectLayerAttributesTableModel allAttributes;
+  private RecordLayerAttributesTableModel allAttributes;
 
-  private DataObjectStore dataStore;
+  private RecordStore dataStore;
 
   private boolean editable = true;
 
@@ -170,7 +170,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   private ToolBar toolBar;
 
-  private UndoManager undoManager = new DataObjectLayerFormUndoManager(this);
+  private UndoManager undoManager = new RecordLayerFormUndoManager(this);
 
   private String focussedFieldName;
 
@@ -187,7 +187,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     map.put("copy", TransferHandler.getCopyAction());
     map.put("paste", TransferHandler.getPasteAction());
 
-    final DataObjectLayerFormTransferHandler transferHandler = new DataObjectLayerFormTransferHandler(
+    final RecordLayerFormTransferHandler transferHandler = new RecordLayerFormTransferHandler(
       this);
     setTransferHandler(transferHandler);
     setFont(SwingUtil.FONT);
@@ -223,7 +223,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final LayerRecord record = getRecord();
     layer.saveChanges(record);
     layer.setSelectedRecords(record);
-    layer.showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+    layer.showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
     closeWindow();
   }
 
@@ -232,7 +232,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   protected ObjectLabelField addCodeTableLabelField(final String fieldName) {
-    final DataObjectStore dataStore = getDataStore();
+    final RecordStore dataStore = getDataStore();
     final CodeTable codeTable = dataStore.getCodeTableByColumn(fieldName);
     final ObjectLabelField field = new ObjectLabelField(fieldName, codeTable);
     field.setFont(SwingUtil.FONT);
@@ -395,8 +395,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   protected void addTabAllFields() {
-    this.allAttributes = new DataObjectLayerAttributesTableModel(this);
-    final BaseJxTable table = AbstractSingleDataObjectTableModel.createTable(this.allAttributes);
+    this.allAttributes = new RecordLayerAttributesTableModel(this);
+    final BaseJxTable table = AbstractSingleRecordTableModel.createTable(this.allAttributes);
     final TableColumnModel columnModel = table.getColumnModel();
     FormAllFieldsModifiedPredicate.add(this, table);
     FormAllFieldsErrorPredicate.add(this, table);
@@ -642,22 +642,22 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   @Override
   public void editingStopped(final ChangeEvent e) {
-    final DataObjectTableCellEditor editor = (DataObjectTableCellEditor)e.getSource();
+    final RecordTableCellEditor editor = (RecordTableCellEditor)e.getSource();
     final String name = editor.getAttributeName();
     final Object value = editor.getCellEditorValue();
     setFieldValue(name, value, true);
   }
 
   public void flipFields() {
-    addUndo(new ReverseDataObjectAttributesUndo(this.record));
+    addUndo(new ReverseRecordAttributesUndo(this.record));
   }
 
   public void flipLineOrientation() {
-    addUndo(new ReverseDataObjectGeometryUndo(this.record));
+    addUndo(new ReverseRecordGeometryUndo(this.record));
   }
 
   public void flipRecordOrientation() {
-    addUndo(new ReverseDataObjectUndo(this.record));
+    addUndo(new ReverseRecordUndo(this.record));
   }
 
   @Override
@@ -688,7 +688,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
   }
 
-  public DataObjectLayerAttributesTableModel getAllAttributes() {
+  public RecordLayerAttributesTableModel getAllAttributes() {
     return this.allAttributes;
   }
 
@@ -713,7 +713,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return string;
   }
 
-  public DataObjectStore getDataStore() {
+  public RecordStore getDataStore() {
     if (this.dataStore == null) {
       if (this.metaData == null) {
         return null;
@@ -1078,7 +1078,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
   }
 
-  protected void setDataStore(final DataObjectStore dataStore) {
+  protected void setDataStore(final RecordStore dataStore) {
     this.dataStore = dataStore;
   }
 

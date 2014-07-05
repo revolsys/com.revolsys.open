@@ -20,7 +20,7 @@
  */
 package com.revolsys.gis.jts.filter;
 
-import com.revolsys.data.filter.DataObjectGeometryFilter;
+import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.jts.LineStringUtil;
@@ -34,7 +34,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
     final LineString line = object.getGeometryValue();
     final LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(
       line, maxDistance);
-    return new DataObjectGeometryFilter<LineString>(lineFilter);
+    return new RecordGeometryFilter<LineString>(lineFilter);
   }
 
   private BoundingBox envelope;

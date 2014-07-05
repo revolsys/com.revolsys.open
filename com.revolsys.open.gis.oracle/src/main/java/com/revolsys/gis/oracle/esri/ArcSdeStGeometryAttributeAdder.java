@@ -3,22 +3,22 @@ package com.revolsys.gis.oracle.esri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
+import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
   private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryAttributeAdder.class);
 
-  private final AbstractJdbcDataObjectStore dataStore;
+  private final AbstractJdbcRecordStore dataStore;
 
   public ArcSdeStGeometryAttributeAdder(
-    final AbstractJdbcDataObjectStore dataStore) {
+    final AbstractJdbcRecordStore dataStore) {
     this.dataStore = dataStore;
 
   }
@@ -28,7 +28,7 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     final String dbName, final String name, final String dataTypeName,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final DataObjectStoreSchema schema = metaData.getSchema();
+    final RecordStoreSchema schema = metaData.getSchema();
     final String typePath = metaData.getPath();
     final String owner = this.dataStore.getDatabaseSchemaName(schema);
     final String tableName = this.dataStore.getDatabaseTableName(typePath);

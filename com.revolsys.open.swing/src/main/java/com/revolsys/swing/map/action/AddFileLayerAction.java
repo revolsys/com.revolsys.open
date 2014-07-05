@@ -17,8 +17,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.data.io.RecordReaderFactory;
-import com.revolsys.data.io.DataObjectStoreFactory;
-import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
+import com.revolsys.data.io.RecordStoreFactory;
+import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -58,25 +58,25 @@ public class AddFileLayerAction extends AbstractAction {
     getFilters(imageFileFilters, allImageExtensions,
       GeoReferencedImageFactory.class);
 
-    final List<FileFilter> dataObjectFileFilters = new ArrayList<FileFilter>();
-    final Set<String> allDataObjectExtensions = new TreeSet<String>();
-    getFilters(dataObjectFileFilters, allDataObjectExtensions,
+    final List<FileFilter> recordFileFilters = new ArrayList<FileFilter>();
+    final Set<String> allRecordExtensions = new TreeSet<String>();
+    getFilters(recordFileFilters, allRecordExtensions,
       RecordReaderFactory.class);
 
     final Set<String> allExtensions = new TreeSet<String>();
-    allExtensions.addAll(allDataObjectExtensions);
+    allExtensions.addAll(allRecordExtensions);
     allExtensions.addAll(allImageExtensions);
     final FileNameExtensionFilter allFilter = createFilter(
       "All Supported files", allExtensions);
     fileChooser.addChoosableFileFilter(allFilter);
 
     fileChooser.addChoosableFileFilter(createFilter("All Vector/Data files",
-      allDataObjectExtensions));
+      allRecordExtensions));
 
     fileChooser.addChoosableFileFilter(createFilter("All Image files",
       allImageExtensions));
 
-    for (final FileFilter fileFilter : dataObjectFileFilters) {
+    for (final FileFilter fileFilter : recordFileFilters) {
       fileChooser.addChoosableFileFilter(fileFilter);
     }
 
@@ -106,8 +106,8 @@ public class AddFileLayerAction extends AbstractAction {
 
   private void getFileDataStoreFilters(final List<FileFilter> fileFilters,
     final Set<String> allExtensions) {
-    final List<DataObjectStoreFactory> factories = DataObjectStoreFactoryRegistry.getFileDataStoreFactories();
-    for (final DataObjectStoreFactory factory : factories) {
+    final List<RecordStoreFactory> factories = RecordStoreFactoryRegistry.getFileDataStoreFactories();
+    for (final RecordStoreFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
       String description = factory.getName();
       description += " (" + CollectionUtil.toString(fileExtensions) + ")";

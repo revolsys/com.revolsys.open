@@ -52,8 +52,8 @@ import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.table.DataObjectLayerTablePanel;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -95,7 +95,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private ComboBox operatorField;
 
-  private final DataObjectLayerTableModel tableModel;
+  private final RecordLayerTableModel tableModel;
 
   private final boolean eventsEnabled = true;
 
@@ -107,7 +107,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private Attribute attribute;
 
-  public AttributeFilterPanel(final DataObjectLayerTablePanel tablePanel) {
+  public AttributeFilterPanel(final RecordLayerTablePanel tablePanel) {
     this.tableModel = tablePanel.getTableModel();
     this.layer = tablePanel.getLayer();
     this.metaData = this.layer.getMetaData();

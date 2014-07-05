@@ -12,28 +12,28 @@ import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.table.DataObjectLayerTable;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 
 public class DeletedPredicate implements HighlightPredicate {
 
   private static final Border BORDER = BorderFactory.createLineBorder(
     WebColors.Red, 2);
 
-  public static void add(final DataObjectLayerTable table) {
-    final DataObjectLayerTableModel model = (DataObjectLayerTableModel)table.getModel();
+  public static void add(final RecordLayerTable table) {
+    final RecordLayerTableModel model = (RecordLayerTableModel)table.getModel();
     final Highlighter highlighter = getHighlighter(model);
     table.addHighlighter(highlighter);
   }
 
-  public static Highlighter getHighlighter(final DataObjectLayerTableModel model) {
+  public static Highlighter getHighlighter(final RecordLayerTableModel model) {
     final DeletedPredicate predicate = new DeletedPredicate(model);
     return new BorderHighlighter(predicate, BORDER);
   }
 
-  private final DataObjectLayerTableModel model;
+  private final RecordLayerTableModel model;
 
-  public DeletedPredicate(final DataObjectLayerTableModel model) {
+  public DeletedPredicate(final RecordLayerTableModel model) {
     this.model = model;
   }
 

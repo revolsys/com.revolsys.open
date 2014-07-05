@@ -16,7 +16,7 @@ import oracle.sql.STRUCT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
@@ -25,7 +25,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
+import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
@@ -113,10 +113,10 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final DataSource dataSource;
 
-  private final AbstractJdbcDataObjectStore dataStore;
+  private final AbstractJdbcRecordStore dataStore;
 
   public OracleSdoGeometryAttributeAdder(
-    final AbstractJdbcDataObjectStore dataStore, final DataSource dataSource) {
+    final AbstractJdbcRecordStore dataStore, final DataSource dataSource) {
     this.dataStore = dataStore;
     this.dataSource = dataSource;
   }
@@ -128,7 +128,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     final boolean required, final String description) {
     final String typePath = metaData.getPath();
     final String columnName = name.toUpperCase();
-    final DataObjectStoreSchema schema = metaData.getSchema();
+    final RecordStoreSchema schema = metaData.getSchema();
 
     GeometryFactory geometryFactory = getColumnProperty(schema, typePath,
       columnName, GEOMETRY_FACTORY);
@@ -178,7 +178,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public void initialize(final DataObjectStoreSchema schema) {
+  public void initialize(final RecordStoreSchema schema) {
     try {
       final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
@@ -213,7 +213,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
               final Datum[] values = dimInfo.getOracleArray();
               final double scaleXy = getScale(values, 0);
               final double scaleZ = getScale(values, 2);
-              final GeometryFactory geometryFactory = ((OracleDataObjectStore)dataStore).getGeometryFactory(
+              final GeometryFactory geometryFactory = ((OracleRecordStore)dataStore).getGeometryFactory(
                 srid, axisCount, scaleXy, scaleZ);
               setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
                 geometryFactory);

@@ -11,11 +11,11 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class MergedValuePredicate implements HighlightPredicate {
 
-  public static void add(final DataObjectRowTable table) {
+  public static void add(final RecordRowTable table) {
     final MergedRecordsTableModel model = table.getTableModel();
     final MergedValuePredicate predicate = new MergedValuePredicate(model);
     table.addHighlighter(new ColorHighlighter(predicate, WebColors.Salmon,

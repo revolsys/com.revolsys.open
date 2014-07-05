@@ -16,7 +16,7 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
 import com.revolsys.jdbc.io.JdbcQueryResultPager;
 
@@ -26,7 +26,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
 
   private List<Record> results = null;
 
-  public PostgreSQLJdbcQueryResultPager(final JdbcDataObjectStore dataStore,
+  public PostgreSQLJdbcQueryResultPager(final JdbcRecordStore dataStore,
     final Map<String, Object> properties, final Query query) {
     super(dataStore, properties, query);
   }
@@ -50,8 +50,8 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
             connection = JdbcUtils.getConnection(dataSource);
           }
           try {
-            final JdbcDataObjectStore dataStore = getDataStore();
-            final RecordFactory dataObjectFactory = getDataObjectFactory();
+            final JdbcRecordStore dataStore = getDataStore();
+            final RecordFactory dataObjectFactory = getRecordFactory();
             final RecordDefinition metaData = getMetaData();
             if (metaData != null) {
               final List<Attribute> attributes = metaData.getAttributes();
@@ -96,7 +96,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
   @Override
   public int getNumResults() {
     if (numResults == null) {
-      final JdbcDataObjectStore dataStore = getDataStore();
+      final JdbcRecordStore dataStore = getDataStore();
       final Query query = getQuery();
       numResults = dataStore.getRowCount(query);
       updateNumPages();

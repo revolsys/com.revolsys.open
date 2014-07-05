@@ -19,12 +19,12 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.table.record.model.RecordRowTableModel;
+import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class ModifiedAttributePredicate implements HighlightPredicate {
-  public static void add(final DataObjectRowTable table) {
-    final DataObjectRowTableModel model = (DataObjectRowTableModel)table.getModel();
+  public static void add(final RecordRowTable table) {
+    final RecordRowTableModel model = (RecordRowTableModel)table.getModel();
     final ModifiedAttributePredicate predicate = new ModifiedAttributePredicate(
       model);
     addModifiedHighlighters(table, predicate);
@@ -43,9 +43,9 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
       WebColors.Black, WebColors.Green, Color.WHITE));
   }
 
-  private final DataObjectRowTableModel model;
+  private final RecordRowTableModel model;
 
-  public ModifiedAttributePredicate(final DataObjectRowTableModel model) {
+  public ModifiedAttributePredicate(final RecordRowTableModel model) {
     this.model = model;
   }
 

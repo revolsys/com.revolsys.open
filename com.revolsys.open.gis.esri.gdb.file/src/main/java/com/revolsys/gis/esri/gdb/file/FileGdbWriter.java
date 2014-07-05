@@ -10,7 +10,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.Attribute;
@@ -25,9 +25,9 @@ import com.revolsys.io.AbstractWriter;
 public class FileGdbWriter extends AbstractWriter<Record> {
   private Map<String, Table> tables = new HashMap<String, Table>();
 
-  private CapiFileGdbDataObjectStore dataStore;
+  private CapiFileGdbRecordStore dataStore;
 
-  FileGdbWriter(final CapiFileGdbDataObjectStore dataObjectStore) {
+  FileGdbWriter(final CapiFileGdbRecordStore dataObjectStore) {
     this.dataStore = dataObjectStore;
   }
 
@@ -194,7 +194,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
   public void write(final Record object) {
     try {
       final RecordDefinition metaData = object.getMetaData();
-      final DataObjectStore dataObjectStore = metaData.getDataStore();
+      final RecordStore dataObjectStore = metaData.getDataStore();
       if (dataObjectStore == this.dataStore) {
         switch (object.getState()) {
           case New:

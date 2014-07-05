@@ -15,8 +15,8 @@ import org.postgresql.ds.PGPoolingDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.DataObjectStore;
-import com.revolsys.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.data.io.RecordStore;
+import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
@@ -45,14 +45,14 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcDataObjectStore createDataObjectStore(final DataSource dataSource) {
-    return new PostgreSQLDataObjectStore(dataSource);
+  public JdbcRecordStore createRecordStore(final DataSource dataSource) {
+    return new PostgreSQLRecordStore(dataSource);
   }
 
   @Override
-  public JdbcDataObjectStore createDataObjectStore(
+  public JdbcRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
-    return new PostgreSQLDataObjectStore(this, connectionProperties);
+    return new PostgreSQLRecordStore(this, connectionProperties);
   }
 
   @Override
@@ -98,9 +98,9 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
-  public Class<? extends DataObjectStore> getDataObjectStoreInterfaceClass(
+  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
-    return JdbcDataObjectStore.class;
+    return JdbcRecordStore.class;
   }
 
   @Override

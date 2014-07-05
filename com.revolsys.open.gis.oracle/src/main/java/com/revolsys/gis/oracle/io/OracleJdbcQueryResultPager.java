@@ -16,13 +16,13 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.io.JdbcDataObjectStore;
+import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
 import com.revolsys.jdbc.io.JdbcQueryResultPager;
 
 public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
-  public OracleJdbcQueryResultPager(final JdbcDataObjectStore dataStore,
+  public OracleJdbcQueryResultPager(final JdbcRecordStore dataStore,
     final Map<String, Object> properties, final Query query) {
     super(dataStore, properties, query);
   }
@@ -33,7 +33,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
   @Override
   protected void updateResults() {
     synchronized (this) {
-      final JdbcDataObjectStore dataStore = getDataStore();
+      final JdbcRecordStore dataStore = getDataStore();
       final Query query = getQuery();
       setNumResults(dataStore.getRowCount(query));
       updateNumPages();
@@ -51,7 +51,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
         final Connection connection = getConnection();
         try {
-          final RecordFactory dataObjectFactory = getDataObjectFactory();
+          final RecordFactory dataObjectFactory = getRecordFactory();
           final RecordDefinition metaData = getMetaData();
           final List<Attribute> attributes = new ArrayList<>();
 

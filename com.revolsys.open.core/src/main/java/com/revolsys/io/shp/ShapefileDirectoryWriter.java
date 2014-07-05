@@ -9,7 +9,7 @@ import javax.annotation.PreDestroy;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.data.io.AbstractDataObjectWriterFactory;
+import com.revolsys.data.io.AbstractRecordWriterFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
@@ -17,7 +17,7 @@ import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
-import com.revolsys.io.xbase.XbaseDataObjectWriter;
+import com.revolsys.io.xbase.XbaseRecordWriter;
 import com.revolsys.jts.geom.Geometry;
 
 public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
@@ -120,16 +120,16 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
       directory.mkdirs();
       final File file = new File(directory, getFileName(metaData) + nameSuffix
         + ".shp");
-      writer = AbstractDataObjectWriterFactory.dataObjectWriter(metaData,
+      writer = AbstractRecordWriterFactory.recordWriter(metaData,
         new FileSystemResource(file));
 
-      ((XbaseDataObjectWriter)writer).setUseZeroForNull(useZeroForNull);
+      ((XbaseRecordWriter)writer).setUseZeroForNull(useZeroForNull);
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
         setProperty(IoConstants.GEOMETRY_FACTORY, geometry.getGeometryFactory());
       }
       writers.put(path, writer);
-      metaDataMap.put(path, ((ShapefileDataObjectWriter)writer).getMetaData());
+      metaDataMap.put(path, ((ShapefileRecordWriter)writer).getMetaData());
     }
     return writer;
   }

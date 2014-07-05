@@ -5,17 +5,17 @@ import java.util.Map.Entry;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.DataObjectStore;
-import com.revolsys.data.io.DataObjectStoreExtension;
-import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.io.RecordStoreExtension;
+import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.oracle.io.OracleSdoGeometryJdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
-import com.revolsys.jdbc.io.AbstractJdbcDataObjectStore;
+import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 
 public class ArcSdeBinaryGeometryDataStoreExtension implements
-  DataObjectStoreExtension {
+  RecordStoreExtension {
 
   private Object sdeUtil;
 
@@ -23,7 +23,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   }
 
   @Override
-  public void initialize(final DataObjectStore dataStore,
+  public void initialize(final RecordStore dataStore,
     final Map<String, Object> connectionProperties) {
     try {
       sdeUtil = new ArcSdeBinaryGeometryDataStoreUtil(dataStore,
@@ -34,13 +34,13 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   }
 
   @Override
-  public boolean isEnabled(final DataObjectStore dataStore) {
+  public boolean isEnabled(final RecordStore dataStore) {
     return ArcSdeConstants.isSdeAvailable(dataStore) && sdeUtil != null;
   }
 
   @Override
-  public void postProcess(final DataObjectStoreSchema schema) {
-    final AbstractJdbcDataObjectStore dataStore = (AbstractJdbcDataObjectStore)schema.getDataStore();
+  public void postProcess(final RecordStoreSchema schema) {
+    final AbstractJdbcRecordStore dataStore = (AbstractJdbcRecordStore)schema.getDataStore();
     for (final RecordDefinition metaData : schema.getTypes()) {
       final String typePath = metaData.getPath();
       final Map<String, Map<String, Object>> typeColumnProperties = JdbcAttributeAdder.getTypeColumnProperties(
@@ -67,7 +67,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   }
 
   @Override
-  public void preProcess(final DataObjectStoreSchema schema) {
+  public void preProcess(final RecordStoreSchema schema) {
   }
 
 }

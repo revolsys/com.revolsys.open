@@ -9,7 +9,7 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.gis.graph.DataObjectGraph;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 
@@ -29,10 +29,10 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
 
   private final Collection<String> excludedAttributes = new HashSet<String>();
 
-  private final DataObjectGraph graph;
+  private final RecordGraph graph;
 
   public NodeRemovalVisitor(final RecordDefinition metaData,
-    final DataObjectGraph graph, final Collection<String> excludedAttributes) {
+    final RecordGraph graph, final Collection<String> excludedAttributes) {
     super();
     this.graph = graph;
     if (excludedAttributes != null) {

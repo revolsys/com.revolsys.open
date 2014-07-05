@@ -608,7 +608,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
         properties);
       add(layer);
       layer.setEditable(true);
-    } else if (AbstractRecordReaderFactory.hasDataObjectReaderFactory(urlString)) {
+    } else if (AbstractRecordReaderFactory.hasRecordReaderFactory(urlString)) {
       final FileRecordLayer layer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = layer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());

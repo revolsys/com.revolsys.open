@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.parallel.process.AbstractMultipleProcess;
 import com.revolsys.parallel.process.Parallel;
@@ -19,9 +19,9 @@ import com.revolsys.process.CopyRecords;
 import com.revolsys.util.CollectionUtil;
 
 public class MultiCopyRecords implements Process {
-  private DataObjectStore targetDataStore;
+  private RecordStore targetDataStore;
 
-  private DataObjectStore sourceDataStore;
+  private RecordStore sourceDataStore;
 
   private Process process;
 
@@ -102,11 +102,11 @@ public class MultiCopyRecords implements Process {
     return this.processNetwork;
   }
 
-  public DataObjectStore getSourceDataStore() {
+  public RecordStore getSourceDataStore() {
     return sourceDataStore;
   }
 
-  public DataObjectStore getTargetDataStore() {
+  public RecordStore getTargetDataStore() {
     return targetDataStore;
   }
 
@@ -144,11 +144,11 @@ public class MultiCopyRecords implements Process {
     }
   }
 
-  public void setSourceDataStore(final DataObjectStore sourceDataStore) {
+  public void setSourceDataStore(final RecordStore sourceDataStore) {
     this.sourceDataStore = sourceDataStore;
   }
 
-  public void setTargetDataStore(final DataObjectStore targetDataStore) {
+  public void setTargetDataStore(final RecordStore targetDataStore) {
     this.targetDataStore = targetDataStore;
   }
 }

@@ -13,7 +13,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.layer.record.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.util.ExceptionUtil;
 
@@ -70,8 +70,8 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
           layerScale = layer.getMaximumScale();
         }
       }
-    } else if (object instanceof AbstractDataObjectLayerRenderer) {
-      final AbstractDataObjectLayerRenderer renderer = (AbstractDataObjectLayerRenderer)object;
+    } else if (object instanceof AbstractRecordLayerRenderer) {
+      final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)object;
       if (this.min) {
         layerScale = renderer.getMinimumScale();
       } else {

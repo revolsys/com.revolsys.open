@@ -298,7 +298,7 @@ public class SaifSchemaReader {
       if (definition instanceof RecordDefinition) {
         final RecordDefinitionImpl metaData = (RecordDefinitionImpl)definition;
         setMetaDataProperties(metaData);
-        metaData.setDataObjectMetaDataFactory(schema);
+        metaData.setRecordDefinitionFactory(schema);
         schema.addMetaData(metaData);
       }
     }

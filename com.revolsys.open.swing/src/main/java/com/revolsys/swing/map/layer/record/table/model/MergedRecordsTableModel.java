@@ -11,10 +11,10 @@ import com.revolsys.swing.map.layer.record.table.predicate.MergedObjectPredicate
 import com.revolsys.swing.map.layer.record.table.predicate.MergedValuePredicate;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.swing.table.dataobject.model.DataObjectListTableModel;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.table.record.model.RecordListTableModel;
+import com.revolsys.swing.table.record.row.RecordRowTable;
 
-public class MergedRecordsTableModel extends DataObjectListTableModel implements
+public class MergedRecordsTableModel extends RecordListTableModel implements
   SortableTableModel {
   private static final long serialVersionUID = 1L;
 
@@ -22,7 +22,7 @@ public class MergedRecordsTableModel extends DataObjectListTableModel implements
     final Record mergedObject, final Collection<LayerRecord> objects) {
     final MergedRecordsTableModel model = new MergedRecordsTableModel(layer,
       mergedObject, objects);
-    final DataObjectRowTable table = new DataObjectRowTable(model);
+    final RecordRowTable table = new RecordRowTable(model);
     table.setVisibleRowCount(objects.size() + 2);
     MergedValuePredicate.add(table);
     MergedObjectPredicate.add(table);

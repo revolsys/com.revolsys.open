@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.data.io.DataObjectIterator;
+import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
@@ -32,7 +32,7 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class XbaseIterator extends AbstractIterator<Record> implements
-  DataObjectIterator {
+  RecordIterator {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<Character, DataType>();
@@ -235,7 +235,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
         if (deleteFlag == -1) {
           throw new NoSuchElementException();
         } else if (deleteFlag == ' ') {
-          object = loadDataObject();
+          object = loadRecord();
         } else if (deleteFlag != 0x1A) {
           currentDeletedCount++;
           in.read(recordBuffer);
@@ -285,7 +285,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     return closeFile;
   }
 
-  protected Record loadDataObject() throws IOException {
+  protected Record loadRecord() throws IOException {
     if (in.read(recordBuffer) != recordBuffer.length) {
       throw new IllegalStateException("Unexpected end of mappedFile");
     }

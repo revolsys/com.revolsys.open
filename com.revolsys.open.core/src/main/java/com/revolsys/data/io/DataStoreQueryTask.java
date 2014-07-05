@@ -14,7 +14,7 @@ import com.revolsys.parallel.process.AbstractProcess;
 
 public class DataStoreQueryTask extends AbstractProcess {
 
-  private final DataObjectStore dataStore;
+  private final RecordStore dataStore;
 
   private final BoundingBox boundingBox;
 
@@ -22,7 +22,7 @@ public class DataStoreQueryTask extends AbstractProcess {
 
   private final String path;
 
-  public DataStoreQueryTask(final DataObjectStore dataStore, final String path,
+  public DataStoreQueryTask(final RecordStore dataStore, final String path,
     final BoundingBox boundingBox) {
     this.dataStore = dataStore;
     this.path = path;

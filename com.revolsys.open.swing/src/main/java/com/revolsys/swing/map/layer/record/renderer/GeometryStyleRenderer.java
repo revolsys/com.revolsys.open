@@ -30,7 +30,7 @@ import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
 import com.revolsys.swing.map.util.GeometryShapeUtil;
 
-public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
+public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_geometry");
 

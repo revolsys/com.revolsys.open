@@ -3,13 +3,13 @@ package com.revolsys.gis.graph.visitor;
 import java.util.List;
 
 import com.revolsys.data.equals.GeometryEqualsExact3d;
-import com.revolsys.data.filter.DataObjectGeometryFilter;
+import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordLog;
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.NotFilter;
-import com.revolsys.gis.graph.DataObjectGraph;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
@@ -22,7 +22,7 @@ import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class LinearIntersectionNotEqualEdgeLogVisitor extends
-  AbstractVisitor<Edge<Record>> implements ObjectProcessor<DataObjectGraph> {
+  AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
   private static final String PROCESSED = LinearIntersectionNotEqualLineEdgeCleanupVisitor.class.getName()
     + ".PROCESSED";
   static {
@@ -30,7 +30,7 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
   }
 
   @Override
-  public void process(final DataObjectGraph graph) {
+  public void process(final RecordGraph graph) {
     graph.visitEdges(this);
   }
 
@@ -55,10 +55,10 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends
       }
 
       final Filter<Record> notEqualLineFilter = new NotFilter<Record>(
-        new DataObjectGeometryFilter<LineString>(new EqualFilter<LineString>(
+        new RecordGeometryFilter<LineString>(new EqualFilter<LineString>(
           line)));
 
-      final DataObjectGeometryFilter<LineString> linearIntersectionFilter = new DataObjectGeometryFilter<LineString>(
+      final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
         new LinearIntersectionFilter(line));
 
       attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(

@@ -12,13 +12,13 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<Record> {
 
   private List<String> typePaths = new ArrayList<String>();
 
-  private final CapiFileGdbDataObjectStore dataStore;
+  private final CapiFileGdbRecordStore dataStore;
 
   private BoundingBox boundingBox;
 
   private int index = 0;
 
-  public FileGdbReader(final CapiFileGdbDataObjectStore dataStore) {
+  public FileGdbReader(final CapiFileGdbRecordStore dataStore) {
     this.dataStore = dataStore;
   }
 

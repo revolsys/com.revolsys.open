@@ -32,7 +32,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private RecordDefinition metaData;
 
-  private CapiFileGdbDataObjectStore dataStore;
+  private CapiFileGdbRecordStore dataStore;
 
   private EnumRows rows;
 
@@ -44,17 +44,17 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private int count;
 
-  FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore dataStore,
     final String typePath) {
     this(dataStore, typePath, "*", "", null, 0, -1);
   }
 
-  FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore dataStore,
     final String typePath, final String whereClause) {
     this(dataStore, typePath, "*", whereClause, null, 0, -1);
   }
 
-  FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore dataStore,
     final String typePath, final String whereClause,
     final BoundingBox boundingBox, final Query query, final int offset,
     final int limit) {
@@ -65,7 +65,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     }
   }
 
-  FileGdbQueryIterator(final CapiFileGdbDataObjectStore dataStore,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore dataStore,
     final String typePath, final String fields, final String sql,
     final BoundingBox boundingBox, final int offset, final int limit) {
     this.dataStore = dataStore;
@@ -75,7 +75,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     this.fields = fields;
     this.sql = sql;
     setBoundingBox(boundingBox);
-    this.dataObjectFactory = dataStore.getDataObjectFactory();
+    this.dataObjectFactory = dataStore.getRecordFactory();
     this.offset = offset;
     this.limit = limit;
   }

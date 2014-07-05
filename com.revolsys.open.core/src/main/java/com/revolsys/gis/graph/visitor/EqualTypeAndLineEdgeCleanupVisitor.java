@@ -11,14 +11,14 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.revolsys.data.equals.DataObjectEquals;
+import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.equals.EqualsInstance;
-import com.revolsys.data.filter.DataObjectGeometryFilter;
+import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordLog;
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.graph.DataObjectGraph;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
@@ -31,7 +31,7 @@ import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class EqualTypeAndLineEdgeCleanupVisitor extends
-  AbstractVisitor<Edge<Record>> implements ObjectProcessor<DataObjectGraph> {
+  AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
 
   /** Flag indicating that the edge has been processed. */
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
@@ -40,8 +40,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
   private Statistics duplicateStatistics;
 
   private Set<String> equalExcludeAttributes = new HashSet<String>(
-    Arrays.asList(DataObjectEquals.EXCLUDE_ID,
-      DataObjectEquals.EXCLUDE_GEOMETRY));
+    Arrays.asList(RecordEquals.EXCLUDE_ID,
+      RecordEquals.EXCLUDE_GEOMETRY));
 
   @PreDestroy
   public void destroy() {
@@ -131,7 +131,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
   }
 
   @Override
-  public void process(final DataObjectGraph graph) {
+  public void process(final RecordGraph graph) {
     graph.visitEdges(this);
   }
 
@@ -153,7 +153,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
       if (equalAttributes) {
         boolean equalExcludedAttributes = true;
         for (final String name : equalExcludeAttributes) {
-          if (!DataObjectEquals.equals(object1, object2, name)) {
+          if (!RecordEquals.equals(object1, object2, name)) {
             equalExcludedAttributes = false;
           }
         }
@@ -211,8 +211,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
 
   public void setEqualExcludeAttributes(final Set<String> equalExcludeAttributes) {
     this.equalExcludeAttributes = new HashSet<String>(equalExcludeAttributes);
-    this.equalExcludeAttributes.add(DataObjectEquals.EXCLUDE_ID);
-    this.equalExcludeAttributes.add(DataObjectEquals.EXCLUDE_GEOMETRY);
+    this.equalExcludeAttributes.add(RecordEquals.EXCLUDE_ID);
+    this.equalExcludeAttributes.add(RecordEquals.EXCLUDE_GEOMETRY);
   }
 
   @Override
@@ -232,7 +232,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
         attributeAndGeometryFilter.addFilter(filter);
       }
 
-      final Filter<Record> equalLineFilter = new DataObjectGeometryFilter<LineString>(
+      final Filter<Record> equalLineFilter = new RecordGeometryFilter<LineString>(
         new LineEqualIgnoreDirectionFilter(line, 2));
       final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(
         equalLineFilter);

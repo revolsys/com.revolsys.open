@@ -9,8 +9,8 @@ import java.util.Map.Entry;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.AbstractDirectoryReader;
-import com.revolsys.data.io.DataObjectDirectoryReader;
-import com.revolsys.data.io.DataObjectIteratorReader;
+import com.revolsys.data.io.RecordDirectoryReader;
+import com.revolsys.data.io.RecordIteratorReader;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -31,7 +31,7 @@ import com.revolsys.spring.SpringUtil;
  * @author Paul Austin
  * @see AbstractDirectoryReader
  */
-public class ShapefileDirectoryReader extends DataObjectDirectoryReader {
+public class ShapefileDirectoryReader extends RecordDirectoryReader {
   private final Map<String, String> fileNameTypeMap = new HashMap<String, String>();
 
   private Map<String, RecordDefinition> typeNameMetaDataMap = new HashMap<String, RecordDefinition>();
@@ -59,7 +59,7 @@ public class ShapefileDirectoryReader extends DataObjectDirectoryReader {
       final String baseName = SpringUtil.getBaseName(resource).toUpperCase();
       iterator.setTypeName(fileNameTypeMap.get(baseName));
       iterator.setMetaData(typeNameMetaDataMap.get(iterator.getTypeName()));
-      return new DataObjectIteratorReader(iterator);
+      return new RecordIteratorReader(iterator);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }

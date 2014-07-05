@@ -13,28 +13,28 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import com.revolsys.awt.WebColors;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
+import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class NewPredicate implements HighlightPredicate {
 
   private static final Border BORDER = BorderFactory.createLineBorder(
     WebColors.Blue, 2);
 
-  public static void add(final DataObjectRowTable table) {
-    final DataObjectLayerTableModel model = (DataObjectLayerTableModel)table.getModel();
+  public static void add(final RecordRowTable table) {
+    final RecordLayerTableModel model = (RecordLayerTableModel)table.getModel();
     final Highlighter highlighter = getHighlighter(model);
     table.addHighlighter(highlighter);
   }
 
-  public static Highlighter getHighlighter(final DataObjectLayerTableModel model) {
+  public static Highlighter getHighlighter(final RecordLayerTableModel model) {
     final NewPredicate predicate = new NewPredicate(model);
     return new BorderHighlighter(predicate, BORDER);
   }
 
-  private final DataObjectLayerTableModel model;
+  private final RecordLayerTableModel model;
 
-  public NewPredicate(final DataObjectLayerTableModel model) {
+  public NewPredicate(final RecordLayerTableModel model) {
     this.model = model;
   }
 

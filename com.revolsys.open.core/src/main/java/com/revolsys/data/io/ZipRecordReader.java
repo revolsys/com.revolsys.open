@@ -59,7 +59,7 @@ RecordReader {
     final File file = new File(this.directory, zipEntryName);
     if (file.exists()) {
       final FileSystemResource fileResource = new FileSystemResource(file);
-      this.reader = AbstractDataObjectAndGeometryReaderFactory.recordReader(
+      this.reader = AbstractRecordAndGeometryReaderFactory.recordReader(
         fileResource, factory);
       if (this.reader == null) {
         close();

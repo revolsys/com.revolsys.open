@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.io.AbstractRecordReaderFactory;
 import com.revolsys.data.io.RecordReaderFactory;
-import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
+import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -39,8 +39,8 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
-import com.revolsys.swing.tree.datastore.FileDataObjectStoreTreeNode;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.record.FileRecordStoreTreeNode;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
 
@@ -152,7 +152,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       for (final File childFile : files) {
         if (!childFile.isHidden()) {
           if (FileTreeNode.isDataStore(childFile)) {
-            final FileDataObjectStoreTreeNode dataStoreNode = new FileDataObjectStoreTreeNode(
+            final FileRecordStoreTreeNode dataStoreNode = new FileRecordStoreTreeNode(
               parent, childFile);
             children.add(dataStoreNode);
           } else {
@@ -221,7 +221,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   }
 
   public static boolean isDataStore(final File file) {
-    final Set<String> fileExtensions = DataObjectStoreFactoryRegistry.getFileExtensions();
+    final Set<String> fileExtensions = RecordStoreFactoryRegistry.getFileExtensions();
     final String extension = FileUtil.getFileNameExtension(file).toLowerCase();
     return fileExtensions.contains(extension);
   }
@@ -334,7 +334,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final String fileName = FileUtil.getFileName(file);
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(fileName)) {
       return true;
-    } else if (AbstractRecordReaderFactory.hasDataObjectReaderFactory(fileName)) {
+    } else if (AbstractRecordReaderFactory.hasRecordReaderFactory(fileName)) {
       return true;
     } else {
       return false;

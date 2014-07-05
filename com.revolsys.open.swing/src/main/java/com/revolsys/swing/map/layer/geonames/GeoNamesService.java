@@ -152,7 +152,7 @@ public class GeoNamesService {
     final List<Record> results = new ArrayList<Record>();
     final List<Map<String, Object>> names = (List<Map<String, Object>>)result.get("geonames");
     for (final Map<String, Object> name : names) {
-      final Record dataObject = metaData.createDataObject();
+      final Record dataObject = metaData.createRecord();
       for (final String attributeName : metaData.getAttributeNames()) {
         final Object value = name.get(attributeName);
         if (value != null) {

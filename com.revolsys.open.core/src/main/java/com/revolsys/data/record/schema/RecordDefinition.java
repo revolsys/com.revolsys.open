@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.types.DataType;
@@ -38,7 +38,7 @@ public interface RecordDefinition extends ObjectWithProperties,
 
   RecordDefinition clone();
 
-  Record createDataObject();
+  Record createRecord();
 
   void delete(Record dataObject);
 
@@ -117,11 +117,11 @@ public interface RecordDefinition extends ObjectWithProperties,
 
   CodeTable getCodeTableByColumn(String column);
 
-  RecordFactory getDataObjectFactory();
+  RecordFactory getRecordFactory();
 
-  RecordDefinitionFactory getDataObjectMetaDataFactory();
+  RecordDefinitionFactory getRecordDefinitionFactory();
 
-  DataObjectStore getDataStore();
+  RecordStore getDataStore();
 
   Object getDefaultValue(String attributeName);
 

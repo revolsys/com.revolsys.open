@@ -29,11 +29,11 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.object.ObjectListTable;
 import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.datastore.DataObjectStoreConnectionsTreeNode;
 import com.revolsys.swing.tree.file.FileSystemsTreeNode;
 import com.revolsys.swing.tree.file.FolderConnectionsTreeNode;
 import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 import com.revolsys.swing.tree.model.node.ListTreeNode;
+import com.revolsys.swing.tree.record.RecordStoreConnectionsTreeNode;
 import com.revolsys.swing.tree.renderer.BaseTreeCellRenderer;
 
 public class LayerChooserPanel extends ValueField implements
@@ -43,7 +43,7 @@ public class LayerChooserPanel extends ValueField implements
   public static BaseTree createTree() {
     final ListTreeNode root = new ListTreeNode();
 
-    final DataObjectStoreConnectionsTreeNode dataStores = new DataObjectStoreConnectionsTreeNode(
+    final RecordStoreConnectionsTreeNode dataStores = new RecordStoreConnectionsTreeNode(
       root);
     root.add(dataStores);
 

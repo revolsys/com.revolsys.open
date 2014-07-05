@@ -14,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.gis.data.model.ArrayDataObject;
-import com.revolsys.gis.data.model.DataObject;
-import com.revolsys.gis.data.model.DataObjectMetaDataImpl;
+import com.revolsys.gis.data.model.ArrayRecord;
+import com.revolsys.gis.data.model.Record;
+import com.revolsys.gis.data.model.RecordMetaDataImpl;
 import com.revolsys.gis.data.model.types.DataTypes;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.Point;
@@ -64,7 +64,7 @@ public class DirectionalAttributesTest {
 
   private static final String OTHER = "Other";
 
-  private static DataObjectMetaDataImpl TABLE;
+  private static RecordMetaDataImpl TABLE;
 
   private static Map<String, String> DIRECTIONAL_VALUES = new LinkedHashMap<String, String>();
 
@@ -97,7 +97,7 @@ public class DirectionalAttributesTest {
     DIRECTIONAL_VALUES.put(BACKWARDS, FORWARDS);
     DIRECTIONAL_VALUES.put(EITHER, EITHER);
 
-    TABLE = new DataObjectMetaDataImpl(new QName("Directional"));
+    TABLE = new RecordMetaDataImpl(new QName("Directional"));
     TABLE.addAttribute(DIRECTIONAL, DataTypes.STRING, false);
     TABLE.addAttribute(LEFT, DataTypes.BOOLEAN, false);
     TABLE.addAttribute(RIGHT, DataTypes.BOOLEAN, false);
@@ -125,7 +125,7 @@ public class DirectionalAttributesTest {
   }
 
   private void assertAttributeEquals(final String message,
-    final DataObject reverse, final String attributeName,
+    final Record reverse, final String attributeName,
     final Object expectedValue) {
     final Object value = reverse.getValue(attributeName);
     Assert.assertEquals(message, expectedValue, value);
@@ -133,8 +133,8 @@ public class DirectionalAttributesTest {
 
   private void assertDirectionalAttributesEqual(final LineString line1,
     final String value1, final LineString line2, final String value2) {
-    final DataObject object1 = createObject(line1, DIRECTIONAL, value1);
-    final DataObject object2 = createObject(line2, DIRECTIONAL, value2);
+    final Record object1 = createObject(line1, DIRECTIONAL, value1);
+    final Record object2 = createObject(line2, DIRECTIONAL, value2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
     Assert.assertTrue(
       "Directional attribute equal " + value1 + " != " + value2, equals);
@@ -143,9 +143,9 @@ public class DirectionalAttributesTest {
   private void assertDirectionalAttributesMerge(final LineString line1,
     final String value1, final LineString line2, final String value2,
     final LineString expectedMergedLine, final String expectedValue) {
-    final DataObject object1 = createObject(line1, DIRECTIONAL, value1);
-    final DataObject object2 = createObject(line2, DIRECTIONAL, value2);
-    final DataObject mergedObject = DirectionalAttributes.mergeLongest(object1,
+    final Record object1 = createObject(line1, DIRECTIONAL, value1);
+    final Record object2 = createObject(line2, DIRECTIONAL, value2);
+    final Record mergedObject = DirectionalAttributes.mergeLongest(object1,
       object2);
 
     assertAttributeEquals("Directional attribute merge ", mergedObject,
@@ -159,8 +159,8 @@ public class DirectionalAttributesTest {
 
   private void assertDirectionalAttributesNotCanMerge(final LineString line1,
     final String value1, final LineString line2, final String value2) {
-    final DataObject object1 = createObject(line1, DIRECTIONAL, value1);
-    final DataObject object2 = createObject(line2, DIRECTIONAL, value2);
+    final Record object1 = createObject(line1, DIRECTIONAL, value1);
+    final Record object2 = createObject(line2, DIRECTIONAL, value2);
     final boolean canMerge = DirectionalAttributes.canMergeObjects(
       MERGE_COORDINATES, object1, object2);
     Assert.assertFalse("Directional attribute not can merge " + value1 + " == "
@@ -169,8 +169,8 @@ public class DirectionalAttributesTest {
 
   private void assertDirectionalAttributesNotEqual(final LineString line1,
     final String value1, final LineString line2, final String value2) {
-    final DataObject object1 = createObject(line1, DIRECTIONAL, value1);
-    final DataObject object2 = createObject(line2, DIRECTIONAL, value2);
+    final Record object1 = createObject(line1, DIRECTIONAL, value1);
+    final Record object2 = createObject(line2, DIRECTIONAL, value2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
     Assert.assertFalse("Directional attribute not equal" + value1 + " == "
       + value2, equals);
@@ -178,8 +178,8 @@ public class DirectionalAttributesTest {
 
   private void assertDirectionalAttributesReverse(final String value,
     final String expectedReverseValue) {
-    final DataObject object = createObject(LINE1, DIRECTIONAL, value);
-    final DataObject reverse = reverse(object);
+    final Record object = createObject(LINE1, DIRECTIONAL, value);
+    final Record reverse = reverse(object);
     final LineString reverseLine = reverse.getGeometryValue();
     Assert.assertTrue("Reverse line", REVERSE_LINE1.equals(reverseLine));
 
@@ -193,10 +193,10 @@ public class DirectionalAttributesTest {
     final LineString line2, final String startLeftValue2,
     final String startRightValue2, final String endLeftValue2,
     final String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
+    final Record object1 = createObject(line1, START_LEFT, startLeftValue1,
       START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
       endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+    final Record object2 = createObject(line2, START_LEFT, startLeftValue2,
       START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
       endRightValue2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
@@ -215,13 +215,13 @@ public class DirectionalAttributesTest {
     final String endRightValue2, final LineString expectedMergedLine,
     final String expectedStartLeftValue, final String expectedStartRightValue,
     final String expectedEndLeftValue, final String expectedEndRightValue) {
-    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
+    final Record object1 = createObject(line1, START_LEFT, startLeftValue1,
       START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
       endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+    final Record object2 = createObject(line2, START_LEFT, startLeftValue2,
       START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
       endRightValue2);
-    DataObject mergedObject = null;
+    Record mergedObject = null;
     try {
       final boolean canMerge = DirectionalAttributes.canMergeObjects(
         MERGE_COORDINATES, object1, object2);
@@ -259,10 +259,10 @@ public class DirectionalAttributesTest {
     final LineString line2, final Object startLeftValue2,
     final Object startRightValue2, final String endLeftValue2,
     final String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
+    final Record object1 = createObject(line1, START_LEFT, startLeftValue1,
       START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
       endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+    final Record object2 = createObject(line2, START_LEFT, startLeftValue2,
       START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
       endRightValue2);
     final boolean canMerge = DirectionalAttributes.canMergeObjects(
@@ -283,10 +283,10 @@ public class DirectionalAttributesTest {
     final LineString line2, final String startLeftValue2,
     final String startRightValue2, final String endLeftValue2,
     final String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT, startLeftValue1,
+    final Record object1 = createObject(line1, START_LEFT, startLeftValue1,
       START_RIGHT, startRightValue1, END_LEFT, endLeftValue1, END_RIGHT,
       endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+    final Record object2 = createObject(line2, START_LEFT, startLeftValue2,
       START_RIGHT, startRightValue2, END_LEFT, endLeftValue2, END_RIGHT,
       endRightValue2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
@@ -300,10 +300,10 @@ public class DirectionalAttributesTest {
   private void assertEndAndSideAttributesReverse(final String startLeftValue,
     final String startRightValue, final String endLeftValue,
     final String endRightValue) {
-    final DataObject object = createObject(LINE1, START_LEFT, startLeftValue,
+    final Record object = createObject(LINE1, START_LEFT, startLeftValue,
       START_RIGHT, startRightValue, END_LEFT, endLeftValue, END_RIGHT,
       endRightValue);
-    final DataObject reverse = reverse(object);
+    final Record reverse = reverse(object);
     final LineString reverseLine = reverse.getGeometryValue();
     Assert.assertTrue("Reverse line", REVERSE_LINE1.equals(reverseLine));
 
@@ -320,9 +320,9 @@ public class DirectionalAttributesTest {
   private void assertEndAttributesEqual(final LineString line1,
     final Boolean startValue1, final Boolean endValue1, final LineString line2,
     final Boolean startValue2, final Boolean endValue2) {
-    final DataObject object1 = createObject(line1, START, startValue1, END,
+    final Record object1 = createObject(line1, START, startValue1, END,
       endValue1);
-    final DataObject object2 = createObject(line2, START, startValue2, END,
+    final Record object2 = createObject(line2, START, startValue2, END,
       endValue2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
     Assert.assertTrue("End attribute equal " + startValue1 + " != "
@@ -334,15 +334,15 @@ public class DirectionalAttributesTest {
     final Boolean startValue2, final Boolean endValue2,
     final LineString expectedMergedLine, final Boolean expectedStartValue,
     final Boolean expectedEndValue) {
-    final DataObject object1 = createObject(line1, START, startValue1, END,
+    final Record object1 = createObject(line1, START, startValue1, END,
       endValue1);
-    final DataObject object2 = createObject(line2, START, startValue2, END,
+    final Record object2 = createObject(line2, START, startValue2, END,
       endValue2);
     final boolean canMerge = DirectionalAttributes.canMergeObjects(
       MERGE_COORDINATES, object1, object2);
     Assert.assertTrue("End attribute can merge  " + startValue1 + " != "
       + startValue2 + " &  " + endValue1 + " != " + endValue2, canMerge);
-    final DataObject mergedObject = DirectionalAttributes.mergeLongest(object1,
+    final Record mergedObject = DirectionalAttributes.mergeLongest(object1,
       object2);
 
     assertAttributeEquals("End attribute merge start", mergedObject, START,
@@ -359,9 +359,9 @@ public class DirectionalAttributesTest {
   private void assertEndAttributesNotCanMerge(final LineString line1,
     final Boolean startValue1, final Boolean endValue1, final LineString line2,
     final Boolean startValue2, final Boolean endValue2) {
-    final DataObject object1 = createObject(line1, START, startValue1, END,
+    final Record object1 = createObject(line1, START, startValue1, END,
       endValue1);
-    final DataObject object2 = createObject(line2, START, startValue2, END,
+    final Record object2 = createObject(line2, START, startValue2, END,
       endValue2);
     final boolean canMerge = DirectionalAttributes.canMergeObjects(
       MERGE_COORDINATES, object1, object2);
@@ -372,9 +372,9 @@ public class DirectionalAttributesTest {
   private void assertEndAttributesNotEqual(final LineString line1,
     final Boolean startValue1, final Boolean endValue1, final LineString line2,
     final Boolean startValue2, final Boolean endValue2) {
-    final DataObject object1 = createObject(line1, START, startValue1, END,
+    final Record object1 = createObject(line1, START, startValue1, END,
       endValue1);
-    final DataObject object2 = createObject(line2, START, startValue2, END,
+    final Record object2 = createObject(line2, START, startValue2, END,
       endValue2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
     Assert.assertFalse("Side attribute not equal " + startValue1 + " == "
@@ -383,9 +383,9 @@ public class DirectionalAttributesTest {
 
   private void assertEndAttributesReverse(final Boolean startValue,
     final Boolean endValue) {
-    final DataObject object = createObject(LINE1, START, startValue, END,
+    final Record object = createObject(LINE1, START, startValue, END,
       endValue);
-    final DataObject reverse = reverse(object);
+    final Record reverse = reverse(object);
     final LineString reverseLine = reverse.getGeometryValue();
     Assert.assertTrue("Reverse line", REVERSE_LINE1.equals(reverseLine));
 
@@ -401,10 +401,10 @@ public class DirectionalAttributesTest {
     final LineString line2, final String startLeftValue2,
     final String startRightValue2, final String endLeftValue2,
     final String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT_TURN,
+    final Record object1 = createObject(line1, START_LEFT_TURN,
       startLeftValue1, START_RIGHT_TURN, startRightValue1, END_LEFT_TURN,
       endLeftValue1, END_RIGHT_TURN, endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT_TURN, startLeftValue2,
+    final Record object2 = createObject(line2, START_LEFT_TURN, startLeftValue2,
       START_RIGHT_TURN, startRightValue2, END_LEFT_TURN, endLeftValue2,
       END_RIGHT_TURN, endRightValue2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
@@ -423,13 +423,13 @@ public class DirectionalAttributesTest {
     final String endRightValue2, final LineString expectedMergedLine,
     final String expectedStartLeftValue, final String expectedStartRightValue,
     final String expectedEndLeftValue, final String expectedEndRightValue) {
-    final DataObject object1 = createObject(line1, START_LEFT_TURN,
+    final Record object1 = createObject(line1, START_LEFT_TURN,
       startLeftValue1, START_RIGHT_TURN, startRightValue1, END_LEFT_TURN,
       endLeftValue1, END_RIGHT_TURN, endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT_TURN,
+    final Record object2 = createObject(line2, START_LEFT_TURN,
       startLeftValue2, START_RIGHT_TURN, startRightValue2, END_LEFT_TURN,
       endLeftValue2, END_RIGHT_TURN, endRightValue2);
-    DataObject mergedObject = null;
+    Record mergedObject = null;
     try {
       final boolean canMerge = DirectionalAttributes.canMergeObjects(
         MERGE_COORDINATES, object1, object2);
@@ -467,10 +467,10 @@ public class DirectionalAttributesTest {
     final LineString line2, final Object startLeftValue2,
     final Object startRightValue2, final String endLeftValue2,
     final String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT_TURN,
+    final Record object1 = createObject(line1, START_LEFT_TURN,
       startLeftValue1, START_RIGHT_TURN, startRightValue1, END_LEFT_TURN,
       endLeftValue1, END_RIGHT_TURN, endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT_TURN,
+    final Record object2 = createObject(line2, START_LEFT_TURN,
       startLeftValue2, START_RIGHT_TURN, startRightValue2, END_LEFT_TURN,
       endLeftValue2, END_RIGHT_TURN, endRightValue2);
     final boolean canMerge = DirectionalAttributes.canMergeObjects(
@@ -491,10 +491,10 @@ public class DirectionalAttributesTest {
     final LineString line2, final String startLeftValue2,
     final String startRightValue2, final String endLeftValue2,
     final String endRightValue2) {
-    final DataObject object1 = createObject(line1, START_LEFT_TURN,
+    final Record object1 = createObject(line1, START_LEFT_TURN,
       startLeftValue1, START_RIGHT_TURN, startRightValue1, END_LEFT_TURN,
       endLeftValue1, END_RIGHT_TURN, endRightValue1);
-    final DataObject object2 = createObject(line2, START_LEFT, startLeftValue2,
+    final Record object2 = createObject(line2, START_LEFT, startLeftValue2,
       START_RIGHT_TURN, startRightValue2, END_LEFT_TURN, endLeftValue2,
       END_RIGHT_TURN, endRightValue2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
@@ -508,10 +508,10 @@ public class DirectionalAttributesTest {
   private void assertEndTurnAttributesReverse(final String startLeftValue,
     final String startRightValue, final String endLeftValue,
     final String endRightValue) {
-    final DataObject object = createObject(LINE1, START_LEFT_TURN,
+    final Record object = createObject(LINE1, START_LEFT_TURN,
       startLeftValue, START_RIGHT_TURN, startRightValue, END_LEFT_TURN,
       endLeftValue, END_RIGHT_TURN, endRightValue);
-    final DataObject reverse = reverse(object);
+    final Record reverse = reverse(object);
     final LineString reverseLine = reverse.getGeometryValue();
     Assert.assertTrue("Reverse line", REVERSE_LINE1.equals(reverseLine));
 
@@ -532,9 +532,9 @@ public class DirectionalAttributesTest {
   private void assertSideAttributesEqual(final LineString line1,
     final Boolean startValue1, final Boolean endValue1, final LineString line2,
     final Boolean startValue2, final Boolean endValue2) {
-    final DataObject object1 = createObject(line1, START, startValue1, END,
+    final Record object1 = createObject(line1, START, startValue1, END,
       endValue1);
-    final DataObject object2 = createObject(line2, START, startValue2, END,
+    final Record object2 = createObject(line2, START, startValue2, END,
       endValue2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
     Assert.assertTrue("Side attribute equal " + startValue1 + " != "
@@ -546,11 +546,11 @@ public class DirectionalAttributesTest {
     final Boolean leftValue2, final Boolean endValue2,
     final LineString expectedMergedLine, final Boolean expectedLeftValue,
     final Boolean expectedRightValue) {
-    final DataObject object1 = createObject(line1, LEFT, leftValue1, RIGHT,
+    final Record object1 = createObject(line1, LEFT, leftValue1, RIGHT,
       endValue1);
-    final DataObject object2 = createObject(line2, LEFT, leftValue2, RIGHT,
+    final Record object2 = createObject(line2, LEFT, leftValue2, RIGHT,
       endValue2);
-    final DataObject mergedObject = DirectionalAttributes.mergeLongest(object1,
+    final Record mergedObject = DirectionalAttributes.mergeLongest(object1,
       object2);
 
     assertAttributeEquals("Side attribute merge left", mergedObject, LEFT,
@@ -566,9 +566,9 @@ public class DirectionalAttributesTest {
   private void assertSideAttributesNotCanMerge(final LineString line1,
     final Boolean leftValue1, final Boolean endValue1, final LineString line2,
     final Boolean leftValue2, final Boolean endValue2) {
-    final DataObject object1 = createObject(line1, LEFT, leftValue1, RIGHT,
+    final Record object1 = createObject(line1, LEFT, leftValue1, RIGHT,
       endValue1);
-    final DataObject object2 = createObject(line2, LEFT, leftValue2, RIGHT,
+    final Record object2 = createObject(line2, LEFT, leftValue2, RIGHT,
       endValue2);
     final boolean canMerge = DirectionalAttributes.canMergeObjects(
       MERGE_COORDINATES, object1, object2);
@@ -585,9 +585,9 @@ public class DirectionalAttributesTest {
   private void assertSideAttributesNotEqual(final LineString line1,
     final Boolean leftValue1, final Boolean endValue1, final LineString line2,
     final Boolean leftValue2, final Boolean endValue2) {
-    final DataObject object1 = createObject(line1, LEFT, leftValue1, RIGHT,
+    final Record object1 = createObject(line1, LEFT, leftValue1, RIGHT,
       endValue1);
-    final DataObject object2 = createObject(line2, LEFT, leftValue2, RIGHT,
+    final Record object2 = createObject(line2, LEFT, leftValue2, RIGHT,
       endValue2);
     final boolean equals = DirectionalAttributes.equalsObjects(object1, object2);
     Assert.assertFalse("Side attribute not equal " + leftValue1 + " == "
@@ -596,9 +596,9 @@ public class DirectionalAttributesTest {
 
   private void assertSideAttributesReverse(final Boolean leftValue,
     final Boolean rightValue) {
-    final DataObject object = createObject(LINE1, LEFT, leftValue, RIGHT,
+    final Record object = createObject(LINE1, LEFT, leftValue, RIGHT,
       rightValue);
-    final DataObject reverse = reverse(object);
+    final Record reverse = reverse(object);
     final LineString reverseLine = reverse.getGeometryValue();
     Assert.assertTrue("Reverse line", REVERSE_LINE1.equals(reverseLine));
 
@@ -608,32 +608,32 @@ public class DirectionalAttributesTest {
       LEFT, rightValue);
   }
 
-  private DataObject createObject(final LineString line) {
-    final DataObject object = new ArrayDataObject(TABLE);
+  private Record createObject(final LineString line) {
+    final Record object = new ArrayRecord(TABLE);
     object.setGeometryValue(line);
     return object;
   }
 
-  private DataObject createObject(final LineString line,
+  private Record createObject(final LineString line,
     final String attributeName, final Object value) {
-    final DataObject object = createObject(line);
+    final Record object = createObject(line);
     object.setValue(attributeName, value);
     return object;
   }
 
-  private DataObject createObject(final LineString line, final String name1,
+  private Record createObject(final LineString line, final String name1,
     final Object value1, final String name2, final Object value2) {
-    final DataObject object = createObject(line);
+    final Record object = createObject(line);
     object.setValue(name1, value1);
     object.setValue(name2, value2);
     return object;
   }
 
-  private DataObject createObject(final LineString line, final String name1,
+  private Record createObject(final LineString line, final String name1,
     final Object value1, final String name2, final Object value2,
     final String name3, final Object value3, final String name4,
     final Object value4) {
-    final DataObject object = createObject(line);
+    final Record object = createObject(line);
     object.setValue(name1, value1);
     object.setValue(name2, value2);
     object.setValue(name3, value3);
@@ -650,7 +650,7 @@ public class DirectionalAttributesTest {
     }
   }
 
-  protected DataObject reverse(final DataObject object) {
+  protected Record reverse(final Record object) {
     return DIRECTIONAL_ATTRIBUTES.getReverse(object);
   }
 

@@ -81,7 +81,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private byte coordinateBytes;
 
-  private Record currentDataObject;
+  private Record currentRecord;
 
   private final RecordFactory dataObjectFactory;
 
@@ -173,7 +173,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
     }
   }
 
-  protected Record loadDataObject() throws IOException {
+  protected Record loadRecord() throws IOException {
     final int featureKey = read();
     if (featureKey != 255) {
 
@@ -277,9 +277,9 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
           setAdmissionHistory(object, 'W');
         break;
       }
-      currentDataObject = object;
+      currentRecord = object;
       loadNextObject = false;
-      return currentDataObject;
+      return currentRecord;
     } else {
       close();
       hasNext = false;
@@ -315,7 +315,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   protected Record loadNextRecord() {
     try {
-      return loadDataObject();
+      return loadRecord();
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
@@ -331,7 +331,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
   public Record next() {
     if (hasNext()) {
       loadNextObject = true;
-      return currentDataObject;
+      return currentRecord;
     } else {
       throw new NoSuchElementException();
     }

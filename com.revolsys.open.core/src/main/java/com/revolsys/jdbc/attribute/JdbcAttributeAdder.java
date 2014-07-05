@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.io.DataObjectStoreSchema;
+import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
@@ -24,7 +24,7 @@ public class JdbcAttributeAdder {
   public static final String TABLE_PROPERTIES = "tableProperties";
 
   public static Map<String, Map<String, Map<String, Object>>> getColumnProperties(
-    final DataObjectStoreSchema schema) {
+    final RecordStoreSchema schema) {
     synchronized (schema) {
       Map<String, Map<String, Map<String, Object>>> columnProperties = schema.getProperty(COLUMN_PROPERTIES);
       if (columnProperties == null) {
@@ -36,7 +36,7 @@ public class JdbcAttributeAdder {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V> V getColumnProperty(final DataObjectStoreSchema schema,
+  public static <V> V getColumnProperty(final RecordStoreSchema schema,
     final String typePath, final String columnName, final String propertyName) {
     final Map<String, Map<String, Object>> columnsProperties = getTypeColumnProperties(
       schema, typePath);
@@ -49,7 +49,7 @@ public class JdbcAttributeAdder {
   }
 
   public static double getDoubleColumnProperty(
-    final DataObjectStoreSchema schema, final String typePath,
+    final RecordStoreSchema schema, final String typePath,
     final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typePath, columnName,
       propertyName);
@@ -62,7 +62,7 @@ public class JdbcAttributeAdder {
   }
 
   public static int getIntegerColumnProperty(
-    final DataObjectStoreSchema schema, final String typePath,
+    final RecordStoreSchema schema, final String typePath,
     final String columnName, final String propertyName) {
     final Object value = getColumnProperty(schema, typePath, columnName,
       propertyName);
@@ -75,7 +75,7 @@ public class JdbcAttributeAdder {
   }
 
   public static Map<String, Map<String, Object>> getTableProperties(
-    final DataObjectStoreSchema schema) {
+    final RecordStoreSchema schema) {
     synchronized (schema) {
       Map<String, Map<String, Object>> tableProperties = schema.getProperty(TABLE_PROPERTIES);
       if (tableProperties == null) {
@@ -87,7 +87,7 @@ public class JdbcAttributeAdder {
   }
 
   public static Map<String, Object> getTableProperties(
-    final DataObjectStoreSchema schema, final String typePath) {
+    final RecordStoreSchema schema, final String typePath) {
     final Map<String, Map<String, Object>> tableProperties = getTableProperties(schema);
     synchronized (tableProperties) {
       Map<String, Object> properties = tableProperties.get(typePath);
@@ -100,7 +100,7 @@ public class JdbcAttributeAdder {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V> V getTableProperty(final DataObjectStoreSchema schema,
+  public static <V> V getTableProperty(final RecordStoreSchema schema,
     final String typePath, final String propertyName) {
     final Map<String, Object> properties = getTableProperties(schema, typePath);
     final Object value = properties.get(propertyName);
@@ -108,7 +108,7 @@ public class JdbcAttributeAdder {
   }
 
   public static Map<String, Map<String, Object>> getTypeColumnProperties(
-    final DataObjectStoreSchema schema, final String typePath) {
+    final RecordStoreSchema schema, final String typePath) {
     final Map<String, Map<String, Map<String, Object>>> esriColumnProperties = getColumnProperties(schema);
     final Map<String, Map<String, Object>> typeColumnProperties = esriColumnProperties.get(typePath);
     if (typeColumnProperties == null) {
@@ -118,7 +118,7 @@ public class JdbcAttributeAdder {
     }
   }
 
-  public static void setColumnProperty(final DataObjectStoreSchema schema,
+  public static void setColumnProperty(final RecordStoreSchema schema,
     final String typePath, final String columnName, final String propertyName,
     final Object propertyValue) {
     final Map<String, Map<String, Map<String, Object>>> tableColumnProperties = getColumnProperties(schema);
@@ -138,7 +138,7 @@ public class JdbcAttributeAdder {
     }
   }
 
-  public static void setTableProperty(final DataObjectStoreSchema schema,
+  public static void setTableProperty(final RecordStoreSchema schema,
     final String typePath, final String propertyName, final Object value) {
     final Map<String, Object> properties = getTableProperties(schema, typePath);
     properties.put(propertyName, value);
@@ -246,6 +246,6 @@ public class JdbcAttributeAdder {
     return attribute;
   }
 
-  public void initialize(final DataObjectStoreSchema schema) {
+  public void initialize(final RecordStoreSchema schema) {
   }
 }

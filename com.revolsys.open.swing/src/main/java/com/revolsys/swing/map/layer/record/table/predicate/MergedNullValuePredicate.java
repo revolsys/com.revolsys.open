@@ -9,11 +9,11 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import com.revolsys.awt.WebColors;
 import com.revolsys.data.record.Record;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class MergedNullValuePredicate implements HighlightPredicate {
 
-  public static void add(final DataObjectRowTable table) {
+  public static void add(final RecordRowTable table) {
     final MergedRecordsTableModel model = table.getTableModel();
     final MergedNullValuePredicate predicate = new MergedNullValuePredicate(
       model);

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
@@ -48,7 +48,7 @@ public class WithinDistance extends Condition {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final DataObjectStore dataStore, final StringBuffer sql) {
+    final RecordStore dataStore, final StringBuffer sql) {
     sql.append("ST_DWithin(");
     if (geometry1Value == null) {
       sql.append("NULL");

@@ -41,7 +41,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   private RecordFactory dataObjectFactory;
 
-  private JdbcDataObjectStore dataStore;
+  private JdbcRecordStore dataStore;
 
   private RecordDefinition metaData;
 
@@ -53,7 +53,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   private final String sql;
 
-  public JdbcQueryResultPager(final JdbcDataObjectStore dataStore,
+  public JdbcQueryResultPager(final JdbcRecordStore dataStore,
     final Map<String, Object> properties, final Query query) {
     this.connection = dataStore.getConnection();
     this.dataSource = dataStore.getDataSource();
@@ -70,7 +70,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
         throw new IllegalArgumentException("Unable to create connection", e);
       }
     }
-    this.dataObjectFactory = dataStore.getDataObjectFactory();
+    this.dataObjectFactory = dataStore.getRecordFactory();
     this.dataStore = dataStore;
 
     this.query = query;
@@ -111,7 +111,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
     return connection;
   }
 
-  public RecordFactory getDataObjectFactory() {
+  public RecordFactory getRecordFactory() {
     return dataObjectFactory;
   }
 
@@ -119,7 +119,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
     return dataSource;
   }
 
-  public JdbcDataObjectStore getDataStore() {
+  public JdbcRecordStore getDataStore() {
     return dataStore;
   }
 

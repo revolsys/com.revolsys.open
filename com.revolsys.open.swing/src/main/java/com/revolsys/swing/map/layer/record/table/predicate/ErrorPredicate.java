@@ -10,26 +10,26 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
-import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
+import com.revolsys.swing.table.record.model.RecordRowTableModel;
+import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class ErrorPredicate implements HighlightPredicate {
 
-  public static void add(final DataObjectRowTable table) {
-    final DataObjectRowTableModel model = table.getTableModel();
+  public static void add(final RecordRowTable table) {
+    final RecordRowTableModel model = table.getTableModel();
     final Highlighter highlighter = getHighlighter(model);
     table.addHighlighter(highlighter);
   }
 
-  public static Highlighter getHighlighter(final DataObjectRowTableModel model) {
+  public static Highlighter getHighlighter(final RecordRowTableModel model) {
     final ErrorPredicate predicate = new ErrorPredicate(model);
     return new ColorHighlighter(predicate, ColorUtil.setAlpha(Color.RED, 64),
       Color.RED, Color.RED, Color.YELLOW);
   }
 
-  private final DataObjectRowTableModel model;
+  private final RecordRowTableModel model;
 
-  public ErrorPredicate(final DataObjectRowTableModel model) {
+  public ErrorPredicate(final RecordRowTableModel model) {
     this.model = model;
   }
 

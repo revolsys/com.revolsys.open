@@ -13,7 +13,7 @@
 >
   <bean
     id="shapeFileReader"
-    class="com.revolsys.data.io.FileDataObjectReaderFactory"
+    class="com.revolsys.data.io.FileRecordReaderFactory"
     p:resource="objects.shp"
   />
 

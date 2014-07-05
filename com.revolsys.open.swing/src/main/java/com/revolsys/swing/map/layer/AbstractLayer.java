@@ -56,7 +56,7 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
-import com.revolsys.swing.map.layer.record.style.panel.DataObjectLayerStylePanel;
+import com.revolsys.swing.map.layer.record.style.panel.RecordLayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
@@ -857,7 +857,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
             final Window window = SwingUtilities.getWindowAncestor(map);
             final TabbedValuePanel panel = createPropertiesPanel();
             panel.setSelectdTab("Style");
-            final DataObjectLayerStylePanel stylePanel = panel.getTab("Style");
+            final RecordLayerStylePanel stylePanel = panel.getTab("Style");
             stylePanel.setSelectedRenderer(renderer);
             panel.showDialog(window);
             refresh();

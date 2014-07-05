@@ -48,11 +48,11 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
-import com.revolsys.data.filter.DataObjectGeometryDistanceFilter;
+import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
+import com.revolsys.data.filter.RecordGeometryDistanceFilter;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.io.AbstractRecordReaderFactory;
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.ListRecordReader;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.query.Condition;
@@ -67,7 +67,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.filter.Filter;
-import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
+import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -86,7 +86,7 @@ import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.dnd.ClipboardUtil;
-import com.revolsys.swing.dnd.transferable.DataObjectReaderTransferable;
+import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.LayerRecordForm;
@@ -97,14 +97,14 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.component.MergeRecordsDialog;
-import com.revolsys.swing.map.layer.record.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.swing.map.layer.record.style.panel.DataObjectLayerStylePanel;
-import com.revolsys.swing.map.layer.record.table.DataObjectLayerTable;
-import com.revolsys.swing.map.layer.record.table.DataObjectLayerTablePanel;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
-import com.revolsys.swing.map.layer.record.table.model.DataObjectMetaDataTableModel;
+import com.revolsys.swing.map.layer.record.style.panel.RecordLayerStylePanel;
+import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
+import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordDefinitionTableModel;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
@@ -233,7 +233,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   private boolean useFieldTitles = false;
 
-  private DataObjectQuadTree index = new DataObjectQuadTree();
+  private RecordQuadTree index = new RecordQuadTree();
 
   private boolean snapToAllLayers = false;
 
@@ -257,7 +257,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   private Query query;
 
-  private DataObjectQuadTree selectedRecordsIndex;
+  private RecordQuadTree selectedRecordsIndex;
 
   private List<String> columnNames;
 
@@ -402,14 +402,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     if (isSelectable()) {
       final List<LayerRecord> records = query(boundingBox);
       for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-        final LayerRecord layerDataObject = iterator.next();
-        if (!isVisible(layerDataObject) || internalIsDeleted(layerDataObject)) {
+        final LayerRecord layerRecord = iterator.next();
+        if (!isVisible(layerRecord) || internalIsDeleted(layerRecord)) {
           iterator.remove();
         }
       }
       addSelectedRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
       }
     }
   }
@@ -438,7 +438,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     if (record != null) {
       final Geometry geometry = record.getGeometryValue();
       if (geometry != null && !geometry.isEmpty()) {
-        final DataObjectQuadTree index = getIndex();
+        final RecordQuadTree index = getIndex();
         addRecordToCache(this.cacheIdIndex, record);
         index.insert(record);
       }
@@ -535,7 +535,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         copies.add(new ArrayRecord(record));
       }
       final RecordReader reader = new ListRecordReader(metaData, copies);
-      final DataObjectReaderTransferable transferable = new DataObjectReaderTransferable(
+      final RecordReaderTransferable transferable = new RecordReaderTransferable(
         reader);
       ClipboardUtil.setContents(transferable);
     }
@@ -581,7 +581,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   protected void createPropertiesPanelFields(
     final TabbedValuePanel propertiesPanel) {
     final RecordDefinition metaData = getMetaData();
-    final BaseJxTable fieldTable = DataObjectMetaDataTableModel.createTable(metaData);
+    final BaseJxTable fieldTable = RecordDefinitionTableModel.createTable(metaData);
 
     final BasePanel fieldPanel = new BasePanel(new BorderLayout());
     fieldPanel.setPreferredSize(new Dimension(500, 400));
@@ -599,7 +599,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   protected void createPropertiesPanelStyle(
     final TabbedValuePanel propertiesPanel) {
     if (getRenderer() != null) {
-      final DataObjectLayerStylePanel stylePanel = new DataObjectLayerStylePanel(
+      final RecordLayerStylePanel stylePanel = new RecordLayerStylePanel(
         this);
       propertiesPanel.addTab("Style", stylePanel);
     }
@@ -646,11 +646,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public Component createTablePanel() {
-    final DataObjectLayerTable table = DataObjectLayerTableModel.createTable(this);
+    final RecordLayerTable table = RecordLayerTableModel.createTable(this);
     if (table == null) {
       return null;
     } else {
-      return new DataObjectLayerTablePanel(this, table);
+      return new RecordLayerTablePanel(this, table);
     }
   }
 
@@ -938,7 +938,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     return getGeometryFactory().getCoordinateSystem();
   }
 
-  public DataObjectStore getDataStore() {
+  public RecordStore getDataStore() {
     return getMetaData().getDataStore();
   }
 
@@ -1000,7 +1000,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     return getMetaData().getIdAttributeName();
   }
 
-  public DataObjectQuadTree getIndex() {
+  public RecordQuadTree getIndex() {
     return this.index;
   }
 
@@ -1103,7 +1103,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           final GeometryFactory geometryFactory = getGeometryFactory();
           geometryDataType = geometryAttribute.getType();
           layerGeometryClass = geometryDataType.getJavaClass();
-          RecordReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+          RecordReader reader = ClipboardUtil.getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
           if (reader == null) {
             final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
             if (StringUtils.hasText(string)) {
@@ -1236,14 +1236,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     "rawtypes", "unchecked"
   })
   public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    final DataObjectQuadTree index = getSelectedRecordsIndex();
+    final RecordQuadTree index = getSelectedRecordsIndex();
     return (List)index.queryIntersects(boundingBox);
   }
 
-  protected DataObjectQuadTree getSelectedRecordsIndex() {
+  protected RecordQuadTree getSelectedRecordsIndex() {
     if (this.selectedRecordsIndex == null) {
       final List<LayerRecord> selectedRecords = getSelectedRecords();
-      final DataObjectQuadTree index = new DataObjectQuadTree(
+      final RecordQuadTree index = new RecordQuadTree(
         getProject().getGeometryFactory(), selectedRecords);
       this.selectedRecordsIndex = index;
     }
@@ -1383,7 +1383,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public boolean isCanPaste() {
-    return ClipboardUtil.isDataFlavorAvailable(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR)
+    return ClipboardUtil.isDataFlavorAvailable(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR)
       || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
   }
 
@@ -1516,7 +1516,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public boolean isVisible(final LayerRecord record) {
     if (isExists() && isVisible()) {
-      final AbstractDataObjectLayerRenderer renderer = getRenderer();
+      final AbstractRecordLayerRenderer renderer = getRenderer();
       if (renderer == null || renderer.isVisible(record)) {
         return true;
       }
@@ -1540,7 +1540,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public void pasteRecords() {
     final boolean eventsEnabled = setEventsEnabled(false);
     try {
-      RecordReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+      RecordReader reader = ClipboardUtil.getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
       if (reader == null) {
         final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
         if (StringUtils.hasText(string)) {
@@ -1692,7 +1692,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       final GeometryFactory geometryFactory = getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
       final List<LayerRecord> results = doQuery(boundingBox);
-      final Filter filter = new DataObjectGeometryBoundingBoxIntersectsFilter(
+      final Filter filter = new RecordGeometryBoundingBoxIntersectsFilter(
         boundingBox);
       return filterQueryResults(results, filter);
     } else {
@@ -1707,7 +1707,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     final double maxDistance) {
     if (hasGeometryAttribute()) {
       final List<LayerRecord> results = doQuery(geometry, maxDistance);
-      final Filter filter = new DataObjectGeometryDistanceFilter(geometry,
+      final Filter filter = new RecordGeometryDistanceFilter(geometry,
         maxDistance);
       return filterQueryResults(results, filter);
     } else {
@@ -1772,7 +1772,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public boolean removeFromIndex(final BoundingBox boundingBox,
     final LayerRecord record) {
     boolean removed = false;
-    final DataObjectQuadTree index = getIndex();
+    final RecordQuadTree index = getIndex();
     final List<LayerRecord> records = (List)index.query(boundingBox);
     for (final LayerRecord indexRecord : records) {
       if (indexRecord.isSame(record)) {
@@ -1989,7 +1989,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   protected void setIndexRecords(final List<LayerRecord> records) {
     synchronized (getSync()) {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final DataObjectQuadTree index = new DataObjectQuadTree(geometryFactory);
+      final RecordQuadTree index = new RecordQuadTree(geometryFactory);
       final Label cacheIdIndex = getCacheIdIndex();
       clearCachedRecords(cacheIdIndex);
       if (records != null) {
@@ -2028,7 +2028,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       if (value instanceof Map) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> style = (Map<String, Object>)value;
-        final LayerRenderer<AbstractRecordLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(
+        final LayerRenderer<AbstractRecordLayer> renderer = AbstractRecordLayerRenderer.getRenderer(
           this, style);
         if (renderer != null) {
           setRenderer(renderer);
@@ -2058,14 +2058,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     if (isSelectable()) {
       final List<LayerRecord> records = query(boundingBox);
       for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-        final LayerRecord layerDataObject = iterator.next();
-        if (!isVisible(layerDataObject) || internalIsDeleted(layerDataObject)) {
+        final LayerRecord layerRecord = iterator.next();
+        if (!isVisible(layerRecord) || internalIsDeleted(layerRecord)) {
           iterator.remove();
         }
       }
       setSelectedRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
       }
     }
   }
@@ -2216,7 +2216,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public void showRecordsTable() {
-    showRecordsTable(DataObjectLayerTableModel.MODE_ALL);
+    showRecordsTable(RecordLayerTableModel.MODE_ALL);
   }
 
   public void showRecordsTable(String attributeFilterMode) {
@@ -2266,13 +2266,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         dockable.toFront();
       }
 
-      if (component instanceof DataObjectLayerTablePanel) {
-        final DataObjectLayerTablePanel tablePanel = (DataObjectLayerTablePanel)component;
+      if (component instanceof RecordLayerTablePanel) {
+        final RecordLayerTablePanel tablePanel = (RecordLayerTablePanel)component;
         tablePanel.setAttributeFilterMode(attributeFilterMode);
       }
     } else {
       if (!StringUtils.hasText(attributeFilterMode)) {
-        attributeFilterMode = DataObjectLayerTableModel.MODE_ALL;
+        attributeFilterMode = RecordLayerTableModel.MODE_ALL;
       }
       Invoke.later(this, "showRecordsTable", attributeFilterMode);
     }
@@ -2384,7 +2384,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       }
       unSelectRecords(records);
       if (isHasSelectedRecords()) {
-        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_SELECTED);
       }
     }
   }

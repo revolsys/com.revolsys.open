@@ -12,9 +12,9 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.DataObjectEquals;
+import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.record.Record;
-import com.revolsys.gis.graph.DataObjectGraph;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
@@ -24,15 +24,15 @@ import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class ItersectsNodeEdgeCleanupVisitor extends
-  AbstractVisitor<Edge<Record>> implements ObjectProcessor<DataObjectGraph> {
+  AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ItersectsNodeEdgeCleanupVisitor.class);
 
   private Statistics splitStatistics;
 
   private final Set<String> equalExcludeAttributes = new HashSet<String>(
-    Arrays.asList(DataObjectEquals.EXCLUDE_ID,
-      DataObjectEquals.EXCLUDE_GEOMETRY));
+    Arrays.asList(RecordEquals.EXCLUDE_ID,
+      RecordEquals.EXCLUDE_GEOMETRY));
 
   @PreDestroy
   public void destroy() {
@@ -69,7 +69,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends
   }
 
   @Override
-  public void process(final DataObjectGraph graph) {
+  public void process(final RecordGraph graph) {
     graph.visitEdges(this);
   }
 

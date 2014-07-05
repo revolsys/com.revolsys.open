@@ -14,7 +14,7 @@ import javax.swing.event.ListDataListener;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.BinaryCondition;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Q;
@@ -24,7 +24,7 @@ import com.revolsys.io.Reader;
 
 public class DataStoreQueryListModel implements ListModel {
 
-  private final DataObjectStore dataStore;
+  private final RecordStore dataStore;
 
   private final String displayAttributeName;
 
@@ -40,14 +40,14 @@ public class DataStoreQueryListModel implements ListModel {
 
   private int maxResults = 10;
 
-  public DataStoreQueryListModel(final DataObjectStore dataStore,
+  public DataStoreQueryListModel(final RecordStore dataStore,
     final String displayAttributeName, final List<Query> queries) {
     this.dataStore = dataStore;
     this.queries.addAll(queries);
     this.displayAttributeName = displayAttributeName;
   }
 
-  public DataStoreQueryListModel(final DataObjectStore dataStore,
+  public DataStoreQueryListModel(final RecordStore dataStore,
     final String displayAttributeName, final Query... queries) {
     this(dataStore, displayAttributeName, Arrays.asList(queries));
   }

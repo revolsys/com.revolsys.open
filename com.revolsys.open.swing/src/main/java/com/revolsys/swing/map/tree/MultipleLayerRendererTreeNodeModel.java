@@ -16,16 +16,16 @@ import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.AbstractDataObjectLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class MultipleLayerRendererTreeNodeModel
   extends
-  AbstractObjectTreeNodeModel<AbstractMultipleRenderer, AbstractDataObjectLayerRenderer>
+  AbstractObjectTreeNodeModel<AbstractMultipleRenderer, AbstractRecordLayerRenderer>
   implements MouseListener {
 
-  private final Set<Class<?>> SUPPORTED_CHILD_CLASSES = Collections.<Class<?>> singleton(AbstractDataObjectLayerRenderer.class);
+  private final Set<Class<?>> SUPPORTED_CHILD_CLASSES = Collections.<Class<?>> singleton(AbstractRecordLayerRenderer.class);
 
   public MultipleLayerRendererTreeNodeModel() {
     setSupportedClasses(AbstractMultipleRenderer.class);
@@ -37,18 +37,18 @@ public class MultipleLayerRendererTreeNodeModel
 
   @Override
   public int addChild(final AbstractMultipleRenderer node,
-    final AbstractDataObjectLayerRenderer renderer) {
+    final AbstractRecordLayerRenderer renderer) {
     return node.addRenderer(renderer.clone());
   }
 
   @Override
   public int addChild(final AbstractMultipleRenderer node, final int index,
-    final AbstractDataObjectLayerRenderer renderer) {
+    final AbstractRecordLayerRenderer renderer) {
     return node.addRenderer(index, renderer.clone());
   }
 
   @Override
-  protected List<AbstractDataObjectLayerRenderer> getChildren(
+  protected List<AbstractRecordLayerRenderer> getChildren(
     final AbstractMultipleRenderer node) {
     return node.getRenderers();
   }
@@ -131,7 +131,7 @@ public class MultipleLayerRendererTreeNodeModel
 
   @Override
   public boolean removeChild(final AbstractMultipleRenderer node,
-    final AbstractDataObjectLayerRenderer renderer) {
+    final AbstractRecordLayerRenderer renderer) {
     node.removeRenderer(renderer);
     return true;
   }

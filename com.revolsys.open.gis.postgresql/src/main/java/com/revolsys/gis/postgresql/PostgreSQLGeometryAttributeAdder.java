@@ -38,10 +38,10 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final DataSource dataSource;
 
-  private final PostgreSQLDataObjectStore dataStore;
+  private final PostgreSQLRecordStore dataStore;
 
   public PostgreSQLGeometryAttributeAdder(
-    final PostgreSQLDataObjectStore dataStore, final DataSource dataSource) {
+    final PostgreSQLRecordStore dataStore, final DataSource dataSource) {
     this.dataStore = dataStore;
     this.dataSource = dataSource;
   }

@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 
-import com.revolsys.data.io.DataObjectStore;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.GlobalIdProperty;
@@ -38,7 +38,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
   private DataSource dataSource;
 
-  private JdbcDataObjectStore dataStore;
+  private JdbcRecordStore dataStore;
 
   private boolean flushBetweenTypes = false;
 
@@ -84,11 +84,11 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
   private boolean throwExceptions = false;
 
-  public JdbcWriterImpl(final JdbcDataObjectStore dataStore) {
+  public JdbcWriterImpl(final JdbcRecordStore dataStore) {
     this(dataStore, dataStore.getStatistics());
   }
 
-  public JdbcWriterImpl(final JdbcDataObjectStore dataStore,
+  public JdbcWriterImpl(final JdbcRecordStore dataStore,
     final StatisticsMap statistics) {
     this.dataStore = dataStore;
     this.statistics = statistics;
@@ -144,7 +144,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   private void delete(final Record object) throws SQLException {
     final RecordDefinition objectType = object.getMetaData();
     final String typePath = objectType.getPath();
-    final RecordDefinition metaData = getDataObjectMetaData(typePath);
+    final RecordDefinition metaData = getRecordDefinition(typePath);
     flushIfRequired(metaData);
     PreparedStatement statement = typeDeleteStatementMap.get(typePath);
     if (statement == null) {
@@ -264,7 +264,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
     return batchSize;
   }
 
-  private RecordDefinition getDataObjectMetaData(final String typePath) {
+  private RecordDefinition getRecordDefinition(final String typePath) {
     if (dataStore == null) {
       return null;
     } else {
@@ -459,7 +459,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   private void insert(final Record object) throws SQLException {
     final RecordDefinition objectType = object.getMetaData();
     final String typePath = objectType.getPath();
-    final RecordDefinition metaData = getDataObjectMetaData(typePath);
+    final RecordDefinition metaData = getRecordDefinition(typePath);
     flushIfRequired(metaData);
     final String idAttributeName = metaData.getIdAttributeName();
     final boolean hasId = idAttributeName != null;
@@ -653,7 +653,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   private void update(final Record object) throws SQLException {
     final RecordDefinition objectType = object.getMetaData();
     final String typePath = objectType.getPath();
-    final RecordDefinition metaData = getDataObjectMetaData(typePath);
+    final RecordDefinition metaData = getRecordDefinition(typePath);
     flushIfRequired(metaData);
     PreparedStatement statement = typeUpdateStatementMap.get(typePath);
     if (statement == null) {
@@ -700,7 +700,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   public synchronized void write(final Record object) {
     try {
       final RecordDefinition metaData = object.getMetaData();
-      final DataObjectStore dataStore = metaData.getDataStore();
+      final RecordStore dataStore = metaData.getDataStore();
       final RecordState state = object.getState();
       if (dataStore != this.dataStore) {
         if (state != RecordState.Deleted) {

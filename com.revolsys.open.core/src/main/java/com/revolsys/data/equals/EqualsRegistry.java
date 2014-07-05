@@ -54,7 +54,7 @@ public class EqualsRegistry implements Equals<Object> {
     register(Timestamp.class, dateEquals);
     register(Map.class, new MapEquals());
     register(List.class, new ListEquals());
-    register(Record.class, new DataObjectEquals());
+    register(Record.class, new RecordEquals());
   }
 
   public boolean equals(final Object object1, final Object object2) {

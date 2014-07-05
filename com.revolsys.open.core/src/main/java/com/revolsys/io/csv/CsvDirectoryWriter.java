@@ -16,7 +16,7 @@ import com.revolsys.jts.geom.Geometry;
 public class CsvDirectoryWriter extends AbstractWriter<Record> {
   private File directory;
 
-  private final Map<RecordDefinition, CsvDataObjectWriter> writers = new HashMap<RecordDefinition, CsvDataObjectWriter>();
+  private final Map<RecordDefinition, CsvRecordWriter> writers = new HashMap<RecordDefinition, CsvRecordWriter>();
 
   private final Map<String, RecordDefinition> metaDataMap = new HashMap<>();
 
@@ -29,7 +29,7 @@ public class CsvDirectoryWriter extends AbstractWriter<Record> {
 
   @Override
   public void close() {
-    for (final CsvDataObjectWriter writer : writers.values()) {
+    for (final CsvRecordWriter writer : writers.values()) {
       FileUtil.closeSilent(writer);
     }
     writers.clear();
@@ -38,7 +38,7 @@ public class CsvDirectoryWriter extends AbstractWriter<Record> {
 
   @Override
   public void flush() {
-    for (final CsvDataObjectWriter writer : writers.values()) {
+    for (final CsvRecordWriter writer : writers.values()) {
       writer.flush();
     }
   }
@@ -51,14 +51,14 @@ public class CsvDirectoryWriter extends AbstractWriter<Record> {
     return metaDataMap.get(path);
   }
 
-  private CsvDataObjectWriter getWriter(final Record record) {
+  private CsvRecordWriter getWriter(final Record record) {
     final RecordDefinition metaData = record.getMetaData();
-    CsvDataObjectWriter writer = writers.get(metaData);
+    CsvRecordWriter writer = writers.get(metaData);
     if (writer == null) {
       try {
         final String path = metaData.getPath();
         final File file = new File(directory, path.toString() + ".csv");
-        writer = new CsvDataObjectWriter(metaData, new FileWriter(file));
+        writer = new CsvRecordWriter(metaData, new FileWriter(file));
         final Geometry geometry = record.getGeometryValue();
         if (geometry != null) {
           writer.setProperty(IoConstants.GEOMETRY_FACTORY,
@@ -85,7 +85,7 @@ public class CsvDirectoryWriter extends AbstractWriter<Record> {
 
   @Override
   public void write(final Record object) {
-    final CsvDataObjectWriter writer = getWriter(object);
+    final CsvRecordWriter writer = getWriter(object);
     writer.write(object);
   }
 
