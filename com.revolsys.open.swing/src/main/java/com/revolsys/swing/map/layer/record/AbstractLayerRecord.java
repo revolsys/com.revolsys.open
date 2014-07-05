@@ -50,12 +50,12 @@ LayerRecord {
   }
 
   @Override
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
       return null;
     } else {
-      return layer.getMetaData();
+      return layer.getRecordDefinition();
     }
   }
 
@@ -90,7 +90,7 @@ LayerRecord {
 
   @Override
   public boolean isModified(final int index) {
-    final String attributeName = getMetaData().getAttributeName(index);
+    final String attributeName = getRecordDefinition().getAttributeName(index);
     return isModified(attributeName);
   }
 
@@ -128,8 +128,8 @@ LayerRecord {
     if (getState() == RecordState.Initalizing) {
       return true;
     } else {
-      final RecordDefinition metaData = getMetaData();
-      final String name = metaData.getAttributeName(index);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final String name = recordDefinition.getAttributeName(index);
       return isValid(name);
     }
   }
@@ -139,7 +139,7 @@ LayerRecord {
     if (getState() == RecordState.Initalizing) {
       return true;
     } else {
-      final Attribute attribute = getMetaData().getAttribute(name);
+      final Attribute attribute = getRecordDefinition().getAttribute(name);
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
@@ -162,7 +162,7 @@ LayerRecord {
 
   @Override
   public void revertEmptyFields() {
-    for (final String fieldName : getMetaData().getAttributeNames()) {
+    for (final String fieldName : getRecordDefinition().getAttributeNames()) {
       final Object value = getValue(fieldName);
       if (Property.isEmpty(value)) {
         if (!this.layer.isFieldUserReadOnly(fieldName)) {

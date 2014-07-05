@@ -34,8 +34,8 @@ BaseInOutProcess<Record, Record> {
     if (id == null) {
       return null;
     } else {
-      final RecordDefinition metaData = object.getMetaData();
-      return metaData.getPath() + "." + id;
+      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      return recordDefinition.getPath() + "." + id;
     }
   }
 

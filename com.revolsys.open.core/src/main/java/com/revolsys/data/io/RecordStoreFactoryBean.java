@@ -16,16 +16,16 @@ public class RecordStoreFactoryBean extends
 
   @Override
   protected RecordStore createInstance() throws Exception {
-    final RecordStore dataObjectStore = RecordStoreFactoryRegistry.createRecordStore(config);
-    Property.set(dataObjectStore, properties);
-    dataObjectStore.initialize();
-    return dataObjectStore;
+    final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(config);
+    Property.set(recordStore, properties);
+    recordStore.initialize();
+    return recordStore;
   }
 
   @Override
-  protected void destroyInstance(final RecordStore dataObjectStore)
+  protected void destroyInstance(final RecordStore recordStore)
     throws Exception {
-    dataObjectStore.close();
+    recordStore.close();
     properties = null;
     config = null;
   }

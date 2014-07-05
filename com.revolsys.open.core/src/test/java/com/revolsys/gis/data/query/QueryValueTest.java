@@ -17,7 +17,7 @@ public class QueryValueTest {
     new QueryValueTest().run();
   }
 
-  private final RecordDefinitionImpl metaData;
+  private final RecordDefinitionImpl recordDefinition;
 
   private final Attribute idAttribute;
 
@@ -28,14 +28,14 @@ public class QueryValueTest {
   private final Attribute descriptionAttribute;
 
   public QueryValueTest() {
-    this.metaData = new RecordDefinitionImpl("Test");
-    this.idAttribute = this.metaData.addAttribute("ID", DataTypes.INT, true);
-    this.nameAttribute = this.metaData.addAttribute("NAME", DataTypes.STRING,
+    this.recordDefinition = new RecordDefinitionImpl("Test");
+    this.idAttribute = this.recordDefinition.addAttribute("ID", DataTypes.INT, true);
+    this.nameAttribute = this.recordDefinition.addAttribute("NAME", DataTypes.STRING,
       255, true);
-    this.descriptionAttribute = this.metaData.addAttribute("DESCRIPTION",
+    this.descriptionAttribute = this.recordDefinition.addAttribute("DESCRIPTION",
       DataTypes.STRING, 255, false);
 
-    this.record = new ArrayRecord(this.metaData);
+    this.record = new ArrayRecord(this.recordDefinition);
     this.record.setValue("ID", 10);
     this.record.setValue("NAME", "foobar");
   }

@@ -36,7 +36,7 @@ import com.revolsys.data.types.EnumerationDataType;
 public class RecordValidator {
   private static final Logger log = Logger.getLogger(RecordValidator.class);
 
-  private final AttributeValueValidator dataObjectAttributeValidator = new RecordAttributeValidator(
+  private final AttributeValueValidator recordAttributeValidator = new RecordAttributeValidator(
     this);
 
   private final Map<DataType, AttributeValueValidator> objectValidators = new HashMap<DataType, AttributeValueValidator>();
@@ -94,7 +94,7 @@ public class RecordValidator {
           final Class<?> validatorClass = Class.forName(className);
           validator = (AttributeValueValidator)validatorClass.newInstance();
         } catch (final Throwable e) {
-          validator = dataObjectAttributeValidator;
+          validator = recordAttributeValidator;
         }
         objectValidators.put(dataType, validator);
       }
@@ -105,12 +105,12 @@ public class RecordValidator {
   public boolean isValid(final Object object) {
     // TODO does not do checks from super classes
     if (object instanceof Record) {
-      final Record dataObject = (Record)object;
+      final Record record = (Record)object;
       boolean valid = true;
 
-      final RecordDefinition type = dataObject.getMetaData();
+      final RecordDefinition type = record.getRecordDefinition();
       for (int i = 0; i < type.getAttributeCount(); i++) {
-        final Object value = dataObject.getValue(i);
+        final Object value = record.getValue(i);
         final DataType dataType = type.getAttributeType(i);
         final Attribute attribDef = type.getAttribute(i);
         final String attributeName = type.getAttributeName(i);
@@ -132,7 +132,7 @@ public class RecordValidator {
                 log.error("Attribute " + attributeName + " '" + value
                   + "' is not a valid value for type '" + dataType + "'");
               }
-              valid = (i == dataObject.getMetaData()
+              valid = (i == record.getRecordDefinition()
                 .getGeometryAttributeIndex());
             }
           }

@@ -34,56 +34,56 @@ public abstract class AbstractRecordAndGeometryIoFactory extends
   /**
    * Create a writer to write to the specified resource.
    * 
-   * @param metaData The metaData for the type of data to write.
+   * @param recordDefinition The recordDefinition for the type of data to write.
    * @param resource The resource to write to.
    * @return The writer.
    */
   @Override
   public Writer<Record> createRecordWriter(
-    final RecordDefinition metaData, final Resource resource) {
+    final RecordDefinition recordDefinition, final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
-    return createRecordWriter(baseName, metaData, out);
+    return createRecordWriter(baseName, recordDefinition, out);
   }
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition metaData, final OutputStream outputStream) {
-    return createRecordWriter(baseName, metaData, outputStream,
+    final RecordDefinition recordDefinition, final OutputStream outputStream) {
+    return createRecordWriter(baseName, recordDefinition, outputStream,
       FileUtil.UTF8);
   }
 
   @Override
   public Writer<Geometry> createGeometryWriter(final Resource resource) {
-    final RecordDefinition metaData = RecordUtil.createGeometryMetaData();
-    final Writer<Record> dataObjectWriter = createRecordWriter(
-      metaData, resource);
-    return createGeometryWriter(dataObjectWriter);
+    final RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final Writer<Record> recordWriter = createRecordWriter(
+      recordDefinition, resource);
+    return createGeometryWriter(recordWriter);
   }
 
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out) {
-    final RecordDefinition metaData = RecordUtil.createGeometryMetaData();
-    final Writer<Record> dataObjectWriter = createRecordWriter(
-      baseName, metaData, out);
-    return createGeometryWriter(dataObjectWriter);
+    final RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final Writer<Record> recordWriter = createRecordWriter(
+      baseName, recordDefinition, out);
+    return createGeometryWriter(recordWriter);
   }
 
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out, final Charset charset) {
-    final RecordDefinition metaData = RecordUtil.createGeometryMetaData();
-    final Writer<Record> dataObjectWriter = createRecordWriter(
-      baseName, metaData, out, charset);
-    return createGeometryWriter(dataObjectWriter);
+    final RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final Writer<Record> recordWriter = createRecordWriter(
+      baseName, recordDefinition, out, charset);
+    return createGeometryWriter(recordWriter);
   }
 
   public Writer<Geometry> createGeometryWriter(
-    final Writer<Record> dataObjectWriter) {
+    final Writer<Record> recordWriter) {
     final Writer<Geometry> geometryWriter = new RecordWriterGeometryWriter(
-      dataObjectWriter);
+      recordWriter);
     return geometryWriter;
   }
 

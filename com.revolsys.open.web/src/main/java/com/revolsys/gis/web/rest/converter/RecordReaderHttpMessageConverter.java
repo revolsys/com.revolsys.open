@@ -89,7 +89,7 @@ public class RecordReaderHttpMessageConverter extends
           + mediaType);
       } else {
         final Reader<Record> reader = readerFactory.createRecordReader(new InputStreamResource(
-          "dataObjectInput", body));
+          "recordInput", body));
 
         GeometryFactory factory = geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
@@ -139,7 +139,7 @@ public class RecordReaderHttpMessageConverter extends
           throw new IllegalArgumentException("Media type " + actualMediaType
             + " not supported");
         } else {
-          final RecordDefinition metaData = reader.getMetaData();
+          final RecordDefinition recordDefinition = reader.getRecordDefinition();
           final HttpHeaders headers = outputMessage.getHeaders();
           headers.setContentType(actualMediaType);
           final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
@@ -160,7 +160,7 @@ public class RecordReaderHttpMessageConverter extends
 
           final OutputStream body = outputMessage.getBody();
           final Writer<Record> writer = writerFactory.createRecordWriter(
-            baseName, metaData, body, charset);
+            baseName, recordDefinition, body, charset);
           if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
             RequestAttributes.SCOPE_REQUEST))) {
             writer.setProperty(IoConstants.WRAP_PROPERTY, false);
@@ -184,17 +184,17 @@ public class RecordReaderHttpMessageConverter extends
 
           final Iterator<Record> iterator = reader.iterator();
           if (iterator.hasNext()) {
-            Record dataObject = iterator.next();
-            final Geometry geometry = dataObject.getGeometryValue();
+            Record record = iterator.next();
+            final Geometry geometry = record.getGeometryValue();
             if (geometry != null) {
               final GeometryFactory geometryFactory = geometry.getGeometryFactory();
               writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
             }
 
-            writer.write(dataObject);
+            writer.write(record);
             while (iterator.hasNext()) {
-              dataObject = iterator.next();
-              writer.write(dataObject);
+              record = iterator.next();
+              writer.write(record);
 
             }
           }

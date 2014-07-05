@@ -61,14 +61,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     this(new ArrayRecordFactory());
   }
 
-  public OracleRecordStore(final RecordFactory dataObjectFactory) {
-    super(dataObjectFactory);
+  public OracleRecordStore(final RecordFactory recordFactory) {
+    super(recordFactory);
     initSettings();
   }
 
-  public OracleRecordStore(final RecordFactory dataObjectFactory,
+  public OracleRecordStore(final RecordFactory recordFactory,
     final DataSource dataSource) {
-    this(dataObjectFactory);
+    this(recordFactory);
     setDataSource(dataSource);
   }
 
@@ -214,7 +214,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
       final Column column = (Column)withinDistance.getGeometry1Value();
       final GeometryFactory geometryFactory = column.getAttribute()
-        .getMetaData()
+        .getRecordDefinition()
         .getGeometryFactory();
       final Value geometry2Value = (Value)withinDistance.getGeometry2Value();
       final Value distanceValue = (Value)withinDistance.getDistanceValue();
@@ -284,8 +284,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public String getGeneratePrimaryKeySql(final RecordDefinition metaData) {
-    final String sequenceName = getSequenceName(metaData);
+  public String getGeneratePrimaryKeySql(final RecordDefinition recordDefinition) {
+    final String sequenceName = getSequenceName(recordDefinition);
     return sequenceName + ".NEXTVAL";
   }
 
@@ -305,8 +305,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public Object getNextPrimaryKey(final RecordDefinition metaData) {
-    final String sequenceName = getSequenceName(metaData);
+  public Object getNextPrimaryKey(final RecordDefinition recordDefinition) {
+    final String sequenceName = getSequenceName(recordDefinition);
     return getNextPrimaryKey(sequenceName);
   }
 
@@ -321,13 +321,13 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     }
   }
 
-  public String getSequenceName(final RecordDefinition metaData) {
-    if (metaData == null) {
+  public String getSequenceName(final RecordDefinition recordDefinition) {
+    if (recordDefinition == null) {
       return null;
     } else {
-      final String typePath = metaData.getPath();
+      final String typePath = recordDefinition.getPath();
       final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
-      final String shortName = ShortNameProperty.getShortName(metaData);
+      final String shortName = ShortNameProperty.getShortName(recordDefinition);
       final String sequenceName;
       if (StringUtils.hasText(shortName)) {
         if (useSchemaSequencePrefix) {

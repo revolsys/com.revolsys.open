@@ -16,15 +16,15 @@ import com.revolsys.gis.graph.attribute.PseudoNodeAttribute;
 
 public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
   public static AbstractRecordDefinitionProperty getProperty(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    return getProperty(metaData);
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    return getProperty(recordDefinition);
   }
 
-  public static PseudoNodeProperty getProperty(final RecordDefinition metaData) {
-    PseudoNodeProperty property = metaData.getProperty(PROPERTY_NAME);
+  public static PseudoNodeProperty getProperty(final RecordDefinition recordDefinition) {
+    PseudoNodeProperty property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
       property = new PseudoNodeProperty();
-      property.setRecordDefinition(metaData);
+      property.setRecordDefinition(recordDefinition);
     }
     return property;
   }
@@ -77,8 +77,8 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition metaData) {
-    super.setRecordDefinition(metaData);
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    super.setRecordDefinition(recordDefinition);
   }
 
   @Override

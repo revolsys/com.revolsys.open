@@ -97,7 +97,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     setExists(exists);
     setType("dataStore");
 
-    setMetaData(dataStore.getRecordDefinition(typePath));
+    setRecordDefinition(dataStore.getRecordDefinition(typePath));
     setTypePath(typePath);
   }
 
@@ -324,13 +324,13 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
         setDataStore(dataStore);
 
-        final RecordDefinition metaData = dataStore.getRecordDefinition(typePath);
+        final RecordDefinition recordDefinition = dataStore.getRecordDefinition(typePath);
 
-        if (metaData == null) {
+        if (recordDefinition == null) {
           LoggerFactory.getLogger(getClass()).error(
             "Cannot find table " + typePath + " for layer " + getPath());
         } else {
-          setMetaData(metaData);
+          setRecordDefinition(recordDefinition);
           return true;
         }
       }
@@ -364,11 +364,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (geometry == null) {
       return Collections.emptyList();
     } else {
-      final RecordDefinition metaData = getMetaData();
+      final RecordDefinition recordDefinition = getRecordDefinition();
       final Attribute geometryAttribute = getGeometryAttribute();
       final WithinDistance where = F.dWithin(geometryAttribute, geometry,
         distance);
-      final Query query = new Query(metaData, where);
+      final Query query = new Query(recordDefinition, where);
       return query(query);
     }
   }
@@ -384,7 +384,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         final boolean enabled = setEventsEnabled(false);
         try {
           final Statistics statistics = query.getProperty("statistics");
-          query.setProperty("dataObjectFactory", this);
+          query.setProperty("recordFactory", this);
           try (
             final Reader<LayerRecord> reader = (Reader)recordStore.query(query)) {
             final List<LayerRecord> records = new ArrayList<>();
@@ -464,8 +464,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
                 writer.write(record);
               } else if (isNew(record)) {
                 Identifier identifier = record.getIdentifier();
-                final RecordDefinition metaData = getMetaData();
-                final List<String> idAttributeNames = metaData.getIdAttributeNames();
+                final RecordDefinition recordDefinition = getRecordDefinition();
+                final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
                 if (identifier == null && !idAttributeNames.isEmpty()) {
                   final Object idValue = dataStore.createPrimaryIdValue(this.typePath);
                   if (idValue != null) {
@@ -497,8 +497,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends LayerRecord> V getCachedRecord(final Identifier identifier) {
-    final RecordDefinition metaData = getMetaData();
-    final List<String> idAttributeNames = metaData.getIdAttributeNames();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
     if (idAttributeNames.isEmpty()) {
       LoggerFactory.getLogger(getClass()).error(
         this.typePath + " does not have a primary key");
@@ -507,8 +507,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       LayerRecord record = this.recordIdToRecordMap.get(identifier);
       if (record == null) {
         final Condition where = Q.equal(identifier, idAttributeNames);
-        final Query query = new Query(metaData, where);
-        query.setProperty("dataObjectFactory", this);
+        final Query query = new Query(recordDefinition, where);
+        query.setProperty("recordFactory", this);
         final RecordStore dataStore = getDataStore();
         if (dataStore == null) {
           return null;
@@ -575,11 +575,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   public Attribute getGeometryAttribute() {
-    final RecordDefinition metaData = getMetaData();
-    if (metaData == null) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
       return null;
     } else {
-      return metaData.getGeometryAttribute();
+      return recordDefinition.getGeometryAttribute();
     }
   }
 
@@ -597,8 +597,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   @Override
   public LayerRecord getRecordById(final Identifier id) {
-    final RecordDefinition metaData = getMetaData();
-    final List<String> idAttributeNames = metaData.getIdAttributeNames();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
     if (idAttributeNames.isEmpty()) {
       LoggerFactory.getLogger(getClass()).error(
         this.typePath + " does not have a primary key");
@@ -607,8 +607,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       LayerRecord record = this.recordIdToRecordMap.get(id);
       if (record == null) {
         final Condition where = Q.equal(id, idAttributeNames);
-        final Query query = new Query(metaData, where);
-        query.setProperty("dataObjectFactory", this);
+        final Query query = new Query(recordDefinition, where);
+        query.setProperty("recordFactory", this);
         final RecordStore dataStore = getDataStore();
         record = (LayerRecord)dataStore.queryFirst(query);
         this.recordIdToRecordMap.put(id, record);
@@ -656,9 +656,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   protected List<LayerRecord> getRecordsFromDataStore(
     final BoundingBox boundingBox) {
-    final RecordDefinition metaData = getMetaData();
+    final RecordDefinition recordDefinition = getRecordDefinition();
     final Attribute geometryAttribute = getGeometryAttribute();
-    final Query query = new Query(metaData, F.envelopeIntersects(
+    final Query query = new Query(recordDefinition, F.envelopeIntersects(
       geometryAttribute, boundingBox));
     return query(query);
   }
@@ -741,8 +741,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   public List<LayerRecord> query(final Map<String, ? extends Object> filter) {
-    final RecordDefinition metaData = getMetaData();
-    final Query query = Query.and(metaData, filter);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Query query = Query.and(recordDefinition, filter);
     return query(query);
   }
 
@@ -848,17 +848,17 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (isExists()) {
         final RecordStore dataStore = getDataStore();
         if (dataStore != null) {
-          final RecordDefinition metaData = dataStore.getRecordDefinition(typePath);
-          if (metaData != null) {
+          final RecordDefinition recordDefinition = dataStore.getRecordDefinition(typePath);
+          if (recordDefinition != null) {
 
-            setMetaData(metaData);
-            setQuery(new Query(metaData));
+            setRecordDefinition(recordDefinition);
+            setQuery(new Query(recordDefinition));
             return;
           }
         }
       }
     }
-    setMetaData(null);
+    setRecordDefinition(null);
     setQuery(null);
   }
 

@@ -36,8 +36,6 @@ import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 
 public final class JdbcUtils {
-  private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
-
   public static void addAttributeName(final StringBuffer sql,
     final String tablePrefix, final Attribute attribute) {
     if (attribute instanceof JdbcAttribute) {
@@ -49,24 +47,24 @@ public final class JdbcUtils {
   }
 
   public static void addColumnNames(final StringBuffer sql,
-    final RecordDefinition metaData, final String tablePrefix) {
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+    final RecordDefinition recordDefinition, final String tablePrefix) {
+    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
       if (i > 0) {
         sql.append(", ");
       }
-      final Attribute attribute = metaData.getAttribute(i);
+      final Attribute attribute = recordDefinition.getAttribute(i);
       addAttributeName(sql, tablePrefix, attribute);
     }
   }
 
   public static void addColumnNames(final StringBuffer sql,
-    final RecordDefinition metaData, final String tablePrefix,
+    final RecordDefinition recordDefinition, final String tablePrefix,
     final List<String> attributeNames, boolean hasColumns) {
     for (final String attributeName : attributeNames) {
       if (hasColumns) {
         sql.append(", ");
       }
-      final Attribute attribute = metaData.getAttribute(attributeName);
+      final Attribute attribute = recordDefinition.getAttribute(attributeName);
       if (attribute == null) {
         sql.append(attributeName);
       } else {
@@ -100,11 +98,11 @@ public final class JdbcUtils {
     final Condition where = query.getWhereCondition();
     if (where != null && !where.isEmpty()) {
       sql.append(" WHERE ");
-      final RecordDefinition metaData = query.getMetaData();
-      if (metaData == null) {
+      final RecordDefinition recordDefinition = query.getRecordDefinition();
+      if (recordDefinition == null) {
         where.appendSql(query, null, sql);
       } else {
-        final RecordStore dataStore = metaData.getDataStore();
+        final RecordStore dataStore = recordDefinition.getDataStore();
         where.appendSql(query, dataStore, sql);
       }
     }
@@ -150,19 +148,20 @@ public final class JdbcUtils {
     }
   }
 
-  public static String createSelectSql(final RecordDefinition metaData,
+  public static String createSelectSql(final RecordDefinition recordDefinition,
     final String tablePrefix, final String fromClause,
     final boolean lockResults, final List<String> attributeNames,
     final Query query, final Map<String, Boolean> orderBy) {
-    final String typePath = metaData.getPath();
+    final String typePath = recordDefinition.getPath();
     final StringBuffer sql = new StringBuffer();
     sql.append("SELECT ");
     boolean hasColumns = false;
     if (attributeNames.isEmpty() || attributeNames.remove("*")) {
-      addColumnNames(sql, metaData, tablePrefix);
+      addColumnNames(sql, recordDefinition, tablePrefix);
       hasColumns = true;
     }
-    addColumnNames(sql, metaData, tablePrefix, attributeNames, hasColumns);
+    addColumnNames(sql, recordDefinition, tablePrefix, attributeNames,
+      hasColumns);
     sql.append(" FROM ");
     if (StringUtils.hasText(fromClause)) {
       sql.append(fromClause);
@@ -309,31 +308,31 @@ public final class JdbcUtils {
 
     String sql = query.getSql();
     final Map<String, Boolean> orderBy = query.getOrderBy();
-    RecordDefinition metaData = query.getMetaData();
+    RecordDefinition recordDefinition = query.getRecordDefinition();
     if (sql == null) {
-      if (metaData == null) {
-        metaData = new RecordDefinitionImpl(tableName);
+      if (recordDefinition == null) {
+        recordDefinition = new RecordDefinitionImpl(tableName);
         // throw new IllegalArgumentException("Unknown table name " +
         // tableName);
       }
       final List<String> attributeNames = new ArrayList<String>(
         query.getAttributeNames());
       if (attributeNames.isEmpty()) {
-        final List<String> metaDataAttributeNames = metaData.getAttributeNames();
-        if (metaDataAttributeNames.isEmpty()) {
+        final List<String> recordDefinitionAttributeNames = recordDefinition.getAttributeNames();
+        if (recordDefinitionAttributeNames.isEmpty()) {
           attributeNames.add("T.*");
         } else {
-          attributeNames.addAll(metaDataAttributeNames);
+          attributeNames.addAll(recordDefinitionAttributeNames);
         }
       }
       final String fromClause = query.getFromClause();
       final boolean lockResults = query.isLockResults();
-      sql = createSelectSql(metaData, "T", fromClause, lockResults,
+      sql = createSelectSql(recordDefinition, "T", fromClause, lockResults,
         attributeNames, query, orderBy);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
         final StringBuffer newSql = new StringBuffer("SELECT ");
-        addColumnNames(newSql, metaData, dbTableName);
+        addColumnNames(newSql, recordDefinition, dbTableName);
         newSql.append(" FROM ");
         newSql.append(sql.substring(14));
         sql = newSql.toString();
@@ -642,6 +641,8 @@ public final class JdbcUtils {
     final JdbcAttribute attribute = JdbcAttribute.createAttribute(value);
     return attribute.setPreparedStatementValue(statement, index, value);
   }
+
+  private static final Logger LOG = Logger.getLogger(JdbcUtils.class);
 
   private JdbcUtils() {
 

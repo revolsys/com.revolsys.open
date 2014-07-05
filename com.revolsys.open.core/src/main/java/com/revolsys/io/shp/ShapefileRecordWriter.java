@@ -79,9 +79,9 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private DataType geometryDataType;
 
-  public ShapefileRecordWriter(final RecordDefinition metaData,
+  public ShapefileRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
-    super(metaData, SpringUtil.getResourceWithExtension(resource, "dbf"));
+    super(recordDefinition, SpringUtil.getResourceWithExtension(resource, "dbf"));
     this.resource = resource;
   }
 
@@ -151,9 +151,9 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   @Override
   protected void init() throws IOException {
     super.init();
-    final RecordDefinitionImpl metaData = (RecordDefinitionImpl)getMetaData();
-    if (metaData != null) {
-      geometryPropertyName = metaData.getGeometryAttributeName();
+    final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)getRecordDefinition();
+    if (recordDefinition != null) {
+      geometryPropertyName = recordDefinition.getGeometryAttributeName();
       if (geometryPropertyName != null) {
 
         this.out = new ResourceEndianOutput(resource);
@@ -188,7 +188,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
           this.geometryFactory = geometry.getGeometryFactory();
         }
         if (this.geometryDataType == null) {
-          this.geometryDataType = object.getMetaData()
+          this.geometryDataType = object.getRecordDefinition()
             .getGeometryAttribute()
             .getType();
         }

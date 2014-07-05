@@ -49,10 +49,10 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
     if (dataStore != null) {
       final RecordStoreSchema schema = dataStore.getSchema(schemaPath);
       if (schema != null) {
-        for (final RecordDefinition metaData : schema.getTypes()) {
-          final String typeName = metaData.getPath();
+        for (final RecordDefinition recordDefinition : schema.getTypes()) {
+          final String typeName = recordDefinition.getPath();
           String geometryType = null;
-          final Attribute geometryAttribute = metaData.getGeometryAttribute();
+          final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
           if (geometryAttribute != null) {
             geometryType = geometryAttribute.getType().toString();
           }

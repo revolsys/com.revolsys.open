@@ -29,7 +29,7 @@ import com.revolsys.util.ExceptionUtil;
 
 public class FileRecordLayer extends ListRecordLayer {
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "dataObjectFile", "File", FileRecordLayer.class, "create");
+    "recordFile", "File", FileRecordLayer.class, "create");
 
   public static FileRecordLayer create(final Map<String, Object> properties) {
     return new FileRecordLayer(properties);
@@ -41,7 +41,7 @@ public class FileRecordLayer extends ListRecordLayer {
 
   public FileRecordLayer(final Map<String, ? extends Object> properties) {
     super(properties);
-    setType("dataObjectFile");
+    setType("recordFile");
   }
 
   @Override
@@ -100,9 +100,9 @@ public class FileRecordLayer extends ListRecordLayer {
         } else {
           try {
             reader.setProperties(getProperties());
-            final RecordDefinition metaData = reader.getMetaData();
-            setMetaData(metaData);
-            final GeometryFactory geometryFactory = metaData.getGeometryFactory();
+            final RecordDefinition recordDefinition = reader.getRecordDefinition();
+            setRecordDefinition(recordDefinition);
+            final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
             BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
             for (final Record record : reader) {
               final Geometry geometry = record.getGeometryValue();

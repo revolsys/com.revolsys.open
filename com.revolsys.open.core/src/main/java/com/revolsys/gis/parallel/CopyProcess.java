@@ -17,9 +17,9 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
 
   private String typeName;
 
-  private RecordDefinitionFactory metaDataFactory;
+  private RecordDefinitionFactory recordDefinitionFactory;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private Map<String, Map<Object, Object>> valueMaps = new HashMap<String, Map<Object, Object>>();
 
@@ -30,11 +30,11 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
 
   protected Record copy(final Record object) {
     Record targetObject;
-    if (metaData == null) {
+    if (recordDefinition == null) {
       targetObject = object;
     } else {
-      targetObject = new ArrayRecord(metaData);
-      for (final String attributeName : metaData.getAttributeNames()) {
+      targetObject = new ArrayRecord(recordDefinition);
+      for (final String attributeName : recordDefinition.getAttributeNames()) {
         copyAttribute(object, attributeName, targetObject, attributeName);
       }
       if (attributeMap != null) {
@@ -67,12 +67,12 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
     return attributeMap;
   }
 
-  public RecordDefinition getMetaData() {
-    return metaData;
+  public RecordDefinition getRecordDefinition() {
+    return recordDefinition;
   }
 
-  public RecordDefinitionFactory getMetaDataFactory() {
-    return metaDataFactory;
+  public RecordDefinitionFactory getRecordDefinitionFactory() {
+    return recordDefinitionFactory;
   }
 
   public String getTypeName() {
@@ -87,8 +87,8 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
   @PostConstruct
   protected void init() {
     super.init();
-    if (metaData == null) {
-      metaData = metaDataFactory.getRecordDefinition(typeName);
+    if (recordDefinition == null) {
+      recordDefinition = recordDefinitionFactory.getRecordDefinition(typeName);
     }
   }
 
@@ -103,12 +103,12 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
     this.attributeMap = attributeMap;
   }
 
-  public void setMetaData(final RecordDefinition metaData) {
-    this.metaData = metaData;
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
   }
 
-  public void setMetaDataFactory(final RecordDefinitionFactory metaDataFactory) {
-    this.metaDataFactory = metaDataFactory;
+  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
+    this.recordDefinitionFactory = recordDefinitionFactory;
   }
 
   public void setTypeName(final String typeName) {

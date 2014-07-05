@@ -26,19 +26,19 @@ public class SimpleRecordConveter implements
   public SimpleRecordConveter() {
   }
 
-  public SimpleRecordConveter(final RecordDefinition dataObjectMetaData) {
-    setRecordDefinition(dataObjectMetaData);
+  public SimpleRecordConveter(final RecordDefinition recordDefinition) {
+    setRecordDefinition(recordDefinition);
   }
 
-  public SimpleRecordConveter(final RecordDefinition dataObjectMetaData,
+  public SimpleRecordConveter(final RecordDefinition recordDefinition,
     final List<SourceToTargetProcess<Record, Record>> processors) {
-    setRecordDefinition(dataObjectMetaData);
+    setRecordDefinition(recordDefinition);
     this.processors = processors;
   }
 
-  public SimpleRecordConveter(final RecordDefinition dataObjectMetaData,
+  public SimpleRecordConveter(final RecordDefinition recordDefinition,
     final SourceToTargetProcess<Record, Record>... processors) {
-    this(dataObjectMetaData, Arrays.asList(processors));
+    this(recordDefinition, Arrays.asList(processors));
   }
 
   public void addProcessor(
@@ -68,9 +68,9 @@ public class SimpleRecordConveter implements
     return processors;
   }
 
-  public void setRecordDefinition(final RecordDefinition dataObjectMetaData) {
-    this.recordDefinition = dataObjectMetaData;
-    this.factory = dataObjectMetaData.getRecordFactory();
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+    this.factory = recordDefinition.getRecordFactory();
   }
 
   public void setProcessors(

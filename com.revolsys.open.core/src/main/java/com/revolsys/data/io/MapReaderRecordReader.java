@@ -16,7 +16,7 @@ import com.revolsys.io.Reader;
 public class MapReaderRecordReader extends AbstractReader<Record> implements
   RecordReader, Iterator<Record> {
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private final Reader<Map<String, Object>> mapReader;
 
@@ -24,9 +24,9 @@ public class MapReaderRecordReader extends AbstractReader<Record> implements
 
   private Iterator<Map<String, Object>> mapIterator;
 
-  public MapReaderRecordReader(final RecordDefinition metaData,
+  public MapReaderRecordReader(final RecordDefinition recordDefinition,
     final Reader<Map<String, Object>> mapReader) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     this.mapReader = mapReader;
   }
 
@@ -36,8 +36,8 @@ public class MapReaderRecordReader extends AbstractReader<Record> implements
   }
 
   @Override
-  public RecordDefinition getMetaData() {
-    return this.metaData;
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   @Override
@@ -57,12 +57,12 @@ public class MapReaderRecordReader extends AbstractReader<Record> implements
   public Record next() {
     if (hasNext()) {
       final Map<String, Object> source = this.mapIterator.next();
-      final Record target = new ArrayRecord(this.metaData);
-      for (final Attribute attribute : this.metaData.getAttributes()) {
+      final Record target = new ArrayRecord(this.recordDefinition);
+      for (final Attribute attribute : this.recordDefinition.getAttributes()) {
         final String name = attribute.getName();
         final Object value = source.get(name);
         if (value != null) {
-          final DataType dataType = this.metaData.getAttributeType(name);
+          final DataType dataType = this.recordDefinition.getAttributeType(name);
           final Object convertedValue = StringConverterRegistry.toObject(
             dataType, value);
           target.setValue(name, convertedValue);

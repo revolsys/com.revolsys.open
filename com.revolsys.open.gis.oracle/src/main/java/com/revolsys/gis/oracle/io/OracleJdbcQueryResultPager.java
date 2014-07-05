@@ -51,19 +51,19 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
         final Connection connection = getConnection();
         try {
-          final RecordFactory dataObjectFactory = getRecordFactory();
-          final RecordDefinition metaData = getMetaData();
+          final RecordFactory recordFactory = getRecordFactory();
+          final RecordDefinition recordDefinition = getRecordDefinition();
           final List<Attribute> attributes = new ArrayList<>();
 
           final List<String> attributeNames = query.getAttributeNames();
           if (attributeNames.isEmpty()) {
-            attributes.addAll(metaData.getAttributes());
+            attributes.addAll(recordDefinition.getAttributes());
           } else {
             for (final String attributeName : attributeNames) {
               if (attributeName.equals("*")) {
-                attributes.addAll(metaData.getAttributes());
+                attributes.addAll(recordDefinition.getAttributes());
               } else {
-                final Attribute attribute = metaData.getAttribute(attributeName);
+                final Attribute attribute = recordDefinition.getAttribute(attributeName);
                 if (attribute != null) {
                   attributes.add(attribute);
                 }
@@ -73,12 +73,12 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
           try (
             final PreparedStatement statement = connection.prepareStatement(sql);
             final ResultSet resultSet = JdbcQueryIterator.getResultSet(
-              metaData, statement, getQuery());) {
+              recordDefinition, statement, getQuery());) {
             if (resultSet.next()) {
               int i = 0;
               do {
                 final Record object = JdbcQueryIterator.getNextObject(
-                  dataStore, metaData, attributes, dataObjectFactory, resultSet);
+                  dataStore, recordDefinition, attributes, recordFactory, resultSet);
                 results.add(object);
                 i++;
               } while (resultSet.next() && i < pageSize);

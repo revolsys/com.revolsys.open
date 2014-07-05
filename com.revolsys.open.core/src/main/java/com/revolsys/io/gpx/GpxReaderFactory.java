@@ -21,7 +21,7 @@ public class GpxReaderFactory extends
   }
 
   public RecordReader createRecordReader(
-    final RecordDefinition metaData, final Resource resource,
+    final RecordDefinition recordDefinition, final Resource resource,
     final RecordFactory factory) {
     throw new UnsupportedOperationException();
   }
@@ -35,10 +35,10 @@ public class GpxReaderFactory extends
    */
   @Override
   public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory dataObjectFactory) {
+    final RecordFactory recordFactory) {
     try {
       final RecordIterator iterator = new GpxIterator(resource,
-        dataObjectFactory, null);
+        recordFactory, null);
       return new RecordIteratorReader(iterator);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to open resource " + resource,

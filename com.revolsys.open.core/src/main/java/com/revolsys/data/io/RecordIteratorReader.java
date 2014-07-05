@@ -10,10 +10,10 @@ public class RecordIteratorReader extends IteratorReader<Record>
   }
 
   @Override
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     final RecordIterator iterator = (RecordIterator)iterator();
     iterator.hasNext();
-    return iterator.getMetaData();
+    return iterator.getRecordDefinition();
   }
 
   @Override

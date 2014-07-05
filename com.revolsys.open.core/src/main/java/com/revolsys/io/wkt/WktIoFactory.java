@@ -38,9 +38,9 @@ public class WktIoFactory extends AbstractRecordAndGeometryIoFactory
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition metaData, final OutputStream outputStream,
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
-    return new WktRecordWriter(metaData, writer);
+    return new WktRecordWriter(recordDefinition, writer);
   }
 }

@@ -31,7 +31,7 @@ public class PolygonNodeRemovalVisitor implements Visitor<Node<Record>> {
 
   private final RecordGraph graph;
 
-  public PolygonNodeRemovalVisitor(final RecordDefinition metaData,
+  public PolygonNodeRemovalVisitor(final RecordDefinition recordDefinition,
     final RecordGraph graph, final Collection<String> excludedAttributes) {
     super();
     this.graph = graph;

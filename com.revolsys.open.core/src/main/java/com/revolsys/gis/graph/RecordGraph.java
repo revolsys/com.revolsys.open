@@ -105,8 +105,8 @@ public class RecordGraph extends Graph<Record> {
     if (object == null) {
       return null;
     } else {
-      final RecordDefinition metaData = object.getMetaData();
-      final String typePath = metaData.getPath();
+      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final String typePath = recordDefinition.getPath();
       return typePath;
     }
   }

@@ -57,8 +57,8 @@ implements Record, Cloneable {
     if (this == other) {
       return 0;
     } else {
-      final int metaDataCompare = getMetaData().compareTo(other.getMetaData());
-      if (metaDataCompare == 0) {
+      final int recordDefinitionCompare = getRecordDefinition().compareTo(other.getRecordDefinition());
+      if (recordDefinitionCompare == 0) {
         final Identifier id1 = getIdentifier();
         final Identifier id2 = other.getIdentifier();
         if (id1 == null) {
@@ -87,7 +87,7 @@ implements Record, Cloneable {
         }
         return -1;
       } else {
-        return metaDataCompare;
+        return recordDefinitionCompare;
       }
     }
 
@@ -95,13 +95,13 @@ implements Record, Cloneable {
 
   @Override
   public void delete() {
-    getMetaData().delete(this);
+    getRecordDefinition().delete(this);
   }
 
   @Override
   public Set<Entry<String, Object>> entrySet() {
     final Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String, Object>>();
-    for (int i = 0; i < this.getMetaData().getAttributeCount(); i++) {
+    for (int i = 0; i < this.getRecordDefinition().getAttributeCount(); i++) {
       entries.add(new RecordMapEntry(this, i));
     }
     return entries;
@@ -124,8 +124,8 @@ implements Record, Cloneable {
 
   @Override
   public String getAttributeTitle(final String name) {
-    final RecordDefinition metaData = getMetaData();
-    return metaData.getAttributeTitle(name);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getAttributeTitle(name);
   }
 
   @Override
@@ -155,11 +155,11 @@ implements Record, Cloneable {
    */
   @Override
   public RecordFactory getFactory() {
-    final RecordDefinition metaData = getMetaData();
-    if (metaData == null) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
       return null;
     } else {
-      return metaData.getRecordFactory();
+      return recordDefinition.getRecordFactory();
     }
   }
 
@@ -181,19 +181,19 @@ implements Record, Cloneable {
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T getGeometryValue() {
-    final RecordDefinition metaData = getMetaData();
-    if (metaData == null) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
       return null;
     } else {
-      final int index = metaData.getGeometryAttributeIndex();
+      final int index = recordDefinition.getGeometryAttributeIndex();
       return (T)getValue(index);
     }
   }
 
   @Override
   public Identifier getIdentifier() {
-    final RecordDefinition metaData = getMetaData();
-    final List<Integer> idAttributeIndexes = metaData.getIdAttributeIndexes();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final List<Integer> idAttributeIndexes = recordDefinition.getIdAttributeIndexes();
     final int idCount = idAttributeIndexes.size();
     if (idCount == 0) {
       return null;
@@ -269,7 +269,7 @@ implements Record, Cloneable {
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Object> T getIdValue() {
-    final int index = this.getMetaData().getIdAttributeIndex();
+    final int index = this.getRecordDefinition().getIdAttributeIndex();
     return (T)getValue(index);
   }
 
@@ -327,7 +327,7 @@ implements Record, Cloneable {
 
   @Override
   public String getTypeName() {
-    return getMetaData().getPath();
+    return getRecordDefinition().getPath();
   }
 
   /**
@@ -340,11 +340,11 @@ implements Record, Cloneable {
   @SuppressWarnings("unchecked")
   public <T extends Object> T getValue(final CharSequence name) {
     try {
-      final int index = this.getMetaData().getAttributeIndex(name);
+      final int index = this.getRecordDefinition().getAttributeIndex(name);
       return (T)getValue(index);
     } catch (final NullPointerException e) {
       LoggerFactory.getLogger(getClass()).warn(
-        "Attribute " + this.getMetaData().getPath() + "." + name
+        "Attribute " + this.getRecordDefinition().getPath() + "." + name
         + " does not exist");
       return null;
     }
@@ -358,14 +358,14 @@ implements Record, Cloneable {
     for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
       final String propertyName = propertyPath[i];
       if (propertyValue instanceof Record) {
-        final Record dataObject = (Record)propertyValue;
+        final Record record = (Record)propertyValue;
 
-        if (dataObject.hasAttribute(propertyName)) {
-          propertyValue = dataObject.getValue(propertyName);
+        if (record.hasAttribute(propertyName)) {
+          propertyValue = record.getValue(propertyName);
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            final CodeTable codeTable = this.getMetaData()
+            final CodeTable codeTable = this.getRecordDefinition()
                 .getCodeTableByColumn(propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
@@ -384,7 +384,7 @@ implements Record, Cloneable {
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = this.getMetaData().getCodeTableByColumn(
+          final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(
             propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
@@ -419,7 +419,7 @@ implements Record, Cloneable {
   @Override
   public List<Object> getValues() {
     final List<Object> values = new ArrayList<Object>();
-    for (int i = 0; i < this.getMetaData().getAttributeCount(); i++) {
+    for (int i = 0; i < this.getRecordDefinition().getAttributeCount(); i++) {
       final Object value = getValue(i);
       values.add(value);
     }
@@ -435,7 +435,7 @@ implements Record, Cloneable {
    */
   @Override
   public boolean hasAttribute(final CharSequence name) {
-    return this.getMetaData().hasAttribute(name);
+    return this.getRecordDefinition().hasAttribute(name);
   }
 
   @Override
@@ -473,14 +473,14 @@ implements Record, Cloneable {
    */
   @Override
   public void setGeometryValue(final Geometry geometry) {
-    final int index = this.getMetaData().getGeometryAttributeIndex();
+    final int index = this.getRecordDefinition().getGeometryAttributeIndex();
     setValue(index, geometry);
   }
 
   @Override
   public void setIdentifier(final Identifier identifier) {
-    final RecordDefinition metaData = getMetaData();
-    final List<String> idAttributeNames = metaData.getIdAttributeNames();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
     AbstractIdentifier.setIdentifier(this, idAttributeNames, identifier);
   }
 
@@ -492,7 +492,7 @@ implements Record, Cloneable {
    */
   @Override
   public void setIdValue(final Object id) {
-    final int index = this.getMetaData().getIdAttributeIndex();
+    final int index = this.getRecordDefinition().getIdAttributeIndex();
     if (this.getState() == RecordState.New
         || this.getState() == RecordState.Initalizing) {
       setValue(index, id);
@@ -513,7 +513,7 @@ implements Record, Cloneable {
    */
   @Override
   public void setValue(final CharSequence name, final Object value) {
-    final int index = this.getMetaData().getAttributeIndex(name);
+    final int index = this.getRecordDefinition().getAttributeIndex(name);
     if (index >= 0) {
       setValue(index, value);
     } else {
@@ -527,16 +527,16 @@ implements Record, Cloneable {
           name.length());
         final Object objectValue = getValue(key);
         if (objectValue == null) {
-          final DataType attributeType = this.getMetaData().getAttributeType(
+          final DataType attributeType = this.getRecordDefinition().getAttributeType(
             key);
           if (attributeType != null) {
             if (attributeType.getJavaClass() == Record.class) {
               final String typePath = attributeType.getName();
-              final RecordDefinitionFactory metaDataFactory = this.getMetaData()
+              final RecordDefinitionFactory recordDefinitionFactory = this.getRecordDefinition()
                   .getRecordDefinitionFactory();
-              final RecordDefinition subMetaData = metaDataFactory.getRecordDefinition(typePath);
-              final RecordFactory dataObjectFactory = subMetaData.getRecordFactory();
-              final Record subObject = dataObjectFactory.createRecord(subMetaData);
+              final RecordDefinition subMetaData = recordDefinitionFactory.getRecordDefinition(typePath);
+              final RecordFactory recordFactory = subMetaData.getRecordFactory();
+              final Record subObject = recordFactory.createRecord(subMetaData);
               subObject.setValue(subKey, value);
               setValue(key, subObject);
             }
@@ -564,7 +564,7 @@ implements Record, Cloneable {
     String codeTableAttributeName;
     String codeTableValueName = null;
     if (dotIndex == -1) {
-      if (name.equals(getMetaData().getIdAttributeName())) {
+      if (name.equals(getRecordDefinition().getIdAttributeName())) {
         codeTableAttributeName = null;
       } else {
         codeTableAttributeName = name;
@@ -573,12 +573,12 @@ implements Record, Cloneable {
       codeTableAttributeName = name.substring(0, dotIndex);
       codeTableValueName = name.substring(dotIndex + 1);
     }
-    final CodeTable codeTable = this.getMetaData().getCodeTableByColumn(
+    final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(
       codeTableAttributeName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(
-          "Cannot get code table for " + this.getMetaData().getPath() + "."
+          "Cannot get code table for " + this.getRecordDefinition().getPath() + "."
               + name);
         return;
       }
@@ -634,7 +634,7 @@ implements Record, Cloneable {
 
   @Override
   public void setValues(final Record object) {
-    for (final String name : this.getMetaData().getAttributeNames()) {
+    for (final String name : this.getRecordDefinition().getAttributeNames()) {
       final Object value = JavaBeanUtil.clone(object.getValue(name));
       setValue(name, value);
     }
@@ -675,11 +675,11 @@ implements Record, Cloneable {
   @Override
   public String toString() {
     final StringBuffer s = new StringBuffer();
-    s.append(this.getMetaData().getPath()).append("(\n");
-    for (int i = 0; i < this.getMetaData().getAttributeCount(); i++) {
+    s.append(this.getRecordDefinition().getPath()).append("(\n");
+    for (int i = 0; i < this.getRecordDefinition().getAttributeCount(); i++) {
       final Object value = getValue(i);
       if (value != null) {
-        s.append(this.getMetaData().getAttributeName(i))
+        s.append(this.getRecordDefinition().getAttributeName(i))
         .append('=')
         .append(value)
         .append('\n');

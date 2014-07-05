@@ -41,15 +41,15 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   @Override
   public void postProcess(final RecordStoreSchema schema) {
     final AbstractJdbcRecordStore dataStore = (AbstractJdbcRecordStore)schema.getDataStore();
-    for (final RecordDefinition metaData : schema.getTypes()) {
-      final String typePath = metaData.getPath();
+    for (final RecordDefinition recordDefinition : schema.getTypes()) {
+      final String typePath = recordDefinition.getPath();
       final Map<String, Map<String, Object>> typeColumnProperties = JdbcAttributeAdder.getTypeColumnProperties(
         schema, typePath);
       for (final Entry<String, Map<String, Object>> columnEntry : typeColumnProperties.entrySet()) {
         final String columnName = columnEntry.getKey();
         final Map<String, Object> columnProperties = columnEntry.getValue();
         if (ArcSdeConstants.SDEBINARY.equals(columnProperties.get(ArcSdeConstants.GEOMETRY_COLUMN_TYPE))) {
-          final Attribute attribute = metaData.getAttribute(columnName);
+          final Attribute attribute = recordDefinition.getAttribute(columnName);
           if (!(attribute instanceof OracleSdoGeometryJdbcAttribute)) {
             if (sdeUtil == null) {
               LoggerFactory.getLogger(getClass())
@@ -57,7 +57,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
                   "SDE Binary columns not supported without the ArcSDE Java API jars");
             } else {
               ((ArcSdeBinaryGeometryDataStoreUtil)sdeUtil).createGeometryColumn(
-                dataStore, schema, metaData, typePath, columnName,
+                dataStore, schema, recordDefinition, typePath, columnName,
                 columnProperties);
             }
           }

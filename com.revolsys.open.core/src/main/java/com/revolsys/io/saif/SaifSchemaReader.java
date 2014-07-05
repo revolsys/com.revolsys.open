@@ -296,10 +296,10 @@ public class SaifSchemaReader {
       currentClass = null;
       final Object definition = getDefinition(iterator);
       if (definition instanceof RecordDefinition) {
-        final RecordDefinitionImpl metaData = (RecordDefinitionImpl)definition;
-        setMetaDataProperties(metaData);
-        metaData.setRecordDefinitionFactory(schema);
-        schema.addMetaData(metaData);
+        final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)definition;
+        setRecordDefinitionProperties(recordDefinition);
+        recordDefinition.setRecordDefinitionFactory(schema);
+        schema.addMetaData(recordDefinition);
       }
     }
     return schema;
@@ -450,10 +450,10 @@ public class SaifSchemaReader {
     this.commonMetaDataProperties = commonMetaDataProperties;
   }
 
-  private void setMetaDataProperties(final RecordDefinitionImpl metaData) {
+  private void setRecordDefinitionProperties(final RecordDefinitionImpl recordDefinition) {
     for (final RecordDefinitionProperty property : commonMetaDataProperties) {
       final RecordDefinitionProperty clonedProperty = property.clone();
-      clonedProperty.setRecordDefinition(metaData);
+      clonedProperty.setRecordDefinition(recordDefinition);
     }
   }
 

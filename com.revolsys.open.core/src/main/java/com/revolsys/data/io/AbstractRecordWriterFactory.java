@@ -21,13 +21,13 @@ public abstract class AbstractRecordWriterFactory extends AbstractIoFactory
   implements RecordWriterFactory {
 
   public static Writer<Record> recordWriter(
-    final RecordDefinition metaData, final Resource resource) {
+    final RecordDefinition recordDefinition, final Resource resource) {
     final RecordWriterFactory writerFactory = getRecordWriterFactory(resource);
     if (writerFactory == null) {
       return null;
     } else {
       final Writer<Record> writer = writerFactory.createRecordWriter(
-        metaData, resource);
+        recordDefinition, resource);
       return writer;
     }
   }
@@ -58,23 +58,23 @@ public abstract class AbstractRecordWriterFactory extends AbstractIoFactory
   /**
    * Create a writer to write to the specified resource.
    * 
-   * @param metaData The metaData for the type of data to write.
+   * @param recordDefinition The recordDefinition for the type of data to write.
    * @param resource The resource to write to.
    * @return The writer.
    */
   @Override
   public Writer<Record> createRecordWriter(
-    final RecordDefinition metaData, final Resource resource) {
+    final RecordDefinition recordDefinition, final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
-    return createRecordWriter(baseName, metaData, out);
+    return createRecordWriter(baseName, recordDefinition, out);
   }
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition metaData, final OutputStream outputStream) {
-    return createRecordWriter(baseName, metaData, outputStream,
+    final RecordDefinition recordDefinition, final OutputStream outputStream) {
+    return createRecordWriter(baseName, recordDefinition, outputStream,
       FileUtil.UTF8);
   }
 

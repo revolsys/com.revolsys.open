@@ -15,7 +15,7 @@ public class RecordMapEntry implements Entry<String, Object> {
 
   @Override
   public String getKey() {
-    return this.record.getMetaData().getAttributeName(this.index);
+    return this.record.getRecordDefinition().getAttributeName(this.index);
   }
 
   @Override

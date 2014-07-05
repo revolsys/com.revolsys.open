@@ -76,7 +76,7 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     return OsmElement.META_DATA;
   }
 

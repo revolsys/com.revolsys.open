@@ -76,7 +76,7 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     return OsmElement.META_DATA;
   }
 

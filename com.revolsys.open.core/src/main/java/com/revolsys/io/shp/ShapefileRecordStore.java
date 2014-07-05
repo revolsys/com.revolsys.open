@@ -33,11 +33,11 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Record create(final RecordDefinition metaData) {
-    final String typePath = metaData.getPath();
+  public Record create(final RecordDefinition recordDefinition) {
+    final String typePath = recordDefinition.getPath();
     final RecordDefinition savedMetaData = getRecordDefinition(typePath);
     if (savedMetaData == null) {
-      return new ArrayRecord(metaData);
+      return new ArrayRecord(recordDefinition);
     } else {
       return new ArrayRecord(savedMetaData);
     }
@@ -50,7 +50,7 @@ public class ShapefileRecordStore extends AbstractRecordStore {
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
-    return writer.getMetaData(typePath);
+    return writer.getRecordDefinition(typePath);
   }
 
   @Override
@@ -60,14 +60,14 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void insert(final Record dataObject) {
-    writer.write(dataObject);
+  public void insert(final Record record) {
+    writer.write(record);
   }
 
   @Override
   protected void loadSchemaRecordDefinitions(
     final RecordStoreSchema schema,
-    final Map<String, RecordDefinition> metaDataMap) {
+    final Map<String, RecordDefinition> recordDefinitionMap) {
   }
 
   @Override

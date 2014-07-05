@@ -82,10 +82,10 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
   }
 
   public void createGeometryColumn(final AbstractJdbcRecordStore dataStore,
-    final RecordStoreSchema schema, final RecordDefinition metaData,
+    final RecordStoreSchema schema, final RecordDefinition recordDefinition,
     final String typePath, final String columnName,
     final Map<String, Object> columnProperties) {
-    final Attribute attribute = metaData.getAttribute(columnName);
+    final Attribute attribute = recordDefinition.getAttribute(columnName);
 
     DataType dataType = JdbcAttributeAdder.getColumnProperty(schema, typePath,
       columnName, JdbcAttributeAdder.GEOMETRY_TYPE);
@@ -102,12 +102,12 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     final ArcSdeBinaryGeometryAttribute sdeAttribute = new ArcSdeBinaryGeometryAttribute(
       this, columnName, columnName, dataType, attribute.isRequired(),
       "The GEOMETRY reference", attribute.getProperties(), geometryFactory);
-    ((RecordDefinitionImpl)metaData).replaceAttribute(attribute, sdeAttribute);
-    sdeAttribute.setMetaData(metaData);
+    ((RecordDefinitionImpl)recordDefinition).replaceAttribute(attribute, sdeAttribute);
+    sdeAttribute.setRecordDefinition(recordDefinition);
 
-    metaData.setProperty("dataStoreIteratorFactory", this.iteratorFactory);
+    recordDefinition.setProperty("dataStoreIteratorFactory", this.iteratorFactory);
 
-    ((RecordDefinitionImpl)metaData).setGeometryAttributeName(columnName);
+    ((RecordDefinitionImpl)recordDefinition).setGeometryAttributeName(columnName);
   }
 
   public AbstractIterator<Record> createIterator(
@@ -169,8 +169,8 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     }
   }
 
-  public String getTableName(final RecordDefinition metaData) {
-    final String typePath = metaData.getPath();
+  public String getTableName(final RecordDefinition recordDefinition) {
+    final String typePath = recordDefinition.getPath();
     return this.dataStore.getDatabaseQualifiedTableName(typePath);
   }
 
@@ -242,7 +242,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
             default:
               LoggerFactory.getLogger(ArcSdeBinaryGeometryDataStoreUtil.class)
                 .error(
-                  "Unsupported column type: " + object.getMetaData() + "."
+                  "Unsupported column type: " + object.getRecordDefinition() + "."
                     + name);
             break;
           }

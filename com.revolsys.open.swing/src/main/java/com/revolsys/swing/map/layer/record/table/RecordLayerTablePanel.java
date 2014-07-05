@@ -70,8 +70,8 @@ public class RecordLayerTablePanel extends TablePanel implements
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     this.tableModel = getTableModel();
-    final RecordDefinition metaData = layer.getMetaData();
-    final boolean hasGeometry = metaData.getGeometryAttributeIndex() != -1;
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    final boolean hasGeometry = recordDefinition.getGeometryAttributeIndex() != -1;
     final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck(
       "deletable");
 
@@ -131,11 +131,11 @@ public class RecordLayerTablePanel extends TablePanel implements
           this, "canPasteRecordGeometry")), this, "pasteGeometry");
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
-      final DataType geometryDataType = metaData.getGeometryAttribute()
+      final DataType geometryDataType = recordDefinition.getGeometryAttribute()
         .getType();
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalAttributes.getProperty(metaData)
+        if (DirectionalAttributes.getProperty(recordDefinition)
           .hasDirectionalAttributes()) {
           editMenu.addMenuItemTitleIcon("geometry",
             LayerRecordForm.FLIP_RECORD_NAME,

@@ -7,12 +7,12 @@ public class ShortNameProperty extends AbstractRecordDefinitionProperty {
   static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
 
   public static ShortNameProperty getProperty(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    return getProperty(metaData);
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    return getProperty(recordDefinition);
   }
 
-  public static ShortNameProperty getProperty(final RecordDefinition metaData) {
-    return metaData.getProperty(PROPERTY_NAME);
+  public static ShortNameProperty getProperty(final RecordDefinition recordDefinition) {
+    return recordDefinition.getProperty(PROPERTY_NAME);
   }
 
   public static String getShortName(final Record object) {
@@ -24,8 +24,8 @@ public class ShortNameProperty extends AbstractRecordDefinitionProperty {
     }
   }
 
-  public static String getShortName(final RecordDefinition metaData) {
-    final ShortNameProperty property = getProperty(metaData);
+  public static String getShortName(final RecordDefinition recordDefinition) {
+    final ShortNameProperty property = getProperty(recordDefinition);
     if (property == null) {
       return null;
     } else {

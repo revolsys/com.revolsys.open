@@ -10,18 +10,18 @@ public class RecordMapTableModel extends AbstractSingleRecordTableModel {
 
   private static final long serialVersionUID = 1L;
 
-  public static JComponent create(final RecordDefinition metaData,
+  public static JComponent create(final RecordDefinition recordDefinition,
     final Map<String, Object> values, final boolean editable) {
-    final RecordMapTableModel model = new RecordMapTableModel(metaData,
+    final RecordMapTableModel model = new RecordMapTableModel(recordDefinition,
       values, editable);
     return createTable(model);
   }
 
   private Map<String, Object> values;
 
-  public RecordMapTableModel(final RecordDefinition metaData,
+  public RecordMapTableModel(final RecordDefinition recordDefinition,
     final Map<String, Object> values, final boolean editable) {
-    super(metaData, editable);
+    super(recordDefinition, editable);
     this.values = values;
   }
 

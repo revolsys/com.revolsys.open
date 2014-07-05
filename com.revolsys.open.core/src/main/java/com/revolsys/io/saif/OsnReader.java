@@ -31,7 +31,7 @@ public class OsnReader implements RecordIterator {
 
   private final String fileName;
 
-  private final RecordDefinitionFactory metaDataFactory;
+  private final RecordDefinitionFactory recordDefinitionFactory;
 
   private boolean nextChecked = false;
 
@@ -39,20 +39,20 @@ public class OsnReader implements RecordIterator {
 
   private ZipFile zipFile;
 
-  public OsnReader(final RecordDefinitionFactory metaDataFactory,
+  public OsnReader(final RecordDefinitionFactory recordDefinitionFactory,
     final File directory, final String fileName, final int srid)
     throws IOException {
-    this.metaDataFactory = metaDataFactory;
+    this.recordDefinitionFactory = recordDefinitionFactory;
     this.directory = directory;
     this.fileName = fileName;
     converters = new OsnConverterRegistry(srid);
     open();
   }
 
-  public OsnReader(final RecordDefinitionFactory metaDataFactory,
+  public OsnReader(final RecordDefinitionFactory recordDefinitionFactory,
     final ZipFile zipFile, final String fileName, final int srid)
     throws IOException {
-    this.metaDataFactory = metaDataFactory;
+    this.recordDefinitionFactory = recordDefinitionFactory;
     this.fileName = fileName;
     this.zipFile = zipFile;
     converters = new OsnConverterRegistry(srid);
@@ -62,13 +62,13 @@ public class OsnReader implements RecordIterator {
   /**
    * Get an attribute definition from the iterator.
    * 
-   * @param dataObject
+   * @param record
    * @param typePath TODO
    * @param iterator The OsnIterator.
    * @return The attribute definition.
    * @throws IOException If an I/O error occurs.
    */
-  private void addAttribute(final Record dataObject) {
+  private void addAttribute(final Record record) {
     if (osnIterator.getEventType() != OsnIterator.START_ATTRIBUTE) {
       if (osnIterator.next() != OsnIterator.START_ATTRIBUTE) {
         osnIterator.throwParseError("Excepecting an attribute name");
@@ -76,7 +76,7 @@ public class OsnReader implements RecordIterator {
     }
     final String name = osnIterator.getStringValue();
     final Object value = getExpression();
-    dataObject.setValue(name, value);
+    record.setValue(name, value);
   }
 
   @Override
@@ -94,12 +94,12 @@ public class OsnReader implements RecordIterator {
     if (converter != null) {
       return converter.read(osnIterator);
     } else {
-      final RecordDefinition type = metaDataFactory.getRecordDefinition(typePath);
-      final Record dataObject = factory.createRecord(type);
+      final RecordDefinition type = recordDefinitionFactory.getRecordDefinition(typePath);
+      final Record record = factory.createRecord(type);
       while (osnIterator.next() != OsnIterator.END_OBJECT) {
-        addAttribute(dataObject);
+        addAttribute(record);
       }
-      return dataObject;
+      return record;
     }
   }
 
@@ -149,8 +149,8 @@ public class OsnReader implements RecordIterator {
     return fileName;
   }
 
-  public RecordDefinitionFactory getMetaDataFactory() {
-    return metaDataFactory;
+  public RecordDefinitionFactory getRecordDefinitionFactory() {
+    return recordDefinitionFactory;
   }
 
   @Override
@@ -241,8 +241,8 @@ public class OsnReader implements RecordIterator {
   private boolean skipToFirstRecord() throws IOException {
     if (osnIterator.next() == OsnIterator.START_DEFINITION) {
       final String typePath = osnIterator.getPathValue();
-      final RecordDefinitionImpl type = (RecordDefinitionImpl)metaDataFactory.getRecordDefinition(typePath);
-      final RecordDefinition spatialDataSetType = metaDataFactory.getRecordDefinition("/SpatialDataSet");
+      final RecordDefinitionImpl type = (RecordDefinitionImpl)recordDefinitionFactory.getRecordDefinition(typePath);
+      final RecordDefinition spatialDataSetType = recordDefinitionFactory.getRecordDefinition("/SpatialDataSet");
       if (type != null && type.isInstanceOf(spatialDataSetType)) {
         final String oiName = osnIterator.nextAttributeName();
 

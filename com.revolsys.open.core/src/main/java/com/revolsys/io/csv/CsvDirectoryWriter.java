@@ -18,7 +18,7 @@ public class CsvDirectoryWriter extends AbstractWriter<Record> {
 
   private final Map<RecordDefinition, CsvRecordWriter> writers = new HashMap<RecordDefinition, CsvRecordWriter>();
 
-  private final Map<String, RecordDefinition> metaDataMap = new HashMap<>();
+  private final Map<String, RecordDefinition> recordDefinitionMap = new HashMap<>();
 
   public CsvDirectoryWriter() {
   }
@@ -33,7 +33,7 @@ public class CsvDirectoryWriter extends AbstractWriter<Record> {
       FileUtil.closeSilent(writer);
     }
     writers.clear();
-    metaDataMap.clear();
+    recordDefinitionMap.clear();
   }
 
   @Override
@@ -47,25 +47,25 @@ public class CsvDirectoryWriter extends AbstractWriter<Record> {
     return directory;
   }
 
-  public RecordDefinition getMetaData(final String path) {
-    return metaDataMap.get(path);
+  public RecordDefinition getRecordDefinition(final String path) {
+    return recordDefinitionMap.get(path);
   }
 
   private CsvRecordWriter getWriter(final Record record) {
-    final RecordDefinition metaData = record.getMetaData();
-    CsvRecordWriter writer = writers.get(metaData);
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    CsvRecordWriter writer = writers.get(recordDefinition);
     if (writer == null) {
       try {
-        final String path = metaData.getPath();
+        final String path = recordDefinition.getPath();
         final File file = new File(directory, path.toString() + ".csv");
-        writer = new CsvRecordWriter(metaData, new FileWriter(file));
+        writer = new CsvRecordWriter(recordDefinition, new FileWriter(file));
         final Geometry geometry = record.getGeometryValue();
         if (geometry != null) {
           writer.setProperty(IoConstants.GEOMETRY_FACTORY,
             geometry.getGeometryFactory());
         }
-        writers.put(metaData, writer);
-        metaDataMap.put(path, metaData);
+        writers.put(recordDefinition, writer);
+        recordDefinitionMap.put(path, recordDefinition);
       } catch (final IOException e) {
         throw new IllegalArgumentException(e.getMessage(), e);
       }

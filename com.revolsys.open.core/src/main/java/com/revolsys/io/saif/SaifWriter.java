@@ -70,7 +70,7 @@ public class SaifWriter extends AbstractWriter<Record> {
 
   protected OsnConverterRegistry converters = new OsnConverterRegistry();
 
-  private RecordDefinitionFactory dataObjectMetaDataFactory;
+  private RecordDefinitionFactory recordDefinitionFactory;
 
   private final Set<String> exportedTypes = new LinkedHashSet<String>();
 
@@ -106,9 +106,9 @@ public class SaifWriter extends AbstractWriter<Record> {
   }
 
   public SaifWriter(final File file,
-    final RecordDefinitionFactory dataObjectMetaDataFactory) throws IOException {
+    final RecordDefinitionFactory recordDefinitionFactory) throws IOException {
     this(file);
-    setRecordDefinitionFactory(dataObjectMetaDataFactory);
+    setRecordDefinitionFactory(recordDefinitionFactory);
   }
 
   public SaifWriter(final String fileName) throws IOException {
@@ -300,7 +300,7 @@ public class SaifWriter extends AbstractWriter<Record> {
     if (compositeTypeName == null) {
       compositeTypeName = typePath + "Composite";
     }
-    final RecordDefinition compisteType = this.dataObjectMetaDataFactory.getRecordDefinition(String.valueOf(compositeTypeName));
+    final RecordDefinition compisteType = this.recordDefinitionFactory.getRecordDefinition(String.valueOf(compositeTypeName));
     return compisteType;
   }
 
@@ -550,7 +550,7 @@ public class SaifWriter extends AbstractWriter<Record> {
   }
 
   public void setRecordDefinitionFactory(final RecordDefinitionFactory schema) {
-    this.dataObjectMetaDataFactory = schema;
+    this.recordDefinitionFactory = schema;
     if (schema != null) {
       this.spatialDataSetType = schema.getRecordDefinition("/SpatialDataSet");
       this.annotatedSpatialDataSetType = schema.getRecordDefinition("/AnnotatedSpatialDataSet");
@@ -575,7 +575,7 @@ public class SaifWriter extends AbstractWriter<Record> {
   @Override
   public void write(final Record object) {
     try {
-      final RecordDefinition type = object.getMetaData();
+      final RecordDefinition type = object.getRecordDefinition();
       final OsnSerializer serializer = getSerializer(type.getPath());
       if (serializer != null) {
         serializer.serializeRecord(object);

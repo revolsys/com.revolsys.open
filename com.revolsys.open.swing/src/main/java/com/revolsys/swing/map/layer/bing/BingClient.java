@@ -39,7 +39,7 @@ public class BingClient {
 
   private final String bingMapsKey;
 
-  private final Map<ImagerySet, Map<String, Object>> metaDataCache = new HashMap<ImagerySet, Map<String, Object>>();
+  private final Map<ImagerySet, Map<String, Object>> recordDefinitionCache = new HashMap<ImagerySet, Map<String, Object>>();
 
   public BingClient() {
     this(null);
@@ -69,12 +69,12 @@ public class BingClient {
   }
 
   public Map<String, Object> getImageryMetadata(final ImagerySet imagerySet) {
-    Map<String, Object> cachedMetaData = this.metaDataCache.get(imagerySet);
+    Map<String, Object> cachedMetaData = this.recordDefinitionCache.get(imagerySet);
     if (cachedMetaData == null) {
       final String url = getImageryMetadataUrl(imagerySet);
       try {
         cachedMetaData = JsonMapIoFactory.toMap(new UrlResource(url));
-        this.metaDataCache.put(imagerySet, cachedMetaData);
+        this.recordDefinitionCache.put(imagerySet, cachedMetaData);
       } catch (final MalformedURLException e) {
         return Collections.emptyMap();
       }
@@ -147,8 +147,8 @@ public class BingClient {
     if (imagerySet == null) {
       imagerySet = ImagerySet.Aerial;
     }
-    final Map<String, Object> metaData = getImageryMetadata(imagerySet);
-    final List<Map<String, Object>> recordSets = (List<Map<String, Object>>)metaData.get("resourceSets");
+    final Map<String, Object> recordDefinition = getImageryMetadata(imagerySet);
+    final List<Map<String, Object>> recordSets = (List<Map<String, Object>>)recordDefinition.get("resourceSets");
     if (recordSets == null) {
       return null;
     } else {

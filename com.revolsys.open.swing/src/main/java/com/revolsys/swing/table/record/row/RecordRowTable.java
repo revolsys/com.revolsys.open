@@ -61,9 +61,9 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
 
   }
 
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     final RecordRowTableModel model = (RecordRowTableModel)getModel();
-    return model.getMetaData();
+    return model.getRecordDefinition();
   }
 
   public Record getSelectedRecord() {
@@ -96,13 +96,13 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     super.initializeColumnPreferredWidth(column);
     final RecordRowTableModel model = getTableModel();
-    final RecordDefinition metaData = model.getMetaData();
+    final RecordDefinition recordDefinition = model.getRecordDefinition();
     final int viewIndex = column.getModelIndex();
     final int attributesOffset = model.getAttributesOffset();
     if (viewIndex < attributesOffset) {
       final String attributeName = model.getFieldName(viewIndex
         - attributesOffset);
-      final Attribute attribute = metaData.getAttribute(attributeName);
+      final Attribute attribute = recordDefinition.getAttribute(attributeName);
       if (attribute != null) {
         Integer columnWidth = attribute.getProperty("tableColumnWidth");
         final String columnName = attribute.getTitle();
@@ -121,11 +121,11 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
   public void mouseClicked(final MouseEvent e) {
     if (e.getSource() == getTableHeader()) {
       final RecordRowTableModel model = (RecordRowTableModel)getModel();
-      final RecordDefinition metaData = model.getMetaData();
+      final RecordDefinition recordDefinition = model.getRecordDefinition();
       final int column = columnAtPoint(e.getPoint());
       if (column > -1 && SwingUtilities.isLeftMouseButton(e)) {
         final int index = convertColumnIndexToModel(column);
-        final Class<?> attributeClass = metaData.getAttributeClass(index);
+        final Class<?> attributeClass = recordDefinition.getAttributeClass(index);
         if (!Geometry.class.isAssignableFrom(attributeClass)) {
           model.setSortOrder(index);
         }

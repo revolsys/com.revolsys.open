@@ -65,7 +65,7 @@ AbstractMapReaderFactory implements RecordReaderFactory {
     }
   }
 
-  private final RecordFactory dataObjectFactory = new ArrayRecordFactory();
+  private final RecordFactory recordFactory = new ArrayRecordFactory();
 
   private final boolean binary;
 
@@ -95,21 +95,21 @@ AbstractMapReaderFactory implements RecordReaderFactory {
    */
   @Override
   public Reader<Record> createDirectoryRecordReader(final File directory) {
-    return createDirectoryRecordReader(directory, this.dataObjectFactory);
+    return createDirectoryRecordReader(directory, this.recordFactory);
 
   }
 
   /**
    * Create a reader for the directory using the specified data object
-   * dataObjectFactory.
+   * recordFactory.
    *
    * @param directory directory file to read.
-   * @param dataObjectFactory The dataObjectFactory used to create data objects.
+   * @param recordFactory The recordFactory used to create data objects.
    * @return The reader for the file.
    */
   @Override
   public Reader<Record> createDirectoryRecordReader(final File directory,
-    final RecordFactory dataObjectFactory) {
+    final RecordFactory recordFactory) {
     final RecordDirectoryReader directoryReader = new RecordDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);
@@ -134,7 +134,7 @@ AbstractMapReaderFactory implements RecordReaderFactory {
    */
   @Override
   public RecordReader createRecordReader(final Resource resource) {
-    return createRecordReader(resource, this.dataObjectFactory);
+    return createRecordReader(resource, this.recordFactory);
 
   }
 

@@ -279,20 +279,20 @@ public class SwingUtil {
 
   @SuppressWarnings("unchecked")
   public static <T extends Field> T createField(
-    final RecordDefinition metaData, final String fieldName,
+    final RecordDefinition recordDefinition, final String fieldName,
     final boolean editable) {
     Field field;
-    final Attribute attribute = metaData.getAttribute(fieldName);
+    final Attribute attribute = recordDefinition.getAttribute(fieldName);
     if (attribute == null) {
       throw new IllegalArgumentException("Cannot find field " + fieldName);
     } else {
       final boolean required = attribute.isRequired();
       final int length = attribute.getLength();
       CodeTable codeTable;
-      if (metaData.getIdAttributeNames().contains(fieldName)) {
+      if (recordDefinition.getIdAttributeNames().contains(fieldName)) {
         codeTable = null;
       } else {
-        codeTable = metaData.getCodeTableByColumn(fieldName);
+        codeTable = recordDefinition.getCodeTableByColumn(fieldName);
       }
 
       final DataType type = attribute.getType();

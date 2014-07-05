@@ -73,7 +73,7 @@ public abstract class AbstractMergeProcess extends
         addOtherObject(otherObject);
         objects[OTHER_INDEX] = null;
         guard[OTHER_INDEX] = true;
-        return otherObject.getMetaData();
+        return otherObject.getRecordDefinition();
       }
     } else if (otherObject == null) {
       if (sourceObject == null) {
@@ -82,12 +82,12 @@ public abstract class AbstractMergeProcess extends
         addSourceObject(sourceObject);
         objects[SOURCE_INDEX] = null;
         guard[SOURCE_INDEX] = true;
-        return sourceObject.getMetaData();
+        return sourceObject.getRecordDefinition();
       }
     } else {
-      final RecordDefinition sourceType = sourceObject.getMetaData();
+      final RecordDefinition sourceType = sourceObject.getRecordDefinition();
       final String sourceTypeName = sourceType.getPath();
-      final RecordDefinition otherType = otherObject.getMetaData();
+      final RecordDefinition otherType = otherObject.getRecordDefinition();
       final String otherTypeName = otherType.getPath();
       if (sourceTypeName.equals(currentTypeName)) {
         addSourceObject(sourceObject);
@@ -202,7 +202,7 @@ public abstract class AbstractMergeProcess extends
             } while (!accept);
             if (accept) {
               objects[i] = object;
-              typePaths[i] = objects[i].getMetaData().getPath();
+              typePaths[i] = objects[i].getRecordDefinition().getPath();
             }
 
           }
@@ -217,7 +217,7 @@ public abstract class AbstractMergeProcess extends
           final int nameCompare = typePaths[SOURCE_INDEX].toString().compareTo(
             typePaths[OTHER_INDEX].toString());
           if (nameCompare <= 0) {
-            currentType = sourceObject.getMetaData();
+            currentType = sourceObject.getRecordDefinition();
             currentTypeName = typePaths[SOURCE_INDEX];
             addSourceObject(sourceObject);
             objects[SOURCE_INDEX] = null;
@@ -226,7 +226,7 @@ public abstract class AbstractMergeProcess extends
             }
           }
           if (nameCompare >= 0) {
-            currentType = otherObject.getMetaData();
+            currentType = otherObject.getRecordDefinition();
             currentTypeName = typePaths[OTHER_INDEX];
             addOtherObject(otherObject);
             objects[OTHER_INDEX] = null;
@@ -235,14 +235,14 @@ public abstract class AbstractMergeProcess extends
             }
           }
         } else {
-          currentType = sourceObject.getMetaData();
+          currentType = sourceObject.getRecordDefinition();
           currentTypeName = typePaths[SOURCE_INDEX];
           if (otherObject != null) {
             addSourceObject(otherObject);
           }
         }
       } else {
-        currentType = otherObject.getMetaData();
+        currentType = otherObject.getRecordDefinition();
         currentTypeName = typePaths[OTHER_INDEX];
         if (otherObject != null) {
           addOtherObject(otherObject);
@@ -257,7 +257,7 @@ public abstract class AbstractMergeProcess extends
           if (channelIndex >= 0) {
             final Record object = channels[channelIndex].read();
             if (acceptObject(object)) {
-              final RecordDefinition type = object.getMetaData();
+              final RecordDefinition type = object.getRecordDefinition();
               final String typePath = type.getPath();
               if (currentTypeName == null || typePath.equals(currentTypeName)) {
                 currentTypeName = typePath;

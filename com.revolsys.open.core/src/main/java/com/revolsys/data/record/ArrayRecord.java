@@ -24,23 +24,23 @@ public class ArrayRecord extends BaseRecord {
   private Object[] attributes;
 
   /**
-   * Construct a new empty ArrayRecord using the metaData.
+   * Construct a new empty ArrayRecord using the recordDefinition.
    *
-   * @param metaData The metaData defining the object type.
+   * @param recordDefinition The recordDefinition defining the object type.
    */
-  public ArrayRecord(final RecordDefinition metaData) {
-    this(metaData, null);
+  public ArrayRecord(final RecordDefinition recordDefinition) {
+    this(recordDefinition, null);
   }
 
-  public ArrayRecord(final RecordDefinition metaData,
+  public ArrayRecord(final RecordDefinition recordDefinition,
     final Map<String, ? extends Object> values) {
-    super(metaData);
-    if (metaData == null) {
+    super(recordDefinition);
+    if (recordDefinition == null) {
       this.attributes = new Object[0];
     } else {
-      final int attributeCount = metaData.getAttributeCount();
+      final int attributeCount = recordDefinition.getAttributeCount();
       this.attributes = new Object[attributeCount];
-      final Map<String, Object> defaultValues = metaData.getDefaultValues();
+      final Map<String, Object> defaultValues = recordDefinition.getDefaultValues();
       setValuesByPath(defaultValues);
       setValues(values);
     }
@@ -55,7 +55,7 @@ public class ArrayRecord extends BaseRecord {
    * @param object The object to clone.
    */
   public ArrayRecord(final Record object) {
-    this(object.getMetaData(), object);
+    this(object.getRecordDefinition(), object);
   }
 
   /**

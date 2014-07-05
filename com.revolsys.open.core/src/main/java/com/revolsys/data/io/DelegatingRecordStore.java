@@ -159,8 +159,8 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordDefinition getMetaData(final RecordDefinition objectMetaData) {
-    return dataStore.getMetaData(objectMetaData);
+  public RecordDefinition getRecordDefinition(final RecordDefinition objectMetaData) {
+    return dataStore.getRecordDefinition(objectMetaData);
   }
 
   @Override
@@ -250,8 +250,8 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void insert(final Record dataObject) {
-    dataStore.insert(dataObject);
+  public void insert(final Record record) {
+    dataStore.insert(record);
   }
 
   @Override
@@ -272,7 +272,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   @Override
   protected void loadSchemaRecordDefinitions(
     final RecordStoreSchema schema,
-    final Map<String, RecordDefinition> metaDataMap) {
+    final Map<String, RecordDefinition> recordDefinitionMap) {
   }
 
   @Override
@@ -327,8 +327,8 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void setRecordFactory(final RecordFactory dataObjectFactory) {
-    dataStore.setRecordFactory(dataObjectFactory);
+  public void setRecordFactory(final RecordFactory recordFactory) {
+    dataStore.setRecordFactory(recordFactory);
   }
 
   @Override

@@ -46,7 +46,7 @@ public class EsriGeodatabaseXmlRecordWriter extends
 
   private boolean opened;
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private String datasetType;
 
@@ -54,9 +54,9 @@ public class EsriGeodatabaseXmlRecordWriter extends
 
   private String geometryType;
 
-  public EsriGeodatabaseXmlRecordWriter(final RecordDefinition metaData,
+  public EsriGeodatabaseXmlRecordWriter(final RecordDefinition recordDefinition,
     final Writer out) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     this.out = new XmlWriter(out);
   }
 
@@ -87,7 +87,7 @@ public class EsriGeodatabaseXmlRecordWriter extends
     out.startTag(VALUES);
     out.attribute(XsiConstants.TYPE, VALUES_TYPE);
 
-    for (final Attribute attribute : metaData.getAttributes()) {
+    for (final Attribute attribute : recordDefinition.getAttributes()) {
       final String attributeName = attribute.getName();
       final Object value = object.getValue(attributeName);
       final DataType type = attribute.getType();
@@ -96,7 +96,7 @@ public class EsriGeodatabaseXmlRecordWriter extends
         fieldType.writeValue(out, value);
       }
     }
-    if (metaData.getAttribute("OBJECTID") == null) {
+    if (recordDefinition.getAttribute("OBJECTID") == null) {
       final EsriGeodatabaseXmlFieldType fieldType = fieldTypes.getFieldType(DataTypes.INTEGER);
       fieldType.writeValue(out, objectId++);
     }
@@ -106,10 +106,10 @@ public class EsriGeodatabaseXmlRecordWriter extends
     out.endTag(RECORD);
   }
 
-  private void writeDataElement(final RecordDefinition metaData,
+  private void writeDataElement(final RecordDefinition recordDefinition,
     final Geometry geometry) {
     final String dataElementType;
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     boolean hasGeometry = false;
     DataType geometryDataType = null;
     if (geometryAttribute != null) {
@@ -156,7 +156,7 @@ public class EsriGeodatabaseXmlRecordWriter extends
     out.startTag(DATA_ELEMENT);
     out.attribute(XsiConstants.TYPE, dataElementType);
 
-    final String path = metaData.getPath();
+    final String path = recordDefinition.getPath();
     final String localName = PathUtil.getName(path);
     out.element(CATALOG_PATH, "/FC=" + localName);
     out.element(NAME, localName);
@@ -190,7 +190,7 @@ public class EsriGeodatabaseXmlRecordWriter extends
     out.element(CAN_VERSION, false);
     out.element(HAS_OID, true);
     out.element(OBJECT_ID_FIELD_NAME, "OBJECTID");
-    writeFields(metaData);
+    writeFields(recordDefinition);
 
     out.element(CLSID, "{52353152-891A-11D0-BEC6-00805F7C4268}");
     out.emptyTag(EXTCLSID);
@@ -297,17 +297,17 @@ public class EsriGeodatabaseXmlRecordWriter extends
     }
   }
 
-  private void writeFields(final RecordDefinition metaData) {
+  private void writeFields(final RecordDefinition recordDefinition) {
     out.startTag(FIELDS);
     out.attribute(XsiConstants.TYPE, FIELDS_TYPE);
 
     out.startTag(FIELD_ARRAY);
     out.attribute(XsiConstants.TYPE, FIELD_ARRAY_TYPE);
 
-    for (final Attribute attribute : metaData.getAttributes()) {
+    for (final Attribute attribute : recordDefinition.getAttributes()) {
       writeField(attribute);
     }
-    if (metaData.getAttribute("OBJECTID") == null) {
+    if (recordDefinition.getAttribute("OBJECTID") == null) {
       writeOidField();
     }
     out.endTag(FIELD_ARRAY);
@@ -339,7 +339,7 @@ public class EsriGeodatabaseXmlRecordWriter extends
 
     out.startTag(DATASET_DEFINITIONS);
     out.attribute(XsiConstants.TYPE, DATASET_DEFINITIONS_TYPE);
-    writeDataElement(metaData, geometry);
+    writeDataElement(recordDefinition, geometry);
     out.endTag(DATASET_DEFINITIONS);
 
     out.endTag(WORKSPACE_DEFINITION);
@@ -400,13 +400,13 @@ public class EsriGeodatabaseXmlRecordWriter extends
     out.startTag(DATASET_DATA);
     out.attribute(XsiConstants.TYPE, DATASET_DATA_TABLE_DATA);
 
-    out.element(DATASET_NAME, metaData.getTypeName());
+    out.element(DATASET_NAME, recordDefinition.getTypeName());
     out.element(DATASET_TYPE, datasetType);
 
     out.startTag(DATA);
     out.attribute(XsiConstants.TYPE, DATA_RECORD_SET);
 
-    writeFields(metaData);
+    writeFields(recordDefinition);
 
     out.startTag(RECORDS);
     out.attribute(XsiConstants.TYPE, RECORDS_TYPE);

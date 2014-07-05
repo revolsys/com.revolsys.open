@@ -27,15 +27,15 @@ public interface JdbcRecordStore extends RecordStore {
 
   DataSource getDataSource();
 
-  String getGeneratePrimaryKeySql(RecordDefinition metaData);
+  String getGeneratePrimaryKeySql(RecordDefinition recordDefinition);
 
   @Override
   String getLabel();
 
-  RecordDefinition getMetaData(String tableName,
+  RecordDefinition getRecordDefinition(String tableName,
     ResultSetMetaData resultSetMetaData);
 
-  Object getNextPrimaryKey(RecordDefinition metaData);
+  Object getNextPrimaryKey(RecordDefinition recordDefinition);
 
   Object getNextPrimaryKey(String typePath);
 

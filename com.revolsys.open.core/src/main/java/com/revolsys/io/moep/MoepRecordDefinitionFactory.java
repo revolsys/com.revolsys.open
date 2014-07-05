@@ -14,12 +14,12 @@ public class MoepRecordDefinitionFactory extends AbstractObjectWithProperties
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
     synchronized (META_DATA_CACHE) {
-      RecordDefinition metaData = META_DATA_CACHE.get(typePath);
-      if (metaData == null) {
-        metaData = MoepConstants.createMetaData(typePath);
-        META_DATA_CACHE.put(typePath, metaData);
+      RecordDefinition recordDefinition = META_DATA_CACHE.get(typePath);
+      if (recordDefinition == null) {
+        recordDefinition = MoepConstants.createMetaData(typePath);
+        META_DATA_CACHE.put(typePath, recordDefinition);
       }
-      return metaData;
+      return recordDefinition;
     }
   }
 

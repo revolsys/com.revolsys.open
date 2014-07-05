@@ -107,12 +107,12 @@ public class QueryWhereConditionField extends ValueField implements
       final String name = attribute.getName();
       final Class<?> typeClass = attribute.getTypeClass();
       final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
-      final RecordDefinition metaData = attribute.getMetaData();
-      if (metaData == null) {
+      final RecordDefinition recordDefinition = attribute.getRecordDefinition();
+      if (recordDefinition == null) {
         return new TextField(20);
       } else {
         JComponent field;
-        if (attribute.equals(metaData.getIdAttribute())) {
+        if (attribute.equals(recordDefinition.getIdAttribute())) {
           field = new TextField(20);
         } else if (StringUtils.hasText(searchFieldFactory)) {
           final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
@@ -153,7 +153,7 @@ public class QueryWhereConditionField extends ValueField implements
 
   private final PropertyChangeListener listener;
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private final ComboBox rightUnaryConditionOperator;
 
@@ -189,8 +189,8 @@ public class QueryWhereConditionField extends ValueField implements
     setTitle("Advanced Search");
     this.originalFilter = filter;
     this.listener = listener;
-    this.metaData = layer.getMetaData();
-    final List<Attribute> attributes = this.metaData.getAttributes();
+    this.recordDefinition = layer.getRecordDefinition();
+    final List<Attribute> attributes = this.recordDefinition.getAttributes();
 
     this.fieldNamesList = new ComboBox(new AttributeTitleStringConveter(layer),
       false, attributes);
@@ -269,7 +269,7 @@ public class QueryWhereConditionField extends ValueField implements
     // pane
 
     this.sqlPrefix = "SELECT * FROM "
-      + this.metaData.getPath().substring(1).replace('/', '.') + " WHERE";
+      + this.recordDefinition.getPath().substring(1).replace('/', '.') + " WHERE";
 
     final JPanel filterTextPanel = new JPanel(new BorderLayout());
     filterTextPanel.setOpaque(false);
@@ -316,7 +316,7 @@ public class QueryWhereConditionField extends ValueField implements
       this.whereTextField.setText(query);
     }
     final String searchField = layer.getProperty("searchField");
-    final Attribute searchAttribute = this.metaData.getAttribute(searchField);
+    final Attribute searchAttribute = this.recordDefinition.getAttribute(searchField);
     if (searchAttribute == null) {
       this.fieldNamesList.setSelectedIndex(0);
     } else {
@@ -564,7 +564,7 @@ public class QueryWhereConditionField extends ValueField implements
       if (event.getStateChange() == ItemEvent.SELECTED) {
         final Attribute attribute = (Attribute)event.getItem();
         final String name = attribute.getName();
-        this.codeTable = this.metaData.getCodeTableByColumn(name);
+        this.codeTable = this.recordDefinition.getCodeTableByColumn(name);
         final JComponent binaryConditionField = createSearchField(attribute,
           this.codeTable);
         if (binaryConditionField instanceof DataStoreQueryTextField) {
@@ -745,7 +745,7 @@ public class QueryWhereConditionField extends ValueField implements
       final Column column = toQueryValue(leftValueNode);
       final Value min = toQueryValue(betweenExpressionStart);
       final Value max = toQueryValue(betweenExpressionEnd);
-      final Attribute attribute = this.metaData.getAttribute(column.getName());
+      final Attribute attribute = this.recordDefinition.getAttribute(column.getName());
       min.convert(attribute);
       max.convert(attribute);
       return (V)new Between(column, min, max);
@@ -784,10 +784,10 @@ public class QueryWhereConditionField extends ValueField implements
               final Column column = (Column)leftCondition;
 
               final String name = column.getName();
-              final Attribute attribute = this.metaData.getAttribute(name);
-              final CodeTable codeTable = this.metaData.getCodeTableByColumn(name);
+              final Attribute attribute = this.recordDefinition.getAttribute(name);
+              final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
               if (codeTable == null
-                  || attribute == this.metaData.getIdAttribute()) {
+                  || attribute == this.recordDefinition.getIdAttribute()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(
@@ -841,7 +841,7 @@ public class QueryWhereConditionField extends ValueField implements
       final ColumnReference column = (ColumnReference)expression;
       String columnName = column.getColumnName();
       columnName = columnName.replaceAll("\"", "");
-      final Attribute attribute = this.metaData.getAttribute(columnName);
+      final Attribute attribute = this.recordDefinition.getAttribute(columnName);
       if (attribute == null) {
         setInvalidMessage("Invalid column name " + columnName);
       } else {

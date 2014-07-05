@@ -81,8 +81,8 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
   }
 
   @Override
-  protected void setMetaData(final RecordDefinition metaData) {
-    tableName = sdeUtil.getTableName(metaData);
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    tableName = sdeUtil.getTableName(recordDefinition);
     geometryColumns = new String[] {
       getName()
     };

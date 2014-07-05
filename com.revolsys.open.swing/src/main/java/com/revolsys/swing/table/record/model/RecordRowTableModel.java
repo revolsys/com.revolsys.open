@@ -43,12 +43,12 @@ public abstract class RecordRowTableModel extends
   /** The columnIndex that the attribute start. Allows for extra columns in subclasses.*/
   private int attributesOffset;
 
-  public RecordRowTableModel(final RecordDefinition metaData,
+  public RecordRowTableModel(final RecordDefinition recordDefinition,
     final Collection<String> attributeNames) {
-    super(metaData);
+    super(recordDefinition);
     setAttributeNames(attributeNames);
     setAttributeTitles(Collections.<String> emptyList());
-    final String idAttributeName = metaData.getIdAttributeName();
+    final String idAttributeName = recordDefinition.getIdAttributeName();
     setSortOrder(idAttributeName);
   }
 
@@ -87,8 +87,8 @@ public abstract class RecordRowTableModel extends
       return null;
     } else {
       final String name = getFieldName(columnIndex);
-      final RecordDefinition metaData = getMetaData();
-      return metaData.getAttribute(name);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      return recordDefinition.getAttribute(name);
     }
   }
 
@@ -98,8 +98,8 @@ public abstract class RecordRowTableModel extends
       return Object.class;
     } else {
       final String name = getFieldName(columnIndex);
-      final RecordDefinition metaData = getMetaData();
-      final DataType type = metaData.getAttributeType(name);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final DataType type = recordDefinition.getAttributeType(name);
       if (type == null) {
         return Object.class;
       } else {
@@ -205,7 +205,7 @@ public abstract class RecordRowTableModel extends
           final String attributeName = getFieldName(rowIndex, columnIndex);
           if (attributeName != null) {
             if (!isReadOnly(attributeName)) {
-              final Class<?> attributeClass = getMetaData().getAttributeClass(
+              final Class<?> attributeClass = getRecordDefinition().getAttributeClass(
                 attributeName);
               if (!Geometry.class.isAssignableFrom(attributeClass)) {
                 return true;
@@ -233,8 +233,8 @@ public abstract class RecordRowTableModel extends
 
   public void setAttributeNames(final Collection<String> attributeNames) {
     if (attributeNames == null || attributeNames.isEmpty()) {
-      final RecordDefinition metaData = getMetaData();
-      this.attributeNames = new ArrayList<String>(metaData.getAttributeNames());
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      this.attributeNames = new ArrayList<String>(recordDefinition.getAttributeNames());
     } else {
       this.attributeNames = new ArrayList<String>(attributeNames);
     }
@@ -252,8 +252,8 @@ public abstract class RecordRowTableModel extends
         title = attributeTitles.get(i);
       } else {
         final String attributeName = getFieldName(i);
-        final RecordDefinition metaData = getMetaData();
-        final Attribute attribute = metaData.getAttribute(attributeName);
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final Attribute attribute = recordDefinition.getAttribute(attributeName);
         title = attribute.getTitle();
       }
       this.attributeTitles.add(title);

@@ -84,11 +84,11 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   public Map<String, Object> createDataTableMap(
     final HttpServletRequest request, final String pageName,
     final Map<String, Object> parameters) {
-    final RecordDefinition metaData = getMetaData();
+    final RecordDefinition recordDefinition = getRecordDefinition();
     Query query = (Query)parameters.get("query");
     if (query == null) {
       final Map<String, Object> filter = (Map<String, Object>)parameters.get("filter");
-      query = Query.and(metaData, filter);
+      query = Query.and(recordDefinition, filter);
     }
     final String fromClause = (String)parameters.get("fromClause");
     query.setFromClause(fromClause);
@@ -154,7 +154,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     return this.dataStore;
   }
 
-  protected RecordDefinition getMetaData() {
+  protected RecordDefinition getRecordDefinition() {
     return getDataStore().getRecordDefinition(getTableName());
   }
 
@@ -178,11 +178,11 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     final String attributeName) {
     final String value = object.getValue(attributeName);
     final RecordStore dataStore = getDataStore();
-    final RecordDefinition metaData = dataStore.getRecordDefinition(this.tableName);
-    if (metaData == null) {
+    final RecordDefinition recordDefinition = dataStore.getRecordDefinition(this.tableName);
+    if (recordDefinition == null) {
       return true;
     } else {
-      final Query query = Query.equal(metaData, attributeName, value);
+      final Query query = Query.equal(recordDefinition, attributeName, value);
       final Reader<Record> results = dataStore.query(query);
       final List<Record> objects = results.read();
       if (object.getState() == RecordState.New) {

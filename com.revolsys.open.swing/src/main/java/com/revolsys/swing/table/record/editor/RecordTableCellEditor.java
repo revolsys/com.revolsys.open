@@ -104,9 +104,9 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
     this.oldValue = value;
     final AbstractRecordTableModel model = (AbstractRecordTableModel)table.getModel();
     this.attributeName = model.getFieldName(rowIndex, columnIndex);
-    final RecordDefinition metaData = model.getMetaData();
-    this.dataType = metaData.getAttributeType(this.attributeName);
-    this.editorComponent = (JComponent)SwingUtil.createField(metaData,
+    final RecordDefinition recordDefinition = model.getRecordDefinition();
+    this.dataType = recordDefinition.getAttributeType(this.attributeName);
+    this.editorComponent = (JComponent)SwingUtil.createField(recordDefinition,
       this.attributeName, true);
     if (this.editorComponent instanceof JTextField) {
       final JTextField textField = (JTextField)this.editorComponent;

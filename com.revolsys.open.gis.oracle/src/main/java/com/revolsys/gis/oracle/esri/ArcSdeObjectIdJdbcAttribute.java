@@ -12,9 +12,9 @@ import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
   public static void replaceAttribute(final String schemaName,
-    final RecordDefinition metaData, final Integer registrationId,
+    final RecordDefinition recordDefinition, final Integer registrationId,
     final String rowIdColumn) {
-    final JdbcAttribute objectIdAttribute = (JdbcAttribute)metaData.getAttribute(rowIdColumn);
+    final JdbcAttribute objectIdAttribute = (JdbcAttribute)recordDefinition.getAttribute(rowIdColumn);
     if (objectIdAttribute != null
       && !(objectIdAttribute instanceof ArcSdeObjectIdJdbcAttribute)) {
       final String name = objectIdAttribute.getName();
@@ -24,12 +24,12 @@ public class ArcSdeObjectIdJdbcAttribute extends JdbcAttribute {
       final ArcSdeObjectIdJdbcAttribute newObjectIdAttribute = new ArcSdeObjectIdJdbcAttribute(
         objectIdAttribute.getDbName(), name, description, properties,
         schemaName, registrationId);
-      newObjectIdAttribute.setMetaData(metaData);
-      final RecordDefinitionImpl metaDataImpl = (RecordDefinitionImpl)metaData;
-      metaDataImpl.replaceAttribute(objectIdAttribute, newObjectIdAttribute);
-      if (metaData.getIdAttributeName() == null
-        && metaData.getIdAttributeNames().isEmpty()) {
-        metaDataImpl.setIdAttributeName(name);
+      newObjectIdAttribute.setRecordDefinition(recordDefinition);
+      final RecordDefinitionImpl recordDefinitionImpl = (RecordDefinitionImpl)recordDefinition;
+      recordDefinitionImpl.replaceAttribute(objectIdAttribute, newObjectIdAttribute);
+      if (recordDefinition.getIdAttributeName() == null
+        && recordDefinition.getIdAttributeNames().isEmpty()) {
+        recordDefinitionImpl.setIdAttributeName(name);
       }
     }
   }

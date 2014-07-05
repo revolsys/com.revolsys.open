@@ -27,7 +27,7 @@ public class RecordLayerAttributesTableModel extends
   private final Reference<LayerRecordForm> form;
 
   public RecordLayerAttributesTableModel(final LayerRecordForm form) {
-    super(form.getMetaData(), true);
+    super(form.getRecordDefinition(), true);
     this.form = new WeakReference<>(form);
     this.layer = form.getLayer();
     this.object = form.getRecord();
@@ -83,8 +83,8 @@ public class RecordLayerAttributesTableModel extends
     if (columnIndex == 2) {
       if (this.form.get().isEditable()) {
         final String attributeName = getFieldName(rowIndex);
-        final RecordDefinition metaData = getMetaData();
-        final Attribute idAttribute = metaData.getIdAttribute();
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final Attribute idAttribute = recordDefinition.getIdAttribute();
         if (idAttribute != null) {
           final String idAttributeName = idAttribute.getName();
           if (attributeName.equals(idAttributeName)) {
@@ -96,7 +96,7 @@ public class RecordLayerAttributesTableModel extends
             return false;
           }
         }
-        if (metaData.getGeometryAttributeNames().contains(attributeName)) {
+        if (recordDefinition.getGeometryAttributeNames().contains(attributeName)) {
           return false;
         } else {
           return this.form.get().isEditable(attributeName);
@@ -121,8 +121,8 @@ public class RecordLayerAttributesTableModel extends
     final Object source = event.getSource();
     if (source == this.object) {
       final String propertyName = event.getPropertyName();
-      final RecordDefinition metaData = getMetaData();
-      final int index = metaData.getAttributeIndex(propertyName);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final int index = recordDefinition.getAttributeIndex(propertyName);
       if (index > -1) {
         try {
           fireTableRowsUpdated(index, index);

@@ -62,7 +62,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>,
    *
    * @return The meta data.
    */
-  RecordDefinition getMetaData();
+  RecordDefinition getRecordDefinition();
 
   Short getShort(final CharSequence name);
 

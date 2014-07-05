@@ -37,9 +37,9 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
   private List<String> equalExclude = new ArrayList<String>();
 
-  private RecordDefinition metaData1;
+  private RecordDefinition recordDefinition1;
 
-  private RecordDefinition metaData2;
+  private RecordDefinition recordDefinition2;
 
   private final Set<String> attributeNames = new TreeSet<String>();
 
@@ -89,8 +89,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
   protected Set<String> getNotEqualAttributeNames(final Record object1,
     final Record object2) {
     final Set<String> notEqualAttributeNames = new LinkedHashSet<String>();
-    final String geometryAttributeName1 = metaData1.getGeometryAttributeName();
-    final String geometryAttributeName2 = metaData2.getGeometryAttributeName();
+    final String geometryAttributeName1 = recordDefinition1.getGeometryAttributeName();
+    final String geometryAttributeName2 = recordDefinition2.getGeometryAttributeName();
     for (final String attributeName : attributeNames) {
       if (!equalExclude.contains(attributeName)
         && !attributeName.equals(geometryAttributeName1)
@@ -135,19 +135,19 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
   private void initAttributes() {
     final List<String> attributeNames1 = new ArrayList<>(
-      metaData1.getAttributeNames());
+      recordDefinition1.getAttributeNames());
     final List<String> attributeNames2 = new ArrayList<>(
-      metaData2.getAttributeNames());
+      recordDefinition2.getAttributeNames());
     attributeNames.addAll(attributeNames1);
     attributeNames.retainAll(attributeNames2);
     attributeNames1.removeAll(attributeNames);
-    attributeNames1.remove(metaData1.getGeometryAttributeName());
+    attributeNames1.remove(recordDefinition1.getGeometryAttributeName());
     if (!attributeNames1.isEmpty()) {
       LoggerFactory.getLogger(getClass()).error(
         "Extra columns in file 1: " + attributeNames1);
     }
     attributeNames2.removeAll(attributeNames);
-    attributeNames2.remove(metaData2.getGeometryAttributeName());
+    attributeNames2.remove(recordDefinition2.getGeometryAttributeName());
     if (!attributeNames2.isEmpty()) {
       LoggerFactory.getLogger(getClass()).error(
         "Extra columns in file 2: " + attributeNames2);
@@ -223,10 +223,10 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
       } else {
         final Channel<Record> channel = channels[index];
         final Record readObject = readObject(channel);
-        if (index == 0 && metaData1 == null) {
-          setMetaData1(readObject.getMetaData());
-        } else if (index == 1 && metaData2 == null) {
-          setMetaData2(readObject.getMetaData());
+        if (index == 0 && recordDefinition1 == null) {
+          setRecordDefinition1(readObject.getRecordDefinition());
+        } else if (index == 1 && recordDefinition2 == null) {
+          setRecordDefinition2(readObject.getRecordDefinition());
         }
 
         if (readObject != null) {
@@ -282,7 +282,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
                 final boolean geometryEquals = geometryEquals(sourceObject,
                   otherObject);
                 if (!geometryEquals) {
-                  final String geometryAttributeName = sourceObject.getMetaData()
+                  final String geometryAttributeName = sourceObject.getRecordDefinition()
                     .getGeometryAttributeName();
                   notEqualAttributeNames.add(geometryAttributeName);
                 }
@@ -325,16 +325,16 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     this.equalExclude = equalExclude;
   }
 
-  public void setMetaData1(final RecordDefinition metaData1) {
-    this.metaData1 = metaData1;
-    if (metaData2 != null) {
+  public void setRecordDefinition1(final RecordDefinition recordDefinition1) {
+    this.recordDefinition1 = recordDefinition1;
+    if (recordDefinition2 != null) {
       initAttributes();
     }
   }
 
-  public void setMetaData2(final RecordDefinition metaData2) {
-    this.metaData2 = metaData2;
-    if (metaData1 != null) {
+  public void setRecordDefinition2(final RecordDefinition recordDefinition2) {
+    this.recordDefinition2 = recordDefinition2;
+    if (recordDefinition1 != null) {
       initAttributes();
     }
   }

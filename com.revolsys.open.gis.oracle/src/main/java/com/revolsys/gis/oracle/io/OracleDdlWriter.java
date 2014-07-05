@@ -29,9 +29,9 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public String getSequenceName(final RecordDefinition metaData) {
-    final String typePath = metaData.getPath();
-    final ShortNameProperty shortNameProperty = ShortNameProperty.getProperty(metaData);
+  public String getSequenceName(final RecordDefinition recordDefinition) {
+    final String typePath = recordDefinition.getPath();
+    final ShortNameProperty shortNameProperty = ShortNameProperty.getProperty(recordDefinition);
     String shortName = null;
     if (shortNameProperty != null) {
       shortName = shortNameProperty.getShortName();
@@ -48,15 +48,15 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     }
   }
 
-  public void writeAddGeometryColumn(final RecordDefinition metaData) {
+  public void writeAddGeometryColumn(final RecordDefinition recordDefinition) {
     final PrintWriter out = getOut();
-    final String typePath = metaData.getPath();
+    final String typePath = recordDefinition.getPath();
     String schemaName = JdbcUtils.getSchemaName(typePath);
     if (schemaName.length() == 0) {
       schemaName = "public";
     }
     final String tableName = PathUtil.getName(typePath);
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     if (geometryAttribute != null) {
       final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
@@ -164,19 +164,19 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public String writeCreateSequence(final RecordDefinition metaData) {
-    final String sequenceName = getSequenceName(metaData);
+  public String writeCreateSequence(final RecordDefinition recordDefinition) {
+    final String sequenceName = getSequenceName(recordDefinition);
     writeCreateSequence(sequenceName);
     return sequenceName;
   }
 
   @Override
-  public void writeGeometryMetaData(final RecordDefinition metaData) {
+  public void writeGeometryMetaData(final RecordDefinition recordDefinition) {
     final PrintWriter out = getOut();
-    final String typePath = metaData.getPath();
+    final String typePath = recordDefinition.getPath();
     final String schemaName = JdbcUtils.getSchemaName(typePath);
     final String tableName = PathUtil.getName(typePath);
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     if (geometryAttribute != null) {
       final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       final String name = geometryAttribute.getName();
@@ -221,7 +221,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public void writeResetSequence(final RecordDefinition metaData,
+  public void writeResetSequence(final RecordDefinition recordDefinition,
     final List<Record> values) {
     final PrintWriter out = getOut();
     Long nextValue = 0L;
@@ -238,7 +238,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       }
     }
     nextValue++;
-    final String sequeneName = getSequenceName(metaData);
+    final String sequeneName = getSequenceName(recordDefinition);
     out.println("DECLARE");
     out.println("  cur_val NUMBER;");
     out.println("BEGIN");

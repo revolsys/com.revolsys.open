@@ -50,8 +50,8 @@ RecordReader {
   }
 
   @Override
-  public RecordDefinition getMetaData() {
-    return this.reader.getMetaData();
+  public RecordDefinition getRecordDefinition() {
+    return this.reader.getRecordDefinition();
   }
 
   protected boolean openFile(final Resource resource,

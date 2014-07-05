@@ -12,7 +12,7 @@ public class XbaseSchemaReader {
 
   private final EndianInput in;
 
-  private RecordDefinitionImpl metaData;
+  private RecordDefinitionImpl recordDefinition;
 
   private final String typePath;
 
@@ -23,9 +23,9 @@ public class XbaseSchemaReader {
     this.fieldDefinitions = fieldDefinitions;
   }
 
-  protected RecordDefinition getMetaData() throws IOException {
-    if (metaData == null) {
-      metaData = new RecordDefinitionImpl(typePath);
+  protected RecordDefinition getRecordDefinition() throws IOException {
+    if (recordDefinition == null) {
+      recordDefinition = new RecordDefinitionImpl(typePath);
       int b = in.read();
       while (b != 0x0D) {
         final StringBuffer fieldName = new StringBuffer();
@@ -51,11 +51,11 @@ public class XbaseSchemaReader {
         if (fieldDefinitions != null) {
           fieldDefinitions.add(field);
         }
-        metaData.addAttribute(fieldName.toString(), field.getDataType(),
+        recordDefinition.addAttribute(fieldName.toString(), field.getDataType(),
           length, true);
       }
     }
-    return metaData;
+    return recordDefinition;
   }
 
 }

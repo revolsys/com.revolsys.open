@@ -161,13 +161,13 @@ public class Value extends QueryValue {
 
       CodeTable codeTable = null;
       if (attribute != null) {
-        final RecordDefinition metaData = attribute.getMetaData();
-        if (metaData != null) {
+        final RecordDefinition recordDefinition = attribute.getRecordDefinition();
+        if (recordDefinition != null) {
           final String fieldName = attribute.getName();
-          codeTable = metaData.getCodeTableByColumn(fieldName);
+          codeTable = recordDefinition.getCodeTableByColumn(fieldName);
           if (codeTable instanceof CodeTableProperty) {
             final CodeTableProperty codeTableProperty = (CodeTableProperty)codeTable;
-            if (codeTableProperty.getRecordDefinition() == metaData) {
+            if (codeTableProperty.getRecordDefinition() == recordDefinition) {
               codeTable = null;
             }
           }
@@ -191,10 +191,10 @@ public class Value extends QueryValue {
   }
 
   @Override
-  public void setMetaData(final RecordDefinition metaData) {
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
     final String attributeName = this.attribute.getName();
     if (StringUtils.hasText(attributeName)) {
-      final Attribute attribute = metaData.getAttribute(attributeName);
+      final Attribute attribute = recordDefinition.getAttribute(attributeName);
       setAttribute(attribute);
     }
   }

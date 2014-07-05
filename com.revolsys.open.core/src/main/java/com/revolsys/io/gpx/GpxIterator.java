@@ -43,7 +43,7 @@ public class GpxIterator implements RecordIterator {
 
   private Record currentRecord;
 
-  private RecordFactory dataObjectFactory;
+  private RecordFactory recordFactory;
 
   private File file;
 
@@ -73,18 +73,18 @@ public class GpxIterator implements RecordIterator {
     this(StaxUtils.createXmlReader(in));
   }
 
-  public GpxIterator(final Reader in, final RecordFactory dataObjectFactory,
+  public GpxIterator(final Reader in, final RecordFactory recordFactory,
     final String path) {
     this(StaxUtils.createXmlReader(in));
-    this.dataObjectFactory = dataObjectFactory;
+    this.recordFactory = recordFactory;
     this.typePath = path;
   }
 
   public GpxIterator(final Resource resource,
-    final RecordFactory dataObjectFactory, final String path)
+    final RecordFactory recordFactory, final String path)
     throws IOException {
     this(StaxUtils.createXmlReader(resource));
-    this.dataObjectFactory = dataObjectFactory;
+    this.recordFactory = recordFactory;
     this.typePath = path;
     this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
@@ -109,7 +109,7 @@ public class GpxIterator implements RecordIterator {
   }
 
   @Override
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     return GpxConstants.GPX_TYPE;
   }
 
@@ -134,7 +134,7 @@ public class GpxIterator implements RecordIterator {
         this.currentRecord = parseRecord();
       } while (this.currentRecord != null
           && this.typePath != null
-        && !this.currentRecord.getMetaData()
+        && !this.currentRecord.getRecordDefinition()
           .getPath()
           .equals(this.typePath));
       this.loadNextObject = false;
@@ -158,7 +158,7 @@ public class GpxIterator implements RecordIterator {
     }
   }
 
-  protected Object parseAttribute(final Record dataObject) {
+  protected Object parseAttribute(final Record record) {
     final String attributeName = this.in.getLocalName();
     final String stringValue = StaxUtils.getElementText(this.in);
     Object value;
@@ -170,7 +170,7 @@ public class GpxIterator implements RecordIterator {
       value = stringValue;
     }
     if (value != null) {
-      dataObject.setValue(attributeName, value);
+      record.setValue(attributeName, value);
     }
     return value;
   }
@@ -236,10 +236,10 @@ public class GpxIterator implements RecordIterator {
 
   protected Record parsePoint(final String featureType, final double index)
     throws XMLStreamException {
-    final Record dataObject = this.dataObjectFactory.createRecord(GpxConstants.GPX_TYPE);
-    dataObject.setValue("dataset_name", this.baseName);
-    dataObject.setValue("index", index);
-    dataObject.setValue("feature_type", featureType);
+    final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
+    record.setValue("dataset_name", this.baseName);
+    record.setValue("index", index);
+    record.setValue("feature_type", featureType);
     final double lat = Double.parseDouble(this.in.getAttributeValue("", "lat"));
     final double lon = Double.parseDouble(this.in.getAttributeValue("", "lon"));
     double elevation = Double.NaN;
@@ -250,7 +250,7 @@ public class GpxIterator implements RecordIterator {
       } else if (this.in.getName().equals(GpxConstants.ELEVATION_ELEMENT)) {
         elevation = Double.parseDouble(StaxUtils.getElementText(this.in));
       } else {
-        parseAttribute(dataObject);
+        parseAttribute(record);
       }
     }
 
@@ -262,16 +262,16 @@ public class GpxIterator implements RecordIterator {
     }
 
     final Point point = this.geometryFactory.point(coord);
-    dataObject.setValue("location", point);
-    return dataObject;
+    record.setValue("location", point);
+    return record;
   }
 
   private Record parseRoute() throws XMLStreamException {
     this.index++;
-    final Record dataObject = this.dataObjectFactory.createRecord(GpxConstants.GPX_TYPE);
-    dataObject.setValue("dataset_name", this.baseName);
-    dataObject.setValue("index", this.index);
-    dataObject.setValue("feature_type", "rte");
+    final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
+    record.setValue("dataset_name", this.baseName);
+    record.setValue("index", this.index);
+    record.setValue("feature_type", "rte");
     final List<Record> pointObjects = new ArrayList<Record>();
     int axisCount = 2;
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
@@ -285,7 +285,7 @@ public class GpxIterator implements RecordIterator {
         final Point point = pointObject.getGeometryValue();
         axisCount = Math.max(axisCount, point.getAxisCount());
       } else {
-        parseAttribute(dataObject);
+        parseAttribute(record);
       }
     }
     final int vertexCount = pointObjects.size();
@@ -302,9 +302,9 @@ public class GpxIterator implements RecordIterator {
       line = this.geometryFactory.lineString();
     }
 
-    dataObject.setGeometryValue(line);
+    record.setGeometryValue(line);
     this.objects.addAll(pointObjects);
-    return dataObject;
+    return record;
   }
 
   private Record parseRoutPoint(final double index) throws XMLStreamException {
@@ -314,7 +314,7 @@ public class GpxIterator implements RecordIterator {
 
   private Record parseTrack() throws XMLStreamException {
     this.index++;
-    final Record record = this.dataObjectFactory.createRecord(GpxConstants.GPX_TYPE);
+    final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
     record.setValue("dataset_name", this.baseName);
     record.setValue("index", this.index);
     record.setValue("feature_type", "trk");

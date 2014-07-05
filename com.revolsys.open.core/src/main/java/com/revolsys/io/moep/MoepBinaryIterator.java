@@ -83,7 +83,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   private Record currentRecord;
 
-  private final RecordFactory dataObjectFactory;
+  private final RecordFactory recordFactory;
 
   private final MoepDirectoryReader directoryReader;
 
@@ -107,9 +107,9 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
 
   public MoepBinaryIterator(final MoepDirectoryReader directoryReader,
     final String fileName, final InputStream in,
-    final RecordFactory dataObjectFactory) {
+    final RecordFactory recordFactory) {
     this.directoryReader = directoryReader;
-    this.dataObjectFactory = dataObjectFactory;
+    this.recordFactory = recordFactory;
     switch (fileName.charAt(fileName.length() - 5)) {
       case 'd':
         originalFileType = "dem";
@@ -193,7 +193,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       final int extraParams = featureKey % 100 / 10;
       final int featureType = featureKey % 10;
       final byte numBytes = (byte)read();
-      final Record object = dataObjectFactory.createRecord(MoepConstants.META_DATA);
+      final Record object = recordFactory.createRecord(MoepConstants.META_DATA);
       object.setValue(MoepConstants.MAPSHEET_NAME, mapsheet);
       object.setValue(MoepConstants.FEATURE_CODE, featureCode);
       object.setValue(MoepConstants.ORIGINAL_FILE_TYPE, originalFileType);

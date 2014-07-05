@@ -14,10 +14,10 @@ public class ExcludeGeometryRowFilter extends RowFilter<TableModel, Integer> {
     final Entry<? extends TableModel, ? extends Integer> entry) {
     final TableModel model = entry.getModel();
     if (model instanceof AbstractRecordTableModel) {
-      final AbstractRecordTableModel dataObjectModel = (AbstractRecordTableModel)entry.getModel();
+      final AbstractRecordTableModel recordModel = (AbstractRecordTableModel)entry.getModel();
       final Integer identifier = entry.getIdentifier();
-      final RecordDefinition metaData = dataObjectModel.getMetaData();
-      final Class<?> clazz = metaData.getAttributeClass(identifier);
+      final RecordDefinition recordDefinition = recordModel.getRecordDefinition();
+      final Class<?> clazz = recordDefinition.getAttributeClass(identifier);
       if (Geometry.class.isAssignableFrom(clazz)) {
         return false;
       }

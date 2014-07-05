@@ -34,14 +34,14 @@ public class SetCodeTableId extends
       final Converter<Record, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
       if (sourceValue != null) {
-        final RecordDefinition targetMetaData = target.getMetaData();
+        final RecordDefinition targetRecordDefinition = target.getRecordDefinition();
         String codeTableValueName = null;
         final int dotIndex = codeTableAttributeName.indexOf(".");
         if (dotIndex != -1) {
           codeTableValueName = codeTableAttributeName.substring(dotIndex + 1);
           codeTableAttributeName = codeTableAttributeName.substring(0, dotIndex);
         }
-        final CodeTable targetCodeTable = targetMetaData.getCodeTableByColumn(codeTableAttributeName);
+        final CodeTable targetCodeTable = targetRecordDefinition.getCodeTableByColumn(codeTableAttributeName);
         if (targetCodeTable != null) {
           if (codeTableValueName == null) {
             sourceValue = targetCodeTable.getId(sourceValue);

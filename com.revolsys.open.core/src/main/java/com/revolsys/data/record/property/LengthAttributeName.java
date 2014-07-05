@@ -11,16 +11,16 @@ public class LengthAttributeName extends AbstractRecordDefinitionProperty {
     + ".propertyName";
 
   public static LengthAttributeName getProperty(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    return getProperty(metaData);
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    return getProperty(recordDefinition);
   }
 
   public static LengthAttributeName getProperty(
-    final RecordDefinition metaData) {
-    LengthAttributeName property = metaData.getProperty(PROPERTY_NAME);
+    final RecordDefinition recordDefinition) {
+    LengthAttributeName property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
       property = new LengthAttributeName();
-      property.setRecordDefinition(metaData);
+      property.setRecordDefinition(recordDefinition);
     }
     return property;
   }

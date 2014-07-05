@@ -20,7 +20,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
-  private RecordFactory dataObjectFactory;
+  private RecordFactory recordFactory;
 
   private Table table;
 
@@ -30,7 +30,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private BoundingBox boundingBox;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private CapiFileGdbRecordStore dataStore;
 
@@ -59,9 +59,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     final BoundingBox boundingBox, final Query query, final int offset,
     final int limit) {
     this(dataStore, typePath, "*", whereClause, boundingBox, offset, limit);
-    final RecordFactory factory = query.getProperty("dataObjectFactory");
+    final RecordFactory factory = query.getProperty("recordFactory");
     if (factory != null) {
-      this.dataObjectFactory = factory;
+      this.recordFactory = factory;
     }
   }
 
@@ -70,12 +70,12 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     final BoundingBox boundingBox, final int offset, final int limit) {
     this.dataStore = dataStore;
     this.typePath = typePath;
-    this.metaData = dataStore.getRecordDefinition(typePath);
+    this.recordDefinition = dataStore.getRecordDefinition(typePath);
     this.table = dataStore.getTable(typePath);
     this.fields = fields;
     this.sql = sql;
     setBoundingBox(boundingBox);
-    this.dataObjectFactory = dataStore.getRecordFactory();
+    this.recordFactory = dataStore.getRecordFactory();
     this.offset = offset;
     this.limit = limit;
   }
@@ -90,7 +90,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         boundingBox = null;
         dataStore = null;
         fields = null;
-        metaData = null;
+        recordDefinition = null;
         rows = null;
         sql = null;
         table = null;
@@ -100,7 +100,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   @Override
   protected void doInit() {
-    if (metaData != null) {
+    if (recordDefinition != null) {
       synchronized (dataStore) {
         if (boundingBox == null) {
           if (sql.startsWith("SELECT")) {
@@ -123,16 +123,16 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     }
   }
 
-  protected RecordDefinition getMetaData() {
-    if (metaData == null) {
+  protected RecordDefinition getRecordDefinition() {
+    if (recordDefinition == null) {
       hasNext();
     }
-    return metaData;
+    return recordDefinition;
   }
 
   @Override
   protected Record getNext() throws NoSuchElementException {
-    if (rows == null || metaData == null) {
+    if (rows == null || recordDefinition == null) {
       throw new NoSuchElementException();
     } else {
       Row row = null;
@@ -149,10 +149,10 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         throw new NoSuchElementException();
       } else {
         try {
-          final Record object = dataObjectFactory.createRecord(metaData);
+          final Record object = recordFactory.createRecord(recordDefinition);
           dataStore.addStatistic("query", object);
           object.setState(RecordState.Initalizing);
-          for (final Attribute attribute : metaData.getAttributes()) {
+          for (final Attribute attribute : recordDefinition.getAttributes()) {
             final String name = attribute.getName();
             final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
             final Object value;
@@ -172,12 +172,12 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
-    final RecordDefinition metaData = this.metaData;
-    if (metaData != null) {
+    final RecordDefinition recordDefinition = this.recordDefinition;
+    if (recordDefinition != null) {
       this.boundingBox = boundingBox;
 
       if (boundingBox != null) {
-        final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
         if (geometryAttribute != null) {
           final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
           if (geometryFactory != null) {

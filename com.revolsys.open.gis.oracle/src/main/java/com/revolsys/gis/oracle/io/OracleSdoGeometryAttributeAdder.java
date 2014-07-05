@@ -122,13 +122,13 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(final RecordDefinitionImpl metaData,
+  public Attribute addAttribute(final RecordDefinitionImpl recordDefinition,
     final String dbName, final String name, final String dataTypeName,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final String typePath = metaData.getPath();
+    final String typePath = recordDefinition.getPath();
     final String columnName = name.toUpperCase();
-    final RecordStoreSchema schema = metaData.getSchema();
+    final RecordStoreSchema schema = recordDefinition.getSchema();
 
     GeometryFactory geometryFactory = getColumnProperty(schema, typePath,
       columnName, GEOMETRY_FACTORY);
@@ -155,7 +155,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     final Attribute attribute = new OracleSdoGeometryJdbcAttribute(dbName,
       name, dataType, sqlType, required, description, null, geometryFactory,
       axisCount, oracleSrid);
-    metaData.addAttribute(attribute);
+    recordDefinition.addAttribute(attribute);
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return attribute;
 

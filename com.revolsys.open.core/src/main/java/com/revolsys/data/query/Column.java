@@ -77,8 +77,8 @@ public class Column extends QueryValue {
   }
 
   @Override
-  public void setMetaData(final RecordDefinition metaData) {
-    attribute = metaData.getAttribute(getName());
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    attribute = recordDefinition.getAttribute(getName());
   }
 
   @Override

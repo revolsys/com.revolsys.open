@@ -97,8 +97,8 @@ public class RecordPseudoNodeRemovalVisitor extends
   }
 
   private void processPseudoNodes(final Node<Record> node) {
-    for (final RecordDefinition metaData : NodeAttributes.getEdgeMetaDatas(node)) {
-      final PseudoNodeProperty property = PseudoNodeProperty.getProperty(metaData);
+    for (final RecordDefinition recordDefinition : NodeAttributes.getEdgeMetaDatas(node)) {
+      final PseudoNodeProperty property = PseudoNodeProperty.getProperty(recordDefinition);
 
       final PseudoNodeAttribute pseudoNodeAttribute = property.getAttribute(node);
       processPseudoNodesForType(node, pseudoNodeAttribute);

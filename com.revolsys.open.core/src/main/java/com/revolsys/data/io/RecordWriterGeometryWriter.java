@@ -44,9 +44,9 @@ public class RecordWriterGeometryWriter extends AbstractWriter<Geometry> {
 
   @Override
   public void write(final Geometry geometry) {
-    RecordDefinition metaData = RecordUtil.createGeometryMetaData();
+    RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
     final Record object = new ArrayRecord(
-      metaData);
+      recordDefinition);
     object.setGeometryValue(geometry);
     writer.write(object);
   }

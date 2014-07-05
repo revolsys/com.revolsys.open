@@ -115,9 +115,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final LayerGroup childGroup = (LayerGroup)layer;
         addSelectedRecords(childGroup, boundingBox);
       } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
-        if (dataObjectLayer.isSelectable(scale)) {
-          dataObjectLayer.addSelectedRecords(boundingBox);
+        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+        if (recordLayer.isSelectable(scale)) {
+          recordLayer.addSelectedRecords(boundingBox);
         }
       }
     }
@@ -136,8 +136,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     Invoke.background("Select records", this, methodName, boundingBox);
   }
 
-  protected boolean isSelectable(final AbstractRecordLayer dataObjectLayer) {
-    return dataObjectLayer.isSelectable();
+  protected boolean isSelectable(final AbstractRecordLayer recordLayer) {
+    return recordLayer.isSelectable();
   }
 
   public boolean isSelectEvent(final MouseEvent event) {
@@ -282,12 +282,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final LayerGroup childGroup = (LayerGroup)layer;
         paintHighlighted(vieport, childGroup);
       } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
-        for (final LayerRecord record : dataObjectLayer.getHighlightedRecords()) {
-          if (record != null && dataObjectLayer.isVisible(record)) {
+        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+        for (final LayerRecord record : recordLayer.getHighlightedRecords()) {
+          if (record != null && recordLayer.isVisible(record)) {
             final Geometry geometry = record.getGeometryValue();
             final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
-            layerRenderer.renderSelectedRecord(vieport, dataObjectLayer, record);
+            layerRenderer.renderSelectedRecord(vieport, recordLayer, record);
             HIGHLIGHT_RENDERER.paintSelected(vieport, viewportGeometryFactory,
               geometry);
           }
@@ -455,11 +455,11 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final LayerGroup childGroup = (LayerGroup)layer;
         selectRecords(childGroup, boundingBox);
       } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
-        if (dataObjectLayer.isSelectable(scale)) {
-          dataObjectLayer.setSelectedRecords(boundingBox);
+        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+        if (recordLayer.isSelectable(scale)) {
+          recordLayer.setSelectedRecords(boundingBox);
         } else {
-          dataObjectLayer.clearSelectedRecords();
+          recordLayer.clearSelectedRecords();
         }
       }
     }
@@ -509,9 +509,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final LayerGroup childGroup = (LayerGroup)layer;
         unSelectRecords(childGroup, boundingBox);
       } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
-        if (dataObjectLayer.isSelectable(scale)) {
-          dataObjectLayer.unSelectRecords(boundingBox);
+        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+        if (recordLayer.isSelectable(scale)) {
+          recordLayer.unSelectRecords(boundingBox);
         }
       }
     }

@@ -86,13 +86,13 @@ public class JsonSchemaWriter {
     return jsonValue;
   }
 
-  public void write(final RecordDefinition metaData) {
-    final Map<String, Object> metaDataMap = new LinkedHashMap<String, Object>();
-    metaDataMap.put("name", metaData.getPath());
+  public void write(final RecordDefinition recordDefinition) {
+    final Map<String, Object> recordDefinitionMap = new LinkedHashMap<String, Object>();
+    recordDefinitionMap.put("name", recordDefinition.getPath());
 
     final List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-    metaDataMap.put("fields", fields);
-    for (final Attribute attribute : metaData.getAttributes()) {
+    recordDefinitionMap.put("fields", fields);
+    for (final Attribute attribute : recordDefinition.getAttributes()) {
       final Map<String, Object> field = new LinkedHashMap<String, Object>();
       final String name = attribute.getName();
       field.put("name", name);
@@ -117,6 +117,6 @@ public class JsonSchemaWriter {
       fields.add(field);
     }
 
-    writer.write(metaDataMap);
+    writer.write(recordDefinitionMap);
   }
 }

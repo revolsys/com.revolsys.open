@@ -315,7 +315,7 @@ public class OsnSerializer {
   }
 
   public void serializeAttributes(final Record object) throws IOException {
-    final RecordDefinition type = object.getMetaData();
+    final RecordDefinition type = object.getRecordDefinition();
     final int attributeCount = type.getAttributeCount();
     for (int i = 0; i < attributeCount; i++) {
       final Object value = object.getValue(i);
@@ -340,7 +340,7 @@ public class OsnSerializer {
               final Object parent = scopes.next();
               if (parent instanceof Record) {
                 final Record parentObject = (Record)parent;
-                if (parentObject.getMetaData()
+                if (parentObject.getRecordDefinition()
                   .getTypeName()
                   .equals(SaifConstants.TEXT_ON_CURVE)) {
                   endLine();
@@ -382,7 +382,7 @@ public class OsnSerializer {
   }
 
   public void serializeStartObject(final Record object) throws IOException {
-    final RecordDefinition type = object.getMetaData();
+    final RecordDefinition type = object.getRecordDefinition();
     final String path = type.getPath();
     startObject(path);
   }

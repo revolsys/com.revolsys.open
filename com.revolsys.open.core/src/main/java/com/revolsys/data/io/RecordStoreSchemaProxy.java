@@ -7,37 +7,37 @@ public class RecordStoreSchemaProxy extends RecordStoreSchema {
   private final RecordStoreSchema schema;
 
   public RecordStoreSchemaProxy(
-    final AbstractRecordStore dataObjectStore, final String name,
+    final AbstractRecordStore recordStore, final String name,
     final RecordStoreSchema schema) {
-    super(dataObjectStore, name);
+    super(recordStore, name);
     this.schema = schema;
   }
 
   @Override
   public synchronized RecordDefinition findMetaData(final String typePath) {
-    RecordDefinition metaData = super.findMetaData(typePath);
-    if (metaData == null) {
-      metaData = schema.findMetaData(typePath);
-      if (metaData != null) {
-        metaData = new RecordDefinitionImpl(getDataStore(), this,
-          metaData);
-        addMetaData(typePath, metaData);
+    RecordDefinition recordDefinition = super.findMetaData(typePath);
+    if (recordDefinition == null) {
+      recordDefinition = schema.findMetaData(typePath);
+      if (recordDefinition != null) {
+        recordDefinition = new RecordDefinitionImpl(getDataStore(), this,
+          recordDefinition);
+        addMetaData(typePath, recordDefinition);
       }
     }
-    return metaData;
+    return recordDefinition;
   }
 
   @Override
-  public synchronized RecordDefinition getMetaData(final String typePath) {
-    RecordDefinition metaData = findMetaData(typePath);
-    if (metaData == null) {
-      metaData = schema.getMetaData(typePath);
-      if (metaData != null) {
-        metaData = new RecordDefinitionImpl(getDataStore(), this,
-          metaData);
-        addMetaData(typePath, metaData);
+  public synchronized RecordDefinition getRecordDefinition(final String typePath) {
+    RecordDefinition recordDefinition = findMetaData(typePath);
+    if (recordDefinition == null) {
+      recordDefinition = schema.getRecordDefinition(typePath);
+      if (recordDefinition != null) {
+        recordDefinition = new RecordDefinitionImpl(getDataStore(), this,
+          recordDefinition);
+        addMetaData(typePath, recordDefinition);
       }
     }
-    return metaData;
+    return recordDefinition;
   }
 }

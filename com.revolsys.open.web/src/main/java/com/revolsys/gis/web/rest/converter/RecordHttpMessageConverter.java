@@ -49,8 +49,8 @@ AbstractHttpMessageConverter<Record> {
     final RecordReader reader = this.readerConverter.read(RecordReader.class,
       inputMessage);
     try {
-      for (final Record dataObject : reader) {
-        return dataObject;
+      for (final Record record : reader) {
+        return record;
       }
       return null;
     } finally {
@@ -67,17 +67,17 @@ AbstractHttpMessageConverter<Record> {
   }
 
   @Override
-  public void write(final Record dataObject, final MediaType mediaType,
+  public void write(final Record record, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
-      if (dataObject != null) {
-        final RecordDefinition metaData = dataObject.getMetaData();
+      if (record != null) {
+        final RecordDefinition recordDefinition = record.getRecordDefinition();
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         requestAttributes.setAttribute(IoConstants.SINGLE_OBJECT_PROPERTY,
           true, RequestAttributes.SCOPE_REQUEST);
-        final ListRecordReader reader = new ListRecordReader(metaData,
-          dataObject);
+        final ListRecordReader reader = new ListRecordReader(recordDefinition,
+          record);
         this.readerConverter.write(reader, mediaType, outputMessage);
       }
     }

@@ -30,21 +30,21 @@ public abstract class AbstractMultipleWriter extends AbstractWriter<Record> {
   }
 
   protected abstract Writer<Record> createWriter(
-    final RecordDefinition metaData);
+    final RecordDefinition recordDefinition);
 
-  private Writer<Record> getWriter(final RecordDefinition metaData) {
-    Writer<Record> writer = writers.get(metaData);
+  private Writer<Record> getWriter(final RecordDefinition recordDefinition) {
+    Writer<Record> writer = writers.get(recordDefinition);
     if (writer == null) {
-      writer = createWriter(metaData);
-      writers.put(metaData, writer);
+      writer = createWriter(recordDefinition);
+      writers.put(recordDefinition, writer);
     }
     return writer;
   }
 
   @Override
   public void write(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    final Writer<Record> writer = getWriter(metaData);
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final Writer<Record> writer = getWriter(recordDefinition);
     writer.write(object);
   }
 }

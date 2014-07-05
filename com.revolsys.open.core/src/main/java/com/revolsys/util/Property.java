@@ -115,8 +115,8 @@ public final class Property {
       return null;
     } else {
       if (object instanceof Record) {
-        final Record dataObject = (Record)object;
-        return dataObject.getValueByPath(key);
+        final Record record = (Record)object;
+        return record.getValueByPath(key);
       } else if (object instanceof Map) {
         final Map<String, ?> map = (Map<String, ?>)object;
         return (T)map.get(key);
@@ -225,8 +225,8 @@ public final class Property {
       return null;
     } else {
       if (object instanceof Record) {
-        final Record dataObject = (Record)object;
-        return dataObject.getValue(key);
+        final Record record = (Record)object;
+        return record.getValue(key);
       } else if (object instanceof Map) {
         final Map<String, ?> map = (Map<String, ?>)object;
         return (T)map.get(key);
@@ -461,8 +461,8 @@ public final class Property {
     final Object value) {
     if (object != null) {
       if (object instanceof Record) {
-        final Record dataObject = (Record)object;
-        dataObject.setValueByPath(propertyName, value);
+        final Record record = (Record)object;
+        record.setValueByPath(propertyName, value);
       } else if (object instanceof Map) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> map = (Map<String, Object>)object;

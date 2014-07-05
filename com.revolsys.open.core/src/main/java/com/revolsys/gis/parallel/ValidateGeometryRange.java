@@ -131,7 +131,7 @@ public class ValidateGeometryRange extends
     final Channel<Record> out, final Record object) {
     // TODO Auto-generated method stub
     final Geometry geometry = object.getGeometryValue();
-    isValid(object.getMetaData().getPath().toString(), geometry);
+    isValid(object.getRecordDefinition().getPath().toString(), geometry);
     out.write(object);
   }
 

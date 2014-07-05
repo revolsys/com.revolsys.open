@@ -77,7 +77,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private final TextField searchTextField;
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private final AbstractRecordLayer layer;
 
@@ -110,7 +110,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
   public AttributeFilterPanel(final RecordLayerTablePanel tablePanel) {
     this.tableModel = tablePanel.getTableModel();
     this.layer = tablePanel.getLayer();
-    this.metaData = this.layer.getMetaData();
+    this.recordDefinition = this.layer.getRecordDefinition();
 
     this.whereLabel = new JLabel();
     this.whereLabel.setMaximumSize(new Dimension(100, 250));
@@ -123,7 +123,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
     add(this.whereLabel);
 
     this.attributeNames = new ArrayList<String>(tablePanel.getColumnNames());
-    this.attributeNames.remove(this.metaData.getGeometryAttributeName());
+    this.attributeNames.remove(this.recordDefinition.getGeometryAttributeName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
       this.layer);
     this.nameField = new ComboBox(converter, false,
@@ -192,7 +192,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
       if (!StringUtils.hasText(searchField)) {
         searchField = this.layer.getProperty("searchField");
         if (!StringUtils.hasText(searchField)) {
-          searchField = this.metaData.getAttributeNames().get(0);
+          searchField = this.recordDefinition.getAttributeNames().get(0);
         }
       }
       setSearchFieldName(searchField);
@@ -469,9 +469,9 @@ ItemListener, DocumentListener, PropertyChangeListener {
     if (!EqualsRegistry.equal(searchFieldName, this.previousSearchFieldName)) {
       this.previousSearchFieldName = searchFieldName;
       this.layer.setProperty("searchField", searchFieldName);
-      this.codeTable = this.metaData.getCodeTableByColumn(searchFieldName);
-      final RecordDefinition metaData = this.tableModel.getMetaData();
-      this.attribute = metaData.getAttribute(searchFieldName);
+      this.codeTable = this.recordDefinition.getCodeTableByColumn(searchFieldName);
+      final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();
+      this.attribute = recordDefinition.getAttribute(searchFieldName);
       final Class<?> attributeClass = this.attribute.getTypeClass();
       if (!EqualsRegistry.equal(searchFieldName,
         this.nameField.getSelectedItem())) {
@@ -480,7 +480,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
       ComboBox operatorField;
       if (this.codeTable != null
-          && !searchFieldName.equals(metaData.getIdAttributeName())) {
+          && !searchFieldName.equals(recordDefinition.getIdAttributeName())) {
         operatorField = this.codeTableOperatorField;
       } else if (Number.class.isAssignableFrom(attributeClass)) {
         operatorField = this.numericOperatorField;

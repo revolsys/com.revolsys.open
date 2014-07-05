@@ -12,18 +12,18 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
   /** Seialization version */
   private static final long serialVersionUID = 2704226494490082708L;
 
-  /** The metaData defining the object type. */
-  private transient RecordDefinition metaData;
+  /** The recordDefinition defining the object type. */
+  private transient RecordDefinition recordDefinition;
 
   protected RecordState state = RecordState.Initalizing;
 
   /**
-   * Construct a new empty BaseRecord using the metaData.
+   * Construct a new empty BaseRecord using the recordDefinition.
    *
-   * @param metaData The metaData defining the object type.
+   * @param recordDefinition The recordDefinition defining the object type.
    */
-  public BaseRecord(final RecordDefinition metaData) {
-    this.metaData = metaData;
+  public BaseRecord(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
   }
 
   /**
@@ -32,8 +32,8 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
    * @return The meta data.
    */
   @Override
-  public RecordDefinition getMetaData() {
-    return this.metaData;
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   @Override
@@ -43,8 +43,8 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
 
   private void readObject(final ObjectInputStream ois)
       throws ClassNotFoundException, IOException {
-    final int metaDataInstanceId = ois.readInt();
-    this.metaData = RecordDefinitionImpl.getMetaData(metaDataInstanceId);
+    final int recordDefinitionInstanceId = ois.readInt();
+    this.recordDefinition = RecordDefinitionImpl.getRecordDefinition(recordDefinitionInstanceId);
     ois.defaultReadObject();
   }
 
@@ -54,7 +54,7 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
   }
 
   private void writeObject(final ObjectOutputStream oos) throws IOException {
-    oos.writeInt(this.metaData.getInstanceId());
+    oos.writeInt(this.recordDefinition.getInstanceId());
     oos.defaultWriteObject();
   }
 }

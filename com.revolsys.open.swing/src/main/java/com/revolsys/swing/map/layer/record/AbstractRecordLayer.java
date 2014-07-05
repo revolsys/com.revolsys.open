@@ -133,8 +133,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           addVisibleLayers(layers, layerGroup);
         } else if (layer instanceof AbstractRecordLayer) {
           if (layer.isExists() && layer.isVisible()) {
-            final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
-            layers.add(dataObjectLayer);
+            final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+            layers.add(recordLayer);
           }
         }
       }
@@ -253,7 +253,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   private final Map<Record, Window> formWindows = new HashMap<Record, Window>();
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private Query query;
 
@@ -291,9 +291,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     setProperties(properties);
   }
 
-  public AbstractRecordLayer(final RecordDefinition metaData) {
-    this(metaData.getTypeName());
-    setMetaData(metaData);
+  public AbstractRecordLayer(final RecordDefinition recordDefinition) {
+    this(recordDefinition.getTypeName());
+    setRecordDefinition(recordDefinition);
   }
 
   public AbstractRecordLayer(final String name) {
@@ -313,8 +313,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   @Override
   public void addComplete(final AbstractOverlay overlay, final Geometry geometry) {
     if (geometry != null) {
-      final RecordDefinition metaData = getMetaData();
-      final String geometryAttributeName = metaData.getGeometryAttributeName();
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
       final Map<String, Object> parameters = new HashMap<String, Object>();
       parameters.put(geometryAttributeName, geometry);
       showAddForm(parameters);
@@ -342,8 +342,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public void addNewRecord() {
-    final RecordDefinition metaData = getMetaData();
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     if (geometryAttribute == null) {
       showAddForm(null);
     } else {
@@ -529,12 +529,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public void copyRecordsToClipboard(final List<LayerRecord> records) {
     if (!records.isEmpty()) {
-      final RecordDefinition metaData = getMetaData();
+      final RecordDefinition recordDefinition = getRecordDefinition();
       final List<Record> copies = new ArrayList<Record>();
       for (final LayerRecord record : records) {
         copies.add(new ArrayRecord(record));
       }
-      final RecordReader reader = new ListRecordReader(metaData, copies);
+      final RecordReader reader = new ListRecordReader(recordDefinition, copies);
       final RecordReaderTransferable transferable = new RecordReaderTransferable(
         reader);
       ClipboardUtil.setContents(transferable);
@@ -580,8 +580,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   protected void createPropertiesPanelFields(
     final TabbedValuePanel propertiesPanel) {
-    final RecordDefinition metaData = getMetaData();
-    final BaseJxTable fieldTable = RecordDefinitionTableModel.createTable(metaData);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final BaseJxTable fieldTable = RecordDefinitionTableModel.createTable(recordDefinition);
 
     final BasePanel fieldPanel = new BasePanel(new BorderLayout());
     fieldPanel.setPreferredSize(new Dimension(500, 400));
@@ -617,7 +617,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public LayerRecord createRecord(final Map<String, Object> values) {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
-      final LayerRecord record = createRecord(getMetaData());
+      final LayerRecord record = createRecord(getRecordDefinition());
       record.setState(RecordState.Initalizing);
       try {
         if (values != null && !values.isEmpty()) {
@@ -636,12 +636,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   @Override
-  public LayerRecord createRecord(final RecordDefinition metaData) {
-    if (metaData.equals(getMetaData())) {
+  public LayerRecord createRecord(final RecordDefinition recordDefinition) {
+    if (recordDefinition.equals(getRecordDefinition())) {
       return new ArrayLayerRecord(this);
     } else {
       throw new IllegalArgumentException("Cannot create records for "
-        + metaData);
+        + recordDefinition);
     }
   }
 
@@ -924,8 +924,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       if (this.columnNames == null) {
         final Set<String> columnNames = new LinkedHashSet<String>(
           this.columnNameOrder);
-        final RecordDefinition metaData = getMetaData();
-        final List<String> attributeNames = metaData.getAttributeNames();
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final List<String> attributeNames = recordDefinition.getAttributeNames();
         columnNames.addAll(attributeNames);
         this.columnNames = new ArrayList<String>(columnNames);
         updateColumnNames();
@@ -939,7 +939,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public RecordStore getDataStore() {
-    return getMetaData().getDataStore();
+    return getRecordDefinition().getDataStore();
   }
 
   public int getDeletedRecordCount() {
@@ -959,27 +959,27 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public String getFieldTitle(final String fieldName) {
     if (isUseFieldTitles()) {
-      final RecordDefinition metaData = getMetaData();
-      return metaData.getAttributeTitle(fieldName);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      return recordDefinition.getAttributeTitle(fieldName);
     } else {
       return fieldName;
     }
   }
 
   public String getGeometryAttributeName() {
-    if (this.metaData == null) {
+    if (this.recordDefinition == null) {
       return "";
     } else {
-      return getMetaData().getGeometryAttributeName();
+      return getRecordDefinition().getGeometryAttributeName();
     }
   }
 
   public DataType getGeometryType() {
-    final RecordDefinition metaData = getMetaData();
-    if (metaData == null) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
       return null;
     } else {
-      final Attribute geometryAttribute = metaData.getGeometryAttribute();
+      final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
       if (geometryAttribute == null) {
         return null;
       } else {
@@ -997,7 +997,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public String getIdAttributeName() {
-    return getMetaData().getIdAttributeName();
+    return getRecordDefinition().getIdAttributeName();
   }
 
   public RecordQuadTree getIndex() {
@@ -1058,17 +1058,17 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       if (compare > 0) {
         return getMergedRecord(point, record2, record1);
       } else {
-        final DirectionalAttributes property = DirectionalAttributes.getProperty(getMetaData());
+        final DirectionalAttributes property = DirectionalAttributes.getProperty(getRecordDefinition());
         final Map<String, Object> newValues = property.getMergedMap(point,
           record1, record2);
         newValues.remove(getIdAttributeName());
-        return new ArrayRecord(getMetaData(), newValues);
+        return new ArrayRecord(getRecordDefinition(), newValues);
       }
     }
   }
 
-  public RecordDefinition getMetaData() {
-    return this.metaData;
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   public int getModifiedRecordCount() {
@@ -1093,8 +1093,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       if (record == null) {
         return null;
       } else {
-        final RecordDefinition metaData = getMetaData();
-        final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
         if (geometryAttribute != null) {
           final MapPanel parentComponent = MapPanel.get(getProject());
           Geometry geometry = null;
@@ -1208,8 +1208,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public int getRowCount() {
-    final RecordDefinition metaData = getMetaData();
-    final Query query = new Query(metaData);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Query query = new Query(recordDefinition);
     return getRowCount(query);
   }
 
@@ -1267,14 +1267,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public boolean hasGeometryAttribute() {
-    return getMetaData().getGeometryAttribute() != null;
+    return getRecordDefinition().getGeometryAttribute() != null;
   }
 
   protected boolean hasPermission(final String permission) {
-    if (this.metaData == null) {
+    if (this.recordDefinition == null) {
       return true;
     } else {
-      final Collection<String> permissions = this.metaData.getProperty("permissions");
+      final Collection<String> permissions = this.recordDefinition.getProperty("permissions");
       if (permissions == null) {
         return true;
       } else {
@@ -1449,7 +1449,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public boolean isLayerRecord(final Record record) {
     if (record == null) {
       return false;
-    } else if (record.getMetaData() == getMetaData()) {
+    } else if (record.getRecordDefinition() == getRecordDefinition()) {
       return true;
     } else {
       return false;
@@ -1556,8 +1556,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       final List<LayerRecord> newRecords = new ArrayList<LayerRecord>();
       final List<Record> regectedRecords = new ArrayList<Record>();
       if (reader != null) {
-        final RecordDefinition metaData = getMetaData();
-        final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
         DataType geometryDataType = null;
         Class<?> layerGeometryClass = null;
         final GeometryFactory geometryFactory = getGeometryFactory();
@@ -1576,7 +1576,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
           for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
             final String attributeName = iterator.next();
-            final Attribute attribute = metaData.getAttribute(attributeName);
+            final Attribute attribute = recordDefinition.getAttribute(attributeName);
             if (attribute == null) {
               iterator.remove();
             } else if (ignorePasteFields != null) {
@@ -1671,11 +1671,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       final String propertyName = event.getPropertyName();
       if (!"errorsUpdated".equals(propertyName)) {
         if (source instanceof LayerRecord) {
-          final LayerRecord dataObject = (LayerRecord)source;
-          if (dataObject.getLayer() == this) {
+          final LayerRecord record = (LayerRecord)source;
+          if (record.getLayer() == this) {
             if (EqualsRegistry.equal(propertyName, getGeometryAttributeName())) {
               final Geometry oldGeometry = (Geometry)event.getOldValue();
-              updateSpatialIndex(dataObject, oldGeometry);
+              updateSpatialIndex(record, oldGeometry);
             }
             clearSelectedRecordsIndex();
           }
@@ -2006,11 +2006,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     }
   }
 
-  protected void setMetaData(final RecordDefinition metaData) {
-    this.metaData = metaData;
-    if (metaData != null) {
-      setGeometryFactory(metaData.getGeometryFactory());
-      if (metaData.getGeometryAttributeIndex() == -1) {
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+    if (recordDefinition != null) {
+      setGeometryFactory(recordDefinition.getGeometryFactory());
+      if (recordDefinition.getGeometryAttributeIndex() == -1) {
         setVisible(false);
         setSelectSupported(false);
         setRenderer(null);
@@ -2042,11 +2042,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public void setQuery(final Query query) {
     final Query oldValue = this.query;
     if (query == null) {
-      final RecordDefinition metaData = getMetaData();
-      if (metaData == null) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      if (recordDefinition == null) {
         this.query = null;
       } else {
-        this.query = new Query(metaData);
+        this.query = new Query(recordDefinition);
       }
     } else {
       this.query = query;
@@ -2091,13 +2091,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public void setSelectedRecordsById(final Object id) {
-    final RecordDefinition metaData = getMetaData();
-    if (metaData != null) {
-      final String idAttributeName = metaData.getIdAttributeName();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      final String idAttributeName = recordDefinition.getIdAttributeName();
       if (idAttributeName == null) {
         clearSelectedRecords();
       } else {
-        final Query query = Query.equal(metaData, idAttributeName, id);
+        final Query query = Query.equal(recordDefinition, idAttributeName, id);
         final List<LayerRecord> records = query(query);
         setSelectedRecords(records);
       }
@@ -2168,8 +2168,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
             } else {
               title = "View " + getName() + " #" + id;
               if (form instanceof LayerRecordForm) {
-                final LayerRecordForm dataObjectForm = (LayerRecordForm)form;
-                dataObjectForm.setEditable(false);
+                final LayerRecordForm recordForm = (LayerRecordForm)form;
+                recordForm.setEditable(false);
               }
             }
             final Window parent = SwingUtil.getActiveWindow();
@@ -2177,8 +2177,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
             window.add(form);
             window.pack();
             if (form instanceof LayerRecordForm) {
-              final LayerRecordForm dataObjectForm = (LayerRecordForm)form;
-              window.addWindowListener(dataObjectForm);
+              final LayerRecordForm recordForm = (LayerRecordForm)form;
+              window.addWindowListener(recordForm);
             }
             SwingUtil.autoAdjustPosition(window);
             final int offset = Math.abs(formCount.incrementAndGet() % 10);
@@ -2405,8 +2405,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   protected void updateColumnNames() {
-    if (this.columnNames != null && this.metaData != null) {
-      final List<String> attributeNames = this.metaData.getAttributeNames();
+    if (this.columnNames != null && this.recordDefinition != null) {
+      final List<String> attributeNames = this.recordDefinition.getAttributeNames();
       this.columnNames.retainAll(attributeNames);
     }
   }

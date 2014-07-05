@@ -62,7 +62,7 @@ public class MoepBinaryReader extends AbstractReader<Record> implements
   }
 
   @Override
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     return MoepConstants.META_DATA;
   }
 

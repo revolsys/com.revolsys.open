@@ -43,8 +43,8 @@ public class CopyValues extends
         value = source.getValueByPath(sourceName);
       }
       if (value != null) {
-        final RecordDefinition targetMetaData = target.getMetaData();
-        final CodeTable codeTable = targetMetaData.getCodeTableByColumn(targetName);
+        final RecordDefinition targetRecordDefinition = target.getRecordDefinition();
+        final CodeTable codeTable = targetRecordDefinition.getCodeTableByColumn(targetName);
         if (codeTable == null) {
           target.setValue(targetName, value);
         } else {

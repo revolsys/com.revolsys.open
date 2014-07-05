@@ -183,12 +183,12 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   public void addRecord(final AbstractRecordLayer layer,
     final AddGeometryCompleteAction addCompleteAction) {
     if (layer != null) {
-      final RecordDefinition metaData = layer.getMetaData();
-      final Attribute geometryAttribute = metaData.getGeometryAttribute();
+      final RecordDefinition recordDefinition = layer.getRecordDefinition();
+      final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
       if (geometryAttribute != null) {
         this.addLayer = layer;
         this.addCompleteAction = addCompleteAction;
-        final GeometryFactory geometryFactory = metaData.getGeometryFactory();
+        final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
         this.setGeometryFactory(geometryFactory);
         clearUndoHistory();
         this.addGeometry = geometryFactory.geometry();
@@ -223,9 +223,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         final LayerGroup childGroup = (LayerGroup)layer;
         addRecords(results, childGroup, boundingBox);
       } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
-        if (dataObjectLayer.isSelectable(scale)) {
-          final List<LayerRecord> selectedRecords = dataObjectLayer.getSelectedRecords();
+        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+        if (recordLayer.isSelectable(scale)) {
+          final List<LayerRecord> selectedRecords = recordLayer.getSelectedRecords();
           for (final LayerRecord selectedRecord : selectedRecords) {
             final Geometry geometry = selectedRecord.getGeometryValue();
             if (boundingBox.intersects(geometry)) {
@@ -245,9 +245,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         final LayerGroup childGroup = (LayerGroup)layer;
         addSelectedObjects(objects, childGroup, boundingBox);
       } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
-        if (dataObjectLayer.isEditable(scale)) {
-          final List<LayerRecord> selectedObjects = dataObjectLayer.getSelectedRecords(boundingBox);
+        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+        if (recordLayer.isEditable(scale)) {
+          final List<LayerRecord> selectedObjects = recordLayer.getSelectedRecords(boundingBox);
           objects.addAll(selectedObjects);
         }
       }
@@ -532,9 +532,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return null;
   }
 
-  protected boolean isEditable(final AbstractRecordLayer dataObjectLayer) {
-    return dataObjectLayer.isExists() && dataObjectLayer.isVisible()
-      && dataObjectLayer.isCanEditRecords();
+  protected boolean isEditable(final AbstractRecordLayer recordLayer) {
+    return recordLayer.isExists() && recordLayer.isVisible()
+      && recordLayer.isCanEditRecords();
   }
 
   protected boolean isGeometryValid(final Geometry geometry) {
@@ -1001,8 +1001,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       }
     } else {
       final LayerRecord object = location.getObject();
-      final RecordDefinition metaData = location.getMetaData();
-      final String geometryAttributeName = metaData.getGeometryAttributeName();
+      final RecordDefinition recordDefinition = location.getRecordDefinition();
+      final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
       final Geometry oldValue = object.getValue(geometryAttributeName);
       if (GeometryEqualsExact3d.equal(newGeometry, oldValue)) {
         return null;

@@ -39,11 +39,11 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   private DataSource dataSource;
 
-  private RecordFactory dataObjectFactory;
+  private RecordFactory recordFactory;
 
   private JdbcRecordStore dataStore;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private PreparedStatement statement;
 
@@ -70,16 +70,16 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
         throw new IllegalArgumentException("Unable to create connection", e);
       }
     }
-    this.dataObjectFactory = dataStore.getRecordFactory();
+    this.recordFactory = dataStore.getRecordFactory();
     this.dataStore = dataStore;
 
     this.query = query;
 
     final String tableName = query.getTypeName();
-    metaData = query.getMetaData();
-    if (metaData == null) {
-      metaData = dataStore.getRecordDefinition(tableName);
-      query.setMetaData(metaData);
+    recordDefinition = query.getRecordDefinition();
+    if (recordDefinition == null) {
+      recordDefinition = dataStore.getRecordDefinition(tableName);
+      query.setRecordDefinition(recordDefinition);
     }
 
     this.sql = JdbcUtils.getSelectSql(query);
@@ -91,10 +91,10 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
     JdbcUtils.close(statement, resultSet);
     JdbcUtils.release(connection, dataSource);
     connection = null;
-    dataObjectFactory = null;
+    recordFactory = null;
     dataSource = null;
     dataStore = null;
-    metaData = null;
+    recordDefinition = null;
     results = null;
     resultSet = null;
     statement = null;
@@ -112,7 +112,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
   }
 
   public RecordFactory getRecordFactory() {
-    return dataObjectFactory;
+    return recordFactory;
   }
 
   public DataSource getDataSource() {
@@ -151,8 +151,8 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
     return results;
   }
 
-  public RecordDefinition getMetaData() {
-    return metaData;
+  public RecordDefinition getRecordDefinition() {
+    return recordDefinition;
   }
 
   /**
@@ -264,7 +264,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
           ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         statement.setFetchSize(pageSize);
 
-        resultSet = JdbcQueryIterator.getResultSet(metaData, statement, query);
+        resultSet = JdbcQueryIterator.getResultSet(recordDefinition, statement, query);
         resultSet.last();
         this.numResults = resultSet.getRow();
       } catch (final SQLException e) {
@@ -363,7 +363,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
           int i = 0;
           do {
             final Record object = JdbcQueryIterator.getNextObject(
-              dataStore, metaData, metaData.getAttributes(), dataObjectFactory,
+              dataStore, recordDefinition, recordDefinition.getAttributes(), recordFactory,
               resultSet);
             results.add(object);
             i++;

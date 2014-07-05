@@ -17,7 +17,7 @@ import com.revolsys.util.MathUtil;
 
 public class JsonRecordWriter extends AbstractWriter<Record> {
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private PrintWriter out;
 
@@ -31,9 +31,9 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
 
   private boolean written;
 
-  public JsonRecordWriter(final RecordDefinition metaData,
+  public JsonRecordWriter(final RecordDefinition recordDefinition,
     final java.io.Writer out) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     if (out instanceof PrintWriter) {
       this.out = (PrintWriter)out;
     } else {
@@ -89,7 +89,7 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
         out = null;
       }
     }
-    metaData = null;
+    recordDefinition = null;
   }
 
   private void endAttribute() {
@@ -182,7 +182,7 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
 
   @Override
   public String toString() {
-    return metaData.getPath().toString();
+    return recordDefinition.getPath().toString();
   }
 
   @SuppressWarnings("unchecked")
@@ -219,15 +219,15 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
     }
     startObject();
     boolean first = true;
-    final int attributeCount = metaData.getAttributeCount();
+    final int attributeCount = recordDefinition.getAttributeCount();
     for (int i = 0; i < attributeCount; i++) {
       final Object value = object.getValue(i);
       if (value != null) {
         if (!first) {
           endAttribute();
         }
-        final String name = metaData.getAttributeName(i);
-        final DataType dataType = metaData.getAttributeType(i);
+        final String name = recordDefinition.getAttributeName(i);
+        final DataType dataType = recordDefinition.getAttributeType(i);
         label(name);
         value(dataType, value);
         first = false;

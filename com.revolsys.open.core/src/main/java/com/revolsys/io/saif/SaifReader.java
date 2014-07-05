@@ -110,7 +110,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
   private boolean loadNewObject = true;
 
   /** The schema definition that will be set on each data object. */
-  private RecordDefinitionFactory metaDataFactory;
+  private RecordDefinitionFactory recordDefinitionFactory;
 
   /** The iterator for the current object set. */
   private OsnReader osnReader;
@@ -284,7 +284,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
   }
 
   @Override
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     // TODO Auto-generated method stub
     return null;
   }
@@ -294,12 +294,12 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
    *
    * @return The schema definition.
    */
-  public RecordDefinitionFactory getMetaDataFactory() {
-    return this.metaDataFactory;
+  public RecordDefinitionFactory getRecordDefinitionFactory() {
+    return this.recordDefinitionFactory;
   }
 
   private <D extends Record> OsnReader getOsnReader(
-    final RecordDefinitionFactory metaDataFactory, final RecordFactory factory,
+    final RecordDefinitionFactory recordDefinitionFactory, final RecordFactory factory,
     final String className) throws IOException {
     String fileName = this.typePathFileNameMap.get(className);
     if (fileName == null) {
@@ -307,9 +307,9 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
     }
     OsnReader reader;
     if (this.zipFile != null) {
-      reader = new OsnReader(metaDataFactory, this.zipFile, fileName, this.srid);
+      reader = new OsnReader(recordDefinitionFactory, this.zipFile, fileName, this.srid);
     } else {
-      reader = new OsnReader(metaDataFactory, this.saifArchiveDirectory,
+      reader = new OsnReader(recordDefinitionFactory, this.saifArchiveDirectory,
         fileName, this.srid);
     }
     reader.setFactory(factory);
@@ -322,14 +322,14 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
 
   public <D extends Record> OsnReader getOsnReader(final String className,
     final RecordFactory factory) throws IOException {
-    final RecordDefinitionFactory metaDataFactory = this.metaDataFactory;
-    return getOsnReader(metaDataFactory, factory, className);
+    final RecordDefinitionFactory recordDefinitionFactory = this.recordDefinitionFactory;
+    return getOsnReader(recordDefinitionFactory, factory, className);
 
   }
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
-    return this.metaDataFactory.getRecordDefinition(typePath);
+    return this.recordDefinitionFactory.getRecordDefinition(typePath);
   }
 
   public int getSrid() {
@@ -526,8 +526,8 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
     } finally {
       FileUtil.closeSilent(in);
     }
-    if (this.metaDataFactory == null) {
-      setMetaDataFactory(this.declaredMetaDataFactory);
+    if (this.recordDefinitionFactory == null) {
+      setRecordDefinitionFactory(this.declaredMetaDataFactory);
     }
   }
 
@@ -537,7 +537,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
       if (reader.hasNext()) {
         final Record spatialReferencing = reader.next();
         final Record coordinateSystem = spatialReferencing.getValue("coordSystem");
-        if (coordinateSystem.getMetaData().getPath().equals("/UTM")) {
+        if (coordinateSystem.getRecordDefinition().getPath().equals("/UTM")) {
           final Number srid = coordinateSystem.getValue("zone");
           setSrid(26900 + srid.intValue());
         }
@@ -593,8 +593,8 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
         final GeometryFactory geometryFactory = GeometryFactory.fixed(
           this.srid, 1.0, 1.0);
 
-        for (final RecordDefinition metaData : ((RecordDefinitionFactoryImpl)this.metaDataFactory).getRecordDefinitions()) {
-          final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        for (final RecordDefinition recordDefinition : ((RecordDefinitionFactoryImpl)this.recordDefinitionFactory).getRecordDefinitions()) {
+          final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
           if (geometryAttribute != null) {
             geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
               geometryFactory);
@@ -704,11 +704,11 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
    *
    * @param schema The schema definition.
    */
-  public void setMetaDataFactory(final RecordDefinitionFactory metaDataFactory) {
-    if (metaDataFactory != null) {
-      this.metaDataFactory = metaDataFactory;
+  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
+    if (recordDefinitionFactory != null) {
+      this.recordDefinitionFactory = recordDefinitionFactory;
     } else {
-      this.metaDataFactory = this.declaredMetaDataFactory;
+      this.recordDefinitionFactory = this.declaredMetaDataFactory;
     }
 
   }

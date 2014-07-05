@@ -27,7 +27,7 @@ AbstractRecordAndGeometryIoFactory {
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition metaData, final OutputStream outputStream,
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     File directory;
     try {
@@ -37,7 +37,7 @@ AbstractRecordAndGeometryIoFactory {
     }
     final Resource tempResource = new FileSystemResource(new File(directory,
       baseName + ".shp"));
-    final Writer<Record> shapeWriter = new ShapefileRecordWriter(metaData,
+    final Writer<Record> shapeWriter = new ShapefileRecordWriter(recordDefinition,
       tempResource);
     return new ZipWriter<Record>(directory, shapeWriter, outputStream);
   }

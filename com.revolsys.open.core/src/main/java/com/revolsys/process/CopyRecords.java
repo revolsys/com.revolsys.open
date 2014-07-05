@@ -75,13 +75,13 @@ public class CopyRecords extends AbstractProcess {
       try {
         final Writer<Record> targetWriter = targetDataStore.createWriter();
         try {
-          final RecordDefinition targetMetaData = targetDataStore.getRecordDefinition(typePath);
-          if (targetMetaData == null) {
+          final RecordDefinition targetRecordDefinition = targetDataStore.getRecordDefinition(typePath);
+          if (targetRecordDefinition == null) {
             LoggerFactory.getLogger(getClass()).error(
               "Cannot find target table: " + typePath);
           } else {
             if (hasSequence) {
-              final String idAttributeName = targetMetaData.getIdAttributeName();
+              final String idAttributeName = targetRecordDefinition.getIdAttributeName();
               Object maxId = targetDataStore.createPrimaryIdValue(typePath);
               for (final Record sourceRecord : reader) {
                 final Object sourceId = sourceRecord.getValue(idAttributeName);

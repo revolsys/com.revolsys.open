@@ -14,14 +14,14 @@ import com.revolsys.io.Writer;
 
 public interface RecordWriterFactory extends IoFactory {
 
-  Writer<Record> createRecordWriter(RecordDefinition metaData,
+  Writer<Record> createRecordWriter(RecordDefinition recordDefinition,
     Resource resource);
 
   Writer<Record> createRecordWriter(String baseName,
-    RecordDefinition metaData, OutputStream outputStream);
+    RecordDefinition recordDefinition, OutputStream outputStream);
 
   Writer<Record> createRecordWriter(String baseName,
-    RecordDefinition metaData, OutputStream outputStream, Charset charset);
+    RecordDefinition recordDefinition, OutputStream outputStream, Charset charset);
 
   Set<CoordinateSystem> getCoordinateSystems();
 

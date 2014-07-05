@@ -39,7 +39,7 @@ public class XbaseRecordWriter extends AbstractWriter<Record> {
 
   private final Resource resource;
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private int numRecords = 0;
 
@@ -53,9 +53,9 @@ public class XbaseRecordWriter extends AbstractWriter<Record> {
 
   private Charset charset = FileUtil.UTF8;
 
-  public XbaseRecordWriter(final RecordDefinition metaData,
+  public XbaseRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     this.resource = resource;
   }
 
@@ -169,8 +169,8 @@ public class XbaseRecordWriter extends AbstractWriter<Record> {
     return charset;
   }
 
-  public RecordDefinition getMetaData() {
-    return metaData;
+  public RecordDefinition getRecordDefinition() {
+    return recordDefinition;
   }
 
   public Map<String, String> getShortNames() {
@@ -380,11 +380,11 @@ public class XbaseRecordWriter extends AbstractWriter<Record> {
 
       fields.clear();
       int numFields = 0;
-      for (final String name : metaData.getAttributeNames()) {
-        final int index = metaData.getAttributeIndex(name);
-        final int length = metaData.getAttributeLength(index);
-        final int scale = metaData.getAttributeScale(index);
-        final DataType attributeType = metaData.getAttributeType(index);
+      for (final String name : recordDefinition.getAttributeNames()) {
+        final int index = recordDefinition.getAttributeIndex(name);
+        final int length = recordDefinition.getAttributeLength(index);
+        final int scale = recordDefinition.getAttributeScale(index);
+        final DataType attributeType = recordDefinition.getAttributeType(index);
         final Class<?> typeJavaClass = attributeType.getJavaClass();
         final int fieldLength = addDbaseField(name, attributeType,
           typeJavaClass, length, scale);

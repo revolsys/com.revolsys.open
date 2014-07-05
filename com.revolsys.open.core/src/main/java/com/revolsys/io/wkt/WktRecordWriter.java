@@ -14,17 +14,17 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class WktRecordWriter extends AbstractWriter<Record> {
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private final PrintWriter out;
 
   private boolean open;
 
-  public WktRecordWriter(final RecordDefinition metaData,
+  public WktRecordWriter(final RecordDefinition recordDefinition,
     final java.io.Writer out) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     this.out = new PrintWriter(new BufferedWriter(out));
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     if (geometryAttribute != null) {
       final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
       setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
@@ -44,7 +44,7 @@ public class WktRecordWriter extends AbstractWriter<Record> {
 
   @Override
   public String toString() {
-    return metaData.getPath().toString();
+    return recordDefinition.getPath().toString();
   }
 
   @Override

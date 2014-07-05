@@ -7,15 +7,15 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
   static final String PROPERTY_NAME = "http://revolsys.com/gis/globalId";
 
   public static GlobalIdProperty getProperty(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    return getProperty(metaData);
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    return getProperty(recordDefinition);
   }
 
-  public static GlobalIdProperty getProperty(final RecordDefinition metaData) {
-    if (metaData == null) {
+  public static GlobalIdProperty getProperty(final RecordDefinition recordDefinition) {
+    if (recordDefinition == null) {
       return null;
     } else {
-      return metaData.getProperty(PROPERTY_NAME);
+      return recordDefinition.getProperty(PROPERTY_NAME);
     }
   }
 
@@ -47,11 +47,11 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition metaData) {
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
     if (attributeName == null) {
-      attributeName = metaData.getIdAttributeName();
+      attributeName = recordDefinition.getIdAttributeName();
     }
-    super.setRecordDefinition(metaData);
+    super.setRecordDefinition(recordDefinition);
   }
 
 }

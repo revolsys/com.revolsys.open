@@ -81,7 +81,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   private final JPopupMenu menu = new JPopupMenu();
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private final JLabel oldValueItem;
 
@@ -94,20 +94,20 @@ public class DataStoreQueryTextField extends TextField implements
 
   private boolean below = false;
 
-  public DataStoreQueryTextField(final RecordDefinition metaData,
+  public DataStoreQueryTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName) {
-    this(metaData, displayAttributeName, new Query(metaData, new Equal(
-      F.upper(displayAttributeName), new Value(null))), new Query(metaData,
+    this(recordDefinition, displayAttributeName, new Query(recordDefinition, new Equal(
+      F.upper(displayAttributeName), new Value(null))), new Query(recordDefinition,
       Q.iLike(displayAttributeName, "")));
 
   }
 
-  public DataStoreQueryTextField(final RecordDefinition metaData,
+  public DataStoreQueryTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName, final List<Query> queries) {
     super(displayAttributeName);
-    this.metaData = metaData;
-    this.dataStore = metaData.getDataStore();
-    this.idAttributeName = metaData.getIdAttributeName();
+    this.recordDefinition = recordDefinition;
+    this.dataStore = recordDefinition.getDataStore();
+    this.idAttributeName = recordDefinition.getIdAttributeName();
     this.displayAttributeName = displayAttributeName;
 
     final Document document = getDocument();
@@ -149,9 +149,9 @@ public class DataStoreQueryTextField extends TextField implements
     setPreferredSize(new Dimension(100, 22));
   }
 
-  public DataStoreQueryTextField(final RecordDefinition metaData,
+  public DataStoreQueryTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName, final Query... queries) {
-    this(metaData, displayAttributeName, Arrays.asList(queries));
+    this(recordDefinition, displayAttributeName, Arrays.asList(queries));
 
   }
 
@@ -211,7 +211,7 @@ public class DataStoreQueryTextField extends TextField implements
     String displayText = this.valueToDisplayMap.get(stringValue);
     if (!StringUtils.hasText(displayText) && StringUtils.hasText(stringValue)) {
       final Record record = this.dataStore.queryFirst(Query.equal(
-        this.metaData, this.idAttributeName, stringValue));
+        this.recordDefinition, this.idAttributeName, stringValue));
       if (record == null) {
         displayText = stringValue;
       } else {

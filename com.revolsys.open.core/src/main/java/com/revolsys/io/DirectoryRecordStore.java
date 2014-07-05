@@ -70,9 +70,9 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordDefinition getMetaData(final RecordDefinition objectMetaData) {
-    final RecordDefinition metaData = super.getMetaData(objectMetaData);
-    if (metaData == null && createMissingTables) {
+  public RecordDefinition getRecordDefinition(final RecordDefinition objectMetaData) {
+    final RecordDefinition recordDefinition = super.getRecordDefinition(objectMetaData);
+    if (recordDefinition == null && createMissingTables) {
       final String typePath = objectMetaData.getPath();
       final String schemaName = PathUtil.getPath(typePath);
       RecordStoreSchema schema = getSchema(schemaName);
@@ -92,7 +92,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       }
       schema.addMetaData(newMetaData);
     }
-    return metaData;
+    return recordDefinition;
   }
 
   @Override
@@ -119,16 +119,16 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   @Override
   public synchronized void insert(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    final String typePath = metaData.getPath();
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final String typePath = recordDefinition.getPath();
     Writer<Record> writer = writers.get(typePath);
     if (writer == null) {
       final String schemaName = PathUtil.getPath(typePath);
       final File subDirectory = new File(getDirectory(), schemaName);
-      final File file = new File(subDirectory, metaData.getTypeName() + "."
+      final File file = new File(subDirectory, recordDefinition.getTypeName() + "."
         + getFileExtension());
       final Resource resource = new FileSystemResource(file);
-      writer = AbstractRecordIoFactory.recordWriter(metaData, resource);
+      writer = AbstractRecordIoFactory.recordWriter(recordDefinition, resource);
       if (writer instanceof ObjectWithProperties) {
         final ObjectWithProperties properties = writer;
         properties.setProperties(getProperties());
@@ -155,17 +155,17 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   @Override
   protected void loadSchemaRecordDefinitions(
     final RecordStoreSchema schema,
-    final Map<String, RecordDefinition> metaDataMap) {
+    final Map<String, RecordDefinition> recordDefinitionMap) {
     final String schemaName = schema.getPath();
     final File subDirectory = new File(directory, schemaName);
     final File[] files = subDirectory.listFiles(new ExtensionFilenameFilter(
       fileExtension));
     if (files != null) {
       for (final File file : files) {
-        final RecordDefinition metaData = loadMetaData(schemaName, file);
-        if (metaData != null) {
-          final String typePath = metaData.getPath();
-          metaDataMap.put(typePath, metaData);
+        final RecordDefinition recordDefinition = loadMetaData(schemaName, file);
+        if (recordDefinition != null) {
+          final String typePath = recordDefinition.getPath();
+          recordDefinitionMap.put(typePath, recordDefinition);
         }
       }
     }

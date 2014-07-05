@@ -123,7 +123,7 @@ public abstract class AbstractIdentifier implements Identifier {
 
   @Override
   public void setIdentifier(final Record record) {
-    setIdentifier(record, record.getMetaData().getAttributeNames());
+    setIdentifier(record, record.getRecordDefinition().getAttributeNames());
   }
 
   @Override

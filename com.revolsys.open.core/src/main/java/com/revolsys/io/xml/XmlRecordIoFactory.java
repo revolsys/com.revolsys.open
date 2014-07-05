@@ -18,11 +18,11 @@ public class XmlRecordIoFactory extends
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition metaData, final OutputStream outputStream,
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);
-    return new XmlRecordWriter(metaData, writer);
+    return new XmlRecordWriter(recordDefinition, writer);
   }
 
 }

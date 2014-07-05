@@ -48,13 +48,13 @@ RecordDefinition, Cloneable {
     return new RecordDefinitionImpl(properties);
   }
 
-  public static void destroy(final RecordDefinitionImpl... metaDataList) {
-    for (final RecordDefinitionImpl metaData : metaDataList) {
-      metaData.destroy();
+  public static void destroy(final RecordDefinitionImpl... recordDefinitionList) {
+    for (final RecordDefinitionImpl recordDefinition : recordDefinitionList) {
+      recordDefinition.destroy();
     }
   }
 
-  public static RecordDefinition getMetaData(final int instanceId) {
+  public static RecordDefinition getRecordDefinition(final int instanceId) {
     return METADATA_CACHE.get(instanceId);
   }
 
@@ -76,7 +76,7 @@ RecordDefinition, Cloneable {
 
   private Map<String, CodeTable> codeTableByColumnMap = new HashMap<String, CodeTable>();
 
-  private RecordFactory dataObjectFactory = new ArrayRecordFactory();
+  private RecordFactory recordFactory = new ArrayRecordFactory();
 
   private RecordDefinitionFactory recordDefinitionFactory;
 
@@ -116,20 +116,20 @@ RecordDefinition, Cloneable {
   public RecordDefinitionImpl() {
   }
 
-  public RecordDefinitionImpl(final RecordStore dataObjectStore,
-    final RecordStoreSchema schema, final RecordDefinition metaData) {
-    this(metaData);
-    this.dataStore = new WeakReference<RecordStore>(dataObjectStore);
-    this.dataObjectFactory = dataObjectStore.getRecordFactory();
+  public RecordDefinitionImpl(final RecordStore recordStore,
+    final RecordStoreSchema schema, final RecordDefinition recordDefinition) {
+    this(recordDefinition);
+    this.dataStore = new WeakReference<RecordStore>(recordStore);
+    this.recordFactory = recordStore.getRecordFactory();
     this.schema = schema;
     METADATA_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final RecordStore dataObjectStore,
+  public RecordDefinitionImpl(final RecordStore recordStore,
     final RecordStoreSchema schema, final String typePath) {
     this(typePath);
-    this.dataStore = new WeakReference<RecordStore>(dataObjectStore);
-    this.dataObjectFactory = dataObjectStore.getRecordFactory();
+    this.dataStore = new WeakReference<RecordStore>(recordStore);
+    this.recordFactory = recordStore.getRecordFactory();
     this.schema = schema;
     METADATA_CACHE.put(this.instanceId, this);
   }
@@ -155,9 +155,9 @@ RecordDefinition, Cloneable {
     }
   }
 
-  public RecordDefinitionImpl(final RecordDefinition metaData) {
-    this(metaData.getPath(), metaData.getProperties(), metaData.getAttributes());
-    setIdAttributeIndex(metaData.getIdAttributeIndex());
+  public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
+    this(recordDefinition.getPath(), recordDefinition.getProperties(), recordDefinition.getAttributes());
+    setIdAttributeIndex(recordDefinition.getIdAttributeIndex());
     METADATA_CACHE.put(this.instanceId, this);
   }
 
@@ -217,7 +217,7 @@ RecordDefinition, Cloneable {
       }
     }
     attribute.setIndex(index);
-    attribute.setMetaData(this);
+    attribute.setRecordDefinition(this);
   }
 
   /**
@@ -285,10 +285,10 @@ RecordDefinition, Cloneable {
       for (final Entry<String, Object> property : properties.entrySet()) {
         final String propertyName = property.getKey();
         if (property instanceof RecordDefinitionProperty) {
-          RecordDefinitionProperty metaDataProperty = (RecordDefinitionProperty)property;
-          metaDataProperty = metaDataProperty.clone();
-          metaDataProperty.setRecordDefinition(this);
-          setProperty(propertyName, metaDataProperty);
+          RecordDefinitionProperty recordDefinitionProperty = (RecordDefinitionProperty)property;
+          recordDefinitionProperty = recordDefinitionProperty.clone();
+          recordDefinitionProperty.setRecordDefinition(this);
+          setProperty(propertyName, recordDefinitionProperty);
         } else {
           setProperty(propertyName, property);
         }
@@ -312,21 +312,21 @@ RecordDefinition, Cloneable {
 
   @Override
   public Record createRecord() {
-    final RecordFactory dataObjectFactory = this.dataObjectFactory;
-    if (dataObjectFactory == null) {
+    final RecordFactory recordFactory = this.recordFactory;
+    if (recordFactory == null) {
       return null;
     } else {
-      return dataObjectFactory.createRecord(this);
+      return recordFactory.createRecord(this);
     }
   }
 
   @Override
-  public void delete(final Record dataObject) {
+  public void delete(final Record record) {
     final RecordStore dataStore = getDataStore();
     if (dataStore == null) {
       throw new UnsupportedOperationException();
     } else {
-      dataStore.delete(dataObject);
+      dataStore.delete(record);
     }
   }
 
@@ -340,7 +340,7 @@ RecordDefinition, Cloneable {
     this.attributeNames.clear();
     this.attributes.clear();
     this.codeTableByColumnMap.clear();
-    this.dataObjectFactory = null;
+    this.recordFactory = null;
     this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
     this.dataStore = null;
     this.defaultValues.clear();
@@ -506,7 +506,7 @@ RecordDefinition, Cloneable {
 
   @Override
   public RecordFactory getRecordFactory() {
-    return this.dataObjectFactory;
+    return this.recordFactory;
   }
 
   @Override

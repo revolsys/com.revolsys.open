@@ -52,16 +52,16 @@ public class NodeAttributes {
     }
 
     public static Set<RecordDefinition> edgeMetaDatas(final Node<?> node) {
-      final Set<RecordDefinition> metaDatas = new HashSet<RecordDefinition>();
+      final Set<RecordDefinition> recordDefinitions = new HashSet<RecordDefinition>();
       for (final Edge<?> edge : node.getEdges()) {
         final Object object = edge.getObject();
         if (object instanceof Record) {
-          final Record dataObject = (Record)object;
-          final RecordDefinition metaData = dataObject.getMetaData();
-          metaDatas.add(metaData);
+          final Record record = (Record)object;
+          final RecordDefinition recordDefinition = record.getRecordDefinition();
+          recordDefinitions.add(recordDefinition);
         }
       }
-      return metaDatas;
+      return recordDefinitions;
     }
 
     public static <T> Map<LineString, Map<String, Set<Edge<T>>>> edgesByLineAndTypeName(

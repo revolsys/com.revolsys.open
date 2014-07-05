@@ -97,7 +97,7 @@ public class NoOp {
   }
 
   public static void typePath(final Record object, final String typePath) {
-    final String typePath2 = object.getMetaData().getPath();
+    final String typePath2 = object.getRecordDefinition().getPath();
     equals(typePath2, typePath);
   }
 

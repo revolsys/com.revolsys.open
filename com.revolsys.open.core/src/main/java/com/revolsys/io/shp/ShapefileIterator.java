@@ -48,7 +48,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
 
   private boolean mappedFile;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private final String name;
 
@@ -163,10 +163,10 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
         if (xbaseIterator != null) {
           xbaseIterator.hasNext();
         }
-        if (metaData == null) {
-          metaData = RecordUtil.createGeometryMetaData();
+        if (recordDefinition == null) {
+          recordDefinition = RecordUtil.createGeometryMetaData();
         }
-        metaData.setGeometryFactory(geometryFactory);
+        recordDefinition.setGeometryFactory(geometryFactory);
       } catch (final IOException e) {
         throw new RuntimeException("Error initializing mappedFile " + resource,
           e);
@@ -183,7 +183,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
     geometryFactory = null;
     in = null;
     indexIn = null;
-    metaData = null;
+    recordDefinition = null;
     resource = null;
     xbaseIterator = null;
   }
@@ -193,8 +193,8 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
   }
 
   @Override
-  public RecordDefinition getMetaData() {
-    return metaData;
+  public RecordDefinition getRecordDefinition() {
+    return recordDefinition;
   }
 
   @Override
@@ -212,7 +212,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
           throw new NoSuchElementException();
         }
       } else {
-        record = recordDefinitionFactory.createRecord(metaData);
+        record = recordDefinitionFactory.createRecord(recordDefinition);
       }
 
       final Geometry geometry = readGeometry();
@@ -349,8 +349,8 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
     }
   }
 
-  public void setMetaData(final RecordDefinition metaData) {
-    this.returnMetaData = metaData;
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.returnMetaData = recordDefinition;
   }
 
   public void setPosition(final int position) {
@@ -386,11 +386,11 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
   }
 
   public void updateMetaData() {
-    assert this.metaData == null : "Cannot override metaData when set";
+    assert this.recordDefinition == null : "Cannot override recordDefinition when set";
     if (xbaseIterator != null) {
-      final RecordDefinitionImpl metaData = xbaseIterator.getMetaData();
-      this.metaData = metaData;
-      if (metaData.getGeometryAttributeIndex() == -1) {
+      final RecordDefinitionImpl recordDefinition = xbaseIterator.getRecordDefinition();
+      this.recordDefinition = recordDefinition;
+      if (recordDefinition.getGeometryAttributeIndex() == -1) {
         DataType geometryType = DataTypes.GEOMETRY;
         switch (shapeType) {
           case ShapefileConstants.POINT_SHAPE:
@@ -424,7 +424,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
           default:
           break;
         }
-        metaData.addAttribute("geometry", geometryType, true);
+        recordDefinition.addAttribute("geometry", geometryType, true);
       }
     }
   }

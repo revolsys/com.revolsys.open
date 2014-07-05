@@ -61,12 +61,12 @@ public class FileGdbIoTest {
       dataStore.initialize();
 
       final String typePath = "/" + geometryTypeString;
-      final RecordDefinitionImpl metaData = new RecordDefinitionImpl(
+      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
         typePath);
-      metaData.addAttribute("ID", DataTypes.INT, true);
-      metaData.addAttribute("GEOMETRY", dataType, true);
-      metaData.setGeometryFactory(geometryFactory);
-      dataStore.getMetaData(metaData);
+      recordDefinition.addAttribute("ID", DataTypes.INT, true);
+      recordDefinition.addAttribute("GEOMETRY", dataType, true);
+      recordDefinition.setGeometryFactory(geometryFactory);
+      dataStore.getRecordDefinition(recordDefinition);
       try (
         Writer<Record> writer = dataStore.createWriter()) {
         writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);

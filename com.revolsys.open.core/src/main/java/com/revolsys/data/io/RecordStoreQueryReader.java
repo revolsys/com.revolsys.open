@@ -63,7 +63,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
         query.and(new SqlCondition(whereClause));
       }
       if (boundingBox != null) {
-        final Attribute geometryAttribute = query.getMetaData()
+        final Attribute geometryAttribute = query.getRecordDefinition()
           .getGeometryAttribute();
         query.and(F.envelopeIntersects(geometryAttribute, boundingBox));
       }
@@ -84,8 +84,8 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
   }
 
   @Override
-  public RecordDefinition getMetaData() {
-    return ((RecordIterator)iterator()).getMetaData();
+  public RecordDefinition getRecordDefinition() {
+    return ((RecordIterator)iterator()).getRecordDefinition();
   }
 
   public List<Query> getQueries() {
@@ -101,16 +101,16 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
   public void open() {
     if (typePaths != null) {
       for (final String tableName : typePaths) {
-        final RecordDefinition metaData = dataStore.getRecordDefinition(tableName);
-        if (metaData != null) {
+        final RecordDefinition recordDefinition = dataStore.getRecordDefinition(tableName);
+        if (recordDefinition != null) {
           Query query;
           if (boundingBox == null) {
-            query = new Query(metaData);
+            query = new Query(recordDefinition);
             query.setWhereCondition(new SqlCondition(whereClause));
           } else {
-            query = new Query(metaData);
+            query = new Query(recordDefinition);
             query.setWhereCondition(F.envelopeIntersects(
-              metaData.getGeometryAttribute(), boundingBox));
+              recordDefinition.getGeometryAttribute(), boundingBox));
             ;
           }
           addQuery(query);

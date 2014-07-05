@@ -22,7 +22,7 @@ public class XhtmlRecordWriter extends AbstractWriter<Record> {
 
   private String cssClass;
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private boolean opened = false;
 
@@ -35,9 +35,9 @@ public class XhtmlRecordWriter extends AbstractWriter<Record> {
 
   private boolean wrap = true;
 
-  public XhtmlRecordWriter(final RecordDefinition metaData,
+  public XhtmlRecordWriter(final RecordDefinition recordDefinition,
     final Writer out) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     this.out = new XmlWriter(out);
   }
 
@@ -84,7 +84,7 @@ public class XhtmlRecordWriter extends AbstractWriter<Record> {
       writeHeader();
     }
     if (singleObject) {
-      for (final String key : metaData.getAttributeNames()) {
+      for (final String key : recordDefinition.getAttributeNames()) {
         final Object value = object.getValue(key);
         out.startTag(HtmlUtil.TR);
         out.element(HtmlUtil.TH,
@@ -102,7 +102,7 @@ public class XhtmlRecordWriter extends AbstractWriter<Record> {
       }
     } else {
       out.startTag(HtmlUtil.TR);
-      for (final String key : metaData.getAttributeNames()) {
+      for (final String key : recordDefinition.getAttributeNames()) {
         final Object value = object.getValue(key);
         out.startTag(HtmlUtil.TD);
         if (value == null) {
@@ -192,7 +192,7 @@ public class XhtmlRecordWriter extends AbstractWriter<Record> {
 
       out.startTag(HtmlUtil.THEAD);
       out.startTag(HtmlUtil.TR);
-      for (final String name : metaData.getAttributeNames()) {
+      for (final String name : recordDefinition.getAttributeNames()) {
         out.element(HtmlUtil.TH, name);
       }
       out.endTag(HtmlUtil.TR);
@@ -204,7 +204,7 @@ public class XhtmlRecordWriter extends AbstractWriter<Record> {
   }
 
   public void writeValue(final String name, final Object value) {
-    final DataType dataType = metaData.getAttributeType(name);
+    final DataType dataType = recordDefinition.getAttributeType(name);
 
     @SuppressWarnings("unchecked")
     final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();

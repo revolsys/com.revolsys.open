@@ -70,7 +70,7 @@ Cloneable, MapSerializer {
   /** The data type of the attribute value. */
   private DataType type;
 
-  private Reference<RecordDefinition> metaData;
+  private Reference<RecordDefinition> recordDefinition;
 
   private String title;
 
@@ -371,11 +371,11 @@ Cloneable, MapSerializer {
     return (V)this.maxValue;
   }
 
-  public RecordDefinition getMetaData() {
-    if (this.metaData == null) {
+  public RecordDefinition getRecordDefinition() {
+    if (this.recordDefinition == null) {
       return null;
     } else {
-      return this.metaData.get();
+      return this.recordDefinition.get();
     }
   }
 
@@ -515,8 +515,8 @@ Cloneable, MapSerializer {
     this.maxValue = maxValue;
   }
 
-  protected void setMetaData(final RecordDefinition metaData) {
-    this.metaData = new WeakReference<RecordDefinition>(metaData);
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = new WeakReference<RecordDefinition>(recordDefinition);
   }
 
   public void setMinValue(final Object minValue) {

@@ -61,8 +61,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   public static RecordLayerTable createTable(
     final AbstractRecordLayer layer) {
-    final RecordDefinition metaData = layer.getMetaData();
-    if (metaData == null) {
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    if (recordDefinition == null) {
       return null;
     } else {
       final List<String> columnNames = layer.getColumnNames();
@@ -152,7 +152,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   public RecordLayerTableModel(final AbstractRecordLayer layer,
     final List<String> attributeNames) {
-    super(layer.getMetaData(), attributeNames);
+    super(layer.getRecordDefinition(), attributeNames);
     this.layer = layer;
     Property.addListener(layer, this);
     setEditable(true);
@@ -185,8 +185,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
       if (this.filterByBoundingBox) {
         final Project project = this.layer.getProject();
         final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-        final RecordDefinition metaData = this.layer.getMetaData();
-        final Attribute geometryAttribute = metaData.getGeometryAttribute();
+        final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
+        final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
         if (geometryAttribute != null) {
           query.and(F.envelopeIntersects(geometryAttribute, viewBoundingBox));
         }
@@ -364,7 +364,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public String getTypeName() {
-    return getMetaData().getPath();
+    return getRecordDefinition().getPath();
   }
 
   @Override
@@ -583,7 +583,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
           if (left instanceof Column) {
             final Column column = (Column)left;
             final String columnName = column.getName();
-            columnIndex = getMetaData().getAttributeIndex(columnName);
+            columnIndex = getRecordDefinition().getAttributeIndex(columnName);
           } else if (left instanceof Function) {
             final Function function = (Function)left;
             left = function.getQueryValues().get(0);
@@ -661,7 +661,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   public String toDisplayValueInternal(final int rowIndex,
     final int attributeIndex, final Object objectValue) {
     if (objectValue == null) {
-      if (getMetaData().getIdAttributeIndex() == attributeIndex) {
+      if (getRecordDefinition().getIdAttributeIndex() == attributeIndex) {
         return "NEW";
       }
     }

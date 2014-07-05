@@ -28,7 +28,7 @@ public class WmsLayer {
 
   private List<Identifier> identifiers = new ArrayList<Identifier>();
 
-  private List<MetadataUrl> metaDataUrls = new ArrayList<MetadataUrl>();
+  private List<MetadataUrl> recordDefinitionUrls = new ArrayList<MetadataUrl>();
 
   private List<FormatUrl> dataUrls = new ArrayList<FormatUrl>();
 
@@ -93,8 +93,8 @@ public class WmsLayer {
 
   }
 
-  public void addMetaDataUrl(final MetadataUrl metaDataUrl) {
-    metaDataUrls.add(metaDataUrl);
+  public void addMetaDataUrl(final MetadataUrl recordDefinitionUrl) {
+    recordDefinitionUrls.add(recordDefinitionUrl);
 
   }
 
@@ -166,8 +166,8 @@ public class WmsLayer {
     return layers;
   }
 
-  public List<MetadataUrl> getMetaDataUrls() {
-    return metaDataUrls;
+  public List<MetadataUrl> getRecordDefinitionUrls() {
+    return recordDefinitionUrls;
   }
 
   public String getName() {
@@ -266,8 +266,8 @@ public class WmsLayer {
     this.layers = layers;
   }
 
-  public void setMetaDataUrls(final List<MetadataUrl> metaDataUrls) {
-    this.metaDataUrls = metaDataUrls;
+  public void setRecordDefinitionUrls(final List<MetadataUrl> recordDefinitionUrls) {
+    this.recordDefinitionUrls = recordDefinitionUrls;
   }
 
   public void setName(final String name) {

@@ -22,34 +22,34 @@ public abstract class AbstractRecordAndGeometryWriterFactory extends
 
   @Override
   public Writer<Geometry> createGeometryWriter(final Resource resource) {
-    RecordDefinition metaData = RecordUtil.createGeometryMetaData();
-    final Writer<Record> dataObjectWriter = createRecordWriter(
-      metaData, resource);
-    return createGeometryWriter(dataObjectWriter);
+    RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final Writer<Record> recordWriter = createRecordWriter(
+      recordDefinition, resource);
+    return createGeometryWriter(recordWriter);
   }
 
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out) {
-    RecordDefinition metaData = RecordUtil.createGeometryMetaData();
-    final Writer<Record> dataObjectWriter = createRecordWriter(
-      baseName, metaData, out);
-    return createGeometryWriter(dataObjectWriter);
+    RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final Writer<Record> recordWriter = createRecordWriter(
+      baseName, recordDefinition, out);
+    return createGeometryWriter(recordWriter);
   }
 
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out, final Charset charset) {
-    RecordDefinition metaData = RecordUtil.createGeometryMetaData();
-    final Writer<Record> dataObjectWriter = createRecordWriter(
-      baseName, metaData, out, charset);
-    return createGeometryWriter(dataObjectWriter);
+    RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final Writer<Record> recordWriter = createRecordWriter(
+      baseName, recordDefinition, out, charset);
+    return createGeometryWriter(recordWriter);
   }
 
   public Writer<Geometry> createGeometryWriter(
-    final Writer<Record> dataObjectWriter) {
+    final Writer<Record> recordWriter) {
     final Writer<Geometry> geometryWriter = new RecordWriterGeometryWriter(
-      dataObjectWriter);
+      recordWriter);
     return geometryWriter;
   }
 }

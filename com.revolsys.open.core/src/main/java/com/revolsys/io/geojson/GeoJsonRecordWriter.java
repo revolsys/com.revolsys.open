@@ -327,8 +327,8 @@ public class GeoJsonRecordWriter extends AbstractWriter<Record>
       mainGeometry = mainGeometry.convert(geometryFactory);
     }
     writeSrid(mainGeometry);
-    final RecordDefinition metaData = object.getMetaData();
-    final int geometryIndex = metaData.getGeometryAttributeIndex();
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final int geometryIndex = recordDefinition.getGeometryAttributeIndex();
     boolean geometryWritten = false;
     out.endAttribute();
     out.label(GEOMETRY);
@@ -342,7 +342,7 @@ public class GeoJsonRecordWriter extends AbstractWriter<Record>
     out.endAttribute();
     out.label(PROPERTIES);
     out.startObject();
-    final int numAttributes = metaData.getAttributeCount();
+    final int numAttributes = recordDefinition.getAttributeCount();
     if (numAttributes > 1 || numAttributes == 1 && geometryIndex == -1) {
       int lastIndex = numAttributes - 1;
       if (lastIndex == geometryIndex) {
@@ -350,7 +350,7 @@ public class GeoJsonRecordWriter extends AbstractWriter<Record>
       }
       for (int i = 0; i < numAttributes; i++) {
         if (i != geometryIndex) {
-          final String name = metaData.getAttributeName(i);
+          final String name = recordDefinition.getAttributeName(i);
           final Object value = object.getValue(i);
           out.label(name);
           if (value instanceof Geometry) {

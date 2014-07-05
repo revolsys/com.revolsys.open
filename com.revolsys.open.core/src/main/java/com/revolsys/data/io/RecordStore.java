@@ -40,7 +40,7 @@ AutoCloseable {
 
   Record copy(Record record);
 
-  Record create(RecordDefinition metaData);
+  Record create(RecordDefinition recordDefinition);
 
   Record create(String typePath);
 
@@ -73,7 +73,7 @@ AutoCloseable {
 
   String getLabel();
 
-  RecordDefinition getMetaData(RecordDefinition metaData);
+  RecordDefinition getRecordDefinition(RecordDefinition recordDefinition);
 
   /**
    * Get the meta data for the specified type.
@@ -145,7 +145,7 @@ AutoCloseable {
 
   Record queryFirst(Query query);
 
-  void setRecordFactory(RecordFactory dataObjectFactory);
+  void setRecordFactory(RecordFactory recordFactory);
 
   void setLabel(String label);
 

@@ -40,8 +40,8 @@ public class TextNameField extends ValueField {
 
     final ArrayList<String> fieldNames = new ArrayList<String>(
       layer.getColumnNames());
-    final RecordDefinition metaData = layer.getMetaData();
-    fieldNames.remove(metaData.getGeometryAttributeName());
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    fieldNames.remove(recordDefinition.getGeometryAttributeName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
       layer);
     this.fieldNamesField = new ComboBox(converter, false, fieldNames.toArray());

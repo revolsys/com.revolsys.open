@@ -137,14 +137,14 @@ public class ArcSdeStGeometryDataStoreExtension implements
   @Override
   public void postProcess(final RecordStoreSchema schema) {
     final String schemaName = schema.getName();
-    for (final RecordDefinition metaData : schema.getTypes()) {
-      final String typePath = metaData.getPath();
+    for (final RecordDefinition recordDefinition : schema.getTypes()) {
+      final String typePath = recordDefinition.getPath();
       final Integer registrationId = JdbcAttributeAdder.getTableProperty(
         schema, typePath, ArcSdeConstants.REGISTRATION_ID);
       final String rowIdColumn = JdbcAttributeAdder.getTableProperty(schema,
         typePath, ArcSdeConstants.ROWID_COLUMN);
       if (registrationId != null && rowIdColumn != null) {
-        ArcSdeObjectIdJdbcAttribute.replaceAttribute(schemaName, metaData,
+        ArcSdeObjectIdJdbcAttribute.replaceAttribute(schemaName, recordDefinition,
           registrationId, rowIdColumn);
       }
     }

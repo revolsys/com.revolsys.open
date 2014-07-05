@@ -149,7 +149,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
 
     } catch (final SQLException e) {
       throw new RuntimeException(this.tableName + ": Unable to create ID for  "
-        + values, e);
+          + values, e);
     }
 
   }
@@ -191,11 +191,11 @@ public class JdbcCodeTable extends AbstractCodeTable {
     if (!this.initialized) {
 
       this.allSql = "SELECT " + this.idColumn + ", "
-          + toString(this.valueColumns) + " FROM " + this.tableName;
+        + toString(this.valueColumns) + " FROM " + this.tableName;
       this.valueByIdSql = "SELECT " + toString(this.valueColumns) + " FROM "
-        + this.tableName + " WHERE " + this.idColumn + " = ?";
+          + this.tableName + " WHERE " + this.idColumn + " = ?";
       this.idByValueSql = "SELECT " + this.idColumn + " FROM " + this.tableName
-        + " WHERE ";
+          + " WHERE ";
       this.insertSql = "INSERT INTO " + this.tableName + " (" + this.idColumn;
       for (int i = 0; i < this.valueColumns.size(); i++) {
         final String columnName = this.valueColumns.get(i);
@@ -235,8 +235,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
           final ResultSet rs = statement.executeQuery();
           try {
             while (rs.next()) {
-              final Identifier id = SingleIdentifier.create(
-                rs.getLong(1));
+              final Identifier id = SingleIdentifier.create(rs.getLong(1));
               final List<Object> values = new ArrayList<Object>();
               for (int i = 0; i < this.valueColumns.size(); i++) {
                 values.add(rs.getObject(2 + i));
@@ -254,13 +253,12 @@ public class JdbcCodeTable extends AbstractCodeTable {
       }
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to load all values for: "
-          + this.tableName, e);
+        + this.tableName, e);
     }
   }
 
   @Override
-  protected Identifier loadId(final List<Object> values,
-    final boolean createId) {
+  protected Identifier loadId(final List<Object> values, final boolean createId) {
     init();
     Identifier id = null;
     if (createId && this.loadAll) {
@@ -278,7 +276,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
               index = JdbcUtils.setValue(statement, index, value);
             }
             try (
-              final ResultSet resultSet = statement.executeQuery()) {
+                final ResultSet resultSet = statement.executeQuery()) {
               if (resultSet.next()) {
                 id = SingleIdentifier.create(resultSet.getLong(1));
               }

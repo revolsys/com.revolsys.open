@@ -28,7 +28,7 @@ implements PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private Set<String> readOnlyFieldNames = new HashSet<String>();
 
@@ -41,8 +41,8 @@ implements PropertyChangeSupportProxy {
     this(null);
   }
 
-  public AbstractRecordTableModel(final RecordDefinition metaData) {
-    this.metaData = metaData;
+  public AbstractRecordTableModel(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
   }
 
   public void addPropertyChangeListener(
@@ -58,7 +58,7 @@ implements PropertyChangeSupportProxy {
 
   @PreDestroy
   public void dispose() {
-    this.metaData = null;
+    this.recordDefinition = null;
   }
 
   protected void firePropertyChange(final PropertyChangeEvent event) {
@@ -78,14 +78,14 @@ implements PropertyChangeSupportProxy {
   }
 
   public String getFieldName(final int attributeIndex) {
-    final RecordDefinition metaData = getMetaData();
-    return metaData.getAttributeName(attributeIndex);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getAttributeName(attributeIndex);
   }
 
   public abstract String getFieldName(int rowIndex, int columnIndex);
 
-  public RecordDefinition getMetaData() {
-    return this.metaData;
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   @Override
@@ -117,9 +117,9 @@ implements PropertyChangeSupportProxy {
     this.editable = editable;
   }
 
-  protected void setMetaData(final RecordDefinition metaData) {
-    if (metaData != this.metaData) {
-      this.metaData = metaData;
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    if (recordDefinition != this.recordDefinition) {
+      this.recordDefinition = recordDefinition;
       fireTableStructureChanged();
     }
   }
@@ -135,8 +135,8 @@ implements PropertyChangeSupportProxy {
   public String toCopyValue(final int rowIndex, final int attributeIndex,
     final Object objectValue) {
     String text;
-    final RecordDefinition metaData = getMetaData();
-    final String idFieldName = metaData.getIdAttributeName();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final String idFieldName = recordDefinition.getIdAttributeName();
     final String name = getFieldName(attributeIndex);
     if (objectValue == null) {
       return null;
@@ -147,7 +147,7 @@ implements PropertyChangeSupportProxy {
       }
       CodeTable codeTable = null;
       if (!name.equals(idFieldName)) {
-        codeTable = metaData.getCodeTableByColumn(name);
+        codeTable = recordDefinition.getCodeTableByColumn(name);
       }
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
@@ -170,8 +170,8 @@ implements PropertyChangeSupportProxy {
   public String toDisplayValue(final int rowIndex, final int attributeIndex,
     final Object objectValue) {
     String text;
-    final RecordDefinition metaData = getMetaData();
-    final String idFieldName = metaData.getIdAttributeName();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final String idFieldName = recordDefinition.getIdAttributeName();
     final String name = getFieldName(attributeIndex);
     if (objectValue == null) {
       if (name.equals(idFieldName)) {
@@ -186,7 +186,7 @@ implements PropertyChangeSupportProxy {
       }
       CodeTable codeTable = null;
       if (!name.equals(idFieldName)) {
-        codeTable = metaData.getCodeTableByColumn(name);
+        codeTable = recordDefinition.getCodeTableByColumn(name);
       }
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
@@ -217,11 +217,11 @@ implements PropertyChangeSupportProxy {
         return null;
       }
     }
-    final RecordDefinition metaData = getMetaData();
+    final RecordDefinition recordDefinition = getRecordDefinition();
     final String name = getFieldName(attributeIndex);
-    final CodeTable codeTable = metaData.getCodeTableByColumn(name);
+    final CodeTable codeTable = recordDefinition.getCodeTableByColumn(name);
     if (codeTable == null) {
-      final Class<?> fieldClass = metaData.getAttributeClass(name);
+      final Class<?> fieldClass = recordDefinition.getAttributeClass(name);
       final Object objectValue = StringConverterRegistry.toObject(fieldClass,
         displayValue);
       return objectValue;

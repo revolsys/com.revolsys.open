@@ -46,14 +46,14 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     this(new ArrayRecordFactory());
   }
 
-  public PostgreSQLRecordStore(final RecordFactory dataObjectFactory) {
-    super(dataObjectFactory);
+  public PostgreSQLRecordStore(final RecordFactory recordFactory) {
+    super(recordFactory);
     initSettings();
   }
 
-  public PostgreSQLRecordStore(final RecordFactory dataObjectFactory,
+  public PostgreSQLRecordStore(final RecordFactory recordFactory,
     final DataSource dataSource) {
-    this(dataObjectFactory);
+    this(recordFactory);
     setDataSource(dataSource);
   }
 
@@ -73,11 +73,11 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  protected JdbcAttribute addAttribute(final RecordDefinitionImpl metaData,
+  protected JdbcAttribute addAttribute(final RecordDefinitionImpl recordDefinition,
     final String dbColumnName, final String name, final String dataType,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final JdbcAttribute attribute = super.addAttribute(metaData, dbColumnName,
+    final JdbcAttribute attribute = super.addAttribute(recordDefinition, dbColumnName,
       name, dataType, sqlType, length, scale, required, description);
     if (!dbColumnName.matches("[a-z_]")) {
       attribute.setQuoteName(true);
@@ -109,14 +109,14 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public String getGeneratePrimaryKeySql(final RecordDefinition metaData) {
-    final String sequenceName = getSequenceName(metaData);
+  public String getGeneratePrimaryKeySql(final RecordDefinition recordDefinition) {
+    final String sequenceName = getSequenceName(recordDefinition);
     return "nextval('" + sequenceName + "')";
   }
 
   @Override
-  public Object getNextPrimaryKey(final RecordDefinition metaData) {
-    final String sequenceName = getSequenceName(metaData);
+  public Object getNextPrimaryKey(final RecordDefinition recordDefinition) {
+    final String sequenceName = getSequenceName(recordDefinition);
     return getNextPrimaryKey(sequenceName);
   }
 
@@ -132,10 +132,10 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     }
   }
 
-  public String getSequenceName(final RecordDefinition metaData) {
-    final String typePath = metaData.getPath();
+  public String getSequenceName(final RecordDefinition recordDefinition) {
+    final String typePath = recordDefinition.getPath();
     final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
-    final String shortName = ShortNameProperty.getShortName(metaData);
+    final String shortName = ShortNameProperty.getShortName(recordDefinition);
     final String sequenceName;
     if (StringUtils.hasText(shortName)) {
       if (this.useSchemaSequencePrefix) {
@@ -145,7 +145,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       }
     } else {
       final String tableName = getDatabaseTableName(typePath);
-      final String idAttributeName = metaData.getIdAttributeName()
+      final String idAttributeName = recordDefinition.getIdAttributeName()
           .toLowerCase();
       if (this.useSchemaSequencePrefix) {
         sequenceName = schema + "." + tableName + "_" + idAttributeName

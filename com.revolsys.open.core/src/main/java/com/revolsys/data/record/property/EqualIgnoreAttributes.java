@@ -11,16 +11,16 @@ import com.revolsys.data.record.schema.RecordDefinition;
 
 public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
   public static EqualIgnoreAttributes getProperty(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    return getProperty(metaData);
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    return getProperty(recordDefinition);
   }
 
   public static EqualIgnoreAttributes getProperty(
-    final RecordDefinition metaData) {
-    EqualIgnoreAttributes property = metaData.getProperty(PROPERTY_NAME);
+    final RecordDefinition recordDefinition) {
+    EqualIgnoreAttributes property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
       property = new EqualIgnoreAttributes();
-      property.setRecordDefinition(metaData);
+      property.setRecordDefinition(recordDefinition);
     }
     return property;
   }
@@ -75,14 +75,14 @@ public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition metaData) {
-    super.setRecordDefinition(metaData);
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    super.setRecordDefinition(recordDefinition);
     if (this.attributeNames.contains(RecordEquals.EXCLUDE_ID)) {
-      final String idAttributeName = metaData.getIdAttributeName();
+      final String idAttributeName = recordDefinition.getIdAttributeName();
       this.attributeNames.add(idAttributeName);
     }
     if (this.attributeNames.contains(RecordEquals.EXCLUDE_GEOMETRY)) {
-      final String geometryAttributeName = metaData.getGeometryAttributeName();
+      final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
       this.attributeNames.add(geometryAttributeName);
     }
   }

@@ -80,10 +80,10 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 
-    final FileGdbRecordStore dataObjectStore = create(file);
-    RecordStoreFactoryRegistry.setConnectionProperties(dataObjectStore,
+    final FileGdbRecordStore recordStore = create(file);
+    RecordStoreFactoryRegistry.setConnectionProperties(recordStore,
       properties);
-    return dataObjectStore;
+    return recordStore;
   }
 
   @Override

@@ -47,11 +47,11 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(final RecordDefinitionImpl metaData,
+  public Attribute addAttribute(final RecordDefinitionImpl recordDefinition,
     final String dbName, final String name, final String dataTypeName,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final String typePath = metaData.getPath();
+    final String typePath = recordDefinition.getPath();
     String owner = dataStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
     if (!StringUtils.hasText(owner)) {
       owner = "public";
@@ -86,7 +86,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(dbName,
         name, dataType, required, description, null, srid, axisCount,
         geometryFactory);
-      metaData.addAttribute(attribute);
+      recordDefinition.addAttribute(attribute);
       attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         geometryFactory);
       return attribute;

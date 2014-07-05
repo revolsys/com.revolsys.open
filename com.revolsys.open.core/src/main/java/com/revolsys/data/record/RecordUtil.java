@@ -25,8 +25,8 @@ import com.revolsys.util.JavaBeanUtil;
 
 public final class RecordUtil {
 
-  public static Record copy(final RecordDefinition metaData, final Record object) {
-    final Record copy = new ArrayRecord(metaData);
+  public static Record copy(final RecordDefinition recordDefinition, final Record object) {
+    final Record copy = new ArrayRecord(recordDefinition);
     copy.setValues(object);
     return copy;
   }
@@ -71,21 +71,21 @@ public final class RecordUtil {
 
   @SuppressWarnings("unchecked")
   public static <T> T getAttributeByPath(final Record object, final String path) {
-    final RecordDefinition metaData = object.getMetaData();
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
 
     final String[] propertyPath = path.split("\\.");
     Object propertyValue = object;
     for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
       final String propertyName = propertyPath[i];
       if (propertyValue instanceof Record) {
-        final Record dataObject = (Record)propertyValue;
+        final Record record = (Record)propertyValue;
 
-        if (dataObject.hasAttribute(propertyName)) {
-          propertyValue = dataObject.getValue(propertyName);
+        if (record.hasAttribute(propertyName)) {
+          propertyValue = record.getValue(propertyName);
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
+            final CodeTable codeTable = recordDefinition.getCodeTableByColumn(propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
             }
@@ -103,7 +103,7 @@ public final class RecordUtil {
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = metaData.getCodeTableByColumn(propertyName);
+          final CodeTable codeTable = recordDefinition.getCodeTableByColumn(propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
           }
@@ -209,12 +209,12 @@ public final class RecordUtil {
     }
   }
 
-  public static Record getObject(final RecordDefinition metaData,
+  public static Record getObject(final RecordDefinition recordDefinition,
     final Map<String, Object> values) {
-    final Record object = new ArrayRecord(metaData);
+    final Record object = new ArrayRecord(recordDefinition);
     for (final Entry<String, Object> entry : values.entrySet()) {
       final String name = entry.getKey();
-      final Attribute attribute = metaData.getAttribute(name);
+      final Attribute attribute = recordDefinition.getAttribute(name);
       if (attribute != null) {
         final Object value = entry.getValue();
         if (value != null) {
@@ -239,11 +239,11 @@ public final class RecordUtil {
     return object;
   }
 
-  public static List<Record> getObjects(final RecordDefinition metaData,
+  public static List<Record> getObjects(final RecordDefinition recordDefinition,
     final Collection<? extends Map<String, Object>> list) {
     final List<Record> objects = new ArrayList<Record>();
     for (final Map<String, Object> map : list) {
-      final Record object = getObject(metaData, map);
+      final Record object = getObject(recordDefinition, map);
       objects.add(object);
     }
     return objects;

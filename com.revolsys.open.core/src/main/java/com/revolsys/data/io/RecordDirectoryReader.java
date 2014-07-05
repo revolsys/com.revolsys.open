@@ -25,10 +25,10 @@ public class RecordDirectoryReader extends
   }
 
   protected void addMetaData(final RecordReader reader) {
-    final RecordDefinition metaData = reader.getMetaData();
-    if (metaData != null) {
-      final String path = metaData.getPath();
-      typePathMetaDataMap.put(path, metaData);
+    final RecordDefinition recordDefinition = reader.getRecordDefinition();
+    if (recordDefinition != null) {
+      final String path = recordDefinition.getPath();
+      typePathMetaDataMap.put(path, recordDefinition);
     }
   }
 
@@ -46,8 +46,8 @@ public class RecordDirectoryReader extends
 
   @Override
   public RecordDefinition getRecordDefinition(final String path) {
-    final RecordDefinition metaData = typePathMetaDataMap.get(path);
-    return metaData;
+    final RecordDefinition recordDefinition = typePathMetaDataMap.get(path);
+    return recordDefinition;
   }
 
   public Statistics getStatistics() {

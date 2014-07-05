@@ -20,7 +20,7 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
 
   private Reference<AbstractRecordStore> dataStore;
 
-  private Map<String, RecordDefinition> metaDataCache = null;
+  private Map<String, RecordDefinition> recordDefinitionCache = null;
 
   private String path;
 
@@ -33,34 +33,34 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
     this.path = path;
   }
 
-  public void addMetaData(final RecordDefinition metaData) {
-    addMetaData(metaData.getPath(), metaData);
+  public void addMetaData(final RecordDefinition recordDefinition) {
+    addMetaData(recordDefinition.getPath(), recordDefinition);
   }
 
   protected void addMetaData(final String typePath,
-    final RecordDefinition metaData) {
-    final Map<String, RecordDefinition> metaDataCache = getMetaDataCache();
-    metaDataCache.put(typePath.toUpperCase(), metaData);
+    final RecordDefinition recordDefinition) {
+    final Map<String, RecordDefinition> recordDefinitionCache = getRecordDefinitionCache();
+    recordDefinitionCache.put(typePath.toUpperCase(), recordDefinition);
   }
 
   @Override
   @PreDestroy
   public synchronized void close() {
-    if (metaDataCache != null) {
-      for (final RecordDefinition metaData : metaDataCache.values()) {
-        metaData.destroy();
+    if (recordDefinitionCache != null) {
+      for (final RecordDefinition recordDefinition : recordDefinitionCache.values()) {
+        recordDefinition.destroy();
       }
     }
     dataStore = null;
-    metaDataCache = null;
+    recordDefinitionCache = null;
     path = null;
     super.close();
   }
 
   public synchronized RecordDefinition findMetaData(final String typePath) {
-    final Map<String, RecordDefinition> metaDataCache = getMetaDataCache();
-    final RecordDefinition metaData = metaDataCache.get(typePath);
-    return metaData;
+    final Map<String, RecordDefinition> recordDefinitionCache = getRecordDefinitionCache();
+    final RecordDefinition recordDefinition = recordDefinitionCache.get(typePath);
+    return recordDefinition;
   }
 
   @SuppressWarnings("unchecked")
@@ -86,22 +86,22 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
     }
   }
 
-  public synchronized RecordDefinition getMetaData(String typePath) {
+  public synchronized RecordDefinition getRecordDefinition(String typePath) {
     typePath = typePath.toUpperCase();
     if (typePath.startsWith(path + "/") || path.equals("/")) {
-      final Map<String, RecordDefinition> metaDataCache = getMetaDataCache();
-      final RecordDefinition metaData = metaDataCache.get(typePath.toUpperCase());
-      return metaData;
+      final Map<String, RecordDefinition> recordDefinitionCache = getRecordDefinitionCache();
+      final RecordDefinition recordDefinition = recordDefinitionCache.get(typePath.toUpperCase());
+      return recordDefinition;
     } else {
       return null;
     }
   }
 
-  protected synchronized Map<String, RecordDefinition> getMetaDataCache() {
-    if (metaDataCache == null) {
+  protected synchronized Map<String, RecordDefinition> getRecordDefinitionCache() {
+    if (recordDefinitionCache == null) {
       refreshMetaData();
     }
-    return metaDataCache;
+    return recordDefinitionCache;
   }
 
   public String getName() {
@@ -114,21 +114,21 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
   }
 
   public List<String> getTypeNames() {
-    final Map<String, RecordDefinition> metaDataCache = getMetaDataCache();
-    return new ArrayList<String>(metaDataCache.keySet());
+    final Map<String, RecordDefinition> recordDefinitionCache = getRecordDefinitionCache();
+    return new ArrayList<String>(recordDefinitionCache.keySet());
   }
 
   public List<RecordDefinition> getTypes() {
-    final Map<String, RecordDefinition> metaDataCache = getMetaDataCache();
-    return new ArrayList<RecordDefinition>(metaDataCache.values());
+    final Map<String, RecordDefinition> recordDefinitionCache = getRecordDefinitionCache();
+    return new ArrayList<RecordDefinition>(recordDefinitionCache.values());
   }
 
   public boolean isInitialized() {
-    return metaDataCache != null;
+    return recordDefinitionCache != null;
   }
 
   public synchronized void refreshMetaData() {
-    metaDataCache = new TreeMap<>();
+    recordDefinitionCache = new TreeMap<>();
     final AbstractRecordStore dataStore = getDataStore();
     if (dataStore != null) {
       final Collection<RecordStoreExtension> extensions = dataStore.getDataStoreExtensions();
@@ -142,7 +142,7 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
             "Unable to pre-process schema " + this, e);
         }
       }
-      dataStore.loadSchemaRecordDefinitions(this, metaDataCache);
+      dataStore.loadSchemaRecordDefinitions(this, recordDefinitionCache);
       for (final RecordStoreExtension extension : extensions) {
         try {
           if (extension.isEnabled(dataStore)) {

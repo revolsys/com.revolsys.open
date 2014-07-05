@@ -25,10 +25,10 @@ public class ListRecordLayer extends AbstractRecordLayer {
 
   public static RecordDefinitionImpl createMetaData(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
-    final RecordDefinitionImpl metaData = new RecordDefinitionImpl(name);
-    metaData.addAttribute("GEOMETRY", geometryType, true);
-    metaData.setGeometryFactory(geometryFactory);
-    return metaData;
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(name);
+    recordDefinition.addAttribute("GEOMETRY", geometryType, true);
+    recordDefinition.setGeometryFactory(geometryFactory);
+    return recordDefinition;
   }
 
   private final List<LayerRecord> records = new ArrayList<LayerRecord>();
@@ -36,8 +36,8 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public ListRecordLayer() {
   }
 
-  public ListRecordLayer(final RecordDefinition metaData) {
-    super(metaData);
+  public ListRecordLayer(final RecordDefinition recordDefinition) {
+    super(recordDefinition);
     setEditable(true);
   }
 
@@ -48,9 +48,9 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public ListRecordLayer(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     super(name);
-    final RecordDefinitionImpl metaData = createMetaData(name,
+    final RecordDefinitionImpl recordDefinition = createMetaData(name,
       geometryFactory, geometryType);
-    setMetaData(metaData);
+    setRecordDefinition(recordDefinition);
   }
 
   @Override
@@ -62,7 +62,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void createRecordInternal(final Map<String, Object> values) {
-    final LayerRecord record = createRecord(getMetaData());
+    final LayerRecord record = createRecord(getRecordDefinition());
     record.setState(RecordState.Initalizing);
     try {
       record.setValues(values);

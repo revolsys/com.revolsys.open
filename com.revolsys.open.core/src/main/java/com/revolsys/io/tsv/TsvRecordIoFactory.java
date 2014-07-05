@@ -25,20 +25,20 @@ public class TsvRecordIoFactory extends AbstractRecordIoFactory {
 
   @Override
   public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory dataObjectFactory) {
+    final RecordFactory recordFactory) {
     final CsvRecordIterator iterator = new CsvRecordIterator(resource,
-      dataObjectFactory, TsvConstants.FIELD_SEPARATOR);
+      recordFactory, TsvConstants.FIELD_SEPARATOR);
     return new RecordIteratorReader(iterator);
   }
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition metaData, final OutputStream outputStream,
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);
 
-    return new CsvRecordWriter(metaData, writer,
+    return new CsvRecordWriter(recordDefinition, writer,
       TsvConstants.FIELD_SEPARATOR, true);
   }
 }

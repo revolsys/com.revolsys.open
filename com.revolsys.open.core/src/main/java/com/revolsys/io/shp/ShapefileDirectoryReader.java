@@ -58,7 +58,7 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
         factory);
       final String baseName = SpringUtil.getBaseName(resource).toUpperCase();
       iterator.setTypeName(fileNameTypeMap.get(baseName));
-      iterator.setMetaData(typeNameMetaDataMap.get(iterator.getTypeName()));
+      iterator.setRecordDefinition(typeNameMetaDataMap.get(iterator.getTypeName()));
       return new RecordIteratorReader(iterator);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);

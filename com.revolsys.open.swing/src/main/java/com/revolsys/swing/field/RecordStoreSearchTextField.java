@@ -74,11 +74,11 @@ public class RecordStoreSearchTextField extends JXSearchField implements
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
-  public RecordStoreSearchTextField(final RecordDefinition metaData,
+  public RecordStoreSearchTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName) {
-    this(metaData.getDataStore(), displayAttributeName, new Query(metaData,
+    this(recordDefinition.getDataStore(), displayAttributeName, new Query(recordDefinition,
       new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
-      metaData, Q.iLike(displayAttributeName, "")));
+      recordDefinition, Q.iLike(displayAttributeName, "")));
   }
 
   public RecordStoreSearchTextField(final RecordStore dataStore,

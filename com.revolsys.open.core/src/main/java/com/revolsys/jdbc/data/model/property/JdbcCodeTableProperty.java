@@ -88,17 +88,17 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition metaData) {
-    super.setRecordDefinition(metaData);
-    this.dataStore = (JdbcRecordStore)metaData.getDataStore();
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    super.setRecordDefinition(recordDefinition);
+    this.dataStore = (JdbcRecordStore)recordDefinition.getDataStore();
     this.dataSource = this.dataStore.getDataSource();
-    if (metaData != null) {
-      this.tableName = JdbcUtils.getQualifiedTableName(metaData.getPath());
+    if (recordDefinition != null) {
+      this.tableName = JdbcUtils.getQualifiedTableName(recordDefinition.getPath());
 
       final List<String> valueAttributeNames = getValueAttributeNames();
-      String idColumn = metaData.getIdAttributeName();
+      String idColumn = recordDefinition.getIdAttributeName();
       if (!StringUtils.hasText(idColumn)) {
-        idColumn = metaData.getAttributeName(0);
+        idColumn = recordDefinition.getAttributeName(0);
       }
       this.insertSql = "INSERT INTO " + this.tableName + " (" + idColumn;
       for (int i = 0; i < valueAttributeNames.size(); i++) {

@@ -20,8 +20,8 @@ public class TypeNamesFilter implements Filter<Record> {
 
   @Override
   public boolean accept(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    final String typePath = metaData.getPath();
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final String typePath = recordDefinition.getPath();
     return typePaths.contains(typePath);
   }
 

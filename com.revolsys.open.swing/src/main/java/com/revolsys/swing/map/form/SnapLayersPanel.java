@@ -98,12 +98,12 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
     fieldsPanel = new JPanel(new HorizontalLayout(5));
     fieldsPanel.setOpaque(false);
 
-    final List<AbstractRecordLayer> dataObjectLayers = layer.getProject()
+    final List<AbstractRecordLayer> recordLayers = layer.getProject()
       .getDescenants(AbstractRecordLayer.class);
 
     layerPathsModel = new BaseListModel<String>();
-    for (final AbstractRecordLayer dataObjectLayer : dataObjectLayers) {
-      final String layerPath = dataObjectLayer.getPath();
+    for (final AbstractRecordLayer recordLayer : recordLayers) {
+      final String layerPath = recordLayer.getPath();
       layerPathsModel.add(layerPath);
     }
     layerPathsField = new JXList(layerPathsModel);

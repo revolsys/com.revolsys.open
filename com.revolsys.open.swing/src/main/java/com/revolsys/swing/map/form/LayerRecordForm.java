@@ -153,7 +153,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   private AbstractRecordLayer layer;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private LayerRecord record;
 
@@ -179,8 +179,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     setLayout(new BorderLayout());
     setName(layer.getName());
     this.layer = layer;
-    final RecordDefinition metaData = layer.getMetaData();
-    setMetaData(metaData);
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    setRecordDefinition(recordDefinition);
     addToolBar(layer);
 
     final ActionMap map = getActionMap();
@@ -196,7 +196,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final boolean editable = layer.isEditable();
     setEditable(editable);
     getAllAttributes().setEditable(isEditable());
-    if (metaData.getGeometryAttributeName() != null) {
+    if (recordDefinition.getGeometryAttributeName() != null) {
       addTabGeometry();
     }
     Property.addListener(layer, this);
@@ -426,7 +426,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   protected void addTabGeometry() {
-    final String geometryAttributeName = this.metaData.getGeometryAttributeName();
+    final String geometryAttributeName = this.recordDefinition.getGeometryAttributeName();
     if (this.geometryCoordinatesPanel == null && geometryAttributeName != null) {
       this.geometryCoordinatesPanel = new GeometryCoordinatesPanel(this,
         geometryAttributeName);
@@ -443,8 +443,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   public ToolBar addToolBar(final AbstractRecordLayer layer) {
     this.toolBar = new ToolBar();
     add(this.toolBar, BorderLayout.NORTH);
-    final RecordDefinition metaData = getMetaData();
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     final boolean hasGeometry = geometryAttribute != null;
     final EnableCheck editable = new ObjectPropertyEnableCheck(this, "editable");
 
@@ -507,7 +507,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
           || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalAttributes.getProperty(metaData)
+        if (DirectionalAttributes.getProperty(recordDefinition)
             .hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
             FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
@@ -607,7 +607,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     this.fieldToNameMap.clear();
     this.fieldValidMap.clear();
     this.geometryCoordinatesPanel = null;
-    this.metaData = null;
+    this.recordDefinition = null;
     this.record = null;
     this.propertyChangeSupport = null;
     this.readOnlyFieldNames.clear();
@@ -693,7 +693,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   public String getCodeValue(final String fieldName, final Object value) {
-    final CodeTable codeTable = this.metaData.getCodeTableByColumn(fieldName);
+    final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(fieldName);
     String string;
     if (value == null) {
       return "-";
@@ -715,10 +715,10 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public RecordStore getDataStore() {
     if (this.dataStore == null) {
-      if (this.metaData == null) {
+      if (this.recordDefinition == null) {
         return null;
       } else {
-        return this.metaData.getDataStore();
+        return this.recordDefinition.getDataStore();
       }
     } else {
       return this.dataStore;
@@ -736,7 +736,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       if (field == null) {
         final boolean enabled = !this.readOnlyFieldNames.contains(fieldName);
         try {
-          field = SwingUtil.createField(this.metaData, fieldName, enabled);
+          field = SwingUtil.createField(this.recordDefinition, fieldName, enabled);
           addField(fieldName, field);
         } catch (final IllegalArgumentException e) {
         }
@@ -776,7 +776,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue(final String name) {
     final Object value = this.fieldValues.get(name);
-    final CodeTable codeTable = this.metaData.getCodeTableByColumn(name);
+    final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
     if (codeTable == null) {
       if (value != null && name.endsWith("_IND")) {
         if ("Y".equals(value) || Boolean.TRUE.equals(value)) {
@@ -794,7 +794,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   public String getGeometryAttributeName() {
-    return getMetaData().getGeometryAttributeName();
+    return getRecordDefinition().getGeometryAttributeName();
   }
 
   public GeometryCoordinatesPanel getGeometryCoordinatesPanel() {
@@ -820,8 +820,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return this.layer;
   }
 
-  public RecordDefinition getMetaData() {
-    return this.metaData;
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   public <T> T getOriginalValue(final String fieldName) {
@@ -893,7 +893,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   public boolean hasOriginalValue(final String name) {
-    return getMetaData().hasAttribute(name);
+    return getRecordDefinition().hasAttribute(name);
   }
 
   protected void invokeAction(final String actionName) {
@@ -1038,10 +1038,10 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
               SwingUtil.setVisible(window, false);
             }
             final Object value = event.getNewValue();
-            final RecordDefinition metaData = getMetaData();
+            final RecordDefinition recordDefinition = getRecordDefinition();
             if ("errorsUpdated".equals(propertyName)) {
               updateErrors();
-            } else if (metaData.hasAttribute(propertyName)) {
+            } else if (recordDefinition.hasAttribute(propertyName)) {
               setFieldValue(propertyName, value, isFieldValidationEnabled());
             }
             final boolean modifiedOrDeleted = isModifiedOrDeleted();
@@ -1181,10 +1181,10 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final boolean validate) {
     boolean changed = false;
     final Object oldValue = getFieldValue(fieldName);
-    final RecordDefinition metaData = getMetaData();
-    if (metaData != null) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
       try {
-        final Class<?> attributeClass = metaData.getAttributeClass(fieldName);
+        final Class<?> attributeClass = recordDefinition.getAttributeClass(fieldName);
         value = StringConverterRegistry.toObject(attributeClass, value);
       } catch (final Throwable e) {
       }
@@ -1213,14 +1213,14 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
   }
 
-  public void setMetaData(final RecordDefinition metaData) {
-    this.metaData = metaData;
-    setDataStore(metaData.getDataStore());
-    final String idAttributeName = metaData.getIdAttributeName();
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+    setDataStore(recordDefinition.getDataStore());
+    final String idAttributeName = recordDefinition.getIdAttributeName();
     if (StringUtils.hasText(idAttributeName)) {
       this.readOnlyFieldNames.add(idAttributeName);
     }
-    for (final Attribute attribute : metaData.getAttributes()) {
+    for (final Attribute attribute : recordDefinition.getAttributes()) {
       if (attribute.isRequired()) {
         final String name = attribute.getName();
         addRequiredFieldNames(name);
@@ -1384,7 +1384,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       if (requiredFieldNames.contains(fieldName)) {
         boolean run = true;
         if (this.record.getState() == RecordState.New) {
-          final String idAttributeName = getMetaData().getIdAttributeName();
+          final String idAttributeName = getRecordDefinition().getIdAttributeName();
           if (fieldName.equals(idAttributeName)) {
             run = false;
           }

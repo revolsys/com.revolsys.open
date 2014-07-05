@@ -31,8 +31,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
   RecordDefinitionProperty {
 
   public static final CodeTableProperty getProperty(
-    final RecordDefinition metaData) {
-    final CodeTableProperty property = metaData.getProperty(PROPERTY_NAME);
+    final RecordDefinition recordDefinition) {
+    final CodeTableProperty property = recordDefinition.getProperty(PROPERTY_NAME);
     return property;
   }
 
@@ -51,7 +51,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private boolean loadAll = true;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private List<String> valueAttributeNames = DEFAULT_ATTRIBUTE_NAMES;
 
@@ -95,7 +95,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   @Override
   public CodeTableProperty clone() {
     final CodeTableProperty clone = (CodeTableProperty)super.clone();
-    clone.metaData = null;
+    clone.recordDefinition = null;
     clone.attributeAliases = new ArrayList<String>(this.attributeAliases);
     clone.valueAttributeNames = new ArrayList<String>(this.valueAttributeNames);
     return clone;
@@ -105,10 +105,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
     if (this.createMissingCodes) {
       // TODO prevent duplicates from other threads/processes
       final Record code = this.dataStore.create(this.typePath);
-      final RecordDefinition metaData = code.getMetaData();
+      final RecordDefinition recordDefinition = code.getRecordDefinition();
       Object id = this.dataStore.createPrimaryIdValue(this.typePath);
       if (id == null) {
-        final Attribute idAttribute = metaData.getIdAttribute();
+        final Attribute idAttribute = recordDefinition.getIdAttribute();
         if (idAttribute != null) {
           if (Number.class.isAssignableFrom(idAttribute.getType()
             .getJavaClass())) {
@@ -168,14 +168,14 @@ public class CodeTableProperty extends AbstractCodeTable implements
   public String getIdAttributeName() {
     if (StringUtils.hasText(this.idAttributeName)) {
       return this.idAttributeName;
-    } else if (this.metaData == null) {
+    } else if (this.recordDefinition == null) {
       return "";
     } else {
-      final String idAttributeName = this.metaData.getIdAttributeName();
+      final String idAttributeName = this.recordDefinition.getIdAttributeName();
       if (StringUtils.hasText(idAttributeName)) {
         return idAttributeName;
       } else {
-        return this.metaData.getAttributeName(0);
+        return this.recordDefinition.getAttributeName(0);
       }
     }
   }
@@ -207,7 +207,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return this.metaData;
+    return this.recordDefinition;
   }
 
   public String getTypeName() {
@@ -253,9 +253,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
         this.threadLoading.set(Boolean.TRUE);
         this.loading = true;
         try {
-          final RecordDefinition metaData = this.dataStore.getRecordDefinition(this.typePath);
+          final RecordDefinition recordDefinition = this.dataStore.getRecordDefinition(this.typePath);
           final Query query = new Query(this.typePath);
-          query.setAttributeNames(metaData.getAttributeNames());
+          query.setAttributeNames(recordDefinition.getAttributeNames());
           for (final String order : this.orderBy) {
             query.addOrderBy(order, true);
           }
@@ -298,7 +298,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
           if (value == null) {
             and.add(Q.isNull(attributeName));
           } else {
-            final Attribute attribute = this.metaData.getAttribute(attributeName);
+            final Attribute attribute = this.recordDefinition.getAttribute(attributeName);
             and.add(Q.equal(attribute, value));
           }
           i++;
@@ -384,20 +384,20 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition metaData) {
-    if (this.metaData != metaData) {
-      if (this.metaData != null) {
-        this.metaData.setProperty(getPropertyName(), null);
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    if (this.recordDefinition != recordDefinition) {
+      if (this.recordDefinition != null) {
+        this.recordDefinition.setProperty(getPropertyName(), null);
       }
-      this.metaData = metaData;
-      if (metaData == null) {
+      this.recordDefinition = recordDefinition;
+      if (recordDefinition == null) {
         this.dataStore = null;
         this.typePath = null;
       } else {
-        this.typePath = metaData.getPath();
+        this.typePath = recordDefinition.getPath();
         setName(PathUtil.getName(this.typePath));
-        this.dataStore = this.metaData.getDataStore();
-        metaData.setProperty(getPropertyName(), this);
+        this.dataStore = this.recordDefinition.getDataStore();
+        recordDefinition.setProperty(getPropertyName(), this);
         this.dataStore.addCodeTable(this);
       }
     }

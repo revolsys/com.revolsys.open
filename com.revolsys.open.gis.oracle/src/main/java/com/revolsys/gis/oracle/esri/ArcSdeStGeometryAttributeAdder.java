@@ -24,12 +24,12 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(final RecordDefinitionImpl metaData,
+  public Attribute addAttribute(final RecordDefinitionImpl recordDefinition,
     final String dbName, final String name, final String dataTypeName,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final RecordStoreSchema schema = metaData.getSchema();
-    final String typePath = metaData.getPath();
+    final RecordStoreSchema schema = recordDefinition.getSchema();
+    final String typePath = recordDefinition.getPath();
     final String owner = this.dataStore.getDatabaseSchemaName(schema);
     final String tableName = this.dataStore.getDatabaseTableName(typePath);
     final String columnName = name.toUpperCase();
@@ -61,7 +61,7 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     final Attribute attribute = new ArcSdeStGeometryAttribute(dbName, name,
       dataType, required, description, null, spatialReference, axisCount);
 
-    metaData.addAttribute(attribute);
+    recordDefinition.addAttribute(attribute);
     attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
     return attribute;
   }

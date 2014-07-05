@@ -78,16 +78,16 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public static DirectionalAttributes getProperty(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    return getProperty(metaData);
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    return getProperty(recordDefinition);
   }
 
   public static DirectionalAttributes getProperty(
-    final RecordDefinition metaData) {
-    DirectionalAttributes property = metaData.getProperty(PROPERTY_NAME);
+    final RecordDefinition recordDefinition) {
+    DirectionalAttributes property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
       property = new DirectionalAttributes();
-      property.setRecordDefinition(metaData);
+      property.setRecordDefinition(recordDefinition);
     }
     return property;
   }
@@ -99,8 +99,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public static boolean hasProperty(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    return metaData.getProperty(PROPERTY_NAME) != null;
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    return recordDefinition.getProperty(PROPERTY_NAME) != null;
   }
 
   public static Record merge(final Record object1,
@@ -243,10 +243,10 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       object2);
 
     if (forwardsIndicators != null) {
-      final RecordDefinition metaData = getRecordDefinition();
-      final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(metaData);
-      for (final String attributeName : metaData.getAttributeNames()) {
-        if (!RecordEquals.isAttributeIgnored(metaData,
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
+      for (final String attributeName : recordDefinition.getAttributeNames()) {
+        if (!RecordEquals.isAttributeIgnored(recordDefinition,
           equalExcludeAttributes, attributeName)
           && !equalIgnore.isAttributeIgnored(attributeName)) {
           if (!canMerge(attributeName, point, object1, object2,
@@ -265,8 +265,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final Record object1, final Record object2,
     final Collection<String> equalExcludeAttributes,
     final boolean[] forwardsIndicators) {
-    final RecordDefinition metaData = getRecordDefinition();
-    if (attributeName.equals(metaData.getGeometryAttributeName())) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (attributeName.equals(recordDefinition.getGeometryAttributeName())) {
       final LineString line1 = object1.getGeometryValue();
       final LineString line2 = object2.getGeometryValue();
       return !line1.equals(line2);
@@ -384,9 +384,9 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
   public boolean equals(final Record object1, final Record object2,
     final Collection<String> equalExcludeAttributes) {
-    final RecordDefinition metaData = getRecordDefinition();
-    final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(metaData);
-    for (final String attributeName : metaData.getAttributeNames()) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
+    for (final String attributeName : recordDefinition.getAttributeNames()) {
       if (!equalExcludeAttributes.contains(attributeName)
         && !equalIgnore.isAttributeIgnored(attributeName)) {
         if (!equals(attributeName, object1, object2, equalExcludeAttributes)) {
@@ -420,8 +420,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final Collection<String> equalExcludeAttributes) {
     final LineString line1 = object1.getGeometryValue();
     final LineString line2 = object2.getGeometryValue();
-    final RecordDefinition metaData = getRecordDefinition();
-    if (attributeName.equals(metaData.getGeometryAttributeName())) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (attributeName.equals(recordDefinition.getGeometryAttributeName())) {
       return line1.equals(line2);
     }
 
@@ -476,13 +476,13 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   public Set<String> getCantMergeAttributes(final Point point,
     final Record object1, final Record object2,
     final Collection<String> equalExcludeAttributes) {
-    final RecordDefinition metaData = getRecordDefinition();
+    final RecordDefinition recordDefinition = getRecordDefinition();
     final boolean[] forwardsIndicators = getForwardsIndicators(point, object1,
       object2);
     if (forwardsIndicators != null) {
       final Set<String> attributeNames = new LinkedHashSet<String>();
-      final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(metaData);
-      for (final String attributeName : metaData.getAttributeNames()) {
+      final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
+      for (final String attributeName : recordDefinition.getAttributeNames()) {
         if (!equalExcludeAttributes.contains(attributeName)
           && !equalIgnore.isAttributeIgnored(attributeName)) {
           if (!canMerge(attributeName, point, object1, object2,
@@ -493,7 +493,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       }
       return attributeNames;
     } else {
-      final String geometryAttributeName = metaData.getGeometryAttributeName();
+      final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
       return Collections.singleton(geometryAttributeName);
     }
   }
@@ -606,8 +606,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       object1);
     setStartAttributes(startObject, newValues);
     setEndAttributes(endObject, newValues);
-    final RecordDefinition metaData = object1.getMetaData();
-    final String geometryAttributeName = metaData.getGeometryAttributeName();
+    final RecordDefinition recordDefinition = object1.getRecordDefinition();
+    final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
     newValues.put(geometryAttributeName, newLine);
     return newValues;
   }

@@ -99,9 +99,9 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
   public void write(final Record object) {
     open();
     writer.startTag(PLACEMARK);
-    final RecordDefinition metaData = object.getMetaData();
-    final int geometryIndex = metaData.getGeometryAttributeIndex();
-    final int idIndex = metaData.getIdAttributeIndex();
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final int geometryIndex = recordDefinition.getGeometryAttributeIndex();
+    final int idIndex = recordDefinition.getIdAttributeIndex();
 
     final String nameAttribute = getProperty(PLACEMARK_NAME_ATTRIBUTE_PROPERTY);
     String name = null;
@@ -110,7 +110,7 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
     }
     if (name == null && idIndex != -1) {
       final Object id = object.getValue(idIndex);
-      final String typeName = metaData.getTypeName();
+      final String typeName = recordDefinition.getTypeName();
       name = typeName + " " + id;
     }
     if (name != null) {
@@ -138,9 +138,9 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
       writer.element(STYLE_URL, defaultStyleUrl);
     }
     boolean hasValues = false;
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
       if (i != geometryIndex) {
-        final String attributeName = metaData.getAttributeName(i);
+        final String attributeName = recordDefinition.getAttributeName(i);
         final Object value = object.getValue(i);
         if (value != null
           || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY))) {
@@ -158,7 +158,7 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
     if (hasValues) {
       writer.endTag(EXTENDED_DATA);
     }
-    final List<Integer> geometryAttributeIndexes = metaData.getGeometryAttributeIndexes();
+    final List<Integer> geometryAttributeIndexes = recordDefinition.getGeometryAttributeIndexes();
     if (!geometryAttributeIndexes.isEmpty()) {
       Geometry geometry = null;
       if (geometryAttributeIndexes.size() == 1) {
@@ -172,7 +172,7 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
           }
         }
         if (!geometries.isEmpty()) {
-          geometry = metaData.getGeometryFactory().geometry(geometries);
+          geometry = recordDefinition.getGeometryFactory().geometry(geometries);
         }
       }
       if (geometry != null) {

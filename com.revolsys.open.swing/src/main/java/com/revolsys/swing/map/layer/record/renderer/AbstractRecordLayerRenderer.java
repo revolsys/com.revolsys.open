@@ -207,8 +207,8 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     final AbstractRecordLayer layer) {
     if (layer.hasGeometryAttribute()) {
       final BoundingBox boundingBox = viewport.getBoundingBox();
-      final List<LayerRecord> dataObjects = layer.queryBackground(boundingBox);
-      renderRecords(viewport, layer, dataObjects);
+      final List<LayerRecord> records = layer.queryBackground(boundingBox);
+      renderRecords(viewport, layer, records);
     }
   }
 

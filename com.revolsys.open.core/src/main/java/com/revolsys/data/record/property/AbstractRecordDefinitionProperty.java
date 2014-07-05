@@ -23,13 +23,13 @@ public abstract class AbstractRecordDefinitionProperty implements
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition metaData) {
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
     if (this.recordDefinition != null) {
       this.recordDefinition.setProperty(getPropertyName(), null);
     }
-    this.recordDefinition = metaData;
-    if (metaData != null) {
-      metaData.setProperty(getPropertyName(), this);
+    this.recordDefinition = recordDefinition;
+    if (recordDefinition != null) {
+      recordDefinition.setProperty(getPropertyName(), this);
     }
   }
 

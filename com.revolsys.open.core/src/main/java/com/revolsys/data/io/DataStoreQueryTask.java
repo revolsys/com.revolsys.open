@@ -41,9 +41,9 @@ public class DataStoreQueryTask extends AbstractProcess {
   @Override
   public void run() {
     objects = new ArrayList<Record>();
-    final RecordDefinition metaData = dataStore.getRecordDefinition(path);
-    final Query query = new Query(metaData);
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final RecordDefinition recordDefinition = dataStore.getRecordDefinition(path);
+    final Query query = new Query(recordDefinition);
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     query.setWhereCondition(F.envelopeIntersects(geometryAttribute, boundingBox));
     try (
       final Reader<Record> reader = dataStore.query(query)) {

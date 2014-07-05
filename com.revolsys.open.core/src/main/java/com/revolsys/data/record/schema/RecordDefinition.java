@@ -40,7 +40,7 @@ public interface RecordDefinition extends ObjectWithProperties,
 
   Record createRecord();
 
-  void delete(Record dataObject);
+  void delete(Record record);
 
   void destroy();
 

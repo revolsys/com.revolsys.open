@@ -32,7 +32,7 @@ public class GmlRecordWriter extends AbstractWriter<Record> implements
 
   private GeometryFactory geometryFactory;
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private boolean opened;
 
@@ -42,12 +42,12 @@ public class GmlRecordWriter extends AbstractWriter<Record> implements
 
   private final String namespaceUri;
 
-  public GmlRecordWriter(final RecordDefinition metaData, final Writer out) {
-    this.metaData = metaData;
+  public GmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+    this.recordDefinition = recordDefinition;
     this.out = new XmlWriter(out);
-    qualifiedName = metaData.getProperty(RecordProperties.QUALIFIED_NAME);
+    qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
-      qualifiedName = new QName(metaData.getTypeName());
+      qualifiedName = new QName(recordDefinition.getTypeName());
     }
     namespaceUri = qualifiedName.getNamespaceURI();
     this.out.setPrefix(qualifiedName);
@@ -110,19 +110,19 @@ public class GmlRecordWriter extends AbstractWriter<Record> implements
       writeHeader();
     }
     out.startTag(FEATURE_MEMBER);
-    final RecordDefinition metaData = object.getMetaData();
-    QName qualifiedName = metaData.getProperty(RecordProperties.QUALIFIED_NAME);
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    QName qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
-      final String typeName = metaData.getPath();
+      final String typeName = recordDefinition.getPath();
       final String path = PathUtil.getPath(typeName);
       final String name = PathUtil.getName(typeName);
       qualifiedName = new QName(path, name);
-      metaData.setProperty(RecordProperties.QUALIFIED_NAME,
+      recordDefinition.setProperty(RecordProperties.QUALIFIED_NAME,
         qualifiedName);
     }
     out.startTag(qualifiedName);
 
-    for (final Attribute attribute : metaData.getAttributes()) {
+    for (final Attribute attribute : recordDefinition.getAttributes()) {
       final String attributeName = attribute.getName();
       out.startTag(namespaceUri, attributeName);
       final Object value = object.getValue(attributeName);

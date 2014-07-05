@@ -13,12 +13,12 @@ public class RecordStoreSchemaMapProxy extends
 
   private final Map<String, RecordStoreSchema> map;
 
-  private final AbstractRecordStore dataObjectStore;
+  private final AbstractRecordStore recordStore;
 
   public RecordStoreSchemaMapProxy(
-    final AbstractRecordStore dataObjectStore,
+    final AbstractRecordStore recordStore,
     final Map<String, RecordStoreSchema> map) {
-    this.dataObjectStore = dataObjectStore;
+    this.recordStore = recordStore;
     this.map = map;
   }
 
@@ -29,7 +29,7 @@ public class RecordStoreSchemaMapProxy extends
       schema = map.get(key);
       if (schema != null) {
         final String path = schema.getPath();
-        schema = new RecordStoreSchemaProxy(dataObjectStore, path, schema);
+        schema = new RecordStoreSchemaProxy(recordStore, path, schema);
         super.put(path, schema);
       }
     }
@@ -40,7 +40,7 @@ public class RecordStoreSchemaMapProxy extends
   public RecordStoreSchema put(final String key,
     final RecordStoreSchema schema) {
     final RecordStoreSchemaProxy schemaProxy = new RecordStoreSchemaProxy(
-      dataObjectStore, key, schema);
+      recordStore, key, schema);
     map.put(key, schema);
     return super.put(key, schemaProxy);
   }

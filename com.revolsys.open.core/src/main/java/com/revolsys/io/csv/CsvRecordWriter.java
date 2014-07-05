@@ -17,25 +17,25 @@ public class CsvRecordWriter extends AbstractWriter<Record> {
   /** The writer */
   private final PrintWriter out;
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private final boolean useQuotes;
 
-  public CsvRecordWriter(final RecordDefinition metaData, final Writer out) {
-    this(metaData, out, CsvConstants.FIELD_SEPARATOR, true);
+  public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+    this(recordDefinition, out, CsvConstants.FIELD_SEPARATOR, true);
 
   }
 
-  public CsvRecordWriter(final RecordDefinition metaData,
+  public CsvRecordWriter(final RecordDefinition recordDefinition,
     final Writer out, final char fieldSeparator, final boolean useQuotes) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     this.out = new PrintWriter(out);
     this.useQuotes = useQuotes;
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
       if (i > 0) {
         this.out.print(fieldSeparator);
       }
-      final String name = metaData.getAttributeName(i);
+      final String name = recordDefinition.getAttributeName(i);
       string(name);
     }
     this.out.println();
@@ -68,14 +68,14 @@ public class CsvRecordWriter extends AbstractWriter<Record> {
 
   @Override
   public void write(final Record object) {
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
       if (i > 0) {
         out.print(fieldSeparator);
       }
       final Object value = object.getValue(i);
       if (value != null) {
-        final String name = metaData.getAttributeName(i);
-        final DataType dataType = metaData.getAttributeType(name);
+        final String name = recordDefinition.getAttributeName(i);
+        final DataType dataType = recordDefinition.getAttributeType(name);
 
         @SuppressWarnings("unchecked")
         final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();

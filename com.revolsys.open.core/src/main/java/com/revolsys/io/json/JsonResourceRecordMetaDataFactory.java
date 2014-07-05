@@ -20,7 +20,7 @@ public class JsonResourceRecordMetaDataFactory extends
   AbstractObjectWithProperties implements ApplicationContextAware,
   RecordDefinitionFactory {
 
-  private final Map<String, RecordDefinition> metaDataMap = new HashMap<String, RecordDefinition>();
+  private final Map<String, RecordDefinition> recordDefinitionMap = new HashMap<String, RecordDefinition>();
 
   private String locationPattern;
 
@@ -32,16 +32,16 @@ public class JsonResourceRecordMetaDataFactory extends
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
-    return metaDataMap.get(typePath);
+    return recordDefinitionMap.get(typePath);
   }
 
   @PostConstruct
   public void init() {
     try {
       for (final Resource resource : applicationContext.getResources(locationPattern)) {
-        final RecordDefinition metaData = MapObjectFactoryRegistry.toObject(resource);
-        final String name = metaData.getPath();
-        metaDataMap.put(name, metaData);
+        final RecordDefinition recordDefinition = MapObjectFactoryRegistry.toObject(resource);
+        final String name = recordDefinition.getPath();
+        recordDefinitionMap.put(name, recordDefinition);
       }
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to get resources for "

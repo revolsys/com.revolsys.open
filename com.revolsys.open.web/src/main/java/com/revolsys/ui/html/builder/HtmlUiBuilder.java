@@ -1734,8 +1734,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void setValue(final Object object, final String key, final Object value) {
     if (object instanceof Record) {
-      final Record dataObject = (Record)object;
-      dataObject.setValueByPath(key, value);
+      final Record record = (Record)object;
+      record.setValueByPath(key, value);
     } else if (object instanceof Map) {
       @SuppressWarnings("unchecked")
       final Map<String, Object> map = (Map<String, Object>)object;

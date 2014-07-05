@@ -151,7 +151,7 @@ public class JdbcAttributeAdder {
     this.dataType = dataType;
   }
 
-  public Attribute addAttribute(final RecordDefinitionImpl metaData,
+  public Attribute addAttribute(final RecordDefinitionImpl recordDefinition,
     final String dbName, final String name, final String dataType,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
@@ -242,7 +242,7 @@ public class JdbcAttributeAdder {
         break;
       }
     }
-    metaData.addAttribute(attribute);
+    recordDefinition.addAttribute(attribute);
     return attribute;
   }
 

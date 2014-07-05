@@ -222,7 +222,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   @Override
-  protected void processObjects(final RecordDefinition metaData,
+  protected void processObjects(final RecordDefinition recordDefinition,
     final Channel<Record> out) {
     if (otherIndex.size() + otherPointMap.size() == 0) {
       if (logNotEqualSource) {

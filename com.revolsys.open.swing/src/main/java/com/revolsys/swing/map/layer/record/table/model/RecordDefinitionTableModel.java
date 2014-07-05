@@ -19,22 +19,22 @@ public class RecordDefinitionTableModel extends AbstractTableModel {
     Integer.class, String.class, String.class, Integer.class, Integer.class,
     Object.class, Object.class, Boolean.class, String.class);
 
-  public static BaseJxTable createTable(final RecordDefinition metaData) {
-    if (metaData == null) {
+  public static BaseJxTable createTable(final RecordDefinition recordDefinition) {
+    if (recordDefinition == null) {
       return null;
     } else {
       final RecordDefinitionTableModel model = new RecordDefinitionTableModel(
-        metaData);
+        recordDefinition);
       final BaseJxTable table = new BaseJxTable(model);
       table.resizeColumnsToContent();
       return table;
     }
   }
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
-  public RecordDefinitionTableModel(final RecordDefinition metaData) {
-    this.metaData = metaData;
+  public RecordDefinitionTableModel(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
   }
 
   @Override
@@ -54,12 +54,12 @@ public class RecordDefinitionTableModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    return this.metaData.getAttributeCount();
+    return this.recordDefinition.getAttributeCount();
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final Attribute attribute = this.metaData.getAttribute(rowIndex);
+    final Attribute attribute = this.recordDefinition.getAttribute(rowIndex);
     if (attribute == null) {
       return "...";
     } else {

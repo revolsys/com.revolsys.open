@@ -147,16 +147,16 @@ public class GeoNamesService {
     }
   }
 
-  private List<Record> mapToObjects(final RecordDefinition metaData,
+  private List<Record> mapToObjects(final RecordDefinition recordDefinition,
     final Map<String, Object> result) {
     final List<Record> results = new ArrayList<Record>();
     final List<Map<String, Object>> names = (List<Map<String, Object>>)result.get("geonames");
     for (final Map<String, Object> name : names) {
-      final Record dataObject = metaData.createRecord();
-      for (final String attributeName : metaData.getAttributeNames()) {
+      final Record record = recordDefinition.createRecord();
+      for (final String attributeName : recordDefinition.getAttributeNames()) {
         final Object value = name.get(attributeName);
         if (value != null) {
-          dataObject.setValue(attributeName, value);
+          record.setValue(attributeName, value);
         }
       }
       final double lat = ((Number)name.get("lat")).doubleValue();
@@ -169,9 +169,9 @@ public class GeoNamesService {
       } else {
         coordinate = new PointDouble(lon, lat, elevation.doubleValue());
       }
-      dataObject.setGeometryValue(GeometryFactory.floating3()
+      record.setGeometryValue(GeometryFactory.floating3()
         .point(coordinate));
-      results.add(dataObject);
+      results.add(record);
     }
     return results;
   }

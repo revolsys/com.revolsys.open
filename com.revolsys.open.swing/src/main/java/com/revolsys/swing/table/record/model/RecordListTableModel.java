@@ -28,35 +28,35 @@ public class RecordListTableModel extends RecordRowTableModel implements
   private static final long serialVersionUID = 1L;
 
   public static TablePanel createPanel(final AbstractRecordLayer layer) {
-    return createPanel(layer.getMetaData(), new ArrayList<LayerRecord>(),
+    return createPanel(layer.getRecordDefinition(), new ArrayList<LayerRecord>(),
       layer.getColumnNames());
   }
 
   public static TablePanel createPanel(final AbstractRecordLayer layer,
     final Collection<LayerRecord> objects) {
-    return createPanel(layer.getMetaData(), objects, layer.getColumnNames());
+    return createPanel(layer.getRecordDefinition(), objects, layer.getColumnNames());
   }
 
-  public static TablePanel createPanel(final RecordDefinition metaData,
+  public static TablePanel createPanel(final RecordDefinition recordDefinition,
     final Collection<LayerRecord> objects,
     final Collection<String> attributeNames) {
     final RecordListTableModel model = new RecordListTableModel(
-      metaData, objects, attributeNames);
+      recordDefinition, objects, attributeNames);
     final JTable table = new RecordRowTable(model);
     return new TablePanel(table);
   }
 
-  public static TablePanel createPanel(final RecordDefinition metaData,
+  public static TablePanel createPanel(final RecordDefinition recordDefinition,
     final List<LayerRecord> objects, final String... attributeNames) {
-    return createPanel(metaData, objects, Arrays.asList(attributeNames));
+    return createPanel(recordDefinition, objects, Arrays.asList(attributeNames));
   }
 
   private final List<LayerRecord> records = new ArrayList<LayerRecord>();
 
-  public RecordListTableModel(final RecordDefinition metaData,
+  public RecordListTableModel(final RecordDefinition recordDefinition,
     final Collection<LayerRecord> objects,
     final Collection<String> columnNames) {
-    super(metaData, columnNames);
+    super(recordDefinition, columnNames);
     if (objects != null) {
       this.records.addAll(objects);
     }
@@ -121,8 +121,8 @@ public class RecordListTableModel extends RecordRowTableModel implements
       if (isReadOnly(attributeName)) {
         return false;
       } else {
-        final RecordDefinition metaData = getMetaData();
-        final DataType dataType = metaData.getAttributeType(attributeName);
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final DataType dataType = recordDefinition.getAttributeType(attributeName);
         if (dataType == null) {
           return false;
         } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {

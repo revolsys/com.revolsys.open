@@ -15,7 +15,7 @@ import com.revolsys.io.Reader;
 public class MetaDataConvertRecordReader extends AbstractReader<Record>
 implements RecordReader, Iterator<Record> {
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private final Reader<Record> reader;
 
@@ -23,9 +23,9 @@ implements RecordReader, Iterator<Record> {
 
   private Iterator<Record> iterator;
 
-  public MetaDataConvertRecordReader(final RecordDefinition metaData,
+  public MetaDataConvertRecordReader(final RecordDefinition recordDefinition,
     final Reader<Record> reader) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     this.reader = reader;
   }
 
@@ -35,8 +35,8 @@ implements RecordReader, Iterator<Record> {
   }
 
   @Override
-  public RecordDefinition getMetaData() {
-    return this.metaData;
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   @Override
@@ -56,12 +56,12 @@ implements RecordReader, Iterator<Record> {
   public Record next() {
     if (hasNext()) {
       final Record source = this.iterator.next();
-      final Record target = new ArrayRecord(this.metaData);
-      for (final Attribute attribute : this.metaData.getAttributes()) {
+      final Record target = new ArrayRecord(this.recordDefinition);
+      for (final Attribute attribute : this.recordDefinition.getAttributes()) {
         final String name = attribute.getName();
         final Object value = source.getValue(name);
         if (value != null) {
-          final DataType dataType = this.metaData.getAttributeType(name);
+          final DataType dataType = this.recordDefinition.getAttributeType(name);
           final Object convertedValue = StringConverterRegistry.toObject(
             dataType, value);
           target.setValue(name, convertedValue);

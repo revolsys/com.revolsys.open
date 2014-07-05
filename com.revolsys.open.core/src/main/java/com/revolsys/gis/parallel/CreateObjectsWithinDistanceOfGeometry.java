@@ -34,7 +34,7 @@ BaseInOutProcess<Record, Record> {
 
   private List<Record> geometryObjects = new ArrayList<Record>();
 
-  private Map<RecordDefinition, Map<RecordDefinition, Geometry>> metaDataGeometryMap = new HashMap<RecordDefinition, Map<RecordDefinition, Geometry>>();
+  private Map<RecordDefinition, Map<RecordDefinition, Geometry>> recordDefinitionGeometryMap = new HashMap<RecordDefinition, Map<RecordDefinition, Geometry>>();
 
   private String typePathTemplate;
 
@@ -51,7 +51,7 @@ BaseInOutProcess<Record, Record> {
     }
     this.attributes = null;
     this.geometryObjects = null;
-    this.metaDataGeometryMap = null;
+    this.recordDefinitionGeometryMap = null;
   }
 
   public Map<String, Object> getAttributes() {
@@ -73,11 +73,11 @@ BaseInOutProcess<Record, Record> {
     return this.geometryObjects;
   }
 
-  private final Map<RecordDefinition, Geometry> getMetaDataGeometries(
-    final RecordDefinition metaData) {
-    Map<RecordDefinition, Geometry> metaDataGeometries = this.metaDataGeometryMap.get(metaData);
-    if (metaDataGeometries == null) {
-      metaDataGeometries = new LinkedHashMap<RecordDefinition, Geometry>();
+  private final Map<RecordDefinition, Geometry> getRecordDefinitionGeometries(
+    final RecordDefinition recordDefinition) {
+    Map<RecordDefinition, Geometry> recordDefinitionGeometries = this.recordDefinitionGeometryMap.get(recordDefinition);
+    if (recordDefinitionGeometries == null) {
+      recordDefinitionGeometries = new LinkedHashMap<RecordDefinition, Geometry>();
       RecordDefinition newMetaData;
       Geometry preparedGeometry;
       for (final Record record : this.geometryObjects) {
@@ -87,12 +87,12 @@ BaseInOutProcess<Record, Record> {
           final Map<String, Object> vars = new HashMap<String, Object>(
               this.attributes);
           vars.putAll(record);
-          vars.put("typePath", metaData.getPath());
+          vars.put("typePath", recordDefinition.getPath());
           context.setVars(vars);
           final String typePath = (String)JexlUtil.evaluateExpression(context,
             this.typePathTemplateExpression);
           newMetaData = new RecordDefinitionImpl(typePath,
-            metaData.getAttributes());
+            recordDefinition.getAttributes());
           if (this.distance > 0) {
             final BufferParameters parameters = new BufferParameters(1, 3, 2,
               1.0D);
@@ -100,13 +100,13 @@ BaseInOutProcess<Record, Record> {
           }
           geometry = DouglasPeuckerSimplifier.simplify(geometry, 2D);
           preparedGeometry = geometry.prepare();
-          metaDataGeometries.put(newMetaData, preparedGeometry);
+          recordDefinitionGeometries.put(newMetaData, preparedGeometry);
         }
       }
 
-      this.metaDataGeometryMap.put(metaData, metaDataGeometries);
+      this.recordDefinitionGeometryMap.put(recordDefinition, recordDefinitionGeometries);
     }
-    return metaDataGeometries;
+    return recordDefinitionGeometries;
   }
 
   public String getTypeNameTemplate() {
@@ -136,12 +136,12 @@ BaseInOutProcess<Record, Record> {
     if (this.writeOriginal) {
       out.write(object);
     }
-    final RecordDefinition metaData = object.getMetaData();
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
     final Geometry geometryValue = object.getGeometryValue();
-    final Map<RecordDefinition, Geometry> metaDataGeometries = getMetaDataGeometries(metaData);
-    for (final Entry<RecordDefinition, Geometry> metaDataGeometry : metaDataGeometries.entrySet()) {
-      final RecordDefinition newMetaData = metaDataGeometry.getKey();
-      final Geometry intersectsGeometry = metaDataGeometry.getValue();
+    final Map<RecordDefinition, Geometry> recordDefinitionGeometries = getRecordDefinitionGeometries(recordDefinition);
+    for (final Entry<RecordDefinition, Geometry> recordDefinitionGeometry : recordDefinitionGeometries.entrySet()) {
+      final RecordDefinition newMetaData = recordDefinitionGeometry.getKey();
+      final Geometry intersectsGeometry = recordDefinitionGeometry.getValue();
       if (intersectsGeometry.intersects(geometryValue)) {
         final Record newObject = new ArrayRecord(newMetaData, object);
         out.write(newObject);

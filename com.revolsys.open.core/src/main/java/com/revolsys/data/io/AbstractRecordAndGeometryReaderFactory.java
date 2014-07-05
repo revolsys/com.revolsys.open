@@ -49,7 +49,7 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends
     return readerFactory;
   }
 
-  private final ArrayRecordFactory dataObjectFactory = new ArrayRecordFactory();
+  private final ArrayRecordFactory recordFactory = new ArrayRecordFactory();
 
   private boolean singleFile = true;
 
@@ -69,7 +69,7 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends
    */
   @Override
   public RecordReader createRecordReader(final Resource resource) {
-    return createRecordReader(resource, dataObjectFactory);
+    return createRecordReader(resource, recordFactory);
 
   }
 
@@ -94,20 +94,20 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends
    */
   @Override
   public Reader<Record> createDirectoryRecordReader(final File directory) {
-    return createDirectoryRecordReader(directory, dataObjectFactory);
+    return createDirectoryRecordReader(directory, recordFactory);
   }
 
   /**
    * Create a reader for the directory using the specified data object
-   * dataObjectFactory.
+   * recordFactory.
    * 
    * @param directory directory file to read.
-   * @param dataObjectFactory The dataObjectFactory used to create data objects.
+   * @param recordFactory The recordFactory used to create data objects.
    * @return The reader for the file.
    */
   @Override
   public Reader<Record> createDirectoryRecordReader(
-    final File directory, final RecordFactory dataObjectFactory) {
+    final File directory, final RecordFactory recordFactory) {
     final RecordDirectoryReader directoryReader = new RecordDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);
@@ -116,10 +116,10 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends
 
   @Override
   public GeometryReader createGeometryReader(final Resource resource) {
-    final Reader<Record> dataObjectReader = createRecordReader(resource);
-    final Iterator<Record> dataObjectIterator = dataObjectReader.iterator();
+    final Reader<Record> recordReader = createRecordReader(resource);
+    final Iterator<Record> recordIterator = recordReader.iterator();
     final RecordGeometryIterator iterator = new RecordGeometryIterator(
-      dataObjectIterator);
+      recordIterator);
     final GeometryReader geometryReader = new GeometryReader(iterator);
     return geometryReader;
   }

@@ -18,7 +18,7 @@ import com.revolsys.io.NamedObject;
 
 public class XmlRecordWriter extends AbstractWriter<Record> {
 
-  private final RecordDefinition metaData;
+  private final RecordDefinition recordDefinition;
 
   private XmlWriter out;
 
@@ -28,9 +28,9 @@ public class XmlRecordWriter extends AbstractWriter<Record> {
 
   private boolean opened;
 
-  public XmlRecordWriter(final RecordDefinition metaData,
+  public XmlRecordWriter(final RecordDefinition recordDefinition,
     final java.io.Writer out) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     if (out instanceof XmlWriter) {
       this.out = (XmlWriter)out;
     } else {
@@ -118,7 +118,7 @@ public class XmlRecordWriter extends AbstractWriter<Record> {
 
   @Override
   public String toString() {
-    return metaData.getPath().toString();
+    return recordDefinition.getPath().toString();
   }
 
   @Override
@@ -126,16 +126,16 @@ public class XmlRecordWriter extends AbstractWriter<Record> {
     if (!opened) {
       writeHeader();
     }
-    QName qualifiedName = metaData.getProperty(RecordProperties.QUALIFIED_NAME);
+    QName qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
-      qualifiedName = new QName(metaData.getTypeName());
+      qualifiedName = new QName(recordDefinition.getTypeName());
     }
 
     out.startTag(qualifiedName);
 
-    final int attributeCount = metaData.getAttributeCount();
+    final int attributeCount = recordDefinition.getAttributeCount();
     for (int i = 0; i < attributeCount; i++) {
-      final String name = metaData.getAttributeName(i);
+      final String name = recordDefinition.getAttributeName(i);
       final Object value = object.getValue(i);
       final QName tagName = new QName(name);
       if (value instanceof Map) {
@@ -150,7 +150,7 @@ public class XmlRecordWriter extends AbstractWriter<Record> {
         list(list);
         out.endTag();
       } else {
-        final DataType dataType = metaData.getAttributeType(i);
+        final DataType dataType = recordDefinition.getAttributeType(i);
         final String string = StringConverterRegistry.toString(dataType, value);
         out.nillableElement(tagName, string);
       }

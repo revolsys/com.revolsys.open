@@ -36,13 +36,13 @@ public class Statistics {
 
   public void add(final Record object) {
     if (object != null) {
-      final RecordDefinition type = object.getMetaData();
+      final RecordDefinition type = object.getRecordDefinition();
       add(type);
     }
   }
 
   public void add(final Record object, final long count) {
-    final RecordDefinition type = object.getMetaData();
+    final RecordDefinition type = object.getRecordDefinition();
     add(type, count);
 
   }

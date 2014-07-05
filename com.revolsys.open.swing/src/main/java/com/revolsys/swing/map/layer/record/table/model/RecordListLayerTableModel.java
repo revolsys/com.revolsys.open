@@ -42,7 +42,7 @@ public class RecordListLayerTableModel extends RecordLayerTableModel
   private List<LayerRecord> records = Collections.emptyList();
 
   public RecordListLayerTableModel(final ListRecordLayer layer) {
-    this(layer, layer.getMetaData().getAttributeNames());
+    this(layer, layer.getRecordDefinition().getAttributeNames());
   }
 
   public RecordListLayerTableModel(final ListRecordLayer layer,
@@ -95,8 +95,8 @@ public class RecordListLayerTableModel extends RecordLayerTableModel
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
       final String columnName = getColumnName(columnIndex);
-      final RecordDefinition metaData = getMetaData();
-      final DataType dataType = metaData.getAttributeType(columnName);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final DataType dataType = recordDefinition.getAttributeType(columnName);
       if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
         return false;
       } else {

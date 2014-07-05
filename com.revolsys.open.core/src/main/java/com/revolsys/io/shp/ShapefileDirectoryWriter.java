@@ -27,7 +27,7 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
 
   private Map<String, Writer<Record>> writers = new HashMap<>();
 
-  private Map<String, RecordDefinition> metaDataMap = new HashMap<>();
+  private Map<String, RecordDefinition> recordDefinitionMap = new HashMap<>();
 
   private boolean useNamespaceAsSubDirectory;
 
@@ -54,7 +54,7 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
         }
       }
       writers = null;
-      metaDataMap = null;
+      recordDefinitionMap = null;
     }
     if (statistics != null) {
       statistics.disconnect();
@@ -77,9 +77,9 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
     return directory;
   }
 
-  private File getDirectory(final RecordDefinition metaData) {
+  private File getDirectory(final RecordDefinition recordDefinition) {
     if (useNamespaceAsSubDirectory) {
-      final String typePath = metaData.getPath();
+      final String typePath = recordDefinition.getPath();
       final String schemaName = PathUtil.getPath(typePath);
       if (StringUtils.hasText(schemaName)) {
         final File childDirectory = new File(directory, schemaName);
@@ -95,12 +95,12 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
     return directory;
   }
 
-  private String getFileName(final RecordDefinition metaData) {
-    return metaData.getTypeName();
+  private String getFileName(final RecordDefinition recordDefinition) {
+    return recordDefinition.getTypeName();
   }
 
-  public RecordDefinition getMetaData(final String path) {
-    return metaDataMap.get(path);
+  public RecordDefinition getRecordDefinition(final String path) {
+    return recordDefinitionMap.get(path);
   }
 
   public String getNameSuffix() {
@@ -112,15 +112,15 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
   }
 
   private Writer<Record> getWriter(final Record object) {
-    final RecordDefinition metaData = object.getMetaData();
-    final String path = metaData.getPath();
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final String path = recordDefinition.getPath();
     Writer<Record> writer = writers.get(path);
     if (writer == null) {
-      final File directory = getDirectory(metaData);
+      final File directory = getDirectory(recordDefinition);
       directory.mkdirs();
-      final File file = new File(directory, getFileName(metaData) + nameSuffix
+      final File file = new File(directory, getFileName(recordDefinition) + nameSuffix
         + ".shp");
-      writer = AbstractRecordWriterFactory.recordWriter(metaData,
+      writer = AbstractRecordWriterFactory.recordWriter(recordDefinition,
         new FileSystemResource(file));
 
       ((XbaseRecordWriter)writer).setUseZeroForNull(useZeroForNull);
@@ -129,7 +129,7 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
         setProperty(IoConstants.GEOMETRY_FACTORY, geometry.getGeometryFactory());
       }
       writers.put(path, writer);
-      metaDataMap.put(path, ((ShapefileRecordWriter)writer).getMetaData());
+      recordDefinitionMap.put(path, ((ShapefileRecordWriter)writer).getRecordDefinition());
     }
     return writer;
   }

@@ -13,9 +13,9 @@ public class FixedValueRecord extends BaseRecord {
 
   private final Object value;
 
-  public FixedValueRecord(final RecordDefinition metaData,
+  public FixedValueRecord(final RecordDefinition recordDefinition,
     final Object value) {
-    super(metaData);
+    super(recordDefinition);
     this.value = value;
   }
 

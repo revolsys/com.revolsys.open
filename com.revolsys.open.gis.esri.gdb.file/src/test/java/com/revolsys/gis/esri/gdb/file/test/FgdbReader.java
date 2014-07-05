@@ -76,7 +76,7 @@ public class FgdbReader {
 
   private DataType geometryType;
 
-  private final RecordDefinitionImpl metaData = new RecordDefinitionImpl();
+  private final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl();
 
   private int numValidRows;
 
@@ -115,12 +115,12 @@ public class FgdbReader {
       final double opt = Math.ceil(optionalFieldCount / 8.0);
       final byte[] nullFields = new byte[(int)opt];
       in.read(nullFields);
-      final Record record = new ArrayRecord(metaData);
+      final Record record = new ArrayRecord(recordDefinition);
       record.setIdValue(objectId++);
       int fieldIndex = 0;
       int optionalFieldIndex = 0;
-      final int idIndex = metaData.getIdAttributeIndex();
-      for (final Attribute field : metaData.getAttributes()) {
+      final int idIndex = recordDefinition.getIdAttributeIndex();
+      for (final Attribute field : recordDefinition.getAttributes()) {
         if (fieldIndex != idIndex) {
           if (field.isRequired() || !isNull(nullFields, optionalFieldIndex++)) {
             final FgdbField fgdbField = (FgdbField)field;
@@ -330,18 +330,18 @@ public class FgdbReader {
     for (int i = 0; i < numFields; i++) {
       final FgdbField field = readFieldDescription();
       if (field != null) {
-        metaData.addAttribute(field);
+        recordDefinition.addAttribute(field);
         if (field instanceof ObjectIdField) {
           final String fieldName = field.getName();
-          metaData.setIdAttributeName(fieldName);
+          recordDefinition.setIdAttributeName(fieldName);
         }
         if (!field.isRequired()) {
           optionalFieldCount++;
         }
       }
     }
-    metaData.setProperty("optionalFieldCount", optionalFieldCount);
-    System.out.println(MapObjectFactoryRegistry.toString(metaData));
+    recordDefinition.setProperty("optionalFieldCount", optionalFieldCount);
+    System.out.println(MapObjectFactoryRegistry.toString(recordDefinition));
   }
 
   protected boolean readFlags() throws IOException {

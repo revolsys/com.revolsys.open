@@ -28,14 +28,14 @@ public class WktRecordIterator extends AbstractIterator<Record>
 
   private WktParser wktParser;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   public WktRecordIterator(final RecordFactory factory,
     final Resource resource) throws IOException {
     this.factory = factory;
     this.in = new BufferedReader(
       FileUtil.createUtf8Reader(resource.getInputStream()));
-    this.metaData = RecordUtil.createGeometryMetaData();
+    this.recordDefinition = RecordUtil.createGeometryMetaData();
   }
 
   @Override
@@ -44,13 +44,13 @@ public class WktRecordIterator extends AbstractIterator<Record>
     factory = null;
     in = null;
     wktParser = null;
-    metaData = null;
+    recordDefinition = null;
   }
 
   @Override
   protected void doInit() {
     GeometryFactory geometryFactory;
-    final Attribute geometryAttribute = metaData.getGeometryAttribute();
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     if (geometryAttribute == null) {
       geometryFactory = GeometryFactory.floating3();
     } else {
@@ -68,8 +68,8 @@ public class WktRecordIterator extends AbstractIterator<Record>
   }
 
   @Override
-  public RecordDefinition getMetaData() {
-    return metaData;
+  public RecordDefinition getRecordDefinition() {
+    return recordDefinition;
   }
 
   @Override
@@ -80,7 +80,7 @@ public class WktRecordIterator extends AbstractIterator<Record>
       if (geometry == null) {
         throw new NoSuchElementException();
       } else {
-        final Record object = factory.createRecord(getMetaData());
+        final Record object = factory.createRecord(getRecordDefinition());
         object.setGeometryValue(geometry);
         return object;
       }

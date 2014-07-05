@@ -40,18 +40,18 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
   public static final RecordDefinition META_DATA;
 
   static {
-    final RecordDefinitionImpl metaData = new RecordDefinitionImpl(
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
         "osm.record");
-    metaData.addAttribute("id", DataTypes.LONG);
-    metaData.addAttribute("visible", DataTypes.BOOLEAN);
-    metaData.addAttribute("version", DataTypes.INT);
-    metaData.addAttribute("changeset", DataTypes.LONG);
-    metaData.addAttribute("timestamp", DataTypes.DATE_TIME);
-    metaData.addAttribute("user", DataTypes.STRING);
-    metaData.addAttribute("uid", DataTypes.INT);
-    metaData.addAttribute("tags", DataTypes.MAP);
-    metaData.addAttribute("geometry", DataTypes.GEOMETRY);
-    META_DATA = metaData;
+    recordDefinition.addAttribute("id", DataTypes.LONG);
+    recordDefinition.addAttribute("visible", DataTypes.BOOLEAN);
+    recordDefinition.addAttribute("version", DataTypes.INT);
+    recordDefinition.addAttribute("changeset", DataTypes.LONG);
+    recordDefinition.addAttribute("timestamp", DataTypes.DATE_TIME);
+    recordDefinition.addAttribute("user", DataTypes.STRING);
+    recordDefinition.addAttribute("uid", DataTypes.INT);
+    recordDefinition.addAttribute("tags", DataTypes.MAP);
+    recordDefinition.addAttribute("geometry", DataTypes.GEOMETRY);
+    META_DATA = recordDefinition;
   }
 
   public OsmElement() {
@@ -117,7 +117,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
   }
 
   @Override
-  public RecordDefinition getMetaData() {
+  public RecordDefinition getRecordDefinition() {
     return META_DATA;
   }
 
@@ -249,7 +249,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
 
   @Override
   public void setValue(final int index, final Object value) {
-    final String propertyName = getMetaData().getAttributeName(index);
+    final String propertyName = getRecordDefinition().getAttributeName(index);
     Property.set(this, propertyName, value);
   }
 

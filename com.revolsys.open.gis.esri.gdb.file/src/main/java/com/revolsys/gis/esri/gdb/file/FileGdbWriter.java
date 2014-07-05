@@ -27,8 +27,8 @@ public class FileGdbWriter extends AbstractWriter<Record> {
 
   private CapiFileGdbRecordStore dataStore;
 
-  FileGdbWriter(final CapiFileGdbRecordStore dataObjectStore) {
-    this.dataStore = dataObjectStore;
+  FileGdbWriter(final CapiFileGdbRecordStore recordStore) {
+    this.dataStore = recordStore;
   }
 
   @Override
@@ -53,7 +53,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
   }
 
   private void delete(final Record object) {
-    final RecordDefinition objectMetaData = object.getMetaData();
+    final RecordDefinition objectMetaData = object.getRecordDefinition();
     final String typePath = objectMetaData.getPath();
     final Table table = getTable(typePath);
     final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
@@ -89,10 +89,10 @@ public class FileGdbWriter extends AbstractWriter<Record> {
   }
 
   private void insert(final Record record) {
-    final RecordDefinition sourceMetaData = record.getMetaData();
-    final RecordDefinition metaData = dataStore.getMetaData(sourceMetaData);
+    final RecordDefinition sourceMetaData = record.getRecordDefinition();
+    final RecordDefinition recordDefinition = dataStore.getRecordDefinition(sourceMetaData);
     final String typePath = sourceMetaData.getPath();
-    for (final Attribute attribute : metaData.getAttributes()) {
+    for (final Attribute attribute : recordDefinition.getAttributes()) {
       final String name = attribute.getName();
       if (attribute.isRequired()) {
         final Object value = record.getValue(name);
@@ -107,7 +107,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
       final Row row = dataStore.createRowObject(table);
       try {
         final List<Object> values = new ArrayList<Object>();
-        for (final Attribute attribute : metaData.getAttributes()) {
+        for (final Attribute attribute : recordDefinition.getAttributes()) {
           final String name = attribute.getName();
           final Object value = record.getValue(name);
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
@@ -116,7 +116,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
           values.add(esriValue);
         }
         dataStore.insertRow(table, row);
-        for (final Attribute attribute : metaData.getAttributes()) {
+        for (final Attribute attribute : recordDefinition.getAttributes()) {
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
           esriAttribute.setPostInsertValue(record, row);
         }
@@ -143,8 +143,8 @@ public class FileGdbWriter extends AbstractWriter<Record> {
     if (objectId == null) {
       insert(object);
     } else {
-      final RecordDefinition sourceMetaData = object.getMetaData();
-      final RecordDefinition metaData = dataStore.getMetaData(sourceMetaData);
+      final RecordDefinition sourceMetaData = object.getRecordDefinition();
+      final RecordDefinition recordDefinition = dataStore.getRecordDefinition(sourceMetaData);
       final String typePath = sourceMetaData.getPath();
       final Table table = getTable(typePath);
       final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
@@ -156,7 +156,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
             try {
               final List<Object> esriValues = new ArrayList<Object>();
               try {
-                for (final Attribute attribute : metaData.getAttributes()) {
+                for (final Attribute attribute : recordDefinition.getAttributes()) {
                   final String name = attribute.getName();
                   final Object value = object.getValue(name);
                   final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
@@ -193,9 +193,9 @@ public class FileGdbWriter extends AbstractWriter<Record> {
   @Override
   public void write(final Record object) {
     try {
-      final RecordDefinition metaData = object.getMetaData();
-      final RecordStore dataObjectStore = metaData.getDataStore();
-      if (dataObjectStore == this.dataStore) {
+      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final RecordStore recordStore = recordDefinition.getDataStore();
+      if (recordStore == this.dataStore) {
         switch (object.getState()) {
           case New:
             insert(object);

@@ -103,11 +103,11 @@ public class IoTestSuite {
   public static void doWriteReadTest(final GeometryFactory geometryFactory,
     final DataType dataType, final Geometry geometry, final String fileExtension) {
     final String geometryTypeString = dataType.toString();
-    final RecordDefinitionImpl metaData = new RecordDefinitionImpl(
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       geometryTypeString);
-    metaData.addAttribute("ID", DataTypes.INT, true);
-    metaData.addAttribute("GEOMETRY", dataType, true);
-    metaData.setGeometryFactory(geometryFactory);
+    recordDefinition.addAttribute("ID", DataTypes.INT, true);
+    recordDefinition.addAttribute("GEOMETRY", dataType, true);
+    recordDefinition.setGeometryFactory(geometryFactory);
     final File file = new File("/tmp/revolsystest/io/" + fileExtension + "/"
       + geometryTypeString + "_" + geometryFactory.getAxisCount() + "_"
       + geometry.getVertexCount() + "." + fileExtension);
@@ -116,11 +116,11 @@ public class IoTestSuite {
     final FileSystemResource resource = new FileSystemResource(file);
     try (
       Writer<Record> writer = AbstractRecordWriterFactory.recordWriter(
-        metaData, resource)) {
+        recordDefinition, resource)) {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
-      final ArrayRecord record = new ArrayRecord(metaData);
+      final ArrayRecord record = new ArrayRecord(recordDefinition);
       record.setValue("ID", 1);
       record.setGeometryValue(geometry);
       writer.write(record);

@@ -70,7 +70,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public String getIdAttributeName() {
-    return getMetaData().getIdAttributeName();
+    return getRecordDefinition().getIdAttributeName();
   }
 
   public String getIndexString() {
@@ -87,8 +87,8 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return this.layer;
   }
 
-  public RecordDefinition getMetaData() {
-    return this.layer.getMetaData();
+  public RecordDefinition getRecordDefinition() {
+    return this.layer.getRecordDefinition();
   }
 
   public LayerRecord getObject() {
@@ -124,8 +124,8 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public String getTypePath() {
-    final RecordDefinition metaData = getMetaData();
-    return metaData.getPath();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getPath();
   }
 
   public Vertex getVertex() {
@@ -145,8 +145,8 @@ public class CloseLocation implements Comparable<CloseLocation> {
     final StringBuffer string = new StringBuffer();
     string.append(getTypePath());
     string.append(", ");
-    final RecordDefinition metaData = getMetaData();
-    string.append(metaData.getIdAttributeName());
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    string.append(recordDefinition.getIdAttributeName());
     string.append("=");
     final Object id = getId();
     string.append(id);

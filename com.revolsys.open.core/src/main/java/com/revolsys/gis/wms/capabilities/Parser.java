@@ -418,22 +418,22 @@ public class Parser extends XmlProcessor {
 
   public MetadataUrl processMetadataURL(final XMLStreamReader parser)
     throws XMLStreamException, IOException {
-    final MetadataUrl metaDataUrl = new MetadataUrl();
+    final MetadataUrl recordDefinitionUrl = new MetadataUrl();
     final String type = parser.getAttributeValue(null, "type");
-    metaDataUrl.setType(type);
+    recordDefinitionUrl.setType(type);
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final String tagName = parser.getName().getLocalPart();
       if (tagName.equals("Format")) {
         final String format = StaxUtils.getElementText(parser);
-        metaDataUrl.setFormat(format);
+        recordDefinitionUrl.setFormat(format);
       } else {
         final Object object = process(parser);
         if (object instanceof URL) {
-          metaDataUrl.setOnlineResource((URL)object);
+          recordDefinitionUrl.setOnlineResource((URL)object);
         }
       }
     }
-    return metaDataUrl;
+    return recordDefinitionUrl;
   }
 
   public URL processOnlineResource(final XMLStreamReader parser)

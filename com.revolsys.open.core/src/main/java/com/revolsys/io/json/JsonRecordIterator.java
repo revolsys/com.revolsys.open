@@ -20,23 +20,23 @@ import com.revolsys.io.FileUtil;
 public class JsonRecordIterator extends AbstractIterator<Record>
   implements RecordIterator {
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private JsonMapIterator iterator;
 
-  public JsonRecordIterator(final RecordDefinition metaData,
+  public JsonRecordIterator(final RecordDefinition recordDefinition,
     final InputStream in) {
-    this(metaData, FileUtil.createUtf8Reader(in));
+    this(recordDefinition, FileUtil.createUtf8Reader(in));
   }
 
-  public JsonRecordIterator(final RecordDefinition metaData,
+  public JsonRecordIterator(final RecordDefinition recordDefinition,
     final Reader in) {
-    this(metaData, in, false);
+    this(recordDefinition, in, false);
   }
 
-  public JsonRecordIterator(final RecordDefinition metaData,
+  public JsonRecordIterator(final RecordDefinition recordDefinition,
     final Reader in, final boolean single) {
-    this.metaData = metaData;
+    this.recordDefinition = recordDefinition;
     try {
       this.iterator = new JsonMapIterator(in, single);
     } catch (final IOException e) {
@@ -48,20 +48,20 @@ public class JsonRecordIterator extends AbstractIterator<Record>
   protected void doClose() {
     FileUtil.closeSilent(iterator);
     iterator = null;
-    metaData = null;
+    recordDefinition = null;
   }
 
   @Override
-  public RecordDefinition getMetaData() {
-    return metaData;
+  public RecordDefinition getRecordDefinition() {
+    return recordDefinition;
   }
 
   @Override
   protected Record getNext() throws NoSuchElementException {
     if (iterator.hasNext()) {
       final Map<String, Object> map = iterator.next();
-      final Record object = new ArrayRecord(metaData);
-      for (final Attribute attribute : metaData.getAttributes()) {
+      final Record object = new ArrayRecord(recordDefinition);
+      for (final Attribute attribute : recordDefinition.getAttributes()) {
         final String name = attribute.getName();
         final Object value = map.get(name);
         if (value != null) {

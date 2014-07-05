@@ -64,13 +64,13 @@ public class XbaseIterator extends AbstractIterator<Record> implements
 
   private int currentDeletedCount = 0;
 
-  private RecordFactory dataObjectFactory;
+  private RecordFactory recordFactory;
 
   private int deletedCount = 0;
 
   private EndianInput in;
 
-  private RecordDefinitionImpl metaData;
+  private RecordDefinitionImpl recordDefinition;
 
   private byte[] recordBuffer;
 
@@ -93,11 +93,11 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   private String typeName;
 
   public XbaseIterator(final Resource resource,
-    final RecordFactory dataObjectFactory) throws IOException {
+    final RecordFactory recordFactory) throws IOException {
     this.typeName = "/" + typeName;
     this.resource = resource;
 
-    this.dataObjectFactory = dataObjectFactory;
+    this.recordFactory = recordFactory;
     final Resource codePageResource = SpringUtil.getResourceWithExtension(
       resource, "cpg");
     if (!(codePageResource instanceof NonExistingResource)
@@ -113,9 +113,9 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   public XbaseIterator(final Resource in,
-    final RecordFactory dataObjectFactory, final Runnable initCallback)
+    final RecordFactory recordFactory, final Runnable initCallback)
     throws IOException {
-    this(in, dataObjectFactory);
+    this(in, recordFactory);
     this.initCallback = initCallback;
   }
 
@@ -158,10 +158,10 @@ public class XbaseIterator extends AbstractIterator<Record> implements
 
   public void forceClose() {
     FileUtil.closeSilent(in);
-    dataObjectFactory = null;
+    recordFactory = null;
     in = null;
     initCallback = null;
-    metaData = null;
+    recordDefinition = null;
     recordBuffer = null;
     resource = null;
   }
@@ -219,8 +219,8 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   @Override
-  public RecordDefinitionImpl getMetaData() {
-    return metaData;
+  public RecordDefinitionImpl getRecordDefinition() {
+    return recordDefinition;
   }
 
   @Override
@@ -289,11 +289,11 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     if (in.read(recordBuffer) != recordBuffer.length) {
       throw new IllegalStateException("Unexpected end of mappedFile");
     }
-    final Record object = dataObjectFactory.createRecord(metaData);
+    final Record object = recordFactory.createRecord(recordDefinition);
     int startIndex = 0;
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
-      int len = metaData.getAttributeLength(i);
-      final DataType type = metaData.getAttributeType(i);
+    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
+      int len = recordDefinition.getAttributeLength(i);
+      final DataType type = recordDefinition.getAttributeType(i);
       Object value = null;
 
       if (type == DataTypes.STRING) {
@@ -336,7 +336,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   private void readMetaData() throws IOException {
-    metaData = new RecordDefinitionImpl(typeName);
+    recordDefinition = new RecordDefinitionImpl(typeName);
     int b = in.read();
     while (b != 0x0D) {
       final StringBuffer fieldName = new StringBuffer();
@@ -362,7 +362,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
       if (fieldType == MEMO_TYPE) {
         length = Integer.MAX_VALUE;
       }
-      metaData.addAttribute(fieldName.toString(), dataType, length,
+      recordDefinition.addAttribute(fieldName.toString(), dataType, length,
         decimalCount, false);
     }
     if (mappedFile) {

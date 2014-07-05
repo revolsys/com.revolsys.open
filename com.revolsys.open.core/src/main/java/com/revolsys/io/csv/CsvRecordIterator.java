@@ -44,13 +44,13 @@ public class CsvRecordIterator extends AbstractIterator<Record>
 
   private GeometryFactory geometryFactory;
 
-  private RecordFactory dataObjectFactory;
+  private RecordFactory recordFactory;
 
   /** The reader to */
   private BufferedReader in;
 
   /** The metadata for the data being read by this iterator. */
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private Resource resource;
 
@@ -66,14 +66,14 @@ public class CsvRecordIterator extends AbstractIterator<Record>
   }
 
   public CsvRecordIterator(final Resource resource,
-    final RecordFactory dataObjectFactory) {
-    this(resource, dataObjectFactory, CsvConstants.FIELD_SEPARATOR);
+    final RecordFactory recordFactory) {
+    this(resource, recordFactory, CsvConstants.FIELD_SEPARATOR);
   }
 
   public CsvRecordIterator(final Resource resource,
-    final RecordFactory dataObjectFactory, final char fieldSeparator) {
+    final RecordFactory recordFactory, final char fieldSeparator) {
     this.resource = resource;
-    this.dataObjectFactory = dataObjectFactory;
+    this.recordFactory = recordFactory;
     this.fieldSeparator = fieldSeparator;
   }
 
@@ -115,7 +115,7 @@ public class CsvRecordIterator extends AbstractIterator<Record>
         geometryFactory);
     }
     final String filename = FileUtil.getBaseName(resource.getFilename());
-    metaData = new RecordDefinitionImpl(filename, getProperties(), attributes);
+    recordDefinition = new RecordDefinitionImpl(filename, getProperties(), attributes);
   }
 
   /**
@@ -124,10 +124,10 @@ public class CsvRecordIterator extends AbstractIterator<Record>
   @Override
   protected void doClose() {
     FileUtil.closeSilent(in);
-    dataObjectFactory = null;
+    recordFactory = null;
     geometryFactory = null;
     in = null;
-    metaData = null;
+    recordDefinition = null;
     resource = null;
   }
 
@@ -160,8 +160,8 @@ public class CsvRecordIterator extends AbstractIterator<Record>
   }
 
   @Override
-  public RecordDefinition getMetaData() {
-    return metaData;
+  public RecordDefinition getRecordDefinition() {
+    return recordDefinition;
   }
 
   @Override
@@ -200,13 +200,13 @@ public class CsvRecordIterator extends AbstractIterator<Record>
    * @return The Record.
    */
   private Record parseRecord(final String[] record) {
-    final Record object = dataObjectFactory.createRecord(metaData);
-    for (int i = 0; i < metaData.getAttributeCount(); i++) {
+    final Record object = recordFactory.createRecord(recordDefinition);
+    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
       String value = null;
       if (i < record.length) {
         value = record[i];
         if (value != null) {
-          final DataType dataType = metaData.getAttributeType(i);
+          final DataType dataType = recordDefinition.getAttributeType(i);
           final Object convertedValue = StringConverterRegistry.toObject(
             dataType, value);
           object.setValue(i, convertedValue);

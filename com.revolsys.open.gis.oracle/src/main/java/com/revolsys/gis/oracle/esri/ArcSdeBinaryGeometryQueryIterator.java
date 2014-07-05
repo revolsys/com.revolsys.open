@@ -36,11 +36,11 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
   private SeConnection connection;
 
-  private RecordFactory dataObjectFactory;
+  private RecordFactory recordFactory;
 
   private JdbcRecordStore dataStore;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private SeQuery seQuery;
 
@@ -57,9 +57,9 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     final JdbcRecordStore dataStore, final Query query,
     final Map<String, Object> properties) {
     this.sdeUtil = sdeUtil;
-    this.dataObjectFactory = query.getProperty("dataObjectFactory");
-    if (this.dataObjectFactory == null) {
-      this.dataObjectFactory = dataStore.getRecordFactory();
+    this.recordFactory = query.getProperty("recordFactory");
+    if (this.recordFactory == null) {
+      this.recordFactory = dataStore.getRecordFactory();
     }
     this.dataStore = dataStore;
     this.query = query;
@@ -78,9 +78,9 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     }
     this.sdeUtil = null;
     this.attributes = null;
-    this.dataObjectFactory = null;
+    this.recordFactory = null;
     this.dataStore = null;
-    this.metaData = null;
+    this.recordDefinition = null;
     this.query = null;
     this.seQuery = null;
     this.statistics = null;
@@ -89,31 +89,31 @@ public class ArcSdeBinaryGeometryQueryIterator extends
   @Override
   protected void doInit() {
     String tableName = this.dataStore.getDatabaseQualifiedTableName(this.query.getTypeName());
-    this.metaData = this.query.getMetaData();
-    if (this.metaData == null) {
+    this.recordDefinition = this.query.getRecordDefinition();
+    if (this.recordDefinition == null) {
       if (tableName != null) {
-        this.metaData = this.dataStore.getRecordDefinition(tableName);
-        this.query.setMetaData(this.metaData);
+        this.recordDefinition = this.dataStore.getRecordDefinition(tableName);
+        this.query.setRecordDefinition(this.recordDefinition);
 
       }
     }
-    if (this.metaData != null) {
-      tableName = sdeUtil.getTableName(this.metaData);
+    if (this.recordDefinition != null) {
+      tableName = sdeUtil.getTableName(this.recordDefinition);
     }
     try {
 
       final List<String> attributeNames = new ArrayList<String>(
         this.query.getAttributeNames());
       if (attributeNames.isEmpty()) {
-        this.attributes.addAll(this.metaData.getAttributes());
-        attributeNames.addAll(this.metaData.getAttributeNames());
+        this.attributes.addAll(this.recordDefinition.getAttributes());
+        attributeNames.addAll(this.recordDefinition.getAttributeNames());
       } else {
         for (final String attributeName : attributeNames) {
           if (attributeName.equals("*")) {
-            this.attributes.addAll(this.metaData.getAttributes());
-            attributeNames.addAll(this.metaData.getAttributeNames());
+            this.attributes.addAll(this.recordDefinition.getAttributes());
+            attributeNames.addAll(this.recordDefinition.getAttributeNames());
           } else {
-            final Attribute attribute = this.metaData.getAttribute(attributeName);
+            final Attribute attribute = this.recordDefinition.getAttribute(attributeName);
             if (attribute != null) {
               this.attributes.add(attribute);
             }
@@ -129,16 +129,16 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       BoundingBox boundingBox = QueryValue.getBoundingBox(this.query);
       if (boundingBox != null) {
         final SeLayer layer = new SeLayer(connection, tableName,
-          this.metaData.getGeometryAttributeName());
+          this.recordDefinition.getGeometryAttributeName());
 
-        final GeometryFactory geometryFactory = this.metaData.getGeometryFactory();
+        final GeometryFactory geometryFactory = this.recordDefinition.getGeometryFactory();
         boundingBox = boundingBox.convert(geometryFactory);
         final SeEnvelope envelope = new SeEnvelope(boundingBox.getMinX(),
           boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY());
         final SeShape shape = new SeShape(layer.getCoordRef());
         shape.generateRectangle(envelope);
         final SeShapeFilter filter = new SeShapeFilter(tableName,
-          this.metaData.getGeometryAttributeName(), shape, SeFilter.METHOD_ENVP);
+          this.recordDefinition.getGeometryAttributeName(), shape, SeFilter.METHOD_ENVP);
         this.seQuery.setSpatialConstraints(SeQuery.SE_SPATIAL_FIRST, false,
           new SeFilter[] {
             filter
@@ -151,9 +151,9 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
       final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {
-        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.metaData).clone();
+        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.recordDefinition).clone();
         newMetaData.setName(typePath);
-        this.metaData = newMetaData;
+        this.recordDefinition = newMetaData;
       }
     } catch (final SeException e) {
       this.seQuery = sdeUtil.close(seQuery);
@@ -161,11 +161,11 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     }
   }
 
-  public RecordDefinition getMetaData() {
-    if (this.metaData == null) {
+  public RecordDefinition getRecordDefinition() {
+    if (this.recordDefinition == null) {
       hasNext();
     }
-    return this.metaData;
+    return this.recordDefinition;
   }
 
   @Override
@@ -174,7 +174,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       if (this.seQuery != null) {
         final SeRow row = this.seQuery.fetch();
         if (row != null) {
-          final Record object = getNextRecord(metaData, row);
+          final Record object = getNextRecord(recordDefinition, row);
           if (this.statistics != null) {
             this.statistics.add(object);
           }
@@ -195,9 +195,9 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     }
   }
 
-  private Record getNextRecord(final RecordDefinition metaData,
+  private Record getNextRecord(final RecordDefinition recordDefinition,
     final SeRow row) {
-    final Record object = this.dataObjectFactory.createRecord(metaData);
+    final Record object = this.recordFactory.createRecord(recordDefinition);
     if (object != null) {
       object.setState(RecordState.Initalizing);
       for (int columnIndex = 0; columnIndex < this.attributes.size(); columnIndex++) {

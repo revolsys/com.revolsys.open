@@ -38,8 +38,8 @@ public class FeatureDatasetTest {
       dataStore.setDefaultSchema("test");
       Assert.assertEquals("Initial Schema Size", 1, dataStore.getSchemas()
         .size());
-      final RecordMetaData metaData = dataStore.getMetaData(newMetaData);
-      Assert.assertNotNull("Created Metadata", metaData);
+      final RecordMetaData recordDefinition = dataStore.getRecordDefinition(newMetaData);
+      Assert.assertNotNull("Created Metadata", recordDefinition);
 
       final Record object = dataStore.create(newMetaData);
       object.setIdValue(1);
@@ -55,8 +55,8 @@ public class FeatureDatasetTest {
       dataStore.initialize();
       dataStore.setDefaultSchema("test");
       RecordStoreSchema schema = dataStore.getSchema("test");
-      for (RecordMetaData metaData2 : schema.getTypes()) {
-        System.out.println(metaData2);
+      for (RecordMetaData recordDefinition2 : schema.getTypes()) {
+        System.out.println(recordDefinition2);
       }
     } finally {
       dataStore.deleteGeodatabase();

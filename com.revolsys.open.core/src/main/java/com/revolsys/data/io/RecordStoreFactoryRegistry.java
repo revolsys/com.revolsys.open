@@ -109,9 +109,9 @@ public class RecordStoreFactoryRegistry {
   }
 
   public static void setConnectionProperties(
-    final RecordStore dataObjectStore, final Map<String, Object> properties) {
+    final RecordStore recordStore, final Map<String, Object> properties) {
     final DirectFieldAccessor dataSourceBean = new DirectFieldAccessor(
-      dataObjectStore);
+      recordStore);
     for (final Entry<String, Object> property : properties.entrySet()) {
       final String name = property.getKey();
       final Object value = property.getValue();

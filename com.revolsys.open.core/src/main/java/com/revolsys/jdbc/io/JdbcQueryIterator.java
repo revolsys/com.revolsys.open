@@ -28,12 +28,12 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   public static Record getNextObject(final JdbcRecordStore dataStore,
-    final RecordDefinition metaData, final List<Attribute> attributes,
-    final RecordFactory dataObjectFactory, final ResultSet resultSet) {
-    final Record object = dataObjectFactory.createRecord(metaData);
+    final RecordDefinition recordDefinition, final List<Attribute> attributes,
+    final RecordFactory recordFactory, final ResultSet resultSet) {
+    final Record object = recordFactory.createRecord(recordDefinition);
     if (object != null) {
       object.setState(RecordState.Initalizing);
       int columnIndex = 1;
@@ -54,7 +54,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
     return object;
   }
 
-  public static ResultSet getResultSet(final RecordDefinition metaData,
+  public static ResultSet getResultSet(final RecordDefinition recordDefinition,
     final PreparedStatement statement, final Query query) throws SQLException {
     JdbcUtils.setPreparedStatementParameters(statement, query);
 
@@ -65,7 +65,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
 
   private final int currentQueryIndex = -1;
 
-  private RecordFactory dataObjectFactory;
+  private RecordFactory recordFactory;
 
   private DataSource dataSource;
 
@@ -73,7 +73,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
 
   private final int fetchSize = 10;
 
-  private RecordDefinition metaData;
+  private RecordDefinition recordDefinition;
 
   private List<Query> queries;
 
@@ -87,15 +87,15 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
 
   private Statistics statistics;
 
-  public JdbcQueryIterator(final JdbcRecordStore dataStore,
-    final Query query, final Map<String, Object> properties) {
+  public JdbcQueryIterator(final JdbcRecordStore dataStore, final Query query,
+    final Map<String, Object> properties) {
     super();
     this.connection = dataStore.getConnection();
     this.dataSource = dataStore.getDataSource();
 
-    if (dataSource != null) {
+    if (this.dataSource != null) {
       try {
-        this.connection = JdbcUtils.getConnection(dataSource);
+        this.connection = JdbcUtils.getConnection(this.dataSource);
         boolean autoCommit = false;
         if (BooleanStringConverter.getBoolean(properties.get("autoCommit"))) {
           autoCommit = true;
@@ -105,9 +105,9 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
         throw new IllegalArgumentException("Unable to create connection", e);
       }
     }
-    this.dataObjectFactory = query.getProperty("dataObjectFactory");
-    if (this.dataObjectFactory == null) {
-      this.dataObjectFactory = dataStore.getRecordFactory();
+    this.recordFactory = query.getProperty("recordFactory");
+    if (this.recordFactory == null) {
+      this.recordFactory = dataStore.getRecordFactory();
     }
     this.dataStore = dataStore;
     this.query = query;
@@ -117,19 +117,19 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
   @Override
   @PreDestroy
   public void doClose() {
-    JdbcUtils.close(statement, resultSet);
-    JdbcUtils.release(connection, dataSource);
-    attributes = null;
-    connection = null;
-    dataObjectFactory = null;
-    dataSource = null;
-    dataStore = null;
-    metaData = null;
-    queries = null;
-    query = null;
-    resultSet = null;
-    statement = null;
-    statistics = null;
+    JdbcUtils.close(this.statement, this.resultSet);
+    JdbcUtils.release(this.connection, this.dataSource);
+    this.attributes = null;
+    this.connection = null;
+    this.recordFactory = null;
+    this.dataSource = null;
+    this.dataStore = null;
+    this.recordDefinition = null;
+    this.queries = null;
+    this.query = null;
+    this.resultSet = null;
+    this.statement = null;
+    this.statistics = null;
   }
 
   @Override
@@ -138,33 +138,26 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
   }
 
   public JdbcRecordStore getDataStore() {
-    return dataStore;
+    return this.dataStore;
   }
 
   protected String getErrorMessage() {
-    if (queries == null) {
+    if (this.queries == null) {
       return null;
     } else {
-      return queries.get(currentQueryIndex).getSql();
+      return this.queries.get(this.currentQueryIndex).getSql();
     }
-  }
-
-  @Override
-  public RecordDefinition getMetaData() {
-    if (metaData == null) {
-      hasNext();
-    }
-    return metaData;
   }
 
   @Override
   protected Record getNext() throws NoSuchElementException {
     try {
-      if (resultSet != null && resultSet.next()) {
-        final Record object = getNextObject(dataStore, metaData,
-          attributes, dataObjectFactory, resultSet);
-        if (statistics != null) {
-          statistics.add(object);
+      if (this.resultSet != null && this.resultSet.next()) {
+        final Record object = getNextObject(this.dataStore,
+          this.recordDefinition, this.attributes, this.recordFactory,
+          this.resultSet);
+        if (this.statistics != null) {
+          this.statistics.add(object);
         }
         return object;
       } else {
@@ -183,55 +176,65 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
     }
   }
 
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    if (this.recordDefinition == null) {
+      hasNext();
+    }
+    return this.recordDefinition;
+  }
+
   protected ResultSet getResultSet() {
-    final String tableName = query.getTypeName();
-    metaData = query.getMetaData();
-    if (metaData == null) {
+    final String tableName = this.query.getTypeName();
+    this.recordDefinition = this.query.getRecordDefinition();
+    if (this.recordDefinition == null) {
       if (tableName != null) {
-        metaData = dataStore.getRecordDefinition(tableName);
-        query.setMetaData(metaData);
+        this.recordDefinition = this.dataStore.getRecordDefinition(tableName);
+        this.query.setRecordDefinition(this.recordDefinition);
       }
     }
-    final String sql = getSql(query);
+    final String sql = getSql(this.query);
     try {
-      statement = connection.prepareStatement(sql);
-      statement.setFetchSize(fetchSize);
+      this.statement = this.connection.prepareStatement(sql);
+      this.statement.setFetchSize(this.fetchSize);
 
-      resultSet = getResultSet(metaData, statement, query);
-      final ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+      this.resultSet = getResultSet(this.recordDefinition, this.statement,
+        this.query);
+      final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
 
-      if (metaData == null) {
-        metaData = dataStore.getMetaData(tableName, resultSetMetaData);
+      if (this.recordDefinition == null) {
+        this.recordDefinition = this.dataStore.getRecordDefinition(tableName,
+          resultSetMetaData);
       }
       final List<String> attributeNames = new ArrayList<String>(
-        query.getAttributeNames());
+          this.query.getAttributeNames());
       if (attributeNames.isEmpty()) {
-        this.attributes.addAll(metaData.getAttributes());
+        this.attributes.addAll(this.recordDefinition.getAttributes());
       } else {
         for (final String attributeName : attributeNames) {
           if (attributeName.equals("*")) {
-            this.attributes.addAll(metaData.getAttributes());
+            this.attributes.addAll(this.recordDefinition.getAttributes());
           } else {
-            final Attribute attribute = metaData.getAttribute(attributeName);
+            final Attribute attribute = this.recordDefinition.getAttribute(attributeName);
             if (attribute != null) {
-              attributes.add(attribute);
+              this.attributes.add(attribute);
             }
           }
         }
       }
 
-      final String typePath = query.getTypeNameAlias();
+      final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {
-        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)metaData).clone();
+        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.recordDefinition).clone();
         newMetaData.setName(typePath);
-        this.metaData = newMetaData;
+        this.recordDefinition = newMetaData;
       }
     } catch (final SQLException e) {
-      JdbcUtils.close(statement, resultSet);
-      throw JdbcUtils.getException(dataSource, connection, "Execute Query",
-        sql, e);
+      JdbcUtils.close(this.statement, this.resultSet);
+      throw JdbcUtils.getException(this.dataSource, this.connection,
+        "Execute Query", sql, e);
     }
-    return resultSet;
+    return this.resultSet;
   }
 
   protected String getSql(final Query query) {

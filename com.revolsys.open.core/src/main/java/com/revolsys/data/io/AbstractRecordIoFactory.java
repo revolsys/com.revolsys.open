@@ -27,13 +27,13 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
     return readerFactory;
   }
 
-  public static Writer<Record> recordWriter(final RecordDefinition metaData,
+  public static Writer<Record> recordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final RecordWriterFactory writerFactory = getRecordWriterFactory(resource);
     if (writerFactory == null) {
       return null;
     } else {
-      final Writer<Record> writer = writerFactory.createRecordWriter(metaData,
+      final Writer<Record> writer = writerFactory.createRecordWriter(recordDefinition,
         resource);
       return writer;
     }
@@ -53,23 +53,23 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
   /**
    * Create a writer to write to the specified resource.
    *
-   * @param metaData The metaData for the type of data to write.
+   * @param recordDefinition The recordDefinition for the type of data to write.
    * @param resource The resource to write to.
    * @return The writer.
    */
   @Override
-  public Writer<Record> createRecordWriter(final RecordDefinition metaData,
+  public Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
-    return createRecordWriter(baseName, metaData, out);
+    return createRecordWriter(baseName, recordDefinition, out);
   }
 
   @Override
   public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition metaData, final OutputStream outputStream) {
-    return createRecordWriter(baseName, metaData, outputStream,
+    final RecordDefinition recordDefinition, final OutputStream outputStream) {
+    return createRecordWriter(baseName, recordDefinition, outputStream,
       FileUtil.UTF8);
   }
 

@@ -28,13 +28,13 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private Reference<Identifier> identifier = new WeakReference<>(null);
 
   public ArrayLayerRecord(final AbstractRecordLayer layer) {
-    super(layer.getMetaData());
+    super(layer.getRecordDefinition());
     this.layer = layer;
   }
 
   public ArrayLayerRecord(final AbstractRecordLayer layer,
     final Map<String, ? extends Object> values) {
-    super(layer.getMetaData());
+    super(layer.getRecordDefinition());
     setState(RecordState.Initalizing);
     setValues(values);
     setState(RecordState.Persisted);
@@ -132,7 +132,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     if (this.originalValues == null) {
       return false;
     } else {
-      final String attributeName = getMetaData().getAttributeName(index);
+      final String attributeName = getRecordDefinition().getAttributeName(index);
       return isModified(attributeName);
     }
   }
@@ -175,8 +175,8 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     if (getState() == RecordState.Initalizing) {
       return true;
     } else {
-      final RecordDefinition metaData = getMetaData();
-      final String name = metaData.getAttributeName(index);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final String name = recordDefinition.getAttributeName(index);
       return isValid(name);
     }
   }
@@ -186,7 +186,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     if (getState() == RecordState.Initalizing) {
       return true;
     } else {
-      final Attribute attribute = getMetaData().getAttribute(name);
+      final Attribute attribute = getRecordDefinition().getAttribute(name);
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
@@ -215,7 +215,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public void revertEmptyFields() {
-    for (final String fieldName : getMetaData().getAttributeNames()) {
+    for (final String fieldName : getRecordDefinition().getAttributeNames()) {
       final Object value = getValue(fieldName);
       if (Property.isEmpty(value)) {
         if (!this.layer.isFieldUserReadOnly(fieldName)) {
@@ -230,8 +230,8 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public void setValue(final int index, final Object value) {
-    final RecordDefinition metaData = getMetaData();
-    final String attributeName = metaData.getAttributeName(index);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final String attributeName = recordDefinition.getAttributeName(index);
 
     final Object oldValue = getValue(index);
     if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {

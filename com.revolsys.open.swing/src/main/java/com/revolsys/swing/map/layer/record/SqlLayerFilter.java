@@ -47,8 +47,8 @@ public class SqlLayerFilter implements Filter<Record>, MapSerializer {
   private synchronized Condition getCondition() {
     if (condition == null) {
       if (!initialized) {
-        final RecordDefinition metaData = layer.getMetaData();
-        if (metaData != null) {
+        final RecordDefinition recordDefinition = layer.getRecordDefinition();
+        if (recordDefinition != null) {
           initialized = true;
           try {
             final Properties properties = System.getProperties();
@@ -62,7 +62,7 @@ public class SqlLayerFilter implements Filter<Record>, MapSerializer {
             }
 
             final String query = new UriTemplate(this.query).expandString(uriVariables);
-            condition = QueryValue.parseWhere(metaData, query);
+            condition = QueryValue.parseWhere(recordDefinition, query);
           } catch (final Throwable e) {
             LoggerFactory.getLogger(getClass()).error(
               "Invalid query: " + query, e);

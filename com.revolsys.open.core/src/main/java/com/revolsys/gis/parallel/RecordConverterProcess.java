@@ -32,7 +32,7 @@ public class RecordConverterProcess extends
 
   private Map<String, Converter<Record, Record>> typeConverterMap = new HashMap<String, Converter<Record, Record>>();
 
-  private RecordDefinitionFactory targetMetaDataFactory;
+  private RecordDefinitionFactory targetRecordDefinitionFactory;
 
   private Map<Object, Map<String, Object>> simpleMapping;
 
@@ -59,7 +59,7 @@ public class RecordConverterProcess extends
 
   protected Record convert(final Record source) {
     int matchCount = 0;
-    final RecordDefinition sourceMetaData = source.getMetaData();
+    final RecordDefinition sourceMetaData = source.getRecordDefinition();
     final String sourceTypeName = sourceMetaData.getPath();
     final Collection<FilterRecordConverter> converters = typeFilterConverterMap.get(sourceTypeName);
     Record target = null;
@@ -119,12 +119,12 @@ public class RecordConverterProcess extends
     return statistics;
   }
 
-  public RecordDefinition getTargetMetaData(final String typePath) {
-    return targetMetaDataFactory.getRecordDefinition(typePath);
+  public RecordDefinition getTargetRecordDefinition(final String typePath) {
+    return targetRecordDefinitionFactory.getRecordDefinition(typePath);
   }
 
-  public RecordDefinitionFactory getTargetMetaDataFactory() {
-    return targetMetaDataFactory;
+  public RecordDefinitionFactory getTargetRecordDefinitionFactory() {
+    return targetRecordDefinitionFactory;
   }
 
   public Map<String, Converter<Record, Record>> getTypeConverterMap() {
@@ -164,9 +164,9 @@ public class RecordConverterProcess extends
         @SuppressWarnings("unchecked")
         final Map<String, String> attributeMapping = (Map<String, String>)map.get("attributeMapping");
 
-        final RecordDefinition targetMetaData = getTargetMetaData(targetTypeName);
+        final RecordDefinition targetRecordDefinition = getTargetRecordDefinition(targetTypeName);
         final SimpleRecordConveter converter = new SimpleRecordConveter(
-          targetMetaData);
+          targetRecordDefinition);
         converter.addProcessor(new CopyValues(attributeMapping));
         addTypeConverter(sourceTypeName, converter);
       }
@@ -204,9 +204,9 @@ public class RecordConverterProcess extends
     }
   }
 
-  public void setTargetMetaDataFactory(
-    final RecordDefinitionFactory targetMetaDataFactory) {
-    this.targetMetaDataFactory = targetMetaDataFactory;
+  public void setTargetRecordDefinitionFactory(
+    final RecordDefinitionFactory targetRecordDefinitionFactory) {
+    this.targetRecordDefinitionFactory = targetRecordDefinitionFactory;
   }
 
   public void setTypeConverterMap(

@@ -51,8 +51,8 @@ public class RecordCodeTableValueFilter implements Filter<Record> {
     if (this.values.contains(propertyValue)) {
       return true;
     } else {
-      final RecordDefinition metaData = object.getMetaData();
-      final CodeTable codeTable = metaData.getCodeTableByColumn(this.attributeName);
+      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final CodeTable codeTable = recordDefinition.getCodeTableByColumn(this.attributeName);
       if (codeTable != null) {
         final Object codeValue = codeTable.getValue(SingleIdentifier.create(propertyValue));
         if (this.values.contains(codeValue)) {

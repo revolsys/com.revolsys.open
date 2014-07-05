@@ -67,10 +67,10 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
           final String attributeName = this.model.getFieldName(columnIndex);
           highlighted = layerRecord.isModified(attributeName);
           if (highlighted) {
-            final RecordDefinition metaData = layerRecord.getMetaData();
-            final String fieldName = metaData.getAttributeName(columnIndex);
+            final RecordDefinition recordDefinition = layerRecord.getRecordDefinition();
+            final String fieldName = recordDefinition.getAttributeName(columnIndex);
             final Object originalValue = layerRecord.getOriginalValue(fieldName);
-            final CodeTable codeTable = metaData.getCodeTableByColumn(fieldName);
+            final CodeTable codeTable = recordDefinition.getCodeTableByColumn(fieldName);
             String text;
             if (originalValue == null) {
               text = "-";

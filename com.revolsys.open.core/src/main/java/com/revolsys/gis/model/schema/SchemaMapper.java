@@ -66,7 +66,7 @@ public class SchemaMapper {
   }
 
   public Record convert(final Record object) {
-    final RecordDefinition type = object.getMetaData();
+    final RecordDefinition type = object.getRecordDefinition();
     final RecordDefinition newType = getClassMapping(type);
     if (newType != null) {
       final Record newObject = newType.createRecord();
