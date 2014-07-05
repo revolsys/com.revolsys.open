@@ -27,7 +27,7 @@ public class OsmDocument implements OsmConstants {
       boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
       if (!boundingBox.isEmpty()) {
         final StringBuffer url = new StringBuffer(serverUrl);
-        url.append("/api/0.6/map?bbox=");
+        url.append("map?bbox=");
         url.append(boundingBox.getMinX());
         url.append(",");
         url.append(boundingBox.getMinY());

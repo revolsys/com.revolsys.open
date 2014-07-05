@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -51,20 +50,9 @@ import com.revolsys.jts.geom.prep.PreparedMultiLineString;
  *@version 1.7
  */
 public class MultiLineStringImpl extends AbstractMultiLineString implements
-  MultiLineString {
+MultiLineString {
 
   private static final long serialVersionUID = 8166665132445433741L;
-
-  /**
-   *  The bounding box of this <code>Geometry</code>.
-   */
-  private BoundingBox boundingBox;
-
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
 
   private final GeometryFactory geometryFactory;
 
@@ -81,91 +69,54 @@ public class MultiLineStringImpl extends AbstractMultiLineString implements
       this.lines = null;
     } else if (hasNullElements(lines)) {
       throw new IllegalArgumentException(
-        "geometries must not contain null elements");
+          "geometries must not contain null elements");
     } else {
       this.lines = lines;
     }
   }
 
-  @Override
-  public BoundingBox getBoundingBox() {
-    if (boundingBox == null) {
-      if (isEmpty()) {
-        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        boundingBox = computeBoundingBox();
-      }
-    }
-    return boundingBox;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (lines == null) {
+    if (this.lines == null) {
       return new ArrayList<V>();
     } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(lines));
+      return (List<V>)new ArrayList<>(Arrays.asList(this.lines));
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (lines == null) {
+    if (this.lines == null) {
       return null;
     } else {
-      return (V)lines[n];
+      return (V)this.lines[n];
     }
   }
 
   @Override
   public int getGeometryCount() {
-    if (lines == null) {
+    if (this.lines == null) {
       return 0;
     } else {
-      return lines.length;
+      return this.lines.length;
     }
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
-  }
-
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getUserData() {
-    return userData;
+    return this.geometryFactory;
   }
 
   @Override
   public boolean isEmpty() {
-    return lines == null;
+    return this.lines == null;
   }
 
   @Override
   public MultiLineString prepare() {
     return new PreparedMultiLineString(this);
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
-    this.userData = userData;
   }
 
 }

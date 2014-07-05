@@ -17,7 +17,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -27,12 +27,12 @@ public class DataObjectListTableModel extends DataObjectRowTableModel implements
   Reorderable {
   private static final long serialVersionUID = 1L;
 
-  public static TablePanel createPanel(final AbstractDataObjectLayer layer) {
+  public static TablePanel createPanel(final AbstractRecordLayer layer) {
     return createPanel(layer.getMetaData(), new ArrayList<LayerRecord>(),
       layer.getColumnNames());
   }
 
-  public static TablePanel createPanel(final AbstractDataObjectLayer layer,
+  public static TablePanel createPanel(final AbstractRecordLayer layer,
     final Collection<LayerRecord> objects) {
     return createPanel(layer.getMetaData(), objects, layer.getColumnNames());
   }

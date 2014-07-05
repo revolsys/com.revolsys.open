@@ -3,7 +3,7 @@ package com.revolsys.io.moep;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.AbstractDataObjectAndGeometryReaderFactory;
-import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 
@@ -15,14 +15,14 @@ public class MoepBinaryReaderFactory extends
     setCustomAttributionSupported(false);
   }
 
-  public DataObjectReader createDataObjectReader(
+  public RecordReader createRecordReader(
     final RecordDefinition metaData, final Resource resource,
     final RecordFactory dataObjectFactory) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public RecordReader createRecordReader(final Resource resource,
     final RecordFactory dataObjectFactory) {
     return new MoepBinaryReader(null, resource, dataObjectFactory);
   }

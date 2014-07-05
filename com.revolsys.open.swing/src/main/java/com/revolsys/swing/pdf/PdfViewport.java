@@ -37,7 +37,7 @@ import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
@@ -316,7 +316,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
   }
 
   @Override
-  public boolean isHidden(final AbstractDataObjectLayer layer,
+  public boolean isHidden(final AbstractRecordLayer layer,
     final LayerRecord record) {
     return false;
   }

@@ -27,9 +27,9 @@ import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
-import com.revolsys.swing.map.form.DataObjectLayerForm;
+import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.component.AttributeFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
@@ -53,7 +53,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   public static final String FILTER_ATTRIBUTE = "filter_attribute";
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
   private final DataObjectLayerTableModel tableModel;
 
@@ -61,7 +61,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
 
   private final DataObjectTableCellEditor tableCellEditor;
 
-  public DataObjectLayerTablePanel(final AbstractDataObjectLayer layer,
+  public DataObjectLayerTablePanel(final AbstractRecordLayer layer,
     final DataObjectLayerTable table) {
     super(table);
     this.layer = layer;
@@ -138,16 +138,16 @@ public class DataObjectLayerTablePanel extends TablePanel implements
         if (DirectionalAttributes.getProperty(metaData)
           .hasDirectionalAttributes()) {
           editMenu.addMenuItemTitleIcon("geometry",
-            DataObjectLayerForm.FLIP_RECORD_NAME,
-            DataObjectLayerForm.FLIP_RECORD_ICON, editableEnableCheck, this,
+            LayerRecordForm.FLIP_RECORD_NAME,
+            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, this,
             "flipRecordOrientation");
           editMenu.addMenuItemTitleIcon("geometry",
-            DataObjectLayerForm.FLIP_LINE_ORIENTATION_NAME,
-            DataObjectLayerForm.FLIP_LINE_ORIENTATION_ICON,
+            LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
+            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON,
             editableEnableCheck, this, "flipLineOrientation");
           editMenu.addMenuItemTitleIcon("geometry",
-            DataObjectLayerForm.FLIP_FIELDS_NAME,
-            DataObjectLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this,
+            LayerRecordForm.FLIP_FIELDS_NAME,
+            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this,
             "flipFields");
         } else {
           editMenu.addMenuItemTitleIcon("geometry", "Flip Line Orientation",
@@ -291,7 +291,7 @@ public class DataObjectLayerTablePanel extends TablePanel implements
     }
   }
 
-  public AbstractDataObjectLayer getLayer() {
+  public AbstractRecordLayer getLayer() {
     return this.layer;
   }
 

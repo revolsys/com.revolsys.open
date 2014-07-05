@@ -4,7 +4,7 @@ import javax.swing.RowSorter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
 
@@ -23,13 +23,13 @@ public class DataObjectLayerTable extends DataObjectRowTable {
 
   @Override
   protected RowSorter<? extends TableModel> createDefaultRowSorter() {
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     final DataObjectLayerTableModel model = (DataObjectLayerTableModel)getTableModel();
     return new DataObjectLayerTableRowSorter(layer, model);
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends AbstractDataObjectLayer> V getLayer() {
+  public <V extends AbstractRecordLayer> V getLayer() {
     final DataObjectLayerTableModel model = (DataObjectLayerTableModel)getTableModel();
     return (V)model.getLayer();
   }

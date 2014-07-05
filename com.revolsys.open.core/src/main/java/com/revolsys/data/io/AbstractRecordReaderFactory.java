@@ -13,48 +13,48 @@ import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
 
-public abstract class AbstractDataObjectReaderFactory extends
-  AbstractMapReaderFactory implements DataObjectReaderFactory {
-  public static DataObjectReader dataObjectReader(final File file) {
+public abstract class AbstractRecordReaderFactory extends
+  AbstractMapReaderFactory implements RecordReaderFactory {
+  public static RecordReader recordReader(final File file) {
     final FileSystemResource resource = new FileSystemResource(file);
-    return dataObjectReader(resource);
+    return recordReader(resource);
   }
 
-  public static DataObjectReader dataObjectReader(final Resource resource) {
-    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+  public static RecordReader recordReader(final Resource resource) {
+    final RecordReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
-      final DataObjectReader reader = readerFactory.createDataObjectReader(resource);
+      final RecordReader reader = readerFactory.createRecordReader(resource);
       return reader;
     }
   }
 
-  public static DataObjectReader dataObjectReader(final Resource resource,
+  public static RecordReader recordReader(final Resource resource,
     final RecordFactory factory) {
-    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    final RecordReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
-      final DataObjectReader reader = readerFactory.createDataObjectReader(
+      final RecordReader reader = readerFactory.createRecordReader(
         resource, factory);
       return reader;
     }
   }
 
-  public static DataObjectReaderFactory getDataObjectReaderFactory(
+  public static RecordReaderFactory getDataObjectReaderFactory(
     final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
-      DataObjectReaderFactory.class, resource);
+    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
+      RecordReaderFactory.class, resource);
     return readerFactory;
   }
 
-  public static DataObjectReaderFactory getDataObjectReaderFactory(
+  public static RecordReaderFactory getDataObjectReaderFactory(
     final String fileName) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByFileName(
-      DataObjectReaderFactory.class, fileName);
+    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByFileName(
+      RecordReaderFactory.class, fileName);
     return readerFactory;
   }
 
@@ -70,7 +70,7 @@ public abstract class AbstractDataObjectReaderFactory extends
 
   private final boolean binary;
 
-  public AbstractDataObjectReaderFactory(final String name, final boolean binary) {
+  public AbstractRecordReaderFactory(final String name, final boolean binary) {
     super(name);
     this.binary = binary;
   }
@@ -83,8 +83,8 @@ public abstract class AbstractDataObjectReaderFactory extends
    * @return The reader for the file.
    */
   @Override
-  public DataObjectReader createDataObjectReader(final Resource resource) {
-    return createDataObjectReader(resource, dataObjectFactory);
+  public RecordReader createRecordReader(final Resource resource) {
+    return createRecordReader(resource, dataObjectFactory);
 
   }
 
@@ -94,7 +94,7 @@ public abstract class AbstractDataObjectReaderFactory extends
    * @return The reader.
    */
   @Override
-  public Reader<Record> createDirectoryDataObjectReader() {
+  public Reader<Record> createDirectoryRecordReader() {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     return directoryReader;
@@ -108,8 +108,8 @@ public abstract class AbstractDataObjectReaderFactory extends
    * @return The reader for the file.
    */
   @Override
-  public Reader<Record> createDirectoryDataObjectReader(final File directory) {
-    return createDirectoryDataObjectReader(directory, dataObjectFactory);
+  public Reader<Record> createDirectoryRecordReader(final File directory) {
+    return createDirectoryRecordReader(directory, dataObjectFactory);
 
   }
 
@@ -122,7 +122,7 @@ public abstract class AbstractDataObjectReaderFactory extends
    * @return The reader for the file.
    */
   @Override
-  public Reader<Record> createDirectoryDataObjectReader(
+  public Reader<Record> createDirectoryRecordReader(
     final File directory, final RecordFactory dataObjectFactory) {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
@@ -135,7 +135,7 @@ public abstract class AbstractDataObjectReaderFactory extends
   })
   @Override
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
-    final Reader reader = createDataObjectReader(resource);
+    final Reader reader = createRecordReader(resource);
     return reader;
   }
 

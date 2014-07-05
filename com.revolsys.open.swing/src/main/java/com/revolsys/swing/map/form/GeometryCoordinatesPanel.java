@@ -26,9 +26,9 @@ public class GeometryCoordinatesPanel extends ValueField implements
 
   private final TablePanel tablePanel;
 
-  private final Reference<DataObjectLayerForm> form;
+  private final Reference<LayerRecordForm> form;
 
-  public GeometryCoordinatesPanel(final DataObjectLayerForm form,
+  public GeometryCoordinatesPanel(final LayerRecordForm form,
     final String fieldName) {
     super(fieldName, null);
     setLayout(new BorderLayout());
@@ -44,7 +44,7 @@ public class GeometryCoordinatesPanel extends ValueField implements
     add(this.tablePanel, BorderLayout.WEST);
   }
 
-  public DataObjectLayerForm getForm() {
+  public LayerRecordForm getForm() {
     return this.form.get();
   }
 

@@ -14,7 +14,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
@@ -57,7 +57,7 @@ public abstract class AbstractMultipleRenderer extends
   private List<AbstractDataObjectLayerRenderer> renderers = new ArrayList<AbstractDataObjectLayerRenderer>();
 
   public AbstractMultipleRenderer(final String type,
-    final AbstractDataObjectLayer layer, final LayerRenderer<?> parent,
+    final AbstractRecordLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
     super(type, "Styles", layer, parent, style);
     @SuppressWarnings("unchecked")
@@ -153,7 +153,7 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   public FilterMultipleRenderer convertToFilterStyle() {
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     final List<AbstractDataObjectLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
@@ -172,7 +172,7 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   public MultipleRenderer convertToMultipleStyle() {
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     final List<AbstractDataObjectLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
@@ -191,7 +191,7 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   public ScaleMultipleRenderer convertToScaleStyle() {
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     final List<AbstractDataObjectLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();

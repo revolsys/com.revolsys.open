@@ -12,13 +12,12 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.query.Query;
-import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.parallel.Invoke;
 
-public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
-  private static final Logger LOG = Logger.getLogger(DataObjectBoundingBoxLayer.class);
+public class BoundingBoxRecordLayer extends AbstractRecordLayer {
+  private static final Logger LOG = Logger.getLogger(BoundingBoxRecordLayer.class);
 
   private boolean loading = false;
 
@@ -30,7 +29,7 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
 
   private SwingWorker worker;
 
-  public DataObjectBoundingBoxLayer(final String type, final String name,
+  public BoundingBoxRecordLayer(final String type, final String name,
     final Class<?> workerClass, final GeometryFactory geometryFactory) {
     super(name, geometryFactory);
     setType(type);
@@ -54,13 +53,13 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
           }
         }
         if (this.boundingBox == null || !boundingBox.equals(this.boundingBox)
-          && !this.loading) {
+            && !this.loading) {
           this.loading = true;
           this.boundingBox = boundingBox;
           firePropertyChange("visible", super.isVisible(), false);
           try {
             final Constructor<?> constructor = this.workerClass.getConstructor(
-              DataObjectBoundingBoxLayer.class, BoundingBox.class);
+              BoundingBoxRecordLayer.class, BoundingBox.class);
             this.worker = (SwingWorker)constructor.newInstance(this,
               boundingBox);
             Invoke.worker(this.worker);
@@ -93,16 +92,16 @@ public class DataObjectBoundingBoxLayer extends AbstractDataObjectLayer {
     return !this.loading && super.isVisible();
   }
 
-  public void setIndex(final BoundingBox boundingBox,
-    final DataObjectQuadTree index) {
+  public void setIndexRecords(final BoundingBox boundingBox,
+    final List<LayerRecord> records) {
     synchronized (this.sync) {
       if (EqualsRegistry.equal(this.boundingBox, boundingBox)) {
-        setIndex(index);
+        setIndexRecords(records);
         this.worker = null;
         this.loading = false;
       }
     }
-    firePropertyChange("index", null, index);
+    firePropertyChange("refresh", false, true);
     firePropertyChange("visible", false, isVisible());
   }
 

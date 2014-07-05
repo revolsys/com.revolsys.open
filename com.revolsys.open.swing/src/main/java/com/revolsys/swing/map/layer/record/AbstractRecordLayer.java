@@ -13,12 +13,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,10 +51,10 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.filter.DataObjectGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.filter.DataObjectGeometryDistanceFilter;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.io.AbstractDataObjectReaderFactory;
-import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.AbstractRecordReaderFactory;
 import com.revolsys.data.io.DataObjectStore;
-import com.revolsys.data.io.ListDataObjectReader;
+import com.revolsys.data.io.ListRecordReader;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.ArrayRecord;
@@ -87,7 +89,7 @@ import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.DataObjectReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.form.DataObjectLayerForm;
+import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.form.SnapLayersPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -114,43 +116,29 @@ import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.SetObjectProperty;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Label;
 
-public abstract class AbstractDataObjectLayer extends AbstractLayer implements
-RecordFactory, AddGeometryCompleteAction {
+public abstract class AbstractRecordLayer extends AbstractLayer implements
+  RecordFactory, AddGeometryCompleteAction {
 
-  public static void addVisibleLayers(
-    final List<AbstractDataObjectLayer> layers, final LayerGroup group) {
+  public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
+    final LayerGroup group) {
     if (group.isExists() && group.isVisible()) {
       for (final Layer layer : group) {
         if (layer instanceof LayerGroup) {
           final LayerGroup layerGroup = (LayerGroup)layer;
           addVisibleLayers(layers, layerGroup);
-        } else if (layer instanceof AbstractDataObjectLayer) {
+        } else if (layer instanceof AbstractRecordLayer) {
           if (layer.isExists() && layer.isVisible()) {
-            final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
+            final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
             layers.add(dataObjectLayer);
           }
         }
       }
     }
-  }
-
-  public static boolean containsSame(
-    final Collection<? extends LayerRecord> records, final LayerRecord record) {
-    if (record != null) {
-      if (records != null) {
-        synchronized (records) {
-          for (final LayerRecord queryRecord : records) {
-            if (queryRecord.isSame(record)) {
-              return true;
-            }
-          }
-        }
-      }
-    }
-    return false;
   }
 
   public static LayerRecord getAndRemoveSame(
@@ -165,42 +153,23 @@ RecordFactory, AddGeometryCompleteAction {
     return null;
   }
 
-  public static List<AbstractDataObjectLayer> getVisibleLayers(
+  public static List<AbstractRecordLayer> getVisibleLayers(
     final LayerGroup group) {
-    final List<AbstractDataObjectLayer> layers = new ArrayList<AbstractDataObjectLayer>();
+    final List<AbstractRecordLayer> layers = new ArrayList<AbstractRecordLayer>();
     addVisibleLayers(layers, group);
     return layers;
   }
 
-  public static int removeSame(final Collection<? extends LayerRecord> records,
-    final Collection<? extends LayerRecord> recordsToRemove) {
-    int count = 0;
-    for (final LayerRecord record : recordsToRemove) {
-      if (removeSame(records, record)) {
-        count++;
-      }
-    }
-    return count;
-  }
+  private final Object sync = new Object();
 
-  public static boolean removeSame(
-    final Collection<? extends LayerRecord> records, final LayerRecord record) {
-    for (final Iterator<? extends LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-      final LayerRecord queryRecord = iterator.next();
-      if (queryRecord.isSame(record)) {
-        iterator.remove();
-        return true;
-      }
-    }
-    return false;
-  }
+  private final Map<Label, Set<LayerRecord>> cacheIdToRecordMap = new HashMap<>();
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
 
   private static AtomicInteger formCount = new AtomicInteger();
 
   static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractDataObjectLayer.class);
+    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractRecordLayer.class);
     menu.setName("Layer");
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");
@@ -212,9 +181,9 @@ RecordFactory, AddGeometryCompleteAction {
       "table_go", exists, "showRecordsTable"));
 
     final EnableCheck hasSelectedRecords = new TreeItemPropertyEnableCheck(
-        "hasSelectedRecords");
+      "hasSelectedRecords");
     final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
-        "hasGeometry");
+      "hasGeometry");
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Selected",
       "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry,
         hasSelectedRecords), "zoomToSelected"));
@@ -225,9 +194,9 @@ RecordFactory, AddGeometryCompleteAction {
     final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
     final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddRecords");
     final EnableCheck canDelete = new TreeItemPropertyEnableCheck(
-        "canDeleteRecords");
+      "canDeleteRecords");
     final EnableCheck canMergeRecords = new TreeItemPropertyEnableCheck(
-        "canMergeRecords");
+      "canMergeRecords");
     final EnableCheck canPaste = new TreeItemPropertyEnableCheck("canPaste");
 
     menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
@@ -248,18 +217,18 @@ RecordFactory, AddGeometryCompleteAction {
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction(
       "Merge Selected Records", "shape_group", canMergeRecords,
-        "mergeSelectedRecords"));
+      "mergeSelectedRecords"));
 
     menu.addMenuItem("dnd", TreeItemRunnable.createAction(
       "Copy Selected Records", "page_copy", hasSelectedRecords,
-        "copySelectedRecords"));
+      "copySelectedRecords"));
 
     menu.addMenuItem("dnd", TreeItemRunnable.createAction("Paste New Records",
       "paste_plain", new AndEnableCheck(canAdd, canPaste), "pasteRecords"));
 
     menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
       "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
-        "Style"));
+      "Style"));
   }
 
   private boolean useFieldTitles = false;
@@ -270,8 +239,6 @@ RecordFactory, AddGeometryCompleteAction {
 
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<String>();
 
-  private final List<LayerRecord> highlightedRecords = new ArrayList<LayerRecord>();
-
   private BoundingBox boundingBox = new BoundingBoxDoubleGf();
 
   private boolean canAddRecords = true;
@@ -279,8 +246,6 @@ RecordFactory, AddGeometryCompleteAction {
   private boolean canDeleteRecords = true;
 
   private boolean canEditRecords = true;
-
-  private final List<LayerRecord> deletedRecords = new ArrayList<LayerRecord>();
 
   private Object editSync;
 
@@ -290,13 +255,7 @@ RecordFactory, AddGeometryCompleteAction {
 
   private RecordDefinition metaData;
 
-  private final List<LayerRecord> modifiedRecords = new ArrayList<LayerRecord>();
-
-  private final List<LayerRecord> newRecords = new ArrayList<LayerRecord>();
-
   private Query query;
-
-  private final List<LayerRecord> selectedRecords = new ArrayList<LayerRecord>();
 
   private DataObjectQuadTree selectedRecordsIndex;
 
@@ -304,16 +263,23 @@ RecordFactory, AddGeometryCompleteAction {
 
   private List<String> columnNameOrder = Collections.emptyList();
 
-  public AbstractDataObjectLayer() {
+  private final Label cacheIdDeleted = new Label("deleted");
+
+  private final Label cacheIdModified = new Label("modified");
+
+  private final Label cacheIdNew = new Label("new");
+
+  private final Label cacheIdSelected = new Label("selected");
+
+  private final Label cacheIdHighlighted = new Label("highlighted");
+
+  private final Label cacheIdIndex = new Label("index");
+
+  public AbstractRecordLayer() {
     this("");
   }
 
-  public AbstractDataObjectLayer(final RecordDefinition metaData) {
-    this(metaData.getTypeName());
-    setMetaData(metaData);
-  }
-
-  public AbstractDataObjectLayer(final Map<String, ? extends Object> properties) {
+  public AbstractRecordLayer(final Map<String, ? extends Object> properties) {
     setReadOnly(false);
     setSelectSupported(true);
     setQuerySupported(true);
@@ -325,7 +291,12 @@ RecordFactory, AddGeometryCompleteAction {
     setProperties(properties);
   }
 
-  public AbstractDataObjectLayer(final String name) {
+  public AbstractRecordLayer(final RecordDefinition metaData) {
+    this(metaData.getTypeName());
+    setMetaData(metaData);
+  }
+
+  public AbstractRecordLayer(final String name) {
     this(name, GeometryFactory.floating3(4326));
     setReadOnly(false);
     setSelectSupported(true);
@@ -333,7 +304,7 @@ RecordFactory, AddGeometryCompleteAction {
     setRenderer(new GeometryStyleRenderer(this));
   }
 
-  public AbstractDataObjectLayer(final String name,
+  public AbstractRecordLayer(final String name,
     final GeometryFactory geometryFactory) {
     super(name);
     setGeometryFactory(geometryFactory);
@@ -351,31 +322,23 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   protected void addHighlightedRecord(final LayerRecord record) {
-    if (isLayerRecord(record)) {
-      synchronized (this.highlightedRecords) {
-        if (!containsSame(this.highlightedRecords, record)) {
-          this.highlightedRecords.add(record);
-        }
-      }
-    }
+    addRecordToCache(this.cacheIdHighlighted, record);
   }
 
   public void addHighlightedRecords(
     final Collection<? extends LayerRecord> records) {
-    synchronized (this.highlightedRecords) {
+    synchronized (getSync()) {
       for (final LayerRecord record : records) {
         addHighlightedRecord(record);
       }
+      cleanCachedRecords();
     }
     fireHighlighted();
   }
 
   protected void addModifiedRecord(final LayerRecord record) {
-    synchronized (this.modifiedRecords) {
-      if (!containsSame(this.modifiedRecords, record)) {
-        this.modifiedRecords.add(record);
-      }
-    }
+    addRecordToCache(this.cacheIdModified, record);
+    cleanCachedRecords();
   }
 
   public void addNewRecord() {
@@ -395,14 +358,44 @@ RecordFactory, AddGeometryCompleteAction {
     }
   }
 
-  protected void addSelectedRecord(final LayerRecord record) {
+  @SuppressWarnings("unchecked")
+  public <V extends LayerRecord> List<V> addRecordsToCache(final Label cacheId,
+    final Collection<? extends LayerRecord> records) {
+    synchronized (getSync()) {
+      final List<V> results = new ArrayList<>();
+      for (final LayerRecord record : records) {
+        final LayerRecord cachedRecord = addRecordToCache(cacheId, record);
+        results.add((V)cachedRecord);
+      }
+      cleanCachedRecords();
+      return results;
+    }
+  }
+
+  public LayerRecord addRecordToCache(final Label cacheId,
+    final LayerRecord record) {
     if (isLayerRecord(record)) {
-      synchronized (this.selectedRecords) {
-        if (!containsSame(this.selectedRecords, record)) {
-          this.selectedRecords.add(record);
+      if (record.getState() == RecordState.Deleted && !isDeleted(record)) {
+        return record;
+      } else {
+        synchronized (getSync()) {
+          Set<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+          if (cachedRecords == null) {
+            cachedRecords = new HashSet<>();
+            this.cacheIdToRecordMap.put(cacheId, cachedRecords);
+          }
+          if (!cachedRecords.contains(record)) {
+            cachedRecords.add(record);
+          }
+          return record;
         }
       }
     }
+    return record;
+  }
+
+  protected void addSelectedRecord(final LayerRecord record) {
+    addRecordToCache(this.cacheIdSelected, record);
   }
 
   public void addSelectedRecords(final BoundingBox boundingBox) {
@@ -415,17 +408,19 @@ RecordFactory, AddGeometryCompleteAction {
         }
       }
       addSelectedRecords(records);
-      if (!this.selectedRecords.isEmpty()) {
+      if (isHasSelectedRecords()) {
         showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
       }
     }
   }
 
   public void addSelectedRecords(final Collection<? extends LayerRecord> records) {
-    for (final LayerRecord record : records) {
-      addSelectedRecord(record);
+    synchronized (getSync()) {
+      for (final LayerRecord record : records) {
+        addSelectedRecord(record);
+      }
+      clearSelectedRecordsIndex();
     }
-    clearSelectedRecordsIndex();
     fireSelected();
   }
 
@@ -444,6 +439,7 @@ RecordFactory, AddGeometryCompleteAction {
       final Geometry geometry = record.getGeometryValue();
       if (geometry != null && !geometry.isEmpty()) {
         final DataObjectQuadTree index = getIndex();
+        addRecordToCache(this.cacheIdIndex, record);
         index.insert(record);
       }
     }
@@ -461,9 +457,12 @@ RecordFactory, AddGeometryCompleteAction {
       final boolean eventsEnabled = setEventsEnabled(false);
       boolean cancelled = true;
       try {
-        cancelled &= internalCancelChanges(this.newRecords);
-        cancelled &= internalCancelChanges(this.deletedRecords);
-        cancelled &= internalCancelChanges(this.modifiedRecords);
+        cancelled &= internalCancelChanges(this.cacheIdNew, getNewRecords());
+        cancelled &= internalCancelChanges(this.cacheIdDeleted,
+          getDeletedRecords());
+        cancelled &= internalCancelChanges(this.cacheIdModified,
+          getModifiedRecords());
+        cleanCachedRecords();
       } finally {
         setEventsEnabled(eventsEnabled);
         fireRecordsChanged();
@@ -471,9 +470,9 @@ RecordFactory, AddGeometryCompleteAction {
       if (!cancelled) {
         JOptionPane.showMessageDialog(MapPanel.get(this),
           "<html><p>There was an error cancelling changes for one or more records.</p>"
-              + "<p>" + getPath() + "</p>"
-              + "<p>Check the logging panel for details.</html>",
-              "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
+            + "<p>" + getPath() + "</p>"
+            + "<p>Check the logging panel for details.</html>",
+          "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
       }
 
     }
@@ -485,18 +484,31 @@ RecordFactory, AddGeometryCompleteAction {
     return geometry != null;
   }
 
-  public void clearSelectedRecords() {
-    synchronized (this.selectedRecords) {
-      this.selectedRecords.clear();
-      clearSelectedRecordsIndex();
+  protected void cleanCachedRecords() {
+    for (final Entry<Label, Set<LayerRecord>> entry : this.cacheIdToRecordMap.entrySet()) {
+      final Label key = entry.getKey();
+      System.out.println(key + ":" + entry.getValue().size());
     }
-    synchronized (this.highlightedRecords) {
-      this.highlightedRecords.clear();
+  }
+
+  public void clearCachedRecords(final Label cacheId) {
+    synchronized (getSync()) {
+      this.cacheIdToRecordMap.remove(cacheId);
+      cleanCachedRecords();
+    }
+  }
+
+  public void clearSelectedRecords() {
+    synchronized (getSync()) {
+      clearCachedRecords(this.cacheIdSelected);
+      clearCachedRecords(this.cacheIdHighlighted);
+      clearSelectedRecordsIndex();
     }
     fireSelected();
   }
 
   protected void clearSelectedRecordsIndex() {
+    cleanCachedRecords();
     this.selectedRecordsIndex = null;
   }
 
@@ -522,7 +534,7 @@ RecordFactory, AddGeometryCompleteAction {
       for (final LayerRecord record : records) {
         copies.add(new ArrayRecord(record));
       }
-      final DataObjectReader reader = new ListDataObjectReader(metaData, copies);
+      final RecordReader reader = new ListRecordReader(metaData, copies);
       final DataObjectReaderTransferable transferable = new DataObjectReaderTransferable(
         reader);
       ClipboardUtil.setContents(transferable);
@@ -534,21 +546,11 @@ RecordFactory, AddGeometryCompleteAction {
     copyRecordsToClipboard(selectedRecords);
   }
 
-  @Override
-  public LayerRecord createRecord(final RecordDefinition metaData) {
-    if (metaData.equals(getMetaData())) {
-      return new ArrayLayerRecord(this);
-    } else {
-      throw new IllegalArgumentException("Cannot create records for "
-          + metaData);
-    }
+  protected LayerRecordForm createDefaultForm(final LayerRecord record) {
+    return new LayerRecordForm(this, record);
   }
 
-  protected DataObjectLayerForm createDefaultForm(final LayerRecord record) {
-    return new DataObjectLayerForm(this, record);
-  }
-
-  public DataObjectLayerForm createForm(final LayerRecord record) {
+  public LayerRecordForm createForm(final LayerRecord record) {
     final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
     if (StringUtils.hasText(formFactoryExpression)) {
       try {
@@ -556,7 +558,7 @@ RecordFactory, AddGeometryCompleteAction {
         final Expression expression = parser.parseExpression(formFactoryExpression);
         final EvaluationContext context = new StandardEvaluationContext(this);
         context.setVariable("object", record);
-        return expression.getValue(context, DataObjectLayerForm.class);
+        return expression.getValue(context, LayerRecordForm.class);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error(
           "Unable to create form for " + this, e);
@@ -614,7 +616,6 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public LayerRecord createRecord(final Map<String, Object> values) {
-
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
       final LayerRecord record = createRecord(getMetaData());
       record.setState(RecordState.Initalizing);
@@ -626,13 +627,21 @@ RecordFactory, AddGeometryCompleteAction {
       } finally {
         record.setState(RecordState.New);
       }
-      synchronized (this.newRecords) {
-        this.newRecords.add(record);
-      }
+      addRecordToCache(this.cacheIdNew, record);
       fireRecordInserted(record);
       return record;
     } else {
       return null;
+    }
+  }
+
+  @Override
+  public LayerRecord createRecord(final RecordDefinition metaData) {
+    if (metaData.equals(getMetaData())) {
+      return new ArrayLayerRecord(this);
+    } else {
+      throw new IllegalArgumentException("Cannot create records for "
+        + metaData);
     }
   }
 
@@ -656,22 +665,18 @@ RecordFactory, AddGeometryCompleteAction {
       }
       for (final Component form : this.forms.values()) {
         if (form != null) {
-          if (form instanceof DataObjectLayerForm) {
-            final DataObjectLayerForm recordForm = (DataObjectLayerForm)form;
+          if (form instanceof LayerRecordForm) {
+            final LayerRecordForm recordForm = (LayerRecordForm)form;
             Invoke.later(recordForm, "destroy");
           }
         }
       }
     }
     this.columnNameOrder.clear();
-    this.deletedRecords.clear();
     this.forms.clear();
     this.formWindows.clear();
-    this.highlightedRecords.clear();
     this.index.clear();
-    this.modifiedRecords.clear();
-    this.newRecords.clear();
-    this.selectedRecords.clear();
+    this.cacheIdToRecordMap.clear();
     if (this.selectedRecordsIndex != null) {
       this.selectedRecordsIndex.clear();
     }
@@ -679,33 +684,8 @@ RecordFactory, AddGeometryCompleteAction {
 
   public void deleteRecord(final LayerRecord record) {
     if (isCanDeleteRecords()) {
-      deleteRecord(record, true);
+      doDeleteRecord(record);
       fireRecordDeleted(record);
-    }
-  }
-
-  protected void deleteRecord(final LayerRecord record,
-    final boolean trackDeletions) {
-    if (isLayerRecord(record)) {
-      unSelectRecords(record);
-      clearSelectedRecordsIndex();
-      synchronized (this.newRecords) {
-        if (!removeSame(this.newRecords, record)) {
-          synchronized (this.modifiedRecords) {
-            removeSame(this.modifiedRecords, record);
-          }
-          if (trackDeletions) {
-            synchronized (this.deletedRecords) {
-              if (!containsSame(this.deletedRecords, record)) {
-                this.deletedRecords.add(record);
-              }
-            }
-          }
-        }
-      }
-      record.setState(RecordState.Deleted);
-      unSelectRecords(record);
-      removeFromIndex(record);
     }
   }
 
@@ -714,17 +694,15 @@ RecordFactory, AddGeometryCompleteAction {
       synchronized (this.getEditSync()) {
         unSelectRecords(records);
         for (final LayerRecord record : records) {
-          deleteRecord(record, true);
+          doDeleteRecord(record);
         }
       }
     } else {
       synchronized (this.getEditSync()) {
         for (final LayerRecord record : records) {
-          synchronized (this.newRecords) {
-            if (removeSame(this.newRecords, record)) {
-              unSelectRecords(record);
-              record.setState(RecordState.Deleted);
-            }
+          if (removeRecordFromCache(this.cacheIdNew, record)) {
+            removeRecordFromCache(record);
+            record.setState(RecordState.Deleted);
           }
         }
       }
@@ -739,6 +717,18 @@ RecordFactory, AddGeometryCompleteAction {
   public void deleteSelectedRecords() {
     final List<LayerRecord> selectedRecords = getSelectedRecords();
     deleteRecords(selectedRecords);
+  }
+
+  protected void doDeleteRecord(final LayerRecord record) {
+    if (isLayerRecord(record)) {
+      removeFromIndex(record);
+      removeRecordFromCache(record);
+
+      addRecordToCache(this.cacheIdDeleted, record);
+
+      record.setState(RecordState.Deleted);
+      clearSelectedRecordsIndex();
+    }
   }
 
   protected List<LayerRecord> doQuery(final BoundingBox boundingBox) {
@@ -790,8 +780,7 @@ RecordFactory, AddGeometryCompleteAction {
   @SuppressWarnings("unchecked")
   protected <V extends LayerRecord> List<V> filterQueryResults(
     final List<V> results, final Filter<Map<String, Object>> filter) {
-    final List<LayerRecord> modifiedRecords = new ArrayList<LayerRecord>(
-        getModifiedRecords());
+    final Collection<LayerRecord> modifiedRecords = getModifiedRecords();
     for (final ListIterator<V> iterator = results.listIterator(); iterator.hasNext();) {
       final LayerRecord record = iterator.next();
       if (internalIsDeleted(record)) {
@@ -850,7 +839,7 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   protected void fireSelected() {
-    final int selectionCount = this.selectedRecords.size();
+    final int selectionCount = getSelectionCount();
     final boolean selected = selectionCount > 0;
     firePropertyChange("hasSelectedRecords", !selected, selected);
     firePropertyChange("selectionCount", -1, selectionCount);
@@ -861,36 +850,71 @@ RecordFactory, AddGeometryCompleteAction {
     return this.boundingBox;
   }
 
-  public LayerRecord getCachedRecord(final Identifier identifier) {
-    return getRecordById(identifier);
+  @SuppressWarnings("unchecked")
+  public <V extends LayerRecord> V getCachedRecord(final Identifier identifier) {
+    return (V)getRecordById(identifier);
+  }
+
+  public int getCachedRecordCount(final Label cacheId) {
+    final Set<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+    if (cachedRecords == null) {
+      return 0;
+    } else {
+      return cachedRecords.size();
+    }
+  }
+
+  public List<LayerRecord> getCachedRecords(final Label cacheId) {
+    synchronized (getSync()) {
+      final ArrayList<LayerRecord> records = new ArrayList<>();
+      final Set<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+      if (cachedRecords != null) {
+        records.addAll(cachedRecords);
+      }
+      return records;
+    }
+  }
+
+  protected final Label getCacheIdDeleted() {
+    return this.cacheIdDeleted;
+  }
+
+  protected final Label getCacheIdHighlighted() {
+    return this.cacheIdHighlighted;
+  }
+
+  public Label getCacheIdIndex() {
+    return this.cacheIdIndex;
+  }
+
+  protected final Label getCacheIdModified() {
+    return this.cacheIdModified;
+  }
+
+  protected final Label getCacheIdNew() {
+    return this.cacheIdNew;
+  }
+
+  protected final Label getCacheIdSelected() {
+    return this.cacheIdSelected;
   }
 
   public int getChangeCount() {
     int changeCount = 0;
-    synchronized (this.newRecords) {
-      changeCount += this.newRecords.size();
-    }
-    synchronized (this.modifiedRecords) {
-      changeCount += this.modifiedRecords.size();
-    }
-    synchronized (this.deletedRecords) {
-      changeCount += this.deletedRecords.size();
+    synchronized (getSync()) {
+      changeCount += getNewRecordCount();
+      changeCount += getModifiedRecordCount();
+      changeCount += getDeletedRecordCount();
     }
     return changeCount;
   }
 
   public List<LayerRecord> getChanges() {
-    synchronized (this.getEditSync()) {
+    synchronized (getSync()) {
       final List<LayerRecord> records = new ArrayList<LayerRecord>();
-      synchronized (this.newRecords) {
-        records.addAll(this.newRecords);
-      }
-      synchronized (this.modifiedRecords) {
-        records.addAll(this.modifiedRecords);
-      }
-      synchronized (this.deletedRecords) {
-        records.addAll(this.deletedRecords);
-      }
+      records.addAll(getNewRecords());
+      records.addAll(getModifiedRecords());
+      records.addAll(getDeletedRecords());
       return records;
     }
   }
@@ -899,7 +923,7 @@ RecordFactory, AddGeometryCompleteAction {
     synchronized (this) {
       if (this.columnNames == null) {
         final Set<String> columnNames = new LinkedHashSet<String>(
-            this.columnNameOrder);
+          this.columnNameOrder);
         final RecordDefinition metaData = getMetaData();
         final List<String> attributeNames = metaData.getAttributeNames();
         columnNames.addAll(attributeNames);
@@ -919,15 +943,11 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public int getDeletedRecordCount() {
-    synchronized (this.deletedRecords) {
-      return this.deletedRecords.size();
-    }
+    return getCachedRecordCount(this.cacheIdDeleted);
   }
 
   public Collection<LayerRecord> getDeletedRecords() {
-    synchronized (this.deletedRecords) {
-      return new ArrayList<LayerRecord>(this.deletedRecords);
-    }
+    return getCachedRecords(this.cacheIdDeleted);
   }
 
   public synchronized Object getEditSync() {
@@ -969,13 +989,11 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public int getHighlightedCount() {
-    return this.highlightedRecords.size();
+    return getCachedRecordCount(this.cacheIdHighlighted);
   }
 
   public Collection<LayerRecord> getHighlightedRecords() {
-    synchronized (this.highlightedRecords) {
-      return new ArrayList<LayerRecord>(this.highlightedRecords);
-    }
+    return getCachedRecords(this.cacheIdHighlighted);
   }
 
   public String getIdAttributeName() {
@@ -1053,18 +1071,20 @@ RecordFactory, AddGeometryCompleteAction {
     return this.metaData;
   }
 
+  public int getModifiedRecordCount() {
+    return getCachedRecordCount(this.cacheIdModified);
+  }
+
   public Collection<LayerRecord> getModifiedRecords() {
-    return new ArrayList<LayerRecord>(this.modifiedRecords);
+    return getCachedRecords(this.cacheIdModified);
   }
 
   public int getNewRecordCount() {
-    return this.newRecords.size();
+    return getCachedRecordCount(this.cacheIdNew);
   }
 
   public List<LayerRecord> getNewRecords() {
-    synchronized (this.newRecords) {
-      return new ArrayList<LayerRecord>(this.newRecords);
-    }
+    return getCachedRecords(this.cacheIdNew);
   }
 
   protected Geometry getPasteRecordGeometry(final LayerRecord record,
@@ -1083,7 +1103,7 @@ RecordFactory, AddGeometryCompleteAction {
           final GeometryFactory geometryFactory = getGeometryFactory();
           geometryDataType = geometryAttribute.getType();
           layerGeometryClass = geometryDataType.getJavaClass();
-          DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+          RecordReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
           if (reader == null) {
             final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
             if (StringUtils.hasText(string)) {
@@ -1097,7 +1117,7 @@ RecordFactory, AddGeometryCompleteAction {
               } catch (final Throwable e) {
               }
               final Resource resource = new ByteArrayResource("t.csv", string);
-              reader = AbstractDataObjectReaderFactory.dataObjectReader(resource);
+              reader = AbstractRecordReaderFactory.recordReader(resource);
             } else {
               return null;
             }
@@ -1123,9 +1143,9 @@ RecordFactory, AddGeometryCompleteAction {
                       JOptionPane.showMessageDialog(
                         parentComponent,
                         "Clipboard should contain a record with a "
-                            + geometryDataType + " not a "
-                            + sourceGeometry.getGeometryType() + ".",
-                            "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+                          + geometryDataType + " not a "
+                          + sourceGeometry.getGeometryType() + ".",
+                        "Paste Geometry", JOptionPane.ERROR_MESSAGE);
                     }
                     return null;
                   }
@@ -1209,9 +1229,7 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public List<LayerRecord> getSelectedRecords() {
-    synchronized (this.selectedRecords) {
-      return new ArrayList<LayerRecord>(this.selectedRecords);
-    }
+    return getCachedRecords(this.cacheIdSelected);
   }
 
   @SuppressWarnings({
@@ -1233,11 +1251,15 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public int getSelectionCount() {
-    return this.selectedRecords.size();
+    return getCachedRecordCount(this.cacheIdSelected);
   }
 
   public Collection<String> getSnapLayerPaths() {
     return getProperty("snapLayers", Collections.<String> emptyList());
+  }
+
+  protected Object getSync() {
+    return this.sync;
   }
 
   public Collection<String> getUserReadOnlyFieldNames() {
@@ -1265,33 +1287,22 @@ RecordFactory, AddGeometryCompleteAction {
   /**
    * Cancel changes for one of the lists of changes {@link #deletedRecords},
    * {@link #newRecords}, {@link #modifiedRecords}.
+   * @param cacheId
    *
    * @param records
    */
-  private boolean internalCancelChanges(final Collection<LayerRecord> records) {
+  private boolean internalCancelChanges(final Label cacheId,
+    final Collection<LayerRecord> records) {
     boolean cancelled = true;
-    for (final LayerRecord record : new ArrayList<LayerRecord>(records)) {
-      final boolean selected = isSelected(record);
-      removeForm(record);
+    for (final LayerRecord record : records) {
       removeFromIndex(record);
       try {
-        final LayerRecord originalRecord = internalCancelChanges(record);
-        if (originalRecord == null) {
-          unSelectRecords(record);
-        } else {
-          addToIndex(originalRecord);
-          if (selected) {
-            if (originalRecord != record) {
-              unSelectRecords(record);
-              addSelectedRecords(record);
-            }
-          }
-        }
+        removeRecordFromCache(cacheId, record);
+        internalCancelChanges(record);
+        addToIndex(record);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to cancel changes.\n" + record, e);
         cancelled = false;
-      } finally {
-        records.remove(record);
       }
     }
     return cancelled;
@@ -1302,19 +1313,14 @@ RecordFactory, AddGeometryCompleteAction {
    *
    * @param record
    */
-  protected LayerRecord internalCancelChanges(final LayerRecord record) {
+  protected void internalCancelChanges(final LayerRecord record) {
     if (record != null) {
-      final boolean isNew = record.getState() == RecordState.New;
       record.cancelChanges();
-      if (!isNew) {
-        return record;
-      }
     }
-    return null;
   }
 
   protected boolean internalIsDeleted(final LayerRecord record) {
-    return containsSame(this.deletedRecords, record);
+    return isRecordCached(this.cacheIdDeleted, record);
   }
 
   /**
@@ -1340,24 +1346,24 @@ RecordFactory, AddGeometryCompleteAction {
       return saved;
     } catch (final Throwable e) {
       ExceptionUtil.log(getClass(), "Unable to save changes for record:\n"
-          + record, e);
+        + record, e);
       return false;
     }
   }
 
   public boolean isCanAddRecords() {
     return !super.isReadOnly() && isEditable() && this.canAddRecords
-        && hasPermission("INSERT");
+      && hasPermission("INSERT");
   }
 
   public boolean isCanDeleteRecords() {
     return !super.isReadOnly() && isEditable() && this.canDeleteRecords
-        && hasPermission("DELETE");
+      && hasPermission("DELETE");
   }
 
   public boolean isCanEditRecords() {
     return !super.isReadOnly() && isEditable() && this.canEditRecords
-        && hasPermission("UPDATE");
+      && hasPermission("UPDATE");
   }
 
   public boolean isCanMergeRecords() {
@@ -1378,7 +1384,7 @@ RecordFactory, AddGeometryCompleteAction {
 
   public boolean isCanPaste() {
     return ClipboardUtil.isDataFlavorAvailable(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR)
-        || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
+      || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
   }
 
   public boolean isDeleted(final LayerRecord record) {
@@ -1393,15 +1399,19 @@ RecordFactory, AddGeometryCompleteAction {
     return getUserReadOnlyFieldNames().contains(fieldName);
   }
 
+  public boolean isHasCachedRecords(final Label cacheId) {
+    return getCachedRecordCount(cacheId) > 0;
+  }
+
   @Override
   public boolean isHasChanges() {
     if (isEditable()) {
       synchronized (this.getEditSync()) {
-        if (!this.newRecords.isEmpty()) {
+        if (isHasCachedRecords(this.cacheIdNew)) {
           return true;
-        } else if (!this.modifiedRecords.isEmpty()) {
+        } else if (isHasCachedRecords(this.cacheIdModified)) {
           return true;
-        } else if (!this.deletedRecords.isEmpty()) {
+        } else if (isHasCachedRecords(this.cacheIdDeleted)) {
           return true;
         } else {
           return false;
@@ -1418,7 +1428,7 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public boolean isHasSelectedRecords() {
-    return getSelectionCount() > 0;
+    return isHasCachedRecords(this.cacheIdSelected);
   }
 
   public boolean isHidden(final LayerRecord record) {
@@ -1432,9 +1442,8 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public boolean isHighlighted(final LayerRecord record) {
-    synchronized (this.highlightedRecords) {
-      return containsSame(this.highlightedRecords, record);
-    }
+
+    return isRecordCached(this.cacheIdHighlighted, record);
   }
 
   public boolean isLayerRecord(final Record record) {
@@ -1448,14 +1457,19 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public boolean isModified(final LayerRecord record) {
-    synchronized (this.modifiedRecords) {
-      return containsSame(this.modifiedRecords, record);
-    }
+    return isRecordCached(this.cacheIdModified, record);
   }
 
   public boolean isNew(final LayerRecord record) {
-    synchronized (this.newRecords) {
-      return this.newRecords.contains(record);
+    return isRecordCached(this.cacheIdNew, record);
+  }
+
+  protected boolean isPostSaveRemoveCacheId(final Label cacheId) {
+    if (cacheId == this.cacheIdDeleted || cacheId == this.cacheIdNew
+      || cacheId == this.cacheIdModified) {
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -1476,14 +1490,20 @@ RecordFactory, AddGeometryCompleteAction {
     }
   }
 
-  public boolean isSelected(final LayerRecord record) {
-    if (record == null) {
-      return false;
-    } else {
-      synchronized (this.selectedRecords) {
-        return containsSame(this.selectedRecords, record);
+  public boolean isRecordCached(final Label cacheId, final LayerRecord record) {
+    if (isLayerRecord(record)) {
+      synchronized (getSync()) {
+        final Set<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+        if (cachedRecords != null) {
+          return cachedRecords.contains(record);
+        }
       }
     }
+    return false;
+  }
+
+  public boolean isSelected(final LayerRecord record) {
+    return isRecordCached(this.cacheIdSelected, record);
   }
 
   public boolean isSnapToAllLayers() {
@@ -1520,16 +1540,16 @@ RecordFactory, AddGeometryCompleteAction {
   public void pasteRecords() {
     final boolean eventsEnabled = setEventsEnabled(false);
     try {
-      DataObjectReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
+      RecordReader reader = ClipboardUtil.getContents(DataObjectReaderTransferable.DATA_OBJECT_READER_FLAVOR);
       if (reader == null) {
         final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
         if (StringUtils.hasText(string)) {
           if (string.contains("\t")) {
             final Resource tsvResource = new ByteArrayResource("t.tsv", string);
-            reader = AbstractDataObjectReaderFactory.dataObjectReader(tsvResource);
+            reader = AbstractRecordReaderFactory.recordReader(tsvResource);
           } else {
             final Resource csvResource = new ByteArrayResource("t.csv", string);
-            reader = AbstractDataObjectReaderFactory.dataObjectReader(csvResource);
+            reader = AbstractRecordReaderFactory.recordReader(csvResource);
           }
         }
       }
@@ -1551,7 +1571,7 @@ RecordFactory, AddGeometryCompleteAction {
         }
         for (final Record sourceRecord : reader) {
           final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-              sourceRecord);
+            sourceRecord);
 
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
           for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
@@ -1596,8 +1616,9 @@ RecordFactory, AddGeometryCompleteAction {
     } finally {
       setEventsEnabled(eventsEnabled);
     }
-    firePropertyChange("recordsInserted", null, this.newRecords);
-    addSelectedRecords(this.newRecords);
+    final List<LayerRecord> newRecords = getNewRecords();
+    firePropertyChange("recordsInserted", null, newRecords);
+    addSelectedRecords(newRecords);
   }
 
   protected void postSaveChanges(final RecordState originalState,
@@ -1608,12 +1629,12 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   protected boolean postSaveDeletedRecord(final LayerRecord record) {
-    boolean deleted;
-    synchronized (this.deletedRecords) {
-      deleted = this.deletedRecords.remove(record);
+    final boolean deleted;
+    synchronized (getSync()) {
+      deleted = removeRecordFromCache(this.cacheIdDeleted, record);
     }
     if (deleted) {
-      unSelectRecords(record);
+      removeRecordFromCache(record);
       removeFromIndex(record);
       return true;
     } else {
@@ -1622,15 +1643,15 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   protected boolean postSaveModifiedRecord(final LayerRecord record) {
-    synchronized (this.modifiedRecords) {
+    synchronized (getSync()) {
       record.clearChanges();
-      return this.modifiedRecords.remove(record);
+      return removeRecordFromCache(this.cacheIdModified, record);
     }
   }
 
   protected boolean postSaveNewRecord(final LayerRecord record) {
-    synchronized (this.newRecords) {
-      if (this.newRecords.remove(record)) {
+    synchronized (getSync()) {
+      if (removeRecordFromCache(this.cacheIdModified, record)) {
         addToIndex(record);
         if (isSelected(record)) {
           unSelectRecords(record);
@@ -1717,8 +1738,8 @@ RecordFactory, AddGeometryCompleteAction {
       if (SwingUtilities.isEventDispatchThread()) {
         final Component form = this.forms.remove(record);
         if (form != null) {
-          if (form instanceof DataObjectLayerForm) {
-            final DataObjectLayerForm recordForm = (DataObjectLayerForm)form;
+          if (form instanceof LayerRecordForm) {
+            final LayerRecordForm recordForm = (LayerRecordForm)form;
             recordForm.destroy();
           }
         }
@@ -1726,7 +1747,7 @@ RecordFactory, AddGeometryCompleteAction {
         if (window != null) {
           window.dispose();
         }
-
+        cleanCachedRecords();
       } else {
         Invoke.later(this, "removeForm", record);
       }
@@ -1773,29 +1794,54 @@ RecordFactory, AddGeometryCompleteAction {
     if (geometry != null && !geometry.isEmpty()) {
       final BoundingBox boundingBox = geometry.getBoundingBox();
       removeFromIndex(boundingBox, record);
+      removeRecordFromCache(this.cacheIdIndex, record);
     }
   }
 
   protected void removeHighlightedRecord(final LayerRecord record) {
-    synchronized (this.highlightedRecords) {
-      for (final Iterator<LayerRecord> iterator = this.highlightedRecords.iterator(); iterator.hasNext();) {
-        final LayerRecord highlightedRecord = iterator.next();
-        if (highlightedRecord.isSame(record)) {
-          iterator.remove();
+    removeRecordFromCache(this.cacheIdHighlighted, record);
+  }
+
+  public boolean removeRecordFromCache(final Label cacheId,
+    final LayerRecord record) {
+    if (isLayerRecord(record)) {
+      synchronized (getSync()) {
+        return CollectionUtil.removeFromSet(this.cacheIdToRecordMap, cacheId,
+          record);
+      }
+    }
+    return false;
+  }
+
+  public boolean removeRecordFromCache(final LayerRecord record) {
+    boolean removed = false;
+    synchronized (getSync()) {
+      if (isLayerRecord(record)) {
+        for (final Label cacheId : new ArrayList<>(
+          this.cacheIdToRecordMap.keySet())) {
+          removed |= removeRecordFromCache(cacheId, record);
         }
       }
+    }
+    return removed;
+  }
+
+  public int removeRecordsFromCache(final Label cacheId,
+    final Collection<? extends LayerRecord> records) {
+    synchronized (getSync()) {
+      int count = 0;
+      for (final LayerRecord record : records) {
+        if (removeRecordFromCache(cacheId, record)) {
+          count++;
+        }
+      }
+      cleanCachedRecords();
+      return count;
     }
   }
 
   protected void removeSelectedRecord(final LayerRecord record) {
-    synchronized (this.selectedRecords) {
-      for (final Iterator<LayerRecord> iterator = this.selectedRecords.iterator(); iterator.hasNext();) {
-        final LayerRecord selectedRecord = iterator.next();
-        if (selectedRecord != null && selectedRecord.isSame(record)) {
-          iterator.remove();
-        }
-      }
-    }
+    removeRecordFromCache(this.cacheIdSelected, record);
     removeHighlightedRecord(record);
   }
 
@@ -1805,17 +1851,10 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public void revertChanges(final LayerRecord record) {
-    synchronized (this.modifiedRecords) {
+    synchronized (getSync()) {
       if (isLayerRecord(record)) {
         postSaveModifiedRecord(record);
-        synchronized (this.deletedRecords) {
-          for (final Iterator<LayerRecord> iterator = this.deletedRecords.iterator(); iterator.hasNext();) {
-            final LayerRecord deletedRecord = iterator.next();
-            if (deletedRecord.isSame(deletedRecord)) {
-              iterator.remove();
-            }
-          }
-        }
+        removeRecordFromCache(this.cacheIdDeleted, record);
       }
     }
   }
@@ -1830,7 +1869,7 @@ RecordFactory, AddGeometryCompleteAction {
           saved &= doSaveChanges();
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unable to save changes for layer: "
-              + this, e);
+            + this, e);
           saved = false;
         } finally {
           setEventsEnabled(eventsEnabled);
@@ -1840,9 +1879,9 @@ RecordFactory, AddGeometryCompleteAction {
       if (!saved) {
         JOptionPane.showMessageDialog(MapPanel.get(this),
           "<html><p>There was an error saving changes for one or more records.</p>"
-              + "<p>" + getPath() + "</p>"
-              + "<p>Check the logging panel for details.</html>",
-              "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
+            + "<p>" + getPath() + "</p>"
+            + "<p>Check the logging panel for details.</html>",
+          "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
       }
       return saved;
     }
@@ -1856,9 +1895,9 @@ RecordFactory, AddGeometryCompleteAction {
     if (!saved) {
       JOptionPane.showMessageDialog(MapPanel.get(this),
         "<html><p>There was an error saving changes to the record.</p>" + "<p>"
-            + getPath() + "</p>"
-            + "<p>Check the logging panel for details.</html>",
-            "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
+          + getPath() + "</p>"
+          + "<p>Check the logging panel for details.</html>",
+        "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
     }
     return saved;
   }
@@ -1935,24 +1974,34 @@ RecordFactory, AddGeometryCompleteAction {
     super.setGeometryFactory(geometryFactory);
     if (geometryFactory != null && this.boundingBox.isEmpty()) {
       this.boundingBox = geometryFactory.getCoordinateSystem()
-          .getAreaBoundingBox();
+        .getAreaBoundingBox();
     }
   }
 
   public void setHighlightedRecords(
     final Collection<LayerRecord> highlightedRecords) {
-    synchronized (this.highlightedRecords) {
-      this.highlightedRecords.clear();
-      this.highlightedRecords.addAll(highlightedRecords);
-
+    synchronized (getSync()) {
+      clearCachedRecords(this.cacheIdHighlighted);
+      addHighlightedRecords(highlightedRecords);
     }
-    fireHighlighted();
   }
 
-  public void setIndex(final DataObjectQuadTree index) {
-    if (index == null || !isExists()) {
-      this.index = new DataObjectQuadTree();
-    } else {
+  protected void setIndexRecords(final List<LayerRecord> records) {
+    synchronized (getSync()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final DataObjectQuadTree index = new DataObjectQuadTree(geometryFactory);
+      final Label cacheIdIndex = getCacheIdIndex();
+      clearCachedRecords(cacheIdIndex);
+      if (records != null) {
+        for (final Record record : records) {
+          final LayerRecord cacheRecord = addRecordToCache(cacheIdIndex,
+            (LayerRecord)record);
+          index.insert(cacheRecord);
+        }
+      }
+      cleanCachedRecords();
+      final List<LayerRecord> newRecords = getNewRecords();
+      index.insert(newRecords);
       this.index = index;
     }
   }
@@ -1979,7 +2028,7 @@ RecordFactory, AddGeometryCompleteAction {
       if (value instanceof Map) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> style = (Map<String, Object>)value;
-        final LayerRenderer<AbstractDataObjectLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(
+        final LayerRenderer<AbstractRecordLayer> renderer = AbstractDataObjectLayerRenderer.getRenderer(
           this, style);
         if (renderer != null) {
           setRenderer(renderer);
@@ -2015,22 +2064,24 @@ RecordFactory, AddGeometryCompleteAction {
         }
       }
       setSelectedRecords(records);
-      if (!this.selectedRecords.isEmpty()) {
+      if (isHasSelectedRecords()) {
         showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
       }
     }
   }
 
   public void setSelectedRecords(final Collection<LayerRecord> selectedRecords) {
-    synchronized (this.selectedRecords) {
-      clearSelectedRecordsIndex();
-      this.selectedRecords.clear();
+    synchronized (getSync()) {
+      clearCachedRecords(this.cacheIdSelected);
       for (final LayerRecord record : selectedRecords) {
         addSelectedRecord(record);
       }
-    }
-    synchronized (this.highlightedRecords) {
-      this.highlightedRecords.retainAll(selectedRecords);
+      for (final LayerRecord record : getHighlightedRecords()) {
+        if (!isSelected(record)) {
+          removeHighlightedRecord(record);
+        }
+      }
+      clearSelectedRecordsIndex();
     }
     fireSelected();
   }
@@ -2072,13 +2123,13 @@ RecordFactory, AddGeometryCompleteAction {
   public void setUserReadOnlyFieldNames(
     final Collection<String> userReadOnlyFieldNames) {
     this.userReadOnlyFieldNames = new LinkedHashSet<String>(
-        userReadOnlyFieldNames);
+      userReadOnlyFieldNames);
   }
 
   public LayerRecord showAddForm(final Map<String, Object> parameters) {
     if (isCanAddRecords()) {
       final LayerRecord newRecord = createRecord(parameters);
-      final DataObjectLayerForm form = createForm(newRecord);
+      final LayerRecordForm form = createForm(newRecord);
       if (form == null) {
         return null;
       } else {
@@ -2089,7 +2140,7 @@ RecordFactory, AddGeometryCompleteAction {
       final Window window = SwingUtil.getActiveWindow();
       JOptionPane.showMessageDialog(window,
         "Adding records is not enabled for the " + getPath()
-        + " layer. If possible make the layer editable", "Cannot Add Record",
+          + " layer. If possible make the layer editable", "Cannot Add Record",
         JOptionPane.ERROR_MESSAGE);
       return null;
     }
@@ -2116,8 +2167,8 @@ RecordFactory, AddGeometryCompleteAction {
               title = "Edit " + getName() + " #" + id;
             } else {
               title = "View " + getName() + " #" + id;
-              if (form instanceof DataObjectLayerForm) {
-                final DataObjectLayerForm dataObjectForm = (DataObjectLayerForm)form;
+              if (form instanceof LayerRecordForm) {
+                final LayerRecordForm dataObjectForm = (LayerRecordForm)form;
                 dataObjectForm.setEditable(false);
               }
             }
@@ -2125,8 +2176,8 @@ RecordFactory, AddGeometryCompleteAction {
             window = new BaseDialog(parent, title);
             window.add(form);
             window.pack();
-            if (form instanceof DataObjectLayerForm) {
-              final DataObjectLayerForm dataObjectForm = (DataObjectLayerForm)form;
+            if (form instanceof LayerRecordForm) {
+              final LayerRecordForm dataObjectForm = (LayerRecordForm)form;
               window.addWindowListener(dataObjectForm);
             }
             SwingUtil.autoAdjustPosition(window);
@@ -2201,8 +2252,8 @@ RecordFactory, AddGeometryCompleteAction {
                 final boolean visible = dockable.isVisible();
                 if (!visible) {
                   dockable.getControl()
-                  .getOwner()
-                  .remove((SingleCDockable)dockable);
+                    .getOwner()
+                    .remove((SingleCDockable)dockable);
                   setProperty("TableView", null);
                 }
               }
@@ -2318,11 +2369,7 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public void unHighlightRecords(final Collection<? extends LayerRecord> records) {
-    synchronized (this.highlightedRecords) {
-      for (final LayerRecord record : records) {
-        removeHighlightedRecord(record);
-      }
-    }
+    removeRecordsFromCache(this.cacheIdHighlighted, records);
     fireHighlighted();
   }
 
@@ -2336,19 +2383,21 @@ RecordFactory, AddGeometryCompleteAction {
         }
       }
       unSelectRecords(records);
-      if (!this.selectedRecords.isEmpty()) {
+      if (isHasSelectedRecords()) {
         showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
       }
     }
   }
 
   public void unSelectRecords(final Collection<? extends LayerRecord> records) {
-    for (final LayerRecord record : records) {
-      removeSelectedRecord(record);
+    synchronized (getSync()) {
+      for (final LayerRecord record : records) {
+        removeSelectedRecord(record);
+      }
+      clearSelectedRecordsIndex();
+      unHighlightRecords(records);
     }
-    clearSelectedRecordsIndex();
     fireSelected();
-    unHighlightRecords(records);
   }
 
   public void unSelectRecords(final LayerRecord... records) {
@@ -2387,9 +2436,9 @@ RecordFactory, AddGeometryCompleteAction {
       final Project project = getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-          .convert(geometryFactory)
-          .expandPercent(0.1)
-          .clipToCoordinateSystem();
+        .convert(geometryFactory)
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
 
       project.setViewBoundingBox(boundingBox);
     }

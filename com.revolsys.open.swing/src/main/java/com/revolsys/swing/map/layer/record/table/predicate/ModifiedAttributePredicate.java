@@ -17,7 +17,7 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.dataobject.model.DataObjectRowTableModel;
 import com.revolsys.swing.table.dataobject.row.DataObjectRowTable;
@@ -59,7 +59,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
       final Record record = this.model.getRecord(rowIndex);
       if (record instanceof LayerRecord) {
         final LayerRecord layerRecord = (LayerRecord)record;
-        final AbstractDataObjectLayer layer = layerRecord.getLayer();
+        final AbstractRecordLayer layer = layerRecord.getLayer();
         if (layer.isDeleted(layerRecord)) {
           highlighted = false;
         } else {

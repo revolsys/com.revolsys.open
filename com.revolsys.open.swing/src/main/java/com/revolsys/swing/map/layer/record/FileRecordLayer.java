@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-import com.revolsys.data.io.AbstractDataObjectReaderFactory;
-import com.revolsys.data.io.DataObjectReader;
-import com.revolsys.data.io.DataObjectReaderFactory;
+import com.revolsys.data.io.AbstractRecordReaderFactory;
+import com.revolsys.data.io.RecordReader;
+import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
@@ -27,19 +27,19 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.ExceptionUtil;
 
-public class DataObjectFileLayer extends DataObjectListLayer {
+public class FileRecordLayer extends ListRecordLayer {
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "dataObjectFile", "File", DataObjectFileLayer.class, "create");
+    "dataObjectFile", "File", FileRecordLayer.class, "create");
 
-  public static DataObjectFileLayer create(final Map<String, Object> properties) {
-    return new DataObjectFileLayer(properties);
+  public static FileRecordLayer create(final Map<String, Object> properties) {
+    return new FileRecordLayer(properties);
   }
 
   private String url;
 
   private Resource resource;
 
-  public DataObjectFileLayer(final Map<String, ? extends Object> properties) {
+  public FileRecordLayer(final Map<String, ? extends Object> properties) {
     super(properties);
     setType("dataObjectFile");
   }
@@ -58,8 +58,8 @@ public class DataObjectFileLayer extends DataObjectListLayer {
     final String fileNameExtension = FileUtil.getFileNameExtension(url);
     if (StringUtils.hasText(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final DataObjectReaderFactory factory = IoFactoryRegistry.getInstance()
-        .getFactoryByFileExtension(DataObjectReaderFactory.class,
+      final RecordReaderFactory factory = IoFactoryRegistry.getInstance()
+        .getFactoryByFileExtension(RecordReaderFactory.class,
           fileNameExtension);
       if (factory != null) {
         SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
@@ -92,7 +92,7 @@ public class DataObjectFileLayer extends DataObjectListLayer {
       return false;
     } else {
       if (resource.exists()) {
-        final DataObjectReader reader = AbstractDataObjectReaderFactory.dataObjectReader(this.resource);
+        final RecordReader reader = AbstractRecordReaderFactory.recordReader(this.resource);
         if (reader == null) {
           LoggerFactory.getLogger(getClass()).error(
             "Cannot find reader for: " + this.resource);

@@ -24,7 +24,7 @@ public class DataObjectDirectoryReader extends
   public DataObjectDirectoryReader() {
   }
 
-  protected void addMetaData(final DataObjectReader reader) {
+  protected void addMetaData(final RecordReader reader) {
     final RecordDefinition metaData = reader.getMetaData();
     if (metaData != null) {
       final String path = metaData.getPath();
@@ -37,9 +37,9 @@ public class DataObjectDirectoryReader extends
     final IoFactoryRegistry registry = IoFactoryRegistry.getInstance();
     final String filename = resource.getFilename();
     final String extension = FileUtil.getFileNameExtension(filename);
-    final DataObjectReaderFactory factory = registry.getFactoryByFileExtension(
-      DataObjectReaderFactory.class, extension);
-    final DataObjectReader reader = factory.createDataObjectReader(resource);
+    final RecordReaderFactory factory = registry.getFactoryByFileExtension(
+      RecordReaderFactory.class, extension);
+    final RecordReader reader = factory.createRecordReader(resource);
     addMetaData(reader);
     return reader;
   }

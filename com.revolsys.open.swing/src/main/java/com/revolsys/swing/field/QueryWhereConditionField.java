@@ -91,7 +91,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.component.AttributeTitleStringConveter;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
@@ -177,12 +177,12 @@ public class QueryWhereConditionField extends ValueField implements
 
   private final Condition originalFilter;
 
-  public QueryWhereConditionField(final AbstractDataObjectLayer layer,
+  public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final Condition filter) {
     this(layer, listener, filter, null);
   }
 
-  public QueryWhereConditionField(final AbstractDataObjectLayer layer,
+  public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final Condition filter,
     final String query) {
     super(new BorderLayout());
@@ -324,7 +324,7 @@ public class QueryWhereConditionField extends ValueField implements
     }
   }
 
-  public QueryWhereConditionField(final AbstractDataObjectLayer layer,
+  public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final String query) {
     this(layer, listener, null, query);
   }

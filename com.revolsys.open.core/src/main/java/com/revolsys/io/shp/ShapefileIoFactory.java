@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.AbstractDataObjectAndGeometryIoFactory;
 import com.revolsys.data.io.DataObjectIteratorReader;
-import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.io.DataObjectStore;
 import com.revolsys.data.io.DataObjectStoreFactory;
 import com.revolsys.data.record.Record;
@@ -32,7 +32,7 @@ public class ShapefileIoFactory extends AbstractDataObjectAndGeometryIoFactory
   }
 
   @Override
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public RecordReader createRecordReader(final Resource resource,
     final RecordFactory dataObjectFactory) {
     try {
       final ShapefileIterator iterator = new ShapefileIterator(resource,

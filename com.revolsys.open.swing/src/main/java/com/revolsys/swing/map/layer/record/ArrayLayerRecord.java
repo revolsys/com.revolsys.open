@@ -21,19 +21,19 @@ import com.revolsys.util.Property;
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private static final long serialVersionUID = 1L;
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
   private Map<String, Object> originalValues;
 
   private Reference<Identifier> identifier = new WeakReference<>(null);
 
-  public ArrayLayerRecord(final AbstractDataObjectLayer layer) {
+  public ArrayLayerRecord(final AbstractRecordLayer layer) {
     super(layer.getMetaData());
     this.layer = layer;
   }
 
-  public ArrayLayerRecord(final AbstractDataObjectLayer layer,
-    final Map<String, Object> values) {
+  public ArrayLayerRecord(final AbstractRecordLayer layer,
+    final Map<String, ? extends Object> values) {
     super(layer.getMetaData());
     setState(RecordState.Initalizing);
     setValues(values);
@@ -70,7 +70,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public void firePropertyChange(final String attributeName,
     final Object oldValue, final Object newValue) {
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
       final PropertyChangeEvent event = new PropertyChangeEvent(this,
         attributeName, oldValue, newValue);
@@ -89,7 +89,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public AbstractDataObjectLayer getLayer() {
+  public AbstractRecordLayer getLayer() {
     return this.layer;
   }
 
@@ -153,7 +153,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     } else if (this == record) {
       return true;
     } else {
-      final AbstractDataObjectLayer layer = getLayer();
+      final AbstractRecordLayer layer = getLayer();
       if (layer.isLayerRecord(record)) {
         final Identifier id = getIdentifier();
         final Identifier otherId = record.getIdentifier();
@@ -199,13 +199,16 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
+  public void postSaveChanges() {
+  }
+
+  @Override
   public LayerRecord revertChanges() {
     if (this.originalValues != null || getState() == RecordState.Deleted) {
       cancelChanges();
-      final AbstractDataObjectLayer layer = getLayer();
+      final AbstractRecordLayer layer = getLayer();
       layer.revertChanges(this);
-      firePropertyChange("state", RecordState.Modified,
-        RecordState.Persisted);
+      firePropertyChange("state", RecordState.Modified, RecordState.Persisted);
     }
     return this;
   }
@@ -232,7 +235,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
     final Object oldValue = getValue(index);
     if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
-      final AbstractDataObjectLayer layer = getLayer();
+      final AbstractRecordLayer layer = getLayer();
       final RecordState state = getState();
       if (RecordState.Initalizing.equals(state)) {
         // Allow modification on initialization

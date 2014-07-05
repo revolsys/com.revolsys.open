@@ -22,8 +22,8 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.AbstractIdentifier;
-import com.revolsys.data.identifier.ListIdentifier;
 import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.identifier.ListIdentifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -34,7 +34,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractRecord extends AbstractMap<String, Object>
-  implements Record, Cloneable {
+implements Record, Cloneable {
 
   /**
    * Create a clone of the object.
@@ -181,8 +181,13 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T getGeometryValue() {
-    final int index = this.getMetaData().getGeometryAttributeIndex();
-    return (T)getValue(index);
+    final RecordDefinition metaData = getMetaData();
+    if (metaData == null) {
+      return null;
+    } else {
+      final int index = metaData.getGeometryAttributeIndex();
+      return (T)getValue(index);
+    }
   }
 
   @Override
@@ -551,15 +556,6 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
     }
   }
 
-  @Override
-  public <T> T setValueByPath(final CharSequence attributePath,
-    final Record source, final String sourceAttributePath) {
-    @SuppressWarnings("unchecked")
-    final T value = (T)source.getValueByPath(sourceAttributePath);
-    setValueByPath(attributePath, value);
-    return value;
-  }
-
   @SuppressWarnings("rawtypes")
   @Override
   public void setValueByPath(final CharSequence path, final Object value) {
@@ -616,6 +612,27 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
+  public <T> T setValueByPath(final CharSequence attributePath,
+    final Record source, final String sourceAttributePath) {
+    @SuppressWarnings("unchecked")
+    final T value = (T)source.getValueByPath(sourceAttributePath);
+    setValueByPath(attributePath, value);
+    return value;
+  }
+
+  @Override
+  public void setValues(final Map<String, ? extends Object> values) {
+    if (values != null) {
+      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
+          values).entrySet()) {
+        final String name = defaultValue.getKey();
+        final Object value = defaultValue.getValue();
+        setValue(name, value);
+      }
+    }
+  }
+
+  @Override
   public void setValues(final Record object) {
     for (final String name : this.getMetaData().getAttributeNames()) {
       final Object value = JavaBeanUtil.clone(object.getValue(name));
@@ -633,18 +650,6 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
       if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
         newValue = JavaBeanUtil.clone(newValue);
         setValue(attributeName, newValue);
-      }
-    }
-  }
-
-  @Override
-  public void setValues(final Map<String, ? extends Object> values) {
-    if (values != null) {
-      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-          values).entrySet()) {
-        final String name = defaultValue.getKey();
-        final Object value = defaultValue.getValue();
-        setValue(name, value);
       }
     }
   }

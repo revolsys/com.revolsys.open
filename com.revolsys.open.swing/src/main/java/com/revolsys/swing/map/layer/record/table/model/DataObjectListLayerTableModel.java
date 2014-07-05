@@ -15,7 +15,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.listener.InvokeMethodListener;
-import com.revolsys.swing.map.layer.record.DataObjectListLayer;
+import com.revolsys.swing.map.layer.record.ListRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.DataObjectLayerTable;
 import com.revolsys.util.Property;
@@ -24,7 +24,7 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
   implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  public static DataObjectLayerTable createTable(final DataObjectListLayer layer) {
+  public static DataObjectLayerTable createTable(final ListRecordLayer layer) {
     final DataObjectLayerTableModel model = new DataObjectListLayerTableModel(
       layer);
     final DataObjectLayerTable table = new DataObjectLayerTable(model);
@@ -35,17 +35,17 @@ public class DataObjectListLayerTableModel extends DataObjectLayerTableModel
     return table;
   }
 
-  private DataObjectListLayer layer;
+  private ListRecordLayer layer;
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
 
   private List<LayerRecord> records = Collections.emptyList();
 
-  public DataObjectListLayerTableModel(final DataObjectListLayer layer) {
+  public DataObjectListLayerTableModel(final ListRecordLayer layer) {
     this(layer, layer.getMetaData().getAttributeNames());
   }
 
-  public DataObjectListLayerTableModel(final DataObjectListLayer layer,
+  public DataObjectListLayerTableModel(final ListRecordLayer layer,
     final List<String> columnNames) {
     super(layer, columnNames);
     this.layer = layer;

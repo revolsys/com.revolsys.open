@@ -11,18 +11,18 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
 
-public interface DataObjectReaderFactory extends IoFactory {
+public interface RecordReaderFactory extends IoFactory {
 
-  DataObjectReader createDataObjectReader(Resource resource);
+  RecordReader createRecordReader(Resource resource);
 
-  DataObjectReader createDataObjectReader(Resource resource,
+  RecordReader createRecordReader(Resource resource,
     RecordFactory factory);
 
-  Reader<Record> createDirectoryDataObjectReader();
+  Reader<Record> createDirectoryRecordReader();
 
-  Reader<Record> createDirectoryDataObjectReader(File file);
+  Reader<Record> createDirectoryRecordReader(File file);
 
-  Reader<Record> createDirectoryDataObjectReader(File file,
+  Reader<Record> createDirectoryRecordReader(File file,
     RecordFactory factory);
 
   Set<CoordinateSystem> getCoordinateSystems();

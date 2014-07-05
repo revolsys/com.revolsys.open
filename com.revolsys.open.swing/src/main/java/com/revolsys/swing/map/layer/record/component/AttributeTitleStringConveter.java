@@ -10,15 +10,15 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.schema.Attribute;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 
 public class AttributeTitleStringConveter extends ObjectToStringConverter
   implements ListCellRenderer {
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
-  public AttributeTitleStringConveter(final AbstractDataObjectLayer layer) {
+  public AttributeTitleStringConveter(final AbstractRecordLayer layer) {
     this.layer = layer;
   }
 

@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.AbstractDataObjectIoFactory;
 import com.revolsys.data.io.DataObjectIteratorReader;
-import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.io.DataObjectStore;
 import com.revolsys.data.io.DataObjectStoreFactory;
 import com.revolsys.data.record.Record;
@@ -30,7 +30,7 @@ public class CsvDataObjectIoFactory extends AbstractDataObjectIoFactory
   }
 
   @Override
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public RecordReader createRecordReader(final Resource resource,
     final RecordFactory dataObjectFactory) {
     final CsvDataObjectIterator iterator = new CsvDataObjectIterator(resource,
       dataObjectFactory);

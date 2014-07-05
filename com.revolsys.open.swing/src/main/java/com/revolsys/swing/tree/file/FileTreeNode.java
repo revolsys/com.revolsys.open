@@ -18,8 +18,8 @@ import javax.swing.tree.TreeNode;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.AbstractDataObjectReaderFactory;
-import com.revolsys.data.io.DataObjectReaderFactory;
+import com.revolsys.data.io.AbstractRecordReaderFactory;
+import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.io.DataObjectStoreFactoryRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
@@ -237,7 +237,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final String fileNameExtension = FileUtil.getFileNameExtension(file);
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     return ioFactoryRegistry.isFileExtensionSupported(
-      DataObjectReaderFactory.class, fileNameExtension);
+      RecordReaderFactory.class, fileNameExtension);
   }
 
   public FileTreeNode(final TreeNode parent, final File file) {
@@ -334,7 +334,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final String fileName = FileUtil.getFileName(file);
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(fileName)) {
       return true;
-    } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(fileName)) {
+    } else if (AbstractRecordReaderFactory.hasDataObjectReaderFactory(fileName)) {
       return true;
     } else {
       return false;

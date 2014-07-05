@@ -17,7 +17,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractDataObjectIoFactory extends
-  AbstractDataObjectReaderFactory implements DataObjectWriterFactory {
+  AbstractRecordReaderFactory implements DataObjectWriterFactory {
 
   public static Writer<Record> dataObjectWriter(
     final RecordDefinition metaData, final Resource resource) {

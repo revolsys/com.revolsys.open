@@ -9,7 +9,7 @@ public interface LayerRecord extends Record {
 
   void firePropertyChange(String propertyName, Object oldValue, Object newValue);
 
-  AbstractDataObjectLayer getLayer();
+  AbstractRecordLayer getLayer();
 
   <T> T getOriginalValue(String attributeName);
 
@@ -24,6 +24,8 @@ public interface LayerRecord extends Record {
   boolean isModified(String name);
 
   boolean isSame(Record record);
+
+  void postSaveChanges();
 
   LayerRecord revertChanges();
 

@@ -70,8 +70,8 @@ import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapApiLayer;
 import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
-import com.revolsys.swing.map.layer.record.DataObjectFileLayer;
-import com.revolsys.swing.map.layer.record.DataObjectStoreLayer;
+import com.revolsys.swing.map.layer.record.FileRecordLayer;
+import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.menu.MenuFactory;
@@ -125,12 +125,12 @@ public class ProjectFrame extends BaseFrame {
 
     // TODO move to a file config
     MapObjectFactoryRegistry.addFactory(LayerGroup.FACTORY);
-    MapObjectFactoryRegistry.addFactory(DataObjectStoreLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(RecordStoreLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(ArcGisServerRestLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(BingLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(OpenStreetMapLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(OpenStreetMapApiLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(DataObjectFileLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(FileRecordLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(GridLayer.FACTORY);
     MapObjectFactoryRegistry.addFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
     MapObjectFactoryRegistry.addFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);

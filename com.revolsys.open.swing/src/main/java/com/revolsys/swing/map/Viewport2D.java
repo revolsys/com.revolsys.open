@@ -33,7 +33,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
@@ -433,7 +433,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     }
   }
 
-  public boolean isHidden(final AbstractDataObjectLayer layer,
+  public boolean isHidden(final AbstractRecordLayer layer,
     final LayerRecord record) {
     return layer.isHidden(record);
   }

@@ -88,14 +88,14 @@ public class FileGdbWriter extends AbstractWriter<Record> {
     return table;
   }
 
-  private void insert(final Record object) {
-    final RecordDefinition sourceMetaData = object.getMetaData();
+  private void insert(final Record record) {
+    final RecordDefinition sourceMetaData = record.getMetaData();
     final RecordDefinition metaData = dataStore.getMetaData(sourceMetaData);
     final String typePath = sourceMetaData.getPath();
     for (final Attribute attribute : metaData.getAttributes()) {
       final String name = attribute.getName();
       if (attribute.isRequired()) {
-        final Object value = object.getValue(name);
+        final Object value = record.getValue(name);
         if (value == null && !(attribute instanceof OidAttribute)) {
           throw new IllegalArgumentException("Atribute " + typePath + "."
             + name + " is required");
@@ -109,29 +109,29 @@ public class FileGdbWriter extends AbstractWriter<Record> {
         final List<Object> values = new ArrayList<Object>();
         for (final Attribute attribute : metaData.getAttributes()) {
           final String name = attribute.getName();
-          final Object value = object.getValue(name);
+          final Object value = record.getValue(name);
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          final Object esriValue = esriAttribute.setInsertValue(object, row,
+          final Object esriValue = esriAttribute.setInsertValue(record, row,
             value);
           values.add(esriValue);
         }
         dataStore.insertRow(table, row);
         for (final Attribute attribute : metaData.getAttributes()) {
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-          esriAttribute.setPostInsertValue(object, row);
+          esriAttribute.setPostInsertValue(record, row);
         }
-        object.setState(RecordState.Persisted);
+        record.setState(RecordState.Persisted);
       } finally {
         dataStore.closeRow(row);
-        dataStore.addStatistic("Insert", object);
+        dataStore.addStatistic("Insert", record);
       }
     } catch (final IllegalArgumentException e) {
       throw new RuntimeException("Unable to insert row " + e.getMessage()
-        + "\n" + object.toString(), e);
+        + "\n" + record.toString(), e);
     } catch (final RuntimeException e) {
       if (LoggerFactory.getLogger(FileGdbWriter.class).isDebugEnabled()) {
         LoggerFactory.getLogger(FileGdbWriter.class).debug(
-          "Unable to insert row \n:" + object.toString());
+          "Unable to insert row \n:" + record.toString());
       }
       throw new RuntimeException("Unable to insert row", e);
     }

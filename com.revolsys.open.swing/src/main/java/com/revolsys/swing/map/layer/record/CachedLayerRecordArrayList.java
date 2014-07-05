@@ -10,16 +10,16 @@ public class CachedLayerRecordArrayList extends ArrayList<LayerRecord> {
 
   private static final AtomicInteger COUNT = new AtomicInteger();
 
-  private final Label cacheId = new Label("list_" + COUNT);
+  private final Label cacheId = new Label("list_" + COUNT.incrementAndGet());
 
-  private final DataObjectStoreLayer layer;
+  private final RecordStoreLayer layer;
 
-  public CachedLayerRecordArrayList(final DataObjectStoreLayer layer) {
+  public CachedLayerRecordArrayList(final RecordStoreLayer layer) {
     super();
     this.layer = layer;
   }
 
-  public CachedLayerRecordArrayList(final DataObjectStoreLayer layer,
+  public CachedLayerRecordArrayList(final RecordStoreLayer layer,
     final Collection<? extends LayerRecord> collection) {
     super(collection);
     this.layer = layer;
@@ -94,7 +94,7 @@ public class CachedLayerRecordArrayList extends ArrayList<LayerRecord> {
   }
 
   private void updateCache() {
-    this.layer.setRecordsToCache(this.cacheId, this);
+    // this.layer.setRecordsToCache(this.cacheId, this);
   }
 
 }

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.algorithm.index.DataObjectQuadTree;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
@@ -15,23 +14,20 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.layer.geonames.GeoNamesService;
-import com.revolsys.swing.map.layer.record.DataObjectBoundingBoxLayer;
+import com.revolsys.swing.map.layer.record.BoundingBoxRecordLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class WikipediaBoundingBoxLayerWorker extends
-  AbstractSwingWorker<DataObjectQuadTree, Void> {
+  AbstractSwingWorker<List<LayerRecord>, Void> {
 
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "wikipedia", "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class,
-    "create");
-
-  public static DataObjectBoundingBoxLayer create(
+  public static BoundingBoxRecordLayer create(
     final Map<String, Object> properties) {
     final GeometryFactory wgs84 = GeometryFactory.floating3(4326);
-    final DataObjectBoundingBoxLayer layer1 = new DataObjectBoundingBoxLayer(
+    final BoundingBoxRecordLayer layer1 = new BoundingBoxRecordLayer(
       "wikipedia", "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class,
       wgs84);
 
@@ -40,12 +36,16 @@ public class WikipediaBoundingBoxLayerWorker extends
     final MarkerStyle style = new MarkerStyle();
     style.setMarker(marker);
     layer1.setRenderer(new MarkerStyleRenderer(layer1, style));
-    final DataObjectBoundingBoxLayer layer = layer1;
+    final BoundingBoxRecordLayer layer = layer1;
     layer.setProperties(properties);
     return layer;
   }
 
-  private final DataObjectBoundingBoxLayer layer;
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "wikipedia", "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class,
+    "create");
+
+  private final BoundingBoxRecordLayer layer;
 
   private final BoundingBox boundingBox;
 
@@ -53,15 +53,15 @@ public class WikipediaBoundingBoxLayerWorker extends
 
   private final GeometryFactory geometryFactory;
 
-  public WikipediaBoundingBoxLayerWorker(
-    final DataObjectBoundingBoxLayer layer, final BoundingBox boundingBox) {
+  public WikipediaBoundingBoxLayerWorker(final BoundingBoxRecordLayer layer,
+    final BoundingBox boundingBox) {
     this.layer = layer;
     this.boundingBox = boundingBox;
     this.geometryFactory = boundingBox.getGeometryFactory();
   }
 
   @Override
-  protected DataObjectQuadTree doInBackground() throws Exception {
+  protected List<LayerRecord> doInBackground() throws Exception {
     BoundingBox boundingBox = this.boundingBox;
     GeometryFactory geometryFactory = this.geometryFactory;
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -71,12 +71,12 @@ public class WikipediaBoundingBoxLayerWorker extends
         .getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
     }
-    final List<Record> results = this.geoNamesService.getWikipediaArticles(boundingBox);
-    for (final Record dataObject : results) {
-      final String title = dataObject.getValue("title");
-      final String wikipediaUrl = dataObject.getValue("wikipediaUrl");
-      final String thumbnailImage = dataObject.getValue("thumbnailImg");
-      final Point point = dataObject.getGeometryValue();
+    final List<LayerRecord> results = (List)this.geoNamesService.getWikipediaArticles(boundingBox);
+    for (final Record record : results) {
+      final String title = record.getValue("title");
+      final String wikipediaUrl = record.getValue("wikipediaUrl");
+      final String thumbnailImage = record.getValue("thumbnailImg");
+      final Point point = record.getGeometryValue();
       String text;
       if (thumbnailImage != null) {
         text = "<html><b>" + title + "</b><br /><img src=\"" + thumbnailImage
@@ -92,8 +92,7 @@ public class WikipediaBoundingBoxLayerWorker extends
       // + wikipediaUrl);
       // }
     }
-    final DataObjectQuadTree index = new DataObjectQuadTree(results);
-    return index;
+    return results;
   }
 
   @Override
@@ -104,10 +103,10 @@ public class WikipediaBoundingBoxLayerWorker extends
   @Override
   protected void uiTask() {
     try {
-      final DataObjectQuadTree index = get();
-      this.layer.setIndex(this.boundingBox, index);
+      final List<LayerRecord> records = get();
+      this.layer.setIndexRecords(this.boundingBox, records);
     } catch (final Throwable e) {
-      this.layer.setIndex(this.boundingBox, null);
+      this.layer.setIndexRecords(this.boundingBox, null);
     }
   }
 }

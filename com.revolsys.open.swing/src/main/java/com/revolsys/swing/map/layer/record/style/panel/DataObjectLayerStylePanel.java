@@ -20,7 +20,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.tree.BaseLayerRendererTreeNodeModel;
 import com.revolsys.swing.map.tree.MultipleLayerRendererTreeNodeModel;
 import com.revolsys.swing.tree.ObjectTree;
@@ -38,13 +38,13 @@ MouseListener, PropertyChangeListener {
 
   private final ObjectTree tree;
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
   private final LayerRenderer<? extends Layer> renderer;
 
   private final List<LayerRenderer<? extends Layer>> renderers = new PropertyChangeArrayList<LayerRenderer<? extends Layer>>();
 
-  public DataObjectLayerStylePanel(final AbstractDataObjectLayer layer) {
+  public DataObjectLayerStylePanel(final AbstractRecordLayer layer) {
     this.layer = layer;
     setLayout(new BorderLayout());
     final JLabel instructions = new JLabel(

@@ -21,11 +21,11 @@ public class SqlLayerFilter implements Filter<Record>, MapSerializer {
 
   private Condition condition;
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
   private boolean initialized;
 
-  public SqlLayerFilter(final AbstractDataObjectLayer layer, final String query) {
+  public SqlLayerFilter(final AbstractRecordLayer layer, final String query) {
     this.layer = layer;
     this.query = query;
   }

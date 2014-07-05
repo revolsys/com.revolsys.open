@@ -9,8 +9,8 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.swing.map.form.DataObjectLayerForm;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.form.LayerRecordForm;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.dataobject.model.AbstractSingleDataObjectTableModel;
 import com.revolsys.util.Property;
@@ -22,15 +22,15 @@ public class DataObjectLayerAttributesTableModel extends
 
   private LayerRecord object;
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
-  private final Reference<DataObjectLayerForm> form;
+  private final Reference<LayerRecordForm> form;
 
-  public DataObjectLayerAttributesTableModel(final DataObjectLayerForm form) {
+  public DataObjectLayerAttributesTableModel(final LayerRecordForm form) {
     super(form.getMetaData(), true);
     this.form = new WeakReference<>(form);
     this.layer = form.getLayer();
-    this.object = form.getObject();
+    this.object = form.getRecord();
     Property.addListener(this.layer, this);
   }
 

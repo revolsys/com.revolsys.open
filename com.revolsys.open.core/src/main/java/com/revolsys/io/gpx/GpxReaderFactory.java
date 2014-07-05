@@ -7,7 +7,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.io.AbstractDataObjectAndGeometryReaderFactory;
 import com.revolsys.data.io.DataObjectIterator;
 import com.revolsys.data.io.DataObjectIteratorReader;
-import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 
@@ -20,7 +20,7 @@ public class GpxReaderFactory extends
     setCustomAttributionSupported(false);
   }
 
-  public DataObjectReader createDataObjectReader(
+  public RecordReader createRecordReader(
     final RecordDefinition metaData, final Resource resource,
     final RecordFactory factory) {
     throw new UnsupportedOperationException();
@@ -34,7 +34,7 @@ public class GpxReaderFactory extends
    * @return The reader for the file.
    */
   @Override
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public RecordReader createRecordReader(final Resource resource,
     final RecordFactory dataObjectFactory) {
     try {
       final DataObjectIterator iterator = new GpxIterator(resource,

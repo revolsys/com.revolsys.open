@@ -16,36 +16,36 @@ import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;
 
 public abstract class AbstractDataObjectAndGeometryReaderFactory extends
-  AbstractGeometryReaderFactory implements DataObjectReaderFactory,
+  AbstractGeometryReaderFactory implements RecordReaderFactory,
   MapReaderFactory {
 
-  public static DataObjectReader dataObjectReader(
+  public static RecordReader recordReader(
     final FileSystemResource resource, final RecordFactory factory) {
-    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    final RecordReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
-      final DataObjectReader reader = readerFactory.createDataObjectReader(
+      final RecordReader reader = readerFactory.createRecordReader(
         resource, factory);
       return reader;
     }
   }
 
-  public static DataObjectReader dataObjectReader(final Resource resource) {
-    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+  public static RecordReader recordReader(final Resource resource) {
+    final RecordReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
-      final DataObjectReader reader = readerFactory.createDataObjectReader(resource);
+      final RecordReader reader = readerFactory.createRecordReader(resource);
       return reader;
     }
   }
 
-  public static DataObjectReaderFactory getDataObjectReaderFactory(
+  public static RecordReaderFactory getDataObjectReaderFactory(
     final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
-      DataObjectReaderFactory.class, resource);
+    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
+      RecordReaderFactory.class, resource);
     return readerFactory;
   }
 
@@ -68,8 +68,8 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * @return The reader for the file.
    */
   @Override
-  public DataObjectReader createDataObjectReader(final Resource resource) {
-    return createDataObjectReader(resource, dataObjectFactory);
+  public RecordReader createRecordReader(final Resource resource) {
+    return createRecordReader(resource, dataObjectFactory);
 
   }
 
@@ -79,7 +79,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * @return The reader.
    */
   @Override
-  public Reader<Record> createDirectoryDataObjectReader() {
+  public Reader<Record> createDirectoryRecordReader() {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     return directoryReader;
@@ -93,8 +93,8 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * @return The reader for the file.
    */
   @Override
-  public Reader<Record> createDirectoryDataObjectReader(final File directory) {
-    return createDirectoryDataObjectReader(directory, dataObjectFactory);
+  public Reader<Record> createDirectoryRecordReader(final File directory) {
+    return createDirectoryRecordReader(directory, dataObjectFactory);
   }
 
   /**
@@ -106,7 +106,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
    * @return The reader for the file.
    */
   @Override
-  public Reader<Record> createDirectoryDataObjectReader(
+  public Reader<Record> createDirectoryRecordReader(
     final File directory, final RecordFactory dataObjectFactory) {
     final DataObjectDirectoryReader directoryReader = new DataObjectDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
@@ -116,7 +116,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
 
   @Override
   public GeometryReader createGeometryReader(final Resource resource) {
-    final Reader<Record> dataObjectReader = createDataObjectReader(resource);
+    final Reader<Record> dataObjectReader = createRecordReader(resource);
     final Iterator<Record> dataObjectIterator = dataObjectReader.iterator();
     final DataObjectGeometryIterator iterator = new DataObjectGeometryIterator(
       dataObjectIterator);
@@ -129,7 +129,7 @@ public abstract class AbstractDataObjectAndGeometryReaderFactory extends
   })
   @Override
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
-    final Reader reader = createDataObjectReader(resource);
+    final Reader reader = createRecordReader(resource);
     return reader;
   }
 

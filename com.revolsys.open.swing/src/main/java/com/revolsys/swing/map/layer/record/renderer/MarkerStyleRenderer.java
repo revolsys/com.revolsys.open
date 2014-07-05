@@ -24,7 +24,7 @@ import com.revolsys.math.Angle;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
@@ -314,26 +314,26 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private MarkerStyle style;
 
-  public MarkerStyleRenderer(final AbstractDataObjectLayer layer,
+  public MarkerStyleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, new MarkerStyle());
   }
 
-  public MarkerStyleRenderer(final AbstractDataObjectLayer layer,
+  public MarkerStyleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
     super("markerStyle", "Marker Style", layer, parent, geometryStyle);
     this.style = new MarkerStyle(geometryStyle);
     setIcon(ICON);
   }
 
-  public MarkerStyleRenderer(final AbstractDataObjectLayer layer,
+  public MarkerStyleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent, final MarkerStyle style) {
     super("markerStyle", "Marker Style", layer, parent);
     this.style = style;
     setIcon(ICON);
   }
 
-  public MarkerStyleRenderer(final AbstractDataObjectLayer layer,
+  public MarkerStyleRenderer(final AbstractRecordLayer layer,
     final MarkerStyle style) {
     this(layer, null, style);
   }
@@ -367,7 +367,7 @@ public class MarkerStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer,
     final LayerRecord object) {
     if (isVisible(object)) {
       final Geometry geometry = object.getGeometryValue();

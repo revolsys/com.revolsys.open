@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.DefaultListSelectionModel;
 
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class DataObjectLayerHighlightedListSelectionModel extends
@@ -24,7 +24,7 @@ public class DataObjectLayerHighlightedListSelectionModel extends
     super.addSelectionInterval(convertRowIndexToModel(index0),
       convertRowIndexToModel(index1));
     final List<LayerRecord> records = getObjects(index0, index1);
-    final AbstractDataObjectLayer layer = this.model.getLayer();
+    final AbstractRecordLayer layer = this.model.getLayer();
     layer.addHighlightedRecords(records);
   }
 
@@ -47,7 +47,7 @@ public class DataObjectLayerHighlightedListSelectionModel extends
     final int rowIndex = convertRowIndexToModel(index);
     final LayerRecord record = this.model.getRecord(rowIndex);
     if (record != null) {
-      final AbstractDataObjectLayer layer = this.model.getLayer();
+      final AbstractRecordLayer layer = this.model.getLayer();
       return layer.isHighlighted(record);
     }
     return false;
@@ -55,7 +55,7 @@ public class DataObjectLayerHighlightedListSelectionModel extends
 
   @Override
   public boolean isSelectionEmpty() {
-    final AbstractDataObjectLayer layer = this.model.getLayer();
+    final AbstractRecordLayer layer = this.model.getLayer();
 
     return layer.getHighlightedCount() == 0;
   }
@@ -65,14 +65,14 @@ public class DataObjectLayerHighlightedListSelectionModel extends
     super.removeSelectionInterval(convertRowIndexToModel(index0),
       convertRowIndexToModel(index1));
     final List<LayerRecord> records = getObjects(index0, index1);
-    final AbstractDataObjectLayer layer = this.model.getLayer();
+    final AbstractRecordLayer layer = this.model.getLayer();
     layer.unHighlightRecords(records);
   }
 
   @Override
   public void setSelectionInterval(final int index0, final int index1) {
     final List<LayerRecord> records = getObjects(index0, index1);
-    final AbstractDataObjectLayer layer = this.model.getLayer();
+    final AbstractRecordLayer layer = this.model.getLayer();
     layer.setHighlightedRecords(records);
     super.setSelectionInterval(convertRowIndexToModel(index0),
       convertRowIndexToModel(index1));

@@ -41,7 +41,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
@@ -360,12 +360,12 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private TextStyle style;
 
-  public TextStyleRenderer(final AbstractDataObjectLayer layer,
+  public TextStyleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public TextStyleRenderer(final AbstractDataObjectLayer layer,
+  public TextStyleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> textStyle) {
     super("textStyle", "Text Style", layer, parent, textStyle);
     this.style = new TextStyle(textStyle);
@@ -390,7 +390,7 @@ public class TextStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer,
     final LayerRecord object) {
     final Geometry geometry = object.getGeometryValue();
     viewport.drawText(object, geometry, this.style);

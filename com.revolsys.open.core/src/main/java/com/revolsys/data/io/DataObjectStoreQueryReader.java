@@ -20,7 +20,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 
 public class DataObjectStoreQueryReader extends IteratorReader<Record>
-  implements DataObjectReader {
+  implements RecordReader {
 
   private AbstractDataObjectStore dataStore;
 

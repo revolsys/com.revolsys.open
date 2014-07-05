@@ -22,8 +22,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.data.io.DataObjectReader;
-import com.revolsys.data.io.DataObjectReaderFactory;
+import com.revolsys.data.io.RecordReader;
+import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.io.DataObjectWriterFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -39,7 +39,7 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.jts.geom.Geometry;
 
 public class DataObjectReaderHttpMessageConverter extends
-  AbstractHttpMessageConverter<DataObjectReader> {
+  AbstractHttpMessageConverter<RecordReader> {
 
   private List<String> requestAttributeNames = Arrays.asList(
     IoConstants.SINGLE_OBJECT_PROPERTY, Kml22Constants.STYLE_URL_PROPERTY,
@@ -54,8 +54,8 @@ public class DataObjectReaderHttpMessageConverter extends
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public DataObjectReaderHttpMessageConverter() {
-    super(DataObjectReader.class, IoFactoryRegistry.getInstance()
-      .getMediaTypes(DataObjectReaderFactory.class),
+    super(RecordReader.class, IoFactoryRegistry.getInstance()
+      .getMediaTypes(RecordReaderFactory.class),
       IoFactoryRegistry.getInstance().getMediaTypes(
         DataObjectWriterFactory.class));
   }
@@ -69,7 +69,7 @@ public class DataObjectReaderHttpMessageConverter extends
   }
 
   @Override
-  public DataObjectReader read(final Class<? extends DataObjectReader> clazz,
+  public RecordReader read(final Class<? extends RecordReader> clazz,
     final HttpInputMessage inputMessage) throws IOException,
     HttpMessageNotReadableException {
     try {
@@ -82,13 +82,13 @@ public class DataObjectReaderHttpMessageConverter extends
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
         + mediaType.getSubtype();
-      final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByMediaType(
-        DataObjectReaderFactory.class, mediaTypeString);
+      final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByMediaType(
+        RecordReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format"
           + mediaType);
       } else {
-        final Reader<Record> reader = readerFactory.createDataObjectReader(new InputStreamResource(
+        final Reader<Record> reader = readerFactory.createRecordReader(new InputStreamResource(
           "dataObjectInput", body));
 
         GeometryFactory factory = geometryFactory;
@@ -98,7 +98,7 @@ public class DataObjectReaderHttpMessageConverter extends
           factory = GeometryFactory.floating3(Integer.parseInt(srid));
         }
         reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
-        return (DataObjectReader)reader;
+        return (RecordReader)reader;
       }
     } catch (final IOException e) {
       throw new HttpMessageNotReadableException("Error reading data", e);
@@ -114,7 +114,7 @@ public class DataObjectReaderHttpMessageConverter extends
   }
 
   @Override
-  public void write(final DataObjectReader reader, final MediaType mediaType,
+  public void write(final RecordReader reader, final MediaType mediaType,
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {

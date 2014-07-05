@@ -52,7 +52,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
@@ -137,7 +137,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   /** Index to the part of the addGeometry that new points should be added too. */
   private int[] addGeometryPartIndex = {};
 
-  private AbstractDataObjectLayer addLayer;
+  private AbstractRecordLayer addLayer;
 
   private boolean dragged = false;
 
@@ -180,7 +180,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
    * 
    * @param addLayer 
    */
-  public void addRecord(final AbstractDataObjectLayer layer,
+  public void addRecord(final AbstractRecordLayer layer,
     final AddGeometryCompleteAction addCompleteAction) {
     if (layer != null) {
       final RecordDefinition metaData = layer.getMetaData();
@@ -222,8 +222,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
         addRecords(results, childGroup, boundingBox);
-      } else if (layer instanceof AbstractDataObjectLayer) {
-        final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
+      } else if (layer instanceof AbstractRecordLayer) {
+        final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
         if (dataObjectLayer.isSelectable(scale)) {
           final List<LayerRecord> selectedRecords = dataObjectLayer.getSelectedRecords();
           for (final LayerRecord selectedRecord : selectedRecords) {
@@ -244,8 +244,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
         addSelectedObjects(objects, childGroup, boundingBox);
-      } else if (layer instanceof AbstractDataObjectLayer) {
-        final AbstractDataObjectLayer dataObjectLayer = (AbstractDataObjectLayer)layer;
+      } else if (layer instanceof AbstractRecordLayer) {
+        final AbstractRecordLayer dataObjectLayer = (AbstractRecordLayer)layer;
         if (dataObjectLayer.isEditable(scale)) {
           final List<LayerRecord> selectedObjects = dataObjectLayer.getSelectedRecords(boundingBox);
           objects.addAll(selectedObjects);
@@ -254,8 +254,8 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     }
   }
 
-  protected boolean addSnapLayers(final Set<AbstractDataObjectLayer> layers,
-    final Project project, final AbstractDataObjectLayer layer,
+  protected boolean addSnapLayers(final Set<AbstractRecordLayer> layers,
+    final Project project, final AbstractRecordLayer layer,
     final double scale) {
     if (layer != null) {
       if (layer.isSnapToAllLayers()) {
@@ -266,9 +266,9 @@ public class EditGeometryOverlay extends AbstractOverlay implements
         if (layerPaths != null) {
           for (final String layerPath : layerPaths) {
             final Layer snapLayer = project.getLayer(layerPath);
-            if (snapLayer instanceof AbstractDataObjectLayer) {
+            if (snapLayer instanceof AbstractRecordLayer) {
               if (snapLayer.isVisible(scale)) {
-                layers.add((AbstractDataObjectLayer)snapLayer);
+                layers.add((AbstractRecordLayer)snapLayer);
               }
             }
           }
@@ -381,7 +381,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return this.addGeometryPartDataType;
   }
 
-  public AbstractDataObjectLayer getAddLayer() {
+  public AbstractRecordLayer getAddLayer() {
     return this.addLayer;
   }
 
@@ -463,25 +463,25 @@ public class EditGeometryOverlay extends AbstractOverlay implements
   }
 
   @Override
-  protected List<AbstractDataObjectLayer> getSnapLayers() {
+  protected List<AbstractRecordLayer> getSnapLayers() {
     final Project project = getProject();
     final double scale = MapPanel.get(project).getScale();
-    final Set<AbstractDataObjectLayer> layers = new LinkedHashSet<AbstractDataObjectLayer>();
+    final Set<AbstractRecordLayer> layers = new LinkedHashSet<AbstractRecordLayer>();
     boolean snapAll = false;
     if (isModeAddGeometry()) {
       snapAll = addSnapLayers(layers, project, this.addLayer, scale);
     } else {
       for (final CloseLocation location : getMouseOverLocations()) {
-        final AbstractDataObjectLayer layer = location.getLayer();
+        final AbstractRecordLayer layer = location.getLayer();
         snapAll |= addSnapLayers(layers, project, layer, scale);
       }
     }
     if (snapAll) {
-      final List<AbstractDataObjectLayer> visibleDescendants = project.getVisibleDescendants(
-        AbstractDataObjectLayer.class, scale);
+      final List<AbstractRecordLayer> visibleDescendants = project.getVisibleDescendants(
+        AbstractRecordLayer.class, scale);
       return visibleDescendants;
     }
-    return new ArrayList<AbstractDataObjectLayer>(layers);
+    return new ArrayList<AbstractRecordLayer>(layers);
   }
 
   protected Geometry getVertexGeometry(final MouseEvent event,
@@ -532,7 +532,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
     return null;
   }
 
-  protected boolean isEditable(final AbstractDataObjectLayer dataObjectLayer) {
+  protected boolean isEditable(final AbstractRecordLayer dataObjectLayer) {
     return dataObjectLayer.isExists() && dataObjectLayer.isVisible()
       && dataObjectLayer.isCanEditRecords();
   }
@@ -826,7 +826,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
       } else if (size < 10) {
         for (final LayerRecord record : records) {
-          final AbstractDataObjectLayer layer = record.getLayer();
+          final AbstractRecordLayer layer = record.getLayer();
           layer.showForm(record);
 
         }
@@ -1007,7 +1007,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (GeometryEqualsExact3d.equal(newGeometry, oldValue)) {
         return null;
       } else {
-        final AbstractDataObjectLayer layer = location.getLayer();
+        final AbstractRecordLayer layer = location.getLayer();
         return layer.createPropertyEdit(object, geometryAttributeName,
           oldValue, newGeometry);
       }
@@ -1053,7 +1053,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
       if (!isModeAddGeometry() && !getMouseOverLocations().isEmpty()) {
         for (final CloseLocation mouseLocation : getMouseOverLocations()) {
           final LayerRecord record = mouseLocation.getObject();
-          final AbstractDataObjectLayer layer = record.getLayer();
+          final AbstractRecordLayer layer = record.getLayer();
           layer.splitRecord(record, mouseLocation);
         }
         e.consume();

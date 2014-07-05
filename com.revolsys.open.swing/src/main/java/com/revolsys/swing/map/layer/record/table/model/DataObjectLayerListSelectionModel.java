@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.DefaultListSelectionModel;
 
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class DataObjectLayerListSelectionModel extends
@@ -23,7 +23,7 @@ public class DataObjectLayerListSelectionModel extends
     super.addSelectionInterval(convertRowIndexToModel(index0),
       convertRowIndexToModel(index1));
     final List<LayerRecord> objects = getObjects(index0, index1);
-    final AbstractDataObjectLayer layer = this.model.getLayer();
+    final AbstractRecordLayer layer = this.model.getLayer();
     layer.addSelectedRecords(objects);
   }
 
@@ -46,7 +46,7 @@ public class DataObjectLayerListSelectionModel extends
     final int rowIndex = convertRowIndexToModel(index);
     final LayerRecord object = this.model.getRecord(rowIndex);
     if (object != null) {
-      final AbstractDataObjectLayer layer = this.model.getLayer();
+      final AbstractRecordLayer layer = this.model.getLayer();
       return layer.isSelected(object);
     }
     return false;
@@ -54,7 +54,7 @@ public class DataObjectLayerListSelectionModel extends
 
   @Override
   public boolean isSelectionEmpty() {
-    final AbstractDataObjectLayer layer = this.model.getLayer();
+    final AbstractRecordLayer layer = this.model.getLayer();
     return layer.getSelectionCount() == 0;
   }
 
@@ -63,14 +63,14 @@ public class DataObjectLayerListSelectionModel extends
     super.removeSelectionInterval(convertRowIndexToModel(index0),
       convertRowIndexToModel(index1));
     final List<LayerRecord> objects = getObjects(index0, index1);
-    final AbstractDataObjectLayer layer = this.model.getLayer();
+    final AbstractRecordLayer layer = this.model.getLayer();
     layer.unSelectRecords(objects);
   }
 
   @Override
   public void setSelectionInterval(final int index0, final int index1) {
     final List<LayerRecord> objects = getObjects(index0, index1);
-    final AbstractDataObjectLayer layer = this.model.getLayer();
+    final AbstractRecordLayer layer = this.model.getLayer();
     layer.setSelectedRecords(objects);
     super.setSelectionInterval(convertRowIndexToModel(index0),
       convertRowIndexToModel(index1));

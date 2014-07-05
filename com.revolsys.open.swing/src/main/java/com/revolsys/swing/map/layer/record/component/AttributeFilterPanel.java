@@ -51,7 +51,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
@@ -79,7 +79,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private final RecordDefinition metaData;
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
   private final ComboBox numericOperatorField = new ComboBox("=", "<>", "Like",
     "IS NULL", "IS NOT NULL", "<", "<=", ">", ">=");
@@ -224,7 +224,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
     return this.tableModel.getFilter();
   }
 
-  public AbstractDataObjectLayer getLayer() {
+  public AbstractRecordLayer getLayer() {
     return this.layer;
   }
 

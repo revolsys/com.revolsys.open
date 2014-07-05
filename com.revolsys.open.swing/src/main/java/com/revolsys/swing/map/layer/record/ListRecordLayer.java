@@ -21,7 +21,7 @@ import com.revolsys.swing.map.layer.record.table.DataObjectLayerTable;
 import com.revolsys.swing.map.layer.record.table.DataObjectLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.DataObjectListLayerTableModel;
 
-public class DataObjectListLayer extends AbstractDataObjectLayer {
+public class ListRecordLayer extends AbstractRecordLayer {
 
   public static RecordDefinitionImpl createMetaData(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
@@ -33,19 +33,19 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
 
   private final List<LayerRecord> records = new ArrayList<LayerRecord>();
 
-  public DataObjectListLayer() {
+  public ListRecordLayer() {
   }
 
-  public DataObjectListLayer(final RecordDefinition metaData) {
+  public ListRecordLayer(final RecordDefinition metaData) {
     super(metaData);
     setEditable(true);
   }
 
-  public DataObjectListLayer(final Map<String, ? extends Object> properties) {
+  public ListRecordLayer(final Map<String, ? extends Object> properties) {
     super(properties);
   }
 
-  public DataObjectListLayer(final String name,
+  public ListRecordLayer(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     super(name);
     final RecordDefinitionImpl metaData = createMetaData(name,
@@ -82,10 +82,9 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   }
 
   @Override
-  protected void deleteRecord(final LayerRecord record,
-    final boolean trackDeletions) {
+  protected void doDeleteRecord(final LayerRecord record) {
     this.records.remove(record);
-    super.deleteRecord(record, trackDeletions);
+    super.doDeleteRecord(record);
     saveChanges(record);
     fireEmpty();
   }
@@ -194,7 +193,7 @@ public class DataObjectListLayer extends AbstractDataObjectLayer {
   @Override
   public List<LayerRecord> getRecords() {
     synchronized (this.records) {
-      final ArrayList<LayerRecord> records = new ArrayList<LayerRecord>(
+      final ArrayList<LayerRecord> records = new ArrayList<>(
         this.records);
       records.addAll(getNewRecords());
       return records;

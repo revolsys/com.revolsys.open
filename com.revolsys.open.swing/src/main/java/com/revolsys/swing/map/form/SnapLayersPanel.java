@@ -31,7 +31,7 @@ import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.list.BaseListModel;
 import com.revolsys.swing.list.filter.StringContainsRowFilter;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.toolbar.ToolBar;
 
 public class SnapLayersPanel extends ValueField implements ActionListener,
@@ -39,7 +39,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
 
   private static final long serialVersionUID = 1L;
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
   private final CheckBox snapToAllLayers;
 
@@ -64,7 +64,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
   private final JButton removeButton;
 
   @SuppressWarnings("unchecked")
-  public SnapLayersPanel(final AbstractDataObjectLayer layer) {
+  public SnapLayersPanel(final AbstractRecordLayer layer) {
     super(new VerticalLayout(5));
     this.layer = layer;
 
@@ -98,11 +98,11 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
     fieldsPanel = new JPanel(new HorizontalLayout(5));
     fieldsPanel.setOpaque(false);
 
-    final List<AbstractDataObjectLayer> dataObjectLayers = layer.getProject()
-      .getDescenants(AbstractDataObjectLayer.class);
+    final List<AbstractRecordLayer> dataObjectLayers = layer.getProject()
+      .getDescenants(AbstractRecordLayer.class);
 
     layerPathsModel = new BaseListModel<String>();
-    for (final AbstractDataObjectLayer dataObjectLayer : dataObjectLayers) {
+    for (final AbstractRecordLayer dataObjectLayer : dataObjectLayers) {
       final String layerPath = dataObjectLayer.getPath();
       layerPathsModel.add(layerPath);
     }

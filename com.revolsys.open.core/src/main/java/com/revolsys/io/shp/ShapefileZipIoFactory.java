@@ -8,8 +8,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.AbstractDataObjectAndGeometryIoFactory;
-import com.revolsys.data.io.DataObjectReader;
-import com.revolsys.data.io.ZipDataObjectReader;
+import com.revolsys.data.io.RecordReader;
+import com.revolsys.data.io.ZipRecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -18,18 +18,11 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.ZipWriter;
 
 public class ShapefileZipIoFactory extends
-  AbstractDataObjectAndGeometryIoFactory {
+AbstractDataObjectAndGeometryIoFactory {
 
   public ShapefileZipIoFactory() {
     super("ESRI Shapefile inside a ZIP archive", true, true);
     addMediaTypeAndFileExtension("application/x-shp+zip", "shpz");
-  }
-
-  @Override
-  public DataObjectReader createDataObjectReader(final Resource resource,
-    final RecordFactory factory) {
-    return new ZipDataObjectReader(resource, ShapefileConstants.FILE_EXTENSION,
-      factory);
   }
 
   @Override
@@ -44,9 +37,16 @@ public class ShapefileZipIoFactory extends
     }
     final Resource tempResource = new FileSystemResource(new File(directory,
       baseName + ".shp"));
-    final Writer<Record> shapeWriter = new ShapefileDataObjectWriter(
-      metaData, tempResource);
+    final Writer<Record> shapeWriter = new ShapefileDataObjectWriter(metaData,
+      tempResource);
     return new ZipWriter<Record>(directory, shapeWriter, outputStream);
+  }
+
+  @Override
+  public RecordReader createRecordReader(final Resource resource,
+    final RecordFactory factory) {
+    return new ZipRecordReader(resource, ShapefileConstants.FILE_EXTENSION,
+      factory);
   }
 
 }

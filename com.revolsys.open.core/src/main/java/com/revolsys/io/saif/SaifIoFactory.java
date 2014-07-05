@@ -3,7 +3,7 @@ package com.revolsys.io.saif;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.AbstractDataObjectAndGeometryReaderFactory;
-import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.RecordFactory;
 
 public class SaifIoFactory extends AbstractDataObjectAndGeometryReaderFactory {
@@ -14,7 +14,7 @@ public class SaifIoFactory extends AbstractDataObjectAndGeometryReaderFactory {
   }
 
   @Override
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public RecordReader createRecordReader(final Resource resource,
     final RecordFactory dataObjectFactory) {
     final SaifReader reader = new SaifReader(resource);
     return reader;

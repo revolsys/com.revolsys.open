@@ -21,17 +21,17 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.MathUtil;
 
-public class OpenStreetMapApiLayer extends AbstractRecordLayer {
+public class OsmOverpassLayer extends AbstractRecordLayer {
 
   public static AbstractRecordLayer create(final Map<String, Object> properties) {
-    return new OpenStreetMapApiLayer(properties);
+    return new OsmOverpassLayer(properties);
   }
 
-  private String serverUrl = "http://www.overpass-api.de/api/xapi?";
+  private String serverUrl = "http://api.openstreetmap.org/";
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "openStreetMapVectorApi", "Open Street Map (Vector API)",
-    OpenStreetMapApiLayer.class, "create");
+    OsmOverpassLayer.class, "create");
 
   private static final int TILE_SCALE_X = 50;
 
@@ -43,7 +43,7 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 
   private final Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
 
-  public OpenStreetMapApiLayer(final Map<String, Object> properties) {
+  public OsmOverpassLayer(final Map<String, Object> properties) {
     super(properties);
     setType("openStreetMapVectorApi");
   }
@@ -59,9 +59,9 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
         if (geometry != null && !geometry.isEmpty()) {
           if (boundingBox.intersects(geometry.getBoundingBox())) {
             final Identifier identifier = record.getIdentifier();
-            final OsmProxyLayerRecord layerRecord = new OsmProxyLayerRecord(
-              this, document, identifier);
-            recordMap.put(identifier, layerRecord);
+            // final OsmProxyLayerRecord layerRecord = new OsmProxyLayerRecord(
+            // this, document, identifier);
+            // recordMap.put(identifier, layerRecord);
           }
         }
       }
@@ -97,13 +97,13 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
     boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
     final List<BoundingBox> boundingBoxes = new ArrayList<>();
     final double minX = Math.floor(boundingBox.getMinX() * TILE_SCALE_X)
-        / TILE_SCALE_X;
+      / TILE_SCALE_X;
     final double minY = Math.floor(boundingBox.getMinY() * TILE_SCALE_Y)
-        / TILE_SCALE_Y;
+      / TILE_SCALE_Y;
     final double maxX = Math.ceil(boundingBox.getMaxX() * TILE_SCALE_X)
-        / TILE_SCALE_X;
+      / TILE_SCALE_X;
     final double maxY = Math.ceil(boundingBox.getMaxY() * TILE_SCALE_Y)
-        / TILE_SCALE_Y;
+      / TILE_SCALE_Y;
     int indexY = 0;
     for (double y = minY; y < maxY;) {
       int indexX = 0;

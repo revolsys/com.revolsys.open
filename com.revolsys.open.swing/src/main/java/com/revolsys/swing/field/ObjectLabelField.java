@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
@@ -124,8 +125,7 @@ public class ObjectLabelField extends JLabel implements Field {
     } else if (this.codeTable == null) {
       text = StringConverterRegistry.toString(object);
     } else {
-      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(
-        object));
+      final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(object));
       if (values == null || values.isEmpty()) {
         text = "-";
       } else {
@@ -133,7 +133,9 @@ public class ObjectLabelField extends JLabel implements Field {
       }
     }
     setText(text);
-    firePropertyChange(this.fieldName, oldValue, object);
+    if (!EqualsRegistry.equal(oldValue, this.fieldValue)) {
+      firePropertyChange(this.fieldName, oldValue, object);
+    }
   }
 
   @Override

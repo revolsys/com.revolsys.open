@@ -3,7 +3,7 @@ package com.revolsys.swing.undo;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
@@ -25,7 +25,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   public boolean canRedo() {
     if (super.canRedo()) {
       if (this.record != null) {
-        final AbstractDataObjectLayer layer = this.record.getLayer();
+        final AbstractRecordLayer layer = this.record.getLayer();
         if (layer != null) {
           return !layer.isDeleted(this.record);
         }
@@ -38,7 +38,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   public boolean canUndo() {
     if (super.canUndo()) {
       if (this.record != null) {
-        final AbstractDataObjectLayer layer = this.record.getLayer();
+        final AbstractRecordLayer layer = this.record.getLayer();
         if (layer != null) {
           return layer.isDeleted(this.record);
         }
@@ -50,7 +50,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   @Override
   protected void doRedo() {
     if (this.record != null) {
-      final AbstractDataObjectLayer layer = this.record.getLayer();
+      final AbstractRecordLayer layer = this.record.getLayer();
       if (layer != null) {
         layer.deleteRecords(this.record);
         layer.unSelectRecords(this.record);
@@ -63,7 +63,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
     if (this.record != null) {
       final LayerRecord sourceRecord = this.record.revertChanges();
       sourceRecord.setValues(this.values);
-      final AbstractDataObjectLayer layer = sourceRecord.getLayer();
+      final AbstractRecordLayer layer = sourceRecord.getLayer();
       layer.addSelectedRecords(sourceRecord);
     }
   }

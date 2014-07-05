@@ -12,40 +12,40 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.io.IoFactoryRegistry;
 
 public class FileDataObjectReaderFactory extends
-  AbstractFactoryBean<DataObjectReader> {
+  AbstractFactoryBean<RecordReader> {
 
-  public static DataObjectReader dataObjectReader(final File file) {
+  public static RecordReader recordReader(final File file) {
     final Resource resource = new FileSystemResource(file);
-    return dataObjectReader(resource);
+    return recordReader(resource);
   }
 
-  public static DataObjectReader dataObjectReader(final Resource resource) {
-    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+  public static RecordReader recordReader(final Resource resource) {
+    final RecordReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
-      final DataObjectReader reader = readerFactory.createDataObjectReader(resource);
+      final RecordReader reader = readerFactory.createRecordReader(resource);
       return reader;
     }
   }
 
-  public static DataObjectReader dataObjectReader(final Resource resource,
+  public static RecordReader recordReader(final Resource resource,
     final RecordFactory factory) {
-    final DataObjectReaderFactory readerFactory = getDataObjectReaderFactory(resource);
+    final RecordReaderFactory readerFactory = getDataObjectReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
-      final DataObjectReader reader = readerFactory.createDataObjectReader(
+      final RecordReader reader = readerFactory.createRecordReader(
         resource, factory);
       return reader;
     }
   }
 
-  protected static DataObjectReaderFactory getDataObjectReaderFactory(
+  protected static RecordReaderFactory getDataObjectReaderFactory(
     final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final DataObjectReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
-      DataObjectReaderFactory.class, resource);
+    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
+      RecordReaderFactory.class, resource);
     return readerFactory;
   }
 
@@ -54,12 +54,12 @@ public class FileDataObjectReaderFactory extends
   private Resource resource;
 
   @Override
-  public DataObjectReader createInstance() throws Exception {
-    return AbstractDataObjectReaderFactory.dataObjectReader(resource, factory);
+  public RecordReader createInstance() throws Exception {
+    return AbstractRecordReaderFactory.recordReader(resource, factory);
   }
 
   @Override
-  protected void destroyInstance(final DataObjectReader reader)
+  protected void destroyInstance(final RecordReader reader)
     throws Exception {
     reader.close();
     factory = null;
@@ -72,7 +72,7 @@ public class FileDataObjectReaderFactory extends
 
   @Override
   public Class<?> getObjectType() {
-    return DataObjectReader.class;
+    return RecordReader.class;
   }
 
   public Resource getResource() {

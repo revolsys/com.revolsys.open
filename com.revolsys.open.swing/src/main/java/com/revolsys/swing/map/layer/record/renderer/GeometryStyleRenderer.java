@@ -23,7 +23,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
@@ -150,28 +150,28 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   private GeometryStyle style;
 
-  public GeometryStyleRenderer(final AbstractDataObjectLayer layer) {
+  public GeometryStyleRenderer(final AbstractRecordLayer layer) {
     this(layer, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
+  public GeometryStyleRenderer(final AbstractRecordLayer layer,
     final GeometryStyle style) {
     this(layer, null, style);
   }
 
-  public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
+  public GeometryStyleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
+  public GeometryStyleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent, final GeometryStyle style) {
     super("geometryStyle", "Geometry Style", layer, parent);
     this.style = style;
     setIcon(ICON);
   }
 
-  public GeometryStyleRenderer(final AbstractDataObjectLayer layer,
+  public GeometryStyleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
     super("geometryStyle", "Geometry Style", layer, parent, geometryStyle);
     this.style = new GeometryStyle(geometryStyle);
@@ -192,7 +192,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   @Override
   public Icon getIcon() {
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
       return super.getIcon();
     } else {
@@ -238,7 +238,7 @@ public class GeometryStyleRenderer extends AbstractDataObjectLayerRenderer {
 
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer,
     final LayerRecord object) {
     final Geometry geometry = object.getGeometryValue();
     viewport.drawGeometry(geometry, style);

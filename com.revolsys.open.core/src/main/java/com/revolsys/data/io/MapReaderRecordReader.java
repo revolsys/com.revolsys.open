@@ -1,6 +1,7 @@
 package com.revolsys.data.io;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -12,39 +13,39 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.Reader;
 
-public class MetaDataConvertDataObjectReader extends AbstractReader<Record>
-  implements DataObjectReader, Iterator<Record> {
+public class MapReaderRecordReader extends AbstractReader<Record> implements
+  RecordReader, Iterator<Record> {
 
   private final RecordDefinition metaData;
 
-  private final Reader<Record> reader;
+  private final Reader<Map<String, Object>> mapReader;
 
   private boolean open;
 
-  private Iterator<Record> iterator;
+  private Iterator<Map<String, Object>> mapIterator;
 
-  public MetaDataConvertDataObjectReader(final RecordDefinition metaData,
-    final Reader<Record> reader) {
+  public MapReaderRecordReader(final RecordDefinition metaData,
+    final Reader<Map<String, Object>> mapReader) {
     this.metaData = metaData;
-    this.reader = reader;
+    this.mapReader = mapReader;
   }
 
   @Override
   public void close() {
-    reader.close();
+    this.mapReader.close();
   }
 
   @Override
   public RecordDefinition getMetaData() {
-    return metaData;
+    return this.metaData;
   }
 
   @Override
   public boolean hasNext() {
-    if (!open) {
+    if (!this.open) {
       open();
     }
-    return iterator.hasNext();
+    return this.mapIterator.hasNext();
   }
 
   @Override
@@ -55,13 +56,13 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<Record>
   @Override
   public Record next() {
     if (hasNext()) {
-      final Record source = iterator.next();
-      final Record target = new ArrayRecord(metaData);
-      for (final Attribute attribute : metaData.getAttributes()) {
+      final Map<String, Object> source = this.mapIterator.next();
+      final Record target = new ArrayRecord(this.metaData);
+      for (final Attribute attribute : this.metaData.getAttributes()) {
         final String name = attribute.getName();
-        final Object value = source.getValue(name);
+        final Object value = source.get(name);
         if (value != null) {
-          final DataType dataType = metaData.getAttributeType(name);
+          final DataType dataType = this.metaData.getAttributeType(name);
           final Object convertedValue = StringConverterRegistry.toObject(
             dataType, value);
           target.setValue(name, convertedValue);
@@ -75,12 +76,12 @@ public class MetaDataConvertDataObjectReader extends AbstractReader<Record>
 
   @Override
   public void open() {
-    open = true;
-    this.iterator = reader.iterator();
+    this.open = true;
+    this.mapIterator = this.mapReader.iterator();
   }
 
   @Override
   public void remove() {
-    iterator.remove();
+    this.mapIterator.remove();
   }
 }

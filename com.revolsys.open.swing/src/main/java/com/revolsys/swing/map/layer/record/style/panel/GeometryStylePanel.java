@@ -17,7 +17,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.util.JavaBeanUtil;
@@ -39,7 +39,7 @@ public class GeometryStylePanel extends BaseStylePanel implements
 
     this.geometryStyleRenderer = geometryStyleRenderer;
     this.geometryStyle = geometryStyleRenderer.getStyle().clone();
-    final AbstractDataObjectLayer layer = geometryStyleRenderer.getLayer();
+    final AbstractRecordLayer layer = geometryStyleRenderer.getLayer();
     final RecordDefinition metaData = layer.getMetaData();
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
 

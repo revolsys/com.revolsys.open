@@ -14,7 +14,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -26,19 +26,19 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_filter");
 
-  public FilterMultipleRenderer(final AbstractDataObjectLayer layer,
+  public FilterMultipleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public FilterMultipleRenderer(final AbstractDataObjectLayer layer,
+  public FilterMultipleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     super("filterStyle", layer, parent, style);
     setIcon(ICON);
   }
 
   protected AbstractDataObjectLayerRenderer getRenderer(
-    final AbstractDataObjectLayer layer,
+    final AbstractRecordLayer layer,
     final List<AbstractDataObjectLayerRenderer> renderers,
     final LayerRecord record, final double scale) {
     for (final AbstractDataObjectLayerRenderer renderer : renderers) {
@@ -56,13 +56,13 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer,
     final LayerRecord record) {
   }
 
   @Override
   protected void renderRecords(final Viewport2D viewport,
-    final AbstractDataObjectLayer layer, final List<LayerRecord> records) {
+    final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final Map<AbstractDataObjectLayerRenderer, List<LayerRecord>> rendererToRecordMap = new LinkedHashMap<>();
     final BoundingBox visibleArea = viewport.getBoundingBox();
     final double scale = viewport.getScale();
@@ -102,7 +102,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void renderSelectedRecord(final Viewport2D viewport,
-    final AbstractDataObjectLayer layer, final LayerRecord record) {
+    final AbstractRecordLayer layer, final LayerRecord record) {
     if (isVisible(record)) {
       final double scale = viewport.getScale();
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {

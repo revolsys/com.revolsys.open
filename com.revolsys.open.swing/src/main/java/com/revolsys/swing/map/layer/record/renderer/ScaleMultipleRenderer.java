@@ -11,7 +11,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.ExceptionUtil;
 
@@ -27,12 +27,12 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   private transient AbstractDataObjectLayerRenderer renderer;
 
-  public ScaleMultipleRenderer(final AbstractDataObjectLayer layer,
+  public ScaleMultipleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public ScaleMultipleRenderer(final AbstractDataObjectLayer layer,
+  public ScaleMultipleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
     super("scaleStyle", layer, parent, style);
     setIcon(ICON);
@@ -70,7 +70,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void render(final Viewport2D viewport,
-    final AbstractDataObjectLayer layer) {
+    final AbstractRecordLayer layer) {
     if (layer.hasGeometryAttribute()) {
       final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
       if (renderer != null) {
@@ -82,7 +82,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   // NOTE: Needed for filter styles
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer,
     final LayerRecord object) {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
@@ -101,7 +101,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   @Override
   // NOTE: Needed for multiple styles
   protected void renderRecords(final Viewport2D viewport,
-    final AbstractDataObjectLayer layer, final List<LayerRecord> objects) {
+    final AbstractRecordLayer layer, final List<LayerRecord> objects) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
@@ -118,7 +118,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void renderSelectedRecord(final Viewport2D viewport,
-    final AbstractDataObjectLayer layer, final LayerRecord object) {
+    final AbstractRecordLayer layer, final LayerRecord object) {
     final AbstractDataObjectLayerRenderer renderer = getRenderer(viewport);
     if (renderer != null) {
       if (isVisible(object)) {

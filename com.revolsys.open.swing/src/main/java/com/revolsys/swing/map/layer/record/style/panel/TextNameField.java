@@ -22,7 +22,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.component.AttributeTitleStringConveter;
 import com.revolsys.util.Property;
 
@@ -32,7 +32,7 @@ public class TextNameField extends ValueField {
 
   private final ComboBox fieldNamesField;
 
-  public TextNameField(final AbstractDataObjectLayer layer,
+  public TextNameField(final AbstractRecordLayer layer,
     final String fieldName, final Object fieldValue) {
     super(new BorderLayout());
     textNameField = new TextArea(fieldName, fieldValue, 3, 30);

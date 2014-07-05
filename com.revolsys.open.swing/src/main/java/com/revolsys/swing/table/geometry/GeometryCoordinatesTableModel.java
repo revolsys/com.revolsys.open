@@ -19,7 +19,7 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.swing.map.form.DataObjectLayerForm;
+import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.table.TablePanel;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {
@@ -48,7 +48,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   private int numIndexItems;
 
-  private Reference<DataObjectLayerForm> form;
+  private Reference<LayerRecordForm> form;
 
   private int vertexIndexColumn;
 
@@ -86,7 +86,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     }
   }
 
-  public DataObjectLayerForm getForm() {
+  public LayerRecordForm getForm() {
     return this.form.get();
   }
 
@@ -139,8 +139,8 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return this.vertexIndexColumn;
   }
 
-  public void setForm(final DataObjectLayerForm form) {
-    this.form = new WeakReference<DataObjectLayerForm>(form);
+  public void setForm(final LayerRecordForm form) {
+    this.form = new WeakReference<LayerRecordForm>(form);
   }
 
   public void setGeometry(final Geometry geometry) {

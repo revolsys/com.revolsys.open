@@ -9,15 +9,15 @@ import com.revolsys.comparator.NumericComparator;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableCoparator;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.DataObjectLayerTableModel;
 
 public class DataObjectLayerTableRowSorter extends
   TableSortController<DataObjectLayerTableModel> {
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
-  public DataObjectLayerTableRowSorter(final AbstractDataObjectLayer layer,
+  public DataObjectLayerTableRowSorter(final AbstractRecordLayer layer,
     final DataObjectLayerTableModel model) {
     super(model);
     this.layer = layer;

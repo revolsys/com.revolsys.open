@@ -66,9 +66,13 @@ public class DataObjectQuadTree extends QuadTree<Record> {
     for (final Iterator<Record> iterator = results.iterator(); iterator.hasNext();) {
       final Record object = iterator.next();
       final Geometry geometry = object.getGeometryValue();
-      final BoundingBox objectBoundingBox = geometry.getBoundingBox();
-      if (!boundingBox.intersects(objectBoundingBox)) {
+      if (geometry == null) {
         iterator.remove();
+      } else {
+        final BoundingBox objectBoundingBox = geometry.getBoundingBox();
+        if (!boundingBox.intersects(objectBoundingBox)) {
+          iterator.remove();
+        }
       }
     }
     return results;
@@ -93,8 +97,7 @@ public class DataObjectQuadTree extends QuadTree<Record> {
     return queryBoundingBox(geometry);
   }
 
-  public Record queryFirst(final Record object,
-    final Filter<Record> filter) {
+  public Record queryFirst(final Record object, final Filter<Record> filter) {
     final Geometry geometry = object.getGeometryValue();
     return getFirstBoundingBox(geometry, filter);
   }
@@ -136,19 +139,13 @@ public class DataObjectQuadTree extends QuadTree<Record> {
   public List<Record> queryList(final BoundingBox boundingBox,
     final Filter<Record> filter, final Comparator<Record> comparator) {
     final CreateListVisitor<Record> listVisitor = new CreateListVisitor<Record>(
-      filter);
+        filter);
     visit(boundingBox, listVisitor);
     final List<Record> list = listVisitor.getList();
     if (comparator != null) {
       Collections.sort(list, comparator);
     }
     return list;
-  }
-
-  public List<Record> queryList(final Record object,
-    final Filter<Record> filter) {
-    final Geometry geometry = object.getGeometryValue();
-    return queryList(geometry, filter);
   }
 
   public List<Record> queryList(final Geometry geometry,
@@ -161,6 +158,11 @@ public class DataObjectQuadTree extends QuadTree<Record> {
     final Filter<Record> filter, final Comparator<Record> comparator) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     return queryList(boundingBox, filter, comparator);
+  }
+
+  public List<Record> queryList(final Record object, final Filter<Record> filter) {
+    final Geometry geometry = object.getGeometryValue();
+    return queryList(geometry, filter);
   }
 
   public void remove(final Collection<? extends Record> objects) {

@@ -15,7 +15,7 @@ import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.util.JavaBeanUtil;
@@ -36,7 +36,7 @@ public class TextStylePanel extends BaseStylePanel implements
 
     this.textStyleRenderer = textStyleRenderer;
     this.textStyle = textStyleRenderer.getStyle().clone();
-    final AbstractDataObjectLayer layer = textStyleRenderer.getLayer();
+    final AbstractRecordLayer layer = textStyleRenderer.getLayer();
     final RecordDefinition metaData = layer.getMetaData();
     final Attribute geometryAttribute = metaData.getGeometryAttribute();
 
@@ -74,7 +74,7 @@ public class TextStylePanel extends BaseStylePanel implements
   protected Field createField(final String fieldName,
     final Class<?> fieldClass, final Object value) {
     if (fieldName.equals("textName")) {
-      final AbstractDataObjectLayer layer = getLayer();
+      final AbstractRecordLayer layer = getLayer();
       final TextNameField textNameField = new TextNameField(layer, fieldName,
         value);
       Property.addListener(textNameField, fieldName, this);

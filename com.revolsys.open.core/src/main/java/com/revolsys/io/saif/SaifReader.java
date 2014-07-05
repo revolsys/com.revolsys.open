@@ -68,7 +68,7 @@ import com.revolsys.spring.SpringUtil;
  */
 public class SaifReader extends AbstractReader<Record> implements
   DataObjectIterator, RecordDefinitionFactory,
-  com.revolsys.data.io.DataObjectReader {
+  com.revolsys.data.io.RecordReader {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);
 

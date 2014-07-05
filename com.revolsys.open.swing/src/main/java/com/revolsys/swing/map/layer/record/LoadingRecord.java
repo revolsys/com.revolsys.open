@@ -6,7 +6,7 @@ import com.revolsys.data.record.RecordState;
 
 public class LoadingRecord extends AbstractLayerRecord {
 
-  public LoadingRecord(final AbstractDataObjectLayer layer) {
+  public LoadingRecord(final AbstractRecordLayer layer) {
     super(layer);
   }
 

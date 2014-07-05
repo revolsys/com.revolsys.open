@@ -4,14 +4,10 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 
-public class ProxyLayerRecord extends AbstractLayerRecord {
+public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
-  private final Identifier recordIdentifier;
-
-  public ProxyLayerRecord(final AbstractDataObjectLayer layer,
-    final Identifier recordIdentifier) {
+  public AbstractProxyLayerRecord(final AbstractRecordLayer layer) {
     super(layer);
-    this.recordIdentifier = recordIdentifier;
   }
 
   @Override
@@ -33,19 +29,10 @@ public class ProxyLayerRecord extends AbstractLayerRecord {
     record.firePropertyChange(propertyName, oldValue, newValue);
   }
 
-  @Override
-  public Identifier getIdentifier() {
-    return this.recordIdentifier;
-  }
-
   protected LayerRecord getLayerRecord() {
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     final Identifier identifier = getIdentifier();
     final LayerRecord record = layer.getCachedRecord(identifier);
-    if (record == null) {
-      throw new IllegalStateException("Cannot find record " + getTypeName()
-        + " #" + identifier);
-    }
     return record;
   }
 
@@ -62,13 +49,21 @@ public class ProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public RecordState getState() {
     final Record record = getRecord();
-    return record.getState();
+    if (record == null) {
+      return RecordState.Deleted;
+    } else {
+      return record.getState();
+    }
   }
 
   @Override
   public <T> T getValue(final int index) {
     final Record record = getRecord();
-    return record.getValue(index);
+    if (record == null) {
+      return null;
+    } else {
+      return record.getValue(index);
+    }
   }
 
   @Override

@@ -49,7 +49,7 @@ import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.component.MarkerField;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.LineCap;
 import com.revolsys.swing.map.layer.record.style.LineJoin;
@@ -259,7 +259,7 @@ PropertyChangeListener {
     } else if (fieldName.equals("lineDashArray")) {
       field = new DashField(fieldName, (List<Measure<Length>>)value);
     } else if (fieldName.equals("queryFilter")) {
-      final AbstractDataObjectLayer layer = getLayer();
+      final AbstractRecordLayer layer = getLayer();
       field = new QueryFilterField(layer, fieldName, (String)value);
       field.setFieldValue(value);
       Property.addListener(field, fieldName, this);

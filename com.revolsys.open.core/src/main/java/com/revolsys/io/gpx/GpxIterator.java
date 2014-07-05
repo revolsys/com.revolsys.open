@@ -32,9 +32,9 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.DateUtil;
+import com.revolsys.util.MathUtil;
 
 public class GpxIterator implements DataObjectIterator {
   private static final DateTimeFormatter XML_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeParser();
@@ -73,8 +73,8 @@ public class GpxIterator implements DataObjectIterator {
     this(StaxUtils.createXmlReader(in));
   }
 
-  public GpxIterator(final Reader in,
-    final RecordFactory dataObjectFactory, final String path) {
+  public GpxIterator(final Reader in, final RecordFactory dataObjectFactory,
+    final String path) {
     this(StaxUtils.createXmlReader(in));
     this.dataObjectFactory = dataObjectFactory;
     this.typePath = path;
@@ -82,7 +82,7 @@ public class GpxIterator implements DataObjectIterator {
 
   public GpxIterator(final Resource resource,
     final RecordFactory dataObjectFactory, final String path)
-        throws IOException {
+    throws IOException {
     this(StaxUtils.createXmlReader(resource));
     this.dataObjectFactory = dataObjectFactory;
     this.typePath = path;
@@ -133,8 +133,8 @@ public class GpxIterator implements DataObjectIterator {
       do {
         this.currentDataObject = parseDataObject();
       } while (this.currentDataObject != null
-        && this.typePath != null
-          && !this.currentDataObject.getMetaData()
+          && this.typePath != null
+        && !this.currentDataObject.getMetaData()
           .getPath()
           .equals(this.typePath));
       this.loadNextObject = false;
@@ -235,7 +235,7 @@ public class GpxIterator implements DataObjectIterator {
   }
 
   protected Record parsePoint(final String featureType, final double index)
-      throws XMLStreamException {
+    throws XMLStreamException {
     final Record dataObject = this.dataObjectFactory.createRecord(GpxConstants.GPX_TYPE);
     dataObject.setValue("dataset_name", this.baseName);
     dataObject.setValue("index", index);
@@ -279,7 +279,7 @@ public class GpxIterator implements DataObjectIterator {
         StaxUtils.skipSubTree(this.in);
       } else if (this.in.getName().equals(GpxConstants.ROUTE_POINT_ELEMENT)) {
         final double pointIndex = this.index + (pointObjects.size() + 1.0)
-          / 10000;
+            / 10000;
         final Record pointObject = parseRoutPoint(pointIndex);
         pointObjects.add(pointObject);
         final Point point = pointObject.getGeometryValue();
@@ -307,38 +307,42 @@ public class GpxIterator implements DataObjectIterator {
     return dataObject;
   }
 
-  private Record parseRoutPoint(final double index)
-      throws XMLStreamException {
+  private Record parseRoutPoint(final double index) throws XMLStreamException {
     final String featureType = "rtept";
     return parsePoint(featureType, index);
   }
 
   private Record parseTrack() throws XMLStreamException {
     this.index++;
-    final Record dataObject = this.dataObjectFactory.createRecord(GpxConstants.GPX_TYPE);
-    dataObject.setValue("dataset_name", this.baseName);
-    dataObject.setValue("index", this.index);
-    dataObject.setValue("feature_type", "trk");
-    final List<LineString> segments = new ArrayList<LineString>();
+    final Record record = this.dataObjectFactory.createRecord(GpxConstants.GPX_TYPE);
+    record.setValue("dataset_name", this.baseName);
+    record.setValue("index", this.index);
+    record.setValue("feature_type", "trk");
+    int axisCount = 2;
+    final List<LineString> lines = new ArrayList<>();
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
         StaxUtils.skipSubTree(this.in);
       } else if (this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
-        final LineString points = parseTrackSegment();
-        if (points.getVertexCount() > 1) {
-          segments.add(points);
+        final LineString line = parseTrackSegment();
+        if (line.getVertexCount() > 1) {
+          lines.add(line);
+          if (line.getAxisCount() > axisCount) {
+            axisCount = line.getAxisCount();
+          }
         }
       } else {
-        parseAttribute(dataObject);
+        parseAttribute(record);
       }
     }
-    final MultiLineString lines = this.geometryFactory.multiLineString(segments);
-    dataObject.setGeometryValue(lines);
-    return dataObject;
+    final MultiLineString multiLine = this.geometryFactory.convertAxisCount(
+      axisCount).multiLineString(lines);
+    record.setGeometryValue(multiLine);
+    return record;
   }
 
   private int parseTrackPoint(final List<Double> points)
-      throws XMLStreamException {
+    throws XMLStreamException {
     final String lonText = this.in.getAttributeValue("", "lon");
     final double lon = Double.parseDouble(lonText);
     points.add(lon);
@@ -353,7 +357,7 @@ public class GpxIterator implements DataObjectIterator {
     double m = Double.NaN;
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)
-          || this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
+        || this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
         StaxUtils.skipSubTree(this.in);
       } else {
         if (this.in.getName().equals(GpxConstants.ELEVATION_ELEMENT)) {
@@ -389,7 +393,8 @@ public class GpxIterator implements DataObjectIterator {
       final int pointAxisCount = parseTrackPoint(coordinates);
       axisCount = Math.max(axisCount, pointAxisCount);
     }
-    return new LineStringDouble(axisCount, coordinates);
+    return this.geometryFactory.convertAxisCount(axisCount).lineString(
+      axisCount, MathUtil.toDoubleArray(coordinates));
   }
 
   private Record parseWaypoint() throws XMLStreamException {

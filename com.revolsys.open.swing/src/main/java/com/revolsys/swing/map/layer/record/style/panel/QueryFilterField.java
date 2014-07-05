@@ -14,7 +14,7 @@ import com.revolsys.data.query.Condition;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextArea;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
@@ -25,9 +25,9 @@ public class QueryFilterField extends ValueField implements
 
   private final JButton clearButton;
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
-  public QueryFilterField(final AbstractDataObjectLayer layer,
+  public QueryFilterField(final AbstractRecordLayer layer,
     final String fieldName, final String query) {
     super(new VerticalLayout());
     this.layer = layer;

@@ -3,12 +3,12 @@ package com.revolsys.swing.map.layer.openstreetmap;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.io.openstreetmap.model.OsmDocument;
 import com.revolsys.io.openstreetmap.model.OsmElement;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.ArrayLayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.ProxyLayerRecord;
+import com.revolsys.swing.map.layer.record.IdentifierProxyLayerRecord;
 
-public class OsmProxyLayerRecord extends ProxyLayerRecord {
+public class OsmProxyLayerRecord extends IdentifierProxyLayerRecord {
   private final OsmDocument document;
 
   public OsmProxyLayerRecord(final OpenStreetMapApiLayer layer,
@@ -21,7 +21,7 @@ public class OsmProxyLayerRecord extends ProxyLayerRecord {
   protected LayerRecord getLayerRecord() {
     final Identifier identifier = getIdentifier();
     final OsmElement record = this.document.getRecord(identifier);
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     return new ArrayLayerRecord(layer, record);
   }
 }

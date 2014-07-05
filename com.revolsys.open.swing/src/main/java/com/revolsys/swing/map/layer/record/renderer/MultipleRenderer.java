@@ -12,7 +12,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractDataObjectLayer;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.util.ExceptionUtil;
@@ -25,12 +25,12 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   private static final Icon ICON = SilkIconLoader.getIcon("style_multiple");
 
-  public MultipleRenderer(final AbstractDataObjectLayer layer,
+  public MultipleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
     this(layer, parent, Collections.<String, Object> emptyMap());
   }
 
-  public MultipleRenderer(final AbstractDataObjectLayer layer,
+  public MultipleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> multipleStyle) {
     super("multipleStyle", layer, parent, multipleStyle);
     setIcon(ICON);
@@ -45,7 +45,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   // Needed for filter styles
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractDataObjectLayer layer,
+    final BoundingBox visibleArea, final AbstractRecordLayer layer,
     final LayerRecord record) {
     if (isVisible(record)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
@@ -67,7 +67,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   protected void renderRecords(final Viewport2D viewport,
-    final AbstractDataObjectLayer layer, final List<LayerRecord> records) {
+    final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final List<LayerRecord> visibleRecords = new ArrayList<>();
     for (final LayerRecord record : records) {
       if (isVisible(record) && !layer.isHidden(record)) {
@@ -88,7 +88,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void renderSelectedRecord(final Viewport2D viewport,
-    final AbstractDataObjectLayer layer, final LayerRecord object) {
+    final AbstractRecordLayer layer, final LayerRecord object) {
     if (isVisible(object)) {
       for (final AbstractDataObjectLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();

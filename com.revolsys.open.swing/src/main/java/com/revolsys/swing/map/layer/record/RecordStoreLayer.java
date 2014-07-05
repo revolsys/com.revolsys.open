@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -59,15 +60,14 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Label;
 
-public class DataObjectStoreLayer extends AbstractDataObjectLayer {
+public class RecordStoreLayer extends AbstractRecordLayer {
 
-  public static AbstractDataObjectLayer create(
-    final Map<String, Object> properties) {
-    return new DataObjectStoreLayer(properties);
+  public static AbstractRecordLayer create(final Map<String, Object> properties) {
+    return new RecordStoreLayer(properties);
   }
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "dataStore", "Data Store", DataObjectStoreLayer.class, "create");
+    "dataStore", "Data Store", RecordStoreLayer.class, "create");
 
   private BoundingBox boundingBox = new BoundingBoxDoubleGf();
 
@@ -80,15 +80,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   private DataObjectStore dataStore;
 
-  private final Label cacheIdDeleted = new Label("deleted");
-
-  private final Label cacheIdForm = new Label("deleted");
-
-  private final Label cacheIdModified = new Label("modified");
-
-  private final Label cacheIdSelected = new Label("selected");
-
-  private final Label cacheIdIndex = new Label("index");
+  private final Label cacheIdForm = new Label("form");
 
   private BoundingBox loadingBoundingBox = new BoundingBoxDoubleGf();
 
@@ -97,11 +89,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
   private final Map<Identifier, LayerRecord> recordIdToRecordMap = new WeakHashMap<>();
 
-  private final Object sync = new Object();
-
   private String typePath;
 
-  public DataObjectStoreLayer(final DataObjectStore dataStore,
+  public RecordStoreLayer(final DataObjectStore dataStore,
     final String typePath, final boolean exists) {
     this.dataStore = dataStore;
     setExists(exists);
@@ -111,18 +101,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     setTypePath(typePath);
   }
 
-  public DataObjectStoreLayer(final Map<String, ? extends Object> properties) {
+  public RecordStoreLayer(final Map<String, ? extends Object> properties) {
     super(properties);
     setType("dataStore");
-  }
-
-  @Override
-  protected void addModifiedRecord(final LayerRecord record) {
-    final LayerRecord cachedRecord = addRecordToCache(this.cacheIdModified,
-      record);
-    if (cachedRecord != null) {
-      super.addModifiedRecord(cachedRecord);
-    }
   }
 
   @Override
@@ -171,7 +152,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       final Identifier identifier = getId(record);
       if (identifier == null) {
         records.add((V)record);
-      } else if (record instanceof ProxyLayerRecord) {
+      } else if (record instanceof AbstractProxyLayerRecord) {
         records.add((V)record);
       } else {
         synchronized (getSync()) {
@@ -191,84 +172,46 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public <V extends LayerRecord> List<V> addRecordsToCache(final Label cacheId,
-    final Collection<? extends LayerRecord> records) {
-    synchronized (getSync()) {
-      final List<V> results = new ArrayList<>();
-      for (final LayerRecord record : records) {
-        final LayerRecord cachedRecord = addRecordToCache(cacheId, record);
-        results.add((V)cachedRecord);
-      }
-      cleanCachedRecords();
-      return results;
-    }
-  }
-
+  @Override
   public LayerRecord addRecordToCache(final Label cacheId,
     final LayerRecord record) {
-    if (record == null) {
-      return null;
-    } else if (!isLayerRecord(record)) {
-      return record;
-    } else if (record.getState() == RecordState.Deleted && !isDeleted(record)) {
-      return record;
-    } else {
-      final Identifier identifier = record.getIdentifier();
-      if (identifier == null) {
+    if (isLayerRecord(record)) {
+      if (record.getState() == RecordState.Deleted && !isDeleted(record)) {
         return record;
       } else {
-        synchronized (getSync()) {
-          LayerRecord proxyRecord;
-          if (record instanceof ProxyLayerRecord) {
-            proxyRecord = record;
-          } else {
-            LayerRecord cachedRecord = this.recordIdToRecordMap.get(identifier);
-            if (cachedRecord == null) {
-              this.recordIdToRecordMap.put(identifier, record);
-              cachedRecord = record;
+        final Identifier identifier = record.getIdentifier();
+        if (identifier == null) {
+          return super.addRecordToCache(cacheId, record);
+        } else {
+          synchronized (getSync()) {
+            LayerRecord proxyRecord;
+            if (record instanceof AbstractProxyLayerRecord) {
+              proxyRecord = record;
+            } else {
+              LayerRecord cachedRecord = this.recordIdToRecordMap.get(identifier);
+              if (cachedRecord == null) {
+                this.recordIdToRecordMap.put(identifier, record);
+                cachedRecord = record;
+              }
+              proxyRecord = createProxyRecord(identifier);
             }
-            proxyRecord = createProxyRecord(identifier);
+            CollectionUtil.addToSet(this.cacheIdToRecordIdMap, cacheId,
+              identifier);
+            return proxyRecord;
           }
-          CollectionUtil.addToSet(this.cacheIdToRecordIdMap, cacheId,
-            identifier);
-          return proxyRecord;
         }
       }
     }
-  }
-
-  @Override
-  protected void addSelectedRecord(final LayerRecord record) {
-    if (isLayerRecord(record)) {
-      final LayerRecord cachedRecord = addRecordToCache(this.cacheIdSelected,
-        record);
-      super.addSelectedRecord(cachedRecord);
-    }
-  }
-
-  @Override
-  public void addSelectedRecords(final BoundingBox boundingBox) {
-    if (isSelectable()) {
-      final List<LayerRecord> records = getRecords(boundingBox);
-      for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-        final LayerRecord layerDataObject = iterator.next();
-        if (!isVisible(layerDataObject) || super.isDeleted(layerDataObject)) {
-          iterator.remove();
-        }
-      }
-      if (!records.isEmpty()) {
-        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
-      }
-      addSelectedRecords(records);
-    }
+    return record;
   }
 
   /**
    * Remove any cached records that are currently not used.
    */
+  @Override
   protected void cleanCachedRecords() {
     synchronized (getSync()) {
+      super.cleanCachedRecords();
       final Set<Identifier> ids = new HashSet<>();
       for (final Set<Identifier> recordIds : this.cacheIdToRecordIdMap.values()) {
         if (recordIds != null) {
@@ -277,8 +220,18 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
       this.recordIdToRecordMap.keySet().retainAll(ids);
     }
+    System.out.println();
+    for (final Entry<Label, Set<Identifier>> entry : this.cacheIdToRecordIdMap.entrySet()) {
+      final Label key = entry.getKey();
+      if (key != getCacheIdIndex()) {
+        System.out.println(getTypePath() + "\tD\t" + key + "\t"
+          + entry.getValue());
+      }
+    }
+
   }
 
+  @Override
   public void clearCachedRecords(final Label cacheId) {
     synchronized (getSync()) {
       this.cacheIdToRecordIdMap.remove(cacheId);
@@ -298,20 +251,27 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
-  @Override
-  public void clearSelectedRecords() {
-    synchronized (getSync()) {
-      super.clearSelectedRecords();
-      clearCachedRecords(this.cacheIdSelected);
-    }
-  }
-
   protected LoadingWorker createLoadingWorker(final BoundingBox boundingBox) {
     return new LoadingWorker(this, boundingBox);
   }
 
-  protected ProxyLayerRecord createProxyRecord(final Identifier identifier) {
-    return new ProxyLayerRecord(this, identifier);
+  @SuppressWarnings("unchecked")
+  protected <V extends LayerRecord> V createProxyRecord(
+    final Identifier identifier) {
+    return (V)new IdentifierProxyLayerRecord(this, identifier);
+  }
+
+  @Override
+  public LayerRecord createRecord(final Map<String, Object> values) {
+    if (!isReadOnly() && isEditable() && isCanAddRecords()) {
+      final LayerRecord record = new NewProxyLayerRecord(this, values);
+      addRecordToCache(getCacheIdNew(), record);
+      cleanCachedRecords();
+      fireRecordInserted(record);
+      return record;
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -334,23 +294,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     super.delete();
     if (loadingWorker != null) {
       loadingWorker.cancel(true);
-    }
-  }
-
-  @Override
-  public void deleteRecord(final LayerRecord record,
-    final boolean trackDeletions) {
-    if (isLayerRecord(record)) {
-      record.setState(RecordState.Deleted);
-      unSelectRecords(record);
-      final Identifier id = record.getIdentifier();
-      if (id == null) {
-        super.deleteRecord(record, trackDeletions);
-      } else {
-        addRecordToCache(this.cacheIdDeleted, record);
-        super.deleteRecord(record, true);
-      }
-      removeFromIndex(record);
     }
   }
 
@@ -436,14 +379,14 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   @Override
   protected List<LayerRecord> doQuery(final Query query) {
     if (isExists()) {
-      final DataObjectStore dataStore = getDataStore();
-      if (dataStore != null) {
+      final DataObjectStore recordStore = getDataStore();
+      if (recordStore != null) {
         final boolean enabled = setEventsEnabled(false);
         try {
           final Statistics statistics = query.getProperty("statistics");
           query.setProperty("dataObjectFactory", this);
           try (
-            final Reader<LayerRecord> reader = (Reader)dataStore.query(query)) {
+            final Reader<LayerRecord> reader = (Reader)recordStore.query(query)) {
             final List<LayerRecord> records = new ArrayList<>();
             for (final LayerRecord record : reader) {
               final boolean added = addProxyRecordToList(records, record);
@@ -490,10 +433,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         boundingBox);
       for (final ListIterator<LayerRecord> iterator = records.listIterator(); iterator.hasNext();) {
         final LayerRecord record = iterator.next();
-        final LayerRecord cachedRecord = getCacheRecord(record);
-        if (filter.accept(cachedRecord)) {
-          iterator.set(cachedRecord);
-        } else {
+        if (!filter.accept(record)) {
           iterator.remove();
         }
       }
@@ -515,7 +455,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
           if (dataStore != null) {
             try (
               final Writer<Record> writer = dataStore.createWriter()) {
-              if (isCached(this.cacheIdDeleted, record)
+              if (isCached(this.getCacheIdDeleted(), record)
                 || super.isDeleted(record)) {
                 preDeleteRecord(record);
                 record.setState(RecordState.Deleted);
@@ -523,12 +463,15 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
               } else if (super.isModified(record)) {
                 writer.write(record);
               } else if (isNew(record)) {
-                Identifier id = record.getIdentifier();
+                Identifier identifier = record.getIdentifier();
                 final RecordDefinition metaData = getMetaData();
                 final List<String> idAttributeNames = metaData.getIdAttributeNames();
-                if (id == null && !idAttributeNames.isEmpty()) {
-                  id = SingleIdentifier.create(dataStore.createPrimaryIdValue(this.typePath));
-                  id.setIdentifier(record, idAttributeNames);
+                if (identifier == null && !idAttributeNames.isEmpty()) {
+                  final Object idValue = dataStore.createPrimaryIdValue(this.typePath);
+                  if (idValue != null) {
+                    identifier = SingleIdentifier.create(idValue);
+                    identifier.setIdentifier(record, idAttributeNames);
+                  }
                 }
                 writer.write(record);
               }
@@ -551,7 +494,9 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return getCoordinateSystem().getAreaBoundingBox();
   }
 
-  public LayerRecord getCachedRecord(final Identifier identifier) {
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends LayerRecord> V getCachedRecord(final Identifier identifier) {
     final RecordDefinition metaData = getMetaData();
     final List<String> idAttributeNames = metaData.getIdAttributeNames();
     if (idAttributeNames.isEmpty()) {
@@ -565,11 +510,25 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         final Query query = new Query(metaData, where);
         query.setProperty("dataObjectFactory", this);
         final DataObjectStore dataStore = getDataStore();
-        record = (LayerRecord)dataStore.queryFirst(query);
-        this.recordIdToRecordMap.put(identifier, record);
+        if (dataStore == null) {
+          return null;
+        } else {
+          record = (LayerRecord)dataStore.queryFirst(query);
+          this.recordIdToRecordMap.put(identifier, record);
+        }
       }
-      return record;
+      return (V)record;
     }
+  }
+
+  @Override
+  public int getCachedRecordCount(final Label cacheId) {
+    int count = super.getCachedRecordCount(cacheId);
+    final Set<Identifier> identifiers = this.cacheIdToRecordIdMap.get(cacheId);
+    if (identifiers != null) {
+      count += identifiers.size();
+    }
+    return count;
   }
 
   @SuppressWarnings({
@@ -593,40 +552,20 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return cachedRecords;
   }
 
-  protected Label getCacheIdSelected() {
-    return this.cacheIdSelected;
-  }
-
-  public LayerRecord getCacheRecord(final LayerRecord record) {
-    if (record == null) {
-      return null;
-    } else if (record instanceof ProxyLayerRecord) {
-      return record;
-    } else {
-      final Identifier id = getId(record);
-      return getCacheRecord(id, record);
-    }
-  }
-
-  private LayerRecord getCacheRecord(final Identifier id,
-    final LayerRecord record) {
-    if (id != null && record != null && isLayerRecord(record)) {
-      if (record instanceof ProxyLayerRecord) {
-        return record;
-      } else if (record.getState() == RecordState.New) {
-        return record;
-      } else if (record.getState() == RecordState.Deleted) {
-        return record;
-      } else {
-        synchronized (getSync()) {
-          if (!this.recordIdToRecordMap.containsKey(id)) {
-            this.recordIdToRecordMap.put(id, record);
+  @Override
+  public List<LayerRecord> getCachedRecords(final Label cacheId) {
+    synchronized (getSync()) {
+      final List<LayerRecord> records = super.getCachedRecords(cacheId);
+      final Set<Identifier> recordIds = this.cacheIdToRecordIdMap.get(cacheId);
+      if (recordIds != null) {
+        for (final Identifier recordId : recordIds) {
+          final LayerRecord record = getRecordById(recordId);
+          if (record != null) {
+            records.add(record);
           }
-          return createProxyRecord(id);
         }
       }
-    } else {
-      return record;
+      return records;
     }
   }
 
@@ -654,30 +593,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
 
   public BoundingBox getLoadingBoundingBox() {
     return this.loadingBoundingBox;
-  }
-
-  protected LayerRecord getProxyRecord(final LayerRecord record) {
-    if (record == null) {
-      return null;
-    } else if (!isLayerRecord(record)) {
-      return record;
-    } else {
-      final Identifier identifier = record.getIdentifier();
-      if (identifier == null) {
-        return record;
-      } else if (record instanceof ProxyLayerRecord) {
-        return record;
-      } else {
-        synchronized (getSync()) {
-          final LayerRecord cachedRecord = this.recordIdToRecordMap.get(identifier);
-          if (cachedRecord == null) {
-            return record;
-          } else {
-            return createProxyRecord(identifier);
-          }
-        }
-      }
-    }
   }
 
   @Override
@@ -739,32 +654,13 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return allRecords;
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
   protected List<LayerRecord> getRecordsFromDataStore(
     final BoundingBox boundingBox) {
-    if (isExists()) {
-      final DataObjectStore dataStore = getDataStore();
-      if (dataStore != null) {
-        final RecordDefinition metaData = getMetaData();
-        final Attribute geometryAttribute = getGeometryAttribute();
-        final Query query = new Query(metaData, F.envelopeIntersects(
-          geometryAttribute, boundingBox));
-        query.setProperty("dataObjectFactory", this);
-        try (
-          final Reader<LayerRecord> reader = (Reader)dataStore.query(query)) {
-          final List<LayerRecord> records = new ArrayList<>();
-
-          for (final LayerRecord record : reader) {
-            final LayerRecord cachedRecord = getCacheRecord(record);
-            records.add(cachedRecord);
-          }
-          return records;
-        }
-      }
-    }
-    return Collections.emptyList();
+    final RecordDefinition metaData = getMetaData();
+    final Attribute geometryAttribute = getGeometryAttribute();
+    final Query query = new Query(metaData, F.envelopeIntersects(
+      geometryAttribute, boundingBox));
+    return query(query);
   }
 
   @Override
@@ -778,28 +674,12 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     return 0;
   }
 
-  protected Object getSync() {
-    return this.sync;
-  }
-
   public String getTypePath() {
     return this.typePath;
   }
 
-  @Override
-  protected LayerRecord internalCancelChanges(final LayerRecord record) {
-    if (record.getState() == RecordState.Deleted) {
-      removeRecordFromCache(this.cacheIdDeleted, record);
-    }
-    return super.internalCancelChanges(record);
-  }
-
   public boolean isCached(final Label cacheId, final LayerRecord record) {
-    if (record == null) {
-      return false;
-    } else if (!isLayerRecord(record)) {
-      return false;
-    } else {
+    if (isLayerRecord(record)) {
       final Identifier identifier = record.getIdentifier();
       if (CollectionUtil.setContains(this.cacheIdToRecordIdMap, cacheId,
         identifier)) {
@@ -808,6 +688,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
         return false;
       }
     }
+    return false;
   }
 
   @Override
@@ -822,19 +703,36 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
   }
 
   @Override
+  public boolean isRecordCached(final Label cacheId, final LayerRecord record) {
+    if (isLayerRecord(record)) {
+      synchronized (getSync()) {
+        final Identifier identifier = record.getIdentifier();
+        if (identifier != null) {
+          final Set<Identifier> identifiers = this.cacheIdToRecordIdMap.get(cacheId);
+          if (identifiers != null) {
+            if (identifiers.contains(identifier)) {
+              return true;
+            }
+          }
+        }
+        return super.isRecordCached(cacheId, record);
+      }
+    }
+    return false;
+  }
+
+  @Override
   protected void postSaveChanges(final RecordState originalState,
     final LayerRecord record) {
     super.postSaveChanges(originalState, record);
-    if (originalState == RecordState.New) {
-      getCacheRecord(record);
-    }
+    record.postSaveChanges();
   }
 
   @Override
   protected boolean postSaveDeletedRecord(final LayerRecord record) {
     final boolean deleted = super.postSaveDeletedRecord(record);
     if (deleted) {
-      removeRecordFromCache(this.cacheIdDeleted, record);
+      removeRecordFromCache(this.getCacheIdDeleted(), record);
     }
     return deleted;
   }
@@ -857,7 +755,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
       this.boundingBox = new BoundingBoxDoubleGf();
       this.loadingBoundingBox = this.boundingBox;
-      setIndex(null);
+      setIndexRecords(null);
       cleanCachedRecords();
     }
     final DataObjectStore dataStore = getDataStore();
@@ -880,51 +778,41 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     }
   }
 
+  @Override
   public boolean removeRecordFromCache(final Label cacheId,
     final LayerRecord record) {
-    if (record == null) {
-      return false;
-    } else if (!isLayerRecord(record)) {
-      return false;
-    } else {
+    boolean removed = false;
+    if (isLayerRecord(record)) {
       final Identifier identifier = record.getIdentifier();
-      if (identifier == null) {
-        return false;
-      } else {
+      if (identifier != null) {
         synchronized (getSync()) {
-          CollectionUtil.removeFromSet(this.cacheIdToRecordIdMap, cacheId,
-            identifier);
+          removed = CollectionUtil.removeFromSet(this.cacheIdToRecordIdMap,
+            cacheId, identifier);
         }
       }
-      return true;
     }
-  }
-
-  public int removeRecordsFromCache(final Label cacheId,
-    final Collection<? extends LayerRecord> records) {
-    synchronized (getSync()) {
-      int count = 0;
-      for (final LayerRecord record : records) {
-        if (removeRecordFromCache(cacheId, record)) {
-          count++;
-        }
-      }
-      cleanCachedRecords();
-      return count;
-    }
+    removed |= super.removeRecordFromCache(cacheId, record);
+    return removed;
   }
 
   @Override
-  protected void removeSelectedRecord(final LayerRecord record) {
-    final Record cahcedRecord = getCacheRecord(record);
-    if (cahcedRecord != null) {
-      super.removeSelectedRecord(record);
+  public boolean removeRecordFromCache(final LayerRecord record) {
+    synchronized (getSync()) {
+      boolean removed = false;
+      if (isLayerRecord(record)) {
+        for (final Label cacheId : new ArrayList<>(
+          this.cacheIdToRecordIdMap.keySet())) {
+          removed |= removeRecordFromCache(cacheId, record);
+        }
+      }
+      removed |= super.removeRecordFromCache(record);
+      return removed;
     }
   }
 
   @Override
   public void revertChanges(final LayerRecord record) {
-    removeRecordFromCache(this.cacheIdDeleted, record);
+    removeRecordFromCache(this.getCacheIdDeleted(), record);
     super.revertChanges(record);
   }
 
@@ -932,21 +820,11 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     this.dataStore = dataStore;
   }
 
-  protected void setRecords(final BoundingBox loadedBoundingBox,
+  protected void setIndexRecords(final BoundingBox loadedBoundingBox,
     final List<LayerRecord> records) {
     synchronized (getSync()) {
       if (loadedBoundingBox == this.loadingBoundingBox) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        final DataObjectQuadTree index = new DataObjectQuadTree(geometryFactory);
-        for (final Record record : records) {
-          final LayerRecord cacheRecord = addRecordToCache(this.cacheIdIndex,
-            (LayerRecord)record);
-          index.insert(cacheRecord);
-        }
-        cleanCachedRecords();
-        final List<LayerRecord> newRecords = getNewRecords();
-        index.insert(newRecords);
-        setIndex(index);
+        setIndexRecords(records);
         clearLoading(loadedBoundingBox);
       }
     }
@@ -959,29 +837,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       this.cacheIdToRecordIdMap.put(cacheId, new HashSet<Identifier>());
       return addRecordsToCache(cacheId, records);
     }
-  }
-
-  @Override
-  public void setSelectedRecords(final BoundingBox boundingBox) {
-    if (isSelectable()) {
-      final List<LayerRecord> records = getRecords(boundingBox);
-      for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-        final LayerRecord layerDataObject = iterator.next();
-        if (!isVisible(layerDataObject) || super.isDeleted(layerDataObject)) {
-          iterator.remove();
-        }
-      }
-      if (!records.isEmpty()) {
-        showRecordsTable(DataObjectLayerTableModel.MODE_SELECTED);
-      }
-      setSelectedRecords(records);
-    }
-  }
-
-  @Override
-  public void setSelectedRecords(final Collection<LayerRecord> records) {
-    super.setSelectedRecords(records);
-    cleanCachedRecords();
   }
 
   public void setTypePath(final String typePath) {
@@ -1012,8 +867,7 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
     synchronized (getSync()) {
       final Identifier identifier = getId(record);
       if (identifier != null) {
-        addRecordToCache(this.cacheIdForm, record);
-        record = getProxyRecord(record);
+        record = addRecordToCache(this.cacheIdForm, record);
       }
       return super.showForm(record);
     }
@@ -1041,12 +895,6 @@ public class DataObjectStoreLayer extends AbstractDataObjectLayer {
       }
       unSelectRecords(records);
     }
-  }
-
-  @Override
-  public void unSelectRecords(final Collection<? extends LayerRecord> records) {
-    super.unSelectRecords(records);
-    removeRecordsFromCache(this.cacheIdSelected, records);
   }
 
 }

@@ -8,7 +8,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.AbstractDataObjectIoFactory;
 import com.revolsys.data.io.DataObjectIteratorReader;
-import com.revolsys.data.io.DataObjectReader;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -23,7 +23,7 @@ public class XBaseDataObjectIoFactory extends AbstractDataObjectIoFactory {
   }
 
   @Override
-  public DataObjectReader createDataObjectReader(final Resource resource,
+  public RecordReader createRecordReader(final Resource resource,
     final RecordFactory dataObjectFactory) {
     try {
       final XbaseIterator iterator = new XbaseIterator(resource,

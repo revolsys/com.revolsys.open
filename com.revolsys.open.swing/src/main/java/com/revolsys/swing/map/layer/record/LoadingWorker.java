@@ -17,9 +17,9 @@ import com.revolsys.swing.parallel.AbstractSwingWorker;
 public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> {
   private final BoundingBox viewportBoundingBox;
 
-  private final DataObjectStoreLayer layer;
+  private final RecordStoreLayer layer;
 
-  public LoadingWorker(final DataObjectStoreLayer layer,
+  public LoadingWorker(final RecordStoreLayer layer,
     final BoundingBox viewportBoundingBox) {
     this.layer = layer;
     this.viewportBoundingBox = viewportBoundingBox;
@@ -62,7 +62,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
       if (!isCancelled()) {
         final List<LayerRecord> records = get();
 
-        this.layer.setRecords(this.viewportBoundingBox, records);
+        this.layer.setIndexRecords(this.viewportBoundingBox, records);
       }
     } catch (final CancellationException e) {
       this.layer.clearLoading(this.viewportBoundingBox);

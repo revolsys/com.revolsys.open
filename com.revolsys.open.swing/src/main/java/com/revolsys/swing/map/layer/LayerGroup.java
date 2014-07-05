@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.data.io.AbstractDataObjectReaderFactory;
+import com.revolsys.data.io.AbstractRecordReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
@@ -35,7 +35,7 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
-import com.revolsys.swing.map.layer.record.DataObjectFileLayer;
+import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
@@ -608,8 +608,8 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
         properties);
       add(layer);
       layer.setEditable(true);
-    } else if (AbstractDataObjectReaderFactory.hasDataObjectReaderFactory(urlString)) {
-      final DataObjectFileLayer layer = new DataObjectFileLayer(properties);
+    } else if (AbstractRecordReaderFactory.hasDataObjectReaderFactory(urlString)) {
+      final FileRecordLayer layer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = layer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());
       add(layer);

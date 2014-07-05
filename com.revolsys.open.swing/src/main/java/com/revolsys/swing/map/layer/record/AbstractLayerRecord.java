@@ -14,11 +14,11 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayerRecord extends AbstractRecord implements
-  LayerRecord {
+LayerRecord {
 
-  private final AbstractDataObjectLayer layer;
+  private final AbstractRecordLayer layer;
 
-  public AbstractLayerRecord(final AbstractDataObjectLayer layer) {
+  public AbstractLayerRecord(final AbstractRecordLayer layer) {
     this.layer = layer;
   }
 
@@ -36,7 +36,7 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements
   @Override
   public void firePropertyChange(final String attributeName,
     final Object oldValue, final Object newValue) {
-    final AbstractDataObjectLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
       final PropertyChangeEvent event = new PropertyChangeEvent(this,
         attributeName, oldValue, newValue);
@@ -45,14 +45,18 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements
   }
 
   @Override
-  public AbstractDataObjectLayer getLayer() {
+  public AbstractRecordLayer getLayer() {
     return this.layer;
   }
 
   @Override
   public RecordDefinition getMetaData() {
-    final AbstractDataObjectLayer layer = getLayer();
-    return layer.getMetaData();
+    final AbstractRecordLayer layer = getLayer();
+    if (layer == null) {
+      return null;
+    } else {
+      return layer.getMetaData();
+    }
   }
 
   @Override
@@ -102,7 +106,7 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements
     } else if (this == record) {
       return true;
     } else {
-      final AbstractDataObjectLayer layer = getLayer();
+      final AbstractRecordLayer layer = getLayer();
       if (layer.isLayerRecord(record)) {
         final Identifier id = getIdentifier();
         final Identifier otherId = record.getIdentifier();
@@ -139,12 +143,16 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-          && !StringUtils.hasText((String)value)) {
+            && !StringUtils.hasText((String)value)) {
           return false;
         }
       }
       return true;
     }
+  }
+
+  @Override
+  public void postSaveChanges() {
   }
 
   @Override
