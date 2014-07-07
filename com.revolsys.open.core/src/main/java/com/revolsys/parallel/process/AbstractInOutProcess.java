@@ -27,7 +27,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     this.out = out;
   }
 
-  protected ChannelValueStore<I> createInDataStore() {
+  protected ChannelValueStore<I> createInValueStore() {
     if (inBufferSize == 0) {
       return new ZeroBuffer<I>();
     } else if (inBufferSize < 0) {
@@ -37,7 +37,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     }
   }
 
-  protected ChannelValueStore<O> createOutDataStore() {
+  protected ChannelValueStore<O> createOutValueStore() {
     if (outBufferSize == 0) {
       return new ZeroBuffer<O>();
     } else if (outBufferSize < 0) {
@@ -57,7 +57,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public Channel<I> getIn() {
     if (in == null) {
       final String channelName = getBeanName() + ".in";
-      final ChannelValueStore<I> buffer = createInDataStore();
+      final ChannelValueStore<I> buffer = createInValueStore();
       final Channel<I> channel = new Channel<I>(channelName, buffer);
       setIn(channel);
     }
@@ -75,7 +75,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public Channel<O> getOut() {
     if (out == null) {
       final String channelName = getBeanName() + ".out";
-      final ChannelValueStore<O> buffer = createOutDataStore();
+      final ChannelValueStore<O> buffer = createOutValueStore();
       final Channel<O> channel = new Channel<O>(channelName, buffer);
       setOut(channel);
     }

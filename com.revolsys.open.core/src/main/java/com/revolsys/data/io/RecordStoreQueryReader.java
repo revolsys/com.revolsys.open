@@ -38,7 +38,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
 
   public RecordStoreQueryReader(final AbstractRecordStore recordStore) {
     this();
-    setDataStore(recordStore);
+    setRecordStore(recordStore);
   }
 
   public void addQuery(final Query query) {
@@ -79,7 +79,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
     return boundingBox;
   }
 
-  public AbstractRecordStore getDataStore() {
+  public AbstractRecordStore getRecordStore() {
     return recordStore;
   }
 
@@ -124,7 +124,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
     this.boundingBox = boundingBox;
   }
 
-  public void setDataStore(final AbstractRecordStore recordStore) {
+  public void setRecordStore(final AbstractRecordStore recordStore) {
     this.recordStore = recordStore;
   }
 

@@ -160,7 +160,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return this.creationTimestampAttributeName;
   }
 
-  public RecordStore getDataStore() {
+  public RecordStore getRecordStore() {
     return this.recordStore;
   }
 
@@ -396,7 +396,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
       } else {
         this.typePath = recordDefinition.getPath();
         setName(PathUtil.getName(this.typePath));
-        this.recordStore = this.recordDefinition.getDataStore();
+        this.recordStore = this.recordDefinition.getRecordStore();
         recordDefinition.setProperty(getPropertyName(), this);
         this.recordStore.addCodeTable(this);
       }

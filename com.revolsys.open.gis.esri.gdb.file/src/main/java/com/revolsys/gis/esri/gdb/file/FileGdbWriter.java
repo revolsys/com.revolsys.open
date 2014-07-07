@@ -194,7 +194,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
   public void write(final Record object) {
     try {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
-      final RecordStore recordStore = recordDefinition.getDataStore();
+      final RecordStore recordStore = recordDefinition.getRecordStore();
       if (recordStore == this.recordStore) {
         switch (object.getState()) {
           case New:

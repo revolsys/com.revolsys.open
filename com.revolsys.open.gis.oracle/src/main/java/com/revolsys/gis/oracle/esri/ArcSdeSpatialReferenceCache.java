@@ -30,7 +30,7 @@ public class ArcSdeSpatialReferenceCache {
 
   public static ArcSdeSpatialReferenceCache get(
     final RecordStoreSchema schema) {
-    final AbstractJdbcRecordStore recordStore = (AbstractJdbcRecordStore)schema.getDataStore();
+    final AbstractJdbcRecordStore recordStore = (AbstractJdbcRecordStore)schema.getRecordStore();
     return get(recordStore);
 
   }

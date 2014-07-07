@@ -21,7 +21,7 @@ public class GlobalIdAttribute extends AbstractFileGdbAttribute {
 
   @Override
   public Object getValue(final Row row) {
-    synchronized (getDataStore()) {
+    synchronized (getRecordStore()) {
       final Guid guid = row.getGlobalId();
       return guid.toString();
     }
@@ -29,7 +29,7 @@ public class GlobalIdAttribute extends AbstractFileGdbAttribute {
 
   @Override
   public void setPostInsertValue(final Record object, final Row row) {
-    synchronized (getDataStore()) {
+    synchronized (getRecordStore()) {
       final Guid guid = row.getGlobalId();
       final String name = getName();
       final String string = guid.toString();

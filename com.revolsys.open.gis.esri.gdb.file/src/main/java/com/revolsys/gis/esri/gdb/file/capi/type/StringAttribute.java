@@ -19,7 +19,7 @@ public class StringAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getDataStore();
+    CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -38,7 +38,7 @@ public class StringAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        getDataStore().setNull(row, name);
+        getRecordStore().setNull(row, name);
       }
       return null;
     } else {
@@ -48,7 +48,7 @@ public class StringAttribute extends AbstractFileGdbAttribute {
           "Value is to long for: " + this + ":" + string);
         string = string.substring(0, getLength());
       }
-      synchronized (getDataStore()) {
+      synchronized (getRecordStore()) {
         row.setString(name, string);
       }
       return string;

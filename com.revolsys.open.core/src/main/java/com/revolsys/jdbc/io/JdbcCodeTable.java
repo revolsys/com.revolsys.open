@@ -166,7 +166,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
     return this.dataSource;
   }
 
-  public JdbcRecordStore getDataStore() {
+  public JdbcRecordStore getRecordStore() {
     return this.recordStore;
   }
 
@@ -358,7 +358,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.dataSource = dataSource;
   }
 
-  public void setDataStore(final JdbcRecordStore recordStore) {
+  public void setRecordStore(final JdbcRecordStore recordStore) {
     this.recordStore = recordStore;
     if (recordStore != null) {
       this.dataSource = recordStore.getDataSource();

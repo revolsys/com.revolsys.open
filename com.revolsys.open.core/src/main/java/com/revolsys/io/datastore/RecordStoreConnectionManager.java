@@ -41,12 +41,12 @@ public class RecordStoreConnectionManager
     return INSTANCE;
   }
 
-  public static <V extends RecordStore> V getDataStore(final File file) {
+  public static <V extends RecordStore> V getRecordStore(final File file) {
     final Map<String, String> connectionProperties = Collections.singletonMap(
       "url", FileUtil.toUrlString(file));
     final Map<String, Object> config = Collections.<String, Object> singletonMap(
       "connection", connectionProperties);
-    return getDataStore(config);
+    return getRecordStore(config);
   }
 
   /**
@@ -55,7 +55,7 @@ public class RecordStoreConnectionManager
    * @return
    */
   @SuppressWarnings("unchecked")
-  public static <T extends RecordStore> T getDataStore(
+  public static <T extends RecordStore> T getRecordStore(
     final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
     final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
@@ -65,7 +65,7 @@ public class RecordStoreConnectionManager
         final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
         final String name = (String)connectionProperties.get("name");
         if (StringUtils.hasText(name)) {
-          recordStore = getDataStore(name);
+          recordStore = getRecordStore(name);
           if (recordStore == null) {
             // TODO give option to add
             return null;
@@ -85,7 +85,7 @@ public class RecordStoreConnectionManager
     }
   }
 
-  public static RecordStore getDataStore(final String name) {
+  public static RecordStore getRecordStore(final String name) {
     final RecordStoreConnectionManager connectionManager = get();
     final List<RecordStoreConnectionRegistry> registries = new ArrayList<RecordStoreConnectionRegistry>();
     registries.addAll(connectionManager.getConnectionRegistries());
@@ -97,14 +97,14 @@ public class RecordStoreConnectionManager
     for (final RecordStoreConnectionRegistry registry : registries) {
       final RecordStoreConnection recordStoreConnection = registry.getConnection(name);
       if (recordStoreConnection != null) {
-        return recordStoreConnection.getDataStore();
+        return recordStoreConnection.getRecordStore();
       }
     }
     return null;
   }
 
   @SuppressWarnings("unchecked")
-  public static void releaseDataStore(final Map<String, ? extends Object> config) {
+  public static void releaseRecordStore(final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
     final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
     synchronized (recordStoreByConfig) {

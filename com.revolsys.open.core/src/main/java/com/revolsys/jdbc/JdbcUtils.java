@@ -102,7 +102,7 @@ public final class JdbcUtils {
       if (recordDefinition == null) {
         where.appendSql(query, null, sql);
       } else {
-        final RecordStore recordStore = recordDefinition.getDataStore();
+        final RecordStore recordStore = recordDefinition.getRecordStore();
         where.appendSql(query, recordStore, sql);
       }
     }
@@ -365,8 +365,8 @@ public final class JdbcUtils {
   public static void lockTable(final RecordStore recordStore,
     final String typePath) {
     if (recordStore instanceof JdbcRecordStore) {
-      final JdbcRecordStore jdbcDataStore = (JdbcRecordStore)recordStore;
-      final DataSource dataSource = jdbcDataStore.getDataSource();
+      final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)recordStore;
+      final DataSource dataSource = jdbcRecordStore.getDataSource();
       final String tableName = getQualifiedTableName(typePath);
       final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
       executeUpdate(dataSource, sql);

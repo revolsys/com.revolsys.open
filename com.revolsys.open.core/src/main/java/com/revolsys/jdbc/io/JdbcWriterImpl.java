@@ -700,7 +700,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   public synchronized void write(final Record object) {
     try {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
-      final RecordStore recordStore = recordDefinition.getDataStore();
+      final RecordStore recordStore = recordDefinition.getRecordStore();
       final RecordState state = object.getState();
       if (recordStore != this.recordStore) {
         if (state != RecordState.Deleted) {

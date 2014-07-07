@@ -119,7 +119,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    final CapiFileGdbRecordStore recordStore = getDataStore();
+    final CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -170,7 +170,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        getDataStore().setNull(row, name);
+        getRecordStore().setNull(row, name);
       }
       return null;
     } else if (value instanceof Geometry) {
@@ -187,7 +187,7 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
         SHP_UTIL.write(writeMethod, out, projectedGeometry);
       }
       final byte[] bytes = byteOut.toByteArray();
-      synchronized (getDataStore()) {
+      synchronized (getRecordStore()) {
         row.setGeometry(bytes);
       }
       return bytes;

@@ -23,7 +23,7 @@ public abstract class AbstractFileGdbAttribute extends Attribute {
     super(name, dataType, length, required);
   }
 
-  public CapiFileGdbRecordStore getDataStore() {
+  public CapiFileGdbRecordStore getRecordStore() {
     if (recordStore == null) {
       return null;
     } else {
@@ -33,7 +33,7 @@ public abstract class AbstractFileGdbAttribute extends Attribute {
 
   public abstract Object getValue(Row row);
 
-  public void setDataStore(final CapiFileGdbRecordStore recordStore) {
+  public void setRecordStore(final CapiFileGdbRecordStore recordStore) {
     this.recordStore = new WeakReference<CapiFileGdbRecordStore>(recordStore);
   }
 

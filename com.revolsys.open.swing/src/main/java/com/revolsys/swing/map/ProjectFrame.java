@@ -312,7 +312,7 @@ public class ProjectFrame extends BaseFrame {
       super.dispose();
       Property.removeAllListeners(this);
       if (this.project != null) {
-        final RecordStoreConnectionRegistry recordStores = this.project.getDataStores();
+        final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
         RecordStoreConnectionManager.get().removeConnectionRegistry(
           recordStores);
         if (Project.get() == this.project) {
@@ -460,7 +460,7 @@ public class ProjectFrame extends BaseFrame {
 
     final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager.get();
     recordStoreConnectionManager.removeConnectionRegistry("Project");
-    recordStoreConnectionManager.addConnectionRegistry(this.project.getDataStores());
+    recordStoreConnectionManager.addConnectionRegistry(this.project.getRecordStores());
 
     final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
     folderConnectionManager.removeConnectionRegistry("Project");

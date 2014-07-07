@@ -48,7 +48,7 @@ public class RecordStoreUpdateProcess extends BaseInProcess<Record> {
    * 
    * @return The data store.
    */
-  public RecordStore getDataStore() {
+  public RecordStore getRecordStore() {
     return recordStore;
   }
 
@@ -83,7 +83,7 @@ public class RecordStoreUpdateProcess extends BaseInProcess<Record> {
    * 
    * @param recordStore The data store.
    */
-  public void setDataStore(final RecordStore recordStore) {
+  public void setRecordStore(final RecordStore recordStore) {
     this.recordStore = recordStore;
   }
 }

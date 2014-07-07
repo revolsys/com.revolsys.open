@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,41 +64,14 @@ import com.revolsys.util.UrlUtil;
 /**
  * The FileUtil class is a utility class for performing common tasks with
  * classes from the java.io package.
- * 
+ *
  * @author Paul Austin
  */
 public final class FileUtil {
-  /** Files or directories to be deleted on exit. */
-  private static final List<File> deleteFilesOnExit = new ArrayList<File>();
-
-  /** The thread that deletes files on exit. */
-  private static Thread deleteFilesOnExitThread;
-
-  /** The logger to record errors to. */
-  private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
-
-  /** The file path separator for UNIX based systems. */
-  public static final char UNIX_FILE_SEPARATOR = '/';
-
-  public static final Charset UTF8 = Charset.forName("UTF-8");
-
-  /** The file path separator for Windows based systems. */
-  public static final char WINDOWS_FILE_SEPARATOR = '\\';
-
-  public static final ExtensionFilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "gif", "jpg", "png", "tif", "tiff", "bmp"
-    }));
-
-  public static final ExtensionFilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "avi", "wmv", "flv", "mpg"
-    }));
-
   /**
    * Close the writer without throwing an I/O exception if the close failed. The
    * error will be logged instead.
-   * 
+   *
    * @param closeables The closables to close.
    */
   public static void closeSilent(final AutoCloseable... closeables) {
@@ -108,7 +81,7 @@ public final class FileUtil {
   /**
    * Close the writer without throwing an I/O exception if the close failed. The
    * error will be logged instead.
-   * 
+   *
    * @param closeables The closables to close.
    */
   public static void closeSilent(
@@ -128,7 +101,7 @@ public final class FileUtil {
   /**
    * Convert the path containing UNIX or Windows file separators to the local
    * {@link File#separator} character.
-   * 
+   *
    * @param path The path to convert.
    * @return The converted path.
    */
@@ -175,13 +148,13 @@ public final class FileUtil {
   /**
    * Copy the contents of the file to the output stream. The output stream will
    * need to be closed manually after invoking this method.
-   * 
+   *
    * @param file The file to read the contents from.
    * @param out The output stream to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
   public static long copy(final File file, final OutputStream out)
-    throws IOException {
+      throws IOException {
     final FileInputStream in = new FileInputStream(file);
     try {
       return copy(in, out);
@@ -193,7 +166,7 @@ public final class FileUtil {
   /**
    * Copy the contents of the file to the writer. The writer will need to be
    * closed manually after invoking this method.
-   * 
+   *
    * @param file The file to read the contents from.
    * @param out The writer to write the contents to.
    * @throws IOException If an I/O error occurs.
@@ -210,7 +183,7 @@ public final class FileUtil {
   /**
    * Copy the contents of the input stream to the file. The input stream will
    * need to be closed manually after invoking this method.
-   * 
+   *
    * @param in The input stream to read the contents from.
    * @param file The file to write the contents to.
    * @throws IOException If an I/O error occurs.
@@ -231,14 +204,14 @@ public final class FileUtil {
 
   /**
    * Writes the content of a zip entry to a file using NIO.
-   * 
+   *
    * @param zin input stream from zip file
    * @param file file path where this entry will be saved
    * @param sz file size
    * @throws IOException if an i/o error
    */
   public static void copy(final InputStream zin, final File file, final long sz)
-    throws IOException {
+      throws IOException {
 
     ReadableByteChannel rc = null;
     FileOutputStream out = null;
@@ -278,7 +251,7 @@ public final class FileUtil {
    * Copy the contents of the input stream to the output stream. The input
    * stream and output stream will need to be closed manually after invoking
    * this method.
-   * 
+   *
    * @param in The input stream to read the contents from.
    * @param out The output stream to write the contents to.
    */
@@ -304,7 +277,7 @@ public final class FileUtil {
   /**
    * Copy the contents of the reader to the file. The reader will need to be
    * closed manually after invoking this method.
-   * 
+   *
    * @param in The reader to read the contents from.
    * @param file The file to write the contents to.
    * @throws IOException If an I/O error occurs.
@@ -326,7 +299,7 @@ public final class FileUtil {
   /**
    * Copy the contents of the reader to the writer. The reader and writer will
    * need to be closed manually after invoking this method.
-   * 
+   *
    * @param in The reader to read the contents from.
    * @param out The writer to write the contents to.
    * @throws IOException If an I/O error occurs.
@@ -352,7 +325,7 @@ public final class FileUtil {
 
   /**
    * Create a new temporary directory.
-   * 
+   *
    * @param prefix The file name prefix.
    * @param suffix The file name suffix.
    * @return The temportary directory.
@@ -395,7 +368,7 @@ public final class FileUtil {
   /**
    * Delete a directory and all the files and sub directories below the
    * directory.
-   * 
+   *
    * @param directory The directory to delete.
    */
   public static boolean deleteDirectory(final File directory) {
@@ -405,7 +378,7 @@ public final class FileUtil {
   /**
    * Delete all the files and sub directories below the directory. If the
    * deleteRoot flag is true the directory will also be deleted.
-   * 
+   *
    * @param directory The directory to delete.
    * @param deleteRoot Flag indicating if the directory should also be deleted.
    * @throws IOException If a file or directory could not be deleted.
@@ -462,9 +435,9 @@ public final class FileUtil {
   /**
    * Add the file to be deleted on exit. If the file is a directory the
    * directory and it's contents will be deleted.
-   * 
+   *
    * DON'T use in web applications
-   * 
+   *
    * @param file The file or directory to delete.
    */
   public static void deleteFileOnExit(final File file) {
@@ -496,7 +469,7 @@ public final class FileUtil {
 
   /**
    * Delete the files that match the java regular expression.
-   * 
+   *
    * @param directory The directory.
    * @param pattern The regular expression to match
    */
@@ -666,7 +639,7 @@ public final class FileUtil {
 
       File file = null;
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
-        .getConnectionRegistries()) {
+          .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
           final File directory = connection.getFile();
@@ -753,6 +726,22 @@ public final class FileUtil {
     }
   }
 
+  public static List<String> getFileNameExtensions(final String fileName) {
+    final List<String> extensions = new ArrayList<>();
+    int startIndex = fileName.indexOf("/");
+    if (startIndex == -1) {
+      startIndex = 0;
+    }
+    for (int dotIndex = fileName.indexOf('.', startIndex); dotIndex > 0; dotIndex = fileName.indexOf(
+      '.', startIndex)) {
+      dotIndex++;
+      final String extension = fileName.substring(dotIndex);
+      extensions.add(extension);
+      startIndex = dotIndex;
+    }
+    return extensions;
+  }
+
   public static String getFileNamePrefix(final File file) {
     final String fileName = getFileName(file);
     return getBaseName(fileName);
@@ -831,7 +820,7 @@ public final class FileUtil {
    * Return the relative path of the file from the parentDirectory. For example
    * the relative path of c:\Data\Files\file1.txt and c:\Data would be
    * Files\file1.txt.
-   * 
+   *
    * @param parentDirectory The parent directory.
    * @param file The file to return the relative path for.
    * @return The relative path.
@@ -948,9 +937,9 @@ public final class FileUtil {
     final StringBuilder encoded = new StringBuilder(len);
     for (int i = 0; i < len; i++) {
       final char ch = host.charAt(i);
-      if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
-        || (ch >= '0' && ch <= '9') || ch == '-' || ch == ',' || ch == '.'
-        || ch == '_' || ch == '~' || ch == ' ') {
+      if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0'
+        && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
+        || ch == '~' || ch == ' ') {
         encoded.append(ch);
       } else {
         encoded.append('%');
@@ -975,6 +964,33 @@ public final class FileUtil {
   public static String toUrlString(final File file) {
     return toUrl(file).toString();
   }
+
+  /** Files or directories to be deleted on exit. */
+  private static final List<File> deleteFilesOnExit = new ArrayList<File>();
+
+  /** The thread that deletes files on exit. */
+  private static Thread deleteFilesOnExitThread;
+
+  /** The logger to record errors to. */
+  private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
+
+  /** The file path separator for UNIX based systems. */
+  public static final char UNIX_FILE_SEPARATOR = '/';
+
+  public static final Charset UTF8 = Charset.forName("UTF-8");
+
+  /** The file path separator for Windows based systems. */
+  public static final char WINDOWS_FILE_SEPARATOR = '\\';
+
+  public static final ExtensionFilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
+    Arrays.asList(new String[] {
+      "gif", "jpg", "png", "tif", "tiff", "bmp"
+    }));
+
+  public static final ExtensionFilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
+    Arrays.asList(new String[] {
+      "avi", "wmv", "flv", "mpg"
+    }));
 
   /**
    * Construct a new FileUtil.

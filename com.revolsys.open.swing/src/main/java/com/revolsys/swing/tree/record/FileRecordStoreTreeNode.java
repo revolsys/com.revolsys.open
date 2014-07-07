@@ -31,16 +31,8 @@ import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.file.FileTreeNode;
 
 public class FileRecordStoreTreeNode extends FileTreeNode implements
-  RecordStoreProxy, RecordStoreConnectionMapProxy {
-  private static final MenuFactory MENU = new MenuFactory();
-
-  static {
-    MENU.addMenuItemTitleIcon("default", "Add Data Store Connection",
-      "link_add", null, FileRecordStoreTreeNode.class,
-      "addDataStoreConnection");
-  }
-
-  public static void addDataStoreConnection() {
+RecordStoreProxy, RecordStoreConnectionMapProxy {
+  public static void addRecordStoreConnection() {
     final FileRecordStoreTreeNode node = BaseTree.getMouseClickItem();
     final File file = node.getUserData();
     final String fileName = FileUtil.getBaseName(file);
@@ -60,7 +52,7 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
 
     SwingUtil.addLabel(panel, "Folder Connections");
     final List<RecordStoreConnectionRegistry> registries = RecordStoreConnectionManager.get()
-      .getVisibleConnectionRegistries();
+        .getVisibleConnectionRegistries();
     final JComboBox registryField = new JComboBox(
       new Vector<RecordStoreConnectionRegistry>(registries));
 
@@ -88,6 +80,14 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
     }
   }
 
+  private static final MenuFactory MENU = new MenuFactory();
+
+  static {
+    MENU.addMenuItemTitleIcon("default", "Add Data Store Connection",
+      "link_add", null, FileRecordStoreTreeNode.class,
+        "addRecordStoreConnection");
+  }
+
   public FileRecordStoreTreeNode(final TreeNode parent, final File file) {
     super(parent, file);
     setType("Data Store");
@@ -99,7 +99,7 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
   @Override
   protected List<TreeNode> doLoadChildren() {
     final List<TreeNode> children = new ArrayList<TreeNode>();
-    final RecordStore recordStore = getDataStore();
+    final RecordStore recordStore = getRecordStore();
     for (final RecordStoreSchema schema : recordStore.getSchemas()) {
       final String schemaPath = schema.getPath();
 
@@ -111,10 +111,15 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
   }
 
   @Override
+  public MenuFactory getMenu() {
+    return MENU;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
-  public <V extends RecordStore> V getDataStore() {
+  public <V extends RecordStore> V getRecordStore() {
     final File file = getUserData();
-    return (V)RecordStoreConnectionManager.getDataStore(file);
+    return (V)RecordStoreConnectionManager.getRecordStore(file);
   }
 
   @Override
@@ -124,11 +129,6 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
     final URL url = FileTreeNode.getUrl(parent, file);
 
     return Collections.<String, Object> singletonMap("url", url.toString());
-  }
-
-  @Override
-  public MenuFactory getMenu() {
-    return MENU;
   }
 
 }

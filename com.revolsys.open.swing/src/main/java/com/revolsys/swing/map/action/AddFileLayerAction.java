@@ -104,9 +104,9 @@ public class AddFileLayerAction extends AbstractAction {
     return new FileNameExtensionFilter(description, array);
   }
 
-  private void getFileDataStoreFilters(final List<FileFilter> fileFilters,
+  private void getFileRecordStoreFilters(final List<FileFilter> fileFilters,
     final Set<String> allExtensions) {
-    final List<RecordStoreFactory> factories = RecordStoreFactoryRegistry.getFileDataStoreFactories();
+    final List<RecordStoreFactory> factories = RecordStoreFactoryRegistry.getFileRecordStoreFactories();
     for (final RecordStoreFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
       String description = factory.getName();

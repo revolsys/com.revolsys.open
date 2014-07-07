@@ -322,7 +322,7 @@ RecordDefinition, Cloneable {
 
   @Override
   public void delete(final Record record) {
-    final RecordStore recordStore = getDataStore();
+    final RecordStore recordStore = getRecordStore();
     if (recordStore == null) {
       throw new UnsupportedOperationException();
     } else {
@@ -492,7 +492,7 @@ RecordDefinition, Cloneable {
 
   @Override
   public CodeTable getCodeTableByColumn(final String column) {
-    final RecordStore recordStore = getDataStore();
+    final RecordStore recordStore = getRecordStore();
     if (recordStore == null) {
       return null;
     } else {
@@ -512,7 +512,7 @@ RecordDefinition, Cloneable {
   @Override
   public RecordDefinitionFactory getRecordDefinitionFactory() {
     if (this.recordDefinitionFactory == null) {
-      final RecordStore recordStore = getDataStore();
+      final RecordStore recordStore = getRecordStore();
       return recordStore;
     } else {
       return this.recordDefinitionFactory;
@@ -520,7 +520,7 @@ RecordDefinition, Cloneable {
   }
 
   @Override
-  public RecordStore getDataStore() {
+  public RecordStore getRecordStore() {
     if (this.recordStore == null) {
       return null;
     } else {

@@ -35,7 +35,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getDataStore();
+    CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -57,7 +57,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        getDataStore().setNull(row, name);
+        getRecordStore().setNull(row, name);
       }
       return null;
     } else {
@@ -78,7 +78,7 @@ public class DateAttribute extends AbstractFileGdbAttribute {
           if (isRequired()) {
             date = MIN_DATE;
           } else {
-            getDataStore().setNull(row, name);
+            getRecordStore().setNull(row, name);
             return null;
           }
         } else if (date.after(MAX_DATE)) {
@@ -88,11 +88,11 @@ public class DateAttribute extends AbstractFileGdbAttribute {
           if (isRequired()) {
             date = MAX_DATE;
           } else {
-            getDataStore().setNull(row, name);
+            getRecordStore().setNull(row, name);
             return null;
           }
         }
-        synchronized (getDataStore()) {
+        synchronized (getRecordStore()) {
           final long time = date.getTime() / 1000;
           synchronized (LOCK) {
             row.setDate(name, time);

@@ -119,7 +119,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
     return dataSource;
   }
 
-  public JdbcRecordStore getDataStore() {
+  public JdbcRecordStore getRecordStore() {
     return recordStore;
   }
 

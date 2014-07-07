@@ -38,7 +38,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
         CapiFileGdbRecordStore recordStore = DATA_STORES.get(fileName);
         if (recordStore == null) {
           recordStore = new CapiFileGdbRecordStore(file);
-          recordStore.setCreateMissingDataStore(false);
+          recordStore.setCreateMissingRecordStore(false);
           DATA_STORES.put(fileName, recordStore);
         }
         return recordStore;

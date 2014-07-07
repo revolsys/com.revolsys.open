@@ -122,7 +122,7 @@ public class Project extends LayerGroup {
     return baseMapLayers;
   }
 
-  public RecordStoreConnectionRegistry getDataStores() {
+  public RecordStoreConnectionRegistry getRecordStores() {
     return recordStores;
   }
 
@@ -241,7 +241,7 @@ public class Project extends LayerGroup {
       setEventsEnabled(false);
       final Resource layersDir = SpringUtil.getResource(resource, "Layers");
       readProperties(layersDir);
-      final RecordStoreConnectionRegistry oldDataStoreConnections = RecordStoreConnectionRegistry.getForThread();
+      final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry.getForThread();
       try {
         final Resource recordStoresDirectory = SpringUtil.getResource(resource,
           "Data Stores");
@@ -249,7 +249,7 @@ public class Project extends LayerGroup {
         final boolean readOnly = isReadOnly();
         final RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
           "Project", recordStoresDirectory, readOnly);
-        setDataStores(recordStores);
+        setRecordStores(recordStores);
         RecordStoreConnectionRegistry.setForThread(recordStores);
 
         final Resource folderConnectionsDirectory = SpringUtil.getResource(
@@ -262,7 +262,7 @@ public class Project extends LayerGroup {
         readBaseMapsLayers(resource);
       } finally {
         setEventsEnabled(true);
-        RecordStoreConnectionRegistry.setForThread(oldDataStoreConnections);
+        RecordStoreConnectionRegistry.setForThread(oldRecordStoreConnections);
       }
     }
   }
@@ -403,7 +403,7 @@ public class Project extends LayerGroup {
     return result;
   }
 
-  public void setDataStores(final RecordStoreConnectionRegistry recordStores) {
+  public void setRecordStores(final RecordStoreConnectionRegistry recordStores) {
     this.recordStores = recordStores;
   }
 

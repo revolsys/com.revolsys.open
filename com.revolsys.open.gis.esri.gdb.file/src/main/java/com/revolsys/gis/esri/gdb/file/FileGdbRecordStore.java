@@ -13,7 +13,7 @@ public interface FileGdbRecordStore extends RecordStore {
   @Override
   void initialize();
 
-  void setCreateMissingDataStore(boolean createMissingDataStore);
+  void setCreateMissingRecordStore(boolean createMissingRecordStore);
 
   void setCreateMissingTables(boolean createMissingTables);
 

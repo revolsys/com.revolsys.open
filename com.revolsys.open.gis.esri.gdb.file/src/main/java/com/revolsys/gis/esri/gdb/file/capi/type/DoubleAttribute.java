@@ -24,7 +24,7 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getDataStore();
+    CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -43,13 +43,13 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        getDataStore().setNull(row, name);
+        getRecordStore().setNull(row, name);
       }
       return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final double doubleValue = number.doubleValue();
-      synchronized (getDataStore()) {
+      synchronized (getRecordStore()) {
         row.setDouble(name, doubleValue);
       }
       return doubleValue;
@@ -57,7 +57,7 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
       final String string = value.toString();
       if (StringUtils.hasText(string)) {
         final double doubleValue = Double.parseDouble(string);
-        synchronized (getDataStore()) {
+        synchronized (getRecordStore()) {
           row.setDouble(name, doubleValue);
         }
         return doubleValue;
@@ -65,7 +65,7 @@ public class DoubleAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        getDataStore().setNull(row, name);
+        getRecordStore().setNull(row, name);
         return null;
       }
     }

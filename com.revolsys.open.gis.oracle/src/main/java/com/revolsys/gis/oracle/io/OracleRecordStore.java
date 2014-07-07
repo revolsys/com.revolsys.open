@@ -388,8 +388,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
         + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
         + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
 
-      addDataStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
-      addDataStoreExtension(new ArcSdeBinaryGeometryRecordStoreExtension());
+      addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
+      addRecordStoreExtension(new ArcSdeBinaryGeometryRecordStoreExtension());
 
     }
   }

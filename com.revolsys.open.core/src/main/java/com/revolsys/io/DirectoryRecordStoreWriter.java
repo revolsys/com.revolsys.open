@@ -23,21 +23,21 @@ public class DirectoryRecordStoreWriter extends AbstractWriter<Record> {
   public void write(final Record object) {
     if (object != null) {
       try {
-        final boolean currentDataStore = object.getRecordDefinition()
-          .getDataStore() == recordStore;
+        final boolean currentRecordStore = object.getRecordDefinition()
+          .getRecordStore() == recordStore;
         switch (object.getState()) {
           case New:
             recordStore.insert(object);
           break;
           case Modified:
-            if (currentDataStore) {
+            if (currentRecordStore) {
               throw new UnsupportedOperationException();
             } else {
               recordStore.insert(object);
             }
           break;
           case Persisted:
-            if (currentDataStore) {
+            if (currentRecordStore) {
               throw new UnsupportedOperationException();
             } else {
               recordStore.insert(object);

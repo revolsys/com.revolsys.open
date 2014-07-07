@@ -59,7 +59,7 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   @Override
   protected List<TreeNode> doLoadChildren() {
     final List<TreeNode> children = new ArrayList<TreeNode>();
-    final RecordStore recordStore = getDataStore();
+    final RecordStore recordStore = getRecordStore();
     if (recordStore != null) {
       for (final RecordStoreSchema schema : recordStore.getSchemas()) {
         final String schemaPath = schema.getPath();
@@ -79,9 +79,9 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V extends RecordStore> V getDataStore() {
+  public <V extends RecordStore> V getRecordStore() {
     final RecordStoreConnection connection = getConnection();
-    return (V)connection.getDataStore();
+    return (V)connection.getRecordStore();
   }
 
   @Override

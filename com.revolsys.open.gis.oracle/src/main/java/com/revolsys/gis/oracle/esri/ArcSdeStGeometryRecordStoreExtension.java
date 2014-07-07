@@ -20,7 +20,7 @@ import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeStGeometryRecordStoreExtension implements
-  RecordStoreExtension {
+RecordStoreExtension {
 
   public ArcSdeStGeometryRecordStoreExtension() {
   }
@@ -28,11 +28,11 @@ public class ArcSdeStGeometryRecordStoreExtension implements
   @Override
   public void initialize(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
-    final OracleRecordStore oracleDataStore = (OracleRecordStore)recordStore;
+    final OracleRecordStore oracleRecordStore = (OracleRecordStore)recordStore;
     final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
-      oracleDataStore);
-    oracleDataStore.addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
-    oracleDataStore.addAttributeAdder("SDE.ST_GEOMETRY",
+      oracleRecordStore);
+    oracleRecordStore.addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
+    oracleRecordStore.addAttributeAdder("SDE.ST_GEOMETRY",
       stGeometryAttributeAdder);
   }
 
@@ -116,7 +116,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements
       while (resultSet.next()) {
         final String tableName = resultSet.getString(2);
         final String typePath = PathUtil.toPath(schemaName, tableName)
-          .toUpperCase();
+            .toUpperCase();
 
         final int registrationId = resultSet.getInt(1);
         JdbcAttributeAdder.setTableProperty(schema, typePath,
@@ -144,24 +144,24 @@ public class ArcSdeStGeometryRecordStoreExtension implements
       final String rowIdColumn = JdbcAttributeAdder.getTableProperty(schema,
         typePath, ArcSdeConstants.ROWID_COLUMN);
       if (registrationId != null && rowIdColumn != null) {
-        ArcSdeObjectIdJdbcAttribute.replaceAttribute(schemaName, recordDefinition,
-          registrationId, rowIdColumn);
+        ArcSdeObjectIdJdbcAttribute.replaceAttribute(schemaName,
+          recordDefinition, registrationId, rowIdColumn);
       }
     }
   }
 
   @Override
   public void preProcess(final RecordStoreSchema schema) {
-    final RecordStore recordStore = schema.getDataStore();
-    final OracleRecordStore oracleDataStore = (OracleRecordStore)recordStore;
+    final RecordStore recordStore = schema.getRecordStore();
+    final OracleRecordStore oracleRecordStore = (OracleRecordStore)recordStore;
     try {
-      final Connection connection = oracleDataStore.getSqlConnection();
+      final Connection connection = oracleRecordStore.getSqlConnection();
       try {
-        final String schemaName = oracleDataStore.getDatabaseSchemaName(schema);
+        final String schemaName = oracleRecordStore.getDatabaseSchemaName(schema);
         loadTableProperties(connection, schema, schemaName);
         loadColumnProperties(schema, schemaName, connection);
       } finally {
-        oracleDataStore.releaseSqlConnection(connection);
+        oracleRecordStore.releaseSqlConnection(connection);
       }
     } catch (final SQLException e) {
       LoggerFactory.getLogger(getClass()).error(

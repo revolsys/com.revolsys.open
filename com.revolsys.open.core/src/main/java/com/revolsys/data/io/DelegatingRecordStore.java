@@ -144,7 +144,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
     return recordStore.getRecordFactory();
   }
 
-  public AbstractRecordStore getDataStore() {
+  public AbstractRecordStore getRecordStore() {
     return recordStore;
   }
 

@@ -65,7 +65,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
     this.config = new HashMap<String, Object>(config);
   }
 
-  protected RecordStore createDataStore() {
+  protected RecordStore createRecordStore() {
     if (config != null) {
       final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(config);
       return recordStore;
@@ -74,9 +74,9 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
     }
   }
 
-  public RecordStore getDataStore() {
+  public RecordStore getRecordStore() {
     if (recordStore == null) {
-      recordStore = createDataStore();
+      recordStore = createRecordStore();
       recordStore.initialize();
     }
     return recordStore;
@@ -102,14 +102,14 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
       return equal;
     } else if (method.getName().equals("close") && numArgs == 0) {
       if (recordStore != null) {
-        final RecordStore recordStore = getDataStore();
+        final RecordStore recordStore = getRecordStore();
 
         recordStore.close();
         this.recordStore = null;
       }
       return null;
     } else {
-      final RecordStore recordStore = getDataStore();
+      final RecordStore recordStore = getRecordStore();
       return method.invoke(recordStore, args);
     }
   }

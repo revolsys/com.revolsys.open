@@ -47,10 +47,10 @@ public class GuidAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    if (getDataStore().isNull(row, name)) {
+    if (getRecordStore().isNull(row, name)) {
       return null;
     } else {
-      synchronized (getDataStore()) {
+      synchronized (getRecordStore()) {
         final Guid guid = row.getGuid(name);
         addGuid(guid);
         return guid.toString();
@@ -67,13 +67,13 @@ public class GuidAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        getDataStore().setNull(row, name);
+        getRecordStore().setNull(row, name);
       }
       return null;
     } else {
       final String guidString = value.toString();
       final Guid guid = getGuid(guidString);
-      synchronized (getDataStore()) {
+      synchronized (getRecordStore()) {
         row.setGuid(name, guid);
       }
       return guid;

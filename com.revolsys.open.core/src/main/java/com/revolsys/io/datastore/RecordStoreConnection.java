@@ -54,7 +54,7 @@ public class RecordStoreConnection implements MapSerializer {
 
   }
 
-  public RecordStore getDataStore() {
+  public RecordStore getRecordStore() {
     synchronized (this) {
       if (recordStore == null) {
         try {
@@ -81,7 +81,7 @@ public class RecordStoreConnection implements MapSerializer {
   }
 
   public List<RecordStoreSchema> getSchemas() {
-    final RecordStore recordStore = getDataStore();
+    final RecordStore recordStore = getRecordStore();
     if (recordStore == null) {
       return Collections.emptyList();
     } else {

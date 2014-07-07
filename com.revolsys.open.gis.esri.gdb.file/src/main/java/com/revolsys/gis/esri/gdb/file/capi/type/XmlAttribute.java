@@ -18,7 +18,7 @@ public class XmlAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getDataStore();
+    CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -37,12 +37,12 @@ public class XmlAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        getDataStore().setNull(row, name);
+        getRecordStore().setNull(row, name);
       }
       return null;
     } else {
       final String string = value.toString();
-      synchronized (getDataStore()) {
+      synchronized (getRecordStore()) {
         row.setXML(name, string);
       }
       return string;

@@ -57,7 +57,7 @@ public class FileGdbIoTest {
     try (
       final CapiFileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file)) {
       recordStore.setCreateMissingTables(true);
-      recordStore.setCreateMissingDataStore(true);
+      recordStore.setCreateMissingRecordStore(true);
       recordStore.initialize();
 
       final String typePath = "/" + geometryTypeString;

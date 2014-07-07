@@ -32,26 +32,25 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   private Writer<Record> writer;
 
-  private boolean createMissingDataStore = true;
+  private boolean createMissingRecordStore = true;
 
-  public DirectoryRecordStore(final File directory,
-    final String fileExtension) {
+  public DirectoryRecordStore(final File directory, final String fileExtension) {
     this.directory = directory;
     this.fileExtension = fileExtension;
   }
 
   @Override
   public void close() {
-    directory = null;
-    if (writers != null) {
-      for (final Writer<Record> writer : writers.values()) {
+    this.directory = null;
+    if (this.writers != null) {
+      for (final Writer<Record> writer : this.writers.values()) {
         writer.close();
       }
-      writers.clear();
+      this.writers.clear();
     }
-    if (writer != null) {
-      writer.close();
-      writer = null;
+    if (this.writer != null) {
+      this.writer.close();
+      this.writer = null;
     }
     super.close();
   }
@@ -62,30 +61,31 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   public File getDirectory() {
-    return directory;
+    return this.directory;
   }
 
   public String getFileExtension() {
-    return fileExtension;
+    return this.fileExtension;
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(final RecordDefinition objectMetaData) {
+  public RecordDefinition getRecordDefinition(
+    final RecordDefinition objectMetaData) {
     final RecordDefinition recordDefinition = super.getRecordDefinition(objectMetaData);
-    if (recordDefinition == null && createMissingTables) {
+    if (recordDefinition == null && this.createMissingTables) {
       final String typePath = objectMetaData.getPath();
       final String schemaName = PathUtil.getPath(typePath);
       RecordStoreSchema schema = getSchema(schemaName);
-      if (schema == null && createMissingTables) {
+      if (schema == null && this.createMissingTables) {
         schema = new RecordStoreSchema(this, schemaName);
         addSchema(schema);
       }
-      final File schemaDirectory = new File(directory, schemaName);
+      final File schemaDirectory = new File(this.directory, schemaName);
       if (!schemaDirectory.exists()) {
         schemaDirectory.mkdirs();
       }
-      final RecordDefinitionImpl newMetaData = new RecordDefinitionImpl(
-        this, schema, typePath);
+      final RecordDefinitionImpl newMetaData = new RecordDefinitionImpl(this,
+        schema, typePath);
       for (final Attribute attribute : objectMetaData.getAttributes()) {
         final Attribute newAttribute = new Attribute(attribute);
         newMetaData.addAttribute(newAttribute);
@@ -102,17 +102,17 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   @Override
   public synchronized Writer<Record> getWriter() {
-    if (writer == null && directory != null) {
-      writer = new DirectoryRecordStoreWriter(this);
+    if (this.writer == null && this.directory != null) {
+      this.writer = new DirectoryRecordStoreWriter(this);
     }
-    return writer;
+    return this.writer;
   }
 
   @PostConstruct
   @Override
   public void initialize() {
-    if (!directory.exists()) {
-      directory.mkdirs();
+    if (!this.directory.exists()) {
+      this.directory.mkdirs();
     }
     super.initialize();
   }
@@ -121,30 +121,30 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   public synchronized void insert(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
-    Writer<Record> writer = writers.get(typePath);
+    Writer<Record> writer = this.writers.get(typePath);
     if (writer == null) {
       final String schemaName = PathUtil.getPath(typePath);
       final File subDirectory = new File(getDirectory(), schemaName);
-      final File file = new File(subDirectory, recordDefinition.getTypeName() + "."
-        + getFileExtension());
+      final File file = new File(subDirectory, recordDefinition.getTypeName()
+        + "." + getFileExtension());
       final Resource resource = new FileSystemResource(file);
       writer = AbstractRecordIoFactory.recordWriter(recordDefinition, resource);
       if (writer instanceof ObjectWithProperties) {
         final ObjectWithProperties properties = writer;
         properties.setProperties(getProperties());
       }
-      writers.put(typePath, writer);
+      this.writers.put(typePath, writer);
     }
     writer.write(object);
     addStatistic("Insert", object);
   }
 
-  public boolean isCreateMissingDataStore() {
-    return createMissingDataStore;
+  public boolean isCreateMissingRecordStore() {
+    return this.createMissingRecordStore;
   }
 
   public boolean isCreateMissingTables() {
-    return createMissingTables;
+    return this.createMissingTables;
   }
 
   protected RecordDefinition loadMetaData(final String schemaName,
@@ -153,13 +153,12 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  protected void loadSchemaRecordDefinitions(
-    final RecordStoreSchema schema,
+  protected void loadSchemaRecordDefinitions(final RecordStoreSchema schema,
     final Map<String, RecordDefinition> recordDefinitionMap) {
     final String schemaName = schema.getPath();
-    final File subDirectory = new File(directory, schemaName);
+    final File subDirectory = new File(this.directory, schemaName);
     final File[] files = subDirectory.listFiles(new ExtensionFilenameFilter(
-      fileExtension));
+      this.fileExtension));
     if (files != null) {
       for (final File file : files) {
         final RecordDefinition recordDefinition = loadMetaData(schemaName, file);
@@ -173,7 +172,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   @Override
   protected void loadSchemas(final Map<String, RecordStoreSchema> schemaMap) {
-    final File[] directories = directory.listFiles(new DirectoryFilenameFilter());
+    final File[] directories = this.directory.listFiles(new DirectoryFilenameFilter());
     if (directories != null) {
       for (final File subDirectory : directories) {
         final String directoryName = FileUtil.getFileName(subDirectory);
@@ -182,8 +181,8 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     }
   }
 
-  public void setCreateMissingDataStore(final boolean createMissingDataStore) {
-    this.createMissingDataStore = createMissingDataStore;
+  public void setCreateMissingRecordStore(final boolean createMissingRecordStore) {
+    this.createMissingRecordStore = createMissingRecordStore;
   }
 
   public void setCreateMissingTables(final boolean createMissingTables) {

@@ -69,7 +69,7 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
     final TreeNode parent = getParentNode();
     if (parent instanceof RecordStoreProxy) {
       final RecordStoreProxy proxy = (RecordStoreProxy)parent;
-      return proxy.getDataStore();
+      return proxy.getRecordStore();
     } else {
       return null;
     }

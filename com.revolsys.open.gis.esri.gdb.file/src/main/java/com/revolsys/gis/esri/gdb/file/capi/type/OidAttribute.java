@@ -22,7 +22,7 @@ public class OidAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getDataStore();
+    CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -34,7 +34,7 @@ public class OidAttribute extends AbstractFileGdbAttribute {
 
   @Override
   public void setPostInsertValue(final Record object, final Row row) {
-    synchronized (getDataStore()) {
+    synchronized (getRecordStore()) {
       final int oid = row.getOid();
       final String name = getName();
       object.setValue(name, oid);

@@ -106,7 +106,7 @@ public class RecordStoreQueryTextField extends TextField implements
     final String displayAttributeName, final List<Query> queries) {
     super(displayAttributeName);
     this.recordDefinition = recordDefinition;
-    this.recordStore = recordDefinition.getDataStore();
+    this.recordStore = recordDefinition.getRecordStore();
     this.idAttributeName = recordDefinition.getIdAttributeName();
     this.displayAttributeName = displayAttributeName;
 

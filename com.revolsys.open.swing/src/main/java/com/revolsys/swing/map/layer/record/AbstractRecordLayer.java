@@ -938,8 +938,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     return getGeometryFactory().getCoordinateSystem();
   }
 
-  public RecordStore getDataStore() {
-    return getRecordDefinition().getDataStore();
+  public RecordStore getRecordStore() {
+    return getRecordDefinition().getRecordStore();
   }
 
   public int getDeletedRecordCount() {

@@ -64,7 +64,7 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends RecordStore> V getDataStore() {
+  public <V extends RecordStore> V getRecordStore() {
     if (recordStore == null) {
       return null;
     } else {
@@ -75,7 +75,7 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
   public GeometryFactory getGeometryFactory() {
     final GeometryFactory geometryFactory = getProperty("geometryFactory");
     if (geometryFactory == null) {
-      final AbstractRecordStore recordStore = getDataStore();
+      final AbstractRecordStore recordStore = getRecordStore();
       if (recordStore == null) {
         return GeometryFactory.floating3();
       } else {
@@ -129,9 +129,9 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
 
   public synchronized void refreshMetaData() {
     recordDefinitionCache = new TreeMap<>();
-    final AbstractRecordStore recordStore = getDataStore();
+    final AbstractRecordStore recordStore = getRecordStore();
     if (recordStore != null) {
-      final Collection<RecordStoreExtension> extensions = recordStore.getDataStoreExtensions();
+      final Collection<RecordStoreExtension> extensions = recordStore.getRecordStoreExtensions();
       for (final RecordStoreExtension extension : extensions) {
         try {
           if (extension.isEnabled(recordStore)) {

@@ -19,7 +19,7 @@ public class RecordStoreSchemaProxy extends RecordStoreSchema {
     if (recordDefinition == null) {
       recordDefinition = schema.findMetaData(typePath);
       if (recordDefinition != null) {
-        recordDefinition = new RecordDefinitionImpl(getDataStore(), this,
+        recordDefinition = new RecordDefinitionImpl(getRecordStore(), this,
           recordDefinition);
         addMetaData(typePath, recordDefinition);
       }
@@ -33,7 +33,7 @@ public class RecordStoreSchemaProxy extends RecordStoreSchema {
     if (recordDefinition == null) {
       recordDefinition = schema.getRecordDefinition(typePath);
       if (recordDefinition != null) {
-        recordDefinition = new RecordDefinitionImpl(getDataStore(), this,
+        recordDefinition = new RecordDefinitionImpl(getRecordStore(), this,
           recordDefinition);
         addMetaData(typePath, recordDefinition);
       }

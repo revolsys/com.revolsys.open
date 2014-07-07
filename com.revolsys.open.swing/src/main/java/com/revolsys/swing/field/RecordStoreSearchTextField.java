@@ -76,7 +76,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
 
   public RecordStoreSearchTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName) {
-    this(recordDefinition.getDataStore(), displayAttributeName, new Query(recordDefinition,
+    this(recordDefinition.getRecordStore(), displayAttributeName, new Query(recordDefinition,
       new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
       recordDefinition, Q.iLike(displayAttributeName, "")));
   }

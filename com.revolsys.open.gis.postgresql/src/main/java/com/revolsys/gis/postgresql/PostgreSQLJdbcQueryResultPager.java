@@ -50,7 +50,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
             connection = JdbcUtils.getConnection(dataSource);
           }
           try {
-            final JdbcRecordStore recordStore = getDataStore();
+            final JdbcRecordStore recordStore = getRecordStore();
             final RecordFactory recordFactory = getRecordFactory();
             final RecordDefinition recordDefinition = getRecordDefinition();
             if (recordDefinition != null) {
@@ -96,7 +96,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
   @Override
   public int getNumResults() {
     if (numResults == null) {
-      final JdbcRecordStore recordStore = getDataStore();
+      final JdbcRecordStore recordStore = getRecordStore();
       final Query query = getQuery();
       numResults = recordStore.getRowCount(query);
       updateNumPages();

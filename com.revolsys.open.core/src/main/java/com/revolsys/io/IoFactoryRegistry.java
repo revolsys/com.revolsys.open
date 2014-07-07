@@ -25,10 +25,6 @@ import com.revolsys.util.CollectionUtil;
 
 public class IoFactoryRegistry {
 
-  private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
-
-  private static IoFactoryRegistry instance = new IoFactoryRegistry();
-
   public static void clearInstance() {
     instance = null;
   }
@@ -52,6 +48,10 @@ public class IoFactoryRegistry {
       return instance;
     }
   }
+
+  private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
+
+  private static IoFactoryRegistry instance = new IoFactoryRegistry();
 
   private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<Class<? extends IoFactory>, Set<String>>();
 
@@ -90,7 +90,7 @@ public class IoFactoryRegistry {
                   addFactory(factory);
                 } else {
                   LOG.error(factoryClassName + " is not a subclass of "
-                    + IoFactory.class);
+                      + IoFactory.class);
                 }
               } catch (final Throwable e) {
                 LOG.error("Unable to load: " + factoryClassName, e);
@@ -108,7 +108,7 @@ public class IoFactoryRegistry {
   }
 
   public synchronized void addFactory(final IoFactory factory) {
-    if (factories.add(factory)) {
+    if (this.factories.add(factory)) {
       final Class<? extends IoFactory> factoryClass = factory.getClass();
       addFactory(factory, factoryClass);
     }
@@ -124,12 +124,13 @@ public class IoFactoryRegistry {
         final Set<IoFactory> factories = getFactories(ioInterface);
         if (factories.add(factory)) {
           for (final String fileExtension : factory.getFileExtensions()) {
-            CollectionUtil.addToTreeSet(classFileExtensions, ioInterface,
+            CollectionUtil.addToTreeSet(this.classFileExtensions, ioInterface,
               fileExtension);
             final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(ioInterface);
             factoriesByFileExtension.put(fileExtension, factory);
             for (final String mediaType : factory.getMediaTypes()) {
-              extensionMimeTypeMap.put(fileExtension.toLowerCase(), mediaType);
+              this.extensionMimeTypeMap.put(fileExtension.toLowerCase(),
+                mediaType);
             }
           }
           final Map<String, IoFactory> factoriesByMediaType = getFactoriesByMediaType(ioInterface);
@@ -149,7 +150,7 @@ public class IoFactoryRegistry {
   }
 
   public Map<String, String> getExtensionMimeTypeMap() {
-    return extensionMimeTypeMap;
+    return this.extensionMimeTypeMap;
   }
 
   @SuppressWarnings("unchecked")
@@ -158,17 +159,17 @@ public class IoFactoryRegistry {
     if (factoryClass == null) {
       return Collections.emptySet();
     } else {
-      Set<IoFactory> factories = classFactories.get(factoryClass);
+      Set<IoFactory> factories = this.classFactories.get(factoryClass);
       if (factories == null) {
         factories = new LinkedHashSet<IoFactory>();
-        classFactories.put(factoryClass, factories);
+        this.classFactories.put(factoryClass, factories);
       }
       return (Set<F>)factories;
     }
   }
 
   public Set<IoFactory> getFactoriesByClass() {
-    return factories;
+    return this.factories;
   }
 
   public <F extends IoFactory> List<F> getFactoriesByFileExtension(
@@ -194,10 +195,10 @@ public class IoFactoryRegistry {
     if (factoryClass == null) {
       return Collections.emptyMap();
     } else {
-      Map<String, IoFactory> factoriesByFileExtension = classFactoriesByFileExtension.get(factoryClass);
+      Map<String, IoFactory> factoriesByFileExtension = this.classFactoriesByFileExtension.get(factoryClass);
       if (factoriesByFileExtension == null) {
         factoriesByFileExtension = new TreeMap<String, IoFactory>();
-        classFactoriesByFileExtension.put(factoryClass,
+        this.classFactoriesByFileExtension.put(factoryClass,
           factoriesByFileExtension);
       }
       return (Map<String, F>)factoriesByFileExtension;
@@ -210,10 +211,10 @@ public class IoFactoryRegistry {
     if (factoryClass == null) {
       return Collections.emptyMap();
     } else {
-      Map<String, IoFactory> factoriesByMediaType = classFactoriesByMediaType.get(factoryClass);
+      Map<String, IoFactory> factoriesByMediaType = this.classFactoriesByMediaType.get(factoryClass);
       if (factoriesByMediaType == null) {
         factoriesByMediaType = new TreeMap<String, IoFactory>();
-        classFactoriesByMediaType.put(factoryClass, factoriesByMediaType);
+        this.classFactoriesByMediaType.put(factoryClass, factoriesByMediaType);
       }
       return (Map<String, F>)factoriesByMediaType;
     }
@@ -234,8 +235,13 @@ public class IoFactoryRegistry {
     if (fileName == null) {
       return null;
     } else {
-      final String fileExtension = FileUtil.getFileNameExtension(fileName);
-      return getFactoryByFileExtension(factoryClass, fileExtension);
+      for (final String fileExtension : FileUtil.getFileNameExtensions(fileName)) {
+        final F factory = getFactoryByFileExtension(factoryClass, fileExtension);
+        if (factory != null) {
+          return factory;
+        }
+      }
+      return null;
     }
   }
 
@@ -275,7 +281,8 @@ public class IoFactoryRegistry {
       return Collections.emptySet();
     } else {
       final Set<String> emptySet = Collections.<String> emptySet();
-      return CollectionUtil.get(classFileExtensions, factoryClass, emptySet);
+      return CollectionUtil.get(this.classFileExtensions, factoryClass,
+        emptySet);
     }
   }
 
@@ -300,9 +307,9 @@ public class IoFactoryRegistry {
   }
 
   public void setFactories(final Set<IoFactory> factories) {
-    classFactoriesByFileExtension.clear();
-    classFactoriesByMediaType.clear();
-    classFactories.clear();
+    this.classFactoriesByFileExtension.clear();
+    this.classFactoriesByMediaType.clear();
+    this.classFactories.clear();
 
     this.factories.clear();
     if (factories != null) {

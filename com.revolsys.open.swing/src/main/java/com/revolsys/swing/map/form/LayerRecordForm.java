@@ -232,7 +232,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   protected ObjectLabelField addCodeTableLabelField(final String fieldName) {
-    final RecordStore recordStore = getDataStore();
+    final RecordStore recordStore = getRecordStore();
     final CodeTable codeTable = recordStore.getCodeTableByColumn(fieldName);
     final ObjectLabelField field = new ObjectLabelField(fieldName, codeTable);
     field.setFont(SwingUtil.FONT);
@@ -713,12 +713,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return string;
   }
 
-  public RecordStore getDataStore() {
+  public RecordStore getRecordStore() {
     if (this.recordStore == null) {
       if (this.recordDefinition == null) {
         return null;
       } else {
-        return this.recordDefinition.getDataStore();
+        return this.recordDefinition.getRecordStore();
       }
     } else {
       return this.recordStore;
@@ -1078,7 +1078,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
   }
 
-  protected void setDataStore(final RecordStore recordStore) {
+  protected void setRecordStore(final RecordStore recordStore) {
     this.recordStore = recordStore;
   }
 
@@ -1215,7 +1215,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
-    setDataStore(recordDefinition.getDataStore());
+    setRecordStore(recordDefinition.getRecordStore());
     final String idAttributeName = recordDefinition.getIdAttributeName();
     if (StringUtils.hasText(idAttributeName)) {
       this.readOnlyFieldNames.add(idAttributeName);

@@ -83,14 +83,14 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   }
 
   @Override
-  public JdbcRecordStore getDataStore() {
+  public JdbcRecordStore getRecordStore() {
     return this.recordStore;
   }
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     super.setRecordDefinition(recordDefinition);
-    this.recordStore = (JdbcRecordStore)recordDefinition.getDataStore();
+    this.recordStore = (JdbcRecordStore)recordDefinition.getRecordStore();
     this.dataSource = this.recordStore.getDataSource();
     if (recordDefinition != null) {
       this.tableName = JdbcUtils.getQualifiedTableName(recordDefinition.getPath());

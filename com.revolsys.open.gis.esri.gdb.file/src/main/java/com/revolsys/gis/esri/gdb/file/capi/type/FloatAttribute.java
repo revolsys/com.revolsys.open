@@ -22,7 +22,7 @@ public class FloatAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getDataStore();
+    CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -41,20 +41,20 @@ public class FloatAttribute extends AbstractFileGdbAttribute {
         throw new IllegalArgumentException(name
           + " is required and cannot be null");
       } else {
-        getDataStore().setNull(row, name);
+        getRecordStore().setNull(row, name);
       }
       return null;
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final float floatValue = number.floatValue();
-      synchronized (getDataStore()) {
+      synchronized (getRecordStore()) {
         row.setFloat(name, floatValue);
       }
       return floatValue;
     } else {
       final String string = value.toString();
       final float floatValue = Float.parseFloat(string);
-      synchronized (getDataStore()) {
+      synchronized (getRecordStore()) {
         row.setFloat(name, floatValue);
       }
       return floatValue;

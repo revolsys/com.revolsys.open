@@ -150,12 +150,12 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     this.tableName = null;
   }
 
-  public RecordStore getDataStore() {
+  public RecordStore getRecordStore() {
     return this.recordStore;
   }
 
   protected RecordDefinition getRecordDefinition() {
-    return getDataStore().getRecordDefinition(getTableName());
+    return getRecordStore().getRecordDefinition(getTableName());
   }
 
   public ResultPager<Record> getResultPager(final Query query) {
@@ -177,7 +177,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   protected boolean isPropertyUnique(final Record object,
     final String attributeName) {
     final String value = object.getValue(attributeName);
-    final RecordStore recordStore = getDataStore();
+    final RecordStore recordStore = getRecordStore();
     final RecordDefinition recordDefinition = recordStore.getRecordDefinition(this.tableName);
     if (recordDefinition == null) {
       return true;
@@ -211,7 +211,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     return object;
   }
 
-  public void setDataStore(final RecordStore recordStore) {
+  public void setRecordStore(final RecordStore recordStore) {
     this.recordStore = recordStore;
   }
 

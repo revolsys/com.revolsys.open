@@ -5,18 +5,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RecordStoreRegistry {
-  private Map<String, RecordStore> recordStores = new HashMap<String, RecordStore>();
+  private Map<String, RecordStore> recordStores = new HashMap<>();
 
-  public void addDataStore(final String name, final RecordStore recordStore) {
+  public void addRecordStore(final String name, final RecordStore recordStore) {
     this.recordStores.put(name, recordStore);
   }
 
   public RecordStore getRecordStore(final String name) {
-    return recordStores.get(name);
+    return this.recordStores.get(name);
   }
 
   public Map<String, RecordStore> getRecordStores() {
-    return Collections.unmodifiableMap(recordStores);
+    return Collections.unmodifiableMap(this.recordStores);
   }
 
   public void setRecordStores(final Map<String, RecordStore> recordStores) {

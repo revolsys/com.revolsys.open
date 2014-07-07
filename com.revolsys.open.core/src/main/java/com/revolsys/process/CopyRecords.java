@@ -16,9 +16,9 @@ import com.revolsys.util.CompareUtil;
 
 public class CopyRecords extends AbstractProcess {
 
-  private RecordStore targetDataStore;
+  private RecordStore targetRecordStore;
 
-  private RecordStore sourceDataStore;
+  private RecordStore sourceRecordStore;
 
   private String typePath;
 
@@ -29,64 +29,64 @@ public class CopyRecords extends AbstractProcess {
   public CopyRecords() {
   }
 
-  public CopyRecords(final RecordStore sourceDataStore,
-    final String typePath, final RecordStore targetDataStore,
-    final boolean hasSequence) {
-    this(sourceDataStore, typePath, new HashMap<String, Boolean>(),
-      targetDataStore, hasSequence);
-  }
-
-  public CopyRecords(final RecordStore sourceDataStore,
+  public CopyRecords(final RecordStore sourceRecordStore,
     final String typePath, final Map<String, Boolean> orderBy,
-    final RecordStore targetDataStore, final boolean hasSequence) {
-    this.sourceDataStore = sourceDataStore;
+    final RecordStore targetRecordStore, final boolean hasSequence) {
+    this.sourceRecordStore = sourceRecordStore;
     this.typePath = typePath;
     this.orderBy = orderBy;
-    this.targetDataStore = targetDataStore;
+    this.targetRecordStore = targetRecordStore;
     this.hasSequence = hasSequence;
   }
 
+  public CopyRecords(final RecordStore sourceRecordStore,
+    final String typePath, final RecordStore targetRecordStore,
+    final boolean hasSequence) {
+    this(sourceRecordStore, typePath, new HashMap<String, Boolean>(),
+      targetRecordStore, hasSequence);
+  }
+
   public Map<String, Boolean> getOrderBy() {
-    return orderBy;
+    return this.orderBy;
   }
 
-  public RecordStore getSourceDataStore() {
-    return sourceDataStore;
+  public RecordStore getSourceRecordStore() {
+    return this.sourceRecordStore;
   }
 
-  public RecordStore getTargetDataStore() {
-    return targetDataStore;
+  public RecordStore getTargetRecordStore() {
+    return this.targetRecordStore;
   }
 
   public String getTypePath() {
-    return typePath;
+    return this.typePath;
   }
 
   public boolean isHasSequence() {
-    return hasSequence;
+    return this.hasSequence;
   }
 
   @Override
   public void run() {
     try {
-      final Query query = new Query(typePath);
-      query.setOrderBy(orderBy);
-      final Reader<Record> reader = sourceDataStore.query(query);
+      final Query query = new Query(this.typePath);
+      query.setOrderBy(this.orderBy);
+      final Reader<Record> reader = this.sourceRecordStore.query(query);
       try {
-        final Writer<Record> targetWriter = targetDataStore.createWriter();
+        final Writer<Record> targetWriter = this.targetRecordStore.createWriter();
         try {
-          final RecordDefinition targetRecordDefinition = targetDataStore.getRecordDefinition(typePath);
+          final RecordDefinition targetRecordDefinition = this.targetRecordStore.getRecordDefinition(this.typePath);
           if (targetRecordDefinition == null) {
             LoggerFactory.getLogger(getClass()).error(
-              "Cannot find target table: " + typePath);
+              "Cannot find target table: " + this.typePath);
           } else {
-            if (hasSequence) {
+            if (this.hasSequence) {
               final String idAttributeName = targetRecordDefinition.getIdAttributeName();
-              Object maxId = targetDataStore.createPrimaryIdValue(typePath);
+              Object maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
               for (final Record sourceRecord : reader) {
                 final Object sourceId = sourceRecord.getValue(idAttributeName);
                 while (CompareUtil.compare(maxId, sourceId) < 0) {
-                  maxId = targetDataStore.createPrimaryIdValue(typePath);
+                  maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
                 }
                 targetWriter.write(sourceRecord);
               }
@@ -103,7 +103,8 @@ public class CopyRecords extends AbstractProcess {
         reader.close();
       }
     } catch (final Throwable e) {
-      throw new RuntimeException("Unable to copy records for " + typePath, e);
+      throw new RuntimeException("Unable to copy records for " + this.typePath,
+        e);
     }
   }
 
@@ -111,12 +112,12 @@ public class CopyRecords extends AbstractProcess {
     this.hasSequence = hasSequence;
   }
 
-  public void setSourceDataStore(final RecordStore sourceDataStore) {
-    this.sourceDataStore = sourceDataStore;
+  public void setSourceRecordStore(final RecordStore sourceRecordStore) {
+    this.sourceRecordStore = sourceRecordStore;
   }
 
-  public void setTargetDataStore(final RecordStore targetDataStore) {
-    this.targetDataStore = targetDataStore;
+  public void setTargetRecordStore(final RecordStore targetRecordStore) {
+    this.targetRecordStore = targetRecordStore;
   }
 
   public void setTypePath(final String typePath) {
@@ -125,7 +126,7 @@ public class CopyRecords extends AbstractProcess {
 
   @Override
   public String toString() {
-    return "Copy " + typePath;
+    return "Copy " + this.typePath;
   }
 
 }

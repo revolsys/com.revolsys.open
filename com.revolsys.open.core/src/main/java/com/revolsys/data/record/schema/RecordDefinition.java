@@ -121,7 +121,7 @@ public interface RecordDefinition extends ObjectWithProperties,
 
   RecordDefinitionFactory getRecordDefinitionFactory();
 
-  RecordStore getDataStore();
+  RecordStore getRecordStore();
 
   Object getDefaultValue(String attributeName);
 

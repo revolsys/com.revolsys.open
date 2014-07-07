@@ -151,7 +151,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     if (files != null) {
       for (final File childFile : files) {
         if (!childFile.isHidden()) {
-          if (FileTreeNode.isDataStore(childFile)) {
+          if (FileTreeNode.isRecordStore(childFile)) {
             final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(
               parent, childFile);
             children.add(recordStoreNode);
@@ -177,7 +177,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
           return ICON_DRIVE_MISSING;
         }
       } else if (exists) {
-        if (isDataStore(file)) {
+        if (isRecordStore(file)) {
           return ICON_FILE_DATABASE;
         } else if (isImage(file)) {
           return ICON_FILE_IMAGE;
@@ -220,7 +220,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
-  public static boolean isDataStore(final File file) {
+  public static boolean isRecordStore(final File file) {
     final Set<String> fileExtensions = RecordStoreFactoryRegistry.getFileExtensions();
     final String extension = FileUtil.getFileNameExtension(file).toLowerCase();
     return fileExtensions.contains(extension);

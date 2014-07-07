@@ -152,7 +152,7 @@ public abstract class AbstractRecordStore extends
     }
   }
 
-  public void addDataStoreExtension(final RecordStoreExtension extension) {
+  public void addRecordStoreExtension(final RecordStoreExtension extension) {
     if (extension != null) {
       try {
         final Map<String, Object> connectionProperties = getConnectionProperties();
@@ -439,7 +439,7 @@ public abstract class AbstractRecordStore extends
     return this.recordFactory;
   }
 
-  public Collection<RecordStoreExtension> getDataStoreExtensions() {
+  public Collection<RecordStoreExtension> getRecordStoreExtensions() {
     return this.recordStoreExtensions;
   }
 

@@ -33,7 +33,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
   @Override
   protected void updateResults() {
     synchronized (this) {
-      final JdbcRecordStore recordStore = getDataStore();
+      final JdbcRecordStore recordStore = getRecordStore();
       final Query query = getQuery();
       setNumResults(recordStore.getRowCount(query));
       updateNumPages();

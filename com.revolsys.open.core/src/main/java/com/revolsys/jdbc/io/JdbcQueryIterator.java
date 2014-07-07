@@ -137,7 +137,7 @@ RecordIterator {
     this.resultSet = getResultSet();
   }
 
-  public JdbcRecordStore getDataStore() {
+  public JdbcRecordStore getRecordStore() {
     return this.recordStore;
   }
 
