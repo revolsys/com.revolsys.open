@@ -113,11 +113,11 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final DataSource dataSource;
 
-  private final AbstractJdbcRecordStore dataStore;
+  private final AbstractJdbcRecordStore recordStore;
 
   public OracleSdoGeometryAttributeAdder(
-    final AbstractJdbcRecordStore dataStore, final DataSource dataSource) {
-    this.dataStore = dataStore;
+    final AbstractJdbcRecordStore recordStore, final DataSource dataSource) {
+    this.recordStore = recordStore;
     this.dataSource = dataSource;
   }
 
@@ -182,7 +182,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     try {
       final Connection connection = JdbcUtils.getConnection(dataSource);
       try {
-        final String schemaName = dataStore.getDatabaseSchemaName(schema);
+        final String schemaName = recordStore.getDatabaseSchemaName(schema);
         final String sridSql = "select M.TABLE_NAME, M.COLUMN_NAME, M.SRID, M.DIMINFO, C.GEOMETRY_TYPE "
           + "from ALL_SDO_GEOM_METADATA M "
           + "LEFT OUTER JOIN ALL_GEOMETRY_COLUMNS C ON (M.OWNER = C.F_TABLE_SCHEMA AND M.TABLE_NAME = C.F_TABLE_NAME AND M.COLUMN_NAME = C.F_GEOMETRY_COLUMN) "
@@ -213,7 +213,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
               final Datum[] values = dimInfo.getOracleArray();
               final double scaleXy = getScale(values, 0);
               final double scaleZ = getScale(values, 2);
-              final GeometryFactory geometryFactory = ((OracleRecordStore)dataStore).getGeometryFactory(
+              final GeometryFactory geometryFactory = ((OracleRecordStore)recordStore).getGeometryFactory(
                 srid, axisCount, scaleXy, scaleZ);
               setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
                 geometryFactory);

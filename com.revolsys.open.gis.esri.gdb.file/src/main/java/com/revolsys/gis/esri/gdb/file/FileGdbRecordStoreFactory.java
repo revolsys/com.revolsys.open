@@ -35,13 +35,13 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
         final AtomicInteger count = CollectionUtil.get(COUNTS, fileName,
           new AtomicInteger());
         count.incrementAndGet();
-        CapiFileGdbRecordStore dataStore = DATA_STORES.get(fileName);
-        if (dataStore == null) {
-          dataStore = new CapiFileGdbRecordStore(file);
-          dataStore.setCreateMissingDataStore(false);
-          DATA_STORES.put(fileName, dataStore);
+        CapiFileGdbRecordStore recordStore = DATA_STORES.get(fileName);
+        if (recordStore == null) {
+          recordStore = new CapiFileGdbRecordStore(file);
+          recordStore.setCreateMissingDataStore(false);
+          DATA_STORES.put(fileName, recordStore);
         }
-        return dataStore;
+        return recordStore;
       }
     }
   }
@@ -57,11 +57,11 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
         final int count = countHolder.decrementAndGet();
         if (count <= 0) {
           COUNTS.remove(fileName);
-          final CapiFileGdbRecordStore dataStore = DATA_STORES.remove(fileName);
-          if (dataStore == null) {
+          final CapiFileGdbRecordStore recordStore = DATA_STORES.remove(fileName);
+          if (recordStore == null) {
             return false;
           } else {
-            dataStore.doClose();
+            recordStore.doClose();
           }
           COUNTS.remove(fileName);
           return true;

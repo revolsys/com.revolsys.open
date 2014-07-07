@@ -49,7 +49,7 @@ public class Project extends LayerGroup {
 
   private LayerGroup baseMapLayers = new LayerGroup("Base Maps");
 
-  private RecordStoreConnectionRegistry dataStores = new RecordStoreConnectionRegistry(
+  private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
     "Project");
 
   private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry(
@@ -123,7 +123,7 @@ public class Project extends LayerGroup {
   }
 
   public RecordStoreConnectionRegistry getDataStores() {
-    return dataStores;
+    return recordStores;
   }
 
   @Override
@@ -243,14 +243,14 @@ public class Project extends LayerGroup {
       readProperties(layersDir);
       final RecordStoreConnectionRegistry oldDataStoreConnections = RecordStoreConnectionRegistry.getForThread();
       try {
-        final Resource dataStoresDirectory = SpringUtil.getResource(resource,
+        final Resource recordStoresDirectory = SpringUtil.getResource(resource,
           "Data Stores");
 
         final boolean readOnly = isReadOnly();
-        final RecordStoreConnectionRegistry dataStores = new RecordStoreConnectionRegistry(
-          "Project", dataStoresDirectory, readOnly);
-        setDataStores(dataStores);
-        RecordStoreConnectionRegistry.setForThread(dataStores);
+        final RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
+          "Project", recordStoresDirectory, readOnly);
+        setDataStores(recordStores);
+        RecordStoreConnectionRegistry.setForThread(recordStores);
 
         final Resource folderConnectionsDirectory = SpringUtil.getResource(
           resource, "Folder Connections");
@@ -403,8 +403,8 @@ public class Project extends LayerGroup {
     return result;
   }
 
-  public void setDataStores(final RecordStoreConnectionRegistry dataStores) {
-    this.dataStores = dataStores;
+  public void setDataStores(final RecordStoreConnectionRegistry recordStores) {
+    this.recordStores = recordStores;
   }
 
   public void setFolderConnections(

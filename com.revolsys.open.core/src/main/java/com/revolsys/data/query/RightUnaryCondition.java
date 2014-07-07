@@ -20,8 +20,8 @@ public class RightUnaryCondition extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
-    value.appendSql(query, dataStore, buffer);
+    final RecordStore recordStore, final StringBuffer buffer) {
+    value.appendSql(query, recordStore, buffer);
     buffer.append(" ");
     buffer.append(operator);
   }

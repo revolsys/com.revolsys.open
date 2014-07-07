@@ -32,9 +32,9 @@ import com.revolsys.jdbc.io.DataStoreIteratorFactory;
 public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   public static final AbstractIterator<Record> createPostgreSQLIterator(
-    final PostgreSQLRecordStore dataStore, final Query query,
+    final PostgreSQLRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
-    return new PostgreSQLJdbcQueryIterator(dataStore, query, properties);
+    return new PostgreSQLJdbcQueryIterator(recordStore, query, properties);
   }
 
   public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(

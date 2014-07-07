@@ -152,9 +152,9 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       for (final File childFile : files) {
         if (!childFile.isHidden()) {
           if (FileTreeNode.isDataStore(childFile)) {
-            final FileRecordStoreTreeNode dataStoreNode = new FileRecordStoreTreeNode(
+            final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(
               parent, childFile);
-            children.add(dataStoreNode);
+            children.add(recordStoreNode);
           } else {
             final FileTreeNode child = new FileTreeNode(parent, childFile);
             children.add(child);

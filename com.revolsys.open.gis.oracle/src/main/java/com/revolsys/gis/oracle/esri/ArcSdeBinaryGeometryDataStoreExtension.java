@@ -23,10 +23,10 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   }
 
   @Override
-  public void initialize(final RecordStore dataStore,
+  public void initialize(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
     try {
-      sdeUtil = new ArcSdeBinaryGeometryDataStoreUtil(dataStore,
+      sdeUtil = new ArcSdeBinaryGeometryDataStoreUtil(recordStore,
         connectionProperties);
     } catch (final NoClassDefFoundError e) {
 
@@ -34,13 +34,13 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
   }
 
   @Override
-  public boolean isEnabled(final RecordStore dataStore) {
-    return ArcSdeConstants.isSdeAvailable(dataStore) && sdeUtil != null;
+  public boolean isEnabled(final RecordStore recordStore) {
+    return ArcSdeConstants.isSdeAvailable(recordStore) && sdeUtil != null;
   }
 
   @Override
   public void postProcess(final RecordStoreSchema schema) {
-    final AbstractJdbcRecordStore dataStore = (AbstractJdbcRecordStore)schema.getDataStore();
+    final AbstractJdbcRecordStore recordStore = (AbstractJdbcRecordStore)schema.getDataStore();
     for (final RecordDefinition recordDefinition : schema.getTypes()) {
       final String typePath = recordDefinition.getPath();
       final Map<String, Map<String, Object>> typeColumnProperties = JdbcAttributeAdder.getTypeColumnProperties(
@@ -57,7 +57,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
                   "SDE Binary columns not supported without the ArcSDE Java API jars");
             } else {
               ((ArcSdeBinaryGeometryDataStoreUtil)sdeUtil).createGeometryColumn(
-                dataStore, schema, recordDefinition, typePath, columnName,
+                recordStore, schema, recordDefinition, typePath, columnName,
                 columnProperties);
             }
           }

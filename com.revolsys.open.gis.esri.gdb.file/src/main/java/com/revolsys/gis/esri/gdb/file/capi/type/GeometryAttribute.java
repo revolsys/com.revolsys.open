@@ -119,12 +119,12 @@ public class GeometryAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    final CapiFileGdbRecordStore dataStore = getDataStore();
-    if (dataStore.isNull(row, name)) {
+    final CapiFileGdbRecordStore recordStore = getDataStore();
+    if (recordStore.isNull(row, name)) {
       return null;
     } else {
       final byte[] buffer;
-      synchronized (dataStore) {
+      synchronized (recordStore) {
         buffer = row.getGeometry();
       }
       final ByteArrayInputStream byteIn = new ByteArrayInputStream(buffer);

@@ -23,9 +23,9 @@ public class ParenthesisCondition extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     buffer.append("(");
-    condition.appendSql(query, dataStore, buffer);
+    condition.appendSql(query, recordStore, buffer);
     buffer.append(")");
   }
 

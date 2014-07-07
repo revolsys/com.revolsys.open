@@ -342,10 +342,10 @@ public class Q {
     return new Like(leftCondition, right);
   }
 
-  public static Condition likeRegEx(final RecordStore dataStore,
+  public static Condition likeRegEx(final RecordStore recordStore,
     final String fieldName, final Object value) {
     QueryValue left;
-    if (dataStore.getClass().getName().contains("Oracle")) {
+    if (recordStore.getClass().getName().contains("Oracle")) {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "");
     } else {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");

@@ -29,7 +29,7 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
-  private RecordStore dataStore;
+  private RecordStore recordStore;
 
   private String tableName;
 
@@ -132,13 +132,13 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
   @Override
   protected Record createObject() {
-    return this.dataStore.create(this.tableName);
+    return this.recordStore.create(this.tableName);
   }
 
   public void deleteObject(final Object id) {
     final Record object = loadObject(id);
     if (object != null) {
-      this.dataStore.delete(object);
+      this.recordStore.delete(object);
     }
   }
 
@@ -146,12 +146,12 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   @PreDestroy
   public void destroy() {
     super.destroy();
-    this.dataStore = null;
+    this.recordStore = null;
     this.tableName = null;
   }
 
   public RecordStore getDataStore() {
-    return this.dataStore;
+    return this.recordStore;
   }
 
   protected RecordDefinition getRecordDefinition() {
@@ -159,7 +159,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   }
 
   public ResultPager<Record> getResultPager(final Query query) {
-    return this.dataStore.page(query);
+    return this.recordStore.page(query);
   }
 
   public String getTableName() {
@@ -169,21 +169,21 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   @Override
   protected void insertObject(final Record object) {
     if (object.getIdentifier() == null) {
-      object.setIdValue(this.dataStore.createPrimaryIdValue(this.tableName));
+      object.setIdValue(this.recordStore.createPrimaryIdValue(this.tableName));
     }
-    this.dataStore.insert(object);
+    this.recordStore.insert(object);
   }
 
   protected boolean isPropertyUnique(final Record object,
     final String attributeName) {
     final String value = object.getValue(attributeName);
-    final RecordStore dataStore = getDataStore();
-    final RecordDefinition recordDefinition = dataStore.getRecordDefinition(this.tableName);
+    final RecordStore recordStore = getDataStore();
+    final RecordDefinition recordDefinition = recordStore.getRecordDefinition(this.tableName);
     if (recordDefinition == null) {
       return true;
     } else {
       final Query query = Query.equal(recordDefinition, attributeName, value);
-      final Reader<Record> results = dataStore.query(query);
+      final Reader<Record> results = recordStore.query(query);
       final List<Record> objects = results.read();
       if (object.getState() == RecordState.New) {
         return objects.isEmpty();
@@ -207,12 +207,12 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   }
 
   public Record loadObject(final String typeName, final Object id) {
-    final Record object = this.dataStore.load(typeName, id);
+    final Record object = this.recordStore.load(typeName, id);
     return object;
   }
 
-  public void setDataStore(final RecordStore dataStore) {
-    this.dataStore = dataStore;
+  public void setDataStore(final RecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   public void setTableName(final String tableName) {
@@ -221,6 +221,6 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
   @Override
   protected void updateObject(final Record object) {
-    this.dataStore.update(object);
+    this.recordStore.update(object);
   }
 }

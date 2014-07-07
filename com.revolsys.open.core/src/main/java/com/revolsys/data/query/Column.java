@@ -26,7 +26,7 @@ public class Column extends QueryValue {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     buffer.append(toString());
   }
 

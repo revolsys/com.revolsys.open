@@ -255,9 +255,9 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   public AbstractIterator<Record> createOracleIterator(
-    final OracleRecordStore dataStore, final Query query,
+    final OracleRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
-    return new OracleJdbcQueryIterator(dataStore, query, properties);
+    return new OracleJdbcQueryIterator(recordStore, query, properties);
   }
 
   public synchronized CoordinateSystem getCoordinateSystem(final int oracleSrid) {

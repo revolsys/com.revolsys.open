@@ -20,16 +20,16 @@ public class RecordStoreConnection implements MapSerializer {
 
   private String name;
 
-  private RecordStore dataStore;
+  private RecordStore recordStore;
 
   private RecordStoreConnectionRegistry registry;
 
   public RecordStoreConnection(
     final RecordStoreConnectionRegistry registry, final String name,
-    final RecordStore dataStore) {
+    final RecordStore recordStore) {
     this.registry = registry;
     this.name = name;
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
   }
 
   public RecordStoreConnection(
@@ -48,7 +48,7 @@ public class RecordStoreConnection implements MapSerializer {
       registry.removeConnection(this);
     }
     this.config = null;
-    this.dataStore = null;
+    this.recordStore = null;
     this.name = null;
     this.registry = null;
 
@@ -56,7 +56,7 @@ public class RecordStoreConnection implements MapSerializer {
 
   public RecordStore getDataStore() {
     synchronized (this) {
-      if (dataStore == null) {
+      if (recordStore == null) {
         try {
           final Map<String, Object> connectionProperties = CollectionUtil.get(
             config, "connection", Collections.<String, Object> emptyMap());
@@ -64,8 +64,8 @@ public class RecordStoreConnection implements MapSerializer {
             LoggerFactory.getLogger(getClass()).error(
               "Data store must include a 'connection' map property: " + name);
           } else {
-            dataStore = RecordStoreFactoryRegistry.createRecordStore(connectionProperties);
-            dataStore.initialize();
+            recordStore = RecordStoreFactoryRegistry.createRecordStore(connectionProperties);
+            recordStore.initialize();
           }
         } catch (final Throwable e) {
           LoggerFactory.getLogger(getClass()).error(
@@ -73,7 +73,7 @@ public class RecordStoreConnection implements MapSerializer {
         }
       }
     }
-    return dataStore;
+    return recordStore;
   }
 
   public String getName() {
@@ -81,11 +81,11 @@ public class RecordStoreConnection implements MapSerializer {
   }
 
   public List<RecordStoreSchema> getSchemas() {
-    final RecordStore dataStore = getDataStore();
-    if (dataStore == null) {
+    final RecordStore recordStore = getDataStore();
+    if (recordStore == null) {
       return Collections.emptyList();
     } else {
-      return dataStore.getSchemas();
+      return recordStore.getSchemas();
     }
   }
 

@@ -22,7 +22,7 @@ import com.revolsys.jts.geom.BoundingBox;
 public class RecordStoreQueryReader extends IteratorReader<Record>
   implements RecordReader {
 
-  private AbstractRecordStore dataStore;
+  private AbstractRecordStore recordStore;
 
   private List<Query> queries = new ArrayList<Query>();
 
@@ -36,9 +36,9 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
     setIterator(new DataStoreMultipleQueryIterator(this));
   }
 
-  public RecordStoreQueryReader(final AbstractRecordStore dataStore) {
+  public RecordStoreQueryReader(final AbstractRecordStore recordStore) {
     this();
-    setDataStore(dataStore);
+    setDataStore(recordStore);
   }
 
   public void addQuery(final Query query) {
@@ -50,7 +50,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
   public void close() {
     super.close();
     boundingBox = null;
-    dataStore = null;
+    recordStore = null;
     queries = null;
     typePaths = null;
     whereClause = null;
@@ -68,7 +68,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
         query.and(F.envelopeIntersects(geometryAttribute, boundingBox));
       }
 
-      final AbstractIterator<Record> iterator = dataStore.createIterator(
+      final AbstractIterator<Record> iterator = recordStore.createIterator(
         query, getProperties());
       return iterator;
     }
@@ -80,7 +80,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
   }
 
   public AbstractRecordStore getDataStore() {
-    return dataStore;
+    return recordStore;
   }
 
   @Override
@@ -101,7 +101,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
   public void open() {
     if (typePaths != null) {
       for (final String tableName : typePaths) {
-        final RecordDefinition recordDefinition = dataStore.getRecordDefinition(tableName);
+        final RecordDefinition recordDefinition = recordStore.getRecordDefinition(tableName);
         if (recordDefinition != null) {
           Query query;
           if (boundingBox == null) {
@@ -124,8 +124,8 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
     this.boundingBox = boundingBox;
   }
 
-  public void setDataStore(final AbstractRecordStore dataStore) {
-    this.dataStore = dataStore;
+  public void setDataStore(final AbstractRecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   /**

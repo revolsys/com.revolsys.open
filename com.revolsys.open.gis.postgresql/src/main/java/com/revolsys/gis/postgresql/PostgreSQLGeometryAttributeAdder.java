@@ -38,11 +38,11 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private final DataSource dataSource;
 
-  private final PostgreSQLRecordStore dataStore;
+  private final PostgreSQLRecordStore recordStore;
 
   public PostgreSQLGeometryAttributeAdder(
-    final PostgreSQLRecordStore dataStore, final DataSource dataSource) {
-    this.dataStore = dataStore;
+    final PostgreSQLRecordStore recordStore, final DataSource dataSource) {
+    this.recordStore = recordStore;
     this.dataSource = dataSource;
   }
 
@@ -52,11 +52,11 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
     final String typePath = recordDefinition.getPath();
-    String owner = dataStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
+    String owner = recordStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
     if (!StringUtils.hasText(owner)) {
       owner = "public";
     }
-    final String tableName = dataStore.getDatabaseTableName(typePath);
+    final String tableName = recordStore.getDatabaseTableName(typePath);
     final String columnName = name.toLowerCase();
     try {
       int srid = 0;
@@ -75,7 +75,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
-      final GeometryFactory storeGeometryFactory = dataStore.getGeometryFactory();
+      final GeometryFactory storeGeometryFactory = recordStore.getGeometryFactory();
       final GeometryFactory geometryFactory;
       if (storeGeometryFactory == null) {
         geometryFactory = GeometryFactory.floating(srid, axisCount);

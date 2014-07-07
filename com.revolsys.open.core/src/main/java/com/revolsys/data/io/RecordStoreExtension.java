@@ -4,10 +4,10 @@ import java.util.Map;
 
 public interface RecordStoreExtension {
 
-  public abstract void initialize(RecordStore dataStore,
+  public abstract void initialize(RecordStore recordStore,
     Map<String, Object> connectionProperties);
 
-  boolean isEnabled(RecordStore dataStore);
+  boolean isEnabled(RecordStore recordStore);
 
   public abstract void postProcess(RecordStoreSchema schema);
 

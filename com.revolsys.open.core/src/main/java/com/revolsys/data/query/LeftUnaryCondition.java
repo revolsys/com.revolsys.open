@@ -20,10 +20,10 @@ public class LeftUnaryCondition extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     buffer.append(operator);
     buffer.append(" ");
-    value.appendSql(query, dataStore, buffer);
+    value.appendSql(query, recordStore, buffer);
   }
 
   @Override

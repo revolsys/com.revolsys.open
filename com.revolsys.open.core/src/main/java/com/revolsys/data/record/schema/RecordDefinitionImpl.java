@@ -80,7 +80,7 @@ RecordDefinition, Cloneable {
 
   private RecordDefinitionFactory recordDefinitionFactory;
 
-  private Reference<RecordStore> dataStore;
+  private Reference<RecordStore> recordStore;
 
   private Map<String, Object> defaultValues = new HashMap<String, Object>();
 
@@ -119,7 +119,7 @@ RecordDefinition, Cloneable {
   public RecordDefinitionImpl(final RecordStore recordStore,
     final RecordStoreSchema schema, final RecordDefinition recordDefinition) {
     this(recordDefinition);
-    this.dataStore = new WeakReference<RecordStore>(recordStore);
+    this.recordStore = new WeakReference<RecordStore>(recordStore);
     this.recordFactory = recordStore.getRecordFactory();
     this.schema = schema;
     METADATA_CACHE.put(this.instanceId, this);
@@ -128,7 +128,7 @@ RecordDefinition, Cloneable {
   public RecordDefinitionImpl(final RecordStore recordStore,
     final RecordStoreSchema schema, final String typePath) {
     this(typePath);
-    this.dataStore = new WeakReference<RecordStore>(recordStore);
+    this.recordStore = new WeakReference<RecordStore>(recordStore);
     this.recordFactory = recordStore.getRecordFactory();
     this.schema = schema;
     METADATA_CACHE.put(this.instanceId, this);
@@ -322,11 +322,11 @@ RecordDefinition, Cloneable {
 
   @Override
   public void delete(final Record record) {
-    final RecordStore dataStore = getDataStore();
-    if (dataStore == null) {
+    final RecordStore recordStore = getDataStore();
+    if (recordStore == null) {
       throw new UnsupportedOperationException();
     } else {
-      dataStore.delete(record);
+      recordStore.delete(record);
     }
   }
 
@@ -342,7 +342,7 @@ RecordDefinition, Cloneable {
     this.codeTableByColumnMap.clear();
     this.recordFactory = null;
     this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
-    this.dataStore = null;
+    this.recordStore = null;
     this.defaultValues.clear();
     this.description = "";
     this.geometryAttributeIndex = -1;
@@ -492,13 +492,13 @@ RecordDefinition, Cloneable {
 
   @Override
   public CodeTable getCodeTableByColumn(final String column) {
-    final RecordStore dataStore = getDataStore();
-    if (dataStore == null) {
+    final RecordStore recordStore = getDataStore();
+    if (recordStore == null) {
       return null;
     } else {
       CodeTable codeTable = this.codeTableByColumnMap.get(column);
-      if (codeTable == null && dataStore != null) {
-        codeTable = dataStore.getCodeTableByColumn(column);
+      if (codeTable == null && recordStore != null) {
+        codeTable = recordStore.getCodeTableByColumn(column);
       }
       return codeTable;
     }
@@ -512,8 +512,8 @@ RecordDefinition, Cloneable {
   @Override
   public RecordDefinitionFactory getRecordDefinitionFactory() {
     if (this.recordDefinitionFactory == null) {
-      final RecordStore dataStore = getDataStore();
-      return dataStore;
+      final RecordStore recordStore = getDataStore();
+      return recordStore;
     } else {
       return this.recordDefinitionFactory;
     }
@@ -521,10 +521,10 @@ RecordDefinition, Cloneable {
 
   @Override
   public RecordStore getDataStore() {
-    if (this.dataStore == null) {
+    if (this.recordStore == null) {
       return null;
     } else {
-      return this.dataStore.get();
+      return this.recordStore.get();
     }
   }
 

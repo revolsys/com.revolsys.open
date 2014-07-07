@@ -59,9 +59,9 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   @Override
   protected List<TreeNode> doLoadChildren() {
     final List<TreeNode> children = new ArrayList<TreeNode>();
-    final RecordStore dataStore = getDataStore();
-    if (dataStore != null) {
-      for (final RecordStoreSchema schema : dataStore.getSchemas()) {
+    final RecordStore recordStore = getDataStore();
+    if (recordStore != null) {
+      for (final RecordStoreSchema schema : recordStore.getSchemas()) {
         final String schemaPath = schema.getPath();
 
         final RecordStoreSchemaTreeNode schemaNode = new RecordStoreSchemaTreeNode(

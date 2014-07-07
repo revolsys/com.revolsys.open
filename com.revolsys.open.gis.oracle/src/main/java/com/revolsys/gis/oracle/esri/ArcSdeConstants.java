@@ -116,9 +116,9 @@ public final class ArcSdeConstants {
     }
   }
 
-  public static boolean isSdeAvailable(final RecordStore dataStore) {
-    if (dataStore instanceof OracleRecordStore) {
-      final OracleRecordStore oracleDataStore = (OracleRecordStore)dataStore;
+  public static boolean isSdeAvailable(final RecordStore recordStore) {
+    if (recordStore instanceof OracleRecordStore) {
+      final OracleRecordStore oracleDataStore = (OracleRecordStore)recordStore;
       final Set<String> allSchemaNames = oracleDataStore.getAllSchemaNames();
       return allSchemaNames.contains("SDE");
     }
@@ -126,8 +126,8 @@ public final class ArcSdeConstants {
   }
 
   public static boolean isSdeAvailable(final RecordStoreSchema schema) {
-    final RecordStore dataStore = schema.getDataStore();
+    final RecordStore recordStore = schema.getDataStore();
 
-    return isSdeAvailable(dataStore);
+    return isSdeAvailable(recordStore);
   }
 }

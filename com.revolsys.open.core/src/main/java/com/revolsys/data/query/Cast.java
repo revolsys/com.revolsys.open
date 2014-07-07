@@ -26,9 +26,9 @@ public class Cast extends QueryValue {
   }
 
   @Override
-  public void appendDefaultSql(Query query, RecordStore dataStore, final StringBuffer buffer) {
+  public void appendDefaultSql(Query query, RecordStore recordStore, final StringBuffer buffer) {
     buffer.append("CAST(");
-    value.appendSql(query, dataStore, buffer);
+    value.appendSql(query, recordStore, buffer);
     buffer.append(" AS ");
     buffer.append(dataType);
     buffer.append(")");

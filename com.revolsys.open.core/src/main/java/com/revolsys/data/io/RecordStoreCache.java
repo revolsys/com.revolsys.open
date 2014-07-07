@@ -9,26 +9,26 @@ import java.util.Map;
 import com.revolsys.jts.geom.BoundingBox;
 
 public class RecordStoreCache {
-  public static RecordStoreCache getCache(final RecordStore dataStore) {
-    return new RecordStoreCache(dataStore);
+  public static RecordStoreCache getCache(final RecordStore recordStore) {
+    return new RecordStoreCache(recordStore);
   }
 
   private final Map<BoundingBox, List> cachedObejcts = Collections.synchronizedMap(new HashMap<BoundingBox, List>());
 
-  private final RecordStore dataStore;
+  private final RecordStore recordStore;
 
   private final Map<BoundingBox, DataStoreQueryTask> loadTasks = new LinkedHashMap<BoundingBox, DataStoreQueryTask>();
 
   private String typePath;
 
-  public RecordStoreCache(final RecordStore dataStore) {
-    this.dataStore = dataStore;
+  public RecordStoreCache(final RecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   private void addBoundingBox(final BoundingBox boundingBox) {
     synchronized (loadTasks) {
       if (!loadTasks.containsKey(boundingBox)) {
-        loadTasks.put(boundingBox, new DataStoreQueryTask(dataStore, typePath,
+        loadTasks.put(boundingBox, new DataStoreQueryTask(recordStore, typePath,
           boundingBox));
       }
     }

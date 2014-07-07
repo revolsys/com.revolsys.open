@@ -206,5 +206,10 @@
       <artifactId>commons-collections4</artifactId>
       <version>4.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.5.0</version>
+    </dependency>
   </dependencies>
 </project>

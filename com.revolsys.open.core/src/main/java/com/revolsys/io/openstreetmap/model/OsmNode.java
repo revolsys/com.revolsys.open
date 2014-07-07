@@ -1,5 +1,8 @@
 package com.revolsys.io.openstreetmap.model;
 
+import java.util.Date;
+import java.util.Map;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
@@ -9,6 +12,14 @@ import com.revolsys.io.xml.StaxUtils;
 public class OsmNode extends OsmElement {
 
   public OsmNode() {
+  }
+
+  public OsmNode(final long id, final boolean visible, final int version,
+    final long changeset, final Date timestamp, final String user,
+    final int uid, final Map<String, String> tags, final double x,
+    final double y) {
+    super(id, visible, version, changeset, timestamp, user, uid, tags);
+    setGeometryValue(OsmConstants.WGS84_2D.point(x, y));
   }
 
   public OsmNode(final XMLStreamReader in) {

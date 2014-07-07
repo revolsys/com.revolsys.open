@@ -37,7 +37,7 @@ public final class EpsgCoordinateSystemsLoader {
     new EpsgCoordinateSystemsLoader().load();
   }
 
-  private final RecordStore dataStore;
+  private final RecordStore recordStore;
 
   private final Map<Integer, Integer> coordinateSystemUnitMap = new HashMap<Integer, Integer>();
 
@@ -50,7 +50,7 @@ public final class EpsgCoordinateSystemsLoader {
     parameters.put("url", "jdbc:postgresql://localhost:5432/epsg");
     parameters.put("username", "epsg");
     parameters.put("password", "epsg");
-    dataStore = RecordStoreFactoryRegistry.createRecordStore(parameters);
+    recordStore = RecordStoreFactoryRegistry.createRecordStore(parameters);
   }
 
   protected Double getDoubleNaN(final Record object, final String name) {
@@ -83,7 +83,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadAreas() throws IOException {
     final Query query = new Query("/public/epsg_area");
     query.addOrderBy("area_code", true);
-    final Reader<Record> reader = dataStore.query(query);
+    final Reader<Record> reader = recordStore.query(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/area.csv");
     final CsvWriter writer = new CsvWriter(
@@ -114,7 +114,7 @@ public final class EpsgCoordinateSystemsLoader {
     final Query query = new Query("/public/epsg_coordinateaxis");
     query.addOrderBy("coord_sys_code", true);
     query.addOrderBy("coord_axis_order", true);
-    final Reader<Record> reader = dataStore.query(query);
+    final Reader<Record> reader = recordStore.query(query);
 
     try {
       for (final Record object : reader) {
@@ -171,7 +171,7 @@ public final class EpsgCoordinateSystemsLoader {
 
   private Map<Integer, String> loadCoordinateAxisNames() {
     final Map<Integer, String> coordinateAxisNames = new HashMap<Integer, String>();
-    final Reader<Record> reader = dataStore.query("/public/epsg_coordinateaxisname");
+    final Reader<Record> reader = recordStore.query("/public/epsg_coordinateaxisname");
     try {
       for (final Record object : reader) {
         final Integer code = object.getInteger("coord_axis_name_code");
@@ -187,7 +187,7 @@ public final class EpsgCoordinateSystemsLoader {
 
   private Map<Integer, String> loadCoordinateOperationMethodNames() {
     final Map<Integer, String> coordinateOperationMethodNames = new HashMap<Integer, String>();
-    final Reader<Record> reader = dataStore.query("/public/epsg_coordoperationmethod");
+    final Reader<Record> reader = recordStore.query("/public/epsg_coordoperationmethod");
     try {
       for (final Record object : reader) {
         final Integer code = object.getInteger("coord_op_method_code");
@@ -204,7 +204,7 @@ public final class EpsgCoordinateSystemsLoader {
 
   private Map<Integer, String> loadCoordinateOperationParamNames() {
     final Map<Integer, String> names = new HashMap<Integer, String>();
-    final Reader<Record> reader = dataStore.query("/public/epsg_coordoperationparam");
+    final Reader<Record> reader = recordStore.query("/public/epsg_coordoperationparam");
     try {
       for (final Record object : reader) {
         final Integer code = object.getInteger("parameter_code");
@@ -222,7 +222,7 @@ public final class EpsgCoordinateSystemsLoader {
   private Map<Integer, Map<String, Object>> loadCoordinateOperationParamValues(
     final Map<Integer, String> coordinateOperationParamNames) {
     final Map<Integer, Map<String, Object>> coordinateOperationParamValues = new HashMap<Integer, Map<String, Object>>();
-    final Reader<Record> reader = dataStore.query("/public/epsg_coordoperationparamvalue");
+    final Reader<Record> reader = recordStore.query("/public/epsg_coordoperationparamvalue");
     try {
       for (final Record object : reader) {
         final Integer code = object.getInteger("coord_op_code");
@@ -251,7 +251,7 @@ public final class EpsgCoordinateSystemsLoader {
     final Map<Integer, Integer> coordinateOperationMethods = new HashMap<Integer, Integer>();
     final Query query = new Query("/public/epsg_coordoperation");
     query.addOrderBy("coord_op_code", true);
-    final Reader<Record> reader = dataStore.query(query);
+    final Reader<Record> reader = recordStore.query(query);
     try {
       for (final Record object : reader) {
         final Integer code = object.getInteger("coord_op_code");
@@ -268,7 +268,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadDatums() throws IOException {
     final Query query = new Query("/public/epsg_datum");
     query.addOrderBy("datum_code", true);
-    final Reader<Record> reader = dataStore.query(query);
+    final Reader<Record> reader = recordStore.query(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/datum.csv");
     final CsvWriter writer = new CsvWriter(
@@ -296,7 +296,7 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private void loadGeographicCoordinateSystems() throws IOException {
-    final Reader<Record> reader = dataStore.query("/public/epsg_coordinatereferencesystem");
+    final Reader<Record> reader = recordStore.query("/public/epsg_coordinatereferencesystem");
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/geographic.csv");
     final CsvWriter writer = new CsvWriter(
@@ -330,7 +330,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadPrimeMeridians() throws IOException {
     final Query query = new Query("/public/epsg_primemeridian");
     query.addOrderBy("prime_meridian_code", true);
-    final Reader<Record> reader = dataStore.query(query);
+    final Reader<Record> reader = recordStore.query(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/primemeridian.csv");
     final CsvWriter writer = new CsvWriter(
@@ -358,7 +358,7 @@ public final class EpsgCoordinateSystemsLoader {
     final Map<Integer, String> coordinateOperationParamNames = loadCoordinateOperationParamNames();
     final Map<Integer, Map<String, Object>> coordinateOperationParamValues = loadCoordinateOperationParamValues(coordinateOperationParamNames);
     final Map<Integer, Integer> coordinateOperationMethods = loadCoordinateOperations();
-    final Reader<Record> reader = dataStore.query("/public/epsg_coordinatereferencesystem");
+    final Reader<Record> reader = recordStore.query("/public/epsg_coordinatereferencesystem");
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/projected.csv");
     final CsvWriter writer = new CsvWriter(
@@ -402,7 +402,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadSpheroids() throws IOException {
     final Query query = new Query("/public/epsg_ellipsoid");
     query.addOrderBy("ellipsoid_code", true);
-    final Reader<Record> reader = dataStore.query(query);
+    final Reader<Record> reader = recordStore.query(query);
     final File file = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/spheroid.csv");
     final CsvWriter writer = new CsvWriter(
@@ -435,7 +435,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void loadUnits() throws IOException {
     final Query query = new Query("/public/epsg_unitofmeasure");
     query.addOrderBy("uom_code", true);
-    final Reader<Record> reader = dataStore.query(query);
+    final Reader<Record> reader = recordStore.query(query);
     final File linearFile = new File(
       "../com.revolsys.open.core/src/main/resources/com/revolsys/gis/cs/epsg/linearunit.csv");
     final CsvWriter linearWriter = new CsvWriter(

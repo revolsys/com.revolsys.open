@@ -6,17 +6,17 @@ import com.revolsys.data.record.Record;
 
 public class DirectoryRecordStoreWriter extends AbstractWriter<Record> {
 
-  private DirectoryRecordStore dataStore;
+  private DirectoryRecordStore recordStore;
 
-  public DirectoryRecordStoreWriter(final DirectoryRecordStore dataStore) {
-    this.dataStore = dataStore;
+  public DirectoryRecordStoreWriter(final DirectoryRecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   @PreDestroy
   @Override
   public void close() {
     super.close();
-    dataStore = null;
+    recordStore = null;
   }
 
   @Override
@@ -24,23 +24,23 @@ public class DirectoryRecordStoreWriter extends AbstractWriter<Record> {
     if (object != null) {
       try {
         final boolean currentDataStore = object.getRecordDefinition()
-          .getDataStore() == dataStore;
+          .getDataStore() == recordStore;
         switch (object.getState()) {
           case New:
-            dataStore.insert(object);
+            recordStore.insert(object);
           break;
           case Modified:
             if (currentDataStore) {
               throw new UnsupportedOperationException();
             } else {
-              dataStore.insert(object);
+              recordStore.insert(object);
             }
           break;
           case Persisted:
             if (currentDataStore) {
               throw new UnsupportedOperationException();
             } else {
-              dataStore.insert(object);
+              recordStore.insert(object);
             }
           case Deleted:
             throw new UnsupportedOperationException();

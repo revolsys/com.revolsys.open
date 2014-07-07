@@ -22,13 +22,13 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private final String name;
 
-  private final CapiFileGdbRecordStore dataStore;
+  private final CapiFileGdbRecordStore recordStore;
 
   private JComponent swingEditor;
 
-  public FileGdbDomainCodeTable(final CapiFileGdbRecordStore dataStore,
+  public FileGdbDomainCodeTable(final CapiFileGdbRecordStore recordStore,
     final CodedValueDomain domain) {
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
     this.domain = domain;
     this.name = domain.getDomainName();
   }
@@ -43,9 +43,9 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   private Identifier createValue(final String name) {
-    synchronized (this.dataStore) {
+    synchronized (this.recordStore) {
       final Identifier id = this.domain.addCodedValue(name);
-      this.dataStore.alterDomain(this.domain);
+      this.recordStore.alterDomain(this.domain);
       LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
       return id;
     }

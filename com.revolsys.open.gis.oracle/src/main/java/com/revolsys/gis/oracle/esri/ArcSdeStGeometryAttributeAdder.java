@@ -15,11 +15,11 @@ import com.revolsys.jts.geom.GeometryFactory;
 public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
   private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryAttributeAdder.class);
 
-  private final AbstractJdbcRecordStore dataStore;
+  private final AbstractJdbcRecordStore recordStore;
 
   public ArcSdeStGeometryAttributeAdder(
-    final AbstractJdbcRecordStore dataStore) {
-    this.dataStore = dataStore;
+    final AbstractJdbcRecordStore recordStore) {
+    this.recordStore = recordStore;
 
   }
 
@@ -30,8 +30,8 @@ public class ArcSdeStGeometryAttributeAdder extends JdbcAttributeAdder {
     final boolean required, final String description) {
     final RecordStoreSchema schema = recordDefinition.getSchema();
     final String typePath = recordDefinition.getPath();
-    final String owner = this.dataStore.getDatabaseSchemaName(schema);
-    final String tableName = this.dataStore.getDatabaseTableName(typePath);
+    final String owner = this.recordStore.getDatabaseSchemaName(schema);
+    final String tableName = this.recordStore.getDatabaseTableName(typePath);
     final String columnName = name.toUpperCase();
     final int esriSrid = JdbcAttributeAdder.getIntegerColumnProperty(schema,
       typePath, columnName, ArcSdeConstants.ESRI_SRID_PROPERTY);

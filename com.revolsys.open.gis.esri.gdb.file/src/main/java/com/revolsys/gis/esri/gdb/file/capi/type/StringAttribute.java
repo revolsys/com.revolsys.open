@@ -19,11 +19,11 @@ public class StringAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore dataStore = getDataStore();
-    if (dataStore.isNull(row, name)) {
+    CapiFileGdbRecordStore recordStore = getDataStore();
+    if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (dataStore) {
+      synchronized (recordStore) {
         return row.getString(name);
       }
     }

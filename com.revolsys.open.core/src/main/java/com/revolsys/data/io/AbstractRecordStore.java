@@ -55,12 +55,12 @@ public abstract class AbstractRecordStore extends
   AbstractObjectWithProperties implements RecordStore {
 
   public static RecordStore close(
-    final Collection<RecordStore> dataStores) {
+    final Collection<RecordStore> recordStores) {
     final List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
-    for (final RecordStore dataStore : dataStores) {
-      if (dataStore != null) {
+    for (final RecordStore recordStore : recordStores) {
+      if (recordStore != null) {
         try {
-          dataStore.close();
+          recordStore.close();
         } catch (final RuntimeException e) {
           exceptions.add(e);
         }
@@ -72,8 +72,8 @@ public abstract class AbstractRecordStore extends
     return null;
   }
 
-  public static RecordStore close(final RecordStore... dataStores) {
-    return close(Arrays.asList(dataStores));
+  public static RecordStore close(final RecordStore... recordStores) {
+    return close(Arrays.asList(recordStores));
   }
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();
@@ -98,7 +98,7 @@ public abstract class AbstractRecordStore extends
 
   private DataStoreIteratorFactory iteratorFactory = new DataStoreIteratorFactory();
 
-  private final Set<RecordStoreExtension> dataStoreExtensions = new LinkedHashSet<RecordStoreExtension>();
+  private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<RecordStoreExtension>();
 
   public AbstractRecordStore() {
     this(new ArrayRecordFactory());
@@ -157,7 +157,7 @@ public abstract class AbstractRecordStore extends
       try {
         final Map<String, Object> connectionProperties = getConnectionProperties();
         extension.initialize(this, connectionProperties);
-        this.dataStoreExtensions.add(extension);
+        this.recordStoreExtensions.add(extension);
       } catch (final Throwable e) {
         ExceptionUtil.log(extension.getClass(), "Unable to initialize", e);
       }
@@ -236,7 +236,7 @@ public abstract class AbstractRecordStore extends
       this.commonMetaDataProperties.clear();
       this.connectionProperties.clear();
       this.recordFactory = null;
-      this.dataStoreExtensions.clear();
+      this.recordStoreExtensions.clear();
       this.iteratorFactory = null;
       this.label = "deleted";
       this.schemaMap.clear();
@@ -315,7 +315,7 @@ public abstract class AbstractRecordStore extends
     } else {
       final RecordDefinition recordDefinition = query.getRecordDefinition();
       if (recordDefinition != null) {
-        final DataStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition.getProperty("dataStoreIteratorFactory");
+        final DataStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition.getProperty("recordStoreIteratorFactory");
         if (recordDefinitionIteratorFactory != null) {
           final AbstractIterator<Record> iterator = recordDefinitionIteratorFactory.createIterator(
             this, query, properties);
@@ -440,7 +440,7 @@ public abstract class AbstractRecordStore extends
   }
 
   public Collection<RecordStoreExtension> getDataStoreExtensions() {
-    return this.dataStoreExtensions;
+    return this.recordStoreExtensions;
   }
 
   public GeometryFactory getGeometryFactory() {

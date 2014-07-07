@@ -44,22 +44,22 @@ public class GeometryTest {
       geometryFactory);
     recordDefinition.setIdAttributeName("ID");
 
-    final FileGdbRecordStore dataStore = FileGdbRecordStoreFactory.create(file);
-    dataStore.initialize();
-    recordDefinition = (RecordDefinitionImpl)dataStore.getRecordDefinition(recordDefinition);
+    final FileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file);
+    recordStore.initialize();
+    recordDefinition = (RecordDefinitionImpl)recordStore.getRecordDefinition(recordDefinition);
     final Record object = new ArrayRecord(recordDefinition);
     object.setIdValue(1);
     object.setGeometryValue(geometry);
 
-    dataStore.insert(object);
+    recordStore.insert(object);
 
-    final Record object2 = dataStore.load(name, 1);
+    final Record object2 = recordStore.load(name, 1);
     if (!EqualsInstance.INSTANCE.equals(object, object2)) {
       System.out.println("Not Equal");
       System.out.println(object);
       System.out.println(object2);
     }
-    dataStore.close();
+    recordStore.close();
   }
 
   public static void main(final String[] args) {

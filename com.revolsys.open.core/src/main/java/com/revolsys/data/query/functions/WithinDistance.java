@@ -48,24 +48,24 @@ public class WithinDistance extends Condition {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore dataStore, final StringBuffer sql) {
+    final RecordStore recordStore, final StringBuffer sql) {
     sql.append("ST_DWithin(");
     if (geometry1Value == null) {
       sql.append("NULL");
     } else {
-      geometry1Value.appendSql(query, dataStore, sql);
+      geometry1Value.appendSql(query, recordStore, sql);
     }
     sql.append(", ");
     if (geometry2Value == null) {
       sql.append("NULL");
     } else {
-      geometry2Value.appendSql(query, dataStore, sql);
+      geometry2Value.appendSql(query, recordStore, sql);
     }
     sql.append(", ");
     if (distanceValue == null) {
       sql.append("0");
     } else {
-      distanceValue.appendSql(query, dataStore, sql);
+      distanceValue.appendSql(query, recordStore, sql);
     }
     sql.append(")");
   }

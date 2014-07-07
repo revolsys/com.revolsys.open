@@ -44,7 +44,7 @@ public class CollectionValue extends QueryValue {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     buffer.append('(');
     for (int i = 0; i < this.queryValues.size(); i++) {
       if (i > 0) {
@@ -54,12 +54,12 @@ public class CollectionValue extends QueryValue {
       final QueryValue queryValue = this.queryValues.get(i);
       if (queryValue instanceof Value) {
         if (this.jdbcAttribute == null) {
-          queryValue.appendSql(query, dataStore, buffer);
+          queryValue.appendSql(query, recordStore, buffer);
         } else {
           this.jdbcAttribute.addSelectStatementPlaceHolder(buffer);
         }
       } else {
-        queryValue.appendSql(query, dataStore, buffer);
+        queryValue.appendSql(query, recordStore, buffer);
       }
 
     }

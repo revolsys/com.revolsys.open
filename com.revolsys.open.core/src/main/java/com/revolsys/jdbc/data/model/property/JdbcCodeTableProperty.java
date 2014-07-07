@@ -20,7 +20,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
 
   private DataSource dataSource;
 
-  private JdbcRecordStore dataStore;
+  private JdbcRecordStore recordStore;
 
   private String insertSql;
 
@@ -43,7 +43,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
         while (id == null) {
           final PreparedStatement statement = connection.prepareStatement(this.insertSql);
           try {
-            id = SingleIdentifier.create(this.dataStore.getNextPrimaryKey(getRecordDefinition()));
+            id = SingleIdentifier.create(this.recordStore.getNextPrimaryKey(getRecordDefinition()));
             int index = 1;
             index = JdbcUtils.setValue(statement, index, id);
             for (int i = 0; i < getValueAttributeNames().size(); i++) {
@@ -84,14 +84,14 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
 
   @Override
   public JdbcRecordStore getDataStore() {
-    return this.dataStore;
+    return this.recordStore;
   }
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     super.setRecordDefinition(recordDefinition);
-    this.dataStore = (JdbcRecordStore)recordDefinition.getDataStore();
-    this.dataSource = this.dataStore.getDataSource();
+    this.recordStore = (JdbcRecordStore)recordDefinition.getDataStore();
+    this.dataSource = this.recordStore.getDataSource();
     if (recordDefinition != null) {
       this.tableName = JdbcUtils.getQualifiedTableName(recordDefinition.getPath());
 
@@ -113,7 +113,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
         this.insertSql += ", ?";
       }
       if (this.useAuditColumns) {
-        if (this.dataStore.getClass()
+        if (this.recordStore.getClass()
             .getName()
             .equals("com.revolsys.gis.oracle.io.OracleRecordStore")) {
           this.insertSql += ", USER, SYSDATE, USER, SYSDATE";

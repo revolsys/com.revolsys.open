@@ -68,18 +68,18 @@ public class RecordStoreConnectionRegistry extends
     addConnection(connection);
   }
 
-  public void addConnection(final String name, final RecordStore dataStore) {
+  public void addConnection(final String name, final RecordStore recordStore) {
     final RecordStoreConnection connection = new RecordStoreConnection(
-      this, name, dataStore);
+      this, name, recordStore);
     addConnection(connection);
   }
 
   @Override
-  protected RecordStoreConnection loadConnection(final File dataStoreFile) {
-    final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(dataStoreFile);
+  protected RecordStoreConnection loadConnection(final File recordStoreFile) {
+    final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(recordStoreFile);
     String name = CollectionUtil.getString(config, "name");
     if (!StringUtils.hasText(name)) {
-      name = FileUtil.getBaseName(dataStoreFile);
+      name = FileUtil.getBaseName(recordStoreFile);
     }
     try {
       final Map<String, Object> connectionProperties = CollectionUtil.get(
@@ -87,17 +87,17 @@ public class RecordStoreConnectionRegistry extends
       if (connectionProperties.isEmpty()) {
         LoggerFactory.getLogger(getClass()).error(
           "Data store must include a 'connection' map property: "
-            + dataStoreFile);
+            + recordStoreFile);
         return null;
       } else {
-        final RecordStoreConnection dataStoreConnection = new RecordStoreConnection(
-          this, dataStoreFile.toString(), config);
-        addConnection(name, dataStoreConnection);
-        return dataStoreConnection;
+        final RecordStoreConnection recordStoreConnection = new RecordStoreConnection(
+          this, recordStoreFile.toString(), config);
+        addConnection(name, recordStoreConnection);
+        return recordStoreConnection;
       }
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error(
-        "Error creating data store from: " + dataStoreFile, e);
+        "Error creating data store from: " + recordStoreFile, e);
       return null;
     }
   }

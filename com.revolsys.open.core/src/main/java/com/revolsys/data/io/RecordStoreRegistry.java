@@ -7,8 +7,8 @@ import java.util.Map;
 public class RecordStoreRegistry {
   private Map<String, RecordStore> recordStores = new HashMap<String, RecordStore>();
 
-  public void addDataStore(final String name, final RecordStore dataStore) {
-    this.recordStores.put(name, dataStore);
+  public void addDataStore(final String name, final RecordStore recordStore) {
+    this.recordStores.put(name, recordStore);
   }
 
   public RecordStore getRecordStore(final String name) {
@@ -19,8 +19,8 @@ public class RecordStoreRegistry {
     return Collections.unmodifiableMap(recordStores);
   }
 
-  public void setRecordStores(final Map<String, RecordStore> dataStores) {
-    this.recordStores = dataStores;
+  public void setRecordStores(final Map<String, RecordStore> recordStores) {
+    this.recordStores = recordStores;
   }
 
 }

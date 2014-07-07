@@ -37,18 +37,18 @@ public class GeometryEqual2d extends Condition {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     buffer.append("ST_EQUALS(");
     if (geometry1Value == null) {
       buffer.append("NULL");
     } else {
-      geometry1Value.appendSql(query, dataStore, buffer);
+      geometry1Value.appendSql(query, recordStore, buffer);
     }
     buffer.append(", ");
     if (geometry1Value == null) {
       buffer.append("NULL");
     } else {
-      geometry1Value.appendSql(query, dataStore, buffer);
+      geometry1Value.appendSql(query, recordStore, buffer);
     }
     buffer.append(")");
   }

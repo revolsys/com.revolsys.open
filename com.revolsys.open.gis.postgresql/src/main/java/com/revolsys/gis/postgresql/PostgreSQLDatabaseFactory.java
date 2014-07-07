@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.io.RecordStore;
-import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
@@ -42,17 +42,6 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
       final PGPoolingDataSource postgreSqlDataSource = (PGPoolingDataSource)dataSource;
       postgreSqlDataSource.close();
     }
-  }
-
-  @Override
-  public JdbcRecordStore createRecordStore(final DataSource dataSource) {
-    return new PostgreSQLRecordStore(dataSource);
-  }
-
-  @Override
-  public JdbcRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
-    return new PostgreSQLRecordStore(this, connectionProperties);
   }
 
   @Override
@@ -98,9 +87,14 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
-  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
+  public JdbcRecordStore createRecordStore(final DataSource dataSource) {
+    return new PostgreSQLRecordStore(dataSource);
+  }
+
+  @Override
+  public JdbcRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
-    return JdbcRecordStore.class;
+    return new PostgreSQLRecordStore(this, connectionProperties);
   }
 
   @Override
@@ -116,6 +110,12 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   @Override
   public List<String> getProductNames() {
     return Collections.singletonList("PostgreSQL");
+  }
+
+  @Override
+  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
+    final Map<String, ? extends Object> connectionProperties) {
+    return JdbcRecordStore.class;
   }
 
   @Override

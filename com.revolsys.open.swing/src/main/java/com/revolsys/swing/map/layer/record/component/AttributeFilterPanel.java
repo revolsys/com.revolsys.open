@@ -452,10 +452,10 @@ ItemListener, DocumentListener, PropertyChangeListener {
       this.searchFieldPanel.setVisible(true);
       addListeners(searchField);
       if (this.searchField instanceof DataStoreQueryTextField) {
-        final DataStoreQueryTextField dataStoreSearchTextField = (DataStoreQueryTextField)this.searchField;
-        dataStoreSearchTextField.setMaxResults(100);
-        dataStoreSearchTextField.setPreferredSize(new Dimension(200, 22));
-        dataStoreSearchTextField.setBelow(true);
+        final DataStoreQueryTextField recordStoreSearchTextField = (DataStoreQueryTextField)this.searchField;
+        recordStoreSearchTextField.setMaxResults(100);
+        recordStoreSearchTextField.setPreferredSize(new Dimension(200, 22));
+        recordStoreSearchTextField.setBelow(true);
       } else if (this.searchField instanceof JXSearchField) {
         final JXSearchField searchTextField = (JXSearchField)this.searchField;
         searchTextField.setPreferredSize(new Dimension(200, 22));

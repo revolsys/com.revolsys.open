@@ -26,9 +26,9 @@ public class ArcSdeStGeometryDataStoreExtension implements
   }
 
   @Override
-  public void initialize(final RecordStore dataStore,
+  public void initialize(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
-    final OracleRecordStore oracleDataStore = (OracleRecordStore)dataStore;
+    final OracleRecordStore oracleDataStore = (OracleRecordStore)recordStore;
     final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
       oracleDataStore);
     oracleDataStore.addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
@@ -37,8 +37,8 @@ public class ArcSdeStGeometryDataStoreExtension implements
   }
 
   @Override
-  public boolean isEnabled(final RecordStore dataStore) {
-    return ArcSdeConstants.isSdeAvailable(dataStore);
+  public boolean isEnabled(final RecordStore recordStore) {
+    return ArcSdeConstants.isSdeAvailable(recordStore);
   }
 
   private void loadColumnProperties(final RecordStoreSchema schema,
@@ -152,8 +152,8 @@ public class ArcSdeStGeometryDataStoreExtension implements
 
   @Override
   public void preProcess(final RecordStoreSchema schema) {
-    final RecordStore dataStore = schema.getDataStore();
-    final OracleRecordStore oracleDataStore = (OracleRecordStore)dataStore;
+    final RecordStore recordStore = schema.getDataStore();
+    final OracleRecordStore oracleDataStore = (OracleRecordStore)recordStore;
     try {
       final Connection connection = oracleDataStore.getSqlConnection();
       try {

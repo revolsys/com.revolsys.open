@@ -38,18 +38,18 @@ public class EnvelopeIntersects extends Condition {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     buffer.append("ST_INTERSECTS(");
     if (boundingBox1Value == null) {
       buffer.append("NULL");
     } else {
-      boundingBox1Value.appendSql(query, dataStore, buffer);
+      boundingBox1Value.appendSql(query, recordStore, buffer);
     }
     buffer.append(", ");
     if (boundingBox1Value == null) {
       buffer.append("NULL");
     } else {
-      boundingBox1Value.appendSql(query, dataStore, buffer);
+      boundingBox1Value.appendSql(query, recordStore, buffer);
     }
     buffer.append(")");
   }

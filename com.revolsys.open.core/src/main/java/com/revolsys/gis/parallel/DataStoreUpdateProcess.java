@@ -30,7 +30,7 @@ import com.revolsys.parallel.process.BaseInProcess;
 
 public class DataStoreUpdateProcess extends BaseInProcess<Record> {
   /** The data store. */
-  private RecordStore dataStore;
+  private RecordStore recordStore;
 
   /**
    * Construct a new DataStoreUpdateProcess.
@@ -40,7 +40,7 @@ public class DataStoreUpdateProcess extends BaseInProcess<Record> {
 
   @PreDestroy
   public void close() {
-    dataStore.close();
+    recordStore.close();
   }
 
   /**
@@ -49,7 +49,7 @@ public class DataStoreUpdateProcess extends BaseInProcess<Record> {
    * @return The data store.
    */
   public RecordStore getDataStore() {
-    return dataStore;
+    return recordStore;
   }
 
   /**
@@ -63,15 +63,15 @@ public class DataStoreUpdateProcess extends BaseInProcess<Record> {
     final RecordState state = object.getState();
     switch (state) {
       case New:
-        dataStore.insert(object);
+        recordStore.insert(object);
       break;
       case Persisted:
       break;
       case Modified:
-        dataStore.update(object);
+        recordStore.update(object);
       break;
       case Deleted:
-        dataStore.delete(object);
+        recordStore.delete(object);
       break;
       default:
       break;
@@ -81,9 +81,9 @@ public class DataStoreUpdateProcess extends BaseInProcess<Record> {
   /**
    * Set the data store.
    * 
-   * @param dataStore The data store.
+   * @param recordStore The data store.
    */
-  public void setDataStore(final RecordStore dataStore) {
-    this.dataStore = dataStore;
+  public void setDataStore(final RecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 }

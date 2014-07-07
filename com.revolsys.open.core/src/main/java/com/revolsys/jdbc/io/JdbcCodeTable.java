@@ -32,7 +32,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
 
   private DataSource dataSource;
 
-  private JdbcRecordStore dataStore;
+  private JdbcRecordStore recordStore;
 
   private String idByValueSql;
 
@@ -119,7 +119,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
         if (id == null) {
           final PreparedStatement statement = connection.prepareStatement(this.insertSql);
           try {
-            id = this.dataStore.getNextPrimaryKey(this.sequenceName);
+            id = this.recordStore.getNextPrimaryKey(this.sequenceName);
             int index = 1;
             index = JdbcUtils.setValue(statement, index, id);
             for (int i = 0; i < this.valueColumns.size(); i++) {
@@ -167,7 +167,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
   }
 
   public JdbcRecordStore getDataStore() {
-    return this.dataStore;
+    return this.recordStore;
   }
 
   @Override
@@ -358,10 +358,10 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.dataSource = dataSource;
   }
 
-  public void setDataStore(final JdbcRecordStore dataStore) {
-    this.dataStore = dataStore;
-    if (dataStore != null) {
-      this.dataSource = dataStore.getDataSource();
+  public void setDataStore(final JdbcRecordStore recordStore) {
+    this.recordStore = recordStore;
+    if (recordStore != null) {
+      this.dataSource = recordStore.getDataSource();
     }
   }
 

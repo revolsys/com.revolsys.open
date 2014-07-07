@@ -125,7 +125,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   private RecordLayerAttributesTableModel allAttributes;
 
-  private RecordStore dataStore;
+  private RecordStore recordStore;
 
   private boolean editable = true;
 
@@ -232,8 +232,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   protected ObjectLabelField addCodeTableLabelField(final String fieldName) {
-    final RecordStore dataStore = getDataStore();
-    final CodeTable codeTable = dataStore.getCodeTableByColumn(fieldName);
+    final RecordStore recordStore = getDataStore();
+    final CodeTable codeTable = recordStore.getCodeTableByColumn(fieldName);
     final ObjectLabelField field = new ObjectLabelField(fieldName, codeTable);
     field.setFont(SwingUtil.FONT);
     addField(fieldName, field);
@@ -597,7 +597,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   public void destroy() {
     this.addOkButton = null;
     this.allAttributes = null;
-    this.dataStore = null;
+    this.recordStore = null;
     this.fieldInValidMessage.clear();
     for (final Field field : this.fields.values()) {
       Property.removeAllListeners(field);
@@ -714,14 +714,14 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   public RecordStore getDataStore() {
-    if (this.dataStore == null) {
+    if (this.recordStore == null) {
       if (this.recordDefinition == null) {
         return null;
       } else {
         return this.recordDefinition.getDataStore();
       }
     } else {
-      return this.dataStore;
+      return this.recordStore;
     }
   }
 
@@ -1078,8 +1078,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
   }
 
-  protected void setDataStore(final RecordStore dataStore) {
-    this.dataStore = dataStore;
+  protected void setDataStore(final RecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   public void setEditable(final boolean editable) {

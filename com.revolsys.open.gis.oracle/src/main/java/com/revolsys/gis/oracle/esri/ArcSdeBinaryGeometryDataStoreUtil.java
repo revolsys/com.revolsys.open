@@ -50,14 +50,14 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();
 
-  private JdbcRecordStore dataStore;
+  private JdbcRecordStore recordStore;
 
   public ArcSdeBinaryGeometryDataStoreUtil() {
   }
 
-  public ArcSdeBinaryGeometryDataStoreUtil(final RecordStore dataStore,
+  public ArcSdeBinaryGeometryDataStoreUtil(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
-    this.dataStore = (JdbcRecordStore)dataStore;
+    this.recordStore = (JdbcRecordStore)recordStore;
     this.connectionProperties = connectionProperties;
   }
 
@@ -81,7 +81,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     return null;
   }
 
-  public void createGeometryColumn(final AbstractJdbcRecordStore dataStore,
+  public void createGeometryColumn(final AbstractJdbcRecordStore recordStore,
     final RecordStoreSchema schema, final RecordDefinition recordDefinition,
     final String typePath, final String columnName,
     final Map<String, Object> columnProperties) {
@@ -105,19 +105,19 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
     ((RecordDefinitionImpl)recordDefinition).replaceAttribute(attribute, sdeAttribute);
     sdeAttribute.setRecordDefinition(recordDefinition);
 
-    recordDefinition.setProperty("dataStoreIteratorFactory", this.iteratorFactory);
+    recordDefinition.setProperty("recordStoreIteratorFactory", this.iteratorFactory);
 
     ((RecordDefinitionImpl)recordDefinition).setGeometryAttributeName(columnName);
   }
 
   public AbstractIterator<Record> createIterator(
-    final OracleRecordStore dataStore, final Query query,
+    final OracleRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
     if (boundingBox == null) {
       return null;
     } else {
-      return new ArcSdeBinaryGeometryQueryIterator(this, dataStore, query,
+      return new ArcSdeBinaryGeometryQueryIterator(this, recordStore, query,
         properties);
     }
   }
@@ -171,7 +171,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
 
   public String getTableName(final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
-    return this.dataStore.getDatabaseQualifiedTableName(typePath);
+    return this.recordStore.getDatabaseQualifiedTableName(typePath);
   }
 
   public void setValueFromRow(final Record object, final SeRow row,

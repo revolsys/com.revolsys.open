@@ -63,7 +63,7 @@ public class Value extends QueryValue {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     if (this.jdbcAttribute == null) {
       buffer.append('?');
     } else {

@@ -57,9 +57,9 @@ import com.revolsys.util.CollectionUtil;
 public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   implements JdbcRecordStore, RecordStoreExtension {
   public static final AbstractIterator<Record> createJdbcIterator(
-    final AbstractJdbcRecordStore dataStore, final Query query,
+    final AbstractJdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
-    return new JdbcQueryIterator(dataStore, query, properties);
+    return new JdbcQueryIterator(recordStore, query, properties);
   }
 
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
@@ -675,7 +675,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public void initialize(final RecordStore dataStore,
+  public void initialize(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
   }
 
@@ -696,7 +696,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public boolean isEnabled(final RecordStore dataStore) {
+  public boolean isEnabled(final RecordStore recordStore) {
     return true;
   }
 

@@ -43,9 +43,9 @@ public class LayerChooserPanel extends ValueField implements
   public static BaseTree createTree() {
     final ListTreeNode root = new ListTreeNode();
 
-    final RecordStoreConnectionsTreeNode dataStores = new RecordStoreConnectionsTreeNode(
+    final RecordStoreConnectionsTreeNode recordStores = new RecordStoreConnectionsTreeNode(
       root);
-    root.add(dataStores);
+    root.add(recordStores);
 
     final FileSystemsTreeNode fileSystems = new FileSystemsTreeNode(root);
     root.add(fileSystems);
@@ -64,7 +64,7 @@ public class LayerChooserPanel extends ValueField implements
     final DefaultTreeSelectionModel selectionModel = new DefaultTreeSelectionModel();
     selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     tree.setSelectionModel(selectionModel);
-    dataStores.expandChildren();
+    recordStores.expandChildren();
     fileSystems.expand();
     folderConnections.expandChildren();
     return tree;

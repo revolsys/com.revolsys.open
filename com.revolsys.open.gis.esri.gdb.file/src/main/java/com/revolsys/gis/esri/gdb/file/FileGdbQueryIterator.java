@@ -32,7 +32,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private RecordDefinition recordDefinition;
 
-  private CapiFileGdbRecordStore dataStore;
+  private CapiFileGdbRecordStore recordStore;
 
   private EnumRows rows;
 
@@ -44,51 +44,51 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private int count;
 
-  FileGdbQueryIterator(final CapiFileGdbRecordStore dataStore,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
     final String typePath) {
-    this(dataStore, typePath, "*", "", null, 0, -1);
+    this(recordStore, typePath, "*", "", null, 0, -1);
   }
 
-  FileGdbQueryIterator(final CapiFileGdbRecordStore dataStore,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
     final String typePath, final String whereClause) {
-    this(dataStore, typePath, "*", whereClause, null, 0, -1);
+    this(recordStore, typePath, "*", whereClause, null, 0, -1);
   }
 
-  FileGdbQueryIterator(final CapiFileGdbRecordStore dataStore,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
     final String typePath, final String whereClause,
     final BoundingBox boundingBox, final Query query, final int offset,
     final int limit) {
-    this(dataStore, typePath, "*", whereClause, boundingBox, offset, limit);
+    this(recordStore, typePath, "*", whereClause, boundingBox, offset, limit);
     final RecordFactory factory = query.getProperty("recordFactory");
     if (factory != null) {
       this.recordFactory = factory;
     }
   }
 
-  FileGdbQueryIterator(final CapiFileGdbRecordStore dataStore,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
     final String typePath, final String fields, final String sql,
     final BoundingBox boundingBox, final int offset, final int limit) {
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
     this.typePath = typePath;
-    this.recordDefinition = dataStore.getRecordDefinition(typePath);
-    this.table = dataStore.getTable(typePath);
+    this.recordDefinition = recordStore.getRecordDefinition(typePath);
+    this.table = recordStore.getTable(typePath);
     this.fields = fields;
     this.sql = sql;
     setBoundingBox(boundingBox);
-    this.recordFactory = dataStore.getRecordFactory();
+    this.recordFactory = recordStore.getRecordFactory();
     this.offset = offset;
     this.limit = limit;
   }
 
   @Override
   protected void doClose() {
-    if (dataStore != null) {
+    if (recordStore != null) {
       try {
-        dataStore.closeEnumRows(rows);
+        recordStore.closeEnumRows(rows);
       } catch (final Throwable e) {
       } finally {
         boundingBox = null;
-        dataStore = null;
+        recordStore = null;
         fields = null;
         recordDefinition = null;
         rows = null;
@@ -101,12 +101,12 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
   @Override
   protected void doInit() {
     if (recordDefinition != null) {
-      synchronized (dataStore) {
+      synchronized (recordStore) {
         if (boundingBox == null) {
           if (sql.startsWith("SELECT")) {
-            rows = dataStore.query(sql, true);
+            rows = recordStore.query(sql, true);
           } else {
-            rows = dataStore.search(table, fields, sql, true);
+            rows = recordStore.search(table, fields, sql, true);
           }
         } else {
           BoundingBox boundingBox = this.boundingBox;
@@ -117,7 +117,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
             boundingBox = boundingBox.expand(0, 1);
           }
           final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter.toEsri(boundingBox);
-          rows = dataStore.search(table, fields, sql, envelope, true);
+          rows = recordStore.search(table, fields, sql, envelope, true);
         }
       }
     }
@@ -137,26 +137,26 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     } else {
       Row row = null;
       while (offset > 0 && count < offset) {
-        dataStore.nextRow(rows);
+        recordStore.nextRow(rows);
         count++;
       }
       if (limit > -1 && count >= offset + limit) {
         throw new NoSuchElementException();
       }
-      row = dataStore.nextRow(rows);
+      row = recordStore.nextRow(rows);
       count++;
       if (row == null) {
         throw new NoSuchElementException();
       } else {
         try {
           final Record object = recordFactory.createRecord(recordDefinition);
-          dataStore.addStatistic("query", object);
+          recordStore.addStatistic("query", object);
           object.setState(RecordState.Initalizing);
           for (final Attribute attribute : recordDefinition.getAttributes()) {
             final String name = attribute.getName();
             final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
             final Object value;
-            synchronized (dataStore) {
+            synchronized (recordStore) {
               value = esriAttribute.getValue(row);
             }
             object.setValue(name, value);
@@ -165,7 +165,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           return object;
 
         } finally {
-          dataStore.closeRow(row);
+          recordStore.closeRow(row);
         }
       }
     }

@@ -41,7 +41,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   private RecordFactory recordFactory;
 
-  private JdbcRecordStore dataStore;
+  private JdbcRecordStore recordStore;
 
   private RecordDefinition recordDefinition;
 
@@ -53,10 +53,10 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   private final String sql;
 
-  public JdbcQueryResultPager(final JdbcRecordStore dataStore,
+  public JdbcQueryResultPager(final JdbcRecordStore recordStore,
     final Map<String, Object> properties, final Query query) {
-    this.connection = dataStore.getConnection();
-    this.dataSource = dataStore.getDataSource();
+    this.connection = recordStore.getConnection();
+    this.dataSource = recordStore.getDataSource();
 
     if (dataSource != null) {
       try {
@@ -70,15 +70,15 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
         throw new IllegalArgumentException("Unable to create connection", e);
       }
     }
-    this.recordFactory = dataStore.getRecordFactory();
-    this.dataStore = dataStore;
+    this.recordFactory = recordStore.getRecordFactory();
+    this.recordStore = recordStore;
 
     this.query = query;
 
     final String tableName = query.getTypeName();
     recordDefinition = query.getRecordDefinition();
     if (recordDefinition == null) {
-      recordDefinition = dataStore.getRecordDefinition(tableName);
+      recordDefinition = recordStore.getRecordDefinition(tableName);
       query.setRecordDefinition(recordDefinition);
     }
 
@@ -93,7 +93,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
     connection = null;
     recordFactory = null;
     dataSource = null;
-    dataStore = null;
+    recordStore = null;
     recordDefinition = null;
     results = null;
     resultSet = null;
@@ -120,7 +120,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
   }
 
   public JdbcRecordStore getDataStore() {
-    return dataStore;
+    return recordStore;
   }
 
   /**
@@ -275,7 +275,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
   }
 
   public boolean isClosed() {
-    return dataStore == null;
+    return recordStore == null;
   }
 
   /**
@@ -363,7 +363,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
           int i = 0;
           do {
             final Record object = JdbcQueryIterator.getNextObject(
-              dataStore, recordDefinition, recordDefinition.getAttributes(), recordFactory,
+              recordStore, recordDefinition, recordDefinition.getAttributes(), recordFactory,
               resultSet);
             results.add(object);
             i++;

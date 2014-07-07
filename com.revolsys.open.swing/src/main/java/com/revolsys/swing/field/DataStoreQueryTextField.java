@@ -69,7 +69,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   private static final long serialVersionUID = 1L;
 
-  private final RecordStore dataStore;
+  private final RecordStore recordStore;
 
   private final String displayAttributeName;
 
@@ -106,7 +106,7 @@ public class DataStoreQueryTextField extends TextField implements
     final String displayAttributeName, final List<Query> queries) {
     super(displayAttributeName);
     this.recordDefinition = recordDefinition;
-    this.dataStore = recordDefinition.getDataStore();
+    this.recordStore = recordDefinition.getDataStore();
     this.idAttributeName = recordDefinition.getIdAttributeName();
     this.displayAttributeName = displayAttributeName;
 
@@ -124,7 +124,7 @@ public class DataStoreQueryTextField extends TextField implements
     this.oldValueItem.setHorizontalAlignment(SwingConstants.LEFT);
     this.menu.add(this.oldValueItem, BorderLayout.NORTH);
 
-    this.listModel = new DataStoreQueryListModel(this.dataStore,
+    this.listModel = new DataStoreQueryListModel(this.recordStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
     this.list.setCellRenderer(new RecordListCellRenderer(
@@ -155,9 +155,9 @@ public class DataStoreQueryTextField extends TextField implements
 
   }
 
-  public DataStoreQueryTextField(final RecordStore dataStore,
+  public DataStoreQueryTextField(final RecordStore recordStore,
     final String typeName, final String displayAttributeName) {
-    this(dataStore.getRecordDefinition(typeName), displayAttributeName, new Query(
+    this(recordStore.getRecordDefinition(typeName), displayAttributeName, new Query(
       typeName, new Equal(F.upper(displayAttributeName), new Value(null))),
       new Query(typeName, Q.iLike(displayAttributeName, "")));
   }
@@ -210,7 +210,7 @@ public class DataStoreQueryTextField extends TextField implements
     final String stringValue = StringConverterRegistry.toString(value);
     String displayText = this.valueToDisplayMap.get(stringValue);
     if (!StringUtils.hasText(displayText) && StringUtils.hasText(stringValue)) {
-      final Record record = this.dataStore.queryFirst(Query.equal(
+      final Record record = this.recordStore.queryFirst(Query.equal(
         this.recordDefinition, this.idAttributeName, stringValue));
       if (record == null) {
         displayText = stringValue;

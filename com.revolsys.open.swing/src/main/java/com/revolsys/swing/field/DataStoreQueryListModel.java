@@ -24,7 +24,7 @@ import com.revolsys.io.Reader;
 
 public class DataStoreQueryListModel implements ListModel {
 
-  private final RecordStore dataStore;
+  private final RecordStore recordStore;
 
   private final String displayAttributeName;
 
@@ -40,16 +40,16 @@ public class DataStoreQueryListModel implements ListModel {
 
   private int maxResults = 10;
 
-  public DataStoreQueryListModel(final RecordStore dataStore,
+  public DataStoreQueryListModel(final RecordStore recordStore,
     final String displayAttributeName, final List<Query> queries) {
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
     this.queries.addAll(queries);
     this.displayAttributeName = displayAttributeName;
   }
 
-  public DataStoreQueryListModel(final RecordStore dataStore,
+  public DataStoreQueryListModel(final RecordStore recordStore,
     final String displayAttributeName, final Query... queries) {
-    this(dataStore, displayAttributeName, Arrays.asList(queries));
+    this(recordStore, displayAttributeName, Arrays.asList(queries));
   }
 
   @Override
@@ -108,7 +108,7 @@ public class DataStoreQueryListModel implements ListModel {
           }
         }
         query.setLimit(this.maxResults);
-        final Reader<Record> reader = this.dataStore.query(query);
+        final Reader<Record> reader = this.recordStore.query(query);
         try {
           final List<Record> objects = reader.read();
           for (final Record object : objects) {

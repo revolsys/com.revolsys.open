@@ -14,7 +14,7 @@ import com.revolsys.parallel.process.AbstractProcess;
 
 public class DataStoreQueryTask extends AbstractProcess {
 
-  private final RecordStore dataStore;
+  private final RecordStore recordStore;
 
   private final BoundingBox boundingBox;
 
@@ -22,9 +22,9 @@ public class DataStoreQueryTask extends AbstractProcess {
 
   private final String path;
 
-  public DataStoreQueryTask(final RecordStore dataStore, final String path,
+  public DataStoreQueryTask(final RecordStore recordStore, final String path,
     final BoundingBox boundingBox) {
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
     this.path = path;
     this.boundingBox = boundingBox;
   }
@@ -41,12 +41,12 @@ public class DataStoreQueryTask extends AbstractProcess {
   @Override
   public void run() {
     objects = new ArrayList<Record>();
-    final RecordDefinition recordDefinition = dataStore.getRecordDefinition(path);
+    final RecordDefinition recordDefinition = recordStore.getRecordDefinition(path);
     final Query query = new Query(recordDefinition);
     final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     query.setWhereCondition(F.envelopeIntersects(geometryAttribute, boundingBox));
     try (
-      final Reader<Record> reader = dataStore.query(query)) {
+      final Reader<Record> reader = recordStore.query(query)) {
       for (final Record object : reader) {
         try {
           objects.add(object);

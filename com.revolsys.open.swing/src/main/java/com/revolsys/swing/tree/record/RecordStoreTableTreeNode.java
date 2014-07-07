@@ -44,7 +44,7 @@ public class RecordStoreTableTreeNode extends LazyLoadTreeNode {
     final RecordStoreSchemaTreeNode schemaNode = node.getParentNode();
     final Map<String, Object> connection = schemaNode.getRecordStoreConnectionMap();
     final Map<String, Object> layerConfig = new LinkedHashMap<String, Object>();
-    layerConfig.put("type", "dataStore");
+    layerConfig.put("type", "recordStore");
     layerConfig.put("name", node.getName());
     layerConfig.put("connection", connection);
     layerConfig.put("typePath", typePath);

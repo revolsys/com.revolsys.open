@@ -359,18 +359,18 @@ public abstract class QueryValue implements Cloneable {
     "AND", "OR", "+", "-", "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE",
     "+", "-", "/", "*", "%", "MOD");
 
-  public abstract void appendDefaultSql(Query query, RecordStore dataStore,
+  public abstract void appendDefaultSql(Query query, RecordStore recordStore,
     StringBuffer sql);
 
   // TODO wrap in a more generic structure
   public abstract int appendParameters(int index, PreparedStatement statement);
 
-  public void appendSql(final Query query, final RecordStore dataStore,
+  public void appendSql(final Query query, final RecordStore recordStore,
     final StringBuffer sql) {
-    if (dataStore == null) {
+    if (recordStore == null) {
       appendDefaultSql(query, null, sql);
     } else {
-      dataStore.appendQueryValue(query, sql, this);
+      recordStore.appendQueryValue(query, sql, this);
     }
   }
 

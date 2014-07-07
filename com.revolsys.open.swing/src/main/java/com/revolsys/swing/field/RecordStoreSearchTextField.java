@@ -81,7 +81,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
       recordDefinition, Q.iLike(displayAttributeName, "")));
   }
 
-  public RecordStoreSearchTextField(final RecordStore dataStore,
+  public RecordStoreSearchTextField(final RecordStore recordStore,
     final String displayAttributeName, final List<Query> queries) {
     this.displayAttributeName = displayAttributeName;
 
@@ -91,7 +91,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
     addKeyListener(this);
     addMouseListener(this);
 
-    this.listModel = new DataStoreQueryListModel(dataStore,
+    this.listModel = new DataStoreQueryListModel(recordStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
     this.list.setCellRenderer(new RecordListCellRenderer(
@@ -116,15 +116,15 @@ public class RecordStoreSearchTextField extends JXSearchField implements
     this.undoManager.addKeyMap(this);
   }
 
-  public RecordStoreSearchTextField(final RecordStore dataStore,
+  public RecordStoreSearchTextField(final RecordStore recordStore,
     final String displayAttributeName, final Query... queries) {
-    this(dataStore, displayAttributeName, Arrays.asList(queries));
+    this(recordStore, displayAttributeName, Arrays.asList(queries));
 
   }
 
-  public RecordStoreSearchTextField(final RecordStore dataStore,
+  public RecordStoreSearchTextField(final RecordStore recordStore,
     final String typeName, final String displayAttributeName) {
-    this(dataStore, displayAttributeName, new Query(typeName, new Equal(
+    this(recordStore, displayAttributeName, new Query(typeName, new Equal(
       F.upper(displayAttributeName), new Value(null))), new Query(typeName,
       Q.iLike(displayAttributeName, "")));
   }

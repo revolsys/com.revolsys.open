@@ -38,7 +38,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
   private DataSource dataSource;
 
-  private JdbcRecordStore dataStore;
+  private JdbcRecordStore recordStore;
 
   private boolean flushBetweenTypes = false;
 
@@ -84,16 +84,16 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
   private boolean throwExceptions = false;
 
-  public JdbcWriterImpl(final JdbcRecordStore dataStore) {
-    this(dataStore, dataStore.getStatistics());
+  public JdbcWriterImpl(final JdbcRecordStore recordStore) {
+    this(recordStore, recordStore.getStatistics());
   }
 
-  public JdbcWriterImpl(final JdbcRecordStore dataStore,
+  public JdbcWriterImpl(final JdbcRecordStore recordStore,
     final StatisticsMap statistics) {
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
     this.statistics = statistics;
-    setConnection(dataStore.getConnection());
-    setDataSource(dataStore.getDataSource());
+    setConnection(recordStore.getConnection());
+    setDataSource(recordStore.getDataSource());
     statistics.connect();
   }
 
@@ -169,7 +169,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       batchCount += 1;
       typeDeleteBatchCountMap.put(typePath, batchCount);
     }
-    dataStore.addStatistic("Delete", object);
+    recordStore.addStatistic("Delete", object);
 
     // TODO this locks code tables which prevents insert
     // if (batchCount >= batchSize) {
@@ -180,7 +180,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   }
 
   protected synchronized void doClose() {
-    if (dataStore != null) {
+    if (recordStore != null) {
       try {
 
         close(typeInsertSqlMap, typeInsertStatementMap, typeInsertBatchCountMap);
@@ -205,7 +205,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
         typeDeleteBatchCountMap = null;
         typeDeleteSqlMap = null;
         typeDeleteStatementMap = null;
-        dataStore = null;
+        recordStore = null;
         if (dataSource != null) {
           try {
             if (!Transaction.isHasCurrentTransaction()) {
@@ -265,10 +265,10 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   }
 
   private RecordDefinition getRecordDefinition(final String typePath) {
-    if (dataStore == null) {
+    if (recordStore == null) {
       return null;
     } else {
-      final RecordDefinition recordDefinition = dataStore.getRecordDefinition(typePath);
+      final RecordDefinition recordDefinition = recordStore.getRecordDefinition(typePath);
       return recordDefinition;
     }
   }
@@ -311,7 +311,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   }
 
   private String getGeneratePrimaryKeySql(final RecordDefinition recordDefinition) {
-    return dataStore.getGeneratePrimaryKeySql(recordDefinition);
+    return recordStore.getGeneratePrimaryKeySql(recordDefinition);
   }
 
   /**
@@ -481,7 +481,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       insertSequence(object, typePath, recordDefinition);
     }
     object.setState(RecordState.Persisted);
-    dataStore.addStatistic("Insert", object);
+    recordStore.addStatistic("Insert", object);
   }
 
   private void insert(final Record object, final String typePath,
@@ -643,10 +643,10 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
   @Override
   public String toString() {
-    if (dataStore == null) {
+    if (recordStore == null) {
       return super.toString();
     } else {
-      return dataStore.toString() + " writer";
+      return recordStore.toString() + " writer";
     }
   }
 
@@ -693,16 +693,16 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       final String sql = getUpdateSql(recordDefinition);
       processCurrentBatch(typePath, sql, statement, typeUpdateBatchCountMap);
     }
-    dataStore.addStatistic("Update", object);
+    recordStore.addStatistic("Update", object);
   }
 
   @Override
   public synchronized void write(final Record object) {
     try {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
-      final RecordStore dataStore = recordDefinition.getDataStore();
+      final RecordStore recordStore = recordDefinition.getDataStore();
       final RecordState state = object.getState();
-      if (dataStore != this.dataStore) {
+      if (recordStore != this.recordStore) {
         if (state != RecordState.Deleted) {
           insert(object);
         }

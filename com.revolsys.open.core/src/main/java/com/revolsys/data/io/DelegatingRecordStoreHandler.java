@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
 
 public class DelegatingRecordStoreHandler implements InvocationHandler {
   public static <T extends RecordStore> T create(final String label,
-    final Class<T> interfaceClass, final T dataStore) {
-    final ClassLoader classLoader = dataStore.getClass().getClassLoader();
+    final Class<T> interfaceClass, final T recordStore) {
+    final ClassLoader classLoader = recordStore.getClass().getClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
       interfaceClass
     };
     final DelegatingRecordStoreHandler handler = new DelegatingRecordStoreHandler(
-      label, dataStore);
+      label, recordStore);
     final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces,
       handler);
     return proxyStore;
@@ -46,7 +46,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
 
   private Map<String, Object> config;
 
-  private RecordStore dataStore;
+  private RecordStore recordStore;
 
   private String label;
 
@@ -54,9 +54,9 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   }
 
   public DelegatingRecordStoreHandler(final String label,
-    final RecordStore dataStore) {
+    final RecordStore recordStore) {
     this.label = label;
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
   }
 
   public DelegatingRecordStoreHandler(final String label,
@@ -67,19 +67,19 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
 
   protected RecordStore createDataStore() {
     if (config != null) {
-      final RecordStore dataStore = RecordStoreFactoryRegistry.createRecordStore(config);
-      return dataStore;
+      final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(config);
+      return recordStore;
     } else {
       throw new UnsupportedOperationException("Data store must be set manually");
     }
   }
 
   public RecordStore getDataStore() {
-    if (dataStore == null) {
-      dataStore = createDataStore();
-      dataStore.initialize();
+    if (recordStore == null) {
+      recordStore = createDataStore();
+      recordStore.initialize();
     }
-    return dataStore;
+    return recordStore;
   }
 
   @Override
@@ -101,16 +101,16 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
       final boolean equal = args[0] == proxy;
       return equal;
     } else if (method.getName().equals("close") && numArgs == 0) {
-      if (dataStore != null) {
-        final RecordStore dataStore = getDataStore();
+      if (recordStore != null) {
+        final RecordStore recordStore = getDataStore();
 
-        dataStore.close();
-        this.dataStore = null;
+        recordStore.close();
+        this.recordStore = null;
       }
       return null;
     } else {
-      final RecordStore dataStore = getDataStore();
-      return method.invoke(dataStore, args);
+      final RecordStore recordStore = getDataStore();
+      return method.invoke(recordStore, args);
     }
   }
 }

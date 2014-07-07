@@ -19,19 +19,19 @@ import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 public class ArcSdeSpatialReferenceCache {
 
   public static ArcSdeSpatialReferenceCache get(
-    final AbstractJdbcRecordStore dataStore) {
-    ArcSdeSpatialReferenceCache spatialReferences = dataStore.getProperty("esriSpatialReferences");
+    final AbstractJdbcRecordStore recordStore) {
+    ArcSdeSpatialReferenceCache spatialReferences = recordStore.getProperty("esriSpatialReferences");
     if (spatialReferences == null) {
-      spatialReferences = new ArcSdeSpatialReferenceCache(dataStore);
-      dataStore.setProperty("esriSpatialReferences", spatialReferences);
+      spatialReferences = new ArcSdeSpatialReferenceCache(recordStore);
+      recordStore.setProperty("esriSpatialReferences", spatialReferences);
     }
     return spatialReferences;
   }
 
   public static ArcSdeSpatialReferenceCache get(
     final RecordStoreSchema schema) {
-    final AbstractJdbcRecordStore dataStore = (AbstractJdbcRecordStore)schema.getDataStore();
-    return get(dataStore);
+    final AbstractJdbcRecordStore recordStore = (AbstractJdbcRecordStore)schema.getDataStore();
+    return get(recordStore);
 
   }
 
@@ -42,13 +42,13 @@ public class ArcSdeSpatialReferenceCache {
 
   private final Map<Integer, ArcSdeSpatialReference> spatialReferences = new HashMap<Integer, ArcSdeSpatialReference>();
 
-  private AbstractJdbcRecordStore dataStore;
+  private AbstractJdbcRecordStore recordStore;
 
   public ArcSdeSpatialReferenceCache() {
   }
 
-  public ArcSdeSpatialReferenceCache(final AbstractJdbcRecordStore dataStore) {
-    this.dataStore = dataStore;
+  public ArcSdeSpatialReferenceCache(final AbstractJdbcRecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   public synchronized ArcSdeSpatialReference getSpatialReference(
@@ -70,7 +70,7 @@ public class ArcSdeSpatialReferenceCache {
   protected ArcSdeSpatialReference getSpatialReference(final String sql,
     final int esriSrid) {
     try {
-      final Connection connection = this.dataStore.getSqlConnection();
+      final Connection connection = this.recordStore.getSqlConnection();
       try {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -127,7 +127,7 @@ public class ArcSdeSpatialReferenceCache {
           JdbcUtils.close(statement, resultSet);
         }
       } finally {
-        this.dataStore.releaseSqlConnection(connection);
+        this.recordStore.releaseSqlConnection(connection);
       }
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to get srid " + esriSrid, e);

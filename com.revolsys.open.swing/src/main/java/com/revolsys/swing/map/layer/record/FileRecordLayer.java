@@ -15,6 +15,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -28,11 +29,17 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class FileRecordLayer extends ListRecordLayer {
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "recordFile", "File", FileRecordLayer.class, "create");
 
   public static FileRecordLayer create(final Map<String, Object> properties) {
     return new FileRecordLayer(properties);
+  }
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "recordFile", "File", FileRecordLayer.class, "create");
+
+  static {
+    MapObjectFactoryRegistry.addFactory(new InvokeMethodMapObjectFactory(
+      "dataObjectFile", "File", FileRecordLayer.class, "create"));
   }
 
   private String url;
@@ -59,8 +66,7 @@ public class FileRecordLayer extends ListRecordLayer {
     if (StringUtils.hasText(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final RecordReaderFactory factory = IoFactoryRegistry.getInstance()
-        .getFactoryByFileExtension(RecordReaderFactory.class,
-          fileNameExtension);
+          .getFactoryByFileExtension(RecordReaderFactory.class, fileNameExtension);
       if (factory != null) {
         SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -71,9 +77,9 @@ public class FileRecordLayer extends ListRecordLayer {
 
   @Override
   protected boolean doInitialize() {
-    url = getProperty("url");
-    if (StringUtils.hasText(url)) {
-      resource = SpringUtil.getResource(url);
+    this.url = getProperty("url");
+    if (StringUtils.hasText(this.url)) {
+      this.resource = SpringUtil.getResource(this.url);
       return revert();
     } else {
       LoggerFactory.getLogger(getClass()).error(
@@ -88,10 +94,10 @@ public class FileRecordLayer extends ListRecordLayer {
   }
 
   public boolean revert() {
-    if (resource == null) {
+    if (this.resource == null) {
       return false;
     } else {
-      if (resource.exists()) {
+      if (this.resource.exists()) {
         final RecordReader reader = AbstractRecordReaderFactory.recordReader(this.resource);
         if (reader == null) {
           LoggerFactory.getLogger(getClass()).error(
@@ -113,7 +119,7 @@ public class FileRecordLayer extends ListRecordLayer {
             setBoundingBox(boundingBox);
             return true;
           } catch (final Throwable e) {
-            ExceptionUtil.log(getClass(), "Error reading: " + resource, e);
+            ExceptionUtil.log(getClass(), "Error reading: " + this.resource, e);
           } finally {
             fireRecordsChanged();
             reader.close();

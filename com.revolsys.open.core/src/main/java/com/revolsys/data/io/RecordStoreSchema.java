@@ -18,7 +18,7 @@ import com.revolsys.util.ExceptionUtil;
 
 public class RecordStoreSchema extends AbstractObjectWithProperties {
 
-  private Reference<AbstractRecordStore> dataStore;
+  private Reference<AbstractRecordStore> recordStore;
 
   private Map<String, RecordDefinition> recordDefinitionCache = null;
 
@@ -27,9 +27,9 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
   public RecordStoreSchema() {
   }
 
-  public RecordStoreSchema(final AbstractRecordStore dataStore,
+  public RecordStoreSchema(final AbstractRecordStore recordStore,
     final String path) {
-    this.dataStore = new WeakReference<AbstractRecordStore>(dataStore);
+    this.recordStore = new WeakReference<AbstractRecordStore>(recordStore);
     this.path = path;
   }
 
@@ -51,7 +51,7 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
         recordDefinition.destroy();
       }
     }
-    dataStore = null;
+    recordStore = null;
     recordDefinitionCache = null;
     path = null;
     super.close();
@@ -65,21 +65,21 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
 
   @SuppressWarnings("unchecked")
   public <V extends RecordStore> V getDataStore() {
-    if (dataStore == null) {
+    if (recordStore == null) {
       return null;
     } else {
-      return (V)dataStore.get();
+      return (V)recordStore.get();
     }
   }
 
   public GeometryFactory getGeometryFactory() {
     final GeometryFactory geometryFactory = getProperty("geometryFactory");
     if (geometryFactory == null) {
-      final AbstractRecordStore dataStore = getDataStore();
-      if (dataStore == null) {
+      final AbstractRecordStore recordStore = getDataStore();
+      if (recordStore == null) {
         return GeometryFactory.floating3();
       } else {
-        return dataStore.getGeometryFactory();
+        return recordStore.getGeometryFactory();
       }
     } else {
       return geometryFactory;
@@ -129,12 +129,12 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
 
   public synchronized void refreshMetaData() {
     recordDefinitionCache = new TreeMap<>();
-    final AbstractRecordStore dataStore = getDataStore();
-    if (dataStore != null) {
-      final Collection<RecordStoreExtension> extensions = dataStore.getDataStoreExtensions();
+    final AbstractRecordStore recordStore = getDataStore();
+    if (recordStore != null) {
+      final Collection<RecordStoreExtension> extensions = recordStore.getDataStoreExtensions();
       for (final RecordStoreExtension extension : extensions) {
         try {
-          if (extension.isEnabled(dataStore)) {
+          if (extension.isEnabled(recordStore)) {
             extension.preProcess(this);
           }
         } catch (final Throwable e) {
@@ -142,10 +142,10 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
             "Unable to pre-process schema " + this, e);
         }
       }
-      dataStore.loadSchemaRecordDefinitions(this, recordDefinitionCache);
+      recordStore.loadSchemaRecordDefinitions(this, recordDefinitionCache);
       for (final RecordStoreExtension extension : extensions) {
         try {
-          if (extension.isEnabled(dataStore)) {
+          if (extension.isEnabled(recordStore)) {
             extension.postProcess(this);
           }
         } catch (final Throwable e) {

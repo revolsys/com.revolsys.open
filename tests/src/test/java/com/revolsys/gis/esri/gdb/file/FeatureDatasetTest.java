@@ -29,37 +29,37 @@ public class FeatureDatasetTest {
     newMetaData.setGeometryFactory(geometryFactory);
 
     final String datasetName = "target/Create.gdb";
-    FileGdbRecordStore dataStore = FileGdbRecordStoreFactory.create(new File(
+    FileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(new File(
       datasetName));
     try {
-      dataStore.setCreateMissingTables(true);
-      dataStore.setCreateMissingDataStore(true);
-      dataStore.initialize();
-      dataStore.setDefaultSchema("test");
-      Assert.assertEquals("Initial Schema Size", 1, dataStore.getSchemas()
+      recordStore.setCreateMissingTables(true);
+      recordStore.setCreateMissingDataStore(true);
+      recordStore.initialize();
+      recordStore.setDefaultSchema("test");
+      Assert.assertEquals("Initial Schema Size", 1, recordStore.getSchemas()
         .size());
-      final RecordMetaData recordDefinition = dataStore.getRecordDefinition(newMetaData);
+      final RecordMetaData recordDefinition = recordStore.getRecordDefinition(newMetaData);
       Assert.assertNotNull("Created Metadata", recordDefinition);
 
-      final Record object = dataStore.create(newMetaData);
+      final Record object = recordStore.create(newMetaData);
       object.setIdValue(1);
       object.setValue("name", "Paul Austin");
       object.setGeometryValue(geometryFactory.createPoint(-122, 150));
-      dataStore.insert(object);
-      for (Record object2 : dataStore.query(typePath)) {
+      recordStore.insert(object);
+      for (Record object2 : recordStore.query(typePath)) {
         System.out.println(object2);
       }
-      dataStore.close();
+      recordStore.close();
 
-      dataStore = FileGdbRecordStoreFactory.create(new File(datasetName));
-      dataStore.initialize();
-      dataStore.setDefaultSchema("test");
-      RecordStoreSchema schema = dataStore.getSchema("test");
+      recordStore = FileGdbRecordStoreFactory.create(new File(datasetName));
+      recordStore.initialize();
+      recordStore.setDefaultSchema("test");
+      RecordStoreSchema schema = recordStore.getSchema("test");
       for (RecordMetaData recordDefinition2 : schema.getTypes()) {
         System.out.println(recordDefinition2);
       }
     } finally {
-      dataStore.deleteGeodatabase();
+      recordStore.deleteGeodatabase();
     }
   }
 }

@@ -37,7 +37,7 @@ public abstract class AbstractMultiCondition extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     buffer.append("(");
     boolean first = true;
 
@@ -49,7 +49,7 @@ public abstract class AbstractMultiCondition extends Condition {
         buffer.append(operator);
         buffer.append(" ");
       }
-      value.appendSql(query, dataStore, buffer);
+      value.appendSql(query, recordStore, buffer);
     }
     buffer.append(")");
   }

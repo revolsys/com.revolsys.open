@@ -22,9 +22,9 @@ import com.revolsys.jdbc.io.JdbcQueryResultPager;
 
 public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
-  public OracleJdbcQueryResultPager(final JdbcRecordStore dataStore,
+  public OracleJdbcQueryResultPager(final JdbcRecordStore recordStore,
     final Map<String, Object> properties, final Query query) {
-    super(dataStore, properties, query);
+    super(recordStore, properties, query);
   }
 
   /**
@@ -33,9 +33,9 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
   @Override
   protected void updateResults() {
     synchronized (this) {
-      final JdbcRecordStore dataStore = getDataStore();
+      final JdbcRecordStore recordStore = getDataStore();
       final Query query = getQuery();
-      setNumResults(dataStore.getRowCount(query));
+      setNumResults(recordStore.getRowCount(query));
       updateNumPages();
 
       final ArrayList<Record> results = new ArrayList<Record>();
@@ -78,7 +78,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
               int i = 0;
               do {
                 final Record object = JdbcQueryIterator.getNextObject(
-                  dataStore, recordDefinition, attributes, recordFactory, resultSet);
+                  recordStore, recordDefinition, attributes, recordFactory, resultSet);
                 results.add(object);
                 i++;
               } while (resultSet.next() && i < pageSize);

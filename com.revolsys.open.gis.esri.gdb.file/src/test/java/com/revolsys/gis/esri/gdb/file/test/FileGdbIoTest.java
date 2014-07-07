@@ -55,10 +55,10 @@ public class FileGdbIoTest {
     FileUtil.deleteDirectory(file);
     file.getParentFile().mkdirs();
     try (
-      final CapiFileGdbRecordStore dataStore = FileGdbRecordStoreFactory.create(file)) {
-      dataStore.setCreateMissingTables(true);
-      dataStore.setCreateMissingDataStore(true);
-      dataStore.initialize();
+      final CapiFileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file)) {
+      recordStore.setCreateMissingTables(true);
+      recordStore.setCreateMissingDataStore(true);
+      recordStore.initialize();
 
       final String typePath = "/" + geometryTypeString;
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
@@ -66,19 +66,19 @@ public class FileGdbIoTest {
       recordDefinition.addAttribute("ID", DataTypes.INT, true);
       recordDefinition.addAttribute("GEOMETRY", dataType, true);
       recordDefinition.setGeometryFactory(geometryFactory);
-      dataStore.getRecordDefinition(recordDefinition);
+      recordStore.getRecordDefinition(recordDefinition);
       try (
-        Writer<Record> writer = dataStore.createWriter()) {
+        Writer<Record> writer = recordStore.createWriter()) {
         writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
-        final Record record = dataStore.create(typePath);
+        final Record record = recordStore.create(typePath);
         record.setValue("ID", 1);
         record.setGeometryValue(geometry);
         writer.write(record);
       }
       try (
-        Reader<Record> reader = dataStore.query(typePath)) {
+        Reader<Record> reader = recordStore.query(typePath)) {
         final List<Record> objects = reader.read();
         Assert.assertEquals("Geometry Count", 1, objects.size());
         final Geometry actual = objects.get(0).getGeometryValue();

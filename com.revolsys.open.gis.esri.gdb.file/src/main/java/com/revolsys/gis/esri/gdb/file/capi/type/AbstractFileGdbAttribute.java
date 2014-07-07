@@ -11,7 +11,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public abstract class AbstractFileGdbAttribute extends Attribute {
 
-  private Reference<CapiFileGdbRecordStore> dataStore;
+  private Reference<CapiFileGdbRecordStore> recordStore;
 
   public AbstractFileGdbAttribute(final String name, final DataType dataType,
     final boolean required) {
@@ -24,17 +24,17 @@ public abstract class AbstractFileGdbAttribute extends Attribute {
   }
 
   public CapiFileGdbRecordStore getDataStore() {
-    if (dataStore == null) {
+    if (recordStore == null) {
       return null;
     } else {
-      return dataStore.get();
+      return recordStore.get();
     }
   }
 
   public abstract Object getValue(Row row);
 
-  public void setDataStore(final CapiFileGdbRecordStore dataStore) {
-    this.dataStore = new WeakReference<CapiFileGdbRecordStore>(dataStore);
+  public void setDataStore(final CapiFileGdbRecordStore recordStore) {
+    this.recordStore = new WeakReference<CapiFileGdbRecordStore>(recordStore);
   }
 
   public Object setInsertValue(final Record object, final Row row,

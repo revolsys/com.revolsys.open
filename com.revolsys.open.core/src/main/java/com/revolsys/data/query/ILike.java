@@ -45,7 +45,7 @@ public class ILike extends BinaryCondition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     final QueryValue left = getLeft();
     final QueryValue right = getRight();
 
@@ -53,13 +53,13 @@ public class ILike extends BinaryCondition {
     if (left == null) {
       buffer.append("NULL");
     } else {
-      left.appendSql(query, dataStore, buffer);
+      left.appendSql(query, recordStore, buffer);
     }
     buffer.append(" AS VARCHAR(4000))) LIKE UPPER(");
     if (right == null) {
       buffer.append("NULL");
     } else {
-      right.appendSql(query, dataStore, buffer);
+      right.appendSql(query, recordStore, buffer);
     }
     buffer.append(")");
   }

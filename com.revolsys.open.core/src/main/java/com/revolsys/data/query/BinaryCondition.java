@@ -30,11 +30,11 @@ public class BinaryCondition extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore dataStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuffer buffer) {
     if (left == null) {
       buffer.append("NULL");
     } else {
-      left.appendSql(query, dataStore, buffer);
+      left.appendSql(query, recordStore, buffer);
     }
     buffer.append(" ");
     buffer.append(operator);
@@ -42,7 +42,7 @@ public class BinaryCondition extends Condition {
     if (right == null) {
       buffer.append("NULL");
     } else {
-      right.appendSql(query, dataStore, buffer);
+      right.appendSql(query, recordStore, buffer);
     }
   }
 

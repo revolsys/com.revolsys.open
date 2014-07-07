@@ -87,7 +87,7 @@ public class SqlCondition extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(Query query, RecordStore dataStore, final StringBuffer buffer) {
+  public void appendDefaultSql(Query query, RecordStore recordStore, final StringBuffer buffer) {
     buffer.append(sql);
   }
 

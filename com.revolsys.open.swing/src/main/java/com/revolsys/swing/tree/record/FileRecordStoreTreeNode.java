@@ -99,8 +99,8 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
   @Override
   protected List<TreeNode> doLoadChildren() {
     final List<TreeNode> children = new ArrayList<TreeNode>();
-    final RecordStore dataStore = getDataStore();
-    for (final RecordStoreSchema schema : dataStore.getSchemas()) {
+    final RecordStore recordStore = getDataStore();
+    for (final RecordStoreSchema schema : recordStore.getSchemas()) {
       final String schemaPath = schema.getPath();
 
       final RecordStoreSchemaTreeNode schemaNode = new RecordStoreSchemaTreeNode(

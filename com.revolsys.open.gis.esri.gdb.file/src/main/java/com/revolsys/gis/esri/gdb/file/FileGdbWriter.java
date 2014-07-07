@@ -25,21 +25,21 @@ import com.revolsys.io.AbstractWriter;
 public class FileGdbWriter extends AbstractWriter<Record> {
   private Map<String, Table> tables = new HashMap<String, Table>();
 
-  private CapiFileGdbRecordStore dataStore;
+  private CapiFileGdbRecordStore recordStore;
 
   FileGdbWriter(final CapiFileGdbRecordStore recordStore) {
-    this.dataStore = recordStore;
+    this.recordStore = recordStore;
   }
 
   @Override
   @PreDestroy
   public void close() {
     try {
-      if (dataStore != null) {
+      if (recordStore != null) {
         for (final Entry<String, Table> entry : tables.entrySet()) {
           final Table table = entry.getValue();
           try {
-            dataStore.freeWriteLock(table);
+            recordStore.freeWriteLock(table);
           } catch (final Throwable e) {
             LoggerFactory.getLogger(FileGdbWriter.class).error(
               "Unable to close table", e);
@@ -48,7 +48,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
       }
     } finally {
       this.tables = null;
-      this.dataStore = null;
+      this.recordStore = null;
     }
   }
 
@@ -56,22 +56,22 @@ public class FileGdbWriter extends AbstractWriter<Record> {
     final RecordDefinition objectMetaData = object.getRecordDefinition();
     final String typePath = objectMetaData.getPath();
     final Table table = getTable(typePath);
-    final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
+    final EnumRows rows = recordStore.search(table, "OBJECTID", "OBJECTID="
       + object.getValue("OBJECTID"), false);
     if (rows != null) {
       try {
-        final Row row = dataStore.nextRow(rows);
+        final Row row = recordStore.nextRow(rows);
         if (row != null) {
           try {
-            dataStore.deletedRow(table, row);
+            recordStore.deletedRow(table, row);
             object.setState(RecordState.Deleted);
           } finally {
-            dataStore.closeRow(row);
-            dataStore.addStatistic("Delete", object);
+            recordStore.closeRow(row);
+            recordStore.addStatistic("Delete", object);
           }
         }
       } finally {
-        dataStore.closeEnumRows(rows);
+        recordStore.closeEnumRows(rows);
       }
     }
   }
@@ -79,10 +79,10 @@ public class FileGdbWriter extends AbstractWriter<Record> {
   private Table getTable(final String typePath) {
     Table table = tables.get(typePath);
     if (table == null) {
-      table = dataStore.getTable(typePath);
+      table = recordStore.getTable(typePath);
       if (table != null) {
         tables.put(typePath, table);
-        dataStore.setWriteLock(table);
+        recordStore.setWriteLock(table);
       }
     }
     return table;
@@ -90,7 +90,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
 
   private void insert(final Record record) {
     final RecordDefinition sourceMetaData = record.getRecordDefinition();
-    final RecordDefinition recordDefinition = dataStore.getRecordDefinition(sourceMetaData);
+    final RecordDefinition recordDefinition = recordStore.getRecordDefinition(sourceMetaData);
     final String typePath = sourceMetaData.getPath();
     for (final Attribute attribute : recordDefinition.getAttributes()) {
       final String name = attribute.getName();
@@ -104,7 +104,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
     }
     final Table table = getTable(typePath);
     try {
-      final Row row = dataStore.createRowObject(table);
+      final Row row = recordStore.createRowObject(table);
       try {
         final List<Object> values = new ArrayList<Object>();
         for (final Attribute attribute : recordDefinition.getAttributes()) {
@@ -115,15 +115,15 @@ public class FileGdbWriter extends AbstractWriter<Record> {
             value);
           values.add(esriValue);
         }
-        dataStore.insertRow(table, row);
+        recordStore.insertRow(table, row);
         for (final Attribute attribute : recordDefinition.getAttributes()) {
           final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
           esriAttribute.setPostInsertValue(record, row);
         }
         record.setState(RecordState.Persisted);
       } finally {
-        dataStore.closeRow(row);
-        dataStore.addStatistic("Insert", record);
+        recordStore.closeRow(row);
+        recordStore.addStatistic("Insert", record);
       }
     } catch (final IllegalArgumentException e) {
       throw new RuntimeException("Unable to insert row " + e.getMessage()
@@ -144,14 +144,14 @@ public class FileGdbWriter extends AbstractWriter<Record> {
       insert(object);
     } else {
       final RecordDefinition sourceMetaData = object.getRecordDefinition();
-      final RecordDefinition recordDefinition = dataStore.getRecordDefinition(sourceMetaData);
+      final RecordDefinition recordDefinition = recordStore.getRecordDefinition(sourceMetaData);
       final String typePath = sourceMetaData.getPath();
       final Table table = getTable(typePath);
-      final EnumRows rows = dataStore.search(table, "OBJECTID", "OBJECTID="
+      final EnumRows rows = recordStore.search(table, "OBJECTID", "OBJECTID="
         + objectId, false);
       if (rows != null) {
         try {
-          final Row row = dataStore.nextRow(rows);
+          final Row row = recordStore.nextRow(rows);
           if (row != null) {
             try {
               final List<Object> esriValues = new ArrayList<Object>();
@@ -163,9 +163,9 @@ public class FileGdbWriter extends AbstractWriter<Record> {
                   esriValues.add(esriAttribute.setUpdateValue(object, row,
                     value));
                 }
-                dataStore.updateRow(table, row);
+                recordStore.updateRow(table, row);
               } finally {
-                dataStore.addStatistic("Update", object);
+                recordStore.addStatistic("Update", object);
               }
             } catch (final IllegalArgumentException e) {
               LoggerFactory.getLogger(FileGdbWriter.class).error(
@@ -180,11 +180,11 @@ public class FileGdbWriter extends AbstractWriter<Record> {
               }
               throw new RuntimeException("Unable to update row", e);
             } finally {
-              dataStore.closeRow(row);
+              recordStore.closeRow(row);
             }
           }
         } finally {
-          dataStore.closeEnumRows(rows);
+          recordStore.closeEnumRows(rows);
         }
       }
     }
@@ -195,7 +195,7 @@ public class FileGdbWriter extends AbstractWriter<Record> {
     try {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final RecordStore recordStore = recordDefinition.getDataStore();
-      if (recordStore == this.dataStore) {
+      if (recordStore == this.recordStore) {
         switch (object.getState()) {
           case New:
             insert(object);

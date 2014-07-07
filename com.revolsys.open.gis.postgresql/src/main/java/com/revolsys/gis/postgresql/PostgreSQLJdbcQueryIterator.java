@@ -8,9 +8,9 @@ import com.revolsys.jdbc.io.JdbcQueryIterator;
 
 public class PostgreSQLJdbcQueryIterator extends JdbcQueryIterator {
 
-  public PostgreSQLJdbcQueryIterator(final JdbcRecordStore dataStore,
+  public PostgreSQLJdbcQueryIterator(final JdbcRecordStore recordStore,
     final Query query, final Map<String, Object> properties) {
-    super(dataStore, query, properties);
+    super(recordStore, query, properties);
   }
 
   @Override

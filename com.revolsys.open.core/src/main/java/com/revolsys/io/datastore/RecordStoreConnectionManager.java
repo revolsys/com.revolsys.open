@@ -27,15 +27,15 @@ public class RecordStoreConnectionManager
 
   static {
     INSTANCE = new RecordStoreConnectionManager();
-    final File dataStoresDirectory = OS.getApplicationDataDirectory("com.revolsys.gis/Data Stores");
+    final File recordStoresDirectory = OS.getApplicationDataDirectory("com.revolsys.gis/Data Stores");
     INSTANCE.addConnectionRegistry("User", new FileSystemResource(
-      dataStoresDirectory));
+      recordStoresDirectory));
   }
 
   // TODO make this garbage collectable with reference counting.
-  private static Map<Map<String, Object>, RecordStore> dataStoreByConfig = new HashMap<Map<String, Object>, RecordStore>();
+  private static Map<Map<String, Object>, RecordStore> recordStoreByConfig = new HashMap<Map<String, Object>, RecordStore>();
 
-  private static Map<Map<String, Object>, AtomicInteger> dataStoreCounts = new HashMap<Map<String, Object>, AtomicInteger>();
+  private static Map<Map<String, Object>, AtomicInteger> recordStoreCounts = new HashMap<Map<String, Object>, AtomicInteger>();
 
   public static RecordStoreConnectionManager get() {
     return INSTANCE;
@@ -59,29 +59,29 @@ public class RecordStoreConnectionManager
     final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
     final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
-    synchronized (dataStoreByConfig) {
-      RecordStore dataStore = dataStoreByConfig.get(configClone);
-      if (dataStore == null) {
+    synchronized (recordStoreByConfig) {
+      RecordStore recordStore = recordStoreByConfig.get(configClone);
+      if (recordStore == null) {
         final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
         final String name = (String)connectionProperties.get("name");
         if (StringUtils.hasText(name)) {
-          dataStore = getDataStore(name);
-          if (dataStore == null) {
+          recordStore = getDataStore(name);
+          if (recordStore == null) {
             // TODO give option to add
             return null;
           }
         } else {
-          dataStore = RecordStoreFactoryRegistry.createRecordStore(connectionProperties);
-          dataStore.setProperties(config);
-          dataStore.initialize();
+          recordStore = RecordStoreFactoryRegistry.createRecordStore(connectionProperties);
+          recordStore.setProperties(config);
+          recordStore.initialize();
         }
-        dataStoreByConfig.put(configClone, dataStore);
-        dataStoreCounts.put(configClone, new AtomicInteger(1));
+        recordStoreByConfig.put(configClone, recordStore);
+        recordStoreCounts.put(configClone, new AtomicInteger(1));
       } else {
-        final AtomicInteger count = dataStoreCounts.get(configClone);
+        final AtomicInteger count = recordStoreCounts.get(configClone);
         count.incrementAndGet();
       }
-      return (T)dataStore;
+      return (T)recordStore;
     }
   }
 
@@ -95,9 +95,9 @@ public class RecordStoreConnectionManager
     }
     Collections.reverse(registries);
     for (final RecordStoreConnectionRegistry registry : registries) {
-      final RecordStoreConnection dataStoreConnection = registry.getConnection(name);
-      if (dataStoreConnection != null) {
-        return dataStoreConnection.getDataStore();
+      final RecordStoreConnection recordStoreConnection = registry.getConnection(name);
+      if (recordStoreConnection != null) {
+        return recordStoreConnection.getDataStore();
       }
     }
     return null;
@@ -107,19 +107,19 @@ public class RecordStoreConnectionManager
   public static void releaseDataStore(final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
     final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
-    synchronized (dataStoreByConfig) {
-      final RecordStore dataStore = dataStoreByConfig.get(configClone);
-      if (dataStore != null) {
-        final AtomicInteger count = dataStoreCounts.get(configClone);
+    synchronized (recordStoreByConfig) {
+      final RecordStore recordStore = recordStoreByConfig.get(configClone);
+      if (recordStore != null) {
+        final AtomicInteger count = recordStoreCounts.get(configClone);
         if (count.decrementAndGet() == 0) {
           final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
           final String name = (String)connectionProperties.get("name");
           if (!StringUtils.hasText(name)) {
             // TODO release for connections from connection registries
-            dataStore.close();
+            recordStore.close();
           }
-          dataStoreByConfig.remove(configClone);
-          dataStoreCounts.remove(configClone);
+          recordStoreByConfig.remove(configClone);
+          recordStoreCounts.remove(configClone);
         }
       }
     }
@@ -138,9 +138,9 @@ public class RecordStoreConnectionManager
   }
 
   public RecordStoreConnectionRegistry addConnectionRegistry(
-    final String name, final Resource dataStoresDirectory) {
+    final String name, final Resource recordStoresDirectory) {
     final RecordStoreConnectionRegistry registry = new RecordStoreConnectionRegistry(
-      this, name, dataStoresDirectory);
+      this, name, recordStoresDirectory);
     addConnectionRegistry(registry);
     return registry;
   }

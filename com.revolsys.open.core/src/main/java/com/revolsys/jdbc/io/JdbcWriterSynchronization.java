@@ -12,11 +12,11 @@ public class JdbcWriterSynchronization extends
 
   private boolean holderActive = true;
 
-  private final AbstractJdbcRecordStore dataStore;
+  private final AbstractJdbcRecordStore recordStore;
 
-  public JdbcWriterSynchronization(final AbstractJdbcRecordStore dataStore,
+  public JdbcWriterSynchronization(final AbstractJdbcRecordStore recordStore,
     final JdbcWriterResourceHolder writerHolder, final Object key) {
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
     this.writerHolder = writerHolder;
     this.key = key;
   }

@@ -30,7 +30,7 @@ import com.revolsys.jdbc.attribute.JdbcAttribute;
 public class JdbcQueryIterator extends AbstractIterator<Record> implements
 RecordIterator {
 
-  public static Record getNextObject(final JdbcRecordStore dataStore,
+  public static Record getNextObject(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<Attribute> attributes,
     final RecordFactory recordFactory, final ResultSet resultSet) {
     final Record object = recordFactory.createRecord(recordDefinition);
@@ -49,7 +49,7 @@ RecordIterator {
         }
       }
       object.setState(RecordState.Persisted);
-      dataStore.addStatistic("query", object);
+      recordStore.addStatistic("query", object);
     }
     return object;
   }
@@ -69,7 +69,7 @@ RecordIterator {
 
   private DataSource dataSource;
 
-  private JdbcRecordStore dataStore;
+  private JdbcRecordStore recordStore;
 
   private final int fetchSize = 10;
 
@@ -87,11 +87,11 @@ RecordIterator {
 
   private Statistics statistics;
 
-  public JdbcQueryIterator(final JdbcRecordStore dataStore, final Query query,
+  public JdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     super();
-    this.connection = dataStore.getConnection();
-    this.dataSource = dataStore.getDataSource();
+    this.connection = recordStore.getConnection();
+    this.dataSource = recordStore.getDataSource();
 
     if (this.dataSource != null) {
       try {
@@ -107,9 +107,9 @@ RecordIterator {
     }
     this.recordFactory = query.getProperty("recordFactory");
     if (this.recordFactory == null) {
-      this.recordFactory = dataStore.getRecordFactory();
+      this.recordFactory = recordStore.getRecordFactory();
     }
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
     this.query = query;
     this.statistics = (Statistics)properties.get(Statistics.class.getName());
   }
@@ -123,7 +123,7 @@ RecordIterator {
     this.connection = null;
     this.recordFactory = null;
     this.dataSource = null;
-    this.dataStore = null;
+    this.recordStore = null;
     this.recordDefinition = null;
     this.queries = null;
     this.query = null;
@@ -138,7 +138,7 @@ RecordIterator {
   }
 
   public JdbcRecordStore getDataStore() {
-    return this.dataStore;
+    return this.recordStore;
   }
 
   protected String getErrorMessage() {
@@ -153,7 +153,7 @@ RecordIterator {
   protected Record getNext() throws NoSuchElementException {
     try {
       if (this.resultSet != null && this.resultSet.next()) {
-        final Record object = getNextObject(this.dataStore,
+        final Record object = getNextObject(this.recordStore,
           this.recordDefinition, this.attributes, this.recordFactory,
           this.resultSet);
         if (this.statistics != null) {
@@ -189,7 +189,7 @@ RecordIterator {
     this.recordDefinition = this.query.getRecordDefinition();
     if (this.recordDefinition == null) {
       if (tableName != null) {
-        this.recordDefinition = this.dataStore.getRecordDefinition(tableName);
+        this.recordDefinition = this.recordStore.getRecordDefinition(tableName);
         this.query.setRecordDefinition(this.recordDefinition);
       }
     }
@@ -203,7 +203,7 @@ RecordIterator {
       final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
 
       if (this.recordDefinition == null) {
-        this.recordDefinition = this.dataStore.getRecordDefinition(tableName,
+        this.recordDefinition = this.recordStore.getRecordDefinition(tableName,
           resultSetMetaData);
       }
       final List<String> attributeNames = new ArrayList<String>(

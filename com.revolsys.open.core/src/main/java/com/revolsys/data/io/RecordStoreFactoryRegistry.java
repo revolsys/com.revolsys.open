@@ -15,7 +15,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class RecordStoreFactoryRegistry {
 
-  private static Map<Pattern, RecordStoreFactory> dataStoreFactoryUrlPatterns = new HashMap<Pattern, RecordStoreFactory>();
+  private static Map<Pattern, RecordStoreFactory> recordStoreFactoryUrlPatterns = new HashMap<Pattern, RecordStoreFactory>();
 
   private static List<RecordStoreFactory> fileDataStoreFactories = new ArrayList<RecordStoreFactory>();
 
@@ -23,7 +23,7 @@ public class RecordStoreFactoryRegistry {
 
   static {
     new ClassPathXmlApplicationContext(
-      "classpath*:META-INF/com.revolsys.gis.dataStore.sf.xml");
+      "classpath*:META-INF/com.revolsys.gis.recordStore.sf.xml");
   }
 
   /**
@@ -35,7 +35,7 @@ public class RecordStoreFactoryRegistry {
   public static <T extends RecordStore> T createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
-    final RecordStoreFactory factory = getDataStoreFactory(url);
+    final RecordStoreFactory factory = getRecordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Data Source Factory not found for "
         + url);
@@ -47,7 +47,7 @@ public class RecordStoreFactoryRegistry {
   @SuppressWarnings("unchecked")
   public static <T extends RecordStore> T createRecordStore(
     final String url) {
-    final RecordStoreFactory factory = getDataStoreFactory(url);
+    final RecordStoreFactory factory = getRecordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Data Source Factory not found for "
         + url);
@@ -61,7 +61,7 @@ public class RecordStoreFactoryRegistry {
   public static Class<?> getRecordStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
-    final RecordStoreFactory factory = getDataStoreFactory(url);
+    final RecordStoreFactory factory = getRecordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Data Source Factory not found for "
         + url);
@@ -70,11 +70,11 @@ public class RecordStoreFactoryRegistry {
     }
   }
 
-  public static RecordStoreFactory getDataStoreFactory(final String url) {
+  public static RecordStoreFactory getRecordStoreFactory(final String url) {
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
     } else {
-      for (final Entry<Pattern, RecordStoreFactory> entry : dataStoreFactoryUrlPatterns.entrySet()) {
+      for (final Entry<Pattern, RecordStoreFactory> entry : recordStoreFactoryUrlPatterns.entrySet()) {
         final Pattern pattern = entry.getKey();
         final RecordStoreFactory factory = entry.getValue();
         if (pattern.matcher(url).matches()) {
@@ -98,7 +98,7 @@ public class RecordStoreFactoryRegistry {
     final List<String> patterns = factory.getUrlPatterns();
     for (final String regex : patterns) {
       final Pattern pattern = Pattern.compile(regex);
-      dataStoreFactoryUrlPatterns.put(pattern, factory);
+      recordStoreFactoryUrlPatterns.put(pattern, factory);
     }
     final List<String> factoryFileExtensions = factory.getFileExtensions();
     if (!factoryFileExtensions.isEmpty()) {

@@ -47,7 +47,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private List<String> attributeAliases = new ArrayList<String>();
 
-  private RecordStore dataStore;
+  private RecordStore recordStore;
 
   private boolean loadAll = true;
 
@@ -104,9 +104,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
   protected synchronized Identifier createId(final List<Object> values) {
     if (this.createMissingCodes) {
       // TODO prevent duplicates from other threads/processes
-      final Record code = this.dataStore.create(this.typePath);
+      final Record code = this.recordStore.create(this.typePath);
       final RecordDefinition recordDefinition = code.getRecordDefinition();
-      Object id = this.dataStore.createPrimaryIdValue(this.typePath);
+      Object id = this.recordStore.createPrimaryIdValue(this.typePath);
       if (id == null) {
         final Attribute idAttribute = recordDefinition.getIdAttribute();
         if (idAttribute != null) {
@@ -133,7 +133,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
         code.setValue(this.modificationTimestampAttributeName, now);
       }
 
-      this.dataStore.insert(code);
+      this.recordStore.insert(code);
       return code.getIdentifier();
     } else {
       return null;
@@ -161,7 +161,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   public RecordStore getDataStore() {
-    return this.dataStore;
+    return this.recordStore;
   }
 
   @Override
@@ -253,16 +253,16 @@ public class CodeTableProperty extends AbstractCodeTable implements
         this.threadLoading.set(Boolean.TRUE);
         this.loading = true;
         try {
-          final RecordDefinition recordDefinition = this.dataStore.getRecordDefinition(this.typePath);
+          final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.typePath);
           final Query query = new Query(this.typePath);
           query.setAttributeNames(recordDefinition.getAttributeNames());
           for (final String order : this.orderBy) {
             query.addOrderBy(order, true);
           }
           try (
-            Reader<Record> reader = this.dataStore.query(query)) {
+            Reader<Record> reader = this.recordStore.query(query)) {
             final List<Record> codes = reader.read();
-            this.dataStore.getStatistics()
+            this.recordStore.getStatistics()
               .getStatistics("query")
               .add(this.typePath, -codes.size());
             Collections.sort(codes, new RecordAttributeComparator(
@@ -305,10 +305,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
         }
       }
       query.setWhereCondition(and);
-      final Reader<Record> reader = this.dataStore.query(query);
+      final Reader<Record> reader = this.recordStore.query(query);
       try {
         final List<Record> codes = reader.read();
-        this.dataStore.getStatistics()
+        this.recordStore.getStatistics()
           .getStatistics("query")
           .add(this.typePath, -codes.size());
         addValues(codes);
@@ -332,7 +332,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
       loadAll();
       values = getValueById(id);
     } else {
-      final Record code = this.dataStore.load(this.typePath, id);
+      final Record code = this.recordStore.load(this.typePath, id);
       if (code != null) {
         addValue(code);
         values = getValueById(id);
@@ -391,14 +391,14 @@ public class CodeTableProperty extends AbstractCodeTable implements
       }
       this.recordDefinition = recordDefinition;
       if (recordDefinition == null) {
-        this.dataStore = null;
+        this.recordStore = null;
         this.typePath = null;
       } else {
         this.typePath = recordDefinition.getPath();
         setName(PathUtil.getName(this.typePath));
-        this.dataStore = this.recordDefinition.getDataStore();
+        this.recordStore = this.recordDefinition.getDataStore();
         recordDefinition.setProperty(getPropertyName(), this);
-        this.dataStore.addCodeTable(this);
+        this.recordStore.addCodeTable(this);
       }
     }
   }

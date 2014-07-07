@@ -1,7 +1,7 @@
 package com.revolsys.io.openstreetmap.model;
 
-import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +27,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
 
   private long changeset;
 
-  private Timestamp timestamp;
+  private Date timestamp;
 
   private String user;
 
@@ -55,6 +55,19 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
   }
 
   public OsmElement() {
+  }
+
+  public OsmElement(final long id, final boolean visible, final int version,
+    final long changeset, final Date timestamp, final String user,
+    final int uid, final Map<String, String> tags) {
+    this.id = id;
+    this.visible = visible;
+    this.version = version;
+    this.changeset = changeset;
+    this.timestamp = timestamp;
+    this.user = user;
+    this.uid = uid;
+    this.tags = tags;
   }
 
   public OsmElement(final XMLStreamReader in) {
@@ -142,7 +155,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
     return new HashMap<>(this.tags);
   }
 
-  public Timestamp getTimestamp() {
+  public Date getTimestamp() {
     return this.timestamp;
   }
 
@@ -235,7 +248,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
     addTags(tags);
   }
 
-  public void setTimestamp(final Timestamp timestamp) {
+  public void setTimestamp(final Date timestamp) {
     this.timestamp = timestamp;
   }
 

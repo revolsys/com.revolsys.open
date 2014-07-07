@@ -38,7 +38,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
   private RecordFactory recordFactory;
 
-  private JdbcRecordStore dataStore;
+  private JdbcRecordStore recordStore;
 
   private RecordDefinition recordDefinition;
 
@@ -54,14 +54,14 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
   public ArcSdeBinaryGeometryQueryIterator(
     final ArcSdeBinaryGeometryDataStoreUtil sdeUtil,
-    final JdbcRecordStore dataStore, final Query query,
+    final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     this.sdeUtil = sdeUtil;
     this.recordFactory = query.getProperty("recordFactory");
     if (this.recordFactory == null) {
-      this.recordFactory = dataStore.getRecordFactory();
+      this.recordFactory = recordStore.getRecordFactory();
     }
-    this.dataStore = dataStore;
+    this.recordStore = recordStore;
     this.query = query;
     this.statistics = (Statistics)properties.get(Statistics.class.getName());
   }
@@ -79,7 +79,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     this.sdeUtil = null;
     this.attributes = null;
     this.recordFactory = null;
-    this.dataStore = null;
+    this.recordStore = null;
     this.recordDefinition = null;
     this.query = null;
     this.seQuery = null;
@@ -88,11 +88,11 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
   @Override
   protected void doInit() {
-    String tableName = this.dataStore.getDatabaseQualifiedTableName(this.query.getTypeName());
+    String tableName = this.recordStore.getDatabaseQualifiedTableName(this.query.getTypeName());
     this.recordDefinition = this.query.getRecordDefinition();
     if (this.recordDefinition == null) {
       if (tableName != null) {
-        this.recordDefinition = this.dataStore.getRecordDefinition(tableName);
+        this.recordDefinition = this.recordStore.getRecordDefinition(tableName);
         this.query.setRecordDefinition(this.recordDefinition);
 
       }
@@ -204,7 +204,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
         sdeUtil.setValueFromRow(object, row, columnIndex);
       }
       object.setState(RecordState.Persisted);
-      this.dataStore.addStatistic("query", object);
+      this.recordStore.addStatistic("query", object);
     }
     return object;
   }
