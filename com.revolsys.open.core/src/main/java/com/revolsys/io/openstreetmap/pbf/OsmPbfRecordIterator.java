@@ -22,10 +22,13 @@ import org.springframework.core.io.Resource;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.LongHashMap;
+import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.ProtocolBufferInputStream;
 import com.revolsys.io.openstreetmap.model.OsmConstants;
+import com.revolsys.io.openstreetmap.model.OsmElement;
 import com.revolsys.io.openstreetmap.model.OsmNode;
 import com.revolsys.io.openstreetmap.model.OsmWay;
 import com.revolsys.io.openstreetmap.pbf.Osmformat.DenseInfo;
@@ -39,10 +42,10 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.spring.SpringUtil;
 
-public class OsmPbfIterator extends AbstractIterator<Record> implements
-  AutoCloseable {
+public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
+RecordIterator {
 
-  private static Logger log = Logger.getLogger(OsmPbfIterator.class.getName());
+  private static Logger log = Logger.getLogger(OsmPbfRecordIterator.class.getName());
 
   private DataInputStream in;
 
@@ -60,11 +63,11 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
 
   private int skippedWayCount = 0;
 
-  public OsmPbfIterator(final DataInputStream in) {
+  public OsmPbfRecordIterator(final DataInputStream in) {
     this.in = in;
   }
 
-  public OsmPbfIterator(final Resource resource) {
+  public OsmPbfRecordIterator(final Resource resource) {
     this(new DataInputStream(SpringUtil.getInputStream(resource)));
   }
 
@@ -79,6 +82,22 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
   public void doClose() {
     FileUtil.closeSilent(this.in);
     this.in = null;
+  }
+
+  @Override
+  protected Record getNext() throws NoSuchElementException {
+    try {
+      while (this.currentRecords.isEmpty()) {
+        processBlob();
+      }
+      return this.currentRecords.removeFirst();
+    } catch (final EOFException e) {
+      System.out.println(this.wayCount);
+      System.out.println(this.skippedWayCount);
+      throw new NoSuchElementException();
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to get next blob from PBF stream.", e);
+    }
   }
 
   // private void processRelations(final List<Relation> relations,
@@ -109,19 +128,8 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
   // }
 
   @Override
-  protected Record getNext() throws NoSuchElementException {
-    try {
-      while (this.currentRecords.isEmpty()) {
-        processBlob();
-      }
-      return this.currentRecords.removeFirst();
-    } catch (final EOFException e) {
-      System.out.println(this.wayCount);
-      System.out.println(this.skippedWayCount);
-      throw new NoSuchElementException();
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to get next blob from PBF stream.", e);
-    }
+  public RecordDefinition getRecordDefinition() {
+    return OsmElement.META_DATA;
   }
 
   private Map<String, String> getTags(final List<Integer> keys,
@@ -177,7 +185,7 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
     }
 
     final Iterator<Integer> keysValuesIterator = nodes.getKeysValsList()
-      .iterator();
+        .iterator();
 
     DenseInfo denseInfo;
     if (nodes.hasDenseinfo()) {
@@ -237,7 +245,7 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
         }
         if (!keysValuesIterator.hasNext()) {
           throw new RuntimeException(
-            "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
+              "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
         }
         final int valueIndex = keysValuesIterator.next();
 
@@ -291,7 +299,7 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
   }
 
   private void processOsmHeader(final byte[] data)
-    throws InvalidProtocolBufferException {
+      throws InvalidProtocolBufferException {
     // Osmformat.HeaderBlock header = Osmformat.HeaderBlock.parseFrom(data);
     //
     // // Build the list of active and unsupported features in the file.
@@ -333,7 +341,7 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
   }
 
   private void processOsmPrimitives(final byte[] data)
-    throws InvalidProtocolBufferException {
+      throws InvalidProtocolBufferException {
     final Osmformat.PrimitiveBlock block = Osmformat.PrimitiveBlock.parseFrom(data);
     final PbfFieldDecoder fieldDecoder = new PbfFieldDecoder(block);
 
@@ -422,20 +430,20 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
         switch (tag) {
           case 0:
             running = false;
-          break;
+            break;
           default:
             this.blobIn.skipField(tag);
             running = false;
-          break;
+            break;
           case 10:
             raw = this.blobIn.readBytes();
-          break;
+            break;
           case 16:
             rawSize = this.blobIn.readInt32();
-          break;
+            break;
           case 26:
             zlibData = this.blobIn.readBytes();
-          break;
+            break;
           case 34:
             throw new RuntimeException("LZMA not supported");
           case 42:
@@ -457,12 +465,12 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
         }
         if (!inflater.finished()) {
           throw new RuntimeException(
-            "PBF blob contains incomplete compressed data.");
+              "PBF blob contains incomplete compressed data.");
         }
         return blobData;
       } else {
         throw new RuntimeException(
-          "PBF blob uses unsupported compression, only raw or zlib may be used.");
+            "PBF blob uses unsupported compression, only raw or zlib may be used.");
       }
     } finally {
       this.blobIn.setInputStream(null);
@@ -485,7 +493,7 @@ public class OsmPbfIterator extends AbstractIterator<Record> implements
             return blobSize;
           default:
             this.blobHeaderIn.skipField(tag);
-          break;
+            break;
           case 10: {
             this.blobType = this.blobHeaderIn.readString();
             break;

@@ -567,14 +567,14 @@ public class QueryWhereConditionField extends ValueField implements
         this.codeTable = this.recordDefinition.getCodeTableByColumn(name);
         final JComponent binaryConditionField = createSearchField(attribute,
           this.codeTable);
-        if (binaryConditionField instanceof DataStoreQueryTextField) {
-          final DataStoreQueryTextField queryField = (DataStoreQueryTextField)binaryConditionField;
+        if (binaryConditionField instanceof RecordStoreQueryTextField) {
+          final RecordStoreQueryTextField queryField = (RecordStoreQueryTextField)binaryConditionField;
           queryField.setBelow(true);
         }
         final JComponent inConditionField = createSearchField(attribute,
           this.codeTable);
-        if (inConditionField instanceof DataStoreQueryTextField) {
-          final DataStoreQueryTextField queryField = (DataStoreQueryTextField)inConditionField;
+        if (inConditionField instanceof RecordStoreQueryTextField) {
+          final RecordStoreQueryTextField queryField = (RecordStoreQueryTextField)inConditionField;
           queryField.setBelow(true);
         }
 

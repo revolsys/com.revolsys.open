@@ -14,7 +14,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.PasswordUtil;
 
-public class AddDataStoreConnectionPanel extends ValueField {
+public class AddRecordStoreConnectionPanel extends ValueField {
   private static final long serialVersionUID = 2750736040832727823L;
 
   private final JTextField passwordField;
@@ -29,13 +29,13 @@ public class AddDataStoreConnectionPanel extends ValueField {
 
   private final String name;
 
-  public AddDataStoreConnectionPanel(
+  public AddRecordStoreConnectionPanel(
     final ConnectionRegistry<RecordStoreConnection> registry) {
     this(registry, null);
 
   }
 
-  public AddDataStoreConnectionPanel(
+  public AddRecordStoreConnectionPanel(
     final ConnectionRegistry<RecordStoreConnection> registry,
     final String name) {
     this.registry = registry;

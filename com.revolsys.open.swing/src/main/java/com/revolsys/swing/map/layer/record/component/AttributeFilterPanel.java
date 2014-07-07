@@ -45,7 +45,7 @@ import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
-import com.revolsys.swing.field.DataStoreQueryTextField;
+import com.revolsys.swing.field.RecordStoreQueryTextField;
 import com.revolsys.swing.field.DateField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
@@ -160,8 +160,8 @@ ItemListener, DocumentListener, PropertyChangeListener {
   }
 
   private void addListeners(final JComponent component) {
-    if (component instanceof DataStoreQueryTextField) {
-      final DataStoreQueryTextField queryField = (DataStoreQueryTextField)component;
+    if (component instanceof RecordStoreQueryTextField) {
+      final RecordStoreQueryTextField queryField = (RecordStoreQueryTextField)component;
       queryField.addItemListener(this);
     } else if (component instanceof JXSearchField) {
       final JXSearchField searchTextField = (JXSearchField)component;
@@ -285,8 +285,8 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   @SuppressWarnings("rawtypes")
   private void removeListeners(final JComponent component) {
-    if (component instanceof DataStoreQueryTextField) {
-      final DataStoreQueryTextField queryField = (DataStoreQueryTextField)component;
+    if (component instanceof RecordStoreQueryTextField) {
+      final RecordStoreQueryTextField queryField = (RecordStoreQueryTextField)component;
       queryField.removeItemListener(this);
     } else if (component instanceof JXSearchField) {
       final JXSearchField searchTextField = (JXSearchField)component;
@@ -451,8 +451,8 @@ ItemListener, DocumentListener, PropertyChangeListener {
     } else {
       this.searchFieldPanel.setVisible(true);
       addListeners(searchField);
-      if (this.searchField instanceof DataStoreQueryTextField) {
-        final DataStoreQueryTextField recordStoreSearchTextField = (DataStoreQueryTextField)this.searchField;
+      if (this.searchField instanceof RecordStoreQueryTextField) {
+        final RecordStoreQueryTextField recordStoreSearchTextField = (RecordStoreQueryTextField)this.searchField;
         recordStoreSearchTextField.setMaxResults(100);
         recordStoreSearchTextField.setPreferredSize(new Dimension(200, 22));
         recordStoreSearchTextField.setBelow(true);

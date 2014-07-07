@@ -64,7 +64,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
 
   private final JPopupMenu menu = new JPopupMenu();
 
-  private final DataStoreQueryListModel listModel;
+  private final RecordStoreQueryListModel listModel;
 
   public Record selectedItem;
 
@@ -91,7 +91,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
     addKeyListener(this);
     addMouseListener(this);
 
-    this.listModel = new DataStoreQueryListModel(recordStore,
+    this.listModel = new RecordStoreQueryListModel(recordStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
     this.list.setCellRenderer(new RecordListCellRenderer(

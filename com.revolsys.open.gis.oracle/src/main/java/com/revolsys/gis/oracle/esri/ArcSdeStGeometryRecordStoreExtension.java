@@ -19,10 +19,10 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class ArcSdeStGeometryDataStoreExtension implements
+public class ArcSdeStGeometryRecordStoreExtension implements
   RecordStoreExtension {
 
-  public ArcSdeStGeometryDataStoreExtension() {
+  public ArcSdeStGeometryRecordStoreExtension() {
   }
 
   @Override

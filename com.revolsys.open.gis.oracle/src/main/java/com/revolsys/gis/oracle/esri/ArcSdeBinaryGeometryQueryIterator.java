@@ -50,10 +50,10 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
   private Statistics statistics;
 
-  private ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
+  private ArcSdeBinaryGeometryRecordStoreUtil sdeUtil;
 
   public ArcSdeBinaryGeometryQueryIterator(
-    final ArcSdeBinaryGeometryDataStoreUtil sdeUtil,
+    final ArcSdeBinaryGeometryRecordStoreUtil sdeUtil,
     final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     this.sdeUtil = sdeUtil;

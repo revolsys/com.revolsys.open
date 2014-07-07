@@ -14,19 +14,19 @@ import com.revolsys.gis.oracle.io.OracleSdoGeometryJdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 
-public class ArcSdeBinaryGeometryDataStoreExtension implements
+public class ArcSdeBinaryGeometryRecordStoreExtension implements
   RecordStoreExtension {
 
   private Object sdeUtil;
 
-  public ArcSdeBinaryGeometryDataStoreExtension() {
+  public ArcSdeBinaryGeometryRecordStoreExtension() {
   }
 
   @Override
   public void initialize(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
     try {
-      sdeUtil = new ArcSdeBinaryGeometryDataStoreUtil(recordStore,
+      sdeUtil = new ArcSdeBinaryGeometryRecordStoreUtil(recordStore,
         connectionProperties);
     } catch (final NoClassDefFoundError e) {
 
@@ -56,7 +56,7 @@ public class ArcSdeBinaryGeometryDataStoreExtension implements
                 .error(
                   "SDE Binary columns not supported without the ArcSDE Java API jars");
             } else {
-              ((ArcSdeBinaryGeometryDataStoreUtil)sdeUtil).createGeometryColumn(
+              ((ArcSdeBinaryGeometryRecordStoreUtil)sdeUtil).createGeometryColumn(
                 recordStore, schema, recordDefinition, typePath, columnName,
                 columnProperties);
             }

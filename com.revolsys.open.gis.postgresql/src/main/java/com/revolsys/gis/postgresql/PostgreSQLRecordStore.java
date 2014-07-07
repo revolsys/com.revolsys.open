@@ -27,7 +27,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
-import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 
 public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
@@ -227,7 +227,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   protected void initSettings() {
-    setIteratorFactory(new DataStoreIteratorFactory(
+    setIteratorFactory(new RecordStoreIteratorFactory(
       PostgreSQLRecordStore.class, "createPostgreSQLIterator"));
   }
 

@@ -31,14 +31,14 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.oracle.esri.ArcSdeBinaryGeometryDataStoreExtension;
+import com.revolsys.gis.oracle.esri.ArcSdeBinaryGeometryRecordStoreExtension;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
-import com.revolsys.gis.oracle.esri.ArcSdeStGeometryDataStoreExtension;
+import com.revolsys.gis.oracle.esri.ArcSdeStGeometryRecordStoreExtension;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
-import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -388,8 +388,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
         + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
         + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
 
-      addDataStoreExtension(new ArcSdeStGeometryDataStoreExtension());
-      addDataStoreExtension(new ArcSdeBinaryGeometryDataStoreExtension());
+      addDataStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
+      addDataStoreExtension(new ArcSdeBinaryGeometryRecordStoreExtension());
 
     }
   }
@@ -398,7 +398,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     setExcludeTablePatterns(".*\\$");
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
-    setIteratorFactory(new DataStoreIteratorFactory(this,
+    setIteratorFactory(new RecordStoreIteratorFactory(this,
       "createOracleIterator"));
   }
 

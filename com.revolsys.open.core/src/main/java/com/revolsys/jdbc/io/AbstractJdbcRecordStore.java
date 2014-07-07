@@ -127,7 +127,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   public AbstractJdbcRecordStore(final RecordFactory recordFactory) {
     super(recordFactory);
-    setIteratorFactory(new DataStoreIteratorFactory(
+    setIteratorFactory(new RecordStoreIteratorFactory(
       AbstractJdbcRecordStore.class, "createJdbcIterator"));
     addDataStoreExtension(this);
   }

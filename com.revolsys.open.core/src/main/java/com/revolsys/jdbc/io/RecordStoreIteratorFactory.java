@@ -12,16 +12,16 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.util.Property;
 
-public class DataStoreIteratorFactory {
+public class RecordStoreIteratorFactory {
 
   private Reference<Object> factory;
 
   private String methodName;
 
-  public DataStoreIteratorFactory() {
+  public RecordStoreIteratorFactory() {
   }
 
-  public DataStoreIteratorFactory(final Object factory, final String methodName) {
+  public RecordStoreIteratorFactory(final Object factory, final String methodName) {
     this.factory = new WeakReference<Object>(factory);
     this.methodName = methodName;
   }

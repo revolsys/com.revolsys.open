@@ -17,7 +17,7 @@ public class NamedChannelBundle<T> {
   /** Flag indicating if the channel has been closed. */
   private boolean closed = false;
 
-  /** The ChannelDataStore used to store the valueQueueByName for the Channel */
+  /** The ChannelValueStore used to store the valueQueueByName for the Channel */
   protected Map<String, Queue<T>> valueQueueByName = new HashMap<String, Queue<T>>();
 
   private AtomicLong sequence = new AtomicLong();

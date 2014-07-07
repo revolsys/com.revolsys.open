@@ -43,7 +43,7 @@ import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
-import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.transaction.Propagation;
@@ -96,7 +96,7 @@ public abstract class AbstractRecordStore extends
 
   private GeometryFactory geometryFactory;
 
-  private DataStoreIteratorFactory iteratorFactory = new DataStoreIteratorFactory();
+  private RecordStoreIteratorFactory iteratorFactory = new RecordStoreIteratorFactory();
 
   private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<RecordStoreExtension>();
 
@@ -315,7 +315,7 @@ public abstract class AbstractRecordStore extends
     } else {
       final RecordDefinition recordDefinition = query.getRecordDefinition();
       if (recordDefinition != null) {
-        final DataStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition.getProperty("recordStoreIteratorFactory");
+        final RecordStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition.getProperty("recordStoreIteratorFactory");
         if (recordDefinitionIteratorFactory != null) {
           final AbstractIterator<Record> iterator = recordDefinitionIteratorFactory.createIterator(
             this, query, properties);
@@ -447,7 +447,7 @@ public abstract class AbstractRecordStore extends
     return this.geometryFactory;
   }
 
-  public DataStoreIteratorFactory getIteratorFactory() {
+  public RecordStoreIteratorFactory getIteratorFactory() {
     return this.iteratorFactory;
   }
 
@@ -786,7 +786,7 @@ public abstract class AbstractRecordStore extends
     this.geometryFactory = geometryFactory;
   }
 
-  public void setIteratorFactory(final DataStoreIteratorFactory iteratorFactory) {
+  public void setIteratorFactory(final RecordStoreIteratorFactory iteratorFactory) {
     this.iteratorFactory = iteratorFactory;
   }
 

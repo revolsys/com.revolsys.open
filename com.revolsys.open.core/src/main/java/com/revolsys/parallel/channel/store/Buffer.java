@@ -3,12 +3,12 @@ package com.revolsys.parallel.channel.store;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.revolsys.parallel.channel.ChannelDataStore;
+import com.revolsys.parallel.channel.ChannelValueStore;
 
 /**
  * <h2>Description</h2>
  * <p>
- * The Buffer class is an implementation of ChannelDataStore which allows more
+ * The Buffer class is an implementation of ChannelValueStore which allows more
  * than one Object to be sent across the Channel at any one time. The Buffer
  * will store the Objects and allow them to be read in the same order as they
  * were written.
@@ -20,7 +20,7 @@ import com.revolsys.parallel.channel.ChannelDataStore;
  * 
  * @author P.D.Austin
  */
-public class Buffer<T> extends ChannelDataStore<T> {
+public class Buffer<T> extends ChannelValueStore<T> {
   /** The storage for the buffered Objects */
   private Queue<T> buffer = new LinkedList<T>();
 

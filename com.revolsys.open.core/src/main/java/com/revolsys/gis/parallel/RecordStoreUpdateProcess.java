@@ -10,7 +10,7 @@ import com.revolsys.parallel.process.BaseInProcess;
 
 /**
  * <p>
- * The DataStoreUpdateProcess process reads each object from the input channel
+ * The RecordStoreUpdateProcess process reads each object from the input channel
  * and updates the object in the data store based on the object's state.
  * </p>
  * <p>
@@ -28,14 +28,14 @@ import com.revolsys.parallel.process.BaseInProcess;
  * </dl>
  */
 
-public class DataStoreUpdateProcess extends BaseInProcess<Record> {
+public class RecordStoreUpdateProcess extends BaseInProcess<Record> {
   /** The data store. */
   private RecordStore recordStore;
 
   /**
-   * Construct a new DataStoreUpdateProcess.
+   * Construct a new RecordStoreUpdateProcess.
    */
-  public DataStoreUpdateProcess() {
+  public RecordStoreUpdateProcess() {
   }
 
   @PreDestroy

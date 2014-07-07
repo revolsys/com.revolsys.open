@@ -3,7 +3,7 @@ package com.revolsys.parallel.process;
 import org.apache.log4j.Logger;
 
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.parallel.channel.ChannelDataStore;
+import com.revolsys.parallel.channel.ChannelValueStore;
 import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.channel.store.ZeroBuffer;
@@ -27,7 +27,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     this.out = out;
   }
 
-  protected ChannelDataStore<I> createInDataStore() {
+  protected ChannelValueStore<I> createInDataStore() {
     if (inBufferSize == 0) {
       return new ZeroBuffer<I>();
     } else if (inBufferSize < 0) {
@@ -37,7 +37,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     }
   }
 
-  protected ChannelDataStore<O> createOutDataStore() {
+  protected ChannelValueStore<O> createOutDataStore() {
     if (outBufferSize == 0) {
       return new ZeroBuffer<O>();
     } else if (outBufferSize < 0) {
@@ -57,7 +57,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public Channel<I> getIn() {
     if (in == null) {
       final String channelName = getBeanName() + ".in";
-      final ChannelDataStore<I> buffer = createInDataStore();
+      final ChannelValueStore<I> buffer = createInDataStore();
       final Channel<I> channel = new Channel<I>(channelName, buffer);
       setIn(channel);
     }
@@ -75,7 +75,7 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public Channel<O> getOut() {
     if (out == null) {
       final String channelName = getBeanName() + ".out";
-      final ChannelDataStore<O> buffer = createOutDataStore();
+      final ChannelValueStore<O> buffer = createOutDataStore();
       final Channel<O> channel = new Channel<O>(channelName, buffer);
       setOut(channel);
     }

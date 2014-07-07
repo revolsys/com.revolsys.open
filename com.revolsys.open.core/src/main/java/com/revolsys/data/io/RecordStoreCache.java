@@ -17,7 +17,7 @@ public class RecordStoreCache {
 
   private final RecordStore recordStore;
 
-  private final Map<BoundingBox, DataStoreQueryTask> loadTasks = new LinkedHashMap<BoundingBox, DataStoreQueryTask>();
+  private final Map<BoundingBox, RecordStoreQueryTask> loadTasks = new LinkedHashMap<BoundingBox, RecordStoreQueryTask>();
 
   private String typePath;
 
@@ -28,7 +28,7 @@ public class RecordStoreCache {
   private void addBoundingBox(final BoundingBox boundingBox) {
     synchronized (loadTasks) {
       if (!loadTasks.containsKey(boundingBox)) {
-        loadTasks.put(boundingBox, new DataStoreQueryTask(recordStore, typePath,
+        loadTasks.put(boundingBox, new RecordStoreQueryTask(recordStore, typePath,
           boundingBox));
       }
     }
@@ -44,7 +44,7 @@ public class RecordStoreCache {
 
   public void removeObjects(final BoundingBox boundingBox) {
     synchronized (loadTasks) {
-      final DataStoreQueryTask task = loadTasks.get(boundingBox);
+      final RecordStoreQueryTask task = loadTasks.get(boundingBox);
       if (task != null) {
         task.cancel();
         loadTasks.remove(task);

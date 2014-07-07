@@ -6,14 +6,14 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.AbstractMultipleIterator;
 import com.revolsys.data.record.Record;
 
-public class DataStoreMultipleQueryIterator extends
+public class RecordStoreMultipleQueryIterator extends
   AbstractMultipleIterator<Record> {
 
   private RecordStoreQueryReader reader;
 
   private int queryIndex = 0;
 
-  public DataStoreMultipleQueryIterator(final RecordStoreQueryReader reader) {
+  public RecordStoreMultipleQueryIterator(final RecordStoreQueryReader reader) {
     this.reader = reader;
   }
 

@@ -32,7 +32,7 @@ import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
-import com.revolsys.jdbc.io.DataStoreIteratorFactory;
+import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -43,19 +43,19 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.util.PasswordUtil;
 
-public class ArcSdeBinaryGeometryDataStoreUtil {
+public class ArcSdeBinaryGeometryRecordStoreUtil {
 
-  private final DataStoreIteratorFactory iteratorFactory = new DataStoreIteratorFactory(
+  private final RecordStoreIteratorFactory iteratorFactory = new RecordStoreIteratorFactory(
     this, "createIterator");
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();
 
   private JdbcRecordStore recordStore;
 
-  public ArcSdeBinaryGeometryDataStoreUtil() {
+  public ArcSdeBinaryGeometryRecordStoreUtil() {
   }
 
-  public ArcSdeBinaryGeometryDataStoreUtil(final RecordStore recordStore,
+  public ArcSdeBinaryGeometryRecordStoreUtil(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
     this.recordStore = (JdbcRecordStore)recordStore;
     this.connectionProperties = connectionProperties;
@@ -240,7 +240,7 @@ public class ArcSdeBinaryGeometryDataStoreUtil {
             break;
 
             default:
-              LoggerFactory.getLogger(ArcSdeBinaryGeometryDataStoreUtil.class)
+              LoggerFactory.getLogger(ArcSdeBinaryGeometryRecordStoreUtil.class)
                 .error(
                   "Unsupported column type: " + object.getRecordDefinition() + "."
                     + name);

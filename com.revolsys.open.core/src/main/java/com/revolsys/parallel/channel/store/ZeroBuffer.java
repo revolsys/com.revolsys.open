@@ -1,10 +1,10 @@
 package com.revolsys.parallel.channel.store;
 
-import com.revolsys.parallel.channel.ChannelDataStore;
+import com.revolsys.parallel.channel.ChannelValueStore;
 
 /**
  * <H2>Description</H2> The ZeroBuffer class is an implementation of
- * ChannelDataStore which allows one Object to be sent across the Channel at any
+ * ChannelValueStore which allows one Object to be sent across the Channel at any
  * one time.
  * <P>
  * The getState method will return EMPTY if the Channel does not contain an
@@ -12,7 +12,7 @@ import com.revolsys.parallel.channel.ChannelDataStore;
  * 
  * @author P.D.Austin
  */
-public class ZeroBuffer<T> extends ChannelDataStore<T> {
+public class ZeroBuffer<T> extends ChannelValueStore<T> {
   /** The current state */
   private int state = EMPTY;
 
@@ -43,7 +43,7 @@ public class ZeroBuffer<T> extends ChannelDataStore<T> {
    * <P>
    * Pre-condition: The state must not be EMPTY
    * 
-   * @return The next available Object from the ChannelDataStore
+   * @return The next available Object from the ChannelValueStore
    */
   @Override
   protected T get() {
@@ -73,7 +73,7 @@ public class ZeroBuffer<T> extends ChannelDataStore<T> {
    * <P>
    * Pre-condition: The state must not be FULL
    * 
-   * @param value The object to put in the ChannelDataStore
+   * @param value The object to put in the ChannelValueStore
    */
   @Override
   protected void put(final T value) {

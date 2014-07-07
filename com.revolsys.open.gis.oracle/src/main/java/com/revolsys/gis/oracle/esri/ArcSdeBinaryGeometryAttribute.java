@@ -22,7 +22,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
 
   private final GeometryFactory geometryFactory;
 
-  private final ArcSdeBinaryGeometryDataStoreUtil sdeUtil;
+  private final ArcSdeBinaryGeometryRecordStoreUtil sdeUtil;
 
   private String tableName;
 
@@ -31,7 +31,7 @@ public class ArcSdeBinaryGeometryAttribute extends JdbcAttribute {
   private boolean valid;
 
   public ArcSdeBinaryGeometryAttribute(
-    final ArcSdeBinaryGeometryDataStoreUtil sdeUtil, final String dbName,
+    final ArcSdeBinaryGeometryRecordStoreUtil sdeUtil, final String dbName,
     final String name, final DataType type, final boolean required,
     final String description, final Map<String, Object> properties,
     final GeometryFactory geometryFactory) {

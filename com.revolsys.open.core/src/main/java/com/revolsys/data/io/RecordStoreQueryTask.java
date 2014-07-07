@@ -12,7 +12,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.parallel.process.AbstractProcess;
 
-public class DataStoreQueryTask extends AbstractProcess {
+public class RecordStoreQueryTask extends AbstractProcess {
 
   private final RecordStore recordStore;
 
@@ -22,7 +22,7 @@ public class DataStoreQueryTask extends AbstractProcess {
 
   private final String path;
 
-  public DataStoreQueryTask(final RecordStore recordStore, final String path,
+  public RecordStoreQueryTask(final RecordStore recordStore, final String path,
     final BoundingBox boundingBox) {
     this.recordStore = recordStore;
     this.path = path;

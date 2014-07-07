@@ -61,7 +61,7 @@ import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 
-public class DataStoreQueryTextField extends TextField implements
+public class RecordStoreQueryTextField extends TextField implements
   DocumentListener, KeyListener, MouseListener, FocusListener,
   ListDataListener, ItemSelectable, Field, ListSelectionListener,
   HighlightPredicate {
@@ -77,7 +77,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   private final JXList list;
 
-  private final DataStoreQueryListModel listModel;
+  private final RecordStoreQueryListModel listModel;
 
   private final JPopupMenu menu = new JPopupMenu();
 
@@ -94,7 +94,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   private boolean below = false;
 
-  public DataStoreQueryTextField(final RecordDefinition recordDefinition,
+  public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName) {
     this(recordDefinition, displayAttributeName, new Query(recordDefinition, new Equal(
       F.upper(displayAttributeName), new Value(null))), new Query(recordDefinition,
@@ -102,7 +102,7 @@ public class DataStoreQueryTextField extends TextField implements
 
   }
 
-  public DataStoreQueryTextField(final RecordDefinition recordDefinition,
+  public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName, final List<Query> queries) {
     super(displayAttributeName);
     this.recordDefinition = recordDefinition;
@@ -124,7 +124,7 @@ public class DataStoreQueryTextField extends TextField implements
     this.oldValueItem.setHorizontalAlignment(SwingConstants.LEFT);
     this.menu.add(this.oldValueItem, BorderLayout.NORTH);
 
-    this.listModel = new DataStoreQueryListModel(this.recordStore,
+    this.listModel = new RecordStoreQueryListModel(this.recordStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
     this.list.setCellRenderer(new RecordListCellRenderer(
@@ -149,13 +149,13 @@ public class DataStoreQueryTextField extends TextField implements
     setPreferredSize(new Dimension(100, 22));
   }
 
-  public DataStoreQueryTextField(final RecordDefinition recordDefinition,
+  public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName, final Query... queries) {
     this(recordDefinition, displayAttributeName, Arrays.asList(queries));
 
   }
 
-  public DataStoreQueryTextField(final RecordStore recordStore,
+  public RecordStoreQueryTextField(final RecordStore recordStore,
     final String typeName, final String displayAttributeName) {
     this(recordStore.getRecordDefinition(typeName), displayAttributeName, new Query(
       typeName, new Equal(F.upper(displayAttributeName), new Value(null))),

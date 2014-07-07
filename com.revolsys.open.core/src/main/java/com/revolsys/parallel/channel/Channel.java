@@ -13,8 +13,8 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
   /** Flag indicating if the channel has been closed. */
   private boolean closed = false;
 
-  /** The ChannelDataStore used to store the data for the Channel */
-  protected ChannelDataStore<T> data;
+  /** The ChannelValueStore used to store the data for the Channel */
+  protected ChannelValueStore<T> data;
 
   /** The monitor reads must synchronize on */
   protected Object monitor = new Object();
@@ -38,18 +38,18 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
   protected Object writeMonitor = new Object();
 
   /**
-   * Constructs a new Channel<T> with a ZeroBuffer ChannelDataStore.
+   * Constructs a new Channel<T> with a ZeroBuffer ChannelValueStore.
    */
   public Channel() {
     this(new ZeroBuffer<T>());
   }
 
   /**
-   * Constructs a new Channel<T> with the specified ChannelDataStore.
+   * Constructs a new Channel<T> with the specified ChannelValueStore.
    * 
-   * @param data The ChannelDataStore used to store the data for the Channel
+   * @param data The ChannelValueStore used to store the data for the Channel
    */
-  public Channel(final ChannelDataStore<T> data) {
+  public Channel(final ChannelValueStore<T> data) {
     this.data = data;
   }
 
@@ -58,7 +58,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
     this.name = name;
   }
 
-  public Channel(final String name, final ChannelDataStore<T> data) {
+  public Channel(final String name, final ChannelValueStore<T> data) {
     this.name = name;
     this.data = data;
   }
@@ -70,13 +70,13 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
   @Override
   public boolean disable() {
     alt = null;
-    return (data.getState() != ChannelDataStore.EMPTY);
+    return (data.getState() != ChannelValueStore.EMPTY);
   }
 
   @Override
   public boolean enable(final MultiInputSelector alt) {
     synchronized (monitor) {
-      if (data.getState() == ChannelDataStore.EMPTY) {
+      if (data.getState() == ChannelValueStore.EMPTY) {
         this.alt = alt;
         return false;
       } else {
@@ -93,7 +93,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
   public boolean isClosed() {
     if (!closed) {
       if (writeClosed) {
-        if (data.getState() == ChannelDataStore.EMPTY) {
+        if (data.getState() == ChannelValueStore.EMPTY) {
           close();
         }
       }
@@ -135,7 +135,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
         if (isClosed()) {
           throw new ClosedException();
         }
-        if (data.getState() == ChannelDataStore.EMPTY) {
+        if (data.getState() == ChannelValueStore.EMPTY) {
           try {
             ThreadUtil.pause(monitor, timeout);
             if (isClosed()) {
@@ -147,7 +147,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
             throw new ClosedException();
           }
         }
-        if (data.getState() == ChannelDataStore.EMPTY) {
+        if (data.getState() == ChannelValueStore.EMPTY) {
           return null;
         } else {
           final T value = data.get();
@@ -214,7 +214,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
         } else {
           monitor.notifyAll();
         }
-        if (data.getState() == ChannelDataStore.FULL) {
+        if (data.getState() == ChannelValueStore.FULL) {
           try {
             ThreadUtil.pause(monitor);
             if (closed) {

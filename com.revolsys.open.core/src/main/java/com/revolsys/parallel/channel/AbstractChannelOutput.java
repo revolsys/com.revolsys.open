@@ -20,7 +20,7 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
   private final Object writeMonitor = new Object();
 
   /**
-   * Constructs a new Channel<T> with a ZeroBuffer ChannelDataStore.
+   * Constructs a new Channel<T> with a ZeroBuffer ChannelValueStore.
    */
   public AbstractChannelOutput() {
   }

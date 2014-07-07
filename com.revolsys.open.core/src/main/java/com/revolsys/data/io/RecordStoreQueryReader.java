@@ -33,7 +33,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
   private String whereClause;
 
   public RecordStoreQueryReader() {
-    setIterator(new DataStoreMultipleQueryIterator(this));
+    setIterator(new RecordStoreMultipleQueryIterator(this));
   }
 
   public RecordStoreQueryReader(final AbstractRecordStore recordStore) {
