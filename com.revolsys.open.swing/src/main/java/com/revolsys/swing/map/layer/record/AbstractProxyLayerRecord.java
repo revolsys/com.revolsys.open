@@ -19,7 +19,9 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public void clearChanges() {
     final LayerRecord record = getLayerRecord();
-    record.clearChanges();
+    if (record != null) {
+      record.clearChanges();
+    }
   }
 
   @Override
@@ -69,7 +71,11 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public boolean isDeleted() {
     final LayerRecord record = getLayerRecord();
-    return record.isDeleted();
+    if (record == null) {
+      return true;
+    } else {
+      return record.isDeleted();
+    }
   }
 
   @Override
@@ -87,7 +93,11 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public boolean isModified(final String name) {
     final LayerRecord record = getLayerRecord();
-    return record.isModified(name);
+    if (record == null) {
+      return false;
+    } else {
+      return record.isModified(name);
+    }
   }
 
   @Override
@@ -105,7 +115,9 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public void setState(final RecordState state) {
     final Record record = getRecord();
-    record.setState(state);
+    if (record != null) {
+      record.setState(state);
+    }
   }
 
   @Override

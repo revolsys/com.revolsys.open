@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -226,22 +225,22 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
       this.recordIdToRecordMap.keySet().retainAll(ids);
     }
-    System.out.println();
-    for (final Entry<Label, Set<Identifier>> entry : this.cacheIdToRecordIdMap.entrySet()) {
-      final Label key = entry.getKey();
-      if (key != getCacheIdIndex()) {
-        System.out.println(getTypePath() + "\tD\t" + key + "\t"
-            + entry.getValue());
-      }
-    }
+    // for (final Entry<Label, Set<Identifier>> entry :
+    // this.cacheIdToRecordIdMap.entrySet()) {
+    // final Label key = entry.getKey();
+    // // if (key != getCacheIdIndex()) {
+    // System.out.println(getTypePath() + "\tR\t" + key + "\t"
+    // + entry.getValue());
+    // // }
+    // }
 
   }
 
   @Override
   public void clearCachedRecords(final Label cacheId) {
     synchronized (getSync()) {
+      super.clearCachedRecords(cacheId);
       this.cacheIdToRecordIdMap.remove(cacheId);
-      cleanCachedRecords();
     }
   }
 
@@ -575,11 +574,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  @Override
-  public RecordStore getRecordStore() {
-    return this.recordStore;
-  }
-
   public Attribute getGeometryAttribute() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
@@ -670,6 +664,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
+  public RecordStore getRecordStore() {
+    return this.recordStore;
+  }
+
+  @Override
   public int getRowCount(final Query query) {
     if (isExists()) {
       final RecordStore recordStore = getRecordStore();
@@ -680,6 +679,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return 0;
   }
 
+  @Override
   public String getTypePath() {
     return this.typePath;
   }
@@ -725,13 +725,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
     }
     return false;
-  }
-
-  @Override
-  protected void postSaveChanges(final RecordState originalState,
-    final LayerRecord record) {
-    super.postSaveChanges(originalState, record);
-    record.postSaveChanges();
   }
 
   @Override
@@ -822,10 +815,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     super.revertChanges(record);
   }
 
-  protected void setRecordStore(final RecordStore recordStore) {
-    this.recordStore = recordStore;
-  }
-
   protected void setIndexRecords(final BoundingBox loadedBoundingBox,
     final List<LayerRecord> records) {
     synchronized (getSync()) {
@@ -843,6 +832,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       this.cacheIdToRecordIdMap.put(cacheId, new HashSet<Identifier>());
       return addRecordsToCache(cacheId, records);
     }
+  }
+
+  protected void setRecordStore(final RecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   public void setTypePath(final String typePath) {

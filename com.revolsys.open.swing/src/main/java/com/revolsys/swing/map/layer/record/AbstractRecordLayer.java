@@ -20,7 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,9 +51,9 @@ import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.filter.RecordGeometryDistanceFilter;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.io.AbstractRecordReaderFactory;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.ListRecordReader;
 import com.revolsys.data.io.RecordReader;
+import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.ArrayRecord;
@@ -103,8 +102,8 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.RecordLayerStylePanel;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
-import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordDefinitionTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
@@ -122,7 +121,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Label;
 
 public abstract class AbstractRecordLayer extends AbstractLayer implements
-  RecordFactory, AddGeometryCompleteAction {
+RecordFactory, AddGeometryCompleteAction {
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
     final LayerGroup group) {
@@ -181,9 +180,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       "table_go", exists, "showRecordsTable"));
 
     final EnableCheck hasSelectedRecords = new TreeItemPropertyEnableCheck(
-      "hasSelectedRecords");
+        "hasSelectedRecords");
     final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
-      "hasGeometry");
+        "hasGeometry");
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Selected",
       "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry,
         hasSelectedRecords), "zoomToSelected"));
@@ -194,9 +193,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
     final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddRecords");
     final EnableCheck canDelete = new TreeItemPropertyEnableCheck(
-      "canDeleteRecords");
+        "canDeleteRecords");
     final EnableCheck canMergeRecords = new TreeItemPropertyEnableCheck(
-      "canMergeRecords");
+        "canMergeRecords");
     final EnableCheck canPaste = new TreeItemPropertyEnableCheck("canPaste");
 
     menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
@@ -217,18 +216,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction(
       "Merge Selected Records", "shape_group", canMergeRecords,
-      "mergeSelectedRecords"));
+        "mergeSelectedRecords"));
 
     menu.addMenuItem("dnd", TreeItemRunnable.createAction(
       "Copy Selected Records", "page_copy", hasSelectedRecords,
-      "copySelectedRecords"));
+        "copySelectedRecords"));
 
     menu.addMenuItem("dnd", TreeItemRunnable.createAction("Paste New Records",
       "paste_plain", new AndEnableCheck(canAdd, canPaste), "pasteRecords"));
 
     menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
       "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
-      "Style"));
+        "Style"));
   }
 
   private boolean useFieldTitles = false;
@@ -336,6 +335,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     fireHighlighted();
   }
 
+  public void addHighlightedRecords(final LayerRecord... records) {
+    addHighlightedRecords(Arrays.asList(records));
+  }
+
   protected void addModifiedRecord(final LayerRecord record) {
     addRecordToCache(this.cacheIdModified, record);
     cleanCachedRecords();
@@ -396,6 +399,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   protected void addSelectedRecord(final LayerRecord record) {
     addRecordToCache(this.cacheIdSelected, record);
+    clearSelectedRecordsIndex();
   }
 
   public void addSelectedRecords(final BoundingBox boundingBox) {
@@ -419,7 +423,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       for (final LayerRecord record : records) {
         addSelectedRecord(record);
       }
-      clearSelectedRecordsIndex();
     }
     fireSelected();
   }
@@ -462,6 +465,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           getDeletedRecords());
         cancelled &= internalCancelChanges(this.cacheIdModified,
           getModifiedRecords());
+        clearSelectedRecordsIndex();
         cleanCachedRecords();
       } finally {
         setEventsEnabled(eventsEnabled);
@@ -470,9 +474,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       if (!cancelled) {
         JOptionPane.showMessageDialog(MapPanel.get(this),
           "<html><p>There was an error cancelling changes for one or more records.</p>"
-            + "<p>" + getPath() + "</p>"
-            + "<p>Check the logging panel for details.</html>",
-          "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
+              + "<p>" + getPath() + "</p>"
+              + "<p>Check the logging panel for details.</html>",
+              "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
       }
 
     }
@@ -485,16 +489,17 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   protected void cleanCachedRecords() {
-    for (final Entry<Label, Set<LayerRecord>> entry : this.cacheIdToRecordMap.entrySet()) {
-      final Label key = entry.getKey();
-      System.out.println(key + ":" + entry.getValue().size());
-    }
+    // for (final Entry<Label, Set<LayerRecord>> entry :
+    // this.cacheIdToRecordMap.entrySet()) {
+    // final Label key = entry.getKey();
+    // System.out.println(getTypePath() + "\tL\t" + key + "\t"
+    // + entry.getValue().size());
+    // }
   }
 
   public void clearCachedRecords(final Label cacheId) {
     synchronized (getSync()) {
       this.cacheIdToRecordMap.remove(cacheId);
-      cleanCachedRecords();
     }
   }
 
@@ -508,7 +513,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   protected void clearSelectedRecordsIndex() {
-    cleanCachedRecords();
     this.selectedRecordsIndex = null;
   }
 
@@ -599,8 +603,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   protected void createPropertiesPanelStyle(
     final TabbedValuePanel propertiesPanel) {
     if (getRenderer() != null) {
-      final RecordLayerStylePanel stylePanel = new RecordLayerStylePanel(
-        this);
+      final RecordLayerStylePanel stylePanel = new RecordLayerStylePanel(this);
       propertiesPanel.addTab("Style", stylePanel);
     }
   }
@@ -641,7 +644,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       return new ArrayLayerRecord(this);
     } else {
       throw new IllegalArgumentException("Cannot create records for "
-        + recordDefinition);
+          + recordDefinition);
     }
   }
 
@@ -677,9 +680,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     this.formWindows.clear();
     this.index.clear();
     this.cacheIdToRecordMap.clear();
-    if (this.selectedRecordsIndex != null) {
-      this.selectedRecordsIndex.clear();
-    }
+    this.selectedRecordsIndex = null;
   }
 
   public void deleteRecord(final LayerRecord record) {
@@ -923,7 +924,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     synchronized (this) {
       if (this.columnNames == null) {
         final Set<String> columnNames = new LinkedHashSet<String>(
-          this.columnNameOrder);
+            this.columnNameOrder);
         final RecordDefinition recordDefinition = getRecordDefinition();
         final List<String> attributeNames = recordDefinition.getAttributeNames();
         columnNames.addAll(attributeNames);
@@ -936,10 +937,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public CoordinateSystem getCoordinateSystem() {
     return getGeometryFactory().getCoordinateSystem();
-  }
-
-  public RecordStore getRecordStore() {
-    return getRecordDefinition().getRecordStore();
   }
 
   public int getDeletedRecordCount() {
@@ -1067,10 +1064,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     }
   }
 
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
-  }
-
   public int getModifiedRecordCount() {
     return getCachedRecordCount(this.cacheIdModified);
   }
@@ -1143,9 +1136,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
                       JOptionPane.showMessageDialog(
                         parentComponent,
                         "Clipboard should contain a record with a "
-                          + geometryDataType + " not a "
-                          + sourceGeometry.getGeometryType() + ".",
-                        "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+                            + geometryDataType + " not a "
+                            + sourceGeometry.getGeometryType() + ".",
+                            "Paste Geometry", JOptionPane.ERROR_MESSAGE);
                     }
                     return null;
                   }
@@ -1203,8 +1196,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     return null;
   }
 
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
+  }
+
   public List<LayerRecord> getRecords() {
     throw new UnsupportedOperationException();
+  }
+
+  public RecordStore getRecordStore() {
+    return getRecordDefinition().getRecordStore();
   }
 
   public int getRowCount() {
@@ -1260,6 +1261,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   protected Object getSync() {
     return this.sync;
+  }
+
+  public String getTypePath() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getPath();
+    }
   }
 
   public Collection<String> getUserReadOnlyFieldNames() {
@@ -1346,24 +1356,24 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       return saved;
     } catch (final Throwable e) {
       ExceptionUtil.log(getClass(), "Unable to save changes for record:\n"
-        + record, e);
+          + record, e);
       return false;
     }
   }
 
   public boolean isCanAddRecords() {
     return !super.isReadOnly() && isEditable() && this.canAddRecords
-      && hasPermission("INSERT");
+        && hasPermission("INSERT");
   }
 
   public boolean isCanDeleteRecords() {
     return !super.isReadOnly() && isEditable() && this.canDeleteRecords
-      && hasPermission("DELETE");
+        && hasPermission("DELETE");
   }
 
   public boolean isCanEditRecords() {
     return !super.isReadOnly() && isEditable() && this.canEditRecords
-      && hasPermission("UPDATE");
+        && hasPermission("UPDATE");
   }
 
   public boolean isCanMergeRecords() {
@@ -1384,7 +1394,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public boolean isCanPaste() {
     return ClipboardUtil.isDataFlavorAvailable(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR)
-      || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
+        || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
   }
 
   public boolean isDeleted(final LayerRecord record) {
@@ -1466,7 +1476,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   protected boolean isPostSaveRemoveCacheId(final Label cacheId) {
     if (cacheId == this.cacheIdDeleted || cacheId == this.cacheIdNew
-      || cacheId == this.cacheIdModified) {
+        || cacheId == this.cacheIdModified) {
       return true;
     } else {
       return false;
@@ -1571,7 +1581,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         }
         for (final Record sourceRecord : reader) {
           final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-            sourceRecord);
+              sourceRecord);
 
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
           for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
@@ -1644,19 +1654,24 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   protected boolean postSaveModifiedRecord(final LayerRecord record) {
     synchronized (getSync()) {
-      record.clearChanges();
-      return removeRecordFromCache(this.cacheIdModified, record);
+      if (removeRecordFromCache(this.cacheIdModified, record)) {
+        record.postSaveModified();
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
   protected boolean postSaveNewRecord(final LayerRecord record) {
     synchronized (getSync()) {
-      if (removeRecordFromCache(this.cacheIdModified, record)) {
+      final boolean selected = isSelected(record);
+      final boolean highlighted = isHighlighted(record);
+      if (removeRecordFromCache(this.cacheIdNew, record)) {
+        removeRecordFromCache(record);
+        record.postSaveNew();
         addToIndex(record);
-        if (isSelected(record)) {
-          unSelectRecords(record);
-          addSelectedRecords(record);
-        }
+        setSelectedHighlighted(record, selected, highlighted);
         return true;
       }
     }
@@ -1676,8 +1691,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
             if (EqualsRegistry.equal(propertyName, getGeometryAttributeName())) {
               final Geometry oldGeometry = (Geometry)event.getOldValue();
               updateSpatialIndex(record, oldGeometry);
+              clearSelectedRecordsIndex();
             }
-            clearSelectedRecordsIndex();
           }
         }
       }
@@ -1818,7 +1833,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     synchronized (getSync()) {
       if (isLayerRecord(record)) {
         for (final Label cacheId : new ArrayList<>(
-          this.cacheIdToRecordMap.keySet())) {
+            this.cacheIdToRecordMap.keySet())) {
           removed |= removeRecordFromCache(cacheId, record);
         }
       }
@@ -1843,6 +1858,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   protected void removeSelectedRecord(final LayerRecord record) {
     removeRecordFromCache(this.cacheIdSelected, record);
     removeHighlightedRecord(record);
+    clearSelectedRecordsIndex();
   }
 
   public void replaceValues(final LayerRecord record,
@@ -1853,8 +1869,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public void revertChanges(final LayerRecord record) {
     synchronized (getSync()) {
       if (isLayerRecord(record)) {
+        final boolean selected = isSelected(record);
+        final boolean highlighted = isHighlighted(record);
         postSaveModifiedRecord(record);
-        removeRecordFromCache(this.cacheIdDeleted, record);
+        if (removeRecordFromCache(this.cacheIdDeleted, record)) {
+          record.setState(RecordState.Persisted);
+        }
+        removeRecordFromCache(record);
+        setSelectedHighlighted(record, selected, highlighted);
+        cleanCachedRecords();
       }
     }
   }
@@ -1869,37 +1892,46 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           saved &= doSaveChanges();
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unable to save changes for layer: "
-            + this, e);
+              + this, e);
           saved = false;
         } finally {
           setEventsEnabled(eventsEnabled);
+          cleanCachedRecords();
           fireRecordsChanged();
         }
       }
       if (!saved) {
         JOptionPane.showMessageDialog(MapPanel.get(this),
           "<html><p>There was an error saving changes for one or more records.</p>"
-            + "<p>" + getPath() + "</p>"
-            + "<p>Check the logging panel for details.</html>",
-          "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
+              + "<p>" + getPath() + "</p>"
+              + "<p>Check the logging panel for details.</html>",
+              "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
       }
       return saved;
     }
   }
 
   public final boolean saveChanges(final LayerRecord record) {
-    final boolean saved = internalSaveChanges(record);
-    if (saved) {
-      fireRecordUpdated(record);
+    synchronized (this.getEditSync()) {
+      final boolean eventsEnabled = setEventsEnabled(false);
+      try {
+        final boolean saved = internalSaveChanges(record);
+        cleanCachedRecords();
+        if (saved) {
+          fireRecordUpdated(record);
+        }
+        if (!saved) {
+          JOptionPane.showMessageDialog(MapPanel.get(this),
+            "<html><p>There was an error saving changes to the record.</p>"
+                + "<p>" + getPath() + "</p>"
+                + "<p>Check the logging panel for details.</html>",
+                "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
+        }
+        return saved;
+      } finally {
+        setEventsEnabled(eventsEnabled);
+      }
     }
-    if (!saved) {
-      JOptionPane.showMessageDialog(MapPanel.get(this),
-        "<html><p>There was an error saving changes to the record.</p>" + "<p>"
-          + getPath() + "</p>"
-          + "<p>Check the logging panel for details.</html>",
-        "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
-    }
-    return saved;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -1974,7 +2006,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     super.setGeometryFactory(geometryFactory);
     if (geometryFactory != null && this.boundingBox.isEmpty()) {
       this.boundingBox = geometryFactory.getCoordinateSystem()
-        .getAreaBoundingBox();
+          .getAreaBoundingBox();
     }
   }
 
@@ -1996,29 +2028,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         for (final Record record : records) {
           final LayerRecord cacheRecord = addRecordToCache(cacheIdIndex,
             (LayerRecord)record);
-          index.insert(cacheRecord);
+          if (!cacheRecord.isDeleted()) {
+            index.insert(cacheRecord);
+          }
         }
       }
       cleanCachedRecords();
       final List<LayerRecord> newRecords = getNewRecords();
       index.insert(newRecords);
       this.index = index;
-    }
-  }
-
-  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = recordDefinition;
-    if (recordDefinition != null) {
-      setGeometryFactory(recordDefinition.getGeometryFactory());
-      if (recordDefinition.getGeometryAttributeIndex() == -1) {
-        setVisible(false);
-        setSelectSupported(false);
-        setRenderer(null);
-      }
-      updateColumnNames();
-      if (this.query == null) {
-        setQuery(null);
-      }
     }
   }
 
@@ -2054,6 +2072,32 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     firePropertyChange("query", oldValue, this.query);
   }
 
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+    if (recordDefinition != null) {
+      setGeometryFactory(recordDefinition.getGeometryFactory());
+      if (recordDefinition.getGeometryAttributeIndex() == -1) {
+        setVisible(false);
+        setSelectSupported(false);
+        setRenderer(null);
+      }
+      updateColumnNames();
+      if (this.query == null) {
+        setQuery(null);
+      }
+    }
+  }
+
+  protected void setSelectedHighlighted(final LayerRecord record,
+    final boolean selected, final boolean highlighted) {
+    if (selected) {
+      addSelectedRecord(record);
+      if (highlighted) {
+        addHighlightedRecord(record);
+      }
+    }
+  }
+
   public void setSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerRecord> records = query(boundingBox);
@@ -2081,7 +2125,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           removeHighlightedRecord(record);
         }
       }
-      clearSelectedRecordsIndex();
     }
     fireSelected();
   }
@@ -2123,7 +2166,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public void setUserReadOnlyFieldNames(
     final Collection<String> userReadOnlyFieldNames) {
     this.userReadOnlyFieldNames = new LinkedHashSet<String>(
-      userReadOnlyFieldNames);
+        userReadOnlyFieldNames);
   }
 
   public LayerRecord showAddForm(final Map<String, Object> parameters) {
@@ -2140,7 +2183,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       final Window window = SwingUtil.getActiveWindow();
       JOptionPane.showMessageDialog(window,
         "Adding records is not enabled for the " + getPath()
-          + " layer. If possible make the layer editable", "Cannot Add Record",
+        + " layer. If possible make the layer editable", "Cannot Add Record",
         JOptionPane.ERROR_MESSAGE);
       return null;
     }
@@ -2252,8 +2295,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
                 final boolean visible = dockable.isVisible();
                 if (!visible) {
                   dockable.getControl()
-                    .getOwner()
-                    .remove((SingleCDockable)dockable);
+                  .getOwner()
+                  .remove((SingleCDockable)dockable);
                   setProperty("TableView", null);
                 }
               }
@@ -2394,7 +2437,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       for (final LayerRecord record : records) {
         removeSelectedRecord(record);
       }
-      clearSelectedRecordsIndex();
       unHighlightRecords(records);
     }
     fireSelected();
@@ -2436,9 +2478,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       final Project project = getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-        .convert(geometryFactory)
-        .expandPercent(0.1)
-        .clipToCoordinateSystem();
+          .convert(geometryFactory)
+          .expandPercent(0.1)
+          .clipToCoordinateSystem();
 
       project.setViewBoundingBox(boundingBox);
     }

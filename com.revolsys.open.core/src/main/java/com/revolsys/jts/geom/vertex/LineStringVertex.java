@@ -15,14 +15,14 @@ public class LineStringVertex extends AbstractVertex {
   @Override
   public double getCoordinate(final int index) {
     final LineString line = getGeometry();
-    return line.getCoordinate(vertexIndex, index);
+    return line.getCoordinate(this.vertexIndex, index);
   }
 
   @Override
   public Vertex getLineNext() {
-    final int newVertexIndex = vertexIndex + 1;
+    final int newVertexIndex = this.vertexIndex + 1;
     final int vertexCount = getLineString().getVertexCount();
-    if (newVertexIndex < vertexCount - 1) {
+    if (newVertexIndex < vertexCount) {
       return new LineStringVertex(getLineString(), newVertexIndex);
     } else {
       return null;
@@ -31,7 +31,7 @@ public class LineStringVertex extends AbstractVertex {
 
   @Override
   public Vertex getLinePrevious() {
-    final int newVertexIndex = vertexIndex - 1;
+    final int newVertexIndex = this.vertexIndex - 1;
     if (newVertexIndex < 0) {
       return null;
     } else {
@@ -46,7 +46,7 @@ public class LineStringVertex extends AbstractVertex {
   @Override
   public int[] getVertexId() {
     return new int[] {
-      vertexIndex
+      this.vertexIndex
     };
   }
 
@@ -67,8 +67,8 @@ public class LineStringVertex extends AbstractVertex {
   @Override
   public Vertex next() {
     final LineString lineString = getLineString();
-    vertexIndex++;
-    if (vertexIndex < lineString.getVertexCount()) {
+    this.vertexIndex++;
+    if (this.vertexIndex < lineString.getVertexCount()) {
       return this;
     } else {
       throw new NoSuchElementException();

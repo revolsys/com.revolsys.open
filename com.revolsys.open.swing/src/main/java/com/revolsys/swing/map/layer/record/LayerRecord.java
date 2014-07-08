@@ -25,7 +25,11 @@ public interface LayerRecord extends Record {
 
   boolean isSame(Record record);
 
-  void postSaveChanges();
+  void postSaveDeleted();
+
+  void postSaveModified();
+
+  void postSaveNew();
 
   LayerRecord revertChanges();
 

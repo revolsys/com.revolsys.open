@@ -52,11 +52,14 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   }
 
   @Override
-  public void postSaveChanges() {
-    if (this.identifier == null) {
-      this.identifier = super.getIdentifier();
-      if (this.identifier != null) {
-        this.record = null;
+  public void postSaveNew() {
+    final RecordState state = getState();
+    if (state == RecordState.Persisted) {
+      if (this.identifier == null) {
+        this.identifier = super.getIdentifier();
+        if (this.identifier != null) {
+          this.record = null;
+        }
       }
     }
   }

@@ -190,7 +190,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-          && !StringUtils.hasText((String)value)) {
+            && !StringUtils.hasText((String)value)) {
           return false;
         }
       }
@@ -199,7 +199,18 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public void postSaveChanges() {
+  public void postSaveDeleted() {
+  }
+
+  @Override
+  public void postSaveModified() {
+    if (getState() == RecordState.Persisted) {
+      clearChanges();
+    }
+  }
+
+  @Override
+  public void postSaveNew() {
   }
 
   @Override

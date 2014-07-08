@@ -100,7 +100,7 @@ public abstract class AbstractGeoReferencedImage extends
     }
 
     for (int j = numRow / 2; j < numRow; ++j) {
-      final MappedLocation mappedLocation = mappings.get(j - (numRow / 2));
+      final MappedLocation mappedLocation = mappings.get(j - numRow / 2);
       final Point sourcePoint = mappedLocation.getSourcePixel();
       final double x = sourcePoint.getX();
       final double y = imageHeight - sourcePoint.getY();
@@ -115,7 +115,7 @@ public abstract class AbstractGeoReferencedImage extends
 
     NodeList lst;
     final Element node = (Element)r.getImageMetadata(0).getAsTree(
-      "javax_imageio_1.0");
+        "javax_imageio_1.0");
     lst = node.getElementsByTagName("HorizontalPixelSize");
     if (lst != null && lst.getLength() == 1) {
       hdpi = (int)(mm2inch / Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
@@ -156,7 +156,7 @@ public abstract class AbstractGeoReferencedImage extends
     }
 
     for (int j = numRow / 2; j < numRow; ++j) {
-      final MappedLocation mappedLocation = mappings.get(j - (numRow / 2));
+      final MappedLocation mappedLocation = mappings.get(j - numRow / 2);
       final Point targetPixel = mappedLocation.getTargetPixel(boundingBox,
         imageWidth, imageHeight);
       final double y = imageHeight - targetPixel.getY();
@@ -196,7 +196,7 @@ public abstract class AbstractGeoReferencedImage extends
 
   protected void addOverviewSize(final int width, final int height) {
     final Dimension size = new Dimension(width, height);
-    overviewSizes.add(size);
+    this.overviewSizes.add(size);
   }
 
   @Override
@@ -249,16 +249,22 @@ public abstract class AbstractGeoReferencedImage extends
           final int imageScreenHeight = (int)Math.ceil(imageModelHeight
             * scaleFactor);
 
-          if (imageScreenWidth > 0 && imageScreenHeight > 0) {
+          if (imageScreenWidth > 0 && imageScreenWidth < 10000
+            && imageScreenHeight > 0 && imageScreenHeight < 10000) {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
               RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
 
               graphics.translate(screenX, screenY);
-              if ((renderedImage instanceof BufferedImage) && !useTransform) {
+              if (renderedImage instanceof BufferedImage && !useTransform) {
                 final BufferedImage bufferedImage = (BufferedImage)renderedImage;
-                graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth,
-                  imageScreenHeight, null);
+                try {
+                  graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth,
+                    imageScreenHeight, null);
+                } catch (final Throwable e) {
+                  LoggerFactory.getLogger(getClass()).error(
+                    imageScreenWidth + "x" + imageScreenHeight, e);
+                }
               } else {
                 final double scaleX = (double)imageScreenWidth / imageWidth;
                 final double scaleY = (double)imageScreenHeight / imageHeight;
@@ -296,7 +302,7 @@ public abstract class AbstractGeoReferencedImage extends
       return new AffineTransform();
     } else {
       final double[] affineTransformMatrix = calculateLSM(boundingBox,
-        imageWidth, imageHeight, mappings);
+        this.imageWidth, this.imageHeight, mappings);
       final double translateX = affineTransformMatrix[2];
       final double translateY = affineTransformMatrix[5];
       final double scaleX = affineTransformMatrix[0];
@@ -373,7 +379,7 @@ public abstract class AbstractGeoReferencedImage extends
   }
 
   public File getFile() {
-    return file;
+    return this.file;
   }
 
   @Override
@@ -460,7 +466,7 @@ public abstract class AbstractGeoReferencedImage extends
 
   @Override
   public List<Dimension> getOverviewSizes() {
-    return overviewSizes;
+    return this.overviewSizes;
   }
 
   @Override
@@ -758,8 +764,8 @@ public abstract class AbstractGeoReferencedImage extends
 
     final int imageHeight = getImageHeight();
     final double y2 = y1 - pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1,
-      x2, y2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2,
+      x1, y1, x2, y2);
     setBoundingBox(boundingBox);
   }
 

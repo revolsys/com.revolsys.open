@@ -50,6 +50,12 @@ LayerRecord {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public <T> T getOriginalValue(final String name) {
+    return (T)getValue(name);
+  }
+
+  @Override
   public RecordDefinition getRecordDefinition() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
@@ -57,12 +63,6 @@ LayerRecord {
     } else {
       return layer.getRecordDefinition();
     }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> T getOriginalValue(final String name) {
-    return (T)getValue(name);
   }
 
   @Override
@@ -152,7 +152,18 @@ LayerRecord {
   }
 
   @Override
-  public void postSaveChanges() {
+  public void postSaveDeleted() {
+  }
+
+  @Override
+  public void postSaveModified() {
+    if (getState() == RecordState.Persisted) {
+      clearChanges();
+    }
+  }
+
+  @Override
+  public void postSaveNew() {
   }
 
   @Override
