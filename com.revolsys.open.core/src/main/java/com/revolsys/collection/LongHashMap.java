@@ -693,8 +693,8 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
 
   @Override
   public T get(final Object obj) {
-    if (obj instanceof Long) {
-      final Long number = (Long)obj;
+    if (obj instanceof Number) {
+      final long number = ((Long)obj).longValue();
       return get(number);
     } else {
       return null;

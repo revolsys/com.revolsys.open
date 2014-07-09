@@ -19,29 +19,11 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.Property;
 
 public abstract class OsmElement extends AbstractRecord implements OsmConstants {
-  private long id;
-
-  private boolean visible;
-
-  private int version;
-
-  private long changeset;
-
-  private Date timestamp;
-
-  private String user;
-
-  private int uid;
-
-  private Map<String, String> tags;
-
-  private Geometry geometry;
-
   public static final RecordDefinition META_DATA;
 
   static {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-        "osm.record");
+      "/osm/record");
     recordDefinition.addAttribute("id", DataTypes.LONG);
     recordDefinition.addAttribute("visible", DataTypes.BOOLEAN);
     recordDefinition.addAttribute("version", DataTypes.INT);
@@ -51,8 +33,28 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
     recordDefinition.addAttribute("uid", DataTypes.INT);
     recordDefinition.addAttribute("tags", DataTypes.MAP);
     recordDefinition.addAttribute("geometry", DataTypes.GEOMETRY);
+    recordDefinition.setGeometryAttributeName("geometry");
+    recordDefinition.setGeometryFactory(WGS84_2D);
     META_DATA = recordDefinition;
   }
+
+  private long changeset = -1;
+
+  private Geometry geometry;
+
+  private long id;
+
+  private Map<String, String> tags = Collections.emptyMap();
+
+  private Date timestamp = new Date(0);
+
+  private int uid = -1;
+
+  private String user = "";
+
+  private int version = -1;
+
+  private boolean visible = true;
 
   public OsmElement() {
   }
@@ -84,7 +86,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
       if (key.length() <= 255) {
         if (StringUtils.hasText(value)) {
           if (value.length() <= 255) {
-            if (this.tags == null) {
+            if (this.tags.isEmpty()) {
               this.tags = new HashMap<>();
             }
             this.tags.put(key, value);
@@ -93,7 +95,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
               + " must be <= 255");
           }
         } else {
-          this.tags.remove(key);
+          removeTag(key);
         }
       } else {
         throw new IllegalArgumentException("Value length " + value.length()
@@ -106,7 +108,8 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
   }
 
   public void addTags(final Map<String, String> tags) {
-    if (tags != null) {
+    if (tags != null && !tags.isEmpty()) {
+
       for (final Entry<String, String> tag : tags.entrySet()) {
         final String key = tag.getKey();
         final String value = tag.getValue();
@@ -148,10 +151,6 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
   }
 
   public Map<String, String> getTags() {
-    final Map<String, String> tags = this.tags;
-    if (tags == null) {
-      return Collections.emptyMap();
-    }
     return new HashMap<>(this.tags);
   }
 
@@ -207,6 +206,15 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
     return this.version;
   }
 
+  @Override
+  public int hashCode() {
+    return (int)(this.id ^ this.id >>> 32);
+  }
+
+  public boolean hasTags() {
+    return this.tags != null && !this.tags.isEmpty();
+  }
+
   public boolean isTagged() {
     return this.tags != null && !this.tags.isEmpty();
   }
@@ -220,6 +228,15 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
     final String value = in.getAttributeValue(null, "v");
     addTag(key, value);
     StaxUtils.skipToEndElement(in, TAG);
+  }
+
+  public void removeTag(final String key) {
+    if (this.tags.containsKey(key)) {
+      this.tags.remove(key);
+      if (this.tags.isEmpty()) {
+        this.tags = Collections.emptyMap();
+      }
+    }
   }
 
   public void setChangeset(final long changeset) {
@@ -244,7 +261,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
   }
 
   public void setTags(final Map<String, String> tags) {
-    this.tags.clear();
+    this.tags = Collections.emptyMap();
     addTags(tags);
   }
 

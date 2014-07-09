@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.spring.SpringUtil;
 
 public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
-RecordIterator {
+  RecordIterator {
 
   private static Logger log = Logger.getLogger(OsmPbfRecordIterator.class.getName());
 
@@ -59,9 +59,11 @@ RecordIterator {
 
   private final ProtocolBufferInputStream blobIn = new ProtocolBufferInputStream();
 
-  private int wayCount = 0;
+  private boolean eof;
 
-  private int skippedWayCount = 0;
+  private final LinkedList<OsmWay> ways = new LinkedList<>();
+
+  private final LinkedList<List<Long>> wayNodeIds = new LinkedList<>();
 
   public OsmPbfRecordIterator(final DataInputStream in) {
     this.in = in;
@@ -69,35 +71,6 @@ RecordIterator {
 
   public OsmPbfRecordIterator(final Resource resource) {
     this(new DataInputStream(SpringUtil.getInputStream(resource)));
-  }
-
-  protected void addNode(final List<Record> currentRecords, final OsmNode node) {
-    final long id = node.getId();
-    final Point point = (Point)node.getGeometryValue();
-    this.nodePoints.put(id, point);
-    currentRecords.add(node);
-  }
-
-  @Override
-  public void doClose() {
-    FileUtil.closeSilent(this.in);
-    this.in = null;
-  }
-
-  @Override
-  protected Record getNext() throws NoSuchElementException {
-    try {
-      while (this.currentRecords.isEmpty()) {
-        processBlob();
-      }
-      return this.currentRecords.removeFirst();
-    } catch (final EOFException e) {
-      System.out.println(this.wayCount);
-      System.out.println(this.skippedWayCount);
-      throw new NoSuchElementException();
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to get next blob from PBF stream.", e);
-    }
   }
 
   // private void processRelations(final List<Relation> relations,
@@ -126,6 +99,46 @@ RecordIterator {
   // decodedEntities.add(new RelationContainer(osmRelation));
   // }
   // }
+
+  protected void addNode(final List<Record> currentRecords, final OsmNode node) {
+    final long id = node.getId();
+    final Point point = (Point)node.getGeometryValue();
+    this.nodePoints.put(id, point);
+    if (node.hasTags()) {
+      currentRecords.add(node);
+    }
+  }
+
+  @Override
+  public void doClose() {
+    FileUtil.closeSilent(this.in);
+    this.in = null;
+  }
+
+  @Override
+  protected Record getNext() throws NoSuchElementException {
+    try {
+      while (this.currentRecords.isEmpty() && !this.eof) {
+        try {
+          processBlob();
+        } catch (final EOFException e) {
+          this.eof = true;
+        }
+      }
+      if (!this.currentRecords.isEmpty()) {
+        return this.currentRecords.removeFirst();
+      } else {
+        final Record record = processWaysWithMissingNodes();
+        if (record == null) {
+          throw new NoSuchElementException();
+        } else {
+          return record;
+        }
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to get next blob from PBF stream.", e);
+    }
+  }
 
   @Override
   public RecordDefinition getRecordDefinition() {
@@ -185,7 +198,7 @@ RecordIterator {
     }
 
     final Iterator<Integer> keysValuesIterator = nodes.getKeysValsList()
-        .iterator();
+      .iterator();
 
     DenseInfo denseInfo;
     if (nodes.hasDenseinfo()) {
@@ -245,7 +258,7 @@ RecordIterator {
         }
         if (!keysValuesIterator.hasNext()) {
           throw new RuntimeException(
-              "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
+            "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
         }
         final int valueIndex = keysValuesIterator.next();
 
@@ -299,7 +312,7 @@ RecordIterator {
   }
 
   private void processOsmHeader(final byte[] data)
-      throws InvalidProtocolBufferException {
+    throws InvalidProtocolBufferException {
     // Osmformat.HeaderBlock header = Osmformat.HeaderBlock.parseFrom(data);
     //
     // // Build the list of active and unsupported features in the file.
@@ -341,78 +354,111 @@ RecordIterator {
   }
 
   private void processOsmPrimitives(final byte[] data)
-      throws InvalidProtocolBufferException {
+    throws InvalidProtocolBufferException {
     final Osmformat.PrimitiveBlock block = Osmformat.PrimitiveBlock.parseFrom(data);
     final PbfFieldDecoder fieldDecoder = new PbfFieldDecoder(block);
 
     for (final PrimitiveGroup primitiveGroup : block.getPrimitivegroupList()) {
       processNodes(primitiveGroup.getDense(), fieldDecoder);
-      processNodes(primitiveGroup.getNodesList(), fieldDecoder);
-      processWays(primitiveGroup.getWaysList(), fieldDecoder);
+      final List<Node> nodesList = primitiveGroup.getNodesList();
+      processNodes(nodesList, fieldDecoder);
+      final List<Way> waysList = primitiveGroup.getWaysList();
+      processWays(waysList, fieldDecoder);
       // processRelations(primitiveGroup.getRelationsList(), fieldDecoder);
     }
   }
 
   private void processWays(final List<Way> ways,
     final PbfFieldDecoder fieldDecoder) {
+    final OsmWay osmWay = new OsmWay();
     // System.out.println("way");
     for (final Way way : ways) {
       final long wayId = way.getId();
-      final boolean visible = true;
-      int version = -1;
-      long changeset = -1;
-      int userId = -1;
-      long time = 0;
-      String username = "";
+      osmWay.setId(wayId);
       if (way.hasInfo()) {
         final Info info = way.getInfo();
-        version = info.getVersion();
-        changeset = info.getChangeset();
-        userId = info.getUid();
-        time = info.getTimestamp();
+
+        final int version = info.getVersion();
+        osmWay.setVersion(version);
+
+        final long changeset = info.getChangeset();
+        osmWay.setChangeset(changeset);
+
+        final int userId = info.getUid();
+        osmWay.setUid(userId);
+
+        final long time = info.getTimestamp();
+        final Date timestamp = fieldDecoder.decodeTimestamp(time);
+        osmWay.setTimestamp(timestamp);
+
         final int userSid = info.getUserSid();
         if (userSid >= 0) {
-          username = fieldDecoder.decodeString(userSid);
+          final String username = fieldDecoder.decodeString(userSid);
+          osmWay.setUser(username);
         }
       }
-      final Date timestamp = fieldDecoder.decodeTimestamp(time);
 
       final List<Integer> keysList = way.getKeysList();
       final List<Integer> valsList = way.getValsList();
       final Map<String, String> tags = getTags(keysList, valsList, fieldDecoder);
+      osmWay.setTags(tags);
 
       // Build up the list of way nodes for the way. The node ids are
       // delta encoded meaning that each id is stored as a delta against
       // the previous one.
-      long nodeId = 0;
-      final List<LineString> lines = new ArrayList<>();
+      final List<Long> nodeIds = new ArrayList<>();
       final List<Point> points = new ArrayList<>();
+      long nodeId = 0;
       for (final long nodeIdOffset : way.getRefsList()) {
         nodeId += nodeIdOffset;
+        nodeIds.add(nodeId);
+        final Point point = this.nodePoints.get(nodeId);
+
+        if (point != null) {
+          points.add(point);
+        }
+      }
+
+      if (nodeIds.size() == points.size()) {
+        final Geometry geometry = OsmConstants.WGS84_2D.lineString(points);
+        osmWay.setGeometryValue(geometry);
+        this.currentRecords.add(osmWay);
+      } else {
+        this.ways.add(osmWay);
+        this.wayNodeIds.add(nodeIds);
+      }
+    }
+  }
+
+  public Record processWaysWithMissingNodes() {
+    while (!this.ways.isEmpty()) {
+      final OsmWay way = this.ways.removeFirst();
+      final List<Long> nodeIds = this.wayNodeIds.removeFirst();
+      final List<LineString> lines = new ArrayList<>();
+      final List<Point> points = new ArrayList<>();
+      for (final Long nodeId : nodeIds) {
         final Point point = this.nodePoints.get(nodeId);
         if (point == null) {
           if (points.size() > 1) {
-            lines.add(OsmConstants.WGS84_2D.lineString(points));
+            final LineString line = OsmConstants.WGS84_2D.lineString(points);
+            lines.add(line);
           }
           points.clear();
         } else {
           points.add(point);
         }
       }
-
       if (points.size() > 1) {
-        lines.add(OsmConstants.WGS84_2D.lineString(points));
+        final LineString line = OsmConstants.WGS84_2D.lineString(points);
+        lines.add(line);
       }
       if (!lines.isEmpty()) {
         final Geometry geometry = OsmConstants.WGS84_2D.geometry(lines);
-        final OsmWay osmWay = new OsmWay(wayId, visible, version, changeset,
-          timestamp, username, userId, tags, geometry);
-        this.currentRecords.add(osmWay);
-        this.wayCount++;
-      } else {
-        this.skippedWayCount++;
+        way.setGeometryValue(geometry);
+        return way;
       }
     }
+    throw new NoSuchElementException();
   }
 
   private byte[] readBlobContent() throws IOException {
@@ -430,20 +476,20 @@ RecordIterator {
         switch (tag) {
           case 0:
             running = false;
-            break;
+          break;
           default:
             this.blobIn.skipField(tag);
             running = false;
-            break;
+          break;
           case 10:
             raw = this.blobIn.readBytes();
-            break;
+          break;
           case 16:
             rawSize = this.blobIn.readInt32();
-            break;
+          break;
           case 26:
             zlibData = this.blobIn.readBytes();
-            break;
+          break;
           case 34:
             throw new RuntimeException("LZMA not supported");
           case 42:
@@ -465,12 +511,12 @@ RecordIterator {
         }
         if (!inflater.finished()) {
           throw new RuntimeException(
-              "PBF blob contains incomplete compressed data.");
+            "PBF blob contains incomplete compressed data.");
         }
         return blobData;
       } else {
         throw new RuntimeException(
-            "PBF blob uses unsupported compression, only raw or zlib may be used.");
+          "PBF blob uses unsupported compression, only raw or zlib may be used.");
       }
     } finally {
       this.blobIn.setInputStream(null);
@@ -493,7 +539,7 @@ RecordIterator {
             return blobSize;
           default:
             this.blobHeaderIn.skipField(tag);
-            break;
+          break;
           case 10: {
             this.blobType = this.blobHeaderIn.readString();
             break;

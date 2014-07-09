@@ -42,4 +42,5 @@ public class OsmNode extends OsmElement {
     final long id = getId();
     return new OsmNodeIdentifier(id);
   }
+
 }
