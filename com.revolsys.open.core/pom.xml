@@ -32,7 +32,7 @@
         <version>2.17</version>
         <configuration>
           <includes>
-            <include>com/revolsys/jts/JtsTestSuite.java</include>
+          <include>com.revolsys.NoTest</include>
           </includes>
         </configuration>
       </plugin>

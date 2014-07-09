@@ -1,4 +1,9 @@
- <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys.open</groupId>
   <artifactId>com.revolsys.open.parent</artifactId>
@@ -124,12 +129,17 @@
           </reportPlugins>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8.1</version>
+      </plugin>
     </plugins>
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
-         <artifactId>wagon-ssh-external</artifactId>
-         <version>1.0-beta-6</version>
+        <artifactId>wagon-ssh-external</artifactId>
+        <version>1.0-beta-6</version>
       </extension>
     </extensions>
   </build>
@@ -315,12 +325,12 @@
     <repository>
       <id>revolsys-releases</id>
       <name>revolsys-releases</name>
-      <url>file:///var/www/open.revolsys.com/htdocs/m2/repository/</url>
+      <url>http://open.revolsys.com/artifactory/libs-release-local/</url>
     </repository>
     <snapshotRepository>
       <id>revolsys-snapshots</id>
       <name>revolsys-snapshots</name>
-      <url>file:///var/www/open.revolsys.com/htdocs/m2/snapshotRepository/</url>
+      <url>http://open.revolsys.com/artifactory/libs-snapshot-local/</url>
     </snapshotRepository>
   </distributionManagement>
 
