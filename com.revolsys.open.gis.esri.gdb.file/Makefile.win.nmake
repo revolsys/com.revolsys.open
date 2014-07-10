@@ -47,21 +47,21 @@ LIBS=$(DLLIBC) $(WINLIBS) FileGDBAPI.lib
 JAVA_INCLUDE="-I$(JAVA_HOME)\include" "-I$(JAVA_HOME)\include\win32"
 
 SRC_FILE=src\main\cxx\EsriFileGdb_wrap.cxx
-TARGET_OBJ=target\o\EsriFileGdbJni-$(ARCH)-winnt.obj
-TARGET_LIB=src\main\resources\native\EsriFileGdbJni-$(ARCH)-winnt.dll
+TARGET_OBJ=target\o\EsriFileGdbJni.obj
+TARGET_LIB=src\main\resources\native\winnt\$(ARCH)\EsriFileGdbJni.dll
 
 all: clean $(TARGET_LIB)
 
 clean:
-  -@ if EXIST target\o del /q target\o
-  -@ if EXIST $(TARGET_OBJ) del /q $(TARGET_OBJ)
-  -@ if NOT EXIST target\o mkdir target\o
+	-@ if EXIST target\o del /q target\o
+	-@ if EXIST $(TARGET_OBJ) del /q $(TARGET_OBJ)
+	-@ if NOT EXIST target\o mkdir target\o
 
 $(SRC_FILE):
 
 $(TARGET_OBJ): $(SRC_FILE)
-  $(CC) $(CFLAGS) $(JAVA_INCLUDE) $(INCLUDE) -I$(ESRI_FILE_GBD_INCLUDE) $(SRC_FILE) /Fo$(TARGET_OBJ)
+	$(CC) $(CFLAGS) $(JAVA_INCLUDE) $(INCLUDE) -I$(ESRI_FILE_GBD_INCLUDE) $(SRC_FILE) /Fo$(TARGET_OBJ)
 
 $(TARGET_LIB): $(TARGET_OBJ)
-  $(LINK) $(LINKFLAGS) -out:$(TARGET_LIB) $(LDIR) $(LIBS) $(TARGET_OBJ)
+	$(LINK) $(LINKFLAGS) -out:$(TARGET_LIB) $(LDIR) $(LIBS) $(TARGET_OBJ)
  
