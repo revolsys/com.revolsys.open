@@ -4,7 +4,7 @@
 
 ESRI_FILE_GBD_HOME=/opt/EsriFileGdb/1.3/${OS}/${ARCH}
 ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb/1.3/${OS}/${ARCH}/include
-JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.7.0_45.jdk/Contents/Home
+JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.7.0_60.jdk/Contents/Home
 CFG=Release
 CXX=clang++
 
@@ -24,21 +24,21 @@ ${TARGET_OBJ}: src/main/cxx/EsriFileGdb_wrap.cxx
 	mkdir -p target/o
 	clang++ \
 		${CXXFLAGS} \
-    -stdlib=libstdc++ \
+		-stdlib=libstdc++ \
 		-mmacosx-version-min=10.6 \
 		-I${ESRI_FILE_GBD_INCLUDE} \
 		-I${JAVA_HOME}/include/ \
-    -I${JAVA_HOME}/include/darwin \
+		-I${JAVA_HOME}/include/darwin \
 		-c src/main/cxx/EsriFileGdb_wrap.cxx \
 		-o ${TARGET_OBJ}
 	
 
 ${TARGET_LIB}: target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
-  mkdir -p ${TARGET_DIR}
+	mkdir -p ${TARGET_DIR}
 	clang++ \
 		${LDFLAGS} \
-    -stdlib=libstdc++ \
-    -mmacosx-version-min=10.6 \
+		-stdlib=libstdc++ \
+		-mmacosx-version-min=10.6 \
 		-O2 \
 		-fpic \
 		-shared \
@@ -47,5 +47,3 @@ ${TARGET_LIB}: target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
 		-L${ESRI_FILE_GBD_HOME}/lib/ \
 		${TARGET_OBJ} \
 		-o ${TARGET_LIB}
-	
-

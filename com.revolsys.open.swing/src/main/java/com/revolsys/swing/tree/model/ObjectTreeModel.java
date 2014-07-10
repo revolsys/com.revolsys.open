@@ -32,8 +32,6 @@ import com.revolsys.util.ExceptionUtil;
 public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   TreeExpansionListener, PropertyChangeListener {
 
-  private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<MenuFactory>();
-
   public static MenuFactory findMenu(final Class<?> clazz) {
     synchronized (CLASS_MENUS) {
       return CLASS_MENUS.find(clazz);
@@ -61,6 +59,8 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
       }
     }
   }
+
+  private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<MenuFactory>();
 
   private final ClassRegistry<ObjectTreeNodeModel<Object, Object>> classNodeModels = new ClassRegistry<ObjectTreeNodeModel<Object, Object>>();
 
@@ -122,9 +122,9 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   public void fireTreeNodesChanged(final TreePath path) {
     final TreeModelEvent event = new TreeModelEvent(this.root, path);
     if (SwingUtilities.isEventDispatchThread()) {
-      eventHandler.treeNodesChanged(event);
+      this.eventHandler.treeNodesChanged(event);
     } else {
-      Invoke.later(eventHandler, "treeNodesChanged", event);
+      Invoke.andWait(this.eventHandler, "treeNodesChanged", event);
     }
   }
 
@@ -162,11 +162,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   }
 
   protected void fireTreeStructureChanged(final TreeModelEvent treeEvent) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      this.eventHandler.treeStructureChanged(treeEvent);
-    } else {
-      Invoke.later(eventHandler, "treeStructureChanged", treeEvent);
-    }
+    Invoke.andWait(this.eventHandler, "treeStructureChanged", treeEvent);
   }
 
   @Override
@@ -302,7 +298,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     final ObjectTreeNodeModel<Object, Object> model, final Object node) {
     if (model != null) {
       model.initialize(node);
-      Invoke.later(this, "setNodeInitialized", path, node);
+      Invoke.andWait(this, "setNodeInitialized", path, node);
     }
   }
 
@@ -351,7 +347,7 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   }
 
   public boolean isVisible(final Object object) {
-    if (BooleanStringConverter.getBoolean(hiddenObjects.get(object))) {
+    if (BooleanStringConverter.getBoolean(this.hiddenObjects.get(object))) {
       return false;
     } else {
       return true;
@@ -426,14 +422,14 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
     if (root != this.root) {
       final Object oldRoot = this.root;
       this.root = root;
-      objectPathMap.clear();
-      initialized.clear();
+      this.objectPathMap.clear();
+      this.initialized.clear();
       TreeModelEvent treeEvent;
       if (root == null && oldRoot != null) {
         treeEvent = new TreeModelEvent(this, (TreePath)null);
       } else {
         final TreePath path = new TreePath(root);
-        objectPathMap.put(root, path);
+        this.objectPathMap.put(root, path);
         treeEvent = new TreeModelEvent(root, path, null, null);
       }
       fireTreeStructureChanged(treeEvent);
@@ -441,11 +437,11 @@ public class ObjectTreeModel implements TreeModel, TreeWillExpandListener,
   }
 
   public void setVisible(final Object object, final boolean visible) {
-    final boolean oldVisible = !hiddenObjects.containsKey(object);
+    final boolean oldVisible = !this.hiddenObjects.containsKey(object);
     if (visible) {
-      hiddenObjects.remove(object);
+      this.hiddenObjects.remove(object);
     } else {
-      hiddenObjects.put(object, true);
+      this.hiddenObjects.put(object, true);
     }
     if (visible != oldVisible) {
       final TreePath path = getPath(object);

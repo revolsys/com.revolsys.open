@@ -8,6 +8,11 @@
 #include "time.h"
 #include "FileGDBAPI.h"
 
+#ifdef _WIN32
+#include <stdio.h>
+_setmaxstdio(2048);
+#endif
+
 std::string wstring2string(std::wstring wstr) {
   std::string str(wstr.length(),' ');
   copy(wstr.begin(),wstr.end(),str.begin());

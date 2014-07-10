@@ -91,7 +91,11 @@ public class WeakCache<K, V> implements Map<K, V> {
   @Override
   public V remove(final Object obj) {
     final Reference<V> oldReference = this.cache.remove(obj);
-    return oldReference.get();
+    if (oldReference == null) {
+      return null;
+    } else {
+      return oldReference.get();
+    }
   }
 
   @Override

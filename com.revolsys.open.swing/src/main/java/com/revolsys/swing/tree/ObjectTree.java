@@ -28,8 +28,6 @@ import com.revolsys.util.Property;
 
 public class ObjectTree extends BaseTree implements PropertyChangeListener {
 
-  private static final long serialVersionUID = 1L;
-
   public static TreePath createTreePath(final Collection<? extends Object> path) {
     final Object[] pathArray = path.toArray();
     return new TreePath(pathArray);
@@ -46,6 +44,8 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
     final Object[] pathArray = pathList.toArray();
     return new TreePath(pathArray);
   }
+
+  private static final long serialVersionUID = 1L;
 
   private final ObjectTreeModel model;
 
@@ -97,7 +97,7 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
   }
 
   public void expandPath(final Object object) {
-    final TreePath path = model.getPath(object);
+    final TreePath path = this.model.getPath(object);
     if (path != null) {
       expandPath(path);
     }
@@ -118,16 +118,16 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
         expandPaths(expectedClasses, (PropertyChangeEvent)object);
       } else if (object != null) {
         if (JavaBeanUtil.isAssignableFrom(expectedClasses, object)) {
-          final TreePath path = model.getPath(object);
+          final TreePath path = this.model.getPath(object);
           if (path != null) {
             expandPath(object);
-            final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+            final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
             if (nodeModel != null) {
               if (nodeModel.isLeaf(object)) {
-                model.fireTreeNodesChanged(path);
+                this.model.fireTreeNodesChanged(path);
               } else {
-                for (int i = 0; i < model.getChildCount(object); i++) {
-                  final Object child = model.getChild(object, i);
+                for (int i = 0; i < this.model.getChildCount(object); i++) {
+                  final Object child = this.model.getChild(object, i);
                   expandPaths(expectedClasses, child);
                 }
               }
@@ -136,7 +136,7 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
         }
       }
     } else {
-      Invoke.later(this, "expandPaths", expectedClasses, object);
+      Invoke.andWait(this, "expandPaths", expectedClasses, object);
     }
   }
 
@@ -152,7 +152,7 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
         }
       }
     } else {
-      Invoke.later(this, "expandPaths", expectedClasses, event);
+      Invoke.andWait(this, "expandPaths", expectedClasses, event);
     }
   }
 
@@ -163,16 +163,16 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
   }
 
   public void expandPaths(final Object parent) {
-    final TreePath path = model.getPath(parent);
+    final TreePath path = this.model.getPath(parent);
     if (path != null) {
       expandPath(parent);
-      final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+      final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
       if (nodeModel != null) {
         if (nodeModel.isLeaf(parent)) {
-          model.fireTreeNodesChanged(path);
+          this.model.fireTreeNodesChanged(path);
         } else {
-          for (int i = 0; i < model.getChildCount(parent); i++) {
-            final Object child = model.getChild(parent, i);
+          for (int i = 0; i < this.model.getChildCount(parent); i++) {
+            final Object child = this.model.getChild(parent, i);
             expandPaths(child);
           }
         }
@@ -183,7 +183,7 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
   @Override
   public MenuFactory getMenuFactory(final TreePath path) {
     final Object node = path.getLastPathComponent();
-    final ObjectTreeNodeModel<Object, Object> nodeModel = model.getNodeModel(path);
+    final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
     if (nodeModel != null) {
       final MenuFactory menu = nodeModel.getMenu(node);
       return menu;
@@ -193,12 +193,12 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
 
   @Override
   public ObjectTreeModel getModel() {
-    return model;
+    return this.model;
   }
 
   @Override
   public Rectangle getPathBounds(final TreePath path) {
-    if (model.isVisible(path.getLastPathComponent())) {
+    if (this.model.isVisible(path.getLastPathComponent())) {
       return super.getPathBounds(path);
     } else {
       return null;
@@ -285,13 +285,13 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
   }
 
   public void setRoot(final Object object) {
-    final Object oldRoot = model.getRoot();
+    final Object oldRoot = this.model.getRoot();
     if (oldRoot != null) {
       collapsePath(new TreePath(oldRoot));
       clearToggledPaths();
     }
     setSelectionPath(null);
-    model.setRoot(object);
+    this.model.setRoot(object);
     if (object != null) {
       final TreePath newPath = new TreePath(object);
       setSelectionPath(newPath);
@@ -300,6 +300,6 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
   }
 
   public void setVisible(final Object object, final boolean visible) {
-    model.setVisible(object, visible);
+    this.model.setVisible(object, visible);
   }
 }

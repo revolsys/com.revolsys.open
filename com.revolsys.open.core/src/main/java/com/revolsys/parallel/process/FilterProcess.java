@@ -1,6 +1,7 @@
 package com.revolsys.parallel.process;
 
 import com.revolsys.filter.Filter;
+import com.revolsys.parallel.channel.Channel;
 
 public class FilterProcess<T> extends BaseInOutProcess<T, T> {
   private Filter<T> filter;
@@ -8,11 +9,11 @@ public class FilterProcess<T> extends BaseInOutProcess<T, T> {
   private boolean invert = false;
 
   public Filter<T> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   public boolean isInvert() {
-    return invert;
+    return this.invert;
   }
 
   protected void postAccept(final T object) {
@@ -22,10 +23,10 @@ public class FilterProcess<T> extends BaseInOutProcess<T, T> {
   }
 
   @Override
-  protected void process(final com.revolsys.parallel.channel.Channel<T> in,
-    final com.revolsys.parallel.channel.Channel<T> out, final T object) {
-    boolean accept = filter.accept(object);
-    if (invert) {
+  protected void process(final Channel<T> in, final Channel<T> out,
+    final T object) {
+    boolean accept = this.filter.accept(object);
+    if (this.invert) {
       accept = !accept;
     }
     if (accept) {

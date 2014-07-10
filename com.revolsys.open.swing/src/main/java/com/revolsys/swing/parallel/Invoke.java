@@ -27,54 +27,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class Invoke {
-  private static PropertyChangeListener PROPERTY_CHANGE_LISTENER = new PropertyChangeListener() {
-    @Override
-    public synchronized void propertyChange(final PropertyChangeEvent event) {
-      final SwingWorker<?, ?> worker = (SwingWorker<?, ?>)event.getSource();
-      if (event.getPropertyName().equals("state")) {
-        if (event.getNewValue().equals(StateValue.STARTED)) {
-          final List<SwingWorker<?, ?>> oldRunningWorkers = getRunningWorkers();
-          if (!CollectionUtil.containsReference(RUNNING_WORKERS, worker)) {
-            RUNNING_WORKERS.add(new WeakReference<SwingWorker<?, ?>>(worker));
-          }
-          PROPERTY_CHANGE_SUPPORT.firePropertyChange("runningWorkers",
-            oldRunningWorkers, RUNNING_WORKERS);
-          return;
-        }
-      }
-      if (worker.isCancelled() || worker.isDone()) {
-        try {
-          final List<SwingWorker<?, ?>> oldRunningWorkers = getRunningWorkers();
-          CollectionUtil.removeReference(RUNNING_WORKERS, worker);
-          PROPERTY_CHANGE_SUPPORT.firePropertyChange("runningWorkers",
-            oldRunningWorkers, RUNNING_WORKERS);
-        } finally {
-          try {
-            final List<SwingWorker<?, ?>> oldWorkers = getWorkers();
-            synchronized (WORKERS) {
-              CollectionUtil.removeReference(WORKERS, worker);
-            }
-            PROPERTY_CHANGE_SUPPORT.firePropertyChange("workers", oldWorkers,
-              WORKERS);
-          } finally {
-            worker.removePropertyChangeListener(this);
-          }
-        }
-      }
-    }
-  };
-
-  private static final PropertyChangeSupport PROPERTY_CHANGE_SUPPORT = new PropertyChangeSupport(
-    Invoke.class);
-
-  private static final List<WeakReference<SwingWorker<?, ?>>> WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
-
-  private static final List<WeakReference<SwingWorker<?, ?>>> RUNNING_WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
-
-  public static void andWait(final Object object, final String methodName,
-    final Object... parameters) {
-    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
-      methodName, parameters);
+  public static void andWait(final InvokeMethodRunnable runnable) {
     if (SwingUtilities.isEventDispatchThread()) {
       runnable.run();
     } else {
@@ -86,6 +39,13 @@ public class Invoke {
         ExceptionUtil.throwCauseException(e);
       }
     }
+  }
+
+  public static void andWait(final Object object, final String methodName,
+    final Object... parameters) {
+    final InvokeMethodRunnable runnable = new InvokeMethodRunnable(object,
+      methodName, parameters);
+    andWait(runnable);
   }
 
   public static void background(final Runnable backgroundTask) {
@@ -103,7 +63,7 @@ public class Invoke {
     final Object object, final String backgroundMethodName,
     final List<Object> parameters) {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
-      description, object, backgroundMethodName, parameters);
+        description, object, backgroundMethodName, parameters);
     worker(worker);
     return worker;
   }
@@ -112,7 +72,7 @@ public class Invoke {
     final Object object, final String backgroundMethodName,
     final Object... parameters) {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
-      description, object, backgroundMethodName, Arrays.asList(parameters));
+        description, object, backgroundMethodName, Arrays.asList(parameters));
     worker(worker);
     return worker;
   }
@@ -169,11 +129,11 @@ public class Invoke {
         } catch (final InvocationTargetException e) {
           LoggerFactory.getLogger(getClass()).error(
             "Error invoking method " + method + " "
-              + Arrays.toString(parameters), e.getTargetException());
+                + Arrays.toString(parameters), e.getTargetException());
         } catch (final Throwable e) {
           LoggerFactory.getLogger(getClass()).error(
             "Error invoking method " + method + " "
-              + Arrays.toString(parameters), e);
+                + Arrays.toString(parameters), e);
         }
       }
     });
@@ -200,8 +160,8 @@ public class Invoke {
     final String doneMethodName,
     final Collection<? extends Object> doneMethodParameters) {
     final SwingWorker<?, ?> worker = new InvokeMethodSwingWorker<Object, Object>(
-      description, object, backgroundMethodName, backgrounMethodParameters,
-      doneMethodName, doneMethodParameters);
+        description, object, backgroundMethodName, backgrounMethodParameters,
+        doneMethodName, doneMethodParameters);
     worker(worker);
     return worker;
   }
@@ -218,6 +178,50 @@ public class Invoke {
     worker.addPropertyChangeListener(PROPERTY_CHANGE_LISTENER);
     worker.execute();
   }
+
+  private static PropertyChangeListener PROPERTY_CHANGE_LISTENER = new PropertyChangeListener() {
+    @Override
+    public synchronized void propertyChange(final PropertyChangeEvent event) {
+      final SwingWorker<?, ?> worker = (SwingWorker<?, ?>)event.getSource();
+      if (event.getPropertyName().equals("state")) {
+        if (event.getNewValue().equals(StateValue.STARTED)) {
+          final List<SwingWorker<?, ?>> oldRunningWorkers = getRunningWorkers();
+          if (!CollectionUtil.containsReference(RUNNING_WORKERS, worker)) {
+            RUNNING_WORKERS.add(new WeakReference<SwingWorker<?, ?>>(worker));
+          }
+          PROPERTY_CHANGE_SUPPORT.firePropertyChange("runningWorkers",
+            oldRunningWorkers, RUNNING_WORKERS);
+          return;
+        }
+      }
+      if (worker.isCancelled() || worker.isDone()) {
+        try {
+          final List<SwingWorker<?, ?>> oldRunningWorkers = getRunningWorkers();
+          CollectionUtil.removeReference(RUNNING_WORKERS, worker);
+          PROPERTY_CHANGE_SUPPORT.firePropertyChange("runningWorkers",
+            oldRunningWorkers, RUNNING_WORKERS);
+        } finally {
+          try {
+            final List<SwingWorker<?, ?>> oldWorkers = getWorkers();
+            synchronized (WORKERS) {
+              CollectionUtil.removeReference(WORKERS, worker);
+            }
+            PROPERTY_CHANGE_SUPPORT.firePropertyChange("workers", oldWorkers,
+              WORKERS);
+          } finally {
+            worker.removePropertyChangeListener(this);
+          }
+        }
+      }
+    }
+  };
+
+  private static final PropertyChangeSupport PROPERTY_CHANGE_SUPPORT = new PropertyChangeSupport(
+    Invoke.class);
+
+  private static final List<WeakReference<SwingWorker<?, ?>>> WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
+
+  private static final List<WeakReference<SwingWorker<?, ?>>> RUNNING_WORKERS = new ArrayList<WeakReference<SwingWorker<?, ?>>>();
 
   private Invoke() {
   }
