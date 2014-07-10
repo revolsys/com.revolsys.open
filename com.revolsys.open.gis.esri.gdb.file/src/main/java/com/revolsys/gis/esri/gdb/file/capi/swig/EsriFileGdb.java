@@ -53,4 +53,8 @@ public class EsriFileGdb {
       Geodatabase.getCPtr(geodatabase), geodatabase);
   }
 
+  public static void setMaxOpenFiles(final int maxOpenFiles) {
+    EsriFileGdbJNI.setMaxOpenFiles(maxOpenFiles);
+  }
+
 }

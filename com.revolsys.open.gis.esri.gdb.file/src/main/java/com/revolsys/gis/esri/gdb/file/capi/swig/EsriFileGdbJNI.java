@@ -402,6 +402,8 @@ public class EsriFileGdbJNI {
   public final static native void Row_setXML(long jarg1, Row jarg1_,
     String jarg2, String jarg3);
 
+  public final static native void setMaxOpenFiles(int jarg1);
+
   public final static native int SpatialReference_getId(long jarg1,
     SpatialReference jarg1_);
 
@@ -622,5 +624,6 @@ public class EsriFileGdbJNI {
 
   static {
     ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
+    EsriFileGdb.setMaxOpenFiles(2048);
   }
 }

@@ -5,13 +5,9 @@
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
+#include <stdio.h>
 #include "time.h"
 #include "FileGDBAPI.h"
-
-#ifdef _WIN32
-#include <stdio.h>
-_setmaxstdio(2048);
-#endif
 
 std::string wstring2string(std::wstring wstr) {
   std::string str(wstr.length(),' ');
@@ -58,6 +54,7 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %pragma(java) jniclasscode=%{
   static {
     ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
+    EsriFileGdb.setMaxOpenFiles(2048);
   }
 %}
 %define EXT_FILEGDB_API
@@ -128,6 +125,13 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 %newobject createGeodatabase;
 %newobject openGeodatabase;
 %inline {
+ 
+  void setMaxOpenFiles(int maxOpenFiles) {
+#ifdef _WIN32
+    _setmaxstdio(maxOpenFiles);
+#endif
+  }
+  
   FileGDBAPI::Geodatabase* createGeodatabase(const std::wstring& path) {
     FileGDBAPI::Geodatabase* value = new FileGDBAPI::Geodatabase();
     checkResult(FileGDBAPI::CreateGeodatabase(path, *value));

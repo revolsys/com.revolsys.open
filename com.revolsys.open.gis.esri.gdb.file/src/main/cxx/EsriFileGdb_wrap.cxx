@@ -215,13 +215,9 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
+#include <stdio.h>
 #include "time.h"
 #include "FileGDBAPI.h"
-
-#ifdef _WIN32
-#include <stdio.h>
-_setmaxstdio(2048);
-#endif
 
 std::string wstring2string(std::wstring wstr) {
   std::string str(wstr.length(),' ');
@@ -359,6 +355,13 @@ template<class T> class ArrayOut {
 };
 
 
+ 
+  void setMaxOpenFiles(int maxOpenFiles) {
+
+
+
+  }
+  
   FileGDBAPI::Geodatabase* createGeodatabase(const std::wstring& path) {
     FileGDBAPI::Geodatabase* value = new FileGDBAPI::Geodatabase();
     checkResult(FileGDBAPI::CreateGeodatabase(path, *value));
@@ -1372,6 +1375,24 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       delete arg1;;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
+    } catch (const std::exception& e) {
+      handleException(jenv, e);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_setMaxOpenFiles(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  int arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  {
+    try {
+      setMaxOpenFiles(arg1);;
     } catch (const std::runtime_error& e) {
       handleException(jenv, e);
     } catch (const std::exception& e) {
