@@ -144,7 +144,8 @@ public class GmlGeometryIterator extends AbstractIterator<Geometry> implements
   protected Geometry getNext() {
     try {
       while (StaxUtils.skipToStartElements(in, ENVELOPE_AND_GEOMETRY_TYPE_NAMES)) {
-        if (in.getName().equals(ENVELOPE)) {
+        QName name = in.getName();
+        if (name.equals(ENVELOPE)) {
           geometryFactory = getGeometryFactory(geometryFactory);
           StaxUtils.skipToEndElement(in, ENVELOPE);
         } else {
